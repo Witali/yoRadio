@@ -24,11 +24,11 @@ def main():
     capture=DiagnosticCapture(args.serial_port)
     suite=Suite(board,'',{},capture,args.output)
     try:
-        started=time.monotonic()
+        started=time.perf_counter()
         deadline=started+args.quiet_seconds
-        while time.monotonic()<deadline:
-            time.sleep(max(0,min(10,deadline-time.monotonic())))
-        report.data['quiet_window']=dict(started_at=started,ended_at=time.monotonic(),http_polls=0)
+        while time.perf_counter()<deadline:
+            time.sleep(max(0,min(10,deadline-time.perf_counter())))
+        report.data['quiet_window']=dict(started_at=started,ended_at=time.perf_counter(),http_polls=0)
         def polled():
             samples=suite.observe(12,'polled-idle')
             require(all(not s['audio'] for s in samples),'Unexpected audio during idle measurement')

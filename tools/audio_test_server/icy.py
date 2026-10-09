@@ -66,6 +66,7 @@ class IcyServer:
                     self.send_error(404)
                     return
                 event = dict(case=name, audio_bytes=0, metadata_bytes=0, blocks=0,
+                             clock='time.perf_counter',
                              metadata_requested=self.headers.get('Icy-MetaData') == '1')
                 outer.events.append(event)
                 self.send_response(200)
@@ -73,11 +74,11 @@ class IcyServer:
                 self.send_header('icy-metaint', str(INTERVAL))
                 self.send_header('Connection', 'close')
                 self.end_headers()
-                started = time.monotonic()
+                started = time.perf_counter()
                 bps = len(fixture['data']) / fixture['seconds'] * 1.02
                 try:
                     for audio, metadata in stream_blocks(fixture['data'], programs[name][0]):
-                        if outer.closed.is_set() or time.monotonic() - started > 30:
+                        if outer.closed.is_set() or time.perf_counter() - started > 30:
                             return
                         self.wfile.write(audio)
                         # Deliberately split the length, key and a title byte.
@@ -87,13 +88,13 @@ class IcyServer:
                         event['audio_bytes'] += len(audio)
                         event['metadata_bytes'] += len(metadata)
                         event['blocks'] += 1
-                        if outer.closed.wait(max(0, started + event['audio_bytes'] / bps - time.monotonic())):
+                        if outer.closed.wait(max(0, started + event['audio_bytes'] / bps - time.perf_counter())):
                             return
                 except (BrokenPipeError, ConnectionError, TimeoutError, OSError):
                     pass
                 finally:
                     self.close_connection = True
-                    event['seconds'] = time.monotonic() - started
+                    event['seconds'] = time.perf_counter() - started
 
         self.http = ThreadingHTTPServer((host, port), Handler)
         self.http.daemon_threads = True

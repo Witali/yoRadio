@@ -98,8 +98,8 @@ class RecordTests(unittest.TestCase):
                             received.extend(chunk)
                 _, audio = bytes(received).split(b'\r\n\r\n', 1)
                 event = server.events[0]
-                deadline = time.monotonic()+1
-                while 'ended_at' not in event and time.monotonic() < deadline:
+                deadline = time.perf_counter()+1
+                while 'ended_at' not in event and time.perf_counter() < deadline:
                     time.sleep(.005)
                 self.assertTrue(event['complete'])
                 self.assertEqual(event['pacing_ratio'], ratio)
@@ -126,7 +126,7 @@ class RecordTests(unittest.TestCase):
             with socket.create_connection(('127.0.0.1', server.server.server_address[1]), timeout=5) as plain:
                 with context.wrap_socket(plain, server_hostname='127.0.0.1') as secure:
                     secure.sendall(b'GET /small/fixture HTTP/1.1\r\nHost: localhost\r\n\r\n')
-                    deadline = time.monotonic()+2
+                    deadline = time.perf_counter()+2
                     while True:
                         self.assertTrue(secure.recv(4096))
                         snapshot = capture_record_observation(server.events)
@@ -134,11 +134,11 @@ class RecordTests(unittest.TestCase):
                             evidence = record_evidence(snapshot['events'], 'small')
                             break
                         except AssertionError:
-                            self.assertLess(time.monotonic(), deadline)
+                            self.assertLess(time.perf_counter(), deadline)
                     count = len(snapshot['events'][0]['records'])
                     while len(server.events[0]['records']) <= count:
                         self.assertTrue(secure.recv(4096))
-                        self.assertLess(time.monotonic(), deadline)
+                        self.assertLess(time.perf_counter(), deadline)
             self.assertGreater(len(server.events[0]['records']), count)
             self.assertEqual(len(snapshot['events'][0]['records']), count)
             self.assertEqual(record_evidence(snapshot['events'], 'small'), evidence)

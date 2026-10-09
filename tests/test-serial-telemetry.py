@@ -6,12 +6,14 @@ import threading
 import unittest
 from unittest.mock import patch
 import itertools
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools/esp32c3_tests'))
 from run import Capture
 from diagnostic import DiagnosticCapture
 from transport import DiagnosticCapture as TransportCapture
 from serial_lines import serial_lines
+from staged_dma import summarize
 
 
 class Port:
@@ -36,6 +38,25 @@ class Port:
 
 
 class SerialTelemetry(unittest.TestCase):
+    def test_sub_tick_dma_samples_keep_distinct_timestamps(self):
+        # The old Windows monotonic source assigns these separate events the
+        # same 15.625 ms tick. The strict replay must accept real 4 ms spacing,
+        # without assigning invented increments or relaxing duplicate checks.
+        for cls in (Capture, DiagnosticCapture, TransportCapture):
+            ticks = iter((100., 100.004, 100.008))
+            clock = SimpleNamespace(monotonic=lambda: 100.,
+                                    perf_counter=lambda: next(ticks))
+            payload = ''.join(
+                f'I: PERF STAGED_DMA: q_overruns=0 writes={n} '
+                f'written_bytes={2048*n} write_us={100*n} max_write_us=100 errors=0\n'
+                for n in (1, 2, 3)).encode()
+            with patch.object(sys.modules[cls.__module__], 'time', clock):
+                cap = self.capture(cls, [payload])
+            result = summarize(cap.rows, 100., 100.009)
+            self.assertTrue(result['coverage_complete'])
+            self.assertEqual(result['delta']['writes'], 2)
+            self.assertAlmostEqual(result['observed_seconds'], .008)
+
     def capture(self, cls, chunks):
         cap = cls.__new__(cls)
         cap.rows, cap.closed = [], threading.Event()
@@ -94,7 +115,7 @@ class SerialTelemetry(unittest.TestCase):
     def test_requested_shutdown_without_newline_still_fails(self):
         closed = threading.Event()
         port = Port([b'PERF partial'], closed)
-        with patch('serial_lines.time.monotonic', side_effect=itertools.count(0, .1)):
+        with patch('serial_lines.time.perf_counter', side_effect=itertools.count(0, .1)):
             self.assertEqual(list(serial_lines(port, closed)),
                              ['serial capture interrupted: incomplete final line'])
         self.assertLess(len(port.read_sizes), 10)

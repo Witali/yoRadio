@@ -15,7 +15,7 @@ FULL=dict(audio=True,pcm_sample_rate=44100,pcm_channels=2,bits_per_sample=16,
 
 class Clock:
     def __init__(self): self.now=0
-    def monotonic(self): return self.now
+    def perf_counter(self): return self.now
     def sleep(self,seconds): self.now+=seconds
 
 

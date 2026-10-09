@@ -20,7 +20,7 @@ class Clock:
     def __init__(self, stop_at=float('inf')):
         self.now, self.stop_at = 100., stop_at
         self.stopped = threading.Event()
-    def monotonic(self): return self.now
+    def perf_counter(self): return self.now
     def is_set(self): return self.stopped.is_set()
     def set(self): self.stopped.set()
     def wait(self, seconds):
@@ -60,8 +60,8 @@ class PauseTests(unittest.TestCase):
             original(stats, ended); finished.set()
         def write(stats, size, *args):
             writes.append(size); return original_write(stats, size, *args)
-        with patch('audio_test_server.server.time', SimpleNamespace(monotonic=clock.monotonic)), \
-             patch('audio_test_server.server.perf_counter', clock.monotonic), \
+        with patch('audio_test_server.server.time', SimpleNamespace(perf_counter=clock.perf_counter)), \
+             patch('audio_test_server.server.perf_counter', clock.perf_counter), \
              patch.object(DeliveryStats, 'finish', finish), patch.object(DeliveryStats, 'write', write):
             with Server('127.0.0.1', 0, {'sample':spec}, delivery_pauses=schedule,
                         unpaced_files=unpaced, pacing_ratio=1., delivery_stats=True) as server:
@@ -128,9 +128,14 @@ class PauseTests(unittest.TestCase):
                                 delivery_pauses=[(1025,.05),(3073,.05)], send_buffer_bytes=4096) as server:
                         context = ssl.create_default_context(cafile=str(keys['ca'])) if secure else None
                         scheme = 'https' if secure else 'http'
+                        before = time.perf_counter()
                         with urlopen(f'{scheme}://127.0.0.1:{server.http.server_port}/file/sample', context=context, timeout=3) as response:
                             self.assertEqual(response.read(), data)
+                        after = time.perf_counter()
                         event = server.events[0]
+                        self.assertEqual(event['clock'], 'time.perf_counter')
+                        self.assertTrue(all(before <= r['started_at'] < r['ended_at'] <= after
+                                            for r in event['pauses']))
                         self.assertEqual(event['sent'], len(data))
                         self.assertEqual(event['send_buffer_requested'], 4096)
                         self.assertGreater(event['send_buffer_actual'], 0)

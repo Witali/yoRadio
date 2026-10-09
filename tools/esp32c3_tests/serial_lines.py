@@ -13,8 +13,8 @@ def serial_lines(port, closed):
             if not pending:
                 return
             if close_deadline is None:
-                close_deadline = time.monotonic() + FINAL_LINE_GRACE_SECONDS
-            if time.monotonic() >= close_deadline:
+                close_deadline = time.perf_counter() + FINAL_LINE_GRACE_SECONDS
+            if time.perf_counter() >= close_deadline:
                 yield 'serial capture interrupted: incomplete final line'
                 return
         try:

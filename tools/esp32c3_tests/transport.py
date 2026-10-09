@@ -23,7 +23,7 @@ class DiagnosticCapture(Capture):
         for line in serial_lines(self.port, self.closed):
             if re.search(r'PERF |Memory .*: free=|Wi-Fi power save:|decode (?:error|failed)|'
                          r'allocation failed|assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted', line):
-                self.rows.append(dict(at=time.monotonic(), line=line))
+                self.rows.append(dict(at=time.perf_counter(), line=line))
 
 
 def main():

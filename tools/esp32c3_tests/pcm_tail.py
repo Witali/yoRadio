@@ -87,13 +87,13 @@ def main():
     def play(name,origin):
         nonlocal previous
         board.stop();time.sleep(.1)
-        started=time.monotonic()
+        started=time.perf_counter()
         observation=dict(name=name,protocol=origin.split(':',1)[0],started_at=started)
         observations.append(observation)
         board.play(origin+'/file/'+name,'flac')
         deadline=started+8
         terminals=[]
-        while time.monotonic()<deadline:
+        while time.perf_counter()<deadline:
             rows=capture.since(started)
             check_file_runtime(rows)
             terminals=terminal_records(rows)
@@ -104,8 +104,8 @@ def main():
         observation['terminal']=current
         require(current['completion']==END_OF_FILE and current['result']==0,'Short-file EOF failed')
         state=board.status()
-        deadline=time.monotonic()+2
-        while state['audio'] and time.monotonic()<deadline:
+        deadline=time.perf_counter()+2
+        while state['audio'] and time.perf_counter()<deadline:
             time.sleep(.05);state=board.status()
         require(not state['audio'],'Playback status remained active after EOF submission')
         evidence=dict(warmup=True) if previous is None else check_submission(previous,current,

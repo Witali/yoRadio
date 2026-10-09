@@ -36,9 +36,9 @@ class Capture:
         for line in serial_lines(self.port, self.closed):
             tls = filter_tls_line(line)
             if tls:
-                self.rows.append(dict(at=time.monotonic(), line=tls))
+                self.rows.append(dict(at=time.perf_counter(), line=tls))
             elif re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted|task_wdt: Task watchdog got triggered|^(?:ESP-ROM:|rst:|waiting for download)', line):
-                self.rows.append(dict(at=time.monotonic(), line=line))
+                self.rows.append(dict(at=time.perf_counter(), line=line))
 
     def since(self, at):
         return [r for r in self.rows if r['at'] >= at]
@@ -63,14 +63,14 @@ class Suite:
         return (origin or self.origin).rstrip('/') + '/' + mode + '/' + name
 
     def observe(self, seconds, name, interval=.4):
-        start = time.monotonic()
+        start = time.perf_counter()
         samples = []
         batch = dict(case=name, started_at=start, samples=samples)
         try:
-            while time.monotonic() - start < seconds:
-                requested = time.monotonic()
+            while time.perf_counter() - start < seconds:
+                requested = time.perf_counter()
                 state = self.board.status()
-                row = dict(seconds=time.monotonic() - start, request_ms=(time.monotonic()-requested)*1000, **state)
+                row = dict(seconds=time.perf_counter() - start, request_ms=(time.perf_counter()-requested)*1000, **state)
                 samples.append(row)
                 if self.checkpoint:
                     self.checkpoint(self.observations, batch)
@@ -80,10 +80,10 @@ class Suite:
             # or exception text that could contain station/credential details.
             batch['interrupted'] = type(error).__name__
             batch['exception_chain'] = exception_details(error)
-            batch['elapsed_seconds'] = time.monotonic() - start
+            batch['elapsed_seconds'] = time.perf_counter() - start
             raise
         finally:
-            batch['ended_at'] = time.monotonic()
+            batch['ended_at'] = time.perf_counter()
             self.observations.append(batch)
             (self.output / 'status.json').write_text(json.dumps(self.observations, indent=2)+'\n', encoding='utf-8')
         return samples
@@ -95,7 +95,7 @@ class Suite:
 
     def file(self, name, hint='auto', origin=None, mode='file'):
         spec = self.specs[name]
-        started = time.monotonic()
+        started = time.perf_counter()
         self.start(name, mode, hint, origin)
         try:
             samples = self.observe(max(7, spec['seconds']-3), name)
@@ -163,8 +163,8 @@ class Suite:
                     'EOF state was replaced by stale PCM metadata or a decode error')
             with self.board.websocket() as ws:
                 ws.send('getindex')
-                deadline = time.monotonic()+5
-                while time.monotonic() < deadline:
+                deadline = time.perf_counter()+5
+                while time.perf_counter() < deadline:
                     message = json.loads(ws.recv(timeout=5))
                     values = {p['id']:p['value'] for p in message.get('payload',[])}
                     if 'fmt' in values:
@@ -187,8 +187,8 @@ class Suite:
             for reconnect in range(2):
                 with self.board.websocket() as ws:
                     ws.send('getindex')
-                    deadline = time.monotonic()+5
-                    while time.monotonic() < deadline:
+                    deadline = time.perf_counter()+5
+                    while time.perf_counter() < deadline:
                         message = json.loads(ws.recv(timeout=5))
                         values = {p['id']:p['value'] for p in message.get('payload',[])}
                         if 'fmt' in values:
@@ -205,7 +205,7 @@ class Suite:
         if not origin or server is None:
             raise Blocked('Provide untrusted --https-origin and --tls-cert/key to capture handshake rejection')
         first_event = len(server.events)
-        started = time.monotonic()
+        started = time.perf_counter()
         self.start('lc-48000-stereo',hint='aac',origin=origin)
         samples = self.observe(12,'untrusted-tls')
         require(not any(s['audio'] for s in samples), 'Untrusted TLS connection was accepted')
@@ -222,14 +222,14 @@ class Suite:
     def boot_time(self):
         self.board.stop()
         self.board.reboot()
-        started = time.monotonic()
+        started = time.perf_counter()
         unavailable = False
         deadline = started+45
-        while time.monotonic() < deadline:
+        while time.perf_counter() < deadline:
             try:
                 state = self.board.status()
                 if unavailable and state.get('network') == 'client':
-                    return dict(ready_ms=(time.monotonic()-started)*1000,
+                    return dict(ready_ms=(time.perf_counter()-started)*1000,
                                 metric='reboot acknowledgement to HTTP client-mode response')
             except (OSError,ValueError,TimeoutError):
                 unavailable = True
@@ -241,7 +241,7 @@ class Suite:
             raise Blocked('Settled heap test requires --serial-port and profiling firmware')
         if stop:
             self.board.stop()
-        started = time.monotonic()
+        started = time.perf_counter()
         self.observe(12, 'settled-idle')
         result = []
         for row in self.capture.since(started):
@@ -279,9 +279,9 @@ class Suite:
         mode = 'stream' if spec['codec'] == 'aac' else 'file'
         if mode == 'file' and spec['seconds'] < seconds+3:
             raise Blocked('Generate a continuous fixture at least 3 s longer than this test')
-        runtime_started = time.monotonic()
+        runtime_started = time.perf_counter()
         self.start(name, mode, spec['codec'], origin)
-        started = time.monotonic()
+        started = time.perf_counter()
         try:
             samples = self.observe(seconds, ('load:' if load else 'soak:') + name,
                                    interval=.1 if load else 1)
@@ -293,7 +293,7 @@ class Suite:
                             serial_capture_enabled=self.capture.port is not None)
             if cpu:
                 evidence.update(check_cpu(self.capture.since(started+10), max_busy=self.cpu_budget,
-                                          start=started+10, end=time.monotonic()))
+                                          start=started+10, end=time.perf_counter()))
                 evidence['cpu_budget_percent'] = self.cpu_budget
             return evidence
         finally:
@@ -447,8 +447,8 @@ def main():
             if not args.leave_stopped:
                 board.reboot()
                 time.sleep(3)
-                deadline = time.monotonic()+40
-                while time.monotonic() < deadline:
+                deadline = time.perf_counter()+40
+                while time.perf_counter() < deadline:
                     try:
                         require(board.info()['app_elf_sha256'] == info['app_elf_sha256'], 'Unexpected firmware after test')
                         return dict(rebooted=True)

@@ -51,18 +51,18 @@ def main():
         return values
 
     def phase(name, seconds, warmup):
-        started = time.monotonic()
+        started = time.perf_counter()
         try:
             samples = suite.observe(seconds, name, interval=.1)
             result = check_playback(samples, spec, minimum=int(seconds*.6), warmup=warmup)
             require(max(s['request_ms'] for s in samples) < 2000, 'WebUI response exceeded 2 s')
             result.update(check_cpu(capture.since(started+warmup), max_busy=args.max_cpu_busy, start=started+warmup,
-                                    end=time.monotonic()))
+                                    end=time.perf_counter()))
             result['max_http_ms'] = max(s['request_ms'] for s in samples)
             return result
         finally:
             report.data['windows'].append(dict(name=name, start=started, warmup=warmup,
-                                                end=time.monotonic()))
+                                                end=time.perf_counter()))
 
     try:
         report.case('idle-before', checkpoint)

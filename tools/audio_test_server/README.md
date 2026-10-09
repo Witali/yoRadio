@@ -207,8 +207,14 @@ Events record both the requested and actual OS value. This reduces host
 buffering but does not eliminate in-flight TCP/TLS bytes or receiver queues.
 A host send pause is **not proof of an equal pause at the board**. Correlate
 these events with decoder-input, DMA and playback observations. Event start/
-end timestamps use the existing monotonic clock; pause elapsed durations
-use the higher-resolution `perf_counter` clock, without mixing their epochs.
+end timestamps, durations and pacing deadlines use `time.perf_counter()`.
+The C3 controllers, serial captures and HTTP/OTA tracing use the same clock;
+server events identify it explicitly. On the tested Windows/Python 3.12 host
+this uses QueryPerformanceCounter with 100 ns reported resolution, avoiding
+the old `time.monotonic()` source's 15.625 ms ticks. Resolution is not a claim
+of USB or network timestamp accuracy. Custom controllers must use the same
+clock; do not compare these timestamps with historical monotonic timestamps
+or rewrite old reports to match the new epoch.
 
 Run `python tests/test-audio-delivery-stats.py` for delay accounting, overflow,
 and real localhost HTTP payload comparisons with timing enabled/disabled.

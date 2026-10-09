@@ -51,8 +51,8 @@ class FramingTests(unittest.TestCase):
                             else:
                                 self.assertNotIn(b'Content-Length:', header)
                                 self.assertNotIn(b'Transfer-Encoding:', header)
-                        deadline = time.monotonic()+2
-                        while 'ended_at' not in server.events[before] and time.monotonic()<deadline:
+                        deadline = time.perf_counter()+2
+                        while 'ended_at' not in server.events[before] and time.perf_counter()<deadline:
                             time.sleep(.01)
                         self.assertEqual(len(server.events), before+1)
                         event = server.events[before]

@@ -16,7 +16,7 @@ from audio_test_server.tls_records import (RecordServer, MAX_OBSERVATION_SECONDS
 
 
 def capture_record_observation(events):
-    return dict(captured_at=time.monotonic(), events=copy.deepcopy(events))
+    return dict(captured_at=time.perf_counter(), events=copy.deepcopy(events))
 
 
 def record_evidence(events, mode):
@@ -95,7 +95,7 @@ def main():
         board.stop()
         time.sleep(.8)
         before = len(server.events)
-        started = time.monotonic()
+        started = time.perf_counter()
         try:
             board.play(f'https://{args.host}:8772/{mode}/{args.case}', 'aac')
             samples = suite.observe(args.seconds, 'tls-record:'+mode, interval=.1)
@@ -112,7 +112,7 @@ def main():
             if mode == 'grow':
                 require(first_pcm < record['first_large_at'], 'Record grew before full-rate decoder playback began')
             no_runtime_faults(capture.since(started))
-            cpu = check_cpu(capture.since(started), max_busy=None, start=started, end=time.monotonic())
+            cpu = check_cpu(capture.since(started), max_busy=None, start=started, end=time.perf_counter())
             require(max(s['request_ms'] for s in samples) < 2000, 'WebUI response exceeded two seconds')
             return dict(**playback, **record, **cpu, first_full_pcm_seconds=first_pcm-started)
         finally:

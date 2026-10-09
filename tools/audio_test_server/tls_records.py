@@ -36,7 +36,7 @@ class Channel:
                 break
             if len(self.event['records']) < 4096:
                 self.event['records'].append(dict(phase=self.phase, type=self.pending[0],
-                    wire_payload_bytes=length, at=time.monotonic()))
+                    wire_payload_bytes=length, at=time.perf_counter()))
             else:
                 self.event['dropped_records'] += 1
             del self.pending[:length + 5]
@@ -85,7 +85,7 @@ class Channel:
         if written != len(payload):
             raise ValueError('TLS write was partial')
         if len(self.event['writes']) < 4096:
-            self.event['writes'].append(dict(phase=phase, plaintext_bytes=written, at=time.monotonic()))
+            self.event['writes'].append(dict(phase=phase, plaintext_bytes=written, at=time.perf_counter()))
         else:
             self.event['dropped_writes'] += 1
 
@@ -128,7 +128,7 @@ class RecordServer:
             def handle(self):
                 event = dict(records=[], writes=[], dropped_records=0, dropped_writes=0,
                              completed_socket_bytes=0, audio_bytes=0, complete=False,
-                             pacing_ratio=pacing_ratio)
+                             pacing_ratio=pacing_ratio, clock='time.perf_counter')
                 outer.events.append(event)
                 self.request.settimeout(10)
                 channel = Channel(self.request, context, event)
@@ -146,13 +146,13 @@ class RecordServer:
                     event.update(mode=mode, fixture=name, fixture_sha256=spec['sha256'])
                     headers = ('HTTP/1.1 200 OK\r\nContent-Type: audio/aac\r\nConnection: close\r\n\r\n').encode()
                     channel.write(headers, 'headers')
-                    started = time.monotonic()
+                    started = time.perf_counter()
                     event['started_at'] = started
                     data, offset, index = spec['data'], 0, 0
                     bps = len(data) / spec['seconds'] * pacing_ratio
                     event['target_audio_bytes_per_second'] = bps
-                    while not outer.closed.is_set() and time.monotonic() - started < seconds:
-                        large = mode == 'large' or mode == 'grow' and time.monotonic() - started >= grow_seconds or mode == 'alternate' and index % 2
+                    while not outer.closed.is_set() and time.perf_counter() - started < seconds:
+                        large = mode == 'large' or mode == 'grow' and time.perf_counter() - started >= grow_seconds or mode == 'alternate' and index % 2
                         count = MAX_RECORD_PLAINTEXT if large else SMALL_RECORD_PLAINTEXT
                         payload = bytearray()
                         while len(payload) < count:
@@ -162,7 +162,7 @@ class RecordServer:
                         channel.write(payload, 'body-large' if large else 'body-small')
                         event['audio_bytes'] += count
                         index += 1
-                        if outer.closed.wait(max(0, started + event['audio_bytes'] / bps - time.monotonic())):
+                        if outer.closed.wait(max(0, started + event['audio_bytes'] / bps - time.perf_counter())):
                             return
                     channel.close_write()
                     event['complete'] = True
@@ -172,7 +172,7 @@ class RecordServer:
                 except (OSError, EOFError, ValueError) as error:
                     event['error'] = type(error).__name__
                 finally:
-                    event['ended_at'] = time.monotonic()
+                    event['ended_at'] = time.perf_counter()
 
         class Server(socketserver.ThreadingTCPServer):
             allow_reuse_address = True

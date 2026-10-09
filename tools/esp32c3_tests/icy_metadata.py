@@ -15,8 +15,8 @@ from audio_test_server.icy import IcyServer, PROGRAMS
 def web_snapshot(board):
     with board.websocket() as ws:
         ws.send('getindex')
-        deadline = time.monotonic() + 5
-        while time.monotonic() < deadline:
+        deadline = time.perf_counter() + 5
+        while time.perf_counter() < deadline:
             message = json.loads(ws.recv(timeout=5))
             values = {p['id']: p['value'] for p in message.get('payload', [])}
             if 'meta' in values:
@@ -62,7 +62,7 @@ def main():
     def run_case(name):
         board.stop()
         time.sleep(.8)
-        started = time.monotonic()
+        started = time.perf_counter()
         try:
             board.play(f'http://{args.host}:8770/{name}', 'aac')
             samples = suite.observe(7, 'icy:'+name)

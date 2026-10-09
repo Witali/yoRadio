@@ -17,7 +17,7 @@ class DeliveryStats:
     MAX_WINDOWS = 4096
 
     def __init__(self, started, event):
-        self.result = event['delivery'] = dict(started_at=started, finished=False,
+        self.result = event['delivery'] = dict(clock='time.perf_counter', started_at=started, finished=False,
                                                windows=[], dropped_windows=0)
         self.started = started
         self.bytes = self.writes = 0
@@ -91,11 +91,11 @@ class DeliveryPauses:
             raise ValueError('Delivery skipped a scheduled byte boundary')
         if sent == offset:
             row = dict(after_bytes=sent, requested_seconds=seconds,
-                       started_at=time.monotonic(), completed=False)
+                       started_at=time.perf_counter(), completed=False)
             self.rows.append(row)
             started = perf_counter()
             interrupted = self.closed.wait(seconds)
-            row.update(ended_at=time.monotonic(), elapsed_seconds=perf_counter()-started,
+            row.update(ended_at=time.perf_counter(), elapsed_seconds=perf_counter()-started,
                        completed=not interrupted)
             self.index += 1
             if interrupted:
@@ -164,7 +164,8 @@ class Server:
                         outer.recovery_attempts[name] = attempt
                     status = 503 if attempt <= initial_failures else 200
                     recovery = dict(mode='recover', fixture=name, attempt=attempt,
-                                    response_status=status, requested_at=time.monotonic())
+                                    response_status=status, clock='time.perf_counter',
+                                    requested_at=time.perf_counter())
                     if status == 503:
                         outer.events.append(recovery)
                         self.send_response(status)
@@ -202,7 +203,8 @@ class Server:
                 self.end_headers()
                 unpaced = unpaced_files and mode == 'file'
                 event = dict(mode=mode, fixture=name, sent=0, complete=False,
-                             pacing_ratio=None if unpaced else pacing_ratio)
+                             pacing_ratio=None if unpaced else pacing_ratio,
+                             clock='time.perf_counter')
                 if send_buffer_bytes is not None:
                     event.update(send_buffer_requested=send_buffer_bytes,
                                  send_buffer_actual=actual_send_buffer)
@@ -214,11 +216,11 @@ class Server:
                 if recovery:
                     event.update(recovery)
                 outer.events.append(event)
-                started = time.monotonic()
+                started = time.perf_counter()
                 deadline = started
                 delivery = DeliveryStats(started, event) if delivery_stats else None
                 try:
-                    while not outer.closed.is_set() and time.monotonic() - started < 86400:
+                    while not outer.closed.is_set() and time.perf_counter() - started < 86400:
                         for segment in spec.get('segments', [spec]):
                             payload = segment['data']
                             bps = len(payload) / segment['seconds'] * pacing_ratio
@@ -226,7 +228,7 @@ class Server:
                             while offset < len(payload):
                                 if outer.closed.is_set():
                                     return
-                                if mode in ('drop','stall') and time.monotonic()-started >= 3:
+                                if mode in ('drop','stall') and time.perf_counter()-started >= 3:
                                     if mode == 'stall':
                                         outer.closed.wait(15)
                                     return
@@ -236,18 +238,18 @@ class Server:
                                     if not size:
                                         return
                                 chunk = payload[offset:offset+size]
-                                write_started = time.monotonic() if delivery else 0
+                                write_started = time.perf_counter() if delivery else 0
                                 self.wfile.write(chunk)
                                 self.wfile.flush()
                                 event['sent'] += len(chunk)
                                 if delivery:
-                                    delivery.write(len(chunk), write_started, time.monotonic(),
+                                    delivery.write(len(chunk), write_started, time.perf_counter(),
                                                    None if unpaced else deadline)
                                 deadline += len(chunk) / bps
                                 if mode == 'jitter' and offset % 8192 == 0:
                                     deadline += .035
                                 offset += len(chunk)
-                                if not unpaced and outer.closed.wait(max(0, deadline - time.monotonic())):
+                                if not unpaced and outer.closed.wait(max(0, deadline - time.perf_counter())):
                                     return
                         if mode != 'stream':
                             event['complete'] = True
@@ -256,9 +258,9 @@ class Server:
                     pass
                 finally:
                     self.close_connection = True
-                    event['seconds'] = time.monotonic() - started
+                    event['seconds'] = time.perf_counter() - started
                     if delivery:
-                        delivery.finish(time.monotonic())
+                        delivery.finish(time.perf_counter())
 
         class TrackingServer(ThreadingHTTPServer):
             def get_request(self):

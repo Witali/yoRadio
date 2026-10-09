@@ -17,7 +17,7 @@ class Clock:
         self.stop_at = stop_at
         self.stopped = threading.Event()
 
-    def monotonic(self):
+    def perf_counter(self):
         return self.now
 
     def wait(self, seconds):
@@ -52,7 +52,7 @@ class PacingTests(unittest.TestCase):
             completed.set()
 
         # Patch only this module's clock; the HTTP server/client keep real time.
-        with patch('audio_test_server.server.time', SimpleNamespace(monotonic=clock.monotonic)), \
+        with patch('audio_test_server.server.time', SimpleNamespace(perf_counter=clock.perf_counter)), \
              patch.object(DeliveryStats, 'finish', finish):
             with Server('127.0.0.1', 0, {'sample': spec}, unpaced_files=unpaced,
                         delivery_stats=True, **kwargs) as server:

@@ -93,7 +93,7 @@ class DiagnosticCapture(run.Capture):
         for line in serial_lines(self.port, self.closed):
             safe = filter_line(line)
             if safe:
-                self.rows.append(dict(at=time.monotonic(), line=safe))
+                self.rows.append(dict(at=time.perf_counter(), line=safe))
 
 
 def main():

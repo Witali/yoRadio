@@ -59,7 +59,7 @@ def main():
         board.stop()
         time.sleep(.8)
         event_count = len(server.events)
-        started = time.monotonic()
+        started = time.perf_counter()
         expected = 'stream read failed' if mode in ('length-short','chunked-short','close-raw') else 'stream ended'
         try:
             board.play(f'https://{args.host}:8773/{mode}/{args.case}', specs[args.case]['codec'])

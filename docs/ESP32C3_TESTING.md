@@ -1333,3 +1333,22 @@ failed gates. Host pauses do not establish the arrival timing at the board;
 enclosing DMA counter intervals do not identify exact audible gaps. Compare
 different queue capacities within this run. The older unpaused experiment
 used the OS-default send buffer and is not a matched pause/no-pause control.
+
+## Common high-resolution host clock
+
+Current C3 tools and shared audio servers use `time.perf_counter()` for
+timestamps, elapsed time and deadlines. Reports save the host clock API,
+implementation and resolution; server events identify the API. New custom
+controllers must use this clock too, including action and capture boundaries.
+Its timestamps can be compared across processes on the same host, but must
+not be mixed with wall time, device uptime or the old Windows/Python 3.12
+`time.monotonic()` epoch. Archived reports and their frozen replay sources
+remain unchanged.
+
+This fixes the known duplicate-tick capture issue on this host: two events
+4 ms apart could previously receive the same 15.625 ms host tick. The serial
+regression exercises all three capture classes and the strict DMA parser
+with such samples. No artificial timestamp increments, parser exemptions,
+socket retries, longer timeouts or altered pacing ratios are introduced.
+Host receive time still includes transport and logging delay; high clock
+resolution does not turn it into device-event or packet-arrival time.

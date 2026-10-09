@@ -105,7 +105,7 @@ def main():
                 modes = ('active', 'stopped') if cycle % 2 == 0 else ('stopped', 'active')
                 for mode in modes:
                     label = f'{cycle+1}:{mode}'
-                    trial = dict(name=label, mode=mode, started_at=time.monotonic())
+                    trial = dict(name=label, mode=mode, started_at=time.perf_counter())
                     report.data['trials'].append(trial)
                     save()
                     print('START', label, flush=True)
@@ -113,7 +113,7 @@ def main():
                         trial['baseline'] = action(label+':baseline', suite.idle_heap)
                         stopped(suite.observations[-1]['samples'])
                         first_event = len(server.events)
-                        trial['play_started_at'] = time.monotonic()
+                        trial['play_started_at'] = time.perf_counter()
                         action(label+':play', lambda:board.play(suite.url('stream',name),'aac'))
                         samples = action(label+':playback', lambda:suite.observe(12,label+':playback'))
                         trial['playback'] = check_playback(samples,spec,warmup=3)
@@ -125,24 +125,24 @@ def main():
                                 trial['server_before_control'][0]['sent'] > 0,
                                 'Expected one delivering TLS stream')
                         if mode == 'stopped':
-                            trial['stop_started_at'] = time.monotonic()
+                            trial['stop_started_at'] = time.perf_counter()
                             action(label+':stop', board.stop)
                             trial['settled'] = action(label+':settle',lambda:suite.idle_heap(stop=False))
                             stopped(suite.observations[-1]['samples'])
                             check_recovery_heap(trial['baseline'],trial['settled'])
-                        trial['reboot_started_at'] = time.monotonic()
+                        trial['reboot_started_at'] = time.perf_counter()
                         action(label+':reboot',board.reboot)
                         time.sleep(3)
                         trial['boot'] = action(label+':verify-boot',lambda:wait_image(
                             board, expected['app_elf_sha256'],identity['partition'],timeout=45))
-                        trial['ended_at'] = time.monotonic()
+                        trial['ended_at'] = time.perf_counter()
                         trial['review'] = review_trial(trial,capture.rows)
                         require(trial['review']['result'] == 'PASS', 'Runtime fault or missing/unexpected reset')
                         trial['result'] = 'PASS'
                         print('END',label,'PASS TLS rows',len(trial['review']['tls']),flush=True)
                     except BaseException as error:
                         trial.update(result='FAIL',exception_chain=exception_details(error),
-                                     ended_at=time.monotonic())
+                                     ended_at=time.perf_counter())
                         raise
                     finally:
                         save()

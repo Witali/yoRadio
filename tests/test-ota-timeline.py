@@ -28,7 +28,7 @@ class Tests(unittest.TestCase):
             self.assertEqual(report.saved[0]['timeline'][0]['event'], 'begin')
             calls.append(True)
             return response
-        with patch.object(ota.time, 'monotonic', side_effect=[1.5, 3.0]):
+        with patch.object(ota.time, 'perf_counter', side_effect=[1.5, 3.0]):
             self.assertIs(ota.timed_action(report, 'ota:while-playing:upload', operation), response)
         self.assertEqual(calls, [True])
         self.assertEqual([r['at'] for r in report.data['timeline']], [1.5, 3.0])

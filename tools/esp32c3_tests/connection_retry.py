@@ -22,8 +22,8 @@ def set_system(board, key, value):
     with board.websocket() as ws:
         ws.send(key+'='+str(value))
         ws.send('getsystem')
-        deadline = time.monotonic()+5
-        while time.monotonic() < deadline:
+        deadline = time.perf_counter()+5
+        while time.perf_counter() < deadline:
             message = json.loads(ws.recv(timeout=5))
             if key in message:
                 require(message[key] == value, 'System setting was not applied')
@@ -102,18 +102,18 @@ def main():
                     if label == 'settings-persistence':
                         require(original_timeout is not None, 'Missing configurable station timeout')
                         set_system(board, 'stationtimeout', 3)
-                        reboot_started = time.monotonic()
+                        reboot_started = time.perf_counter()
                         board.reboot()
                         wait_ready(board, info['app_elf_sha256'])
-                        report.data['planned_reboots'].append(dict(start=reboot_started, end=time.monotonic()))
+                        report.data['planned_reboots'].append(dict(start=reboot_started, end=time.perf_counter()))
                         require(board.settings()['getsystem']['stationtimeout'] == 3,
                                 'Station timeout did not persist across reboot')
                         for invalid in ('0', '121', '-1', '3.5', 'abc', '256'):
                             with board.websocket() as ws:
                                 ws.send('stationtimeout='+invalid)
-                                deadline = time.monotonic()+5
+                                deadline = time.perf_counter()+5
                                 rejected = False
-                                while time.monotonic() < deadline:
+                                while time.perf_counter() < deadline:
                                     if 'commandError' in json.loads(ws.recv(timeout=5)):
                                         rejected = True
                                         break
@@ -130,8 +130,8 @@ def main():
                                     for s in samples[-5:]), 'Stalled station did not stop as unavailable')
                         return dict(timeout_seconds=timeout, stalled_stream_stopped=True)
                     suite.start(name, 'recover', 'aac')
-                    deadline = time.monotonic()+5
-                    while not server.events and time.monotonic() < deadline:
+                    deadline = time.perf_counter()+5
+                    while not server.events and time.perf_counter() < deadline:
                         time.sleep(.05)
                     require(server.events and server.events[0].get('response_status') == 503,
                             'No controlled initial 503 response')

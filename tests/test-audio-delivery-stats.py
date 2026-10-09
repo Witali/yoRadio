@@ -38,8 +38,8 @@ class DeliveryStatsTest(unittest.TestCase):
                         port=server.http.server_address[1]
                         with urlopen(f'http://127.0.0.1:{port}/file/test',timeout=3) as response:
                             self.assertEqual(response.read(),data)
-                        deadline=time.monotonic()+2
-                        while time.monotonic()<deadline and not server.events[0].get('seconds'):
+                        deadline=time.perf_counter()+2
+                        while time.perf_counter()<deadline and not server.events[0].get('seconds'):
                             time.sleep(.005)
                         event=server.events[0]
                         self.assertTrue(event['complete'])

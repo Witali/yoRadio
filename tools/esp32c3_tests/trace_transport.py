@@ -32,7 +32,7 @@ class TransportTrace:
         def traced_socket_connect(sock, address):
             row = getattr(owner.context, 'connect_row', None)
             watched = row is not None and address[:2] == (owner.host, 80)
-            attempt = dict(at=time.monotonic()) if watched else None
+            attempt = dict(at=time.perf_counter()) if watched else None
             try:
                 result = owner.original_connect(sock, address)
                 if watched:
@@ -50,7 +50,7 @@ class TransportTrace:
                         attempt['local_port'] = sock.getsockname()[1]
                     except OSError:
                         attempt['port_unavailable'] = True
-                    attempt['ms'] = (time.monotonic() - attempt['at']) * 1000
+                    attempt['ms'] = (time.perf_counter() - attempt['at']) * 1000
                     row.setdefault('socket_attempts', []).append(attempt)
 
         class TracedConnection(original):
@@ -65,7 +65,7 @@ class TransportTrace:
             def measured(self, phase, action):
                 if self.trace_number is None:
                     return action()
-                started = time.monotonic()
+                started = time.perf_counter()
                 row = dict(request=self.trace_number, phase=phase, at=started)
                 previous_row = getattr(owner.context, 'connect_row', None)
                 if phase == 'connect':
@@ -86,7 +86,7 @@ class TransportTrace:
                 finally:
                     if phase == 'connect':
                         owner.context.connect_row = previous_row
-                    row['ms'] = (time.monotonic() - started) * 1000
+                    row['ms'] = (time.perf_counter() - started) * 1000
                     with owner.lock:
                         owner.stream.write(json.dumps(row) + '\n')
                         owner.stream.flush()

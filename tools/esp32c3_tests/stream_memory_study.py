@@ -24,7 +24,7 @@ def save_json(path, value):
 
 
 class Checkpoint:
-    def __init__(self, output, capture, seconds=30, clock=time.monotonic):
+    def __init__(self, output, capture, seconds=30, clock=time.perf_counter):
         self.output, self.capture, self.seconds, self.clock = output, capture, seconds, clock
         self.next = 0
 
@@ -112,7 +112,7 @@ def main():
         # An interrupted load can run cleanup successfully without completing
         # its acceptance check. Do not turn that into a completed/PASS study.
         save_json(args.output/'checkpoint.json', dict(finished=True, complete=complete,
-                  all_cases_pass=complete and report.exit_code() == 0, at=time.monotonic()))
+                  all_cases_pass=complete and report.exit_code() == 0, at=time.perf_counter()))
     return report.exit_code()
 
 

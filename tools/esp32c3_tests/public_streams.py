@@ -156,18 +156,18 @@ def main():
         report.save()
         board.stop()
         time.sleep(.8)
-        started = time.monotonic()
+        started = time.perf_counter()
         window = dict(start=started)
         report.data.setdefault('windows', {})[name] = window
         try:
             board.play(play_urls[name])
             samples = suite.observe(args.seconds, name, interval=args.interval)
             evidence = metrics(samples, capture.since(started), reference['spec'],
-                               args.seconds, started, time.monotonic(), max_busy=args.max_cpu_busy)
+                               args.seconds, started, time.perf_counter(), max_busy=args.max_cpu_busy)
             with board.websocket() as ws:
                 ws.send('getindex')
-                deadline = time.monotonic()+5
-                while time.monotonic() < deadline:
+                deadline = time.perf_counter()+5
+                while time.perf_counter() < deadline:
                     message = json.loads(ws.recv(timeout=5))
                     values = {p['id']: p['value'] for p in message.get('payload', [])}
                     if 'fmt' in values:
@@ -178,7 +178,7 @@ def main():
                     require(False, 'No WebSocket playback snapshot')
             return dict(reference=reference, websocket_matches_rest=True, **evidence)
         finally:
-            window['end'] = time.monotonic()
+            window['end'] = time.perf_counter()
             board.stop()
 
     def recovery():
@@ -199,9 +199,9 @@ def main():
             board.stop()
             require(not board.status()['audio'], 'Could not restore stopped state')
             return dict(stopped_state_restored=True, **verify_snapshot(board, before))
-        deadline = time.monotonic()+30
+        deadline = time.perf_counter()+30
         state = board.status()
-        while not state['audio'] and time.monotonic() < deadline:
+        while not state['audio'] and time.perf_counter() < deadline:
             time.sleep(1)
             state = board.status()
         require(state['audio'], 'Saved station did not resume after reboot')

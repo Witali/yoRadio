@@ -24,7 +24,7 @@ class FramingServer:
         class Handler(socketserver.BaseRequestHandler):
             def handle(self):
                 event = dict(records=[], writes=[], dropped_records=0, dropped_writes=0,
-                             completed_socket_bytes=0, complete=False)
+                             completed_socket_bytes=0, complete=False, clock='time.perf_counter')
                 outer.events.append(event)
                 self.request.settimeout(10)
                 channel = Channel(self.request, context, event)
@@ -42,7 +42,7 @@ class FramingServer:
                     if not data:
                         raise ValueError('Empty fixture')
                     event.update(mode=mode, fixture=name, fixture_sha256=spec['sha256'],
-                                 body_bytes=len(data), started_at=time.monotonic())
+                                 body_bytes=len(data), started_at=time.perf_counter())
                     headers = ['HTTP/1.1 200 OK', 'Content-Type: '+spec['mime'], 'Connection: close']
                     if framing == 'length':
                         # Deliver every valid codec frame but deliberately promise
@@ -66,7 +66,7 @@ class FramingServer:
                 except (OSError, EOFError, ValueError) as error:
                     event['error'] = type(error).__name__
                 finally:
-                    event['ended_at'] = time.monotonic()
+                    event['ended_at'] = time.perf_counter()
 
         class Server(socketserver.ThreadingTCPServer):
             allow_reuse_address = True

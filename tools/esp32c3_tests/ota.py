@@ -79,8 +79,8 @@ def upload(origin, body, declared=None, interrupt=None, pace=0, send_limit=None)
 
 
 def wait_image(board, digest, partition, timeout=45):
-    deadline = time.monotonic()+timeout
-    while time.monotonic() < deadline:
+    deadline = time.perf_counter()+timeout
+    while time.perf_counter() < deadline:
         try:
             info = board.info()
             if info['app_elf_sha256'] == digest and info['partition'] == partition:
@@ -106,9 +106,9 @@ def verify_snapshot(board, before):
 
 def wait_playback(board, spec=None, timeout=12):
     """Require full fixture format before OTA; preserve the generic flag-only CLI."""
-    deadline = time.monotonic()+timeout
+    deadline = time.perf_counter()+timeout
     consecutive = 0
-    while time.monotonic() < deadline:
+    while time.perf_counter() < deadline:
         state = board.status()
         correct = matches(state, spec) if spec is not None else state.get('audio') is True
         consecutive = consecutive+1 if correct else 0
@@ -119,24 +119,24 @@ def wait_playback(board, spec=None, timeout=12):
 
 
 def timed_action(report, name, action):
-    """Persist action boundaries on the serial-capture monotonic clock.
+    """Persist action boundaries on the serial-capture perf_counter clock.
 
     Names come from fixed test operations. Do not retain callback results or
     exception messages: these can include private response bodies and URLs.
     A returned action is not necessarily a passed acceptance gate.
     """
-    report.data['timeline_clock'] = 'time.monotonic seconds'
+    report.data['timeline_clock'] = 'time.perf_counter seconds'
     rows = report.data.setdefault('timeline', [])
-    rows.append(dict(action=name, event='begin', at=time.monotonic()))
+    rows.append(dict(action=name, event='begin', at=time.perf_counter()))
     report.save()
     try:
         result = action()
     except BaseException as error:
-        rows.append(dict(action=name, event='raised', at=time.monotonic(),
+        rows.append(dict(action=name, event='raised', at=time.perf_counter(),
                          exception=type(error).__name__))
         report.save()
         raise
-    rows.append(dict(action=name, event='returned', at=time.monotonic()))
+    rows.append(dict(action=name, event='returned', at=time.perf_counter()))
     report.save()
     return result
 
@@ -197,13 +197,13 @@ def main():
                 lambda: wait_playback(board, play_spec))
         active = board.info()
         target = 'app1' if active['partition'] == 'app0' else 'app0'
-        start = time.monotonic()
+        start = time.perf_counter()
         status, body = timed_action(report, name+':upload',
             lambda: upload(args.board,multipart(image),pace=.08 if slow else 0))
         require(status == 200 and body == b'OK', 'OTA did not return HTTP 200 OK')
         booted = timed_action(report, name+':verify-boot',
             lambda: wait_image(board,expected['app_elf_sha256'],target))
-        return dict(partition=booted['partition'], elapsed_seconds=time.monotonic()-start,
+        return dict(partition=booted['partition'], elapsed_seconds=time.perf_counter()-start,
                     hash_verified=True, playback_before=playback, **verify_snapshot(board,before))
 
     try:

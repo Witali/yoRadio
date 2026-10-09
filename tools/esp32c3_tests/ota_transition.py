@@ -58,13 +58,13 @@ def main():
         suite.start(name, 'stream', 'aac')
         playback = check_playback(suite.observe(7, 'before-ota'), specs[name])
         slot = 'app0' if initial['partition'] == 'app1' else 'app1'
-        started = time.monotonic()
+        started = time.perf_counter()
         # Deliberately do not stop first: the firmware must quiesce playback.
         status, body = upload(board.origin, multipart(target_bytes))
         require(status == 200 and body == b'OK', 'OTA did not return HTTP 200 OK')
         after = wait_image(board, target['app_elf_sha256'], slot)
         return dict(playing_before_upload=playback, after=after,
-                    elapsed_seconds=time.monotonic()-started,
+                    elapsed_seconds=time.perf_counter()-started,
                     **verify_snapshot(board, before))
 
     try:
