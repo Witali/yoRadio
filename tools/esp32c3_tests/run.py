@@ -146,9 +146,9 @@ class Suite:
         finally:
             self.board.stop()
 
-    def eof(self, name, hint='auto'):
+    def eof(self, name, hint='auto', origin=None):
         """Check terminal status independently of HE-AAC full-rate acceptance."""
-        self.start(name, hint=hint)
+        self.start(name, hint=hint, origin=origin)
         try:
             samples = self.observe(max(7, self.specs[name]['seconds']-3), name+':playing')
             require(any(s['audio'] and s.get('pcm_sample_rate') for s in samples),
@@ -326,6 +326,8 @@ def main():
     parser.add_argument('--https-origin', help='Trusted HTTPS origin serving identical /file routes')
     parser.add_argument('--sustained-protocol', choices=('http', 'https'), default='http',
                         help='Transport for soak/load cases; HTTPS requires --https-origin')
+    parser.add_argument('--eof-protocol', choices=('http', 'https'), default='http',
+                        help='Transport for exact EOF state checks; HTTPS requires --https-origin')
     parser.add_argument('--tls-cert', type=Path)
     parser.add_argument('--tls-key', type=Path)
     parser.add_argument('--tls-port', type=int, default=8771)
@@ -340,6 +342,9 @@ def main():
     if args.sustained_protocol == 'https':
         require(args.https_origin and args.https_origin.startswith('https://'),
                 'HTTPS soak/load requires a trusted --https-origin')
+    if args.eof_protocol == 'https':
+        require(args.https_origin and args.https_origin.startswith('https://'),
+                'HTTPS EOF requires a trusted --https-origin')
     specs = fixtures(args.fixture_manifest)
     names = args.case or [n for n in specs if n not in SEQUENCES]
     require(all(n in specs for n in names), 'Unknown fixture name')
@@ -352,6 +357,7 @@ def main():
     report.data['fixture_hashes'] = {n:specs[n]['sha256'] for n in names}
     report.data['requested_suites'] = args.suite
     report.data['sustained_protocol'] = args.sustained_protocol
+    report.data['eof_protocol'] = args.eof_protocol
     report.data['server_options'] = dict(unpaced_files=args.unpaced_files,
                                        delivery_stats=args.delivery_stats,
                                        pacing_ratio=args.pacing_ratio)
@@ -391,9 +397,11 @@ def main():
                     report.case('transition:'+name, lambda n=name,s=sequence: suite.transition(n,s))
                 report.case('stop-play-generation', suite.stop_race)
             if 'eof' in args.suite:
+                eof_origin = args.https_origin if args.eof_protocol == 'https' else None
+                eof_prefix = 'eof:https:' if args.eof_protocol == 'https' else 'eof:'
                 for name in names:
                     for hint in ('auto',specs[name]['codec']):
-                        report.case(f'eof:{name}:{hint}',lambda n=name,h=hint: suite.eof(n,h))
+                        report.case(f'{eof_prefix}{name}:{hint}',lambda n=name,h=hint: suite.eof(n,h,eof_origin))
             if 'faults' in args.suite:
                 for mode in ('drop','stall','error'):
                     report.case('network:'+mode, lambda m=mode: suite.fault(m))

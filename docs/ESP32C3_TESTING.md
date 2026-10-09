@@ -771,6 +771,16 @@ when CPU profiling is disabled; serial capture is needed to observe UART faults.
 See the [extended reserve tests](ESP32C3_TLS_RX_RESERVE_20261008.md), including
 the original heap-trend, watchdog and host-transport failures.
 
+For exact EOF checks over HTTPS, use `run.py --suite eof --eof-protocol https`
+with the same trusted `--https-origin` and laboratory certificate/key options.
+The default EOF transport remains HTTP. HTTPS entries use the `eof:https:`
+prefix, and the report records `eof_protocol`. Both transports require decoded
+playback before EOF, confirmed stopped REST samples, cleared PCM metadata and
+a stopped WebSocket snapshot. A polling timeout fails the case even if earlier
+samples already showed `stream ended`; no retry is added. Run
+`python tests/test-eof-transport.py` for host checks of transport selection,
+stale metadata, incomplete observations and timeout propagation.
+
 For host-side HTTP failures, prefix the runner with
 `python tools/esp32c3_tests/trace_transport.py --runner diagnostic -- run`,
 followed by the same `run.py` arguments. For TLS wire tests, use
