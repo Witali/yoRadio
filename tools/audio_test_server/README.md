@@ -178,6 +178,38 @@ At most 4096 windows are saved per request; `dropped_windows` reports truncation
 An interrupted worker can leave `finished=false`. Reject incomplete captures
 when comparing full-stream totals. Timing is disabled by default.
 
+## Reproducible delivery pauses
+
+`--delivery-pause BYTE_OFFSET:SECONDS` pauses before sending the byte at an
+exact position in the response body. Repeat it in increasing byte order;
+at most 64 pauses of more than zero and at most two seconds are allowed.
+Positions count encoded bytes, not PCM samples or TCP bytes. Chunk boundaries
+are split when necessary; payload bytes and their order are unchanged.
+
+```powershell
+python tools/audio_test_server/server.py --fixture-manifest .build/audio-stress-60s/manifest.json --unpaced-files --delivery-stats --send-buffer-bytes 4096 --delivery-pause 2000000:0.05 --delivery-pause 4000000:0.10 --delivery-pause 6000000:0.20 --events-output .build/audio-pauses.json
+python tests/test-audio-server-pauses.py
+```
+
+This works over HTTP or HTTPS and with any board. Each connection starts a
+fresh schedule; continuous ADTS counts bytes across repetitions and changing
+segments. A pause at or beyond finite EOF is not executed. Compare requested
+`pause_schedule` with actual `pauses`, their byte positions, completion flags
+and elapsed durations. Stopping the server interrupts a pending pause.
+
+Pauses do **not** shift normal pacing deadlines. Paced delivery catches up
+after a pause; unpaced file delivery resumes as fast as TCP permits. This
+avoids the persistent rate deficit of repeatedly adding delay to every
+deadline. Existing `/jitter` behavior and all default settings are unchanged.
+
+`--send-buffer-bytes` optionally requests `SO_SNDBUF` (1 KiB to 1 MiB).
+Events record both the requested and actual OS value. This reduces host
+buffering but does not eliminate in-flight TCP/TLS bytes or receiver queues.
+A host send pause is **not proof of an equal pause at the board**. Correlate
+these events with decoder-input, DMA and playback observations. Event start/
+end timestamps use the existing monotonic clock; pause elapsed durations
+use the higher-resolution `perf_counter` clock, without mixing their epochs.
+
 Run `python tests/test-audio-delivery-stats.py` for delay accounting, overflow,
 and real localhost HTTP payload comparisons with timing enabled/disabled.
 
