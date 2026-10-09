@@ -1,5 +1,6 @@
 """Acceptance-parser tests: incomplete or wrong PCM tails must fail."""
 import copy
+from fractions import Fraction
 from pathlib import Path
 import sys
 import unittest
@@ -35,6 +36,17 @@ class TailTests(unittest.TestCase):
     def test_missing_tail_rejected(self):
         with self.assertRaises(Failure):
             check_submission(self.previous,terminal_records(rows(written=2048))[0],127,48000)
+
+    def test_rational_rate_and_wrong_mode(self):
+        for rate in (8000,44100,48000):
+            frames=5000
+            expected=1+(frames-1)*625000//(13*rate)
+            end=terminal_records(rows(expected%512,8,2048+((expected+511)//512)*2048))[0]
+            result=check_submission(self.previous,end,frames,rate,Fraction(625000,13))
+            self.assertEqual(result['output_frames'],expected)
+            with self.assertRaises(Failure):check_submission(self.previous,end,frames,rate)
+        for invalid in (48000,48076.923,Fraction(96000)):
+            with self.assertRaises(Failure):check_submission(self.previous,end,frames,rate,invalid)
 
     def test_wrong_padding_rejected(self):
         with self.assertRaises(Failure):

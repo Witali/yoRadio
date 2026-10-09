@@ -23,6 +23,13 @@ interpolation loses 4.23 dB RMS at 20 kHz for 48 kHz input. It stays disabled
 and has not been flashed. Implement and measure the higher-quality FIR
 candidate before treating software clock compensation as a production fix.
 
+The [32-tap FIR candidate](ESP32C3_FIR_RATE_20261009.md) now passes 122 host
+quality cases (at most 1 LSB versus its double-precision finite-kernel oracle)
+and 95 lifecycle cases. A diagnostic image is built with +120 B linked BSS
+and unchanged AAC/FLAC objects. It remains disabled pending physical CPU,
+memory and continuity qualification; the oracle bound is not an ideal-signal
+or analog-output accuracy claim.
+
 1. Resolve or bound heavy-FLAC input starvation and delayed DMA service.
    Compare buffering against reproducible delivery interruptions, not just
    mean CPU usage. The [integer-clock baseline](ESP32C3_FLAC_INTEGER_20261009.md)

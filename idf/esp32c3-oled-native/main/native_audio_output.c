@@ -20,6 +20,14 @@
 #include "native_audio_settings.h"
 #include "soc/soc_caps.h"
 
+#ifdef CONFIG_YORADIO_PDM_INTEGER_FIR
+#ifndef CONFIG_YORADIO_PDM_INTEGER_RATE_COMPENSATION
+#error FIR requires the audited integer-rate compensation configuration
+#endif
+#include "native_pcm_fir.h"
+static pcm_fir_state_t s_pcm_fir;
+#endif
+
 #if SOC_I2S_PDM_MAX_TX_LINES < 2
 #error ESP32-C3 stereo PDM requires two hardware TX data lines
 #endif
@@ -151,6 +159,9 @@ static void hold_pdm_low(void) {
 }
 
 static void reset_resampler(void) {
+#ifdef CONFIG_YORADIO_PDM_INTEGER_FIR
+    pcm_fir_reset(&s_pcm_fir);
+#endif
     s_resampler_has_previous = false;
     s_previous_left = 0;
     s_previous_right = 0;
@@ -302,6 +313,7 @@ static esp_err_t pdm_begin(void) {
     return ESP_OK;
 }
 
+#ifndef CONFIG_YORADIO_PDM_INTEGER_FIR
 static int16_t interpolate_sample(int16_t previous, int16_t current,
                                   uint32_t fraction) {
     int32_t delta = (int32_t)current - previous;
@@ -311,8 +323,14 @@ static int16_t interpolate_sample(int16_t previous, int16_t current,
     return (int16_t)((int32_t)previous +
                      scaled / (int32_t)RESAMPLER_SCALE);
 }
+#endif
 
 static esp_err_t pdm_write_resampled(int16_t left, int16_t right) {
+#ifdef CONFIG_YORADIO_PDM_INTEGER_FIR
+    return pcm_fir_push(&s_pcm_fir, left, right,
+                        s_input_sample_rate * PCM_FIR_RATE_DENOMINATOR,
+                        false, pdm_queue_frame);
+#else
     const uint32_t input_step =
         s_input_sample_rate * RESAMPLER_OUTPUT_RATE_DENOMINATOR;
     if (input_step == RESAMPLER_OUTPUT_RATE_NUMERATOR) {
@@ -351,6 +369,7 @@ static esp_err_t pdm_write_resampled(int16_t left, int16_t right) {
     s_previous_left = left;
     s_previous_right = right;
     return ESP_OK;
+#endif
 }
 
 esp_err_t native_audio_output_init(void) {
@@ -510,8 +529,17 @@ void native_audio_output_discard_pcm(void) {
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
-    size_t tail_frames = s_buffered_frames;
     esp_err_t result = ESP_OK;
+#ifdef CONFIG_YORADIO_PDM_INTEGER_FIR
+    result = pcm_fir_drain(&s_pcm_fir,
+                           s_input_sample_rate * PCM_FIR_RATE_DENOMINATOR,
+                           pdm_queue_frame);
+    if (result != ESP_OK) {
+        s_buffered_frames = 0;
+        reset_resampler();
+    }
+#endif
+    size_t tail_frames = s_buffered_frames;
     if (tail_frames) {
         // The output task is the sole owner. Consume this tail once, even on
         // a partial/failed driver write, so a later stream cannot replay it.
@@ -537,6 +565,9 @@ void native_audio_output_idle(void) {
 esp_err_t native_audio_output_suspend(void) {
     if (!s_pdm) return ESP_OK;
     s_buffered_frames = 0;
+#ifdef CONFIG_YORADIO_PDM_INTEGER_FIR
+    pcm_fir_reset(&s_pcm_fir);
+#endif
     uint32_t count = ramp_frames();
     for (uint32_t first = 0; first < count; first += PDM_DMA_FRAMES) {
         fill_ramp(PDM_DMA_FRAMES, first, count, false);

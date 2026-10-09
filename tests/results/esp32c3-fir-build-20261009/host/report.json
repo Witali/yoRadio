@@ -1,0 +1,1141 @@
+{
+  "sources": {
+    "tools/codec_benchmark/run_pcm_fir_host.py": "4baea0c7555a30a0badf1dbe00f5aa333d4877a1006d8d00759a30580ae0122e",
+    "tools/codec_benchmark/run_output_dma_host.py": "c1f13fa39b7401cae62c8fee411c23c93dd470cc684d56b2d605bcea89a13d05",
+    "tools/codec_benchmark/generate_pcm_fir.py": "61fc0f34513860ff5ec3e55a4fa1c9a80c41de660e3212369f60b15970ec8eed",
+    "tools/codec_benchmark/compare_integer_rate_filters.py": "9611df754c5e69b10983923b55868fcd2e1b5b8761ddda1117d33b5bcaf88a81",
+    "idf/esp32c3-oled-native/main/native_audio_output.c": "ef3cf7bb0a2e61dd3aa5fc6c49e22453c623eaa6dd1abc40c55b4adcc2d610ef",
+    "idf/esp32c3-oled-native/main/native_audio_output.h": "0331612bc0c3274223a0c6b5ce3982189d2520ca0ef13c7cd6b8199a2b7584d4",
+    "idf/esp32c3-oled-native/main/native_i2s_generator.c": "b9b030839a3f23682bbe3d22d80cc3d45ab2e4c98ca9d3a8abb69dfe5f90e099",
+    "idf/esp32c3-oled-native/main/native_pcm_fir.h": "c9285a52025f71145726d34c6ca317e9dab3570f9ff7410b17813226267a2c07",
+    "idf/esp32c3-oled-native/main/native_pcm_fir_coefficients.h": "0cae0a2a1384fdab706f358ebdfe4b3899cf6732e86a4a5a3ee808b98c1b9adb",
+    "tests/native/output_dma/stubs.h": "9319f8e5edbd5529feed5c350f2e1594a96ec289c4d913fb7107228158122c70",
+    "tests/native/output_dma/boundaries.c": "ea6046d2af378bc6f6c623a046ad985168f0440473c12478a71928e6b9e6c4c6",
+    "tests/native/output_dma/fir_quality.c": "e7b581820a9ff4406b0947a338f9a742e0085f19ade173352b0bd92f55a64a9d"
+  },
+  "results": {
+    "fir_quality": [
+      {
+        "rate": 8000,
+        "frames": 1,
+        "output_frames": 1,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 8000,
+        "frames": 2,
+        "output_frames": 7,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 8000,
+        "frames": 15,
+        "output_frames": 85,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 12
+      },
+      {
+        "rate": 8000,
+        "frames": 16,
+        "output_frames": 91,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 10
+      },
+      {
+        "rate": 8000,
+        "frames": 17,
+        "output_frames": 97,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 14
+      },
+      {
+        "rate": 8000,
+        "frames": 31,
+        "output_frames": 181,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 30
+      },
+      {
+        "rate": 8000,
+        "frames": 32,
+        "output_frames": 187,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 30
+      },
+      {
+        "rate": 8000,
+        "frames": 511,
+        "output_frames": 3065,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 349
+      },
+      {
+        "rate": 8000,
+        "frames": 512,
+        "output_frames": 3071,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 352
+      },
+      {
+        "rate": 8000,
+        "frames": 513,
+        "output_frames": 3077,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 351
+      },
+      {
+        "rate": 8000,
+        "frames": 2500,
+        "output_frames": 15019,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 1481
+      },
+      {
+        "rate": 11025,
+        "frames": 1,
+        "output_frames": 1,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 11025,
+        "frames": 2,
+        "output_frames": 5,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 11025,
+        "frames": 15,
+        "output_frames": 62,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 10
+      },
+      {
+        "rate": 11025,
+        "frames": 16,
+        "output_frames": 66,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 8
+      },
+      {
+        "rate": 11025,
+        "frames": 17,
+        "output_frames": 70,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 11
+      },
+      {
+        "rate": 11025,
+        "frames": 31,
+        "output_frames": 131,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 22
+      },
+      {
+        "rate": 11025,
+        "frames": 32,
+        "output_frames": 136,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 22
+      },
+      {
+        "rate": 11025,
+        "frames": 511,
+        "output_frames": 2224,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 246
+      },
+      {
+        "rate": 11025,
+        "frames": 512,
+        "output_frames": 2229,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 247
+      },
+      {
+        "rate": 11025,
+        "frames": 513,
+        "output_frames": 2233,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 247
+      },
+      {
+        "rate": 11025,
+        "frames": 2500,
+        "output_frames": 10898,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 1069
+      },
+      {
+        "rate": 12000,
+        "frames": 1,
+        "output_frames": 1,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 12000,
+        "frames": 2,
+        "output_frames": 5,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 12000,
+        "frames": 15,
+        "output_frames": 57,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 8
+      },
+      {
+        "rate": 12000,
+        "frames": 16,
+        "output_frames": 61,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 7
+      },
+      {
+        "rate": 12000,
+        "frames": 17,
+        "output_frames": 65,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 10
+      },
+      {
+        "rate": 12000,
+        "frames": 31,
+        "output_frames": 121,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 20
+      },
+      {
+        "rate": 12000,
+        "frames": 32,
+        "output_frames": 125,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 20
+      },
+      {
+        "rate": 12000,
+        "frames": 511,
+        "output_frames": 2044,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 233
+      },
+      {
+        "rate": 12000,
+        "frames": 512,
+        "output_frames": 2048,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 235
+      },
+      {
+        "rate": 12000,
+        "frames": 513,
+        "output_frames": 2052,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 235
+      },
+      {
+        "rate": 12000,
+        "frames": 2500,
+        "output_frames": 10013,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 994
+      },
+      {
+        "rate": 16000,
+        "frames": 1,
+        "output_frames": 1,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 16000,
+        "frames": 2,
+        "output_frames": 4,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 16000,
+        "frames": 15,
+        "output_frames": 43,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 7
+      },
+      {
+        "rate": 16000,
+        "frames": 16,
+        "output_frames": 46,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 5
+      },
+      {
+        "rate": 16000,
+        "frames": 17,
+        "output_frames": 49,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 7
+      },
+      {
+        "rate": 16000,
+        "frames": 31,
+        "output_frames": 91,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 15
+      },
+      {
+        "rate": 16000,
+        "frames": 32,
+        "output_frames": 94,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 15
+      },
+      {
+        "rate": 16000,
+        "frames": 511,
+        "output_frames": 1533,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 171
+      },
+      {
+        "rate": 16000,
+        "frames": 512,
+        "output_frames": 1536,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 172
+      },
+      {
+        "rate": 16000,
+        "frames": 513,
+        "output_frames": 1539,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 172
+      },
+      {
+        "rate": 16000,
+        "frames": 2500,
+        "output_frames": 7510,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 749
+      },
+      {
+        "rate": 22050,
+        "frames": 1,
+        "output_frames": 1,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 22050,
+        "frames": 2,
+        "output_frames": 3,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 22050,
+        "frames": 15,
+        "output_frames": 31,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 5
+      },
+      {
+        "rate": 22050,
+        "frames": 16,
+        "output_frames": 33,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 4
+      },
+      {
+        "rate": 22050,
+        "frames": 17,
+        "output_frames": 35,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 6
+      },
+      {
+        "rate": 22050,
+        "frames": 31,
+        "output_frames": 66,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 13
+      },
+      {
+        "rate": 22050,
+        "frames": 32,
+        "output_frames": 68,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 13
+      },
+      {
+        "rate": 22050,
+        "frames": 511,
+        "output_frames": 1112,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 127
+      },
+      {
+        "rate": 22050,
+        "frames": 512,
+        "output_frames": 1115,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 128
+      },
+      {
+        "rate": 22050,
+        "frames": 513,
+        "output_frames": 1117,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 128
+      },
+      {
+        "rate": 22050,
+        "frames": 2500,
+        "output_frames": 5449,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 531
+      },
+      {
+        "rate": 24000,
+        "frames": 1,
+        "output_frames": 1,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 24000,
+        "frames": 2,
+        "output_frames": 3,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 24000,
+        "frames": 15,
+        "output_frames": 29,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 4
+      },
+      {
+        "rate": 24000,
+        "frames": 16,
+        "output_frames": 31,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 3
+      },
+      {
+        "rate": 24000,
+        "frames": 17,
+        "output_frames": 33,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 4
+      },
+      {
+        "rate": 24000,
+        "frames": 31,
+        "output_frames": 61,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 9
+      },
+      {
+        "rate": 24000,
+        "frames": 32,
+        "output_frames": 63,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 9
+      },
+      {
+        "rate": 24000,
+        "frames": 511,
+        "output_frames": 1022,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 114
+      },
+      {
+        "rate": 24000,
+        "frames": 512,
+        "output_frames": 1024,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 114
+      },
+      {
+        "rate": 24000,
+        "frames": 513,
+        "output_frames": 1026,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 114
+      },
+      {
+        "rate": 24000,
+        "frames": 2500,
+        "output_frames": 5007,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 485
+      },
+      {
+        "rate": 32000,
+        "frames": 1,
+        "output_frames": 1,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 32000,
+        "frames": 2,
+        "output_frames": 2,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 32000,
+        "frames": 15,
+        "output_frames": 22,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 3
+      },
+      {
+        "rate": 32000,
+        "frames": 16,
+        "output_frames": 23,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 2
+      },
+      {
+        "rate": 32000,
+        "frames": 17,
+        "output_frames": 25,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 3
+      },
+      {
+        "rate": 32000,
+        "frames": 31,
+        "output_frames": 46,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 7
+      },
+      {
+        "rate": 32000,
+        "frames": 32,
+        "output_frames": 47,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 7
+      },
+      {
+        "rate": 32000,
+        "frames": 511,
+        "output_frames": 767,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 91
+      },
+      {
+        "rate": 32000,
+        "frames": 512,
+        "output_frames": 768,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 91
+      },
+      {
+        "rate": 32000,
+        "frames": 513,
+        "output_frames": 770,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 91
+      },
+      {
+        "rate": 32000,
+        "frames": 2500,
+        "output_frames": 3755,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 380
+      },
+      {
+        "rate": 44100,
+        "frames": 1,
+        "output_frames": 1,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 44100,
+        "frames": 2,
+        "output_frames": 2,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 44100,
+        "frames": 15,
+        "output_frames": 16,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 3
+      },
+      {
+        "rate": 44100,
+        "frames": 16,
+        "output_frames": 17,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 3
+      },
+      {
+        "rate": 44100,
+        "frames": 17,
+        "output_frames": 18,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 4
+      },
+      {
+        "rate": 44100,
+        "frames": 31,
+        "output_frames": 33,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 6
+      },
+      {
+        "rate": 44100,
+        "frames": 32,
+        "output_frames": 34,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 6
+      },
+      {
+        "rate": 44100,
+        "frames": 511,
+        "output_frames": 556,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 62
+      },
+      {
+        "rate": 44100,
+        "frames": 512,
+        "output_frames": 558,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 62
+      },
+      {
+        "rate": 44100,
+        "frames": 513,
+        "output_frames": 559,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 62
+      },
+      {
+        "rate": 44100,
+        "frames": 2500,
+        "output_frames": 2725,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 290
+      },
+      {
+        "rate": 44101,
+        "frames": 1,
+        "output_frames": 1,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 44101,
+        "frames": 2,
+        "output_frames": 2,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 44101,
+        "frames": 15,
+        "output_frames": 16,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 3
+      },
+      {
+        "rate": 44101,
+        "frames": 16,
+        "output_frames": 17,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 3
+      },
+      {
+        "rate": 44101,
+        "frames": 17,
+        "output_frames": 18,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 4
+      },
+      {
+        "rate": 44101,
+        "frames": 31,
+        "output_frames": 33,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 6
+      },
+      {
+        "rate": 44101,
+        "frames": 32,
+        "output_frames": 34,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 6
+      },
+      {
+        "rate": 44101,
+        "frames": 511,
+        "output_frames": 556,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 64
+      },
+      {
+        "rate": 44101,
+        "frames": 512,
+        "output_frames": 558,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 64
+      },
+      {
+        "rate": 44101,
+        "frames": 513,
+        "output_frames": 559,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 64
+      },
+      {
+        "rate": 44101,
+        "frames": 2500,
+        "output_frames": 2725,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 298
+      },
+      {
+        "rate": 48000,
+        "frames": 1,
+        "output_frames": 1,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 48000,
+        "frames": 2,
+        "output_frames": 2,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 0,
+        "saturated_samples": 0
+      },
+      {
+        "rate": 48000,
+        "frames": 15,
+        "output_frames": 15,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 1
+      },
+      {
+        "rate": 48000,
+        "frames": 16,
+        "output_frames": 16,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 1
+      },
+      {
+        "rate": 48000,
+        "frames": 17,
+        "output_frames": 17,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 1
+      },
+      {
+        "rate": 48000,
+        "frames": 31,
+        "output_frames": 31,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 2
+      },
+      {
+        "rate": 48000,
+        "frames": 32,
+        "output_frames": 32,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 2
+      },
+      {
+        "rate": 48000,
+        "frames": 511,
+        "output_frames": 511,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 60
+      },
+      {
+        "rate": 48000,
+        "frames": 512,
+        "output_frames": 512,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 60
+      },
+      {
+        "rate": 48000,
+        "frames": 513,
+        "output_frames": 513,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 60
+      },
+      {
+        "rate": 48000,
+        "frames": 2500,
+        "output_frames": 2504,
+        "tone": 0,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 239
+      },
+      {
+        "rate": 48000,
+        "frames": 2500,
+        "output_frames": 2504,
+        "tone": 0,
+        "full_scale": 1,
+        "max_reference_lsb": 1,
+        "saturated_samples": 126
+      },
+      {
+        "rate": 44100,
+        "frames": 2500,
+        "output_frames": 2725,
+        "tone": 0,
+        "full_scale": 1,
+        "max_reference_lsb": 1,
+        "saturated_samples": 150
+      },
+      {
+        "rate": 44100,
+        "frames": 96000,
+        "output_frames": 104657,
+        "tone": 100,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0,
+        "gain_db": 4.33e-06,
+        "ideal_error_db": -90.87753207
+      },
+      {
+        "rate": 44100,
+        "frames": 96000,
+        "output_frames": 104657,
+        "tone": 1000,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0,
+        "gain_db": -0.00013038,
+        "ideal_error_db": -89.17590804
+      },
+      {
+        "rate": 44100,
+        "frames": 96000,
+        "output_frames": 104657,
+        "tone": 10000,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0,
+        "gain_db": -0.00024725,
+        "ideal_error_db": -86.74247496
+      },
+      {
+        "rate": 44100,
+        "frames": 96000,
+        "output_frames": 104657,
+        "tone": 18000,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0,
+        "gain_db": -0.00117454,
+        "ideal_error_db": -74.50150797
+      },
+      {
+        "rate": 44100,
+        "frames": 96000,
+        "output_frames": 104657,
+        "tone": 20000,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0,
+        "gain_db": -0.44227582,
+        "ideal_error_db": -22.8351559
+      },
+      {
+        "rate": 48000,
+        "frames": 96000,
+        "output_frames": 96153,
+        "tone": 100,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0,
+        "gain_db": -6.77e-06,
+        "ideal_error_db": -91.10489471
+      },
+      {
+        "rate": 48000,
+        "frames": 96000,
+        "output_frames": 96153,
+        "tone": 1000,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0,
+        "gain_db": -3.848e-05,
+        "ideal_error_db": -90.19977088
+      },
+      {
+        "rate": 48000,
+        "frames": 96000,
+        "output_frames": 96153,
+        "tone": 10000,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0,
+        "gain_db": -9.485e-05,
+        "ideal_error_db": -88.99049235
+      },
+      {
+        "rate": 48000,
+        "frames": 96000,
+        "output_frames": 96153,
+        "tone": 18000,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0,
+        "gain_db": 0.00138005,
+        "ideal_error_db": -72.70141796
+      },
+      {
+        "rate": 48000,
+        "frames": 96000,
+        "output_frames": 96153,
+        "tone": 20000,
+        "full_scale": 0,
+        "max_reference_lsb": 1,
+        "saturated_samples": 0,
+        "gain_db": -0.00297307,
+        "ideal_error_db": -66.20139565
+      }
+    ],
+    "boundaries": "PASS output boundaries cases=95 pcm_bytes=456704\n"
+  },
+  "physical_tested": false,
+  "sanitizers_passed": true
+}

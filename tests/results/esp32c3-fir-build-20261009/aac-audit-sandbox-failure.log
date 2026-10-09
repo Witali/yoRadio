@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\codec_benchmark\verify_aac_network_build.py", line 120, in <module>
+    main()
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\codec_benchmark\verify_aac_network_build.py", line 104, in main
+    result = verify(args.build, args.objdump)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\codec_benchmark\verify_aac_network_build.py", line 79, in verify
+    code = subprocess.run([str(objdump), '-d', '--disassemble='+caller, str(elf_path)],
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 1538, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 623] {Недопустимое перемещение системной DLL}
+Системная библиотека %hs перемещена в памяти. Работа приложения будет нарушена.
+Перемещение произошло из-за того, что библиотека %hs заняла область адресов, зарезервированную для системных DLL Windows. Обратитесь к поставщику за новой версией библиотеки

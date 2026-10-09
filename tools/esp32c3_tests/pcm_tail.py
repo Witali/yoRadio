@@ -1,6 +1,7 @@
 """Verify driver-submitted PCM tails; this does not capture the analog output."""
 import argparse
 from contextlib import ExitStack
+from fractions import Fraction
 import json
 import math
 from pathlib import Path
@@ -48,12 +49,14 @@ def terminal_records(rows):
     return terminals
 
 
-def check_submission(previous,current,frames,rate):
+def check_submission(previous,current,frames,rate,output_rate=Fraction(OUTPUT_RATE)):
     require(frames>0 and 8000<=rate<=OUTPUT_RATE,'Invalid expected PCM shape')
+    require(isinstance(output_rate,Fraction) and output_rate in (Fraction(48000),Fraction(625000,13)),
+            'Unknown resampler output rate')
     require(current['generation']>previous['generation'],'Stale/reset stream generation')
     require(current['completion']==END_OF_FILE,'Stream did not complete as EOF')
     require(current['result']==0 and current['flush']['result']==0,'PCM tail write failed')
-    produced=1+(frames-1)*OUTPUT_RATE//rate
+    produced=1+(frames-1)*output_rate.numerator//(rate*output_rate.denominator)
     expected_bytes=((produced+DMA_FRAMES-1)//DMA_FRAMES)*DMA_FRAMES*STEREO_S16_FRAME_BYTES
     require(current['flush']['frames']==produced%DMA_FRAMES,'Wrong remaining PCM frame count')
     a,b=previous['dma'],current['dma']
@@ -73,6 +76,8 @@ def main():
     parser.add_argument('--fixture-manifest',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--tls-cert');parser.add_argument('--tls-key')
+    parser.add_argument('--integer-rate-compensation',action='store_true',
+                        help='Expect the audited rational resampler, 625000/13 output frames/s')
     args=parser.parse_args()
     require(bool(args.tls_cert)==bool(args.tls_key),'Both TLS certificate and key are required')
     args.output.mkdir(parents=True,exist_ok=False)
@@ -81,6 +86,8 @@ def main():
     require(len(entries)==30 and all(e['round_trip_exact'] for e in entries),'Expected 30 verified tail fixtures')
     board=Board(args.board);report=Report(args.output/'report.json',board.info())
     report.data['scope']=__doc__
+    output_rate=Fraction(625000,13) if args.integer_rate_compensation else Fraction(OUTPUT_RATE)
+    report.data['resampler_output_rate']=str(output_rate)
     capture=DiagnosticCapture(args.serial_port)
     previous=None;observations=[];http=tls=None
     report.data['fixtures']=entries
@@ -109,7 +116,7 @@ def main():
             time.sleep(.05);state=board.status()
         require(not state['audio'],'Playback status remained active after EOF submission')
         evidence=dict(warmup=True) if previous is None else check_submission(previous,current,
-            specs[name]['frames'],specs[name]['rate'])
+            specs[name]['frames'],specs[name]['rate'],output_rate)
         observation['status']=state
         previous=current
         (args.output/'status.json').write_text(json.dumps(observations,indent=2)+'\n')
