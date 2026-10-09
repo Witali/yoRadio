@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import re
 import sys
+from urllib.parse import urlsplit
 
 from common import fixtures, require
 from diagnostic import DiagnosticCapture
@@ -30,24 +31,36 @@ def main():
     parser.add_argument('--host', required=True)
     parser.add_argument('--serial-port', required=True)
     parser.add_argument('--firmware', type=Path, required=True)
+    parser.add_argument('--case', default='lc-48000-stereo', help='Controlled fixture used for playback during OTA')
+    parser.add_argument('--https-origin', help='Use the local TLS listener for playback during OTA')
+    parser.add_argument('--tls-cert', type=Path)
+    parser.add_argument('--tls-key', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--suite', action='append', choices=('negative', 'roundtrip', 'while-playing', 'slow'))
     args = parser.parse_args()
+    require(bool(args.https_origin) == bool(args.tls_cert) == bool(args.tls_key),
+            'HTTPS playback requires its origin, certificate and key')
+    require(not args.https_origin or args.https_origin.startswith('https://'), 'Expected HTTPS playback origin')
     config = args.firmware.with_name('sdkconfig').read_text()
     require('CONFIG_YORADIO_QEMU=y' not in config, 'Do not flash a QEMU image')
     require('CONFIG_YORADIO_DEEP_SLEEP_CLOCK=y' not in config, 'Use an awake image')
     args.output.mkdir(parents=True, exist_ok=True)
     specs = fixtures()
+    require(args.case in specs and 'rate' in specs[args.case], 'Use one concrete playback fixture')
+    origin = args.https_origin or 'http://'+args.host+':8770'
+    port = (urlsplit(origin).port or 443) if args.https_origin else 8770
     metadata = dict(script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-                    fixture_hashes={'lc-48000-stereo': specs['lc-48000-stereo']['sha256']})
+                    fixture_hashes={args.case: specs[args.case]['sha256']},
+                    transport='https' if args.https_origin else 'http')
     capture = DiagnosticCapture(args.serial_port)
     argv = sys.argv
     result = 1
     try:
-        with Server(args.host, 8770, specs) as server:
+        with Server(args.host, port, specs,
+                    args.tls_cert, args.tls_key, pacing_ratio=1.0) as server:
             suites = args.suite or ['negative', 'roundtrip', 'while-playing', 'slow']
             sys.argv = ['ota.py', '--board', args.board, '--firmware', str(args.firmware),
-                        '--play-url', f'http://{args.host}:8770/stream/lc-48000-stereo',
+                        '--play-url', origin+'/stream/'+args.case, '--play-fixture', args.case,
                         '--output', str(args.output/'report.json')]
             for suite in suites:
                 sys.argv += ['--suite', suite]

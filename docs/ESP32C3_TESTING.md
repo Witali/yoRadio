@@ -1007,6 +1007,18 @@ report, and check the HTTP task's stack high-water mark as well as decode/output
 tasks. Under `--suite switch`, use at least three cycles. Never label the CPU
 usage of reduced-rate AAC-core fallback as full HE/SBR performance.
 
+## OTA during full-format playback
+
+For OTA during playback, `ota_diagnostic.py --case hev2-44100-stereo` requires
+three consecutive full-rate/profile/channel observations before uploading.
+Use `--https-origin https://PC_IP:8771 --tls-cert <server.pem> --tls-key <server.key>`
+to exercise HE-AACv2 and TLS reception together. The selected fixture hash,
+transport and actual pre-upload status are saved. The image must already
+trust the server certificate; this does not disable verification.
+`ota.py --play-fixture <name>` enables the same format gate for a separately
+controlled `--play-url`. Run `python tests/test-ota-playback-format.py` to verify
+rejection of core fallback, wrong channels/rates and transient matches.
+
 ## PCM-tail submission and EOF
 
 The staged output must flush its final partial block before publishing EOF and

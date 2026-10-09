@@ -14,7 +14,7 @@ import sys
 import time
 from urllib.parse import urlsplit
 
-from common import Board, Failure, Report, require, sha
+from common import Board, Failure, Report, fixtures, matches, require, sha
 
 
 BOUNDARY = 'yoradio-c3-acceptance-20260930'
@@ -104,14 +104,34 @@ def verify_snapshot(board, before):
     return dict(wifi_unchanged=True, playlist_unchanged=True, settings_unchanged=True)
 
 
+def wait_playback(board, spec=None, timeout=12):
+    """Require full fixture format before OTA; preserve the generic flag-only CLI."""
+    deadline = time.monotonic()+timeout
+    consecutive = 0
+    while time.monotonic() < deadline:
+        state = board.status()
+        correct = matches(state, spec) if spec is not None else state.get('audio') is True
+        consecutive = consecutive+1 if correct else 0
+        if consecutive >= (3 if spec is not None else 1):
+            return state
+        time.sleep(.3)
+    raise Failure('Expected playback format was not stable before OTA')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--board', required=True)
     parser.add_argument('--firmware', type=Path, required=True)
     parser.add_argument('--suite', choices=('negative','roundtrip','while-playing','slow'), action='append', required=True)
     parser.add_argument('--play-url', help='Controlled audio URL for --suite while-playing')
+    parser.add_argument('--play-fixture', help='Require this built-in fixture rate/channels/profile before OTA')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    play_spec = None
+    if args.play_fixture:
+        known = fixtures()
+        require(args.play_fixture in known and 'rate' in known[args.play_fixture], 'Unknown concrete playback fixture')
+        play_spec = known[args.play_fixture]
     board = Board(args.board)
     board.status()
     image = args.firmware.read_bytes()
@@ -124,6 +144,9 @@ def main():
     before = snapshot(board)
     report = Report(args.output, initial)
     report.data['image'] = expected
+    if play_spec is not None:
+        report.data['play_fixture'] = {k:play_spec[k] for k in
+            ('codec','profile','rate','channels','bits','sha256')}
 
     def reject(name, body, declared=None, interrupt=None):
         active = board.info()
@@ -139,15 +162,13 @@ def main():
         return dict(http=status, active_image_unchanged=True, **verify_snapshot(board,before))
 
     def accepted(slow=False, playing=False):
+        playback = None
         if playing:
             from common import Blocked
             if not args.play_url:
                 raise Blocked('Provide --play-url for OTA during active playback')
             board.play(args.play_url)
-            deadline = time.monotonic()+12
-            while time.monotonic() < deadline and not board.status()['audio']:
-                time.sleep(.3)
-            require(board.status()['audio'], 'Audio was not active before OTA')
+            playback = wait_playback(board, play_spec)
         active = board.info()
         target = 'app1' if active['partition'] == 'app0' else 'app0'
         start = time.monotonic()
@@ -155,7 +176,7 @@ def main():
         require(status == 200 and body == b'OK', 'OTA did not return HTTP 200 OK')
         booted = wait_image(board,expected['app_elf_sha256'],target)
         return dict(partition=booted['partition'], elapsed_seconds=time.monotonic()-start,
-                    hash_verified=True, **verify_snapshot(board,before))
+                    hash_verified=True, playback_before=playback, **verify_snapshot(board,before))
 
     try:
         if 'negative' in args.suite:
