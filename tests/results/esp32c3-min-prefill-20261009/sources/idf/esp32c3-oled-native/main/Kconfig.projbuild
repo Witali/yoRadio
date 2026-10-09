@@ -83,9 +83,8 @@ config YORADIO_INPUT_PREFILL_MIN_MS
     range 0 YORADIO_INPUT_PREFILL_MS
     default 0
     help
-        Wait at least this interval after leasing the first input packet,
-        then open the decoder once the queue is full or the maximum expires.
-        This can add delivery margin for bursty
+        Keep the existing input queue full for at least this startup interval
+        before opening the decoder. This can add delivery margin for bursty
         TLS records without allocating more RAM. Stop and station changes
         still cancel the wait. The maximum prefill time remains the deadline.
         Zero preserves the early-full exit; keep this experiment off until

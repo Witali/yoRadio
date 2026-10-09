@@ -1,0 +1,520 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-prefill-min250\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+420118ac <output_task>:
+    // Do not erase a completion interrupt occurring while the log is written.
+    *flow = (output_flow_t){.start_us = now, .overruns = overruns};
+}
+#endif
+
+static void output_task(void *argument) {
+420118ac:	7171                	addi	sp,sp,-176
+#ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
+    s_output_task = xTaskGetCurrentTaskHandle();
+#endif
+    uint32_t sample_rate = 0;
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+    output_flow_t flow = {0};
+420118ae:	1808                	addi	a0,sp,48
+420118b0:	04000613          	li	a2,64
+420118b4:	4581                	li	a1,0
+static void output_task(void *argument) {
+420118b6:	d706                	sw	ra,172(sp)
+420118b8:	d522                	sw	s0,168(sp)
+420118ba:	d326                	sw	s1,164(sp)
+420118bc:	d14a                	sw	s2,160(sp)
+420118be:	cf4e                	sw	s3,156(sp)
+420118c0:	cd52                	sw	s4,152(sp)
+420118c2:	cb56                	sw	s5,148(sp)
+420118c4:	c95a                	sw	s6,144(sp)
+420118c6:	c75e                	sw	s7,140(sp)
+420118c8:	c562                	sw	s8,136(sp)
+420118ca:	c366                	sw	s9,132(sp)
+420118cc:	c16a                	sw	s10,128(sp)
+420118ce:	deee                	sw	s11,124(sp)
+    output_flow_t flow = {0};
+420118d0:	fdfef097          	auipc	ra,0xfdfef
+420118d4:	a84080e7          	jalr	-1404(ra) # 40000354 <memset>
+#endif
+    uint32_t generation = atomic_load(&s_generation);
+420118d8:	3fc9a7b7          	lui	a5,0x3fc9a
+420118dc:	d0078793          	addi	a5,a5,-768 # 3fc99d00 <s_generation>
+420118e0:	0330000f          	fence	rw,rw
+420118e4:	0007ad03          	lw	s10,0(a5)
+420118e8:	0230000f          	fence	r,rw
+420118ec:	3c1266b7          	lui	a3,0x3c126
+420118f0:	3c126737          	lui	a4,0x3c126
+420118f4:	3c1267b7          	lui	a5,0x3c126
+        pipeline_wait_record(&flow.submit,
+            (uint32_t)(esp_timer_get_time() - submit_start), false);
+        output_flow_report(&flow, generation);
+#endif
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "%s write failed: %s", native_audio_output_name(),
+420118f8:	ae468693          	addi	a3,a3,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+                ESP_LOGE(TAG, "%s %lu Hz setup failed: %s",
+420118fc:	e1c70713          	addi	a4,a4,-484 # 3c125e1c <_esp_libc_clock_array_end+0x5ccc>
+            ESP_LOGW(TAG, "%s write failed: %s", native_audio_output_name(),
+42011900:	e4478793          	addi	a5,a5,-444 # 3c125e44 <_esp_libc_clock_array_end+0x5cf4>
+42011904:	c836                	sw	a3,16(sp)
+                ESP_LOGE(TAG, "%s %lu Hz setup failed: %s",
+42011906:	ce3a                	sw	a4,28(sp)
+            ESP_LOGW(TAG, "%s write failed: %s", native_audio_output_name(),
+42011908:	cc3e                	sw	a5,24(sp)
+    output_flow_t flow = {0};
+4201190a:	4c01                	li	s8,0
+4201190c:	4b81                	li	s7,0
+4201190e:	c202                	sw	zero,4(sp)
+42011910:	c402                	sw	zero,8(sp)
+42011912:	4b01                	li	s6,0
+42011914:	4981                	li	s3,0
+42011916:	4901                	li	s2,0
+42011918:	4401                	li	s0,0
+4201191a:	c002                	sw	zero,0(sp)
+4201191c:	4a81                	li	s5,0
+4201191e:	4a01                	li	s4,0
+    uint32_t sample_rate = 0;
+42011920:	c602                	sw	zero,12(sp)
+        uint32_t current_generation = atomic_load(&s_generation);
+42011922:	3fc9a7b7          	lui	a5,0x3fc9a
+42011926:	d0078793          	addi	a5,a5,-768 # 3fc99d00 <s_generation>
+4201192a:	0330000f          	fence	rw,rw
+4201192e:	4384                	lw	s1,0(a5)
+42011930:	0230000f          	fence	r,rw
+        if (generation != current_generation) {
+42011934:	03a48b63          	beq	s1,s10,4201196a <output_task+0xbe>
+            native_audio_output_discard_pcm();
+42011938:	1a6120ef          	jal	42023ade <native_audio_output_discard_pcm>
+        .overruns = native_audio_output_dma_overruns(),
+4201193c:	0a9110ef          	jal	420231e4 <native_audio_output_dma_overruns>
+42011940:	842a                	mv	s0,a0
+    *flow = (output_flow_t){
+42011942:	04000613          	li	a2,64
+42011946:	1808                	addi	a0,sp,48
+42011948:	4581                	li	a1,0
+4201194a:	fdfef097          	auipc	ra,0xfdfef
+4201194e:	a0a080e7          	jalr	-1526(ra) # 40000354 <memset>
+42011952:	4c01                	li	s8,0
+42011954:	d4a2                	sw	s0,104(sp)
+42011956:	4b81                	li	s7,0
+42011958:	c202                	sw	zero,4(sp)
+4201195a:	c402                	sw	zero,8(sp)
+4201195c:	4b01                	li	s6,0
+4201195e:	4981                	li	s3,0
+42011960:	4901                	li	s2,0
+42011962:	4401                	li	s0,0
+42011964:	c002                	sw	zero,0(sp)
+42011966:	4a81                	li	s5,0
+42011968:	4a01                	li	s4,0
+        pcm_packet_t *packet = pipeline_receive(s_pcm, &item_size,
+4201196a:	3fc9a7b7          	lui	a5,0x3fc9a
+4201196e:	d047ad03          	lw	s10,-764(a5) # 3fc99d04 <s_pcm>
+#include "pipeline_wait.h"
+
+static inline void *pipeline_receive(RingbufHandle_t ring, size_t *size,
+                                     TickType_t timeout,
+                                     pipeline_wait_t *stats) {
+    void *item = xRingbufferReceive(ring, size, 0);
+42011972:	4601                	li	a2,0
+42011974:	106c                	addi	a1,sp,44
+42011976:	856a                	mv	a0,s10
+        size_t item_size = 0;
+42011978:	d602                	sw	zero,44(sp)
+4201197a:	00106097          	auipc	ra,0x106
+4201197e:	efc080e7          	jalr	-260(ra) # 42117876 <xRingbufferReceive>
+42011982:	8caa                	mv	s9,a0
+    if (item) return item;
+42011984:	14050a63          	beqz	a0,42011ad8 <output_task+0x22c>
+        current_generation = atomic_load(&s_generation);
+42011988:	3fc9a7b7          	lui	a5,0x3fc9a
+4201198c:	d0078793          	addi	a5,a5,-768 # 3fc99d00 <s_generation>
+42011990:	0330000f          	fence	rw,rw
+42011994:	0007ad03          	lw	s10,0(a5)
+42011998:	0230000f          	fence	r,rw
+        if (generation != current_generation) {
+4201199c:	03a48b63          	beq	s1,s10,420119d2 <output_task+0x126>
+            native_audio_output_discard_pcm();
+420119a0:	13e120ef          	jal	42023ade <native_audio_output_discard_pcm>
+        .overruns = native_audio_output_dma_overruns(),
+420119a4:	041110ef          	jal	420231e4 <native_audio_output_dma_overruns>
+420119a8:	842a                	mv	s0,a0
+    *flow = (output_flow_t){
+420119aa:	04000613          	li	a2,64
+420119ae:	1808                	addi	a0,sp,48
+420119b0:	4581                	li	a1,0
+420119b2:	fdfef097          	auipc	ra,0xfdfef
+420119b6:	9a2080e7          	jalr	-1630(ra) # 40000354 <memset>
+420119ba:	4c01                	li	s8,0
+420119bc:	d4a2                	sw	s0,104(sp)
+420119be:	4b81                	li	s7,0
+420119c0:	c202                	sw	zero,4(sp)
+420119c2:	c402                	sw	zero,8(sp)
+420119c4:	4b01                	li	s6,0
+420119c6:	4981                	li	s3,0
+420119c8:	4901                	li	s2,0
+420119ca:	4401                	li	s0,0
+420119cc:	c002                	sw	zero,0(sp)
+420119ce:	4a81                	li	s5,0
+420119d0:	4a01                	li	s4,0
+        if (packet->generation != atomic_load(&s_generation)) {
+420119d2:	000ca703          	lw	a4,0(s9)
+420119d6:	3fc9a7b7          	lui	a5,0x3fc9a
+420119da:	d0078793          	addi	a5,a5,-768 # 3fc99d00 <s_generation>
+420119de:	0330000f          	fence	rw,rw
+420119e2:	439c                	lw	a5,0(a5)
+420119e4:	0230000f          	fence	r,rw
+420119e8:	16f71f63          	bne	a4,a5,42011b66 <output_task+0x2ba>
+        if (packet->end_of_stream) {
+420119ec:	00cca783          	lw	a5,12(s9)
+420119f0:	1c079063          	bnez	a5,42011bb0 <output_task+0x304>
+        if (packet->sample_rate != sample_rate) {
+420119f4:	004ca503          	lw	a0,4(s9)
+420119f8:	47b2                	lw	a5,12(sp)
+420119fa:	00f50a63          	beq	a0,a5,42011a0e <output_task+0x162>
+                native_audio_output_configure(packet->sample_rate);
+420119fe:	220120ef          	jal	42023c1e <native_audio_output_configure>
+42011a02:	8daa                	mv	s11,a0
+            if (result != ESP_OK) {
+42011a04:	26051563          	bnez	a0,42011c6e <output_task+0x3c2>
+            sample_rate = packet->sample_rate;
+42011a08:	004ca783          	lw	a5,4(s9)
+42011a0c:	c63e                	sw	a5,12(sp)
+        if (!flow.start_us) output_flow_reset(&flow, true);
+42011a0e:	014ae7b3          	or	a5,s5,s4
+} pipeline_wait_t;
+
+static inline void pipeline_wait_record(pipeline_wait_t *stats,
+                                        uint32_t us, bool timeout) {
+    stats->us += us;
+    ++stats->count;
+42011a12:	0b85                	addi	s7,s7,1
+42011a14:	16078363          	beqz	a5,42011b7a <output_task+0x2ce>
+        int64_t submit_start = esp_timer_get_time();
+42011a18:	fe370097          	auipc	ra,0xfe370
+42011a1c:	9bc080e7          	jalr	-1604(ra) # 403813d4 <esp_timer_get_time>
+        esp_err_t result = native_audio_output_write_pcm(
+42011a20:	009cc683          	lbu	a3,9(s9)
+42011a24:	008cc603          	lbu	a2,8(s9)
+42011a28:	00acd583          	lhu	a1,10(s9)
+        int64_t submit_start = esp_timer_get_time();
+42011a2c:	8daa                	mv	s11,a0
+        esp_err_t result = native_audio_output_write_pcm(
+42011a2e:	010c8513          	addi	a0,s9,16
+42011a32:	06d110ef          	jal	4202329e <native_audio_output_write_pcm>
+        vRingbufferReturnItem(s_pcm, packet);
+42011a36:	3fc9a7b7          	lui	a5,0x3fc9a
+        esp_err_t result = native_audio_output_write_pcm(
+42011a3a:	84aa                	mv	s1,a0
+        vRingbufferReturnItem(s_pcm, packet);
+42011a3c:	d047a503          	lw	a0,-764(a5) # 3fc99d04 <s_pcm>
+42011a40:	85e6                	mv	a1,s9
+42011a42:	00106097          	auipc	ra,0x106
+42011a46:	eb0080e7          	jalr	-336(ra) # 421178f2 <vRingbufferReturnItem>
+            (uint32_t)(esp_timer_get_time() - submit_start), false);
+42011a4a:	fe370097          	auipc	ra,0xfe370
+42011a4e:	98a080e7          	jalr	-1654(ra) # 403813d4 <esp_timer_get_time>
+    stats->us += us;
+42011a52:	4792                	lw	a5,4(sp)
+42011a54:	41b50533          	sub	a0,a0,s11
+42011a58:	46a2                	lw	a3,8(sp)
+42011a5a:	00f50733          	add	a4,a0,a5
+42011a5e:	00a737b3          	sltu	a5,a4,a0
+42011a62:	97b6                	add	a5,a5,a3
+        output_flow_report(&flow, generation);
+42011a64:	cabe                	sw	a5,84(sp)
+42011a66:	4782                	lw	a5,0(sp)
+42011a68:	c8ba                	sw	a4,80(sp)
+42011a6a:	d856                	sw	s5,48(sp)
+42011a6c:	da52                	sw	s4,52(sp)
+42011a6e:	dc22                	sw	s0,56(sp)
+42011a70:	de3e                	sw	a5,60(sp)
+42011a72:	c0ca                	sw	s2,64(sp)
+42011a74:	c2ce                	sw	s3,68(sp)
+42011a76:	c4da                	sw	s6,72(sp)
+42011a78:	ccde                	sw	s7,88(sp)
+    stats->timeouts += timeout;
+    if (us > stats->max_us) stats->max_us = us;
+42011a7a:	01857363          	bgeu	a0,s8,42011a80 <output_task+0x1d4>
+42011a7e:	8562                	mv	a0,s8
+42011a80:	d0aa                	sw	a0,96(sp)
+42011a82:	85ea                	mv	a1,s10
+42011a84:	1808                	addi	a0,sp,48
+42011a86:	eeaff0ef          	jal	42011170 <output_flow_report>
+42011a8a:	57f2                	lw	a5,60(sp)
+42011a8c:	5ac2                	lw	s5,48(sp)
+42011a8e:	5a52                	lw	s4,52(sp)
+42011a90:	c03e                	sw	a5,0(sp)
+42011a92:	47c6                	lw	a5,80(sp)
+42011a94:	5462                	lw	s0,56(sp)
+42011a96:	4906                	lw	s2,64(sp)
+42011a98:	c23e                	sw	a5,4(sp)
+42011a9a:	47d6                	lw	a5,84(sp)
+42011a9c:	4996                	lw	s3,68(sp)
+42011a9e:	4b26                	lw	s6,72(sp)
+42011aa0:	c43e                	sw	a5,8(sp)
+42011aa2:	4be6                	lw	s7,88(sp)
+42011aa4:	5c06                	lw	s8,96(sp)
+        if (result != ESP_OK) {
+42011aa6:	e6048ee3          	beqz	s1,42011922 <output_task+0x76>
+            ESP_LOGW(TAG, "%s write failed: %s", native_audio_output_name(),
+42011aaa:	fe378097          	auipc	ra,0xfe378
+42011aae:	9f4080e7          	jalr	-1548(ra) # 4038949e <esp_log_timestamp>
+42011ab2:	ca2a                	sw	a0,20(sp)
+42011ab4:	28a120ef          	jal	42023d3e <native_audio_output_name>
+42011ab8:	8daa                	mv	s11,a0
+42011aba:	8526                	mv	a0,s1
+42011abc:	b35f00ef          	jal	420025f0 <esp_err_to_name>
+42011ac0:	4742                	lw	a4,16(sp)
+42011ac2:	46d2                	lw	a3,20(sp)
+42011ac4:	4662                	lw	a2,24(sp)
+42011ac6:	882a                	mv	a6,a0
+42011ac8:	87ee                	mv	a5,s11
+42011aca:	85ba                	mv	a1,a4
+42011acc:	4509                	li	a0,2
+42011ace:	fe378097          	auipc	ra,0xfe378
+42011ad2:	8c8080e7          	jalr	-1848(ra) # 40389396 <esp_log>
+42011ad6:	b5b1                	j	42011922 <output_task+0x76>
+    int64_t start = esp_timer_get_time();
+42011ad8:	fe370097          	auipc	ra,0xfe370
+42011adc:	8fc080e7          	jalr	-1796(ra) # 403813d4 <esp_timer_get_time>
+42011ae0:	8daa                	mv	s11,a0
+    item = xRingbufferReceive(ring, size, timeout);
+42011ae2:	106c                	addi	a1,sp,44
+42011ae4:	856a                	mv	a0,s10
+42011ae6:	4615                	li	a2,5
+42011ae8:	00106097          	auipc	ra,0x106
+42011aec:	d8e080e7          	jalr	-626(ra) # 42117876 <xRingbufferReceive>
+42011af0:	8caa                	mv	s9,a0
+    pipeline_wait_record(stats, (uint32_t)(esp_timer_get_time() - start),
+42011af2:	fe370097          	auipc	ra,0xfe370
+42011af6:	8e2080e7          	jalr	-1822(ra) # 403813d4 <esp_timer_get_time>
+    stats->us += us;
+42011afa:	4782                	lw	a5,0(sp)
+42011afc:	41b50533          	sub	a0,a0,s11
+42011b00:	00a40db3          	add	s11,s0,a0
+42011b04:	008dbd33          	sltu	s10,s11,s0
+42011b08:	9d3e                	add	s10,s10,a5
+42011b0a:	c06a                	sw	s10,0(sp)
+42011b0c:	001cb793          	seqz	a5,s9
+    stats->timeouts += timeout;
+42011b10:	99be                	add	s3,s3,a5
+    ++stats->count;
+42011b12:	0905                	addi	s2,s2,1
+    stats->us += us;
+42011b14:	846e                	mv	s0,s11
+    if (us > stats->max_us) stats->max_us = us;
+42011b16:	00ab7363          	bgeu	s6,a0,42011b1c <output_task+0x270>
+42011b1a:	8b2a                	mv	s6,a0
+        if (!packet) {
+42011b1c:	e60c96e3          	bnez	s9,42011988 <output_task+0xdc>
+            native_audio_output_idle();
+42011b20:	218120ef          	jal	42023d38 <native_audio_output_idle>
+            output_flow_report(&flow, generation);
+42011b24:	4792                	lw	a5,4(sp)
+42011b26:	85a6                	mv	a1,s1
+42011b28:	1808                	addi	a0,sp,48
+42011b2a:	c8be                	sw	a5,80(sp)
+42011b2c:	47a2                	lw	a5,8(sp)
+42011b2e:	d856                	sw	s5,48(sp)
+42011b30:	da52                	sw	s4,52(sp)
+42011b32:	de6a                	sw	s10,60(sp)
+42011b34:	c0ca                	sw	s2,64(sp)
+42011b36:	c2ce                	sw	s3,68(sp)
+42011b38:	c4da                	sw	s6,72(sp)
+42011b3a:	cabe                	sw	a5,84(sp)
+42011b3c:	ccde                	sw	s7,88(sp)
+42011b3e:	d0e2                	sw	s8,96(sp)
+42011b40:	dc6e                	sw	s11,56(sp)
+42011b42:	e2eff0ef          	jal	42011170 <output_flow_report>
+42011b46:	57f2                	lw	a5,60(sp)
+42011b48:	5ac2                	lw	s5,48(sp)
+42011b4a:	5a52                	lw	s4,52(sp)
+42011b4c:	c03e                	sw	a5,0(sp)
+42011b4e:	47c6                	lw	a5,80(sp)
+42011b50:	5462                	lw	s0,56(sp)
+42011b52:	4906                	lw	s2,64(sp)
+42011b54:	c23e                	sw	a5,4(sp)
+42011b56:	47d6                	lw	a5,84(sp)
+42011b58:	4996                	lw	s3,68(sp)
+42011b5a:	4b26                	lw	s6,72(sp)
+42011b5c:	4be6                	lw	s7,88(sp)
+42011b5e:	5c06                	lw	s8,96(sp)
+            continue;
+42011b60:	8d26                	mv	s10,s1
+            output_flow_report(&flow, generation);
+42011b62:	c43e                	sw	a5,8(sp)
+            continue;
+42011b64:	bb7d                	j	42011922 <output_task+0x76>
+            vRingbufferReturnItem(s_pcm, packet);
+42011b66:	3fc9a7b7          	lui	a5,0x3fc9a
+42011b6a:	d047a503          	lw	a0,-764(a5) # 3fc99d04 <s_pcm>
+42011b6e:	85e6                	mv	a1,s9
+42011b70:	00106097          	auipc	ra,0x106
+42011b74:	d82080e7          	jalr	-638(ra) # 421178f2 <vRingbufferReturnItem>
+            continue;
+42011b78:	b36d                	j	42011922 <output_task+0x76>
+        .start_us = active ? esp_timer_get_time() : 0,
+42011b7a:	fe370097          	auipc	ra,0xfe370
+42011b7e:	85a080e7          	jalr	-1958(ra) # 403813d4 <esp_timer_get_time>
+42011b82:	8a2e                	mv	s4,a1
+42011b84:	8aaa                	mv	s5,a0
+        .overruns = native_audio_output_dma_overruns(),
+42011b86:	65e110ef          	jal	420231e4 <native_audio_output_dma_overruns>
+    *flow = (output_flow_t){
+42011b8a:	d4aa                	sw	a0,104(sp)
+42011b8c:	c682                	sw	zero,76(sp)
+42011b8e:	c882                	sw	zero,80(sp)
+42011b90:	ca82                	sw	zero,84(sp)
+42011b92:	cc82                	sw	zero,88(sp)
+42011b94:	ce82                	sw	zero,92(sp)
+42011b96:	d082                	sw	zero,96(sp)
+42011b98:	d282                	sw	zero,100(sp)
+42011b9a:	d682                	sw	zero,108(sp)
+42011b9c:	4c01                	li	s8,0
+42011b9e:	4b01                	li	s6,0
+42011ba0:	4981                	li	s3,0
+42011ba2:	4901                	li	s2,0
+}
+42011ba4:	4b85                	li	s7,1
+    *flow = (output_flow_t){
+42011ba6:	c202                	sw	zero,4(sp)
+42011ba8:	c402                	sw	zero,8(sp)
+42011baa:	4401                	li	s0,0
+42011bac:	c002                	sw	zero,0(sp)
+}
+42011bae:	b5ad                	j	42011a18 <output_task+0x16c>
+            esp_err_t flush_result = native_audio_output_flush_pcm();
+42011bb0:	759110ef          	jal	42023b08 <native_audio_output_flush_pcm>
+42011bb4:	842a                	mv	s0,a0
+            if (flush_result != ESP_OK) ESP_LOGW(TAG, "PCM tail flush failed: %s", esp_err_to_name(flush_result));
+42011bb6:	0e051f63          	bnez	a0,42011cb4 <output_task+0x408>
+            ESP_LOGI(TAG, "PERF PCM_END: generation=%lu completion=%lu result=%d",
+42011bba:	fe378097          	auipc	ra,0xfe378
+42011bbe:	8e4080e7          	jalr	-1820(ra) # 4038949e <esp_log_timestamp>
+42011bc2:	4742                	lw	a4,16(sp)
+42011bc4:	000ca783          	lw	a5,0(s9)
+42011bc8:	00cca803          	lw	a6,12(s9)
+42011bcc:	3c126637          	lui	a2,0x3c126
+42011bd0:	86aa                	mv	a3,a0
+42011bd2:	85ba                	mv	a1,a4
+42011bd4:	88a2                	mv	a7,s0
+42011bd6:	dd860613          	addi	a2,a2,-552 # 3c125dd8 <_esp_libc_clock_array_end+0x5c88>
+42011bda:	450d                	li	a0,3
+42011bdc:	fe377097          	auipc	ra,0xfe377
+42011be0:	7ba080e7          	jalr	1978(ra) # 40389396 <esp_log>
+                    audio_completion_status(packet->end_of_stream));
+42011be4:	00cca783          	lw	a5,12(s9)
+};
+
+static inline const char *audio_completion_status(unsigned reason) {
+    switch (reason) {
+        case AUDIO_END_READ_FAILED: return "stream read failed";
+        case AUDIO_END_BUFFER_STALLED: return "buffer stalled";
+42011be8:	3c126737          	lui	a4,0x3c126
+42011bec:	d9070693          	addi	a3,a4,-624 # 3c125d90 <_esp_libc_clock_array_end+0x5c40>
+    switch (reason) {
+42011bf0:	470d                	li	a4,3
+    state_set_audio(packet->generation, false,
+42011bf2:	000ca583          	lw	a1,0(s9)
+42011bf6:	02e78463          	beq	a5,a4,42011c1e <output_task+0x372>
+        case AUDIO_END_UNAVAILABLE: return AUDIO_STATUS_STATION_UNAVAILABLE;
+42011bfa:	3c1256b7          	lui	a3,0x3c125
+    switch (reason) {
+42011bfe:	4711                	li	a4,4
+        case AUDIO_END_UNAVAILABLE: return AUDIO_STATUS_STATION_UNAVAILABLE;
+42011c00:	4f468693          	addi	a3,a3,1268 # 3c1254f4 <_esp_libc_clock_array_end+0x53a4>
+    switch (reason) {
+42011c04:	00e78d63          	beq	a5,a4,42011c1e <output_task+0x372>
+42011c08:	3c126737          	lui	a4,0x3c126
+42011c0c:	d7c70693          	addi	a3,a4,-644 # 3c125d7c <_esp_libc_clock_array_end+0x5c2c>
+42011c10:	4709                	li	a4,2
+42011c12:	00e78663          	beq	a5,a4,42011c1e <output_task+0x372>
+        default: return "stream ended";
+42011c16:	3c1267b7          	lui	a5,0x3c126
+42011c1a:	da078693          	addi	a3,a5,-608 # 3c125da0 <_esp_libc_clock_array_end+0x5c50>
+    native_state_set_audio(s_state, generation, running, format);
+42011c1e:	3fc9a7b7          	lui	a5,0x3fc9a
+42011c22:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42011c26:	4601                	li	a2,0
+    *flow = (output_flow_t){
+42011c28:	4c01                	li	s8,0
+    native_state_set_audio(s_state, generation, running, format);
+42011c2a:	2fa050ef          	jal	42016f24 <native_state_set_audio>
+            vRingbufferReturnItem(s_pcm, packet);
+42011c2e:	3fc9a7b7          	lui	a5,0x3fc9a
+42011c32:	d047a503          	lw	a0,-764(a5) # 3fc99d04 <s_pcm>
+42011c36:	85e6                	mv	a1,s9
+    *flow = (output_flow_t){
+42011c38:	4b81                	li	s7,0
+            vRingbufferReturnItem(s_pcm, packet);
+42011c3a:	00106097          	auipc	ra,0x106
+42011c3e:	cb8080e7          	jalr	-840(ra) # 421178f2 <vRingbufferReturnItem>
+        .overruns = native_audio_output_dma_overruns(),
+42011c42:	5a2110ef          	jal	420231e4 <native_audio_output_dma_overruns>
+42011c46:	842a                	mv	s0,a0
+    *flow = (output_flow_t){
+42011c48:	04000613          	li	a2,64
+42011c4c:	1808                	addi	a0,sp,48
+42011c4e:	4581                	li	a1,0
+42011c50:	fdfee097          	auipc	ra,0xfdfee
+42011c54:	704080e7          	jalr	1796(ra) # 40000354 <memset>
+42011c58:	4b01                	li	s6,0
+42011c5a:	d4a2                	sw	s0,104(sp)
+42011c5c:	c202                	sw	zero,4(sp)
+42011c5e:	c402                	sw	zero,8(sp)
+42011c60:	4981                	li	s3,0
+42011c62:	4901                	li	s2,0
+42011c64:	4401                	li	s0,0
+42011c66:	c002                	sw	zero,0(sp)
+42011c68:	4a81                	li	s5,0
+42011c6a:	4a01                	li	s4,0
+            continue;
+42011c6c:	b95d                	j	42011922 <output_task+0x76>
+                ESP_LOGE(TAG, "%s %lu Hz setup failed: %s",
+42011c6e:	fe378097          	auipc	ra,0xfe378
+42011c72:	830080e7          	jalr	-2000(ra) # 4038949e <esp_log_timestamp>
+42011c76:	ca2a                	sw	a0,20(sp)
+42011c78:	0c6120ef          	jal	42023d3e <native_audio_output_name>
+42011c7c:	84aa                	mv	s1,a0
+42011c7e:	856e                	mv	a0,s11
+42011c80:	004cad83          	lw	s11,4(s9)
+42011c84:	96df00ef          	jal	420025f0 <esp_err_to_name>
+42011c88:	4742                	lw	a4,16(sp)
+42011c8a:	46d2                	lw	a3,20(sp)
+42011c8c:	4672                	lw	a2,28(sp)
+42011c8e:	88aa                	mv	a7,a0
+42011c90:	87a6                	mv	a5,s1
+42011c92:	85ba                	mv	a1,a4
+42011c94:	886e                	mv	a6,s11
+42011c96:	4505                	li	a0,1
+42011c98:	fe377097          	auipc	ra,0xfe377
+42011c9c:	6fe080e7          	jalr	1790(ra) # 40389396 <esp_log>
+                vRingbufferReturnItem(s_pcm, packet);
+42011ca0:	3fc9a7b7          	lui	a5,0x3fc9a
+42011ca4:	d047a503          	lw	a0,-764(a5) # 3fc99d04 <s_pcm>
+42011ca8:	85e6                	mv	a1,s9
+42011caa:	00106097          	auipc	ra,0x106
+42011cae:	c48080e7          	jalr	-952(ra) # 421178f2 <vRingbufferReturnItem>
+                continue;
+42011cb2:	b985                	j	42011922 <output_task+0x76>
+            if (flush_result != ESP_OK) ESP_LOGW(TAG, "PCM tail flush failed: %s", esp_err_to_name(flush_result));
+42011cb4:	fe377097          	auipc	ra,0xfe377
+42011cb8:	7ea080e7          	jalr	2026(ra) # 4038949e <esp_log_timestamp>
+42011cbc:	84aa                	mv	s1,a0
+42011cbe:	8522                	mv	a0,s0
+42011cc0:	931f00ef          	jal	420025f0 <esp_err_to_name>
+42011cc4:	4742                	lw	a4,16(sp)
+42011cc6:	3c126637          	lui	a2,0x3c126
+42011cca:	87aa                	mv	a5,a0
+42011ccc:	86a6                	mv	a3,s1
+42011cce:	db060613          	addi	a2,a2,-592 # 3c125db0 <_esp_libc_clock_array_end+0x5c60>
+42011cd2:	85ba                	mv	a1,a4
+42011cd4:	4509                	li	a0,2
+42011cd6:	fe377097          	auipc	ra,0xfe377
+42011cda:	6c0080e7          	jalr	1728(ra) # 40389396 <esp_log>
+42011cde:	bdf1                	j	42011bba <output_task+0x30e>

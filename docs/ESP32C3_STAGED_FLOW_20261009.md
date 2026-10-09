@@ -125,8 +125,10 @@ The existing maximum prefill exits early when the queue fills, after about
 9 ms for bursty full records. Small records instead use the 500 ms deadline.
 Commit `f2d94570` adds an experimental, default-zero minimum prefill. A 250 ms
 minimum retains the same queue and the same 500 ms deadline; Stop and new
-generations cancel promptly. Its separate image is still under evaluation.
-It is not part of the measurements above.
+generations cancel promptly. The [completed separate comparison](ESP32C3_MIN_PREFILL_20261009.md)
+records zero observed DMA queue events for that candidate, including its
+600 s alternating-record case. It is not part of the measurements above,
+and broader candidate qualification remains open.
 
 No acoustic capture or listening comparison is available. Fractional clocking
 and minimum prefill remain experimental. This diagnosis does not qualify all
