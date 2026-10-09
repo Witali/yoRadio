@@ -1,0 +1,24 @@
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-flac-input-growth-20261009/host-stream-enabled/test.c: In function ‘stream_http_read’:
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-flac-input-growth-20261009/host-stream-enabled/test.c:236:21: error: implicit declaration of function ‘tls_path_profile_begin’ [-Werror=implicit-function-declaration]
+  236 |     int64_t start = tls_path_profile_begin();
+      |                     ^~~~~~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-flac-input-growth-20261009/host-stream-enabled/test.c:238:5: error: implicit declaration of function ‘tls_path_profile_end’ [-Werror=implicit-function-declaration]
+  238 |     tls_path_profile_end(TLS_PATH_HTTP_READ, start, length > 0 ? (size_t)length : 0,
+      |     ^~~~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-flac-input-growth-20261009/host-stream-enabled/test.c:238:26: error: ‘TLS_PATH_HTTP_READ’ undeclared (first use in this function)
+  238 |     tls_path_profile_end(TLS_PATH_HTTP_READ, start, length > 0 ? (size_t)length : 0,
+      |                          ^~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-flac-input-growth-20261009/host-stream-enabled/test.c:238:26: note: each undeclared identifier is reported only once for each function it appears in
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-flac-input-growth-20261009/host-stream-enabled/test.c:239:61: error: ‘TLS_PATH_OK’ undeclared (first use in this function)
+  239 |         received > 0 ? (size_t)received : 0, received > 0 ? TLS_PATH_OK :
+      |                                                             ^~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-flac-input-growth-20261009/host-stream-enabled/test.c:240:25: error: ‘TLS_PATH_ZERO’ undeclared (first use in this function)
+  240 |         received == 0 ? TLS_PATH_ZERO : received == -ESP_ERR_HTTP_EAGAIN ? TLS_PATH_RETRY : TLS_PATH_ERROR);
+      |                         ^~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-flac-input-growth-20261009/host-stream-enabled/test.c:240:76: error: ‘TLS_PATH_RETRY’ undeclared (first use in this function)
+  240 |         received == 0 ? TLS_PATH_ZERO : received == -ESP_ERR_HTTP_EAGAIN ? TLS_PATH_RETRY : TLS_PATH_ERROR);
+      |                                                                            ^~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-flac-input-growth-20261009/host-stream-enabled/test.c:240:93: error: ‘TLS_PATH_ERROR’ undeclared (first use in this function)
+  240 |         received == 0 ? TLS_PATH_ZERO : received == -ESP_ERR_HTTP_EAGAIN ? TLS_PATH_RETRY : TLS_PATH_ERROR);
+      |                                                                                             ^~~~~~~~~~~~~~
+cc1: all warnings being treated as errors

@@ -1,0 +1,1247 @@
+42011ce0:	7129                	addi	sp,sp,-320
+42011ce2:	12112e23          	sw	ra,316(sp)
+42011ce6:	12812c23          	sw	s0,312(sp)
+42011cea:	12912a23          	sw	s1,308(sp)
+42011cee:	13212823          	sw	s2,304(sp)
+42011cf2:	13312623          	sw	s3,300(sp)
+42011cf6:	13412423          	sw	s4,296(sp)
+42011cfa:	13512223          	sw	s5,292(sp)
+42011cfe:	13612023          	sw	s6,288(sp)
+42011d02:	11712e23          	sw	s7,284(sp)
+42011d06:	11912a23          	sw	s9,276(sp)
+42011d0a:	11b12623          	sw	s11,268(sp)
+42011d0e:	11812c23          	sw	s8,280(sp)
+42011d12:	11a12823          	sw	s10,272(sp)
+42011d16:	5ca020ef          	jal	420142e0 <decoder_register_codecs>
+42011d1a:	842a                	mv	s0,a0
+42011d1c:	06000613          	li	a2,96
+42011d20:	1108                	addi	a0,sp,160
+42011d22:	4581                	li	a1,0
+42011d24:	da02                	sw	zero,52(sp)
+42011d26:	fdfee097          	auipc	ra,0xfdfee
+42011d2a:	62e080e7          	jalr	1582(ra) # 40000354 <memset>
+42011d2e:	3fc9a737          	lui	a4,0x3fc9a
+42011d32:	000f47b7          	lui	a5,0xf4
+42011d36:	ce870713          	addi	a4,a4,-792 # 3fc99ce8 <s_bitrate_updated_us>
+42011d3a:	24078793          	addi	a5,a5,576 # f4240 <CSR_UINTSTATUS+0xf358f>
+42011d3e:	de02                	sw	zero,60(sp)
+42011d40:	c082                	sw	zero,64(sp)
+42011d42:	c282                	sw	zero,68(sp)
+42011d44:	c482                	sw	zero,72(sp)
+42011d46:	02010923          	sb	zero,50(sp)
+42011d4a:	d23a                	sw	a4,36(sp)
+42011d4c:	d43e                	sw	a5,40(sp)
+42011d4e:	4981                	li	s3,0
+42011d50:	4a81                	li	s5,0
+42011d52:	4901                	li	s2,0
+42011d54:	4c81                	li	s9,0
+42011d56:	4b01                	li	s6,0
+42011d58:	ce02                	sw	zero,28(sp)
+42011d5a:	4481                	li	s1,0
+42011d5c:	4b81                	li	s7,0
+42011d5e:	3fc9aa37          	lui	s4,0x3fc9a
+42011d62:	3fc9adb7          	lui	s11,0x3fc9a
+42011d66:	7f7160ef          	jal	42028d5c <tls_input_reserve_poll>
+42011d6a:	d04a0793          	addi	a5,s4,-764 # 3fc99d04 <s_generation>
+42011d6e:	0330000f          	fence	rw,rw
+42011d72:	0007ac03          	lw	s8,0(a5)
+42011d76:	0230000f          	fence	r,rw
+42011d7a:	429c0d63          	beq	s8,s1,420121b4 <decoder_task+0x4d4>
+42011d7e:	3fc9a7b7          	lui	a5,0x3fc9a
+42011d82:	d0078793          	addi	a5,a5,-768 # 3fc99d00 <s_decoder_target_codec>
+42011d86:	0330000f          	fence	rw,rw
+42011d8a:	4384                	lw	s1,0(a5)
+42011d8c:	0230000f          	fence	r,rw
+42011d90:	5552                	lw	a0,52(sp)
+42011d92:	c119                	beqz	a0,42011d98 <decoder_task+0xb8>
+42011d94:	12f270ef          	jal	420396c2 <esp_audio_simple_dec_close>
+42011d98:	854e                	mv	a0,s3
+42011d9a:	da02                	sw	zero,52(sp)
+42011d9c:	5a6020ef          	jal	42014342 <native_aac_decoder_destroy>
+42011da0:	000b8563          	beqz	s7,42011daa <decoder_task+0xca>
+42011da4:	855e                	mv	a0,s7
+42011da6:	277230ef          	jal	4203581c <custom_flac_decoder_destroy>
+42011daa:	48048b63          	beqz	s1,42012240 <decoder_task+0x560>
+42011dae:	de02                	sw	zero,60(sp)
+42011db0:	c082                	sw	zero,64(sp)
+42011db2:	c282                	sw	zero,68(sp)
+42011db4:	c482                	sw	zero,72(sp)
+42011db6:	02010923          	sb	zero,50(sp)
+42011dba:	3fc9a7b7          	lui	a5,0x3fc9a
+42011dbe:	cfc78793          	addi	a5,a5,-772 # 3fc99cfc <s_decoder_released_generation>
+42011dc2:	0310000f          	fence	rw,w
+42011dc6:	0187a023          	sw	s8,0(a5)
+42011dca:	0330000f          	fence	rw,rw
+42011dce:	4b81                	li	s7,0
+42011dd0:	84e2                	mv	s1,s8
+42011dd2:	ce02                	sw	zero,28(sp)
+42011dd4:	4b01                	li	s6,0
+42011dd6:	4c81                	li	s9,0
+42011dd8:	4981                	li	s3,0
+42011dda:	d0cda503          	lw	a0,-756(s11) # 3fc99d0c <s_encoded>
+42011dde:	4601                	li	a2,0
+42011de0:	182c                	addi	a1,sp,56
+42011de2:	dc02                	sw	zero,56(sp)
+42011de4:	25f160ef          	jal	42028842 <adaptive_input_receive>
+42011de8:	8d2a                	mv	s10,a0
+42011dea:	40050163          	beqz	a0,420121ec <decoder_task+0x50c>
+42011dee:	000d2703          	lw	a4,0(s10)
+42011df2:	d04a0793          	addi	a5,s4,-764
+42011df6:	0330000f          	fence	rw,rw
+42011dfa:	439c                	lw	a5,0(a5)
+42011dfc:	0230000f          	fence	r,rw
+42011e00:	3ef71063          	bne	a4,a5,420121e0 <decoder_task+0x500>
+42011e04:	000d2783          	lw	a5,0(s10)
+42011e08:	4772                	lw	a4,28(sp)
+42011e0a:	3ce78b63          	beq	a5,a4,420121e0 <decoder_task+0x500>
+42011e0e:	004d2703          	lw	a4,4(s10)
+42011e12:	e709                	bnez	a4,42011e1c <decoder_task+0x13c>
+42011e14:	00ad4703          	lbu	a4,10(s10)
+42011e18:	64071863          	bnez	a4,42012468 <decoder_task+0x788>
+42011e1c:	12041c63          	bnez	s0,42011f54 <decoder_task+0x274>
+42011e20:	14978363          	beq	a5,s1,42011f66 <decoder_task+0x286>
+42011e24:	5552                	lw	a0,52(sp)
+42011e26:	c119                	beqz	a0,42011e2c <decoder_task+0x14c>
+42011e28:	09b270ef          	jal	420396c2 <esp_audio_simple_dec_close>
+42011e2c:	854e                	mv	a0,s3
+42011e2e:	da02                	sw	zero,52(sp)
+42011e30:	512020ef          	jal	42014342 <native_aac_decoder_destroy>
+42011e34:	000b8563          	beqz	s7,42011e3e <decoder_task+0x15e>
+42011e38:	855e                	mv	a0,s7
+42011e3a:	1e3230ef          	jal	4203581c <custom_flac_decoder_destroy>
+42011e3e:	008d5783          	lhu	a5,8(s10)
+42011e42:	c789                	beqz	a5,42011e4c <decoder_task+0x16c>
+42011e44:	00ad4783          	lbu	a5,10(s10)
+42011e48:	50078863          	beqz	a5,42012358 <decoder_task+0x678>
+42011e4c:	5712                	lw	a4,36(sp)
+42011e4e:	3fc9a7b7          	lui	a5,0x3fc9a
+42011e52:	4801                	li	a6,0
+42011e54:	ce07a823          	sw	zero,-784(a5) # 3fc99cf0 <s_published_bitrate_bps>
+42011e58:	4781                	li	a5,0
+42011e5a:	c31c                	sw	a5,0(a4)
+42011e5c:	000d2483          	lw	s1,0(s10)
+42011e60:	004d2b03          	lw	s6,4(s10)
+42011e64:	01072223          	sw	a6,4(a4)
+42011e68:	02010923          	sb	zero,50(sp)
+42011e6c:	fe36f097          	auipc	ra,0xfe36f
+42011e70:	568080e7          	jalr	1384(ra) # 403813d4 <esp_timer_get_time>
+42011e74:	8c2a                	mv	s8,a0
+42011e76:	8cae                	mv	s9,a1
+42011e78:	05000613          	li	a2,80
+42011e7c:	1908                	addi	a0,sp,176
+42011e7e:	4581                	li	a1,0
+42011e80:	fdfee097          	auipc	ra,0xfdfee
+42011e84:	4d4080e7          	jalr	1236(ra) # 40000354 <memset>
+42011e88:	478d                	li	a5,3
+42011e8a:	d126                	sw	s1,160(sp)
+42011e8c:	d35a                	sw	s6,164(sp)
+42011e8e:	d562                	sw	s8,168(sp)
+42011e90:	d766                	sw	s9,172(sp)
+42011e92:	3afb0d63          	beq	s6,a5,4201224c <decoder_task+0x56c>
+42011e96:	4789                	li	a5,2
+42011e98:	48fb0563          	beq	s6,a5,42012322 <decoder_task+0x642>
+42011e9c:	640d                	lui	s0,0x3
+42011e9e:	0e8af2e3          	bgeu	s5,s0,42012782 <decoder_task+0xaa2>
+42011ea2:	85a2                	mv	a1,s0
+42011ea4:	854a                	mv	a0,s2
+42011ea6:	c9af70ef          	jal	42009340 <realloc>
+42011eaa:	0e0501e3          	beqz	a0,4201278c <decoder_task+0xaac>
+42011eae:	c302                	sw	zero,132(sp)
+42011eb0:	c502                	sw	zero,136(sp)
+42011eb2:	c702                	sw	zero,140(sp)
+42011eb4:	892a                	mv	s2,a0
+42011eb6:	8aa2                	mv	s5,s0
+42011eb8:	4791                	li	a5,4
+42011eba:	08fb07e3          	beq	s6,a5,42012748 <decoder_task+0xa68>
+42011ebe:	203357b7          	lui	a5,0x20335
+42011ec2:	04d78793          	addi	a5,a5,77 # 2033504d <CSR_UINTSTATUS+0x2033439c>
+42011ec6:	184c                	addi	a1,sp,52
+42011ec8:	0108                	addi	a0,sp,128
+42011eca:	c13e                	sw	a5,128(sp)
+42011ecc:	076160ef          	jal	42027f42 <__wrap_esp_audio_simple_dec_open>
+42011ed0:	842a                	mv	s0,a0
+42011ed2:	080507e3          	beqz	a0,42012760 <decoder_task+0xa80>
+42011ed6:	fe377097          	auipc	ra,0xfe377
+42011eda:	5c8080e7          	jalr	1480(ra) # 4038949e <esp_log_timestamp>
+42011ede:	3c1267b7          	lui	a5,0x3c126
+42011ee2:	4985                	li	s3,1
+42011ee4:	86aa                	mv	a3,a0
+42011ee6:	ad878793          	addi	a5,a5,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+42011eea:	233b1ee3          	bne	s6,s3,42012926 <decoder_task+0xc46>
+42011eee:	3c126737          	lui	a4,0x3c126
+42011ef2:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42011ef6:	3c126637          	lui	a2,0x3c126
+42011efa:	85ba                	mv	a1,a4
+42011efc:	8822                	mv	a6,s0
+42011efe:	f9060613          	addi	a2,a2,-112 # 3c125f90 <_esp_libc_clock_array_end+0x5e40>
+42011f02:	4505                	li	a0,1
+42011f04:	fe377097          	auipc	ra,0xfe377
+42011f08:	492080e7          	jalr	1170(ra) # 40389396 <esp_log>
+42011f0c:	3c126737          	lui	a4,0x3c126
+42011f10:	57f9                	li	a5,-2
+42011f12:	e7470693          	addi	a3,a4,-396 # 3c125e74 <_esp_libc_clock_array_end+0x5d24>
+42011f16:	42f409e3          	beq	s0,a5,42012b48 <decoder_task+0xe68>
+42011f1a:	3fc9a7b7          	lui	a5,0x3fc9a
+42011f1e:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+42011f22:	4601                	li	a2,0
+42011f24:	85a6                	mv	a1,s1
+42011f26:	052050ef          	jal	42016f78 <native_state_set_audio>
+42011f2a:	5552                	lw	a0,52(sp)
+42011f2c:	c501                	beqz	a0,42011f34 <decoder_task+0x254>
+42011f2e:	794270ef          	jal	420396c2 <esp_audio_simple_dec_close>
+42011f32:	da02                	sw	zero,52(sp)
+42011f34:	854a                	mv	a0,s2
+42011f36:	c0ef70ef          	jal	42009344 <cfree>
+42011f3a:	4a81                	li	s5,0
+42011f3c:	ce26                	sw	s1,28(sp)
+42011f3e:	4901                	li	s2,0
+42011f40:	4b81                	li	s7,0
+42011f42:	4c81                	li	s9,0
+42011f44:	d0cda503          	lw	a0,-756(s11)
+42011f48:	85ea                	mv	a1,s10
+42011f4a:	4981                	li	s3,0
+42011f4c:	1f5160ef          	jal	42028940 <adaptive_input_return>
+42011f50:	4401                	li	s0,0
+42011f52:	bd11                	j	42011d66 <decoder_task+0x86>
+42011f54:	38c020ef          	jal	420142e0 <decoder_register_codecs>
+42011f58:	842a                	mv	s0,a0
+42011f5a:	0a0512e3          	bnez	a0,420127fe <decoder_task+0xb1e>
+42011f5e:	000d2783          	lw	a5,0(s10)
+42011f62:	ec9791e3          	bne	a5,s1,42011e24 <decoder_task+0x144>
+42011f66:	004d2783          	lw	a5,4(s10)
+42011f6a:	eb679de3          	bne	a5,s6,42011e24 <decoder_task+0x144>
+42011f6e:	478d                	li	a5,3
+42011f70:	14fb0ce3          	beq	s6,a5,420128c8 <decoder_task+0xbe8>
+42011f74:	57d2                	lw	a5,52(sp)
+42011f76:	00f9e7b3          	or	a5,s3,a5
+42011f7a:	d7e9                	beqz	a5,42011f44 <decoder_task+0x264>
+42011f7c:	008d5783          	lhu	a5,8(s10)
+42011f80:	00bd0713          	addi	a4,s10,11
+42011f84:	da82                	sw	zero,116(sp)
+42011f86:	dc82                	sw	zero,120(sp)
+42011f88:	de82                	sw	zero,124(sp)
+42011f8a:	d8be                	sw	a5,112(sp)
+42011f8c:	d6ba                	sw	a4,108(sp)
+42011f8e:	00ad4703          	lbu	a4,10(s10)
+42011f92:	ffeb0693          	addi	a3,s6,-2
+42011f96:	0016b693          	seqz	a3,a3
+42011f9a:	00e03733          	snez	a4,a4
+42011f9e:	d036                	sw	a3,32(sp)
+42011fa0:	06e10a23          	sb	a4,116(sp)
+42011fa4:	5a098763          	beqz	s3,42012552 <decoder_task+0x872>
+42011fa8:	e789                	bnez	a5,42011fb2 <decoder_task+0x2d2>
+42011faa:	07414783          	lbu	a5,116(sp)
+42011fae:	1c078b63          	beqz	a5,42012184 <decoder_task+0x4a4>
+42011fb2:	4781                	li	a5,0
+42011fb4:	4801                	li	a6,0
+42011fb6:	cabe                	sw	a5,84(sp)
+42011fb8:	ccc2                	sw	a6,88(sp)
+42011fba:	c6ca                	sw	s2,76(sp)
+42011fbc:	c8d6                	sw	s5,80(sp)
+42011fbe:	dc82                	sw	zero,120(sp)
+42011fc0:	fe36f097          	auipc	ra,0xfe36f
+42011fc4:	414080e7          	jalr	1044(ra) # 403813d4 <esp_timer_get_time>
+42011fc8:	842a                	mv	s0,a0
+42011fca:	00f0                	addi	a2,sp,76
+42011fcc:	10ec                	addi	a1,sp,108
+42011fce:	854e                	mv	a0,s3
+42011fd0:	3a8020ef          	jal	42014378 <native_aac_decoder_process>
+42011fd4:	8c2a                	mv	s8,a0
+42011fd6:	fe36f097          	auipc	ra,0xfe36f
+42011fda:	3fe080e7          	jalr	1022(ra) # 403813d4 <esp_timer_get_time>
+42011fde:	57ca                	lw	a5,176(sp)
+42011fe0:	56da                	lw	a3,180(sp)
+42011fe2:	8d01                	sub	a0,a0,s0
+42011fe4:	00a78733          	add	a4,a5,a0
+42011fe8:	00f737b3          	sltu	a5,a4,a5
+42011fec:	97b6                	add	a5,a5,a3
+42011fee:	db3e                	sw	a5,180(sp)
+42011ff0:	478e                	lw	a5,192(sp)
+42011ff2:	d93a                	sw	a4,176(sp)
+42011ff4:	471e                	lw	a4,196(sp)
+42011ff6:	0785                	addi	a5,a5,1
+42011ff8:	c1be                	sw	a5,192(sp)
+42011ffa:	00a77363          	bgeu	a4,a0,42012000 <decoder_task+0x320>
+42011ffe:	c3aa                	sw	a0,196(sp)
+42012000:	8bfd                	andi	a5,a5,31
+42012002:	64078c63          	beqz	a5,4201265a <decoder_task+0x97a>
+42012006:	d04a0793          	addi	a5,s4,-764
+4201200a:	0330000f          	fence	rw,rw
+4201200e:	439c                	lw	a5,0(a5)
+42012010:	0230000f          	fence	r,rw
+42012014:	16979863          	bne	a5,s1,42012184 <decoder_task+0x4a4>
+42012018:	57e1                	li	a5,-8
+4201201a:	60fc0a63          	beq	s8,a5,4201262e <decoder_task+0x94e>
+4201201e:	680c1963          	bnez	s8,420126b0 <decoder_task+0x9d0>
+42012022:	57e6                	lw	a5,120(sp)
+42012024:	5746                	lw	a4,112(sp)
+42012026:	02f766e3          	bltu	a4,a5,42012852 <decoder_task+0xb72>
+4201202a:	8f1d                	sub	a4,a4,a5
+4201202c:	46ae                	lw	a3,200(sp)
+4201202e:	d8ba                	sw	a4,112(sp)
+42012030:	5736                	lw	a4,108(sp)
+42012032:	96be                	add	a3,a3,a5
+42012034:	c5b6                	sw	a3,200(sp)
+42012036:	97ba                	add	a5,a5,a4
+42012038:	4766                	lw	a4,88(sp)
+4201203a:	d6be                	sw	a5,108(sp)
+4201203c:	10070d63          	beqz	a4,42012156 <decoder_task+0x476>
+42012040:	08ec                	addi	a1,sp,92
+42012042:	854e                	mv	a0,s3
+42012044:	ce82                	sw	zero,92(sp)
+42012046:	d082                	sw	zero,96(sp)
+42012048:	d282                	sw	zero,100(sp)
+4201204a:	d482                	sw	zero,104(sp)
+4201204c:	654020ef          	jal	420146a0 <native_aac_decoder_get_info>
+42012050:	60051b63          	bnez	a0,42012666 <decoder_task+0x986>
+42012054:	5782                	lw	a5,32(sp)
+42012056:	03310613          	addi	a2,sp,51
+4201205a:	08ec                	addi	a1,sp,92
+4201205c:	854e                	mv	a0,s3
+4201205e:	02f109a3          	sb	a5,51(sp)
+42012062:	64c020ef          	jal	420146ae <native_aac_decoder_label>
+42012066:	03314683          	lbu	a3,51(sp)
+4201206a:	842a                	mv	s0,a0
+4201206c:	4501                	li	a0,0
+4201206e:	6c068563          	beqz	a3,42012738 <decoder_task+0xa58>
+42012072:	d04a0793          	addi	a5,s4,-764
+42012076:	0330000f          	fence	rw,rw
+4201207a:	4398                	lw	a4,0(a5)
+4201207c:	0230000f          	fence	r,rw
+42012080:	4781                	li	a5,0
+42012082:	06971163          	bne	a4,s1,420120e4 <decoder_task+0x404>
+42012086:	4776                	lw	a4,92(sp)
+42012088:	cf31                	beqz	a4,420120e4 <decoder_task+0x404>
+4201208a:	06114803          	lbu	a6,97(sp)
+4201208e:	04080b63          	beqz	a6,420120e4 <decoder_task+0x404>
+42012092:	06014603          	lbu	a2,96(sp)
+42012096:	c639                	beqz	a2,420120e4 <decoder_task+0x404>
+42012098:	5586                	lw	a1,96(sp)
+4201209a:	5796                	lw	a5,100(sp)
+4201209c:	de3a                	sw	a4,60(sp)
+4201209e:	c0ae                	sw	a1,64(sp)
+420120a0:	55a6                	lw	a1,104(sp)
+420120a2:	c2be                	sw	a5,68(sp)
+420120a4:	4785                	li	a5,1
+420120a6:	08012523          	sw	zero,138(sp)
+420120aa:	08012723          	sw	zero,142(sp)
+420120ae:	08011923          	sh	zero,146(sp)
+420120b2:	c122                	sw	s0,128(sp)
+420120b4:	c33a                	sw	a4,132(sp)
+420120b6:	c4ae                	sw	a1,72(sp)
+420120b8:	02f10923          	sb	a5,50(sp)
+420120bc:	060502e3          	beqz	a0,42012920 <decoder_task+0xc40>
+420120c0:	3fc9a7b7          	lui	a5,0x3fc9a
+420120c4:	08a10423          	sb	a0,136(sp)
+420120c8:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+420120cc:	08c104a3          	sb	a2,137(sp)
+420120d0:	85a6                	mv	a1,s1
+420120d2:	0110                	addi	a2,sp,128
+420120d4:	c73a                	sw	a4,140(sp)
+420120d6:	09010823          	sb	a6,144(sp)
+420120da:	08d10923          	sb	a3,146(sp)
+420120de:	78b040ef          	jal	42017068 <native_state_set_stream_info>
+420120e2:	4785                	li	a5,1
+420120e4:	5596                	lw	a1,100(sp)
+420120e6:	8526                	mv	a0,s1
+420120e8:	02f10923          	sb	a5,50(sp)
+420120ec:	9e6ff0ef          	jal	420112d2 <state_set_decoder_bitrate>
+420120f0:	03214783          	lbu	a5,50(sp)
+420120f4:	c3ad                	beqz	a5,42012156 <decoder_task+0x476>
+420120f6:	5a0c8663          	beqz	s9,420126a2 <decoder_task+0x9c2>
+420120fa:	04014503          	lbu	a0,64(sp)
+420120fe:	04114783          	lbu	a5,65(sp)
+42012102:	4466                	lw	s0,88(sp)
+42012104:	051d                	addi	a0,a0,7
+42012106:	810d                	srli	a0,a0,0x3
+42012108:	02f50533          	mul	a0,a0,a5
+4201210c:	c91d                	beqz	a0,42012142 <decoder_task+0x462>
+4201210e:	5672                	lw	a2,60(sp)
+42012110:	ca0d                	beqz	a2,42012142 <decoder_task+0x462>
+42012112:	02a45533          	divu	a0,s0,a0
+42012116:	57a2                	lw	a5,40(sp)
+42012118:	4681                	li	a3,0
+4201211a:	02f535b3          	mulhu	a1,a0,a5
+4201211e:	02f50533          	mul	a0,a0,a5
+42012122:	fdfee097          	auipc	ra,0xfdfee
+42012126:	78a080e7          	jalr	1930(ra) # 400008ac <__udivdi3>
+4201212a:	57ea                	lw	a5,184(sp)
+4201212c:	56fa                	lw	a3,188(sp)
+4201212e:	473e                	lw	a4,204(sp)
+42012130:	953e                	add	a0,a0,a5
+42012132:	96ae                	add	a3,a3,a1
+42012134:	00f537b3          	sltu	a5,a0,a5
+42012138:	97b6                	add	a5,a5,a3
+4201213a:	9722                	add	a4,a4,s0
+4201213c:	df3e                	sw	a5,188(sp)
+4201213e:	dd2a                	sw	a0,184(sp)
+42012140:	c7ba                	sw	a4,204(sp)
+42012142:	8722                	mv	a4,s0
+42012144:	86ca                	mv	a3,s2
+42012146:	1870                	addi	a2,sp,60
+42012148:	85a6                	mv	a1,s1
+4201214a:	1108                	addi	a0,sp,160
+4201214c:	cfeff0ef          	jal	4201164a <send_pcm>
+42012150:	8caa                	mv	s9,a0
+42012152:	0e0509e3          	beqz	a0,42012a44 <decoder_task+0xd64>
+42012156:	fe36f097          	auipc	ra,0xfe36f
+4201215a:	27e080e7          	jalr	638(ra) # 403813d4 <esp_timer_get_time>
+4201215e:	862e                	mv	a2,a1
+42012160:	85aa                	mv	a1,a0
+42012162:	1108                	addi	a0,sp,160
+42012164:	d4ffe0ef          	jal	42010eb2 <decode_stats_report>
+42012168:	4766                	lw	a4,88(sp)
+4201216a:	57e6                	lw	a5,120(sp)
+4201216c:	07414683          	lbu	a3,116(sp)
+42012170:	8fd9                	or	a5,a5,a4
+42012172:	4a079863          	bnez	a5,42012622 <decoder_task+0x942>
+42012176:	100687e3          	beqz	a3,42012a84 <decoder_task+0xda4>
+4201217a:	4701                	li	a4,0
+4201217c:	57c6                	lw	a5,112(sp)
+4201217e:	8f5d                	or	a4,a4,a5
+42012180:	e20714e3          	bnez	a4,42011fa8 <decoder_task+0x2c8>
+42012184:	00ad4783          	lbu	a5,10(s10)
+42012188:	58079763          	bnez	a5,42012716 <decoder_task+0xa36>
+4201218c:	47f2                	lw	a5,28(sp)
+4201218e:	58978463          	beq	a5,s1,42012716 <decoder_task+0xa36>
+42012192:	45f2                	lw	a1,28(sp)
+42012194:	856a                	mv	a0,s10
+42012196:	4401                	li	s0,0
+42012198:	e6aff0ef          	jal	42011802 <return_decoded_packet>
+4201219c:	3c1160ef          	jal	42028d5c <tls_input_reserve_poll>
+420121a0:	d04a0793          	addi	a5,s4,-764
+420121a4:	0330000f          	fence	rw,rw
+420121a8:	0007ac03          	lw	s8,0(a5)
+420121ac:	0230000f          	fence	r,rw
+420121b0:	bc9c17e3          	bne	s8,s1,42011d7e <decoder_task+0x9e>
+420121b4:	47f2                	lw	a5,28(sp)
+420121b6:	c20782e3          	beqz	a5,42011dda <decoder_task+0xfa>
+420121ba:	c29790e3          	bne	a5,s1,42011dda <decoder_task+0xfa>
+420121be:	5552                	lw	a0,52(sp)
+420121c0:	c119                	beqz	a0,420121c6 <decoder_task+0x4e6>
+420121c2:	500270ef          	jal	420396c2 <esp_audio_simple_dec_close>
+420121c6:	da02                	sw	zero,52(sp)
+420121c8:	00098563          	beqz	s3,420121d2 <decoder_task+0x4f2>
+420121cc:	854e                	mv	a0,s3
+420121ce:	174020ef          	jal	42014342 <native_aac_decoder_destroy>
+420121d2:	854a                	mv	a0,s2
+420121d4:	970f70ef          	jal	42009344 <cfree>
+420121d8:	4981                	li	s3,0
+420121da:	4a81                	li	s5,0
+420121dc:	4901                	li	s2,0
+420121de:	bef5                	j	42011dda <decoder_task+0xfa>
+420121e0:	d0cda503          	lw	a0,-756(s11)
+420121e4:	85ea                	mv	a1,s10
+420121e6:	75a160ef          	jal	42028940 <adaptive_input_return>
+420121ea:	beb5                	j	42011d66 <decoder_task+0x86>
+420121ec:	fe36f097          	auipc	ra,0xfe36f
+420121f0:	1e8080e7          	jalr	488(ra) # 403813d4 <esp_timer_get_time>
+420121f4:	8c2a                	mv	s8,a0
+420121f6:	d0cda503          	lw	a0,-756(s11)
+420121fa:	182c                	addi	a1,sp,56
+420121fc:	4651                	li	a2,20
+420121fe:	644160ef          	jal	42028842 <adaptive_input_receive>
+42012202:	8d2a                	mv	s10,a0
+42012204:	fe36f097          	auipc	ra,0xfe36f
+42012208:	1d0080e7          	jalr	464(ra) # 403813d4 <esp_timer_get_time>
+4201220c:	47ce                	lw	a5,208(sp)
+4201220e:	46de                	lw	a3,212(sp)
+42012210:	41850533          	sub	a0,a0,s8
+42012214:	00a78733          	add	a4,a5,a0
+42012218:	00f737b3          	sltu	a5,a4,a5
+4201221c:	c9ba                	sw	a4,208(sp)
+4201221e:	476e                	lw	a4,216(sp)
+42012220:	97b6                	add	a5,a5,a3
+42012222:	cbbe                	sw	a5,212(sp)
+42012224:	47fe                	lw	a5,220(sp)
+42012226:	0705                	addi	a4,a4,1
+42012228:	001d3693          	seqz	a3,s10
+4201222c:	cdba                	sw	a4,216(sp)
+4201222e:	570e                	lw	a4,224(sp)
+42012230:	97b6                	add	a5,a5,a3
+42012232:	cfbe                	sw	a5,220(sp)
+42012234:	00a77363          	bgeu	a4,a0,4201223a <decoder_task+0x55a>
+42012238:	d1aa                	sw	a0,224(sp)
+4201223a:	ba0d1ae3          	bnez	s10,42011dee <decoder_task+0x10e>
+4201223e:	b625                	j	42011d66 <decoder_task+0x86>
+42012240:	854a                	mv	a0,s2
+42012242:	902f70ef          	jal	42009344 <cfree>
+42012246:	4a81                	li	s5,0
+42012248:	4901                	li	s2,0
+4201224a:	b695                	j	42011dae <decoder_task+0xce>
+4201224c:	854a                	mv	a0,s2
+4201224e:	8f6f70ef          	jal	42009344 <cfree>
+42012252:	56a230ef          	jal	420357bc <custom_flac_decoder_create>
+42012256:	8baa                	mv	s7,a0
+42012258:	66050b63          	beqz	a0,420128ce <decoder_task+0xbee>
+4201225c:	4981                	li	s3,0
+4201225e:	4a81                	li	s5,0
+42012260:	4901                	li	s2,0
+42012262:	4c81                	li	s9,0
+42012264:	4661                	li	a2,24
+42012266:	4581                	li	a1,0
+42012268:	0108                	addi	a0,sp,128
+4201226a:	fdfee097          	auipc	ra,0xfdfee
+4201226e:	0ea080e7          	jalr	234(ra) # 40000354 <memset>
+42012272:	111c                	addi	a5,sp,160
+42012274:	d8be                	sw	a5,112(sp)
+42012276:	187c                	addi	a5,sp,60
+42012278:	dabe                	sw	a5,116(sp)
+4201227a:	03210793          	addi	a5,sp,50
+4201227e:	dcbe                	sw	a5,120(sp)
+42012280:	d6a6                	sw	s1,108(sp)
+42012282:	00ad4683          	lbu	a3,10(s10)
+42012286:	008d5603          	lhu	a2,8(s10)
+4201228a:	42013737          	lui	a4,0x42013
+4201228e:	00d036b3          	snez	a3,a3
+42012292:	10fc                	addi	a5,sp,108
+42012294:	b7270713          	addi	a4,a4,-1166 # 42012b72 <custom_flac_output>
+42012298:	00bd0593          	addi	a1,s10,11
+4201229c:	08010813          	addi	a6,sp,128
+420122a0:	855e                	mv	a0,s7
+420122a2:	5a0230ef          	jal	42035842 <custom_flac_decoder_feed>
+420122a6:	57ca                	lw	a5,176(sp)
+420122a8:	470a                	lw	a4,128(sp)
+420122aa:	565a                	lw	a2,180(sp)
+420122ac:	459a                	lw	a1,132(sp)
+420122ae:	468e                	lw	a3,192(sp)
+420122b0:	973e                	add	a4,a4,a5
+420122b2:	842a                	mv	s0,a0
+420122b4:	452a                	lw	a0,136(sp)
+420122b6:	962e                	add	a2,a2,a1
+420122b8:	00f737b3          	sltu	a5,a4,a5
+420122bc:	97b2                	add	a5,a5,a2
+420122be:	45ba                	lw	a1,140(sp)
+420122c0:	461e                	lw	a2,196(sp)
+420122c2:	96aa                	add	a3,a3,a0
+420122c4:	d93a                	sw	a4,176(sp)
+420122c6:	db3e                	sw	a5,180(sp)
+420122c8:	c1b6                	sw	a3,192(sp)
+420122ca:	00b67363          	bgeu	a2,a1,420122d0 <decoder_task+0x5f0>
+420122ce:	c3ae                	sw	a1,196(sp)
+420122d0:	47ae                	lw	a5,200(sp)
+420122d2:	474a                	lw	a4,144(sp)
+420122d4:	97ba                	add	a5,a5,a4
+420122d6:	c5be                	sw	a5,200(sp)
+420122d8:	6a0c8163          	beqz	s9,4201297a <decoder_task+0xc9a>
+420122dc:	4c85                	li	s9,1
+420122de:	fe36f097          	auipc	ra,0xfe36f
+420122e2:	0f6080e7          	jalr	246(ra) # 403813d4 <esp_timer_get_time>
+420122e6:	862e                	mv	a2,a1
+420122e8:	85aa                	mv	a1,a0
+420122ea:	1108                	addi	a0,sp,160
+420122ec:	bc7fe0ef          	jal	42010eb2 <decode_stats_report>
+420122f0:	00045b63          	bgez	s0,42012306 <decoder_task+0x626>
+420122f4:	d04a0793          	addi	a5,s4,-764
+420122f8:	0330000f          	fence	rw,rw
+420122fc:	439c                	lw	a5,0(a5)
+420122fe:	0230000f          	fence	r,rw
+42012302:	7e978363          	beq	a5,s1,42012ae8 <decoder_task+0xe08>
+42012306:	00ad4783          	lbu	a5,10(s10)
+4201230a:	60079663          	bnez	a5,42012916 <decoder_task+0xc36>
+4201230e:	47f2                	lw	a5,28(sp)
+42012310:	60978363          	beq	a5,s1,42012916 <decoder_task+0xc36>
+42012314:	45f2                	lw	a1,28(sp)
+42012316:	856a                	mv	a0,s10
+42012318:	4b0d                	li	s6,3
+4201231a:	ce8ff0ef          	jal	42011802 <return_decoded_packet>
+4201231e:	4401                	li	s0,0
+42012320:	b499                	j	42011d66 <decoder_task+0x86>
+42012322:	6589                	lui	a1,0x2
+42012324:	44ba8663          	beq	s5,a1,42012770 <decoder_task+0xa90>
+42012328:	854a                	mv	a0,s2
+4201232a:	816f70ef          	jal	42009340 <realloc>
+4201232e:	842a                	mv	s0,a0
+42012330:	020507e3          	beqz	a0,42012b5e <decoder_task+0xe7e>
+42012334:	204347b7          	lui	a5,0x20434
+42012338:	14178793          	addi	a5,a5,321 # 20434141 <CSR_UINTSTATUS+0x20433490>
+4201233c:	c302                	sw	zero,132(sp)
+4201233e:	c502                	sw	zero,136(sp)
+42012340:	c702                	sw	zero,140(sp)
+42012342:	c13e                	sw	a5,128(sp)
+42012344:	7d3010ef          	jal	42014316 <native_aac_decoder_create>
+42012348:	89aa                	mv	s3,a0
+4201234a:	66050163          	beqz	a0,420129ac <decoder_task+0xccc>
+4201234e:	8922                	mv	s2,s0
+42012350:	6a89                	lui	s5,0x2
+42012352:	4b81                	li	s7,0
+42012354:	4c81                	li	s9,0
+42012356:	b11d                	j	42011f7c <decoder_task+0x29c>
+42012358:	000d2b83          	lw	s7,0(s10)
+4201235c:	fe36f097          	auipc	ra,0xfe36f
+42012360:	078080e7          	jalr	120(ra) # 403813d4 <esp_timer_get_time>
+42012364:	0003d7b7          	lui	a5,0x3d
+42012368:	08f78793          	addi	a5,a5,143 # 3d08f <CSR_UINTSTATUS+0x3c3de>
+4201236c:	89aa                	mv	s3,a0
+4201236e:	8c2e                	mv	s8,a1
+42012370:	d03e                	sw	a5,32(sp)
+42012372:	4401                	li	s0,0
+42012374:	a039                	j	42012382 <decoder_task+0x6a2>
+42012376:	8fe1                	and	a5,a5,s0
+42012378:	e3bd                	bnez	a5,420123de <decoder_task+0x6fe>
+4201237a:	00108097          	auipc	ra,0x108
+4201237e:	f32080e7          	jalr	-206(ra) # 4211a2ac <vTaskDelay>
+42012382:	d04a0793          	addi	a5,s4,-764
+42012386:	0330000f          	fence	rw,rw
+4201238a:	439c                	lw	a5,0(a5)
+4201238c:	0230000f          	fence	r,rw
+42012390:	0108                	addi	a0,sp,128
+42012392:	05779763          	bne	a5,s7,420123e0 <decoder_task+0x700>
+42012396:	d0cda583          	lw	a1,-756(s11)
+4201239a:	71b150ef          	jal	420282b4 <adaptive_input_stats>
+4201239e:	479a                	lw	a5,132(sp)
+420123a0:	444a                	lw	s0,144(sp)
+420123a2:	00f43433          	sltu	s0,s0,a5
+420123a6:	fe36f097          	auipc	ra,0xfe36f
+420123aa:	02e080e7          	jalr	46(ra) # 403813d4 <esp_timer_get_time>
+420123ae:	41350733          	sub	a4,a0,s3
+420123b2:	00e53533          	sltu	a0,a0,a4
+420123b6:	418585b3          	sub	a1,a1,s8
+420123ba:	8d89                	sub	a1,a1,a0
+420123bc:	00144413          	xori	s0,s0,1
+420123c0:	4529                	li	a0,10
+420123c2:	00b04f63          	bgtz	a1,420123e0 <decoder_task+0x700>
+420123c6:	4e058a63          	beqz	a1,420128ba <decoder_task+0xbda>
+420123ca:	4785                	li	a5,1
+420123cc:	fab045e3          	bgtz	a1,42012376 <decoder_task+0x696>
+420123d0:	e581                	bnez	a1,420123d8 <decoder_task+0x6f8>
+420123d2:	5682                	lw	a3,32(sp)
+420123d4:	fae6e1e3          	bltu	a3,a4,42012376 <decoder_task+0x696>
+420123d8:	4781                	li	a5,0
+420123da:	8fe1                	and	a5,a5,s0
+420123dc:	dfd9                	beqz	a5,4201237a <decoder_task+0x69a>
+420123de:	843e                	mv	s0,a5
+420123e0:	d04a0793          	addi	a5,s4,-764
+420123e4:	0330000f          	fence	rw,rw
+420123e8:	439c                	lw	a5,0(a5)
+420123ea:	0230000f          	fence	r,rw
+420123ee:	d03e                	sw	a5,32(sp)
+420123f0:	fe377097          	auipc	ra,0xfe377
+420123f4:	0ae080e7          	jalr	174(ra) # 4038949e <esp_log_timestamp>
+420123f8:	d62a                	sw	a0,44(sp)
+420123fa:	fe36f097          	auipc	ra,0xfe36f
+420123fe:	fda080e7          	jalr	-38(ra) # 403813d4 <esp_timer_get_time>
+42012402:	413509b3          	sub	s3,a0,s3
+42012406:	01353533          	sltu	a0,a0,s3
+4201240a:	418585b3          	sub	a1,a1,s8
+4201240e:	8d89                	sub	a1,a1,a0
+42012410:	3e800613          	li	a2,1000
+42012414:	4681                	li	a3,0
+42012416:	854e                	mv	a0,s3
+42012418:	fdfee097          	auipc	ra,0xfdfee
+4201241c:	39c080e7          	jalr	924(ra) # 400007b4 <__divdi3>
+42012420:	5782                	lw	a5,32(sp)
+42012422:	56b2                	lw	a3,44(sp)
+42012424:	3c126637          	lui	a2,0x3c126
+42012428:	417787b3          	sub	a5,a5,s7
+4201242c:	00f037b3          	snez	a5,a5
+42012430:	c03e                	sw	a5,0(sp)
+42012432:	3c1267b7          	lui	a5,0x3c126
+42012436:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+4201243a:	882a                	mv	a6,a0
+4201243c:	87de                	mv	a5,s7
+4201243e:	88a2                	mv	a7,s0
+42012440:	85ba                	mv	a1,a4
+42012442:	ed860613          	addi	a2,a2,-296 # 3c125ed8 <_esp_libc_clock_array_end+0x5d88>
+42012446:	450d                	li	a0,3
+42012448:	fe377097          	auipc	ra,0xfe377
+4201244c:	f4e080e7          	jalr	-178(ra) # 40389396 <esp_log>
+42012450:	5782                	lw	a5,32(sp)
+42012452:	9f778de3          	beq	a5,s7,42011e4c <decoder_task+0x16c>
+42012456:	d0cda503          	lw	a0,-756(s11)
+4201245a:	85ea                	mv	a1,s10
+4201245c:	4981                	li	s3,0
+4201245e:	4e2160ef          	jal	42028940 <adaptive_input_return>
+42012462:	4b81                	li	s7,0
+42012464:	4401                	li	s0,0
+42012466:	b201                	j	42011d66 <decoder_task+0x86>
+42012468:	45f2                	lw	a1,28(sp)
+4201246a:	856a                	mv	a0,s10
+4201246c:	b96ff0ef          	jal	42011802 <return_decoded_packet>
+42012470:	b8dd                	j	42011d66 <decoder_task+0x86>
+42012472:	3c1267b7          	lui	a5,0x3c126
+42012476:	ad478593          	addi	a1,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+4201247a:	d04a0793          	addi	a5,s4,-764
+4201247e:	0330000f          	fence	rw,rw
+42012482:	439c                	lw	a5,0(a5)
+42012484:	0230000f          	fence	r,rw
+42012488:	02979163          	bne	a5,s1,420124aa <decoder_task+0x7ca>
+4201248c:	47f6                	lw	a5,92(sp)
+4201248e:	cf99                	beqz	a5,420124ac <decoder_task+0x7cc>
+42012490:	06114683          	lbu	a3,97(sp)
+42012494:	ca99                	beqz	a3,420124aa <decoder_task+0x7ca>
+42012496:	06015703          	lhu	a4,96(sp)
+4201249a:	06014503          	lbu	a0,96(sp)
+4201249e:	00875613          	srli	a2,a4,0x8
+420124a2:	0722                	slli	a4,a4,0x8
+420124a4:	963a                	add	a2,a2,a4
+420124a6:	48051663          	bnez	a0,42012932 <decoder_task+0xc52>
+420124aa:	4781                	li	a5,0
+420124ac:	5596                	lw	a1,100(sp)
+420124ae:	8526                	mv	a0,s1
+420124b0:	02f10923          	sb	a5,50(sp)
+420124b4:	e1ffe0ef          	jal	420112d2 <state_set_decoder_bitrate>
+420124b8:	03214783          	lbu	a5,50(sp)
+420124bc:	c7a5                	beqz	a5,42012524 <decoder_task+0x844>
+420124be:	2a0c8b63          	beqz	s9,42012774 <decoder_task+0xa94>
+420124c2:	04014503          	lbu	a0,64(sp)
+420124c6:	04114783          	lbu	a5,65(sp)
+420124ca:	4466                	lw	s0,88(sp)
+420124cc:	051d                	addi	a0,a0,7
+420124ce:	810d                	srli	a0,a0,0x3
+420124d0:	02f50533          	mul	a0,a0,a5
+420124d4:	cd15                	beqz	a0,42012510 <decoder_task+0x830>
+420124d6:	5672                	lw	a2,60(sp)
+420124d8:	ce05                	beqz	a2,42012510 <decoder_task+0x830>
+420124da:	02a45533          	divu	a0,s0,a0
+420124de:	000f47b7          	lui	a5,0xf4
+420124e2:	24078793          	addi	a5,a5,576 # f4240 <CSR_UINTSTATUS+0xf358f>
+420124e6:	4681                	li	a3,0
+420124e8:	02f535b3          	mulhu	a1,a0,a5
+420124ec:	02f50533          	mul	a0,a0,a5
+420124f0:	fdfee097          	auipc	ra,0xfdfee
+420124f4:	3bc080e7          	jalr	956(ra) # 400008ac <__udivdi3>
+420124f8:	57ea                	lw	a5,184(sp)
+420124fa:	56fa                	lw	a3,188(sp)
+420124fc:	473e                	lw	a4,204(sp)
+420124fe:	953e                	add	a0,a0,a5
+42012500:	96ae                	add	a3,a3,a1
+42012502:	00f537b3          	sltu	a5,a0,a5
+42012506:	97b6                	add	a5,a5,a3
+42012508:	9722                	add	a4,a4,s0
+4201250a:	df3e                	sw	a5,188(sp)
+4201250c:	dd2a                	sw	a0,184(sp)
+4201250e:	c7ba                	sw	a4,204(sp)
+42012510:	8722                	mv	a4,s0
+42012512:	86ca                	mv	a3,s2
+42012514:	1870                	addi	a2,sp,60
+42012516:	85a6                	mv	a1,s1
+42012518:	1108                	addi	a0,sp,160
+4201251a:	930ff0ef          	jal	4201164a <send_pcm>
+4201251e:	8caa                	mv	s9,a0
+42012520:	52050263          	beqz	a0,42012a44 <decoder_task+0xd64>
+42012524:	fe36f097          	auipc	ra,0xfe36f
+42012528:	eb0080e7          	jalr	-336(ra) # 403813d4 <esp_timer_get_time>
+4201252c:	862e                	mv	a2,a1
+4201252e:	85aa                	mv	a1,a0
+42012530:	1108                	addi	a0,sp,160
+42012532:	981fe0ef          	jal	42010eb2 <decode_stats_report>
+42012536:	4766                	lw	a4,88(sp)
+42012538:	57e6                	lw	a5,120(sp)
+4201253a:	07414683          	lbu	a3,116(sp)
+4201253e:	8fd9                	or	a5,a5,a4
+42012540:	12079663          	bnez	a5,4201266c <decoder_task+0x98c>
+42012544:	54068063          	beqz	a3,42012a84 <decoder_task+0xda4>
+42012548:	4701                	li	a4,0
+4201254a:	57c6                	lw	a5,112(sp)
+4201254c:	8f5d                	or	a4,a4,a5
+4201254e:	c2070be3          	beqz	a4,42012184 <decoder_task+0x4a4>
+42012552:	e789                	bnez	a5,4201255c <decoder_task+0x87c>
+42012554:	07414783          	lbu	a5,116(sp)
+42012558:	c20786e3          	beqz	a5,42012184 <decoder_task+0x4a4>
+4201255c:	4781                	li	a5,0
+4201255e:	4801                	li	a6,0
+42012560:	cabe                	sw	a5,84(sp)
+42012562:	ccc2                	sw	a6,88(sp)
+42012564:	c6ca                	sw	s2,76(sp)
+42012566:	c8d6                	sw	s5,80(sp)
+42012568:	dc82                	sw	zero,120(sp)
+4201256a:	fe36f097          	auipc	ra,0xfe36f
+4201256e:	e6a080e7          	jalr	-406(ra) # 403813d4 <esp_timer_get_time>
+42012572:	842a                	mv	s0,a0
+42012574:	5552                	lw	a0,52(sp)
+42012576:	00f0                	addi	a2,sp,76
+42012578:	10ec                	addi	a1,sp,108
+4201257a:	355150ef          	jal	420280ce <__wrap_esp_audio_simple_dec_process>
+4201257e:	8c2a                	mv	s8,a0
+42012580:	fe36f097          	auipc	ra,0xfe36f
+42012584:	e54080e7          	jalr	-428(ra) # 403813d4 <esp_timer_get_time>
+42012588:	57ca                	lw	a5,176(sp)
+4201258a:	56da                	lw	a3,180(sp)
+4201258c:	8d01                	sub	a0,a0,s0
+4201258e:	00a78733          	add	a4,a5,a0
+42012592:	00f737b3          	sltu	a5,a4,a5
+42012596:	97b6                	add	a5,a5,a3
+42012598:	db3e                	sw	a5,180(sp)
+4201259a:	478e                	lw	a5,192(sp)
+4201259c:	d93a                	sw	a4,176(sp)
+4201259e:	471e                	lw	a4,196(sp)
+420125a0:	0785                	addi	a5,a5,1
+420125a2:	c1be                	sw	a5,192(sp)
+420125a4:	00a77363          	bgeu	a4,a0,420125aa <decoder_task+0x8ca>
+420125a8:	c3aa                	sw	a0,196(sp)
+420125aa:	8bfd                	andi	a5,a5,31
+420125ac:	c3f5                	beqz	a5,42012690 <decoder_task+0x9b0>
+420125ae:	d04a0793          	addi	a5,s4,-764
+420125b2:	0330000f          	fence	rw,rw
+420125b6:	439c                	lw	a5,0(a5)
+420125b8:	0230000f          	fence	r,rw
+420125bc:	bc9794e3          	bne	a5,s1,42012184 <decoder_task+0x4a4>
+420125c0:	57e1                	li	a5,-8
+420125c2:	0afc0b63          	beq	s8,a5,42012678 <decoder_task+0x998>
+420125c6:	0e0c1563          	bnez	s8,420126b0 <decoder_task+0x9d0>
+420125ca:	57e6                	lw	a5,120(sp)
+420125cc:	5746                	lw	a4,112(sp)
+420125ce:	28f76263          	bltu	a4,a5,42012852 <decoder_task+0xb72>
+420125d2:	8f1d                	sub	a4,a4,a5
+420125d4:	46ae                	lw	a3,200(sp)
+420125d6:	d8ba                	sw	a4,112(sp)
+420125d8:	5736                	lw	a4,108(sp)
+420125da:	96be                	add	a3,a3,a5
+420125dc:	c5b6                	sw	a3,200(sp)
+420125de:	97ba                	add	a5,a5,a4
+420125e0:	4766                	lw	a4,88(sp)
+420125e2:	d6be                	sw	a5,108(sp)
+420125e4:	d321                	beqz	a4,42012524 <decoder_task+0x844>
+420125e6:	5552                	lw	a0,52(sp)
+420125e8:	08ec                	addi	a1,sp,92
+420125ea:	ce82                	sw	zero,92(sp)
+420125ec:	d082                	sw	zero,96(sp)
+420125ee:	d282                	sw	zero,100(sp)
+420125f0:	d482                	sw	zero,104(sp)
+420125f2:	058270ef          	jal	4203964a <esp_audio_simple_dec_get_info>
+420125f6:	e15d                	bnez	a0,4201269c <decoder_task+0x9bc>
+420125f8:	5782                	lw	a5,32(sp)
+420125fa:	02f109a3          	sb	a5,51(sp)
+420125fe:	4789                	li	a5,2
+42012600:	40fb0a63          	beq	s6,a5,42012a14 <decoder_task+0xd34>
+42012604:	4791                	li	a5,4
+42012606:	e6fb06e3          	beq	s6,a5,42012472 <decoder_task+0x792>
+4201260a:	3c126737          	lui	a4,0x3c126
+4201260e:	4785                	li	a5,1
+42012610:	ad870593          	addi	a1,a4,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+42012614:	e6fb03e3          	beq	s6,a5,4201247a <decoder_task+0x79a>
+42012618:	3c1267b7          	lui	a5,0x3c126
+4201261c:	adc78593          	addi	a1,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+42012620:	bda9                	j	4201247a <decoder_task+0x79a>
+42012622:	b4069de3          	bnez	a3,4201217c <decoder_task+0x49c>
+42012626:	57c6                	lw	a5,112(sp)
+42012628:	980795e3          	bnez	a5,42011fb2 <decoder_task+0x2d2>
+4201262c:	bea1                	j	42012184 <decoder_task+0x4a4>
+4201262e:	5766                	lw	a4,120(sp)
+42012630:	57b6                	lw	a5,108(sp)
+42012632:	46ae                	lw	a3,200(sp)
+42012634:	4456                	lw	s0,84(sp)
+42012636:	97ba                	add	a5,a5,a4
+42012638:	d6be                	sw	a5,108(sp)
+4201263a:	57c6                	lw	a5,112(sp)
+4201263c:	96ba                	add	a3,a3,a4
+4201263e:	c5b6                	sw	a3,200(sp)
+42012640:	8f99                	sub	a5,a5,a4
+42012642:	d8be                	sw	a5,112(sp)
+42012644:	3c8afd63          	bgeu	s5,s0,42012a1e <decoder_task+0xd3e>
+42012648:	85a2                	mv	a1,s0
+4201264a:	854a                	mv	a0,s2
+4201264c:	cf5f60ef          	jal	42009340 <realloc>
+42012650:	3c050763          	beqz	a0,42012a1e <decoder_task+0xd3e>
+42012654:	8aa2                	mv	s5,s0
+42012656:	892a                	mv	s2,a0
+42012658:	baa9                	j	42011fb2 <decoder_task+0x2d2>
+4201265a:	4505                	li	a0,1
+4201265c:	00108097          	auipc	ra,0x108
+42012660:	c50080e7          	jalr	-944(ra) # 4211a2ac <vTaskDelay>
+42012664:	b24d                	j	42012006 <decoder_task+0x326>
+42012666:	02010923          	sb	zero,50(sp)
+4201266a:	b4f5                	j	42012156 <decoder_task+0x476>
+4201266c:	ec069fe3          	bnez	a3,4201254a <decoder_task+0x86a>
+42012670:	57c6                	lw	a5,112(sp)
+42012672:	ee0795e3          	bnez	a5,4201255c <decoder_task+0x87c>
+42012676:	b639                	j	42012184 <decoder_task+0x4a4>
+42012678:	4456                	lw	s0,84(sp)
+4201267a:	3a8af263          	bgeu	s5,s0,42012a1e <decoder_task+0xd3e>
+4201267e:	85a2                	mv	a1,s0
+42012680:	854a                	mv	a0,s2
+42012682:	cbff60ef          	jal	42009340 <realloc>
+42012686:	38050c63          	beqz	a0,42012a1e <decoder_task+0xd3e>
+4201268a:	892a                	mv	s2,a0
+4201268c:	8aa2                	mv	s5,s0
+4201268e:	b5f9                	j	4201255c <decoder_task+0x87c>
+42012690:	4505                	li	a0,1
+42012692:	00108097          	auipc	ra,0x108
+42012696:	c1a080e7          	jalr	-998(ra) # 4211a2ac <vTaskDelay>
+4201269a:	bf11                	j	420125ae <decoder_task+0x8ce>
+4201269c:	02010923          	sb	zero,50(sp)
+420126a0:	b551                	j	42012524 <decoder_task+0x844>
+420126a2:	3c1267b7          	lui	a5,0x3c126
+420126a6:	ffc78513          	addi	a0,a5,-4 # 3c125ffc <_esp_libc_clock_array_end+0x5eac>
+420126aa:	bc5fe0ef          	jal	4201126e <log_runtime_memory>
+420126ae:	b4b1                	j	420120fa <decoder_task+0x41a>
+420126b0:	4a89                	li	s5,2
+420126b2:	8462                	mv	s0,s8
+420126b4:	fe377097          	auipc	ra,0xfe377
+420126b8:	dea080e7          	jalr	-534(ra) # 4038949e <esp_log_timestamp>
+420126bc:	355b0263          	beq	s6,s5,42012a00 <decoder_task+0xd20>
+420126c0:	4791                	li	a5,4
+420126c2:	3afb0763          	beq	s6,a5,42012a70 <decoder_task+0xd90>
+420126c6:	3c1267b7          	lui	a5,0x3c126
+420126ca:	4705                	li	a4,1
+420126cc:	ad878793          	addi	a5,a5,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+420126d0:	00eb0663          	beq	s6,a4,420126dc <decoder_task+0x9fc>
+420126d4:	3c1267b7          	lui	a5,0x3c126
+420126d8:	adc78793          	addi	a5,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+420126dc:	3c126737          	lui	a4,0x3c126
+420126e0:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420126e4:	3c126637          	lui	a2,0x3c126
+420126e8:	86aa                	mv	a3,a0
+420126ea:	85ba                	mv	a1,a4
+420126ec:	8822                	mv	a6,s0
+420126ee:	03060613          	addi	a2,a2,48 # 3c126030 <_esp_libc_clock_array_end+0x5ee0>
+420126f2:	4509                	li	a0,2
+420126f4:	fe377097          	auipc	ra,0xfe377
+420126f8:	ca2080e7          	jalr	-862(ra) # 40389396 <esp_log>
+420126fc:	3fc9a7b7          	lui	a5,0x3fc9a
+42012700:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+42012704:	3c1267b7          	lui	a5,0x3c126
+42012708:	e8478693          	addi	a3,a5,-380 # 3c125e84 <_esp_libc_clock_array_end+0x5d34>
+4201270c:	85a6                	mv	a1,s1
+4201270e:	4601                	li	a2,0
+42012710:	069040ef          	jal	42016f78 <native_state_set_audio>
+42012714:	ce26                	sw	s1,28(sp)
+42012716:	5552                	lw	a0,52(sp)
+42012718:	c119                	beqz	a0,4201271e <decoder_task+0xa3e>
+4201271a:	7a9260ef          	jal	420396c2 <esp_audio_simple_dec_close>
+4201271e:	da02                	sw	zero,52(sp)
+42012720:	00098563          	beqz	s3,4201272a <decoder_task+0xa4a>
+42012724:	854e                	mv	a0,s3
+42012726:	41d010ef          	jal	42014342 <native_aac_decoder_destroy>
+4201272a:	854a                	mv	a0,s2
+4201272c:	c19f60ef          	jal	42009344 <cfree>
+42012730:	4981                	li	s3,0
+42012732:	4a81                	li	s5,0
+42012734:	4901                	li	s2,0
+42012736:	bcb1                	j	42012192 <decoder_task+0x4b2>
+42012738:	854e                	mv	a0,s3
+4201273a:	7cd010ef          	jal	42014706 <native_aac_decoder_source_channels>
+4201273e:	03314683          	lbu	a3,51(sp)
+42012742:	0ff57513          	zext.b	a0,a0
+42012746:	b235                	j	42012072 <decoder_task+0x392>
+42012748:	204747b7          	lui	a5,0x20474
+4201274c:	74f78793          	addi	a5,a5,1871 # 2047474f <CSR_UINTSTATUS+0x20473a9e>
+42012750:	184c                	addi	a1,sp,52
+42012752:	0108                	addi	a0,sp,128
+42012754:	c13e                	sw	a5,128(sp)
+42012756:	7ec150ef          	jal	42027f42 <__wrap_esp_audio_simple_dec_open>
+4201275a:	842a                	mv	s0,a0
+4201275c:	28051763          	bnez	a0,420129ea <decoder_task+0xd0a>
+42012760:	5bd2                	lw	s7,52(sp)
+42012762:	4c81                	li	s9,0
+42012764:	fe0b8063          	beqz	s7,42011f44 <decoder_task+0x264>
+42012768:	4981                	li	s3,0
+4201276a:	4b81                	li	s7,0
+4201276c:	811ff06f          	j	42011f7c <decoder_task+0x29c>
+42012770:	844a                	mv	s0,s2
+42012772:	b6c9                	j	42012334 <decoder_task+0x654>
+42012774:	3c1267b7          	lui	a5,0x3c126
+42012778:	ffc78513          	addi	a0,a5,-4 # 3c125ffc <_esp_libc_clock_array_end+0x5eac>
+4201277c:	af3fe0ef          	jal	4201126e <log_runtime_memory>
+42012780:	b389                	j	420124c2 <decoder_task+0x7e2>
+42012782:	c302                	sw	zero,132(sp)
+42012784:	c502                	sw	zero,136(sp)
+42012786:	c702                	sw	zero,140(sp)
+42012788:	f30ff06f          	j	42011eb8 <decoder_task+0x1d8>
+4201278c:	fe377097          	auipc	ra,0xfe377
+42012790:	d12080e7          	jalr	-750(ra) # 4038949e <esp_log_timestamp>
+42012794:	4791                	li	a5,4
+42012796:	4405                	li	s0,1
+42012798:	86aa                	mv	a3,a0
+4201279a:	2afb0063          	beq	s6,a5,42012a3a <decoder_task+0xd5a>
+4201279e:	3c1267b7          	lui	a5,0x3c126
+420127a2:	ad878793          	addi	a5,a5,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+420127a6:	008b0663          	beq	s6,s0,420127b2 <decoder_task+0xad2>
+420127aa:	3c1267b7          	lui	a5,0x3c126
+420127ae:	adc78793          	addi	a5,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+420127b2:	3c126737          	lui	a4,0x3c126
+420127b6:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420127ba:	3c126637          	lui	a2,0x3c126
+420127be:	85ba                	mv	a1,a4
+420127c0:	f6060613          	addi	a2,a2,-160 # 3c125f60 <_esp_libc_clock_array_end+0x5e10>
+420127c4:	4505                	li	a0,1
+420127c6:	fe377097          	auipc	ra,0xfe377
+420127ca:	bd0080e7          	jalr	-1072(ra) # 40389396 <esp_log>
+420127ce:	3fc9a7b7          	lui	a5,0x3fc9a
+420127d2:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+420127d6:	3c1267b7          	lui	a5,0x3c126
+420127da:	e6878693          	addi	a3,a5,-408 # 3c125e68 <_esp_libc_clock_array_end+0x5d18>
+420127de:	85a6                	mv	a1,s1
+420127e0:	4601                	li	a2,0
+420127e2:	796040ef          	jal	42016f78 <native_state_set_audio>
+420127e6:	d0cda503          	lw	a0,-756(s11)
+420127ea:	85ea                	mv	a1,s10
+420127ec:	4981                	li	s3,0
+420127ee:	152160ef          	jal	42028940 <adaptive_input_return>
+420127f2:	4c81                	li	s9,0
+420127f4:	ce26                	sw	s1,28(sp)
+420127f6:	4b81                	li	s7,0
+420127f8:	4401                	li	s0,0
+420127fa:	d6cff06f          	j	42011d66 <decoder_task+0x86>
+420127fe:	fe377097          	auipc	ra,0xfe377
+42012802:	ca0080e7          	jalr	-864(ra) # 4038949e <esp_log_timestamp>
+42012806:	3c126737          	lui	a4,0x3c126
+4201280a:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+4201280e:	3c126637          	lui	a2,0x3c126
+42012812:	85ba                	mv	a1,a4
+42012814:	86aa                	mv	a3,a0
+42012816:	87a2                	mv	a5,s0
+42012818:	e9460613          	addi	a2,a2,-364 # 3c125e94 <_esp_libc_clock_array_end+0x5d44>
+4201281c:	4505                	li	a0,1
+4201281e:	fe377097          	auipc	ra,0xfe377
+42012822:	b78080e7          	jalr	-1160(ra) # 40389396 <esp_log>
+42012826:	3fc9a7b7          	lui	a5,0x3fc9a
+4201282a:	000d2583          	lw	a1,0(s10)
+4201282e:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+42012832:	3c1267b7          	lui	a5,0x3c126
+42012836:	ec478693          	addi	a3,a5,-316 # 3c125ec4 <_esp_libc_clock_array_end+0x5d74>
+4201283a:	4601                	li	a2,0
+4201283c:	73c040ef          	jal	42016f78 <native_state_set_audio>
+42012840:	000d2783          	lw	a5,0(s10)
+42012844:	856a                	mv	a0,s10
+42012846:	85be                	mv	a1,a5
+42012848:	ce3e                	sw	a5,28(sp)
+4201284a:	fb9fe0ef          	jal	42011802 <return_decoded_packet>
+4201284e:	d18ff06f          	j	42011d66 <decoder_task+0x86>
+42012852:	fe377097          	auipc	ra,0xfe377
+42012856:	c4c080e7          	jalr	-948(ra) # 4038949e <esp_log_timestamp>
+4201285a:	4789                	li	a5,2
+4201285c:	4405                	li	s0,1
+4201285e:	1afb0663          	beq	s6,a5,42012a0a <decoder_task+0xd2a>
+42012862:	4791                	li	a5,4
+42012864:	20fb0b63          	beq	s6,a5,42012a7a <decoder_task+0xd9a>
+42012868:	3c1267b7          	lui	a5,0x3c126
+4201286c:	ad878793          	addi	a5,a5,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+42012870:	008b0663          	beq	s6,s0,4201287c <decoder_task+0xb9c>
+42012874:	3c1267b7          	lui	a5,0x3c126
+42012878:	adc78793          	addi	a5,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+4201287c:	58c6                	lw	a7,112(sp)
+4201287e:	5866                	lw	a6,120(sp)
+42012880:	3c126737          	lui	a4,0x3c126
+42012884:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42012888:	3c126637          	lui	a2,0x3c126
+4201288c:	86aa                	mv	a3,a0
+4201288e:	85ba                	mv	a1,a4
+42012890:	05460613          	addi	a2,a2,84 # 3c126054 <_esp_libc_clock_array_end+0x5f04>
+42012894:	4505                	li	a0,1
+42012896:	fe377097          	auipc	ra,0xfe377
+4201289a:	b00080e7          	jalr	-1280(ra) # 40389396 <esp_log>
+4201289e:	3fc9a7b7          	lui	a5,0x3fc9a
+420128a2:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+420128a6:	3c1267b7          	lui	a5,0x3c126
+420128aa:	09078693          	addi	a3,a5,144 # 3c126090 <_esp_libc_clock_array_end+0x5f40>
+420128ae:	85a6                	mv	a1,s1
+420128b0:	4601                	li	a2,0
+420128b2:	6c6040ef          	jal	42016f78 <native_state_set_audio>
+420128b6:	ce26                	sw	s1,28(sp)
+420128b8:	bdb9                	j	42012716 <decoder_task+0xa36>
+420128ba:	0007a7b7          	lui	a5,0x7a
+420128be:	11f78793          	addi	a5,a5,287 # 7a11f <CSR_UINTSTATUS+0x7946e>
+420128c2:	b0e7f4e3          	bgeu	a5,a4,420123ca <decoder_task+0x6ea>
+420128c6:	be29                	j	420123e0 <decoder_task+0x700>
+420128c8:	a20b8fe3          	beqz	s7,42012306 <decoder_task+0x626>
+420128cc:	ba61                	j	42012264 <decoder_task+0x584>
+420128ce:	fe377097          	auipc	ra,0xfe377
+420128d2:	bd0080e7          	jalr	-1072(ra) # 4038949e <esp_log_timestamp>
+420128d6:	3c1267b7          	lui	a5,0x3c126
+420128da:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420128de:	3c1267b7          	lui	a5,0x3c126
+420128e2:	86aa                	mv	a3,a0
+420128e4:	85ba                	mv	a1,a4
+420128e6:	f2c78613          	addi	a2,a5,-212 # 3c125f2c <_esp_libc_clock_array_end+0x5ddc>
+420128ea:	4505                	li	a0,1
+420128ec:	fe377097          	auipc	ra,0xfe377
+420128f0:	aaa080e7          	jalr	-1366(ra) # 40389396 <esp_log>
+420128f4:	3fc9a7b7          	lui	a5,0x3fc9a
+420128f8:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+420128fc:	3c1267b7          	lui	a5,0x3c126
+42012900:	e6878693          	addi	a3,a5,-408 # 3c125e68 <_esp_libc_clock_array_end+0x5d18>
+42012904:	85a6                	mv	a1,s1
+42012906:	4601                	li	a2,0
+42012908:	670040ef          	jal	42016f78 <native_state_set_audio>
+4201290c:	4981                	li	s3,0
+4201290e:	ce26                	sw	s1,28(sp)
+42012910:	4901                	li	s2,0
+42012912:	4a81                	li	s5,0
+42012914:	4c81                	li	s9,0
+42012916:	855e                	mv	a0,s7
+42012918:	705220ef          	jal	4203581c <custom_flac_decoder_destroy>
+4201291c:	4b81                	li	s7,0
+4201291e:	badd                	j	42012314 <decoder_task+0x634>
+42012920:	8542                	mv	a0,a6
+42012922:	f9eff06f          	j	420120c0 <decoder_task+0x3e0>
+42012926:	3c1267b7          	lui	a5,0x3c126
+4201292a:	adc78793          	addi	a5,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+4201292e:	dc0ff06f          	j	42011eee <decoder_task+0x20e>
+42012932:	08012723          	sw	zero,142(sp)
+42012936:	08012523          	sw	zero,138(sp)
+4201293a:	de3e                	sw	a5,60(sp)
+4201293c:	08c11423          	sh	a2,136(sp)
+42012940:	c33e                	sw	a5,132(sp)
+42012942:	5606                	lw	a2,96(sp)
+42012944:	c73e                	sw	a5,140(sp)
+42012946:	3fc9a7b7          	lui	a5,0x3fc9a
+4201294a:	5726                	lw	a4,104(sp)
+4201294c:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+42012950:	08d10823          	sb	a3,144(sp)
+42012954:	5782                	lw	a5,32(sp)
+42012956:	5696                	lw	a3,100(sp)
+42012958:	08011923          	sh	zero,146(sp)
+4201295c:	c12e                	sw	a1,128(sp)
+4201295e:	c0b2                	sw	a2,64(sp)
+42012960:	4405                	li	s0,1
+42012962:	0110                	addi	a2,sp,128
+42012964:	85a6                	mv	a1,s1
+42012966:	08f10923          	sb	a5,146(sp)
+4201296a:	c2b6                	sw	a3,68(sp)
+4201296c:	c4ba                	sw	a4,72(sp)
+4201296e:	02810923          	sb	s0,50(sp)
+42012972:	6f6040ef          	jal	42017068 <native_state_set_stream_info>
+42012976:	87a2                	mv	a5,s0
+42012978:	be15                	j	420124ac <decoder_task+0x7cc>
+4201297a:	03214c83          	lbu	s9,50(sp)
+4201297e:	960c80e3          	beqz	s9,420122de <decoder_task+0x5fe>
+42012982:	00044e63          	bltz	s0,4201299e <decoder_task+0xcbe>
+42012986:	00ad4783          	lbu	a5,10(s10)
+4201298a:	eb91                	bnez	a5,4201299e <decoder_task+0xcbe>
+4201298c:	3fc9a7b7          	lui	a5,0x3fc9a
+42012990:	cf878793          	addi	a5,a5,-776 # 3fc99cf8 <s_flac_input_ready_generation>
+42012994:	0310000f          	fence	rw,w
+42012998:	c384                	sw	s1,0(a5)
+4201299a:	0330000f          	fence	rw,rw
+4201299e:	3c1267b7          	lui	a5,0x3c126
+420129a2:	fb878513          	addi	a0,a5,-72 # 3c125fb8 <_esp_libc_clock_array_end+0x5e68>
+420129a6:	8c9fe0ef          	jal	4201126e <log_runtime_memory>
+420129aa:	ba0d                	j	420122dc <decoder_task+0x5fc>
+420129ac:	fe377097          	auipc	ra,0xfe377
+420129b0:	af2080e7          	jalr	-1294(ra) # 4038949e <esp_log_timestamp>
+420129b4:	3c1267b7          	lui	a5,0x3c126
+420129b8:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420129bc:	3c126637          	lui	a2,0x3c126
+420129c0:	3c1267b7          	lui	a5,0x3c126
+420129c4:	86aa                	mv	a3,a0
+420129c6:	ac878793          	addi	a5,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+420129ca:	85ba                	mv	a1,a4
+420129cc:	f9060613          	addi	a2,a2,-112 # 3c125f90 <_esp_libc_clock_array_end+0x5e40>
+420129d0:	5879                	li	a6,-2
+420129d2:	4505                	li	a0,1
+420129d4:	fe377097          	auipc	ra,0xfe377
+420129d8:	9c2080e7          	jalr	-1598(ra) # 40389396 <esp_log>
+420129dc:	3c1267b7          	lui	a5,0x3c126
+420129e0:	8922                	mv	s2,s0
+420129e2:	e6878693          	addi	a3,a5,-408 # 3c125e68 <_esp_libc_clock_array_end+0x5d18>
+420129e6:	d34ff06f          	j	42011f1a <decoder_task+0x23a>
+420129ea:	fe377097          	auipc	ra,0xfe377
+420129ee:	ab4080e7          	jalr	-1356(ra) # 4038949e <esp_log_timestamp>
+420129f2:	3c1267b7          	lui	a5,0x3c126
+420129f6:	86aa                	mv	a3,a0
+420129f8:	ad478793          	addi	a5,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+420129fc:	cf2ff06f          	j	42011eee <decoder_task+0x20e>
+42012a00:	3c1267b7          	lui	a5,0x3c126
+42012a04:	ac878793          	addi	a5,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+42012a08:	b9d1                	j	420126dc <decoder_task+0x9fc>
+42012a0a:	3c1267b7          	lui	a5,0x3c126
+42012a0e:	ac878793          	addi	a5,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+42012a12:	b5ad                	j	4201287c <decoder_task+0xb9c>
+42012a14:	3c1267b7          	lui	a5,0x3c126
+42012a18:	ac878593          	addi	a1,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+42012a1c:	bcb9                	j	4201247a <decoder_task+0x79a>
+42012a1e:	3fc9a7b7          	lui	a5,0x3fc9a
+42012a22:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+42012a26:	3c1267b7          	lui	a5,0x3c126
+42012a2a:	01878693          	addi	a3,a5,24 # 3c126018 <_esp_libc_clock_array_end+0x5ec8>
+42012a2e:	4601                	li	a2,0
+42012a30:	85a6                	mv	a1,s1
+42012a32:	546040ef          	jal	42016f78 <native_state_set_audio>
+42012a36:	ce26                	sw	s1,28(sp)
+42012a38:	b9f9                	j	42012716 <decoder_task+0xa36>
+42012a3a:	3c1267b7          	lui	a5,0x3c126
+42012a3e:	ad478793          	addi	a5,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+42012a42:	bb85                	j	420127b2 <decoder_task+0xad2>
+42012a44:	fe377097          	auipc	ra,0xfe377
+42012a48:	a5a080e7          	jalr	-1446(ra) # 4038949e <esp_log_timestamp>
+42012a4c:	3c1267b7          	lui	a5,0x3c126
+42012a50:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42012a54:	3c1267b7          	lui	a5,0x3c126
+42012a58:	86aa                	mv	a3,a0
+42012a5a:	85ba                	mv	a1,a4
+42012a5c:	0a478613          	addi	a2,a5,164 # 3c1260a4 <_esp_libc_clock_array_end+0x5f54>
+42012a60:	4509                	li	a0,2
+42012a62:	fe377097          	auipc	ra,0xfe377
+42012a66:	934080e7          	jalr	-1740(ra) # 40389396 <esp_log>
+42012a6a:	4c85                	li	s9,1
+42012a6c:	f18ff06f          	j	42012184 <decoder_task+0x4a4>
+42012a70:	3c1267b7          	lui	a5,0x3c126
+42012a74:	ad478793          	addi	a5,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+42012a78:	b195                	j	420126dc <decoder_task+0x9fc>
+42012a7a:	3c1267b7          	lui	a5,0x3c126
+42012a7e:	ad478793          	addi	a5,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+42012a82:	bbed                	j	4201287c <decoder_task+0xb9c>
+42012a84:	fe377097          	auipc	ra,0xfe377
+42012a88:	a1a080e7          	jalr	-1510(ra) # 4038949e <esp_log_timestamp>
+42012a8c:	4789                	li	a5,2
+42012a8e:	4405                	li	s0,1
+42012a90:	86aa                	mv	a3,a0
+42012a92:	0afb0663          	beq	s6,a5,42012b3e <decoder_task+0xe5e>
+42012a96:	4791                	li	a5,4
+42012a98:	0afb0e63          	beq	s6,a5,42012b54 <decoder_task+0xe74>
+42012a9c:	3c1267b7          	lui	a5,0x3c126
+42012aa0:	ad878793          	addi	a5,a5,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+42012aa4:	008b0663          	beq	s6,s0,42012ab0 <decoder_task+0xdd0>
+42012aa8:	3c1267b7          	lui	a5,0x3c126
+42012aac:	adc78793          	addi	a5,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+42012ab0:	3c126737          	lui	a4,0x3c126
+42012ab4:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42012ab8:	3c126637          	lui	a2,0x3c126
+42012abc:	85ba                	mv	a1,a4
+42012abe:	0c460613          	addi	a2,a2,196 # 3c1260c4 <_esp_libc_clock_array_end+0x5f74>
+42012ac2:	4505                	li	a0,1
+42012ac4:	fe377097          	auipc	ra,0xfe377
+42012ac8:	8d2080e7          	jalr	-1838(ra) # 40389396 <esp_log>
+42012acc:	3fc9a7b7          	lui	a5,0x3fc9a
+42012ad0:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+42012ad4:	3c1267b7          	lui	a5,0x3c126
+42012ad8:	0f478693          	addi	a3,a5,244 # 3c1260f4 <_esp_libc_clock_array_end+0x5fa4>
+42012adc:	85a6                	mv	a1,s1
+42012ade:	4601                	li	a2,0
+42012ae0:	498040ef          	jal	42016f78 <native_state_set_audio>
+42012ae4:	ce26                	sw	s1,28(sp)
+42012ae6:	b905                	j	42012716 <decoder_task+0xa36>
+42012ae8:	fe377097          	auipc	ra,0xfe377
+42012aec:	9b6080e7          	jalr	-1610(ra) # 4038949e <esp_log_timestamp>
+42012af0:	3c126737          	lui	a4,0x3c126
+42012af4:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42012af8:	3c126637          	lui	a2,0x3c126
+42012afc:	86aa                	mv	a3,a0
+42012afe:	87a2                	mv	a5,s0
+42012b00:	85ba                	mv	a1,a4
+42012b02:	fd060613          	addi	a2,a2,-48 # 3c125fd0 <_esp_libc_clock_array_end+0x5e80>
+42012b06:	4509                	li	a0,2
+42012b08:	fe377097          	auipc	ra,0xfe377
+42012b0c:	88e080e7          	jalr	-1906(ra) # 40389396 <esp_log>
+42012b10:	3c126737          	lui	a4,0x3c126
+42012b14:	0419                	addi	s0,s0,6 # 3006 <CSR_UINTSTATUS+0x2355>
+42012b16:	4785                	li	a5,1
+42012b18:	e8470693          	addi	a3,a4,-380 # 3c125e84 <_esp_libc_clock_array_end+0x5d34>
+42012b1c:	0087e663          	bltu	a5,s0,42012b28 <decoder_task+0xe48>
+42012b20:	3c1267b7          	lui	a5,0x3c126
+42012b24:	e6878693          	addi	a3,a5,-408 # 3c125e68 <_esp_libc_clock_array_end+0x5d18>
+42012b28:	3fc9a7b7          	lui	a5,0x3fc9a
+42012b2c:	d147a503          	lw	a0,-748(a5) # 3fc99d14 <s_state>
+42012b30:	4601                	li	a2,0
+42012b32:	85a6                	mv	a1,s1
+42012b34:	444040ef          	jal	42016f78 <native_state_set_audio>
+42012b38:	ce26                	sw	s1,28(sp)
+42012b3a:	fccff06f          	j	42012306 <decoder_task+0x626>
+42012b3e:	3c1267b7          	lui	a5,0x3c126
+42012b42:	ac878793          	addi	a5,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+42012b46:	b7ad                	j	42012ab0 <decoder_task+0xdd0>
+42012b48:	3c1267b7          	lui	a5,0x3c126
+42012b4c:	e6878693          	addi	a3,a5,-408 # 3c125e68 <_esp_libc_clock_array_end+0x5d18>
+42012b50:	bcaff06f          	j	42011f1a <decoder_task+0x23a>
+42012b54:	3c1267b7          	lui	a5,0x3c126
+42012b58:	ad478793          	addi	a5,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+42012b5c:	bf91                	j	42012ab0 <decoder_task+0xdd0>
+42012b5e:	fe377097          	auipc	ra,0xfe377
+42012b62:	940080e7          	jalr	-1728(ra) # 4038949e <esp_log_timestamp>
+42012b66:	3c1267b7          	lui	a5,0x3c126
+42012b6a:	86aa                	mv	a3,a0
+42012b6c:	ac878793          	addi	a5,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+42012b70:	b189                	j	420127b2 <decoder_task+0xad2>
+

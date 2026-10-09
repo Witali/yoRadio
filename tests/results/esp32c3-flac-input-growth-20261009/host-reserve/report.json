@@ -1,0 +1,44 @@
+{
+  "variants": [
+    {
+      "adaptive_input": false,
+      "rx_only": false,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": true,
+      "rx_only": false,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": false,
+      "rx_only": true,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": true,
+      "rx_only": true,
+      "passed": true,
+      "concurrent_allocations": 8000
+    }
+  ],
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "scope": "Actual C allocators; pthread platform and simulated heap. SDK sizing separately verified in ELF; no physical qualification.",
+  "sources": {
+    "idf/esp32c3-oled-native/main/adaptive_input.h": "200d80ca26291066c83e90c97361e7cf6d861368a4e1663d92f0aceadc90067f",
+    "idf/esp32c3-oled-native/main/adaptive_input.c": "c177216c45b5f13dfe2cb0be511c4967e9dde41e28fc551ecb0c5fd2a1184e47",
+    "idf/esp32c3-oled-native/main/tls_input_reserve.c": "5ca70ab90b6e45105d1bc487c2a7f179a1daa64792167e2e58dfd55e23d2c38a",
+    "idf/esp32c3-oled-native/main/tls_large_reserve.h": "90535c776f09ce7294839613746bd1a6d40d75d3d9b0aea34b533ed22356fa89",
+    "idf/esp32c3-oled-native/main/tls_large_reserve.c": "6d6b0e1212fd447cef9da16905fcbae4d9486e077a07917f447ea08d921b50f1",
+    "idf/esp32c3-oled-native/main/tls_input_reserve.h": "1bf63d107156a9dc8ee04f81e472bc4cf53d9424048eff34525c7994436a418a",
+    "tests/native/adaptive_input_test.c": "32504306e23d087f8f905c393be937caca42f8c499e0735ab52fa85b9394b43a",
+    "tests/native/tls_large_reserve_test.c": "2b7cedb74d913fd3e7f7234da28f3a7665ed88a203223601fe1235955a810353",
+    "tests/run-tls-large-reserve.py": "0782c50e665485dba174d99085cb7e1118a36d464e0a8d5e86e0b82e572d3340"
+  }
+}

@@ -1,0 +1,18 @@
+42028bfc:	7179                	addi	sp,sp,-48
+42028bfe:	d606                	sw	ra,44(sp)
+42028c00:	d422                	sw	s0,40(sp)
+42028c02:	3fc9a7b7          	lui	a5,0x3fc9a
+42028c06:	e0c78793          	addi	a5,a5,-500 # 3fc99e0c <s_input>
+42028c0a:	0330000f          	fence	rw,rw
+42028c0e:	4380                	lw	s0,0(a5)
+42028c10:	0230000f          	fence	r,rw
+42028c14:	85a2                	mv	a1,s0
+42028c16:	0048                	addi	a0,sp,4
+42028c18:	e9cff0ef          	jal	420282b4 <adaptive_input_stats>
+42028c1c:	8522                	mv	a0,s0
+42028c1e:	5422                	lw	s0,40(sp)
+42028c20:	45b2                	lw	a1,12(sp)
+42028c22:	50b2                	lw	ra,44(sp)
+42028c24:	6145                	addi	sp,sp,48
+42028c26:	805ff06f          	j	4202842a <adaptive_input_set_limit>
+
