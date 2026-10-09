@@ -52,14 +52,23 @@ static int64_t esp_timer_get_time(void) { return ++now_us; }
 static unsigned heap_polls, logs;
 static char last_log[512];
 static void network_heap_profile_poll(void) { assert(!in_core); ++heap_polls; }
-static void log_line(const char *tag, const char *format, ...) {
-    assert(!in_core); assert(!strcmp(tag, "web_tcp"));
-    va_list args; va_start(args, format);
-    vsnprintf(last_log, sizeof(last_log), format, args); va_end(args); ++logs;
+static uint32_t esp_rom_crc32_le(uint32_t crc, const uint8_t *data, uint32_t len) {
+    crc = ~crc;
+    while (len--) {
+        crc ^= *data++;
+        for (unsigned n=0;n<8;++n) crc = (crc >> 1) ^ (0xedb88320U & (0U-(crc&1U)));
+    }
+    return ~crc;
 }
-#define ESP_LOGI log_line
+static int log_frame(const char *line, FILE *stream) {
+    assert(!in_core && stream == stdout && strlen(line) == 58);
+    strcpy(last_log, line); ++logs;
+    return fputs(line, stdout); // Python independently checks encoding and CRC.
+}
+#define fputs log_frame
 /* PRODUCTION_HEADER */
 /* PRODUCTION_SOURCE */
+#undef fputs
 
 static struct netif interface = {42};
 static struct pbuf *expected_packet;
@@ -151,9 +160,9 @@ int main(void) {
     send_output(80,32000,TCP_SYN,TCP_HLEN,&destination,17);
     assert(output_calls == 7 && s_write == 4);
     now_us = WEB_TCP_POLL_US;
-    web_tcp_probe_poll(); assert(logs == 4 && heap_polls == 1 && s_read == s_write);
-    assert(strstr(last_log,"port=32000") && strstr(last_log,"result=-7"));
-    web_tcp_probe_poll(); assert(logs == 4 && heap_polls == 1);
+    web_tcp_probe_poll(); assert(logs == 5 && heap_polls == 1 && s_read == s_write);
+    assert(strncmp(last_log,"PERF TS2:",9)==0);
+    web_tcp_probe_poll(); assert(logs == 5 && heap_polls == 1);
     // Exercise both unsigned queue-index wrap and saturation without overwrite.
     s_read = s_write = UINT32_MAX-31;
     for (unsigned n=0;n<WEB_TCP_EVENTS+5;++n) {
@@ -161,8 +170,9 @@ int main(void) {
     }
     assert(s_dropped == 5 && s_write-s_read == WEB_TCP_EVENTS);
     assert(s_events[s_read % WEB_TCP_EVENTS].remote_port == 0);
-    web_tcp_probe_poll(); assert(logs == 68 && s_read == s_write);
-    assert(strstr(last_log,"port=63") && strstr(last_log,"dropped=5"));
+    web_tcp_probe_poll(); assert(logs == 69 && s_read == s_write);
+    web_tcp_probe_log_listener(0x10203040, 1007, 3, 4, 1, 5, 2, 1);
+    assert(logs == 70 && strncmp(last_log,"PERF TL2:",9)==0);
     puts("PASS TCP probe: input ownership, exact forwarding, states, filters, bounded ring and wrap");
     return 0;
 }

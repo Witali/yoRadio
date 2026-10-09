@@ -4,9 +4,10 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include "esp_attr.h"
-#include "esp_log.h"
+#include "esp_rom_crc.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "lwip/ip.h"
@@ -27,6 +28,33 @@ _Static_assert(sizeof(web_tcp_event_t) == 16, "Bounded TCP diagnostic storage");
 static RTC_DATA_ATTR web_tcp_event_t s_events[WEB_TCP_EVENTS];
 static portMUX_TYPE s_lock = portMUX_INITIALIZER_UNLOCKED;
 static uint32_t s_read, s_write, s_sequence, s_dropped;
+
+// Version 2 wire frames: 9 ASCII header bytes + five 32-bit hex words,
+// CRC-32/ISO-HDLC of those 49 ASCII bytes, then newline. Including VFS CRLF
+// translation the record is 59 bytes, below the native USB 64-byte packet.
+// This reduces traffic; CRC and sequence/watermark checks still must detect
+// lost data. No logging format can guarantee delivery through a stalled USB.
+enum { WEB_TCP_FRAME_BODY = 49, WEB_TCP_FRAME_BYTES = 58 };
+static void emit_frame(char kind, uint32_t a, uint32_t b, uint32_t c,
+                       uint32_t d, uint32_t e) {
+    char line[WEB_TCP_FRAME_BYTES + 1];
+    snprintf(line, sizeof(line), "PERF T%c2:%08" PRIx32 "%08" PRIx32
+             "%08" PRIx32 "%08" PRIx32 "%08" PRIx32, kind, a, b, c, d, e);
+    uint32_t crc = esp_rom_crc32_le(0, (const uint8_t *)line, WEB_TCP_FRAME_BODY);
+    snprintf(line + WEB_TCP_FRAME_BODY, sizeof(line) - WEB_TCP_FRAME_BODY,
+             "%08" PRIx32 "\n", crc);
+    fputs(line, stdout);
+}
+
+void web_tcp_probe_log_listener(uint32_t sequence, uint32_t age_ms,
+                                uint32_t syn_received, uint32_t established,
+                                uint32_t listeners, uint32_t backlog,
+                                uint32_t pending, uint32_t backlog_supported) {
+    // Counts fit their explicit fields: lwIP's configured PCB capacity is
+    // below 256; there is one native port-80 listener and its backlog is u8.
+    emit_frame('L', sequence, age_ms, syn_received | (established << 16),
+               listeners | (backlog << 8) | (pending << 16) | (backlog_supported << 24), 0);
+}
 
 static void record(web_tcp_event_t event) {
     event.at_us = (uint32_t)esp_timer_get_time();
@@ -118,6 +146,7 @@ err_t __wrap_ip4_output_if(struct pbuf *packet, const ip4_addr_t *source,
 
 void web_tcp_probe_poll(void) {
     // Logging and heap sampling never run in TCP input/output or its core lock.
+    static uint32_t last_emitted_sequence;
     for (unsigned n = 0; n < WEB_TCP_EVENTS; ++n) {
         web_tcp_event_t event;
         portENTER_CRITICAL(&s_lock);
@@ -126,16 +155,23 @@ void web_tcp_probe_poll(void) {
         uint32_t dropped = s_dropped;
         portEXIT_CRITICAL(&s_lock);
         if (!available) break;
-        ESP_LOGI("web_tcp", "PERF WEB_TCP: seq=%" PRIu32 " us=%" PRIu32
-                 " dir=%u port=%u flags=%u before=%u after=%u result=%d pending=%u dropped=%" PRIu32,
-                 event.sequence, event.at_us, (unsigned)event.direction, (unsigned)event.remote_port,
-                 (unsigned)event.flags, (unsigned)event.before, (unsigned)event.after,
-                 (int)event.result, (unsigned)event.pending, dropped);
+        emit_frame('C', event.sequence, event.at_us,
+                   (uint32_t)event.remote_port | ((uint32_t)event.direction << 16) |
+                   ((uint32_t)event.flags << 24),
+                   (uint32_t)event.before | ((uint32_t)event.after << 8) |
+                   ((uint32_t)(uint8_t)event.result << 16) | ((uint32_t)event.pending << 24),
+                   dropped);
+        last_emitted_sequence = event.sequence;
     }
     static int64_t previous_us;
     int64_t now = esp_timer_get_time();
     if (now - previous_us >= WEB_TCP_POLL_US) {
         previous_us = now;
+        portENTER_CRITICAL(&s_lock);
+        uint32_t sequence = s_sequence, dropped = s_dropped, pending = s_write - s_read;
+        portEXIT_CRITICAL(&s_lock);
+        // A periodic watermark detects lost final events even in quiet idle.
+        emit_frame('S', sequence, (uint32_t)now, dropped, pending, last_emitted_sequence);
         network_heap_profile_poll();
     }
 }

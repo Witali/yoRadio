@@ -139,12 +139,10 @@ void network_heap_profile_poll(void) {
                  (unsigned)previous.sequence, age_ms, (unsigned)previous.rx_window,
                  (unsigned)previous.rx_window_max, (unsigned)previous.rx_refused_bytes);
 #ifdef CONFIG_YORADIO_WEB_TCP_PROBE
-        ESP_LOGI("net_heap", "PERF WEB_LISTEN: seq=%u age_ms=%" PRId64
-                 " syn_rcvd=%u established=%u listeners=%u backlog=%u pending=%u backlog_supported=%u",
-                 (unsigned)previous.sequence, age_ms, (unsigned)previous.web_syn,
-                 (unsigned)previous.web_established, (unsigned)previous.web_listeners,
-                 (unsigned)previous.web_backlog, (unsigned)previous.web_pending,
-                 (unsigned)TCP_LISTEN_BACKLOG);
+        web_tcp_probe_log_listener(previous.sequence, (uint32_t)age_ms,
+                                   previous.web_syn, previous.web_established,
+                                   previous.web_listeners, previous.web_backlog,
+                                   previous.web_pending, TCP_LISTEN_BACKLOG);
 #endif
     }
     if (pending || tcpip_callbackmsg_trycallback(s_message) != ERR_OK) {

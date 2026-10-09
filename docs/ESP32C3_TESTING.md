@@ -1236,7 +1236,7 @@ snapshots once per second, independently of incoming HTTP requests. Its
 profiling interval includes the diagnostic work; these builds are not
 production CPU benchmarks.
 
-`PERF WEB_TCP` contains a sequence number, low 32 bits of the device's
+TCP event frames contain a sequence number, low 32 bits of the device's
 microsecond clock, peer port, direction (`0` receive, `1` transmit), flags,
 PCB state before/after receive, output result, pending accepts and dropped
 event count. State/pending `255` means unavailable; receive result `0` is
@@ -1248,7 +1248,7 @@ output path, not delivery to the computer.
 Events are recorded on wrapper return: a SYN-ACK generated inside input can
 appear before its corresponding received SYN. Serial arrival time includes
 the consumer/logging delay. Reject incomplete sequences or nonzero dropped
-counts as a complete connection trace. `PERF WEB_LISTEN` reports SYN_RCVD,
+counts as a complete connection trace. Listener frames report SYN_RCVD,
 ESTABLISHED and listener counts, with `backlog_supported` explicitly stating
 whether the SDK has TCP listen-backlog accounting. Zero pending/backlog
 values with this flag off must not be interpreted as an empty accept queue.
@@ -1260,6 +1260,7 @@ saturation and unsigned index wrap, under ASan/UBSan with backlog on/off:
 ```powershell
 python tests/run-web-tcp-probe.py --output NEW_DIRECTORY
 python tests/test-esp32c3-transport-trace.py
+python tests/test-web-tcp.py
 ```
 
 `TransportTrace(..., capture_socket_ports=True)` additionally saves the local
@@ -1273,3 +1274,29 @@ The [first physical TCP-probe repeat](ESP32C3_WEB_TCP_PROBE_20261009.md)
 passes application checks but rejects the complete TCP trace because USB
 output loses characters and merges lines. Preserve this distinction:
 successful offline replay reproduces the failed telemetry gate too.
+
+The current v2 wire format replaces verbose `PERF WEB_TCP` / `WEB_LISTEN`
+lines with 58-byte records (59 after CRLF translation). Every frame has a
+9-byte `PERF TC2:`, `PERF TL2:` or `PERF TS2:` header, five eight-digit
+lowercase hex words, eight hex CRC digits and a newline. CRC-32/ISO-HDLC
+uses seed zero over the first 49 ASCII bytes, including the frame type.
+It uses the ESP ROM implementation and is computed outside lwIP's core lock.
+
+| Frame | Five words, in order |
+| --- | --- |
+| TC2 event | Sequence; device microseconds; port in bits 0–15, direction 16–23, flags 24–31; before/after/signed result/pending as four bytes from least significant to most; dropped count |
+| TL2 listener | Sample sequence; age in ms; SYN_RCVD low 16 bits and ESTABLISHED high 16 bits; listener/backlog/pending/backlog-supported as four bytes; reserved zero |
+| TS2 watermark | Generated event sequence; device microseconds; dropped count; queued count; last emitted event sequence |
+
+`tools/esp32c3_tests/web_tcp.py` decodes these frames and rejects malformed,
+merged or CRC-damaged records. `window()` requires event/listener continuity,
+zero drops and periodic watermarks; a watermark exposes missing final events
+even if no further connection is made. It reports the actual first/last
+qualified anchors and the unqualified edge durations explicitly. It rejects
+watermark/listener coverage gaps exceeding 2.5 seconds. Do not repair damaged
+text or treat bytes outside those anchors as complete telemetry.
+
+Short records reduce output traffic but do not guarantee USB delivery.
+Host sanitizer runs decode actual C-generated frames independently with
+Python's CRC implementation. Parser tests also delete/change every hex digit,
+merge lines and remove final events to check that corruption is rejected.
