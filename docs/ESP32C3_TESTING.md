@@ -802,6 +802,15 @@ counter wrap, reset and ISR events during logging. `test-pipeline-flow.py`
 checks both log formats; `test-pipeline-flow-evidence.py` verifies that the
 older direct-output evidence still produces the same summaries.
 
+For a bounded startup-margin experiment, set
+`CONFIG_YORADIO_INPUT_PREFILL_MIN_MS=250` with
+`CONFIG_YORADIO_INPUT_PREFILL_MS=500`. The minimum delays the early-full exit
+without adding queue storage; Stop and a new generation still cancel promptly.
+Both options remain off by default. `tests/run-input-prefill.py` exercises the
+actual C function for both queue implementations at minima 0, 1, 250 and
+500 ms, including coarse ticks, short/sparse input, cancellation and wrap.
+Only hardware comparison can establish whether it improves continuity.
+
 The [output-priority comparison](ESP32C3_OUTPUT_PRIORITY_20261006.md) tests
 raising the direct-DMA output task from priority 6 to 8 above the decoder at 7.
 It combines matched instrumented LPC12/LPC32 captures with a profile-off

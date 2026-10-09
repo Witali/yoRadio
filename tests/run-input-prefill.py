@@ -35,17 +35,19 @@ def main():
         dest.write_bytes(source_file.read_bytes())
     report['source_sha256'] = {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
                               for p in (source,harness,Path(__file__).resolve())}
-    for mode in ('ring','adaptive'):
-        binary = args.output/mode
+    for mode,minimum in ((mode,minimum) for mode in ('ring','adaptive') for minimum in (0,1,250,500)):
+        name = mode+'-min'+str(minimum)
+        binary = args.output/name
         command = ['gcc','-std=c11','-O2','-g','-Wall','-Wextra','-Werror',
                    '-fsanitize=address,undefined','-fno-pie','-no-pie']
+        command += ['-DCONFIG_YORADIO_INPUT_PREFILL_MIN_MS='+str(minimum)]
         if mode=='adaptive': command += ['-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1']
-        (args.output/(mode+'-build.log')).write_bytes(run(command+[host(unit),'-o',host(binary)]))
+        (args.output/(name+'-build.log')).write_bytes(run(command+[host(unit),'-o',host(binary)]))
         log = run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                    'UBSAN_OPTIONS=halt_on_error=1',host(binary)])
-        (args.output/(mode+'.log')).write_bytes(log)
+        (args.output/(name+'.log')).write_bytes(log)
         assert log.startswith(b'PASS initial input prefill:')
-        report['variants'][mode] = dict(result='PASS',cases=10 if mode=='adaptive' else 8)
+        report['variants'][name] = dict(result='PASS',cases=12 if mode=='adaptive' else 10,minimum_ms=minimum)
     (args.output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report,indent=2))
 

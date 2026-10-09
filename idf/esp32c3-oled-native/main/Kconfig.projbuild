@@ -77,6 +77,19 @@ config YORADIO_INPUT_PREFILL_MS
         Short finite files can be delayed by this bounded startup interval.
         Keep zero until continuity, TLS memory peaks, EOF and switching pass.
 
+config YORADIO_INPUT_PREFILL_MIN_MS
+    int "Minimum initial compressed-input prefill time (experimental, ms)"
+    depends on YORADIO_INPUT_PREFILL_MS > 0
+    range 0 YORADIO_INPUT_PREFILL_MS
+    default 0
+    help
+        Keep the existing input queue full for at least this startup interval
+        before opening the decoder. This can add delivery margin for bursty
+        TLS records without allocating more RAM. Stop and station changes
+        still cancel the wait. The maximum prefill time remains the deadline.
+        Zero preserves the early-full exit; keep this experiment off until
+        queue-wait, codec/EOF and TLS memory checks confirm an improvement.
+
 config YORADIO_TLS_RETAIN_RX_BUFFER
     bool "Retain the full TLS receive buffer after handshake (experimental)"
     depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_DYNAMIC_BUFFER

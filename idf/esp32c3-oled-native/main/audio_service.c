@@ -1032,8 +1032,9 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
 static bool prefill_encoded_input(uint32_t generation) {
     // The decoder retains its first input lease. Only the producer appends
     // packets while we wait; no queued or leased storage may be reclaimed.
-    // Finish when the producer would need the consumer to make room, even
-    // when TLS has reduced the adaptive queue to its configured minimum.
+    // Normally finish when the producer needs the consumer to make room.
+    // An optional minimum delay adds margin for bursty delivery without
+    // changing capacity, including the TLS-reduced adaptive queue.
     const int64_t started_us = esp_timer_get_time();
     const int64_t maximum_us = CONFIG_YORADIO_INPUT_PREFILL_MS * 1000LL;
     TickType_t poll_ticks = pdMS_TO_TICKS(INPUT_PREFILL_POLL_MS);
@@ -1047,7 +1048,16 @@ static bool prefill_encoded_input(uint32_t generation) {
         full = xRingbufferGetCurFreeSize(s_encoded) <
                sizeof(encoded_packet_t) + STREAM_CHUNK_SIZE;
 #endif
+#if CONFIG_YORADIO_INPUT_PREFILL_MIN_MS > 0
+        _Static_assert(CONFIG_YORADIO_INPUT_PREFILL_MIN_MS <= CONFIG_YORADIO_INPUT_PREFILL_MS,
+                       "Minimum prefill must not exceed its deadline");
+        int64_t elapsed_us = esp_timer_get_time() - started_us;
+        if (elapsed_us >= maximum_us ||
+            (full && elapsed_us >= CONFIG_YORADIO_INPUT_PREFILL_MIN_MS * 1000LL)) break;
+#else
+        // Keep the original early-full path when the experiment is disabled.
         if (full || esp_timer_get_time() - started_us >= maximum_us) break;
+#endif
         vTaskDelay(poll_ticks);
     }
     bool current = atomic_load(&s_generation) == generation;

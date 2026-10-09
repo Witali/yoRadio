@@ -6,6 +6,9 @@
 #include <stdatomic.h>
 
 enum { STREAM_CHUNK_SIZE = 2048, CONFIG_YORADIO_INPUT_PREFILL_MS = 500 };
+#ifndef CONFIG_YORADIO_INPUT_PREFILL_MIN_MS
+#define CONFIG_YORADIO_INPUT_PREFILL_MIN_MS 0
+#endif
 typedef int native_codec_t;
 typedef unsigned TickType_t;
 static unsigned tick_ms = 1, sleeps;
@@ -60,9 +63,12 @@ static void reset(unsigned generation) {
 }
 
 int main(void) {
-    reset(7); // Fast producer must not be kept blocked for the whole timeout.
+    const int64_t minimum_us = CONFIG_YORADIO_INPUT_PREFILL_MIN_MS * 1000LL;
+    const int64_t rounded_minimum = (minimum_us + 9999) / 10000 * 10000;
+    reset(7); // A fast producer observes only the configured minimum delay.
     full_at_us = 17000;
-    assert(prefill_encoded_input(7) && now_us == 20000 && sleeps == 2);
+    int64_t fast_time = rounded_minimum > 20000 ? rounded_minimum : 20000;
+    assert(prefill_encoded_input(7) && now_us == fast_time && sleeps == fast_time / 10000);
 
     reset(7); // Sparse input/short finite data cannot wait forever.
     assert(prefill_encoded_input(7) && now_us == 500000 && sleeps == 50);
@@ -76,7 +82,7 @@ int main(void) {
 
     reset(0); // Generation zero and wraparound are ordinary valid values.
     initially_full = true;
-    assert(prefill_encoded_input(0) && now_us == 0);
+    assert(prefill_encoded_input(0) && now_us == rounded_minimum);
     reset(UINT32_MAX);
     cancel_at_us = 10000;
     assert(!prefill_encoded_input(UINT32_MAX) && now_us == 10000);
@@ -89,15 +95,26 @@ int main(void) {
     full_at_us = cancel_at_us = 10000;
     assert(!prefill_encoded_input(7) && now_us == 10000);
 
+    reset(7); // A late producer still exits before the maximum when possible.
+    full_at_us = 470000;
+    int64_t late_time = rounded_minimum > 470000 ? rounded_minimum : 470000;
+    assert(prefill_encoded_input(7) && now_us == late_time);
+
+    reset(7); // Minimum delay is rounded up by polling, including coarse ticks.
+    tick_ms = 20;
+    initially_full = true;
+    assert(prefill_encoded_input(7) && now_us == (minimum_us + 19999) / 20000 * 20000);
+
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
     reset(7); // The TLS-reduced two-slot queue uses its actual capacity.
     resident = 2;
     full_at_us = 10000;
-    assert(prefill_encoded_input(7) && now_us == 10000);
+    int64_t reduced_time = rounded_minimum > 10000 ? rounded_minimum : 10000;
+    assert(prefill_encoded_input(7) && now_us == reduced_time);
     reset(7); // A defensive zero-capacity snapshot never deadlocks startup.
     resident = 0;
     initially_full = true;
-    assert(prefill_encoded_input(7) && now_us == 0);
+    assert(prefill_encoded_input(7) && now_us == rounded_minimum);
 #endif
     puts("PASS initial input prefill: timing, backpressure, cancellation, wrap and coarse ticks");
 }
