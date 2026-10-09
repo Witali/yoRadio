@@ -1043,6 +1043,29 @@ trust the server certificate; this does not disable verification.
 controlled `--play-url`. Run `python tests/test-ota-playback-format.py` to verify
 rejection of core fallback, wrong channels/rates and transient matches.
 
+### Filtered TLS error codes
+
+Acceptance and diagnostic serial captures retain a signed `mbedtls_return`
+and an allowlisted `operation` for the exact ESP-IDF messages emitted by
+`esp_mbedtls_dynamic_impl.c` (`fetch_input`, decimal `-ret`) and
+`esp_tls_mbedtls.c` (`read`, `write`, `handshake`, hexadecimal `-ret`). For
+example, `error=80` and `read error :-0x0050` both represent return `-80`.
+The component is retained, so propagation through multiple layers is visible;
+two log rows do not necessarily mean two independent failures.
+
+Unknown or malformed messages remain generic TLS failures. Appended text,
+hosts, URLs and certificate subjects are discarded. Allocation-size evidence
+and the separate certificate-bundle rejection marker are preserved. A numeric
+handshake code alone does not satisfy the certificate-rejection test, and
+being close to a reset does not automatically excuse an error. Earlier
+archives lacking a numeric code cannot be retroactively assigned one.
+
+```powershell
+python tests/test-tls-error-codes.py
+python tests/test-serial-telemetry.py
+python tests/test-esp32c3-tls-dynamic-evidence.py
+```
+
 ## PCM-tail submission and EOF
 
 The staged output must flush its final partial block before publishing EOF and

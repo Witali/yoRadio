@@ -9,6 +9,8 @@ import time
 import sys
 from urllib.request import Request, urlopen
 
+from tls_error_codes import error_detail
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 
@@ -62,7 +64,8 @@ def filter_tls_line(line):
         return TLS_CERTIFICATE_REJECTED
     size = re.search(r'\balloc\((\d+) bytes\) failed\b', body)
     return ('TLS failure: component=' + tls.group(1) +
-            (' allocation_bytes=' + size.group(1) if size else ''))
+            (' allocation_bytes=' + size.group(1) if size else '') +
+            error_detail(tls.group(1), body))
 
 
 def check_certificate_rejection(alerts, rows):

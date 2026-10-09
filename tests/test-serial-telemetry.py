@@ -55,6 +55,16 @@ class SerialTelemetry(unittest.TestCase):
                 self.assertEqual(len(cap.rows), 1)
                 self.assertTrue(cap.rows[0]['line'].startswith('serial capture interrupted:'))
 
+    def test_tls_numeric_detail_survives_fragmented_capture(self):
+        for cls in (Capture, DiagnosticCapture):
+            cap = self.capture(cls, [b'E (123) Dynamic Impl: mbedtls_ssl_fetch_', b'',
+                b'input error=80\r\nE (124) esp-tls-mbedtls: read error :-0x0050\n',
+                b'E (125) esp-tls-mbedtls: private.example detail\n'])
+            self.assertEqual([r['line'] for r in cap.rows], [
+                'TLS failure: component=Dynamic Impl operation=fetch_input mbedtls_return=-80',
+                'TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-80',
+                'TLS failure: component=esp-tls-mbedtls'])
+
     def test_os_error_is_visible(self):
         cap = Capture.__new__(Capture)
         cap.rows, cap.closed = [], threading.Event()

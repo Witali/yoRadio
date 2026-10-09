@@ -40,6 +40,8 @@ class FileRuntimeTests(unittest.TestCase):
             'PERF allocation failed: requested=1700',
             'AAC decode error', 'OGG decode failed',
             'TLS failure: component=esp-tls-mbedtls',
+            'TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-80',
+            'TLS failure: component=Dynamic Impl operation=fetch_input mbedtls_return=-80',
             'assert failed: owner', 'Guru Meditation Error', 'CORRUPT HEAP',
             'PANIC registers: MEPC=0x42000000', 'serial capture interrupted',
             'E (1000) task_wdt: Task watchdog got triggered.',
