@@ -5,6 +5,12 @@ alongside falling free heap. They do not yet identify every live allocation.
 Both original **FAIL** results remain unchanged. This analysis on 9 October
 adds a controlled delivery-rate option for the next physical comparison.
 
+Follow-up: the [9 October physical pacing comparison](ESP32C3_HEAP_PACING_20261009.md)
+is now complete. At 1.00x, heap remained stable but DMA queue overruns occurred;
+at 1.02x, receive queues filled and the original heap-trend gate failed again.
+Both recovered settled idle memory after Stop. The follow-up preserves every
+original verdict and records a separate PDM clock hypothesis.
+
 ## Observed memory and receive credit
 
 `NET_HEAP` and `NET_RX` come from the same TCPIP callback. Pairing uses their
