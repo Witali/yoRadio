@@ -1,0 +1,14 @@
+{
+  "sources": {
+    "idf\\esp32c3-oled-native\\main\\native_audio_output.c": "bcde82b5017f49521fafc8965dabd7641549ddc6c87136c43221630eade04552",
+    "idf\\esp32c3-oled-native\\main\\native_audio_output.h": "1fe313b39c90f3602243fa36671af5304044f7e20466078fcf2bc2c32adb961d",
+    "idf\\esp32c3-oled-native\\main\\native_i2s_generator.c": "b9b030839a3f23682bbe3d22d80cc3d45ab2e4c98ca9d3a8abb69dfe5f90e099",
+    "tests\\native\\output_dma\\stubs.h": "9319f8e5edbd5529feed5c350f2e1594a96ec289c4d913fb7107228158122c70",
+    "idf\\esp32c3-oled-native\\main\\audio_service.c": "4f9ab8689587ea23b9f3442ef587b85ac34a155ec1e01fd7bb9150fb3825bc59",
+    ".build\\c3-output-tail-audit-20261009\\probe.c": "89d9f65ca1116d2dc011e034f3169e169dcb73ed466ebfe7382335487eb1ce4d",
+    ".build\\c3-output-tail-audit-20261009\\probe.py": "2b2dc509d342e5ecca57f848f1b255f15715a9c3f39a20585a8748bd22400879"
+  },
+  "result": "BUG REPRODUCED",
+  "scope": "Real staged C functions under guarded host DMA, with EOF represented by its current no-output-work branch; not a full output_task test.",
+  "output": "after_eof_idle pending_frames=128 dma_audio_bytes=0\nsame_rate_replacement old_frames=128 new_frames=384\nREPRODUCED staged tail retained at EOF and copied into next same-rate stream\n"
+}
