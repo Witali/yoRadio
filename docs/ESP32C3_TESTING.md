@@ -1315,3 +1315,21 @@ actual QIO/80 MHz and PDM registers and restores the prior quiet application.
 Offline replay retains the progressive-heap failure, nonzero FLAC DMA
 counters and the rejected whole-AAC timestamp interval. Extra FLAC slots
 remain disabled by default; CPU is informational.
+
+## Matched source delivery pauses
+
+The shared server's `--delivery-pause BYTE_OFFSET:SECONDS` option introduces
+bounded pauses at exact encoded-byte positions over HTTP or HTTPS, for any
+board. `--send-buffer-bytes` controls the requested host socket send buffer.
+See the [server instructions](../tools/audio_test_server/README.md#reproducible-delivery-pauses)
+and run `python tests/test-audio-server-pauses.py` for exact-payload, timing,
+catch-up, cancellation and verifying-TLS checks.
+
+The [C3 physical comparison](ESP32C3_DELIVERY_PAUSES_20261009.md) reuses the
+saved 4/8-slot integer-clock images in control/expanded/control order, with
+identical 50/100/200 ms host pauses. Offline replay checks the actual schedule,
+complete measured windows, settled memory and restoration, and preserves
+failed gates. Host pauses do not establish the arrival timing at the board;
+enclosing DMA counter intervals do not identify exact audible gaps. Compare
+different queue capacities within this run. The older unpaused experiment
+used the OS-default send buffer and is not a matched pause/no-pause control.

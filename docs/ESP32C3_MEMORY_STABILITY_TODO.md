@@ -3,6 +3,37 @@
 Goal: keep HTTPS radio playback reliable on the ESP32-C3 OLED board by
 avoiding repeated allocation and release of large heap blocks.
 
+## Remaining qualification work, 2026-10-09
+
+On `codex/esp32c3-idf-upgrade`, full-rate compact AAC/SBR/PS is already
+implemented; the retained PC19 PCM comparisons meet the 3-LSB allowance.
+Historical unchecked items below are not all descriptions of today's code.
+The remaining release work concerns the complete network/audio application:
+
+1. Resolve or bound heavy-FLAC input starvation and delayed DMA service.
+   Compare buffering against reproducible delivery interruptions, not just
+   mean CPU usage. The [integer-clock baseline](ESP32C3_FLAC_INTEGER_20261009.md)
+   and [matched delivery pauses](ESP32C3_DELIVERY_PAUSES_20261009.md) retain
+   nonzero DMA counters and distinguish them from acoustic measurements.
+2. Choose the production TLS reserve, input-pool and prefill settings.
+   Verify full 16 KiB TLS records, bounded in-playback memory use, codec
+   transitions and settled Stop recovery. Recovery alone does not explain
+   earlier in-playback heap-trend failures or prove allocation ownership.
+3. Diagnose the intermittent WebUI TCP connection timeout. A later run
+   without the timeout does not establish a repair. Keep complete traces
+   and separate host transport failures from firmware faults.
+4. Qualify one final quiet production configuration: all supported formats
+   over HTTP/HTTPS, AAC profile/rate/channel transitions, EOF, reconnect,
+   certificate failures, repeated OTA and bounded long-playback tests.
+   Previous passing matrices on different experimental images do not replace
+   this check. Preserve full AAC features and rates; CPU percentage alone
+   remains informational.
+
+The [exact nominal 48 kHz option](ESP32C3_PDM_CLOCK_20261009.md) separately
+awaits listening or analog output-noise measurements. It remains default-off.
+The AP display and WebUI Deep Sleep switch are separate feature items in the
+[board TODO](ESP32C3_OLED_NATIVE_TODO.md).
+
 The [Flash constant audit](ESP32C3_FLASH_CONSTANT_CANDIDATES_20260930.md) records
 source and ELF candidates, including string copies and SDK placement limits.
 Large application/codec constants are already in Flash; the listed candidates

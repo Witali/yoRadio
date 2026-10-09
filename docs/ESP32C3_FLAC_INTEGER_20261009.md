@@ -115,6 +115,13 @@ compare ordinary/expanded capacity with the same pause schedule. Then repeat
 the selected settings against the full format/network/OTA matrix. Preserve
 full AAC features and verify additional FLAC allocations retire before AAC.
 
+The [matched delivery-pause follow-up](ESP32C3_DELIVERY_PAUSES_20261009.md)
+reuses these images with identical host send-buffer settings and byte-position
+pauses. It measures 25/16/23 DMA events in control/expanded/control order,
+with settled recovery and successful measured HE-AACv2 afterward. The extra
+capacity helps in this bounded comparison but does not eliminate the events;
+the default remains unchanged.
+
 ## Artifacts, restoration and replay
 
 - [Ordinary queue image](../firmware/development/esp32c3-idf-6.1-r9a97-flac-integer0/manifest.json):
