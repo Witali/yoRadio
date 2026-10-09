@@ -128,11 +128,16 @@ capture code.
 
 ## Remaining acceptance work
 
-Before changing defaults, verify the candidate's full codec HTTP/HTTPS matrix,
-short-file EOF and tail handling, rapid Stop/station changes, TLS closures and
-certificate rejection, OTA during full HE-AACv2 playback, and the final quiet
-production memory configuration. Existing results for a different image
-remain useful controls but do not qualify this image automatically.
+The later [full regression](ESP32C3_MIN_PREFILL_REGRESSION_20261009.md) passes
+the codec matrix, PCM-tail and switching checks, but retains one WebUI connect
+timeout during exact HE-AAC EOF observation and 84 heavy-FLAC DMA queue overruns.
+The controlled HE-AACv2 improvement above does not qualify all-codec continuity.
+
+Before changing defaults, resolve the heavy-FLAC continuity finding and the
+interrupted EOF observation, then verify TLS closures, certificate rejection,
+OTA during full HE-AACv2 playback and the final quiet memory configuration.
+Repeat the relevant regression when firmware changes. Existing results for a
+different image remain useful controls but do not qualify this image automatically.
 
 ## Evidence and replay
 
