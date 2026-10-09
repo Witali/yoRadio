@@ -1053,6 +1053,15 @@ trust the server certificate; this does not disable verification.
 controlled `--play-url`. Run `python tests/test-ota-playback-format.py` to verify
 rejection of core fallback, wrong channels/rates and transient matches.
 
+OTA reports also retain a `timeline` on the same host monotonic clock used
+by serial capture. Each upload, playback readiness check, boot verification
+and final restoration reboot has persisted begin/returned/raised boundaries.
+`returned` only describes a completed call; the original acceptance case
+still decides PASS/FAIL. Response bodies and private exception messages are
+excluded. Use `python tests/test-ota-timeline.py` to check timing persistence
+and exception propagation. Correlate TLS errors with these actions without
+automatically exempting errors close to an intentional reboot.
+
 ### Filtered TLS error codes
 
 Acceptance and diagnostic serial captures retain a signed `mbedtls_return`
