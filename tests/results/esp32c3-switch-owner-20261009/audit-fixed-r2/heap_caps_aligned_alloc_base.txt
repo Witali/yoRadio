@@ -1,0 +1,87 @@
+420059d2:	7179                	addi	sp,sp,-48
+420059d4:	c62a                	sw	a0,12(sp)
+420059d6:	c42e                	sw	a1,8(sp)
+420059d8:	c232                	sw	a2,4(sp)
+420059da:	002c                	addi	a1,sp,8
+420059dc:	0050                	addi	a2,sp,4
+420059de:	0068                	addi	a0,sp,12
+420059e0:	d606                	sw	ra,44(sp)
+420059e2:	7fb000ef          	jal	420069dc <esp_heap_adjust_alignment_to_hw>
+420059e6:	47a2                	lw	a5,8(sp)
+420059e8:	00064737          	lui	a4,0x64
+420059ec:	fff78693          	addi	a3,a5,-1
+420059f0:	08e6fb63          	bgeu	a3,a4,42005a86 <heap_caps_aligned_alloc_base+0xb4>
+420059f4:	4712                	lw	a4,4(sp)
+420059f6:	d422                	sw	s0,40(sp)
+420059f8:	d226                	sw	s1,36(sp)
+420059fa:	d04a                	sw	s2,32(sp)
+420059fc:	ce4e                	sw	s3,28(sp)
+420059fe:	cc52                	sw	s4,24(sp)
+42005a00:	ca56                	sw	s5,20(sp)
+42005a02:	8b09                	andi	a4,a4,2
+42005a04:	eb49                	bnez	a4,42005a96 <heap_caps_aligned_alloc_base+0xc4>
+42005a06:	4a81                	li	s5,0
+42005a08:	3fc9a4b7          	lui	s1,0x3fc9a
+42005a0c:	4991                	li	s3,4
+42005a0e:	490d                	li	s2,3
+42005a10:	bbc4a403          	lw	s0,-1092(s1) # 3fc99bbc <registered_heaps>
+42005a14:	c025                	beqz	s0,42005a74 <heap_caps_aligned_alloc_base+0xa2>
+42005a16:	002a9a13          	slli	s4,s5,0x2
+42005a1a:	a019                	j	42005a20 <heap_caps_aligned_alloc_base+0x4e>
+42005a1c:	5000                	lw	s0,32(s0)
+42005a1e:	c839                	beqz	s0,42005a74 <heap_caps_aligned_alloc_base+0xa2>
+42005a20:	4c48                	lw	a0,28(s0)
+42005a22:	014407b3          	add	a5,s0,s4
+42005a26:	d97d                	beqz	a0,42005a1c <heap_caps_aligned_alloc_base+0x4a>
+42005a28:	439c                	lw	a5,0(a5)
+42005a2a:	4712                	lw	a4,4(sp)
+42005a2c:	8ff9                	and	a5,a5,a4
+42005a2e:	d7fd                	beqz	a5,42005a1c <heap_caps_aligned_alloc_base+0x4a>
+42005a30:	401c                	lw	a5,0(s0)
+42005a32:	4050                	lw	a2,4(s0)
+42005a34:	4414                	lw	a3,8(s0)
+42005a36:	8fd1                	or	a5,a5,a2
+42005a38:	8fd5                	or	a5,a5,a3
+42005a3a:	8ff9                	and	a5,a5,a4
+42005a3c:	fef710e3          	bne	a4,a5,42005a1c <heap_caps_aligned_alloc_base+0x4a>
+42005a40:	4632                	lw	a2,12(sp)
+42005a42:	45a2                	lw	a1,8(sp)
+42005a44:	4681                	li	a3,0
+42005a46:	04c9e463          	bltu	s3,a2,42005a8e <heap_caps_aligned_alloc_base+0xbc>
+42005a4a:	b85fd0ef          	jal	420035ce <multi_heap_malloc>
+42005a4e:	d579                	beqz	a0,42005a1c <heap_caps_aligned_alloc_base+0x4a>
+42005a50:	420297b7          	lui	a5,0x42029
+42005a54:	5ec78793          	addi	a5,a5,1516 # 420295ec <esp_heap_trace_alloc_hook>
+42005a58:	c799                	beqz	a5,42005a66 <heap_caps_aligned_alloc_base+0x94>
+42005a5a:	4612                	lw	a2,4(sp)
+42005a5c:	45a2                	lw	a1,8(sp)
+42005a5e:	c02a                	sw	a0,0(sp)
+42005a60:	38d230ef          	jal	420295ec <esp_heap_trace_alloc_hook>
+42005a64:	4502                	lw	a0,0(sp)
+42005a66:	5422                	lw	s0,40(sp)
+42005a68:	5492                	lw	s1,36(sp)
+42005a6a:	5902                	lw	s2,32(sp)
+42005a6c:	49f2                	lw	s3,28(sp)
+42005a6e:	4a62                	lw	s4,24(sp)
+42005a70:	4ad2                	lw	s5,20(sp)
+42005a72:	a819                	j	42005a88 <heap_caps_aligned_alloc_base+0xb6>
+42005a74:	0a85                	addi	s5,s5,1
+42005a76:	f92a9de3          	bne	s5,s2,42005a10 <heap_caps_aligned_alloc_base+0x3e>
+42005a7a:	5422                	lw	s0,40(sp)
+42005a7c:	5492                	lw	s1,36(sp)
+42005a7e:	5902                	lw	s2,32(sp)
+42005a80:	49f2                	lw	s3,28(sp)
+42005a82:	4a62                	lw	s4,24(sp)
+42005a84:	4ad2                	lw	s5,20(sp)
+42005a86:	4501                	li	a0,0
+42005a88:	50b2                	lw	ra,44(sp)
+42005a8a:	6145                	addi	sp,sp,48
+42005a8c:	8082                	ret
+42005a8e:	d6ffd0ef          	jal	420037fc <multi_heap_aligned_alloc_offs>
+42005a92:	d549                	beqz	a0,42005a1c <heap_caps_aligned_alloc_base+0x4a>
+42005a94:	bf75                	j	42005a50 <heap_caps_aligned_alloc_base+0x7e>
+42005a96:	078d                	addi	a5,a5,3
+42005a98:	9bf1                	andi	a5,a5,-4
+42005a9a:	c43e                	sw	a5,8(sp)
+42005a9c:	b7ad                	j	42005a06 <heap_caps_aligned_alloc_base+0x34>
+

@@ -1,0 +1,44 @@
+42005952:	cd3d                	beqz	a0,420059d0 <heap_caps_free+0x7e>
+42005954:	1101                	addi	sp,sp,-32
+42005956:	bfc807b7          	lui	a5,0xbfc80
+4200595a:	ce06                	sw	ra,28(sp)
+4200595c:	97aa                	add	a5,a5,a0
+4200595e:	00060737          	lui	a4,0x60
+42005962:	85aa                	mv	a1,a0
+42005964:	06e7e063          	bltu	a5,a4,420059c4 <heap_caps_free+0x72>
+42005968:	3fc9a7b7          	lui	a5,0x3fc9a
+4200596c:	bbc7a783          	lw	a5,-1092(a5) # 3fc99bbc <registered_heaps>
+42005970:	cb99                	beqz	a5,42005986 <heap_caps_free+0x34>
+42005972:	4fc8                	lw	a0,28(a5)
+42005974:	c519                	beqz	a0,42005982 <heap_caps_free+0x30>
+42005976:	47d8                	lw	a4,12(a5)
+42005978:	00e5c563          	blt	a1,a4,42005982 <heap_caps_free+0x30>
+4200597c:	4b98                	lw	a4,16(a5)
+4200597e:	02e5c663          	blt	a1,a4,420059aa <heap_caps_free+0x58>
+42005982:	539c                	lw	a5,32(a5)
+42005984:	f7fd                	bnez	a5,42005972 <heap_caps_free+0x20>
+42005986:	3c1236b7          	lui	a3,0x3c123
+4200598a:	3c13f637          	lui	a2,0x3c13f
+4200598e:	3c123537          	lui	a0,0x3c123
+42005992:	56068693          	addi	a3,a3,1376 # 3c123560 <_esp_libc_clock_array_end+0x3410>
+42005996:	6bc60613          	addi	a2,a2,1724 # 3c13f6bc <__func__.1>
+4200599a:	5b650513          	addi	a0,a0,1462 # 3c1235b6 <_esp_libc_clock_array_end+0x3466>
+4200599e:	05000593          	li	a1,80
+420059a2:	fe381097          	auipc	ra,0xfe381
+420059a6:	0ba080e7          	jalr	186(ra) # 40386a5c <__assert_func>
+420059aa:	c62e                	sw	a1,12(sp)
+420059ac:	ca5fd0ef          	jal	42003650 <multi_heap_aligned_free>
+420059b0:	420297b7          	lui	a5,0x42029
+420059b4:	58c78793          	addi	a5,a5,1420 # 4202958c <esp_heap_trace_free_hook>
+420059b8:	cb89                	beqz	a5,420059ca <heap_caps_free+0x78>
+420059ba:	4532                	lw	a0,12(sp)
+420059bc:	40f2                	lw	ra,28(sp)
+420059be:	6105                	addi	sp,sp,32
+420059c0:	3cd2306f          	j	4202958c <esp_heap_trace_free_hook>
+420059c4:	ffc52583          	lw	a1,-4(a0)
+420059c8:	b745                	j	42005968 <heap_caps_free+0x16>
+420059ca:	40f2                	lw	ra,28(sp)
+420059cc:	6105                	addi	sp,sp,32
+420059ce:	8082                	ret
+420059d0:	8082                	ret
+

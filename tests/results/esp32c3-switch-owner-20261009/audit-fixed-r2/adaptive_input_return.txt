@@ -1,0 +1,157 @@
+42028c8a:	1a050163          	beqz	a0,42028e2c <adaptive_input_return+0x1a2>
+42028c8e:	18058f63          	beqz	a1,42028e2c <adaptive_input_return+0x1a2>
+42028c92:	1101                	addi	sp,sp,-32
+42028c94:	ce06                	sw	ra,28(sp)
+42028c96:	c62e                	sw	a1,12(sp)
+42028c98:	c42a                	sw	a0,8(sp)
+42028c9a:	fe35f097          	auipc	ra,0xfe35f
+42028c9e:	374080e7          	jalr	884(ra) # 4038800e <vPortEnterCritical>
+42028ca2:	48a2                	lw	a7,8(sp)
+42028ca4:	0148a603          	lw	a2,20(a7)
+42028ca8:	ce09                	beqz	a2,42028cc2 <adaptive_input_return+0x38>
+42028caa:	45b2                	lw	a1,12(sp)
+42028cac:	03088713          	addi	a4,a7,48
+42028cb0:	4781                	li	a5,0
+42028cb2:	4815                	li	a6,5
+42028cb4:	4314                	lw	a3,0(a4)
+42028cb6:	00b68c63          	beq	a3,a1,42028cce <adaptive_input_return+0x44>
+42028cba:	0785                	addi	a5,a5,1
+42028cbc:	0741                	addi	a4,a4,16
+42028cbe:	fec79be3          	bne	a5,a2,42028cb4 <adaptive_input_return+0x2a>
+42028cc2:	fe35f097          	auipc	ra,0xfe35f
+42028cc6:	388080e7          	jalr	904(ra) # 4038804a <vPortExitCritical>
+42028cca:	4501                	li	a0,0
+42028ccc:	aaa9                	j	42028e26 <adaptive_input_return+0x19c>
+42028cce:	4714                	lw	a3,8(a4)
+42028cd0:	ff0695e3          	bne	a3,a6,42028cba <adaptive_input_return+0x30>
+42028cd4:	01c8a503          	lw	a0,28(a7)
+42028cd8:	0248a303          	lw	t1,36(a7)
+42028cdc:	12a37163          	bgeu	t1,a0,42028dfe <adaptive_input_return+0x174>
+42028ce0:	4701                	li	a4,0
+42028ce2:	10078c63          	beqz	a5,42028dfa <adaptive_input_return+0x170>
+42028ce6:	0308a703          	lw	a4,48(a7)
+42028cea:	4685                	li	a3,1
+42028cec:	00e03733          	snez	a4,a4
+42028cf0:	10d78563          	beq	a5,a3,42028dfa <adaptive_input_return+0x170>
+42028cf4:	0408a683          	lw	a3,64(a7)
+42028cf8:	4609                	li	a2,2
+42028cfa:	00d036b3          	snez	a3,a3
+42028cfe:	9736                	add	a4,a4,a3
+42028d00:	0ec78d63          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028d04:	0508a683          	lw	a3,80(a7)
+42028d08:	460d                	li	a2,3
+42028d0a:	00d036b3          	snez	a3,a3
+42028d0e:	9736                	add	a4,a4,a3
+42028d10:	0ec78563          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028d14:	0608a683          	lw	a3,96(a7)
+42028d18:	4611                	li	a2,4
+42028d1a:	00d036b3          	snez	a3,a3
+42028d1e:	9736                	add	a4,a4,a3
+42028d20:	0cc78d63          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028d24:	0708a683          	lw	a3,112(a7)
+42028d28:	4615                	li	a2,5
+42028d2a:	00d036b3          	snez	a3,a3
+42028d2e:	9736                	add	a4,a4,a3
+42028d30:	0cc78563          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028d34:	0808a683          	lw	a3,128(a7)
+42028d38:	4619                	li	a2,6
+42028d3a:	00d036b3          	snez	a3,a3
+42028d3e:	9736                	add	a4,a4,a3
+42028d40:	0ac78d63          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028d44:	0908a683          	lw	a3,144(a7)
+42028d48:	461d                	li	a2,7
+42028d4a:	00d036b3          	snez	a3,a3
+42028d4e:	9736                	add	a4,a4,a3
+42028d50:	0ac78563          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028d54:	0a08a683          	lw	a3,160(a7)
+42028d58:	4621                	li	a2,8
+42028d5a:	00d036b3          	snez	a3,a3
+42028d5e:	9736                	add	a4,a4,a3
+42028d60:	08c78d63          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028d64:	0b08a683          	lw	a3,176(a7)
+42028d68:	4625                	li	a2,9
+42028d6a:	00d036b3          	snez	a3,a3
+42028d6e:	9736                	add	a4,a4,a3
+42028d70:	08c78563          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028d74:	0c08a683          	lw	a3,192(a7)
+42028d78:	4629                	li	a2,10
+42028d7a:	00d036b3          	snez	a3,a3
+42028d7e:	9736                	add	a4,a4,a3
+42028d80:	06c78d63          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028d84:	0d08a683          	lw	a3,208(a7)
+42028d88:	462d                	li	a2,11
+42028d8a:	00d036b3          	snez	a3,a3
+42028d8e:	9736                	add	a4,a4,a3
+42028d90:	06c78563          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028d94:	0e08a683          	lw	a3,224(a7)
+42028d98:	4631                	li	a2,12
+42028d9a:	00d036b3          	snez	a3,a3
+42028d9e:	9736                	add	a4,a4,a3
+42028da0:	04c78d63          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028da4:	0f08a683          	lw	a3,240(a7)
+42028da8:	4635                	li	a2,13
+42028daa:	00d036b3          	snez	a3,a3
+42028dae:	9736                	add	a4,a4,a3
+42028db0:	04c78563          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028db4:	1008a683          	lw	a3,256(a7)
+42028db8:	4639                	li	a2,14
+42028dba:	00d036b3          	snez	a3,a3
+42028dbe:	9736                	add	a4,a4,a3
+42028dc0:	02c78d63          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028dc4:	1108a683          	lw	a3,272(a7)
+42028dc8:	463d                	li	a2,15
+42028dca:	00d036b3          	snez	a3,a3
+42028dce:	9736                	add	a4,a4,a3
+42028dd0:	02c78563          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028dd4:	1208a683          	lw	a3,288(a7)
+42028dd8:	4641                	li	a2,16
+42028dda:	00d036b3          	snez	a3,a3
+42028dde:	9736                	add	a4,a4,a3
+42028de0:	00c78d63          	beq	a5,a2,42028dfa <adaptive_input_return+0x170>
+42028de4:	13088813          	addi	a6,a7,304
+42028de8:	00082683          	lw	a3,0(a6)
+42028dec:	0605                	addi	a2,a2,1
+42028dee:	0841                	addi	a6,a6,16
+42028df0:	00d036b3          	snez	a3,a3
+42028df4:	9736                	add	a4,a4,a3
+42028df6:	fec799e3          	bne	a5,a2,42028de8 <adaptive_input_return+0x15e>
+42028dfa:	02677b63          	bgeu	a4,t1,42028e30 <adaptive_input_return+0x1a6>
+42028dfe:	0792                	slli	a5,a5,0x4
+42028e00:	97c6                	add	a5,a5,a7
+42028e02:	c446                	sw	a7,8(sp)
+42028e04:	4709                	li	a4,2
+42028e06:	0207aa23          	sw	zero,52(a5)
+42028e0a:	df98                	sw	a4,56(a5)
+42028e0c:	fe35f097          	auipc	ra,0xfe35f
+42028e10:	23e080e7          	jalr	574(ra) # 4038804a <vPortExitCritical>
+42028e14:	48a2                	lw	a7,8(sp)
+42028e16:	00c8a503          	lw	a0,12(a7)
+42028e1a:	4681                	li	a3,0
+42028e1c:	4601                	li	a2,0
+42028e1e:	4581                	li	a1,0
+42028e20:	607f00ef          	jal	42119c26 <xQueueGenericSend>
+42028e24:	4505                	li	a0,1
+42028e26:	40f2                	lw	ra,28(sp)
+42028e28:	6105                	addi	sp,sp,32
+42028e2a:	8082                	ret
+42028e2c:	4501                	li	a0,0
+42028e2e:	8082                	ret
+42028e30:	0792                	slli	a5,a5,0x4
+42028e32:	97c6                	add	a5,a5,a7
+42028e34:	0207a823          	sw	zero,48(a5)
+42028e38:	0208a683          	lw	a3,32(a7)
+42028e3c:	fff50713          	addi	a4,a0,-1
+42028e40:	00e8ae23          	sw	a4,28(a7)
+42028e44:	00168713          	addi	a4,a3,1
+42028e48:	02e8a023          	sw	a4,32(a7)
+42028e4c:	0207ac23          	sw	zero,56(a5)
+42028e50:	0207aa23          	sw	zero,52(a5)
+42028e54:	c446                	sw	a7,8(sp)
+42028e56:	c62e                	sw	a1,12(sp)
+42028e58:	fe35f097          	auipc	ra,0xfe35f
+42028e5c:	1f2080e7          	jalr	498(ra) # 4038804a <vPortExitCritical>
+42028e60:	4532                	lw	a0,12(sp)
+42028e62:	e7ae00ef          	jal	420094dc <cfree>
+42028e66:	48a2                	lw	a7,8(sp)
+42028e68:	b77d                	j	42028e16 <adaptive_input_return+0x18c>
+

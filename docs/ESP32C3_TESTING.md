@@ -1217,3 +1217,10 @@ input waits, CPU, heap/largest block and settled recovery. Then exercise
 FLAC-to-full-HE-AAC/PS switching, EOF, TLS record growth and OTA. Preserve all
 failed observations; zero DMA events alone do not prove unchanged analog
 sound quality.
+
+The [input-retention study](ESP32C3_INPUT_RETENTION_20261009.md) adds continuous
+allocation-owner snapshots and a 60-second idle period without HTTP polling.
+Keep the initial free-region baseline as well as the first switch baseline:
+loss during the first cycle or within a size-class tolerance must remain
+visible. Its offline replay retains the original early TLS-server shutdown
+faults and the corrected-harness comparison separately.

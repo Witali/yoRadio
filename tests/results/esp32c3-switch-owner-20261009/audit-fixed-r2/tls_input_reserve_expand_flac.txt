@@ -1,0 +1,70 @@
+42028f46:	715d                	addi	sp,sp,-80
+42028f48:	c686                	sw	ra,76(sp)
+42028f4a:	c4a2                	sw	s0,72(sp)
+42028f4c:	3fc9a7b7          	lui	a5,0x3fc9a
+42028f50:	e0c78793          	addi	a5,a5,-500 # 3fc99e0c <s_input>
+42028f54:	0330000f          	fence	rw,rw
+42028f58:	4380                	lw	s0,0(a5)
+42028f5a:	0230000f          	fence	r,rw
+42028f5e:	0848                	addi	a0,sp,20
+42028f60:	85a2                	mv	a1,s0
+42028f62:	d4eff0ef          	jal	420284b0 <adaptive_input_stats>
+42028f66:	e409                	bnez	s0,42028f70 <tls_input_reserve_expand_flac+0x2a>
+42028f68:	40b6                	lw	ra,76(sp)
+42028f6a:	4426                	lw	s0,72(sp)
+42028f6c:	6161                	addi	sp,sp,80
+42028f6e:	8082                	ret
+42028f70:	45f2                	lw	a1,28(sp)
+42028f72:	8522                	mv	a0,s0
+42028f74:	c2a6                	sw	s1,68(sp)
+42028f76:	0591                	addi	a1,a1,4
+42028f78:	c0ca                	sw	s2,64(sp)
+42028f7a:	de4e                	sw	s3,60(sp)
+42028f7c:	4491                	li	s1,4
+42028f7e:	49d2                	lw	s3,20(sp)
+42028f80:	6921                	lui	s2,0x8
+42028f82:	ea4ff0ef          	jal	42028626 <adaptive_input_set_limit>
+42028f86:	6505                	lui	a0,0x1
+42028f88:	80450513          	addi	a0,a0,-2044 # 804 <ALIGN_VECTOR_TABLE+0x704>
+42028f8c:	e83d90ef          	jal	42002e0e <heap_caps_get_free_size>
+42028f90:	87aa                	mv	a5,a0
+42028f92:	41278733          	sub	a4,a5,s2
+42028f96:	8522                	mv	a0,s0
+42028f98:	0127e963          	bltu	a5,s2,42028faa <tls_input_reserve_expand_flac+0x64>
+42028f9c:	01376763          	bltu	a4,s3,42028faa <tls_input_reserve_expand_flac+0x64>
+42028fa0:	dc0ff0ef          	jal	42028560 <adaptive_input_restore_one>
+42028fa4:	14fd                	addi	s1,s1,-1
+42028fa6:	c111                	beqz	a0,42028faa <tls_input_reserve_expand_flac+0x64>
+42028fa8:	fcf9                	bnez	s1,42028f86 <tls_input_reserve_expand_flac+0x40>
+42028faa:	85a2                	mv	a1,s0
+42028fac:	0848                	addi	a0,sp,20
+42028fae:	d02ff0ef          	jal	420284b0 <adaptive_input_stats>
+42028fb2:	44e2                	lw	s1,24(sp)
+42028fb4:	4452                	lw	s0,20(sp)
+42028fb6:	4972                	lw	s2,28(sp)
+42028fb8:	fe360097          	auipc	ra,0xfe360
+42028fbc:	4e6080e7          	jalr	1254(ra) # 4038949e <esp_log_timestamp>
+42028fc0:	028485b3          	mul	a1,s1,s0
+42028fc4:	5782                	lw	a5,32(sp)
+42028fc6:	58a2                	lw	a7,40(sp)
+42028fc8:	3c12b737          	lui	a4,0x3c12b
+42028fcc:	e4870713          	addi	a4,a4,-440 # 3c12ae48 <_esp_libc_clock_array_end+0xacf8>
+42028fd0:	3c12b637          	lui	a2,0x3c12b
+42028fd4:	c03e                	sw	a5,0(sp)
+42028fd6:	86aa                	mv	a3,a0
+42028fd8:	884a                	mv	a6,s2
+42028fda:	87a6                	mv	a5,s1
+42028fdc:	c22e                	sw	a1,4(sp)
+42028fde:	e5460613          	addi	a2,a2,-428 # 3c12ae54 <_esp_libc_clock_array_end+0xad04>
+42028fe2:	85ba                	mv	a1,a4
+42028fe4:	450d                	li	a0,3
+42028fe6:	fe360097          	auipc	ra,0xfe360
+42028fea:	3b0080e7          	jalr	944(ra) # 40389396 <esp_log>
+42028fee:	40b6                	lw	ra,76(sp)
+42028ff0:	4426                	lw	s0,72(sp)
+42028ff2:	4496                	lw	s1,68(sp)
+42028ff4:	4906                	lw	s2,64(sp)
+42028ff6:	59f2                	lw	s3,60(sp)
+42028ff8:	6161                	addi	sp,sp,80
+42028ffa:	8082                	ret
+

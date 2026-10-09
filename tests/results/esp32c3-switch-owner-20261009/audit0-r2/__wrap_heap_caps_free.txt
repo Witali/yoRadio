@@ -1,0 +1,12 @@
+42029358:	1101                	addi	sp,sp,-32
+4202935a:	ce06                	sw	ra,28(sp)
+4202935c:	c62a                	sw	a0,12(sp)
+4202935e:	fe35f097          	auipc	ra,0xfe35f
+42029362:	cb0080e7          	jalr	-848(ra) # 4038800e <vPortEnterCritical>
+42029366:	4532                	lw	a0,12(sp)
+42029368:	deadc0ef          	jal	42005952 <heap_caps_free>
+4202936c:	40f2                	lw	ra,28(sp)
+4202936e:	6105                	addi	sp,sp,32
+42029370:	fe35f317          	auipc	t1,0xfe35f
+42029374:	cda30067          	jr	-806(t1) # 4038804a <vPortExitCritical>
+

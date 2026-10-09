@@ -1,0 +1,2361 @@
+{
+  "scope": "Owner metadata in one initially free region; original failures retained. Diagnostic timing is not a production benchmark.",
+  "trials": {
+    "retained-confirmed": {
+      "board": {
+        "version": "idf61-retained-owner",
+        "partition": "app0",
+        "max_size": 1900544,
+        "app_elf_sha256": "b3faa1e0c849315c2a4a55d663e877cb351517282a4f0d59956ac2c8e0de7da2"
+      },
+      "original_cases": [
+        {
+          "name": "initial-idle-owner-capture",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 129876,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 129856,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ],
+            "snapshots": 3,
+            "first_sequence": 1
+          },
+          "seconds": 12.438
+        },
+        {
+          "name": "switching-and-heap",
+          "result": "PASS",
+          "evidence": {
+            "cycles": 3,
+            "station_changes": 9
+          },
+          "seconds": 111.828
+        },
+        {
+          "name": "eof:https:flac-level8:auto",
+          "result": "PASS",
+          "evidence": {
+            "scope": "EOF state only; decoded profile acceptance is separate",
+            "observed_formats": [
+              "FLAC",
+              "FLAC 48 kHz stereo"
+            ],
+            "terminal_samples": 12,
+            "websocket_stopped": true
+          },
+          "seconds": 19.406
+        },
+        {
+          "name": "eof:https:flac-level8:flac",
+          "result": "PASS",
+          "evidence": {
+            "scope": "EOF state only; decoded profile acceptance is separate",
+            "observed_formats": [
+              "FLAC",
+              "FLAC 48 kHz stereo"
+            ],
+            "terminal_samples": 12,
+            "websocket_stopped": true
+          },
+          "seconds": 19.656
+        },
+        {
+          "name": "eof:https:hev2-44100-stereo:auto",
+          "result": "PASS",
+          "evidence": {
+            "scope": "EOF state only; decoded profile acceptance is separate",
+            "observed_formats": [
+              "AAC",
+              "HE-AACv2 44.1 kHz stereo"
+            ],
+            "terminal_samples": 13,
+            "websocket_stopped": true
+          },
+          "seconds": 20.531
+        },
+        {
+          "name": "eof:https:hev2-44100-stereo:aac",
+          "result": "PASS",
+          "evidence": {
+            "scope": "EOF state only; decoded profile acceptance is separate",
+            "observed_formats": [
+              "AAC",
+              "HE-AACv2 44.1 kHz stereo"
+            ],
+            "terminal_samples": 12,
+            "websocket_stopped": true
+          },
+          "seconds": 20.328
+        },
+        {
+          "name": "idle-before-records",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 129916,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 129916,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 129916,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.578
+        },
+        {
+          "name": "tls-record:grow",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "URLError"
+            },
+            {
+              "type": "TimeoutError"
+            },
+            {
+              "type": "URLError"
+            },
+            {
+              "type": "TimeoutError"
+            }
+          ],
+          "reason": "URLError",
+          "seconds": 46.015
+        },
+        {
+          "name": "idle-after-records",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 129916,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 129916,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 129916,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.532
+        },
+        {
+          "name": "quiet-without-http",
+          "result": "PASS",
+          "evidence": {
+            "started_at": 250460.093,
+            "ended_at": 250520.093,
+            "http_polls": 0
+          },
+          "seconds": 60.203
+        },
+        {
+          "name": "idle-after-quiet",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 129900,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 129900,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 129900,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.532
+        },
+        {
+          "name": "cross-stage-recovery",
+          "result": "PASS",
+          "evidence": {
+            "baseline": "first-switch-cycle",
+            "checked": 3
+          },
+          "seconds": 0.015
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.0
+        },
+        {
+          "name": "stop-and-settings",
+          "result": "PASS",
+          "evidence": {
+            "stopped": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 0.656
+        },
+        {
+          "name": "runtime-after-capture-close",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.0
+        },
+        {
+          "name": "owners-complete",
+          "result": "PASS",
+          "evidence": {
+            "snapshots": 33,
+            "peak_live": 23,
+            "final_live": 0
+          },
+          "seconds": 0.0
+        }
+      ],
+      "passed": 15,
+      "total": 16,
+      "failures": [
+        {
+          "name": "tls-record:grow",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "URLError"
+            },
+            {
+              "type": "TimeoutError"
+            },
+            {
+              "type": "URLError"
+            },
+            {
+              "type": "TimeoutError"
+            }
+          ],
+          "reason": "URLError",
+          "seconds": 46.015
+        }
+      ],
+      "owner_analysis": {
+        "complete": true,
+        "scope": "Live allocation task/lifetime metadata within one initially free heap region; not a complete all-heap event trace",
+        "snapshots": [
+          {
+            "seq": 1,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 0,
+            "lost": 0,
+            "alloc_events": 0,
+            "free_events": 0,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 374,
+            "at": 250185.781,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "initial-idle-owner-capture"
+          },
+          {
+            "seq": 2,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 0,
+            "lost": 0,
+            "alloc_events": 0,
+            "free_events": 0,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 218,
+            "at": 250190.781,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "initial-idle-owner-capture"
+          },
+          {
+            "seq": 3,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 0,
+            "lost": 0,
+            "alloc_events": 0,
+            "free_events": 0,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 211,
+            "at": 250195.781,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "initial-idle-owner-capture"
+          },
+          {
+            "seq": 4,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 21,
+            "lost": 0,
+            "alloc_events": 785,
+            "free_events": 775,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 214,
+            "at": 250226.171,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "switching-and-heap"
+          },
+          {
+            "seq": 5,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 21,
+            "lost": 0,
+            "alloc_events": 785,
+            "free_events": 775,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 213,
+            "at": 250231.187,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "switching-and-heap"
+          },
+          {
+            "seq": 6,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 21,
+            "lost": 0,
+            "alloc_events": 1203,
+            "free_events": 1180,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 215,
+            "at": 250263.39,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "switching-and-heap"
+          },
+          {
+            "seq": 7,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 21,
+            "lost": 0,
+            "alloc_events": 1203,
+            "free_events": 1180,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 213,
+            "at": 250268.39,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "switching-and-heap"
+          },
+          {
+            "seq": 8,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 21,
+            "lost": 0,
+            "alloc_events": 1957,
+            "free_events": 1924,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 213,
+            "at": 250300.765,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "switching-and-heap"
+          },
+          {
+            "seq": 9,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 21,
+            "lost": 0,
+            "alloc_events": 1957,
+            "free_events": 1924,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 219,
+            "at": 250305.765,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "switching-and-heap"
+          },
+          {
+            "seq": 10,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 3004,
+            "free_events": 2958,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 425,
+            "at": 250326.109,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "eof:https:flac-level8:auto"
+          },
+          {
+            "seq": 11,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4246,
+            "free_events": 4187,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 214,
+            "at": 250345.484,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "eof:https:flac-level8:flac"
+          },
+          {
+            "seq": 12,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4342,
+            "free_events": 4283,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 209,
+            "at": 250365.906,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "eof:https:hev2-44100-stereo:auto"
+          },
+          {
+            "seq": 13,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4471,
+            "free_events": 4412,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 211,
+            "at": 250386.406,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "eof:https:hev2-44100-stereo:aac"
+          },
+          {
+            "seq": 14,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4471,
+            "free_events": 4412,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 212,
+            "at": 250391.406,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "idle-before-records"
+          },
+          {
+            "seq": 15,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4471,
+            "free_events": 4412,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 216,
+            "at": 250396.406,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "idle-before-records"
+          },
+          {
+            "seq": 16,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4471,
+            "free_events": 4412,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 212,
+            "at": 250401.406,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "tls-record:grow"
+          },
+          {
+            "seq": 17,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 211,
+            "at": 250452.14,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "idle-after-records"
+          },
+          {
+            "seq": 18,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 413,
+            "at": 250457.14,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "idle-after-records"
+          },
+          {
+            "seq": 19,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 211,
+            "at": 250462.156,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 20,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 214,
+            "at": 250467.156,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 21,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 214,
+            "at": 250472.156,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 22,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 210,
+            "at": 250477.156,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 23,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 214,
+            "at": 250482.156,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 24,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 214,
+            "at": 250487.156,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 25,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 214,
+            "at": 250492.156,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 26,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 214,
+            "at": 250497.156,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 27,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 213,
+            "at": 250502.156,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 28,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 214,
+            "at": 250507.171,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 29,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 217,
+            "at": 250512.171,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 30,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 215,
+            "at": 250517.171,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "quiet-without-http"
+          },
+          {
+            "seq": 31,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 213,
+            "at": 250522.171,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "idle-after-quiet"
+          },
+          {
+            "seq": 32,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 213,
+            "at": 250527.171,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "idle-after-quiet"
+          },
+          {
+            "seq": 33,
+            "first": 1070342616,
+            "last": 1070450444,
+            "live": 0,
+            "peak": 23,
+            "lost": 0,
+            "alloc_events": 4570,
+            "free_events": 4511,
+            "rows": 1,
+            "dropped": 0,
+            "unknown": 0,
+            "walk_us": 216,
+            "at": 250532.171,
+            "blocks": [
+              {
+                "address": 1070342616,
+                "bytes": 107828,
+                "id": 0,
+                "requested": 0,
+                "task": "free"
+              }
+            ],
+            "largest_raw_free": 107828,
+            "action": "idle-after-quiet"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "name": "initial-idle-owner-capture",
+          "started_at": 250183.89,
+          "ended_at": 250196.328
+        },
+        {
+          "name": "switching-and-heap",
+          "started_at": 250196.328,
+          "ended_at": 250308.156
+        },
+        {
+          "name": "eof:https:flac-level8:auto",
+          "started_at": 250308.406,
+          "ended_at": 250327.812
+        },
+        {
+          "name": "eof:https:flac-level8:flac",
+          "started_at": 250327.828,
+          "ended_at": 250347.484
+        },
+        {
+          "name": "eof:https:hev2-44100-stereo:auto",
+          "started_at": 250347.5,
+          "ended_at": 250368.031
+        },
+        {
+          "name": "eof:https:hev2-44100-stereo:aac",
+          "started_at": 250368.031,
+          "ended_at": 250388.359
+        },
+        {
+          "name": "idle-before-records",
+          "started_at": 250388.484,
+          "ended_at": 250401.062
+        },
+        {
+          "name": "tls-record:grow",
+          "started_at": 250401.078,
+          "ended_at": 250447.093
+        },
+        {
+          "name": "idle-after-records",
+          "started_at": 250447.093,
+          "ended_at": 250459.625
+        },
+        {
+          "name": "quiet-without-http",
+          "started_at": 250459.89,
+          "ended_at": 250520.093
+        },
+        {
+          "name": "idle-after-quiet",
+          "started_at": 250520.093,
+          "ended_at": 250532.625
+        },
+        {
+          "name": "cross-stage-recovery",
+          "started_at": 250532.625,
+          "ended_at": 250532.64
+        },
+        {
+          "name": "runtime",
+          "started_at": 250532.64,
+          "ended_at": 250532.656
+        },
+        {
+          "name": "stop-and-settings",
+          "started_at": 250532.656,
+          "ended_at": 250533.312
+        },
+        {
+          "name": "runtime-after-capture-close",
+          "started_at": 250533.406,
+          "ended_at": 250533.406
+        },
+        {
+          "name": "owners-complete",
+          "started_at": 250533.421,
+          "ended_at": 250533.421
+        }
+      ],
+      "idle_checkpoints": {
+        "initial": {
+          "heap": 129866.0,
+          "largest": 106496.0,
+          "tasks": 17.0
+        },
+        "before-records": {
+          "heap": 129916,
+          "largest": 106496,
+          "tasks": 17
+        },
+        "after-records": {
+          "heap": 129916,
+          "largest": 106496,
+          "tasks": 17
+        },
+        "after-quiet": {
+          "heap": 129900,
+          "largest": 106496,
+          "tasks": 17
+        }
+      },
+      "quiet_window": {
+        "started_at": 250460.093,
+        "ended_at": 250520.093,
+        "http_polls": 0
+      },
+      "independent_formats": [
+        {
+          "name": "switch:0:flac-level8",
+          "result": "PASS",
+          "evidence": {
+            "samples": 11,
+            "rate": 48000,
+            "channels": 2
+          }
+        },
+        {
+          "name": "switch:0:he-48000-stereo",
+          "result": "PASS",
+          "evidence": {
+            "samples": 10,
+            "rate": 48000,
+            "channels": 2
+          }
+        },
+        {
+          "name": "switch:0:hev2-44100-stereo",
+          "result": "PASS",
+          "evidence": {
+            "samples": 10,
+            "rate": 44100,
+            "channels": 2
+          }
+        },
+        {
+          "name": "switch:1:flac-level8",
+          "result": "PASS",
+          "evidence": {
+            "samples": 11,
+            "rate": 48000,
+            "channels": 2
+          }
+        },
+        {
+          "name": "switch:1:he-48000-stereo",
+          "result": "PASS",
+          "evidence": {
+            "samples": 10,
+            "rate": 48000,
+            "channels": 2
+          }
+        },
+        {
+          "name": "switch:1:hev2-44100-stereo",
+          "result": "PASS",
+          "evidence": {
+            "samples": 10,
+            "rate": 44100,
+            "channels": 2
+          }
+        },
+        {
+          "name": "switch:2:flac-level8",
+          "result": "PASS",
+          "evidence": {
+            "samples": 11,
+            "rate": 48000,
+            "channels": 2
+          }
+        },
+        {
+          "name": "switch:2:he-48000-stereo",
+          "result": "PASS",
+          "evidence": {
+            "samples": 10,
+            "rate": 48000,
+            "channels": 2
+          }
+        },
+        {
+          "name": "switch:2:hev2-44100-stereo",
+          "result": "PASS",
+          "evidence": {
+            "samples": 11,
+            "rate": 44100,
+            "channels": 2
+          }
+        }
+      ],
+      "full_capture_runtime": {
+        "name": "full-capture-runtime",
+        "result": "PASS",
+        "evidence": null
+      },
+      "independent_eof": [
+        {
+          "name": "flac-level8:playing",
+          "result": "PASS",
+          "evidence": {
+            "terminal_samples": 12,
+            "scope": "REST samples replayed; WebSocket verdict is original evidence only."
+          }
+        },
+        {
+          "name": "flac-level8:playing",
+          "result": "PASS",
+          "evidence": {
+            "terminal_samples": 12,
+            "scope": "REST samples replayed; WebSocket verdict is original evidence only."
+          }
+        },
+        {
+          "name": "hev2-44100-stereo:playing",
+          "result": "PASS",
+          "evidence": {
+            "terminal_samples": 13,
+            "scope": "REST samples replayed; WebSocket verdict is original evidence only."
+          }
+        },
+        {
+          "name": "hev2-44100-stereo:playing",
+          "result": "PASS",
+          "evidence": {
+            "terminal_samples": 12,
+            "scope": "REST samples replayed; WebSocket verdict is original evidence only."
+          }
+        }
+      ],
+      "independent_records": {
+        "name": "grow",
+        "result": "FAIL",
+        "reason": "No frozen record acceptance snapshot"
+      },
+      "switching": {
+        "failures": [],
+        "checkpoints": [
+          [
+            {
+              "heap": 129856,
+              "largest": 106496,
+              "tasks": 17
+            },
+            {
+              "heap": 129856,
+              "largest": 106496,
+              "tasks": 17
+            }
+          ],
+          [
+            {
+              "heap": 129888,
+              "largest": 106496,
+              "tasks": 17
+            },
+            {
+              "heap": 129888,
+              "largest": 106496,
+              "tasks": 17
+            }
+          ],
+          [
+            {
+              "heap": 129916,
+              "largest": 106496,
+              "tasks": 17
+            },
+            {
+              "heap": 129912,
+              "largest": 106496,
+              "tasks": 17
+            }
+          ]
+        ]
+      },
+      "cross_phase": {
+        "before-records": {
+          "name": "before-records",
+          "result": "PASS",
+          "evidence": null
+        },
+        "after-records": {
+          "name": "after-records",
+          "result": "PASS",
+          "evidence": null
+        },
+        "after-quiet": {
+          "name": "after-quiet",
+          "result": "PASS",
+          "evidence": null
+        }
+      },
+      "nonfree_snapshots": [],
+      "initial_raw_free": 107828,
+      "minimum_raw_free": 107828,
+      "final_raw_free": 107828,
+      "peak_live": 23,
+      "max_walk_us": 425,
+      "live_identities": {},
+      "transport_failures": [
+        {
+          "request": 646,
+          "phase": "connect",
+          "at": 250437.062,
+          "result": "FAIL",
+          "error_type": "TimeoutError",
+          "ms": 5016.00000000326
+        },
+        {
+          "request": 646,
+          "phase": "request_including_connect",
+          "at": 250437.062,
+          "result": "FAIL",
+          "error_type": "TimeoutError",
+          "ms": 5016.00000000326
+        },
+        {
+          "request": 647,
+          "phase": "connect",
+          "at": 250442.078,
+          "result": "FAIL",
+          "error_type": "TimeoutError",
+          "ms": 5014.999999984866
+        },
+        {
+          "request": 647,
+          "phase": "request_including_connect",
+          "at": 250442.078,
+          "result": "FAIL",
+          "error_type": "TimeoutError",
+          "ms": 5014.999999984866
+        }
+      ],
+      "input_sha256": {
+        "report.json": "7ff4c58d617fd804335e95da27742adb09f409212de0380eeb09964e56ce484b",
+        "status.json": "dfe243fadb8336bf5a0c14b526fef9802499f0c3b625f7691ab444ea5558827b",
+        "performance.json": "31997652d4cf82c3ed963b87cb98ec394a1c873d08a2cf79985a409bb0b0888f",
+        "request-phases.jsonl": "5cea60518559b351e3dda132e9e18c75d8358322aa5f86f86dc8565d5877a0d0"
+      },
+      "record_metrics": [
+        {
+          "mode": "retained-confirmed",
+          "case": "retained-confirmed",
+          "observation": "tls-record:grow",
+          "board": {
+            "version": "idf61-retained-owner",
+            "partition": "app0",
+            "max_size": 1900544,
+            "app_elf_sha256": "b3faa1e0c849315c2a4a55d663e877cb351517282a4f0d59956ac2c8e0de7da2"
+          },
+          "original_acceptance": [
+            {
+              "name": "initial-idle-owner-capture",
+              "result": "PASS",
+              "evidence": {
+                "samples": [
+                  {
+                    "heap": 129876,
+                    "largest": 106496,
+                    "tasks": 17
+                  },
+                  {
+                    "heap": 129856,
+                    "largest": 106496,
+                    "tasks": 17
+                  }
+                ],
+                "snapshots": 3,
+                "first_sequence": 1
+              },
+              "seconds": 12.438
+            },
+            {
+              "name": "switching-and-heap",
+              "result": "PASS",
+              "evidence": {
+                "cycles": 3,
+                "station_changes": 9
+              },
+              "seconds": 111.828
+            },
+            {
+              "name": "eof:https:flac-level8:auto",
+              "result": "PASS",
+              "evidence": {
+                "scope": "EOF state only; decoded profile acceptance is separate",
+                "observed_formats": [
+                  "FLAC",
+                  "FLAC 48 kHz stereo"
+                ],
+                "terminal_samples": 12,
+                "websocket_stopped": true
+              },
+              "seconds": 19.406
+            },
+            {
+              "name": "eof:https:flac-level8:flac",
+              "result": "PASS",
+              "evidence": {
+                "scope": "EOF state only; decoded profile acceptance is separate",
+                "observed_formats": [
+                  "FLAC",
+                  "FLAC 48 kHz stereo"
+                ],
+                "terminal_samples": 12,
+                "websocket_stopped": true
+              },
+              "seconds": 19.656
+            },
+            {
+              "name": "eof:https:hev2-44100-stereo:auto",
+              "result": "PASS",
+              "evidence": {
+                "scope": "EOF state only; decoded profile acceptance is separate",
+                "observed_formats": [
+                  "AAC",
+                  "HE-AACv2 44.1 kHz stereo"
+                ],
+                "terminal_samples": 13,
+                "websocket_stopped": true
+              },
+              "seconds": 20.531
+            },
+            {
+              "name": "eof:https:hev2-44100-stereo:aac",
+              "result": "PASS",
+              "evidence": {
+                "scope": "EOF state only; decoded profile acceptance is separate",
+                "observed_formats": [
+                  "AAC",
+                  "HE-AACv2 44.1 kHz stereo"
+                ],
+                "terminal_samples": 12,
+                "websocket_stopped": true
+              },
+              "seconds": 20.328
+            },
+            {
+              "name": "idle-before-records",
+              "result": "PASS",
+              "evidence": {
+                "samples": [
+                  {
+                    "heap": 129916,
+                    "largest": 106496,
+                    "tasks": 17
+                  },
+                  {
+                    "heap": 129916,
+                    "largest": 106496,
+                    "tasks": 17
+                  },
+                  {
+                    "heap": 129916,
+                    "largest": 106496,
+                    "tasks": 17
+                  }
+                ]
+              },
+              "seconds": 12.578
+            },
+            {
+              "name": "tls-record:grow",
+              "result": "FAIL",
+              "exception_chain": [
+                {
+                  "type": "URLError"
+                },
+                {
+                  "type": "TimeoutError"
+                },
+                {
+                  "type": "URLError"
+                },
+                {
+                  "type": "TimeoutError"
+                }
+              ],
+              "reason": "URLError",
+              "seconds": 46.015
+            },
+            {
+              "name": "idle-after-records",
+              "result": "PASS",
+              "evidence": {
+                "samples": [
+                  {
+                    "heap": 129916,
+                    "largest": 106496,
+                    "tasks": 17
+                  },
+                  {
+                    "heap": 129916,
+                    "largest": 106496,
+                    "tasks": 17
+                  },
+                  {
+                    "heap": 129916,
+                    "largest": 106496,
+                    "tasks": 17
+                  }
+                ]
+              },
+              "seconds": 12.532
+            },
+            {
+              "name": "quiet-without-http",
+              "result": "PASS",
+              "evidence": {
+                "started_at": 250460.093,
+                "ended_at": 250520.093,
+                "http_polls": 0
+              },
+              "seconds": 60.203
+            },
+            {
+              "name": "idle-after-quiet",
+              "result": "PASS",
+              "evidence": {
+                "samples": [
+                  {
+                    "heap": 129900,
+                    "largest": 106496,
+                    "tasks": 17
+                  },
+                  {
+                    "heap": 129900,
+                    "largest": 106496,
+                    "tasks": 17
+                  },
+                  {
+                    "heap": 129900,
+                    "largest": 106496,
+                    "tasks": 17
+                  }
+                ]
+              },
+              "seconds": 12.532
+            },
+            {
+              "name": "cross-stage-recovery",
+              "result": "PASS",
+              "evidence": {
+                "baseline": "first-switch-cycle",
+                "checked": 3
+              },
+              "seconds": 0.015
+            },
+            {
+              "name": "runtime",
+              "result": "PASS",
+              "evidence": null,
+              "seconds": 0.0
+            },
+            {
+              "name": "stop-and-settings",
+              "result": "PASS",
+              "evidence": {
+                "stopped": true,
+                "wifi_unchanged": true,
+                "playlist_unchanged": true,
+                "settings_unchanged": true
+              },
+              "seconds": 0.656
+            },
+            {
+              "name": "runtime-after-capture-close",
+              "result": "PASS",
+              "evidence": null,
+              "seconds": 0.0
+            },
+            {
+              "name": "owners-complete",
+              "result": "PASS",
+              "evidence": {
+                "snapshots": 33,
+                "peak_live": 23,
+                "final_live": 0
+              },
+              "seconds": 0.0
+            }
+          ],
+          "original_gates_passed": false,
+          "runtime_acceptance": {
+            "result": "FAIL",
+            "failures": [
+              "Status observation interrupted: URLError"
+            ]
+          },
+          "acceptance_passed": false,
+          "seconds": 39.92200000002049,
+          "measured_start": 250412.156,
+          "measured_end": 250442.078,
+          "interrupted": "URLError",
+          "cpu": {
+            "observed_seconds": 20.457000000000022,
+            "windows": 4,
+            "peak_percent": 63.7,
+            "busy_mean_percent": 62.76822114679572,
+            "idle_mean_percent": 37.23177885320428,
+            "decode_mean_percent": 42.7747128122403,
+            "stream_mean_percent": 0.6748839028205502,
+            "output_mean_percent": 7.3,
+            "wifi_mean_percent": 4.048560394974825,
+            "tcpip_mean_percent": 2.6994427335386417,
+            "web_mean_percent": 1.8747910250769912,
+            "at_least_85_percent": {
+              "seconds": 0,
+              "observed_time_percent": 0.0
+            },
+            "at_least_95_percent": {
+              "seconds": 0,
+              "observed_time_percent": 0.0
+            },
+            "at_least_99.9_percent": {
+              "seconds": 0,
+              "observed_time_percent": 0.0
+            },
+            "measurement_seconds": 29.92200000002049,
+            "coverage_percent": 68.36775616598494,
+            "full_intervals": 4,
+            "gaps": [
+              {
+                "start": 250412.156,
+                "end": 250414.22,
+                "seconds": 2.0640000000130385
+              },
+              {
+                "start": 250419.359,
+                "end": 250419.35900000003,
+                "seconds": 2.9103830456733704e-11
+              },
+              {
+                "start": 250429.531,
+                "end": 250429.533,
+                "seconds": 0.0020000000076834112
+              },
+              {
+                "start": 250434.671,
+                "end": 250442.078,
+                "seconds": 7.407000000006519
+              }
+            ],
+            "invalid_intervals": [],
+            "maximum_gap_seconds": 7.407000000006519,
+            "coverage_complete": true,
+            "excluded_gap_seconds": 0
+          },
+          "cpu_intervals": [
+            {
+              "at": 250419.359,
+              "seconds": 5.13900000000001,
+              "busy": 63.3,
+              "idle": 36.7,
+              "decode": 42.9,
+              "stream": 0.7,
+              "output": 7.3,
+              "wifi": 4.0,
+              "tcpip": 2.7,
+              "web": 1.8
+            },
+            {
+              "at": 250424.515,
+              "seconds": 5.1559999999999775,
+              "busy": 60.9,
+              "idle": 39.1,
+              "decode": 42.6,
+              "stream": 0.7,
+              "output": 7.3,
+              "wifi": 4.0,
+              "tcpip": 2.7,
+              "web": 1.8
+            },
+            {
+              "at": 250429.531,
+              "seconds": 5.024000000000001,
+              "busy": 63.7,
+              "idle": 36.3,
+              "decode": 42.8,
+              "stream": 0.7,
+              "output": 7.3,
+              "wifi": 4.3,
+              "tcpip": 2.8,
+              "web": 1.9
+            },
+            {
+              "at": 250434.671,
+              "seconds": 5.138000000000034,
+              "busy": 63.2,
+              "idle": 36.8,
+              "decode": 42.8,
+              "stream": 0.6,
+              "output": 7.3,
+              "wifi": 3.9,
+              "tcpip": 2.6,
+              "web": 2.0
+            }
+          ],
+          "malformed_cpu": [],
+          "cpu_parse_error": null,
+          "cpu_gaps": [],
+          "decoder_intervals": [
+            {
+              "at": 250418.437,
+              "seconds": 5.013,
+              "wall_ms": 5013,
+              "audio_ms": 5015,
+              "decode_ms": 2297
+            },
+            {
+              "at": 250423.453,
+              "seconds": 5.013,
+              "wall_ms": 5013,
+              "audio_ms": 5015,
+              "decode_ms": 2316
+            },
+            {
+              "at": 250428.468,
+              "seconds": 5.013,
+              "wall_ms": 5013,
+              "audio_ms": 5015,
+              "decode_ms": 2311
+            },
+            {
+              "at": 250433.5,
+              "seconds": 5.026,
+              "wall_ms": 5026,
+              "audio_ms": 5015,
+              "decode_ms": 2310
+            },
+            {
+              "at": 250438.515,
+              "seconds": 5.013,
+              "wall_ms": 5013,
+              "audio_ms": 5015,
+              "decode_ms": 2256
+            }
+          ],
+          "decoder_coverage": {
+            "measurement_seconds": 29.92200000002049,
+            "observed_seconds": 25.078,
+            "coverage_percent": 83.81124256394233,
+            "full_intervals": 5,
+            "gaps": [
+              {
+                "start": 250412.156,
+                "end": 250413.424,
+                "seconds": 1.268000000010943
+              },
+              {
+                "start": 250418.437,
+                "end": 250418.44,
+                "seconds": 0.0029999999969732016
+              },
+              {
+                "start": 250423.453,
+                "end": 250423.455,
+                "seconds": 0.001999999978579581
+              },
+              {
+                "start": 250428.468,
+                "end": 250428.474,
+                "seconds": 0.005999999993946403
+              },
+              {
+                "start": 250433.5,
+                "end": 250433.502,
+                "seconds": 0.0020000000076834112
+              },
+              {
+                "start": 250438.515,
+                "end": 250442.078,
+                "seconds": 3.562999999994645
+              }
+            ],
+            "invalid_intervals": [],
+            "maximum_gap_seconds": 3.562999999994645,
+            "coverage_complete": true
+          },
+          "malformed_decoder": [],
+          "malformed_heap": [],
+          "fault_rows": [],
+          "minimum_rssi": -68,
+          "median_rssi": -67.0,
+          "maximum_http_ms": 157.00000000651926,
+          "input_sha256": {
+            "report.json": "7ff4c58d617fd804335e95da27742adb09f409212de0380eeb09964e56ce484b",
+            "status.json": "dfe243fadb8336bf5a0c14b526fef9802499f0c3b625f7691ab444ea5558827b",
+            "performance.json": "31997652d4cf82c3ed963b87cb98ec394a1c873d08a2cf79985a409bb0b0888f",
+            "request-phases.jsonl": "5cea60518559b351e3dda132e9e18c75d8358322aa5f86f86dc8565d5877a0d0"
+          },
+          "decoder_totals": {
+            "wall_ms": 25078,
+            "audio_ms": 25075,
+            "decode_ms": 11490
+          },
+          "decoded_audio_wall_ratio": 0.9998803732355053,
+          "elapsed_decode_ms_per_audio_second": 458.22532402791626,
+          "heap": {
+            "heap": {
+              "min": 23004,
+              "first_median": 23004,
+              "last_median": 23004
+            },
+            "largest": {
+              "min": 13312,
+              "first_median": 13312,
+              "last_median": 13312
+            }
+          },
+          "dma": {
+            "samples": 6,
+            "start": 250413.453,
+            "end": 250438.5,
+            "observed_seconds": 25.046999999991385,
+            "coverage_complete": true,
+            "maximum_sample_gap_seconds": 5.01600000000326,
+            "delta": {
+              "q_overruns": 0,
+              "writes": 2349,
+              "written_bytes": 4810752,
+              "write_us": 22854803,
+              "errors": 0
+            },
+            "maximum_write_us_since_boot": 18478,
+            "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+            "acoustic_continuity_qualified": false,
+            "overruns_per_second": 0.0,
+            "written_audio_wall_ratio": 1.0003593244703404
+          },
+          "telemetry_complete": false,
+          "complete": false,
+          "flow_decoder": {
+            "windows": [
+              {
+                "gen": 48,
+                "window_us": 5013325,
+                "input_us": 0,
+                "input_n": 0,
+                "input_timeouts": 0,
+                "input_max": 0,
+                "pcm_us": 2579461,
+                "pcm_n": 144,
+                "pcm_timeouts": 0,
+                "pcm_max": 32326
+              },
+              {
+                "gen": 48,
+                "window_us": 5013289,
+                "input_us": 0,
+                "input_n": 0,
+                "input_timeouts": 0,
+                "input_max": 0,
+                "pcm_us": 2556205,
+                "pcm_n": 140,
+                "pcm_timeouts": 0,
+                "pcm_max": 32181
+              },
+              {
+                "gen": 48,
+                "window_us": 5013384,
+                "input_us": 0,
+                "input_n": 0,
+                "input_timeouts": 0,
+                "input_max": 0,
+                "pcm_us": 2566726,
+                "pcm_n": 142,
+                "pcm_timeouts": 0,
+                "pcm_max": 32631
+              },
+              {
+                "gen": 48,
+                "window_us": 5026689,
+                "input_us": 0,
+                "input_n": 0,
+                "input_timeouts": 0,
+                "input_max": 0,
+                "pcm_us": 2566033,
+                "pcm_n": 145,
+                "pcm_timeouts": 0,
+                "pcm_max": 33090
+              },
+              {
+                "gen": 48,
+                "window_us": 5013217,
+                "input_us": 0,
+                "input_n": 0,
+                "input_timeouts": 0,
+                "input_max": 0,
+                "pcm_us": 2621687,
+                "pcm_n": 154,
+                "pcm_timeouts": 0,
+                "pcm_max": 34128
+              }
+            ],
+            "malformed": [],
+            "observed_seconds": 25.079904,
+            "input": {
+              "us": 0,
+              "count": 0,
+              "wall_percent": 0.0,
+              "mean_us": 0,
+              "max_us": 0,
+              "timeouts": 0
+            },
+            "pcm": {
+              "us": 12890112,
+              "count": 725,
+              "wall_percent": 51.39617759302428,
+              "mean_us": 17779.464827586206,
+              "max_us": 34128,
+              "timeouts": 0
+            },
+            "coverage": {
+              "measurement_seconds": 29.92200000002049,
+              "observed_seconds": 25.079904,
+              "coverage_percent": 83.81760577495763,
+              "full_intervals": 5,
+              "gaps": [
+                {
+                  "start": 250412.156,
+                  "end": 250413.423675,
+                  "seconds": 1.2676750000100583
+                },
+                {
+                  "start": 250418.437,
+                  "end": 250418.439711,
+                  "seconds": 0.0027110000082757324
+                },
+                {
+                  "start": 250423.453,
+                  "end": 250423.454616,
+                  "seconds": 0.0016159999941010028
+                },
+                {
+                  "start": 250428.468,
+                  "end": 250428.473311,
+                  "seconds": 0.005311000015353784
+                },
+                {
+                  "start": 250433.5,
+                  "end": 250433.501783,
+                  "seconds": 0.001783000014256686
+                },
+                {
+                  "start": 250438.515,
+                  "end": 250442.078,
+                  "seconds": 3.562999999994645
+                }
+              ],
+              "invalid_intervals": [],
+              "maximum_gap_seconds": 3.562999999994645,
+              "coverage_complete": true
+            },
+            "issues": [],
+            "intervals": [
+              {
+                "at": 250418.437,
+                "seconds": 5.013325,
+                "gen": 48,
+                "window_us": 5013325,
+                "input_us": 0,
+                "input_n": 0,
+                "input_timeouts": 0,
+                "input_max": 0,
+                "pcm_us": 2579461,
+                "pcm_n": 144,
+                "pcm_timeouts": 0,
+                "pcm_max": 32326
+              },
+              {
+                "at": 250423.453,
+                "seconds": 5.013289,
+                "gen": 48,
+                "window_us": 5013289,
+                "input_us": 0,
+                "input_n": 0,
+                "input_timeouts": 0,
+                "input_max": 0,
+                "pcm_us": 2556205,
+                "pcm_n": 140,
+                "pcm_timeouts": 0,
+                "pcm_max": 32181
+              },
+              {
+                "at": 250428.468,
+                "seconds": 5.013384,
+                "gen": 48,
+                "window_us": 5013384,
+                "input_us": 0,
+                "input_n": 0,
+                "input_timeouts": 0,
+                "input_max": 0,
+                "pcm_us": 2566726,
+                "pcm_n": 142,
+                "pcm_timeouts": 0,
+                "pcm_max": 32631
+              },
+              {
+                "at": 250433.5,
+                "seconds": 5.026689,
+                "gen": 48,
+                "window_us": 5026689,
+                "input_us": 0,
+                "input_n": 0,
+                "input_timeouts": 0,
+                "input_max": 0,
+                "pcm_us": 2566033,
+                "pcm_n": 145,
+                "pcm_timeouts": 0,
+                "pcm_max": 33090
+              },
+              {
+                "at": 250438.515,
+                "seconds": 5.013217,
+                "gen": 48,
+                "window_us": 5013217,
+                "input_us": 0,
+                "input_n": 0,
+                "input_timeouts": 0,
+                "input_max": 0,
+                "pcm_us": 2621687,
+                "pcm_n": 154,
+                "pcm_timeouts": 0,
+                "pcm_max": 34128
+              }
+            ],
+            "complete": true
+          },
+          "flow_output": {
+            "windows": [
+              {
+                "gen": 48,
+                "window_us": 5011883,
+                "empty_us": 84222,
+                "empty_n": 169,
+                "empty_timeouts": 4,
+                "empty_max": 4651,
+                "submit_us": 4918704,
+                "submit_n": 324,
+                "submit_max": 23433,
+                "overruns": 0
+              },
+              {
+                "gen": 48,
+                "window_us": 5012889,
+                "empty_us": 71531,
+                "empty_n": 164,
+                "empty_timeouts": 1,
+                "empty_max": 4334,
+                "submit_us": 4932132,
+                "submit_n": 324,
+                "submit_max": 23457,
+                "overruns": 0
+              },
+              {
+                "gen": 48,
+                "window_us": 5013889,
+                "empty_us": 80261,
+                "empty_n": 168,
+                "empty_timeouts": 5,
+                "empty_max": 4973,
+                "submit_us": 4923612,
+                "submit_n": 324,
+                "submit_max": 23376,
+                "overruns": 0
+              },
+              {
+                "gen": 48,
+                "window_us": 5001884,
+                "empty_us": 80453,
+                "empty_n": 169,
+                "empty_timeouts": 4,
+                "empty_max": 4566,
+                "submit_us": 4911305,
+                "submit_n": 323,
+                "submit_max": 22958,
+                "overruns": 0
+              },
+              {
+                "gen": 48,
+                "window_us": 5013312,
+                "empty_us": 57844,
+                "empty_n": 167,
+                "empty_timeouts": 1,
+                "empty_max": 4800,
+                "submit_us": 4947219,
+                "submit_n": 324,
+                "submit_max": 22922,
+                "overruns": 0
+              }
+            ],
+            "malformed": [],
+            "observed_seconds": 25.053857,
+            "empty": {
+              "us": 374311,
+              "count": 837,
+              "wall_percent": 1.4940254508517392,
+              "mean_us": 447.2054958183991,
+              "max_us": 4973,
+              "timeouts": 15
+            },
+            "submit": {
+              "us": 24632972,
+              "count": 1619,
+              "wall_percent": 98.32007902016844,
+              "mean_us": 15214.930203829525,
+              "max_us": 23457,
+              "timeouts": 0
+            },
+            "overruns": 0,
+            "overruns_per_second": 0.0,
+            "coverage": {
+              "measurement_seconds": 29.92200000002049,
+              "observed_seconds": 25.053857,
+              "coverage_percent": 83.730556112502,
+              "full_intervals": 5,
+              "gaps": [
+                {
+                  "start": 250412.156,
+                  "end": 250413.456117,
+                  "seconds": 1.3001170000061393
+                },
+                {
+                  "start": 250418.468,
+                  "end": 250418.471111,
+                  "seconds": 0.0031109999981708825
+                },
+                {
+                  "start": 250428.484,
+                  "end": 250428.498116,
+                  "seconds": 0.014116000005742535
+                },
+                {
+                  "start": 250438.5,
+                  "end": 250442.078,
+                  "seconds": 3.5780000000086147
+                }
+              ],
+              "invalid_intervals": [],
+              "maximum_gap_seconds": 3.5780000000086147,
+              "coverage_complete": true
+            },
+            "issues": [],
+            "intervals": [
+              {
+                "at": 250418.468,
+                "seconds": 5.011883,
+                "gen": 48,
+                "window_us": 5011883,
+                "empty_us": 84222,
+                "empty_n": 169,
+                "empty_timeouts": 4,
+                "empty_max": 4651,
+                "submit_us": 4918704,
+                "submit_n": 324,
+                "submit_max": 23433,
+                "overruns": 0
+              },
+              {
+                "at": 250423.484,
+                "seconds": 5.012889,
+                "gen": 48,
+                "window_us": 5012889,
+                "empty_us": 71531,
+                "empty_n": 164,
+                "empty_timeouts": 1,
+                "empty_max": 4334,
+                "submit_us": 4932132,
+                "submit_n": 324,
+                "submit_max": 23457,
+                "overruns": 0
+              },
+              {
+                "at": 250428.484,
+                "seconds": 5.013889,
+                "gen": 48,
+                "window_us": 5013889,
+                "empty_us": 80261,
+                "empty_n": 168,
+                "empty_timeouts": 5,
+                "empty_max": 4973,
+                "submit_us": 4923612,
+                "submit_n": 324,
+                "submit_max": 23376,
+                "overruns": 0
+              },
+              {
+                "at": 250433.5,
+                "seconds": 5.001884,
+                "gen": 48,
+                "window_us": 5001884,
+                "empty_us": 80453,
+                "empty_n": 169,
+                "empty_timeouts": 4,
+                "empty_max": 4566,
+                "submit_us": 4911305,
+                "submit_n": 323,
+                "submit_max": 22958,
+                "overruns": 0
+              },
+              {
+                "at": 250438.5,
+                "seconds": 5.013312,
+                "gen": 48,
+                "window_us": 5013312,
+                "empty_us": 57844,
+                "empty_n": 167,
+                "empty_timeouts": 1,
+                "empty_max": 4800,
+                "submit_us": 4947219,
+                "submit_n": 324,
+                "submit_max": 22922,
+                "overruns": 0
+              }
+            ],
+            "complete": true
+          },
+          "whole_observed_dma_review": {
+            "result": "PASS",
+            "issues": []
+          },
+          "whole_observed_dma_events": []
+        }
+      ]
+    }
+  },
+  "incomplete": []
+}

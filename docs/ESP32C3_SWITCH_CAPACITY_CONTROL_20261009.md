@@ -135,3 +135,7 @@ first baseline across every Stop/EOF boundary. Identify live allocations
 that divide the free region before changing allocation policy. Investigate
 the WebUI connection timeout separately. Full public-radio continuity, the
 candidate's negative OTA suite and analog clock qualification remain open.
+
+Follow-up: the [owner-trace and retention study](ESP32C3_INPUT_RETENTION_20261009.md)
+reproduces displacement of baseline input buffers and tests a targeted
+ordinary-shrink fix. The observations and failures above remain unchanged.

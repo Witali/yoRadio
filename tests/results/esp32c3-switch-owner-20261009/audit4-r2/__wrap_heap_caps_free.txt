@@ -1,0 +1,12 @@
+42029620:	1101                	addi	sp,sp,-32
+42029622:	ce06                	sw	ra,28(sp)
+42029624:	c62a                	sw	a0,12(sp)
+42029626:	fe35f097          	auipc	ra,0xfe35f
+4202962a:	9e8080e7          	jalr	-1560(ra) # 4038800e <vPortEnterCritical>
+4202962e:	4532                	lw	a0,12(sp)
+42029630:	b22dc0ef          	jal	42005952 <heap_caps_free>
+42029634:	40f2                	lw	ra,28(sp)
+42029636:	6105                	addi	sp,sp,32
+42029638:	fe35f317          	auipc	t1,0xfe35f
+4202963c:	a1230067          	jr	-1518(t1) # 4038804a <vPortExitCritical>
+
