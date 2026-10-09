@@ -1,0 +1,110 @@
+{
+  "scope": "Source comparison only; older SDKs not reflashed in this experiment.",
+  "versions": [
+    {
+      "version": "v5.5.4",
+      "revision": "735507283d5b2f9fb363a1901172dbd9e847945d",
+      "sources": {
+        "driver": {
+          "path": "components/esp_driver_i2s/i2s_pdm.c",
+          "sha256": "449632d5ebcebaf40fab4ef5bf490057d19b0739d84c4a9336ef7f07690bbf2d",
+          "normalized_sha256": "f8f2804dcc4359d6cecbe0802b89e425e3055bd94b7241906488e7909b1682b1",
+          "url": "https://github.com/espressif/esp-idf/blob/735507283d5b2f9fb363a1901172dbd9e847945d/components/esp_driver_i2s/i2s_pdm.c"
+        },
+        "header": {
+          "path": "components/esp_driver_i2s/include/driver/i2s_pdm.h",
+          "sha256": "deec30a4f8eb5a673331c2078826f867bc06881a3a0914be69bcb6ca89513c0e",
+          "normalized_sha256": "366f3a1141f156950a422ce9ca1366a73e3329ce21f618af72880521a3373c56",
+          "url": "https://github.com/espressif/esp-idf/blob/735507283d5b2f9fb363a1901172dbd9e847945d/components/esp_driver_i2s/include/driver/i2s_pdm.h"
+        }
+      },
+      "integer_override_line": 94,
+      "integer_override": "i2s_ll_tx_set_raw_clk_div(handle->controller->hal.dev, clk_info.mclk_div, 1, 1, 0, 0);",
+      "dac_default_macro": "#define I2S_PDM_TX_CLK_DAC_DEFAULT_CONFIG(rate) { \\\n    .sample_rate_hz = rate, \\\n    .clk_src = I2S_CLK_SRC_DEFAULT, \\\n    .mclk_multiple = I2S_MCLK_MULTIPLE_256, \\\n    .up_sample_fp = 960, \\\n    .up_sample_fs = (rate) / 100, \\\n    .bclk_div = 13, \\\n}"
+    },
+    {
+      "version": "v6.0.2",
+      "revision": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+      "sources": {
+        "driver": {
+          "path": "components/esp_driver_i2s/i2s_pdm.c",
+          "sha256": "dcf4df0b8f95aae1a081580c91d2c2b9e51618eb1e74c2b20d0a6db265754a41",
+          "normalized_sha256": "0353cd476609b30a35c457d8388f8a145059ae4bfa7acd4b9baefb5e5012d926",
+          "url": "https://github.com/espressif/esp-idf/blob/7101770dc6db2667b3c477cc31365dd1acd6db4e/components/esp_driver_i2s/i2s_pdm.c"
+        },
+        "header": {
+          "path": "components/esp_driver_i2s/include/driver/i2s_pdm.h",
+          "sha256": "deec30a4f8eb5a673331c2078826f867bc06881a3a0914be69bcb6ca89513c0e",
+          "normalized_sha256": "366f3a1141f156950a422ce9ca1366a73e3329ce21f618af72880521a3373c56",
+          "url": "https://github.com/espressif/esp-idf/blob/7101770dc6db2667b3c477cc31365dd1acd6db4e/components/esp_driver_i2s/include/driver/i2s_pdm.h"
+        }
+      },
+      "integer_override_line": 102,
+      "integer_override": "i2s_ll_tx_set_raw_clk_div(handle->controller->hal.dev, clk_info.mclk_div, 1, 1, 0, 0);",
+      "dac_default_macro": "#define I2S_PDM_TX_CLK_DAC_DEFAULT_CONFIG(rate) { \\\n    .sample_rate_hz = rate, \\\n    .clk_src = I2S_CLK_SRC_DEFAULT, \\\n    .mclk_multiple = I2S_MCLK_MULTIPLE_256, \\\n    .up_sample_fp = 960, \\\n    .up_sample_fs = (rate) / 100, \\\n    .bclk_div = 13, \\\n}"
+    },
+    {
+      "version": "v6.0.3",
+      "revision": "76f5dedd9950a3012fee8fb7d5586df21fc67802",
+      "sources": {
+        "driver": {
+          "path": "components/esp_driver_i2s/i2s_pdm.c",
+          "sha256": "4cf22a867f333200fdf775e579f7a243d55ac6666246ff452f6848adc163da88",
+          "normalized_sha256": "7bec52fe23bdcfc0ebadfb0eefed808d6a8e0ec7f607e547afafd15bc6d715da",
+          "url": "https://github.com/espressif/esp-idf/blob/76f5dedd9950a3012fee8fb7d5586df21fc67802/components/esp_driver_i2s/i2s_pdm.c"
+        },
+        "header": {
+          "path": "components/esp_driver_i2s/include/driver/i2s_pdm.h",
+          "sha256": "deec30a4f8eb5a673331c2078826f867bc06881a3a0914be69bcb6ca89513c0e",
+          "normalized_sha256": "366f3a1141f156950a422ce9ca1366a73e3329ce21f618af72880521a3373c56",
+          "url": "https://github.com/espressif/esp-idf/blob/76f5dedd9950a3012fee8fb7d5586df21fc67802/components/esp_driver_i2s/include/driver/i2s_pdm.h"
+        }
+      },
+      "integer_override_line": 102,
+      "integer_override": "i2s_ll_tx_set_raw_clk_div(handle->controller->hal.dev, clk_info.mclk_div, 1, 1, 0, 0);",
+      "dac_default_macro": "#define I2S_PDM_TX_CLK_DAC_DEFAULT_CONFIG(rate) { \\\n    .sample_rate_hz = rate, \\\n    .clk_src = I2S_CLK_SRC_DEFAULT, \\\n    .mclk_multiple = I2S_MCLK_MULTIPLE_256, \\\n    .up_sample_fp = 960, \\\n    .up_sample_fs = (rate) / 100, \\\n    .bclk_div = 13, \\\n}"
+    },
+    {
+      "version": "v6.1",
+      "revision": "fff9895c82d744c7237be8847347bdd1b07c6643",
+      "sources": {
+        "driver": {
+          "path": "components/esp_driver_i2s/i2s_pdm.c",
+          "sha256": "d9f0dbdc617c731849c0f02f400fd3b3e88ae7c9254cda1e52059591a7b0f398",
+          "normalized_sha256": "e1f10fcab65ee36899d0b6f32d16eae3ef24be8e75455c1de45458a7413c8836",
+          "url": "https://github.com/espressif/esp-idf/blob/fff9895c82d744c7237be8847347bdd1b07c6643/components/esp_driver_i2s/i2s_pdm.c"
+        },
+        "header": {
+          "path": "components/esp_driver_i2s/include/driver/i2s_pdm.h",
+          "sha256": "d9b40bd58f20df8fefc20cd084871c462aeaf5bab0356401bacb011185930943",
+          "normalized_sha256": "e5a4ccb5d17e4050fc5cf2509e41438212c5ec1b95e858fd1ddcdc936a5902cf",
+          "url": "https://github.com/espressif/esp-idf/blob/fff9895c82d744c7237be8847347bdd1b07c6643/components/esp_driver_i2s/include/driver/i2s_pdm.h"
+        }
+      },
+      "integer_override_line": 102,
+      "integer_override": "i2s_ll_tx_set_raw_clk_div(handle->controller->hal.dev, clk_info.mclk_div, 1, 1, 0, 0);",
+      "dac_default_macro": "#define I2S_PDM_TX_CLK_DAC_DEFAULT_CONFIG(rate) { \\\n    .sample_rate_hz = rate, \\\n    .clk_src = I2S_CLK_SRC_DEFAULT, \\\n    .mclk_multiple = I2S_MCLK_MULTIPLE_256, \\\n    .up_sample_fp = 960, \\\n    .up_sample_fs = (rate) / 100, \\\n    .bclk_div = 13, \\\n}"
+    },
+    {
+      "version": "v6.1-9a97f6c54ec6",
+      "revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+      "sources": {
+        "driver": {
+          "path": "components/esp_driver_i2s/i2s_pdm.c",
+          "sha256": "d9f0dbdc617c731849c0f02f400fd3b3e88ae7c9254cda1e52059591a7b0f398",
+          "normalized_sha256": "e1f10fcab65ee36899d0b6f32d16eae3ef24be8e75455c1de45458a7413c8836",
+          "url": "https://github.com/espressif/esp-idf/blob/9a97f6c54ec638111ce55cd36581b3c192f15207/components/esp_driver_i2s/i2s_pdm.c"
+        },
+        "header": {
+          "path": "components/esp_driver_i2s/include/driver/i2s_pdm.h",
+          "sha256": "d9b40bd58f20df8fefc20cd084871c462aeaf5bab0356401bacb011185930943",
+          "normalized_sha256": "e5a4ccb5d17e4050fc5cf2509e41438212c5ec1b95e858fd1ddcdc936a5902cf",
+          "url": "https://github.com/espressif/esp-idf/blob/9a97f6c54ec638111ce55cd36581b3c192f15207/components/esp_driver_i2s/include/driver/i2s_pdm.h"
+        }
+      },
+      "integer_override_line": 102,
+      "integer_override": "i2s_ll_tx_set_raw_clk_div(handle->controller->hal.dev, clk_info.mclk_div, 1, 1, 0, 0);",
+      "dac_default_macro": "#define I2S_PDM_TX_CLK_DAC_DEFAULT_CONFIG(rate) { \\\n    .sample_rate_hz = rate, \\\n    .clk_src = I2S_CLK_SRC_DEFAULT, \\\n    .mclk_multiple = I2S_MCLK_MULTIPLE_256, \\\n    .up_sample_fp = 960, \\\n    .up_sample_fs = (rate) / 100, \\\n    .bclk_div = 13, \\\n}"
+    }
+  ]
+}

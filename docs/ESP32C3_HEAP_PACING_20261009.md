@@ -83,7 +83,12 @@ Afterward, app-only OTA restored `idf61-qio80-8c1f2d2d`, app SHA-256
 The expected ELF identity and three playing AAC status observations were
 verified. Wi-Fi, playlist and settings comparisons all passed.
 
-## PDM clock hypothesis
+## PDM clock hypothesis and follow up
+
+The subsequent [integer versus fractional clock experiment](ESP32C3_PDM_CLOCK_20261009.md)
+confirms the configured divider fields on the board and compares two
+ten-minute real-time HE-AACv2 runs. The source/binary findings below describe
+the evidence available during this initial pacing comparison.
 
 The pinned ESP-IDF revision is `9a97f6c54ec638111ce55cd36581b3c192f15207`.
 The application's DAC configuration requests 48,000 PCM frames/s, selects a
@@ -126,7 +131,8 @@ noise overwrite, before enabling output, using the SDK's named HAL fields,
 critical section and required divider-update sequence. This is an initialization
 change, so it does not add work to the decoding loop. It needs a build option,
 live-register readback, sustained playback comparison and noise measurement.
-It has not yet been installed on the board.
+The follow-up implements the optional divider and register readback, tests
+both settings on the board, and retains analog noise qualification as pending.
 
 Changing only the PCM-to-PDM FP/FS ratio is not a verified substitute. The
 pinned driver truncates FP/FS to an integer oversampling ratio and writes that

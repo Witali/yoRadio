@@ -1,0 +1,667 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-pdm-integer\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4209220a <i2s_pdm_tx_set_clock>:
+typedef struct {
+    uint32_t source_select, integer, x, y, z, yn1, bclk_div, osr, fp, fs;
+} yoradio_pdm_clock_snapshot_t;
+#endif
+static esp_err_t i2s_pdm_tx_set_clock(i2s_chan_handle_t handle, const i2s_pdm_tx_clk_config_t *clk_cfg)
+{
+4209220a:	7171                	addi	sp,sp,-176
+4209220c:	cf4e                	sw	s3,156(sp)
+    esp_err_t ret = ESP_OK;
+    i2s_pdm_tx_config_t *pdm_tx_cfg = (i2s_pdm_tx_config_t *)(handle->mode_info);
+#if SOC_I2S_HW_VERSION_2
+    ESP_RETURN_ON_FALSE(clk_cfg->clk_src != I2S_CLK_SRC_EXTERNAL, ESP_ERR_INVALID_ARG, TAG, "not support external clock source in pdm mode");
+4209220e:	0045a983          	lw	s3,4(a1)
+{
+42092212:	d706                	sw	ra,172(sp)
+42092214:	cb56                	sw	s5,148(sp)
+    ESP_RETURN_ON_FALSE(clk_cfg->clk_src != I2S_CLK_SRC_EXTERNAL, ESP_ERR_INVALID_ARG, TAG, "not support external clock source in pdm mode");
+42092216:	57fd                	li	a5,-1
+42092218:	3cf98263          	beq	s3,a5,420925dc <i2s_pdm_tx_set_clock+0x3d2>
+#endif
+    ESP_RETURN_ON_FALSE(clk_cfg->up_sample_fs <= 480, ESP_ERR_INVALID_ARG, TAG, "up_sample_fs should be within 480");
+4209221c:	4994                	lw	a3,16(a1)
+4209221e:	d522                	sw	s0,168(sp)
+42092220:	1e000793          	li	a5,480
+42092224:	842e                	mv	s0,a1
+42092226:	3ed7e763          	bltu	a5,a3,42092614 <i2s_pdm_tx_set_clock+0x40a>
+    clk_info->bclk_div = clk_cfg->bclk_div < I2S_PDM_TX_BCLK_DIV_MIN ? I2S_PDM_TX_BCLK_DIV_MIN : clk_cfg->bclk_div;
+4209222a:	49cc                	lw	a1,20(a1)
+4209222c:	d326                	sw	s1,164(sp)
+4209222e:	d14a                	sw	s2,160(sp)
+42092230:	cd52                	sw	s4,152(sp)
+42092232:	c95a                	sw	s6,144(sp)
+42092234:	c75e                	sw	s7,140(sp)
+42092236:	c562                	sw	s8,136(sp)
+42092238:	4721                	li	a4,8
+    i2s_pdm_tx_config_t *pdm_tx_cfg = (i2s_pdm_tx_config_t *)(handle->mode_info);
+4209223a:	03c52903          	lw	s2,60(a0)
+    uint32_t rate = clk_cfg->sample_rate_hz;
+4209223e:	00042a83          	lw	s5,0(s0)
+42092242:	84aa                	mv	s1,a0
+    clk_info->bclk_div = clk_cfg->bclk_div < I2S_PDM_TX_BCLK_DIV_MIN ? I2S_PDM_TX_BCLK_DIV_MIN : clk_cfg->bclk_div;
+42092244:	2ee5ee63          	bltu	a1,a4,42092540 <i2s_pdm_tx_set_clock+0x336>
+    if (!handle->is_raw_pdm) {
+42092248:	40b8                	lw	a4,64(s1)
+    clk_info->bclk_div = clk_cfg->bclk_div < I2S_PDM_TX_BCLK_DIV_MIN ? I2S_PDM_TX_BCLK_DIV_MIN : clk_cfg->bclk_div;
+4209224a:	05c2                	slli	a1,a1,0x10
+4209224c:	81c1                	srli	a1,a1,0x10
+    if (!handle->is_raw_pdm) {
+4209224e:	830d                	srli	a4,a4,0x3
+    clk_info->bclk_div = clk_cfg->bclk_div < I2S_PDM_TX_BCLK_DIV_MIN ? I2S_PDM_TX_BCLK_DIV_MIN : clk_cfg->bclk_div;
+42092250:	06b11f23          	sh	a1,126(sp)
+    if (!handle->is_raw_pdm) {
+42092254:	8b05                	andi	a4,a4,1
+42092256:	2c070a63          	beqz	a4,4209252a <i2s_pdm_tx_set_clock+0x320>
+        if (rate < 512000) {
+4209225a:	0007d737          	lui	a4,0x7d
+4209225e:	2eeaec63          	bltu	s5,a4,42092556 <i2s_pdm_tx_set_clock+0x34c>
+42092262:	854e                	mv	a0,s3
+42092264:	3c136a37          	lui	s4,0x3c136
+        clk_info->bclk = rate * 2;
+42092268:	001a9793          	slli	a5,s5,0x1
+    uint32_t over_sample_ratio = 0;
+4209226c:	4c01                	li	s8,0
+    clk_info->mclk = clk_info->bclk * clk_info->bclk_div;
+4209226e:	02f585b3          	mul	a1,a1,a5
+        clk_info->bclk = rate * I2S_LL_PDM_BCK_FACTOR * over_sample_ratio;
+42092272:	dcbe                	sw	a5,120(sp)
+    clk_info->mclk = clk_info->bclk * clk_info->bclk_div;
+42092274:	daae                	sw	a1,116(sp)
+    clk_info->sclk = i2s_get_source_clk_freq(clk_cfg->clk_src, clk_info->mclk);
+42092276:	db0fe0ef          	jal	42090826 <i2s_get_source_clk_freq>
+    clk_info->mclk_div = clk_info->sclk / clk_info->mclk;
+4209227a:	5ad6                	lw	s5,116(sp)
+    clk_info->sclk = i2s_get_source_clk_freq(clk_cfg->clk_src, clk_info->mclk);
+4209227c:	d8aa                	sw	a0,112(sp)
+    clk_info->mclk_div = clk_info->sclk / clk_info->mclk;
+4209227e:	035557b3          	divu	a5,a0,s5
+42092282:	07c2                	slli	a5,a5,0x10
+42092284:	83c1                	srli	a5,a5,0x10
+42092286:	06f11e23          	sh	a5,124(sp)
+4209228a:	d43e                	sw	a5,40(sp)
+    ESP_RETURN_ON_FALSE((float)clk_info->sclk > clk_info->mclk * 1.99, ESP_ERR_INVALID_ARG, TAG, "sample rate is too large");
+4209228c:	fdf6e097          	auipc	ra,0xfdf6e
+42092290:	584080e7          	jalr	1412(ra) # 40000810 <__floatunsisf>
+42092294:	fdf6e097          	auipc	ra,0xfdf6e
+42092298:	538080e7          	jalr	1336(ra) # 400007cc <__extendsfdf2>
+4209229c:	8b2a                	mv	s6,a0
+4209229e:	8556                	mv	a0,s5
+420922a0:	8bae                	mv	s7,a1
+420922a2:	fdf6e097          	auipc	ra,0xfdf6e
+420922a6:	56a080e7          	jalr	1386(ra) # 4000080c <__floatunsidf>
+420922aa:	3c147737          	lui	a4,0x3c147
+420922ae:	22070713          	addi	a4,a4,544 # 3c147220 <crc16_table+0x20c>
+420922b2:	4310                	lw	a2,0(a4)
+420922b4:	4354                	lw	a3,4(a4)
+420922b6:	fdf6e097          	auipc	ra,0xfdf6e
+420922ba:	592080e7          	jalr	1426(ra) # 40000848 <__muldf3>
+420922be:	862a                	mv	a2,a0
+420922c0:	86ae                	mv	a3,a1
+420922c2:	855a                	mv	a0,s6
+420922c4:	85de                	mv	a1,s7
+420922c6:	fdf6e097          	auipc	ra,0xfdf6e
+420922ca:	55a080e7          	jalr	1370(ra) # 40000820 <__gtdf2>
+420922ce:	57a2                	lw	a5,40(sp)
+420922d0:	36a05f63          	blez	a0,4209264e <i2s_pdm_tx_set_clock+0x444>
+    ESP_RETURN_ON_FALSE(clk_info->mclk_div < 256, ESP_ERR_INVALID_ARG, TAG, "sample rate is too small");
+420922d4:	0ff00713          	li	a4,255
+420922d8:	40f76263          	bltu	a4,a5,420926dc <i2s_pdm_tx_set_clock+0x4d2>
+    if (!handle->is_raw_pdm) {
+420922dc:	40bc                	lw	a5,64(s1)
+420922de:	838d                	srli	a5,a5,0x3
+420922e0:	8b85                	andi	a5,a5,1
+420922e2:	ef95                	bnez	a5,4209231e <i2s_pdm_tx_set_clock+0x114>
+        i2s_ll_tx_set_pdm_fpfs(handle->controller->hal.dev, pdm_tx_clk->up_sample_fp, pdm_tx_clk->up_sample_fs);
+420922e4:	409c                	lw	a5,0(s1)
+ * @param fp The fp value of TX PDM filter module group0.
+ * @param fs The fs value of TX PDM filter module group0.
+ */
+static inline void i2s_ll_tx_set_pdm_fpfs(i2s_dev_t *hw, uint32_t fp, uint32_t fs)
+{
+    hw->tx_pcm2pdm_conf1.tx_pdm_fp = fp;
+420922e6:	4454                	lw	a3,12(s0)
+420922e8:	4810                	lw	a2,16(s0)
+420922ea:	43d8                	lw	a4,4(a5)
+420922ec:	3ff6f693          	andi	a3,a3,1023
+    hw->tx_pcm2pdm_conf1.tx_pdm_fs = fs;
+420922f0:	fff005b7          	lui	a1,0xfff00
+    hw->tx_pcm2pdm_conf1.tx_pdm_fp = fp;
+420922f4:	437c                	lw	a5,68(a4)
+    hw->tx_pcm2pdm_conf1.tx_pdm_fs = fs;
+420922f6:	3ff67613          	andi	a2,a2,1023
+420922fa:	3ff58593          	addi	a1,a1,1023 # fff003ff <SYSTEM+0x9fe403ff>
+    hw->tx_pcm2pdm_conf1.tx_pdm_fp = fp;
+420922fe:	c007f793          	andi	a5,a5,-1024
+42092302:	8fd5                	or	a5,a5,a3
+42092304:	c37c                	sw	a5,68(a4)
+    hw->tx_pcm2pdm_conf1.tx_pdm_fs = fs;
+42092306:	4374                	lw	a3,68(a4)
+42092308:	062a                	slli	a2,a2,0xa
+    hw->tx_pcm2pdm_conf.tx_pdm_sinc_osr2 = ovr;
+4209230a:	00fc7793          	andi	a5,s8,15
+    hw->tx_pcm2pdm_conf1.tx_pdm_fs = fs;
+4209230e:	8eed                	and	a3,a3,a1
+42092310:	8ed1                	or	a3,a3,a2
+42092312:	c374                	sw	a3,68(a4)
+    hw->tx_pcm2pdm_conf.tx_pdm_sinc_osr2 = ovr;
+42092314:	4334                	lw	a3,64(a4)
+42092316:	0786                	slli	a5,a5,0x1
+42092318:	9a85                	andi	a3,a3,-31
+4209231a:	8fd5                	or	a5,a5,a3
+4209231c:	c33c                	sw	a5,64(a4)
+                       ESP_ERR_INVALID_ARG, TAG, "Unsupported fractional PDM experiment configuration");
+#endif
+#ifdef CONFIG_YORADIO_PDM_CLOCK_DIAGNOSTICS
+    yoradio_pdm_clock_snapshot_t yoradio_clock;
+#endif
+    ESP_RETURN_ON_ERROR(esp_clk_tree_enable_src((soc_module_clk_t)clk_src, true), TAG, "clock source enable failed");
+4209231e:	4585                	li	a1,1
+42092320:	854e                	mv	a0,s3
+42092322:	fe2f3097          	auipc	ra,0xfe2f3
+42092326:	4e0080e7          	jalr	1248(ra) # 40385802 <esp_clk_tree_enable_src>
+4209232a:	8aaa                	mv	s5,a0
+4209232c:	38051063          	bnez	a0,420926ac <i2s_pdm_tx_set_clock+0x4a2>
+
+    hal_utils_clk_div_t ret_mclk_div = {};
+42092330:	d282                	sw	zero,100(sp)
+42092332:	d482                	sw	zero,104(sp)
+42092334:	d682                	sw	zero,108(sp)
+    portENTER_CRITICAL(&g_i2s.spinlock);
+42092336:	fe2f6097          	auipc	ra,0xfe2f6
+4209233a:	cd8080e7          	jalr	-808(ra) # 4038800e <vPortEnterCritical>
+    /* Set clock configurations in HAL*/
+    PERIPH_RCC_ATOMIC() {
+4209233e:	fe2f3097          	auipc	ra,0xfe2f3
+42092342:	7ba080e7          	jalr	1978(ra) # 40385af8 <periph_rcc_enter>
+        i2s_hal_set_tx_clock(&handle->controller->hal, &clk_info, clk_cfg->clk_src, &ret_mclk_div);
+42092346:	4088                	lw	a0,0(s1)
+42092348:	4050                	lw	a2,4(s0)
+4209234a:	10d4                	addi	a3,sp,100
+4209234c:	0511                	addi	a0,a0,4
+4209234e:	188c                	addi	a1,sp,112
+42092350:	75d710ef          	jal	421042ac <i2s_hal_set_tx_clock>
+    PERIPH_RCC_ATOMIC() {
+42092354:	fe2f3097          	auipc	ra,0xfe2f3
+42092358:	7a8080e7          	jalr	1960(ra) # 40385afc <periph_rcc_exit>
+    }
+#if SOC_I2S_HW_VERSION_2
+    /* Work around for PDM TX clock, overwrite the raw division directly to reduce the noise
+     * This set of coefficients is a special division to reduce the background noise in PDM TX mode */
+#ifndef CONFIG_YORADIO_PDM_FRACTIONAL_CLOCK
+    i2s_ll_tx_set_raw_clk_div(handle->controller->hal.dev, clk_info.mclk_div, 1, 1, 0, 0);
+4209235c:	409c                	lw	a5,0(s1)
+    hw->tx_clkm_div_conf.tx_clkm_div_yn1 = 0;
+4209235e:	f80006b7          	lui	a3,0xf8000
+42092362:	16fd                	addi	a3,a3,-1 # f7ffffff <SYSTEM+0x97f3ffff>
+42092364:	43dc                	lw	a5,4(a5)
+    HAL_FORCE_MODIFY_U32_REG_FIELD(hw->tx_clkm_conf, tx_clkm_div_num, div_int);
+42092366:	07c14503          	lbu	a0,124(sp)
+    hw->tx_clkm_div_conf.tx_clkm_div_y = 1;
+4209236a:	fffc05b7          	lui	a1,0xfffc0
+    HAL_FORCE_MODIFY_U32_REG_FIELD(hw->tx_clkm_conf, tx_clkm_div_num, 2);
+4209236e:	5bd8                	lw	a4,52(a5)
+    hw->tx_clkm_div_conf.tx_clkm_div_y = 1;
+42092370:	1ff58593          	addi	a1,a1,511 # fffc01ff <SYSTEM+0x9ff001ff>
+    hw->tx_clkm_div_conf.tx_clkm_div_x = 0;
+42092374:	f8040637          	lui	a2,0xf8040
+    HAL_FORCE_MODIFY_U32_REG_FIELD(hw->tx_clkm_conf, tx_clkm_div_num, 2);
+42092378:	ceba                	sw	a4,92(sp)
+4209237a:	4776                	lw	a4,92(sp)
+    hw->tx_clkm_div_conf.tx_clkm_div_x = 0;
+4209237c:	167d                	addi	a2,a2,-1 # f803ffff <SYSTEM+0x97f7ffff>
+    hw->tx_clkm_div_conf.tx_clkm_div_x = x;
+4209237e:	00040837          	lui	a6,0x40
+    HAL_FORCE_MODIFY_U32_REG_FIELD(hw->tx_clkm_conf, tx_clkm_div_num, 2);
+42092382:	f0077713          	andi	a4,a4,-256
+42092386:	00276713          	ori	a4,a4,2
+4209238a:	ceba                	sw	a4,92(sp)
+4209238c:	4776                	lw	a4,92(sp)
+4209238e:	dbd8                	sw	a4,52(a5)
+    hw->tx_clkm_div_conf.tx_clkm_div_yn1 = 0;
+42092390:	5fd8                	lw	a4,60(a5)
+42092392:	8f75                	and	a4,a4,a3
+42092394:	dfd8                	sw	a4,60(a5)
+    hw->tx_clkm_div_conf.tx_clkm_div_y = 1;
+42092396:	5fd8                	lw	a4,60(a5)
+42092398:	8f6d                	and	a4,a4,a1
+4209239a:	20076713          	ori	a4,a4,512
+4209239e:	dfd8                	sw	a4,60(a5)
+    hw->tx_clkm_div_conf.tx_clkm_div_z = 0;
+420923a0:	5fd8                	lw	a4,60(a5)
+420923a2:	e0077713          	andi	a4,a4,-512
+420923a6:	dfd8                	sw	a4,60(a5)
+    hw->tx_clkm_div_conf.tx_clkm_div_x = 0;
+420923a8:	5fd8                	lw	a4,60(a5)
+420923aa:	8f71                	and	a4,a4,a2
+420923ac:	dfd8                	sw	a4,60(a5)
+    hw->tx_clkm_div_conf.tx_clkm_div_yn1 = yn1;
+420923ae:	5fd8                	lw	a4,60(a5)
+420923b0:	8f75                	and	a4,a4,a3
+420923b2:	dfd8                	sw	a4,60(a5)
+    hw->tx_clkm_div_conf.tx_clkm_div_z = z;
+420923b4:	5fd8                	lw	a4,60(a5)
+420923b6:	e0077713          	andi	a4,a4,-512
+420923ba:	dfd8                	sw	a4,60(a5)
+    hw->tx_clkm_div_conf.tx_clkm_div_y = y;
+420923bc:	5fd8                	lw	a4,60(a5)
+420923be:	8f6d                	and	a4,a4,a1
+420923c0:	20076713          	ori	a4,a4,512
+420923c4:	dfd8                	sw	a4,60(a5)
+    hw->tx_clkm_div_conf.tx_clkm_div_x = x;
+420923c6:	5fd8                	lw	a4,60(a5)
+420923c8:	8f71                	and	a4,a4,a2
+420923ca:	01076733          	or	a4,a4,a6
+420923ce:	dfd8                	sw	a4,60(a5)
+    HAL_FORCE_MODIFY_U32_REG_FIELD(hw->tx_clkm_conf, tx_clkm_div_num, div_int);
+420923d0:	5bd8                	lw	a4,52(a5)
+420923d2:	d0ba                	sw	a4,96(sp)
+420923d4:	5706                	lw	a4,96(sp)
+420923d6:	f0077713          	andi	a4,a4,-256
+420923da:	8f49                	or	a4,a4,a0
+420923dc:	d0ba                	sw	a4,96(sp)
+420923de:	5706                	lw	a4,96(sp)
+420923e0:	dbd8                	sw	a4,52(a5)
+
+#ifdef CONFIG_YORADIO_PDM_CLOCK_DIAGNOSTICS
+    /* Read actual fields under the existing TX setup lock. No logging here. */
+    i2s_dev_t *yoradio_hw = handle->controller->hal.dev;
+    yoradio_clock = (yoradio_pdm_clock_snapshot_t) {
+        .source_select = yoradio_hw->tx_clkm_conf.tx_clk_sel,
+420923e2:	0347a803          	lw	a6,52(a5)
+        .integer = yoradio_hw->tx_clkm_conf.tx_clkm_div_num,
+420923e6:	0347a883          	lw	a7,52(a5)
+        .x = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_x,
+420923ea:	5fcc                	lw	a1,60(a5)
+        .y = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_y,
+420923ec:	03c7a303          	lw	t1,60(a5)
+        .z = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_z,
+420923f0:	03c7af03          	lw	t5,60(a5)
+        .yn1 = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_yn1,
+420923f4:	03c7ae03          	lw	t3,60(a5)
+        .bclk_div = yoradio_hw->tx_conf1.tx_bck_div_num + 1U,
+420923f8:	57d8                	lw	a4,44(a5)
+        .osr = yoradio_hw->tx_pcm2pdm_conf.tx_pdm_sinc_osr2,
+420923fa:	0407ae83          	lw	t4,64(a5)
+        .fp = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fp,
+420923fe:	43f0                	lw	a2,68(a5)
+        .fs = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fs,
+42092400:	43f4                	lw	a3,68(a5)
+        .source_select = yoradio_hw->tx_clkm_conf.tx_clk_sel,
+42092402:	01b85813          	srli	a6,a6,0x1b
+        .bclk_div = yoradio_hw->tx_conf1.tx_bck_div_num + 1U,
+42092406:	00775793          	srli	a5,a4,0x7
+        .x = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_x,
+4209240a:	81c9                	srli	a1,a1,0x12
+        .fs = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fs,
+4209240c:	00a6d713          	srli	a4,a3,0xa
+        .y = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_y,
+42092410:	00935313          	srli	t1,t1,0x9
+        .yn1 = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_yn1,
+42092414:	01be5e13          	srli	t3,t3,0x1b
+        .osr = yoradio_hw->tx_pcm2pdm_conf.tx_pdm_sinc_osr2,
+42092418:	001ede93          	srli	t4,t4,0x1
+        .source_select = yoradio_hw->tx_clkm_conf.tx_clk_sel,
+4209241c:	00387813          	andi	a6,a6,3
+        .integer = yoradio_hw->tx_clkm_conf.tx_clkm_div_num,
+42092420:	0ff8f893          	zext.b	a7,a7
+        .x = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_x,
+42092424:	1ff5f593          	andi	a1,a1,511
+        .y = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_y,
+42092428:	1ff37313          	andi	t1,t1,511
+        .z = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_z,
+4209242c:	1fff7f13          	andi	t5,t5,511
+        .yn1 = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_yn1,
+42092430:	001e7e13          	andi	t3,t3,1
+        .bclk_div = yoradio_hw->tx_conf1.tx_bck_div_num + 1U,
+42092434:	03f7f793          	andi	a5,a5,63
+        .osr = yoradio_hw->tx_pcm2pdm_conf.tx_pdm_sinc_osr2,
+42092438:	00fefe93          	andi	t4,t4,15
+        .fs = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fs,
+4209243c:	3ff77713          	andi	a4,a4,1023
+        .fp = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fp,
+42092440:	3ff67613          	andi	a2,a2,1023
+        .source_select = yoradio_hw->tx_clkm_conf.tx_clk_sel,
+42092444:	c6c2                	sw	a6,76(sp)
+        .integer = yoradio_hw->tx_clkm_conf.tx_clkm_div_num,
+42092446:	c4c6                	sw	a7,72(sp)
+        .x = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_x,
+42092448:	c2ae                	sw	a1,68(sp)
+        .y = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_y,
+4209244a:	c09a                	sw	t1,64(sp)
+        .z = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_z,
+4209244c:	de7a                	sw	t5,60(sp)
+        .yn1 = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_yn1,
+4209244e:	dc72                	sw	t3,56(sp)
+        .bclk_div = yoradio_hw->tx_conf1.tx_bck_div_num + 1U,
+42092450:	da3e                	sw	a5,52(sp)
+        .osr = yoradio_hw->tx_pcm2pdm_conf.tx_pdm_sinc_osr2,
+42092452:	d876                	sw	t4,48(sp)
+        .fs = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fs,
+42092454:	d63a                	sw	a4,44(sp)
+        .fp = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fp,
+42092456:	d432                	sw	a2,40(sp)
+    };
+#endif
+    portEXIT_CRITICAL(&g_i2s.spinlock);
+42092458:	fe2f6097          	auipc	ra,0xfe2f6
+4209245c:	bf2080e7          	jalr	-1038(ra) # 4038804a <vPortExitCritical>
+#ifdef CONFIG_YORADIO_PDM_CLOCK_DIAGNOSTICS
+    /* Setup-time register readback, not a measurement of crystal accuracy. */
+    ESP_LOGI(TAG, "PERF PDM_CLOCK: sclk=%"PRIu32" source=%"PRIu32" integer=%"PRIu32
+42092460:	fe2f7097          	auipc	ra,0xfe2f7
+42092464:	03e080e7          	jalr	62(ra) # 4038949e <esp_log_timestamp>
+        .bclk_div = yoradio_hw->tx_conf1.tx_bck_div_num + 1U,
+42092468:	57d2                	lw	a5,52(sp)
+        .fs = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fs,
+4209246a:	5732                	lw	a4,44(sp)
+        .fp = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fp,
+4209246c:	5622                	lw	a2,40(sp)
+        .x = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_x,
+4209246e:	4596                	lw	a1,68(sp)
+        .osr = yoradio_hw->tx_pcm2pdm_conf.tx_pdm_sinc_osr2,
+42092470:	5ec2                	lw	t4,48(sp)
+        .yn1 = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_yn1,
+42092472:	5e62                	lw	t3,56(sp)
+        .z = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_z,
+42092474:	5f72                	lw	t5,60(sp)
+        .y = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_y,
+42092476:	4306                	lw	t1,64(sp)
+        .bclk_div = yoradio_hw->tx_conf1.tx_bck_div_num + 1U,
+42092478:	0785                	addi	a5,a5,1
+    ESP_LOGI(TAG, "PERF PDM_CLOCK: sclk=%"PRIu32" source=%"PRIu32" integer=%"PRIu32
+4209247a:	c83e                	sw	a5,16(sp)
+4209247c:	48a6                	lw	a7,72(sp)
+4209247e:	57c6                	lw	a5,112(sp)
+42092480:	4836                	lw	a6,76(sp)
+        .fs = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fs,
+42092482:	ce3a                	sw	a4,28(sp)
+        .fp = yoradio_hw->tx_pcm2pdm_conf1.tx_pdm_fp,
+42092484:	cc32                	sw	a2,24(sp)
+    ESP_LOGI(TAG, "PERF PDM_CLOCK: sclk=%"PRIu32" source=%"PRIu32" integer=%"PRIu32
+42092486:	808a0713          	addi	a4,s4,-2040 # 3c135808 <_esp_libc_clock_array_end+0x156b8>
+4209248a:	3c136637          	lui	a2,0x3c136
+4209248e:	86aa                	mv	a3,a0
+        .x = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_x,
+42092490:	c02e                	sw	a1,0(sp)
+    ESP_LOGI(TAG, "PERF PDM_CLOCK: sclk=%"PRIu32" source=%"PRIu32" integer=%"PRIu32
+42092492:	b0060613          	addi	a2,a2,-1280 # 3c135b00 <_esp_libc_clock_array_end+0x159b0>
+42092496:	85ba                	mv	a1,a4
+        .osr = yoradio_hw->tx_pcm2pdm_conf.tx_pdm_sinc_osr2,
+42092498:	ca76                	sw	t4,20(sp)
+        .yn1 = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_yn1,
+4209249a:	c672                	sw	t3,12(sp)
+        .z = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_z,
+4209249c:	c47a                	sw	t5,8(sp)
+        .y = yoradio_hw->tx_clkm_div_conf.tx_clkm_div_y,
+4209249e:	c21a                	sw	t1,4(sp)
+    ESP_LOGI(TAG, "PERF PDM_CLOCK: sclk=%"PRIu32" source=%"PRIu32" integer=%"PRIu32
+420924a0:	450d                	li	a0,3
+420924a2:	fe2f7097          	auipc	ra,0xfe2f7
+420924a6:	ef4080e7          	jalr	-268(ra) # 40389396 <esp_log>
+             yoradio_clock.x, yoradio_clock.y, yoradio_clock.z, yoradio_clock.yn1,
+             yoradio_clock.bclk_div, yoradio_clock.osr, yoradio_clock.fp, yoradio_clock.fs);
+#endif
+
+
+    uint64_t tmp_div = (uint64_t)ret_mclk_div.integer * ret_mclk_div.denominator + ret_mclk_div.numerator;
+420924aa:	55a6                	lw	a1,104(sp)
+420924ac:	5716                	lw	a4,100(sp)
+420924ae:	5636                	lw	a2,108(sp)
+420924b0:	02b707b3          	mul	a5,a4,a1
+420924b4:	02b73733          	mulhu	a4,a4,a1
+420924b8:	963e                	add	a2,a2,a5
+420924ba:	00f636b3          	sltu	a3,a2,a5
+420924be:	96ba                	add	a3,a3,a4
+    ESP_GOTO_ON_FALSE(tmp_div != 0 && ret_mclk_div.denominator != 0, ESP_ERR_INVALID_ARG, err, TAG, "invalid mclk division result");
+420924c0:	00d667b3          	or	a5,a2,a3
+420924c4:	c3e1                	beqz	a5,42092584 <i2s_pdm_tx_set_clock+0x37a>
+420924c6:	cddd                	beqz	a1,42092584 <i2s_pdm_tx_set_clock+0x37a>
+
+    /* Update the mode info: clock configuration */
+    memcpy(&(pdm_tx_cfg->clk_cfg), clk_cfg, sizeof(i2s_pdm_tx_clk_config_t));
+420924c8:	4008                	lw	a0,0(s0)
+420924ca:	405c                	lw	a5,4(s0)
+420924cc:	00842803          	lw	a6,8(s0)
+420924d0:	444c                	lw	a1,12(s0)
+420924d2:	4818                	lw	a4,16(s0)
+420924d4:	00a92023          	sw	a0,0(s2)
+420924d8:	00f92223          	sw	a5,4(s2)
+    handle->clk_src = clk_cfg->clk_src;
+    handle->sclk_hz = clk_info.sclk;
+    handle->origin_mclk_hz = ((uint64_t)clk_info.sclk * ret_mclk_div.denominator) / tmp_div;
+420924dc:	5526                	lw	a0,104(sp)
+    handle->sclk_hz = clk_info.sclk;
+420924de:	57c6                	lw	a5,112(sp)
+    memcpy(&(pdm_tx_cfg->clk_cfg), clk_cfg, sizeof(i2s_pdm_tx_clk_config_t));
+420924e0:	00b92623          	sw	a1,12(s2)
+420924e4:	01092423          	sw	a6,8(s2)
+    handle->origin_mclk_hz = ((uint64_t)clk_info.sclk * ret_mclk_div.denominator) / tmp_div;
+420924e8:	02f535b3          	mulhu	a1,a0,a5
+    memcpy(&(pdm_tx_cfg->clk_cfg), clk_cfg, sizeof(i2s_pdm_tx_clk_config_t));
+420924ec:	00e92823          	sw	a4,16(s2)
+420924f0:	4858                	lw	a4,20(s0)
+420924f2:	00e92a23          	sw	a4,20(s2)
+    handle->clk_src = clk_cfg->clk_src;
+420924f6:	4058                	lw	a4,4(s0)
+    handle->sclk_hz = clk_info.sclk;
+420924f8:	c8fc                	sw	a5,84(s1)
+    handle->clk_src = clk_cfg->clk_src;
+420924fa:	c8b8                	sw	a4,80(s1)
+    handle->origin_mclk_hz = ((uint64_t)clk_info.sclk * ret_mclk_div.denominator) / tmp_div;
+420924fc:	02f50533          	mul	a0,a0,a5
+42092500:	fdf6e097          	auipc	ra,0xfdf6e
+42092504:	3ac080e7          	jalr	940(ra) # 400008ac <__udivdi3>
+    handle->curr_mclk_hz = handle->origin_mclk_hz;
+    handle->bclk_hz = clk_info.bclk;
+42092508:	57e6                	lw	a5,120(sp)
+    handle->origin_mclk_hz = ((uint64_t)clk_info.sclk * ret_mclk_div.denominator) / tmp_div;
+4209250a:	cca8                	sw	a0,88(s1)
+    handle->curr_mclk_hz = handle->origin_mclk_hz;
+4209250c:	cce8                	sw	a0,92(s1)
+    handle->bclk_hz = clk_info.bclk;
+4209250e:	d0bc                	sw	a5,96(s1)
+42092510:	542a                	lw	s0,168(sp)
+    return ret;
+
+err:
+    esp_clk_tree_enable_src((soc_module_clk_t)clk_src, false);
+    return ret;
+}
+42092512:	50ba                	lw	ra,172(sp)
+    handle->bclk_hz = clk_info.bclk;
+42092514:	549a                	lw	s1,164(sp)
+42092516:	590a                	lw	s2,160(sp)
+42092518:	4a6a                	lw	s4,152(sp)
+4209251a:	4b4a                	lw	s6,144(sp)
+4209251c:	4bba                	lw	s7,140(sp)
+4209251e:	4c2a                	lw	s8,136(sp)
+}
+42092520:	49fa                	lw	s3,156(sp)
+42092522:	8556                	mv	a0,s5
+42092524:	4ada                	lw	s5,148(sp)
+42092526:	614d                	addi	sp,sp,176
+42092528:	8082                	ret
+        over_sample_ratio = pdm_tx_clk->up_sample_fp / pdm_tx_clk->up_sample_fs;
+4209252a:	4458                	lw	a4,12(s0)
+4209252c:	854e                	mv	a0,s3
+4209252e:	3c136a37          	lui	s4,0x3c136
+42092532:	02d757b3          	divu	a5,a4,a3
+42092536:	8c3e                	mv	s8,a5
+        clk_info->bclk = rate * I2S_LL_PDM_BCK_FACTOR * over_sample_ratio;
+42092538:	02fa87b3          	mul	a5,s5,a5
+4209253c:	079a                	slli	a5,a5,0x6
+4209253e:	bb05                	j	4209226e <i2s_pdm_tx_set_clock+0x64>
+    clk_info->bclk_div = clk_cfg->bclk_div < I2S_PDM_TX_BCLK_DIV_MIN ? I2S_PDM_TX_BCLK_DIV_MIN : clk_cfg->bclk_div;
+42092540:	85ba                	mv	a1,a4
+    if (!handle->is_raw_pdm) {
+42092542:	40b8                	lw	a4,64(s1)
+    clk_info->bclk_div = clk_cfg->bclk_div < I2S_PDM_TX_BCLK_DIV_MIN ? I2S_PDM_TX_BCLK_DIV_MIN : clk_cfg->bclk_div;
+42092544:	05c2                	slli	a1,a1,0x10
+42092546:	81c1                	srli	a1,a1,0x10
+    if (!handle->is_raw_pdm) {
+42092548:	830d                	srli	a4,a4,0x3
+    clk_info->bclk_div = clk_cfg->bclk_div < I2S_PDM_TX_BCLK_DIV_MIN ? I2S_PDM_TX_BCLK_DIV_MIN : clk_cfg->bclk_div;
+4209254a:	06b11f23          	sh	a1,126(sp)
+    if (!handle->is_raw_pdm) {
+4209254e:	8b05                	andi	a4,a4,1
+42092550:	d00715e3          	bnez	a4,4209225a <i2s_pdm_tx_set_clock+0x50>
+42092554:	bfd9                	j	4209252a <i2s_pdm_tx_set_clock+0x320>
+            ESP_LOGW(TAG, "the over sample rate might be too small for the raw PDM mode");
+42092556:	fe2f7097          	auipc	ra,0xfe2f7
+4209255a:	f48080e7          	jalr	-184(ra) # 4038949e <esp_log_timestamp>
+4209255e:	3c136a37          	lui	s4,0x3c136
+42092562:	808a0713          	addi	a4,s4,-2040 # 3c135808 <_esp_libc_clock_array_end+0x156b8>
+42092566:	3c136637          	lui	a2,0x3c136
+4209256a:	86aa                	mv	a3,a0
+4209256c:	85ba                	mv	a1,a4
+4209256e:	4509                	li	a0,2
+42092570:	a2860613          	addi	a2,a2,-1496 # 3c135a28 <_esp_libc_clock_array_end+0x158d8>
+42092574:	fe2f7097          	auipc	ra,0xfe2f7
+42092578:	e22080e7          	jalr	-478(ra) # 40389396 <esp_log>
+    clk_info->mclk = clk_info->bclk * clk_info->bclk_div;
+4209257c:	07e15583          	lhu	a1,126(sp)
+    clk_info->sclk = i2s_get_source_clk_freq(clk_cfg->clk_src, clk_info->mclk);
+42092580:	4048                	lw	a0,4(s0)
+42092582:	b1dd                	j	42092268 <i2s_pdm_tx_set_clock+0x5e>
+    ESP_GOTO_ON_FALSE(tmp_div != 0 && ret_mclk_div.denominator != 0, ESP_ERR_INVALID_ARG, err, TAG, "invalid mclk division result");
+42092584:	fe2f7097          	auipc	ra,0xfe2f7
+42092588:	f1a080e7          	jalr	-230(ra) # 4038949e <esp_log_timestamp>
+4209258c:	808a0713          	addi	a4,s4,-2040
+42092590:	3c1767b7          	lui	a5,0x3c176
+42092594:	3c136637          	lui	a2,0x3c136
+42092598:	86aa                	mv	a3,a0
+4209259a:	85ba                	mv	a1,a4
+4209259c:	4505                	li	a0,1
+4209259e:	e5078793          	addi	a5,a5,-432 # 3c175e50 <__FUNCTION__.13>
+420925a2:	b7860613          	addi	a2,a2,-1160 # 3c135b78 <_esp_libc_clock_array_end+0x15a28>
+420925a6:	0a600813          	li	a6,166
+420925aa:	fe2f7097          	auipc	ra,0xfe2f7
+420925ae:	dec080e7          	jalr	-532(ra) # 40389396 <esp_log>
+    esp_clk_tree_enable_src((soc_module_clk_t)clk_src, false);
+420925b2:	854e                	mv	a0,s3
+420925b4:	4581                	li	a1,0
+420925b6:	fe2f3097          	auipc	ra,0xfe2f3
+420925ba:	24c080e7          	jalr	588(ra) # 40385802 <esp_clk_tree_enable_src>
+    return ret;
+420925be:	542a                	lw	s0,168(sp)
+420925c0:	549a                	lw	s1,164(sp)
+420925c2:	590a                	lw	s2,160(sp)
+420925c4:	4a6a                	lw	s4,152(sp)
+420925c6:	4b4a                	lw	s6,144(sp)
+420925c8:	4bba                	lw	s7,140(sp)
+420925ca:	4c2a                	lw	s8,136(sp)
+    ESP_RETURN_ON_FALSE(clk_cfg->clk_src != I2S_CLK_SRC_EXTERNAL, ESP_ERR_INVALID_ARG, TAG, "not support external clock source in pdm mode");
+420925cc:	10200a93          	li	s5,258
+}
+420925d0:	50ba                	lw	ra,172(sp)
+420925d2:	49fa                	lw	s3,156(sp)
+420925d4:	8556                	mv	a0,s5
+420925d6:	4ada                	lw	s5,148(sp)
+420925d8:	614d                	addi	sp,sp,176
+420925da:	8082                	ret
+    ESP_RETURN_ON_FALSE(clk_cfg->clk_src != I2S_CLK_SRC_EXTERNAL, ESP_ERR_INVALID_ARG, TAG, "not support external clock source in pdm mode");
+420925dc:	fe2f7097          	auipc	ra,0xfe2f7
+420925e0:	ec2080e7          	jalr	-318(ra) # 4038949e <esp_log_timestamp>
+420925e4:	3c136737          	lui	a4,0x3c136
+420925e8:	80870713          	addi	a4,a4,-2040 # 3c135808 <_esp_libc_clock_array_end+0x156b8>
+420925ec:	3c1767b7          	lui	a5,0x3c176
+420925f0:	3c136637          	lui	a2,0x3c136
+420925f4:	86aa                	mv	a3,a0
+420925f6:	85ba                	mv	a1,a4
+420925f8:	e5078793          	addi	a5,a5,-432 # 3c175e50 <__FUNCTION__.13>
+420925fc:	9ac60613          	addi	a2,a2,-1620 # 3c1359ac <_esp_libc_clock_array_end+0x1585c>
+42092600:	05d00813          	li	a6,93
+42092604:	4505                	li	a0,1
+42092606:	fe2f7097          	auipc	ra,0xfe2f7
+4209260a:	d90080e7          	jalr	-624(ra) # 40389396 <esp_log>
+4209260e:	10200a93          	li	s5,258
+42092612:	bf7d                	j	420925d0 <i2s_pdm_tx_set_clock+0x3c6>
+    ESP_RETURN_ON_FALSE(clk_cfg->up_sample_fs <= 480, ESP_ERR_INVALID_ARG, TAG, "up_sample_fs should be within 480");
+42092614:	fe2f7097          	auipc	ra,0xfe2f7
+42092618:	e8a080e7          	jalr	-374(ra) # 4038949e <esp_log_timestamp>
+4209261c:	3c136737          	lui	a4,0x3c136
+42092620:	80870713          	addi	a4,a4,-2040 # 3c135808 <_esp_libc_clock_array_end+0x156b8>
+42092624:	3c1767b7          	lui	a5,0x3c176
+42092628:	3c136637          	lui	a2,0x3c136
+4209262c:	86aa                	mv	a3,a0
+4209262e:	85ba                	mv	a1,a4
+42092630:	e5078793          	addi	a5,a5,-432 # 3c175e50 <__FUNCTION__.13>
+42092634:	9f060613          	addi	a2,a2,-1552 # 3c1359f0 <_esp_libc_clock_array_end+0x158a0>
+42092638:	05f00813          	li	a6,95
+4209263c:	4505                	li	a0,1
+4209263e:	fe2f7097          	auipc	ra,0xfe2f7
+42092642:	d58080e7          	jalr	-680(ra) # 40389396 <esp_log>
+    ESP_RETURN_ON_FALSE(clk_cfg->clk_src != I2S_CLK_SRC_EXTERNAL, ESP_ERR_INVALID_ARG, TAG, "not support external clock source in pdm mode");
+42092646:	10200a93          	li	s5,258
+    ESP_RETURN_ON_FALSE(clk_cfg->up_sample_fs <= 480, ESP_ERR_INVALID_ARG, TAG, "up_sample_fs should be within 480");
+4209264a:	542a                	lw	s0,168(sp)
+4209264c:	b751                	j	420925d0 <i2s_pdm_tx_set_clock+0x3c6>
+    ESP_RETURN_ON_FALSE((float)clk_info->sclk > clk_info->mclk * 1.99, ESP_ERR_INVALID_ARG, TAG, "sample rate is too large");
+4209264e:	fe2f7097          	auipc	ra,0xfe2f7
+42092652:	e50080e7          	jalr	-432(ra) # 4038949e <esp_log_timestamp>
+42092656:	808a0713          	addi	a4,s4,-2040
+4209265a:	3c1767b7          	lui	a5,0x3c176
+4209265e:	3c136637          	lui	a2,0x3c136
+42092662:	86aa                	mv	a3,a0
+42092664:	85ba                	mv	a1,a4
+42092666:	e3478793          	addi	a5,a5,-460 # 3c175e34 <__FUNCTION__.12>
+4209266a:	a7460613          	addi	a2,a2,-1420 # 3c135a74 <_esp_libc_clock_array_end+0x15924>
+4209266e:	03b00813          	li	a6,59
+42092672:	4505                	li	a0,1
+42092674:	fe2f7097          	auipc	ra,0xfe2f7
+42092678:	d22080e7          	jalr	-734(ra) # 40389396 <esp_log>
+    ESP_RETURN_ON_ERROR(i2s_pdm_tx_calculate_clock(handle, clk_cfg, &clk_info), TAG, "clock calculate failed");
+4209267c:	fe2f7097          	auipc	ra,0xfe2f7
+42092680:	e22080e7          	jalr	-478(ra) # 4038949e <esp_log_timestamp>
+42092684:	808a0713          	addi	a4,s4,-2040
+42092688:	3c1767b7          	lui	a5,0x3c176
+4209268c:	3c136637          	lui	a2,0x3c136
+42092690:	86aa                	mv	a3,a0
+42092692:	85ba                	mv	a1,a4
+42092694:	e5078793          	addi	a5,a5,-432 # 3c175e50 <__FUNCTION__.13>
+42092698:	ad460613          	addi	a2,a2,-1324 # 3c135ad4 <_esp_libc_clock_array_end+0x15984>
+4209269c:	06a00813          	li	a6,106
+420926a0:	4505                	li	a0,1
+420926a2:	fe2f7097          	auipc	ra,0xfe2f7
+420926a6:	cf4080e7          	jalr	-780(ra) # 40389396 <esp_log>
+420926aa:	bf11                	j	420925be <i2s_pdm_tx_set_clock+0x3b4>
+    ESP_RETURN_ON_ERROR(esp_clk_tree_enable_src((soc_module_clk_t)clk_src, true), TAG, "clock source enable failed");
+420926ac:	fe2f7097          	auipc	ra,0xfe2f7
+420926b0:	df2080e7          	jalr	-526(ra) # 4038949e <esp_log_timestamp>
+420926b4:	808a0713          	addi	a4,s4,-2040
+420926b8:	3c1767b7          	lui	a5,0x3c176
+420926bc:	3c12c637          	lui	a2,0x3c12c
+420926c0:	86aa                	mv	a3,a0
+420926c2:	85ba                	mv	a1,a4
+420926c4:	e5078793          	addi	a5,a5,-432 # 3c175e50 <__FUNCTION__.13>
+420926c8:	4f060613          	addi	a2,a2,1264 # 3c12c4f0 <_esp_libc_clock_array_end+0xc3a0>
+420926cc:	07900813          	li	a6,121
+420926d0:	4505                	li	a0,1
+420926d2:	fe2f7097          	auipc	ra,0xfe2f7
+420926d6:	cc4080e7          	jalr	-828(ra) # 40389396 <esp_log>
+420926da:	bd1d                	j	42092510 <i2s_pdm_tx_set_clock+0x306>
+    ESP_RETURN_ON_FALSE(clk_info->mclk_div < 256, ESP_ERR_INVALID_ARG, TAG, "sample rate is too small");
+420926dc:	fe2f7097          	auipc	ra,0xfe2f7
+420926e0:	dc2080e7          	jalr	-574(ra) # 4038949e <esp_log_timestamp>
+420926e4:	808a0713          	addi	a4,s4,-2040
+420926e8:	3c1767b7          	lui	a5,0x3c176
+420926ec:	3c136637          	lui	a2,0x3c136
+420926f0:	86aa                	mv	a3,a0
+420926f2:	85ba                	mv	a1,a4
+420926f4:	e3478793          	addi	a5,a5,-460 # 3c175e34 <__FUNCTION__.12>
+420926f8:	aa460613          	addi	a2,a2,-1372 # 3c135aa4 <_esp_libc_clock_array_end+0x15954>
+420926fc:	03c00813          	li	a6,60
+42092700:	4505                	li	a0,1
+42092702:	fe2f7097          	auipc	ra,0xfe2f7
+42092706:	c94080e7          	jalr	-876(ra) # 40389396 <esp_log>
+    ESP_RETURN_ON_ERROR(i2s_pdm_tx_calculate_clock(handle, clk_cfg, &clk_info), TAG, "clock calculate failed");
+4209270a:	bf8d                	j	4209267c <i2s_pdm_tx_set_clock+0x472>

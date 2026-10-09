@@ -1,0 +1,46 @@
+{
+  "idf": "6.1",
+  "profile": "r9a97-pdm-fractional",
+  "source_head_at_capture": "fd355344fa499f961400631130ed1d06c54ef263",
+  "embedded_project_version": "idf61-pdm-fractional",
+  "idf_from_image": "9a97f6c5",
+  "image": {
+    "app_elf_sha256": "c44c6a0d7587905f99e830485b09aa7dcd11127e072a767b089a6fe3601fbee3",
+    "sha256": "e04408556964db80e12300c0db70878178c2ce4f292bf69729f1a17b9332746f",
+    "bytes": 1619328
+  },
+  "build_directory": "idf\\esp32c3-oled-native\\build-idf-6.1-r9a97-pdm-fractional",
+  "qualification": "Setup register readback and one 600-second HE-AACv2 HTTPS run; original load/heap gates pass. Not production or analog noise qualified.",
+  "sdkconfig_sha256": "f39c4432fdeb6a5c3bf650c90c8eff346717402c74299c32801cd4b0c15f1aff",
+  "elf_sha256": "c44c6a0d7587905f99e830485b09aa7dcd11127e072a767b089a6fe3601fbee3",
+  "project_version_at_build": "idf61-pdm-fractional",
+  "idf_git_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+  "laboratory_only": true,
+  "production_qualified": false,
+  "clock_mode": "fractional",
+  "clock_diagnostics": true,
+  "expected_flash_mode": "qio",
+  "flash_mhz": 80,
+  "extra_trust_ca_sha256": "5d07cd4783170ceeb5933e41a9618d7c0775567f7e9307d8478390cf3f526de8",
+  "restoration_image": "esp32c3-idf-6.1-r9a97-production-qio80",
+  "restoration_app_sha256": "21311e2f87a97cbbf03fe3036111334df8fac75ffe63b9b3207ff2d02e82de0a",
+  "source_overlay_sha256": {
+    "tools/patch_i2s_pdm_clock.py": "83cdcc611ffbb6cc3cd37d07549a3f85c10800d616758798b0f05b24ad83ac80",
+    "tools/esp32c3_tests/pdm_clock.py": "9858b6b13dd76cc6d083d8f854e5a285984fca54156b7e1d8c5c1c4844cdec02",
+    "tests/test-pdm-clock.py": "b3f0aa0fd28f784b866e6d89c05c6a2b831d69ad188debe78f8ec045d70241d5",
+    "idf/esp32c3-oled-native/CMakeLists.txt": "016f25e5f996e2f17d0a14ac7994ee129e61da25c1dc35e38638f19c8dbf5fa4",
+    "idf/esp32c3-oled-native/main/Kconfig.projbuild": "869cdb6f211d193ae4876cbea77694b09b12885f223333472e79d5e5393e4ee3",
+    "idf/esp32c3-oled-native/main/CMakeLists.txt": "728eccbea81999a6f06879b860a6b1c206083d24266103e203c55eca08e4d867"
+  },
+  "source_note": "The pre-existing main CMake CLZ block is inactive; no CLZ benchmark source compiled.",
+  "bootloader_sha256": "8d68f6aa22a6e0c20a8f16fa1605b99826744b222f6a3fb8a3df6da784d0429d",
+  "qualification_before_physical": "Build and linked audits only; clock/noise and sustained physical checks not yet qualified",
+  "physical_evidence": "tests/results/esp32c3-pdm-clock-20261009",
+  "physical_results": {
+    "original_gates_passed": true,
+    "telemetry_complete": true,
+    "readable_dma_queue_overrun_delta": 20,
+    "analog_noise_measured": false,
+    "production_default_enabled": false
+  }
+}
