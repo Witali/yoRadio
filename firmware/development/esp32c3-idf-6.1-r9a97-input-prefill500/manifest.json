@@ -1,0 +1,52 @@
+{
+  "idf": "6.1",
+  "profile": "r9a97-input-prefill500",
+  "source_head_at_capture": "3323d2e2ce298845e73e7a66722bb49ee781567f",
+  "embedded_project_version": "idf61-prefill500",
+  "idf_from_image": "9a97f6c5",
+  "image": {
+    "app_elf_sha256": "c3ca0caf7f9c780927093bc15b709adb8947e3b93287f4c06f9b108b210f4b9a",
+    "sha256": "44dc8d2d6f20aec49ec7a336211b9db876df3c72af1eaa6cfc1e4d2382159252",
+    "bytes": 1619760
+  },
+  "build_directory": "idf\\esp32c3-oled-native\\build-idf-6.1-r9a97-input-prefill500",
+  "qualification": "18 host cases; linked audits; 44/44 HTTP/HTTPS file cases, 600 s HE-AACv2 and 180 s FLAC HTTPS/WebUI load, transitions/faults, 12 mixed-codec changes; production restored. No acoustic qualification.",
+  "sdkconfig_sha256": "9732e1f5bb628029c6fe95bdaf9c6597eaf1c79eb89f8bdfca3e7dfbadc7d4da",
+  "elf_sha256": "c3ca0caf7f9c780927093bc15b709adb8947e3b93287f4c06f9b108b210f4b9a",
+  "project_version_at_build": "idf61-prefill500",
+  "idf_git_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+  "laboratory_only": true,
+  "production_qualified": false,
+  "input_prefill_ms": 500,
+  "clock_mode": "fractional",
+  "control_app_sha256": "e04408556964db80e12300c0db70878178c2ce4f292bf69729f1a17b9332746f",
+  "source_overlay_sha256": {
+    "idf/esp32c3-oled-native/main/audio_service.c": "4f9ab8689587ea23b9f3442ef587b85ac34a155ec1e01fd7bb9150fb3825bc59",
+    "idf/esp32c3-oled-native/main/Kconfig.projbuild": "bbdae0d3ed3fc9ee3d1209fadbfb4fd909b32796d5ca5d5d4c60ceff5aa896a4",
+    "idf/esp32c3-oled-native/main/CMakeLists.txt": "728eccbea81999a6f06879b860a6b1c206083d24266103e203c55eca08e4d867",
+    "idf/esp32c3-oled-native/sdkconfig.input-prefill.defaults": "36ab0a3ebddcf79ae0883573dc21c9fc3af37c5addda0f66d4afbd1dcbc4e3b1",
+    "tests/native/input_prefill_test.c": "5fc9ff0bba440368d8116f2cd5507cb43aad86c91b285ed6e6e381d9bfa214d6",
+    "tests/run-input-prefill.py": "07b5bf28bf8b811d49404bdcaa28570a3e05ad765519dbb9aee811eb6f8ecad8"
+  },
+  "bootloader_sha256": "c91d71bbb596f5d5c7325ce75dddddc25526e1ae633918e6f11a3dfc7043caaa",
+  "source_note": "Unrelated main CMake CLZ changes are inactive; no CLZ source compiled.",
+  "extra_trust_ca_sha256": "5d07cd4783170ceeb5933e41a9618d7c0775567f7e9307d8478390cf3f526de8",
+  "restoration_app_sha256": "21311e2f87a97cbbf03fe3036111334df8fac75ffe63b9b3207ff2d02e82de0a",
+  "physical_evidence": "tests/results/esp32c3-input-prefill-20261009",
+  "original_report_entries": {
+    "passed": 65,
+    "total": 65,
+    "includes_idle_and_cleanup": true
+  },
+  "sustained_selected_dma": {
+    "hev2_overruns": 0,
+    "flac_overruns": 0,
+    "write_errors": 0
+  },
+  "limitations": [
+    "No listening or analog noise capture",
+    "HE-AACv2 network correlation rejected for nonconsecutive snapshots",
+    "Staged EOF/same-rate tail repair not included",
+    "Laboratory TLS/input memory configuration differs from quiet production"
+  ]
+}

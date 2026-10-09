@@ -68,6 +68,7 @@
 #define STREAM_RETRY_INITIAL_MS 1000U
 #define STREAM_RETRY_MAX_MS 30000U
 #define STREAM_RETRY_POLL_MS 100U
+#define INPUT_PREFILL_POLL_MS 10U
 enum {
     AUDIO_STREAM_PRIORITY = 5,
     AUDIO_DECODE_PRIORITY = 7,
@@ -1027,6 +1028,37 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
 }
 #endif
 
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+static bool prefill_encoded_input(uint32_t generation) {
+    // The decoder retains its first input lease. Only the producer appends
+    // packets while we wait; no queued or leased storage may be reclaimed.
+    // Finish when the producer would need the consumer to make room, even
+    // when TLS has reduced the adaptive queue to its configured minimum.
+    const int64_t started_us = esp_timer_get_time();
+    const int64_t maximum_us = CONFIG_YORADIO_INPUT_PREFILL_MS * 1000LL;
+    TickType_t poll_ticks = pdMS_TO_TICKS(INPUT_PREFILL_POLL_MS);
+    if (!poll_ticks) poll_ticks = 1;
+    bool full = false;
+    while (atomic_load(&s_generation) == generation) {
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+        adaptive_input_stats_t capacity = adaptive_input_stats(s_encoded);
+        full = capacity.occupied >= capacity.resident;
+#else
+        full = xRingbufferGetCurFreeSize(s_encoded) <
+               sizeof(encoded_packet_t) + STREAM_CHUNK_SIZE;
+#endif
+        if (full || esp_timer_get_time() - started_us >= maximum_us) break;
+        vTaskDelay(poll_ticks);
+    }
+    bool current = atomic_load(&s_generation) == generation;
+    ESP_LOGI(TAG, "PERF INPUT_PREFILL: generation=%lu elapsed_ms=%lu full=%u cancelled=%u",
+             (unsigned long)generation,
+             (unsigned long)((esp_timer_get_time() - started_us) / 1000LL),
+             full, !current);
+    return current;
+}
+#endif
+
 static void decoder_task(void *argument) {
     (void)argument;
     esp_audio_err_t registration_result = decoder_register_codecs();
@@ -1170,6 +1202,13 @@ static void decoder_task(void *argument) {
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
             legacy_decoder = NULL;
+#endif
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+            if (packet->data_size && !packet->end_of_stream &&
+                !prefill_encoded_input(packet->generation)) {
+                encoded_return(s_encoded, packet);
+                continue;
+            }
 #endif
             generation = packet->generation;
             codec = packet->codec;

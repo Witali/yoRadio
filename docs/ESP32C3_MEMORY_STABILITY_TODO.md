@@ -116,6 +116,23 @@ This is a diagnostic plan, not evidence that the heap decline is harmless or
 that copied RX packets explain all of it. Codec precision, full TLS record
 capacity and certificate verification remain unchanged.
 
+### Clock and startup follow-up, 2026-10-09
+
+The [initial-input-prefill experiment](ESP32C3_INPUT_PREFILL_20261009.md)
+uses the same existing queue and a bounded startup wait. With fractional PDM
+clocking it passes 44 HTTP/HTTPS file cases, ten-minute HE-AACv2 and three-minute
+heavy FLAC load, transitions/faults and 12 mixed-codec changes. Both sustained
+selected DMA windows have zero queue overruns and write errors; Stop restores
+the idle heap. Defaults remain disabled. HE-AACv2 network heap/receive pairing
+is incomplete and rejected, so these results do not identify RX allocation
+ownership or erase the earlier failed memory experiments.
+
+The [staged PCM tail audit](ESP32C3_PCM_TAIL_AUDIT_20261009.md) separately
+reproduces retained EOF samples entering the next equal-rate stream. Repair
+and qualify this boundary before treating status-level EOF tests as complete
+audio-output coverage. Fractional clock noise and the final production
+memory configuration still require qualification.
+
 ## Current SDK-upgrade branch checkpoint, 2026-10-07
 
 On `codex/esp32c3-idf-upgrade`, the ESP32-C3 defaults now select the compact
