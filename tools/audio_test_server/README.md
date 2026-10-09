@@ -17,6 +17,22 @@ Routes: `/file/NAME` (finite), `/stream/NAME` (continuous ADTS AAC),
 No arbitrary local paths are exposed. FLAC and Ogg files are not concatenated
 to pretend they are continuous streams.
 
+### Delivery rate for memory investigations
+
+Paced routes default to **1.02 times** the fixture's audio rate. That deliberate
+surplus gradually fills receive queues; a fall in free heap during this phase
+alone does not identify a decoder leak. Use `--pacing-ratio 1.0` for a control
+with no deliberate rate surplus, or retain `--pacing-ratio 1.02` for the existing
+stress condition. Clock differences and burst delivery can still fill queues.
+The event log records the selected ratio. Compare both conditions with unchanged
+playback, allocation-failure and memory-recovery checks.
+
+`--unpaced-files` overrides this rate only for finite file downloads; live AAC
+and fault routes remain paced. The C3 `tools/esp32c3_tests/run.py` runner accepts
+the same option for its built-in HTTP and HTTPS servers. An external
+`--https-origin` must be configured separately. These settings do not alter the
+specialized `tls_records.py` server.
+
 Generate additional continuous files with FFmpeg/FFprobe:
 
 ```powershell

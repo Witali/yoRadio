@@ -1,6 +1,7 @@
 """Physical C3 acceptance suite. See docs/ESP32C3_TESTING.md before running."""
 import argparse
 import json
+import math
 from pathlib import Path
 import re
 import statistics
@@ -320,6 +321,8 @@ def main():
                         help='Use normal TCP backpressure for local /file downloads; keep existing load gates')
     parser.add_argument('--delivery-stats', action='store_true',
                         help='Retain host socket-write timing; does not relax playback/CPU gates')
+    parser.add_argument('--pacing-ratio', type=float, default=1.02,
+                        help='Paced fixture rate; 1.0 separates queue filling from the default 1.02 load')
     parser.add_argument('--https-origin', help='Trusted HTTPS origin serving identical /file routes')
     parser.add_argument('--sustained-protocol', choices=('http', 'https'), default='http',
                         help='Transport for soak/load cases; HTTPS requires --https-origin')
@@ -330,6 +333,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--leave-stopped', action='store_true', help='Do not reboot to restore saved station')
     args = parser.parse_args()
+    require(math.isfinite(args.pacing_ratio) and args.pacing_ratio > 0,
+            'Pacing ratio must be finite and positive')
     require(args.soak_seconds >= 60, 'Soak must last at least 60 seconds; default is one hour')
     require(args.load_seconds >= 40, 'Load must last at least the original 40 seconds')
     if args.sustained_protocol == 'https':
@@ -348,7 +353,8 @@ def main():
     report.data['requested_suites'] = args.suite
     report.data['sustained_protocol'] = args.sustained_protocol
     report.data['server_options'] = dict(unpaced_files=args.unpaced_files,
-                                       delivery_stats=args.delivery_stats)
+                                       delivery_stats=args.delivery_stats,
+                                       pacing_ratio=args.pacing_ratio)
     report.data['cpu_budget_percent'] = args.max_cpu_busy
     if 'load' in args.suite:
         report.data['load_options'] = dict(seconds=args.load_seconds,
@@ -365,12 +371,12 @@ def main():
     tls = None
     try:
         with Server(args.host, args.port, specs, unpaced_files=args.unpaced_files,
-                    delivery_stats=args.delivery_stats) as server:
+                    delivery_stats=args.delivery_stats, pacing_ratio=args.pacing_ratio) as server:
             if args.tls_cert:
                 require(args.tls_key and args.https_origin, 'TLS server requires key and HTTPS hostname')
                 tls = Server(args.host, args.tls_port, specs, args.tls_cert, args.tls_key,
                              unpaced_files=args.unpaced_files,
-                             delivery_stats=args.delivery_stats).__enter__()
+                             delivery_stats=args.delivery_stats, pacing_ratio=args.pacing_ratio).__enter__()
             for protocol in ('http','https'):
                 if protocol in args.suite:
                     for name in names:

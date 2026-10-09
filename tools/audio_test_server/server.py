@@ -2,6 +2,7 @@
 import argparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import math
 from pathlib import Path
 import ssl
 import threading
@@ -53,9 +54,12 @@ class DeliveryStats:
 
 class Server:
     def __init__(self, host, port, fixtures, cert=None, key=None, *, unpaced_files=False,
-                 delivery_stats=False, initial_failures=0):
+                 delivery_stats=False, initial_failures=0, pacing_ratio=1.02):
         if type(initial_failures) is not int or initial_failures < 0:
             raise ValueError('initial_failures must be a nonnegative integer')
+        if (type(pacing_ratio) not in (int, float) or
+                not math.isfinite(pacing_ratio) or pacing_ratio <= 0):
+            raise ValueError('pacing_ratio must be finite and positive')
         self.fixtures = fixtures
         self.events = []
         self.closed = threading.Event()
@@ -128,7 +132,7 @@ class Server:
                 self.end_headers()
                 unpaced = unpaced_files and mode == 'file'
                 event = dict(mode=mode, fixture=name, sent=0, complete=False,
-                             pacing_ratio=None if unpaced else 1.02)
+                             pacing_ratio=None if unpaced else pacing_ratio)
                 if isinstance(self.connection, ssl.SSLSocket):
                     # Record negotiated algorithms, never certificates/keys.
                     event['tls_version'] = self.connection.version()
@@ -143,7 +147,7 @@ class Server:
                     while not outer.closed.is_set() and time.monotonic() - started < 86400:
                         for segment in spec.get('segments', [spec]):
                             payload = segment['data']
-                            bps = len(payload) / segment['seconds'] * 1.02
+                            bps = len(payload) / segment['seconds'] * pacing_ratio
                             for offset in range(0, len(payload), 1024):
                                 if outer.closed.is_set():
                                     return
@@ -212,6 +216,8 @@ def main():
                         help='Serve /file at the speed allowed by TCP; retain pacing for live/fault routes')
     parser.add_argument('--delivery-stats', action='store_true',
                         help='Record bounded host socket-write timing and pacing lag')
+    parser.add_argument('--pacing-ratio', type=float, default=1.02,
+                        help='Paced audio rate relative to fixture duration (default 1.02; 1 is real time)')
     parser.add_argument('--initial-failures', type=int, default=0,
                         help='On /recover/FIXTURE, return 503 for this many requests, then serve the file')
     parser.add_argument('--events-output', type=Path,
@@ -221,7 +227,8 @@ def main():
     if bool(args.cert) != bool(args.key):
         parser.error('--cert and --key must be supplied together')
     with Server(args.host,args.port,specs,args.cert,args.key, unpaced_files=args.unpaced_files,
-                delivery_stats=args.delivery_stats, initial_failures=args.initial_failures) as server:
+                delivery_stats=args.delivery_stats, initial_failures=args.initial_failures,
+                pacing_ratio=args.pacing_ratio) as server:
         print(f"Serving {len(specs)} fixtures on port {args.port}; /manifest.json lists them", flush=True)
         try:
             threading.Event().wait()
