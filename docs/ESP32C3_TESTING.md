@@ -1128,3 +1128,31 @@ with a frozen archive that can be replayed without a board.
 The [RAM profile report](ESP32C3_AAC_RADIO_RAM_20261001.md) includes the physical
 comparison and the distinction between elapsed decode-call time and total
 FreeRTOS CPU utilization.
+
+## TLS errors around an explicit reboot
+
+Use the paired control when TLS messages appear near a requested reboot.
+It compares full HE-AACv2 HTTPS playback against playback followed by Stop,
+cleared PCM state and settled heap recovery. Three pairs reverse their order
+in the middle cycle. Persisted action boundaries, numeric TLS errors and
+software-reset causes distinguish playback, Stop and reboot intervals.
+
+```powershell
+python tests/test-reboot-tls-review.py
+python tools/esp32c3_tests/reboot_tls.py --board http://192.168.100.4 --host 192.168.100.253 --serial-port COM9 --firmware firmware/development/esp32c3-idf-6.1-r9a97-prefill-min250/app.bin --ca <ca.pem> --cert <server.pem> --key <server.key> --cycles 3 --output .build/reboot-tls-new
+```
+
+The selected awake profiling image must already be installed and trust the
+valid laboratory certificate in addition to the normal public roots. The
+runner does not flash, preserves saved settings and leaves playback stopped.
+Use an outer controller to restore the original application and playback;
+keep keys and private settings out of archived evidence. Use a fresh output
+directory for every run.
+
+An operational trial passes only with full fixture format, one software reset
+inside the explicit reboot interval, verified image/partition after boot and
+no recorded decoder, allocation, panic, watchdog or capture fault. A TLS
+message still yields `REVIEW_REQUIRED`, including during Stop or reboot.
+The numeric code and controlled comparison must explain its scope; proximity
+to a reset alone never makes it harmless. These short controls do not replace
+sustained playback or analog checks.
