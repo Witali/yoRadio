@@ -128,8 +128,8 @@ is incomplete and rejected, so these results do not identify RX allocation
 ownership or erase the earlier failed memory experiments.
 
 The [staged PCM tail audit](ESP32C3_PCM_TAIL_AUDIT_20261009.md) separately
-reproduces retained EOF samples entering the next equal-rate stream. Repair
-and qualify this boundary before treating status-level EOF tests as complete
+reproduces retained EOF samples entering the next equal-rate stream. The source
+repair passes host checks; qualify it on the board before treating EOF tests as complete
 audio-output coverage. Fractional clock noise and the final production
 memory configuration still require qualification.
 

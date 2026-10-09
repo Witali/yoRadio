@@ -1655,11 +1655,8 @@ static void output_task(void *argument) {
 #ifdef CONFIG_YORADIO_PIPELINE_PROFILE
     output_flow_t flow = {0};
 #endif
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
     uint32_t generation = atomic_load(&s_generation);
-#endif
     while (true) {
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
             native_audio_output_discard_pcm();
@@ -1668,7 +1665,6 @@ static void output_task(void *argument) {
             output_flow_reset(&flow, false);
 #endif
         }
-#endif
 #ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
         if (atomic_exchange(&s_suspend_output, false)) {
             s_suspend_result = native_audio_output_suspend();
@@ -1694,7 +1690,6 @@ static void output_task(void *argument) {
 #endif
             continue;
         }
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
         current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
             native_audio_output_discard_pcm();
@@ -1703,16 +1698,13 @@ static void output_task(void *argument) {
             output_flow_reset(&flow, false);
 #endif
         }
-#endif
         if (packet->generation != atomic_load(&s_generation)) {
             vRingbufferReturnItem(s_pcm, packet);
             continue;
         }
         if (packet->end_of_stream) {
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
             esp_err_t flush_result = native_audio_output_flush_pcm();
             if (flush_result != ESP_OK) ESP_LOGW(TAG, "PCM tail flush failed: %s", esp_err_to_name(flush_result));
-#endif
             finish_pcm_stream(packet);
             vRingbufferReturnItem(s_pcm, packet);
 #ifdef CONFIG_YORADIO_PIPELINE_PROFILE

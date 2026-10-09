@@ -345,8 +345,8 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
     }
     ESP_RETURN_ON_ERROR(pdm_begin(), TAG, "start fixed-rate stereo PDM");
     if (input_sample_rate != s_input_sample_rate) {
+        ESP_RETURN_ON_ERROR(native_audio_output_flush_pcm(), TAG, "flush old PCM rate");
         s_input_sample_rate = input_sample_rate;
-        s_buffered_frames = 0;
         reset_resampler();
         native_audio_normalizer_set_sample_rate(input_sample_rate);
         ESP_LOGI(TAG, "Stereo PDM resampler input changed to %lu Hz",
@@ -478,6 +478,23 @@ void native_audio_output_set_balance(int8_t balance) {
 
 int8_t native_audio_output_get_balance(void) {
     return native_audio_settings_get_balance();
+}
+
+void native_audio_output_discard_pcm(void) {
+    s_buffered_frames = 0;
+    reset_resampler();
+}
+
+esp_err_t native_audio_output_flush_pcm(void) {
+    if (!s_buffered_frames) return ESP_OK;
+    // The output task is the sole owner. Consume this tail once, even on
+    // a partial/failed driver write, so a later stream cannot replay it.
+    memset(s_frame_buffer + s_buffered_frames * 2U, 0,
+           (PDM_DMA_FRAMES - s_buffered_frames) * 2U * sizeof(*s_frame_buffer));
+    s_buffered_frames = 0;
+    esp_err_t result = pdm_write_block(s_frame_buffer, PDM_DMA_FRAMES);
+    if (result != ESP_OK) reset_resampler();
+    return result;
 }
 
 void native_audio_output_idle(void) {

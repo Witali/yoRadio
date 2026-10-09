@@ -31,9 +31,13 @@ struct native_audio_pcm_lease {
 esp_err_t native_audio_output_submit_pcm(native_audio_pcm_lease_t *lease,
     uint8_t *data, size_t size, uint8_t bits_per_sample, uint8_t channels,
     void (*release)(native_audio_pcm_lease_t *));
+#endif
+
+// Owned by the output task. Flush submits a zero-padded final DMA block; it
+// does not wait for the hardware to play it. Discard drops software PCM
+// and resampler history on Stop/new stream without draining old samples.
 esp_err_t native_audio_output_flush_pcm(void);
 void native_audio_output_discard_pcm(void);
-#endif
 
 esp_err_t native_audio_output_init(void);
 esp_err_t native_audio_output_configure(uint32_t input_sample_rate);

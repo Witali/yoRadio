@@ -40,25 +40,71 @@ PCM arithmetic parity, but do not cover production EOF and same-rate switching.
 
 ## Repair and acceptance plan
 
-- [ ] Expose flush/discard operations for every output backend, including the
+- [x] Expose flush/discard operations for every output backend, including the
   QEMU sink. Keep direct-DMA lease ownership and release rules unchanged.
-- [ ] At EOF, submit the staged remainder with zero padding; propagate write
+- [x] At EOF, submit the staged remainder with zero padding; propagate write
   failure without replaying stale PCM. Define whether completion means data
   submitted or hardware playback drained, and test that contract explicitly.
-- [ ] On Stop/new generation, discard staged software PCM and reset resampler
+- [x] On Stop/new generation, discard staged software PCM and reset resampler
   history before accepting new-generation data, including equal-rate streams.
   Check generation changes while receiving or writing a packet.
-- [ ] Flush valid old-rate data before an in-stream rate change. Keep ordinary
+- [x] Flush valid old-rate data before an in-stream rate change. Keep ordinary
   same-stream chunk boundaries continuous and avoid extra per-packet padding.
-- [ ] Add regression cases for 1, 127, 511, 512 and 513 frames; mono/stereo;
+- [x] Add regression cases for 1, 127, 511, 512 and 513 frames; mono/stereo;
   source rates 8–48 kHz; repeated EOF; same-rate replacement; Stop; rate changes;
   failed/short DMA writes; and resampler-history isolation. Remove the host
   harness's manual staged-tail workaround in favor of the public API.
-- [ ] Test the actual output-task integration, not just helper functions.
-  Repeat physical EOF/transitions, Stop/Play races and continuous playback.
+- [x] Test the actual output-task integration with deterministic queue/output
+  stubs, including generation changes during receive, write and flush.
+- [ ] Complete final firmware linking and physical EOF/transitions, Stop/Play
+  races and continuous playback qualification of the repaired image.
 
-No repair is included in this audit. The concurrently running prefill firmware
-is kept unchanged so its physical comparison remains attributable.
+## Source repair and validation
+
+The working source now implements the repair. EOF flush submits one padded
+block and consumes the software tail once, including a failed or short write.
+The output task logs flush failure and keeps its existing completion-status
+contract. Completion means submission to the driver, not the end of hardware
+playback. Stop/new generation clears software samples and interpolation
+history; already queued hardware DMA frames finish naturally.
+
+The rate-change path flushes valid old-rate samples before resetting the
+resampler. Padding can add silence up to the rest of that final 512-frame
+block, matching the existing direct-DMA boundary behavior. Normal chunk
+boundaries remain continuous. The QEMU sink writes frames synchronously, so
+its flush is empty and its discard resets interpolation history.
+
+Validation of the exact changed sources:
+
+- 95 staged and 94 direct-output boundary cases pass ASan/UBSan. The staged
+  suite includes the stock driver's extra short-write case; both produce the
+  same 456,704 PCM bytes.
+- 10 real `output_task` cases pass for each output mode. A negative control
+  rejects the original task because it publishes EOF without calling flush.
+- The existing 432-case PCM matrix passes for staged/direct output and both
+  diagnostic configurations: all four emit the same 12,331,776 bytes. The
+  648-case normalizer comparison remains exact.
+- Six isolated ESP32-C3 compiler checks pass: staged output/task, direct task,
+  direct task with pipeline diagnostics, and QEMU output/task. These are
+  object compilation checks, not a final linked firmware or physical test.
+
+The [repair evidence](../tests/results/esp32c3-output-tail-fix-20261009/)
+retains source hashes, generated host translation units, logs, the expected
+negative-control failure and target compile commands. Initial test-build
+failures from an embedded `#pragma once` and mixed copies of a header are
+also retained; both test setup issues were corrected before the passing runs.
+
+The completed prefill experiment used the unchanged baseline output. Its
+physical passes cannot be reused as hardware qualification of this repair.
+The connected board remains on the restored production image.
+
+Run the repair tests from the repository root (use new output directories):
+
+```powershell
+python tools/codec_benchmark/run_output_dma_host.py --profile --output .build/output-parity
+python tools/codec_benchmark/run_output_boundary_host.py --output .build/output-boundaries
+python tests/run-output-task-boundaries.py --output .build/output-task-boundaries
+```
 
 ## Frozen evidence
 

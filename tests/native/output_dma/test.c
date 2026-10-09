@@ -127,7 +127,7 @@ int main(int argc,char **argv){
     for(unsigned v=0;v<4;++v)for(int b=-16;b<=16;b+=16)
     for(unsigned norm=0;norm<2;++norm){
         volume=volumes[v];balance=b;normalize=norm;
-        s_input_sample_rate=0;assert(native_audio_output_configure(rates[r])==0);
+        native_audio_output_discard_pcm();assert(native_audio_output_configure(rates[r])==0);
         size_t begin=captured;unsigned calls=normalizer_calls;
         for(unsigned c=0;c<sizeof(chunks)/sizeof(chunks[0]);++c){
 #ifdef BASELINE
@@ -148,11 +148,7 @@ int main(int argc,char **argv){
 #endif
         }
 #ifdef BASELINE
-        if(s_buffered_frames){
-            memset(s_frame_buffer+s_buffered_frames*2,0,(512-s_buffered_frames)*4);
-            assert(pdm_write_block(s_frame_buffer,512)==0);
-        }
-        s_buffered_frames=0;
+        assert(native_audio_output_flush_pcm()==0);
 #else
         assert(native_audio_output_flush_pcm()==0 && !outstanding);
 #endif
