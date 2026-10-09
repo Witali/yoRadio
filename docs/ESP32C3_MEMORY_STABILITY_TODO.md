@@ -136,6 +136,21 @@ have zero overruns/write errors and settled idle memory recovers. The saved
 production image is restored afterward. Fractional clock noise, analog EOF
 output and the final production memory configuration still require qualification.
 
+The [controlled-record/OTA follow-up](ESP32C3_TLS_FINAL_GATES_20261009.md)
+uses this same image with explicit 1.0x record pacing. Short record/memory
+gates pass, but the 16 KiB case has four post-warmup DMA queue events;
+whole observed intervals also retain startup events. The ten-minute
+alternating-record run is interrupted by host Windows connect error 10048
+after 395.390 seconds and remains failed. Repeat it without hiding the
+transport error, add staged-path starvation measurements, and compare a
+bounded minimum prefill against the current early-full exit before
+promoting this configuration. No listening or analog noise test is complete.
+All 15 original OTA entries pass, including full HE-AACv2 over HTTPS, but
+extended review retains two generic TLS errors immediately before the
+explicit restoration reboot. Add safe numeric error codes and phase timing
+before classifying them; the old serial-health pass is not proof of clean
+TLS runtime. The previous production image and settings are restored.
+
 ## Current SDK-upgrade branch checkpoint, 2026-10-07
 
 On `codex/esp32c3-idf-upgrade`, the ESP32-C3 defaults now select the compact
