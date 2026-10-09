@@ -17,6 +17,12 @@ compensation in the resampler against the nominal integer PDM clock before
 claiming continuous AAC output. This diagnostic image does not qualify the
 separately built quiet production candidate.
 
+The [rational-rate resampler experiment](ESP32C3_INTEGER_RATE_COMPENSATION_20261009.md)
+now passes sample-count and memory-safety host checks, but its linear
+interpolation loses 4.23 dB RMS at 20 kHz for 48 kHz input. It stays disabled
+and has not been flashed. Implement and measure the higher-quality FIR
+candidate before treating software clock compensation as a production fix.
+
 1. Resolve or bound heavy-FLAC input starvation and delayed DMA service.
    Compare buffering against reproducible delivery interruptions, not just
    mean CPU usage. The [integer-clock baseline](ESP32C3_FLAC_INTEGER_20261009.md)

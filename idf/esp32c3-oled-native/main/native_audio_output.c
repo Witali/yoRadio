@@ -31,6 +31,20 @@
 #define PDM_BIAS_SETTLE_MS 2U
 #define RESAMPLER_SCALE 32768U
 #define RESAMPLER_FRACTION_MULTIPLIER_Q16 44739U
+#ifdef CONFIG_YORADIO_PDM_INTEGER_RATE_COMPENSATION
+#ifdef CONFIG_YORADIO_PDM_FRACTIONAL_CLOCK
+#error Integer-rate compensation must not be combined with the fractional PDM clock
+#endif
+// The audited integer DAC clock is 160 MHz / (2 * 13 * 128) = 625000/13 Hz.
+// Keep rational phase units so every input rate follows that clock without
+// a cumulative sample-count error or a new buffer. The driver validates it.
+#define RESAMPLER_OUTPUT_RATE_NUMERATOR 625000U
+#define RESAMPLER_OUTPUT_RATE_DENOMINATOR 13U
+#define RESAMPLER_FRACTION_MULTIPLIER_Q32 225179981U
+#else
+#define RESAMPLER_OUTPUT_RATE_NUMERATOR PDM_OUTPUT_SAMPLE_RATE
+#define RESAMPLER_OUTPUT_RATE_DENOMINATOR 1U
+#endif
 #define SAMPLE_GAIN_SCALE 32768U
 #define VOLUME_DENOMINATOR 254U
 #define BALANCE_DENOMINATOR 16U
@@ -299,31 +313,41 @@ static int16_t interpolate_sample(int16_t previous, int16_t current,
 }
 
 static esp_err_t pdm_write_resampled(int16_t left, int16_t right) {
-    if (s_input_sample_rate == PDM_OUTPUT_SAMPLE_RATE) {
+    const uint32_t input_step =
+        s_input_sample_rate * RESAMPLER_OUTPUT_RATE_DENOMINATOR;
+    if (input_step == RESAMPLER_OUTPUT_RATE_NUMERATOR) {
         return pdm_queue_frame(left, right);
     }
     if (!s_resampler_has_previous) {
         s_resampler_has_previous = true;
         s_previous_left = left;
         s_previous_right = right;
-        s_resampler_next_phase = s_input_sample_rate;
+        s_resampler_next_phase = input_step;
         return pdm_queue_frame(left, right);
     }
 
     uint32_t phase = s_resampler_next_phase;
-    while (phase <= PDM_OUTPUT_SAMPLE_RATE) {
+    while (phase <= RESAMPLER_OUTPUT_RATE_NUMERATOR) {
+#ifdef CONFIG_YORADIO_PDM_INTEGER_RATE_COMPENSATION
+        // round(phase * 32768 / 625000). A rounded Q32 reciprocal uses the
+        // high half of the RV32 multiply, without a per-frame division.
+        uint32_t fraction = (uint32_t)(
+            ((uint64_t)phase * RESAMPLER_FRACTION_MULTIPLIER_Q32 +
+             (UINT64_C(1) << 31)) >> 32);
+#else
         // round(phase * 32768 / 48000), using a Q16 reciprocal. This hot path
         // runs once per 48 kHz output frame, so avoid a hardware division.
         uint32_t fraction =
             (phase * RESAMPLER_FRACTION_MULTIPLIER_Q16 + 32768U) >> 16;
+#endif
         ESP_RETURN_ON_ERROR(
             pdm_queue_frame(interpolate_sample(s_previous_left, left, fraction),
                             interpolate_sample(s_previous_right, right,
                                                fraction)),
             TAG, "write resampled stereo PDM");
-        phase += s_input_sample_rate;
+        phase += input_step;
     }
-    s_resampler_next_phase = phase - PDM_OUTPUT_SAMPLE_RATE;
+    s_resampler_next_phase = phase - RESAMPLER_OUTPUT_RATE_NUMERATOR;
     s_previous_left = left;
     s_previous_right = right;
     return ESP_OK;
