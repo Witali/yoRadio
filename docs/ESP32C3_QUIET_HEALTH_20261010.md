@@ -1,7 +1,7 @@
 # Quiet production candidate with runtime health, 2026-10-10
 
 The next production candidate combines the measured early-MPI repair, the
-17,058-byte RX-only TLS reserve, adaptive input with five minimum slots,
+17,058-byte RX-only TLS reserve, adaptive input with four minimum packet slots,
 250/500 ms input prefill, four extra FLAC slots and nominal fractional
 48 kHz output. It retains ESP-IDF `9a97f6c54ec6`, QIO 80 MHz, full compact
 AAC/SBR/PS at native rates and output/decoder priorities 8/7.
@@ -11,6 +11,14 @@ sleep, no console/logging and no optional profiler task or DMA/heap/TCP
 probes. Direct-DMA PCM, software integer-rate compensation and FIR are off.
 New [on-demand health](ESP32C3_PRODUCTION_HEALTH.md) makes its actual heap,
 restarts and lifetime allocation/watchdog counters observable.
+
+`CONFIG_YORADIO_INPUT_MIN_BLOCKS=5` counts 1,600-byte configuration units,
+not packet slots: 8,000 requested bytes round up to four 2,060-byte slots
+(2,048 audio bytes plus a 12-byte encoded-packet header each). This requests
+8,240 bytes of slot storage, excluding allocator and queue metadata. Four
+optional FLAC slots bring the limit to eight, subject to the saved target
+and heap check. The earlier wording "five minimum slots" was incorrect;
+the firmware configuration is unchanged.
 
 ## Build evidence
 
