@@ -25,6 +25,10 @@ Install and verify the specified quiet health image before the second command;
 the runner itself does not flash. It checks automatic/explicit codec selection,
 one continuous playing-status interval, format, duration against decoded frame
 count, EOF, a stopped tail, health counters, memory headroom and Stop recovery.
+The initial connection/container state may have `audio=true` before PCM
+metadata exists. Only that known, entirely unset prefix is allowed; decoded
+format and duration checks begin at the first populated metadata sample.
+Wrong nonzero metadata or metadata disappearing later still fails.
 An early EOF, a missing EOF or stopped/resumed playback fails. HTTP timing and
 heap gates remain 2 seconds and 16/8 KiB free/largest respectively. Settings
 are compared only in memory. These are status/health tests, not bit-exact PCM

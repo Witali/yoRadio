@@ -109,14 +109,35 @@ and compare required allocation sizes/lifetimes before changing the budget
 or input-pool policy. Neither this threshold nor the response-time threshold
 was relaxed.
 
-## Next public HTTPS fixtures
+Follow-up analysis finds seven consecutive below-budget samples spanning
+3.29 seconds. The AAC frame buffer can request up to 8,191 bytes through
+`realloc`; an in-place extension may still succeed, so this remains a risk,
+not an observed OOM. Test valid frame growth under steady HE-AAC memory load
+before closing this item. Existing mocked-codec framing tests do not establish
+that result. Details are retained in the subsequent archive's
+[headroom review](../tests/results/esp32c3-public-files-20261010/headroom-review.json).
 
-FFmpeg's public collections provide candidates for
+## Completed public HTTPS fixtures
+
+FFmpeg's public collections provide independently decoded references for
 [FLAC](https://samples.ffmpeg.org/A-codecs/lossless/),
 [Opus](https://samples.ffmpeg.org/A-codecs/opus/) and
 [Vorbis](https://samples.ffmpeg.org/ogg/Vorbis/).
-These are discovered sources, not completed tests. Verify their codec, rate,
-channels, bit depth, duration and TLS connection before board acceptance.
+The exact quiet image completed automatic/explicit selection for each file.
+Original results are **13/15 PASS**: Opus auto and Vorbis explicit each
+captured one container-detection sample before PCM metadata existed, which
+the original verifier incorrectly treated as a decoded format mismatch.
+The repaired verifier passes all six file cases on an offline replay of the
+same measurements. Both original failures remain saved; this is not a new
+physical run or a claim that the original suite passed 15/15.
+
+All 859 health observations retain one boot identity and zero allocation or
+watchdog events. Minimum sampled free/largest memory is 53,540/36,864 bytes.
+All codec recovery checks pass; the controller restores the exact listened
+image, settings and stopped state. See the
+[file qualification archive](../tests/results/esp32c3-public-files-20261010/README.md).
+These finite files extend exact-image HTTPS codec coverage; they do not close
+the earlier HE-AAC failures or establish sustained acoustic continuity.
 
 ## Completed local and OTA qualification
 

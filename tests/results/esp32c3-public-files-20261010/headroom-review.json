@@ -1,0 +1,54 @@
+{
+  "original_case": "https:groovesalad-16-aac",
+  "original_result": "FAIL",
+  "original_budget_largest": 8192,
+  "steady_samples": 82,
+  "below_budget_samples": 7,
+  "below_budget_times_seconds": [
+    23.152885100000276,
+    23.685415700000704,
+    24.252543999999943,
+    24.808861100000286,
+    25.35168849999991,
+    25.909791300000506,
+    26.445840400000634
+  ],
+  "largest_histogram": {
+    "10240": 2,
+    "11776": 4,
+    "12288": 7,
+    "13824": 6,
+    "7936": 7,
+    "11264": 17,
+    "16384": 1,
+    "14336": 8,
+    "9216": 7,
+    "12800": 9,
+    "13312": 8,
+    "8704": 6
+  },
+  "minimum_heap": 21152,
+  "relevant_request": {
+    "function": "native_aac_decoder.c:reserve_frame",
+    "maximum_bytes": 8191,
+    "operation": "realloc",
+    "same_capacity_reused": true,
+    "risk": "May require a new contiguous block; in-place growth can sometimes succeed. This is not proof of an allocation failure."
+  },
+  "existing_test_scope": "Host framing/allocator fault injection with a mocked codec and synthetic bytes; not valid large AAC audio on a memory-loaded board",
+  "next_test": "Create a standards-valid frame-growth fixture, independently decode it, then test growth after HE-AAC has reached steady state with WebUI traffic.",
+  "invariants": [
+    "Retain AAC profile/rate/channel support",
+    "Do not discard queued or leased input",
+    "Keep the original failed verdict and budget until allocation needs are verified"
+  ],
+  "sources": {
+    "idf/esp32c3-oled-native/main/native_aac_decoder.c": "a2b7a50bce58aeb812473e59e1451e098893f8afdcc512e953857151bca19508",
+    "tests/native/esp32c3_aac_memory_test.c": "58074b4ff70d99a02e71989f79ba8eabe212ce0ff334b19a375a5a12d778d059"
+  },
+  "prior_evidence": {
+    "tests\\results\\esp32c3-quiet-health-20261010\\physical\\public\\status.json": "8608d6d5fb20f565785c719b3529cebdfc4f892530a67c870393b2f94d0a9647",
+    "tests\\results\\esp32c3-quiet-health-20261010\\physical\\public\\health.json": "c2128bd40e2e1bc9e1bdd9dfb5b210706d873646c63367b23c9dbe0daf82d2c9",
+    "tests\\results\\esp32c3-quiet-health-20261010\\physical\\public\\report.json": "494d75c732872ba70bb63f26863a210e673aba0a86e6e91335eb7a1694e85dca"
+  }
+}
