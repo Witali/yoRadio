@@ -11,6 +11,8 @@ only the frozen clock-build overlay, and installed through WebUI app OTA.
 - `host-tests.json`: five existing divider/driver tests passed.
 - `deployment.json`: OTA acceptance, app identity, three playing observations,
   and settings comparisons. It contains no Wi-Fi credentials or station URLs.
+- `listening-feedback.json`: subsequent user report of no noticeable audible
+  difference on 2026-10-10. Original deployment/build records are unchanged.
 - `logs/`: original build console and compiler/configuration logs. The first
   configuration attempt lacked the tracked root `playlist.csv` in the isolated
   source snapshot. It was restored from the same commit before the successful
@@ -39,6 +41,7 @@ installation must use a fresh evidence destination and verify board identity.
 Successful deployment leaves the new image playing for the user, rather than
 restoring the integer clock automatically.
 
-Analog listening remains pending. The short status check is not an acoustic
-test or a complete codec/network regression matrix. Repository defaults remain
-unchanged. See [the report](../../../docs/ESP32C3_PDM_LISTENING_20261010.md).
+The user reports no noticeable audible difference. Quantitative analog
+measurements and complete codec/network qualification remain outstanding.
+Repository defaults remain unchanged. See
+[the report](../../../docs/ESP32C3_PDM_LISTENING_20261010.md).

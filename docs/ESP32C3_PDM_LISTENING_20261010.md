@@ -6,8 +6,9 @@ The board now runs `idf61-listen48-8c1f2d`, installed through application-only
 WebUI OTA on 2026-10-10. The image retains the hardware fractional divider
 `2 + 1/312`, targeting nominal **48,000 PCM frames/s** instead of
 48,076.923 frames/s. The user requested this mode for a listening check.
-Listening feedback and quantitative analog noise measurements are pending;
-this is not a change to the repository's production default.
+On 2026-10-10 the user reported no noticeable difference in sound after
+listening. Quantitative analog noise measurements remain pending; this is
+not a change to the repository's production default.
 
 This comparison uses the **previously installed production source**, commit
 `8c1f2d2d2a2c75a0f2819ae32412a29a22cda23c`, rather than introducing the newer
@@ -55,6 +56,17 @@ gap-free playback.
   SHA-256 `21311e2f87a97cbbf03fe3036111334df8fac75ffe63b9b3207ff2d02e82de0a`.
 - [Build recipe, source hashes and installation result](../tests/results/esp32c3-pdm-listening-20261010/README.md).
 
-Listen at the same volume and through the same amplifier/filter, paying
-attention to quiet passages, additional hiss or tonal noise, and clicks.
-Record the user's result before deciding whether to adopt the mode more widely.
+## Listening result — 2026-10-10
+
+Asked whether additional background noise, whistling or clicks appeared,
+especially during quiet passages at the usual listening volume, the user
+answered: "Заметной разницы не слышу" ("I do not hear a noticeable difference").
+The fractional-clock image remains installed for use.
+
+This is a subjective report on this board and audio setup. Listening duration
+and the exact material were not specified. It supports the absence of an
+obvious audible regression under the user's listening conditions, but does
+not establish unchanged SNR/THD+N or complete codec/network qualification.
+The original deployment record correctly retains its then-pending listening
+status; the later [feedback record](../tests/results/esp32c3-pdm-listening-20261010/listening-feedback.json)
+is saved separately.
