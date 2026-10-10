@@ -12,6 +12,7 @@ dependencies automatically. The legacy Arduino target remains available via
 ---
 - [Hardware](#hardware)
 - [ESP32-C3 0.42-inch OLED board](docs/ESP32-C3-0.42-OLED.md)
+- [Small_TV ESP32-C2 smart clock and original firmware backup](Small_TV/README.md)
 - [Connection tables](#connection-tables)
 - [Software dependencies](#dependencies)
 - [Hardware setup](#hardware-setup)
