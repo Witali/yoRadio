@@ -61,6 +61,15 @@ EOF/Stop/switching/network recovery, real HTTPS playback and AAC frame growth.
 Keep the existing memory and output gates; do not qualify the firmware from
 these four cases alone.
 
+### Follow-up with normal public trust
+
+The [normal-trust candidate](ESP32C3_PREFILL1000_QUIET_20261010.md) subsequently
+passes 42/42 local multi-codec/lifecycle checks, 22/22 additional short output
+windows and 15/15 OTA checks, including update during HE-AAC playback and
+slow upload. Its 50 application objects and static RAM/IRAM sizes match this
+laboratory image. Public HTTPS and the earlier memory-headroom scenario
+remain separate pending qualification; production defaults are unchanged.
+
 ## Reproducibility and restoration
 
 App SHA-256: `da17257c0d8a523ed4f6a758bc3f081ccda7c03d648463b39da7db6a0abae8d2`.
