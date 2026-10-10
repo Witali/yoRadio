@@ -10,6 +10,15 @@ implemented; the retained PC19 PCM comparisons meet the 3-LSB allowance.
 Historical unchecked items below are not all descriptions of today's code.
 The remaining release work concerns the complete network/audio application:
 
+The [integrated fractional-clock trial](ESP32C3_FRACTIONAL_INTEGRATION_20261010.md)
+now completes ten-minute HE-AACv2 with zero observed DMA counter increments,
+stable in-playback free heap and full queue-flow coverage. Post-Stop largest
+allocatable capacity still loses 12,288 B. Heavy FLAC is interrupted after
+77.34 seconds by two five-second TCP connect timeouts; its partial DMA
+bracket has zero increments. Neither the diagnostic combination nor the
+separately built quiet image is production-qualified. Next attribute the
+remaining heap owner and TCP handshake failure with the retained probes.
+
 Latest [integer-clock cross-codec qualification](ESP32C3_INTEGER_QUALIFICATION_20261009.md)
 passes the HTTPS matrix and 33 codec switches. Ten-minute HE-AACv2 retains one
 initial-idle TCP timeout and 11 late delayed-DMA notifications. The next
