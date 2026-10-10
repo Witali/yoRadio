@@ -1,0 +1,143 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-pcm-tail\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4202368a <native_audio_output_flush_pcm>:
+void native_audio_output_discard_pcm(void) {
+    s_buffered_frames = 0;
+    reset_resampler();
+}
+
+esp_err_t native_audio_output_flush_pcm(void) {
+4202368a:	7179                	addi	sp,sp,-48
+4202368c:	d226                	sw	s1,36(sp)
+    size_t tail_frames = s_buffered_frames;
+4202368e:	3fc9a4b7          	lui	s1,0x3fc9a
+esp_err_t native_audio_output_flush_pcm(void) {
+42023692:	d422                	sw	s0,40(sp)
+    size_t tail_frames = s_buffered_frames;
+42023694:	de44a403          	lw	s0,-540(s1) # 3fc99de4 <s_buffered_frames>
+esp_err_t native_audio_output_flush_pcm(void) {
+42023698:	d606                	sw	ra,44(sp)
+    esp_err_t result = ESP_OK;
+    if (tail_frames) {
+4202369a:	ec41                	bnez	s0,42023732 <native_audio_output_flush_pcm+0xa8>
+        // The output task is the sole owner. Consume this tail once, even on
+        // a partial/failed driver write, so a later stream cannot replay it.
+        memset(s_frame_buffer + tail_frames * 2U, 0,
+               (PDM_DMA_FRAMES - tail_frames) * 2U * sizeof(*s_frame_buffer));
+        s_buffered_frames = 0;
+        result = pdm_write_block(s_frame_buffer, PDM_DMA_FRAMES);
+4202369c:	4481                	li	s1,0
+        if (result != ESP_OK) reset_resampler();
+    }
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+    ESP_LOGI(TAG, "PERF PCM_FLUSH: frames=%lu result=%d",
+4202369e:	fe366097          	auipc	ra,0xfe366
+420236a2:	e00080e7          	jalr	-512(ra) # 4038949e <esp_log_timestamp>
+420236a6:	87a2                	mv	a5,s0
+420236a8:	3c126437          	lui	s0,0x3c126
+420236ac:	3f840713          	addi	a4,s0,1016 # 3c1263f8 <_esp_libc_clock_array_end+0x62a8>
+420236b0:	3c12a637          	lui	a2,0x3c12a
+420236b4:	86aa                	mv	a3,a0
+420236b6:	8826                	mv	a6,s1
+420236b8:	85ba                	mv	a1,a4
+420236ba:	7a060613          	addi	a2,a2,1952 # 3c12a7a0 <_esp_libc_clock_array_end+0xa650>
+420236be:	450d                	li	a0,3
+420236c0:	fe366097          	auipc	ra,0xfe366
+420236c4:	cd6080e7          	jalr	-810(ra) # 40389396 <esp_log>
+    ESP_LOGI(TAG,
+420236c8:	fe366097          	auipc	ra,0xfe366
+420236cc:	dd6080e7          	jalr	-554(ra) # 4038949e <esp_log_timestamp>
+420236d0:	3fc91737          	lui	a4,0x3fc91
+420236d4:	69870713          	addi	a4,a4,1688 # 3fc91698 <s_dma_write_profile>
+420236d8:	4f4c                	lw	a1,28(a4)
+420236da:	01072f03          	lw	t5,16(a4)
+420236de:	01472f83          	lw	t6,20(a4)
+420236e2:	00872e03          	lw	t3,8(a4)
+420236e6:	00c72e83          	lw	t4,12(a4)
+420236ea:	00072303          	lw	t1,0(a4)
+420236ee:	00472383          	lw	t2,4(a4)
+420236f2:	3fc8d7b7          	lui	a5,0x3fc8d
+420236f6:	01872803          	lw	a6,24(a4)
+420236fa:	69c7a783          	lw	a5,1692(a5) # 3fc8d69c <s_dma_overruns>
+420236fe:	3f840713          	addi	a4,s0,1016
+42023702:	3c12a637          	lui	a2,0x3c12a
+42023706:	cc2e                	sw	a1,24(sp)
+42023708:	86aa                	mv	a3,a0
+4202370a:	c87a                	sw	t5,16(sp)
+4202370c:	ca7e                	sw	t6,20(sp)
+4202370e:	c472                	sw	t3,8(sp)
+42023710:	c676                	sw	t4,12(sp)
+42023712:	c01a                	sw	t1,0(sp)
+42023714:	c21e                	sw	t2,4(sp)
+42023716:	450d                	li	a0,3
+42023718:	85ba                	mv	a1,a4
+4202371a:	6d060613          	addi	a2,a2,1744 # 3c12a6d0 <_esp_libc_clock_array_end+0xa580>
+4202371e:	fe366097          	auipc	ra,0xfe366
+42023722:	c78080e7          	jalr	-904(ra) # 40389396 <esp_log>
+             (unsigned long)tail_frames, (int)result);
+    staged_dma_report();
+#endif
+    return result;
+}
+42023726:	50b2                	lw	ra,44(sp)
+42023728:	5422                	lw	s0,40(sp)
+4202372a:	8526                	mv	a0,s1
+4202372c:	5492                	lw	s1,36(sp)
+4202372e:	6145                	addi	sp,sp,48
+42023730:	8082                	ret
+               (PDM_DMA_FRAMES - tail_frames) * 2U * sizeof(*s_frame_buffer));
+42023732:	20000713          	li	a4,512
+        memset(s_frame_buffer + tail_frames * 2U, 0,
+42023736:	3fc917b7          	lui	a5,0x3fc91
+4202373a:	6b878793          	addi	a5,a5,1720 # 3fc916b8 <s_frame_buffer>
+               (PDM_DMA_FRAMES - tail_frames) * 2U * sizeof(*s_frame_buffer));
+4202373e:	40870633          	sub	a2,a4,s0
+        memset(s_frame_buffer + tail_frames * 2U, 0,
+42023742:	00241513          	slli	a0,s0,0x2
+42023746:	953e                	add	a0,a0,a5
+42023748:	060a                	slli	a2,a2,0x2
+4202374a:	4581                	li	a1,0
+4202374c:	fdfdd097          	auipc	ra,0xfdfdd
+42023750:	c08080e7          	jalr	-1016(ra) # 40000354 <memset>
+    if (!s_pdm || !s_pdm_running) return ESP_ERR_INVALID_STATE;
+42023754:	3fc9a7b7          	lui	a5,0x3fc9a
+42023758:	df07a783          	lw	a5,-528(a5) # 3fc99df0 <s_pdm>
+        s_buffered_frames = 0;
+4202375c:	de04a223          	sw	zero,-540(s1)
+    if (!s_pdm || !s_pdm_running) return ESP_ERR_INVALID_STATE;
+42023760:	cf8d                	beqz	a5,4202379a <native_audio_output_flush_pcm+0x110>
+42023762:	3fc9a7b7          	lui	a5,0x3fc9a
+42023766:	dec7c783          	lbu	a5,-532(a5) # 3fc99dec <s_pdm_running>
+4202376a:	cb85                	beqz	a5,4202379a <native_audio_output_flush_pcm+0x110>
+4202376c:	20000513          	li	a0,512
+42023770:	f3dfe0ef          	jal	420226ac <pdm_write_block.part.0.constprop.0>
+42023774:	84aa                	mv	s1,a0
+        if (result != ESP_OK) reset_resampler();
+42023776:	d11d                	beqz	a0,4202369c <native_audio_output_flush_pcm+0x12>
+    s_resampler_has_previous = false;
+42023778:	3fc9a637          	lui	a2,0x3fc9a
+    s_previous_left = 0;
+4202377c:	3fc9a6b7          	lui	a3,0x3fc9a
+    s_previous_right = 0;
+42023780:	3fc9a737          	lui	a4,0x3fc9a
+    s_resampler_next_phase = 0;
+42023784:	3fc9a7b7          	lui	a5,0x3fc9a
+    s_resampler_has_previous = false;
+42023788:	de060023          	sb	zero,-544(a2) # 3fc99de0 <s_resampler_has_previous>
+    s_previous_left = 0;
+4202378c:	dc069f23          	sh	zero,-546(a3) # 3fc99dde <s_previous_left>
+    s_previous_right = 0;
+42023790:	dc071e23          	sh	zero,-548(a4) # 3fc99ddc <s_previous_right>
+    s_resampler_next_phase = 0;
+42023794:	dc07ac23          	sw	zero,-552(a5) # 3fc99dd8 <s_resampler_next_phase>
+}
+42023798:	b719                	j	4202369e <native_audio_output_flush_pcm+0x14>
+    if (!s_pdm || !s_pdm_running) return ESP_ERR_INVALID_STATE;
+4202379a:	10300493          	li	s1,259
+4202379e:	bfe9                	j	42023778 <native_audio_output_flush_pcm+0xee>

@@ -1,0 +1,926 @@
+{
+  "board": {
+    "version": "idf61-frac4",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "2b5d3d6172be92d9dd5e32161593f59df2132ef2b62fce99506707201ff00d92"
+  },
+  "cases": [
+    {
+      "name": "idle-before",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 133148,
+            "largest": 102400,
+            "tasks": 17
+          },
+          {
+            "heap": 133148,
+            "largest": 102400,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.54
+    },
+    {
+      "name": "flac-https",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "URLError"
+        },
+        {
+          "type": "TimeoutError"
+        },
+        {
+          "type": "URLError"
+        },
+        {
+          "type": "TimeoutError"
+        }
+      ],
+      "reason": "URLError",
+      "seconds": 83.381
+    },
+    {
+      "name": "idle-after-flac",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 112828,
+            "largest": 49152,
+            "tasks": 17
+          },
+          {
+            "heap": 133148,
+            "largest": 102400,
+            "tasks": 17
+          },
+          {
+            "heap": 133160,
+            "largest": 102400,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.573
+    },
+    {
+      "name": "flac-heap-recovery",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    },
+    {
+      "name": "stop",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.176
+    },
+    {
+      "name": "runtime-after-capture-close",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.001
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "cpu_budget_percent": null,
+  "created_utc": "2026-10-10T11:33:18.331363+00:00",
+  "host_clock": {
+    "api": "time.perf_counter",
+    "implementation": "QueryPerformanceCounter()",
+    "monotonic": true,
+    "adjustable": false,
+    "resolution": 1e-07
+  },
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/aac_reference.py": "7fb171138167be63ae8503c3c39ca1f664feb13eaea3d89727d4ea617e59aaf3",
+    "tools/esp32c3_tests/allocations.py": "b2478abdad5627c08a9af520c4ab776e0232b51edfd70006905dec96a1095ea7",
+    "tools/esp32c3_tests/common.py": "e2dde169d19f12e82f774b74ade6ae7de073cc08c24f97fe11ff3843d2fc0df9",
+    "tools/esp32c3_tests/compare_latency.py": "4530ec501fb350e9b7bf1c6b4c63724754296fe835c346e6ebc18354db25c394",
+    "tools/esp32c3_tests/compare_output_dma.py": "04de602acaed8846b3dc0c37a8ca11b061a436be1730cfadd4c2b408591e56b0",
+    "tools/esp32c3_tests/compare_output_priority.py": "073979d7a6ddd40ab324b6d06c80c35131cc180a26a1a8bc5f11780e3a1153cc",
+    "tools/esp32c3_tests/compare_output_priority_matrix.py": "680840fb1beb2d4c6a9708e460803411820f82107e1679c4d39eb8023f8962fb",
+    "tools/esp32c3_tests/connection_retry.py": "1f09f000f72d605bc70e89754783c8dabe885dee7ff224f331578ba44791947e",
+    "tools/esp32c3_tests/diagnostic.py": "bb9e7477ab73d6d323befd6f0f50180b319abeee8f50d70fc20d58beadeb546b",
+    "tools/esp32c3_tests/flac_truncation.py": "b24a3ae36165f63ac1dd0d988a98752083b35946dd8bc16b37c3fce1fc8400ce",
+    "tools/esp32c3_tests/flash_constants.py": "7bf7955d7c1d1cf2fa6806baa4ef4413c151610c0bd40eace96e3972b4350ae5",
+    "tools/esp32c3_tests/flash_mode.py": "16ada30f8abf9d66937e82e21e041c4aabceccd319f0c756109becaa61532ffb",
+    "tools/esp32c3_tests/heap_fragment.py": "998c454faad743f4fa14bd3be960ede6944a4a5e522e45d749b42120f07fd803",
+    "tools/esp32c3_tests/heap_idle.py": "eb36a08b01bfc973398477c8e2eee4dbe5a9706cc464424bb68496ff56fc4a21",
+    "tools/esp32c3_tests/heap_receive_correlation.py": "0fbe6924928b89aecf6d37cf4b8a6368e3eaf0746b55a989b24fed73de62b212",
+    "tools/esp32c3_tests/http_headers.py": "845395d01169e27be0211d2deeef1a42f9ce486f5f6756a2e16b16cace269d29",
+    "tools/esp32c3_tests/icy_metadata.py": "96d0551eab277692dc742631a196126e127890fe8edf0e9a59db6108e1c97bc5",
+    "tools/esp32c3_tests/iram_inventory.py": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f",
+    "tools/esp32c3_tests/load_windows.py": "eee95396e81156bb4ae8b74a1e165d0fa4f3912ff1d0a1dbb1d86584d28b9df2",
+    "tools/esp32c3_tests/memory.py": "94bed682722b011f0d3f039d3ee656225c99b76cbee419473a29245b86e77922",
+    "tools/esp32c3_tests/network_memory.py": "c77cef3021fb54c9b08f07c1ee25f3938cefc97e176724689ef2b005957d2aca",
+    "tools/esp32c3_tests/ota.py": "b85f04e302067ca1b7f9b68eb727ef3fcdb3b0350f666b7f62acd52f3db75494",
+    "tools/esp32c3_tests/ota_diagnostic.py": "1ef7902be1cd8b686a8952a41d9aa80941b0e1301ac29b9a6670a7b28e568af8",
+    "tools/esp32c3_tests/ota_transition.py": "53c57eefae9400104980023a1edf2ca6e6ca6e527f7f86ad2b167cd01db5681f",
+    "tools/esp32c3_tests/output_priority_matrix.py": "d5ed53dfcd71d757576cb5e6649e14aef4b476622460d5e3bab63baa7b14c475",
+    "tools/esp32c3_tests/pcm_tail.py": "9c0f8ed7c87d51ce5948ff13be3175b6b76c099ca4ac238458bd6fd660285ff0",
+    "tools/esp32c3_tests/pdm_clock.py": "9858b6b13dd76cc6d083d8f854e5a285984fca54156b7e1d8c5c1c4844cdec02",
+    "tools/esp32c3_tests/pipeline_flow.py": "0de43140ad727f21d5068d611a5c31fa3c62de9451175ab1bf0033454307c239",
+    "tools/esp32c3_tests/pipeline_flow_study.py": "bf464bbdbb6b3d67d019e68b8ea1861cc34df89f4e2f2df7c272266a210d1e82",
+    "tools/esp32c3_tests/pool_settle.py": "fb98ed089b6121a198a21fc90750fe763e60a95f6a3bd569b04fc46597fe4818",
+    "tools/esp32c3_tests/public_streams.py": "1ebe4680459eaf051bdf3a8cb383f41982b28c6f0df00b4c926da70421de35c7",
+    "tools/esp32c3_tests/radio_flac_study.py": "25c55f49cf95a2117c499a90da6b53f3a0212b76a82b36ac1fb9f3dd7ea07a76",
+    "tools/esp32c3_tests/reboot_tls.py": "32d936becc6f4cfae90490d9f7a8104d7b26d0161672de8af08f81fa7fbf31cb",
+    "tools/esp32c3_tests/reference_eof.py": "7828d8746c12f98d174d32ce1e5c2251e71b331e35d7b2dffd69c6a66e23974f",
+    "tools/esp32c3_tests/run.py": "64f49d6279b16fac76f6a76827b7a5e46a4775fa605d894c4e5be0650adbde78",
+    "tools/esp32c3_tests/rx_ownership.py": "448b976c1d915d3f413cfb055b02fa0aa9a0a3e9253e72af65127f413e992829",
+    "tools/esp32c3_tests/serial_lines.py": "6fc25767619e102ad3847fb23363d15941a38e7032ef678b610700b8dfe4985b",
+    "tools/esp32c3_tests/staged_dma.py": "84412aaaae33491863411207c01c7b9c8702a9e232a899459d91845bb4d5e1fc",
+    "tools/esp32c3_tests/stream_memory_study.py": "11cb8f9db1ab21c12b32b608e3502b502574e735b0ac3b8d9b9003fe15554fe4",
+    "tools/esp32c3_tests/summarize_codec_sequence.py": "90f94232cbdd247be4ac21f73a9aebcc726f3d49186c2233109b1454f63a2166",
+    "tools/esp32c3_tests/summarize_load.py": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133",
+    "tools/esp32c3_tests/summarize_memory.py": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae",
+    "tools/esp32c3_tests/summarize_public.py": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+    "tools/esp32c3_tests/summarize_public_windows.py": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709",
+    "tools/esp32c3_tests/summarize_radio_flac.py": "72d66f872f1b511d9964e16cb72e7885791dd7bb8a9499ac0244678bf7135c47",
+    "tools/esp32c3_tests/summarize_rx_ownership.py": "0e62d6da908502efbfd4111aa7491b9f8a195219ac325a10862c93ab9e116685",
+    "tools/esp32c3_tests/summarize_stream_memory.py": "d32c496ce429750a5565b4396bcc1030b5319ebe33eee9940e390cb62d788697",
+    "tools/esp32c3_tests/summarize_sustained.py": "6f3a7786ec5c36935a2fd7714c8add9a9ccbf686b887eaa074e55e325e814245",
+    "tools/esp32c3_tests/summarize_terminal_cpu.py": "db99ad6e55f2b3e671106cdb2c3902225704d9167a2e65ef662fe23c726c69bd",
+    "tools/esp32c3_tests/summarize_terminal_memory.py": "f351cf6f73e9d256a406e8a7da5b65ab46e354b0cefca7543536f3ebac077bda",
+    "tools/esp32c3_tests/terminal_memory.py": "e920df2d0150a1e93e982c1fa06578444879e35c2158fee270ebd2f041bbe478",
+    "tools/esp32c3_tests/tls_error_codes.py": "d7b8baa6309ed2d14b8c825ebdd29b3e7461bc8cfea565a8268e5e69d638f6f4",
+    "tools/esp32c3_tests/tls_framing.py": "3012905396ee1a455e3ce6e14c4fa2e756ef379d7c749722526dba64cd4aed0e",
+    "tools/esp32c3_tests/tls_path.py": "52d1199afc26194e266252f7fd6a141875c03190a5abfb3e68068f957f7fbe42",
+    "tools/esp32c3_tests/tls_records.py": "2e93a2aed22785da0e7ba9f0fbd352c61b5680d1900ea8e08d703095dd69536d",
+    "tools/esp32c3_tests/trace_transport.py": "bfe205282071de4a0a561d137d52bd056eaea9ce7abe706bdc2a7e6d94960f47",
+    "tools/esp32c3_tests/transport.py": "124917ee9999594b628eb9d4f1b7fd045001e97d54faee19e5f07342a230142c",
+    "tools/esp32c3_tests/verify_adaptive_input_link.py": "d2c2bbe2c2cde72665828318aab4ee6f02e7245852fb57cbfd0ca9cf3e5ee247",
+    "tools/esp32c3_tests/verify_gcm_byte_link.py": "d46f80cabf959514832f70b50ca6817714039e4091195575b8af16da9235b5f1",
+    "tools/esp32c3_tests/verify_http_link.py": "caf7314d37464b1f4aeb7bdaa0e49cd84fb901bfacbef3c9dfc5caceb1124f73",
+    "tools/esp32c3_tests/verify_tls_path_link.py": "75f102153680aac6a11092bfeec9cc0b04ba899080c0d56ab473f757087cff6e",
+    "tools/esp32c3_tests/web_tcp.py": "d0468bc0f2769f90b138e4041cd715647f07e9d7af95a44f9372a83644e12f16",
+    "tools/audio_test_server/fixtures.py": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642",
+    "tools/audio_test_server/generate.py": "21f37cb2f4a8d5c3881227199d8ee3fae8e373bd7c13373ec75baf44d339b0c8",
+    "tools/audio_test_server/generate_flac_depths.py": "6f15589438a6fd31fb937e95e7f840a3288ff083c5e3771b6e9b486cede9f4c1",
+    "tools/audio_test_server/generate_flac_high_depth.py": "55417b00036c9256c5229fe51447be47b238dafa45b9f14e124771c09d515068",
+    "tools/audio_test_server/generate_pcm_tails.py": "a928505b88ea9c439bcf87aa0626de7ed2395129f9caf6b79e6081cc902d9c23",
+    "tools/audio_test_server/generate_stress.py": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e",
+    "tools/audio_test_server/icy.py": "75ddc364aadd2296537f8568e67e0ba877f8a3e05fbc8aa5b9e963125ba437fd",
+    "tools/audio_test_server/make_test_certificate.py": "6771a7840b4c704c0e7f5ea50c14beeee110edfca63f171bbe8ca9beecd3330a",
+    "tools/audio_test_server/record_test_ca.py": "de680e4970d042e9d18744c9779822897c6b5e8930a75aa7cc9184dace79aaeb",
+    "tools/audio_test_server/server.py": "a8c97949d119e99e544562c374380f6a73ab059508ef7b1cb3014c2d72712415",
+    "tools/audio_test_server/tls_framing.py": "83d067b29e473d24817f505977a491668c4c789560221e4868e1eec50b744930",
+    "tools/audio_test_server/tls_records.py": "c6da0d4d65865a929a43e1cf9fa5713787dcc1211445ee6f190b3610cf125a3d"
+  },
+  "firmware_sha256": "6ef20f1ae25429027165b6cd7549cc053bc1fdf5741176287a34105d2fa6ad02",
+  "sdkconfig_sha256": "b4de9eda6a818921be813a5c2b4ccaaee97b531dbc1ee88d34bf08208290370a",
+  "source_sha256": "16a0f372f7580cb4244bb024f90b68e3793a3391a972aa46c48627ebdc33c409",
+  "fixture_sha256": {
+    "stress-flac-48000-2ch-16bit-610s": "3971068e09afad15702e257d54d6ad5600e847511e4bd9fac6c3e47917f739b3",
+    "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e"
+  },
+  "actions": [
+    {
+      "name": "idle-before",
+      "started_at": 2807.2376344,
+      "ended_at": 2819.7792953
+    },
+    {
+      "name": "flac-https",
+      "started_at": 2819.7858923,
+      "ended_at": 2903.1674322
+    },
+    {
+      "name": "idle-after-flac",
+      "started_at": 2903.1696149,
+      "ended_at": 2915.7434809
+    },
+    {
+      "name": "flac-heap-recovery",
+      "started_at": 2915.7455528,
+      "ended_at": 2915.7462477
+    },
+    {
+      "name": "stop",
+      "started_at": 2915.9864134,
+      "ended_at": 2916.1633691
+    },
+    {
+      "name": "runtime-after-capture-close",
+      "started_at": 2916.3323535,
+      "ended_at": 2916.3349743
+    }
+  ],
+  "idle": {
+    "before": [
+      {
+        "heap": 133148,
+        "largest": 102400,
+        "tasks": 17
+      },
+      {
+        "heap": 133148,
+        "largest": 102400,
+        "tasks": 17
+      }
+    ],
+    "after-flac": [
+      {
+        "heap": 112828,
+        "largest": 49152,
+        "tasks": 17
+      },
+      {
+        "heap": 133148,
+        "largest": 102400,
+        "tasks": 17
+      },
+      {
+        "heap": 133160,
+        "largest": 102400,
+        "tasks": 17
+      }
+    ]
+  },
+  "server_events": [
+    {
+      "mode": "file",
+      "fixture": "stress-flac-48000-2ch-16bit-610s",
+      "sent": 11606016,
+      "complete": false,
+      "pacing_ratio": null,
+      "clock": "time.perf_counter",
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "delivery": {
+        "clock": "time.perf_counter",
+        "started_at": 2821.1668481,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 2821.1668481,
+            "ended_at": 2822.1691334,
+            "bytes": 212992,
+            "writes": 208,
+            "write_seconds": 1.0013874000014766,
+            "max_write_seconds": 0.19197340000027907,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2822.1691334,
+            "ended_at": 2823.2000527,
+            "bytes": 162816,
+            "writes": 159,
+            "write_seconds": 1.030104999994819,
+            "max_write_seconds": 0.05650550000018484,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2823.2000527,
+            "ended_at": 2824.2039069,
+            "bytes": 162816,
+            "writes": 159,
+            "write_seconds": 1.0031233000017892,
+            "max_write_seconds": 0.05854619999990973,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2824.2039069,
+            "ended_at": 2825.2138395,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0091880000031779,
+            "max_write_seconds": 0.05995760000041628,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2825.2138395,
+            "ended_at": 2826.2211183,
+            "bytes": 165888,
+            "writes": 162,
+            "write_seconds": 1.0063912999980857,
+            "max_write_seconds": 0.06793670000024576,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2826.2211183,
+            "ended_at": 2827.2312141,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.009057099999609,
+            "max_write_seconds": 0.06426250000004075,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2827.2312141,
+            "ended_at": 2828.2332285,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.0011918000027435,
+            "max_write_seconds": 0.06361680000009073,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2828.2332285,
+            "ended_at": 2829.243521,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.009653800003889,
+            "max_write_seconds": 0.06042630000001736,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2829.243521,
+            "ended_at": 2830.2456465,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0013631000019814,
+            "max_write_seconds": 0.058764200000041455,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2830.2456465,
+            "ended_at": 2831.2569467,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.0105839000043488,
+            "max_write_seconds": 0.05551239999977042,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2831.2569467,
+            "ended_at": 2832.2581451,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0004076000032,
+            "max_write_seconds": 0.06287069999962114,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2832.2581451,
+            "ended_at": 2833.272735,
+            "bytes": 156672,
+            "writes": 153,
+            "write_seconds": 1.0138372999986132,
+            "max_write_seconds": 0.06367890000001353,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2833.272735,
+            "ended_at": 2834.2730232,
+            "bytes": 165888,
+            "writes": 162,
+            "write_seconds": 0.9993415000008099,
+            "max_write_seconds": 0.06299490000037622,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2834.2730232,
+            "ended_at": 2835.2786904,
+            "bytes": 158720,
+            "writes": 155,
+            "write_seconds": 1.0049142999978358,
+            "max_write_seconds": 0.0565308999998706,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2835.2786904,
+            "ended_at": 2836.2803557,
+            "bytes": 162816,
+            "writes": 159,
+            "write_seconds": 1.0008751999939705,
+            "max_write_seconds": 0.05526599999984683,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2836.2803557,
+            "ended_at": 2837.3102355,
+            "bytes": 161792,
+            "writes": 158,
+            "write_seconds": 1.0291160000051605,
+            "max_write_seconds": 0.057451299999684124,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2837.3102355,
+            "ended_at": 2838.3690257,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0579818999967756,
+            "max_write_seconds": 0.06315989999984595,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2838.3690257,
+            "ended_at": 2839.419004,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0491564000003564,
+            "max_write_seconds": 0.058781599999747414,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2839.419004,
+            "ended_at": 2840.4196972,
+            "bytes": 165888,
+            "writes": 162,
+            "write_seconds": 0.999886399998104,
+            "max_write_seconds": 0.06146600000010949,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2840.4196972,
+            "ended_at": 2841.4348845,
+            "bytes": 157696,
+            "writes": 154,
+            "write_seconds": 1.0144476999994367,
+            "max_write_seconds": 0.0682795000002443,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2841.4348845,
+            "ended_at": 2842.4351309,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 0.999429499998314,
+            "max_write_seconds": 0.05790019999994911,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2842.4351309,
+            "ended_at": 2843.4582426,
+            "bytes": 156672,
+            "writes": 153,
+            "write_seconds": 1.0223575999975765,
+            "max_write_seconds": 0.06086199999981545,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2843.4582426,
+            "ended_at": 2844.4617422,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.002696300001844,
+            "max_write_seconds": 0.06571020000001226,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2844.4617422,
+            "ended_at": 2845.4683012,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.0057758999987527,
+            "max_write_seconds": 0.07001069999978426,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2845.4683012,
+            "ended_at": 2846.4715537,
+            "bytes": 165888,
+            "writes": 162,
+            "write_seconds": 1.0024327000014637,
+            "max_write_seconds": 0.061187900000277295,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2846.4715537,
+            "ended_at": 2847.4824301,
+            "bytes": 157696,
+            "writes": 154,
+            "write_seconds": 1.0100909999996475,
+            "max_write_seconds": 0.06122730000015508,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2847.4824301,
+            "ended_at": 2848.4828023,
+            "bytes": 164864,
+            "writes": 161,
+            "write_seconds": 0.9996020000012322,
+            "max_write_seconds": 0.0563308999999208,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2848.4828023,
+            "ended_at": 2849.5049933,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.021269799998663,
+            "max_write_seconds": 0.06296100000008664,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2849.5049933,
+            "ended_at": 2850.5383772,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0324112000025707,
+            "max_write_seconds": 0.0669143999998596,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2850.5383772,
+            "ended_at": 2851.5397653,
+            "bytes": 162816,
+            "writes": 159,
+            "write_seconds": 1.000544400002127,
+            "max_write_seconds": 0.058657099999891216,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2851.5397653,
+            "ended_at": 2852.5402707,
+            "bytes": 161792,
+            "writes": 158,
+            "write_seconds": 0.9996970000024703,
+            "max_write_seconds": 0.060204699999758304,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2852.5402707,
+            "ended_at": 2853.5502288,
+            "bytes": 156672,
+            "writes": 153,
+            "write_seconds": 1.0092091999981676,
+            "max_write_seconds": 0.060583800000131305,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2853.5502288,
+            "ended_at": 2854.5917368,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0406491999997343,
+            "max_write_seconds": 0.058875000000170985,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2854.5917368,
+            "ended_at": 2855.6449452,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.0524045999991358,
+            "max_write_seconds": 0.057060699999965436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2855.6449452,
+            "ended_at": 2856.7035893,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.0578663000032975,
+            "max_write_seconds": 0.06248900000036883,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2856.7035893,
+            "ended_at": 2857.7523288,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.0479291000001467,
+            "max_write_seconds": 0.06385230000023512,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2857.7523288,
+            "ended_at": 2858.755598,
+            "bytes": 164864,
+            "writes": 161,
+            "write_seconds": 1.00257099999817,
+            "max_write_seconds": 0.05771499999991647,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2858.755598,
+            "ended_at": 2859.7711034,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0148218999993333,
+            "max_write_seconds": 0.06284349999987171,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2859.7711034,
+            "ended_at": 2860.7713703,
+            "bytes": 163840,
+            "writes": 160,
+            "write_seconds": 0.9995243999987906,
+            "max_write_seconds": 0.05929710000009436,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2860.7713703,
+            "ended_at": 2861.7839612,
+            "bytes": 158720,
+            "writes": 155,
+            "write_seconds": 1.0118481999984397,
+            "max_write_seconds": 0.062089499999729014,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2861.7839612,
+            "ended_at": 2862.783968,
+            "bytes": 165888,
+            "writes": 162,
+            "write_seconds": 0.9992280000019491,
+            "max_write_seconds": 0.06463129999974626,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2862.783968,
+            "ended_at": 2863.8006307,
+            "bytes": 157696,
+            "writes": 154,
+            "write_seconds": 1.0159405999997944,
+            "max_write_seconds": 0.058906800000386284,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2863.8006307,
+            "ended_at": 2864.8028914,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0014990000004218,
+            "max_write_seconds": 0.057445999999799824,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2864.8028914,
+            "ended_at": 2865.8039093,
+            "bytes": 157696,
+            "writes": 154,
+            "write_seconds": 1.000254500002029,
+            "max_write_seconds": 0.05770200000006298,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2865.8039093,
+            "ended_at": 2866.8049245,
+            "bytes": 162816,
+            "writes": 159,
+            "write_seconds": 1.000226499999826,
+            "max_write_seconds": 0.06061149999959525,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2866.8049245,
+            "ended_at": 2867.8058836,
+            "bytes": 160768,
+            "writes": 157,
+            "write_seconds": 0.999908000000687,
+            "max_write_seconds": 0.06166050000001633,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2867.8058836,
+            "ended_at": 2868.8102059,
+            "bytes": 156672,
+            "writes": 153,
+            "write_seconds": 1.0034532999998191,
+            "max_write_seconds": 0.06524409999974523,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2868.8102059,
+            "ended_at": 2869.8570294,
+            "bytes": 164864,
+            "writes": 161,
+            "write_seconds": 1.0461478999977771,
+            "max_write_seconds": 0.06414600000016435,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2869.8570294,
+            "ended_at": 2870.9038539,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.046132499997384,
+            "max_write_seconds": 0.063805499999944,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2870.9038539,
+            "ended_at": 2871.9065182,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0019807000003311,
+            "max_write_seconds": 0.05549189999965165,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2871.9065182,
+            "ended_at": 2872.9245676,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.0174327999993693,
+            "max_write_seconds": 0.05889190000016242,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2872.9245676,
+            "ended_at": 2873.9264266,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0010641000003488,
+            "max_write_seconds": 0.05402439999988928,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2873.9264266,
+            "ended_at": 2874.936075,
+            "bytes": 154624,
+            "writes": 151,
+            "write_seconds": 1.0088638000033825,
+            "max_write_seconds": 0.05691380000007484,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2874.936075,
+            "ended_at": 2875.9386919,
+            "bytes": 165888,
+            "writes": 162,
+            "write_seconds": 1.0019401000031394,
+            "max_write_seconds": 0.052877600000101666,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2875.9386919,
+            "ended_at": 2876.9517121,
+            "bytes": 158720,
+            "writes": 155,
+            "write_seconds": 1.0121537999984866,
+            "max_write_seconds": 0.06435339999961798,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2876.9517121,
+            "ended_at": 2877.9519233,
+            "bytes": 163840,
+            "writes": 160,
+            "write_seconds": 0.9995419000019865,
+            "max_write_seconds": 0.06241759999966234,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2877.9519233,
+            "ended_at": 2878.9661177,
+            "bytes": 158720,
+            "writes": 155,
+            "write_seconds": 1.0135696999964239,
+            "max_write_seconds": 0.0614768999998887,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2878.9661177,
+            "ended_at": 2879.9689979,
+            "bytes": 165888,
+            "writes": 162,
+            "write_seconds": 1.002157299998089,
+            "max_write_seconds": 0.06864620000033028,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2879.9689979,
+            "ended_at": 2880.9899326,
+            "bytes": 156672,
+            "writes": 153,
+            "write_seconds": 1.0202979000018786,
+            "max_write_seconds": 0.05840519999992466,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2880.9899326,
+            "ended_at": 2882.0466837,
+            "bytes": 171008,
+            "writes": 167,
+            "write_seconds": 1.0559120000002622,
+            "max_write_seconds": 0.06046909999986383,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2882.0466837,
+            "ended_at": 2883.0523118,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0049633999992693,
+            "max_write_seconds": 0.06329279999999926,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2883.0523118,
+            "ended_at": 2884.0676096,
+            "bytes": 155648,
+            "writes": 152,
+            "write_seconds": 1.0144305000035274,
+            "max_write_seconds": 0.05872139999974024,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2884.0676096,
+            "ended_at": 2885.0734417,
+            "bytes": 168960,
+            "writes": 165,
+            "write_seconds": 1.0050668999970185,
+            "max_write_seconds": 0.059400099999948,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2885.0734417,
+            "ended_at": 2886.0794476,
+            "bytes": 156672,
+            "writes": 153,
+            "write_seconds": 1.0053055000003042,
+            "max_write_seconds": 0.06113249999998516,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2886.0794476,
+            "ended_at": 2887.1341066,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0539771000017026,
+            "max_write_seconds": 0.060726700000032,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2887.1341066,
+            "ended_at": 2888.1817018,
+            "bytes": 166912,
+            "writes": 163,
+            "write_seconds": 1.0468982999991567,
+            "max_write_seconds": 0.057529799999883835,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2888.1817018,
+            "ended_at": 2889.1821945,
+            "bytes": 165888,
+            "writes": 162,
+            "write_seconds": 0.999826999996003,
+            "max_write_seconds": 0.05673369999976785,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2889.1821945,
+            "ended_at": 2890.2077899,
+            "bytes": 159744,
+            "writes": 156,
+            "write_seconds": 1.0247017000015148,
+            "max_write_seconds": 0.06024020000040764,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2890.2077899,
+            "ended_at": 2891.2092263,
+            "bytes": 167936,
+            "writes": 164,
+            "write_seconds": 1.0007725000054961,
+            "max_write_seconds": 0.05497749999994994,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2891.2092263,
+            "ended_at": 2892.2200035,
+            "bytes": 154624,
+            "writes": 151,
+            "write_seconds": 1.0101468999987446,
+            "max_write_seconds": 0.056903199999851495,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2892.2200035,
+            "ended_at": 2893.5812218,
+            "bytes": 153600,
+            "writes": 150,
+            "write_seconds": 1.3606126999952721,
+            "max_write_seconds": 0.39931269999988217,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2893.5812218,
+            "ended_at": 2894.5833215,
+            "bytes": 2048,
+            "writes": 2,
+            "write_seconds": 1.0020688999998129,
+            "max_write_seconds": 0.506026699999893,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 2894.5833215,
+            "ended_at": 2904.0209168,
+            "bytes": 6144,
+            "writes": 6,
+            "write_seconds": 0.08557879999989382,
+            "max_write_seconds": 0.05738019999989774,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 2904.0209168
+      },
+      "seconds": 82.8540653
+    }
+  ]
+}

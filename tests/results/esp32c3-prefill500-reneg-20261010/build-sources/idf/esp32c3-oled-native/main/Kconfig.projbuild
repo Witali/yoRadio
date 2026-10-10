@@ -1,0 +1,890 @@
+menu "yoRadio ESP32-C3 OLED"
+
+config YORADIO_TLS_EARLY_MPI_LOCK
+    bool "Initialize the TLS hardware MPI mutex at startup (experimental)"
+    depends on IDF_TARGET_ESP32C3 && ESP_TLS_USING_MBEDTLS && MBEDTLS_HARDWARE_MPI
+    default n
+    help
+        Acquire and release the SDK's existing hardware MPI mutex during
+        normal application startup, before network and decoder allocations.
+        This moves its lazy, application-lifetime allocation out of the first
+        TLS handshake, where a small persistent object can split a large
+        temporary heap region. Lock ownership and cryptographic operations
+        remain with the SDK. The deep-sleep clock fast path runs first, and
+        codec-only benchmarks do not initialize this otherwise unused lock.
+        Keep disabled until fresh-boot TLS, repeated handshakes, codec changes,
+        settled memory recovery and the final quiet configuration are checked.
+
+config YORADIO_TLS_LARGE_BLOCK_RESERVE
+    bool "Reserve one large TLS allocation in static RAM (experimental)"
+    depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_INTERNAL_MEM_ALLOC && MBEDTLS_DYNAMIC_BUFFER
+    default n
+    help
+        Place one full-record-sized allocation slot in aligned static RAM,
+        deriving its capacity from the SDK's dynamic TLS buffer definitions.
+        Small allocations, oversize requests and simultaneous allocations use
+        the normal heap. The slot is not tied to a specific connection or RX
+        allocation site; it may also serve large handshake allocations.
+        Keep disabled until full-record playback, certificates, concurrent
+        contexts, all codecs and OTA pass. With adaptive input, keep its queue
+        at the configured minimum from startup to fund this permanent reserve,
+        unless the separate post-frame FLAC expansion experiment is selected.
+
+config YORADIO_TLS_RX_ONLY_RESERVE
+    bool "Use the static TLS reserve only for RX allocations (experimental)"
+    depends on YORADIO_TLS_LARGE_BLOCK_RESERVE
+    default n
+    help
+        Route the audited SDK RX allocation sites, including small records
+        and cached state, through the existing reserved slot. Other handshake,
+        TX and context allocations stay on the ordinary heap. A simultaneous
+        RX allocation falls back to the ordinary allocator. No additional large
+        buffer is reserved. Requires the audited pinned SDK source; keep off
+        until lifecycle, all record sizes, concurrent contexts and OTA pass.
+
+config YORADIO_GCM_BYTE_GHASH
+    bool "Process GHASH two nibbles at once (experimental)"
+    depends on IDF_TARGET_ESP32C3 && MBEDTLS_HARDWARE_AES
+    default n
+    help
+        Use an exact eight-bit polynomial recurrence for GHASH calls of at
+        least 128 bytes in the audited SDK AES-GCM implementation. Adds a
+        temporary 256-byte key-derived table on the existing caller stack,
+        wiped before return, and a 1024-byte constant reduction table in flash.
+        No heap or context-layout change. Keep off pending crypto, stack and
+        physical playback qualification. Unknown SDK sources fail the build.
+
+config YORADIO_ADAPTIVE_INPUT_BUFFER
+    bool "Release idle compressed-input blocks for TLS (experimental)"
+    depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_INTERNAL_MEM_ALLOC
+    default n
+    help
+        Replace the compressed-input ring with independently allocated packet
+        slots. Before a failing mbedTLS allocation, reclaim only idle slots
+        above the minimum; never discard queued data or decoder/producer leases.
+        Refill available capacity between connections, unless the permanent
+        TLS large-block reserve is enabled; that combination keeps the input
+        at its minimum from startup, including for HTTP. The separate FLAC
+        expansion option can restore slots after decoder initialization.
+        Slots are rounded to
+        complete stream packets, so the effective size differs from the legacy
+        ring. This cannot guarantee a contiguous TLS allocation or enough jitter
+        tolerance. Keep disabled until all-codec and long-playback tests pass.
+
+config YORADIO_INPUT_MIN_BLOCKS
+    int "Minimum compressed-input capacity (1600-byte units)"
+    depends on YORADIO_ADAPTIVE_INPUT_BUFFER
+    range 5 14
+    default 5
+    help
+        Reserve at least this many bytes in complete packet slots, rounded up
+        and capped by the user's configured target capacity. The target itself
+        is rounded up to complete slots. A slot being written, queued, or read
+        cannot be released, even above this minimum. NVS settings are unchanged.
+
+config YORADIO_INPUT_PREFILL_MS
+    int "Maximum initial compressed-input prefill time (experimental, ms)"
+    range 0 1000
+    default 0
+    help
+        Before opening a decoder for a new stream, allow its existing input
+        queue to accumulate compressed audio. Finish early when another full
+        stream packet no longer fits, and cancel promptly on Stop or a new
+        station. The first received packet stays leased; no extra allocation
+        or audio copy is introduced. Zero preserves immediate decoding.
+        Short finite files can be delayed by this bounded startup interval.
+        Keep zero until continuity, TLS memory peaks, EOF and switching pass.
+
+config YORADIO_FLAC_INPUT_EXTRA_SLOTS
+    int "Extra input slots after the first FLAC frame (experimental)"
+    depends on YORADIO_ADAPTIVE_INPUT_BUFFER && YORADIO_TLS_LARGE_BLOCK_RESERVE && YORADIO_FLAC_DECODER_CUSTOM
+    range 0 8
+    default 0
+    help
+        After the custom FLAC decoder has allocated its working memory and
+        decoded a complete frame, let the stream task restore this many input
+        slots above the minimum, capped by the saved input-buffer target.
+        Each allocation checks for at least 32 KiB of remaining internal heap;
+        this is advisory headroom, not another reservation. The TLS reserve
+        remains intact. Stop, EOF and station changes shrink the queue again,
+        reclaiming queued or leased slots only when the decoder returns them.
+        Zero preserves the existing policy. Keep disabled until heavy FLAC,
+        AAC switching, memory recovery, TLS and OTA checks pass.
+
+config YORADIO_INPUT_PREFILL_MIN_MS
+    int "Minimum initial compressed-input prefill time (experimental, ms)"
+    depends on YORADIO_INPUT_PREFILL_MS > 0
+    range 0 YORADIO_INPUT_PREFILL_MS
+    default 0
+    help
+        Wait at least this interval after leasing the first input packet,
+        then open the decoder once the queue is full or the maximum expires.
+        This can add delivery margin for bursty
+        TLS records without allocating more RAM. Stop and station changes
+        still cancel the wait. The maximum prefill time remains the deadline.
+        Zero preserves the early-full exit; keep this experiment off until
+        queue-wait, codec/EOF and TLS memory checks confirm an improvement.
+
+config YORADIO_TLS_RETAIN_RX_BUFFER
+    bool "Retain the full TLS receive buffer after handshake (experimental)"
+    depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_DYNAMIC_BUFFER
+    default n
+    help
+        Use ESP-IDF's HTTP_TLS_DYN_BUF_RX_STATIC strategy for radio streams.
+        It allocates a full receive buffer after a successful TLS handshake
+        and retains it until connection teardown, avoiding record-by-record
+        heap fragmentation. Transmit buffers remain dynamic. Keep the full
+        TLS record size and certificate validation. Qualify SBR allocation,
+        mixed codecs, Stop/EOF, redirects, long playback and OTA before use
+        as a production default.
+
+config YORADIO_DIRECT_DMA_PCM
+    bool "Generate processed PCM directly in I2S DMA (experimental)"
+    depends on !YORADIO_QEMU
+    default n
+    help
+        Remove the 2048-byte output staging buffer. The output task writes
+        gain-adjusted, resampled stereo PCM into the pinned I2S driver's
+        free DMA blocks. Codec workspace and the PCM queue remain separate.
+        Keep disabled until matched timing and underrun tests pass on C3.
+
+config YORADIO_OUTPUT_TASK_FIRST
+    bool "Service audio output above the decoder"
+    default y
+    help
+        Raise the PCM output task from priority 6 to 8; decoding stays at 7
+        and compressed input at 5. A completed DMA block can then preempt a
+        long decoder call. Output blocks normally when it has no PCM or no
+        free DMA block. Keep codec arithmetic, buffers and timeouts unchanged.
+        Applies to both staged PCM output and direct DMA output. Disable only
+        for comparison with the previous output priority of 6.
+
+config YORADIO_PIPELINE_PROFILE
+    bool "Measure decoder queue waits and DMA completion overruns"
+    depends on !YORADIO_QEMU
+    select YORADIO_STAGED_DMA_PROFILE if !YORADIO_DIRECT_DMA_PCM
+    default n
+    help
+        Diagnostic only. Probe queue availability before the normal blocking
+        call and report task-local wall times every five seconds. Count I2S
+        completion-queue overruns in a bounded ISR callback. Does not change
+        timeouts, priorities, queue capacities or audio samples. Adds logging
+        and timing overhead; keep disabled in production timing comparisons.
+        Works with staged and direct output. Staged output reports PCM-empty
+        and total submission time, without claiming a separate DMA wait time.
+
+config YORADIO_STAGED_DMA_PROFILE
+    bool "Measure staged PCM writes and DMA queue overruns"
+    depends on !YORADIO_DIRECT_DMA_PCM && !YORADIO_QEMU
+    default n
+    help
+        Diagnostic only. Count completed-descriptor queue overruns in a small
+        ISR callback and log cumulative write bytes, errors and wall time
+        every five seconds of PCM activity. Includes intentional silence and
+        startup ramps: compare counters only within sustained playback.
+        A queue overrun indicates delayed service, not an exact acoustic gap
+        count. Does not change PCM, DMA buffers, priorities or timeouts.
+
+config YORADIO_PDM_FRACTIONAL_CLOCK
+    bool "Keep the precise 48 kHz PDM clock divider (experimental)"
+    depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU
+    default n
+    help
+        Keep the HAL-calculated fractional divider instead of the SDK's
+        integer-only PDM noise workaround. Supports the audited 48 kHz DAC
+        configuration with the 160 MHz source, BCLK divider 13 and FP/FS
+        960/480. Changes initialization only, for both output implementations.
+        Unknown SDK sources fail configuration. Keep disabled pending clock,
+        sustained playback and analog noise qualification.
+
+config YORADIO_PDM_INTEGER_RATE_COMPENSATION
+    bool "Resample to the actual integer PDM clock rate (experimental)"
+    depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU
+    depends on !YORADIO_PDM_FRACTIONAL_CLOCK && !YORADIO_DIRECT_DMA_PCM
+    default n
+    help
+        Target 625000/13 PCM frames/s in the staged-output resampler while
+        retaining the SDK integer DAC clock and its noise workaround. This
+        prevents nominal 0.1603% excess consumption of a real-time source.
+        Also interpolates 48 kHz input, which otherwise bypasses resampling.
+        Changes output interpolation, not codec precision or source metadata.
+        Requires the audited 160 MHz, divider 2/13, FP/FS 960/480 DAC setup.
+        No extra PCM buffer. Keep disabled pending quality, CPU and physical
+        continuity qualification; crystal error and network jitter remain.
+        The current linear interpolator fails the 48 kHz high-frequency
+        quality check. This option is for research, not a production fix.
+
+config YORADIO_PDM_INTEGER_FIR
+    bool "Use 32-tap FIR for integer-rate compensation (experimental)"
+    depends on YORADIO_PDM_INTEGER_RATE_COMPENSATION
+    default n
+    help
+        Replace linear interpolation with a Q19 windowed-sinc interpolator.
+        Adds a 136-byte stereo history/state and about 110 KiB of constant
+        coefficients in Flash. A direct 625-phase table reduces work for
+        48 kHz input; other rates interpolate two 256-phase table entries.
+        Introduces 16 input frames of lookahead. EOF drains that history;
+        Stop discards it. Keep disabled until CPU, quality and physical
+        all-format playback tests pass.
+
+config YORADIO_PDM_CLOCK_DIAGNOSTICS
+    bool "Report PDM clock register readback at setup"
+    depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU
+    default n
+    help
+        Snapshot the actual TX divider and PCM-to-PDM register fields under
+        the existing setup lock, then log them after releasing the lock.
+        Works with either clock mode. The source frequency is the SDK's
+        nominal value, not an external measurement of crystal accuracy.
+
+config YORADIO_CODEC_MEMORY_TRACE
+    bool "Trace codec allocation lifetimes (diagnostic only)"
+    default n
+    help
+        Replace esp_audio_codec's weak allocation shims with bounded tracking.
+        Requires INFO logs. Adds fixed RAM overhead and logs after AAC calls;
+        do not use this build for CPU timing or as a production profile.
+
+config YORADIO_RX_BUFFER_DIAGNOSTICS
+    bool "Trace live Wi-Fi receive-buffer ownership (diagnostic only)"
+    depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU
+    default n
+    help
+        Track the public netif receive ownership handoff without changing codec
+        settings. Bound the table at 32 buffers and report overflow. Match live
+        pointers to heap allocation ranges without reading packet contents.
+        Uses about 0.6 KiB static RAM and 1.1 KiB of decoder stack between calls.
+        The locked heap walk and USB logs change timing; not a CPU benchmark.
+
+config YORADIO_HEAP_FRAGMENT_PROBE
+    bool "Identify live owners in the former largest idle heap block"
+    depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU && !YORADIO_DEEP_SLEEP_CLOCK && HEAP_TRACING_OFF && HEAP_POISONING_DISABLED && !HEAP_TASK_TRACKING && HEAP_PLACE_FUNCTION_INTO_FLASH
+    select HEAP_USE_HOOKS
+    default n
+    help
+        Diagnostic only. After five seconds of decoder idle, watch the largest
+        free region. Keep 128 live allocation records and counters in about
+        3.1 KiB RTC RAM, leaving normal DRAM unchanged; report
+        overflow and unknown owners. Log metadata on the decoder stack only
+        after Stop/EOF, outside heap locks. Free/realloc use a critical section
+        on C3 to prevent address-reuse races. Changes timing, not a CPU benchmark.
+        Uses the flash-resident allocator configuration; not for cache-off ISRs.
+
+config YORADIO_AAC_PLUS
+    bool "Decode full HE-AAC SBR/PS with Espressif AAC"
+    depends on YORADIO_AAC_DECODER_ESPRESSIF
+    default y
+    help
+        Reconstruct the high-frequency SBR band and HE-AAC v2 stereo instead
+        of playing only the lower-rate AAC core. Uses more CPU and RAM.
+        If disabled, status explicitly labels the decoder's PCM parameters;
+        the public API cannot confirm the nominal source format in that mode.
+
+config YORADIO_AAC_LATE_SBR
+    bool "Preserve implicit SBR/PS through late and missing extensions"
+    depends on YORADIO_AAC_COMPACT_SBR && YORADIO_AAC_PLUS
+    default n
+    help
+        Keep extension parsing active, initialize late SBR without resetting
+        AAC transform history, and retain established SBR/PS across frames
+        with no extension data. Uses the audited native controller branch.
+        QEMU PCM and fault tests pass; physical qualification remains open.
+
+config YORADIO_QEMU_AAC_LATE_SBR_TEST
+    bool "Test late implicit SBR activation and retention in QEMU"
+    depends on YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST && YORADIO_AAC_PLUS
+    select YORADIO_AAC_LATE_SBR
+    default n
+    help
+        Exercise the shared controller with PCM capture, failure injection,
+        reset and concurrent-decoder checks. Never flash the QEMU test image.
+
+config YORADIO_QEMU_AAC_LATE_SBR_CAPTURE
+    bool "Capture exact transition PCM for storage A/B comparison"
+    depends on YORADIO_QEMU_AAC_LATE_SBR_TEST
+    default n
+    help
+        Print raw signed-16 PCM from the transition regression. Emulator-only
+        evidence; the extra output is excluded from timing measurements.
+
+config YORADIO_DEEP_SLEEP_CLOCK
+    bool "Deep sleep while showing the stopped-radio clock"
+    depends on !YORADIO_QEMU
+    default n
+    help
+        Opt-in mode enabled by build.ps1 -DeepSleepClock. Stops Wi-Fi and
+        I2S, then uses an RTC wake stub to update the OLED every 500 ms.
+        WebUI and USB are unavailable asleep. Hold BOOT for over 500 ms
+        to restore the station screen; press again to play. GPIO9 cannot
+        wake the C3 directly, so brief clicks can be missed.
+        Requires synchronized time; setup/AP mode stays awake.
+
+config YORADIO_WEB_SEND_TIMEOUT_SECONDS
+    int "Web content send timeout (seconds)"
+    range 5 120
+    default 20
+    help
+        Maximum time a static-content worker waits for one socket send. A
+        longer timeout prevents slow or temporarily backgrounded mobile
+        browsers from receiving a truncated WebUI response.
+
+config YORADIO_WEB_STATIC_WORKERS
+    int "Parallel WebUI static-content workers"
+    range 1 4
+    default 2
+    help
+        Number of asynchronous workers that may read SPIFFS and send WebUI
+        files in parallel. The main HTTP task remains available for WebSocket
+        traffic while static responses are in progress.
+
+config YORADIO_QEMU
+    bool "Build the headless QEMU smoke-test profile"
+    default n
+    help
+        Skip peripherals that the ESP32-C3 QEMU machine does not emulate and
+        run deterministic NVS, SPIFFS and FreeRTOS startup checks instead.
+        This option is intended only for sdkconfig.qemu.defaults.
+
+config YORADIO_QEMU_AAC_TEST
+    bool "Run AAC stream-format regression fixtures in QEMU"
+    depends on YORADIO_QEMU && YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS
+    default n
+    help
+        Decode generated AAC-LC, HE-AAC and HE-AAC v2 fixtures, verify PCM
+        layouts and stream changes, and write the result to the virtual OLED.
+        Test fixtures are included only in this emulator image.
+
+config YORADIO_VORBIS_REPAIR
+    bool "Use checked Vorbis initialization and cleanup"
+    default y
+    help
+        Source-level repair of the pinned Ogg/Vorbis ownership paths.
+        Decoder arithmetic remains in the original archive.
+
+config YORADIO_QEMU_VORBIS_LIFECYCLE
+    bool "Run isolated original Vorbis allocation/failure tests in QEMU"
+    depends on YORADIO_QEMU && !YORADIO_QEMU_AAC_TEST
+    default n
+    help
+        Separate test entry point, with no radio tasks or networking. Uses
+        the pinned original Ogg/Vorbis objects and records allocation owners,
+        injected failures and PCM hashes. Never flash this image to a board.
+
+config YORADIO_QEMU_AAC_PROFILE
+    bool "Count AAC decoder instructions in QEMU (requires icount)"
+    depends on YORADIO_QEMU_AAC_TEST
+    default n
+    help
+        Measure instruction demand using the RISC-V minstret counter.
+        run-qemu.ps1 enables fixed icount automatically for this profile.
+        These are instruction counts, not hardware CPU cycle measurements.
+
+config YORADIO_QEMU_CACHE_TEST
+    bool "Run short AAC flash-cache traces with a QEMU plugin"
+    depends on YORADIO_QEMU_AAC_TEST && !YORADIO_QEMU_AAC_PROFILE
+    default n
+    help
+        Emit no-op markers around decoder calls for the host cache model.
+        Requires icount and tools/codec_benchmark/cache/esp32c3_cache.c.
+        Modelled misses are not physical cache counters or CPU timings.
+
+config YORADIO_QEMU_AAC_BFP16_TEST
+    bool "Compare SBR QMF BFP16 storage against original PCM in QEMU"
+    depends on YORADIO_QEMU_AAC_TEST && !YORADIO_QEMU_AAC_PROFILE && !YORADIO_QEMU_CACHE_TEST
+    default n
+    help
+        Numerical experiment: quantize low-band QMF at the analysis boundary
+        using signed 16-bit mantissas and one exponent per group. Compare raw
+        PCM from separate reference/candidate decoders and count instructions.
+        Requires QEMU icount. Does not reduce allocation sizes or enable this
+        lossy representation in production. Precision failures are reported
+        as results; experiment completion is not a precision approval.
+
+config YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+    bool "Compare packed complex 14+14+4 SBR/PS history in QEMU"
+    depends on YORADIO_QEMU_AAC_TEST && !YORADIO_QEMU_AAC_PROFILE && !YORADIO_QEMU_CACHE_TEST && !YORADIO_QEMU_AAC_BFP16_TEST
+    default n
+    help
+        Qualify the proposed 32-bit complex storage format at frame boundaries
+        using the pinned AAC binary. Compare nearest and floor/midpoint modes,
+        separately for SBR, PS and both. Includes exact traversal controls.
+        This numerical experiment does not reduce allocations. Requires icount;
+        it must never be enabled in production or used to qualify all AAC files.
+
+config YORADIO_QEMU_AAC_PACKED_HISTORY_ERROR_LIMIT
+    int "Development PCM error limit for packed AAC history (LSB)"
+    depends on YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+    range 1 5
+    default 5
+    help
+        Temporary development tolerance, updated by the user to five LSB.
+        The production requirement is three LSB per sample/channel.
+
+config YORADIO_QEMU_AAC_PC16_HISTORY_TEST
+    bool "Use PC16 history with eight packed exponent nibbles in QEMU"
+    depends on YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+    default n
+    help
+        Test 16+16 mantissas, shift=exponent+1, with block-of-eight versus
+        scalar storage paths. Retains the pinned history scope and exact
+        controls. Numerical test only: does not shrink production allocations.
+
+config YORADIO_QEMU_AAC_AREA_STORAGE_TEST
+    bool "Probe separate AAC state areas with 18-bit paired storage"
+    depends on YORADIO_QEMU_AAC_PACKED_HISTORY_TEST && !YORADIO_QEMU_AAC_PC16_HISTORY_TEST && !YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST && !YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
+    default n
+    help
+        Isolated numerical probes of high QMF, hybrid, IMDCT and real-valued
+        coefficient histories. Original allocations and DSP remain unchanged.
+
+config YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST
+    bool "Test FAAD-style packed PS writes in the current Espressif decoder"
+    depends on YORADIO_QEMU_AAC_PACKED_HISTORY_TEST && !YORADIO_QEMU_AAC_PC16_HISTORY_TEST
+    default n
+    help
+        Replace PS decorrelation with a source port of the pinned RV32 arithmetic.
+        Compare native source, packed midpoint storage and binary bypass.
+        The closed SBR owner allocation is unchanged; only delay payload shrinks.
+        QEMU-only qualification, never a production memory-saving claim.
+
+config YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
+    bool "Test lossless AAC SBR allocation changes in QEMU"
+    depends on YORADIO_QEMU_AAC_PACKED_HISTORY_TEST && !YORADIO_QEMU_AAC_PC16_HISTORY_TEST && !YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST && !YORADIO_CODEC_MEMORY_TRACE
+    default n
+    help
+        Pinned private-ABI experiment with paired PCM and guarded allocations.
+        Never enable this test owner registry in production firmware.
+
+config YORADIO_QEMU_AAC_PC16_WRITE_TEST
+    bool "Compare packed 16+16 PS writes with grouped exponent words"
+    depends on YORADIO_QEMU_AAC_PS_HISTORY_PORT_TEST
+    default n
+    help
+        QEMU paired native/PC16 PS delay writes. Tests the same source allocator
+        and decorrelator as the experimental physical PC16 option.
+
+config YORADIO_QEMU_AAC_QMF_STORAGE_TEST
+    bool "Compare complex QMF storage formats after native analysis in QEMU"
+    depends on YORADIO_QEMU_AAC_BFP16_TEST
+    default n
+    help
+        Quantize each new QMF row using packed words and shared or independent
+        exponents, then restore for unchanged native DSP. Numerical probe only.
+
+config YORADIO_QEMU_AAC_PS_STORAGE_TEST
+    bool "Compare PS shared and independent exponent storage in QEMU"
+    depends on YORADIO_QEMU_AAC_PC16_WRITE_TEST && !YORADIO_AAC_PS_PC16_CACHE
+    default n
+    help
+        Actual feedback writes: original PC16, independent Re/Im exponents,
+        and 17/18-bit mantissa high bits in metadata words. No production default changes.
+
+config YORADIO_QEMU_AAC_COMBINED_STORAGE_TEST
+    bool "Combine qualified AAC storage probes and actual PS writes"
+    depends on YORADIO_QEMU_AAC_PS_STORAGE_TEST && !YORADIO_QEMU_AAC_AREA_STORAGE_TEST
+    default n
+    help
+        Paired reference/candidate PCM with cumulative compression effects.
+        Keeps original owner allocations. IMDCT compression is excluded.
+
+config YORADIO_COMPACT_SERVICE_STACKS
+    bool "Use measured smaller BOOT, output and WebSocket task stacks"
+    default n
+    help
+        Board RAM profile. Saves 8192 requested stack bytes; keeps the shared
+        decoder's 16384-byte stack. Selected by this board's sdkconfig.defaults
+        to leave contiguous heap for compact SBR. Repeat all-codec and WebUI/OTA
+        stack/load measurements when service stack sizes or call paths change.
+
+config YORADIO_CPU_PROFILE_HTTP
+    bool "Sample runtime diagnostics in the existing HTTP task"
+    depends on FREERTOS_GENERATE_RUN_TIME_STATS
+    default n
+    help
+        Diagnostic only. Poll /api/native/status regularly to emit the existing
+        CPU/heap/stack logs, at most once per five seconds. Avoids allocating a
+        separate 4096-byte profiler task stack. Uses the HTTP server's stack.
+
+config YORADIO_TLS_PATH_PROFILE
+    bool "Measure HTTP/TLS/poll/AES wall time in the stream task"
+    depends on YORADIO_CPU_PROFILE_HTTP && ESP_TLS_USING_MBEDTLS && MBEDTLS_HARDWARE_AES && !YORADIO_QEMU
+    default n
+    help
+        Diagnostic only. Fixed counters, no heap allocation or extra task.
+        Records calls, byte counts, outcomes and elapsed wall time including
+        waits and preemption. Nested times overlap; these are not CPU times.
+        Reports cumulative counters every five seconds via the HTTP profiler.
+        Does not retain addresses, keys, payloads or peer identifiers.
+
+config YORADIO_NETWORK_HEAP_PROFILE
+    bool "Sample heap and TCP queues for network memory diagnosis"
+    depends on YORADIO_CPU_PROFILE_HTTP && !YORADIO_QEMU
+    default n
+    help
+        Diagnostic only. Reuses one lwIP callback message and the HTTP profiler;
+        adds no task/stack. Traverses TCP lists only on the lwIP thread and logs
+        numeric counters, no addresses or packet contents. Reported sample age
+        must be subtracted when correlating with playback. Counts exclude Wi-Fi
+        buffers, TLS and application receive queues. Not a production default.
+
+config YORADIO_AAC_EARLY_SBR_RESERVE
+    bool "Reserve AAC SBR state before core and PCM allocations"
+    depends on YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
+    default n
+    help
+        Private-ABI placement experiment for esp_audio_codec 2.6.2. Requires
+        FreeRTOS TLS slot 1. No DSP or allocation size changes; reject silent
+        core-only fallback when SBR allocation fails. Not qualified by default.
+
+config YORADIO_HEAP_LAYOUT_DIAGNOSTICS
+    bool "Log selected heap blocks around AAC allocation phases"
+    depends on FREERTOS_GENERATE_RUN_TIME_STATS && !YORADIO_QEMU && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_AAC_EARLY_SBR_RESERVE && !YORADIO_AAC_EARLY_SCRATCH_RESERVE
+    default n
+    help
+        Temporary diagnostic. Uses about 1.6 KiB of the existing AAC task stack,
+        no persistent allocation table. Captures free areas >=256 bytes, their
+        immediate neighbors and allocations >=1024 bytes. Bounded at 128 rows;
+        reports truncation. Logs metadata only, outside heap locks. USB logging
+        changes scheduling; this is not a CPU benchmark or a production option.
+
+config YORADIO_QEMU_AAC_SMOOTHING_TEST
+    bool "QEMU compact five-entry SBR smoothing pointer tables"
+    depends on YORADIO_QEMU_AAC_SBR_LAYOUT_TEST
+    default n
+    help
+        Build isolated, SHA-pinned copies of seven native decoder functions.
+        Changes address offsets only; compare exact PCM and allocation guards.
+        Not a production option. Original vendor reset API is unsupported.
+
+config YORADIO_QEMU_AAC_RESET_TEST
+    bool "Reproduce and repair AAC reset with guarded core allocations"
+    depends on YORADIO_QEMU_AAC_SBR_LAYOUT_TEST && (!YORADIO_QEMU_AAC_SMOOTHING_TEST || YORADIO_QEMU_AAC_COMPACT_OWNER_TEST)
+    default n
+    help
+        QEMU-only. Pad the baseline core to contain a stale vendor offset,
+        compare repaired reset and subsequent PCM on the smaller SBR owner.
+
+config YORADIO_QEMU_AAC_COMPACT_OWNER_TEST
+    bool "QEMU combined compact tables and relocated PS control"
+    depends on YORADIO_QEMU_AAC_SMOOTHING_TEST
+    default n
+    help
+        Lossless 49708-byte SBR owner, with allocation guards, exact PCM,
+        lifecycle and direct-reset comparisons against the original decoder.
+
+config YORADIO_QEMU_AAC_HIGH_HISTORY_TEST
+    bool "QEMU compact persistent high-QMF history"
+    depends on YORADIO_QEMU_AAC_COMPACT_OWNER_TEST
+    default n
+    help
+        Replace the six retained high-QMF rows with shared-exponent complex
+        storage. Native working rows remain int32. Includes real-only SBR,
+        PS, repaired reset, format changes, guards and actual allocation size.
+
+config YORADIO_QEMU_AAC_HIGH_HISTORY_PC16
+    bool "Use 16-bit mantissas instead of 18-bit in high-QMF history"
+    depends on YORADIO_QEMU_AAC_HIGH_HISTORY_TEST
+    default n
+
+config YORADIO_QEMU_AAC_HIGH_HISTORY_PC19
+    bool "QEMU 19-bit high-QMF history for SBR-gap precision qualification"
+    depends on YORADIO_QEMU_AAC_LATE_SBR_TEST && YORADIO_AAC_HIGH_HISTORY
+    depends on !YORADIO_QEMU_AAC_HIGH_HISTORY_PC16
+    default n
+    help
+        Retain 19-bit real/imaginary mantissas and a shared four-bit shift.
+        Three 10-bit metadata entries share one word. Adds 96 bytes to each
+        packed history, before owner overlays/alignment. QEMU-only; require
+        the unchanged 3-LSB PCM gate plus speed and physical memory tests.
+
+config YORADIO_QEMU_AAC_HIGH_HISTORY_PC19_SIDECAR
+    bool "Keep PC19 extra bits in the decoder context"
+    depends on YORADIO_QEMU_AAC_HIGH_HISTORY_PC19
+    default n
+    help
+        Keep the 18-bit-sized SBR owner and store the additional two metadata
+        bits per complex pair in 144 bytes owned by the decoder context.
+        Same PC19 arithmetic; qualify cleanup/reset and actual heap separately.
+
+config YORADIO_QEMU_AAC_SMOOTHING_HISTORY_TEST
+    bool "QEMU four persistent SBR smoothing rows with a temporary fifth"
+    depends on YORADIO_QEMU_AAC_HIGH_HISTORY_TEST && !YORADIO_QEMU_AAC_HIGH_HISTORY_PC16
+    default n
+    help
+        Retain all five FIR taps with unchanged native arithmetic. Save 2048
+        owner bytes using 1024 temporary stack bytes during envelope processing.
+        QEMU-only; physical stack, full-radio memory and CPU gates remain open.
+
+config YORADIO_WEB_TCP_PROBE
+    bool "Trace native WebUI TCP handshakes"
+    depends on YORADIO_NETWORK_HEAP_PROFILE && !YORADIO_QEMU
+    default n
+    help
+        Diagnostic only: record bounded TCP handshake metadata for port 80,
+        including the peer port, flags and PCB state. Never retain addresses,
+        packet contents or payload. Uses 1024 RTC bytes plus small counters.
+        The existing WebSocket task drains events and samples network heap
+        independently of HTTP requests. TCP behavior remains unchanged.
+
+config YORADIO_TCP_ALLOCATION_DIAGNOSTICS
+    bool "Trace TCP control-block allocation and release"
+    depends on YORADIO_HEAP_LAYOUT_DIAGNOSTICS
+    default n
+    help
+        Correlate fragmentation with TCP control-block lifetimes. Log only
+        pointer, structure size and state on release, never IP/port/payload.
+        Pass through the unmodified lwIP allocator and protocol behavior.
+
+config YORADIO_TCP_PCB_POOL_DIAGNOSTICS
+    bool "Retain experimental TCP PCB pool lifetimes"
+    depends on YORADIO_TCP_PCB_POOL
+    default n
+    help
+        Diagnostic only. Keeps the last 128 pool ownership/state/caller events,
+        printing them only on an ownership assertion. No remote host address,
+        port or payload. Costs 1028 B DRAM on C3 and changes timing/layout;
+        do not use this mode to qualify performance.
+
+config YORADIO_TCP_PCB_POOL
+    bool "Keep TCP control blocks in a fixed RTC RAM pool"
+    depends on IDF_TARGET_ESP32C3 && !YORADIO_QEMU && !YORADIO_TCP_ALLOCATION_DIAGNOSTICS
+    default n
+    help
+        Placement experiment: keep exactly LWIP_MAX_ACTIVE_TCP control blocks
+        in RTC RAM so long-lived TIME_WAIT nodes cannot divide the large AAC
+        heap region. TCP limits, timers, packet buffers and DSP are unchanged.
+        Costs sizeof(tcp_pcb) times the configured count in RTC RAM plus one
+        DRAM ownership byte per slot. Requires heap-backed memp without its
+        overflow instrumentation. Qualify switching, TLS, WebUI/OTA and sleep.
+
+config YORADIO_AAC_EARLY_SCRATCH_RESERVE
+    bool "Place AAC scratch workspace before core and caller PCM"
+    depends on YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS && !YORADIO_AAC_EARLY_SBR_RESERVE && !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+    default n
+    help
+        Pinned-ABI placement experiment. Reserve the unchanged 12288-byte AAC
+        workspace before larger allocations. Uses TLS slot 1 during SDK calls;
+        no DSP or format changes. Require physical switching/heap acceptance.
+
+config YORADIO_AAC_RELOCATE_PS
+    bool "Relocate AAC PS control to unused right-channel workspace"
+    depends on YORADIO_AAC_EARLY_SCRATCH_RESERVE
+    default n
+    help
+        Pinned lossless SBR layout: owner 55128 -> 51596 bytes. Keep each
+        decoder's ownership in its TLS-scoped adapter context. Normal close/
+        reopen is supported; do not call the vendor's broken direct reset.
+        Experimental until full-radio playback/OTA/stack gates are met.
+
+config YORADIO_AAC_COMPACT_SBR
+    bool "Use lossless compact SBR tables and relocated PS control"
+    depends on IDF_TARGET_ESP32C3 && YORADIO_AAC_DECODER_ESPRESSIF && YORADIO_AAC_PLUS
+    depends on !YORADIO_AAC_EARLY_SBR_RESERVE && !YORADIO_AAC_EARLY_SCRATCH_RESERVE
+    depends on !YORADIO_CODEC_MEMORY_TRACE && !YORADIO_HEAP_LAYOUT_DIAGNOSTICS && !YORADIO_QEMU_AAC_PACKED_HISTORY_TEST
+    default n
+    help
+        Audited archive only: owner 55128 -> 49708 bytes with native DSP.
+        Per-decoder ownership, repaired direct reset and close/reopen support.
+        SBR allocation failure is an error, never accepted as core-only PCM.
+        Experimental until full-radio memory, CPU and OTA gates are met.
+
+config YORADIO_AAC_HIGH_HISTORY
+    bool "Pack retained high-QMF history"
+    depends on YORADIO_AAC_COMPACT_SBR
+    default n
+    help
+        PC18 by default; full-rate SBR/PS arithmetic stays int32. Shrinks
+        the compact owner from 49708 to 47980 bytes. Per-decoder TLS context
+        isolates unpack/pack calls. Experimental until full-radio memory,
+        CPU and OTA gates pass; production PCM error must be <=3 LSB.
+
+config YORADIO_AAC_HIGH_HISTORY_PC19
+    bool "Use 19-bit QMF mantissas with per-decoder extra bits"
+    depends on YORADIO_AAC_HIGH_HISTORY && !YORADIO_QEMU_AAC_HIGH_HISTORY_PC16
+    default n
+    help
+        Retain 19-bit real/imaginary mantissas and a shared four-bit shift.
+        Keep the PC18-sized owner and add 144 bytes to the decoder context.
+        Synthetic SBR-gap and retained real-recording PCM comparisons pass
+        the 3-LSB limit. Physical CPU, network/heap and OTA gates remain open.
+
+config YORADIO_AAC_SMOOTHING_HISTORY
+    bool "Retain four SBR smoothing rows with a scoped fifth row"
+    depends on YORADIO_AAC_HIGH_HISTORY
+    default n
+    help
+        Preserve all five FIR terms and native integer arithmetic. Shrinks the
+        PC18 owner from 47980 to 45932 bytes, using 1024 temporary stack bytes
+        plus wrapper overhead during complex envelope processing. Requires
+        physical stack, full-radio memory, CPU and OTA qualification.
+
+config YORADIO_AAC_LOW_WORKSPACE
+    bool "Retain low-QMF history and use a scoped decoder-stack matrix"
+    depends on YORADIO_AAC_SMOOTHING_HISTORY
+    default n
+    help
+        Preserve native SBR/PS arithmetic and all eight low-QMF history rows.
+        Shrinks the owner from 45932 to 35900 bytes and uses a 10240-byte
+        matrix on the existing 16384-byte decoder stack. No QEMU poisoning
+        or pointer registry in production. Requires physical stack, CPU,
+        full-radio memory and OTA qualification before default use.
+
+config YORADIO_AAC_ASYMMETRIC_OWNER
+    bool "Reserve PS overlay only in the right SBR channel"
+    depends on YORADIO_AAC_LOW_WORKSPACE
+    default n
+    help
+        Retain full native SBR/PS arithmetic and the complete right-channel PS
+        overlay. Common prefix pointer tables allow a smaller left channel,
+        reducing the owner from 35900 to 32744 bytes. Uses the same 16384-byte
+        decoder stack. Requires physical CPU, memory, network and OTA gates
+        before enabling by default; no test instrumentation in production.
+
+config YORADIO_AAC_PS_PC16
+    bool "Store PS complex delays as 16+16 with grouped exponent nibbles"
+    depends on YORADIO_AAC_RELOCATE_PS
+    default n
+    help
+        Development compression: eight complex mantissa words plus one word
+        holding their independent four-bit exponents. Full SBR/PS arithmetic
+        remains int32. Require PCM <=5 LSB during development, <=3 in production,
+        plus speed and full-radio lifecycle qualification.
+
+config YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
+    bool "QEMU compact production adapter ownership and reset tests"
+    depends on YORADIO_QEMU_AAC_TEST && YORADIO_AAC_COMPACT_SBR
+    default n
+    help
+        Exercise real SDK failure cleanup, task isolation and reset through
+        the production adapter. Fault injection exists only in this test mode.
+
+config YORADIO_QEMU_AAC_POINTER_AUDIT
+    bool "Audit exact AAC pointer targets and lifetimes in QEMU"
+    depends on YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST && YORADIO_AAC_SMOOTHING_HISTORY
+    default n
+    help
+        Validate core allocations, SBR workspace bindings, PS pointer tables,
+        rotating smoothing rows and stack ownership. Test-only instrumentation.
+
+config YORADIO_QEMU_AAC_LOW_WORKSPACE
+    bool "Keep only low-QMF history in the owner; use scoped stack rows"
+    depends on YORADIO_QEMU_AAC_POINTER_AUDIT && !YORADIO_QEMU_AAC_LOW_LIFETIME
+    default n
+    help
+        Experimental smaller owner. Retain eight low-QMF rows per channel,
+        preserve the right-channel PS overlay and use a 10 KiB call-local matrix.
+        Requires exact PCM, stack, reset and pointer qualification before use.
+
+config YORADIO_QEMU_AAC_ASYMMETRIC_OWNER
+    bool "Keep PS overlay only in the right SBR channel"
+    depends on YORADIO_QEMU_AAC_LOW_WORKSPACE
+    default n
+    help
+        Experimental asymmetric owner with common prefix pointer tables.
+        Preserve all native SBR/PS arithmetic. Requires exact pointer, PCM,
+        reset, allocation and stack qualification before physical integration.
+
+config YORADIO_QEMU_AAC_LOW_LIFETIME
+    bool "Poison transient low-QMF rows before each audited decode"
+    depends on YORADIO_QEMU_AAC_POINTER_AUDIT
+    default n
+    help
+        QEMU-only lifetime experiment. Overwrite rows 8..39 before analysis and
+        require unchanged complete PCM. Does not shrink the production owner.
+
+config YORADIO_QEMU_AAC_LOW_POISON_HISTORY
+    bool "Negative control: also poison the last retained QMF row"
+    depends on YORADIO_QEMU_AAC_LOW_LIFETIME
+    default n
+    help
+        Intentionally damages required row 7 to verify the PCM comparison
+        detects a broken history lifetime. Never enable in board firmware.
+
+config YORADIO_AAC_PS_PC16_CACHE
+    bool "Cache reconstructed PC16 complex delays"
+    depends on YORADIO_AAC_PS_PC16 || YORADIO_QEMU_AAC_PC16_WRITE_TEST
+    default n
+    help
+        Four eight-pair cache lines, 288 stack bytes during PS decorrelation.
+        Packed writes invalidate entries so rounding remains identical.
+        Experimental: measure instruction cost and stack before enabling.
+
+config YORADIO_ROTARY_ENCODER
+    bool "Enable external rotary encoder"
+    default n
+    help
+        Enable the Arduino-compatible primary encoder behavior: rotation
+        changes volume with optional acceleration and a short switch click
+        toggles play/pause. The native OLED UI has no station-list menu, so
+        the Arduino long-press menu gesture is intentionally not assigned.
+
+if YORADIO_ROTARY_ENCODER
+
+config YORADIO_ROTARY_ENCODER_GPIO_A
+    int "Encoder phase A GPIO"
+    range 0 21
+    default 0
+
+config YORADIO_ROTARY_ENCODER_GPIO_B
+    int "Encoder phase B GPIO"
+    range 0 21
+    default 1
+
+config YORADIO_ROTARY_ENCODER_STEPS
+    int "Quadrature transitions per detent"
+    range 1 4
+    default 4
+
+config YORADIO_ROTARY_ENCODER_PULLUP
+    bool "Enable internal pull-ups"
+    default y
+
+config YORADIO_ROTARY_ENCODER_REVERSE
+    bool "Reverse rotation direction"
+    default n
+
+config YORADIO_ROTARY_ENCODER_BUTTON
+    bool "Enable encoder push switch"
+    default y
+
+config YORADIO_ROTARY_ENCODER_BUTTON_GPIO
+    int "Encoder switch GPIO"
+    range 0 21
+    default 4
+    depends on YORADIO_ROTARY_ENCODER_BUTTON
+
+endif
+
+config YORADIO_OLED_HW_SCROLL
+    bool "Use SSD1306 hardware text scrolling"
+    default n
+    help
+        Use the SSD1306 horizontal scroll engine for text that fits its
+        128-column GDDRAM. Longer text automatically keeps the software
+        scrolling path so metadata is never truncated.
+
+choice YORADIO_FLAC_DECODER
+    prompt "FLAC decoder implementation"
+    default YORADIO_FLAC_DECODER_CUSTOM
+    help
+        Select the FLAC decoder used by the native audio pipeline. The custom
+        decoder reuses yoRadio's O3-optimized, block-sized implementation.
+        The Espressif decoder remains available for comparison and fallback.
+
+    config YORADIO_FLAC_DECODER_CUSTOM
+        bool "yoRadio custom FLAC (recommended)"
+
+    config YORADIO_FLAC_DECODER_ESPRESSIF
+        bool "Espressif esp_audio_codec FLAC"
+endchoice
+
+config YORADIO_FLAC_BYTEWISE_RICE
+    bool "Experimental bytewise FLAC Rice reader"
+    depends on YORADIO_FLAC_DECODER_CUSTOM
+    default n
+    help
+        Count a Rice unary run within each cached byte instead of reading
+        individual bits. Preserves sample precision and input bounds. Use
+        for target performance comparisons; host timing is not C3 timing.
+
+endmenu

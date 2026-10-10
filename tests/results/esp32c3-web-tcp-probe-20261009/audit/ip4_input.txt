@@ -1,0 +1,249 @@
+42087622:	7179                	addi	sp,sp,-48
+42087624:	d226                	sw	s1,36(sp)
+42087626:	4144                	lw	s1,4(a0)
+42087628:	d422                	sw	s0,40(sp)
+4208762a:	d606                	sw	ra,44(sp)
+4208762c:	0004c783          	lbu	a5,0(s1)
+42087630:	4711                	li	a4,4
+42087632:	842a                	mv	s0,a0
+42087634:	0047d693          	srli	a3,a5,0x4
+42087638:	06e69863          	bne	a3,a4,420876a8 <ip4_input+0x86>
+4208763c:	0024d503          	lhu	a0,2(s1)
+42087640:	8bbd                	andi	a5,a5,15
+42087642:	d04a                	sw	s2,32(sp)
+42087644:	ce4e                	sw	s3,28(sp)
+42087646:	892e                	mv	s2,a1
+42087648:	00279993          	slli	s3,a5,0x2
+4208764c:	aabf50ef          	jal	4207d0f6 <lwip_htons>
+42087650:	00845783          	lhu	a5,8(s0)
+42087654:	85aa                	mv	a1,a0
+42087656:	06f56263          	bltu	a0,a5,420876ba <ip4_input+0x98>
+4208765a:	00a45783          	lhu	a5,10(s0)
+4208765e:	0537e363          	bltu	a5,s3,420876a4 <ip4_input+0x82>
+42087662:	00845783          	lhu	a5,8(s0)
+42087666:	02b7ef63          	bltu	a5,a1,420876a4 <ip4_input+0x82>
+4208766a:	0149b793          	sltiu	a5,s3,20
+4208766e:	eb9d                	bnez	a5,420876a4 <ip4_input+0x82>
+42087670:	4894                	lw	a3,16(s1)
+42087672:	44c8                	lw	a0,12(s1)
+42087674:	3fc977b7          	lui	a5,0x3fc97
+42087678:	b6078793          	addi	a5,a5,-1184 # 3fc96b60 <ip_data>
+4208767c:	cbd4                	sw	a3,20(a5)
+4208767e:	cb88                	sw	a0,16(a5)
+42087680:	0f06f593          	andi	a1,a3,240
+42087684:	0e000613          	li	a2,224
+42087688:	03994703          	lbu	a4,57(s2)
+4208768c:	04c59163          	bne	a1,a2,420876ce <ip4_input+0xac>
+42087690:	02077713          	andi	a4,a4,32
+42087694:	18071d63          	bnez	a4,4208782e <ip4_input+0x20c>
+42087698:	0094c683          	lbu	a3,9(s1)
+4208769c:	4745                	li	a4,17
+4208769e:	16e68263          	beq	a3,a4,42087802 <ip4_input+0x1e0>
+420876a2:	e145                	bnez	a0,42087742 <ip4_input+0x120>
+420876a4:	5902                	lw	s2,32(sp)
+420876a6:	49f2                	lw	s3,28(sp)
+420876a8:	8522                	mv	a0,s0
+420876aa:	8dbf70ef          	jal	4207ef84 <pbuf_free>
+420876ae:	50b2                	lw	ra,44(sp)
+420876b0:	5422                	lw	s0,40(sp)
+420876b2:	5492                	lw	s1,36(sp)
+420876b4:	4501                	li	a0,0
+420876b6:	6145                	addi	sp,sp,48
+420876b8:	8082                	ret
+420876ba:	c42a                	sw	a0,8(sp)
+420876bc:	8522                	mv	a0,s0
+420876be:	badf70ef          	jal	4207f26a <pbuf_realloc>
+420876c2:	00a45783          	lhu	a5,10(s0)
+420876c6:	45a2                	lw	a1,8(sp)
+420876c8:	f937fde3          	bgeu	a5,s3,42087662 <ip4_input+0x40>
+420876cc:	bfe1                	j	420876a4 <ip4_input+0x82>
+420876ce:	8b05                	andi	a4,a4,1
+420876d0:	c305                	beqz	a4,420876f0 <ip4_input+0xce>
+420876d2:	00492703          	lw	a4,4(s2)
+420876d6:	cf09                	beqz	a4,420876f0 <ip4_input+0xce>
+420876d8:	20e68863          	beq	a3,a4,420878e8 <ip4_input+0x2c6>
+420876dc:	8536                	mv	a0,a3
+420876de:	85ca                	mv	a1,s2
+420876e0:	21ed                	jal	42087bca <ip4_addr_isbroadcast_u32>
+420876e2:	3fc977b7          	lui	a5,0x3fc97
+420876e6:	b6078793          	addi	a5,a5,-1184 # 3fc96b60 <ip_data>
+420876ea:	20051363          	bnez	a0,420878f0 <ip4_input+0x2ce>
+420876ee:	4bd4                	lw	a3,20(a5)
+420876f0:	0ff6f693          	zext.b	a3,a3
+420876f4:	07f00713          	li	a4,127
+420876f8:	02e68e63          	beq	a3,a4,42087734 <ip4_input+0x112>
+420876fc:	3fc9a737          	lui	a4,0x3fc9a
+42087700:	f6872703          	lw	a4,-152(a4) # 3fc99f68 <netif_list>
+42087704:	cb05                	beqz	a4,42087734 <ip4_input+0x112>
+42087706:	02e90563          	beq	s2,a4,42087730 <ip4_input+0x10e>
+4208770a:	03974683          	lbu	a3,57(a4)
+4208770e:	8a85                	andi	a3,a3,1
+42087710:	c285                	beqz	a3,42087730 <ip4_input+0x10e>
+42087712:	4354                	lw	a3,4(a4)
+42087714:	ce91                	beqz	a3,42087730 <ip4_input+0x10e>
+42087716:	4bc8                	lw	a0,20(a5)
+42087718:	85ba                	mv	a1,a4
+4208771a:	1ea68063          	beq	a3,a0,420878fa <ip4_input+0x2d8>
+4208771e:	c43a                	sw	a4,8(sp)
+42087720:	216d                	jal	42087bca <ip4_addr_isbroadcast_u32>
+42087722:	3fc977b7          	lui	a5,0x3fc97
+42087726:	4722                	lw	a4,8(sp)
+42087728:	b6078793          	addi	a5,a5,-1184 # 3fc96b60 <ip_data>
+4208772c:	1c051763          	bnez	a0,420878fa <ip4_input+0x2d8>
+42087730:	4318                	lw	a4,0(a4)
+42087732:	fb71                	bnez	a4,42087706 <ip4_input+0xe4>
+42087734:	0094c683          	lbu	a3,9(s1)
+42087738:	4745                	li	a4,17
+4208773a:	0ce68f63          	beq	a3,a4,42087818 <ip4_input+0x1f6>
+4208773e:	4b88                	lw	a0,16(a5)
+42087740:	d135                	beqz	a0,420876a4 <ip4_input+0x82>
+42087742:	4701                	li	a4,0
+42087744:	85ca                	mv	a1,s2
+42087746:	c43a                	sw	a4,8(sp)
+42087748:	2149                	jal	42087bca <ip4_addr_isbroadcast_u32>
+4208774a:	fd29                	bnez	a0,420876a4 <ip4_input+0x82>
+4208774c:	3fc977b7          	lui	a5,0x3fc97
+42087750:	b6078793          	addi	a5,a5,-1184 # 3fc96b60 <ip_data>
+42087754:	4b94                	lw	a3,16(a5)
+42087756:	0e000613          	li	a2,224
+4208775a:	0f06f693          	andi	a3,a3,240
+4208775e:	f4c683e3          	beq	a3,a2,420876a4 <ip4_input+0x82>
+42087762:	4722                	lw	a4,8(sp)
+42087764:	d321                	beqz	a4,420876a4 <ip4_input+0x82>
+42087766:	0064d683          	lhu	a3,6(s1)
+4208776a:	f3f6f693          	andi	a3,a3,-193
+4208776e:	fa9d                	bnez	a3,420876a4 <ip4_input+0x82>
+42087770:	cc52                	sw	s4,24(sp)
+42087772:	c398                	sw	a4,0(a5)
+42087774:	0127a223          	sw	s2,4(a5)
+42087778:	c784                	sw	s1,8(a5)
+4208777a:	0004c683          	lbu	a3,0(s1)
+4208777e:	85ca                	mv	a1,s2
+42087780:	8522                	mv	a0,s0
+42087782:	8abd                	andi	a3,a3,15
+42087784:	068a                	slli	a3,a3,0x2
+42087786:	00d79623          	sh	a3,12(a5)
+4208778a:	c43a                	sw	a4,8(sp)
+4208778c:	950f80ef          	jal	4207f8dc <raw_input>
+42087790:	3fc97a37          	lui	s4,0x3fc97
+42087794:	4685                	li	a3,1
+42087796:	b60a0793          	addi	a5,s4,-1184 # 3fc96b60 <ip_data>
+4208779a:	04d50463          	beq	a0,a3,420877e2 <ip4_input+0x1c0>
+4208779e:	85ce                	mv	a1,s3
+420877a0:	c62a                	sw	a0,12(sp)
+420877a2:	8522                	mv	a0,s0
+420877a4:	f08f70ef          	jal	4207eeac <pbuf_remove_header>
+420877a8:	0094c583          	lbu	a1,9(s1)
+420877ac:	4519                	li	a0,6
+420877ae:	b60a0793          	addi	a5,s4,-1184
+420877b2:	0ca58763          	beq	a1,a0,42087880 <ip4_input+0x25e>
+420877b6:	4632                	lw	a2,12(sp)
+420877b8:	4722                	lw	a4,8(sp)
+420877ba:	0ab56763          	bltu	a0,a1,42087868 <ip4_input+0x246>
+420877be:	4685                	li	a3,1
+420877c0:	10d58b63          	beq	a1,a3,420878d6 <ip4_input+0x2b4>
+420877c4:	4689                	li	a3,2
+420877c6:	0cd59663          	bne	a1,a3,42087892 <ip4_input+0x270>
+420877ca:	3fc97637          	lui	a2,0x3fc97
+420877ce:	85ca                	mv	a1,s2
+420877d0:	8522                	mv	a0,s0
+420877d2:	b7460613          	addi	a2,a2,-1164 # 3fc96b74 <ip_data+0x14>
+420877d6:	973ff0ef          	jal	42087148 <igmp_input>
+420877da:	3fc977b7          	lui	a5,0x3fc97
+420877de:	b6078793          	addi	a5,a5,-1184 # 3fc96b60 <ip_data>
+420877e2:	5902                	lw	s2,32(sp)
+420877e4:	49f2                	lw	s3,28(sp)
+420877e6:	4a62                	lw	s4,24(sp)
+420877e8:	0007a023          	sw	zero,0(a5)
+420877ec:	0007a223          	sw	zero,4(a5)
+420877f0:	0007a423          	sw	zero,8(a5)
+420877f4:	00079623          	sh	zero,12(a5)
+420877f8:	0007a823          	sw	zero,16(a5)
+420877fc:	0007aa23          	sw	zero,20(a5)
+42087800:	b57d                	j	420876ae <ip4_input+0x8c>
+42087802:	01348733          	add	a4,s1,s3
+42087806:	00275683          	lhu	a3,2(a4)
+4208780a:	6711                	lui	a4,0x4
+4208780c:	40070713          	addi	a4,a4,1024 # 4400 <_rtc_slow_length+0x2924>
+42087810:	e8e699e3          	bne	a3,a4,420876a2 <ip4_input+0x80>
+42087814:	874a                	mv	a4,s2
+42087816:	bf81                	j	42087766 <ip4_input+0x144>
+42087818:	01348733          	add	a4,s1,s3
+4208781c:	00275683          	lhu	a3,2(a4)
+42087820:	6711                	lui	a4,0x4
+42087822:	40070713          	addi	a4,a4,1024 # 4400 <_rtc_slow_length+0x2924>
+42087826:	fee687e3          	beq	a3,a4,42087814 <ip4_input+0x1f2>
+4208782a:	4b88                	lw	a0,16(a5)
+4208782c:	bf11                	j	42087740 <ip4_input+0x11e>
+4208782e:	3fc975b7          	lui	a1,0x3fc97
+42087832:	b7458593          	addi	a1,a1,-1164 # 3fc96b74 <ip_data+0x14>
+42087836:	854a                	mv	a0,s2
+42087838:	8fdff0ef          	jal	42087134 <igmp_lookfor_group>
+4208783c:	3fc977b7          	lui	a5,0x3fc97
+42087840:	b6078793          	addi	a5,a5,-1184 # 3fc96b60 <ip_data>
+42087844:	ee0508e3          	beqz	a0,42087734 <ip4_input+0x112>
+42087848:	4bd0                	lw	a2,20(a5)
+4208784a:	010006b7          	lui	a3,0x1000
+4208784e:	0e068693          	addi	a3,a3,224 # 10000e0 <_rtc_slow_length+0xffe604>
+42087852:	4b88                	lw	a0,16(a5)
+42087854:	874a                	mv	a4,s2
+42087856:	00d60563          	beq	a2,a3,42087860 <ip4_input+0x23e>
+4208785a:	f00506e3          	beqz	a0,42087766 <ip4_input+0x144>
+4208785e:	b5dd                	j	42087744 <ip4_input+0x122>
+42087860:	ee0512e3          	bnez	a0,42087744 <ip4_input+0x122>
+42087864:	874a                	mv	a4,s2
+42087866:	b701                	j	42087766 <ip4_input+0x144>
+42087868:	46c5                	li	a3,17
+4208786a:	02d59463          	bne	a1,a3,42087892 <ip4_input+0x270>
+4208786e:	85ca                	mv	a1,s2
+42087870:	8522                	mv	a0,s0
+42087872:	e85fb0ef          	jal	420836f6 <udp_input>
+42087876:	3fc977b7          	lui	a5,0x3fc97
+4208787a:	b6078793          	addi	a5,a5,-1184 # 3fc96b60 <ip_data>
+4208787e:	b795                	j	420877e2 <ip4_input+0x1c0>
+42087880:	85ca                	mv	a1,s2
+42087882:	8522                	mv	a0,s0
+42087884:	f8f9a0ef          	jal	42022812 <__wrap_tcp_input>
+42087888:	3fc977b7          	lui	a5,0x3fc97
+4208788c:	b6078793          	addi	a5,a5,-1184 # 3fc96b60 <ip_data>
+42087890:	bf89                	j	420877e2 <ip4_input+0x1c0>
+42087892:	4489                	li	s1,2
+42087894:	02960963          	beq	a2,s1,420878c6 <ip4_input+0x2a4>
+42087898:	4bc8                	lw	a0,20(a5)
+4208789a:	85ba                	mv	a1,a4
+4208789c:	3fc97937          	lui	s2,0x3fc97
+420878a0:	262d                	jal	42087bca <ip4_addr_isbroadcast_u32>
+420878a2:	b6090793          	addi	a5,s2,-1184 # 3fc96b60 <ip_data>
+420878a6:	e105                	bnez	a0,420878c6 <ip4_input+0x2a4>
+420878a8:	4bd8                	lw	a4,20(a5)
+420878aa:	0e000693          	li	a3,224
+420878ae:	0f077713          	andi	a4,a4,240
+420878b2:	00d70a63          	beq	a4,a3,420878c6 <ip4_input+0x2a4>
+420878b6:	85ce                	mv	a1,s3
+420878b8:	8522                	mv	a0,s0
+420878ba:	e50f70ef          	jal	4207ef0a <pbuf_header_force>
+420878be:	85a6                	mv	a1,s1
+420878c0:	8522                	mv	a0,s0
+420878c2:	bf0ff0ef          	jal	42086cb2 <icmp_dest_unreach>
+420878c6:	8522                	mv	a0,s0
+420878c8:	ebcf70ef          	jal	4207ef84 <pbuf_free>
+420878cc:	3fc977b7          	lui	a5,0x3fc97
+420878d0:	b6078793          	addi	a5,a5,-1184 # 3fc96b60 <ip_data>
+420878d4:	b739                	j	420877e2 <ip4_input+0x1c0>
+420878d6:	85ca                	mv	a1,s2
+420878d8:	8522                	mv	a0,s0
+420878da:	9b6ff0ef          	jal	42086a90 <icmp_input>
+420878de:	3fc977b7          	lui	a5,0x3fc97
+420878e2:	b6078793          	addi	a5,a5,-1184 # 3fc96b60 <ip_data>
+420878e6:	bdf5                	j	420877e2 <ip4_input+0x1c0>
+420878e8:	874a                	mv	a4,s2
+420878ea:	e6050ee3          	beqz	a0,42087766 <ip4_input+0x144>
+420878ee:	bd99                	j	42087744 <ip4_input+0x122>
+420878f0:	4b88                	lw	a0,16(a5)
+420878f2:	874a                	mv	a4,s2
+420878f4:	e60509e3          	beqz	a0,42087766 <ip4_input+0x144>
+420878f8:	b5b1                	j	42087744 <ip4_input+0x122>
+420878fa:	4b88                	lw	a0,16(a5)
+420878fc:	e60505e3          	beqz	a0,42087766 <ip4_input+0x144>
+42087900:	b591                	j	42087744 <ip4_input+0x122>
+

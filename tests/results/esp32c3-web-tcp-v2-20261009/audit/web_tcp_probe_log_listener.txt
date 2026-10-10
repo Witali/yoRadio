@@ -1,0 +1,37 @@
+42022812:	0842                	slli	a6,a6,0x10
+42022814:	00e86833          	or	a6,a6,a4
+42022818:	06c2                	slli	a3,a3,0x10
+4202281a:	08e2                	slli	a7,a7,0x18
+4202281c:	711d                	addi	sp,sp,-96
+4202281e:	011868b3          	or	a7,a6,a7
+42022822:	07a2                	slli	a5,a5,0x8
+42022824:	00c6e833          	or	a6,a3,a2
+42022828:	3c12a637          	lui	a2,0x3c12a
+4202282c:	00f8e8b3          	or	a7,a7,a5
+42022830:	872a                	mv	a4,a0
+42022832:	87ae                	mv	a5,a1
+42022834:	04c00693          	li	a3,76
+42022838:	c002                	sw	zero,0(sp)
+4202283a:	0848                	addi	a0,sp,20
+4202283c:	5c060613          	addi	a2,a2,1472 # 3c12a5c0 <_esp_libc_clock_array_end+0xa470>
+42022840:	03b00593          	li	a1,59
+42022844:	ce86                	sw	ra,92(sp)
+42022846:	632e70ef          	jal	42109e78 <snprintf>
+4202284a:	084c                	addi	a1,sp,20
+4202284c:	03100613          	li	a2,49
+42022850:	4501                	li	a0,0
+42022852:	fdfde097          	auipc	ra,0xfdfde
+42022856:	dd6080e7          	jalr	-554(ra) # 40000628 <crc32_le>
+4202285a:	3c13a637          	lui	a2,0x3c13a
+4202285e:	86aa                	mv	a3,a0
+42022860:	b1860613          	addi	a2,a2,-1256 # 3c139b18 <_esp_libc_clock_array_end+0x199c8>
+42022864:	04510513          	addi	a0,sp,69
+42022868:	45a9                	li	a1,10
+4202286a:	60ee70ef          	jal	42109e78 <snprintf>
+4202286e:	9581a583          	lw	a1,-1704(gp) # 3fc8bd58 <stdout>
+42022872:	0848                	addi	a0,sp,20
+42022874:	03ce70ef          	jal	421098b0 <fputs>
+42022878:	40f6                	lw	ra,92(sp)
+4202287a:	6125                	addi	sp,sp,96
+4202287c:	8082                	ret
+

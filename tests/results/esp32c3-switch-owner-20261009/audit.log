@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\.build\c3-switch-owner-20261009\audit.py", line 50, in <module>
+    disassembly=subprocess.check_output([str(OBJDUMP),'-d',str(elf)],text=True)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 1538, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [WinError 623] {Недопустимое перемещение системной DLL}
+
+Системная библиотека %hs перемещена в памяти. Работа приложения будет нарушена.
+
+Перемещение произошло из-за того, что библиотека %hs заняла область адресов, зарезервированную для системных DLL Windows. Обратитесь к поставщику за новой версией библиотеки

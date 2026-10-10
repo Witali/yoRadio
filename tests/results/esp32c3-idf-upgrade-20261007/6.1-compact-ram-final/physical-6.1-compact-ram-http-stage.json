@@ -1,0 +1,104 @@
+[
+  {
+    "name": "install-6.1-compact-ram-http",
+    "code": 0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-ram-http-production\\app.bin",
+      "--output",
+      ".build\\idf-upgrade\\install-6.1-compact-ram-http.json"
+    ]
+  },
+  {
+    "name": "physical-6.1-compact-ram-http-headers-recheck",
+    "code": 0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/http_headers.py",
+      "--board",
+      "http://192.168.100.4",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-ram-http-production\\app.bin",
+      "--output",
+      ".build\\idf-upgrade\\physical-6.1-compact-ram-http-headers-recheck.json"
+    ]
+  },
+  {
+    "name": "physical-6.1-compact-ram-http-ota",
+    "code": 0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/ota.py",
+      "--board",
+      "http://192.168.100.4",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-ram-http-production\\app.bin",
+      "--suite",
+      "negative",
+      "--suite",
+      "roundtrip",
+      "--suite",
+      "slow",
+      "--output",
+      ".build\\idf-upgrade\\physical-6.1-compact-ram-http-ota.json"
+    ]
+  },
+  {
+    "name": "physical-6.1-compact-ram-http-production",
+    "code": 0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/run.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--sdkconfig",
+      "firmware\\development\\esp32c3-idf-6.1-compact-ram-http-production\\sdkconfig",
+      "--suite",
+      "http",
+      "--suite",
+      "transitions",
+      "--suite",
+      "websocket",
+      "--suite",
+      "boot-time",
+      "--cycles",
+      "2",
+      "--output",
+      ".build\\idf-upgrade\\physical-6.1-compact-ram-http-production",
+      "--case",
+      "lc-48000-stereo",
+      "--case",
+      "he-48000-stereo",
+      "--case",
+      "hev2-44100-stereo"
+    ]
+  },
+  {
+    "name": "physical-6.1-compact-ram-http-quiet-https",
+    "code": 1,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/quiet-public.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-ram-http-production\\app.bin",
+      "--output",
+      ".build\\idf-upgrade\\physical-6.1-compact-ram-http-quiet-https",
+      "--aac-reference-command",
+      ".build\\idf-upgrade\\faad-reference-command.json"
+    ]
+  }
+]

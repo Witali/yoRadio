@@ -1,0 +1,224 @@
+{
+  "result": "PASS",
+  "scope": "Evidence and original verdict validation; does not turn failed runs into passes or qualify analog sound.",
+  "trials": [
+    {
+      "name": "expanded-owner",
+      "passed": 13,
+      "total": 15,
+      "failures": [
+        {
+          "name": "cross-stage-recovery",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Cross-stage contiguous-memory recovery failed",
+          "seconds": 0.0
+        },
+        {
+          "name": "runtime",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Runtime allocation/decoder/TLS failure",
+          "seconds": 0.0
+        }
+      ],
+      "initial_raw_free": 104424,
+      "final_raw_free": 94164,
+      "final_live": 1,
+      "runtime": [
+        {
+          "at": 248088.406,
+          "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+        }
+      ],
+      "transport_failures": [],
+      "full_capture_runtime": {
+        "name": "full-capture-runtime",
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder/TLS failure"
+      }
+    },
+    {
+      "name": "control-owner",
+      "passed": 14,
+      "total": 15,
+      "failures": [
+        {
+          "name": "runtime",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Runtime allocation/decoder/TLS failure",
+          "seconds": 0.0
+        }
+      ],
+      "initial_raw_free": 100076,
+      "final_raw_free": 100076,
+      "final_live": 0,
+      "runtime": [
+        {
+          "at": 248501.687,
+          "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+        }
+      ],
+      "transport_failures": [],
+      "full_capture_runtime": {
+        "name": "full-capture-runtime",
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder/TLS failure"
+      }
+    },
+    {
+      "name": "original-growth",
+      "passed": 15,
+      "total": 15,
+      "failures": [],
+      "initial_raw_free": 104556,
+      "final_raw_free": 95576,
+      "final_live": 2,
+      "runtime": [],
+      "transport_failures": [],
+      "full_capture_runtime": {
+        "name": "full-capture-runtime",
+        "result": "PASS",
+        "evidence": null
+      }
+    },
+    {
+      "name": "retained-growth",
+      "passed": 15,
+      "total": 15,
+      "failures": [],
+      "initial_raw_free": 99204,
+      "final_raw_free": 99204,
+      "final_live": 0,
+      "runtime": [
+        {
+          "at": 249955.734,
+          "line": "serial capture interrupted: incomplete final line"
+        }
+      ],
+      "transport_failures": [],
+      "full_capture_runtime": {
+        "name": "full-capture-runtime",
+        "result": "FAIL",
+        "reason": "Serial panic or capture failure"
+      }
+    },
+    {
+      "name": "retained-confirmed",
+      "passed": 15,
+      "total": 16,
+      "failures": [
+        {
+          "name": "tls-record:grow",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "URLError"
+            },
+            {
+              "type": "TimeoutError"
+            },
+            {
+              "type": "URLError"
+            },
+            {
+              "type": "TimeoutError"
+            }
+          ],
+          "reason": "URLError",
+          "seconds": 46.015
+        }
+      ],
+      "initial_raw_free": 107828,
+      "final_raw_free": 107828,
+      "final_live": 0,
+      "runtime": [],
+      "transport_failures": [
+        {
+          "request": 646,
+          "phase": "connect",
+          "at": 250437.062,
+          "result": "FAIL",
+          "error_type": "TimeoutError",
+          "ms": 5016.00000000326
+        },
+        {
+          "request": 646,
+          "phase": "request_including_connect",
+          "at": 250437.062,
+          "result": "FAIL",
+          "error_type": "TimeoutError",
+          "ms": 5016.00000000326
+        },
+        {
+          "request": 647,
+          "phase": "connect",
+          "at": 250442.078,
+          "result": "FAIL",
+          "error_type": "TimeoutError",
+          "ms": 5014.999999984866
+        },
+        {
+          "request": 647,
+          "phase": "request_including_connect",
+          "at": 250442.078,
+          "result": "FAIL",
+          "error_type": "TimeoutError",
+          "ms": 5014.999999984866
+        }
+      ],
+      "full_capture_runtime": {
+        "name": "full-capture-runtime",
+        "result": "PASS",
+        "evidence": null
+      }
+    }
+  ],
+  "source_changes": [
+    "idf/esp32c3-oled-native/main/adaptive_input.c",
+    "idf/esp32c3-oled-native/main/adaptive_input.h",
+    "idf/esp32c3-oled-native/main/tls_input_reserve.c"
+  ],
+  "section_size_delta": {
+    ".rtc.text": 0,
+    ".iram0.end": 0,
+    ".dram0.dummy": 0,
+    ".rtc.force_slow": 0,
+    ".dram0.heap_start": 0,
+    ".rtc.force_fast": 0,
+    ".rtc.data": 0,
+    ".iram0.text": 0,
+    ".iram0.text_end": 0,
+    ".iram0.data": 0,
+    ".dram0.bss": 0,
+    ".dram0.data": 0,
+    ".flash.text": 516,
+    ".iram0.bss": 0,
+    ".flash.rodata": 8
+  },
+  "host": {
+    "queue_packets": 30000,
+    "reserve_variants": 5,
+    "reserve_allocations": 40000,
+    "stream_enabled": 42,
+    "stream_disabled": 37,
+    "prefill_cases": 88
+  },
+  "capture_source_sha256": {
+    "tools/esp32c3_tests/serial_lines.py": "1b18634ddd14a044759d59c1612faca5ab842eb60fd3fa02644f9d532e8a7c7f",
+    "tests/test-serial-telemetry.py": "3a626e0cdab33348df417ff8e359bb84913f634dd51c2f73ab794bd842aba5e8"
+  }
+}

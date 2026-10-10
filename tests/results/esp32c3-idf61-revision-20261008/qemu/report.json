@@ -1,0 +1,50 @@
+{
+  "idf": "6.1-9a97f6c54ec6",
+  "returncode": 0,
+  "checks": {
+    "QEMU_SMOKE_PASS": true,
+    "QEMU_OLED_PASS": true,
+    "QEMU_AUDIO_PASS": true,
+    "QEMU_AAC_FORMAT_PASS": true,
+    "audio_file": true
+  },
+  "passed": true,
+  "command": [
+    "wsl.exe",
+    "--exec",
+    "timeout",
+    "--kill-after=2",
+    "600",
+    "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+    "-M",
+    "esp32c3,audiodev=audio0",
+    "-nographic",
+    "-no-reboot",
+    "-snapshot",
+    "-audiodev",
+    "wav,id=audio0,path=/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/idf-upgrade/qemu-head9a97/audio.wav,out.frequency=48000",
+    "-icount",
+    "shift=0,align=off,sleep=off",
+    "-L",
+    "/mnt/c/Work/QEMU-ESP32/share/qemu",
+    "-drive",
+    "file=/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/idf-upgrade/qemu-head9a97/flash.bin,if=mtd,format=raw"
+  ],
+  "app_sha256": "34967928f161d37d4936028c9058faef3e9acd34a1b45a510cd7e609bc91fb66",
+  "sdkconfig_sha256": "f88e47f238907059093670a3892ab0fcee233c7b50bba4a8ee98a85f875ff06e",
+  "fixture": null,
+  "measurements": [
+    "I (1000) qemu_aac: QEMU_AAC_CASE_PASS HE44 first: 44100 Hz 2 ch, 14 frames, 28672 samples, free 204672 min 118016",
+    "I (1219) qemu_aac: QEMU_AAC_CASE_PASS LC44 stereo: 44100 Hz 2 ch, 24 frames, 24576 samples, free 238664 min 118016",
+    "I (1639) qemu_aac: QEMU_AAC_CASE_PASS LC22 mono: 22050 Hz 1 ch, 13 frames, 13312 samples, free 238536 min 118016",
+    "I (2199) qemu_aac: QEMU_AAC_CASE_PASS LC48 stereo: 48000 Hz 2 ch, 26 frames, 26624 samples, free 238536 min 118016",
+    "I (2849) qemu_aac: QEMU_AAC_CASE_PASS HE44 stereo: 44100 Hz 2 ch, 14 frames, 28672 samples, free 204544 min 118016",
+    "I (3489) qemu_aac: QEMU_AAC_CASE_PASS HE48 stereo: 48000 Hz 2 ch, 15 frames, 30720 samples, free 204544 min 118016",
+    "I (4179) qemu_aac: QEMU_AAC_CASE_PASS HEv2 stereo: 44100 Hz 2 ch, 15 frames, 30720 samples, free 204544 min 118016",
+    "I (4789) qemu_aac: QEMU_AAC_CASE_PASS LC22 same header: 22050 Hz 1 ch, 13 frames, 13312 samples, free 238536 min 118016",
+    "I (5479) qemu_aac: QEMU_AAC_CASE_PASS Implicit SBR full: 44100 Hz 2 ch, 15 frames, 30720 samples, free 204544 min 118016",
+    "I (5479) qemu_aac: QEMU_AAC_LATE_SBR_FORMAT_PASS history retained; PCM quality still unqualified",
+    "I (6179) qemu_aac: QEMU_AAC_CASE_PASS HEv2 restart: 44100 Hz 2 ch, 15 frames, 30720 samples, free 205056 min 118016",
+    "I (8766) qemu_aac: QEMU_AAC_FORMAT_PASS full-rate HE-AAC, PS stereo and in-stream layout changes"
+  ]
+}

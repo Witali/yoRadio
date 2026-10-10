@@ -1,0 +1,54 @@
+{
+  "budget_largest_bytes": 8192,
+  "below_budget_samples": [
+    {
+      "seconds": 76.47528259999854,
+      "heap": 24668,
+      "largest": 7424,
+      "rssi": -74,
+      "request_ms": 156.91750000041793,
+      "output": {
+        "available": true,
+        "completion_queue_drops": 2132,
+        "write_errors": 0
+      }
+    }
+  ],
+  "largest_histogram": {
+    "7424": 1,
+    "8192": 1,
+    "8704": 3,
+    "9216": 7,
+    "9728": 13,
+    "10240": 12,
+    "10752": 11,
+    "11264": 26,
+    "11776": 28,
+    "12288": 40,
+    "12800": 78,
+    "13312": 66,
+    "13824": 58,
+    "14336": 54,
+    "14848": 25,
+    "15360": 47,
+    "15872": 17,
+    "16384": 13,
+    "17408": 6,
+    "18432": 1
+  },
+  "idle_medians": {
+    "initial": {
+      "heap": 139968,
+      "largest": 114688,
+      "tasks": 16
+    },
+    "final": {
+      "heap": 139716,
+      "largest": 114688,
+      "tasks": 16
+    }
+  },
+  "lifetime_minimum_heap": 12920,
+  "distinction": "Headroom gate failure, not an observed allocation failure; keep original threshold and failed verdict",
+  "next_step": "Measure allocation sizes and lifetimes under TLS frame growth before changing reserves or accepting a smaller budget"
+}

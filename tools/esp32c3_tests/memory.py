@@ -12,8 +12,8 @@ from audio_test_server.server import Server
 
 def wait_ready(board, identity):
     time.sleep(3)
-    deadline = time.monotonic() + 40
-    while time.monotonic() < deadline:
+    deadline = time.perf_counter() + 40
+    while time.perf_counter() < deadline:
         try:
             require(board.info()['app_elf_sha256'] == identity,
                     'Unexpected application after reboot')
@@ -27,8 +27,8 @@ def set_audio_buffer(board, blocks):
     with board.websocket() as ws:
         ws.send('abuff=' + str(blocks))
         ws.send('getsystem')
-        deadline = time.monotonic() + 5
-        while time.monotonic() < deadline:
+        deadline = time.perf_counter() + 5
+        while time.perf_counter() < deadline:
             value = json.loads(ws.recv(timeout=5))
             if 'abuff' in value:
                 require(value['abuff'] == blocks, 'Audio buffer setting was not applied')

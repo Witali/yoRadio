@@ -1,0 +1,179 @@
+{
+  "scope": "Provenance and complete evidence, not production or analog qualification.",
+  "configuration_difference": {
+    "CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS": {
+      "before": "0",
+      "after": "4"
+    }
+  },
+  "phases": {
+    "flac-control-before": {
+      "passed": 3,
+      "total": 4,
+      "runtime": "PASS",
+      "transport_failures": 0,
+      "growth": [],
+      "independent_failures": []
+    },
+    "flac-candidate": {
+      "passed": 4,
+      "total": 4,
+      "runtime": "PASS",
+      "transport_failures": 0,
+      "growth": [
+        {
+          "at": 244479.218,
+          "resident": 8,
+          "minimum": 4,
+          "limit": 8,
+          "target": 8,
+          "capacity": 16480
+        }
+      ],
+      "independent_failures": []
+    },
+    "flac-control-after": {
+      "passed": 4,
+      "total": 4,
+      "runtime": "PASS",
+      "transport_failures": 0,
+      "growth": [],
+      "independent_failures": []
+    },
+    "switch": {
+      "passed": 1,
+      "total": 2,
+      "runtime": "PASS",
+      "transport_failures": 0,
+      "growth": [
+        {
+          "at": 244943.875,
+          "resident": 8,
+          "minimum": 4,
+          "limit": 8,
+          "target": 8,
+          "capacity": 16480
+        },
+        {
+          "at": 244981.062,
+          "resident": 8,
+          "minimum": 4,
+          "limit": 8,
+          "target": 8,
+          "capacity": 16480
+        },
+        {
+          "at": 245017.921,
+          "resident": 8,
+          "minimum": 4,
+          "limit": 8,
+          "target": 8,
+          "capacity": 16480
+        }
+      ],
+      "independent_failures": []
+    },
+    "eof-https": {
+      "passed": 5,
+      "total": 5,
+      "runtime": "PASS",
+      "transport_failures": 0,
+      "growth": [
+        {
+          "at": 245056.406,
+          "resident": 8,
+          "minimum": 4,
+          "limit": 8,
+          "target": 8,
+          "capacity": 16480
+        },
+        {
+          "at": 245075.968,
+          "resident": 8,
+          "minimum": 4,
+          "limit": 8,
+          "target": 8,
+          "capacity": 16480
+        }
+      ],
+      "independent_failures": []
+    },
+    "records-after-switch": {
+      "passed": 5,
+      "total": 5,
+      "runtime": "PASS",
+      "transport_failures": 0,
+      "growth": [],
+      "independent_failures": []
+    }
+  },
+  "clocks": {
+    "flac-control-before": {
+      "variant": "0",
+      "qio80": true,
+      "nominal_48khz": true,
+      "mapped_crc_checks": 4
+    },
+    "flac-candidate": {
+      "variant": "4",
+      "qio80": true,
+      "nominal_48khz": true,
+      "mapped_crc_checks": 4
+    },
+    "flac-control-after": {
+      "variant": "0",
+      "qio80": true,
+      "nominal_48khz": true,
+      "mapped_crc_checks": 4
+    },
+    "switch-candidate": {
+      "variant": "4",
+      "qio80": true,
+      "nominal_48khz": true,
+      "mapped_crc_checks": 4
+    }
+  },
+  "sustained": [
+    {
+      "phase": "flac-control-before",
+      "variant": "0",
+      "telemetry": true,
+      "decoder_flow": true,
+      "output_flow": true,
+      "selected_dma_events": 77,
+      "whole_observed_dma_events": 82
+    },
+    {
+      "phase": "flac-candidate",
+      "variant": "4",
+      "telemetry": true,
+      "decoder_flow": true,
+      "output_flow": true,
+      "selected_dma_events": 7,
+      "whole_observed_dma_events": 24
+    },
+    {
+      "phase": "flac-control-after",
+      "variant": "0",
+      "telemetry": true,
+      "decoder_flow": true,
+      "output_flow": true,
+      "selected_dma_events": 11,
+      "whole_observed_dma_events": 12
+    },
+    {
+      "phase": "records-after-switch",
+      "variant": "4",
+      "telemetry": true,
+      "decoder_flow": true,
+      "output_flow": true,
+      "selected_dma_events": 0,
+      "whole_observed_dma_events": 0
+    }
+  ],
+  "result": "PASS",
+  "restored": true,
+  "source_files": 226,
+  "production_qualified": false,
+  "analog_qualified": false
+}

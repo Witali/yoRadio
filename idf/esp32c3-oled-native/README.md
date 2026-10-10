@@ -13,6 +13,11 @@ network, WebUI and audio pipeline sources were carried over from that target.
 
 ## Hardware profile
 
+Agents optimizing this target should start with the
+[ESP32-C3 optimization reference](../../docs/ESP32C3_OPTIMIZATION_REFERENCE.md)
+for CPU/memory capabilities, cycle-counter usage, measurement limits and the
+ESP-IDF 6.1 speed recommendations relevant to this board.
+
 ### RAM policy for Wi-Fi and AAC
 
 The C3 defaults and `build-production.ps1` disable `CONFIG_ESP_WIFI_IRAM_OPT`
@@ -33,11 +38,34 @@ that every networking callback remains cache-independent. See Espressif's
 and [interrupt allocation guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/api-reference/system/intr_alloc.html).
 Use `build.ps1` with a separate sdkconfig to compare Wi-Fi IRAM settings.
 
-The default full-radio profile still needs a memory-layout fix: its 55,128-byte
-SBR allocation failed in the full radio and the codec silently output only
-the AAC core. Full-rate HE/v2 passed the isolated hardware decoder benchmark.
-See the [hardware measurements](../../docs/ESP32C3_CACHE_HARDWARE_20260930.md)
-and [remaining memory work](../../docs/ESP32C3_MEMORY_STABILITY_TODO.md).
+Fresh builds now select compact PC19 SBR storage, scoped low-QMF workspace and
+the asymmetric owner. The requested SBR owner falls from 55,128 to 32,744 bytes;
+the adapter includes the PC19 side metadata. Full SBR/PS arithmetic, output
+rates/channels and the existing 16 KiB decoder stack are retained. Original
+uncompacted builds can fail the larger allocation and output only the AAC core.
+See the [compact profile evidence](../../docs/ESP32C3_AAC_PC19_NETWORK_20261004.md)
+and [current SDK qualification](../../docs/ESP32C3_IDF_UPGRADE_20261007.md).
+
+The default system RAM profile also uses the measured smaller BOOT, audio-output
+and WebSocket-status stacks (8,192 fewer requested bytes), plus 6 static Wi-Fi RX
+buffers and at most 16 dynamic RX and TX buffers each. This leaves room for the
+contiguous SBR allocation: enabling compact AAC alone still failed with a
+26,624-byte largest free block on the physical board. The shared decoder stack
+and full TLS record sizes are unchanged. The heap allocator keeps its original
+IRAM placement; the separate flash-allocator experiment is not enabled here.
+
+Compact storage does not by itself qualify every public stream. The ESP-IDF
+6.1 profiling tests still record HE allocation failures over HTTPS and network
+allocation failures for some public HTTP streams. Controlled local HE/HEv2
+playback passes at full rate; consult the current SDK report for the separate
+load, sustained-playback and quiet-production outcomes. Dynamic TLS buffers
+and the RTC TCP pool remain separate experiments, not board defaults.
+
+The optional [minimum input / TLS reservation experiment](../../docs/ESP32C3_TLS_RESERVE_20261008.md)
+reclaims only idle compressed-input slots and can reserve one full-record TLS
+allocation in static DRAM. Both options are off by default. A contiguous TLS
+slot does not guarantee enough memory for networking or every codec; consult
+the report before enabling these overlays.
 
 The optional [IRAM placement profiles](../../docs/ESP32C3_IRAM_REDUCTION_20261001.md)
 compare a 3584-byte conservative capacity saving with a 23392-byte saving using
@@ -53,6 +81,12 @@ That follow-up also found an `Illegal instruction` panic during OTA with the
 Auto Suspend placement profile. Keep that profile disabled pending diagnosis.
 
 ### Acceptance tests
+
+The optional `sdkconfig.qio80.defaults` selects QIO 80 MHz for the tested XMC
+4 MiB board. A mode change requires the matching bootloader as well as the
+application. See the [quiet QIO production deployment](../../docs/ESP32C3_PRODUCTION_QIO80_20261008.md)
+for its saved image, build recipe and completed/skipped checks; the generic
+board default remains DIO.
 
 The [testing guide](../../docs/ESP32C3_TESTING.md) lists missing coverage,
 executable HTTP/HTTPS, codec-switching, CPU/heap and OTA tests, plus procedures
@@ -169,7 +203,8 @@ The same scripts can be run directly from this directory:
 downloads into the repository-local ignored `.idf` directory:
 
 - portable CPython 3.12.10, verified by SHA-256;
-- official ESP-IDF v6.0.2 and its pinned submodules;
+- official ESP-IDF from the series in [idf-version.txt](idf-version.txt), at
+  the exact commit in [idf-revision.txt](idf-revision.txt), with pinned submodules;
 - the ESP32-C3 RISC-V compiler, CMake, Ninja, esptool and IDF Python packages;
 - official Espressif `esp_audio_codec` at commit
   `67b8d0e98f58c774b8652480893037273190e8dc`, including native ESP32-C3
@@ -177,6 +212,13 @@ downloads into the repository-local ignored `.idf` directory:
 
 Application sources compile with `-O3`. The ESP-IDF component manager is
 disabled, so builds cannot silently update dependencies.
+
+The current SDK pin is `release/v6.1` commit
+`9a97f6c54ec638111ce55cd36581b3c192f15207`, checked on 2026-10-08.
+It is newer than the `v6.1` release tag. Setup keeps this checkout in
+`.idf/v6.1-9a97f6c54ec6`, alongside older SDKs, and build verifies its commit.
+The toolchain lives in `.idf/tools-v6.1`; setup installs the versions required
+by the pinned SDK. Updating the upstream branch does not silently move this pin.
 
 Useful commands:
 
@@ -186,6 +228,21 @@ Useful commands:
 .\build.ps1 -IdfArguments @('-p', 'COM7', 'app-flash')
 .\build.ps1 -IdfArguments @('-p', 'COM7', 'monitor')
 ```
+
+### Audio task priorities
+
+By default, audio output runs at priority **8**, decoding at **7**, and stream
+input at **5**. `CONFIG_YORADIO_OUTPUT_TASK_FIRST=y` applies to both ordinary
+staged PCM output and the optional direct-DMA path. The output task waits when
+PCM or a free DMA block is unavailable, allowing decoding and input to proceed.
+This setting changes scheduling only; codec arithmetic, buffer sizes and
+timeouts are unchanged.
+
+For a comparison build, disable `YORADIO_OUTPUT_TASK_FIRST` in `menuconfig`
+(output returns to priority 6). Existing `sdkconfig` files retain an explicit
+disabled value; enable the option there or use a fresh build configuration.
+See the [priority measurements](../../docs/ESP32C3_OUTPUT_PRIORITY_20261006.md)
+for previous results and their limitations.
 
 ### Decoder selection
 
@@ -212,10 +269,15 @@ not exposed as a WebUI setting.
 Fresh builds enable `CONFIG_YORADIO_AAC_DECODER_ESPRESSIF=y` and
 `CONFIG_YORADIO_AAC_PLUS=y`. This reconstructs the HE-AAC high-frequency band
 and HE-AAC v2 stereo; HE-AAC is not capped at its 22.05/24 kHz core rate.
-The emulator tests actual 44.1/48 kHz PCM. AAC Plus uses more CPU and RAM;
-real-board playback margin with Wi-Fi still needs measurement.
+The emulator tests actual 44.1/48 kHz PCM. The compact configuration described
+below is enabled in new board builds; recorded network/heap limitations remain
+documented in the qualification reports.
 
-An existing `sdkconfig` keeps its saved decoder choice. To change it, run
+An existing `sdkconfig` keeps its saved decoder and compact-storage choices.
+Use a fresh build directory/sdkconfig to pick up all new defaults. The explicit
+`sdkconfig.aac-pc19.defaults` overlay also documents the complete feature chain;
+defaults files do not override choices in an existing sdkconfig. To change the
+decoder manually, run
 `./build.ps1 menuconfig` (PowerShell: `.\build.ps1 menuconfig`), select
 **yoRadio codec backends → AAC decoder → Espressif**, then enable
 **yoRadio ESP32-C3 OLED → Decode full HE-AAC SBR/PS with Espressif AAC**.
@@ -241,21 +303,21 @@ With Helix, `HE-AAC 44.1 kHz core mono` means SBR was detected but PS stereo was
 not confirmed; the actual PCM may still be 22.05 kHz mono.
 
 ADTS rate/channel/profile changes recreate the Espressif decoder at the frame
-boundary. **Unmodified SDK limitation:** introducing SBR/PS with an identical ADTS
-configuration after AAC-LC can leave core-only output until Stop/Play or a stream
-restart. The status then explicitly reports actual `AAC PCM` parameters.
-This case remains in the TODO; it is not hidden by doubling the displayed rate.
-See the [validation report](../../docs/ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md).
+boundary. The default late-SBR controller also handles SBR/PS activation with an
+unchanged ADTS configuration and retains established extensions across gaps.
+The unmodified control still has the historical Stop/Play requirement described
+in the [original validation report](../../docs/ESP32C3_STREAM_FORMAT_VALIDATION_20260930.md).
 
-The opt-in `sdkconfig.aac-pc19.defaults` qualification profile combines the
+The board defaults and `sdkconfig.aac-pc19.defaults` profile combine the
 compact SBR owner with `CONFIG_YORADIO_AAC_HIGH_HISTORY_PC19` and
 `CONFIG_YORADIO_AAC_LATE_SBR`. The first keeps 19-bit QMF mantissas with 144 bytes
 of extra per-decoder metadata. The second repairs late activation and retains
 SBR/PS through frames without extensions, preserving the AAC transform history.
 Both options work in the network firmware; QEMU test options remain separate.
 The shared implementation passed synthetic/recorded PCM tests within 3 LSB.
-Keep the existing 16 KiB decoder stack and the pinned AAC archive. This is an
-experimental physical-test profile; it does not change the board defaults.
+Keep the existing 16 KiB decoder stack and the pinned AAC archive. To build an
+uncompacted reference, apply `sdkconfig.aac-native.defaults` after the board
+defaults in a separate fresh configuration. It keeps AAC Plus enabled.
 Before deployment, `tools/codec_benchmark/verify_aac_network_build.py` checks
 the actual linked calls, type sizes, image/ELF match and absence of QEMU hooks.
 

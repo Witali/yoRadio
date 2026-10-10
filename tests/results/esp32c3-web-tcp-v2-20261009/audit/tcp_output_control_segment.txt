@@ -1,0 +1,74 @@
+4208203e:	7179                	addi	sp,sp,-48
+42082040:	d422                	sw	s0,40(sp)
+42082042:	d04a                	sw	s2,32(sp)
+42082044:	ce4e                	sw	s3,28(sp)
+42082046:	d606                	sw	ra,44(sp)
+42082048:	842e                	mv	s0,a1
+4208204a:	8932                	mv	s2,a2
+4208204c:	89b6                	mv	s3,a3
+4208204e:	c935                	beqz	a0,420820c2 <tcp_output_control_segment+0x84>
+42082050:	d226                	sw	s1,36(sp)
+42082052:	84aa                	mv	s1,a0
+42082054:	00854503          	lbu	a0,8(a0)
+42082058:	ed21                	bnez	a0,420820b0 <tcp_output_control_segment+0x72>
+4208205a:	85b6                	mv	a1,a3
+4208205c:	8532                	mv	a0,a2
+4208205e:	76a050ef          	jal	420877c8 <ip4_route_src>
+42082062:	c931                	beqz	a0,420820b6 <tcp_output_control_segment+0x78>
+42082064:	405c                	lw	a5,4(s0)
+42082066:	00845603          	lhu	a2,8(s0)
+4208206a:	c62a                	sw	a0,12(sp)
+4208206c:	874e                	mv	a4,s3
+4208206e:	86ca                	mv	a3,s2
+42082070:	4599                	li	a1,6
+42082072:	8522                	mv	a0,s0
+42082074:	c43e                	sw	a5,8(sp)
+42082076:	250090ef          	jal	4208b2c6 <ip_chksum_pseudo>
+4208207a:	47a2                	lw	a5,8(sp)
+4208207c:	4832                	lw	a6,12(sp)
+4208207e:	00a79823          	sh	a0,16(a5)
+42082082:	00b4c683          	lbu	a3,11(s1)
+42082086:	00a4c703          	lbu	a4,10(s1)
+4208208a:	864e                	mv	a2,s3
+4208208c:	85ca                	mv	a1,s2
+4208208e:	4799                	li	a5,6
+42082090:	8522                	mv	a0,s0
+42082092:	9b9a00ef          	jal	42022a4a <__wrap_ip4_output_if>
+42082096:	87aa                	mv	a5,a0
+42082098:	8522                	mv	a0,s0
+4208209a:	843e                	mv	s0,a5
+4208209c:	8b2fd0ef          	jal	4207f14e <pbuf_free>
+420820a0:	5492                	lw	s1,36(sp)
+420820a2:	50b2                	lw	ra,44(sp)
+420820a4:	8522                	mv	a0,s0
+420820a6:	5422                	lw	s0,40(sp)
+420820a8:	5902                	lw	s2,32(sp)
+420820aa:	49f2                	lw	s3,28(sp)
+420820ac:	6145                	addi	sp,sp,48
+420820ae:	8082                	ret
+420820b0:	d0dfc0ef          	jal	4207edbc <netif_get_by_index>
+420820b4:	f945                	bnez	a0,42082064 <tcp_output_control_segment+0x26>
+420820b6:	5492                	lw	s1,36(sp)
+420820b8:	8522                	mv	a0,s0
+420820ba:	894fd0ef          	jal	4207f14e <pbuf_free>
+420820be:	5471                	li	s0,-4
+420820c0:	b7cd                	j	420820a2 <tcp_output_control_segment+0x64>
+420820c2:	85b6                	mv	a1,a3
+420820c4:	8532                	mv	a0,a2
+420820c6:	702050ef          	jal	420877c8 <ip4_route_src>
+420820ca:	d57d                	beqz	a0,420820b8 <tcp_output_control_segment+0x7a>
+420820cc:	00845603          	lhu	a2,8(s0)
+420820d0:	d226                	sw	s1,36(sp)
+420820d2:	4044                	lw	s1,4(s0)
+420820d4:	c42a                	sw	a0,8(sp)
+420820d6:	874e                	mv	a4,s3
+420820d8:	86ca                	mv	a3,s2
+420820da:	4599                	li	a1,6
+420820dc:	8522                	mv	a0,s0
+420820de:	1e8090ef          	jal	4208b2c6 <ip_chksum_pseudo>
+420820e2:	4822                	lw	a6,8(sp)
+420820e4:	00a49823          	sh	a0,16(s1)
+420820e8:	4701                	li	a4,0
+420820ea:	04000693          	li	a3,64
+420820ee:	bf71                	j	4208208a <tcp_output_control_segment+0x4c>
+

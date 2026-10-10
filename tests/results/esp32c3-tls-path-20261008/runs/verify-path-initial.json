@@ -1,0 +1,111 @@
+{
+  "result": "FAIL",
+  "elf_sha256": "5aee16bafd5d2c2817456563aaea44db7dab2254648d839a4a233d62c8db7e85",
+  "sdkconfig_sha256": "aa7dd920aff173220da337b208cd1e1ee624c2a89a9bc879dbb8e5ea7b263914",
+  "calls": [
+    {
+      "caller": "stream_http_read",
+      "target": "esp_http_client_read",
+      "calls": [
+        "42013aa8:\t7a17f0ef          \tjal\t42093a48 <esp_http_client_read>"
+      ],
+      "disassembly_sha256": "70700363958860cfa4b266f206c0be321708734e4211555e1d3b0404809d1fb3"
+    },
+    {
+      "caller": "stream_http_read",
+      "target": "tls_path_profile_end",
+      "calls": [
+        "42013acc:\t667140ef          \tjal\t42028932 <tls_path_profile_end>",
+        "42013b36:\t5fd140ef          \tjal\t42028932 <tls_path_profile_end>"
+      ],
+      "disassembly_sha256": "70700363958860cfa4b266f206c0be321708734e4211555e1d3b0404809d1fb3"
+    },
+    {
+      "caller": "yoradio_mbedtls_ssl_read",
+      "target": "tls_path_profile_end",
+      "calls": [
+        "42028746:\t22f5                \tjal\t42028932 <tls_path_profile_end>",
+        "42028772:\t22c1                \tjal\t42028932 <tls_path_profile_end>"
+      ],
+      "disassembly_sha256": "eb1b91a3d3be7cd31587f705974bddbff31d050fbd76c91bde0989dfaae22e97"
+    },
+    {
+      "caller": "ssl_read",
+      "target": "__wrap_esp_transport_poll_read",
+      "calls": [
+        "421053b6:\t807230ef          \tjal\t42028bbc <__wrap_esp_transport_poll_read>"
+      ],
+      "disassembly_sha256": "471790466e73e047b95d209f3ab3637ae601870eb7cdb7ac304386aa1cedefc6"
+    },
+    {
+      "caller": "esp_crypto_aes_gcm_decrypt",
+      "target": "__wrap_esp_aes_gcm_auth_decrypt",
+      "calls": [
+        "420b3616:\tec2750ef          \tjal\t42028cd8 <__wrap_esp_aes_gcm_auth_decrypt>"
+      ],
+      "disassembly_sha256": "d6705c64ccd00ef6513669beb01ef346f3fef5de1a49f7b09e2baace4270c8be"
+    },
+    {
+      "caller": "esp_aes_gcm_update",
+      "target": "__wrap_esp_aes_crypt_ctr",
+      "calls": [
+        "420affea:\tdc9780ef          \tjal\t42028db2 <__wrap_esp_aes_crypt_ctr>"
+      ],
+      "disassembly_sha256": "e19c8fa4d317d8c5a589de18337ae7d8e183bc1688054c20ff2c676b37a449f4"
+    },
+    {
+      "caller": "esp_aes_gcm_finish",
+      "target": "__wrap_esp_aes_crypt_ctr",
+      "calls": [
+        "420b00e2:\tcd1780ef          \tjal\t42028db2 <__wrap_esp_aes_crypt_ctr>"
+      ],
+      "disassembly_sha256": "ed2e05b607e6517276675de308e7cf4391398c721631cba4f53a3525aac8b620"
+    },
+    {
+      "caller": "__wrap_esp_transport_poll_read",
+      "target": "esp_transport_poll_read",
+      "calls": [
+        "42028bf4:\t4866a0ef          \tjal\t4209307a <esp_transport_poll_read>",
+        "42028cd4:\t3a66a06f          \tj\t4209307a <esp_transport_poll_read>"
+      ],
+      "disassembly_sha256": "3773c4d771a03af855cb7c4e7119308208d0d7fa7099eda892bd2381d93695bc"
+    },
+    {
+      "caller": "__wrap_esp_transport_poll_read",
+      "target": "tls_path_profile_end",
+      "calls": [],
+      "disassembly_sha256": "3773c4d771a03af855cb7c4e7119308208d0d7fa7099eda892bd2381d93695bc"
+    },
+    {
+      "caller": "__wrap_esp_aes_gcm_auth_decrypt",
+      "target": "esp_aes_gcm_auth_decrypt",
+      "calls": [
+        "42028d40:\t45c870ef          \tjal\t420b019c <esp_aes_gcm_auth_decrypt>",
+        "42028dae:\t3ee8706f          \tj\t420b019c <esp_aes_gcm_auth_decrypt>"
+      ],
+      "disassembly_sha256": "684773da05a358fa8386fdec9d2d2782a37d73495763371cc02e710538bf6783"
+    },
+    {
+      "caller": "__wrap_esp_aes_gcm_auth_decrypt",
+      "target": "tls_path_profile_end",
+      "calls": [],
+      "disassembly_sha256": "684773da05a358fa8386fdec9d2d2782a37d73495763371cc02e710538bf6783"
+    },
+    {
+      "caller": "__wrap_esp_aes_crypt_ctr",
+      "target": "esp_aes_crypt_ctr",
+      "calls": [
+        "42028e08:\t760860ef          \tjal\t420af568 <esp_aes_crypt_ctr>",
+        "42028e68:\t7008606f          \tj\t420af568 <esp_aes_crypt_ctr>"
+      ],
+      "disassembly_sha256": "dfe57f9dac1149dd9fde0f9b74dee76b21c92cb9f1ab441768ecec77c63f8399"
+    },
+    {
+      "caller": "__wrap_esp_aes_crypt_ctr",
+      "target": "tls_path_profile_end",
+      "calls": [],
+      "disassembly_sha256": "dfe57f9dac1149dd9fde0f9b74dee76b21c92cb9f1ab441768ecec77c63f8399"
+    }
+  ],
+  "scope": "Linked call routes only; run verify_http_link.py separately for the SDK dynamic RX chain."
+}

@@ -1,0 +1,119 @@
+{
+  "board": {
+    "version": "idf61-9a97-tlspath",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "5aee16bafd5d2c2817456563aaea44db7dab2254648d839a4a233d62c8db7e85"
+  },
+  "cases": [
+    {
+      "name": "tls-record:alternate",
+      "interrupted": false,
+      "samples": 16,
+      "start": 161740.218,
+      "end": 161815.328,
+      "observed_seconds": 75.11000000001513,
+      "coverage_complete": true,
+      "maximum_sample_gap_seconds": 5.01600000000326,
+      "delta": {
+        "q_overruns": 0,
+        "writes": 7053,
+        "written_bytes": 14444544,
+        "write_us": 67424695,
+        "errors": 0
+      },
+      "maximum_write_us_since_boot": 24835,
+      "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+      "acoustic_continuity_qualified": false
+    }
+  ],
+  "original_acceptance": [
+    {
+      "name": "idle-before",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 132800,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132800,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.657
+    },
+    {
+      "name": "tls-record:alternate",
+      "result": "PASS",
+      "evidence": {
+        "samples": 450,
+        "rate": 44100,
+        "channels": 2,
+        "record_counts": {
+          "1048": 22,
+          "16408": 21
+        },
+        "first_large_at": 161730.14,
+        "mean_busy": 64.10555555555555,
+        "peak_busy": 68.3,
+        "minimum_heap": 25528.0,
+        "minimum_largest": 16384.0,
+        "audio_wall_ratio": 1.0019263070110527,
+        "first_full_pcm_seconds": 0.9219999999913853
+      },
+      "seconds": 91.25
+    },
+    {
+      "name": "idle-recovery",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 132828,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132828,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132828,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.375
+    },
+    {
+      "name": "runtime",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    },
+    {
+      "name": "restore",
+      "result": "PASS",
+      "evidence": {
+        "stopped": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 0.594
+    }
+  ],
+  "source_sha256": "84412aaaae33491863411207c01c7b9c8702a9e232a899459d91845bb4d5e1fc",
+  "input_sha256": {
+    "performance.json": "e68ca913bef2be9087c92ba74379b66bd691690f481b6e631fe0c8cc3040019c",
+    "status.json": "82b3e6293421f04d5568d176bf2f639e4d8065f8a634edd92201bfde193f3b8c",
+    "report.json": "04d4327036860fc0f071e85b90619e95dc4218d5c80ada705819b210565c2ac6"
+  }
+}

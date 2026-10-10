@@ -1,0 +1,135 @@
+Activating ESP-IDF 6.1
+Setting IDF_PATH to 'C:\Work\yoRadio\.idf\v6.1-9a97f6c54ec6'.
+* Checking python version ... 3.12.10
+* Checking python dependencies ... OK
+* Deactivating the current ESP-IDF environment (if any) ... OK
+* Establishing a new ESP-IDF environment ... OK
+* Identifying shell ... pwsh.exe
+* Detecting outdated tools in system ... Found tools that are not used by active ESP-IDF version.
+For removing old versions of esp-rom-elfs, openocd-esp32 use command 'python.exe C:\Work\yoRadio\.idf\v6.1-9a97f6c54ec6\tools\idf_tools.py uninstall'
+To free up even more space, remove installation packages of those tools.
+Use option python.exe C:\Work\yoRadio\.idf\v6.1-9a97f6c54ec6\tools\idf_tools.py uninstall --remove-archives.
+
+Done! You can now compile ESP-IDF projects.
+Go to the project directory and run:
+
+  idf.py build
+
+{"variant": "r9a97-flash-dio80", "idf": "9a97f6c5", "bytes": 1618944, "elf": "9e4cafd0fcb7742bd0cea3c1c304610522c1b8828b05f6d260a3e080164413b3"}
+{
+  "app_sha256": "68518edb3ec408b6626c0cac93d08622c67344e75f760c716266c60536a2fe11",
+  "elf_sha256": "9e4cafd0fcb7742bd0cea3c1c304610522c1b8828b05f6d260a3e080164413b3",
+  "sdkconfig_sha256": "89b6f7c13f24774e342d46aee8661f98f8c90a31c47f6bf70973a523d59cf4fa",
+  "app_bytes": 1618944,
+  "types": {
+    "native_aac_decoder": 204,
+    "aac_high_owner_t": 32744,
+    "aac_high_runtime_t": 160
+  },
+  "linked_calls": {
+    "compact5_PVMP4AudioDecodeFrame": [
+      "aac_late_sbr_select",
+      "__wrap_get_sbr_bitstream",
+      "__wrap_getfill"
+    ],
+    "__wrap_get_sbr_bitstream": [
+      "aac_fill_sbr",
+      "aac_late_sbr_after_fill"
+    ],
+    "aac_late_sbr_select": [
+      "aac_late_sbr_retain"
+    ]
+  },
+  "features": [
+    "AAC_PLUS",
+    "AAC_COMPACT_SBR",
+    "AAC_HIGH_HISTORY",
+    "AAC_HIGH_HISTORY_PC19",
+    "AAC_SMOOTHING_HISTORY",
+    "AAC_LOW_WORKSPACE",
+    "AAC_ASYMMETRIC_OWNER",
+    "AAC_LATE_SBR"
+  ],
+  "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+  "layout_sha256": "a3cb0ea5f4b000c9b6c11c67d60255e87ca6c83db6fc95284fdc668ce8172a40",
+  "branch_patch": {
+    "experiment": "qemu_missing_sbr_retention",
+    "input_sha256": "841917bf358fded2909d7bceb65de782da32674794ce7226c2717884a563b861",
+    "bridge_source_sha256": "91b9a5cb50760b4f3ca74a217e4c1210a454f3c17a4320b90f8709c4c47de9f8",
+    "output_sha256": "dde9f78c13f8c947f9004732df6456b2ad1a618ecf21bf3d12735bae3109fb5b",
+    "section": ".text.PVMP4AudioDecodeFrame",
+    "branch_offset": 552,
+    "original": "5a071b63",
+    "replacement": "0000006f",
+    "active_label": ".L245",
+    "active_offset": 2014,
+    "disable_offset": 556,
+    "branch_target": "aac_late_sbr_select",
+    "changed_native_bytes": 4,
+    "bridge_stack_bytes": 64,
+    "structure_offsets_changed": false
+  },
+  "hardware_tested": false,
+  "production_qualified": false
+}
+
+{
+  "result": "PASS",
+  "dynamic_buffers": true,
+  "retained_rx": false,
+  "sdkconfig_sha256": "89b6f7c13f24774e342d46aee8661f98f8c90a31c47f6bf70973a523d59cf4fa",
+  "elf_sha256": "9e4cafd0fcb7742bd0cea3c1c304610522c1b8828b05f6d260a3e080164413b3",
+  "calls": [
+    {
+      "caller": "stream_task",
+      "target": "stream_http_read",
+      "calls": [
+        "42012f74:\t309000ef          \tjal\t42013a7c <stream_http_read>",
+        "4201324a:\t033000ef          \tjal\t42013a7c <stream_http_read>"
+      ],
+      "disassembly_sha256": "3113d01320263f50fd35322ed111a874645365b65036cb1b98f5f65d8c22fe2e"
+    },
+    {
+      "caller": "esp_mbedtls_read",
+      "target": "yoradio_mbedtls_ssl_read",
+      "calls": [
+        "4210312a:\td6a250ef          \tjal\t42028694 <yoradio_mbedtls_ssl_read>"
+      ],
+      "disassembly_sha256": "1558892fcf3e2532abc11d5b478b092a2bec75975428db0417a2a92f19432f73"
+    },
+    {
+      "caller": "yoradio_mbedtls_ssl_read",
+      "target": "__wrap_mbedtls_ssl_read",
+      "calls": [
+        "4202869c:\t6b7730ef          \tjal\t4209c552 <__wrap_mbedtls_ssl_read>"
+      ],
+      "disassembly_sha256": "6ff3a414c9be68a885a642add4bdc62648ec58b11b36c20af4219038c7eab4b9"
+    },
+    {
+      "caller": "__wrap_mbedtls_ssl_read",
+      "target": "esp_mbedtls_add_rx_buffer",
+      "calls": [
+        "4209c560:\t210d                \tjal\t4209c982 <esp_mbedtls_add_rx_buffer>"
+      ],
+      "disassembly_sha256": "0b19494062aaee19a94d61bb2ec35043ffeb9805c5f5d1d6989f9878f3d3e4e6"
+    },
+    {
+      "caller": "__wrap_mbedtls_ssl_read",
+      "target": "mbedtls_ssl_read",
+      "calls": [
+        "4209c576:\t7d1010ef          \tjal\t4209e546 <mbedtls_ssl_read>"
+      ],
+      "disassembly_sha256": "0b19494062aaee19a94d61bb2ec35043ffeb9805c5f5d1d6989f9878f3d3e4e6"
+    },
+    {
+      "caller": "__wrap_mbedtls_ssl_read",
+      "target": "esp_mbedtls_free_rx_buffer",
+      "calls": [
+        "4209c590:\t2ba9                \tjal\t4209caea <esp_mbedtls_free_rx_buffer>"
+      ],
+      "disassembly_sha256": "0b19494062aaee19a94d61bb2ec35043ffeb9805c5f5d1d6989f9878f3d3e4e6"
+    }
+  ],
+  "scope": "Linked RISC-V call paths only; no hardware or TLS cryptography qualification"
+}
+PASS linked adaptive input allocator

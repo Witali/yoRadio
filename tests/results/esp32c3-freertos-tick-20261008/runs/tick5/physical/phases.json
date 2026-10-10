@@ -1,0 +1,141 @@
+[
+  {
+    "name": "install",
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly-dmaprof-tick5\\app.bin",
+      "--output",
+      ".build\\c3-tick-20261008\\tick5\\physical\\install.json"
+    ],
+    "code": 0,
+    "seconds": 25.75
+  },
+  {
+    "name": "flac-https-60",
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/trace_transport.py",
+      "--runner",
+      "diagnostic",
+      "--",
+      "run",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--suite",
+      "load",
+      "--load-seconds",
+      "60",
+      "--load-idle-recovery",
+      "--case",
+      "stress-flac-48000-2ch-16bit-610s",
+      "--fixture-manifest",
+      ".build/c3-reserve-soak-20261008/fixtures/manifest.json",
+      "--sustained-protocol",
+      "https",
+      "--unpaced-files",
+      "--delivery-stats",
+      "--leave-stopped",
+      "--https-origin",
+      "https://192.168.100.253:8771",
+      "--tls-cert",
+      ".build\\c3-tls-records-20261007\\trust\\server.pem",
+      "--tls-key",
+      ".build\\c3-tls-records-20261007\\trust\\server.key",
+      "--sdkconfig",
+      "firmware\\development\\esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly-dmaprof-tick5\\sdkconfig",
+      "--output",
+      ".build\\c3-tick-20261008\\tick5\\physical\\flac-https-60"
+    ],
+    "code": 1,
+    "seconds": 87.32800000000861
+  },
+  {
+    "name": "aac-alternate-90",
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/trace_transport.py",
+      "--runner",
+      "tls_records",
+      "--",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly-dmaprof-tick5\\app.bin",
+      "--ca",
+      ".build\\c3-tls-records-20261007\\trust\\ca.pem",
+      "--cert",
+      ".build\\c3-tls-records-20261007\\trust\\server.pem",
+      "--key",
+      ".build\\c3-tls-records-20261007\\trust\\server.key",
+      "--mode",
+      "alternate",
+      "--seconds",
+      "90",
+      "--output",
+      ".build\\c3-tick-20261008\\tick5\\physical\\aac-alternate-90"
+    ],
+    "code": 0,
+    "seconds": 118.17199999999139
+  },
+  {
+    "name": "restore",
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware/development/esp32c3-idf-6.1-compact-icy-quiet/app.bin",
+      "--output",
+      ".build\\c3-tick-20261008\\tick5\\physical\\restore.json"
+    ],
+    "code": 0,
+    "seconds": 29.125
+  },
+  {
+    "name": "summarize-flac-https-60",
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/staged_dma.py",
+      "--input",
+      ".build\\c3-tick-20261008\\tick5\\physical\\flac-https-60",
+      "--output",
+      ".build\\c3-tick-20261008\\tick5\\physical\\flac-https-60-dma.json"
+    ],
+    "code": 0,
+    "seconds": 0.11000000001513399
+  },
+  {
+    "name": "summarize-aac-alternate-90",
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/staged_dma.py",
+      "--input",
+      ".build\\c3-tick-20261008\\tick5\\physical\\aac-alternate-90",
+      "--output",
+      ".build\\c3-tick-20261008\\tick5\\physical\\aac-alternate-90-dma.json"
+    ],
+    "code": 0,
+    "seconds": 0.125
+  }
+]

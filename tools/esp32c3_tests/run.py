@@ -1,6 +1,7 @@
 """Physical C3 acceptance suite. See docs/ESP32C3_TESTING.md before running."""
 import argparse
 import json
+import math
 from pathlib import Path
 import re
 import statistics
@@ -10,7 +11,8 @@ import time
 
 from common import (Blocked, Board, Failure, Report, check_cpu, check_playback,
                     check_recovery_heap, check_transitions, fixtures, require,
-                    filter_tls_line, check_certificate_rejection, exception_details)
+                    filter_tls_line, check_certificate_rejection, exception_details,
+                    check_file_runtime)
 from audio_test_server.server import Server
 from audio_test_server.fixtures import SEQUENCES
 from serial_lines import serial_lines
@@ -34,9 +36,9 @@ class Capture:
         for line in serial_lines(self.port, self.closed):
             tls = filter_tls_line(line)
             if tls:
-                self.rows.append(dict(at=time.monotonic(), line=tls))
-            elif re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted', line):
-                self.rows.append(dict(at=time.monotonic(), line=line))
+                self.rows.append(dict(at=time.perf_counter(), line=tls))
+            elif re.search(r'PERF |Memory .*: free=|decode (?:error|failed)|allocation failed|assert failed|Guru Meditation|CORRUPT HEAP|serial capture interrupted|task_wdt: Task watchdog got triggered|^(?:ESP-ROM:|rst:|waiting for download)', line):
+                self.rows.append(dict(at=time.perf_counter(), line=line))
 
     def since(self, at):
         return [r for r in self.rows if r['at'] >= at]
@@ -61,14 +63,14 @@ class Suite:
         return (origin or self.origin).rstrip('/') + '/' + mode + '/' + name
 
     def observe(self, seconds, name, interval=.4):
-        start = time.monotonic()
+        start = time.perf_counter()
         samples = []
         batch = dict(case=name, started_at=start, samples=samples)
         try:
-            while time.monotonic() - start < seconds:
-                requested = time.monotonic()
+            while time.perf_counter() - start < seconds:
+                requested = time.perf_counter()
                 state = self.board.status()
-                row = dict(seconds=time.monotonic() - start, request_ms=(time.monotonic()-requested)*1000, **state)
+                row = dict(seconds=time.perf_counter() - start, request_ms=(time.perf_counter()-requested)*1000, **state)
                 samples.append(row)
                 if self.checkpoint:
                     self.checkpoint(self.observations, batch)
@@ -78,10 +80,10 @@ class Suite:
             # or exception text that could contain station/credential details.
             batch['interrupted'] = type(error).__name__
             batch['exception_chain'] = exception_details(error)
-            batch['elapsed_seconds'] = time.monotonic() - start
+            batch['elapsed_seconds'] = time.perf_counter() - start
             raise
         finally:
-            batch['ended_at'] = time.monotonic()
+            batch['ended_at'] = time.perf_counter()
             self.observations.append(batch)
             (self.output / 'status.json').write_text(json.dumps(self.observations, indent=2)+'\n', encoding='utf-8')
         return samples
@@ -93,12 +95,15 @@ class Suite:
 
     def file(self, name, hint='auto', origin=None, mode='file'):
         spec = self.specs[name]
+        started = time.perf_counter()
         self.start(name, mode, hint, origin)
         try:
             samples = self.observe(max(7, spec['seconds']-3), name)
             evidence = check_playback(samples, spec)
             tail = self.observe(8, name + ':eof')
             require(any(not s['audio'] for s in tail), 'Finite stream never reached EOF')
+            check_file_runtime(self.capture.since(started))
+            evidence['serial_capture_enabled'] = self.capture.port is not None
             # No explicit stop: test that the next playback recovers from EOF.
             return evidence
         finally:
@@ -141,9 +146,9 @@ class Suite:
         finally:
             self.board.stop()
 
-    def eof(self, name, hint='auto'):
+    def eof(self, name, hint='auto', origin=None):
         """Check terminal status independently of HE-AAC full-rate acceptance."""
-        self.start(name, hint=hint)
+        self.start(name, hint=hint, origin=origin)
         try:
             samples = self.observe(max(7, self.specs[name]['seconds']-3), name+':playing')
             require(any(s['audio'] and s.get('pcm_sample_rate') for s in samples),
@@ -158,8 +163,8 @@ class Suite:
                     'EOF state was replaced by stale PCM metadata or a decode error')
             with self.board.websocket() as ws:
                 ws.send('getindex')
-                deadline = time.monotonic()+5
-                while time.monotonic() < deadline:
+                deadline = time.perf_counter()+5
+                while time.perf_counter() < deadline:
                     message = json.loads(ws.recv(timeout=5))
                     values = {p['id']:p['value'] for p in message.get('payload',[])}
                     if 'fmt' in values:
@@ -182,8 +187,8 @@ class Suite:
             for reconnect in range(2):
                 with self.board.websocket() as ws:
                     ws.send('getindex')
-                    deadline = time.monotonic()+5
-                    while time.monotonic() < deadline:
+                    deadline = time.perf_counter()+5
+                    while time.perf_counter() < deadline:
                         message = json.loads(ws.recv(timeout=5))
                         values = {p['id']:p['value'] for p in message.get('payload',[])}
                         if 'fmt' in values:
@@ -200,7 +205,7 @@ class Suite:
         if not origin or server is None:
             raise Blocked('Provide untrusted --https-origin and --tls-cert/key to capture handshake rejection')
         first_event = len(server.events)
-        started = time.monotonic()
+        started = time.perf_counter()
         self.start('lc-48000-stereo',hint='aac',origin=origin)
         samples = self.observe(12,'untrusted-tls')
         require(not any(s['audio'] for s in samples), 'Untrusted TLS connection was accepted')
@@ -217,14 +222,14 @@ class Suite:
     def boot_time(self):
         self.board.stop()
         self.board.reboot()
-        started = time.monotonic()
+        started = time.perf_counter()
         unavailable = False
         deadline = started+45
-        while time.monotonic() < deadline:
+        while time.perf_counter() < deadline:
             try:
                 state = self.board.status()
                 if unavailable and state.get('network') == 'client':
-                    return dict(ready_ms=(time.monotonic()-started)*1000,
+                    return dict(ready_ms=(time.perf_counter()-started)*1000,
                                 metric='reboot acknowledgement to HTTP client-mode response')
             except (OSError,ValueError,TimeoutError):
                 unavailable = True
@@ -236,7 +241,7 @@ class Suite:
             raise Blocked('Settled heap test requires --serial-port and profiling firmware')
         if stop:
             self.board.stop()
-        started = time.monotonic()
+        started = time.perf_counter()
         self.observe(12, 'settled-idle')
         result = []
         for row in self.capture.since(started):
@@ -266,25 +271,29 @@ class Suite:
         check_recovery_heap(checkpoints[0], checkpoints[-1])
         return dict(cycles=cycles, station_changes=len(names)*cycles)
 
-    def sustained(self, seconds, name='lc-48000-stereo', cpu=False, load=False):
+    def sustained(self, seconds, name='lc-48000-stereo', cpu=False, load=False,
+                  origin=None):
         if cpu and not self.capture.port:
             raise Blocked('CPU/heap checks require --serial-port and profiling firmware')
         spec = self.specs[name]
         mode = 'stream' if spec['codec'] == 'aac' else 'file'
         if mode == 'file' and spec['seconds'] < seconds+3:
             raise Blocked('Generate a continuous fixture at least 3 s longer than this test')
-        self.start(name, mode, spec['codec'])
-        started = time.monotonic()
+        runtime_started = time.perf_counter()
+        self.start(name, mode, spec['codec'], origin)
+        started = time.perf_counter()
         try:
             samples = self.observe(seconds, ('load:' if load else 'soak:') + name,
                                    interval=.1 if load else 1)
             check_playback(samples, self.specs[name], minimum=max(5, int(seconds*.6)), warmup=5)
+            check_file_runtime(self.capture.since(runtime_started))
             require(max(s['request_ms'] for s in samples) < 2000, 'WebUI response exceeded 2 s')
             evidence = dict(duration=seconds, status_samples=len(samples),
-                            max_http_ms=max(s['request_ms'] for s in samples))
+                            max_http_ms=max(s['request_ms'] for s in samples),
+                            serial_capture_enabled=self.capture.port is not None)
             if cpu:
                 evidence.update(check_cpu(self.capture.since(started+10), max_busy=self.cpu_budget,
-                                          start=started+10, end=time.monotonic()))
+                                          start=started+10, end=time.perf_counter()))
                 evidence['cpu_budget_percent'] = self.cpu_budget
             return evidence
         finally:
@@ -312,7 +321,13 @@ def main():
                         help='Use normal TCP backpressure for local /file downloads; keep existing load gates')
     parser.add_argument('--delivery-stats', action='store_true',
                         help='Retain host socket-write timing; does not relax playback/CPU gates')
+    parser.add_argument('--pacing-ratio', type=float, default=1.02,
+                        help='Paced fixture rate; 1.0 separates queue filling from the default 1.02 load')
     parser.add_argument('--https-origin', help='Trusted HTTPS origin serving identical /file routes')
+    parser.add_argument('--sustained-protocol', choices=('http', 'https'), default='http',
+                        help='Transport for soak/load cases; HTTPS requires --https-origin')
+    parser.add_argument('--eof-protocol', choices=('http', 'https'), default='http',
+                        help='Transport for exact EOF state checks; HTTPS requires --https-origin')
     parser.add_argument('--tls-cert', type=Path)
     parser.add_argument('--tls-key', type=Path)
     parser.add_argument('--tls-port', type=int, default=8771)
@@ -320,8 +335,16 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--leave-stopped', action='store_true', help='Do not reboot to restore saved station')
     args = parser.parse_args()
+    require(math.isfinite(args.pacing_ratio) and args.pacing_ratio > 0,
+            'Pacing ratio must be finite and positive')
     require(args.soak_seconds >= 60, 'Soak must last at least 60 seconds; default is one hour')
     require(args.load_seconds >= 40, 'Load must last at least the original 40 seconds')
+    if args.sustained_protocol == 'https':
+        require(args.https_origin and args.https_origin.startswith('https://'),
+                'HTTPS soak/load requires a trusted --https-origin')
+    if args.eof_protocol == 'https':
+        require(args.https_origin and args.https_origin.startswith('https://'),
+                'HTTPS EOF requires a trusted --https-origin')
     specs = fixtures(args.fixture_manifest)
     names = args.case or [n for n in specs if n not in SEQUENCES]
     require(all(n in specs for n in names), 'Unknown fixture name')
@@ -333,8 +356,11 @@ def main():
     report = Report(args.output/'report.json', info)
     report.data['fixture_hashes'] = {n:specs[n]['sha256'] for n in names}
     report.data['requested_suites'] = args.suite
+    report.data['sustained_protocol'] = args.sustained_protocol
+    report.data['eof_protocol'] = args.eof_protocol
     report.data['server_options'] = dict(unpaced_files=args.unpaced_files,
-                                       delivery_stats=args.delivery_stats)
+                                       delivery_stats=args.delivery_stats,
+                                       pacing_ratio=args.pacing_ratio)
     report.data['cpu_budget_percent'] = args.max_cpu_busy
     if 'load' in args.suite:
         report.data['load_options'] = dict(seconds=args.load_seconds,
@@ -351,12 +377,12 @@ def main():
     tls = None
     try:
         with Server(args.host, args.port, specs, unpaced_files=args.unpaced_files,
-                    delivery_stats=args.delivery_stats) as server:
+                    delivery_stats=args.delivery_stats, pacing_ratio=args.pacing_ratio) as server:
             if args.tls_cert:
                 require(args.tls_key and args.https_origin, 'TLS server requires key and HTTPS hostname')
                 tls = Server(args.host, args.tls_port, specs, args.tls_cert, args.tls_key,
                              unpaced_files=args.unpaced_files,
-                             delivery_stats=args.delivery_stats).__enter__()
+                             delivery_stats=args.delivery_stats, pacing_ratio=args.pacing_ratio).__enter__()
             for protocol in ('http','https'):
                 if protocol in args.suite:
                     for name in names:
@@ -371,9 +397,11 @@ def main():
                     report.case('transition:'+name, lambda n=name,s=sequence: suite.transition(n,s))
                 report.case('stop-play-generation', suite.stop_race)
             if 'eof' in args.suite:
+                eof_origin = args.https_origin if args.eof_protocol == 'https' else None
+                eof_prefix = 'eof:https:' if args.eof_protocol == 'https' else 'eof:'
                 for name in names:
                     for hint in ('auto',specs[name]['codec']):
-                        report.case(f'eof:{name}:{hint}',lambda n=name,h=hint: suite.eof(n,h))
+                        report.case(f'{eof_prefix}{name}:{hint}',lambda n=name,h=hint: suite.eof(n,h,eof_origin))
             if 'faults' in args.suite:
                 for mode in ('drop','stall','error'):
                     report.case('network:'+mode, lambda m=mode: suite.fault(m))
@@ -389,8 +417,9 @@ def main():
                 for cycle in range(args.cycles):
                     report.case('boot-ready:'+str(cycle+1),suite.boot_time)
             for name in (names if args.case else ['lc-48000-stereo','he-48000-stereo','hev2-44100-stereo']):
+                origin = args.https_origin if args.sustained_protocol == 'https' else None
                 if 'soak' in args.suite:
-                    report.case('soak:'+name, lambda n=name: suite.sustained(args.soak_seconds,n,cpu=True))
+                    report.case('soak:'+name, lambda n=name: suite.sustained(args.soak_seconds,n,cpu=True,origin=origin))
                 if 'load' in args.suite:
                     baseline = []
                     if args.load_idle_recovery:
@@ -398,7 +427,7 @@ def main():
                             baseline.extend(suite.idle_heap())
                             return dict(samples=baseline)
                         report.case('load-idle-baseline:'+name, baseline_heap)
-                    report.case('cpu-under-http-load:'+name, lambda n=name: suite.sustained(args.load_seconds,n,cpu=True,load=True))
+                    report.case('cpu-under-http-load:'+name, lambda n=name: suite.sustained(args.load_seconds,n,cpu=True,load=True,origin=origin))
                     if args.load_idle_recovery:
                         def recovered_heap():
                             final = suite.idle_heap()
@@ -418,8 +447,8 @@ def main():
             if not args.leave_stopped:
                 board.reboot()
                 time.sleep(3)
-                deadline = time.monotonic()+40
-                while time.monotonic() < deadline:
+                deadline = time.perf_counter()+40
+                while time.perf_counter() < deadline:
                     try:
                         require(board.info()['app_elf_sha256'] == info['app_elf_sha256'], 'Unexpected firmware after test')
                         return dict(rebooted=True)

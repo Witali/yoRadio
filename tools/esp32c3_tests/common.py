@@ -9,6 +9,8 @@ import time
 import sys
 from urllib.request import Request, urlopen
 
+from tls_error_codes import error_detail
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 
@@ -62,7 +64,8 @@ def filter_tls_line(line):
         return TLS_CERTIFICATE_REJECTED
     size = re.search(r'\balloc\((\d+) bytes\) failed\b', body)
     return ('TLS failure: component=' + tls.group(1) +
-            (' allocation_bytes=' + size.group(1) if size else ''))
+            (' allocation_bytes=' + size.group(1) if size else '') +
+            error_detail(tls.group(1), body))
 
 
 def check_certificate_rejection(alerts, rows):
@@ -128,8 +131,8 @@ class Board:
             for command, marker in [('getsystem','abuff'), ('getscreen','scrt'),
                                     ('gettimezone','tzh'), ('getcontrols','vols')]:
                 ws.send(command)
-                deadline = time.monotonic() + 5
-                while time.monotonic() < deadline:
+                deadline = time.perf_counter() + 5
+                while time.perf_counter() < deadline:
                     value = json.loads(ws.recv(timeout=5))
                     if marker in value:
                         value.pop('ipaddr', None)  # DHCP may change after boot.
@@ -141,8 +144,8 @@ class Board:
     def reboot(self):
         with self.websocket() as ws:
             ws.send('reboot')
-            deadline = time.monotonic() + 5
-            while time.monotonic() < deadline:
+            deadline = time.perf_counter() + 5
+            while time.perf_counter() < deadline:
                 if json.loads(ws.recv(timeout=5)).get('rebooting') == 1:
                     return
         raise Failure('No reboot acknowledgement')
@@ -153,7 +156,19 @@ def matches(state, spec):
             and state.get('pcm_channels') == spec['channels']
             and state.get('bits_per_sample') == spec['bits']
             and state.get('format', '').startswith(spec['label'])
+            and ('source_channels' not in spec or state.get('channels') == spec['source_channels'])
             and not state.get('channels_are_core', False))
+
+
+def check_file_runtime(records):
+    """Positive file cases must not hide recorded failures behind valid PCM status."""
+    faults = (r'allocation failed|decode (?:error|failed)|TLS failure:|'
+              r'assert failed|Guru Meditation|CORRUPT HEAP|PANIC|'
+              r'serial capture interrupted|task_wdt: Task watchdog got triggered|'
+              r'PERF watchdog: task_timeouts=[1-9][0-9]*\b|'
+              r'Runtime watchdog timeout|^(?:ESP-ROM:|rst:|waiting for download)')
+    require(not any(re.search(faults, r['line']) for r in records),
+            'Runtime failure during file playback')
 
 
 def check_playback(samples, spec, minimum=5, warmup=2):
@@ -237,13 +252,15 @@ class Report:
         self.data = dict(board=info, cases=[], note='PASS covers recorded checks only; no acoustic/IRQ inference')
         self.data['cpu_budget_percent'] = None
         self.data['created_utc'] = datetime.now(timezone.utc).isoformat()
+        self.data['host_clock'] = dict(api='time.perf_counter',
+                                      **vars(time.get_clock_info('perf_counter')))
         self.data['test_sources_sha256'] = {
             str(p.relative_to(ROOT)).replace('\\','/'): sha(p.read_bytes())
             for directory in ('esp32c3_tests','audio_test_server')
             for p in sorted((ROOT/'tools'/directory).glob('*.py'))}
 
     def case(self, name, action):
-        started = time.monotonic()
+        started = time.perf_counter()
         record = dict(name=name, result='FAIL')
         try:
             record['evidence'] = action()
@@ -255,7 +272,7 @@ class Report:
             # URL errors can include private URLs; only our controlled assertion
             # text is retained. Technical samples are saved separately by runner.
             record['reason'] = str(error) if isinstance(error, Failure) else type(error).__name__
-        record['seconds'] = round(time.monotonic() - started, 3)
+        record['seconds'] = round(time.perf_counter() - started, 3)
         self.data['cases'].append(record)
         self.save()
         print(name + ': ' + record['result'] + (' - ' + record['reason'] if 'reason' in record else ''), flush=True)

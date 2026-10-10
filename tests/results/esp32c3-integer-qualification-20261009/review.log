@@ -1,0 +1,91 @@
+{
+  "missing": [],
+  "phases": {
+    "matrix-https": {
+      "passed": 23,
+      "total": 23,
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "failed_checks": [],
+      "heap_recovery": null,
+      "connections": 838,
+      "connection_failures": [],
+      "digital_acceptance": null,
+      "dma": null,
+      "whole_dma": null
+    },
+    "transitions-switch": {
+      "passed": 6,
+      "total": 6,
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "failed_checks": [],
+      "heap_recovery": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "connections": 894,
+      "connection_failures": [],
+      "digital_acceptance": null,
+      "dma": null,
+      "whole_dma": null
+    },
+    "tls-record-grow": {
+      "passed": 3,
+      "total": 5,
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "failed_checks": [],
+      "heap_recovery": {
+        "result": "FAIL",
+        "reason": "Original initial-idle gate failed; no qualified baseline"
+      },
+      "connections": 3374,
+      "connection_failures": [
+        {
+          "request": 28,
+          "phase": "connect",
+          "at": 258445.491946,
+          "result": "FAIL",
+          "error_type": "TimeoutError",
+          "ms": 5014.85100001446
+        }
+      ],
+      "digital_acceptance": false,
+      "dma": {
+        "q_overruns": 11,
+        "writes": 55005,
+        "written_bytes": 112650240,
+        "write_us": 536020540,
+        "errors": 0
+      },
+      "whole_dma": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 121,
+          "start": 258452.8213729,
+          "end": 259048.7256953,
+          "observed_seconds": 595.9043223999906,
+          "coverage_complete": true,
+          "maximum_sample_gap_seconds": 5.01667810001527,
+          "delta": {
+            "q_overruns": 11,
+            "writes": 55949,
+            "written_bytes": 114583552,
+            "write_us": 545169806,
+            "errors": 0
+          },
+          "maximum_write_us_since_boot": 17296,
+          "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+          "acoustic_continuity_qualified": false
+        }
+      }
+    }
+  }
+}

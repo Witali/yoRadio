@@ -1,4 +1,5 @@
 #include "audio_service.h"
+#include "audio_pipeline_probe.h"
 #include "audio_completion.h"
 #include "decoder_pcm.h"
 #include "decoder_resources.h"
@@ -17,6 +18,7 @@
 #include "esp_check.h"
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
+#include "stream_http_reader.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -38,14 +40,18 @@
 #endif
 #include "native_audio_output.h"
 #include "pipeline_profile.h"
-#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+#if defined(CONFIG_YORADIO_PIPELINE_PROFILE) && defined(CONFIG_YORADIO_DIRECT_DMA_PCM)
 #include "native_i2s_generator.h"
 #endif
 #include "rx_buffer_diagnostic.h"
 #include "heap_fragment_probe.h"
+#include "icy_title.h"
 #include "network_service.h"
 
 #include "runtime_settings.h"
+#if defined(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER) || defined(CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE)
+#include "tls_input_reserve.h"
+#endif
 #define STREAM_CHUNK_SIZE 2048
 #define STREAM_READ_TIMEOUT_MS 250
 #define PCM_RING_SIZE (8 * 1024)
@@ -57,13 +63,13 @@
 #define PCM_PACKET_DATA_SIZE 3584
 #endif
 #define MAX_HTTP_REDIRECTS 5
-#define ICY_METADATA_MAX 4080
 #define DECODE_STATS_INTERVAL_US 5000000LL
 #define BITRATE_UPDATE_INTERVAL_US 1000000LL
 #define STREAM_BITRATE_INTERVAL_US 5000000LL
 #define STREAM_RETRY_INITIAL_MS 1000U
 #define STREAM_RETRY_MAX_MS 30000U
 #define STREAM_RETRY_POLL_MS 100U
+#define INPUT_PREFILL_POLL_MS 10U
 enum {
     AUDIO_STREAM_PRIORITY = 5,
     AUDIO_DECODE_PRIORITY = 7,
@@ -151,12 +157,27 @@ static esp_err_t benchmark_autostart(void);
 static const char *const TAG = "audio";
 static native_state_t *s_state;
 static QueueHandle_t s_commands;
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+static adaptive_input_t *s_encoded;
+#define encoded_acquire adaptive_input_acquire
+#define encoded_commit adaptive_input_commit
+#define encoded_return adaptive_input_return
+#else
 static RingbufHandle_t s_encoded;
+#define encoded_acquire xRingbufferSendAcquire
+#define encoded_commit xRingbufferSendComplete
+#define encoded_return vRingbufferReturnItem
+#endif
 static RingbufHandle_t s_pcm;
+#ifndef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
 static size_t s_encoded_usable_size;
+#endif
 static atomic_uint s_generation;
 static atomic_uint s_decoder_target_codec;
 static atomic_uint s_decoder_released_generation;
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+static atomic_uint s_flac_input_ready_generation;
+#endif
 static portMUX_TYPE s_generation_lock = portMUX_INITIALIZER_UNLOCKED;
 static char s_last_url[sizeof(((play_command_t *)0)->url)];
 static native_codec_t s_last_codec;
@@ -165,13 +186,17 @@ static native_codec_t s_last_codec;
 static uint32_t s_published_bitrate_bps;
 static int64_t s_bitrate_updated_us;
 static atomic_bool s_measured_bitrate_ready;
-// One stream task owns this workspace; keeping it in BSS avoids a 4 KiB
-// allocation/free cycle whenever a station starts or stops.
-static char s_icy_metadata[ICY_METADATA_MAX + 1];
+// One stream task owns the bounded incremental metadata parser.
+static icy_title_parser_t s_icy_title;
+_Static_assert(ICY_TITLE_CAPACITY == sizeof(((native_state_t *)0)->title),
+               "ICY parsing must preserve the full published title capacity");
 static void log_runtime_memory(const char *stage);
 
 static void dispose_http_client(esp_http_client_handle_t client) {
     if (!client) return;
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+    tls_input_reserve_finish_connection();
+#endif
     esp_http_client_close(client);
     esp_http_client_cleanup(client);
 }
@@ -418,7 +443,7 @@ static bool send_encoded(uint32_t generation, native_codec_t codec,
                          const uint8_t *data, size_t size, uint8_t eos) {
     size_t packet_size = sizeof(encoded_packet_t) + size;
     encoded_packet_t *packet = NULL;
-    while (xRingbufferSendAcquire(s_encoded, (void **)&packet, packet_size,
+    while (encoded_acquire(s_encoded, (void **)&packet, packet_size,
                                   pdMS_TO_TICKS(250)) != pdTRUE) {
         // A slow decoder must apply TCP backpressure, not terminate the
         // station. Short waits still let a station change cancel promptly.
@@ -429,7 +454,7 @@ static bool send_encoded(uint32_t generation, native_codec_t codec,
     packet->data_size = (uint16_t)size;
     packet->end_of_stream = eos;
     if (size) memcpy(packet->data, data, size);
-    return xRingbufferSendComplete(s_encoded, packet) == pdTRUE;
+    return encoded_commit(s_encoded, packet) == pdTRUE;
 }
 
 static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
@@ -489,17 +514,8 @@ static void state_set_decoder_bitrate(uint32_t generation, uint32_t bitrate_bps)
              (unsigned long)bitrate_bps);
 }
 
-static void parse_icy_metadata(uint32_t generation, char *metadata,
-                               size_t size) {
-    if (!metadata || !size) return;
-    metadata[size] = '\0';
-    char *title = strstr(metadata, "StreamTitle='");
+static void publish_icy_title(uint32_t generation, const char *title) {
     if (!title) return;
-    title += strlen("StreamTitle='");
-    char *end = strstr(title, "';");
-    if (!end) end = strchr(title, '\'');
-    if (!end) return;
-    *end = '\0';
     if (generation != atomic_load(&s_generation)) return;
     native_state_set_title(s_state, title);
     // A stop or station change can race the title publication between the
@@ -654,6 +670,11 @@ static void stream_task(void *argument) {
             continue;
         }
 
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+        // Previous HTTP/TLS client is closed. Apply the TLS memory budget;
+        // queued packets and outstanding leases keep their owners.
+        tls_input_reserve_prepare_connection();
+#endif
         network_service_set_streaming(true);
         state_set_audio(command.generation, false, "connecting");
 
@@ -663,6 +684,11 @@ static void stream_task(void *argument) {
             .buffer_size = STREAM_CHUNK_SIZE,
             .buffer_size_tx = 4096,
             .crt_bundle_attach = esp_crt_bundle_attach,
+#ifdef CONFIG_YORADIO_TLS_RETAIN_RX_BUFFER
+            // Allocate the full RX record once after the handshake. TX and
+            // handshake allocations still use the SDK's dynamic strategy.
+            .tls_dyn_buf_strategy = HTTP_TLS_DYN_BUF_RX_STATIC,
+#endif
             .disable_auto_redirect = false,
             .max_redirection_count = MAX_HTTP_REDIRECTS,
             .keep_alive_enable = true,
@@ -677,6 +703,9 @@ static void stream_task(void *argument) {
             continue;
         }
         esp_http_client_set_header(client, "Icy-MetaData", "1");
+        // One response per connection (RFC 9112 section 9.3). TCP keepalive
+        // probes above are independent of HTTP connection reuse.
+        esp_http_client_set_header(client, "Connection", "close");
         bool retryable;
         esp_err_t result = open_stream(client, command.url, retry.deadline_us,
                                        &retryable);
@@ -736,10 +765,8 @@ static void stream_task(void *argument) {
                 ESP_LOGI(TAG, "ICY bitrate: %lu kbit/s", icy_bitrate);
             }
         }
-        char *metadata = metadata_interval ? s_icy_metadata : NULL;
         size_t audio_until_metadata = metadata_interval;
         size_t metadata_remaining = 0;
-        size_t metadata_written = 0;
         bool first_chunk = true;
         bool stream_stalled = false;
         bool stream_read_failed = false;
@@ -748,9 +775,23 @@ static void stream_task(void *argument) {
         stream_bitrate_meter_t bitrate_meter = {
             .started_us = esp_timer_get_time(),
         };
+        stream_http_reader_t reader = {0};
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+        bool input_growth_attempted = false;
+#endif
         while (atomic_load(&s_generation) == command.generation) {
-            int received = esp_http_client_read(client, (char *)buffer,
-                                                STREAM_CHUNK_SIZE);
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+            if (!input_growth_attempted && codec == NATIVE_CODEC_FLAC &&
+                atomic_load(&s_flac_input_ready_generation) == command.generation) {
+                input_growth_attempted = true;
+                tls_input_reserve_expand_flac();
+            }
+#endif
+            AUDIO_PROBE_FLAG(stream_read, 1U);
+            int received = stream_http_read(&reader, client, (char *)buffer,
+                                            STREAM_CHUNK_SIZE);
+            AUDIO_PROBE_FLAG(stream_read, 0U);
+            if (received > 0) AUDIO_PROBE_STAMP(network_us);
             // Stop/station change may happen while the socket read is blocked.
             // Never pass data returned by that obsolete read to ICY or audio.
             if (atomic_load(&s_generation) != command.generation) break;
@@ -811,8 +852,8 @@ static void stream_task(void *argument) {
                     offset += chunk;
                     audio_until_metadata -= chunk;
                 } else if (!metadata_remaining) {
-                    metadata_remaining = (size_t)buffer[offset++] * 16U;
-                    metadata_written = 0;
+                    metadata_remaining = (size_t)buffer[offset++] * ICY_METADATA_BLOCK_BYTES;
+                    icy_title_begin(&s_icy_title);
                     if (!metadata_remaining) {
                         audio_until_metadata = metadata_interval;
                     }
@@ -821,19 +862,12 @@ static void stream_task(void *argument) {
                     size_t chunk = available < metadata_remaining
                                        ? available
                                        : metadata_remaining;
-                    if (metadata && metadata_written + chunk <=
-                                        ICY_METADATA_MAX) {
-                        memcpy(metadata + metadata_written, buffer + offset,
-                               chunk);
-                    }
-                    metadata_written += chunk;
+                    icy_title_feed(&s_icy_title, buffer + offset, chunk);
                     metadata_remaining -= chunk;
                     offset += chunk;
                     if (!metadata_remaining) {
-                        if (metadata && metadata_written <= ICY_METADATA_MAX) {
-                            parse_icy_metadata(command.generation, metadata,
-                                               metadata_written);
-                        }
+                        publish_icy_title(command.generation,
+                                          icy_title_finish(&s_icy_title));
                         audio_until_metadata = metadata_interval;
                     }
                 }
@@ -918,7 +952,7 @@ static void return_decoded_packet(encoded_packet_t *packet,
     if (packet->end_of_stream && packet->generation != failed_generation) {
         send_pcm_end(packet->generation, packet->end_of_stream);
     }
-    vRingbufferReturnItem(s_encoded, packet);
+    encoded_return(s_encoded, packet);
 }
 
 static void finish_pcm_stream(const pcm_packet_t *packet) {
@@ -1014,6 +1048,47 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
 }
 #endif
 
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+static bool prefill_encoded_input(uint32_t generation) {
+    // The decoder retains its first input lease. Only the producer appends
+    // packets while we wait; no queued or leased storage may be reclaimed.
+    // Normally finish when the producer needs the consumer to make room.
+    // An optional minimum delay adds margin for bursty delivery without
+    // changing capacity, including the TLS-reduced adaptive queue.
+    const int64_t started_us = esp_timer_get_time();
+    const int64_t maximum_us = CONFIG_YORADIO_INPUT_PREFILL_MS * 1000LL;
+    TickType_t poll_ticks = pdMS_TO_TICKS(INPUT_PREFILL_POLL_MS);
+    if (!poll_ticks) poll_ticks = 1;
+    bool full = false;
+    while (atomic_load(&s_generation) == generation) {
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+        adaptive_input_stats_t capacity = adaptive_input_stats(s_encoded);
+        full = capacity.occupied >= capacity.resident;
+#else
+        full = xRingbufferGetCurFreeSize(s_encoded) <
+               sizeof(encoded_packet_t) + STREAM_CHUNK_SIZE;
+#endif
+#if CONFIG_YORADIO_INPUT_PREFILL_MIN_MS > 0
+        _Static_assert(CONFIG_YORADIO_INPUT_PREFILL_MIN_MS <= CONFIG_YORADIO_INPUT_PREFILL_MS,
+                       "Minimum prefill must not exceed its deadline");
+        int64_t elapsed_us = esp_timer_get_time() - started_us;
+        if (elapsed_us >= maximum_us ||
+            (full && elapsed_us >= CONFIG_YORADIO_INPUT_PREFILL_MIN_MS * 1000LL)) break;
+#else
+        // Keep the original early-full path when the experiment is disabled.
+        if (full || esp_timer_get_time() - started_us >= maximum_us) break;
+#endif
+        vTaskDelay(poll_ticks);
+    }
+    bool current = atomic_load(&s_generation) == generation;
+    ESP_LOGI(TAG, "PERF INPUT_PREFILL: generation=%lu elapsed_ms=%lu full=%u cancelled=%u",
+             (unsigned long)generation,
+             (unsigned long)((esp_timer_get_time() - started_us) / 1000LL),
+             full, !current);
+    return current;
+}
+#endif
+
 static void decoder_task(void *argument) {
     (void)argument;
     esp_audio_err_t registration_result = decoder_register_codecs();
@@ -1041,6 +1116,9 @@ static void decoder_task(void *argument) {
 
     while (true) {
         rx_buffer_diagnostic_poll();
+#if defined(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER) || defined(CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE)
+        tls_input_reserve_poll();
+#endif
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
@@ -1102,15 +1180,32 @@ static void decoder_task(void *argument) {
                                  && !legacy_decoder
 #endif
         );
+        AUDIO_PROBE_FLAG(decoder_wait, 1U);
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+        encoded_packet_t *packet = adaptive_input_receive(s_encoded, &item_size, 0);
+        if (!packet) {
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+            int64_t wait_started = esp_timer_get_time();
+#endif
+            packet = adaptive_input_receive(s_encoded, &item_size, pdMS_TO_TICKS(20));
+#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+            pipeline_wait_record(&stats.input_empty,
+                (uint32_t)(esp_timer_get_time() - wait_started), packet == NULL);
+#endif
+        }
+#else
         encoded_packet_t *packet = pipeline_receive(
             s_encoded, &item_size, pdMS_TO_TICKS(20), &stats.input_empty);
+#endif
+        AUDIO_PROBE_FLAG(decoder_wait, 0U);
         if (!packet) continue;
+        if (packet->data_size) AUDIO_PROBE_STAMP(input_us);
         if (packet->generation != atomic_load(&s_generation)) {
-            vRingbufferReturnItem(s_encoded, packet);
+            encoded_return(s_encoded, packet);
             continue;
         }
         if (packet->generation == failed_generation) {
-            vRingbufferReturnItem(s_encoded, packet);
+            encoded_return(s_encoded, packet);
             continue;
         }
         if (packet->codec == NATIVE_CODEC_AUTO && packet->end_of_stream) {
@@ -1140,6 +1235,13 @@ static void decoder_task(void *argument) {
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
             legacy_decoder = NULL;
+#endif
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+            if (packet->data_size && !packet->end_of_stream &&
+                !prefill_encoded_input(packet->generation)) {
+                encoded_return(s_encoded, packet);
+                continue;
+            }
 #endif
             generation = packet->generation;
             codec = packet->codec;
@@ -1211,7 +1313,7 @@ static void decoder_task(void *argument) {
                     ESP_LOGE(TAG, "Old codec arena is still in use");
                     state_set_audio(generation, false, "decoder release failed");
                     failed_generation = generation;
-                    vRingbufferReturnItem(s_encoded, packet);
+                    encoded_return(s_encoded, packet);
                     continue;
                 }
 #endif
@@ -1221,7 +1323,7 @@ static void decoder_task(void *argument) {
                     if (!aac_decoder) {
                         state_set_audio(generation, false, "NO MEMORY");
                         failed_generation = generation;
-                        vRingbufferReturnItem(s_encoded, packet);
+                        encoded_return(s_encoded, packet);
                         continue;
                     }
                 }
@@ -1236,7 +1338,7 @@ static void decoder_task(void *argument) {
                              codec_name(codec));
                     state_set_audio(generation, false, "NO MEMORY");
                     failed_generation = generation;
-                    vRingbufferReturnItem(s_encoded, packet);
+                    encoded_return(s_encoded, packet);
                     continue;
                 }
                 esp_audio_simple_dec_cfg_t cfg = {
@@ -1300,6 +1402,10 @@ static void decoder_task(void *argument) {
                 }
 #endif
                 if (!first_frame_memory_logged && stream_info_ready) {
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+                    if (result >= 0 && !packet->end_of_stream)
+                        atomic_store(&s_flac_input_ready_generation, generation);
+#endif
                     log_runtime_memory("after first FLAC frame");
                     first_frame_memory_logged = true;
                 }
@@ -1386,7 +1492,7 @@ static void decoder_task(void *argument) {
         }
 #endif
         if (!decoder && !aac_decoder) {
-            vRingbufferReturnItem(s_encoded, packet);
+            encoded_return(s_encoded, packet);
             continue;
         }
         esp_audio_simple_dec_raw_t raw = {
@@ -1552,14 +1658,17 @@ static void output_flow_reset(output_flow_t *flow, bool active) {
         .start_us = active ? esp_timer_get_time() : 0,
         .overruns = native_audio_output_dma_overruns(),
     };
+#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
     native_i2s_take_wait_profile();
+#endif
 }
 
 static void output_flow_report(output_flow_t *flow, uint32_t generation) {
     int64_t now = esp_timer_get_time();
     if (!flow->start_us || now - flow->start_us < DECODE_STATS_INTERVAL_US) return;
-    pipeline_wait_t dma = native_i2s_take_wait_profile();
     uint32_t overruns = native_audio_output_dma_overruns();
+#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
+    pipeline_wait_t dma = native_i2s_take_wait_profile();
     ESP_LOGI(TAG,
         "PERF FLOW_OUT: gen=%lu window_us=%llu "
         "empty_us=%llu empty_n=%lu empty_timeouts=%lu empty_max=%lu "
@@ -1572,6 +1681,19 @@ static void output_flow_report(output_flow_t *flow, uint32_t generation) {
         (unsigned long)flow->submit.max_us, (unsigned long long)dma.us,
         (unsigned long)dma.count, (unsigned long)dma.timeouts,
         (unsigned long)dma.max_us, (unsigned long)(overruns - flow->overruns));
+#else
+    // The stock staged driver does not expose a separate DMA wait. Report
+    // its entire submission time under a distinct marker, never as zero wait.
+    ESP_LOGI(TAG,
+        "PERF FLOW_STAGED_OUT: gen=%lu window_us=%llu "
+        "empty_us=%llu empty_n=%lu empty_timeouts=%lu empty_max=%lu "
+        "submit_us=%llu submit_n=%lu submit_max=%lu overruns=%lu",
+        (unsigned long)generation, (unsigned long long)(now - flow->start_us),
+        (unsigned long long)flow->empty.us, (unsigned long)flow->empty.count,
+        (unsigned long)flow->empty.timeouts, (unsigned long)flow->empty.max_us,
+        (unsigned long long)flow->submit.us, (unsigned long)flow->submit.count,
+        (unsigned long)flow->submit.max_us, (unsigned long)(overruns - flow->overruns));
+#endif
     // Do not erase a completion interrupt occurring while the log is written.
     *flow = (output_flow_t){.start_us = now, .overruns = overruns};
 }
@@ -1586,11 +1708,8 @@ static void output_task(void *argument) {
 #ifdef CONFIG_YORADIO_PIPELINE_PROFILE
     output_flow_t flow = {0};
 #endif
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
     uint32_t generation = atomic_load(&s_generation);
-#endif
     while (true) {
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
         uint32_t current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
             native_audio_output_discard_pcm();
@@ -1599,7 +1718,6 @@ static void output_task(void *argument) {
             output_flow_reset(&flow, false);
 #endif
         }
-#endif
 #ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
         if (atomic_exchange(&s_suspend_output, false)) {
             s_suspend_result = native_audio_output_suspend();
@@ -1616,8 +1734,12 @@ static void output_task(void *argument) {
         }
 #endif
         size_t item_size = 0;
+        AUDIO_PROBE_STAMP(output_us);
+        AUDIO_PROBE_FLAG(output_wait, 1U);
         pcm_packet_t *packet = pipeline_receive(s_pcm, &item_size,
                                                  pdMS_TO_TICKS(5), &flow.empty);
+        AUDIO_PROBE_FLAG(output_wait, 0U);
+        AUDIO_PROBE_STAMP(output_us);
         if (!packet) {
             native_audio_output_idle();
 #ifdef CONFIG_YORADIO_PIPELINE_PROFILE
@@ -1625,7 +1747,6 @@ static void output_task(void *argument) {
 #endif
             continue;
         }
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
         current_generation = atomic_load(&s_generation);
         if (generation != current_generation) {
             native_audio_output_discard_pcm();
@@ -1634,15 +1755,17 @@ static void output_task(void *argument) {
             output_flow_reset(&flow, false);
 #endif
         }
-#endif
         if (packet->generation != atomic_load(&s_generation)) {
             vRingbufferReturnItem(s_pcm, packet);
             continue;
         }
         if (packet->end_of_stream) {
-#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
             esp_err_t flush_result = native_audio_output_flush_pcm();
             if (flush_result != ESP_OK) ESP_LOGW(TAG, "PCM tail flush failed: %s", esp_err_to_name(flush_result));
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+            ESP_LOGI(TAG, "PERF PCM_END: generation=%lu completion=%lu result=%d",
+                     (unsigned long)packet->generation,
+                     (unsigned long)packet->end_of_stream, (int)flush_result);
 #endif
             finish_pcm_stream(packet);
             vRingbufferReturnItem(s_pcm, packet);
@@ -1664,6 +1787,7 @@ static void output_task(void *argument) {
             }
             sample_rate = packet->sample_rate;
         }
+        AUDIO_PROBE_STAMP(pcm_us);
 #ifdef CONFIG_YORADIO_PIPELINE_PROFILE
         if (!flow.start_us) output_flow_reset(&flow, true);
         int64_t submit_start = esp_timer_get_time();
@@ -1705,18 +1829,36 @@ esp_err_t audio_service_start(native_state_t *state) {
     atomic_init(&s_generation, 0);
     atomic_init(&s_decoder_target_codec, NATIVE_CODEC_AUTO);
     atomic_init(&s_decoder_released_generation, 0);
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+    atomic_init(&s_flac_input_ready_generation, 0);
+#endif
     atomic_init(&s_measured_bitrate_ready, false);
     s_last_url[0] = '\0';
     s_last_codec = NATIVE_CODEC_AUTO;
     size_t encoded_ring_size =
         (size_t)runtime_settings_get_audio_buffer_blocks() * 1600U;
     s_commands = xQueueCreate(1, sizeof(play_command_t));
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    s_encoded = adaptive_input_create(encoded_ring_size,
+        CONFIG_YORADIO_INPUT_MIN_BLOCKS * 1600U,
+        sizeof(encoded_packet_t) + STREAM_CHUNK_SIZE);
+    tls_input_reserve_bind(s_encoded);
+#else
     s_encoded = xRingbufferCreate(encoded_ring_size, RINGBUF_TYPE_NOSPLIT);
+#endif
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     if (!s_commands || !s_encoded || !s_pcm) {
         return ESP_ERR_NO_MEM;
     }
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    adaptive_input_stats_t input_stats = adaptive_input_stats(s_encoded);
+    encoded_ring_size = input_stats.resident * input_stats.packet_capacity;
+    ESP_LOGI(TAG, "Adaptive input: slots=%u minimum=%u target=%u slot_bytes=%u",
+             input_stats.resident, input_stats.minimum, input_stats.target,
+             (unsigned)input_stats.packet_capacity);
+#else
     s_encoded_usable_size = xRingbufferGetCurFreeSize(s_encoded);
+#endif
     // The historical ordering favored uninterrupted decode-call timing. With
     // OUTPUT_TASK_FIRST, a ready DMA block preempts long decode calls instead.
     // Compare decoder task CPU separately from elapsed call time: the latter
@@ -1844,6 +1986,10 @@ void audio_service_stop(void) {
 }
 
 uint8_t audio_service_buffer_fill_percent(void) {
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    adaptive_input_stats_t stats = adaptive_input_stats(s_encoded);
+    return stats.resident ? (uint8_t)(stats.occupied * 100U / stats.resident) : 0;
+#else
     if (!s_encoded || !s_encoded_usable_size) return 0;
     size_t free_size = xRingbufferGetCurFreeSize(s_encoded);
     if (free_size >= s_encoded_usable_size) return 0;
@@ -1851,4 +1997,5 @@ uint8_t audio_service_buffer_fill_percent(void) {
     unsigned percent =
         (unsigned)((used_size * 100U) / s_encoded_usable_size);
     return (uint8_t)(percent > 100U ? 100U : percent);
+#endif
 }

@@ -1,0 +1,181 @@
+[
+  {
+    "name": "install-control",
+    "code": 0,
+    "seconds": 25.968999999997322,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-control-profile\\app.bin",
+      "--output",
+      ".build\\c3-memory-20261007\\install-control.json"
+    ]
+  },
+  {
+    "name": "control-https",
+    "code": 1,
+    "seconds": 52.10899999999674,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/public_streams.py",
+      "--board",
+      "http://192.168.100.4",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-control-profile\\app.bin",
+      "--case",
+      "groovesalad-64-aac",
+      "--transport",
+      "https",
+      "--seconds",
+      "60",
+      "--aac-reference-command",
+      ".build/idf-upgrade/faad-reference-command.json",
+      "--output",
+      ".build\\c3-memory-20261007\\control-https"
+    ]
+  },
+  {
+    "name": "control-soak",
+    "code": 1,
+    "seconds": 635.4850000000006,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/stream_memory_study.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-control-profile\\app.bin",
+      "--case",
+      "hev2-44100-stereo",
+      "--seconds",
+      "600",
+      "--output",
+      ".build\\c3-memory-20261007\\control-soak"
+    ]
+  },
+  {
+    "name": "control-soak-summary",
+    "code": 0,
+    "seconds": 0.15600000000267755,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/summarize_sustained.py",
+      "--input",
+      ".build\\c3-memory-20261007\\control-soak",
+      "--output",
+      ".build\\c3-memory-20261007\\control-soak-summary.json"
+    ]
+  },
+  {
+    "name": "install-rxcopy",
+    "code": 0,
+    "seconds": 25.578000000008615,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-rxcopy-profile\\app.bin",
+      "--output",
+      ".build\\c3-memory-20261007\\install-rxcopy.json"
+    ]
+  },
+  {
+    "name": "rxcopy-https",
+    "code": 1,
+    "seconds": 46.51599999998871,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/public_streams.py",
+      "--board",
+      "http://192.168.100.4",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-rxcopy-profile\\app.bin",
+      "--case",
+      "groovesalad-64-aac",
+      "--transport",
+      "https",
+      "--seconds",
+      "60",
+      "--aac-reference-command",
+      ".build/idf-upgrade/faad-reference-command.json",
+      "--output",
+      ".build\\c3-memory-20261007\\rxcopy-https"
+    ]
+  },
+  {
+    "name": "rxcopy-soak",
+    "code": 1,
+    "seconds": 636.5149999999994,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/stream_memory_study.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-rxcopy-profile\\app.bin",
+      "--case",
+      "hev2-44100-stereo",
+      "--seconds",
+      "600",
+      "--output",
+      ".build\\c3-memory-20261007\\rxcopy-soak"
+    ]
+  },
+  {
+    "name": "rxcopy-soak-summary",
+    "code": 0,
+    "seconds": 0.15700000000651926,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/summarize_sustained.py",
+      "--input",
+      ".build\\c3-memory-20261007\\rxcopy-soak",
+      "--output",
+      ".build\\c3-memory-20261007\\rxcopy-soak-summary.json"
+    ]
+  },
+  {
+    "name": "restore-guarded-production",
+    "code": 0,
+    "seconds": 25.139999999999418,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware/development/esp32c3-idf-6.1-compact-ram-http-production/app.bin",
+      "--output",
+      ".build\\c3-memory-20261007\\restore-guarded-production.json"
+    ]
+  }
+]

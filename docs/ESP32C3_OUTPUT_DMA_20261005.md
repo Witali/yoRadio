@@ -19,6 +19,74 @@ The native AAC adapter's input `memcpy`/`memmove` assembles compressed frames.
 Those operations are not PCM output copies. This audit does not claim that all
 private instructions of every vendor decoder have been decompiled.
 
+## ESP-IDF 6.1 follow-up, 8 October
+
+The direct-DMA implementation remains optional. Its CMake source-hash guard
+still accepts only the audited 6.0.2 I2S implementation. In the pinned 6.1
+revision `9a97f6c54ec638111ce55cd36581b3c192f15207`, both driver files differ:
+`i2s_common.c` SHA-256 starts `87b3443817bf`, and `i2s_private.h` starts
+`49fecb9c0a8a`. Enabling the option currently fails configuration. Audit the
+new descriptor ownership, writer locking and lifecycle before changing the
+guard; the old physical results are not a 6.1 qualification.
+
+For that comparison, `CONFIG_YORADIO_STAGED_DMA_PROFILE=y` adds diagnostics
+to the ordinary staged output. It is disabled by default and mutually
+exclusive with direct DMA and QEMU. The unchanged stock `i2s_channel_write`
+path, PCM arithmetic, buffer capacities, timeout and task priorities remain.
+An optional `on_send_q_ovf` ISR callback only increments an aligned DRAM word;
+reporting runs in the output task. A linked 6.1 audit confirms an 18-byte IRAM
+callback with no calls, a 4-byte DRAM counter and 32 bytes of task-local
+accounting. Registration failures retain the existing channel cleanup path.
+
+The cumulative `PERF STAGED_DMA:` record contains completion-queue overruns,
+write attempts, actual written bytes, total/max write wall time and errors.
+An SDK error or short write remains an output failure. Silence and startup
+ramps also affect these counters: compare deltas only within sustained
+playback, after warmup. A queue overrun is delayed service, not an exact
+number of missing samples. Write wall time includes waiting and preemption.
+The maximum is since boot, not a reconstructed maximum for a selected window.
+
+The host ASan/UBSan comparison passes all 432 PCM cases for staged, direct,
+and both instrumented variants, with the same 12,331,776-byte PCM hash shown
+below. Normalizer checks pass all 648 settings with zero LSB differences.
+Additional fault injection covers failed callback registration, SDK timeout,
+short writes and cumulative counter retention. Six parser tests reject
+damaged rows/resets and preserve gaps in telemetry coverage. The optional
+6.1 image builds and passes linked AAC/HTTP/TLS allocation audits. Its physical
+follow-up below retains the failed FLAC qualification.
+
+```text
+python tools/codec_benchmark/run_output_dma_host.py --profile --output <new-host-directory>
+python tests/test-staged-dma.py
+python tools/esp32c3_tests/staged_dma.py --input <completed-playback-study> --output <new-summary.json>
+```
+
+The parser retains the original acceptance results and never declares
+acoustic continuity qualified. Deltas cover only the first through last
+selected samples, without extrapolation. Evidence is retained under
+`tests/results/esp32c3-staged-dma-profile-20261008/`; the laboratory build is
+`firmware/development/esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly-dmaprof/`.
+It includes a test CA and experimental TLS settings and is not a production
+default recommendation.
+
+### Physical staged-output baseline
+
+On the pinned 6.1 build above, the 60-second HTTPS FLAC case recorded 154
+completion-queue overruns across 45.109 seconds between sustained-playback
+samples after warmup (3.414/s). Its runtime gate failed with 11 new watchdog
+events. The 90-second HE-AACv2 case with alternating 1/16 KiB TLS records passed
+its original gates and recorded zero overruns across 75.110 observed seconds.
+Telemetry coverage was complete in both selected windows; SDK write errors
+were zero. The 20,490 microsecond maximum write duration was since boot and
+carried into the subsequent AAC run; it is not an AAC-specific maximum.
+
+The separate ten-minute FLAC run lagged real time by 2.56% and captured 114
+watchdog events. Memory shortage was not observed in that run. These counters
+establish delayed DMA service, but no electrical or acoustic capture was made.
+The controller restored the quiet image and verified settings and playback.
+See the [immutable raw evidence](../tests/results/esp32c3-rxonly-long-20261008/)
+and the [matched TLS comparison](ESP32C3_TLS_RX_RESERVE_20261008.md).
+
 ## Implementation (final experimental variant)
 
 `CONFIG_YORADIO_DIRECT_DMA_PCM=y` selects `native_audio_output_dma.c`.

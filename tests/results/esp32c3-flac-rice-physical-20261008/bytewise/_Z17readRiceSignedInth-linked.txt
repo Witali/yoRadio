@@ -1,0 +1,135 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-flac-rice-bytewise\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+420360f6 <_Z17readRiceSignedInth>:
+420360f6:	7179                	addi	sp,sp,-48
+420360f8:	d226                	sw	s1,36(sp)
+420360fa:	d606                	sw	ra,44(sp)
+420360fc:	47f9                	li	a5,30
+420360fe:	3fc9a4b7          	lui	s1,0x3fc9a
+42036102:	0aa7ef63          	bltu	a5,a0,420361c0 <_Z17readRiceSignedInth+0xca>
+42036106:	e6048783          	lb	a5,-416(s1) # 3fc99e60 <m_readError>
+4203610a:	efd5                	bnez	a5,420361c6 <_Z17readRiceSignedInth+0xd0>
+4203610c:	ce4e                	sw	s3,28(sp)
+4203610e:	3fc9a9b7          	lui	s3,0x3fc9a
+42036112:	d422                	sw	s0,40(sp)
+42036114:	e509c403          	lbu	s0,-432(s3) # 3fc99e50 <m_bitBufferLen>
+42036118:	c65e                	sw	s7,12(sp)
+4203611a:	3fc9a7b7          	lui	a5,0x3fc9a
+4203611e:	d04a                	sw	s2,32(sp)
+42036120:	cc52                	sw	s4,24(sp)
+42036122:	ca56                	sw	s5,20(sp)
+42036124:	c85a                	sw	s6,16(sp)
+42036126:	e707a883          	lw	a7,-400(a5) # 3fc99e70 <m_inptr>
+4203612a:	8baa                	mv	s7,a0
+4203612c:	12040463          	beqz	s0,42036254 <_Z17readRiceSignedInth+0x15e>
+42036130:	3fc9a737          	lui	a4,0x3fc9a
+42036134:	57fd                	li	a5,-1
+42036136:	e5872703          	lw	a4,-424(a4) # 3fc99e58 <m_bitBuffer>
+4203613a:	008797b3          	sll	a5,a5,s0
+4203613e:	fff7c793          	not	a5,a5
+42036142:	4901                	li	s2,0
+42036144:	5a7d                	li	s4,-1
+42036146:	017a5ab3          	srl	s5,s4,s7
+4203614a:	00e7f533          	and	a0,a5,a4
+4203614e:	412a8b33          	sub	s6,s5,s2
+42036152:	c141                	beqz	a0,420361d2 <_Z17readRiceSignedInth+0xdc>
+42036154:	fdfca097          	auipc	ra,0xfdfca
+42036158:	648080e7          	jalr	1608(ra) # 4000079c <__clzsi2>
+4203615c:	fe040793          	addi	a5,s0,-32
+42036160:	97aa                	add	a5,a5,a0
+42036162:	0ff7f793          	zext.b	a5,a5
+42036166:	0cfb6263          	bltu	s6,a5,4203622a <_Z17readRiceSignedInth+0x134>
+4203616a:	9452                	add	s0,s0,s4
+4203616c:	8c1d                	sub	s0,s0,a5
+4203616e:	855e                	mv	a0,s7
+42036170:	97ca                	add	a5,a5,s2
+42036172:	01779bb3          	sll	s7,a5,s7
+42036176:	e4898823          	sb	s0,-432(s3)
+4203617a:	d8bff0ef          	jal	42035f04 <_Z8readUinth>
+4203617e:	00abe7b3          	or	a5,s7,a0
+42036182:	03478863          	beq	a5,s4,420361b2 <_Z17readRiceSignedInth+0xbc>
+42036186:	5422                	lw	s0,40(sp)
+42036188:	50b2                	lw	ra,44(sp)
+4203618a:	01f79713          	slli	a4,a5,0x1f
+4203618e:	41f75513          	srai	a0,a4,0x1f
+42036192:	0017d713          	srli	a4,a5,0x1
+42036196:	8d39                	xor	a0,a0,a4
+42036198:	01f79713          	slli	a4,a5,0x1f
+4203619c:	5902                	lw	s2,32(sp)
+4203619e:	49f2                	lw	s3,28(sp)
+420361a0:	4a62                	lw	s4,24(sp)
+420361a2:	4ad2                	lw	s5,20(sp)
+420361a4:	4b42                	lw	s6,16(sp)
+420361a6:	4bb2                	lw	s7,12(sp)
+420361a8:	5492                	lw	s1,36(sp)
+420361aa:	41f75593          	srai	a1,a4,0x1f
+420361ae:	6145                	addi	sp,sp,48
+420361b0:	8082                	ret
+420361b2:	5422                	lw	s0,40(sp)
+420361b4:	5902                	lw	s2,32(sp)
+420361b6:	49f2                	lw	s3,28(sp)
+420361b8:	4a62                	lw	s4,24(sp)
+420361ba:	4ad2                	lw	s5,20(sp)
+420361bc:	4b42                	lw	s6,16(sp)
+420361be:	4bb2                	lw	s7,12(sp)
+420361c0:	57cd                	li	a5,-13
+420361c2:	e6f48023          	sb	a5,-416(s1)
+420361c6:	50b2                	lw	ra,44(sp)
+420361c8:	5492                	lw	s1,36(sp)
+420361ca:	4501                	li	a0,0
+420361cc:	4581                	li	a1,0
+420361ce:	6145                	addi	sp,sp,48
+420361d0:	8082                	ret
+420361d2:	048b6c63          	bltu	s6,s0,4203622a <_Z17readRiceSignedInth+0x134>
+420361d6:	9922                	add	s2,s2,s0
+420361d8:	e4098823          	sb	zero,-432(s3)
+420361dc:	3fc9a837          	lui	a6,0x3fc9a
+420361e0:	e6c82583          	lw	a1,-404(a6) # 3fc99e6c <m_bytesAvail>
+420361e4:	06b05463          	blez	a1,4203624c <_Z17readRiceSignedInth+0x156>
+420361e8:	3fc9a637          	lui	a2,0x3fc9a
+420361ec:	e6462703          	lw	a4,-412(a2) # 3fc99e64 <m_rIndex>
+420361f0:	3fc9a7b7          	lui	a5,0x3fc9a
+420361f4:	e5878793          	addi	a5,a5,-424 # 3fc99e58 <m_bitBuffer>
+420361f8:	00170513          	addi	a0,a4,1
+420361fc:	e6a62223          	sw	a0,-412(a2)
+42036200:	9746                	add	a4,a4,a7
+42036202:	4388                	lw	a0,0(a5)
+42036204:	43d0                	lw	a2,4(a5)
+42036206:	00074703          	lbu	a4,0(a4)
+4203620a:	00851313          	slli	t1,a0,0x8
+4203620e:	0622                	slli	a2,a2,0x8
+42036210:	8161                	srli	a0,a0,0x18
+42036212:	15fd                	addi	a1,a1,-1
+42036214:	00676733          	or	a4,a4,t1
+42036218:	962a                	add	a2,a2,a0
+4203621a:	c398                	sw	a4,0(a5)
+4203621c:	c3d0                	sw	a2,4(a5)
+4203621e:	e6b82623          	sw	a1,-404(a6)
+42036222:	0ff00793          	li	a5,255
+42036226:	4421                	li	s0,8
+42036228:	bf31                	j	42036144 <_Z17readRiceSignedInth+0x4e>
+4203622a:	415407b3          	sub	a5,s0,s5
+4203622e:	17fd                	addi	a5,a5,-1
+42036230:	97ca                	add	a5,a5,s2
+42036232:	574d                	li	a4,-13
+42036234:	e4f98823          	sb	a5,-432(s3)
+42036238:	e6e48023          	sb	a4,-416(s1)
+4203623c:	5422                	lw	s0,40(sp)
+4203623e:	5902                	lw	s2,32(sp)
+42036240:	49f2                	lw	s3,28(sp)
+42036242:	4a62                	lw	s4,24(sp)
+42036244:	4ad2                	lw	s5,20(sp)
+42036246:	4b42                	lw	s6,16(sp)
+42036248:	4bb2                	lw	s7,12(sp)
+4203624a:	bfb5                	j	420361c6 <_Z17readRiceSignedInth+0xd0>
+4203624c:	57d1                	li	a5,-12
+4203624e:	e6f48023          	sb	a5,-416(s1)
+42036252:	b7ed                	j	4203623c <_Z17readRiceSignedInth+0x146>
+42036254:	4901                	li	s2,0
+42036256:	b759                	j	420361dc <_Z17readRiceSignedInth+0xe6>

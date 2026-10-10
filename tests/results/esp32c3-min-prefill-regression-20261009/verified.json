@@ -1,0 +1,82 @@
+{
+  "scope": "Provenance and exact coverage; PASS here does not override continuity findings.",
+  "phases": {
+    "short-pcm-tails": {
+      "passed": 62,
+      "total": 62,
+      "runtime": "PASS",
+      "transport_failure_phase_records": 0,
+      "failed_transport_requests": [],
+      "independent_replay_failures": []
+    },
+    "matrix-http": {
+      "passed": 23,
+      "total": 23,
+      "runtime": "PASS",
+      "transport_failure_phase_records": 0,
+      "failed_transport_requests": [],
+      "independent_replay_failures": []
+    },
+    "matrix-https": {
+      "passed": 23,
+      "total": 23,
+      "runtime": "PASS",
+      "transport_failure_phase_records": 0,
+      "failed_transport_requests": [],
+      "independent_replay_failures": []
+    },
+    "heavy-flac": {
+      "passed": 4,
+      "total": 4,
+      "runtime": "PASS",
+      "transport_failure_phase_records": 0,
+      "failed_transport_requests": [],
+      "independent_replay_failures": []
+    },
+    "transitions-faults-websocket": {
+      "passed": 10,
+      "total": 10,
+      "runtime": "PASS",
+      "transport_failure_phase_records": 0,
+      "failed_transport_requests": [],
+      "independent_replay_failures": []
+    },
+    "switch-all": {
+      "passed": 2,
+      "total": 2,
+      "runtime": "PASS",
+      "transport_failure_phase_records": 0,
+      "failed_transport_requests": [],
+      "independent_replay_failures": []
+    },
+    "eof-http": {
+      "passed": 22,
+      "total": 23,
+      "runtime": "PASS",
+      "transport_failure_phase_records": 2,
+      "failed_transport_requests": [
+        820
+      ],
+      "independent_replay_failures": [
+        {
+          "name": "eof:he-48000-stereo:aac",
+          "result": "FAIL",
+          "reason": "Interrupted EOF observation; retain the original failure"
+        }
+      ]
+    }
+  },
+  "heavy_flac": {
+    "telemetry_complete": true,
+    "decoder_flow_complete": true,
+    "output_flow_complete": true,
+    "selected_dma_events": 84,
+    "whole_observed_dma_events": 84,
+    "continuity": "REVIEW_REQUIRED"
+  },
+  "result": "PASS",
+  "source_files": 81,
+  "restored": true,
+  "mapped_crc_checks": 4,
+  "fractional_clock_analog_qualified": false
+}

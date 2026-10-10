@@ -1,0 +1,30 @@
+42002d84:	1101                	addi	sp,sp,-32
+42002d86:	cc22                	sw	s0,24(sp)
+42002d88:	ca26                	sw	s1,20(sp)
+42002d8a:	ce06                	sw	ra,28(sp)
+42002d8c:	842e                	mv	s0,a1
+42002d8e:	84b2                	mv	s1,a2
+42002d90:	5e8260ef          	jal	42029378 <__wrap_heap_caps_realloc_base>
+42002d94:	87aa                	mv	a5,a0
+42002d96:	e111                	bnez	a0,42002d9a <heap_caps_realloc+0x16>
+42002d98:	e419                	bnez	s0,42002da6 <heap_caps_realloc+0x22>
+42002d9a:	40f2                	lw	ra,28(sp)
+42002d9c:	4462                	lw	s0,24(sp)
+42002d9e:	44d2                	lw	s1,20(sp)
+42002da0:	853e                	mv	a0,a5
+42002da2:	6105                	addi	sp,sp,32
+42002da4:	8082                	ret
+42002da6:	3c13f637          	lui	a2,0x3c13f
+42002daa:	c62a                	sw	a0,12(sp)
+42002dac:	85a6                	mv	a1,s1
+42002dae:	8522                	mv	a0,s0
+42002db0:	39c60613          	addi	a2,a2,924 # 3c13f39c <__func__.7>
+42002db4:	3361                	jal	42002b3c <heap_caps_alloc_failed>
+42002db6:	47b2                	lw	a5,12(sp)
+42002db8:	40f2                	lw	ra,28(sp)
+42002dba:	4462                	lw	s0,24(sp)
+42002dbc:	44d2                	lw	s1,20(sp)
+42002dbe:	853e                	mv	a0,a5
+42002dc0:	6105                	addi	sp,sp,32
+42002dc2:	8082                	ret
+

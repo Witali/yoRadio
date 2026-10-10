@@ -1,0 +1,69 @@
+{
+  "idf": "6.1",
+  "profile": "r9a97-pcm-tail",
+  "source_head_at_capture": "7b9c017cb769c413dc32b3fbf80caa664af320dc",
+  "embedded_project_version": "idf61-pcm-tail",
+  "idf_from_image": "9a97f6c5",
+  "image": {
+    "app_elf_sha256": "8a95b5a9a3c72f4d82c5a1c3d2b1acee34445e253802c9fa1a820443b7d76a46",
+    "sha256": "e7d19f98719bb2f8b244096dffe73f57a98794d53fcb63ad918ff3ffbf3c1853",
+    "bytes": 1620496
+  },
+  "build_directory": "idf\\esp32c3-oled-native\\build-idf-6.1-r9a97-pcm-tail",
+  "qualification": "Full linked build, exact host PCM parity, 60 measured short-file cases and complete physical regression passed; analog quality and final production configuration remain unqualified",
+  "sdkconfig_sha256": "9732e1f5bb628029c6fe95bdaf9c6597eaf1c79eb89f8bdfca3e7dfbadc7d4da",
+  "elf_sha256": "8a95b5a9a3c72f4d82c5a1c3d2b1acee34445e253802c9fa1a820443b7d76a46",
+  "project_version_at_build": "idf61-pcm-tail",
+  "idf_git_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+  "laboratory_only": true,
+  "production_qualified": false,
+  "controlled_tls_followup": {
+    "report": "docs/ESP32C3_TLS_FINAL_GATES_20261009.md",
+    "record_pacing_ratio": 1.0,
+    "continuity_qualified": false,
+    "findings": [
+      "Four post-warmup DMA queue events in the short 16 KiB record case; startup events also retained",
+      "Ten-minute alternating-record observation interrupted after 395.390 seconds by host Windows connect error 10048",
+      "Original 15 OTA entries pass; two generic TLS error rows before the restoration reboot require classification"
+    ]
+  },
+  "input_prefill_ms": 500,
+  "clock_mode": "fractional",
+  "control_app_sha256": "44dc8d2d6f20aec49ec7a336211b9db876df3c72af1eaa6cfc1e4d2382159252",
+  "source_overlay_sha256": {
+    "idf/esp32c3-oled-native/main/audio_service.c": "4ba30f8a609025721b580be1a1298442ce1bdb4e16f2772bcbe617a4723c83a8",
+    "idf/esp32c3-oled-native/main/native_audio_output.c": "3d93e0e069b2483603478d8dba11029dcf85842c1f741f0e3436e4cf12329b62",
+    "idf/esp32c3-oled-native/main/native_audio_output.h": "0331612bc0c3274223a0c6b5ce3982189d2520ca0ef13c7cd6b8199a2b7584d4",
+    "idf/esp32c3-oled-native/main/native_audio_output_qemu.c": "e994b86f37b5dfd826079445404d17d1383fda9444c70ed71dd1548ba9b7c7f5",
+    "idf/esp32c3-oled-native/main/Kconfig.projbuild": "bbdae0d3ed3fc9ee3d1209fadbfb4fd909b32796d5ca5d5d4c60ceff5aa896a4",
+    "idf/esp32c3-oled-native/main/CMakeLists.txt": "728eccbea81999a6f06879b860a6b1c206083d24266103e203c55eca08e4d867",
+    "idf/esp32c3-oled-native/sdkconfig.input-prefill.defaults": "36ab0a3ebddcf79ae0883573dc21c9fc3af37c5addda0f66d4afbd1dcbc4e3b1",
+    "tools/audio_test_server/generate_pcm_tails.py": "a928505b88ea9c439bcf87aa0626de7ed2395129f9caf6b79e6081cc902d9c23",
+    "tools/esp32c3_tests/pcm_tail.py": "60725e812321a0140e0498ada8ab8ac5450c7d0c71ba264aef2de32284294406",
+    "tests/test-pcm-tail.py": "86fa5ae0f6484773ae3ff7e72f4a291cc93c66a08ea8b86b4a9595ade101a079"
+  },
+  "bootloader_sha256": "136d688ddcce5862e5824b207ed44d142f56c81f4c957ed5f436394a170b8b25",
+  "source_note": "Unrelated main CMake CLZ changes are inactive; no CLZ source compiled.",
+  "extra_trust_ca_sha256": "5d07cd4783170ceeb5933e41a9618d7c0775567f7e9307d8478390cf3f526de8",
+  "restoration_app_sha256": "21311e2f87a97cbbf03fe3036111334df8fac75ffe63b9b3207ff2d02e82de0a",
+  "physical_qualification": {
+    "report": "docs/ESP32C3_PCM_TAIL_BOARD_20261009.md",
+    "evidence": "tests/results/esp32c3-pcm-tail-board-20261009",
+    "original_report_entries": 127,
+    "all_original_gates_passed": true,
+    "short_file_measurements": 60,
+    "format_transport_cases": 44,
+    "sustained_dma_overruns": [
+      0,
+      0
+    ],
+    "sustained_write_errors": [
+      0,
+      0
+    ],
+    "production_restored": true,
+    "analog_capture": false,
+    "listening_comparison": false,
+    "diagnostics_commit": "66e0e4e0"
+  }
+}

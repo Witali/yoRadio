@@ -1,0 +1,227 @@
+{
+  "framing": {
+    "cases": [
+      {
+        "name": "framing:length-notify",
+        "result": "FAIL",
+        "reason": "Runtime decoder/memory/serial failure",
+        "seconds": 19.906
+      },
+      {
+        "name": "framing:length-raw",
+        "result": "FAIL",
+        "reason": "Runtime decoder/memory/serial failure",
+        "seconds": 20.156
+      },
+      {
+        "name": "framing:length-short",
+        "result": "FAIL",
+        "reason": "Runtime decoder/memory/serial failure",
+        "seconds": 20.032
+      },
+      {
+        "name": "framing:chunked-notify",
+        "result": "FAIL",
+        "reason": "Runtime decoder/memory/serial failure",
+        "seconds": 20.078
+      },
+      {
+        "name": "framing:chunked-raw",
+        "result": "FAIL",
+        "reason": "Runtime decoder/memory/serial failure",
+        "seconds": 20.187
+      },
+      {
+        "name": "framing:chunked-short",
+        "result": "FAIL",
+        "reason": "Runtime decoder/memory/serial failure",
+        "seconds": 20.203
+      },
+      {
+        "name": "framing:close-notify",
+        "result": "FAIL",
+        "reason": "Runtime decoder/memory/serial failure",
+        "seconds": 20.219
+      },
+      {
+        "name": "framing:close-raw",
+        "result": "FAIL",
+        "reason": "Runtime decoder/memory/serial failure",
+        "seconds": 20.281
+      },
+      {
+        "name": "settings-preserved",
+        "result": "PASS",
+        "seconds": 0.828
+      }
+    ],
+    "allocation_failures": 181,
+    "requested_bytes": [
+      1060,
+      1100,
+      1180,
+      1296,
+      1392,
+      1404,
+      1512,
+      1700
+    ],
+    "first_allocation_failure": {
+      "at": 137713.328,
+      "requested": 1700,
+      "free": 8908,
+      "largest": 1536
+    },
+    "allocation_minimum_free": 4876,
+    "allocation_minimum_largest": 704,
+    "sample_batches": [
+      {
+        "case": "framing:length-notify",
+        "duration_seconds": 18.84399999998277,
+        "samples": 35,
+        "full_hev2_samples": 12,
+        "last_sample_seconds": 18.687999999994645,
+        "rssi_min": -69,
+        "rssi_max": -59
+      },
+      {
+        "case": "framing:length-raw",
+        "duration_seconds": 18.98499999998603,
+        "samples": 48,
+        "full_hev2_samples": 24,
+        "last_sample_seconds": 18.828999999997905,
+        "rssi_min": -70,
+        "rssi_max": -59
+      },
+      {
+        "case": "framing:length-short",
+        "duration_seconds": 18.89100000000326,
+        "samples": 35,
+        "full_hev2_samples": 11,
+        "last_sample_seconds": 18.735000000015134,
+        "rssi_min": -69,
+        "rssi_max": -59
+      },
+      {
+        "case": "framing:chunked-notify",
+        "duration_seconds": 18.89000000001397,
+        "samples": 59,
+        "full_hev2_samples": 35,
+        "last_sample_seconds": 18.734000000025844,
+        "rssi_min": -70,
+        "rssi_max": -59
+      },
+      {
+        "case": "framing:chunked-raw",
+        "duration_seconds": 18.96799999999348,
+        "samples": 42,
+        "full_hev2_samples": 18,
+        "last_sample_seconds": 18.812000000005355,
+        "rssi_min": -69,
+        "rssi_max": -59
+      },
+      {
+        "case": "framing:chunked-short",
+        "duration_seconds": 19.0,
+        "samples": 50,
+        "full_hev2_samples": 26,
+        "last_sample_seconds": 18.85899999999674,
+        "rssi_min": -79,
+        "rssi_max": -60
+      },
+      {
+        "case": "framing:close-notify",
+        "duration_seconds": 19.09299999999348,
+        "samples": 45,
+        "full_hev2_samples": 20,
+        "last_sample_seconds": 18.937000000005355,
+        "rssi_min": -83,
+        "rssi_max": -59
+      },
+      {
+        "case": "framing:close-raw",
+        "duration_seconds": 19.14100000000326,
+        "samples": 59,
+        "full_hev2_samples": 34,
+        "last_sample_seconds": 18.985000000015134,
+        "rssi_min": -77,
+        "rssi_max": -59
+      }
+    ],
+    "panic_or_reset_lines": []
+  },
+  "tls-soak": {
+    "cases": [
+      {
+        "name": "idle-before",
+        "result": "PASS",
+        "seconds": 12.25
+      },
+      {
+        "name": "tls-record:alternate",
+        "result": "FAIL",
+        "reason": "TimeoutError",
+        "seconds": 525.859
+      },
+      {
+        "name": "idle-recovery",
+        "result": "PASS",
+        "seconds": 12.422
+      },
+      {
+        "name": "runtime",
+        "result": "FAIL",
+        "reason": "Runtime allocation/decoder/TLS failure",
+        "seconds": 0.0
+      },
+      {
+        "name": "restore",
+        "result": "PASS",
+        "seconds": 0.75
+      }
+    ],
+    "allocation_failures": 51,
+    "requested_bytes": [
+      1512,
+      1700
+    ],
+    "first_allocation_failure": {
+      "at": 137970.5,
+      "requested": 1700,
+      "free": 7276,
+      "largest": 1536
+    },
+    "allocation_minimum_free": 5148,
+    "allocation_minimum_largest": 1024,
+    "sample_batches": [
+      {
+        "case": "settled-idle",
+        "duration_seconds": 12.187999999994645,
+        "samples": 24,
+        "full_hev2_samples": 0,
+        "last_sample_seconds": 11.78200000000652,
+        "rssi_min": -77,
+        "rssi_max": -60
+      },
+      {
+        "case": "tls-record:alternate",
+        "duration_seconds": 523.6560000000172,
+        "samples": 2749,
+        "full_hev2_samples": 2744,
+        "last_sample_seconds": 518.5310000000172,
+        "rssi_min": -82,
+        "rssi_max": -59
+      },
+      {
+        "case": "settled-idle",
+        "duration_seconds": 12.312999999994645,
+        "samples": 24,
+        "full_hev2_samples": 0,
+        "last_sample_seconds": 11.922000000020489,
+        "rssi_min": -62,
+        "rssi_max": -60
+      }
+    ],
+    "panic_or_reset_lines": []
+  }
+}

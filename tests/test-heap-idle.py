@@ -38,7 +38,7 @@ class HeapIdleTest(unittest.TestCase):
             argv=['heap_idle','--board','http://test','--serial-port','fake','--output',folder]
             with patch.object(sys,'argv',argv),patch.object(heap_idle,'Board',Board),\
                  patch.object(heap_idle,'DiagnosticCapture',Capture),patch.object(heap_idle,'Suite',Suite),\
-                 patch.object(heap_idle,'time',SimpleNamespace(monotonic=lambda:now[0],sleep=sleep)):
+                 patch.object(heap_idle,'time',SimpleNamespace(perf_counter=lambda:now[0],sleep=sleep)):
                 self.assertEqual(heap_idle.main(),0)
             result=json.loads((Path(folder)/'report.json').read_text())
             self.assertEqual(result['quiet_window'],dict(started_at=0,ended_at=130,http_polls=0))

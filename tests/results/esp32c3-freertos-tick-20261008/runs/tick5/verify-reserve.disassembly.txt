@@ -1,0 +1,520 @@
+__wrap_esp_mbedtls_mem_calloc:
+42028228:	c95d                	beqz	a0,420282de <__wrap_esp_mbedtls_mem_calloc+0xb6>
+4202822a:	c9d5                	beqz	a1,420282de <__wrap_esp_mbedtls_mem_calloc+0xb6>
+4202822c:	02b537b3          	mulhu	a5,a0,a1
+42028230:	e7dd                	bnez	a5,420282de <__wrap_esp_mbedtls_mem_calloc+0xb6>
+42028232:	1101                	addi	sp,sp,-32
+42028234:	ca26                	sw	s1,20(sp)
+42028236:	c84a                	sw	s2,16(sp)
+42028238:	c452                	sw	s4,8(sp)
+4202823a:	02b50933          	mul	s2,a0,a1
+4202823e:	ce06                	sw	ra,28(sp)
+42028240:	cc22                	sw	s0,24(sp)
+42028242:	c64e                	sw	s3,12(sp)
+42028244:	c256                	sw	s5,4(sp)
+42028246:	8a2e                	mv	s4,a1
+42028248:	84aa                	mv	s1,a0
+4202824a:	3fc9a7b7          	lui	a5,0x3fc9a
+4202824e:	e0478793          	addi	a5,a5,-508 # 3fc99e04 <s_input>
+42028252:	0330000f          	fence	rw,rw
+42028256:	0007a983          	lw	s3,0(a5)
+4202825a:	0230000f          	fence	r,rw
+4202825e:	6505                	lui	a0,0x1
+42028260:	80450513          	addi	a0,a0,-2044 # 804 <ALIGN_VECTOR_TABLE+0x704>
+42028264:	cbdda0ef          	jal	42002f20 <heap_caps_get_largest_free_block>
+42028268:	3fc9a437          	lui	s0,0x3fc9a
+4202826c:	87aa                	mv	a5,a0
+4202826e:	e0040413          	addi	s0,s0,-512 # 3fc99e00 <s_reclaimed>
+42028272:	3fc9aab7          	lui	s5,0x3fc9a
+42028276:	854e                	mv	a0,s3
+42028278:	0327fd63          	bgeu	a5,s2,420282b2 <__wrap_esp_mbedtls_mem_calloc+0x8a>
+4202827c:	e75ff0ef          	jal	420280f0 <adaptive_input_release_one>
+42028280:	c90d                	beqz	a0,420282b2 <__wrap_esp_mbedtls_mem_calloc+0x8a>
+42028282:	df8a8793          	addi	a5,s5,-520 # 3fc99df8 <s_last_request>
+42028286:	0310000f          	fence	rw,w
+4202828a:	0127a023          	sw	s2,0(a5)
+4202828e:	0330000f          	fence	rw,rw
+42028292:	4615                	li	a2,5
+42028294:	4585                	li	a1,1
+42028296:	8522                	mv	a0,s0
+42028298:	fe35f097          	auipc	ra,0xfe35f
+4202829c:	bea080e7          	jalr	-1046(ra) # 40386e82 <__atomic_fetch_add_4>
+420282a0:	6505                	lui	a0,0x1
+420282a2:	80450513          	addi	a0,a0,-2044 # 804 <ALIGN_VECTOR_TABLE+0x704>
+420282a6:	c7bda0ef          	jal	42002f20 <heap_caps_get_largest_free_block>
+420282aa:	87aa                	mv	a5,a0
+420282ac:	854e                	mv	a0,s3
+420282ae:	fd27e7e3          	bltu	a5,s2,4202827c <__wrap_esp_mbedtls_mem_calloc+0x54>
+420282b2:	85d2                	mv	a1,s4
+420282b4:	8526                	mv	a0,s1
+420282b6:	5744c0ef          	jal	4207482a <esp_mbedtls_mem_calloc>
+420282ba:	842a                	mv	s0,a0
+420282bc:	e519                	bnez	a0,420282ca <__wrap_esp_mbedtls_mem_calloc+0xa2>
+420282be:	854e                	mv	a0,s3
+420282c0:	e31ff0ef          	jal	420280f0 <adaptive_input_release_one>
+420282c4:	3fc9a7b7          	lui	a5,0x3fc9a
+420282c8:	ed09                	bnez	a0,420282e2 <__wrap_esp_mbedtls_mem_calloc+0xba>
+420282ca:	40f2                	lw	ra,28(sp)
+420282cc:	8522                	mv	a0,s0
+420282ce:	4462                	lw	s0,24(sp)
+420282d0:	44d2                	lw	s1,20(sp)
+420282d2:	4942                	lw	s2,16(sp)
+420282d4:	49b2                	lw	s3,12(sp)
+420282d6:	4a22                	lw	s4,8(sp)
+420282d8:	4a92                	lw	s5,4(sp)
+420282da:	6105                	addi	sp,sp,32
+420282dc:	8082                	ret
+420282de:	54c4c06f          	j	4207482a <esp_mbedtls_mem_calloc>
+420282e2:	df878793          	addi	a5,a5,-520 # 3fc99df8 <s_last_request>
+420282e6:	0310000f          	fence	rw,w
+420282ea:	0127a023          	sw	s2,0(a5)
+420282ee:	0330000f          	fence	rw,rw
+420282f2:	3fc9a537          	lui	a0,0x3fc9a
+420282f6:	4615                	li	a2,5
+420282f8:	4585                	li	a1,1
+420282fa:	e0050513          	addi	a0,a0,-512 # 3fc99e00 <s_reclaimed>
+420282fe:	fe35f097          	auipc	ra,0xfe35f
+42028302:	b84080e7          	jalr	-1148(ra) # 40386e82 <__atomic_fetch_add_4>
+42028306:	3fc9a537          	lui	a0,0x3fc9a
+4202830a:	4585                	li	a1,1
+4202830c:	dfc50513          	addi	a0,a0,-516 # 3fc99dfc <s_retries>
+42028310:	4615                	li	a2,5
+42028312:	fe35f097          	auipc	ra,0xfe35f
+42028316:	b70080e7          	jalr	-1168(ra) # 40386e82 <__atomic_fetch_add_4>
+4202831a:	85d2                	mv	a1,s4
+4202831c:	8526                	mv	a0,s1
+4202831e:	50c4c0ef          	jal	4207482a <esp_mbedtls_mem_calloc>
+42028322:	dd51                	beqz	a0,420282be <__wrap_esp_mbedtls_mem_calloc+0x96>
+42028324:	842a                	mv	s0,a0
+42028326:	b755                	j	420282ca <__wrap_esp_mbedtls_mem_calloc+0xa2>
+
+
+__wrap_esp_mbedtls_mem_free:
+4202840e:	1141                	addi	sp,sp,-16
+42028410:	c422                	sw	s0,8(sp)
+42028412:	c606                	sw	ra,12(sp)
+42028414:	842a                	mv	s0,a0
+42028416:	28c1                	jal	420284e6 <tls_large_reserve_free>
+42028418:	c509                	beqz	a0,42028422 <__wrap_esp_mbedtls_mem_free+0x14>
+4202841a:	40b2                	lw	ra,12(sp)
+4202841c:	4422                	lw	s0,8(sp)
+4202841e:	0141                	addi	sp,sp,16
+42028420:	8082                	ret
+42028422:	8522                	mv	a0,s0
+42028424:	4422                	lw	s0,8(sp)
+42028426:	40b2                	lw	ra,12(sp)
+42028428:	0141                	addi	sp,sp,16
+4202842a:	40a4c06f          	j	42074834 <esp_mbedtls_mem_free>
+
+
+tls_large_reserve_calloc:
+4202842e:	cd51                	beqz	a0,420284ca <tls_large_reserve_calloc+0x9c>
+42028430:	1101                	addi	sp,sp,-32
+42028432:	6791                	lui	a5,0x4
+42028434:	cc22                	sw	s0,24(sp)
+42028436:	ce06                	sw	ra,28(sp)
+42028438:	2a278793          	addi	a5,a5,674 # 42a2 <CSR_UINTSTATUS+0x35f1>
+4202843c:	842a                	mv	s0,a0
+4202843e:	06a7e763          	bltu	a5,a0,420284ac <tls_large_reserve_calloc+0x7e>
+42028442:	4715                	li	a4,5
+42028444:	3fc9a537          	lui	a0,0x3fc9a
+42028448:	86ba                	mv	a3,a4
+4202844a:	e2c50513          	addi	a0,a0,-468 # 3fc99e2c <s_busy>
+4202844e:	4605                	li	a2,1
+42028450:	00f10593          	addi	a1,sp,15
+42028454:	000107a3          	sb	zero,15(sp)
+42028458:	fe35f097          	auipc	ra,0xfe35f
+4202845c:	954080e7          	jalr	-1708(ra) # 40386dac <__atomic_compare_exchange_1>
+42028460:	c53d                	beqz	a0,420284ce <tls_large_reserve_calloc+0xa0>
+42028462:	3fc927b7          	lui	a5,0x3fc92
+42028466:	ed078513          	addi	a0,a5,-304 # 3fc91ed0 <s_tls_large_storage>
+4202846a:	8622                	mv	a2,s0
+4202846c:	4581                	li	a1,0
+4202846e:	fdfd8097          	auipc	ra,0xfdfd8
+42028472:	ee6080e7          	jalr	-282(ra) # 40000354 <memset>
+42028476:	3fc9a737          	lui	a4,0x3fc9a
+4202847a:	e2870793          	addi	a5,a4,-472 # 3fc99e28 <s_used>
+4202847e:	0310000f          	fence	rw,w
+42028482:	c380                	sw	s0,0(a5)
+42028484:	0330000f          	fence	rw,rw
+42028488:	3fc9a537          	lui	a0,0x3fc9a
+4202848c:	e2450513          	addi	a0,a0,-476 # 3fc99e24 <s_allocations>
+42028490:	4615                	li	a2,5
+42028492:	4585                	li	a1,1
+42028494:	fe35f097          	auipc	ra,0xfe35f
+42028498:	9ee080e7          	jalr	-1554(ra) # 40386e82 <__atomic_fetch_add_4>
+4202849c:	40f2                	lw	ra,28(sp)
+4202849e:	4462                	lw	s0,24(sp)
+420284a0:	3fc927b7          	lui	a5,0x3fc92
+420284a4:	ed078513          	addi	a0,a5,-304 # 3fc91ed0 <s_tls_large_storage>
+420284a8:	6105                	addi	sp,sp,32
+420284aa:	8082                	ret
+420284ac:	3fc9a537          	lui	a0,0x3fc9a
+420284b0:	e1850513          	addi	a0,a0,-488 # 3fc99e18 <s_oversize>
+420284b4:	4615                	li	a2,5
+420284b6:	4585                	li	a1,1
+420284b8:	fe35f097          	auipc	ra,0xfe35f
+420284bc:	9ca080e7          	jalr	-1590(ra) # 40386e82 <__atomic_fetch_add_4>
+420284c0:	4501                	li	a0,0
+420284c2:	40f2                	lw	ra,28(sp)
+420284c4:	4462                	lw	s0,24(sp)
+420284c6:	6105                	addi	sp,sp,32
+420284c8:	8082                	ret
+420284ca:	4501                	li	a0,0
+420284cc:	8082                	ret
+420284ce:	3fc9a537          	lui	a0,0x3fc9a
+420284d2:	e1c50513          	addi	a0,a0,-484 # 3fc99e1c <s_busy_fallbacks>
+420284d6:	4615                	li	a2,5
+420284d8:	4585                	li	a1,1
+420284da:	fe35f097          	auipc	ra,0xfe35f
+420284de:	9a8080e7          	jalr	-1624(ra) # 40386e82 <__atomic_fetch_add_4>
+420284e2:	4501                	li	a0,0
+420284e4:	bff9                	j	420284c2 <tls_large_reserve_calloc+0x94>
+
+
+tls_large_reserve_free:
+420284e6:	3fc927b7          	lui	a5,0x3fc92
+420284ea:	ed078793          	addi	a5,a5,-304 # 3fc91ed0 <s_tls_large_storage>
+420284ee:	00f50563          	beq	a0,a5,420284f8 <tls_large_reserve_free+0x12>
+420284f2:	4781                	li	a5,0
+420284f4:	853e                	mv	a0,a5
+420284f6:	8082                	ret
+420284f8:	1101                	addi	sp,sp,-32
+420284fa:	ce06                	sw	ra,28(sp)
+420284fc:	3fc9a737          	lui	a4,0x3fc9a
+42028500:	e2c70793          	addi	a5,a4,-468 # 3fc99e2c <s_busy>
+42028504:	0330000f          	fence	rw,rw
+42028508:	00078783          	lb	a5,0(a5)
+4202850c:	0230000f          	fence	r,rw
+42028510:	0ff7f793          	zext.b	a5,a5
+42028514:	c3a5                	beqz	a5,42028574 <tls_large_reserve_free+0x8e>
+42028516:	c63e                	sw	a5,12(sp)
+42028518:	3fc9a6b7          	lui	a3,0x3fc9a
+4202851c:	e2868793          	addi	a5,a3,-472 # 3fc99e28 <s_used>
+42028520:	0330000f          	fence	rw,rw
+42028524:	438c                	lw	a1,0(a5)
+42028526:	0230000f          	fence	r,rw
+4202852a:	2007f0ef          	jal	420a772a <mbedtls_platform_zeroize>
+4202852e:	3fc9a6b7          	lui	a3,0x3fc9a
+42028532:	e2868793          	addi	a5,a3,-472 # 3fc99e28 <s_used>
+42028536:	0310000f          	fence	rw,w
+4202853a:	0007a023          	sw	zero,0(a5)
+4202853e:	0330000f          	fence	rw,rw
+42028542:	3fc9a537          	lui	a0,0x3fc9a
+42028546:	4615                	li	a2,5
+42028548:	4585                	li	a1,1
+4202854a:	e2050513          	addi	a0,a0,-480 # 3fc99e20 <s_releases>
+4202854e:	fe35f097          	auipc	ra,0xfe35f
+42028552:	934080e7          	jalr	-1740(ra) # 40386e82 <__atomic_fetch_add_4>
+42028556:	3fc9a737          	lui	a4,0x3fc9a
+4202855a:	e2c70793          	addi	a5,a4,-468 # 3fc99e2c <s_busy>
+4202855e:	0310000f          	fence	rw,w
+42028562:	00078023          	sb	zero,0(a5)
+42028566:	0330000f          	fence	rw,rw
+4202856a:	47b2                	lw	a5,12(sp)
+4202856c:	40f2                	lw	ra,28(sp)
+4202856e:	853e                	mv	a0,a5
+42028570:	6105                	addi	sp,sp,32
+42028572:	8082                	ret
+42028574:	3c12b6b7          	lui	a3,0x3c12b
+42028578:	3c142637          	lui	a2,0x3c142
+4202857c:	3c12b537          	lui	a0,0x3c12b
+42028580:	b6068693          	addi	a3,a3,-1184 # 3c12ab60 <_esp_libc_clock_array_end+0xaa10>
+42028584:	ae060613          	addi	a2,a2,-1312 # 3c141ae0 <__func__.3>
+42028588:	b8050513          	addi	a0,a0,-1152 # 3c12ab80 <_esp_libc_clock_array_end+0xaa30>
+4202858c:	03200593          	li	a1,50
+42028590:	fe35e097          	auipc	ra,0xfe35e
+42028594:	4d8080e7          	jalr	1240(ra) # 40386a68 <__assert_func>
+
+
+yoradio_tls_rx_calloc:
+42028328:	c115                	beqz	a0,4202834c <yoradio_tls_rx_calloc+0x24>
+4202832a:	c18d                	beqz	a1,4202834c <yoradio_tls_rx_calloc+0x24>
+4202832c:	02b537b3          	mulhu	a5,a0,a1
+42028330:	ef91                	bnez	a5,4202834c <yoradio_tls_rx_calloc+0x24>
+42028332:	87aa                	mv	a5,a0
+42028334:	02b50533          	mul	a0,a0,a1
+42028338:	1101                	addi	sp,sp,-32
+4202833a:	c62e                	sw	a1,12(sp)
+4202833c:	ce06                	sw	ra,28(sp)
+4202833e:	c43e                	sw	a5,8(sp)
+42028340:	20fd                	jal	4202842e <tls_large_reserve_calloc>
+42028342:	45b2                	lw	a1,12(sp)
+42028344:	c511                	beqz	a0,42028350 <yoradio_tls_rx_calloc+0x28>
+42028346:	40f2                	lw	ra,28(sp)
+42028348:	6105                	addi	sp,sp,32
+4202834a:	8082                	ret
+4202834c:	4de4c06f          	j	4207482a <esp_mbedtls_mem_calloc>
+42028350:	4522                	lw	a0,8(sp)
+42028352:	40f2                	lw	ra,28(sp)
+42028354:	6105                	addi	sp,sp,32
+42028356:	ed3ff06f          	j	42028228 <__wrap_esp_mbedtls_mem_calloc>
+
+
+esp_mbedtls_dynamic_set_rx_buf_static:
+4209c5ae:	516c                	lw	a1,100(a0)
+4209c5b0:	1101                	addi	sp,sp,-32
+4209c5b2:	cc22                	sw	s0,24(sp)
+4209c5b4:	4641                	li	a2,16
+4209c5b6:	842a                	mv	s0,a0
+4209c5b8:	850a                	mv	a0,sp
+4209c5ba:	ce06                	sw	ra,28(sp)
+4209c5bc:	fe2ea097          	auipc	ra,0xfe2ea
+4209c5c0:	624080e7          	jalr	1572(ra) # 40386be0 <memcpy>
+4209c5c4:	8522                	mv	a0,s0
+4209c5c6:	fcdff0ef          	jal	4209c592 <esp_mbedtls_reset_free_rx_buffer>
+4209c5ca:	6591                	lui	a1,0x4
+4209c5cc:	2a258593          	addi	a1,a1,674 # 42a2 <CSR_UINTSTATUS+0x35f1>
+4209c5d0:	4505                	li	a0,1
+4209c5d2:	d578b0ef          	jal	42028328 <yoradio_tls_rx_calloc>
+4209c5d6:	ed0d                	bnez	a0,4209c610 <esp_mbedtls_dynamic_set_rx_buf_static+0x62>
+4209c5d8:	fe2ed097          	auipc	ra,0xfe2ed
+4209c5dc:	ed2080e7          	jalr	-302(ra) # 403894aa <esp_log_timestamp>
+4209c5e0:	3c138737          	lui	a4,0x3c138
+4209c5e4:	3f470713          	addi	a4,a4,1012 # 3c1383f4 <_esp_libc_clock_array_end+0x182a4>
+4209c5e8:	6791                	lui	a5,0x4
+4209c5ea:	3c138637          	lui	a2,0x3c138
+4209c5ee:	86aa                	mv	a3,a0
+4209c5f0:	2a278793          	addi	a5,a5,674 # 42a2 <CSR_UINTSTATUS+0x35f1>
+4209c5f4:	4505                	li	a0,1
+4209c5f6:	42860613          	addi	a2,a2,1064 # 3c138428 <_esp_libc_clock_array_end+0x182d8>
+4209c5fa:	85ba                	mv	a1,a4
+4209c5fc:	fe2ed097          	auipc	ra,0xfe2ed
+4209c600:	da6080e7          	jalr	-602(ra) # 403893a2 <esp_log>
+4209c604:	10100513          	li	a0,257
+4209c608:	40f2                	lw	ra,28(sp)
+4209c60a:	4462                	lw	s0,24(sp)
+4209c60c:	6105                	addi	sp,sp,32
+4209c60e:	8082                	ret
+4209c610:	6791                	lui	a5,0x4
+4209c612:	29a78793          	addi	a5,a5,666 # 429a <CSR_UINTSTATUS+0x35e9>
+4209c616:	c15c                	sw	a5,4(a0)
+4209c618:	00052023          	sw	zero,0(a0)
+4209c61c:	00850593          	addi	a1,a0,8
+4209c620:	8522                	mv	a0,s0
+4209c622:	e79ff0ef          	jal	4209c49a <init_rx_buffer>
+4209c626:	543c                	lw	a5,104(s0)
+4209c628:	4702                	lw	a4,0(sp)
+4209c62a:	4501                	li	a0,0
+4209c62c:	c398                	sw	a4,0(a5)
+4209c62e:	4712                	lw	a4,4(sp)
+4209c630:	c3d8                	sw	a4,4(a5)
+4209c632:	587c                	lw	a5,116(s0)
+4209c634:	4722                	lw	a4,8(sp)
+4209c636:	c398                	sw	a4,0(a5)
+4209c638:	4732                	lw	a4,12(sp)
+4209c63a:	c3d8                	sw	a4,4(a5)
+4209c63c:	507c                	lw	a5,100(s0)
+4209c63e:	4709                	li	a4,2
+4209c640:	fee7ac23          	sw	a4,-8(a5)
+4209c644:	b7d1                	j	4209c608 <esp_mbedtls_dynamic_set_rx_buf_static+0x5a>
+
+
+esp_mbedtls_add_rx_buffer:
+4209c7cc:	517c                	lw	a5,100(a0)
+4209c7ce:	715d                	addi	sp,sp,-80
+4209c7d0:	c686                	sw	ra,76(sp)
+4209c7d2:	c4a2                	sw	s0,72(sp)
+4209c7d4:	c2a6                	sw	s1,68(sp)
+4209c7d6:	c0ca                	sw	s2,64(sp)
+4209c7d8:	de4e                	sw	s3,60(sp)
+4209c7da:	dc52                	sw	s4,56(sp)
+4209c7dc:	da56                	sw	s5,52(sp)
+4209c7de:	cb81                	beqz	a5,4209c7ee <esp_mbedtls_add_rx_buffer+0x22>
+4209c7e0:	ff87a783          	lw	a5,-8(a5)
+4209c7e4:	4905                	li	s2,1
+4209c7e6:	9bf5                	andi	a5,a5,-3
+4209c7e8:	e781                	bnez	a5,4209c7f0 <esp_mbedtls_add_rx_buffer+0x24>
+4209c7ea:	4481                	li	s1,0
+4209c7ec:	a09d                	j	4209c852 <esp_mbedtls_add_rx_buffer+0x86>
+4209c7ee:	4901                	li	s2,0
+4209c7f0:	01b10793          	addi	a5,sp,27
+4209c7f4:	01810993          	addi	s3,sp,24
+4209c7f8:	07352623          	sw	s3,108(a0)
+4209c7fc:	d93c                	sw	a5,112(a0)
+4209c7fe:	4595                	li	a1,5
+4209c800:	842a                	mv	s0,a0
+4209c802:	3d2010ef          	jal	4209dbd4 <mbedtls_ssl_fetch_input>
+4209c806:	84aa                	mv	s1,a0
+4209c808:	cd39                	beqz	a0,4209c866 <esp_mbedtls_add_rx_buffer+0x9a>
+4209c80a:	77e9                	lui	a5,0xffffa
+4209c80c:	80078793          	addi	a5,a5,-2048 # ffff9800 <SYSTEM+0x9ff39800>
+4209c810:	04f50163          	beq	a0,a5,4209c852 <esp_mbedtls_add_rx_buffer+0x86>
+4209c814:	77e5                	lui	a5,0xffff9
+4209c816:	70078793          	addi	a5,a5,1792 # ffff9700 <SYSTEM+0x9ff39700>
+4209c81a:	02f50c63          	beq	a0,a5,4209c852 <esp_mbedtls_add_rx_buffer+0x86>
+4209c81e:	77e5                	lui	a5,0xffff9
+4209c820:	d8078793          	addi	a5,a5,-640 # ffff8d80 <SYSTEM+0x9ff38d80>
+4209c824:	02f50763          	beq	a0,a5,4209c852 <esp_mbedtls_add_rx_buffer+0x86>
+4209c828:	fe2ed097          	auipc	ra,0xfe2ed
+4209c82c:	c82080e7          	jalr	-894(ra) # 403894aa <esp_log_timestamp>
+4209c830:	3c138737          	lui	a4,0x3c138
+4209c834:	3f470713          	addi	a4,a4,1012 # 3c1383f4 <_esp_libc_clock_array_end+0x182a4>
+4209c838:	3c138637          	lui	a2,0x3c138
+4209c83c:	86aa                	mv	a3,a0
+4209c83e:	409007b3          	neg	a5,s1
+4209c842:	47c60613          	addi	a2,a2,1148 # 3c13847c <_esp_libc_clock_array_end+0x1832c>
+4209c846:	85ba                	mv	a1,a4
+4209c848:	4505                	li	a0,1
+4209c84a:	fe2ed097          	auipc	ra,0xfe2ed
+4209c84e:	b58080e7          	jalr	-1192(ra) # 403893a2 <esp_log>
+4209c852:	40b6                	lw	ra,76(sp)
+4209c854:	4426                	lw	s0,72(sp)
+4209c856:	4906                	lw	s2,64(sp)
+4209c858:	59f2                	lw	s3,60(sp)
+4209c85a:	5a62                	lw	s4,56(sp)
+4209c85c:	5ad2                	lw	s5,52(sp)
+4209c85e:	8526                	mv	a0,s1
+4209c860:	4496                	lw	s1,68(sp)
+4209c862:	6161                	addi	sp,sp,80
+4209c864:	8082                	ret
+4209c866:	547c                	lw	a5,108(s0)
+4209c868:	6485                	lui	s1,0x1
+4209c86a:	08842a03          	lw	s4,136(s0)
+4209c86e:	0007c783          	lbu	a5,0(a5)
+4209c872:	14d48493          	addi	s1,s1,333 # 114d <CSR_UINTSTATUS+0x49c>
+4209c876:	08f42023          	sw	a5,128(s0)
+4209c87a:	583c                	lw	a5,112(s0)
+4209c87c:	0007d703          	lhu	a4,0(a5)
+4209c880:	00875793          	srli	a5,a4,0x8
+4209c884:	0722                	slli	a4,a4,0x8
+4209c886:	97ba                	add	a5,a5,a4
+4209c888:	07c2                	slli	a5,a5,0x10
+4209c88a:	83c1                	srli	a5,a5,0x10
+4209c88c:	08f42223          	sw	a5,132(s0)
+4209c890:	c399                	beqz	a5,4209c896 <esp_mbedtls_add_rx_buffer+0xca>
+4209c892:	14d78493          	addi	s1,a5,333
+4209c896:	02090163          	beqz	s2,4209c8b8 <esp_mbedtls_add_rx_buffer+0xec>
+4209c89a:	506c                	lw	a1,100(s0)
+4209c89c:	4641                	li	a2,16
+4209c89e:	1008                	addi	a0,sp,32
+4209c8a0:	c62e                	sw	a1,12(sp)
+4209c8a2:	fe2ea097          	auipc	ra,0xfe2ea
+4209c8a6:	33e080e7          	jalr	830(ra) # 40386be0 <memcpy>
+4209c8aa:	4532                	lw	a0,12(sp)
+4209c8ac:	c33ff0ef          	jal	4209c4de <esp_mbedtls_free_buf>
+4209c8b0:	4581                	li	a1,0
+4209c8b2:	8522                	mv	a0,s0
+4209c8b4:	be7ff0ef          	jal	4209c49a <init_rx_buffer>
+4209c8b8:	00848593          	addi	a1,s1,8
+4209c8bc:	4505                	li	a0,1
+4209c8be:	a6b8b0ef          	jal	42028328 <yoradio_tls_rx_calloc>
+4209c8c2:	e90d                	bnez	a0,4209c8f4 <esp_mbedtls_add_rx_buffer+0x128>
+4209c8c4:	fe2ed097          	auipc	ra,0xfe2ed
+4209c8c8:	be6080e7          	jalr	-1050(ra) # 403894aa <esp_log_timestamp>
+4209c8cc:	3c138737          	lui	a4,0x3c138
+4209c8d0:	3f470713          	addi	a4,a4,1012 # 3c1383f4 <_esp_libc_clock_array_end+0x182a4>
+4209c8d4:	3c138637          	lui	a2,0x3c138
+4209c8d8:	86aa                	mv	a3,a0
+4209c8da:	00848793          	addi	a5,s1,8
+4209c8de:	40460613          	addi	a2,a2,1028 # 3c138404 <_esp_libc_clock_array_end+0x182b4>
+4209c8e2:	85ba                	mv	a1,a4
+4209c8e4:	4505                	li	a0,1
+4209c8e6:	fe2ed097          	auipc	ra,0xfe2ed
+4209c8ea:	abc080e7          	jalr	-1348(ra) # 403893a2 <esp_log>
+4209c8ee:	f7300493          	li	s1,-141
+4209c8f2:	b785                	j	4209c852 <esp_mbedtls_add_rx_buffer+0x86>
+4209c8f4:	00052023          	sw	zero,0(a0)
+4209c8f8:	c144                	sw	s1,4(a0)
+4209c8fa:	00850593          	addi	a1,a0,8
+4209c8fe:	8522                	mv	a0,s0
+4209c900:	b9bff0ef          	jal	4209c49a <init_rx_buffer>
+4209c904:	00090c63          	beqz	s2,4209c91c <esp_mbedtls_add_rx_buffer+0x150>
+4209c908:	543c                	lw	a5,104(s0)
+4209c90a:	5702                	lw	a4,32(sp)
+4209c90c:	c398                	sw	a4,0(a5)
+4209c90e:	5712                	lw	a4,36(sp)
+4209c910:	c3d8                	sw	a4,4(a5)
+4209c912:	587c                	lw	a5,116(s0)
+4209c914:	5722                	lw	a4,40(sp)
+4209c916:	c398                	sw	a4,0(a5)
+4209c918:	5732                	lw	a4,44(sp)
+4209c91a:	c3d8                	sw	a4,4(a5)
+4209c91c:	5468                	lw	a0,108(s0)
+4209c91e:	8652                	mv	a2,s4
+4209c920:	85ce                	mv	a1,s3
+4209c922:	fe2ea097          	auipc	ra,0xfe2ea
+4209c926:	2be080e7          	jalr	702(ra) # 40386be0 <memcpy>
+4209c92a:	09442423          	sw	s4,136(s0)
+4209c92e:	08042223          	sw	zero,132(s0)
+4209c932:	bd65                	j	4209c7ea <esp_mbedtls_add_rx_buffer+0x1e>
+
+
+esp_mbedtls_free_rx_buffer:
+4209c934:	517c                	lw	a5,100(a0)
+4209c936:	c7e1                	beqz	a5,4209c9fe <esp_mbedtls_free_rx_buffer+0xca>
+4209c938:	ff87a683          	lw	a3,-8(a5)
+4209c93c:	4709                	li	a4,2
+4209c93e:	0ce68063          	beq	a3,a4,4209c9fe <esp_mbedtls_free_rx_buffer+0xca>
+4209c942:	08c52703          	lw	a4,140(a0)
+4209c946:	c709                	beqz	a4,4209c950 <esp_mbedtls_free_rx_buffer+0x1c>
+4209c948:	08452603          	lw	a2,132(a0)
+4209c94c:	0ac76963          	bltu	a4,a2,4209c9fe <esp_mbedtls_free_rx_buffer+0xca>
+4209c950:	4705                	li	a4,1
+4209c952:	0ae68663          	beq	a3,a4,4209c9fe <esp_mbedtls_free_rx_buffer+0xca>
+4209c956:	08052683          	lw	a3,128(a0)
+4209c95a:	ea91                	bnez	a3,4209c96e <esp_mbedtls_free_rx_buffer+0x3a>
+4209c95c:	4114                	lw	a3,0(a0)
+4209c95e:	0086c683          	lbu	a3,8(a3)
+4209c962:	08e69e63          	bne	a3,a4,4209c9fe <esp_mbedtls_free_rx_buffer+0xca>
+4209c966:	4154                	lw	a3,4(a0)
+4209c968:	4709                	li	a4,2
+4209c96a:	08e69a63          	bne	a3,a4,4209c9fe <esp_mbedtls_free_rx_buffer+0xca>
+4209c96e:	5538                	lw	a4,104(a0)
+4209c970:	1101                	addi	sp,sp,-32
+4209c972:	ce06                	sw	ra,28(sp)
+4209c974:	cc22                	sw	s0,24(sp)
+4209c976:	4314                	lw	a3,0(a4)
+4209c978:	4358                	lw	a4,4(a4)
+4209c97a:	842a                	mv	s0,a0
+4209c97c:	c036                	sw	a3,0(sp)
+4209c97e:	c23a                	sw	a4,4(sp)
+4209c980:	5978                	lw	a4,116(a0)
+4209c982:	853e                	mv	a0,a5
+4209c984:	4314                	lw	a3,0(a4)
+4209c986:	4358                	lw	a4,4(a4)
+4209c988:	c436                	sw	a3,8(sp)
+4209c98a:	c63a                	sw	a4,12(sp)
+4209c98c:	b53ff0ef          	jal	4209c4de <esp_mbedtls_free_buf>
+4209c990:	4581                	li	a1,0
+4209c992:	8522                	mv	a0,s0
+4209c994:	b07ff0ef          	jal	4209c49a <init_rx_buffer>
+4209c998:	45e1                	li	a1,24
+4209c99a:	4505                	li	a0,1
+4209c99c:	98d8b0ef          	jal	42028328 <yoradio_tls_rx_calloc>
+4209c9a0:	e91d                	bnez	a0,4209c9d6 <esp_mbedtls_free_rx_buffer+0xa2>
+4209c9a2:	fe2ed097          	auipc	ra,0xfe2ed
+4209c9a6:	b08080e7          	jalr	-1272(ra) # 403894aa <esp_log_timestamp>
+4209c9aa:	3c138737          	lui	a4,0x3c138
+4209c9ae:	3f470713          	addi	a4,a4,1012 # 3c1383f4 <_esp_libc_clock_array_end+0x182a4>
+4209c9b2:	3c138637          	lui	a2,0x3c138
+4209c9b6:	86aa                	mv	a3,a0
+4209c9b8:	47e1                	li	a5,24
+4209c9ba:	4505                	li	a0,1
+4209c9bc:	40460613          	addi	a2,a2,1028 # 3c138404 <_esp_libc_clock_array_end+0x182b4>
+4209c9c0:	85ba                	mv	a1,a4
+4209c9c2:	fe2ed097          	auipc	ra,0xfe2ed
+4209c9c6:	9e0080e7          	jalr	-1568(ra) # 403893a2 <esp_log>
+4209c9ca:	f7300513          	li	a0,-141
+4209c9ce:	40f2                	lw	ra,28(sp)
+4209c9d0:	4462                	lw	s0,24(sp)
+4209c9d2:	6105                	addi	sp,sp,32
+4209c9d4:	8082                	ret
+4209c9d6:	4641                	li	a2,16
+4209c9d8:	c150                	sw	a2,4(a0)
+4209c9da:	00052023          	sw	zero,0(a0)
+4209c9de:	858a                	mv	a1,sp
+4209c9e0:	0521                	addi	a0,a0,8
+4209c9e2:	fe2ea097          	auipc	ra,0xfe2ea
+4209c9e6:	1fe080e7          	jalr	510(ra) # 40386be0 <memcpy>
+4209c9ea:	85aa                	mv	a1,a0
+4209c9ec:	8522                	mv	a0,s0
+4209c9ee:	aadff0ef          	jal	4209c49a <init_rx_buffer>
+4209c9f2:	507c                	lw	a5,100(s0)
+4209c9f4:	4705                	li	a4,1
+4209c9f6:	4501                	li	a0,0
+4209c9f8:	fee7ac23          	sw	a4,-8(a5)
+4209c9fc:	bfc9                	j	4209c9ce <esp_mbedtls_free_rx_buffer+0x9a>
+4209c9fe:	4501                	li	a0,0
+4209ca00:	8082                	ret
+

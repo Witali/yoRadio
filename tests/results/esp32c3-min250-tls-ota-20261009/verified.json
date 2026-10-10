@@ -1,0 +1,418 @@
+{
+  "scope": "Evidence integrity and coverage, not an all-gates or analog PASS.",
+  "phases": {
+    "framing": {
+      "passed": 9,
+      "total": 9,
+      "runtime_review": "PASS",
+      "tls_rows": 3,
+      "transport_failures": []
+    },
+    "certificate-rejection": {
+      "passed": 0,
+      "total": 2,
+      "runtime_review": "PASS",
+      "tls_rows": 12,
+      "transport_failures": [
+        30,
+        31
+      ]
+    },
+    "eof-https-all": {
+      "passed": 23,
+      "total": 23,
+      "runtime_review": "PASS",
+      "tls_rows": 0,
+      "transport_failures": []
+    },
+    "ota": {
+      "passed": 15,
+      "total": 15,
+      "runtime_review": "REVIEW_REQUIRED",
+      "tls_rows": 2,
+      "transport_failures": []
+    },
+    "records-after-ota": {
+      "passed": 5,
+      "total": 5,
+      "runtime_review": "PASS",
+      "tls_rows": 0,
+      "transport_failures": []
+    }
+  },
+  "first_campaign": "ABORTED",
+  "first_campaign_failure": {
+    "exception_chain": [
+      {
+        "type": "URLError"
+      },
+      {
+        "type": "TimeoutError"
+      }
+    ]
+  },
+  "framing_replay": [
+    {
+      "name": "length-notify",
+      "result": "PASS",
+      "evidence": {
+        "terminal": "stream ended",
+        "full_format_samples": 51
+      }
+    },
+    {
+      "name": "length-raw",
+      "result": "PASS",
+      "evidence": {
+        "terminal": "stream ended",
+        "full_format_samples": 50
+      }
+    },
+    {
+      "name": "length-short",
+      "result": "PASS",
+      "evidence": {
+        "terminal": "stream read failed",
+        "full_format_samples": 51
+      }
+    },
+    {
+      "name": "chunked-notify",
+      "result": "PASS",
+      "evidence": {
+        "terminal": "stream ended",
+        "full_format_samples": 50
+      }
+    },
+    {
+      "name": "chunked-raw",
+      "result": "PASS",
+      "evidence": {
+        "terminal": "stream ended",
+        "full_format_samples": 51
+      }
+    },
+    {
+      "name": "chunked-short",
+      "result": "PASS",
+      "evidence": {
+        "terminal": "stream read failed",
+        "full_format_samples": 50
+      }
+    },
+    {
+      "name": "close-notify",
+      "result": "PASS",
+      "evidence": {
+        "terminal": "stream ended",
+        "full_format_samples": 51
+      }
+    },
+    {
+      "name": "close-raw",
+      "result": "PASS",
+      "evidence": {
+        "terminal": "stream read failed",
+        "full_format_samples": 50
+      }
+    }
+  ],
+  "framing_tls_context": [
+    {
+      "row": {
+        "at": 239863.328,
+        "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+      },
+      "observations": [
+        "framing:length-short"
+      ],
+      "expected_incomplete_response_eof": true
+    },
+    {
+      "row": {
+        "at": 239923.562,
+        "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+      },
+      "observations": [
+        "framing:chunked-short"
+      ],
+      "expected_incomplete_response_eof": true
+    },
+    {
+      "row": {
+        "at": 239963.578,
+        "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+      },
+      "observations": [
+        "framing:close-raw"
+      ],
+      "expected_incomplete_response_eof": true
+    }
+  ],
+  "certificate_rejection_only": {
+    "name": "certificate-rejection-only",
+    "result": "PASS",
+    "evidence": {
+      "samples": 24,
+      "alerts": [
+        "TLSV1_ALERT_ACCESS_DENIED",
+        "TLSV1_ALERT_ACCESS_DENIED",
+        "TLSV1_ALERT_ACCESS_DENIED",
+        "TLSV1_ALERT_ACCESS_DENIED"
+      ],
+      "scope": "Certificate rejection only. HTTP recovery and cleanup remain failed."
+    }
+  },
+  "eof_replay": {
+    "passed": 22,
+    "total": 22,
+    "format_passed": 22
+  },
+  "ota": {
+    "timed_actions": 32,
+    "expected_actions_completed": true,
+    "serial_health": "PASS",
+    "runtime_review": "REVIEW_REQUIRED",
+    "tls_context": [
+      {
+        "row": {
+          "at": 240962.312,
+          "line": "TLS failure: component=Dynamic Impl operation=fetch_input mbedtls_return=-76"
+        },
+        "previous_action": {
+          "action": "restore-saved-station:reboot-request",
+          "event": "returned",
+          "at": 240962.046
+        },
+        "next_action": {
+          "action": "restore-saved-station:verify-boot",
+          "event": "begin",
+          "at": 240965.046
+        },
+        "seconds_before_next_reset": 0.09399999998277053
+      },
+      {
+        "row": {
+          "at": 240962.312,
+          "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-76"
+        },
+        "previous_action": {
+          "action": "restore-saved-station:reboot-request",
+          "event": "returned",
+          "at": 240962.046
+        },
+        "next_action": {
+          "action": "restore-saved-station:verify-boot",
+          "event": "begin",
+          "at": 240965.046
+        },
+        "seconds_before_next_reset": 0.09399999998277053
+      }
+    ],
+    "observed_reset_banners": 5,
+    "reset_review": {
+      "windows": [
+        {
+          "action": "ota:roundtrip:1",
+          "start": 240817.703,
+          "end": 240846.89
+        },
+        {
+          "action": "ota:roundtrip:2",
+          "start": 240848.328,
+          "end": 240878.0
+        },
+        {
+          "action": "ota:while-playing",
+          "start": 240882.25,
+          "end": 240911.593
+        },
+        {
+          "action": "ota:slow",
+          "start": 240913.0,
+          "end": 240960.531
+        },
+        {
+          "action": "restore-saved-station",
+          "start": 240961.984,
+          "end": 240976.234
+        }
+      ],
+      "rows": [
+        {
+          "row": {
+            "at": 240832.578,
+            "line": "rst:0xc (RTC_SW_CPU_RST),boot:0xc (SPI_FAST_FLASH_BOOT)"
+          },
+          "actions": [
+            "ota:roundtrip:1"
+          ],
+          "expected": true
+        },
+        {
+          "row": {
+            "at": 240863.703,
+            "line": "rst:0xc (RTC_SW_CPU_RST),boot:0xc (SPI_FAST_FLASH_BOOT)"
+          },
+          "actions": [
+            "ota:roundtrip:2"
+          ],
+          "expected": true
+        },
+        {
+          "row": {
+            "at": 240897.25,
+            "line": "rst:0xc (RTC_SW_CPU_RST),boot:0xc (SPI_FAST_FLASH_BOOT)"
+          },
+          "actions": [
+            "ota:while-playing"
+          ],
+          "expected": true
+        },
+        {
+          "row": {
+            "at": 240946.265,
+            "line": "rst:0xc (RTC_SW_CPU_RST),boot:0xc (SPI_FAST_FLASH_BOOT)"
+          },
+          "actions": [
+            "ota:slow"
+          ],
+          "expected": true
+        },
+        {
+          "row": {
+            "at": 240962.406,
+            "line": "rst:0xc (RTC_SW_CPU_RST),boot:0xc (SPI_FAST_FLASH_BOOT)"
+          },
+          "actions": [
+            "restore-saved-station"
+          ],
+          "expected": true
+        }
+      ],
+      "result": "PASS",
+      "note": "Host-received reset banners inside explicit upload/reboot intervals; no inference for missing banners."
+    }
+  },
+  "records_after_ota": {
+    "original": [
+      {
+        "name": "idle-before",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 133124,
+              "largest": 98304,
+              "tasks": 17
+            },
+            {
+              "heap": 133092,
+              "largest": 98304,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.531
+      },
+      {
+        "name": "tls-record:grow",
+        "result": "PASS",
+        "evidence": {
+          "samples": 383,
+          "rate": 44100,
+          "channels": 2,
+          "record_counts": {
+            "1048": 118,
+            "16408": 11
+          },
+          "first_large_at": 241022.375,
+          "mean_busy": 54.733333333333334,
+          "peak_busy": 59.9,
+          "minimum_heap": 25788.0,
+          "minimum_largest": 10752.0,
+          "audio_wall_ratio": 1.0005839208146408,
+          "first_full_pcm_seconds": 1.5929999999934807
+        },
+        "seconds": 76.125
+      },
+      {
+        "name": "idle-recovery",
+        "result": "PASS",
+        "evidence": {
+          "samples": [
+            {
+              "heap": 133092,
+              "largest": 98304,
+              "tasks": 17
+            },
+            {
+              "heap": 133092,
+              "largest": 98304,
+              "tasks": 17
+            },
+            {
+              "heap": 133092,
+              "largest": 98304,
+              "tasks": 17
+            }
+          ]
+        },
+        "seconds": 12.39
+      },
+      {
+        "name": "runtime",
+        "result": "PASS",
+        "evidence": null,
+        "seconds": 0.0
+      },
+      {
+        "name": "restore",
+        "result": "PASS",
+        "evidence": {
+          "stopped": true,
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        },
+        "seconds": 0.484
+      }
+    ],
+    "record_replay": {
+      "grow": {
+        "name": "grow",
+        "result": "PASS",
+        "evidence": {
+          "record_counts": {
+            "1048": 118,
+            "16408": 11
+          },
+          "first_large_at": 241022.375
+        }
+      }
+    },
+    "heap_replay": {
+      "name": "idle-recovery",
+      "result": "PASS",
+      "evidence": null
+    },
+    "telemetry_complete": true,
+    "decoder_flow_complete": true,
+    "output_flow_complete": true,
+    "selected_dma": {
+      "q_overruns": 0,
+      "writes": 5636,
+      "written_bytes": 11542528,
+      "write_us": 55463689,
+      "errors": 0
+    },
+    "whole_dma_events": []
+  },
+  "result": "PASS",
+  "restored": true,
+  "source_files": 76,
+  "mapped_crc_checks": 8,
+  "nominal_48khz": true,
+  "qio80": true,
+  "analog_qualified": false
+}

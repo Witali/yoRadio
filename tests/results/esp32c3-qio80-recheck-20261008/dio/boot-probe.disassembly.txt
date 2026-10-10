@@ -1,0 +1,29 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-flash-dio80\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+42028882 <__wrap_app_main>:
+42028882:	6509                	lui	a0,0x2
+42028884:	1141                	addi	sp,sp,-16
+42028886:	f4050513          	addi	a0,a0,-192 # 1f40 <CSR_UINTSTATUS+0x128f>
+4202888a:	c606                	sw	ra,12(sp)
+4202888c:	73bf00ef          	jal	421197c6 <vTaskDelay>
+42028890:	e25ff0ef          	jal	420286b4 <probe>
+42028894:	c11d                	beqz	a0,420288ba <__wrap_app_main+0x38>
+42028896:	3c12b5b7          	lui	a1,0x3c12b
+4202889a:	cec58593          	addi	a1,a1,-788 # 3c12acec <_esp_libc_clock_array_end+0xab9c>
+4202889e:	3c12b537          	lui	a0,0x3c12b
+420288a2:	cf450513          	addi	a0,a0,-780 # 3c12acf4 <_esp_libc_clock_array_end+0xaba4>
+420288a6:	049df0ef          	jal	421080ee <printf>
+420288aa:	9581a503          	lw	a0,-1704(gp) # 3fc8bd58 <stdout>
+420288ae:	156df0ef          	jal	42107a04 <fflush>
+420288b2:	40b2                	lw	ra,12(sp)
+420288b4:	0141                	addi	sp,sp,16
+420288b6:	ae0e806f          	j	42010b96 <app_main>
+420288ba:	3c1225b7          	lui	a1,0x3c122
+420288be:	8e858593          	addi	a1,a1,-1816 # 3c1218e8 <_esp_libc_clock_array_end+0x1798>
+420288c2:	bff1                	j	4202889e <__wrap_app_main+0x1c>

@@ -1,0 +1,54 @@
+E.
+======================================================================
+ERROR: test_failures_then_exact_file_per_fixture (__main__.RecoveryServer.test_failures_then_exact_file_per_fixture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 1344, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\http\client.py", line 1338, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\http\client.py", line 1384, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\http\client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\http\client.py", line 1093, in _send_output
+    self.send(msg)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\http\client.py", line 1037, in send
+    self.connect()
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\http\client.py", line 1003, in connect
+    self.sock = self._create_connection(
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\socket.py", line 865, in create_connection
+    raise exceptions[0]
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\socket.py", line 850, in create_connection
+    sock.connect(sa)
+PermissionError: [WinError 10013] Сделана попытка доступа к сокету методом, запрещенным правами доступа
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\test-audio-server-recovery.py", line 22, in test_failures_then_exact_file_per_fixture
+    urlopen(origin+'/recover/'+name)
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 515, in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 532, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 1373, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 1347, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error [WinError 10013] Сделана попытка доступа к сокету методом, запрещенным правами доступа>
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.527s
+
+FAILED (errors=1)

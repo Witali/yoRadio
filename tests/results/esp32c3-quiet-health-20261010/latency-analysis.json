@@ -1,0 +1,74 @@
+{
+  "scope": "Inference assuming clock offset stays within adjacent-sample bounds plus 10 ms slack; not packet capture",
+  "original_test_verdicts_unchanged": true,
+  "events": [
+    {
+      "health": {
+        "at": 6243.1660257,
+        "request_ms": 6769.6074000004955,
+        "schema": 1,
+        "boot_id": "330148e482d36e25",
+        "uptime_ms": 100200,
+        "reset_reason": 3,
+        "heap": 31412,
+        "largest": 20480,
+        "minimum_heap": 15208,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "nearby_fast_samples": 34,
+      "offset_seconds": [
+        6137.9861257,
+        6138.0592161
+      ],
+      "post_snapshot_delay_seconds": [
+        4.906809600000088,
+        4.979900000000271
+      ],
+      "request_phases": [
+        {
+          "request": 258,
+          "phase": "connect",
+          "at": 6236.3965039,
+          "socket_attempts": [
+            {
+              "at": 6236.3965854,
+              "result": "PASS",
+              "local_port": 57083,
+              "ms": 1771.6111999998247
+            }
+          ],
+          "result": "PASS",
+          "local_port": 57083,
+          "ms": 1771.7181999996683
+        },
+        {
+          "request": 258,
+          "phase": "request_including_connect",
+          "at": 6236.3964749,
+          "result": "PASS",
+          "ms": 1771.8672999999399
+        },
+        {
+          "request": 258,
+          "phase": "response_headers",
+          "at": 6238.168363,
+          "result": "PASS",
+          "ms": 4997.481899999912
+        },
+        {
+          "request": 258,
+          "phase": "response_body",
+          "at": 6243.1659135,
+          "result": "PASS",
+          "ms": 0.06510000002890592
+        }
+      ]
+    }
+  ],
+  "inputs": {
+    "health.json": "c2128bd40e2e1bc9e1bdd9dfb5b210706d873646c63367b23c9dbe0daf82d2c9",
+    "request-phases.jsonl": "f727013aa0d6b994c29cf4ca4cdeb793608f0ab2ff1543813fc1905aef43c789"
+  }
+}

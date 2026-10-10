@@ -3,10 +3,419 @@
 Goal: keep HTTPS radio playback reliable on the ESP32-C3 OLED board by
 avoiding repeated allocation and release of large heap blocks.
 
+## Remaining qualification work, 2026-10-10
+
+On `codex/esp32c3-idf-upgrade`, full-rate compact AAC/SBR/PS is already
+implemented; the retained PC19 PCM comparisons meet the 3-LSB allowance.
+Historical unchecked items below are not all descriptions of today's code.
+The remaining release work concerns the complete network/audio application:
+
+The [integrated fractional-clock trial](ESP32C3_FRACTIONAL_INTEGRATION_20261010.md)
+now completes ten-minute HE-AACv2 with zero observed DMA counter increments,
+stable in-playback free heap and full queue-flow coverage. Post-Stop largest
+allocatable capacity still loses 12,288 B. Heavy FLAC is interrupted after
+77.34 seconds by two five-second TCP connect timeouts; its partial DMA
+bracket has zero increments. Neither the diagnostic combination nor the
+separately built quiet image is production-qualified. Next attribute the
+remaining heap owner and TCP handshake failure with the retained probes.
+
+The [owner/TCP follow-up](ESP32C3_TLS_HEAP_OWNER_20261010.md) now identifies
+one persistent 92-byte `radio_stream` allocation splitting the largest free
+region after first AAC/TLS use. It matches the SDK mutex size, motivating the
+controlled early-initialization test below. Heavy FLAC completes 600 seconds with zero DMA
+counter increments on the instrumented image. TCP connect timeouts do not
+recur, but four missing TCP records invalidate its whole trace. The short
+AAC repeat retains its recovery failure and one early DMA counter increment.
+The subsequent [early MPI-lock initialization trial](ESP32C3_EARLY_MPI_LOCK_20261010.md)
+passes fresh-boot full-record AAC/TLS on both diagnostic configurations
+(5/5 each) and 34/34 matrix, switch, transition and recovery checks on the
+lighter one. The watched region returns to one free block, and largest
+allocatable capacity remains 114,688 B after Stop instead of 102,400 B.
+This preserves contiguous capacity without reducing decoder storage or
+weakening recovery thresholds. The optional initialization remains off by
+default; final quiet-image qualification and intermittent TCP diagnosis
+remain open. The earlier failures above stay part of the control evidence.
+
+The [quiet production health qualification](ESP32C3_QUIET_HEALTH_20261010.md)
+now records 42/42 local HTTP/lifecycle checks and 13/13 OTA checks.
+Public HTTPS retains two original failed gates (8/10): one 7.029-second
+paired status/health observation and one HE-AAC minimum largest block
+of 7,936 B, below the unchanged 8,192 B budget. All five public source
+formats match independent references; there are no recorded allocation
+failures or watchdog events in the public campaign. Device timestamps
+place about 4.9 seconds of the slow response after health snapshot
+construction; transport attribution remains open. Keep these failures
+and qualify the remaining exact-image HTTPS, certificate-error and
+sustained-playback scope before enabling the integrated defaults.
+
+Latest [integer-clock cross-codec qualification](ESP32C3_INTEGER_QUALIFICATION_20261009.md)
+passes the HTTPS matrix and 33 codec switches. Ten-minute HE-AACv2 retains one
+initial-idle TCP timeout and 11 late delayed-DMA notifications. The integrated
+trial above combines the hardware fractional divider with the retained TLS
+reserve, 250/500 ms input prefill and four extra FLAC input slots. Its retained
+failures still require resolution. Diagnostic results do not qualify a
+separately built quiet production candidate.
+
+The [rational-rate resampler experiment](ESP32C3_INTEGER_RATE_COMPENSATION_20261009.md)
+now passes sample-count and memory-safety host checks, but its linear
+interpolation loses 4.23 dB RMS at 20 kHz for 48 kHz input. It stays disabled
+and has not been flashed.
+
+The [32-tap FIR candidate](ESP32C3_FIR_RATE_20261009.md) now passes 122 host
+quality cases (at most 1 LSB versus its double-precision finite-kernel oracle)
+and 95 lifecycle cases. A diagnostic image is built with +120 B linked BSS
+and unchanged AAC/FLAC objects. Its completed
+[physical tests](ESP32C3_FIR_PHYSICAL_20261010.md) fail: FLAC and HE-AACv2
+produce watchdog events and fail to keep pace. It remains disabled. The
+host oracle bound is not an ideal-signal or analog-output accuracy claim.
+
+1. Resolve or bound heavy-FLAC input starvation and delayed DMA service.
+   Compare buffering against reproducible delivery interruptions, not just
+   mean CPU usage. The [integer-clock baseline](ESP32C3_FLAC_INTEGER_20261009.md)
+   and [matched delivery pauses](ESP32C3_DELIVERY_PAUSES_20261009.md) retain
+   nonzero DMA counters and distinguish them from acoustic measurements.
+2. Choose the production TLS reserve, input-pool and prefill settings.
+   Verify full 16 KiB TLS records, bounded in-playback memory use, codec
+   transitions and settled Stop recovery. Recovery alone does not explain
+   earlier in-playback heap-trend failures or prove allocation ownership.
+3. Diagnose the intermittent WebUI TCP connection timeout. A later run
+   without the timeout does not establish a repair. Keep complete traces
+   and separate host transport failures from firmware faults.
+4. Qualify one final quiet production configuration: all supported formats
+   over HTTP/HTTPS, AAC profile/rate/channel transitions, EOF, reconnect,
+   certificate failures, repeated OTA and bounded long-playback tests.
+   Previous passing matrices on different experimental images do not replace
+   this check. Preserve full AAC features and rates; CPU percentage alone
+   remains informational.
+
+The [exact nominal 48 kHz option](ESP32C3_PDM_CLOCK_20261009.md) has now passed
+the user's [subjective listening comparison](ESP32C3_PDM_LISTENING_20261010.md):
+no noticeable sound difference. That installed image changes only the clock
+relative to the previous production source; it does not include the latest
+memory and queue experiments. Quantitative analog noise measurements remain
+unperformed. The repository default remains off until the combined firmware
+is qualified.
+The AP display and WebUI Deep Sleep switch are separate feature items in the
+[board TODO](ESP32C3_OLED_NATIVE_TODO.md).
+
 The [Flash constant audit](ESP32C3_FLASH_CONSTANT_CANDIDATES_20260930.md) records
 source and ELF candidates, including string copies and SDK placement limits.
 Large application/codec constants are already in Flash; the listed candidates
 are not implemented savings and do not yet resolve the SBR allocation deficit.
+
+## Further memory research priorities
+
+### Pipeline synchronization and clock drift — 2026-10-10
+
+The current staged-output path already uses bounded queues and event-driven
+backpressure: network input -> compressed packets -> decoder -> 8 KiB PCM
+ring -> output task -> four 512-frame DMA descriptors. `send_pcm()` waits
+for room instead of overwriting queued samples. If the compressed queue is
+full, `send_encoded()` waits and stops reading, applying TCP backpressure.
+`i2s_channel_write()` waits for reusable descriptors; hardware clocking sets
+the average output pace. Queue timeouts bound waits; they do not delay a
+task after data or space becomes available. Output priority is 8 versus
+decoder priority 7 with `CONFIG_YORADIO_OUTPUT_TASK_FIRST=y`.
+
+At 48 kHz, stereo, 16-bit PCM, the four DMA descriptors represent 42.67 ms.
+The PCM ring's 8 KiB is another theoretical 42.67 ms before packet headers,
+alignment and ring fragmentation; this is not guaranteed usable headroom.
+Compressed-input time coverage depends on codec bitrate and packet sizes.
+The 250/500 ms input-prefill configuration controls waiting time, not a
+guaranteed amount of buffered audio. Current staged output does not wait
+for three decoded-audio DMA buffers at every Play; that separate prefill
+behavior belongs to the disabled direct-DMA experiment. Idle descriptors
+auto-clear to PCM zero if new audio does not arrive in time.
+
+The fixed-ratio resampler converts the decoded source rate to nominal
+48 kHz. There is no adaptive clock-drift controller. The fractional divider
+removes the known nominal 0.1603% output-rate mismatch; it cannot remove
+crystal tolerance or an independently clocked live source's drift. A full
+PCM queue is normally evidence of a decoder producing faster than real time,
+not a memory overflow or proof that the station clock is too fast.
+
+Further investigation, only if the integrated 48 kHz traces show a need:
+
+- Distinguish abrupt delivery/CPU stalls from a sustained trend in buffered
+  audio duration. Correlate compressed-input availability, PCM waits, DMA
+  counters and decoder execution. Compressed-byte fill percentage alone is
+  not audio duration for variable-bitrate material.
+- Test reproducible jitter and slightly mismatched source pacing separately.
+  Include TCP backpressure and buffering outside the application in the
+  interpretation; a paced host sender can itself block and hide drift.
+- If sustained clock drift is demonstrated, evaluate a bounded, slowly
+  varying resampling ratio with a dead band and limits. Do not steer it
+  solely from instantaneous PCM fill, because decoder bursts and ordinary
+  backpressure determine that fill. Measure PCM quality and CPU impact.
+- Handle a genuine prolonged underrun with an explicit rebuffering policy
+  if needed. Do not periodically pause DMA as a clock correction, and do
+  not expect clock adaptation to repair insufficient decoder throughput or
+  a disconnected station.
+
+The [RX-only implementation and extended control tests](ESP32C3_TLS_RX_RESERVE_20261008.md)
+record the optional implementation, host/link checks and remaining physical
+gates. The preceding reserve image still fails the ten-minute AAC heap-trend
+check; extended FLAC testing confirms task-watchdog events. Neither issue is
+closed by the allocator implementation or the new audio-priority default.
+
+The next experiments should control allocation ownership and lifetime while
+preserving full AAC/SBR/PS, original sample rates, the 3-LSB PCM allowance and
+all other supported codecs. These are research items, not production defaults.
+
+1. **Reserve one large buffer specifically for TLS reception.** Reuse it for
+   both small and full-sized records. The current 17,058-byte generic reserve
+   can be claimed by a large handshake allocation and does not serve small RX
+   allocations. Audit RX setup, cached state, retained-buffer conversion,
+   errors, reset, destruction and simultaneous contexts before changing its
+   owner. Derive capacity from SDK symbols and retain certificate validation
+   and full 16 KiB incoming records. Measure allocation churn, CPU and peak RAM.
+2. **Keep a bounded pool of compressed-audio packets.** Release only unused
+   blocks above the configured minimum; preserve queued data, FIFO order and
+   producer/decoder pointer leases. The optional adaptive queue is the starting
+   implementation. Compare effective buffering for short packets, network
+   jitter, output underruns and stop/reconnect behavior at each pool size.
+3. **Reuse decoder memory between sessions where lifetimes permit it.** Audit
+   every user of each region, including interior pointers, output callbacks,
+   cancellation and late SBR/PS activation. Retain or reset storage only after
+   the previous owner has released it; release incompatible retained storage
+   before another codec or TLS handshake needs that RAM. Measure total peak
+   use and fragmentation across mixed-codec switches, not just allocation count.
+4. **Budget separate operating headroom for Wi-Fi, cryptography and WebUI.**
+   Include allocations outside the mbedTLS hooks, DMA/alignment requirements,
+   certificate verification, reconnect and OTA. Measure total free memory and
+   the largest allocatable block for each required memory capability. Reserving
+   TLS RAM must not cause smaller network or crypto allocations to fail.
+
+### Allocation order experiment
+
+Compare early placement of large, long-lived TLS/decoder buffers with the
+current allocation order before short-lived network/WebUI allocations begin.
+Correct allocations already occupy disjoint regions; this experiment targets
+free holes between live objects. Use stack-style allocation only for scratch
+whose releases are strictly last-in, first-out, or reset an entire session
+arena after all its users have released their pointers. TLS, packet queues and
+decoders have independent lifetimes and must not share an assumed global LIFO
+order. Check peak simultaneous use, late SBR activation, mixed-codec switches,
+reconnect and OTA; early reservation may reduce headroom for smaller requests.
+
+The [startup-minimum reserve experiment](ESP32C3_TLS_RESERVE_20261008.md) uses
+**17,058 bytes** for the TLS slot and releases **8,240 bytes** of input-packet
+storage. Its 44-case HTTP/HTTPS file matrix records **zero allocation failures**
+and **43/44 passes**. The remaining FLAC case contains an unresolved diagnostic
+dump. This result supports further investigation; it does not establish full
+stability or a net RAM saving. Keep the failed case and the separate WebUI
+timeout in the qualification record.
+
+For each experiment, retain an unchanged control image, exact configuration
+and source hashes, peak RAM and largest-block measurements, CPU, playback
+continuity and PCM quality results. Acceptance requires all-codec HTTP/HTTPS,
+small/growing/full TLS records, ten-minute playback, mixed-codec transitions,
+reconnect, EOF and OTA tests. CPU percentage alone is not a rejection gate;
+runtime faults and output gaps remain failures.
+
+### Next ownership measurement: copied RX packets (2026-10-08)
+
+The [matched ten-minute runs](../tests/results/esp32c3-rxonly-long-20261008/long/summary.json)
+still fail the original heap-trend gate: first/last steady-state median free
+heap falls by 9,352 B with the generic reserve and 9,440 B with RX-only.
+Stop restores the settled heap and largest block, but this does not identify
+the allocations retained while playing. TCP uncredited payload grows to about
+8 KiB; it is not allocated RAM and must not be subtracted from the heap loss.
+The RX-only network snapshot series is incomplete and remains rejected.
+
+The [copy-path audit](ESP32C3_RX_COPY_20261007.md) establishes why the existing
+`esp_pbuf_allocate` tracer cannot answer this question: enabled L2-to-L3 copies
+use `pbuf_alloc(PBUF_RAW, len, PBUF_RAM)` instead.
+
+- [ ] Generate guarded, build-local copies of pinned `wlanif.c` and `pbuf.c`.
+  Register successful copied-RX allocations before network handoff; remove an
+  owner only in the reference-count-zero `STD_HEAP` branch immediately before
+  `mem_free(p)`. A non-final `pbuf_free()` is not a release. Preserve SDK sources,
+  allocation behavior, error cleanup and packet traffic.
+- [ ] Verify the exact allocator mapping before querying block size. The
+  current pinned configuration uses `MEM_LIBC_MALLOC=1` and no lwIP memory
+  statistics prefix, so the PBUF_RAM pointer is the malloc base. Record
+  `heap_caps_get_allocated_size(p)` separately from payload length and allocator
+  header overhead. Reject incompatible allocator settings at build time.
+- [ ] Use a fixed registry, initially 32 entries of pointer, allocated size,
+  birth time and allocation ID (512 B on RV32), plus bounded counters. Record
+  live/peak count and allocated bytes, oldest live age, maximum completed
+  lifetime, alloc/free totals, sequence and CRC. Overflow, duplicate live
+  registration and incomplete telemetry invalidate coverage. The global
+  final-free hook also sees legitimate unregistered TX/control pbufs; ignore
+  those rather than reporting false missing releases.
+- [ ] Keep registry locking short. Query size/time before registration locking;
+  copy counters under the lock and log afterward. Remove the owner before the
+  actual free to prevent address reuse races. Never dereference freed pointers,
+  allocate tracker entries on the heap, walk the heap under the lock or log
+  packet contents. Account for tracker BSS and execution overhead separately.
+- [ ] Repeat the same 600-second alternating-record HE-AACv2 test, original
+  memory/runtime gates, and settled Stop recovery. Use a compact periodic
+  snapshot plus post-Stop observation. Attribute measured live RX blocks and
+  their lifetimes first; investigate remaining heap movement separately.
+
+This is a diagnostic plan, not evidence that the heap decline is harmless or
+that copied RX packets explain all of it. Codec precision, full TLS record
+capacity and certificate verification remain unchanged.
+
+### Clock and startup follow-up, 2026-10-09
+
+The [initial-input-prefill experiment](ESP32C3_INPUT_PREFILL_20261009.md)
+uses the same existing queue and a bounded startup wait. With fractional PDM
+clocking it passes 44 HTTP/HTTPS file cases, ten-minute HE-AACv2 and three-minute
+heavy FLAC load, transitions/faults and 12 mixed-codec changes. Both sustained
+selected DMA windows have zero queue overruns and write errors; Stop restores
+the idle heap. Defaults remain disabled. HE-AACv2 network heap/receive pairing
+is incomplete and rejected, so these results do not identify RX allocation
+ownership or erase the earlier failed memory experiments.
+
+The [staged PCM tail audit](ESP32C3_PCM_TAIL_AUDIT_20261009.md) separately
+reproduces retained EOF samples entering the next equal-rate stream. The source
+repair passes host checks and its [hardware follow-up](ESP32C3_PCM_TAIL_BOARD_20261009.md)
+passes 60 measured short-file cases, the 44-case HTTP/HTTPS matrix, sustained
+HE-AACv2/FLAC, transitions and switching. Both selected sustained DMA windows
+have zero overruns/write errors and settled idle memory recovers. The saved
+production image is restored afterward. Fractional clock noise, analog EOF
+output and the final production memory configuration still require qualification.
+
+The [controlled-record/OTA follow-up](ESP32C3_TLS_FINAL_GATES_20261009.md)
+uses this same image with explicit 1.0x record pacing. Short record/memory
+gates pass, but the 16 KiB case has four post-warmup DMA queue events;
+whole observed intervals also retain startup events. The ten-minute
+alternating-record run is interrupted by host Windows connect error 10048
+after 395.390 seconds and remains failed. Repeat it without hiding the
+transport error, add staged-path starvation measurements, and compare a
+bounded minimum prefill against the current early-full exit before
+promoting this configuration. No listening or analog noise test is complete.
+All 15 original OTA entries pass, including full HE-AACv2 over HTTPS, but
+extended review retains two generic TLS errors immediately before the
+explicit restoration reboot. Add safe numeric error codes and phase timing
+before classifying them; the old serial-health pass is not proof of clean
+TLS runtime. The previous production image and settings are restored.
+
+## Current SDK-upgrade branch checkpoint, 2026-10-07
+
+On `codex/esp32c3-idf-upgrade`, the ESP32-C3 defaults now select the compact
+PC19 owner, smoothing history, stack-scoped low-QMF workspace, asymmetric
+channel layout and late SBR activation. The linked SBR owner is **32,744 B**,
+down from 55,128 B; the native adapter is 204 B, including its PC19 sidecar.
+This supersedes the earlier PC18/default-selection checkpoints below on this
+branch. It does not describe `main` or qualify every public radio stream.
+
+The current production precision allowance is **3 output PCM LSB**. Retained
+compact-corpus measurements reach 2 LSB; the historical 1/2/5-LSB decisions
+below remain records of their original experiments. Full SBR/PS and original
+output rates remain required. See the
+[SDK qualification report](ESP32C3_IDF_UPGRADE_20261007.md) and
+[ICY/RX memory follow-up](ESP32C3_ICY_RX_MEMORY_20261007.md).
+
+The remaining network-memory gates are separate from compact PCM quality:
+
+- [x] Reduce the ICY metadata parser's static RAM: 3,888 B measured in the
+  linked quiet image, with fragmented-input and physical title/audio tests.
+- [x] Compare RX copying under a ten-minute HEv2/WebUI load. Copying eliminates
+  the observed allocation failures in that run, but the original heap-decline
+  gate still fails; retain both findings.
+- [ ] Qualify full-sized TLS records after the decoder and receive queues are
+  active. The [controlled TLS record test](ESP32C3_TLS_RECORD_MEMORY_20261007.md)
+  passes 1 KiB records with both allocators, but dynamic 16 KiB records fail a
+  16,749-byte allocation and permanent buffers suffer 167 small-block allocation
+  failures across the three large-record modes. Small-record success is insufficient.
+  The [four-segment TCP window follow-up](ESP32C3_TCP_RX_WINDOW_20261007.md)
+  removes allocation failures in the dynamic run, but alternating records still
+  fail the original heap-trend gate; static TLS retains three allocation failures.
+  Keep the overlay optional until phase-aware/ten-minute and throughput checks.
+  The [600-second follow-up](ESP32C3_HTTP_TLS_PHYSICAL_20261007.md) now
+  reproduces a real failure at 270.906 s: 16,749 B requested, 27,756 B free,
+  15,360 B largest block. RX4 is therefore not a production memory fix.
+  The optional RX6 window passes a public MP3-256 minute that failed on RX4,
+  but still has failing heap-trend gates and needs long-load qualification.
+  The [retained RX experiment](ESP32C3_RETAINED_TLS_RX_20261008.md) avoids
+  per-record large allocation but fails small network allocations instead:
+  181 failures across eight framing cases and 51 in the interrupted soak.
+  Keep it disabled. The active qualification target is the pinned latest
+  `release/v6.1` revision `9a97f6c54ec6`, rather than the original release tag.
+  Its [physical follow-up](ESP32C3_IDF61_REVISION_20261008.md) passes all 44
+  HTTP/HTTPS file cases and four public AAC minutes, but the alternating-record
+  run again fails a 16,749-byte request: 27,040 B free / 15,360 B largest.
+  RX6 is still not a complete memory fix. A separate MP3 WebUI timeout also
+  requires diagnosis; no decoder/allocation fault was recorded in that window.
+  The [static Wi-Fi RX4 experiment](ESP32C3_WIFI_STATIC_RX_20261008.md) frees
+  about 3.3 KB and passes 75 seconds, but its longer repeat fails at 30.515 s:
+  16,749 B requested / 27,248 B free / 15,872 B largest. Keep it optional.
+- [ ] Test a dedicated, early-placed TLS RX allocation block on the pinned
+  SDK, so unrelated allocations cannot split the next full-record buffer.
+  First audit every dynamic RX allocation and free path, including setup,
+  error cleanup, retained-RX conversion, context destruction and concurrent
+  TLS contexts. Derive capacity from SDK symbols, retain a heap fallback for
+  additional contexts, and do not change certificate validation, full record
+  capacity or AAC features. This is a placement experiment, not a claimed
+  RAM saving; repeat the failing record-growth case and all codec/OTA gates.
+  The [static-slot implementation](ESP32C3_TLS_RESERVE_20261008.md) and host/link
+  audits are complete behind an off-by-default option. Its late-reclamation
+  image passes all four paced record modes for 75 seconds each, but fails all
+  eight framing cases and 13/44 file cases through smaller allocation failures.
+  The startup-minimum follow-up funds the reserve before input packets arrive;
+  framing improves to 8/8 and files to 43/44, with zero captured allocation
+  failures. The remaining FLAC case has an unresolved nonfatal diagnostic dump;
+  a small-record WebUI timeout passes a timed repeat but remains unexplained.
+  Retain the separate results and keep production qualification open.
+- [ ] Qualify the optional [adaptive input queue](ESP32C3_ADAPTIVE_INPUT_TLS_20261008.md):
+  reclaim only idle packet slots above a configured minimum when mbedTLS needs
+  memory, preserving queued bytes and outstanding leases. It is implemented
+  behind an off-by-default build option; host ownership/concurrency and linked
+  allocator checks pass. Two physical full-record tests still fail at about
+  five seconds. The repeat confirms four idle slots (8,240 B) are released,
+  with 33,920 B free but only a 12,288-byte largest block for a 16,749-byte TLS
+  request. Preserve the feature as an optional experiment; physical TLS,
+  all-codec and continuity gates remain.
+- [ ] Compare the RX-only reservation with an isolated allocator for all
+  mbedTLS allocations. The pinned SDK exposes `MBEDTLS_CUSTOM_MEM_ALLOC` and
+  `mbedtls_platform_set_calloc_free()`; install the allocator before the first
+  crypto/TLS allocation and retain it for every matching free. Measure peak
+  live bytes, largest requests, allocator overhead and retained crypto state
+  during handshake, certificate verification, playback, reconnect and OTA
+  before choosing a capacity. A measured sample peak is not a bound for every
+  certificate chain or concurrent connection. Keep a separate full-record RX
+  slot so small TLS allocations cannot fragment that required contiguous block.
+  Check full record capacity and normal certificate validation in every test.
+  This remains a proposal; no private allocator is enabled by this audit.
+  - The hook does **not** cover all memory needed by HTTPS: pinned
+    `esp_tls.c`/`esp_tls_mbedtls.c` also use libc allocations; the PSA AES/GCM
+    driver uses `malloc`, and the SHA driver uses `heap_caps_malloc` with
+    `MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL`. Audit the enabled driver paths and
+    their frees/alignment separately, as well as socket/network buffers.
+    Do not claim complete TLS reservation based only on mbedTLS hook counters.
+  - Do not implement transparent relocation of existing library allocations.
+    The SDK's `components/heap/tlsf/tlsf.c::tlsf_free` already merges adjacent
+    free blocks using `block_merge_prev/next`; it cannot join holes separated
+    by live allocations without moving them. Moving live C objects requires
+    updating every alias/interior pointer and respecting hardware ownership.
+    Handles or offsets could support compaction in a separately owned data
+    structure, but are not a drop-in replacement for TLS, Wi-Fi or DMA buffers.
+  - Reference: [mbedTLS allocator hooks and static-buffer allocation](https://mbed-tls.readthedocs.io/en/latest/kb/how-to/using-static-memory-instead-of-the-heap/).
+    Reserving RAM changes ownership and placement, not total RAM capacity;
+    also measure the remaining codec/network/WebUI headroom.
+- [ ] Resolve contiguous allocation with full TLS buffers. The static-TLS
+  follow-up has 35,640–40,020 B free at three failed 32,744-byte SBR requests,
+  but only 25,600–29,696 B in the largest block. Audit allocation order before
+  testing an early **compact-sized** reservation; the old early-reserve switch
+  requests the original 55,128-byte structure and is incompatible with this
+  compact configuration. Do not enable that old switch as a shortcut.
+- [ ] Repeat all public LC/HE/mono-HE/MP3 cases, ten-minute load, mixed-codec
+  switches, late SBR/PS, EOF and OTA during playback on the final memory fix.
+- [x] Reproduce and contain fatal TLS read errors after a positive partial HTTP
+  read. The alternating-record test logs a second 46,622-byte request after
+  allocation failure; its exact error-state cause still needs targeted proof.
+  The [RFC audit and reader guard](ESP32C3_HTTP_TLS_RFC_AUDIT_20261007.md)
+  now reproduce/prevent the extra read in both SDKs (85 updated host cases each
+  plus 37 retained stream-task cases). The physical TLS allocation failure
+  terminates with read failure and does not repeat the older large request.
+- [ ] Resolve the RFC audit's remaining HTTPS closure gaps: distinguish TLS
+  `close_notify` from raw EOF below HTTP, verify outbound closure/alert behavior,
+  and cover truncation and certificate identity with actual TLS fixtures.
+  Incoming raw EOF/clean close and complete/incomplete HTTP framing now pass
+  eight physical cases; outgoing alerts and identity-negative fixtures remain.
 
 ## Physical AAC findings, 2026-09-30
 

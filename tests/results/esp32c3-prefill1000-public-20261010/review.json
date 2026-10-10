@@ -1,0 +1,593 @@
+{
+  "review": "PASS",
+  "original_acceptance": {
+    "passed": 6,
+    "total": 10
+  },
+  "original_failures": [
+    {
+      "name": "https:groovesalad-64-aac",
+      "reason": "Progressive heap loss in public playback"
+    },
+    {
+      "name": "https:groovesalad-32-aac",
+      "reason": "Progressive heap loss in public playback"
+    },
+    {
+      "name": "https:groovesalad-16-aac",
+      "reason": "In-playback memory below existing budget"
+    },
+    {
+      "name": "https:groovesalad-256-mp3",
+      "reason": "Insufficient actual playback samples"
+    }
+  ],
+  "scope": "Original live gates retained; additional paired windows start at batch time + 15 s, which may differ slightly from the live runner pre-command timestamp",
+  "windows": {
+    "groovesalad-128-aac": {
+      "original": {
+        "name": "https:groovesalad-128-aac",
+        "result": "PASS",
+        "evidence": {
+          "reference": {
+            "spec": {
+              "codec": "aac",
+              "profile": "LC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "AAC PCM"
+            },
+            "ffprobe_spec": {
+              "codec": "aac",
+              "profile": "LC",
+              "rate": 44100,
+              "channels": 2,
+              "bits": 16,
+              "label": "AAC PCM"
+            },
+            "input_sha256": "d04f179e3ee61ca42e67f27a518156637b6ed3e2a71e7515239431198a6c7bb4",
+            "input_bytes": 80307,
+            "frames": 216,
+            "faad": {
+              "samples": 440320,
+              "frames": 216,
+              "rate": 44100,
+              "channels": 2,
+              "ps_frames": 0,
+              "different": 0,
+              "over_two": 0,
+              "over_five": 0,
+              "maximum": 0,
+              "square_error": 0,
+              "square_signal": 7091137928779,
+              "scope": 0,
+              "float_scale": 1,
+              "history": [
+                {
+                  "pairs": 0,
+                  "changed_components": 0,
+                  "saturated": 0,
+                  "out_of_range": 0,
+                  "rms_native": 0,
+                  "peak_native": 0,
+                  "exponents": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "pairs": 0,
+                  "changed_components": 0,
+                  "saturated": 0,
+                  "out_of_range": 0,
+                  "rms_native": 0,
+                  "peak_native": 0,
+                  "exponents": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              ]
+            },
+            "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+            "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+            "tls_verify": true
+          },
+          "playback": {
+            "samples": 78,
+            "rate": 44100,
+            "channels": 2
+          },
+          "health": {
+            "samples": 78,
+            "boot_id": "8f663b7eabba6dd2",
+            "minimum_heap": 56492,
+            "minimum_largest": 38912,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0
+          },
+          "first_pcm_seconds": 2.8103466000029584,
+          "max_status_and_health_ms": 1080.2915999993274
+        },
+        "seconds": 67.554
+      },
+      "spec": {
+        "codec": "aac",
+        "profile": "LC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "AAC PCM"
+      },
+      "output": {
+        "samples": 78,
+        "elapsed_ms": 44850,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      },
+      "health": {
+        "samples": 78,
+        "boot_id": "8f663b7eabba6dd2",
+        "minimum_heap": 56492,
+        "minimum_largest": 38912,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "maximum_status_health_ms": 1080.2915999993274,
+      "rssi_range": [
+        -72,
+        -69
+      ],
+      "checks": {
+        "format": {
+          "result": "PASS",
+          "evidence": {
+            "first_full_pcm_seconds": 3.3405274000033387,
+            "samples": 78,
+            "rate": 44100,
+            "channels": 2
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 78,
+            "elapsed_ms": 44850,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 78,
+            "boot_id": "8f663b7eabba6dd2",
+            "minimum_heap": 56492,
+            "minimum_largest": 38912,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0
+          }
+        },
+        "response": {
+          "result": "PASS",
+          "evidence": {
+            "maximum_ms": 1080.2915999993274
+          }
+        }
+      },
+      "below_budget_samples": []
+    },
+    "groovesalad-64-aac": {
+      "original": {
+        "name": "https:groovesalad-64-aac",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss in public playback",
+        "seconds": 67.122
+      },
+      "spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC ",
+        "source_channels": 2
+      },
+      "output": {
+        "samples": 81,
+        "elapsed_ms": 44048,
+        "completion_queue_drops": 56,
+        "write_errors": 0
+      },
+      "health": {
+        "samples": 81,
+        "boot_id": "8f663b7eabba6dd2",
+        "minimum_heap": 20940,
+        "minimum_largest": 8704,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "maximum_status_health_ms": 195.70459999886225,
+      "rssi_range": [
+        -71,
+        -69
+      ],
+      "checks": {
+        "format": {
+          "result": "PASS",
+          "evidence": {
+            "first_full_pcm_seconds": 3.349928200001159,
+            "samples": 81,
+            "rate": 44100,
+            "channels": 2
+          }
+        },
+        "output": {
+          "result": "FAIL",
+          "reason": "I2S completion queue overflow during sustained play"
+        },
+        "memory": {
+          "result": "FAIL",
+          "reason": "Progressive heap loss"
+        },
+        "response": {
+          "result": "PASS",
+          "evidence": {
+            "maximum_ms": 195.70459999886225
+          }
+        }
+      },
+      "below_budget_samples": []
+    },
+    "groovesalad-32-aac": {
+      "original": {
+        "name": "https:groovesalad-32-aac",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Progressive heap loss in public playback",
+        "seconds": 68.237
+      },
+      "spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC ",
+        "source_channels": 2
+      },
+      "output": {
+        "samples": 82,
+        "elapsed_ms": 44390,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      },
+      "health": {
+        "samples": 82,
+        "boot_id": "8f663b7eabba6dd2",
+        "minimum_heap": 21020,
+        "minimum_largest": 8192,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "maximum_status_health_ms": 191.2835000002815,
+      "rssi_range": [
+        -71,
+        -69
+      ],
+      "checks": {
+        "format": {
+          "result": "PASS",
+          "evidence": {
+            "first_full_pcm_seconds": 3.396805600001244,
+            "samples": 82,
+            "rate": 44100,
+            "channels": 2
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 82,
+            "elapsed_ms": 44390,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 82,
+            "boot_id": "8f663b7eabba6dd2",
+            "minimum_heap": 21020,
+            "minimum_largest": 8192,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0
+          }
+        },
+        "response": {
+          "result": "PASS",
+          "evidence": {
+            "maximum_ms": 191.2835000002815
+          }
+        }
+      },
+      "below_budget_samples": []
+    },
+    "groovesalad-16-aac": {
+      "original": {
+        "name": "https:groovesalad-16-aac",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "In-playback memory below existing budget",
+        "seconds": 70.498
+      },
+      "spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 32000,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC ",
+        "source_channels": 1
+      },
+      "output": {
+        "samples": 83,
+        "elapsed_ms": 44769,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      },
+      "health": {
+        "samples": 83,
+        "boot_id": "8f663b7eabba6dd2",
+        "minimum_heap": 21004,
+        "minimum_largest": 6656,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "maximum_status_health_ms": 247.0629999988887,
+      "rssi_range": [
+        -75,
+        -68
+      ],
+      "checks": {
+        "format": {
+          "result": "PASS",
+          "evidence": {
+            "first_full_pcm_seconds": 4.453220700001111,
+            "samples": 83,
+            "rate": 32000,
+            "channels": 2
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 83,
+            "elapsed_ms": 44769,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "memory": {
+          "result": "FAIL",
+          "reason": "In-playback memory below existing budget"
+        },
+        "response": {
+          "result": "PASS",
+          "evidence": {
+            "maximum_ms": 247.0629999988887
+          }
+        }
+      },
+      "below_budget_samples": [
+        {
+          "seconds": 24.088318699999945,
+          "heap": 21068,
+          "largest": 6656
+        },
+        {
+          "seconds": 24.66251850000117,
+          "heap": 22700,
+          "largest": 6656
+        },
+        {
+          "seconds": 25.1912502999985,
+          "heap": 22600,
+          "largest": 6656
+        },
+        {
+          "seconds": 25.722783099998196,
+          "heap": 24236,
+          "largest": 6656
+        },
+        {
+          "seconds": 26.254759299998113,
+          "heap": 24240,
+          "largest": 6656
+        },
+        {
+          "seconds": 26.78412810000009,
+          "heap": 22532,
+          "largest": 6656
+        },
+        {
+          "seconds": 27.35173550000036,
+          "heap": 24200,
+          "largest": 6656
+        },
+        {
+          "seconds": 27.88562870000169,
+          "heap": 21440,
+          "largest": 6656
+        },
+        {
+          "seconds": 57.307919899998524,
+          "heap": 21060,
+          "largest": 7168
+        },
+        {
+          "seconds": 57.85540929999843,
+          "heap": 21060,
+          "largest": 7168
+        },
+        {
+          "seconds": 58.40336640000169,
+          "heap": 22536,
+          "largest": 7168
+        },
+        {
+          "seconds": 58.935148699998535,
+          "heap": 22536,
+          "largest": 7168
+        },
+        {
+          "seconds": 59.482501700000284,
+          "heap": 22956,
+          "largest": 7168
+        },
+        {
+          "seconds": 60.105505899999116,
+          "heap": 21392,
+          "largest": 7168
+        }
+      ]
+    },
+    "groovesalad-256-mp3": {
+      "original": {
+        "name": "https:groovesalad-256-mp3",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Insufficient actual playback samples",
+        "seconds": 61.988
+      },
+      "spec": {
+        "codec": "mp3",
+        "profile": null,
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "MP3"
+      },
+      "output": {
+        "samples": 75,
+        "elapsed_ms": 44593,
+        "completion_queue_drops": 3667,
+        "write_errors": 0
+      },
+      "health": {
+        "samples": 75,
+        "boot_id": "8f663b7eabba6dd2",
+        "minimum_heap": 80440,
+        "minimum_largest": 65536,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "maximum_status_health_ms": 398.036200000206,
+      "rssi_range": [
+        -74,
+        -70
+      ],
+      "checks": {
+        "format": {
+          "result": "FAIL",
+          "reason": "Insufficient actual playback samples"
+        },
+        "output": {
+          "result": "FAIL",
+          "reason": "I2S completion queue overflow during sustained play"
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 75,
+            "boot_id": "8f663b7eabba6dd2",
+            "minimum_heap": 80440,
+            "minimum_largest": 65536,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0
+          }
+        },
+        "response": {
+          "result": "PASS",
+          "evidence": {
+            "maximum_ms": 398.036200000206
+          }
+        }
+      },
+      "below_budget_samples": []
+    }
+  },
+  "lifetime_health": {
+    "samples": 558,
+    "boot_id": "8f663b7eabba6dd2",
+    "minimum_heap": 20940,
+    "minimum_largest": 6656,
+    "allocation_failures": 0,
+    "task_watchdog_events": 0
+  },
+  "sdk_lifetime_minimum_heap": 14588,
+  "recovery": {
+    "result": "PASS",
+    "evidence": null
+  },
+  "exact_listened_image_restored": true,
+  "idle_medians": {
+    "initial": {
+      "heap": 139980,
+      "largest": 114688,
+      "tasks": 16
+    },
+    "public": {
+      "heap": 139752,
+      "largest": 114688,
+      "tasks": 16
+    }
+  }
+}

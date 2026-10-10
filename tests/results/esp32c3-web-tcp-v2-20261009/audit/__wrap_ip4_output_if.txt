@@ -1,0 +1,150 @@
+42022a4a:	ffa78893          	addi	a7,a5,-6
+42022a4e:	832a                	mv	t1,a0
+42022a50:	00089963          	bnez	a7,42022a62 <__wrap_ip4_output_if+0x18>
+42022a54:	c619                	beqz	a2,42022a62 <__wrap_ip4_output_if+0x18>
+42022a56:	c511                	beqz	a0,42022a62 <__wrap_ip4_output_if+0x18>
+42022a58:	00a55883          	lhu	a7,10(a0)
+42022a5c:	454d                	li	a0,19
+42022a5e:	01156563          	bltu	a0,a7,42022a68 <__wrap_ip4_output_if+0x1e>
+42022a62:	851a                	mv	a0,t1
+42022a64:	30e6506f          	j	42087d72 <ip4_output_if>
+42022a68:	00432883          	lw	a7,4(t1)
+42022a6c:	715d                	addi	sp,sp,-80
+42022a6e:	c4a2                	sw	s0,72(sp)
+42022a70:	c686                	sw	ra,76(sp)
+42022a72:	0028de83          	lhu	t4,2(a7)
+42022a76:	d23e                	sw	a5,36(sp)
+42022a78:	0008d503          	lhu	a0,0(a7)
+42022a7c:	00c8d783          	lhu	a5,12(a7)
+42022a80:	d442                	sw	a6,40(sp)
+42022a82:	d03a                	sw	a4,32(sp)
+42022a84:	ce36                	sw	a3,28(sp)
+42022a86:	cc32                	sw	a2,24(sp)
+42022a88:	ca2e                	sw	a1,20(sp)
+42022a8a:	c81a                	sw	t1,16(sp)
+42022a8c:	c676                	sw	t4,12(sp)
+42022a8e:	843e                	mv	s0,a5
+42022a90:	0315a0ef          	jal	4207d2c0 <lwip_htons>
+42022a94:	8e2a                	mv	t3,a0
+42022a96:	05000513          	li	a0,80
+42022a9a:	4eb2                	lw	t4,12(sp)
+42022a9c:	4342                	lw	t1,16(sp)
+42022a9e:	45d2                	lw	a1,20(sp)
+42022aa0:	4662                	lw	a2,24(sp)
+42022aa2:	46f2                	lw	a3,28(sp)
+42022aa4:	5702                	lw	a4,32(sp)
+42022aa6:	5792                	lw	a5,36(sp)
+42022aa8:	5822                	lw	a6,40(sp)
+42022aaa:	00ae0863          	beq	t3,a0,42022aba <__wrap_ip4_output_if+0x70>
+42022aae:	4426                	lw	s0,72(sp)
+42022ab0:	40b6                	lw	ra,76(sp)
+42022ab2:	851a                	mv	a0,t1
+42022ab4:	6161                	addi	sp,sp,80
+42022ab6:	2bc6506f          	j	42087d72 <ip4_output_if>
+42022aba:	8522                	mv	a0,s0
+42022abc:	d642                	sw	a6,44(sp)
+42022abe:	d03e                	sw	a5,32(sp)
+42022ac0:	ce3a                	sw	a4,28(sp)
+42022ac2:	cc36                	sw	a3,24(sp)
+42022ac4:	ca32                	sw	a2,20(sp)
+42022ac6:	c82e                	sw	a1,16(sp)
+42022ac8:	c61a                	sw	t1,12(sp)
+42022aca:	c2a6                	sw	s1,68(sp)
+42022acc:	c0ca                	sw	s2,64(sp)
+42022ace:	de4e                	sw	s3,60(sp)
+42022ad0:	d472                	sw	t3,40(sp)
+42022ad2:	d276                	sw	t4,36(sp)
+42022ad4:	7ec5a0ef          	jal	4207d2c0 <lwip_htons>
+42022ad8:	8919                	andi	a0,a0,6
+42022ada:	4332                	lw	t1,12(sp)
+42022adc:	45c2                	lw	a1,16(sp)
+42022ade:	4652                	lw	a2,20(sp)
+42022ae0:	46e2                	lw	a3,24(sp)
+42022ae2:	4772                	lw	a4,28(sp)
+42022ae4:	5782                	lw	a5,32(sp)
+42022ae6:	5832                	lw	a6,44(sp)
+42022ae8:	e509                	bnez	a0,42022af2 <__wrap_ip4_output_if+0xa8>
+42022aea:	4496                	lw	s1,68(sp)
+42022aec:	4906                	lw	s2,64(sp)
+42022aee:	59f2                	lw	s3,60(sp)
+42022af0:	bf7d                	j	42022aae <__wrap_ip4_output_if+0x64>
+42022af2:	5512                	lw	a0,36(sp)
+42022af4:	d042                	sw	a6,32(sp)
+42022af6:	7ca5a0ef          	jal	4207d2c0 <lwip_htons>
+42022afa:	84aa                	mv	s1,a0
+42022afc:	8522                	mv	a0,s0
+42022afe:	7c25a0ef          	jal	4207d2c0 <lwip_htons>
+42022b02:	3fc9a7b7          	lui	a5,0x3fc9a
+42022b06:	ff07a783          	lw	a5,-16(a5) # 3fc99ff0 <tcp_listen_pcbs>
+42022b0a:	4332                	lw	t1,12(sp)
+42022b0c:	45c2                	lw	a1,16(sp)
+42022b0e:	4652                	lw	a2,20(sp)
+42022b10:	46e2                	lw	a3,24(sp)
+42022b12:	4772                	lw	a4,28(sp)
+42022b14:	5802                	lw	a6,32(sp)
+42022b16:	5e22                	lw	t3,40(sp)
+42022b18:	892a                	mv	s2,a0
+42022b1a:	e781                	bnez	a5,42022b22 <__wrap_ip4_output_if+0xd8>
+42022b1c:	a06d                	j	42022bc6 <__wrap_ip4_output_if+0x17c>
+42022b1e:	47dc                	lw	a5,12(a5)
+42022b20:	c3dd                	beqz	a5,42022bc6 <__wrap_ip4_output_if+0x17c>
+42022b22:	01a7d883          	lhu	a7,26(a5)
+42022b26:	ffc89ce3          	bne	a7,t3,42022b1e <__wrap_ip4_output_if+0xd4>
+42022b2a:	0217c783          	lbu	a5,33(a5)
+42022b2e:	89be                	mv	s3,a5
+42022b30:	4799                	li	a5,6
+42022b32:	851a                	mv	a0,t1
+42022b34:	23e650ef          	jal	42087d72 <ip4_output_if>
+42022b38:	842a                	mv	s0,a0
+42022b3a:	fe35f097          	auipc	ra,0xfe35f
+42022b3e:	89a080e7          	jalr	-1894(ra) # 403813d4 <esp_timer_get_time>
+42022b42:	c62a                	sw	a0,12(sp)
+42022b44:	fe365097          	auipc	ra,0xfe365
+42022b48:	4ca080e7          	jalr	1226(ra) # 4038800e <vPortEnterCritical>
+42022b4c:	3fc9a7b7          	lui	a5,0x3fc9a
+42022b50:	dc07a703          	lw	a4,-576(a5) # 3fc99dc0 <s_sequence>
+42022b54:	3fc9a5b7          	lui	a1,0x3fc9a
+42022b58:	dc45a683          	lw	a3,-572(a1) # 3fc99dc4 <s_write>
+42022b5c:	3fc9a637          	lui	a2,0x3fc9a
+42022b60:	dc862603          	lw	a2,-568(a2) # 3fc99dc8 <s_read>
+42022b64:	0705                	addi	a4,a4,1
+42022b66:	dce7a023          	sw	a4,-576(a5)
+42022b6a:	fc068793          	addi	a5,a3,-64
+42022b6e:	4532                	lw	a0,12(sp)
+42022b70:	04c78e63          	beq	a5,a2,42022bcc <__wrap_ip4_output_if+0x182>
+42022b74:	03f6f813          	andi	a6,a3,63
+42022b78:	500007b7          	lui	a5,0x50000
+42022b7c:	0812                	slli	a6,a6,0x4
+42022b7e:	00078793          	mv	a5,a5
+42022b82:	97c2                	add	a5,a5,a6
+42022b84:	03f97613          	andi	a2,s2,63
+42022b88:	0685                	addi	a3,a3,1
+42022b8a:	4885                	li	a7,1
+42022b8c:	587d                	li	a6,-1
+42022b8e:	dcd5a223          	sw	a3,-572(a1)
+42022b92:	00c785a3          	sb	a2,11(a5) # 5000000b <s_events+0xb>
+42022b96:	c398                	sw	a4,0(a5)
+42022b98:	c3c8                	sw	a0,4(a5)
+42022b9a:	00979423          	sh	s1,8(a5)
+42022b9e:	00878723          	sb	s0,14(a5)
+42022ba2:	013787a3          	sb	s3,15(a5)
+42022ba6:	01178523          	sb	a7,10(a5)
+42022baa:	01079623          	sh	a6,12(a5)
+42022bae:	fe365097          	auipc	ra,0xfe365
+42022bb2:	49c080e7          	jalr	1180(ra) # 4038804a <vPortExitCritical>
+42022bb6:	40b6                	lw	ra,76(sp)
+42022bb8:	8522                	mv	a0,s0
+42022bba:	4426                	lw	s0,72(sp)
+42022bbc:	4496                	lw	s1,68(sp)
+42022bbe:	4906                	lw	s2,64(sp)
+42022bc0:	59f2                	lw	s3,60(sp)
+42022bc2:	6161                	addi	sp,sp,80
+42022bc4:	8082                	ret
+42022bc6:	0ff00993          	li	s3,255
+42022bca:	b79d                	j	42022b30 <__wrap_ip4_output_if+0xe6>
+42022bcc:	3fc9a737          	lui	a4,0x3fc9a
+42022bd0:	dbc72783          	lw	a5,-580(a4) # 3fc99dbc <s_dropped>
+42022bd4:	0785                	addi	a5,a5,1
+42022bd6:	daf72e23          	sw	a5,-580(a4)
+42022bda:	bfd1                	j	42022bae <__wrap_ip4_output_if+0x164>
+

@@ -20,8 +20,18 @@ parser.add_argument('--allocator', choices=('pool', 'heap'), default='pool')
 parser.add_argument('--unpatched', action='store_true', help='reproduce the SDK defect')
 parser.add_argument('--output', type=Path, help='retain source hashes and per-case output')
 args = parser.parse_args()
-lwip = args.lwip or next((p/'.idf/v6.0.2/components/lwip/lwip' for p in ROOT.parents
-                         if (p/'.idf/v6.0.2/components/lwip/lwip/src/core/tcp.c').exists()), None)
+idf_version = (ROOT/'idf/esp32c3-oled-native/idf-version.txt').read_text().strip()
+revision_file = ROOT/'idf/esp32c3-oled-native/idf-revision.txt'
+idf_directory = idf_version
+if revision_file.exists():
+    import re
+    revision = revision_file.read_text().strip()
+    if not re.fullmatch(r'[0-9a-f]{40}', revision):
+        parser.error('ESP-IDF revision must be a full lowercase commit hash')
+    idf_directory += '-' + revision[:12]
+lwip_relative = Path('.idf')/idf_directory/'components/lwip/lwip'
+lwip = args.lwip or next((p/lwip_relative for p in (ROOT, *ROOT.parents)
+                         if (p/lwip_relative/'src/core/tcp.c').exists()), None)
 if not lwip:
     parser.error('supply --lwip /path/to/pinned/esp-lwip')
 revision = subprocess.check_output(['git', '-C', str(lwip), 'rev-parse', 'HEAD'], text=True).strip()

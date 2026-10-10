@@ -451,9 +451,11 @@ test("native radio requests and publishes ICY song metadata", () => {
 
   assert.match(audio, /Icy-MetaData", "1"/);
   assert.match(audio, /icy-metaint/);
-  assert.match(audio, /StreamTitle='/);
+  assert.match(read("main", "icy_title.c"), /StreamTitle='/);
   assert.match(audio, /native_state_set_title\(s_state, title\)/);
-  assert.match(audio, /parse_icy_metadata\(uint32_t generation/);
+  assert.match(audio, /publish_icy_title\(uint32_t generation/);
+  assert.match(audio, /icy_title_feed\(&s_icy_title, buffer \+ offset, chunk\)/);
+  assert.match(audio, /publish_icy_title\(command.generation,\s*icy_title_finish\(&s_icy_title\)\)/);
   assert.match(
     audio,
     /generation != atomic_load\(&s_generation\)[\s\S]*native_state_set_title\(s_state, ""\)/,
@@ -474,7 +476,7 @@ test("native radio requests and publishes ICY song metadata", () => {
   );
   assert.match(
     audio,
-    /esp_http_client_read\(client,[\s\S]*atomic_load\(&s_generation\) != command\.generation[\s\S]*received == -ESP_ERR_HTTP_EAGAIN/,
+    /stream_http_read\(&reader, client,[\s\S]*atomic_load\(&s_generation\) != command\.generation[\s\S]*received == -ESP_ERR_HTTP_EAGAIN/,
   );
   assert.match(
     audio,
@@ -640,8 +642,10 @@ test("single-core decoder yields to idle and drops obsolete station data", () =>
   assert.match(audio, /\(stats\.calls & 31U\) == 0U[\s\S]*vTaskDelay\(1\)/);
   assert.match(
     audio,
-    /packet->generation != atomic_load\(&s_generation\)[\s\S]*vRingbufferReturnItem\(s_encoded, packet\)/,
+    /packet->generation != atomic_load\(&s_generation\)[\s\S]*encoded_return\(s_encoded, packet\)/,
   );
+  assert.match(audio, /#define encoded_return vRingbufferReturnItem/);
+  assert.match(audio, /#define encoded_return adaptive_input_return/);
   assert.match(
     audio,
     /packet->generation != atomic_load\(&s_generation\)[\s\S]*vRingbufferReturnItem\(s_pcm, packet\)/,
@@ -1056,8 +1060,10 @@ test("native audio buffers backpressure instead of dropping a live stream", () =
 
   assert.match(
     audio,
-    /xRingbufferSendAcquire\(s_encoded[\s\S]*pdMS_TO_TICKS\(250\)[\s\S]*atomic_load\(&s_generation\) != generation/,
+    /encoded_acquire\(s_encoded[\s\S]*pdMS_TO_TICKS\(250\)[\s\S]*atomic_load\(&s_generation\) != generation/,
   );
+  assert.match(audio, /#define encoded_acquire xRingbufferSendAcquire/);
+  assert.match(audio, /#define encoded_acquire adaptive_input_acquire/);
   assert.match(
     audio,
     /pipeline_acquire\(s_pcm[\s\S]*pdMS_TO_TICKS\(250\), &stats->pcm_full\)[\s\S]*atomic_load\(&s_generation\) != generation/,

@@ -1,0 +1,206 @@
+[
+  {
+    "name": "install-icy-debug",
+    "code": 0,
+    "seconds": 25.01600000000326,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-icy-debug\\app.bin",
+      "--output",
+      ".build\\c3-memory-20261007\\install-icy-debug.json"
+    ]
+  },
+  {
+    "name": "icy-debug",
+    "code": 0,
+    "seconds": 61.75,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/icy_metadata.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-icy-debug\\app.bin",
+      "--output",
+      ".build\\c3-memory-20261007\\icy-debug"
+    ]
+  },
+  {
+    "name": "install-icy-rxcopy-profile",
+    "code": 0,
+    "seconds": 25.843999999997322,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-rxcopy-profile\\app.bin",
+      "--output",
+      ".build\\c3-memory-20261007\\install-icy-rxcopy-profile.json"
+    ]
+  },
+  {
+    "name": "icy-rxcopy-http",
+    "code": 0,
+    "seconds": 100.64100000000326,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/public_streams.py",
+      "--board",
+      "http://192.168.100.4",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-rxcopy-profile\\app.bin",
+      "--case",
+      "groovesalad-64-aac",
+      "--transport",
+      "http",
+      "--seconds",
+      "60",
+      "--aac-reference-command",
+      ".build/idf-upgrade/faad-reference-command.json",
+      "--output",
+      ".build\\c3-memory-20261007\\icy-rxcopy-http"
+    ]
+  },
+  {
+    "name": "icy-rxcopy-https",
+    "code": 0,
+    "seconds": 101.84299999999348,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/public_streams.py",
+      "--board",
+      "http://192.168.100.4",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-rxcopy-profile\\app.bin",
+      "--case",
+      "groovesalad-64-aac",
+      "--transport",
+      "https",
+      "--seconds",
+      "60",
+      "--aac-reference-command",
+      ".build/idf-upgrade/faad-reference-command.json",
+      "--output",
+      ".build\\c3-memory-20261007\\icy-rxcopy-https"
+    ]
+  },
+  {
+    "name": "icy-rxcopy-soak",
+    "code": 1,
+    "seconds": 635.5630000000092,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/stream_memory_study.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-memory-icy-rxcopy-profile\\app.bin",
+      "--case",
+      "hev2-44100-stereo",
+      "--seconds",
+      "600",
+      "--output",
+      ".build\\c3-memory-20261007\\icy-rxcopy-soak"
+    ]
+  },
+  {
+    "name": "icy-rxcopy-soak-summary",
+    "code": 0,
+    "seconds": 0.17199999999138527,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/summarize_sustained.py",
+      "--input",
+      ".build\\c3-memory-20261007\\icy-rxcopy-soak",
+      "--output",
+      ".build\\c3-memory-20261007\\icy-rxcopy-soak-summary.json"
+    ]
+  },
+  {
+    "name": "install-icy-quiet",
+    "code": 0,
+    "seconds": 23.625,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-icy-quiet\\app.bin",
+      "--output",
+      ".build\\c3-memory-20261007\\install-icy-quiet.json"
+    ]
+  },
+  {
+    "name": "icy-quiet",
+    "code": 1,
+    "seconds": 62.26499999999942,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/icy_metadata.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-icy-quiet\\app.bin",
+      "--output",
+      ".build\\c3-memory-20261007\\icy-quiet"
+    ]
+  },
+  {
+    "name": "icy-quiet-ota",
+    "code": 0,
+    "seconds": 172.1880000000092,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/ota.py",
+      "--board",
+      "http://192.168.100.4",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-icy-quiet\\app.bin",
+      "--suite",
+      "negative",
+      "--suite",
+      "roundtrip",
+      "--suite",
+      "slow",
+      "--output",
+      ".build\\c3-memory-20261007\\icy-quiet-ota.json"
+    ]
+  }
+]

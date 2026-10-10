@@ -17,7 +17,7 @@ from summarize_sustained import window
 
 class Clock:
     def __init__(self): self.now = 0
-    def monotonic(self): return self.now
+    def perf_counter(self): return self.now
     def sleep(self, seconds): self.now += seconds
 
 
@@ -32,7 +32,7 @@ class MemoryStudy(unittest.TestCase):
     def test_checkpoint_is_incomplete_throttled_and_does_not_mutate(self):
         clock = Clock()
         capture = SimpleNamespace(rows=[dict(at=0, line='PERF test')])
-        checkpoint = Checkpoint(self.output, capture, seconds=30, clock=clock.monotonic)
+        checkpoint = Checkpoint(self.output, capture, seconds=30, clock=clock.perf_counter)
         batch = dict(case='load:test', started_at=0, samples=[dict(seconds=0)])
         checkpoint([], batch)
         before = (self.output/'status.json').read_bytes()
@@ -55,7 +55,7 @@ class MemoryStudy(unittest.TestCase):
         board = SimpleNamespace(status=lambda: dict(audio=True))
         capture = SimpleNamespace(rows=[])
         suite = Suite(board, 'http://unused.invalid', {}, capture, self.output,
-                      checkpoint=Checkpoint(self.output, capture, seconds=.3, clock=clock.monotonic))
+                      checkpoint=Checkpoint(self.output, capture, seconds=.3, clock=clock.perf_counter))
         with patch('run.time', clock):
             result = suite.observe(1, 'load:test', interval=.4)
         saved = json.loads((self.output/'status.json').read_text())[0]

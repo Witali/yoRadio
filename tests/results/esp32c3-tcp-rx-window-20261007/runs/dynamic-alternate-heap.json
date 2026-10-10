@@ -1,0 +1,167 @@
+{
+  "original_case": {
+    "name": "tls-record:alternate",
+    "result": "FAIL",
+    "exception_chain": [
+      {
+        "type": "Failure"
+      }
+    ],
+    "reason": "Progressive heap loss during continuous playback",
+    "seconds": 76.328
+  },
+  "cpu_samples": [
+    {
+      "seconds": 0.047,
+      "busy": 58.4,
+      "heap": 123668,
+      "largest": 114688
+    },
+    {
+      "seconds": 5.125,
+      "busy": 69.3,
+      "heap": 17120,
+      "largest": 4608
+    },
+    {
+      "seconds": 10.203,
+      "busy": 71.3,
+      "heap": 36752,
+      "largest": 17408
+    },
+    {
+      "seconds": 15.265,
+      "busy": 70.7,
+      "heap": 36752,
+      "largest": 17408
+    },
+    {
+      "seconds": 20.265,
+      "busy": 71.0,
+      "heap": 36752,
+      "largest": 17408
+    },
+    {
+      "seconds": 25.312,
+      "busy": 69.1,
+      "heap": 36748,
+      "largest": 17408
+    },
+    {
+      "seconds": 30.375,
+      "busy": 71.2,
+      "heap": 36752,
+      "largest": 17408
+    },
+    {
+      "seconds": 35.39,
+      "busy": 71.8,
+      "heap": 19368,
+      "largest": 7936
+    },
+    {
+      "seconds": 40.437,
+      "busy": 70.9,
+      "heap": 36752,
+      "largest": 17408
+    },
+    {
+      "seconds": 45.437,
+      "busy": 69.0,
+      "heap": 36752,
+      "largest": 17408
+    },
+    {
+      "seconds": 50.578,
+      "busy": 71.1,
+      "heap": 36752,
+      "largest": 17408
+    },
+    {
+      "seconds": 55.609,
+      "busy": 71.3,
+      "heap": 36752,
+      "largest": 17408
+    },
+    {
+      "seconds": 60.609,
+      "busy": 71.6,
+      "heap": 18948,
+      "largest": 7936
+    },
+    {
+      "seconds": 65.656,
+      "busy": 68.9,
+      "heap": 19368,
+      "largest": 7936
+    },
+    {
+      "seconds": 70.656,
+      "busy": 70.9,
+      "heap": 36740,
+      "largest": 17408
+    }
+  ],
+  "original_first3_heap_median": 36752,
+  "original_last3_heap_median": 19368,
+  "return_to_high_heap": {
+    "first": {
+      "seconds": 10.203,
+      "busy": 71.3,
+      "heap": 36752,
+      "largest": 17408
+    },
+    "last": {
+      "seconds": 70.656,
+      "busy": 70.9,
+      "heap": 36740,
+      "largest": 17408
+    }
+  },
+  "note": "Original FAIL retained. Repeated return to ~36752 B and final 36740 B is consistent with transient TLS/RX allocation, not proof of a progressive leak. No phase-matched lifetime instrumentation or ten-minute soak yet.",
+  "idle_cases": [
+    {
+      "name": "idle-before",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 143640,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 143624,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.484
+    },
+    {
+      "name": "idle-recovery",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 143672,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 143660,
+            "largest": 114688,
+            "tasks": 17
+          },
+          {
+            "heap": 143660,
+            "largest": 114688,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.375
+    }
+  ]
+}

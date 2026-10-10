@@ -1,0 +1,205 @@
+
+idf/esp32c3-oled-native/build-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly/yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+42013708 <audio_service_start>:
+42013708:	711d                	addi	sp,sp,-96
+4201370a:	3fc9a7b7          	lui	a5,0x3fc9a
+4201370e:	ce86                	sw	ra,92(sp)
+42013710:	cca2                	sw	s0,88(sp)
+42013712:	cea7a023          	sw	a0,-800(a5) # 3fc99ce0 <s_state>
+42013716:	3400f0ef          	jal	42022a56 <native_audio_output_init>
+4201371a:	1e051363          	bnez	a0,42013900 <audio_service_start+0x1f8>
+4201371e:	5f71e0ef          	jal	42032514 <audio_level_led_init>
+42013722:	842a                	mv	s0,a0
+42013724:	20051d63          	bnez	a0,4201393e <audio_service_start+0x236>
+42013728:	3fc9a7b7          	lui	a5,0x3fc9a
+4201372c:	caa6                	sw	s1,84(sp)
+4201372e:	cd078793          	addi	a5,a5,-816 # 3fc99cd0 <s_generation>
+42013732:	0007a023          	sw	zero,0(a5)
+42013736:	3fc9a7b7          	lui	a5,0x3fc9a
+4201373a:	ccc78793          	addi	a5,a5,-820 # 3fc99ccc <s_decoder_target_codec>
+4201373e:	0007a023          	sw	zero,0(a5)
+42013742:	3fc9a7b7          	lui	a5,0x3fc9a
+42013746:	cc878793          	addi	a5,a5,-824 # 3fc99cc8 <s_decoder_released_generation>
+4201374a:	0007a023          	sw	zero,0(a5)
+4201374e:	3fc9a7b7          	lui	a5,0x3fc9a
+42013752:	cb078793          	addi	a5,a5,-848 # 3fc99cb0 <s_measured_bitrate_ready>
+42013756:	00078023          	sb	zero,0(a5)
+4201375a:	3fc907b7          	lui	a5,0x3fc90
+4201375e:	ea078e23          	sb	zero,-324(a5) # 3fc8febc <s_last_url>
+42013762:	3fc9a7b7          	lui	a5,0x3fc9a
+42013766:	cc07a223          	sw	zero,-828(a5) # 3fc99cc4 <s_last_codec>
+4201376a:	421080ef          	jal	4201c38a <runtime_settings_get_audio_buffer_blocks>
+4201376e:	84aa                	mv	s1,a0
+42013770:	4601                	li	a2,0
+42013772:	20800593          	li	a1,520
+42013776:	4505                	li	a0,1
+42013778:	00105097          	auipc	ra,0x105
+4201377c:	880080e7          	jalr	-1920(ra) # 42117ff8 <xQueueGenericCreate>
+42013780:	872a                	mv	a4,a0
+42013782:	64000513          	li	a0,1600
+42013786:	02a48533          	mul	a0,s1,a0
+4201378a:	6605                	lui	a2,0x1
+4201378c:	6589                	lui	a1,0x2
+4201378e:	3fc9a7b7          	lui	a5,0x3fc9a
+42013792:	80c60613          	addi	a2,a2,-2036 # 80c <ALIGN_VECTOR_TABLE+0x70c>
+42013796:	f4058593          	addi	a1,a1,-192 # 1f40 <CSR_UINTSTATUS+0x128f>
+4201379a:	cce7ae23          	sw	a4,-804(a5) # 3fc99cdc <s_commands>
+4201379e:	32a140ef          	jal	42027ac8 <adaptive_input_create>
+420137a2:	3fc9a737          	lui	a4,0x3fc9a
+420137a6:	cca72c23          	sw	a0,-808(a4) # 3fc99cd8 <s_encoded>
+420137aa:	08f140ef          	jal	42028038 <tls_input_reserve_bind>
+420137ae:	4581                	li	a1,0
+420137b0:	6509                	lui	a0,0x2
+420137b2:	00103097          	auipc	ra,0x103
+420137b6:	10c080e7          	jalr	268(ra) # 421168be <xRingbufferCreate>
+420137ba:	3fc9a7b7          	lui	a5,0x3fc9a
+420137be:	cdc7a783          	lw	a5,-804(a5) # 3fc99cdc <s_commands>
+420137c2:	3fc9a6b7          	lui	a3,0x3fc9a
+420137c6:	cca6aa23          	sw	a0,-812(a3) # 3fc99cd4 <s_pcm>
+420137ca:	3fc9a737          	lui	a4,0x3fc9a
+420137ce:	c3c1                	beqz	a5,4201384e <audio_service_start+0x146>
+420137d0:	cd872583          	lw	a1,-808(a4) # 3fc99cd8 <s_encoded>
+420137d4:	cd2d                	beqz	a0,4201384e <audio_service_start+0x146>
+420137d6:	cda5                	beqz	a1,4201384e <audio_service_start+0x146>
+420137d8:	1028                	addi	a0,sp,40
+420137da:	c8ca                	sw	s2,80(sp)
+420137dc:	c6ce                	sw	s3,76(sp)
+420137de:	c4d2                	sw	s4,72(sp)
+420137e0:	248140ef          	jal	42027a28 <adaptive_input_stats>
+420137e4:	5a22                	lw	s4,40(sp)
+420137e6:	59b2                	lw	s3,44(sp)
+420137e8:	fe376097          	auipc	ra,0xfe376
+420137ec:	ca4080e7          	jalr	-860(ra) # 4038948c <esp_log_timestamp>
+420137f0:	58d2                	lw	a7,52(sp)
+420137f2:	5842                	lw	a6,48(sp)
+420137f4:	3c126937          	lui	s2,0x3c126
+420137f8:	ae490713          	addi	a4,s2,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420137fc:	3c126637          	lui	a2,0x3c126
+42013800:	86aa                	mv	a3,a0
+42013802:	85ba                	mv	a1,a4
+42013804:	87ce                	mv	a5,s3
+42013806:	2cc60613          	addi	a2,a2,716 # 3c1262cc <_esp_libc_clock_array_end+0x617c>
+4201380a:	450d                	li	a0,3
+4201380c:	c052                	sw	s4,0(sp)
+4201380e:	fe376097          	auipc	ra,0xfe376
+42013812:	b76080e7          	jalr	-1162(ra) # 40389384 <esp_log>
+42013816:	3c1265b7          	lui	a1,0x3c126
+4201381a:	42012537          	lui	a0,0x42012
+4201381e:	800004b7          	lui	s1,0x80000
+42013822:	6609                	lui	a2,0x2
+42013824:	4781                	li	a5,0
+42013826:	fff48813          	addi	a6,s1,-1 # 7fffffff <SYSTEM+0x1ff3ffff>
+4201382a:	80060613          	addi	a2,a2,-2048 # 1800 <CSR_UINTSTATUS+0xb4f>
+4201382e:	31858593          	addi	a1,a1,792 # 3c126318 <_esp_libc_clock_array_end+0x61c8>
+42013832:	7f650513          	addi	a0,a0,2038 # 420127f6 <stream_task>
+42013836:	4715                	li	a4,5
+42013838:	4681                	li	a3,0
+4201383a:	00107097          	auipc	ra,0x107
+4201383e:	a98080e7          	jalr	-1384(ra) # 4211a2d2 <xTaskCreatePinnedToCore>
+42013842:	4785                	li	a5,1
+42013844:	00f50d63          	beq	a0,a5,4201385e <audio_service_start+0x156>
+42013848:	4946                	lw	s2,80(sp)
+4201384a:	49b6                	lw	s3,76(sp)
+4201384c:	4a26                	lw	s4,72(sp)
+4201384e:	44d6                	lw	s1,84(sp)
+42013850:	10100413          	li	s0,257
+42013854:	40f6                	lw	ra,92(sp)
+42013856:	8522                	mv	a0,s0
+42013858:	4466                	lw	s0,88(sp)
+4201385a:	6125                	addi	sp,sp,96
+4201385c:	8082                	ret
+4201385e:	ca2a                	sw	a0,20(sp)
+42013860:	3c1265b7          	lui	a1,0x3c126
+42013864:	42012537          	lui	a0,0x42012
+42013868:	32858593          	addi	a1,a1,808 # 3c126328 <_esp_libc_clock_array_end+0x61d8>
+4201386c:	82850513          	addi	a0,a0,-2008 # 42011828 <decoder_task>
+42013870:	fff48813          	addi	a6,s1,-1
+42013874:	4781                	li	a5,0
+42013876:	471d                	li	a4,7
+42013878:	4681                	li	a3,0
+4201387a:	6611                	lui	a2,0x4
+4201387c:	00107097          	auipc	ra,0x107
+42013880:	a56080e7          	jalr	-1450(ra) # 4211a2d2 <xTaskCreatePinnedToCore>
+42013884:	48d2                	lw	a7,20(sp)
+42013886:	fd1511e3          	bne	a0,a7,42013848 <audio_service_start+0x140>
+4201388a:	6705                	lui	a4,0x1
+4201388c:	3c1265b7          	lui	a1,0x3c126
+42013890:	42011537          	lui	a0,0x42011
+42013894:	80070613          	addi	a2,a4,-2048 # 800 <ALIGN_VECTOR_TABLE+0x700>
+42013898:	fff48813          	addi	a6,s1,-1
+4201389c:	33858593          	addi	a1,a1,824 # 3c126338 <_esp_libc_clock_array_end+0x61e8>
+420138a0:	0d450513          	addi	a0,a0,212 # 420110d4 <output_task>
+420138a4:	4781                	li	a5,0
+420138a6:	4721                	li	a4,8
+420138a8:	4681                	li	a3,0
+420138aa:	00107097          	auipc	ra,0x107
+420138ae:	a28080e7          	jalr	-1496(ra) # 4211a2d2 <xTaskCreatePinnedToCore>
+420138b2:	4352                	lw	t1,20(sp)
+420138b4:	f8651ae3          	bne	a0,t1,42013848 <audio_service_start+0x140>
+420138b8:	03498833          	mul	a6,s3,s4
+420138bc:	ce42                	sw	a6,28(sp)
+420138be:	fe376097          	auipc	ra,0xfe376
+420138c2:	bce080e7          	jalr	-1074(ra) # 4038948c <esp_log_timestamp>
+420138c6:	cc2a                	sw	a0,24(sp)
+420138c8:	37d0f0ef          	jal	42023444 <native_audio_output_name>
+420138cc:	ca2a                	sw	a0,20(sp)
+420138ce:	4511                	li	a0,4
+420138d0:	d0aef0ef          	jal	42002dda <heap_caps_get_free_size>
+420138d4:	4872                	lw	a6,28(sp)
+420138d6:	47d2                	lw	a5,20(sp)
+420138d8:	46e2                	lw	a3,24(sp)
+420138da:	ae490713          	addi	a4,s2,-1308
+420138de:	3c126637          	lui	a2,0x3c126
+420138e2:	c02a                	sw	a0,0(sp)
+420138e4:	85ba                	mv	a1,a4
+420138e6:	34860613          	addi	a2,a2,840 # 3c126348 <_esp_libc_clock_array_end+0x61f8>
+420138ea:	6889                	lui	a7,0x2
+420138ec:	450d                	li	a0,3
+420138ee:	fe376097          	auipc	ra,0xfe376
+420138f2:	a96080e7          	jalr	-1386(ra) # 40389384 <esp_log>
+420138f6:	44d6                	lw	s1,84(sp)
+420138f8:	4946                	lw	s2,80(sp)
+420138fa:	49b6                	lw	s3,76(sp)
+420138fc:	4a26                	lw	s4,72(sp)
+420138fe:	bf99                	j	42013854 <audio_service_start+0x14c>
+42013900:	842a                	mv	s0,a0
+42013902:	fe376097          	auipc	ra,0xfe376
+42013906:	b8a080e7          	jalr	-1142(ra) # 4038948c <esp_log_timestamp>
+4201390a:	3c126737          	lui	a4,0x3c126
+4201390e:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42013912:	3c1407b7          	lui	a5,0x3c140
+42013916:	3c126637          	lui	a2,0x3c126
+4201391a:	86aa                	mv	a3,a0
+4201391c:	85ba                	mv	a1,a4
+4201391e:	4505                	li	a0,1
+42013920:	98078793          	addi	a5,a5,-1664 # 3c13f980 <__FUNCTION__.0>
+42013924:	26c60613          	addi	a2,a2,620 # 3c12626c <_esp_libc_clock_array_end+0x611c>
+42013928:	6c300813          	li	a6,1731
+4201392c:	fe376097          	auipc	ra,0xfe376
+42013930:	a58080e7          	jalr	-1448(ra) # 40389384 <esp_log>
+42013934:	40f6                	lw	ra,92(sp)
+42013936:	8522                	mv	a0,s0
+42013938:	4466                	lw	s0,88(sp)
+4201393a:	6125                	addi	sp,sp,96
+4201393c:	8082                	ret
+4201393e:	fe376097          	auipc	ra,0xfe376
+42013942:	b4e080e7          	jalr	-1202(ra) # 4038948c <esp_log_timestamp>
+42013946:	3c126737          	lui	a4,0x3c126
+4201394a:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+4201394e:	3c1407b7          	lui	a5,0x3c140
+42013952:	3c126637          	lui	a2,0x3c126
+42013956:	86aa                	mv	a3,a0
+42013958:	85ba                	mv	a1,a4
+4201395a:	98078793          	addi	a5,a5,-1664 # 3c13f980 <__FUNCTION__.0>
+4201395e:	29c60613          	addi	a2,a2,668 # 3c12629c <_esp_libc_clock_array_end+0x614c>
+42013962:	6c500813          	li	a6,1733
+42013966:	4505                	li	a0,1
+42013968:	fe376097          	auipc	ra,0xfe376
+4201396c:	a1c080e7          	jalr	-1508(ra) # 40389384 <esp_log>
+42013970:	b5d5                	j	42013854 <audio_service_start+0x14c>

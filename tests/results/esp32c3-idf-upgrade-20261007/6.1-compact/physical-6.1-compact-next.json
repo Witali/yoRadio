@@ -1,0 +1,73 @@
+[
+  {
+    "name": "install-6.1-compact-profile",
+    "returncode": 0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-profile\\app.bin",
+      "--output",
+      ".build\\idf-upgrade\\install-6.1-compact-profile.json"
+    ],
+    "seconds": 25.54699999999866
+  },
+  {
+    "name": "physical-6.1-compact-matrix",
+    "returncode": 1,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/run.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--sdkconfig",
+      "firmware\\development\\esp32c3-idf-6.1-compact-profile\\sdkconfig",
+      "--suite",
+      "http",
+      "--suite",
+      "eof",
+      "--suite",
+      "transitions",
+      "--suite",
+      "faults",
+      "--suite",
+      "websocket",
+      "--suite",
+      "boot-time",
+      "--suite",
+      "tls-rejection",
+      "--cycles",
+      "2",
+      "--https-origin",
+      "https://192.168.100.253:8771",
+      "--tls-cert",
+      ".build\\idf-upgrade\\tls\\cert.pem",
+      "--tls-key",
+      ".build\\idf-upgrade\\tls\\key.pem",
+      "--output",
+      ".build\\idf-upgrade\\physical-6.1-compact-matrix"
+    ],
+    "seconds": 993.6880000000019
+  },
+  {
+    "name": "physical-6.1-compact-stage",
+    "returncode": 1,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/physical-stage.py",
+      "--version",
+      "6.1-compact"
+    ],
+    "seconds": 0.125
+  }
+]

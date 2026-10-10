@@ -1,0 +1,779 @@
+{
+  "phases": {
+    "hev2-tls-grow": {
+      "controller": {
+        "name": "hev2-tls-grow",
+        "code": 1,
+        "seconds": 102.54250729999967,
+        "image": {
+          "app_elf_sha256": "3a7765831c0c7a109ce02d7a9fdc40e3b47809267e745607ec357c461ec501d5",
+          "sha256": "991f29dd04a1458fea7adaaa377b5ee2165a6e900c601bd8ffb5e5e165674cbc",
+          "bytes": 1631904
+        }
+      },
+      "passed": 4,
+      "total": 5,
+      "original_cases": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 129348,
+                "largest": 114688,
+                "tasks": 17
+              },
+              {
+                "heap": 129348,
+                "largest": 114688,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.378
+        },
+        {
+          "name": "tls-record:grow",
+          "result": "PASS",
+          "evidence": {
+            "samples": 388,
+            "rate": 44100,
+            "channels": 2,
+            "record_counts": {
+              "1048": 118,
+              "16408": 11
+            },
+            "first_large_at": 3356.2367631,
+            "mean_busy": 56.57333333333333,
+            "peak_busy": 61.5,
+            "minimum_heap": 22208.0,
+            "minimum_largest": 15360.0,
+            "audio_wall_ratio": 1.000484178747401,
+            "first_full_pcm_seconds": 1.586704600000303
+          },
+          "seconds": 76.241
+        },
+        {
+          "name": "idle-recovery",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Persistent largest loss: 12288.0 bytes",
+          "seconds": 12.345
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.003
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "evidence": {
+            "stopped": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 0.596
+        }
+      ],
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "owners": {
+        "result": "PASS",
+        "evidence": {
+          "complete": true,
+          "scope": "Live allocation task/lifetime metadata within one initially free heap region; not a complete all-heap event trace",
+          "snapshots": [
+            {
+              "seq": 1,
+              "first": 1070334828,
+              "last": 1070450444,
+              "live": 0,
+              "peak": 0,
+              "lost": 0,
+              "alloc_events": 0,
+              "free_events": 0,
+              "rows": 1,
+              "dropped": 0,
+              "unknown": 0,
+              "walk_us": 364,
+              "at": 3314.8823084,
+              "blocks": [
+                {
+                  "address": 1070334828,
+                  "bytes": 115616,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                }
+              ],
+              "largest_raw_free": 115616
+            },
+            {
+              "seq": 2,
+              "first": 1070334828,
+              "last": 1070450444,
+              "live": 0,
+              "peak": 0,
+              "lost": 0,
+              "alloc_events": 0,
+              "free_events": 0,
+              "rows": 1,
+              "dropped": 0,
+              "unknown": 0,
+              "walk_us": 204,
+              "at": 3319.8830704,
+              "blocks": [
+                {
+                  "address": 1070334828,
+                  "bytes": 115616,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                }
+              ],
+              "largest_raw_free": 115616
+            },
+            {
+              "seq": 3,
+              "first": 1070334828,
+              "last": 1070450444,
+              "live": 0,
+              "peak": 0,
+              "lost": 0,
+              "alloc_events": 0,
+              "free_events": 0,
+              "rows": 1,
+              "dropped": 0,
+              "unknown": 0,
+              "walk_us": 203,
+              "at": 3324.8853874,
+              "blocks": [
+                {
+                  "address": 1070334828,
+                  "bytes": 115616,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                }
+              ],
+              "largest_raw_free": 115616
+            },
+            {
+              "seq": 4,
+              "first": 1070334828,
+              "last": 1070450444,
+              "live": 1,
+              "peak": 18,
+              "lost": 0,
+              "alloc_events": 3722,
+              "free_events": 3721,
+              "rows": 3,
+              "dropped": 0,
+              "unknown": 0,
+              "walk_us": 218,
+              "at": 3405.8540273,
+              "blocks": [
+                {
+                  "address": 1070334828,
+                  "bytes": 9984,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                },
+                {
+                  "address": 1070344816,
+                  "bytes": 92,
+                  "id": 32,
+                  "requested": 92,
+                  "task": "radio_strea"
+                },
+                {
+                  "address": 1070344912,
+                  "bytes": 105532,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                }
+              ],
+              "largest_raw_free": 105532
+            },
+            {
+              "seq": 5,
+              "first": 1070334828,
+              "last": 1070450444,
+              "live": 1,
+              "peak": 18,
+              "lost": 0,
+              "alloc_events": 3722,
+              "free_events": 3721,
+              "rows": 3,
+              "dropped": 0,
+              "unknown": 0,
+              "walk_us": 217,
+              "at": 3410.8567721,
+              "blocks": [
+                {
+                  "address": 1070334828,
+                  "bytes": 9984,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                },
+                {
+                  "address": 1070344816,
+                  "bytes": 92,
+                  "id": 32,
+                  "requested": 92,
+                  "task": "radio_strea"
+                },
+                {
+                  "address": 1070344912,
+                  "bytes": 105532,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                }
+              ],
+              "largest_raw_free": 105532
+            }
+          ]
+        }
+      },
+      "observations": [
+        {
+          "case": "tls-record:grow",
+          "seconds": 75.11351030000014,
+          "interrupted": false,
+          "tcp": {
+            "result": "PASS",
+            "evidence": {
+              "start": 3326.1697777,
+              "end": 3399.8552401,
+              "first_edge_seconds": 0.5113719999999375,
+              "last_edge_seconds": 0.9166758999999729,
+              "events": 1226,
+              "listeners": 70,
+              "watermarks": 71
+            }
+          },
+          "dma": {
+            "result": "PASS",
+            "evidence": {
+              "samples": 15,
+              "start": 3326.9677214,
+              "end": 3397.081944,
+              "observed_seconds": 70.11422260000018,
+              "coverage_complete": true,
+              "maximum_sample_gap_seconds": 5.013757799999894,
+              "delta": {
+                "q_overruns": 1,
+                "writes": 6576,
+                "written_bytes": 13467648,
+                "write_us": 64561975,
+                "errors": 0
+              },
+              "maximum_write_us_since_boot": 16415,
+              "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+              "acoustic_continuity_qualified": false
+            }
+          },
+          "dma_after_10_seconds": {
+            "result": "PASS",
+            "evidence": {
+              "samples": 13,
+              "start": 3336.9858407,
+              "end": 3397.081944,
+              "observed_seconds": 60.09610329999987,
+              "coverage_complete": true,
+              "maximum_sample_gap_seconds": 5.013757799999894,
+              "delta": {
+                "q_overruns": 0,
+                "writes": 5634,
+                "written_bytes": 11538432,
+                "write_us": 55343283,
+                "errors": 0
+              },
+              "maximum_write_us_since_boot": 16415,
+              "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+              "acoustic_continuity_qualified": false
+            }
+          }
+        }
+      ],
+      "frames": 1614,
+      "malformed": [],
+      "event_sequence_gaps": [],
+      "max_ring_drops": 0,
+      "tx_errors": [],
+      "host_connections": 475,
+      "max_connect_ms": 97.99729999986084,
+      "failed_connections": [],
+      "input_sha256": {
+        "report.json": "ccd8adb708d0979e25b35305260f9a81808af35838ec7fb39d535df6346005c9",
+        "performance.json": "de2ad9880178610c7f82bfa4d863d1d85719d8850759bf7f7091cd702bca82b4",
+        "status.json": "116343d5e48b755770d0128ea74e1bfc6c2fc90018eaed22b28dcee223eafad7"
+      }
+    },
+    "flac-https": {
+      "controller": {
+        "name": "flac-https",
+        "code": 0,
+        "seconds": 627.2400828999998,
+        "image": {
+          "app_elf_sha256": "3a7765831c0c7a109ce02d7a9fdc40e3b47809267e745607ec357c461ec501d5",
+          "sha256": "991f29dd04a1458fea7adaaa377b5ee2165a6e900c601bd8ffb5e5e165674cbc",
+          "bytes": 1631904
+        }
+      },
+      "passed": 6,
+      "total": 6,
+      "original_cases": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 129000,
+                "largest": 102400,
+                "tasks": 17
+              },
+              {
+                "heap": 129008,
+                "largest": 102400,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.507
+        },
+        {
+          "name": "flac-https",
+          "result": "PASS",
+          "evidence": {
+            "duration": 600,
+            "status_samples": 3286,
+            "max_http_ms": 1489.5687000002908,
+            "serial_capture_enabled": true,
+            "mean_busy": 82.70344827586207,
+            "peak_busy": 83.7,
+            "minimum_heap": 44624.0,
+            "minimum_largest": 36864.0,
+            "audio_wall_ratio": 0.9998983312773658,
+            "cpu_budget_percent": null
+          },
+          "seconds": 601.257
+        },
+        {
+          "name": "idle-after-flac",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 129036,
+                "largest": 102400,
+                "tasks": 17
+              },
+              {
+                "heap": 129016,
+                "largest": 102400,
+                "tasks": 17
+              },
+              {
+                "heap": 129016,
+                "largest": 102400,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.373
+        },
+        {
+          "name": "flac-heap-recovery",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.0
+        },
+        {
+          "name": "stop",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.136
+        },
+        {
+          "name": "runtime-after-capture-close",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.026
+        }
+      ],
+      "runtime": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "owners": {
+        "result": "PASS",
+        "evidence": {
+          "complete": true,
+          "scope": "Live allocation task/lifetime metadata within one initially free heap region; not a complete all-heap event trace",
+          "snapshots": [
+            {
+              "seq": 6,
+              "first": 1070334828,
+              "last": 1070450444,
+              "live": 1,
+              "peak": 18,
+              "lost": 0,
+              "alloc_events": 3731,
+              "free_events": 3730,
+              "rows": 3,
+              "dropped": 0,
+              "unknown": 0,
+              "walk_us": 219,
+              "at": 3415.8612169,
+              "blocks": [
+                {
+                  "address": 1070334828,
+                  "bytes": 9984,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                },
+                {
+                  "address": 1070344816,
+                  "bytes": 92,
+                  "id": 32,
+                  "requested": 92,
+                  "task": "radio_strea"
+                },
+                {
+                  "address": 1070344912,
+                  "bytes": 105532,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                }
+              ],
+              "largest_raw_free": 105532
+            },
+            {
+              "seq": 7,
+              "first": 1070334828,
+              "last": 1070450444,
+              "live": 1,
+              "peak": 18,
+              "lost": 0,
+              "alloc_events": 3731,
+              "free_events": 3730,
+              "rows": 3,
+              "dropped": 0,
+              "unknown": 0,
+              "walk_us": 217,
+              "at": 3420.8659054,
+              "blocks": [
+                {
+                  "address": 1070334828,
+                  "bytes": 9984,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                },
+                {
+                  "address": 1070344816,
+                  "bytes": 92,
+                  "id": 32,
+                  "requested": 92,
+                  "task": "radio_strea"
+                },
+                {
+                  "address": 1070344912,
+                  "bytes": 105532,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                }
+              ],
+              "largest_raw_free": 105532
+            },
+            {
+              "seq": 8,
+              "first": 1070334828,
+              "last": 1070450444,
+              "live": 1,
+              "peak": 18,
+              "lost": 0,
+              "alloc_events": 3731,
+              "free_events": 3730,
+              "rows": 3,
+              "dropped": 0,
+              "unknown": 0,
+              "walk_us": 219,
+              "at": 3425.8706963,
+              "blocks": [
+                {
+                  "address": 1070334828,
+                  "bytes": 9984,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                },
+                {
+                  "address": 1070344816,
+                  "bytes": 92,
+                  "id": 32,
+                  "requested": 92,
+                  "task": "radio_strea"
+                },
+                {
+                  "address": 1070344912,
+                  "bytes": 105532,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                }
+              ],
+              "largest_raw_free": 105532
+            },
+            {
+              "seq": 9,
+              "first": 1070334828,
+              "last": 1070450444,
+              "live": 1,
+              "peak": 29,
+              "lost": 0,
+              "alloc_events": 182192,
+              "free_events": 182118,
+              "rows": 3,
+              "dropped": 0,
+              "unknown": 0,
+              "walk_us": 216,
+              "at": 4033.2874502,
+              "blocks": [
+                {
+                  "address": 1070334828,
+                  "bytes": 9984,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                },
+                {
+                  "address": 1070344816,
+                  "bytes": 92,
+                  "id": 32,
+                  "requested": 92,
+                  "task": "radio_strea"
+                },
+                {
+                  "address": 1070344912,
+                  "bytes": 105532,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                }
+              ],
+              "largest_raw_free": 105532
+            },
+            {
+              "seq": 10,
+              "first": 1070334828,
+              "last": 1070450444,
+              "live": 1,
+              "peak": 29,
+              "lost": 0,
+              "alloc_events": 182192,
+              "free_events": 182118,
+              "rows": 3,
+              "dropped": 0,
+              "unknown": 0,
+              "walk_us": 219,
+              "at": 4038.2912203,
+              "blocks": [
+                {
+                  "address": 1070334828,
+                  "bytes": 9984,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                },
+                {
+                  "address": 1070344816,
+                  "bytes": 92,
+                  "id": 32,
+                  "requested": 92,
+                  "task": "radio_strea"
+                },
+                {
+                  "address": 1070344912,
+                  "bytes": 105532,
+                  "id": 0,
+                  "requested": 0,
+                  "task": "free"
+                }
+              ],
+              "largest_raw_free": 105532
+            }
+          ]
+        }
+      },
+      "observations": [
+        {
+          "case": "load:stress-flac-48000-2ch-16bit-610s",
+          "seconds": 600.0018918000001,
+          "interrupted": false,
+          "tcp": {
+            "result": "FAIL",
+            "reason": "Missing or duplicate TCP event"
+          },
+          "dma": {
+            "result": "PASS",
+            "evidence": {
+              "samples": 121,
+              "start": 3428.8615349,
+              "end": 4024.1904447,
+              "observed_seconds": 595.3289098,
+              "coverage_complete": true,
+              "maximum_sample_gap_seconds": 5.010281500000019,
+              "delta": {
+                "q_overruns": 0,
+                "writes": 55817,
+                "written_bytes": 114313216,
+                "write_us": 552560876,
+                "errors": 0
+              },
+              "maximum_write_us_since_boot": 18851,
+              "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+              "acoustic_continuity_qualified": false
+            }
+          },
+          "dma_after_10_seconds": {
+            "result": "PASS",
+            "evidence": {
+              "samples": 118,
+              "start": 3438.8710519,
+              "end": 4024.1904447,
+              "observed_seconds": 585.3193928000001,
+              "coverage_complete": true,
+              "maximum_sample_gap_seconds": 5.010281500000019,
+              "delta": {
+                "q_overruns": 0,
+                "writes": 54875,
+                "written_bytes": 112384000,
+                "write_us": 543317845,
+                "errors": 0
+              },
+              "maximum_write_us_since_boot": 18851,
+              "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+              "acoustic_continuity_qualified": false
+            }
+          }
+        }
+      ],
+      "frames": 11176,
+      "malformed": [],
+      "event_sequence_gaps": [
+        {
+          "previous": 1835,
+          "next": 1837,
+          "previous_at": 3445.9720787,
+          "next_at": 3446.1527252
+        },
+        {
+          "previous": 2266,
+          "next": 2268,
+          "previous_at": 3472.0849144,
+          "next_at": 3472.152983
+        },
+        {
+          "previous": 3602,
+          "next": 3604,
+          "previous_at": 3554.8319828,
+          "next_at": 3555.014002
+        },
+        {
+          "previous": 10223,
+          "next": 10225,
+          "previous_at": 3957.0645625,
+          "next_at": 3957.2440408
+        }
+      ],
+      "max_ring_drops": 0,
+      "tx_errors": [],
+      "host_connections": 3340,
+      "max_connect_ms": 1027.1105000001626,
+      "failed_connections": [],
+      "input_sha256": {
+        "report.json": "9f97254dcb711a41d4da5c13689ef3fe6ae34307a4cca5b2b3111d55f36cf9b0",
+        "performance.json": "61d3a61ab9e38bdf611b599b091cd111e0e741904674bac0d5bb73e3065fd148",
+        "status.json": "c0ffb7dc0ce3d5953ee5f2e403b69f6b36f72a062ddcbb767efacf18fb6201a8"
+      }
+    }
+  },
+  "scope": "Attribution with additional probes; not a matched production timing or memory-layout comparison.",
+  "restoration": {
+    "identity": {
+      "version": "idf61-listen48-8c1f2d",
+      "partition": "app1",
+      "max_size": 1900544,
+      "app_elf_sha256": "76e863160ad21acba7ce86eeaca27f9fb6d58ebf4d3a79ca42ef7b42ae40885b"
+    },
+    "persistence": {
+      "wifi_unchanged": true,
+      "playlist_unchanged": true,
+      "settings_unchanged": true
+    },
+    "states": [
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": false,
+        "format": "stopped",
+        "sample_rate": 0,
+        "channels": 0,
+        "bits_per_sample": 0,
+        "pcm_sample_rate": 0,
+        "pcm_channels": 0,
+        "format_is_pcm": false,
+        "channels_are_core": false,
+        "rssi": -70
+      },
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": false,
+        "format": "stopped",
+        "sample_rate": 0,
+        "channels": 0,
+        "bits_per_sample": 0,
+        "pcm_sample_rate": 0,
+        "pcm_channels": 0,
+        "format_is_pcm": false,
+        "channels_are_core": false,
+        "rssi": -74
+      },
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": false,
+        "format": "stopped",
+        "sample_rate": 0,
+        "channels": 0,
+        "bits_per_sample": 0,
+        "pcm_sample_rate": 0,
+        "pcm_channels": 0,
+        "format_is_pcm": false,
+        "channels_are_core": false,
+        "rssi": -74
+      }
+    ]
+  }
+}

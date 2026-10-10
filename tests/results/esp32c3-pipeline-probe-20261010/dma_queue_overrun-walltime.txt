@@ -1,0 +1,66 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-quiet-pipeline-probe\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+4038136e <dma_queue_overrun>:
+4038136e:	3fc8d737          	lui	a4,0x3fc8d
+40381372:	15872783          	lw	a5,344(a4) # 3fc8d158 <s_dma_overruns>
+40381376:	1141                	addi	sp,sp,-16
+40381378:	c606                	sw	ra,12(sp)
+4038137a:	0785                	addi	a5,a5,1
+4038137c:	14f72c23          	sw	a5,344(a4)
+40381380:	3dd5                	jal	40381274 <esp_timer_get_time>
+40381382:	3fc8d7b7          	lui	a5,0x3fc8d
+40381386:	f5478793          	addi	a5,a5,-172 # 3fc8cf54 <s_audio_pipeline_probe>
+4038138a:	4390                	lw	a2,0(a5)
+4038138c:	43d8                	lw	a4,4(a5)
+4038138e:	4794                	lw	a3,8(a5)
+40381390:	00c03633          	snez	a2,a2
+40381394:	00e03733          	snez	a4,a4
+40381398:	00d036b3          	snez	a3,a3
+4038139c:	0706                	slli	a4,a4,0x1
+4038139e:	068a                	slli	a3,a3,0x2
+403813a0:	4fcc                	lw	a1,28(a5)
+403813a2:	8ed9                	or	a3,a3,a4
+403813a4:	8ed1                	or	a3,a3,a2
+403813a6:	00269613          	slli	a2,a3,0x2
+403813aa:	963e                	add	a2,a2,a5
+403813ac:	0585                	addi	a1,a1,1
+403813ae:	02462803          	lw	a6,36(a2)
+403813b2:	00f5f893          	andi	a7,a1,15
+403813b6:	00389713          	slli	a4,a7,0x3
+403813ba:	41170733          	sub	a4,a4,a7
+403813be:	0805                	addi	a6,a6,1
+403813c0:	070a                	slli	a4,a4,0x2
+403813c2:	03062223          	sw	a6,36(a2)
+403813c6:	973e                	add	a4,a4,a5
+403813c8:	c36c                	sw	a1,68(a4)
+403813ca:	c728                	sw	a0,72(a4)
+403813cc:	c774                	sw	a3,76(a4)
+403813ce:	47d4                	lw	a3,12(a5)
+403813d0:	463d                	li	a2,15
+403813d2:	40d506b3          	sub	a3,a0,a3
+403813d6:	cb34                	sw	a3,80(a4)
+403813d8:	4b94                	lw	a3,16(a5)
+403813da:	40d506b3          	sub	a3,a0,a3
+403813de:	cb74                	sw	a3,84(a4)
+403813e0:	4bd4                	lw	a3,20(a5)
+403813e2:	40d506b3          	sub	a3,a0,a3
+403813e6:	cf34                	sw	a3,88(a4)
+403813e8:	4f94                	lw	a3,24(a5)
+403813ea:	8d15                	sub	a0,a0,a3
+403813ec:	cf68                	sw	a0,92(a4)
+403813ee:	cfcc                	sw	a1,28(a5)
+403813f0:	5398                	lw	a4,32(a5)
+403813f2:	00e66563          	bltu	a2,a4,403813fc <dma_queue_overrun+0x8e>
+403813f6:	5398                	lw	a4,32(a5)
+403813f8:	0705                	addi	a4,a4,1
+403813fa:	d398                	sw	a4,32(a5)
+403813fc:	40b2                	lw	ra,12(sp)
+403813fe:	4501                	li	a0,0
+40381400:	0141                	addi	sp,sp,16
+40381402:	8082                	ret
+
+Disassembly of section .flash.text:

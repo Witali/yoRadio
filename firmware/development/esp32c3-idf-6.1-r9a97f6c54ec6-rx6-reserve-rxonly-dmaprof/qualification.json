@@ -1,0 +1,26 @@
+{
+  "result": "NOT_QUALIFIED",
+  "image": {
+    "app_elf_sha256": "bfeb06c3114b1c1c3dc8a377eb091c8c33bcf4df58a92adbabea5dd3b06250f9",
+    "sha256": "4b8909b053d59353b96c7327452ce00f3ce3d613417975c684596b3194ca299f",
+    "bytes": 1618128
+  },
+  "laboratory_only": true,
+  "physical_tests": true,
+  "purpose": "Measure staged-output DMA overruns without changing PCM or scheduling",
+  "reference": "firmware/development/esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-rxonly",
+  "followup_evidence": "tests/results/esp32c3-rxonly-long-20261008",
+  "pending": [
+    "Resolve retained physical failures and remaining production acceptance gates"
+  ],
+  "physical_summary": {
+    "flac_seconds": 60,
+    "flac_dma_overruns": 154,
+    "flac_dma_observed_seconds": 45.109,
+    "flac_runtime": "FAIL",
+    "aac_seconds": 90,
+    "aac_dma_overruns": 0,
+    "aac_runtime": "PASS",
+    "restoration": "PASS"
+  }
+}

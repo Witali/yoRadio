@@ -1,0 +1,23 @@
+{"pyopenssl": "26.4.0", "openssl": "OpenSSL 4.0.3 29 Sep 2026"}
+{"handshakes": [{"at": 13398.7754433, "renegotiations": 0, "pending": false, "version": "TLSv1.2", "cipher": "ECDHE-RSA-AES128-GCM-SHA256"}, {"at": 13399.135136, "renegotiations": 1, "pending": true, "version": "TLSv1.2", "cipher": "ECDHE-RSA-AES128-GCM-SHA256"}, {"at": 13399.1366586, "renegotiations": 1, "pending": false, "version": "TLSv1.2", "cipher": "ECDHE-RSA-AES128-GCM-SHA256"}], "renegotiation_requests": [{"at": 13399.1351012, "before": 0}], "renegotiation_completions": [{"at": 13399.1367071, "after": 1, "pending": false}]}
+FF
+======================================================================
+FAIL: test_completed_full_handshake_and_exact_audio (__main__.RenegotiationTests.test_completed_full_handshake_and_exact_audio)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tests/test-tls-renegotiation-server.py", line 55, in test_completed_full_handshake_and_exact_audio
+    self.assertEqual(len(event['handshakes']),2)
+AssertionError: 3 != 2
+
+======================================================================
+FAIL: test_refusal_cannot_count_as_completion (__main__.RenegotiationTests.test_refusal_cannot_count_as_completion)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tests/test-tls-renegotiation-server.py", line 73, in test_refusal_cannot_count_as_completion
+    self.assertEqual(len(event['handshakes']),1)
+AssertionError: 2 != 1
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.648s
+
+FAILED (failures=2)

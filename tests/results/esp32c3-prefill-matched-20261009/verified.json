@@ -1,0 +1,123 @@
+{
+  "scope": "Provenance/coverage, not acoustic qualification; original and extra failures remain failures.",
+  "configuration_difference": {
+    "CONFIG_YORADIO_INPUT_PREFILL_MIN_MS": {
+      "before": "0",
+      "after": "250"
+    }
+  },
+  "phases": {
+    "eof-http": {
+      "passed": 5,
+      "total": 5,
+      "runtime": "PASS",
+      "failed_transport_requests": [],
+      "independent_failures": []
+    },
+    "eof-https": {
+      "passed": 5,
+      "total": 5,
+      "runtime": "PASS",
+      "failed_transport_requests": [],
+      "independent_failures": []
+    },
+    "flac-control-before": {
+      "passed": 4,
+      "total": 4,
+      "runtime": "PASS",
+      "failed_transport_requests": [],
+      "independent_failures": []
+    },
+    "flac-candidate": {
+      "passed": 4,
+      "total": 4,
+      "runtime": "PASS",
+      "failed_transport_requests": [],
+      "independent_failures": []
+    },
+    "flac-control-after": {
+      "passed": 4,
+      "total": 4,
+      "runtime": "PASS",
+      "failed_transport_requests": [],
+      "independent_failures": []
+    }
+  },
+  "clocks": {
+    "eof-candidate": {
+      "variant": "250",
+      "mapped_crc_checks": 4,
+      "nominal_48khz": true,
+      "qio80": true
+    },
+    "flac-control-before": {
+      "variant": "0",
+      "mapped_crc_checks": 4,
+      "nominal_48khz": true,
+      "qio80": true
+    },
+    "flac-candidate": {
+      "variant": "250",
+      "mapped_crc_checks": 4,
+      "nominal_48khz": true,
+      "qio80": true
+    },
+    "flac-control-after": {
+      "variant": "0",
+      "mapped_crc_checks": 4,
+      "nominal_48khz": true,
+      "qio80": true
+    }
+  },
+  "flac": [
+    {
+      "phase": "flac-control-before",
+      "variant": "0",
+      "telemetry_complete": true,
+      "decoder_flow_complete": true,
+      "output_flow_complete": true,
+      "selected_dma_events": 0,
+      "whole_observed_dma_events": 0,
+      "continuity": "NO_RECORDED_EVENTS",
+      "heap_replay": {
+        "name": "idle-recovery",
+        "result": "PASS",
+        "evidence": null
+      }
+    },
+    {
+      "phase": "flac-candidate",
+      "variant": "250",
+      "telemetry_complete": true,
+      "decoder_flow_complete": true,
+      "output_flow_complete": true,
+      "selected_dma_events": 0,
+      "whole_observed_dma_events": 1,
+      "continuity": "REVIEW_REQUIRED",
+      "heap_replay": {
+        "name": "idle-recovery",
+        "result": "PASS",
+        "evidence": null
+      }
+    },
+    {
+      "phase": "flac-control-after",
+      "variant": "0",
+      "telemetry_complete": true,
+      "decoder_flow_complete": true,
+      "output_flow_complete": true,
+      "selected_dma_events": 0,
+      "whole_observed_dma_events": 0,
+      "continuity": "NO_RECORDED_EVENTS",
+      "heap_replay": {
+        "name": "idle-recovery",
+        "result": "PASS",
+        "evidence": null
+      }
+    }
+  ],
+  "result": "PASS",
+  "restored": true,
+  "source_files": 81,
+  "fractional_clock_analog_qualified": false
+}

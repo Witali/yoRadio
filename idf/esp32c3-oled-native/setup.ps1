@@ -11,8 +11,11 @@ if ([string]::IsNullOrWhiteSpace($DependencyRoot)) {
     $DependencyRoot = Join-Path $worktreeRoot ".idf"
 }
 $DependencyRoot = [IO.Path]::GetFullPath($DependencyRoot)
-$idfPath = Join-Path $DependencyRoot "v6.0.2"
-$idfToolsPath = Join-Path $DependencyRoot "tools-v6.0.2"
+. (Join-Path $project 'idf-pin.ps1')
+$idfPin = Get-YoRadioIdfPin -Project $project
+$idfVersion = $idfPin.Version
+$idfPath = Join-Path $DependencyRoot $idfPin.Directory
+$idfToolsPath = Join-Path $DependencyRoot "tools-$idfVersion"
 $audioCodecPath = Join-Path $DependencyRoot "esp-adf-libs"
 $pythonVersion = "3.12.10"
 $pythonRoot = Join-Path $DependencyRoot "python-$pythonVersion"
@@ -45,8 +48,10 @@ function Install-GitDependency {
         [switch]$Submodules
     )
     if (Test-Path -LiteralPath (Join-Path $Destination ".git")) {
-        $actual = (& git -C $Destination describe --tags --exact-match 2>$null)
-        if (($LASTEXITCODE -ne 0) -or ($actual.Trim() -ne $Revision)) {
+        $expected = (& git -C $Destination rev-parse --verify "$Revision^{commit}" 2>$null)
+        if ($LASTEXITCODE -ne 0) { throw "Cannot resolve pinned revision $Revision at $Destination" }
+        $actual = (& git -C $Destination rev-parse HEAD).Trim()
+        if (($LASTEXITCODE -ne 0) -or ($actual -ne $expected.Trim())) {
             throw "Dependency at $Destination is not pinned to $Revision"
         }
         if ($Submodules) {
@@ -59,7 +64,15 @@ function Install-GitDependency {
         throw "Dependency path exists but is not a Git checkout: $Destination"
     }
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Destination) | Out-Null
-    Invoke-Git clone --branch $Revision --depth 1 $Url $Destination
+    if ($Revision -match '^[0-9a-f]{40}$') {
+        New-Item -ItemType Directory -Force -Path $Destination | Out-Null
+        Invoke-Git -C $Destination init
+        Invoke-Git -C $Destination remote add origin $Url
+        Invoke-Git -C $Destination fetch --depth 1 --no-recurse-submodules origin $Revision
+        Invoke-Git -C $Destination checkout --detach $Revision
+    } else {
+        Invoke-Git clone --branch $Revision --depth 1 $Url $Destination
+    }
     Invoke-Git -C $Destination config core.longpaths true
     if ($Submodules) {
         Invoke-Git -C $Destination submodule update --init --recursive --depth 1
@@ -102,7 +115,7 @@ if (-not (Test-Path -LiteralPath $pythonExe -PathType Leaf)) {
 
 Install-GitDependency `
     -Url "https://github.com/espressif/esp-idf.git" `
-    -Revision "v6.0.2" `
+    -Revision $idfPin.Revision `
     -Destination $idfPath `
     -Submodules
 Install-AudioCodec -Destination $audioCodecPath

@@ -6,15 +6,20 @@
 #include <string.h>
 #include <stdatomic.h>
 #include <setjmp.h>
+#include "icy_title.h"
+/* PRODUCTION_PROFILE_HEADER */
 #define AUDIO_STATUS_STATION_UNAVAILABLE "station unavailable"
 
 typedef int esp_err_t;
 typedef int native_codec_t;
-enum { ESP_OK, ESP_FAIL, ESP_ERR_HTTP_CONNECT, ESP_ERR_HTTP_WRITE_DATA,
+enum { ESP_OK=0, ESP_FAIL=-1, ESP_ERR_HTTP_CONNECT=0x7001, ESP_ERR_HTTP_WRITE_DATA,
        ESP_ERR_HTTP_EAGAIN, ESP_ERR_TIMEOUT, ESP_ERR_HTTP_FETCH_HEADER,
-       ESP_ERR_HTTP_MAX_REDIRECT, ESP_ERR_HTTP_INVALID_TRANSPORT,
-       NATIVE_CODEC_AUTO, NATIVE_CODEC_AAC, AUDIO_END_EOF,
+       ESP_ERR_HTTP_MAX_REDIRECT, ESP_ERR_HTTP_INVALID_TRANSPORT };
+enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_AAC, NATIVE_CODEC_FLAC, AUDIO_END_EOF,
        AUDIO_END_BUFFER_STALLED, AUDIO_END_READ_FAILED, AUDIO_END_UNAVAILABLE };
+enum { ESP_ERR_MBEDTLS_SSL_READ_FAILED=0x801d,
+       ESP_TLS_ERR_SSL_TIMEOUT=-0x6800, ESP_TLS_ERR_SSL_WANT_READ=-0x6900,
+       ESP_TLS_ERR_SSL_WANT_WRITE=-0x6880, TEST_TLS_ALLOCATION_ERROR=141 };
 enum { STREAM_CHUNK_SIZE = 2048, STREAM_READ_TIMEOUT_MS = 250,
        MAX_HTTP_REDIRECTS = 5, ICY_METADATA_MAX = 4080 };
 typedef uint32_t TickType_t;
@@ -26,7 +31,7 @@ typedef uint32_t TickType_t;
 #define ESP_LOGI(tag, ...) ESP_LOGE(tag, __VA_ARGS__)
 static atomic_uint s_generation, s_decoder_released_generation;
 static void *s_commands, *s_state;
-static char s_icy_metadata[ICY_METADATA_MAX + 1];
+static icy_title_parser_t s_icy_title;
 typedef struct { int64_t started_us; uint64_t audio_bytes; } stream_bitrate_meter_t;
 
 /* PRODUCTION_COMMAND_TYPES */
@@ -37,14 +42,38 @@ typedef struct {
     unsigned timeout_ms, buffer_size, buffer_size_tx, max_redirection_count;
     bool disable_auto_redirect, keep_alive_enable;
     void *crt_bundle_attach;
+    unsigned tls_dyn_buf_strategy;
 } esp_http_client_config_t;
+enum { HTTP_TLS_DYN_BUF_RX_STATIC=1 };
 #define esp_crt_bundle_attach NULL
 typedef struct { bool live; } fake_client_t;
 typedef fake_client_t *esp_http_client_handle_t;
+/* PRODUCTION_HTTP_READER_TYPE */
 typedef struct { int result, status; bool bad_headers; } attempt_t;
 static fake_client_t client;
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+static atomic_uint s_flac_input_ready_generation;
+static unsigned growth_calls, finish_calls, finite_reads, read_calls, ready_on_read;
+static void tls_input_reserve_expand_flac(void) {
+    assert(client.live);
+    assert(atomic_load(&s_flac_input_ready_generation) == atomic_load(&s_generation));
+    ++growth_calls;
+}
+static void tls_input_reserve_finish_connection(void) {
+    assert(client.live);
+    ++finish_calls;
+}
+#endif
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+static bool input_prepared;
+static void tls_input_reserve_prepare_connection(void) {
+    assert(!client.live && !input_prepared);
+    input_prepared = true;
+}
+#endif
 static attempt_t attempts[16];
 static unsigned attempt_count, attempt_limit, eos_count, eof_reason, close_count;
+static unsigned connection_close_headers;
 static int64_t now_us, attempt_times[16], event_us;
 static unsigned event_kind, stop_after_attempt;
 static bool watchdog, queued, init_oom, cancel_in_open;
@@ -52,6 +81,7 @@ static play_command_t queued_command;
 static jmp_buf finished;
 static void *input_buffer;
 static int read_result;
+static int read_tls_error;
 static bool send_ok;
 static uint8_t timeout_sec;
 static int64_t open_duration_us, header_duration_us, read_step_us;
@@ -74,7 +104,7 @@ static void native_state_set_bitrate(void *state, uint32_t gen, uint32_t rate) {
     (void)state; (void)gen; (void)rate;
 }
 static native_codec_t codec_from_content_type(const char *type) { (void)type; return NATIVE_CODEC_AAC; }
-static void parse_icy_metadata(uint32_t gen, char *data, size_t size) { (void)gen; (void)data; (void)size; }
+static void publish_icy_title(uint32_t gen, const char *title) { (void)gen; (void)title; }
 static void stream_bitrate_add(uint32_t gen, stream_bitrate_meter_t *meter, size_t size) {
     (void)gen; (void)meter; (void)size;
 }
@@ -114,6 +144,15 @@ static int xQueueReceive(void *queue, void *destination, TickType_t wait) {
 }
 static esp_http_client_handle_t esp_http_client_init(const esp_http_client_config_t *config) {
     assert(!client.live);
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    assert(input_prepared);
+    input_prepared = false;
+#endif
+#ifdef CONFIG_YORADIO_TLS_RETAIN_RX_BUFFER
+    assert(config->tls_dyn_buf_strategy==HTTP_TLS_DYN_BUF_RX_STATIC);
+#else
+    assert(config->tls_dyn_buf_strategy==0);
+#endif
     if (init_oom) return NULL;
     assert(attempt_count < attempt_limit);
     attempt_times[attempt_count++] = now_us;
@@ -123,7 +162,10 @@ static esp_http_client_handle_t esp_http_client_init(const esp_http_client_confi
     return &client;
 }
 static void esp_http_client_set_header(esp_http_client_handle_t c, const char *key, const char *value) {
-    (void)c; (void)key; (void)value;
+    (void)c;
+    if (!strcmp(key, "Connection")) {
+        assert(!strcmp(value, "close")); ++connection_close_headers;
+    }
 }
 static int esp_http_client_open(esp_http_client_handle_t c, int size) {
     (void)c; (void)size;
@@ -139,16 +181,29 @@ static int esp_http_client_get_status_code(esp_http_client_handle_t c) { (void)c
 static int esp_http_client_get_errno(esp_http_client_handle_t c) { (void)c; return 0; }
 static int esp_http_client_set_redirection(esp_http_client_handle_t c) { (void)c; return ESP_OK; }
 static void esp_http_client_close(esp_http_client_handle_t c) { assert(c->live); ++close_count; }
-static void dispose_http_client(esp_http_client_handle_t c) { assert(c->live); c->live = false; }
+static void esp_http_client_cleanup(esp_http_client_handle_t c) { assert(c->live); c->live = false; }
+/* PRODUCTION_DISPOSE_CLIENT */
 static void esp_http_client_set_timeout_ms(esp_http_client_handle_t c, int timeout) { (void)c; (void)timeout; }
 static int esp_http_client_get_response_header(esp_http_client_handle_t c, const char *key, char **value) {
     (void)c; (void)key; (void)value; return ESP_FAIL;
 }
 static int esp_http_client_read(esp_http_client_handle_t c, char *data, size_t size) {
     now_us += read_step_us;
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+    ++read_calls;
+    if (ready_on_read && read_calls == ready_on_read)
+        atomic_store(&s_flac_input_ready_generation, atomic_load(&s_generation));
+    if (finite_reads) return read_calls <= finite_reads ? 32 : 0;
+#endif
     (void)c; (void)data; (void)size; return read_result;
 }
 static bool esp_http_client_is_complete_data_received(esp_http_client_handle_t c) { (void)c; return true; }
+static int esp_http_client_get_and_clear_last_tls_error(esp_http_client_handle_t c, int *code, int *flags) {
+    (void)c; (void)flags; *code=read_tls_error; read_tls_error=0;
+    return *code ? ESP_ERR_MBEDTLS_SSL_READ_FAILED : ESP_OK;
+}
+
+/* PRODUCTION_HTTP_READER */
 
 /* PRODUCTION_OPEN_STREAM */
 #define malloc stream_malloc
@@ -156,13 +211,21 @@ static bool esp_http_client_is_complete_data_received(esp_http_client_handle_t c
 #undef malloc
 
 static void reset(unsigned count) {
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+    atomic_store(&s_flac_input_ready_generation, 0);
+    growth_calls = finish_calls = finite_reads = read_calls = ready_on_read = 0;
+#endif
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    input_prepared = false;
+#endif
     memset(attempts, 0, sizeof(attempts));
     memset(attempt_times, 0, sizeof(attempt_times));
     atomic_store(&s_generation, 0); atomic_store(&s_decoder_released_generation, 0);
     attempt_count = eos_count = close_count = event_kind = stop_after_attempt = 0;
+    connection_close_headers = 0;
     now_us = event_us = 0; attempt_limit = count;
     watchdog = send_ok = true; init_oom = cancel_in_open = queued = false;
-    input_buffer = NULL; read_result = 0; client.live = false;
+    input_buffer = NULL; read_result = read_tls_error = 0; client.live = false;
     timeout_sec = 10; open_duration_us = header_duration_us = read_step_us = 0;
     last_state[0] = last_url[0] = 0;
     for (unsigned i=0; i<count; ++i) attempts[i].status = 503;
@@ -171,6 +234,10 @@ static void reset(unsigned count) {
 static void execute(void) {
     if (!setjmp(finished)) stream_task(NULL);
     assert(!client.live);
+    assert(connection_close_headers == attempt_count);
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+    assert(finish_calls == attempt_count);
+#endif
     free(input_buffer); input_buffer = NULL;
 }
 int main(void) {
@@ -228,5 +295,28 @@ int main(void) {
     reset(1); attempts[0].status=200; timeout_sec=2; read_result=-ESP_ERR_HTTP_EAGAIN;
     read_step_us=1000000; execute();
     assert(eof_reason==AUDIO_END_UNAVAILABLE && now_us==2000000); ++cases;
+    reset(1); attempts[0].status=200; read_result=32; read_tls_error=TEST_TLS_ALLOCATION_ERROR;
+    execute(); assert(eof_reason==AUDIO_END_READ_FAILED && close_count==2); ++cases;
+    reset(1); attempts[0].status=200; read_result=ESP_FAIL;
+    execute(); assert(eof_reason==AUDIO_END_READ_FAILED && close_count==2); ++cases;
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+    // Explicit FLAC grows once, only after this generation produces PCM.
+    reset(1); attempts[0].status=200; queued_command.requested_codec=NATIVE_CODEC_FLAC;
+    finite_reads=4; ready_on_read=2;
+    execute(); assert(growth_calls==1 && read_calls==5); ++cases;
+    // An old decoder, an unready decoder and a different codec cannot grow.
+    reset(1); attempts[0].status=200; queued_command.requested_codec=NATIVE_CODEC_FLAC;
+    finite_reads=4; atomic_store(&s_flac_input_ready_generation, 99);
+    execute(); assert(!growth_calls); ++cases;
+    reset(1); attempts[0].status=200; queued_command.requested_codec=NATIVE_CODEC_FLAC;
+    finite_reads=4;
+    execute(); assert(!growth_calls); ++cases;
+    reset(1); attempts[0].status=200; finite_reads=4; ready_on_read=1;
+    execute(); assert(!growth_calls); ++cases;
+    reset(1); attempts[0].status=200; queued_command.requested_codec=NATIVE_CODEC_FLAC;
+    atomic_store(&s_flac_input_ready_generation, atomic_load(&s_generation));
+    read_result=ESP_FAIL;
+    execute(); assert(growth_calls==1 && finish_calls==1 && eof_reason==AUDIO_END_READ_FAILED); ++cases;
+#endif
     printf("PASS stream retry cases=%u; HTTP ownership, cancellation, EOF and error gates\n", cases);
 }

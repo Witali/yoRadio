@@ -1,0 +1,200 @@
+{
+  "cases": [
+    {
+      "name": "tls-record:alternate",
+      "snapshots": 16,
+      "observed_seconds": 75.830531,
+      "first_sequence": 5,
+      "last_sequence": 20,
+      "coverage_complete": true,
+      "maximum_sample_gap_seconds": 5.202999999979511,
+      "stages": {
+        "http": {
+          "delta": {
+            "calls": 191,
+            "elapsed_us": 22061585,
+            "requested": 391168,
+            "completed": 301056,
+            "ok": 156,
+            "zero": 0,
+            "retry": 35,
+            "errors": 0,
+            "le1024": 0,
+            "le4096": 191,
+            "le16384": 0,
+            "larger": 0
+          },
+          "inclusive_wall_percent": 29.093275108412467,
+          "mean_call_us": 115505.68062827225,
+          "max_us_since_boot": 564544
+        },
+        "tls": {
+          "delta": {
+            "calls": 174,
+            "elapsed_us": 1222592,
+            "requested": 337920,
+            "completed": 301056,
+            "ok": 174,
+            "zero": 0,
+            "retry": 0,
+            "errors": 0,
+            "le1024": 18,
+            "le4096": 156,
+            "le16384": 0,
+            "larger": 0
+          },
+          "inclusive_wall_percent": 1.6122688103028053,
+          "mean_call_us": 7026.390804597701,
+          "max_us_since_boot": 138145
+        },
+        "poll": {
+          "delta": {
+            "calls": 227,
+            "elapsed_us": 20699092,
+            "requested": 0,
+            "completed": 0,
+            "ok": 174,
+            "zero": 53,
+            "retry": 0,
+            "errors": 0,
+            "le1024": 227,
+            "le4096": 0,
+            "le16384": 0,
+            "larger": 0
+          },
+          "inclusive_wall_percent": 27.296514645268672,
+          "mean_call_us": 91185.42731277533,
+          "max_us_since_boot": 321622
+        },
+        "gcm": {
+          "delta": {
+            "calls": 36,
+            "elapsed_us": 474239,
+            "requested": 313344,
+            "completed": 313344,
+            "ok": 36,
+            "zero": 0,
+            "retry": 0,
+            "errors": 0,
+            "le1024": 18,
+            "le4096": 0,
+            "le16384": 18,
+            "larger": 0
+          },
+          "inclusive_wall_percent": 0.6253932205749687,
+          "mean_call_us": 13173.305555555555,
+          "max_us_since_boot": 40740
+        },
+        "ctr": {
+          "delta": {
+            "calls": 72,
+            "elapsed_us": 47149,
+            "requested": 313920,
+            "completed": 313920,
+            "ok": 72,
+            "zero": 0,
+            "retry": 0,
+            "errors": 0,
+            "le1024": 54,
+            "le4096": 0,
+            "le16384": 18,
+            "larger": 0
+          },
+          "inclusive_wall_percent": 0.06217680316652405,
+          "mean_call_us": 654.8472222222222,
+          "max_us_since_boot": 27820
+        }
+      },
+      "note": "Summarize inclusive HTTP/TLS/poll/AES wall times, never CPU attribution.\n\nCounters are charged when each call returns. Nested stages overlap and a call\ncan cross a sampling boundary. Do not add their times or infer exact exclusive\nCPU time by subtraction. max_us is the lifetime maximum, not a window maximum."
+    }
+  ],
+  "original_acceptance": [
+    {
+      "name": "idle-before",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 132660,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132640,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.218
+    },
+    {
+      "name": "tls-record:alternate",
+      "result": "PASS",
+      "evidence": {
+        "samples": 445,
+        "rate": 44100,
+        "channels": 2,
+        "record_counts": {
+          "1048": 22,
+          "16408": 21
+        },
+        "first_large_at": 161950.281,
+        "mean_busy": 63.794444444444444,
+        "peak_busy": 68.4,
+        "minimum_heap": 25800.0,
+        "minimum_largest": 17408.0,
+        "audio_wall_ratio": 1.0019969223901986,
+        "first_full_pcm_seconds": 0.9219999999913853
+      },
+      "seconds": 91.329
+    },
+    {
+      "name": "idle-recovery",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "heap": 132672,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132672,
+            "largest": 106496,
+            "tasks": 17
+          },
+          {
+            "heap": 132700,
+            "largest": 106496,
+            "tasks": 17
+          }
+        ]
+      },
+      "seconds": 12.468
+    },
+    {
+      "name": "runtime",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    },
+    {
+      "name": "restore",
+      "result": "PASS",
+      "evidence": {
+        "stopped": true,
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 0.672
+    }
+  ],
+  "source_sha256": "52d1199afc26194e266252f7fd6a141875c03190a5abfb3e68068f957f7fbe42",
+  "input_sha256": {
+    "performance": "a791d84b19ac2e4a734eb66c14e54e6676662a22f50a6df93a57b5d5080995f8",
+    "status": "d1792873751e415e9f917cc5dcbe55ce27ba7e64620311d3e749b797ea25208b",
+    "report": "cf141567d2e6a1e4718c246c881dc7c23fef5a6db20904a991765f011f042b9f"
+  }
+}

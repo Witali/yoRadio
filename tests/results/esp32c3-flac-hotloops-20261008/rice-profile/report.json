@@ -1,0 +1,1261 @@
+{
+  "platform": "WSL x86_64 host; not ESP32-C3 timing",
+  "clock": "CLOCK_THREAD_CPUTIME_ID",
+  "revision": null,
+  "repeats": 3,
+  "defines": [
+    "FLAC_BYTEWISE_RICE=1"
+  ],
+  "sources": {
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp": "9f7d6319c7278befa402cab81ad4caa389d4b0b25e68caabd77912b7898936ac",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.h": "17d21ad00a3b057fd6ae73c3e24d0f9910d82101de8f0d57656b25c5bc23c2be",
+    "tests/native/flac_bounds/Arduino.h": "628aa1fa77fc1f1f89201aca3c8b03b5ba7a09806ee4ef143929a42f3bc12713",
+    "tests/native/flac_hotloops/profile.h": "963f6839cfdbab83f4668463259bec0734a984222bcab9bb4e2a8f9a444dd6eb",
+    "tests/native/flac_hotloops/main.cpp": "a28c71143bbd95c70e0320ce5405182abc307aa496a6aa1c1fcca2d196e25881",
+    "tools/codec_benchmark/profile_flac_hotloops.py": "f1cb9e92d20ebc92e82ba0be0b5c36642cb7ee6b7bb3954177ae008af7c4d943"
+  },
+  "cases": [
+    {
+      "name": "radio-groovesalad-lpc32",
+      "fixture_sha256": "1f0306ba383060a1185095b657cbe4e6433339781e93e4af557263d826367e43",
+      "variants": {
+        "plain": {
+          "decode_ns": 645407961,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 729483091,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53889058,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 16748285,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 35421963,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 268939929,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 307118877,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-groovesalad-lpc12",
+      "fixture_sha256": "278dc66755fc51bc04fe9ac2b8c2c76491762f2e356643746240139804cf7690",
+      "variants": {
+        "plain": {
+          "decode_ns": 513775679,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 594754587,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 54139773,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 16399576,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 34562569,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 266734066,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 175232750,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "5bc5e4f58610363c580c16af4a1ab7943055f091009504b031dabd82be1f29be",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-dronezone-lpc32",
+      "fixture_sha256": "03809e51cb7b903b819080d8c63549fc0d4f75f0d81644db49f333147063e61e",
+      "variants": {
+        "plain": {
+          "decode_ns": 614847292,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 701915415,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 54765275,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 18859971,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 35620053,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 263975769,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 281022311,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-dronezone-lpc12",
+      "fixture_sha256": "45ed1532ed3469db7f16f4fc390a860bdd9d48084df1b0a4ccb7e8198e3b6567",
+      "variants": {
+        "plain": {
+          "decode_ns": 517656321,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 590404087,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53636763,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 18773306,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 34515551,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 261920517,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 173915855,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "a0233f0dd360840a4a43b5423f401cbbce819f3e0fac7cad0ee69308257eb211",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-indiepop-lpc32",
+      "fixture_sha256": "02d5bcff9fb8a1d23c4b7443a0e355526c90e1616abe3ef99791c0df66d77846",
+      "variants": {
+        "plain": {
+          "decode_ns": 622874292,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 698706001,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53749651,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 18336343,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 34933743,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 251847425,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 292038365,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-indiepop-lpc12",
+      "fixture_sha256": "28e24de31bae076d0e27c5a27bd049c30f71b9d81e5b00e020245eb16e809682",
+      "variants": {
+        "plain": {
+          "decode_ns": 510026404,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 586463262,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53892471,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 18252878,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 34482135,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 256578458,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 175636092,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "0538c34d58243759c64e2f9d5399ae1a9e4479ab696282c8cad7e7cdc37c0957",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-sonicuniverse-lpc32",
+      "fixture_sha256": "453f6e7d0d37a6bb2dc2f0f7fce394e9bd6b4c9f0c8c716193e255c38398fdd7",
+      "variants": {
+        "plain": {
+          "decode_ns": 682921078,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 762738723,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53286968,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 16472078,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 35225555,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 261832929,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 348746992,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-sonicuniverse-lpc12",
+      "fixture_sha256": "42ba573601c98d89cc4f11e2991e171d93fe7b675bf3b60d634c54c90e3f99cf",
+      "variants": {
+        "plain": {
+          "decode_ns": 508564093,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 586656362,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53831576,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 16369487,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 34480395,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 261746026,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 172755008,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "5ff5d9d009f78bb0f4b6c10bb71a5f223d5d9ddb8281c4b1e51e20f0ac47560f",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-bootliquor-lpc32",
+      "fixture_sha256": "6e79fffd9ec066d66534db25ed655523c59deb927972f08f145c8d6a29b66721",
+      "variants": {
+        "plain": {
+          "decode_ns": 667576819,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 748042097,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53497545,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 17669177,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 35316646,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 255006221,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 339304102,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-bootliquor-lpc12",
+      "fixture_sha256": "f8b012cfdfe73957975cb8f01ecd8363455492b698e8cee1723e40d7e5e922f2",
+      "variants": {
+        "plain": {
+          "decode_ns": 510958867,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 587809049,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53930369,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 18078168,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 34802300,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 257135216,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 176294797,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "d1ee95414d77343dfd9c6b7177badea7bb16b136f3ecb740af797e7793d12fe4",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-7soul-lpc32",
+      "fixture_sha256": "7d488bd27ef46bacf516ad13b31bfb66515663ebde630b491c94dbc3a8a1116c",
+      "variants": {
+        "plain": {
+          "decode_ns": 663369233,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 740528679,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53558719,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 18993123,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 35406356,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 257838047,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 327333429,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-7soul-lpc12",
+      "fixture_sha256": "de6b033ebe1f22cf255d7412f60d8cb450dc361ae78994b4cc0f4c6d7975bd68",
+      "variants": {
+        "plain": {
+          "decode_ns": 510809332,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 588277651,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53315390,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 17064494,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 34165888,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 260680843,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 176124455,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "43bb4bd86b453df86ce407fbf36e1967b489e9f2a0729be3d6b556290f7e9eb4",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-folkfwd-lpc32",
+      "fixture_sha256": "5db93c1bae4266ebbda7e0aac4f67d6106955bd7a3809470e0c5bb497bfa670b",
+      "variants": {
+        "plain": {
+          "decode_ns": 689865738,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 767450209,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53622647,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 17061881,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 35411883,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 262665223,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 350958303,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-folkfwd-lpc12",
+      "fixture_sha256": "f29d4dc1f2925983e5bae3ed074336719b34da7ec1d653f17c873bfa44674a3f",
+      "variants": {
+        "plain": {
+          "decode_ns": 516809059,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 594949534,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 54075674,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 17520467,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 34885253,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 265342013,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 175728389,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "0c1583ec7694056e5d5fb7e40bde234493414a9f303d36161dbea51bd45a38a5",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-illstreet-lpc32",
+      "fixture_sha256": "c99f452e0f120b32f5286a705ce79adf82b959af69078d644afb0aa76eab04b9",
+      "variants": {
+        "plain": {
+          "decode_ns": 637421908,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 718844146,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53559857,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 17571237,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 35040244,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 261922557,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 303379535,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-illstreet-lpc12",
+      "fixture_sha256": "3a4a6beb40b7f2c26a7dd0b61828e5915afe9ed32f045ad1055e46fe1f4278c8",
+      "variants": {
+        "plain": {
+          "decode_ns": 510721995,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 585991041,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 54603456,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 17986914,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 34616069,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 256020725,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 175135974,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "da880ecee8a314979dcd03876451c52fb8cde76451eca12b08b464d541111c5f",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-thetrip-lpc32",
+      "fixture_sha256": "78949654015893070aae68f9f9c8cf7e70bff269cd2a660e48ffd3e1d6e97625",
+      "variants": {
+        "plain": {
+          "decode_ns": 623796570,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 711210102,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 54695272,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 16551149,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 35483632,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 268288951,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 288191033,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-thetrip-lpc12",
+      "fixture_sha256": "d7565eebaf04f1d70bd4a9c9ac32051a89b558b2522697ce46459c7dfd6f239c",
+      "variants": {
+        "plain": {
+          "decode_ns": 514541186,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 619163667,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 57950142,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 17544567,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 36900973,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 278994659,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 178770957,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "65b25e5683b2bae296a986fe9694ddccce9de94beb827973e3404140b3026a3e",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-bossa-lpc32",
+      "fixture_sha256": "838cea7f892137739ad245953f6e4d2aab8f4d7c5109b9072da264023d3a4d34",
+      "variants": {
+        "plain": {
+          "decode_ns": 703287932,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 785445906,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 56149879,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 12078512,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 36536108,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 275666293,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 356979638,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    },
+    {
+      "name": "radio-bossa-lpc12",
+      "fixture_sha256": "d2a104ea86498293d606fb7b6c5c4a3292ab46cc81a75b64ace1c7635d90aa2d",
+      "variants": {
+        "plain": {
+          "decode_ns": 517940059,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "stereo": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "subframe": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "residual": {
+              "cpu_ns": 0,
+              "calls": 0
+            },
+            "prediction": {
+              "cpu_ns": 0,
+              "calls": 0
+            }
+          },
+          "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+          "pcm_bytes": 21168000,
+          "identical": true
+        },
+        "profile": {
+          "decode_ns": 592303539,
+          "stages": {
+            "frame_and_pcm": {
+              "cpu_ns": 53644404,
+              "calls": 34455
+            },
+            "stereo": {
+              "cpu_ns": 11532702,
+              "calls": 3447
+            },
+            "subframe": {
+              "cpu_ns": 34330214,
+              "calls": 6894
+            },
+            "residual": {
+              "cpu_ns": 271380525,
+              "calls": 6894
+            },
+            "prediction": {
+              "cpu_ns": 174220016,
+              "calls": 6894
+            }
+          },
+          "pcm_sha256": "9a12c7386e9ca260b66856bb92c2a744843d3ad298a0e1ddc13983c074a74c4b",
+          "pcm_bytes": 21168000,
+          "identical": true
+        }
+      }
+    }
+  ],
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "passed": true
+}

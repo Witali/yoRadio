@@ -44,7 +44,7 @@ def main():
         with Server(args.host,8770,specs) as server:
             for name in cuts:
                 def fault(n=name):
-                    started=time.monotonic();suite.start(n,hint='flac')
+                    started=time.perf_counter();suite.start(n,hint='flac')
                     rows=suite.observe(max(8,specs[n]['seconds']+5),n)
                     require(all(not r['audio'] for r in rows[-3:]),'Truncated FLAC did not leave playback')
                     require(board.info()['app_elf_sha256']==identity['app_elf_sha256'],'Image changed')

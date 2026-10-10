@@ -1,0 +1,96 @@
+[
+  {
+    "name": "install",
+    "code": 0,
+    "seconds": 25.171999999991385,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-floor\\app.bin",
+      "--output",
+      ".build\\c3-tls-reserve-floor-20261008\\matrix\\install.json"
+    ]
+  },
+  {
+    "name": "framing",
+    "code": 0,
+    "seconds": 162.73399999999674,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/tls_framing.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-floor\\app.bin",
+      "--ca",
+      ".build\\c3-tls-records-20261007\\trust\\ca.pem",
+      "--cert",
+      ".build\\c3-tls-records-20261007\\trust\\server.pem",
+      "--key",
+      ".build\\c3-tls-records-20261007\\trust\\server.key",
+      "--output",
+      ".build\\c3-tls-reserve-floor-20261008\\matrix\\framing"
+    ]
+  },
+  {
+    "name": "records",
+    "code": 1,
+    "seconds": 302.0940000000119,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      "tools/esp32c3_tests/tls_records.py",
+      "--board",
+      "http://192.168.100.4",
+      "--host",
+      "192.168.100.253",
+      "--serial-port",
+      "COM9",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-r9a97f6c54ec6-rx6-reserve-floor\\app.bin",
+      "--ca",
+      ".build\\c3-tls-records-20261007\\trust\\ca.pem",
+      "--cert",
+      ".build\\c3-tls-records-20261007\\trust\\server.pem",
+      "--key",
+      ".build\\c3-tls-records-20261007\\trust\\server.key",
+      "--mode",
+      "small",
+      "--mode",
+      "large",
+      "--mode",
+      "grow",
+      "--mode",
+      "alternate",
+      "--seconds",
+      "75",
+      "--output",
+      ".build\\c3-tls-reserve-floor-20261008\\matrix\\records"
+    ]
+  },
+  {
+    "name": "restore",
+    "code": 0,
+    "seconds": 25.01600000000326,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware/development/esp32c3-idf-6.1-compact-icy-quiet/app.bin",
+      "--output",
+      ".build\\c3-tls-reserve-floor-20261008\\matrix\\restore.json"
+    ]
+  }
+]

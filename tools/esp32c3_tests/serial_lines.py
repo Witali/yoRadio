@@ -1,11 +1,27 @@
 """Read passive serial telemetry in chunks and preserve lines across timeouts."""
+import time
+
+FINAL_LINE_GRACE_SECONDS = 0.5
 
 
 def serial_lines(port, closed):
     pending = bytearray()
-    while not closed.is_set():
+    close_deadline = None
+    while True:
+        closing = closed.is_set()
+        if closing:
+            if not pending:
+                return
+            if close_deadline is None:
+                close_deadline = time.perf_counter() + FINAL_LINE_GRACE_SECONDS
+            if time.perf_counter() >= close_deadline:
+                yield 'serial capture interrupted: incomplete final line'
+                return
         try:
-            data = port.read(min(4096, port.in_waiting or 1))
+            # Finish only the current line on requested shutdown. Single-byte
+            # reads stop at its newline without starting another partial line.
+            # A missing newline still fails closed after the bounded grace.
+            data = port.read(1 if closing else min(4096, port.in_waiting or 1))
         except OSError:
             yield 'serial capture interrupted'
             return
@@ -18,5 +34,3 @@ def serial_lines(port, closed):
             # Do not retain unbounded/no-newline output or expose its contents.
             yield 'serial capture interrupted: overlong line'
             return
-    if pending:
-        yield 'serial capture interrupted: incomplete final line'

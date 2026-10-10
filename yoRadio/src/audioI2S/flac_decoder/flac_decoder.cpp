@@ -187,11 +187,46 @@ int32_t readSignedInt(int nBits){
 int64_t readRiceSignedInt(uint8_t param){
     if(param > 30) { m_readError = ERR_FLAC_INVALID_DATA; return 0; }
     uint32_t val = 0;
+#if defined(FLAC_BYTEWISE_RICE) && FLAC_BYTEWISE_RICE
+    // Successful readUint calls leave at most seven cached bits. Inspect only
+    // those bits, loading one byte when empty so frame byte accounting matches
+    // the scalar reader. No lookahead beyond the byte containing the terminator.
+    constexpr uint8_t kBitsPerByte = 8;
+    constexpr unsigned kUnsignedBits = sizeof(unsigned) * kBitsPerByte;
+    const uint32_t maximumQuotient = UINT32_MAX >> param;
+    if(m_readError) return 0;
+    for(;;) {
+        if(m_bitBufferLen == 0) {
+            if(m_bytesAvail <= 0) { m_readError = ERR_FLAC_TRUNCATED_INPUT; return 0; }
+            m_bitBuffer = (m_bitBuffer << kBitsPerByte) | m_inptr[m_rIndex++];
+            --m_bytesAvail;
+            m_bitBufferLen = kBitsPerByte;
+        }
+        const unsigned cached = static_cast<unsigned>(m_bitBuffer) &
+            ((UINT32_C(1) << m_bitBufferLen) - 1);
+        // __builtin_clz(0) is undefined. An all-zero cache is a whole unary run.
+        const uint8_t zeros = cached ? __builtin_clz(cached) -
+            (kUnsignedBits - m_bitBufferLen) : m_bitBufferLen;
+        if(zeros > maximumQuotient - val) {
+            // The scalar loop consumes the first excessive zero before failing.
+            m_bitBufferLen -= maximumQuotient - val + 1;
+            m_readError = ERR_FLAC_INVALID_DATA;
+            return 0;
+        }
+        val += zeros;
+        m_bitBufferLen -= zeros;
+        if(cached) {
+            --m_bitBufferLen; // Consume the unary terminator.
+            break;
+        }
+    }
+#else
     while (readUint(1) == 0) {
         if(m_readError) return 0;
         if(val == (UINT32_MAX >> param)) { m_readError = ERR_FLAC_INVALID_DATA; return 0; }
         ++val;
     }
+#endif
     val = (val << param) | readUint(param);
     if(val == UINT32_MAX) { m_readError = ERR_FLAC_INVALID_DATA; return 0; }
     return static_cast<int64_t>(val >> 1) ^ -static_cast<int64_t>(val & 1);
@@ -804,6 +839,9 @@ void restoreLinearPrediction(uint8_t ch, uint8_t shift) {
             // overflow a 32-bit accumulator even when the final PCM fits.
             constexpr size_t kTapsPerGroup = 4;
             size_t j = 0;
+#if defined(FLAC_LPC_NO_AUTO_UNROLL) && FLAC_LPC_NO_AUTO_UNROLL
+#pragma GCC unroll 1
+#endif
             for(; j + kTapsPerGroup <= activeCoefficients; j += kTapsPerGroup) {
                 sum += static_cast<int64_t>(history[-static_cast<int>(j)]) * coefs[j];
                 sum += static_cast<int64_t>(history[-static_cast<int>(j + 1)]) * coefs[j + 1];

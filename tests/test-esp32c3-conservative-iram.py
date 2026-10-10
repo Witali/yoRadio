@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import sys
 import unittest
+from evidence_sources import historical_source
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULT = ROOT/'tests/results/esp32c3-conservative-20261001'
@@ -63,7 +64,7 @@ class ConservativeEvidence(unittest.TestCase):
         for report in RESULT.glob('*/report.json'):
             value = read(report)
             for name, expected in value['test_sources_sha256'].items():
-                self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(), expected, name)
+                self.assertEqual(hashlib.sha256(historical_source(ROOT, name, expected)).hexdigest(), expected, name)
             if report.parent.name != 'install-ota':
                 self.assertEqual(value['board']['app_elf_sha256'], manifest['image']['app_elf_sha256'])
         self.assertEqual(read(RESULT/'ota-repeat/capture.json')['script_sha256'],

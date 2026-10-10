@@ -14,7 +14,7 @@ import sys
 import time
 from urllib.parse import urlsplit
 
-from common import Board, Failure, Report, require, sha
+from common import Board, Failure, Report, fixtures, matches, require, sha
 
 
 BOUNDARY = 'yoradio-c3-acceptance-20260930'
@@ -79,8 +79,8 @@ def upload(origin, body, declared=None, interrupt=None, pace=0, send_limit=None)
 
 
 def wait_image(board, digest, partition, timeout=45):
-    deadline = time.monotonic()+timeout
-    while time.monotonic() < deadline:
+    deadline = time.perf_counter()+timeout
+    while time.perf_counter() < deadline:
         try:
             info = board.info()
             if info['app_elf_sha256'] == digest and info['partition'] == partition:
@@ -104,14 +104,57 @@ def verify_snapshot(board, before):
     return dict(wifi_unchanged=True, playlist_unchanged=True, settings_unchanged=True)
 
 
+def wait_playback(board, spec=None, timeout=12):
+    """Require full fixture format before OTA; preserve the generic flag-only CLI."""
+    deadline = time.perf_counter()+timeout
+    consecutive = 0
+    while time.perf_counter() < deadline:
+        state = board.status()
+        correct = matches(state, spec) if spec is not None else state.get('audio') is True
+        consecutive = consecutive+1 if correct else 0
+        if consecutive >= (3 if spec is not None else 1):
+            return state
+        time.sleep(.3)
+    raise Failure('Expected playback format was not stable before OTA')
+
+
+def timed_action(report, name, action):
+    """Persist action boundaries on the serial-capture perf_counter clock.
+
+    Names come from fixed test operations. Do not retain callback results or
+    exception messages: these can include private response bodies and URLs.
+    A returned action is not necessarily a passed acceptance gate.
+    """
+    report.data['timeline_clock'] = 'time.perf_counter seconds'
+    rows = report.data.setdefault('timeline', [])
+    rows.append(dict(action=name, event='begin', at=time.perf_counter()))
+    report.save()
+    try:
+        result = action()
+    except BaseException as error:
+        rows.append(dict(action=name, event='raised', at=time.perf_counter(),
+                         exception=type(error).__name__))
+        report.save()
+        raise
+    rows.append(dict(action=name, event='returned', at=time.perf_counter()))
+    report.save()
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--board', required=True)
     parser.add_argument('--firmware', type=Path, required=True)
     parser.add_argument('--suite', choices=('negative','roundtrip','while-playing','slow'), action='append', required=True)
     parser.add_argument('--play-url', help='Controlled audio URL for --suite while-playing')
+    parser.add_argument('--play-fixture', help='Require this built-in fixture rate/channels/profile before OTA')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    play_spec = None
+    if args.play_fixture:
+        known = fixtures()
+        require(args.play_fixture in known and 'rate' in known[args.play_fixture], 'Unknown concrete playback fixture')
+        play_spec = known[args.play_fixture]
     board = Board(args.board)
     board.status()
     image = args.firmware.read_bytes()
@@ -124,6 +167,9 @@ def main():
     before = snapshot(board)
     report = Report(args.output, initial)
     report.data['image'] = expected
+    if play_spec is not None:
+        report.data['play_fixture'] = {k:play_spec[k] for k in
+            ('codec','profile','rate','channels','bits','sha256')}
 
     def reject(name, body, declared=None, interrupt=None):
         active = board.info()
@@ -131,31 +177,34 @@ def main():
         # receiver return its rejection instead of racing a megabyte send
         # against the receiver's bounded drain/close window.
         limit = 2048 if name in ('wrong-chip','wrong-project','spiffs-target') else None
-        status, _ = upload(args.board,body,declared,interrupt,send_limit=limit)
+        status, _ = timed_action(report, 'ota:'+name+':upload',
+            lambda: upload(args.board,body,declared,interrupt,send_limit=limit))
         if interrupt != 'disconnect':
             require(status == 400, f'Expected HTTP 400, received {status}')
         time.sleep(1 if interrupt != 'disconnect' else 2)
-        wait_image(board,active['app_elf_sha256'],active['partition'])
+        timed_action(report, 'ota:'+name+':verify-active-image',
+            lambda: wait_image(board,active['app_elf_sha256'],active['partition']))
         return dict(http=status, active_image_unchanged=True, **verify_snapshot(board,before))
 
-    def accepted(slow=False, playing=False):
+    def accepted(name, slow=False, playing=False):
+        playback = None
         if playing:
             from common import Blocked
             if not args.play_url:
                 raise Blocked('Provide --play-url for OTA during active playback')
-            board.play(args.play_url)
-            deadline = time.monotonic()+12
-            while time.monotonic() < deadline and not board.status()['audio']:
-                time.sleep(.3)
-            require(board.status()['audio'], 'Audio was not active before OTA')
+            timed_action(report, name+':play-request', lambda: board.play(args.play_url))
+            playback = timed_action(report, name+':stable-playback',
+                lambda: wait_playback(board, play_spec))
         active = board.info()
         target = 'app1' if active['partition'] == 'app0' else 'app0'
-        start = time.monotonic()
-        status, body = upload(args.board,multipart(image),pace=.08 if slow else 0)
+        start = time.perf_counter()
+        status, body = timed_action(report, name+':upload',
+            lambda: upload(args.board,multipart(image),pace=.08 if slow else 0))
         require(status == 200 and body == b'OK', 'OTA did not return HTTP 200 OK')
-        booted = wait_image(board,expected['app_elf_sha256'],target)
-        return dict(partition=booted['partition'], elapsed_seconds=time.monotonic()-start,
-                    hash_verified=True, **verify_snapshot(board,before))
+        booted = timed_action(report, name+':verify-boot',
+            lambda: wait_image(board,expected['app_elf_sha256'],target))
+        return dict(partition=booted['partition'], elapsed_seconds=time.perf_counter()-start,
+                    hash_verified=True, playback_before=playback, **verify_snapshot(board,before))
 
     try:
         if 'negative' in args.suite:
@@ -165,17 +214,19 @@ def main():
                 report.case('ota:'+interrupt, lambda i=interrupt: reject(i,multipart(image),interrupt=i))
         if 'roundtrip' in args.suite:
             for i in range(2):
-                report.case('ota:roundtrip:'+str(i+1),accepted)
+                name = 'ota:roundtrip:'+str(i+1)
+                report.case(name, lambda n=name: accepted(n))
         if 'while-playing' in args.suite:
-            report.case('ota:while-playing',lambda: accepted(playing=True))
+            report.case('ota:while-playing',lambda: accepted('ota:while-playing',playing=True))
         if 'slow' in args.suite:
-            report.case('ota:slow',lambda: accepted(slow=True))
+            report.case('ota:slow',lambda: accepted('ota:slow',slow=True))
     finally:
         def restore():
             partition = board.info()['partition']
-            board.reboot()
+            timed_action(report, 'restore-saved-station:reboot-request', board.reboot)
             time.sleep(3)
-            wait_image(board,expected['app_elf_sha256'],partition)
+            timed_action(report, 'restore-saved-station:verify-boot',
+                lambda: wait_image(board,expected['app_elf_sha256'],partition))
             return verify_snapshot(board,before)
         report.case('restore-saved-station',restore)
     return report.exit_code()

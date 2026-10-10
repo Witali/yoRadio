@@ -1,0 +1,2118 @@
+{
+  "scope": "Original failures retained; controlled recovery is not public-station or analog qualification.",
+  "phases": {
+    "framing": {
+      "controller": {
+        "name": "framing",
+        "code": 0,
+        "seconds": 163.56299999999464
+      },
+      "original": [
+        {
+          "name": "framing:length-notify",
+          "result": "PASS",
+          "evidence": {
+            "expected_terminal": "stream ended",
+            "observed_terminal": "stream ended",
+            "full_format_samples": 51,
+            "first_full_pcm_seconds": 0.7340000000258442
+          },
+          "seconds": 20.265
+        },
+        {
+          "name": "framing:length-raw",
+          "result": "PASS",
+          "evidence": {
+            "expected_terminal": "stream ended",
+            "observed_terminal": "stream ended",
+            "full_format_samples": 50,
+            "first_full_pcm_seconds": 0.75
+          },
+          "seconds": 20.063
+        },
+        {
+          "name": "framing:length-short",
+          "result": "PASS",
+          "evidence": {
+            "expected_terminal": "stream read failed",
+            "observed_terminal": "stream read failed",
+            "full_format_samples": 51,
+            "first_full_pcm_seconds": 0.7340000000258442
+          },
+          "seconds": 20.031
+        },
+        {
+          "name": "framing:chunked-notify",
+          "result": "PASS",
+          "evidence": {
+            "expected_terminal": "stream ended",
+            "observed_terminal": "stream ended",
+            "full_format_samples": 51,
+            "first_full_pcm_seconds": 0.75
+          },
+          "seconds": 20.297
+        },
+        {
+          "name": "framing:chunked-raw",
+          "result": "PASS",
+          "evidence": {
+            "expected_terminal": "stream ended",
+            "observed_terminal": "stream ended",
+            "full_format_samples": 50,
+            "first_full_pcm_seconds": 0.7349999999860302
+          },
+          "seconds": 20.156
+        },
+        {
+          "name": "framing:chunked-short",
+          "result": "PASS",
+          "evidence": {
+            "expected_terminal": "stream read failed",
+            "observed_terminal": "stream read failed",
+            "full_format_samples": 50,
+            "first_full_pcm_seconds": 0.7190000000118744
+          },
+          "seconds": 20.25
+        },
+        {
+          "name": "framing:close-notify",
+          "result": "PASS",
+          "evidence": {
+            "expected_terminal": "stream ended",
+            "observed_terminal": "stream ended",
+            "full_format_samples": 51,
+            "first_full_pcm_seconds": 0.75
+          },
+          "seconds": 20.328
+        },
+        {
+          "name": "framing:close-raw",
+          "result": "PASS",
+          "evidence": {
+            "expected_terminal": "stream read failed",
+            "observed_terminal": "stream read failed",
+            "full_format_samples": 50,
+            "first_full_pcm_seconds": 0.7809999999881256
+          },
+          "seconds": 20.234
+        },
+        {
+          "name": "settings-preserved",
+          "result": "PASS",
+          "evidence": {
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 0.516
+        }
+      ],
+      "passed": 9,
+      "total": 9,
+      "runtime_faults": [],
+      "tls": [
+        {
+          "at": 242416.328,
+          "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+        },
+        {
+          "at": 242476.828,
+          "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+        },
+        {
+          "at": 242516.875,
+          "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+        }
+      ],
+      "transport_failures": [],
+      "input_sha256": {
+        "report": "cc71b5eb2281b846e919d442410b160f390c2124a5857c5f3fc4fc2ec26acb2b",
+        "status": "7ab8d6e5027df12be04ce1c20f2f198ac05e209b34039a8bb39fe1fb9ec60d67",
+        "performance": "6eebea1f19f83073d9c45b61f120498305fc54b5659dc72a00f214609dded4e1"
+      },
+      "replay": [
+        {
+          "name": "length-notify",
+          "result": "PASS",
+          "evidence": {
+            "terminal": "stream ended",
+            "full_format_samples": 51
+          }
+        },
+        {
+          "name": "length-raw",
+          "result": "PASS",
+          "evidence": {
+            "terminal": "stream ended",
+            "full_format_samples": 50
+          }
+        },
+        {
+          "name": "length-short",
+          "result": "PASS",
+          "evidence": {
+            "terminal": "stream read failed",
+            "full_format_samples": 51
+          }
+        },
+        {
+          "name": "chunked-notify",
+          "result": "PASS",
+          "evidence": {
+            "terminal": "stream ended",
+            "full_format_samples": 51
+          }
+        },
+        {
+          "name": "chunked-raw",
+          "result": "PASS",
+          "evidence": {
+            "terminal": "stream ended",
+            "full_format_samples": 50
+          }
+        },
+        {
+          "name": "chunked-short",
+          "result": "PASS",
+          "evidence": {
+            "terminal": "stream read failed",
+            "full_format_samples": 50
+          }
+        },
+        {
+          "name": "close-notify",
+          "result": "PASS",
+          "evidence": {
+            "terminal": "stream ended",
+            "full_format_samples": 51
+          }
+        },
+        {
+          "name": "close-raw",
+          "result": "PASS",
+          "evidence": {
+            "terminal": "stream read failed",
+            "full_format_samples": 50
+          }
+        }
+      ],
+      "tls_context": [
+        {
+          "row": {
+            "at": 242416.328,
+            "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+          },
+          "observations": [
+            "framing:length-short"
+          ],
+          "expected": true
+        },
+        {
+          "row": {
+            "at": 242476.828,
+            "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+          },
+          "observations": [
+            "framing:chunked-short"
+          ],
+          "expected": true
+        },
+        {
+          "row": {
+            "at": 242516.875,
+            "line": "TLS failure: component=esp-tls-mbedtls operation=read mbedtls_return=-29312"
+          },
+          "observations": [
+            "framing:close-raw"
+          ],
+          "expected": true
+        }
+      ],
+      "runtime_review": "PASS"
+    },
+    "certificate-rejection": {
+      "controller": {
+        "name": "certificate-rejection",
+        "code": 0,
+        "seconds": 23.187999999994645
+      },
+      "original": [
+        {
+          "name": "untrusted-tls-rejected",
+          "result": "PASS",
+          "evidence": {
+            "untrusted_rejected": true,
+            "http_recovered": true,
+            "tls_alerts": [
+              "TLSV1_ALERT_ACCESS_DENIED",
+              "TLSV1_ALERT_ACCESS_DENIED",
+              "TLSV1_ALERT_ACCESS_DENIED",
+              "TLSV1_ALERT_ACCESS_DENIED"
+            ],
+            "certificate_bundle_rejected": true
+          },
+          "seconds": 21.562
+        },
+        {
+          "name": "restore-board",
+          "result": "PASS",
+          "evidence": {
+            "left_stopped": true
+          },
+          "seconds": 0.235
+        }
+      ],
+      "passed": 2,
+      "total": 2,
+      "runtime_faults": [],
+      "tls": [
+        {
+          "at": 242528.609,
+          "line": "TLS failure: component=esp-x509-crt-bundle certificate_verification_failed=true"
+        },
+        {
+          "at": 242528.609,
+          "line": "TLS failure: component=esp-tls-mbedtls operation=handshake mbedtls_return=-12288"
+        },
+        {
+          "at": 242528.609,
+          "line": "TLS failure: component=esp-tls"
+        },
+        {
+          "at": 242529.625,
+          "line": "TLS failure: component=esp-x509-crt-bundle certificate_verification_failed=true"
+        },
+        {
+          "at": 242529.64,
+          "line": "TLS failure: component=esp-tls-mbedtls operation=handshake mbedtls_return=-12288"
+        },
+        {
+          "at": 242529.64,
+          "line": "TLS failure: component=esp-tls"
+        },
+        {
+          "at": 242531.656,
+          "line": "TLS failure: component=esp-x509-crt-bundle certificate_verification_failed=true"
+        },
+        {
+          "at": 242531.656,
+          "line": "TLS failure: component=esp-tls-mbedtls operation=handshake mbedtls_return=-12288"
+        },
+        {
+          "at": 242531.656,
+          "line": "TLS failure: component=esp-tls"
+        },
+        {
+          "at": 242535.687,
+          "line": "TLS failure: component=esp-x509-crt-bundle certificate_verification_failed=true"
+        },
+        {
+          "at": 242535.687,
+          "line": "TLS failure: component=esp-tls-mbedtls operation=handshake mbedtls_return=-12288"
+        },
+        {
+          "at": 242535.687,
+          "line": "TLS failure: component=esp-tls"
+        }
+      ],
+      "transport_failures": [],
+      "input_sha256": {
+        "report": "697362bf8707fdb2d3c8b28d2e82b6d76fdc93a8684bf1359a18bcbda45afc74",
+        "status": "bffa0bf160147584ee1a2a1987dadeed06e55348f94a1b76306239963ba2bfb2",
+        "performance": "fd059e844f42ddf2c7edc760b135915c1a9bd3ae5367594dacb696db57569961"
+      },
+      "certificate_control": {
+        "valid_at_test": true,
+        "self_signed": true,
+        "address_matches": true,
+        "sha256": "94d2041ab590fd2deacef08f91734844cf54d84993f2a79af31d972f4053bedf"
+      },
+      "rejection_replay": {
+        "name": "rejection",
+        "result": "PASS",
+        "evidence": {
+          "samples": 24,
+          "alerts": [
+            "TLSV1_ALERT_ACCESS_DENIED",
+            "TLSV1_ALERT_ACCESS_DENIED",
+            "TLSV1_ALERT_ACCESS_DENIED",
+            "TLSV1_ALERT_ACCESS_DENIED"
+          ]
+        }
+      },
+      "recovery_replay": {
+        "name": "http-recovery",
+        "result": "PASS",
+        "evidence": {
+          "samples": 10,
+          "rate": 48000,
+          "channels": 2
+        }
+      },
+      "tls_counts": {
+        "TLS failure: component=esp-tls": 4,
+        "TLS failure: component=esp-tls-mbedtls operation=handshake mbedtls_return=-12288": 4,
+        "TLS failure: component=esp-x509-crt-bundle certificate_verification_failed=true": 4
+      },
+      "recovery_samples": 15,
+      "server_events": [
+        {
+          "mode": "file",
+          "fixture": "lc-48000-stereo",
+          "sent": 117760,
+          "complete": false,
+          "pacing_ratio": 1.0,
+          "seconds": 7.217999999993481
+        }
+      ],
+      "runtime_review": "PASS"
+    },
+    "records-after-rejection": {
+      "controller": {
+        "name": "records-after-rejection",
+        "code": 0,
+        "seconds": 102.68799999999464
+      },
+      "original": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133132,
+                "largest": 102400,
+                "tasks": 17
+              },
+              {
+                "heap": 133132,
+                "largest": 102400,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.453
+        },
+        {
+          "name": "tls-record:grow",
+          "result": "PASS",
+          "evidence": {
+            "samples": 386,
+            "rate": 44100,
+            "channels": 2,
+            "record_counts": {
+              "1048": 118,
+              "16408": 11
+            },
+            "first_large_at": 242595.296,
+            "mean_busy": 54.82,
+            "peak_busy": 60.1,
+            "minimum_heap": 26280.0,
+            "minimum_largest": 14336.0,
+            "audio_wall_ratio": 1.0006266735031049,
+            "first_full_pcm_seconds": 1.5939999999827705
+          },
+          "seconds": 76.187
+        },
+        {
+          "name": "idle-recovery",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133124,
+                "largest": 102400,
+                "tasks": 17
+              },
+              {
+                "heap": 133124,
+                "largest": 102400,
+                "tasks": 17
+              },
+              {
+                "heap": 133124,
+                "largest": 102400,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.359
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.0
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "evidence": {
+            "stopped": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 0.484
+        }
+      ],
+      "passed": 5,
+      "total": 5,
+      "runtime_faults": [],
+      "tls": [],
+      "transport_failures": [],
+      "input_sha256": {
+        "report": "7f3f5a2734d56aa526f8f2f0dc9c4d387267a95fa4c8292f05cb90c8ae42dbf5",
+        "status": "e0313cd429103f7fa4c9fa6ab02288569dbdd44b5c476ed6aed5253dbd7d971b",
+        "performance": "96ba75b35d7d79ac2cb5d22ea5dc4b0ef221edc84d7e9ee8bf9603b812d72183"
+      },
+      "record_replay": {
+        "grow": {
+          "name": "grow",
+          "result": "PASS",
+          "evidence": {
+            "record_counts": {
+              "1048": 118,
+              "16408": 11
+            },
+            "first_large_at": 242595.296
+          }
+        }
+      },
+      "heap_replay": {
+        "name": "idle-recovery",
+        "result": "PASS",
+        "evidence": null
+      },
+      "idle_before": {
+        "samples": [
+          {
+            "heap": 133132,
+            "largest": 102400,
+            "tasks": 17
+          },
+          {
+            "heap": 133132,
+            "largest": 102400,
+            "tasks": 17
+          }
+        ]
+      },
+      "idle_after": {
+        "samples": [
+          {
+            "heap": 133124,
+            "largest": 102400,
+            "tasks": 17
+          },
+          {
+            "heap": 133124,
+            "largest": 102400,
+            "tasks": 17
+          },
+          {
+            "heap": 133124,
+            "largest": 102400,
+            "tasks": 17
+          }
+        ]
+      },
+      "metrics": {
+        "mode": "records-after-rejection",
+        "case": "records-after-rejection",
+        "observation": "tls-record:grow",
+        "board": {
+          "version": "idf61-prefill-min250",
+          "partition": "app0",
+          "max_size": 1900544,
+          "app_elf_sha256": "5a17d251e0a7b308dd011e850b1b1016afba0b46bc7dee6263b82f8c624a4ff3"
+        },
+        "original_acceptance": [
+          {
+            "name": "idle-before",
+            "result": "PASS",
+            "evidence": {
+              "samples": [
+                {
+                  "heap": 133132,
+                  "largest": 102400,
+                  "tasks": 17
+                },
+                {
+                  "heap": 133132,
+                  "largest": 102400,
+                  "tasks": 17
+                }
+              ]
+            },
+            "seconds": 12.453
+          },
+          {
+            "name": "tls-record:grow",
+            "result": "PASS",
+            "evidence": {
+              "samples": 386,
+              "rate": 44100,
+              "channels": 2,
+              "record_counts": {
+                "1048": 118,
+                "16408": 11
+              },
+              "first_large_at": 242595.296,
+              "mean_busy": 54.82,
+              "peak_busy": 60.1,
+              "minimum_heap": 26280.0,
+              "minimum_largest": 14336.0,
+              "audio_wall_ratio": 1.0006266735031049,
+              "first_full_pcm_seconds": 1.5939999999827705
+            },
+            "seconds": 76.187
+          },
+          {
+            "name": "idle-recovery",
+            "result": "PASS",
+            "evidence": {
+              "samples": [
+                {
+                  "heap": 133124,
+                  "largest": 102400,
+                  "tasks": 17
+                },
+                {
+                  "heap": 133124,
+                  "largest": 102400,
+                  "tasks": 17
+                },
+                {
+                  "heap": 133124,
+                  "largest": 102400,
+                  "tasks": 17
+                }
+              ]
+            },
+            "seconds": 12.359
+          },
+          {
+            "name": "runtime",
+            "result": "PASS",
+            "evidence": null,
+            "seconds": 0.0
+          },
+          {
+            "name": "restore",
+            "result": "PASS",
+            "evidence": {
+              "stopped": true,
+              "wifi_unchanged": true,
+              "playlist_unchanged": true,
+              "settings_unchanged": true
+            },
+            "seconds": 0.484
+          }
+        ],
+        "original_gates_passed": true,
+        "runtime_acceptance": {
+          "result": "PASS",
+          "failures": []
+        },
+        "acceptance_passed": true,
+        "seconds": 75.10899999999674,
+        "measured_start": 242574.75,
+        "measured_end": 242639.859,
+        "interrupted": false,
+        "cpu": {
+          "observed_seconds": 61.06699999999998,
+          "windows": 12,
+          "peak_percent": 60.1,
+          "busy_mean_percent": 58.697276761589734,
+          "idle_mean_percent": 41.30272323841027,
+          "decode_mean_percent": 39.38288601044754,
+          "stream_mean_percent": 0.4503103149000278,
+          "output_mean_percent": 7.208189365778572,
+          "wifi_mean_percent": 3.6829842631863365,
+          "tcpip_mean_percent": 2.508284343426073,
+          "web_mean_percent": 1.8243699543124767,
+          "at_least_85_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_95_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "at_least_99.9_percent": {
+            "seconds": 0,
+            "observed_time_percent": 0.0
+          },
+          "measurement_seconds": 65.10899999999674,
+          "coverage_percent": 93.79194888571939,
+          "full_intervals": 12,
+          "gaps": [
+            {
+              "start": 242574.75,
+              "end": 242574.88900000002,
+              "seconds": 0.13900000002468005
+            },
+            {
+              "start": 242585.015,
+              "end": 242585.01599999997,
+              "seconds": 0.00099999996018596
+            },
+            {
+              "start": 242595.312,
+              "end": 242595.318,
+              "seconds": 0.005999999993946403
+            },
+            {
+              "start": 242605.39,
+              "end": 242605.403,
+              "seconds": 0.012999999977182597
+            },
+            {
+              "start": 242615.64,
+              "end": 242615.643,
+              "seconds": 0.0029999999969732016
+            },
+            {
+              "start": 242620.703,
+              "end": 242620.711,
+              "seconds": 0.008000000001629815
+            },
+            {
+              "start": 242630.921,
+              "end": 242630.926,
+              "seconds": 0.005000000004656613
+            },
+            {
+              "start": 242635.953,
+              "end": 242639.859,
+              "seconds": 3.9059999999881256
+            }
+          ],
+          "invalid_intervals": [],
+          "maximum_gap_seconds": 3.9059999999881256,
+          "coverage_complete": true,
+          "excluded_gap_seconds": 0
+        },
+        "cpu_intervals": [
+          {
+            "at": 242579.89,
+            "seconds": 5.001000000000005,
+            "busy": 60.1,
+            "idle": 39.9,
+            "decode": 39.5,
+            "stream": 0.7,
+            "output": 7.3,
+            "wifi": 3.8,
+            "tcpip": 2.6,
+            "web": 2.1
+          },
+          {
+            "at": 242585.015,
+            "seconds": 5.1299999999999955,
+            "busy": 58.7,
+            "idle": 41.3,
+            "decode": 39.2,
+            "stream": 0.7,
+            "output": 7.2,
+            "wifi": 3.8,
+            "tcpip": 2.6,
+            "web": 1.8
+          },
+          {
+            "at": 242590.156,
+            "seconds": 5.139999999999986,
+            "busy": 58.3,
+            "idle": 41.7,
+            "decode": 39.5,
+            "stream": 0.7,
+            "output": 7.2,
+            "wifi": 3.8,
+            "tcpip": 2.6,
+            "web": 1.8
+          },
+          {
+            "at": 242595.312,
+            "seconds": 5.158999999999992,
+            "busy": 59.8,
+            "idle": 40.2,
+            "decode": 39.4,
+            "stream": 0.7,
+            "output": 7.2,
+            "wifi": 3.8,
+            "tcpip": 2.6,
+            "web": 1.7
+          },
+          {
+            "at": 242600.328,
+            "seconds": 5.010000000000019,
+            "busy": 59.5,
+            "idle": 40.5,
+            "decode": 39.5,
+            "stream": 0.4,
+            "output": 7.2,
+            "wifi": 3.9,
+            "tcpip": 2.5,
+            "web": 1.8
+          },
+          {
+            "at": 242605.39,
+            "seconds": 5.07699999999997,
+            "busy": 56.7,
+            "idle": 43.3,
+            "decode": 39.3,
+            "stream": 0.3,
+            "output": 7.2,
+            "wifi": 3.5,
+            "tcpip": 2.4,
+            "web": 1.8
+          },
+          {
+            "at": 242610.5,
+            "seconds": 5.097000000000037,
+            "busy": 58.8,
+            "idle": 41.2,
+            "decode": 39.4,
+            "stream": 0.3,
+            "output": 7.2,
+            "wifi": 3.6,
+            "tcpip": 2.4,
+            "web": 2.0
+          },
+          {
+            "at": 242615.64,
+            "seconds": 5.156000000000006,
+            "busy": 58.7,
+            "idle": 41.3,
+            "decode": 39.3,
+            "stream": 0.3,
+            "output": 7.2,
+            "wifi": 3.5,
+            "tcpip": 2.4,
+            "web": 1.7
+          },
+          {
+            "at": 242620.703,
+            "seconds": 5.060000000000002,
+            "busy": 59.4,
+            "idle": 40.6,
+            "decode": 39.4,
+            "stream": 0.4,
+            "output": 7.2,
+            "wifi": 3.8,
+            "tcpip": 2.6,
+            "web": 1.8
+          },
+          {
+            "at": 242625.812,
+            "seconds": 5.100999999999999,
+            "busy": 56.5,
+            "idle": 43.5,
+            "decode": 39.4,
+            "stream": 0.3,
+            "output": 7.2,
+            "wifi": 3.5,
+            "tcpip": 2.4,
+            "web": 1.8
+          },
+          {
+            "at": 242630.921,
+            "seconds": 5.1089999999999804,
+            "busy": 58.9,
+            "idle": 41.1,
+            "decode": 39.3,
+            "stream": 0.3,
+            "output": 7.2,
+            "wifi": 3.6,
+            "tcpip": 2.5,
+            "web": 1.8
+          },
+          {
+            "at": 242635.953,
+            "seconds": 5.026999999999987,
+            "busy": 59.0,
+            "idle": 41.0,
+            "decode": 39.4,
+            "stream": 0.3,
+            "output": 7.2,
+            "wifi": 3.6,
+            "tcpip": 2.5,
+            "web": 1.8
+          }
+        ],
+        "malformed_cpu": [],
+        "cpu_parse_error": null,
+        "cpu_gaps": [],
+        "decoder_intervals": [
+          {
+            "at": 242581.109,
+            "seconds": 5.013,
+            "wall_ms": 5013,
+            "audio_ms": 5015,
+            "decode_ms": 2101
+          },
+          {
+            "at": 242586.125,
+            "seconds": 5.013,
+            "wall_ms": 5013,
+            "audio_ms": 5015,
+            "decode_ms": 2105
+          },
+          {
+            "at": 242591.14,
+            "seconds": 5.014,
+            "wall_ms": 5014,
+            "audio_ms": 5015,
+            "decode_ms": 2095
+          },
+          {
+            "at": 242596.171,
+            "seconds": 5.025,
+            "wall_ms": 5025,
+            "audio_ms": 5015,
+            "decode_ms": 2078
+          },
+          {
+            "at": 242601.187,
+            "seconds": 5.013,
+            "wall_ms": 5013,
+            "audio_ms": 5015,
+            "decode_ms": 2088
+          },
+          {
+            "at": 242606.203,
+            "seconds": 5.013,
+            "wall_ms": 5013,
+            "audio_ms": 5015,
+            "decode_ms": 2074
+          },
+          {
+            "at": 242611.203,
+            "seconds": 5.013,
+            "wall_ms": 5013,
+            "audio_ms": 5015,
+            "decode_ms": 2076
+          },
+          {
+            "at": 242616.218,
+            "seconds": 5.01,
+            "wall_ms": 5010,
+            "audio_ms": 5015,
+            "decode_ms": 2060
+          },
+          {
+            "at": 242621.25,
+            "seconds": 5.024,
+            "wall_ms": 5024,
+            "audio_ms": 5015,
+            "decode_ms": 2082
+          },
+          {
+            "at": 242626.25,
+            "seconds": 5.013,
+            "wall_ms": 5013,
+            "audio_ms": 5015,
+            "decode_ms": 2080
+          },
+          {
+            "at": 242631.265,
+            "seconds": 5.013,
+            "wall_ms": 5013,
+            "audio_ms": 5015,
+            "decode_ms": 2088
+          },
+          {
+            "at": 242636.281,
+            "seconds": 5.013,
+            "wall_ms": 5013,
+            "audio_ms": 5015,
+            "decode_ms": 2092
+          }
+        ],
+        "decoder_coverage": {
+          "measurement_seconds": 65.10899999999674,
+          "observed_seconds": 60.177,
+          "coverage_percent": 92.42501036723496,
+          "full_intervals": 12,
+          "gaps": [
+            {
+              "start": 242574.75,
+              "end": 242576.096,
+              "seconds": 1.345999999990454
+            },
+            {
+              "start": 242581.109,
+              "end": 242581.112,
+              "seconds": 0.0029999999969732016
+            },
+            {
+              "start": 242586.125,
+              "end": 242586.12600000002,
+              "seconds": 0.0010000000183936208
+            },
+            {
+              "start": 242591.14,
+              "end": 242591.146,
+              "seconds": 0.005999999993946403
+            },
+            {
+              "start": 242596.171,
+              "end": 242596.174,
+              "seconds": 0.0029999999969732016
+            },
+            {
+              "start": 242601.187,
+              "end": 242601.19,
+              "seconds": 0.0029999999969732016
+            },
+            {
+              "start": 242611.203,
+              "end": 242611.20799999998,
+              "seconds": 0.004999999975552782
+            },
+            {
+              "start": 242616.218,
+              "end": 242616.226,
+              "seconds": 0.008000000001629815
+            },
+            {
+              "start": 242626.25,
+              "end": 242626.252,
+              "seconds": 0.0020000000076834112
+            },
+            {
+              "start": 242631.265,
+              "end": 242631.26799999998,
+              "seconds": 0.002999999967869371
+            },
+            {
+              "start": 242636.281,
+              "end": 242639.859,
+              "seconds": 3.5780000000086147
+            }
+          ],
+          "invalid_intervals": [],
+          "maximum_gap_seconds": 3.5780000000086147,
+          "coverage_complete": true
+        },
+        "malformed_decoder": [],
+        "malformed_heap": [],
+        "fault_rows": [],
+        "minimum_rssi": -68,
+        "median_rssi": -63.0,
+        "maximum_http_ms": 125.0,
+        "input_sha256": {
+          "report": "7f3f5a2734d56aa526f8f2f0dc9c4d387267a95fa4c8292f05cb90c8ae42dbf5",
+          "status": "e0313cd429103f7fa4c9fa6ab02288569dbdd44b5c476ed6aed5253dbd7d971b",
+          "performance": "96ba75b35d7d79ac2cb5d22ea5dc4b0ef221edc84d7e9ee8bf9603b812d72183"
+        },
+        "decoder_totals": {
+          "wall_ms": 60177,
+          "audio_ms": 60180,
+          "decode_ms": 25019
+        },
+        "decoded_audio_wall_ratio": 1.000049852933845,
+        "elapsed_decode_ms_per_audio_second": 415.73612495845794,
+        "heap": {
+          "heap": {
+            "min": 26280,
+            "first_median": 26280,
+            "last_median": 26280
+          },
+          "largest": {
+            "min": 14336,
+            "first_median": 14336,
+            "last_median": 14336
+          }
+        },
+        "dma": {
+          "samples": 13,
+          "start": 242576.125,
+          "end": 242636.234,
+          "observed_seconds": 60.10899999999674,
+          "coverage_complete": true,
+          "maximum_sample_gap_seconds": 5.01600000000326,
+          "delta": {
+            "q_overruns": 0,
+            "writes": 5636,
+            "written_bytes": 11542528,
+            "write_us": 55439904,
+            "errors": 0
+          },
+          "maximum_write_us_since_boot": 14646,
+          "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+          "acoustic_continuity_qualified": false,
+          "overruns_per_second": 0.0,
+          "written_audio_wall_ratio": 1.000138637031669
+        },
+        "telemetry_complete": true,
+        "complete": true,
+        "flow_decoder": {
+          "windows": [
+            {
+              "gen": 37,
+              "window_us": 5013307,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2775100,
+              "pcm_n": 180,
+              "pcm_timeouts": 0,
+              "pcm_max": 31979
+            },
+            {
+              "gen": 37,
+              "window_us": 5013428,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2782663,
+              "pcm_n": 180,
+              "pcm_timeouts": 0,
+              "pcm_max": 31614
+            },
+            {
+              "gen": 37,
+              "window_us": 5014165,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2790444,
+              "pcm_n": 186,
+              "pcm_timeouts": 0,
+              "pcm_max": 31630
+            },
+            {
+              "gen": 37,
+              "window_us": 5025841,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2820968,
+              "pcm_n": 191,
+              "pcm_timeouts": 0,
+              "pcm_max": 33923
+            },
+            {
+              "gen": 37,
+              "window_us": 5013146,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2798389,
+              "pcm_n": 189,
+              "pcm_timeouts": 0,
+              "pcm_max": 34000
+            },
+            {
+              "gen": 37,
+              "window_us": 5013446,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2809364,
+              "pcm_n": 188,
+              "pcm_timeouts": 0,
+              "pcm_max": 33720
+            },
+            {
+              "gen": 37,
+              "window_us": 5013223,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2813475,
+              "pcm_n": 189,
+              "pcm_timeouts": 0,
+              "pcm_max": 31963
+            },
+            {
+              "gen": 37,
+              "window_us": 5010702,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2824465,
+              "pcm_n": 191,
+              "pcm_timeouts": 0,
+              "pcm_max": 32832
+            },
+            {
+              "gen": 37,
+              "window_us": 5024148,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2816363,
+              "pcm_n": 184,
+              "pcm_timeouts": 0,
+              "pcm_max": 32301
+            },
+            {
+              "gen": 37,
+              "window_us": 5013272,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2799726,
+              "pcm_n": 192,
+              "pcm_timeouts": 0,
+              "pcm_max": 31554
+            },
+            {
+              "gen": 37,
+              "window_us": 5013365,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2796170,
+              "pcm_n": 183,
+              "pcm_timeouts": 0,
+              "pcm_max": 33969
+            },
+            {
+              "gen": 37,
+              "window_us": 5013374,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2789740,
+              "pcm_n": 182,
+              "pcm_timeouts": 0,
+              "pcm_max": 32247
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 60.181417,
+          "input": {
+            "us": 0,
+            "count": 0,
+            "wall_percent": 0.0,
+            "mean_us": 0,
+            "max_us": 0,
+            "timeouts": 0
+          },
+          "pcm": {
+            "us": 33616867,
+            "count": 2235,
+            "wall_percent": 55.859214813768844,
+            "mean_us": 15041.103803131991,
+            "max_us": 34000,
+            "timeouts": 0
+          },
+          "coverage": {
+            "measurement_seconds": 65.10899999999674,
+            "observed_seconds": 60.181417,
+            "coverage_percent": 92.43179437559019,
+            "full_intervals": 12,
+            "gaps": [
+              {
+                "start": 242574.75,
+                "end": 242576.111693,
+                "seconds": 1.3616930000134744
+              },
+              {
+                "start": 242586.125,
+                "end": 242586.125835,
+                "seconds": 0.0008350000134669244
+              },
+              {
+                "start": 242591.14,
+                "end": 242591.145159,
+                "seconds": 0.0051589999930001795
+              },
+              {
+                "start": 242596.171,
+                "end": 242596.173854,
+                "seconds": 0.002853999991202727
+              },
+              {
+                "start": 242601.187,
+                "end": 242601.189554,
+                "seconds": 0.002554000006057322
+              },
+              {
+                "start": 242611.203,
+                "end": 242611.207298,
+                "seconds": 0.004297999985283241
+              },
+              {
+                "start": 242616.218,
+                "end": 242616.225852,
+                "seconds": 0.007852000009734184
+              },
+              {
+                "start": 242626.25,
+                "end": 242626.25163500002,
+                "seconds": 0.001635000022361055
+              },
+              {
+                "start": 242631.265,
+                "end": 242631.267626,
+                "seconds": 0.0026259999722242355
+              },
+              {
+                "start": 242636.281,
+                "end": 242639.859,
+                "seconds": 3.5780000000086147
+              }
+            ],
+            "invalid_intervals": [],
+            "maximum_gap_seconds": 3.5780000000086147,
+            "coverage_complete": true
+          },
+          "issues": [],
+          "intervals": [
+            {
+              "at": 242581.125,
+              "seconds": 5.013307,
+              "gen": 37,
+              "window_us": 5013307,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2775100,
+              "pcm_n": 180,
+              "pcm_timeouts": 0,
+              "pcm_max": 31979
+            },
+            {
+              "at": 242586.125,
+              "seconds": 5.013428,
+              "gen": 37,
+              "window_us": 5013428,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2782663,
+              "pcm_n": 180,
+              "pcm_timeouts": 0,
+              "pcm_max": 31614
+            },
+            {
+              "at": 242591.14,
+              "seconds": 5.014165,
+              "gen": 37,
+              "window_us": 5014165,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2790444,
+              "pcm_n": 186,
+              "pcm_timeouts": 0,
+              "pcm_max": 31630
+            },
+            {
+              "at": 242596.171,
+              "seconds": 5.025841,
+              "gen": 37,
+              "window_us": 5025841,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2820968,
+              "pcm_n": 191,
+              "pcm_timeouts": 0,
+              "pcm_max": 33923
+            },
+            {
+              "at": 242601.187,
+              "seconds": 5.013146,
+              "gen": 37,
+              "window_us": 5013146,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2798389,
+              "pcm_n": 189,
+              "pcm_timeouts": 0,
+              "pcm_max": 34000
+            },
+            {
+              "at": 242606.203,
+              "seconds": 5.013446,
+              "gen": 37,
+              "window_us": 5013446,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2809364,
+              "pcm_n": 188,
+              "pcm_timeouts": 0,
+              "pcm_max": 33720
+            },
+            {
+              "at": 242611.203,
+              "seconds": 5.013223,
+              "gen": 37,
+              "window_us": 5013223,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2813475,
+              "pcm_n": 189,
+              "pcm_timeouts": 0,
+              "pcm_max": 31963
+            },
+            {
+              "at": 242616.218,
+              "seconds": 5.010702,
+              "gen": 37,
+              "window_us": 5010702,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2824465,
+              "pcm_n": 191,
+              "pcm_timeouts": 0,
+              "pcm_max": 32832
+            },
+            {
+              "at": 242621.25,
+              "seconds": 5.024148,
+              "gen": 37,
+              "window_us": 5024148,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2816363,
+              "pcm_n": 184,
+              "pcm_timeouts": 0,
+              "pcm_max": 32301
+            },
+            {
+              "at": 242626.25,
+              "seconds": 5.013272,
+              "gen": 37,
+              "window_us": 5013272,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2799726,
+              "pcm_n": 192,
+              "pcm_timeouts": 0,
+              "pcm_max": 31554
+            },
+            {
+              "at": 242631.265,
+              "seconds": 5.013365,
+              "gen": 37,
+              "window_us": 5013365,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2796170,
+              "pcm_n": 183,
+              "pcm_timeouts": 0,
+              "pcm_max": 33969
+            },
+            {
+              "at": 242636.281,
+              "seconds": 5.013374,
+              "gen": 37,
+              "window_us": 5013374,
+              "input_us": 0,
+              "input_n": 0,
+              "input_timeouts": 0,
+              "input_max": 0,
+              "pcm_us": 2789740,
+              "pcm_n": 182,
+              "pcm_timeouts": 0,
+              "pcm_max": 32247
+            }
+          ],
+          "complete": true
+        },
+        "flow_output": {
+          "windows": [
+            {
+              "gen": 37,
+              "window_us": 5013469,
+              "empty_us": 37269,
+              "empty_n": 161,
+              "empty_timeouts": 0,
+              "empty_max": 4714,
+              "submit_us": 4965448,
+              "submit_n": 324,
+              "submit_max": 23447,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5013310,
+              "empty_us": 23590,
+              "empty_n": 158,
+              "empty_timeouts": 0,
+              "empty_max": 2921,
+              "submit_us": 4981255,
+              "submit_n": 324,
+              "submit_max": 23259,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5013469,
+              "empty_us": 25483,
+              "empty_n": 160,
+              "empty_timeouts": 0,
+              "empty_max": 2815,
+              "submit_us": 4977752,
+              "submit_n": 324,
+              "submit_max": 22527,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5001896,
+              "empty_us": 22831,
+              "empty_n": 159,
+              "empty_timeouts": 0,
+              "empty_max": 2388,
+              "submit_us": 4968698,
+              "submit_n": 323,
+              "submit_max": 22931,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5013292,
+              "empty_us": 36685,
+              "empty_n": 161,
+              "empty_timeouts": 1,
+              "empty_max": 4353,
+              "submit_us": 4967775,
+              "submit_n": 324,
+              "submit_max": 22850,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5013480,
+              "empty_us": 33813,
+              "empty_n": 161,
+              "empty_timeouts": 0,
+              "empty_max": 4499,
+              "submit_us": 4971274,
+              "submit_n": 324,
+              "submit_max": 25153,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5013309,
+              "empty_us": 25905,
+              "empty_n": 158,
+              "empty_timeouts": 1,
+              "empty_max": 4285,
+              "submit_us": 4979076,
+              "submit_n": 324,
+              "submit_max": 22761,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5002467,
+              "empty_us": 23689,
+              "empty_n": 159,
+              "empty_timeouts": 0,
+              "empty_max": 4470,
+              "submit_us": 4970245,
+              "submit_n": 323,
+              "submit_max": 25886,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5002890,
+              "empty_us": 26755,
+              "empty_n": 159,
+              "empty_timeouts": 0,
+              "empty_max": 3409,
+              "submit_us": 4967841,
+              "submit_n": 323,
+              "submit_max": 24956,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5013308,
+              "empty_us": 32801,
+              "empty_n": 162,
+              "empty_timeouts": 1,
+              "empty_max": 4463,
+              "submit_us": 4971836,
+              "submit_n": 324,
+              "submit_max": 22686,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5002462,
+              "empty_us": 36410,
+              "empty_n": 161,
+              "empty_timeouts": 0,
+              "empty_max": 4299,
+              "submit_us": 4957793,
+              "submit_n": 323,
+              "submit_max": 24716,
+              "overruns": 0
+            },
+            {
+              "gen": 37,
+              "window_us": 5013313,
+              "empty_us": 34539,
+              "empty_n": 158,
+              "empty_timeouts": 0,
+              "empty_max": 4000,
+              "submit_us": 4970192,
+              "submit_n": 324,
+              "submit_max": 22654,
+              "overruns": 0
+            }
+          ],
+          "malformed": [],
+          "observed_seconds": 60.116665,
+          "empty": {
+            "us": 359770,
+            "count": 1917,
+            "wall_percent": 0.5984530246313564,
+            "mean_us": 187.6734480959833,
+            "max_us": 4714,
+            "timeouts": 3
+          },
+          "submit": {
+            "us": 59649185,
+            "count": 3884,
+            "wall_percent": 99.22237868650897,
+            "mean_us": 15357.668640576725,
+            "max_us": 25886,
+            "timeouts": 0
+          },
+          "overruns": 0,
+          "overruns_per_second": 0.0,
+          "coverage": {
+            "measurement_seconds": 65.10899999999674,
+            "observed_seconds": 60.116665,
+            "coverage_percent": 92.33234268688354,
+            "full_intervals": 12,
+            "gaps": [
+              {
+                "start": 242574.75,
+                "end": 242576.12653100002,
+                "seconds": 1.3765310000162572
+              },
+              {
+                "start": 242581.14,
+                "end": 242581.14268999998,
+                "seconds": 0.0026899999647866935
+              },
+              {
+                "start": 242586.156,
+                "end": 242586.157531,
+                "seconds": 0.0015310000162571669
+              },
+              {
+                "start": 242596.171,
+                "end": 242596.17370800002,
+                "seconds": 0.0027080000145360827
+              },
+              {
+                "start": 242606.187,
+                "end": 242606.189691,
+                "seconds": 0.0026910000015050173
+              },
+              {
+                "start": 242616.203,
+                "end": 242616.21511,
+                "seconds": 0.012109999981475994
+              },
+              {
+                "start": 242626.218,
+                "end": 242626.231538,
+                "seconds": 0.013537999999243766
+              },
+              {
+                "start": 242636.234,
+                "end": 242639.859,
+                "seconds": 3.625
+              }
+            ],
+            "invalid_intervals": [],
+            "maximum_gap_seconds": 3.625,
+            "coverage_complete": true
+          },
+          "issues": [],
+          "intervals": [
+            {
+              "at": 242581.14,
+              "seconds": 5.013469,
+              "gen": 37,
+              "window_us": 5013469,
+              "empty_us": 37269,
+              "empty_n": 161,
+              "empty_timeouts": 0,
+              "empty_max": 4714,
+              "submit_us": 4965448,
+              "submit_n": 324,
+              "submit_max": 23447,
+              "overruns": 0
+            },
+            {
+              "at": 242586.156,
+              "seconds": 5.01331,
+              "gen": 37,
+              "window_us": 5013310,
+              "empty_us": 23590,
+              "empty_n": 158,
+              "empty_timeouts": 0,
+              "empty_max": 2921,
+              "submit_us": 4981255,
+              "submit_n": 324,
+              "submit_max": 23259,
+              "overruns": 0
+            },
+            {
+              "at": 242591.171,
+              "seconds": 5.013469,
+              "gen": 37,
+              "window_us": 5013469,
+              "empty_us": 25483,
+              "empty_n": 160,
+              "empty_timeouts": 0,
+              "empty_max": 2815,
+              "submit_us": 4977752,
+              "submit_n": 324,
+              "submit_max": 22527,
+              "overruns": 0
+            },
+            {
+              "at": 242596.171,
+              "seconds": 5.001896,
+              "gen": 37,
+              "window_us": 5001896,
+              "empty_us": 22831,
+              "empty_n": 159,
+              "empty_timeouts": 0,
+              "empty_max": 2388,
+              "submit_us": 4968698,
+              "submit_n": 323,
+              "submit_max": 22931,
+              "overruns": 0
+            },
+            {
+              "at": 242601.187,
+              "seconds": 5.013292,
+              "gen": 37,
+              "window_us": 5013292,
+              "empty_us": 36685,
+              "empty_n": 161,
+              "empty_timeouts": 1,
+              "empty_max": 4353,
+              "submit_us": 4967775,
+              "submit_n": 324,
+              "submit_max": 22850,
+              "overruns": 0
+            },
+            {
+              "at": 242606.187,
+              "seconds": 5.01348,
+              "gen": 37,
+              "window_us": 5013480,
+              "empty_us": 33813,
+              "empty_n": 161,
+              "empty_timeouts": 0,
+              "empty_max": 4499,
+              "submit_us": 4971274,
+              "submit_n": 324,
+              "submit_max": 25153,
+              "overruns": 0
+            },
+            {
+              "at": 242611.203,
+              "seconds": 5.013309,
+              "gen": 37,
+              "window_us": 5013309,
+              "empty_us": 25905,
+              "empty_n": 158,
+              "empty_timeouts": 1,
+              "empty_max": 4285,
+              "submit_us": 4979076,
+              "submit_n": 324,
+              "submit_max": 22761,
+              "overruns": 0
+            },
+            {
+              "at": 242616.203,
+              "seconds": 5.002467,
+              "gen": 37,
+              "window_us": 5002467,
+              "empty_us": 23689,
+              "empty_n": 159,
+              "empty_timeouts": 0,
+              "empty_max": 4470,
+              "submit_us": 4970245,
+              "submit_n": 323,
+              "submit_max": 25886,
+              "overruns": 0
+            },
+            {
+              "at": 242621.218,
+              "seconds": 5.00289,
+              "gen": 37,
+              "window_us": 5002890,
+              "empty_us": 26755,
+              "empty_n": 159,
+              "empty_timeouts": 0,
+              "empty_max": 3409,
+              "submit_us": 4967841,
+              "submit_n": 323,
+              "submit_max": 24956,
+              "overruns": 0
+            },
+            {
+              "at": 242626.218,
+              "seconds": 5.013308,
+              "gen": 37,
+              "window_us": 5013308,
+              "empty_us": 32801,
+              "empty_n": 162,
+              "empty_timeouts": 1,
+              "empty_max": 4463,
+              "submit_us": 4971836,
+              "submit_n": 324,
+              "submit_max": 22686,
+              "overruns": 0
+            },
+            {
+              "at": 242631.234,
+              "seconds": 5.002462,
+              "gen": 37,
+              "window_us": 5002462,
+              "empty_us": 36410,
+              "empty_n": 161,
+              "empty_timeouts": 0,
+              "empty_max": 4299,
+              "submit_us": 4957793,
+              "submit_n": 323,
+              "submit_max": 24716,
+              "overruns": 0
+            },
+            {
+              "at": 242636.234,
+              "seconds": 5.013313,
+              "gen": 37,
+              "window_us": 5013313,
+              "empty_us": 34539,
+              "empty_n": 158,
+              "empty_timeouts": 0,
+              "empty_max": 4000,
+              "submit_us": 4970192,
+              "submit_n": 324,
+              "submit_max": 22654,
+              "overruns": 0
+            }
+          ],
+          "complete": true
+        },
+        "whole_dma_events": []
+      },
+      "pacing_ratio": 1.0,
+      "runtime_review": "PASS"
+    }
+  },
+  "incomplete": [],
+  "controller_fractional-clock": {
+    "identity": {
+      "version": "idf61-prefill-min250",
+      "partition": "app0",
+      "max_size": 1900544,
+      "app_elf_sha256": "5a17d251e0a7b308dd011e850b1b1016afba0b46bc7dee6263b82f8c624a4ff3"
+    },
+    "rows": [
+      {
+        "at": 242355.906,
+        "line": "FLASH_PROBE_ENV expected=qio ctrl=0x012c2008 clock=0x80000000 source_mhz=80 divider=1 actual_mhz=80 cpu_hz=160000000 jedec=0x464016 physical_bytes=4194304"
+      },
+      {
+        "at": 242356.218,
+        "line": "FLASH_PROBE_READ pass=1 offset=0x00010000 bytes=1622096 crc32=0x2f93ccaa"
+      },
+      {
+        "at": 242356.421,
+        "line": "FLASH_PROBE_READ pass=2 offset=0x00010000 bytes=1622096 crc32=0x2f93ccaa"
+      },
+      {
+        "at": 242356.625,
+        "line": "FLASH_PROBE_READ pass=3 offset=0x00010000 bytes=1622096 crc32=0x2f93ccaa"
+      },
+      {
+        "at": 242356.828,
+        "line": "FLASH_PROBE_READ pass=4 offset=0x00010000 bytes=1622096 crc32=0x2f93ccaa"
+      },
+      {
+        "at": 242356.828,
+        "line": "FLASH_PROBE_PASS normal_app_follows=1"
+      },
+      {
+        "at": 242361.156,
+        "line": "I (13520) i2s_pdm: PERF PDM_CLOCK: sclk=160000000 source=2 integer=2 x=311 y=0 z=1 yn1=0 bdiv=13 osr=2 fp=960 fs=480"
+      }
+    ],
+    "transport": [],
+    "clocks": [
+      {
+        "at": 242361.156,
+        "registers": {
+          "sclk": 160000000,
+          "source": 2,
+          "integer": 2,
+          "x": 311,
+          "y": 0,
+          "z": 1,
+          "yn1": 0,
+          "bdiv": 13,
+          "osr": 2,
+          "fp": 960,
+          "fs": 480
+        },
+        "divider": "625/312",
+        "nominal_pcm_hz_fraction": "48000",
+        "nominal_pcm_hz": 48000.0,
+        "error_ppm": 0.0,
+        "exact_nominal_48khz": true,
+        "note": "Configured register readback; source Hz is nominal, not externally measured."
+      }
+    ],
+    "parsed": true
+  },
+  "controller_host-failure-monitor": [],
+  "controller_initial": {
+    "identity": {
+      "version": "idf61-qio80-8c1f2d2d",
+      "partition": "app1",
+      "max_size": 1900544,
+      "app_elf_sha256": "54ec71b493261f3c00f86a649625c83e8c772b00eb2af5a3aae594c25e937094"
+    },
+    "status": {
+      "firmware": "esp32c3-oled-native",
+      "network": "client",
+      "audio": true,
+      "format": "AAC PCM 44.1 kHz stereo",
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits_per_sample": 16,
+      "pcm_sample_rate": 44100,
+      "pcm_channels": 2,
+      "format_is_pcm": true,
+      "channels_are_core": false,
+      "rssi": -67
+    },
+    "candidate": {
+      "app_elf_sha256": "5a17d251e0a7b308dd011e850b1b1016afba0b46bc7dee6263b82f8c624a4ff3",
+      "sha256": "89d320f663bda6439456c95b6f47d09cd5cac2d434ff9fe85df568fa07fbae9c",
+      "bytes": 1622096
+    },
+    "quiet": {
+      "app_elf_sha256": "54ec71b493261f3c00f86a649625c83e8c772b00eb2af5a3aae594c25e937094",
+      "sha256": "21311e2f87a97cbbf03fe3036111334df8fac75ffe63b9b3207ff2d02e82de0a",
+      "bytes": 1446688
+    },
+    "source_head": "6fc12daeb3510d42e8eede106ef6d5333d014a5f",
+    "test_sources_sha256": {
+      "tools/esp32c3_tests/aac_reference.py": "7fb171138167be63ae8503c3c39ca1f664feb13eaea3d89727d4ea617e59aaf3",
+      "tools/esp32c3_tests/allocations.py": "b2478abdad5627c08a9af520c4ab776e0232b51edfd70006905dec96a1095ea7",
+      "tools/esp32c3_tests/common.py": "88969816d5215e05d0a01361cbbe6f26e4fd2b08746be0e0a51ef71570fa88a5",
+      "tools/esp32c3_tests/compare_latency.py": "4530ec501fb350e9b7bf1c6b4c63724754296fe835c346e6ebc18354db25c394",
+      "tools/esp32c3_tests/compare_output_dma.py": "04de602acaed8846b3dc0c37a8ca11b061a436be1730cfadd4c2b408591e56b0",
+      "tools/esp32c3_tests/compare_output_priority.py": "073979d7a6ddd40ab324b6d06c80c35131cc180a26a1a8bc5f11780e3a1153cc",
+      "tools/esp32c3_tests/compare_output_priority_matrix.py": "680840fb1beb2d4c6a9708e460803411820f82107e1679c4d39eb8023f8962fb",
+      "tools/esp32c3_tests/connection_retry.py": "1c0a17e8c023511a0f975f63d3493c6e24bab1e3cb4b69a0615b51a7cab080b1",
+      "tools/esp32c3_tests/diagnostic.py": "9ed286e6931eb74d683a417ddeeea654847412f1b088b2d88f80a9afbcc82ac4",
+      "tools/esp32c3_tests/flac_truncation.py": "8ed8a8dbce97bf7384be558bff1c55b0bf37f707f2c1879ca5b96058c0e49e56",
+      "tools/esp32c3_tests/flash_constants.py": "7bf7955d7c1d1cf2fa6806baa4ef4413c151610c0bd40eace96e3972b4350ae5",
+      "tools/esp32c3_tests/flash_mode.py": "16ada30f8abf9d66937e82e21e041c4aabceccd319f0c756109becaa61532ffb",
+      "tools/esp32c3_tests/heap_fragment.py": "998c454faad743f4fa14bd3be960ede6944a4a5e522e45d749b42120f07fd803",
+      "tools/esp32c3_tests/heap_idle.py": "3b31cd39fb91b92b28c33a7f64633689b1535741510bd6a32b3ed9efeef3d643",
+      "tools/esp32c3_tests/heap_receive_correlation.py": "0fbe6924928b89aecf6d37cf4b8a6368e3eaf0746b55a989b24fed73de62b212",
+      "tools/esp32c3_tests/http_headers.py": "845395d01169e27be0211d2deeef1a42f9ce486f5f6756a2e16b16cace269d29",
+      "tools/esp32c3_tests/icy_metadata.py": "1b2260230a21d2526bc2a737125d956f105000c2bdeae2054a574f639d66a03e",
+      "tools/esp32c3_tests/iram_inventory.py": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f",
+      "tools/esp32c3_tests/load_windows.py": "eee95396e81156bb4ae8b74a1e165d0fa4f3912ff1d0a1dbb1d86584d28b9df2",
+      "tools/esp32c3_tests/memory.py": "2d02410fb60db20f90f3131812e6db10657d99865bbc791427f04bcfa89eae81",
+      "tools/esp32c3_tests/network_memory.py": "c77cef3021fb54c9b08f07c1ee25f3938cefc97e176724689ef2b005957d2aca",
+      "tools/esp32c3_tests/ota.py": "b893602a1faf034846b74e594cd1594d504f73271f905fab2ea87270b0ab6ee5",
+      "tools/esp32c3_tests/ota_diagnostic.py": "1ef7902be1cd8b686a8952a41d9aa80941b0e1301ac29b9a6670a7b28e568af8",
+      "tools/esp32c3_tests/ota_transition.py": "28d55e1a99489c5ede457dbb6ddfc82fbf327ce0a61cac3ccb277ec0fca2c5f6",
+      "tools/esp32c3_tests/output_priority_matrix.py": "d5ed53dfcd71d757576cb5e6649e14aef4b476622460d5e3bab63baa7b14c475",
+      "tools/esp32c3_tests/pcm_tail.py": "60725e812321a0140e0498ada8ab8ac5450c7d0c71ba264aef2de32284294406",
+      "tools/esp32c3_tests/pdm_clock.py": "9858b6b13dd76cc6d083d8f854e5a285984fca54156b7e1d8c5c1c4844cdec02",
+      "tools/esp32c3_tests/pipeline_flow.py": "0de43140ad727f21d5068d611a5c31fa3c62de9451175ab1bf0033454307c239",
+      "tools/esp32c3_tests/pipeline_flow_study.py": "bf464bbdbb6b3d67d019e68b8ea1861cc34df89f4e2f2df7c272266a210d1e82",
+      "tools/esp32c3_tests/pool_settle.py": "805b05ba463b0b5d91b3587abd1c7c4712cdfde37f44413ef74ca37bd63f3eb0",
+      "tools/esp32c3_tests/public_streams.py": "5e41a2a69cb9b69d2c6f8957258285d2f9478ff6c39aaafafde00a8b83264107",
+      "tools/esp32c3_tests/radio_flac_study.py": "25c55f49cf95a2117c499a90da6b53f3a0212b76a82b36ac1fb9f3dd7ea07a76",
+      "tools/esp32c3_tests/reboot_tls.py": "39bc4b53db14bf5eda5352dbee3bcb03e14ee70128e6c9109771bdaabe5bfde2",
+      "tools/esp32c3_tests/reference_eof.py": "7828d8746c12f98d174d32ce1e5c2251e71b331e35d7b2dffd69c6a66e23974f",
+      "tools/esp32c3_tests/run.py": "3333f089a23825189a63efd803210daa9edb0eb776292beabed075b9094cc512",
+      "tools/esp32c3_tests/rx_ownership.py": "448b976c1d915d3f413cfb055b02fa0aa9a0a3e9253e72af65127f413e992829",
+      "tools/esp32c3_tests/serial_lines.py": "54a0dfa271186f9de5206c8061423138769cffa3523a002a5c000d5d6abd2316",
+      "tools/esp32c3_tests/staged_dma.py": "84412aaaae33491863411207c01c7b9c8702a9e232a899459d91845bb4d5e1fc",
+      "tools/esp32c3_tests/stream_memory_study.py": "2ec9fe9d46069143fbd4c6ca3edeace91819f7b0f74277d46753e61a58b27ade",
+      "tools/esp32c3_tests/summarize_codec_sequence.py": "90f94232cbdd247be4ac21f73a9aebcc726f3d49186c2233109b1454f63a2166",
+      "tools/esp32c3_tests/summarize_load.py": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133",
+      "tools/esp32c3_tests/summarize_memory.py": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae",
+      "tools/esp32c3_tests/summarize_public.py": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+      "tools/esp32c3_tests/summarize_public_windows.py": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709",
+      "tools/esp32c3_tests/summarize_radio_flac.py": "72d66f872f1b511d9964e16cb72e7885791dd7bb8a9499ac0244678bf7135c47",
+      "tools/esp32c3_tests/summarize_rx_ownership.py": "0e62d6da908502efbfd4111aa7491b9f8a195219ac325a10862c93ab9e116685",
+      "tools/esp32c3_tests/summarize_stream_memory.py": "d32c496ce429750a5565b4396bcc1030b5319ebe33eee9940e390cb62d788697",
+      "tools/esp32c3_tests/summarize_sustained.py": "6f3a7786ec5c36935a2fd7714c8add9a9ccbf686b887eaa074e55e325e814245",
+      "tools/esp32c3_tests/summarize_terminal_cpu.py": "db99ad6e55f2b3e671106cdb2c3902225704d9167a2e65ef662fe23c726c69bd",
+      "tools/esp32c3_tests/summarize_terminal_memory.py": "f351cf6f73e9d256a406e8a7da5b65ab46e354b0cefca7543536f3ebac077bda",
+      "tools/esp32c3_tests/terminal_memory.py": "e920df2d0150a1e93e982c1fa06578444879e35c2158fee270ebd2f041bbe478",
+      "tools/esp32c3_tests/tls_error_codes.py": "d7b8baa6309ed2d14b8c825ebdd29b3e7461bc8cfea565a8268e5e69d638f6f4",
+      "tools/esp32c3_tests/tls_framing.py": "c937d76cedefeb7a56ae5cef783bd2ca796b0987d4d43eab99ba952a467b1910",
+      "tools/esp32c3_tests/tls_path.py": "52d1199afc26194e266252f7fd6a141875c03190a5abfb3e68068f957f7fbe42",
+      "tools/esp32c3_tests/tls_records.py": "7527068b5255dc1a3319b5986c0f1b0a4bf186b2be6b69d7ef68dad7bbd04fee",
+      "tools/esp32c3_tests/trace_transport.py": "0a50fe3ed2a8058529f18cfa7086286b9a973a9eeeaa7514b800a7ef9d1320ce",
+      "tools/esp32c3_tests/transport.py": "b3e41e4d54431fdbb5f26e88727a45e99c9958dba9097cb724fdae55f9ca1686",
+      "tools/esp32c3_tests/verify_adaptive_input_link.py": "d2c2bbe2c2cde72665828318aab4ee6f02e7245852fb57cbfd0ca9cf3e5ee247",
+      "tools/esp32c3_tests/verify_gcm_byte_link.py": "d46f80cabf959514832f70b50ca6817714039e4091195575b8af16da9235b5f1",
+      "tools/esp32c3_tests/verify_http_link.py": "caf7314d37464b1f4aeb7bdaa0e49cd84fb901bfacbef3c9dfc5caceb1124f73",
+      "tools/esp32c3_tests/verify_tls_path_link.py": "75f102153680aac6a11092bfeec9cc0b04ba899080c0d56ab473f757087cff6e",
+      "tools/audio_test_server/fixtures.py": "c8b5e79eb559b377228da5f53aa3d68da8622b789f23aa7491bebdaf4b8b7642",
+      "tools/audio_test_server/generate.py": "21f37cb2f4a8d5c3881227199d8ee3fae8e373bd7c13373ec75baf44d339b0c8",
+      "tools/audio_test_server/generate_flac_depths.py": "6f15589438a6fd31fb937e95e7f840a3288ff083c5e3771b6e9b486cede9f4c1",
+      "tools/audio_test_server/generate_flac_high_depth.py": "55417b00036c9256c5229fe51447be47b238dafa45b9f14e124771c09d515068",
+      "tools/audio_test_server/generate_pcm_tails.py": "a928505b88ea9c439bcf87aa0626de7ed2395129f9caf6b79e6081cc902d9c23",
+      "tools/audio_test_server/generate_stress.py": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e",
+      "tools/audio_test_server/icy.py": "d9ed666a8cf63f897e414c402e4b1dab8ae52cd8066a0a30ae6f85b70f1aef29",
+      "tools/audio_test_server/make_test_certificate.py": "6771a7840b4c704c0e7f5ea50c14beeee110edfca63f171bbe8ca9beecd3330a",
+      "tools/audio_test_server/record_test_ca.py": "de680e4970d042e9d18744c9779822897c6b5e8930a75aa7cc9184dace79aaeb",
+      "tools/audio_test_server/server.py": "d61ebdb382efe2c2cfa01a8146b17124ca7c101fd7899734c4d0037b46c0d433",
+      "tools/audio_test_server/tls_framing.py": "de99ac3673730263b24c9ed4a1ace1d6a2eaa0387e4977c4992e56e3cf74097c",
+      "tools/audio_test_server/tls_records.py": "f4054958ab794eaf687572a13c144a4f9256120d274d031d8c8333f3f8fc2aa4"
+    },
+    "ca_sha256": "5d07cd4783170ceeb5933e41a9618d7c0775567f7e9307d8478390cf3f526de8",
+    "leaf_sha256": "4d6a4af374578942056ad33c30afe1c9653476d27b5daf9666716bb9c9fb6b35",
+    "untrusted_cert_sha256": "94d2041ab590fd2deacef08f91734844cf54d84993f2a79af31d972f4053bedf"
+  },
+  "controller_installed": {
+    "identity": {
+      "version": "idf61-prefill-min250",
+      "partition": "app0",
+      "max_size": 1900544,
+      "app_elf_sha256": "5a17d251e0a7b308dd011e850b1b1016afba0b46bc7dee6263b82f8c624a4ff3"
+    },
+    "persistence": {
+      "wifi_unchanged": true,
+      "playlist_unchanged": true,
+      "settings_unchanged": true
+    }
+  },
+  "controller_phases": [
+    {
+      "name": "framing",
+      "code": 0,
+      "seconds": 163.56299999999464
+    },
+    {
+      "name": "certificate-rejection",
+      "code": 0,
+      "seconds": 23.187999999994645
+    },
+    {
+      "name": "records-after-rejection",
+      "code": 0,
+      "seconds": 102.68799999999464
+    }
+  ],
+  "controller_restoration": {
+    "identity": {
+      "version": "idf61-qio80-8c1f2d2d",
+      "partition": "app1",
+      "max_size": 1900544,
+      "app_elf_sha256": "54ec71b493261f3c00f86a649625c83e8c772b00eb2af5a3aae594c25e937094"
+    },
+    "persistence": {
+      "wifi_unchanged": true,
+      "playlist_unchanged": true,
+      "settings_unchanged": true
+    },
+    "states": [
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": true,
+        "format": "AAC PCM 44.1 kHz stereo",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 16,
+        "pcm_sample_rate": 44100,
+        "pcm_channels": 2,
+        "format_is_pcm": true,
+        "channels_are_core": false,
+        "rssi": -63
+      },
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": true,
+        "format": "AAC PCM 44.1 kHz stereo",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 16,
+        "pcm_sample_rate": 44100,
+        "pcm_channels": 2,
+        "format_is_pcm": true,
+        "channels_are_core": false,
+        "rssi": -69
+      },
+      {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": true,
+        "format": "AAC PCM 44.1 kHz stereo",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 16,
+        "pcm_sample_rate": 44100,
+        "pcm_channels": 2,
+        "format_is_pcm": true,
+        "channels_are_core": false,
+        "rssi": -63
+      }
+    ]
+  },
+  "controller_settings-after-tests": {
+    "wifi_unchanged": true,
+    "playlist_unchanged": true,
+    "settings_unchanged": true
+  },
+  "restored": true,
+  "result": "PASS",
+  "result_scope": "Integrity and replay, not an all-firmware-gates verdict."
+}

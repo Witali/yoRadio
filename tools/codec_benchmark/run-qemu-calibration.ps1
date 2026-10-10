@@ -13,7 +13,9 @@ if (-not $DependencyRoot) { $DependencyRoot = Join-Path $repo ".idf" }
 if (-not $OutputDirectory) { $OutputDirectory = Join-Path $repo ".build/qemu-codec-calibration" }
 $DependencyRoot = [IO.Path]::GetFullPath($DependencyRoot)
 $OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
-$python = Join-Path $DependencyRoot "tools-v6.0.2/python_env/idf6.0_py3.12_env/Scripts/python.exe"
+$idfVersion = (Get-Content -LiteralPath (Join-Path $repo 'idf/esp32c3-oled-native/idf-version.txt') -Raw).Trim()
+$idfSeries = $idfVersion -replace '^v(\d+\.\d+).*$', '$1'
+$python = Join-Path $DependencyRoot "tools-$idfVersion/python_env/idf${idfSeries}_py3.12_env/Scripts/python.exe"
 if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw "ESP-IDF Python is unavailable: $python" }
 $project = Join-Path $repo "idf/esp32c3-oled-native"
 $log = Join-Path (Join-Path $project $BuildDirectory) "qemu-smoke.log"

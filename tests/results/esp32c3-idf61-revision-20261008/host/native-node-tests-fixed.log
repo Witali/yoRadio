@@ -1,0 +1,286 @@
+TAP version 13
+# Subtest: repository default setup and build select native ESP-IDF firmware
+ok 1 - repository default setup and build select native ESP-IDF firmware
+  ---
+  duration_ms: 2.5198
+  type: 'test'
+  ...
+# Subtest: debug and production profiles compile the same sources
+ok 2 - debug and production profiles compile the same sources
+  ---
+  duration_ms: 1.6085
+  type: 'test'
+  ...
+# Subtest: production builds save the application under firmware
+ok 3 - production builds save the application under firmware
+  ---
+  duration_ms: 2.0949
+  type: 'test'
+  ...
+# Subtest: ESP32-C3 native target is Arduino-free and selects the RISC-V chip
+ok 4 - ESP32-C3 native target is Arduino-free and selects the RISC-V chip
+  ---
+  duration_ms: 1.1708
+  type: 'test'
+  ...
+# Subtest: native board profile maps OLED, controls and stereo PDM pins
+ok 5 - native board profile maps OLED, controls and stereo PDM pins
+  ---
+  duration_ms: 1.0197
+  type: 'test'
+  ...
+# Subtest: native task stacks are configured by each board profile
+ok 6 - native task stacks are configured by each board profile
+  ---
+  duration_ms: 3.6894
+  type: 'test'
+  ...
+# Subtest: native OLED driver uses the 72x40 geometry and controller offset
+ok 7 - native OLED driver uses the 72x40 geometry and controller offset
+  ---
+  duration_ms: 0.6693
+  type: 'test'
+  ...
+# Subtest: native OLED presents a legible full-screen yoRadio boot logo first
+ok 8 - native OLED presents a legible full-screen yoRadio boot logo first
+  ---
+  duration_ms: 2.0657
+  type: 'test'
+  ...
+# Subtest: stopped-radio screensaver draws a full-screen clock and wakes on BOOT
+ok 9 - stopped-radio screensaver draws a full-screen clock and wakes on BOOT
+  ---
+  duration_ms: 2.5902
+  type: 'test'
+  ...
+# Subtest: native SNTP owns server names and retries at low priority after reconnect
+ok 10 - native SNTP owns server names and retries at low priority after reconnect
+  ---
+  duration_ms: 1.3389
+  type: 'test'
+  ...
+# Subtest: native OLED brightness uses the shared 0..100 setting and persists it
+ok 11 - native OLED brightness uses the shared 0..100 setting and persists it
+  ---
+  duration_ms: 1.3564
+  type: 'test'
+  ...
+# Subtest: native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll
+ok 12 - native OLED uses 15-pixel Spleen rows, inverse station and smooth scroll
+  ---
+  duration_ms: 1.0432
+  type: 'test'
+  ...
+# Subtest: native OLED defaults to software scroll and keeps hardware scroll optional
+ok 13 - native OLED defaults to software scroll and keeps hardware scroll optional
+  ---
+  duration_ms: 1.3074
+  type: 'test'
+  ...
+# Subtest: native OLED alternates ICY title with live stream parameters
+ok 14 - native OLED alternates ICY title with live stream parameters
+  ---
+  duration_ms: 1.0995
+  type: 'test'
+  ...
+# Subtest: native WebUI and OLED share the confirmed decoded format
+ok 15 - native WebUI and OLED share the confirmed decoded format
+  ---
+  duration_ms: 0.7312
+  type: 'test'
+  ...
+# Subtest: native OLED normalizes dash variants before the replacement glyph
+ok 16 - native OLED normalizes dash variants before the replacement glyph
+  ---
+  duration_ms: 0.3936
+  type: 'test'
+  ...
+# Subtest: native radio requests and publishes ICY song metadata
+ok 17 - native radio requests and publishes ICY song metadata
+  ---
+  duration_ms: 1.8974
+  type: 'test'
+  ...
+# Subtest: native HTTPS station switching releases incompatible codec memory before TLS
+ok 18 - native HTTPS station switching releases incompatible codec memory before TLS
+  ---
+  duration_ms: 2.7977
+  type: 'test'
+  ...
+# Subtest: native WebUI publishes ICY or decoder bitrate instead of a constant zero
+ok 19 - native WebUI publishes ICY or decoder bitrate instead of a constant zero
+  ---
+  duration_ms: 1.2699
+  type: 'test'
+  ...
+# Subtest: native BOOT gestures match the documented one-button controls
+ok 20 - native BOOT gestures match the documented one-button controls
+  ---
+  duration_ms: 1.4999
+  type: 'test'
+  ...
+# Subtest: single-core pipeline never pins work to nonexistent core 1
+ok 21 - single-core pipeline never pins work to nonexistent core 1
+  ---
+  duration_ms: 0.761
+  type: 'test'
+  ...
+# Subtest: single-core decoder yields to idle and drops obsolete station data
+ok 22 - single-core decoder yields to idle and drops obsolete station data
+  ---
+  duration_ms: 0.4921
+  type: 'test'
+  ...
+# Subtest: native ESP-IDF decoders advance past consumed compressed input
+ok 23 - native ESP-IDF decoders advance past consumed compressed input
+  ---
+  duration_ms: 1.0601
+  type: 'test'
+  ...
+# Subtest: native decoder reports measured real-time headroom
+ok 24 - native decoder reports measured real-time headroom
+  ---
+  duration_ms: 0.4604
+  type: 'test'
+  ...
+# Subtest: native audio pipeline batches PCM using the current decoded layout
+ok 25 - native audio pipeline batches PCM using the current decoded layout
+  ---
+  duration_ms: 0.7519
+  type: 'test'
+  ...
+# Subtest: native FLAC reuses the optimized yoRadio decoder without Arduino Core
+ok 26 - native FLAC reuses the optimized yoRadio decoder without Arduino Core
+  ---
+  duration_ms: 1.153
+  type: 'test'
+  ...
+# Subtest: native decoder errors and EOF release independent PCM before terminal publication
+ok 27 - native decoder errors and EOF release independent PCM before terminal publication
+  ---
+  duration_ms: 0.4377
+  type: 'test'
+  ...
+# Subtest: native FLAC decoder is selectable at compile time
+ok 28 - native FLAC decoder is selectable at compile time
+  ---
+  duration_ms: 0.9188
+  type: 'test'
+  ...
+# Subtest: native MP3 and AAC alternatives are selectable at compile time
+ok 29 - native MP3 and AAC alternatives are selectable at compile time
+  ---
+  duration_ms: 1.1724
+  type: 'test'
+  ...
+# Subtest: native ESP-IDF boards default to Espressif MP3
+ok 30 - native ESP-IDF boards default to Espressif MP3
+  ---
+  duration_ms: 2.4902
+  type: 'test'
+  ...
+# Subtest: shared WebUI does not expose MP3 backend selection
+ok 31 - shared WebUI does not expose MP3 backend selection
+  ---
+  duration_ms: 0.5351
+  type: 'test'
+  ...
+# Subtest: native benchmark build reads codec fixtures only from dedicated flash
+ok 32 - native benchmark build reads codec fixtures only from dedicated flash
+  ---
+  duration_ms: 0.5898
+  type: 'test'
+  ...
+# Subtest: native partition table reserves 256 KiB for SPIFFS with dual OTA
+ok 33 - native partition table reserves 256 KiB for SPIFFS with dual OTA
+  ---
+  duration_ms: 0.3715
+  type: 'test'
+  ...
+# Subtest: native C3 uses wifi.csv as its only persistent credential source
+ok 34 - native C3 uses wifi.csv as its only persistent credential source
+  ---
+  duration_ms: 0.2882
+  type: 'test'
+  ...
+# Subtest: native C3 disables modem sleep only while audio is active
+ok 35 - native C3 disables modem sleep only while audio is active
+  ---
+  duration_ms: 0.7276
+  type: 'test'
+  ...
+# Subtest: native audio buffers cover high-bitrate remote streams
+ok 36 - native audio buffers cover high-bitrate remote streams
+  ---
+  duration_ms: 1.6932
+  type: 'test'
+  ...
+# Subtest: native C3 refreshes Wi-Fi signal strength for WebSocket status
+ok 37 - native C3 refreshes Wi-Fi signal strength for WebSocket status
+  ---
+  duration_ms: 0.4552
+  type: 'test'
+  ...
+# Subtest: native WebUI publishes player changes promptly and uses buffer percent
+ok 38 - native WebUI publishes player changes promptly and uses buffer percent
+  ---
+  duration_ms: 1.1538
+  type: 'test'
+  ...
+# Subtest: native stream connection reports HTTP failures and follows redirects
+ok 39 - native stream connection reports HTTP failures and follows redirects
+  ---
+  duration_ms: 0.4542
+  type: 'test'
+  ...
+# Subtest: native audio buffers backpressure instead of dropping a live stream
+ok 40 - native audio buffers backpressure instead of dropping a live stream
+  ---
+  duration_ms: 0.5839
+  type: 'test'
+  ...
+# Subtest: native WebUI uses only the standard ESP-IDF HTTP and WebSocket server
+ok 41 - native WebUI uses only the standard ESP-IDF HTTP and WebSocket server
+  ---
+  duration_ms: 1.0973
+  type: 'test'
+  ...
+# Subtest: native settings page is complete in client mode and Wi-Fi-only in AP mode
+ok 42 - native settings page is complete in client mode and Wi-Fi-only in AP mode
+  ---
+  duration_ms: 1.0536
+  type: 'test'
+  ...
+# Subtest: native WebUI reuses shared pages and recovers an empty filesystem
+ok 43 - native WebUI reuses shared pages and recovers an empty filesystem
+  ---
+  duration_ms: 0.8839
+  type: 'test'
+  ...
+# Subtest: native playlist reload event is emitted only after a successful upload
+ok 44 - native playlist reload event is emitted only after a successful upload
+  ---
+  duration_ms: 0.7405
+  type: 'test'
+  ...
+# Subtest: native SPIFFS image contains the shared WebUI and repository playlist
+ok 45 - native SPIFFS image contains the shared WebUI and repository playlist
+  ---
+  duration_ms: 0.279
+  type: 'test'
+  ...
+# Subtest: native radio persists and restores the last selected station
+ok 46 - native radio persists and restores the last selected station
+  ---
+  duration_ms: 0.3956
+  type: 'test'
+  ...
+1..46
+# tests 46
+# suites 0
+# pass 46
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 164.5485

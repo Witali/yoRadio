@@ -1,0 +1,123 @@
+42022b70:	7159                	addi	sp,sp,-112
+42022b72:	cece                	sw	s3,92(sp)
+42022b74:	500009b7          	lui	s3,0x50000
+42022b78:	00098793          	mv	a5,s3
+42022b7c:	d2a6                	sw	s1,100(sp)
+42022b7e:	3c12a4b7          	lui	s1,0x3c12a
+42022b82:	ccd2                	sw	s4,88(sp)
+42022b84:	d23e                	sw	a5,36(sp)
+42022b86:	3c12aa37          	lui	s4,0x3c12a
+42022b8a:	5c048793          	addi	a5,s1,1472 # 3c12a5c0 <_esp_libc_clock_array_end+0xa470>
+42022b8e:	d43e                	sw	a5,40(sp)
+42022b90:	5c8a0793          	addi	a5,s4,1480 # 3c12a5c8 <_esp_libc_clock_array_end+0xa478>
+42022b94:	d4a2                	sw	s0,104(sp)
+42022b96:	d0ca                	sw	s2,96(sp)
+42022b98:	cad6                	sw	s5,84(sp)
+42022b9a:	d686                	sw	ra,108(sp)
+42022b9c:	c8da                	sw	s6,80(sp)
+42022b9e:	c6de                	sw	s7,76(sp)
+42022ba0:	c4e2                	sw	s8,72(sp)
+42022ba2:	c2e6                	sw	s9,68(sp)
+42022ba4:	c0ea                	sw	s10,64(sp)
+42022ba6:	de6e                	sw	s11,60(sp)
+42022ba8:	d63e                	sw	a5,44(sp)
+42022baa:	04000413          	li	s0,64
+42022bae:	3fc9a937          	lui	s2,0x3fc9a
+42022bb2:	3fc9aab7          	lui	s5,0x3fc9a
+42022bb6:	a0b5                	j	42022c22 <web_tcp_probe_poll+0xb2>
+42022bb8:	431c                	lw	a5,0(a4)
+42022bba:	00472c03          	lw	s8,4(a4)
+42022bbe:	00875d03          	lhu	s10,8(a4)
+42022bc2:	d03e                	sw	a5,32(sp)
+42022bc4:	3fc9a7b7          	lui	a5,0x3fc9a
+42022bc8:	00a74c83          	lbu	s9,10(a4)
+42022bcc:	00b74d83          	lbu	s11,11(a4)
+42022bd0:	00c74a03          	lbu	s4,12(a4)
+42022bd4:	00d74b03          	lbu	s6,13(a4)
+42022bd8:	00e70983          	lb	s3,14(a4)
+42022bdc:	00f74483          	lbu	s1,15(a4)
+42022be0:	db87ab83          	lw	s7,-584(a5) # 3fc99db8 <s_dropped>
+42022be4:	dcc92223          	sw	a2,-572(s2) # 3fc99dc4 <s_read>
+42022be8:	fe365097          	auipc	ra,0xfe365
+42022bec:	462080e7          	jalr	1122(ra) # 4038804a <vPortExitCritical>
+42022bf0:	fe367097          	auipc	ra,0xfe367
+42022bf4:	8ae080e7          	jalr	-1874(ra) # 4038949e <esp_log_timestamp>
+42022bf8:	5722                	lw	a4,40(sp)
+42022bfa:	5782                	lw	a5,32(sp)
+42022bfc:	5632                	lw	a2,44(sp)
+42022bfe:	86aa                	mv	a3,a0
+42022c00:	cc5e                	sw	s7,24(sp)
+42022c02:	ca26                	sw	s1,20(sp)
+42022c04:	c84e                	sw	s3,16(sp)
+42022c06:	c65a                	sw	s6,12(sp)
+42022c08:	c452                	sw	s4,8(sp)
+42022c0a:	c26e                	sw	s11,4(sp)
+42022c0c:	c06a                	sw	s10,0(sp)
+42022c0e:	88e6                	mv	a7,s9
+42022c10:	8862                	mv	a6,s8
+42022c12:	85ba                	mv	a1,a4
+42022c14:	450d                	li	a0,3
+42022c16:	147d                	addi	s0,s0,-1
+42022c18:	fe366097          	auipc	ra,0xfe366
+42022c1c:	77e080e7          	jalr	1918(ra) # 40389396 <esp_log>
+42022c20:	c415                	beqz	s0,42022c4c <web_tcp_probe_poll+0xdc>
+42022c22:	fe365097          	auipc	ra,0xfe365
+42022c26:	3ec080e7          	jalr	1004(ra) # 4038800e <vPortEnterCritical>
+42022c2a:	dc492783          	lw	a5,-572(s2)
+42022c2e:	5612                	lw	a2,36(sp)
+42022c30:	dc0aa683          	lw	a3,-576(s5) # 3fc99dc0 <s_write>
+42022c34:	03f7f713          	andi	a4,a5,63
+42022c38:	0712                	slli	a4,a4,0x4
+42022c3a:	9732                	add	a4,a4,a2
+42022c3c:	00178613          	addi	a2,a5,1
+42022c40:	f6d79ce3          	bne	a5,a3,42022bb8 <web_tcp_probe_poll+0x48>
+42022c44:	fe365097          	auipc	ra,0xfe365
+42022c48:	406080e7          	jalr	1030(ra) # 4038804a <vPortExitCritical>
+42022c4c:	fe35e097          	auipc	ra,0xfe35e
+42022c50:	788080e7          	jalr	1928(ra) # 403813d4 <esp_timer_get_time>
+42022c54:	3fc9a737          	lui	a4,0x3fc9a
+42022c58:	db070713          	addi	a4,a4,-592 # 3fc99db0 <previous_us.0>
+42022c5c:	4314                	lw	a3,0(a4)
+42022c5e:	435c                	lw	a5,4(a4)
+42022c60:	40d506b3          	sub	a3,a0,a3
+42022c64:	00d53633          	sltu	a2,a0,a3
+42022c68:	40f587b3          	sub	a5,a1,a5
+42022c6c:	8f91                	sub	a5,a5,a2
+42022c6e:	02f04863          	bgtz	a5,42022c9e <web_tcp_probe_poll+0x12e>
+42022c72:	c385                	beqz	a5,42022c92 <web_tcp_probe_poll+0x122>
+42022c74:	50b6                	lw	ra,108(sp)
+42022c76:	5426                	lw	s0,104(sp)
+42022c78:	5496                	lw	s1,100(sp)
+42022c7a:	5906                	lw	s2,96(sp)
+42022c7c:	49f6                	lw	s3,92(sp)
+42022c7e:	4a66                	lw	s4,88(sp)
+42022c80:	4ad6                	lw	s5,84(sp)
+42022c82:	4b46                	lw	s6,80(sp)
+42022c84:	4bb6                	lw	s7,76(sp)
+42022c86:	4c26                	lw	s8,72(sp)
+42022c88:	4c96                	lw	s9,68(sp)
+42022c8a:	4d06                	lw	s10,64(sp)
+42022c8c:	5df2                	lw	s11,60(sp)
+42022c8e:	6165                	addi	sp,sp,112
+42022c90:	8082                	ret
+42022c92:	000f47b7          	lui	a5,0xf4
+42022c96:	23f78793          	addi	a5,a5,575 # f423f <_rtc_slow_length+0xf2763>
+42022c9a:	fcd7fde3          	bgeu	a5,a3,42022c74 <web_tcp_probe_poll+0x104>
+42022c9e:	5426                	lw	s0,104(sp)
+42022ca0:	50b6                	lw	ra,108(sp)
+42022ca2:	5496                	lw	s1,100(sp)
+42022ca4:	5906                	lw	s2,96(sp)
+42022ca6:	49f6                	lw	s3,92(sp)
+42022ca8:	4a66                	lw	s4,88(sp)
+42022caa:	4ad6                	lw	s5,84(sp)
+42022cac:	4b46                	lw	s6,80(sp)
+42022cae:	4bb6                	lw	s7,76(sp)
+42022cb0:	4c26                	lw	s8,72(sp)
+42022cb2:	4c96                	lw	s9,68(sp)
+42022cb4:	4d06                	lw	s10,64(sp)
+42022cb6:	5df2                	lw	s11,60(sp)
+42022cb8:	c308                	sw	a0,0(a4)
+42022cba:	c34c                	sw	a1,4(a4)
+42022cbc:	6165                	addi	sp,sp,112
+42022cbe:	3b10906f          	j	4202c86e <network_heap_profile_poll>
+

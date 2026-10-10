@@ -245,6 +245,15 @@ int8_t native_audio_output_get_balance(void) {
     return native_audio_settings_get_balance();
 }
 
+esp_err_t native_audio_output_flush_pcm(void) {
+    // The virtual sink receives each generated frame synchronously.
+    return ESP_OK;
+}
+
+void native_audio_output_discard_pcm(void) {
+    reset_resampler();
+}
+
 void native_audio_output_idle(void) {
     audio_level_led_update_peak(0);
 }

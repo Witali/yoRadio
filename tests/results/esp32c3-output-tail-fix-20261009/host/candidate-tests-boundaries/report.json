@@ -1,0 +1,26 @@
+{
+  "physical_dma": false,
+  "variants": {
+    "staged": {
+      "log": "PASS output boundaries cases=95 pcm_bytes=456704\n",
+      "pcm_sha256": "c1765070a434b4774bd2b88b754d8960e36c878fb800111f7b450ed6531c6051",
+      "bytes": 456704
+    },
+    "dma": {
+      "log": "PASS output boundaries cases=94 pcm_bytes=456704\n",
+      "pcm_sha256": "c1765070a434b4774bd2b88b754d8960e36c878fb800111f7b450ed6531c6051",
+      "bytes": 456704
+    }
+  },
+  "sources": {
+    "idf/esp32c3-oled-native/main/native_audio_output.c": "ada1ae9284e554fe1b99b3d63babaefde80e1cd6e8f014a8a8bb4d52f93eb33c",
+    "idf/esp32c3-oled-native/main/native_audio_output_dma.c": "4a5859e0e220e91b723e3bfd44229f5d12108c569bb70a00cbd63c416b7b9a1f",
+    "idf/esp32c3-oled-native/main/native_audio_output.h": "0331612bc0c3274223a0c6b5ce3982189d2520ca0ef13c7cd6b8199a2b7584d4",
+    "idf/esp32c3-oled-native/main/native_i2s_generator.c": "b9b030839a3f23682bbe3d22d80cc3d45ab2e4c98ca9d3a8abb69dfe5f90e099",
+    "idf/esp32c3-oled-native/main/pipeline_wait.h": "a8b9b6c01e78e620d052955c91072444a1ed6715212206ce018c65f461735ad1",
+    "tests/native/output_dma/stubs.h": "9319f8e5edbd5529feed5c350f2e1594a96ec289c4d913fb7107228158122c70",
+    "tests/native/output_dma/boundaries.c": "9246a686fa69dc392fda1919b41252c65e8fcfe287bffe0b6f4b3e2ca51b3256",
+    "tools/codec_benchmark/run_output_boundary_host.py": "a81a3a2a00cf6ba62407a4bfc90219b0a207430fe7daa729c573e8bb927036ef"
+  },
+  "pcm_identical": true
+}

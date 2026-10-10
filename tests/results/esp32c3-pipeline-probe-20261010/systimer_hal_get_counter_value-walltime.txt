@@ -1,0 +1,33 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-quiet-pipeline-probe\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+4038512a <systimer_hal_get_counter_value>:
+4038512a:	4118                	lw	a4,0(a0)
+4038512c:	00259693          	slli	a3,a1,0x2
+40385130:	40000637          	lui	a2,0x40000
+40385134:	96ba                	add	a3,a3,a4
+40385136:	42dc                	lw	a5,4(a3)
+40385138:	8fd1                	or	a5,a5,a2
+4038513a:	c2dc                	sw	a5,4(a3)
+4038513c:	42dc                	lw	a5,4(a3)
+4038513e:	00279613          	slli	a2,a5,0x2
+40385142:	fe065de3          	bgez	a2,4038513c <systimer_hal_get_counter_value+0x12>
+40385146:	00359613          	slli	a2,a1,0x3
+4038514a:	963a                	add	a2,a2,a4
+4038514c:	05a1                	addi	a1,a1,8
+4038514e:	4268                	lw	a0,68(a2)
+40385150:	058e                	slli	a1,a1,0x3
+40385152:	001006b7          	lui	a3,0x100
+40385156:	972e                	add	a4,a4,a1
+40385158:	16fd                	addi	a3,a3,-1 # fffff <CSR_UINTSTATUS+0xff34e>
+4038515a:	430c                	lw	a1,0(a4)
+4038515c:	87aa                	mv	a5,a0
+4038515e:	4268                	lw	a0,68(a2)
+40385160:	fea79de3          	bne	a5,a0,4038515a <systimer_hal_get_counter_value+0x30>
+40385164:	8df5                	and	a1,a1,a3
+40385166:	8082                	ret
+
+Disassembly of section .flash.text:

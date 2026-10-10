@@ -1,0 +1,86 @@
+{
+  "result": "NOT_QUALIFIED",
+  "physical_tests": true,
+  "laboratory_only": true,
+  "bus_mode_clock_image_crc": "PASS",
+  "finite_file_matrix": {
+    "http": {
+      "PASS": 22,
+      "FAIL": 0,
+      "BLOCKED": 0
+    },
+    "https": {
+      "PASS": 22,
+      "FAIL": 0,
+      "BLOCKED": 0
+    }
+  },
+  "original_failures": [
+    {
+      "suite": "hev2-ten-minutes",
+      "name": "cpu-under-http-load:hev2-44100-stereo",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Progressive heap loss during continuous playback",
+      "seconds": 601.25
+    }
+  ],
+  "runtime": {
+    "matrix": {
+      "result": "PASS",
+      "failures": []
+    },
+    "transitions-faults-websocket": {
+      "result": "PASS",
+      "serial_health": {
+        "name": "ota:serial-health",
+        "result": "PASS",
+        "evidence": {
+          "records": 451,
+          "faults": []
+        },
+        "note": "Expected OTA reboot banners are allowed; panic/capture errors are not."
+      },
+      "unexpected_reboots_or_allocations": [],
+      "scope": "Decoder errors during deliberately malformed streams retain per-case recovery checks"
+    },
+    "switch": {
+      "result": "PASS",
+      "failures": []
+    },
+    "heavy-flac": {
+      "result": "PASS",
+      "failures": []
+    },
+    "hev2-ten-minutes": {
+      "result": "PASS",
+      "failures": []
+    },
+    "boot-ready": {
+      "result": "NOT_APPLIED",
+      "reason": "Intentional resets; retain per-case readiness gates and raw capture"
+    }
+  },
+  "settings_preserved": {
+    "wifi_unchanged": true,
+    "playlist_unchanged": true,
+    "settings_unchanged": true
+  },
+  "original_firmware_restored": true,
+  "restoration_recovery": {
+    "initial_controller_exit_code": 1,
+    "initial_error": "Expected application did not return",
+    "initial_readiness_timeout_seconds": 45,
+    "retry_method": "Skill script, watchdog reset; no Flash writes",
+    "retry_process_exit_code": 0,
+    "retry_http_status": 200
+  },
+  "acoustic_continuity_qualified": false,
+  "report": "docs/ESP32C3_QIO80_RECHECK_20261008.md",
+  "evidence": "tests/results/esp32c3-qio80-recheck-20261008",
+  "scope": "Matched sequential DIO then QIO; awake ESP-IDF 6.1 laboratory profile. CPU utilization informational; all original failures retained. Two probed boots and five software readiness boots per mode. No cold power cycle, deep sleep or acoustic capture. OTA while playing not repeated."
+}

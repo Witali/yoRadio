@@ -1,0 +1,1179 @@
+42012e42:	6505                	lui	a0,0x1
+42012e44:	ca010113          	addi	sp,sp,-864
+42012e48:	80050513          	addi	a0,a0,-2048 # 800 <ALIGN_VECTOR_TABLE+0x700>
+42012e4c:	34112e23          	sw	ra,860(sp)
+42012e50:	34812c23          	sw	s0,856(sp)
+42012e54:	34912a23          	sw	s1,852(sp)
+42012e58:	35212823          	sw	s2,848(sp)
+42012e5c:	35312623          	sw	s3,844(sp)
+42012e60:	35412423          	sw	s4,840(sp)
+42012e64:	35512223          	sw	s5,836(sp)
+42012e68:	35612023          	sw	s6,832(sp)
+42012e6c:	33712e23          	sw	s7,828(sp)
+42012e70:	33812c23          	sw	s8,824(sp)
+42012e74:	33912a23          	sw	s9,820(sp)
+42012e78:	33a12823          	sw	s10,816(sp)
+42012e7c:	33b12623          	sw	s11,812(sp)
+42012e80:	cbcf60ef          	jal	4200933c <malloc>
+42012e84:	d22a                	sw	a0,36(sp)
+42012e86:	540508e3          	beqz	a0,42013bd6 <stream_task+0xd94>
+42012e8a:	3c126737          	lui	a4,0x3c126
+42012e8e:	420767b7          	lui	a5,0x42076
+42012e92:	14470713          	addi	a4,a4,324 # 3c126144 <_esp_libc_clock_array_end+0x5ff4>
+42012e96:	8ce78793          	addi	a5,a5,-1842 # 420758ce <esp_crt_bundle_attach>
+42012e9a:	d63a                	sw	a4,44(sp)
+42012e9c:	d83e                	sw	a5,48(sp)
+42012e9e:	3fc9adb7          	lui	s11,0x3fc9a
+42012ea2:	3fc9ad37          	lui	s10,0x3fc9a
+42012ea6:	3fc9abb7          	lui	s7,0x3fc9a
+42012eaa:	06400c13          	li	s8,100
+42012eae:	4c85                	li	s9,1
+42012eb0:	d0cd2503          	lw	a0,-756(s10) # 3fc99d0c <s_commands>
+42012eb4:	567d                	li	a2,-1
+42012eb6:	0a2c                	addi	a1,sp,280
+42012eb8:	00106097          	auipc	ra,0x106
+42012ebc:	398080e7          	jalr	920(ra) # 42119250 <xQueueReceive>
+42012ec0:	36f090ef          	jal	4201ca2e <runtime_settings_get_station_timeout_sec>
+42012ec4:	892a                	mv	s2,a0
+42012ec6:	fe36e097          	auipc	ra,0xfe36e
+42012eca:	50e080e7          	jalr	1294(ra) # 403813d4 <esp_timer_get_time>
+42012ece:	000f47b7          	lui	a5,0xf4
+42012ed2:	24078793          	addi	a5,a5,576 # f4240 <CSR_UINTSTATUS+0xf358f>
+42012ed6:	02f91733          	mulh	a4,s2,a5
+42012eda:	4981                	li	s3,0
+42012edc:	02f907b3          	mul	a5,s2,a5
+42012ee0:	972e                	add	a4,a4,a1
+42012ee2:	00a78433          	add	s0,a5,a0
+42012ee6:	00f437b3          	sltu	a5,s0,a5
+42012eea:	00e784b3          	add	s1,a5,a4
+42012eee:	d00d8793          	addi	a5,s11,-768 # 3fc99d00 <s_generation>
+42012ef2:	0330000f          	fence	rw,rw
+42012ef6:	4398                	lw	a4,0(a5)
+42012ef8:	0230000f          	fence	r,rw
+42012efc:	11812783          	lw	a5,280(sp)
+42012f00:	06f71863          	bne	a4,a5,42012f70 <stream_task+0x12e>
+42012f04:	cf8b8793          	addi	a5,s7,-776 # 3fc99cf8 <s_decoder_released_generation>
+42012f08:	0330000f          	fence	rw,rw
+42012f0c:	4398                	lw	a4,0(a5)
+42012f0e:	0230000f          	fence	r,rw
+42012f12:	11812783          	lw	a5,280(sp)
+42012f16:	04f70d63          	beq	a4,a5,42012f70 <stream_task+0x12e>
+42012f1a:	fe36e097          	auipc	ra,0xfe36e
+42012f1e:	4ba080e7          	jalr	1210(ra) # 403813d4 <esp_timer_get_time>
+42012f22:	40a40733          	sub	a4,s0,a0
+42012f26:	40b485b3          	sub	a1,s1,a1
+42012f2a:	00e437b3          	sltu	a5,s0,a4
+42012f2e:	40f587b3          	sub	a5,a1,a5
+42012f32:	34f05263          	blez	a5,42013276 <stream_task+0x434>
+42012f36:	3e770513          	addi	a0,a4,999
+42012f3a:	00e535b3          	sltu	a1,a0,a4
+42012f3e:	95be                	add	a1,a1,a5
+42012f40:	3e800613          	li	a2,1000
+42012f44:	4681                	li	a3,0
+42012f46:	fdfee097          	auipc	ra,0xfdfee
+42012f4a:	86e080e7          	jalr	-1938(ra) # 400007b4 <__divdi3>
+42012f4e:	c10d                	beqz	a0,42012f70 <stream_task+0x12e>
+42012f50:	4505                	li	a0,1
+42012f52:	00107097          	auipc	ra,0x107
+42012f56:	09a080e7          	jalr	154(ra) # 42119fec <vTaskDelay>
+42012f5a:	d00d8793          	addi	a5,s11,-768
+42012f5e:	0330000f          	fence	rw,rw
+42012f62:	4398                	lw	a4,0(a5)
+42012f64:	0230000f          	fence	r,rw
+42012f68:	11812783          	lw	a5,280(sp)
+42012f6c:	f8f70ce3          	beq	a4,a5,42012f04 <stream_task+0xc2>
+42012f70:	d00d8793          	addi	a5,s11,-768
+42012f74:	0330000f          	fence	rw,rw
+42012f78:	4398                	lw	a4,0(a5)
+42012f7a:	0230000f          	fence	r,rw
+42012f7e:	11812783          	lw	a5,280(sp)
+42012f82:	f2f717e3          	bne	a4,a5,42012eb0 <stream_task+0x6e>
+42012f86:	fe36e097          	auipc	ra,0xfe36e
+42012f8a:	44e080e7          	jalr	1102(ra) # 403813d4 <esp_timer_get_time>
+42012f8e:	40a40733          	sub	a4,s0,a0
+42012f92:	40b487b3          	sub	a5,s1,a1
+42012f96:	00e436b3          	sltu	a3,s0,a4
+42012f9a:	8f95                	sub	a5,a5,a3
+42012f9c:	2ef05d63          	blez	a5,42013296 <stream_task+0x454>
+42012fa0:	3e770513          	addi	a0,a4,999
+42012fa4:	00e53733          	sltu	a4,a0,a4
+42012fa8:	00f705b3          	add	a1,a4,a5
+42012fac:	3e800613          	li	a2,1000
+42012fb0:	4681                	li	a3,0
+42012fb2:	fdfee097          	auipc	ra,0xfdfee
+42012fb6:	802080e7          	jalr	-2046(ra) # 400007b4 <__divdi3>
+42012fba:	28050463          	beqz	a0,42013242 <stream_task+0x400>
+42012fbe:	151150ef          	jal	4202890e <tls_input_reserve_prepare_connection>
+42012fc2:	4505                	li	a0,1
+42012fc4:	2ae050ef          	jal	42018272 <network_service_set_streaming>
+42012fc8:	3fc9a7b7          	lui	a5,0x3fc9a
+42012fcc:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42012fd0:	11812583          	lw	a1,280(sp)
+42012fd4:	3c1267b7          	lui	a5,0x3c126
+42012fd8:	d7078693          	addi	a3,a5,-656 # 3c125d70 <_esp_libc_clock_array_end+0x5c20>
+42012fdc:	4601                	li	a2,0
+42012fde:	747030ef          	jal	42016f24 <native_state_set_audio>
+42012fe2:	0a000613          	li	a2,160
+42012fe6:	4581                	li	a1,0
+42012fe8:	18a8                	addi	a0,sp,120
+42012fea:	fdfed097          	auipc	ra,0xfdfed
+42012fee:	36a080e7          	jalr	874(ra) # 40000354 <memset>
+42012ff2:	121c                	addi	a5,sp,288
+42012ff4:	dabe                	sw	a5,116(sp)
+42012ff6:	57b2                	lw	a5,44(sp)
+42012ff8:	df3e                	sw	a5,188(sp)
+42012ffa:	fe36e097          	auipc	ra,0xfe36e
+42012ffe:	3da080e7          	jalr	986(ra) # 403813d4 <esp_timer_get_time>
+42013002:	40a40733          	sub	a4,s0,a0
+42013006:	40b487b3          	sub	a5,s1,a1
+4201300a:	00e436b3          	sltu	a3,s0,a4
+4201300e:	8f95                	sub	a5,a5,a3
+42013010:	46f05b63          	blez	a5,42013486 <stream_task+0x644>
+42013014:	3e770513          	addi	a0,a4,999
+42013018:	00e53733          	sltu	a4,a0,a4
+4201301c:	00f705b3          	add	a1,a4,a5
+42013020:	3e800613          	li	a2,1000
+42013024:	4681                	li	a3,0
+42013026:	fdfed097          	auipc	ra,0xfdfed
+4201302a:	78e080e7          	jalr	1934(ra) # 400007b4 <__divdi3>
+4201302e:	4795                	li	a5,5
+42013030:	c7be                	sw	a5,204(sp)
+42013032:	6785                	lui	a5,0x1
+42013034:	80078713          	addi	a4,a5,-2048 # 800 <ALIGN_VECTOR_TABLE+0x700>
+42013038:	d1be                	sw	a5,224(sp)
+4201303a:	57c2                	lw	a5,48(sp)
+4201303c:	c3aa                	sw	a0,196(sp)
+4201303e:	18c8                	addi	a0,sp,116
+42013040:	cfba                	sw	a4,220(sp)
+42013042:	d9be                	sw	a5,240(sp)
+42013044:	0f910a23          	sb	s9,244(sp)
+42013048:	35e810ef          	jal	420943a6 <esp_http_client_init>
+4201304c:	8b2a                	mv	s6,a0
+4201304e:	68050163          	beqz	a0,420136d0 <stream_task+0x88e>
+42013052:	3c1247b7          	lui	a5,0x3c124
+42013056:	77878613          	addi	a2,a5,1912 # 3c124778 <_esp_libc_clock_array_end+0x4628>
+4201305a:	3c1267b7          	lui	a5,0x3c126
+4201305e:	17078593          	addi	a1,a5,368 # 3c126170 <_esp_libc_clock_array_end+0x6020>
+42013062:	76e800ef          	jal	420937d0 <esp_http_client_set_header>
+42013066:	3c1267b7          	lui	a5,0x3c126
+4201306a:	18078613          	addi	a2,a5,384 # 3c126180 <_esp_libc_clock_array_end+0x6030>
+4201306e:	3c1267b7          	lui	a5,0x3c126
+42013072:	18878593          	addi	a1,a5,392 # 3c126188 <_esp_libc_clock_array_end+0x6038>
+42013076:	855a                	mv	a0,s6
+42013078:	758800ef          	jal	420937d0 <esp_http_client_set_header>
+4201307c:	c602                	sw	zero,12(sp)
+4201307e:	fe36e097          	auipc	ra,0xfe36e
+42013082:	356080e7          	jalr	854(ra) # 403813d4 <esp_timer_get_time>
+42013086:	40a407b3          	sub	a5,s0,a0
+4201308a:	40b485b3          	sub	a1,s1,a1
+4201308e:	00f43733          	sltu	a4,s0,a5
+42013092:	8d99                	sub	a1,a1,a4
+42013094:	22b05063          	blez	a1,420132b4 <stream_task+0x472>
+42013098:	3e778513          	addi	a0,a5,999
+4201309c:	00f537b3          	sltu	a5,a0,a5
+420130a0:	95be                	add	a1,a1,a5
+420130a2:	3e800613          	li	a2,1000
+420130a6:	4681                	li	a3,0
+420130a8:	fdfed097          	auipc	ra,0xfdfed
+420130ac:	70c080e7          	jalr	1804(ra) # 400007b4 <__divdi3>
+420130b0:	20050563          	beqz	a0,420132ba <stream_task+0x478>
+420130b4:	85aa                	mv	a1,a0
+420130b6:	855a                	mv	a0,s6
+420130b8:	09d800ef          	jal	42093954 <esp_http_client_set_timeout_ms>
+420130bc:	fe376097          	auipc	ra,0xfe376
+420130c0:	3e2080e7          	jalr	994(ra) # 4038949e <esp_log_timestamp>
+420130c4:	4732                	lw	a4,12(sp)
+420130c6:	3c1397b7          	lui	a5,0x3c139
+420130ca:	86aa                	mv	a3,a0
+420130cc:	dd878793          	addi	a5,a5,-552 # 3c138dd8 <_esp_libc_clock_array_end+0x18c88>
+420130d0:	c709                	beqz	a4,420130da <stream_task+0x298>
+420130d2:	3c1267b7          	lui	a5,0x3c126
+420130d6:	10478793          	addi	a5,a5,260 # 3c126104 <_esp_libc_clock_array_end+0x5fb4>
+420130da:	3c126737          	lui	a4,0x3c126
+420130de:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420130e2:	3c126637          	lui	a2,0x3c126
+420130e6:	85ba                	mv	a1,a4
+420130e8:	12010813          	addi	a6,sp,288
+420130ec:	19460613          	addi	a2,a2,404 # 3c126194 <_esp_libc_clock_array_end+0x6044>
+420130f0:	450d                	li	a0,3
+420130f2:	fe376097          	auipc	ra,0xfe376
+420130f6:	2a4080e7          	jalr	676(ra) # 40389396 <esp_log>
+420130fa:	855a                	mv	a0,s6
+420130fc:	4581                	li	a1,0
+420130fe:	65d810ef          	jal	42094f5a <esp_http_client_open>
+42013102:	8aaa                	mv	s5,a0
+42013104:	180514e3          	bnez	a0,42013a8c <stream_task+0xc4a>
+42013108:	fe36e097          	auipc	ra,0xfe36e
+4201310c:	2cc080e7          	jalr	716(ra) # 403813d4 <esp_timer_get_time>
+42013110:	40a407b3          	sub	a5,s0,a0
+42013114:	40b485b3          	sub	a1,s1,a1
+42013118:	00f43733          	sltu	a4,s0,a5
+4201311c:	8d99                	sub	a1,a1,a4
+4201311e:	38b05863          	blez	a1,420134ae <stream_task+0x66c>
+42013122:	3e778513          	addi	a0,a5,999
+42013126:	00f537b3          	sltu	a5,a0,a5
+4201312a:	95be                	add	a1,a1,a5
+4201312c:	3e800613          	li	a2,1000
+42013130:	4681                	li	a3,0
+42013132:	fdfed097          	auipc	ra,0xfdfed
+42013136:	682080e7          	jalr	1666(ra) # 400007b4 <__divdi3>
+4201313a:	85aa                	mv	a1,a0
+4201313c:	16050f63          	beqz	a0,420132ba <stream_task+0x478>
+42013140:	855a                	mv	a0,s6
+42013142:	013800ef          	jal	42093954 <esp_http_client_set_timeout_ms>
+42013146:	855a                	mv	a0,s6
+42013148:	2a3800ef          	jal	42093bea <esp_http_client_fetch_headers>
+4201314c:	c82a                	sw	a0,16(sp)
+4201314e:	8aae                	mv	s5,a1
+42013150:	fe36e097          	auipc	ra,0xfe36e
+42013154:	284080e7          	jalr	644(ra) # 403813d4 <esp_timer_get_time>
+42013158:	40a407b3          	sub	a5,s0,a0
+4201315c:	40b485b3          	sub	a1,s1,a1
+42013160:	00f43733          	sltu	a4,s0,a5
+42013164:	8d99                	sub	a1,a1,a4
+42013166:	5ab05063          	blez	a1,42013706 <stream_task+0x8c4>
+4201316a:	3e778513          	addi	a0,a5,999
+4201316e:	00f537b3          	sltu	a5,a0,a5
+42013172:	95be                	add	a1,a1,a5
+42013174:	3e800613          	li	a2,1000
+42013178:	4681                	li	a3,0
+4201317a:	fdfed097          	auipc	ra,0xfdfed
+4201317e:	63a080e7          	jalr	1594(ra) # 400007b4 <__divdi3>
+42013182:	12050c63          	beqz	a0,420132ba <stream_task+0x478>
+42013186:	855a                	mv	a0,s6
+42013188:	665810ef          	jal	42094fec <esp_http_client_get_status_code>
+4201318c:	8a2a                	mv	s4,a0
+4201318e:	280ac2e3          	bltz	s5,42013c12 <stream_task+0xdd0>
+42013192:	fe376097          	auipc	ra,0xfe376
+42013196:	30c080e7          	jalr	780(ra) # 4038949e <esp_log_timestamp>
+4201319a:	4842                	lw	a6,16(sp)
+4201319c:	3c126737          	lui	a4,0x3c126
+420131a0:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420131a4:	3c126637          	lui	a2,0x3c126
+420131a8:	86aa                	mv	a3,a0
+420131aa:	85ba                	mv	a1,a4
+420131ac:	88d6                	mv	a7,s5
+420131ae:	87d2                	mv	a5,s4
+420131b0:	26c60613          	addi	a2,a2,620 # 3c12626c <_esp_libc_clock_array_end+0x611c>
+420131b4:	450d                	li	a0,3
+420131b6:	fe376097          	auipc	ra,0xfe376
+420131ba:	1e0080e7          	jalr	480(ra) # 40389396 <esp_log>
+420131be:	f38a0713          	addi	a4,s4,-200
+420131c2:	06300693          	li	a3,99
+420131c6:	28e6f163          	bgeu	a3,a4,42013448 <stream_task+0x606>
+420131ca:	ecda0a93          	addi	s5,s4,-307
+420131ce:	ed3a0713          	addi	a4,s4,-301
+420131d2:	002aba93          	sltiu	s5,s5,2
+420131d6:	00373713          	sltiu	a4,a4,3
+420131da:	00eaeab3          	or	s5,s5,a4
+420131de:	700a8f63          	beqz	s5,420138fc <stream_task+0xaba>
+420131e2:	47b2                	lw	a5,12(sp)
+420131e4:	4715                	li	a4,5
+420131e6:	72e78763          	beq	a5,a4,42013914 <stream_task+0xad2>
+420131ea:	855a                	mv	a0,s6
+420131ec:	1d9810ef          	jal	42094bc4 <esp_http_client_set_redirection>
+420131f0:	8aaa                	mv	s5,a0
+420131f2:	855a                	mv	a0,s6
+420131f4:	34b800ef          	jal	42093d3e <esp_http_client_close>
+420131f8:	2a0a9ee3          	bnez	s5,42013cb4 <stream_task+0xe72>
+420131fc:	47b2                	lw	a5,12(sp)
+420131fe:	0785                	addi	a5,a5,1
+42013200:	c63e                	sw	a5,12(sp)
+42013202:	bdb5                	j	4201307e <stream_task+0x23c>
+42013204:	e399                	bnez	a5,4201320a <stream_task+0x3c8>
+42013206:	20071e63          	bnez	a4,42013422 <stream_task+0x5e0>
+4201320a:	fe36e097          	auipc	ra,0xfe36e
+4201320e:	1ca080e7          	jalr	458(ra) # 403813d4 <esp_timer_get_time>
+42013212:	40a40733          	sub	a4,s0,a0
+42013216:	40b485b3          	sub	a1,s1,a1
+4201321a:	00e437b3          	sltu	a5,s0,a4
+4201321e:	40f587b3          	sub	a5,a1,a5
+42013222:	2cf054e3          	blez	a5,42013cea <stream_task+0xea8>
+42013226:	3e770513          	addi	a0,a4,999
+4201322a:	00e535b3          	sltu	a1,a0,a4
+4201322e:	95be                	add	a1,a1,a5
+42013230:	3e800613          	li	a2,1000
+42013234:	4681                	li	a3,0
+42013236:	fdfed097          	auipc	ra,0xfdfed
+4201323a:	57e080e7          	jalr	1406(ra) # 400007b4 <__divdi3>
+4201323e:	ca0518e3          	bnez	a0,42012eee <stream_task+0xac>
+42013242:	11812583          	lw	a1,280(sp)
+42013246:	d00d8793          	addi	a5,s11,-768
+4201324a:	0330000f          	fence	rw,rw
+4201324e:	439c                	lw	a5,0(a5)
+42013250:	0230000f          	fence	r,rw
+42013254:	c4f59ee3          	bne	a1,a5,42012eb0 <stream_task+0x6e>
+42013258:	3fc9a7b7          	lui	a5,0x3fc9a
+4201325c:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42013260:	3c1257b7          	lui	a5,0x3c125
+42013264:	4f478693          	addi	a3,a5,1268 # 3c1254f4 <_esp_libc_clock_array_end+0x53a4>
+42013268:	4601                	li	a2,0
+4201326a:	4bb030ef          	jal	42016f24 <native_state_set_audio>
+4201326e:	4501                	li	a0,0
+42013270:	002050ef          	jal	42018272 <network_service_set_streaming>
+42013274:	b935                	j	42012eb0 <stream_task+0x6e>
+42013276:	ce079de3          	bnez	a5,42012f70 <stream_task+0x12e>
+4201327a:	ca071ee3          	bnez	a4,42012f36 <stream_task+0xf4>
+4201327e:	d00d8793          	addi	a5,s11,-768
+42013282:	0330000f          	fence	rw,rw
+42013286:	4398                	lw	a4,0(a5)
+42013288:	0230000f          	fence	r,rw
+4201328c:	11812783          	lw	a5,280(sp)
+42013290:	c2f710e3          	bne	a4,a5,42012eb0 <stream_task+0x6e>
+42013294:	b9cd                	j	42012f86 <stream_task+0x144>
+42013296:	f7d5                	bnez	a5,42013242 <stream_task+0x400>
+42013298:	d00714e3          	bnez	a4,42012fa0 <stream_task+0x15e>
+4201329c:	11812583          	lw	a1,280(sp)
+420132a0:	d00d8793          	addi	a5,s11,-768
+420132a4:	0330000f          	fence	rw,rw
+420132a8:	439c                	lw	a5,0(a5)
+420132aa:	0230000f          	fence	r,rw
+420132ae:	c0f591e3          	bne	a1,a5,42012eb0 <stream_task+0x6e>
+420132b2:	b75d                	j	42013258 <stream_task+0x416>
+420132b4:	e199                	bnez	a1,420132ba <stream_task+0x478>
+420132b6:	de0791e3          	bnez	a5,42013098 <stream_task+0x256>
+420132ba:	4a01                	li	s4,0
+420132bc:	10700a93          	li	s5,263
+420132c0:	fe376097          	auipc	ra,0xfe376
+420132c4:	1de080e7          	jalr	478(ra) # 4038949e <esp_log_timestamp>
+420132c8:	c62a                	sw	a0,12(sp)
+420132ca:	8556                	mv	a0,s5
+420132cc:	b24ef0ef          	jal	420025f0 <esp_err_to_name>
+420132d0:	46b2                	lw	a3,12(sp)
+420132d2:	3c126737          	lui	a4,0x3c126
+420132d6:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420132da:	3c126637          	lui	a2,0x3c126
+420132de:	882a                	mv	a6,a0
+420132e0:	121c                	addi	a5,sp,288
+420132e2:	85ba                	mv	a1,a4
+420132e4:	23860613          	addi	a2,a2,568 # 3c126238 <_esp_libc_clock_array_end+0x60e8>
+420132e8:	4505                	li	a0,1
+420132ea:	fe376097          	auipc	ra,0xfe376
+420132ee:	0ac080e7          	jalr	172(ra) # 40389396 <esp_log>
+420132f2:	d00d8793          	addi	a5,s11,-768
+420132f6:	0330000f          	fence	rw,rw
+420132fa:	439c                	lw	a5,0(a5)
+420132fc:	0230000f          	fence	r,rw
+42013300:	11812583          	lw	a1,280(sp)
+42013304:	74b78c63          	beq	a5,a1,42013a5c <stream_task+0xc1a>
+42013308:	855a                	mv	a0,s6
+4201330a:	235800ef          	jal	42093d3e <esp_http_client_close>
+4201330e:	855a                	mv	a0,s6
+42013310:	467800ef          	jal	42093f76 <esp_http_client_cleanup>
+42013314:	f20a07e3          	beqz	s4,42013242 <stream_task+0x400>
+42013318:	11812a03          	lw	s4,280(sp)
+4201331c:	d00d8793          	addi	a5,s11,-768
+42013320:	0330000f          	fence	rw,rw
+42013324:	439c                	lw	a5,0(a5)
+42013326:	0230000f          	fence	r,rw
+4201332a:	f0fa1ce3          	bne	s4,a5,42013242 <stream_task+0x400>
+4201332e:	6ea090ef          	jal	4201ca18 <runtime_settings_get_watchdog>
+42013332:	f00508e3          	beqz	a0,42013242 <stream_task+0x400>
+42013336:	fe36e097          	auipc	ra,0xfe36e
+4201333a:	09e080e7          	jalr	158(ra) # 403813d4 <esp_timer_get_time>
+4201333e:	40a407b3          	sub	a5,s0,a0
+42013342:	40b485b3          	sub	a1,s1,a1
+42013346:	00f43733          	sltu	a4,s0,a5
+4201334a:	8d99                	sub	a1,a1,a4
+4201334c:	00b04663          	bgtz	a1,42013358 <stream_task+0x516>
+42013350:	1c0598e3          	bnez	a1,42013d20 <stream_task+0xede>
+42013354:	1c0786e3          	beqz	a5,42013d20 <stream_task+0xede>
+42013358:	3e778513          	addi	a0,a5,999
+4201335c:	00f537b3          	sltu	a5,a0,a5
+42013360:	95be                	add	a1,a1,a5
+42013362:	3e800613          	li	a2,1000
+42013366:	4681                	li	a3,0
+42013368:	fdfed097          	auipc	ra,0xfdfed
+4201336c:	44c080e7          	jalr	1100(ra) # 400007b4 <__divdi3>
+42013370:	1a0508e3          	beqz	a0,42013d20 <stream_task+0xede>
+42013374:	1a0982e3          	beqz	s3,42013d18 <stream_task+0xed6>
+42013378:	679d                	lui	a5,0x7
+4201337a:	0986                	slli	s3,s3,0x1
+4201337c:	53078793          	addi	a5,a5,1328 # 7530 <CSR_UINTSTATUS+0x687f>
+42013380:	0137f363          	bgeu	a5,s3,42013386 <stream_task+0x544>
+42013384:	89be                	mv	s3,a5
+42013386:	fe36e097          	auipc	ra,0xfe36e
+4201338a:	04e080e7          	jalr	78(ra) # 403813d4 <esp_timer_get_time>
+4201338e:	3e800793          	li	a5,1000
+42013392:	02f99733          	mulh	a4,s3,a5
+42013396:	02f987b3          	mul	a5,s3,a5
+4201339a:	972e                	add	a4,a4,a1
+4201339c:	00a78a33          	add	s4,a5,a0
+420133a0:	00fa37b3          	sltu	a5,s4,a5
+420133a4:	00e78ab3          	add	s5,a5,a4
+420133a8:	1754c4e3          	blt	s1,s5,42013d10 <stream_task+0xece>
+420133ac:	169a80e3          	beq	s5,s1,42013d0c <stream_task+0xeca>
+420133b0:	fe376097          	auipc	ra,0xfe376
+420133b4:	0ee080e7          	jalr	238(ra) # 4038949e <esp_log_timestamp>
+420133b8:	3c126737          	lui	a4,0x3c126
+420133bc:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420133c0:	3c126637          	lui	a2,0x3c126
+420133c4:	86aa                	mv	a3,a0
+420133c6:	87ce                	mv	a5,s3
+420133c8:	85ba                	mv	a1,a4
+420133ca:	2e860613          	addi	a2,a2,744 # 3c1262e8 <_esp_libc_clock_array_end+0x6198>
+420133ce:	4509                	li	a0,2
+420133d0:	fe376097          	auipc	ra,0xfe376
+420133d4:	fc6080e7          	jalr	-58(ra) # 40389396 <esp_log>
+420133d8:	11812703          	lw	a4,280(sp)
+420133dc:	d00d8793          	addi	a5,s11,-768
+420133e0:	0330000f          	fence	rw,rw
+420133e4:	439c                	lw	a5,0(a5)
+420133e6:	0230000f          	fence	r,rw
+420133ea:	acf713e3          	bne	a4,a5,42012eb0 <stream_task+0x6e>
+420133ee:	62a090ef          	jal	4201ca18 <runtime_settings_get_watchdog>
+420133f2:	aa050fe3          	beqz	a0,42012eb0 <stream_task+0x6e>
+420133f6:	fe36e097          	auipc	ra,0xfe36e
+420133fa:	fde080e7          	jalr	-34(ra) # 403813d4 <esp_timer_get_time>
+420133fe:	40aa0733          	sub	a4,s4,a0
+42013402:	40ba87b3          	sub	a5,s5,a1
+42013406:	3e770513          	addi	a0,a4,999
+4201340a:	00ea35b3          	sltu	a1,s4,a4
+4201340e:	00e53833          	sltu	a6,a0,a4
+42013412:	8f8d                	sub	a5,a5,a1
+42013414:	3e800613          	li	a2,1000
+42013418:	4681                	li	a3,0
+4201341a:	00f805b3          	add	a1,a6,a5
+4201341e:	def053e3          	blez	a5,42013204 <stream_task+0x3c2>
+42013422:	fdfed097          	auipc	ra,0xfdfed
+42013426:	392080e7          	jalr	914(ra) # 400007b4 <__divdi3>
+4201342a:	862a                	mv	a2,a0
+4201342c:	0a2c                	addi	a1,sp,280
+4201342e:	d0cd2503          	lw	a0,-756(s10)
+42013432:	00cc7463          	bgeu	s8,a2,4201343a <stream_task+0x5f8>
+42013436:	06400613          	li	a2,100
+4201343a:	00106097          	auipc	ra,0x106
+4201343e:	e16080e7          	jalr	-490(ra) # 42119250 <xQueueReceive>
+42013442:	f9951be3          	bne	a0,s9,420133d8 <stream_task+0x596>
+42013446:	bcad                	j	42012ec0 <stream_task+0x7e>
+42013448:	12012703          	lw	a4,288(sp)
+4201344c:	707477b7          	lui	a5,0x70747
+42013450:	46878793          	addi	a5,a5,1128 # 70747468 <SYSTEM+0x10687468>
+42013454:	02f70e63          	beq	a4,a5,42013490 <stream_task+0x64e>
+42013458:	0fa00593          	li	a1,250
+4201345c:	855a                	mv	a0,s6
+4201345e:	4f6800ef          	jal	42093954 <esp_http_client_set_timeout_ms>
+42013462:	d00d8793          	addi	a5,s11,-768
+42013466:	0330000f          	fence	rw,rw
+4201346a:	438c                	lw	a1,0(a5)
+4201346c:	0230000f          	fence	r,rw
+42013470:	11812783          	lw	a5,280(sp)
+42013474:	04f58263          	beq	a1,a5,420134b8 <stream_task+0x676>
+42013478:	855a                	mv	a0,s6
+4201347a:	0c5800ef          	jal	42093d3e <esp_http_client_close>
+4201347e:	855a                	mv	a0,s6
+42013480:	2f7800ef          	jal	42093f76 <esp_http_client_cleanup>
+42013484:	b435                	j	42012eb0 <stream_task+0x6e>
+42013486:	e399                	bnez	a5,4201348c <stream_task+0x64a>
+42013488:	b80716e3          	bnez	a4,42013014 <stream_task+0x1d2>
+4201348c:	4501                	li	a0,0
+4201348e:	b645                	j	4201302e <stream_task+0x1ec>
+42013490:	12412703          	lw	a4,292(sp)
+42013494:	2f2f47b7          	lui	a5,0x2f2f4
+42013498:	a7378793          	addi	a5,a5,-1421 # 2f2f3a73 <CSR_UINTSTATUS+0x2f2f2dc2>
+4201349c:	faf71ee3          	bne	a4,a5,42013458 <stream_task+0x616>
+420134a0:	3c1267b7          	lui	a5,0x3c126
+420134a4:	31878513          	addi	a0,a5,792 # 3c126318 <_esp_libc_clock_array_end+0x61c8>
+420134a8:	dc7fd0ef          	jal	4201126e <log_runtime_memory>
+420134ac:	b775                	j	42013458 <stream_task+0x616>
+420134ae:	e00596e3          	bnez	a1,420132ba <stream_task+0x478>
+420134b2:	c60798e3          	bnez	a5,42013122 <stream_task+0x2e0>
+420134b6:	b511                	j	420132ba <stream_task+0x478>
+420134b8:	3fc9a7b7          	lui	a5,0x3fc9a
+420134bc:	000f4437          	lui	s0,0xf4
+420134c0:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+420134c4:	24040413          	addi	s0,s0,576 # f4240 <CSR_UINTSTATUS+0xf358f>
+420134c8:	3c1267b7          	lui	a5,0x3c126
+420134cc:	32c78693          	addi	a3,a5,812 # 3c12632c <_esp_libc_clock_array_end+0x61dc>
+420134d0:	028907b3          	mul	a5,s2,s0
+420134d4:	4605                	li	a2,1
+420134d6:	d03e                	sw	a5,32(sp)
+420134d8:	24d030ef          	jal	42016f24 <native_state_set_audio>
+420134dc:	11c12483          	lw	s1,284(sp)
+420134e0:	02891433          	mulh	s0,s2,s0
+420134e4:	c8a6                	sw	s1,80(sp)
+420134e6:	34048663          	beqz	s1,42013832 <stream_task+0x9f0>
+420134ea:	3c1267b7          	lui	a5,0x3c126
+420134ee:	08d0                	addi	a2,sp,84
+420134f0:	37478593          	addi	a1,a5,884 # 3c126374 <_esp_libc_clock_array_end+0x6224>
+420134f4:	855a                	mv	a0,s6
+420134f6:	ca82                	sw	zero,84(sp)
+420134f8:	2ee800ef          	jal	420937e6 <esp_http_client_get_response_header>
+420134fc:	4a01                	li	s4,0
+420134fe:	ed05                	bnez	a0,42013536 <stream_task+0x6f4>
+42013500:	4556                	lw	a0,84(sp)
+42013502:	c915                	beqz	a0,42013536 <stream_task+0x6f4>
+42013504:	4629                	li	a2,10
+42013506:	4581                	li	a1,0
+42013508:	72af50ef          	jal	42108c32 <strtoul>
+4201350c:	8a2a                	mv	s4,a0
+4201350e:	fe376097          	auipc	ra,0xfe376
+42013512:	f90080e7          	jalr	-112(ra) # 4038949e <esp_log_timestamp>
+42013516:	3c126737          	lui	a4,0x3c126
+4201351a:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+4201351e:	3c126637          	lui	a2,0x3c126
+42013522:	86aa                	mv	a3,a0
+42013524:	87d2                	mv	a5,s4
+42013526:	85ba                	mv	a1,a4
+42013528:	38060613          	addi	a2,a2,896 # 3c126380 <_esp_libc_clock_array_end+0x6230>
+4201352c:	450d                	li	a0,3
+4201352e:	fe376097          	auipc	ra,0xfe376
+42013532:	e68080e7          	jalr	-408(ra) # 40389396 <esp_log>
+42013536:	3c1267b7          	lui	a5,0x3c126
+4201353a:	08b0                	addi	a2,sp,88
+4201353c:	3a878593          	addi	a1,a5,936 # 3c1263a8 <_esp_libc_clock_array_end+0x6258>
+42013540:	855a                	mv	a0,s6
+42013542:	cc82                	sw	zero,88(sp)
+42013544:	2a2800ef          	jal	420937e6 <esp_http_client_get_response_header>
+42013548:	e911                	bnez	a0,4201355c <stream_task+0x71a>
+4201354a:	4566                	lw	a0,88(sp)
+4201354c:	c901                	beqz	a0,4201355c <stream_task+0x71a>
+4201354e:	4629                	li	a2,10
+42013550:	4581                	li	a1,0
+42013552:	6e0f50ef          	jal	42108c32 <strtoul>
+42013556:	84aa                	mv	s1,a0
+42013558:	46051b63          	bnez	a0,420139ce <stream_task+0xb8c>
+4201355c:	059107a3          	sb	s9,79(sp)
+42013560:	fe36e097          	auipc	ra,0xfe36e
+42013564:	e74080e7          	jalr	-396(ra) # 403813d4 <esp_timer_get_time>
+42013568:	4781                	li	a5,0
+4201356a:	4801                	li	a6,0
+4201356c:	cc2e                	sw	a1,24(sp)
+4201356e:	d4be                	sw	a5,104(sp)
+42013570:	d6c2                	sw	a6,108(sp)
+42013572:	ca2a                	sw	a0,20(sp)
+42013574:	fe36e097          	auipc	ra,0xfe36e
+42013578:	e60080e7          	jalr	-416(ra) # 403813d4 <esp_timer_get_time>
+4201357c:	d0aa                	sw	a0,96(sp)
+4201357e:	04010623          	sb	zero,76(sp)
+42013582:	d2ae                	sw	a1,100(sp)
+42013584:	2e0a0363          	beqz	s4,4201386a <stream_task+0xa28>
+42013588:	6705                	lui	a4,0x1
+4201358a:	77e5                	lui	a5,0xffff9
+4201358c:	5912                	lw	s2,36(sp)
+4201358e:	80070713          	addi	a4,a4,-2048 # 800 <ALIGN_VECTOR_TABLE+0x700>
+42013592:	17e5                	addi	a5,a5,-7 # ffff8ff9 <SYSTEM+0x9ff38ff9>
+42013594:	dc3a                	sw	a4,56(sp)
+42013596:	de3e                	sw	a5,60(sp)
+42013598:	89d2                	mv	s3,s4
+4201359a:	c802                	sw	zero,16(sp)
+4201359c:	c65a                	sw	s6,12(sp)
+4201359e:	d00d8793          	addi	a5,s11,-768
+420135a2:	0330000f          	fence	rw,rw
+420135a6:	439c                	lw	a5,0(a5)
+420135a8:	0230000f          	fence	r,rw
+420135ac:	11812a83          	lw	s5,280(sp)
+420135b0:	4cfa9663          	bne	s5,a5,42013a7c <stream_task+0xc3a>
+420135b4:	56e2                	lw	a3,56(sp)
+420135b6:	45b2                	lw	a1,12(sp)
+420135b8:	864a                	mv	a2,s2
+420135ba:	00e8                	addi	a0,sp,76
+420135bc:	331000ef          	jal	420140ec <stream_http_read>
+420135c0:	84aa                	mv	s1,a0
+420135c2:	d00d8793          	addi	a5,s11,-768
+420135c6:	0330000f          	fence	rw,rw
+420135ca:	439c                	lw	a5,0(a5)
+420135cc:	0230000f          	fence	r,rw
+420135d0:	11812a83          	lw	s5,280(sp)
+420135d4:	4afa9463          	bne	s5,a5,42013a7c <stream_task+0xc3a>
+420135d8:	57f2                	lw	a5,60(sp)
+420135da:	22f50563          	beq	a0,a5,42013804 <stream_task+0x9c2>
+420135de:	5a054a63          	bltz	a0,42013b92 <stream_task+0xd50>
+420135e2:	12051763          	bnez	a0,42013710 <stream_task+0x8ce>
+420135e6:	4532                	lw	a0,12(sp)
+420135e8:	37c800ef          	jal	42093964 <esp_http_client_is_complete_data_received>
+420135ec:	6a051f63          	bnez	a0,42013caa <stream_task+0xe68>
+420135f0:	428090ef          	jal	4201ca18 <runtime_settings_get_watchdog>
+420135f4:	c961                	beqz	a0,420136c4 <stream_task+0x882>
+420135f6:	fe36e097          	auipc	ra,0xfe36e
+420135fa:	dde080e7          	jalr	-546(ra) # 403813d4 <esp_timer_get_time>
+420135fe:	47d2                	lw	a5,20(sp)
+42013600:	40f50733          	sub	a4,a0,a5
+42013604:	47e2                	lw	a5,24(sp)
+42013606:	00e53533          	sltu	a0,a0,a4
+4201360a:	40f587b3          	sub	a5,a1,a5
+4201360e:	8f89                	sub	a5,a5,a0
+42013610:	0a87ca63          	blt	a5,s0,420136c4 <stream_task+0x882>
+42013614:	00f41563          	bne	s0,a5,4201361e <stream_task+0x7dc>
+42013618:	5782                	lw	a5,32(sp)
+4201361a:	0af76563          	bltu	a4,a5,420136c4 <stream_task+0x882>
+4201361e:	4b32                	lw	s6,12(sp)
+42013620:	fe376097          	auipc	ra,0xfe376
+42013624:	e7e080e7          	jalr	-386(ra) # 4038949e <esp_log_timestamp>
+42013628:	3c1267b7          	lui	a5,0x3c126
+4201362c:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42013630:	3c1267b7          	lui	a5,0x3c126
+42013634:	86aa                	mv	a3,a0
+42013636:	85ba                	mv	a1,a4
+42013638:	43078613          	addi	a2,a5,1072 # 3c126430 <_esp_libc_clock_array_end+0x62e0>
+4201363c:	4509                	li	a0,2
+4201363e:	fe376097          	auipc	ra,0xfe376
+42013642:	d58080e7          	jalr	-680(ra) # 40389396 <esp_log>
+42013646:	11812a83          	lw	s5,280(sp)
+4201364a:	4411                	li	s0,4
+4201364c:	44c6                	lw	s1,80(sp)
+4201364e:	ce82                	sw	zero,92(sp)
+42013650:	a811                	j	42013664 <stream_task+0x822>
+42013652:	d00d8793          	addi	a5,s11,-768
+42013656:	0330000f          	fence	rw,rw
+4201365a:	439c                	lw	a5,0(a5)
+4201365c:	0230000f          	fence	r,rw
+42013660:	02fa9c63          	bne	s5,a5,42013698 <stream_task+0x856>
+42013664:	3fc9a7b7          	lui	a5,0x3fc9a
+42013668:	d087a503          	lw	a0,-760(a5) # 3fc99d08 <s_encoded>
+4201366c:	0fa00693          	li	a3,250
+42013670:	4631                	li	a2,12
+42013672:	08ec                	addi	a1,sp,92
+42013674:	6a5140ef          	jal	42028518 <adaptive_input_acquire>
+42013678:	fd951de3          	bne	a0,s9,42013652 <stream_task+0x810>
+4201367c:	45f6                	lw	a1,92(sp)
+4201367e:	3fc9a7b7          	lui	a5,0x3fc9a
+42013682:	d087a503          	lw	a0,-760(a5) # 3fc99d08 <s_encoded>
+42013686:	0155a023          	sw	s5,0(a1)
+4201368a:	c1c4                	sw	s1,4(a1)
+4201368c:	00059423          	sh	zero,8(a1)
+42013690:	00858523          	sb	s0,10(a1)
+42013694:	76b140ef          	jal	420285fe <adaptive_input_commit>
+42013698:	855a                	mv	a0,s6
+4201369a:	6a4800ef          	jal	42093d3e <esp_http_client_close>
+4201369e:	855a                	mv	a0,s6
+420136a0:	0d7800ef          	jal	42093f76 <esp_http_client_cleanup>
+420136a4:	d00d8793          	addi	a5,s11,-768
+420136a8:	0330000f          	fence	rw,rw
+420136ac:	4398                	lw	a4,0(a5)
+420136ae:	0230000f          	fence	r,rw
+420136b2:	11812783          	lw	a5,280(sp)
+420136b6:	fef71d63          	bne	a4,a5,42012eb0 <stream_task+0x6e>
+420136ba:	4501                	li	a0,0
+420136bc:	3b7040ef          	jal	42018272 <network_service_set_streaming>
+420136c0:	ff0ff06f          	j	42012eb0 <stream_task+0x6e>
+420136c4:	4529                	li	a0,10
+420136c6:	00107097          	auipc	ra,0x107
+420136ca:	926080e7          	jalr	-1754(ra) # 42119fec <vTaskDelay>
+420136ce:	bdc1                	j	4201359e <stream_task+0x75c>
+420136d0:	d00d8793          	addi	a5,s11,-768
+420136d4:	0330000f          	fence	rw,rw
+420136d8:	438c                	lw	a1,0(a5)
+420136da:	0230000f          	fence	r,rw
+420136de:	11812783          	lw	a5,280(sp)
+420136e2:	fcf59763          	bne	a1,a5,42012eb0 <stream_task+0x6e>
+420136e6:	3fc9a7b7          	lui	a5,0x3fc9a
+420136ea:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+420136ee:	3c1267b7          	lui	a5,0x3c126
+420136f2:	15878693          	addi	a3,a5,344 # 3c126158 <_esp_libc_clock_array_end+0x6008>
+420136f6:	4601                	li	a2,0
+420136f8:	02d030ef          	jal	42016f24 <native_state_set_audio>
+420136fc:	4501                	li	a0,0
+420136fe:	375040ef          	jal	42018272 <network_service_set_streaming>
+42013702:	faeff06f          	j	42012eb0 <stream_task+0x6e>
+42013706:	ba059ae3          	bnez	a1,420132ba <stream_task+0x478>
+4201370a:	a60790e3          	bnez	a5,4201316a <stream_task+0x328>
+4201370e:	b675                	j	420132ba <stream_task+0x478>
+42013710:	fe36e097          	auipc	ra,0xfe36e
+42013714:	cc4080e7          	jalr	-828(ra) # 403813d4 <esp_timer_get_time>
+42013718:	3fc907b7          	lui	a5,0x3fc90
+4201371c:	e0078793          	addi	a5,a5,-512 # 3fc8fe00 <s_icy_title>
+42013720:	cc2e                	sw	a1,24(sp)
+42013722:	ca2a                	sw	a0,20(sp)
+42013724:	da3e                	sw	a5,52(sp)
+42013726:	4b01                	li	s6,0
+42013728:	ce22                	sw	s0,28(sp)
+4201372a:	016905b3          	add	a1,s2,s6
+4201372e:	842e                	mv	s0,a1
+42013730:	02099363          	bnez	s3,42013756 <stream_task+0x914>
+42013734:	47c2                	lw	a5,16(sp)
+42013736:	e7e9                	bnez	a5,42013800 <stream_task+0x9be>
+42013738:	0005c783          	lbu	a5,0(a1)
+4201373c:	5552                	lw	a0,52(sp)
+4201373e:	0b05                	addi	s6,s6,1
+42013740:	00479a93          	slli	s5,a5,0x4
+42013744:	245000ef          	jal	42014188 <icy_title_begin>
+42013748:	040a9363          	bnez	s5,4201378e <stream_task+0x94c>
+4201374c:	489b7163          	bgeu	s6,s1,42013bce <stream_task+0xd8c>
+42013750:	01690433          	add	s0,s2,s6
+42013754:	89d2                	mv	s3,s4
+42013756:	41648833          	sub	a6,s1,s6
+4201375a:	d44a                	sw	s2,40(sp)
+4201375c:	8926                	mv	s2,s1
+4201375e:	84a2                	mv	s1,s0
+42013760:	8442                	mv	s0,a6
+42013762:	04f10713          	addi	a4,sp,79
+42013766:	8626                	mv	a2,s1
+42013768:	088c                	addi	a1,sp,80
+4201376a:	8aa2                	mv	s5,s0
+4201376c:	0089f363          	bgeu	s3,s0,42013772 <stream_task+0x930>
+42013770:	8ace                	mv	s5,s3
+42013772:	11812503          	lw	a0,280(sp)
+42013776:	86d6                	mv	a3,s5
+42013778:	d50ff0ef          	jal	42012cc8 <send_stream_audio>
+4201377c:	20050963          	beqz	a0,4201398e <stream_task+0xb4c>
+42013780:	060a9163          	bnez	s5,420137e2 <stream_task+0x9a0>
+42013784:	fd2b6fe3          	bltu	s6,s2,42013762 <stream_task+0x920>
+42013788:	4472                	lw	s0,28(sp)
+4201378a:	5922                	lw	s2,40(sp)
+4201378c:	bd09                	j	4201359e <stream_task+0x75c>
+4201378e:	2c9b7363          	bgeu	s6,s1,42013a54 <stream_task+0xc12>
+42013792:	016905b3          	add	a1,s2,s6
+42013796:	41648433          	sub	s0,s1,s6
+4201379a:	5552                	lw	a0,52(sp)
+4201379c:	008af363          	bgeu	s5,s0,420137a2 <stream_task+0x960>
+420137a0:	8456                	mv	s0,s5
+420137a2:	8622                	mv	a2,s0
+420137a4:	408a8ab3          	sub	s5,s5,s0
+420137a8:	1ef000ef          	jal	42014196 <icy_title_feed>
+420137ac:	9b22                	add	s6,s6,s0
+420137ae:	fe0a90e3          	bnez	s5,4201378e <stream_task+0x94c>
+420137b2:	5552                	lw	a0,52(sp)
+420137b4:	11812a83          	lw	s5,280(sp)
+420137b8:	2a9000ef          	jal	42014260 <icy_title_finish>
+420137bc:	842a                	mv	s0,a0
+420137be:	c919                	beqz	a0,420137d4 <stream_task+0x992>
+420137c0:	d00d8793          	addi	a5,s11,-768
+420137c4:	0330000f          	fence	rw,rw
+420137c8:	0007a983          	lw	s3,0(a5)
+420137cc:	0230000f          	fence	r,rw
+420137d0:	23598d63          	beq	s3,s5,42013a0a <stream_task+0xbc8>
+420137d4:	3e9b7d63          	bgeu	s6,s1,42013bce <stream_task+0xd8c>
+420137d8:	01690433          	add	s0,s2,s6
+420137dc:	89d2                	mv	s3,s4
+420137de:	c802                	sw	zero,16(sp)
+420137e0:	bf9d                	j	42013756 <stream_task+0x914>
+420137e2:	11812503          	lw	a0,280(sp)
+420137e6:	84ca                	mv	s1,s2
+420137e8:	8656                	mv	a2,s5
+420137ea:	108c                	addi	a1,sp,96
+420137ec:	9b56                	add	s6,s6,s5
+420137ee:	5922                	lw	s2,40(sp)
+420137f0:	415989b3          	sub	s3,s3,s5
+420137f4:	bbbfd0ef          	jal	420113ae <stream_bitrate_add.part.0>
+420137f8:	f29b69e3          	bltu	s6,s1,4201372a <stream_task+0x8e8>
+420137fc:	4472                	lw	s0,28(sp)
+420137fe:	b345                	j	4201359e <stream_task+0x75c>
+42013800:	8abe                	mv	s5,a5
+42013802:	bf51                	j	42013796 <stream_task+0x954>
+42013804:	214090ef          	jal	4201ca18 <runtime_settings_get_watchdog>
+42013808:	d8050be3          	beqz	a0,4201359e <stream_task+0x75c>
+4201380c:	fe36e097          	auipc	ra,0xfe36e
+42013810:	bc8080e7          	jalr	-1080(ra) # 403813d4 <esp_timer_get_time>
+42013814:	47d2                	lw	a5,20(sp)
+42013816:	40f50733          	sub	a4,a0,a5
+4201381a:	47e2                	lw	a5,24(sp)
+4201381c:	00e53533          	sltu	a0,a0,a4
+42013820:	40f587b3          	sub	a5,a1,a5
+42013824:	8f89                	sub	a5,a5,a0
+42013826:	d687cce3          	blt	a5,s0,4201359e <stream_task+0x75c>
+4201382a:	24f40c63          	beq	s0,a5,42013a82 <stream_task+0xc40>
+4201382e:	4b32                	lw	s6,12(sp)
+42013830:	bd19                	j	42013646 <stream_task+0x804>
+42013832:	3c1267b7          	lui	a5,0x3c126
+42013836:	1090                	addi	a2,sp,96
+42013838:	33878593          	addi	a1,a5,824 # 3c126338 <_esp_libc_clock_array_end+0x61e8>
+4201383c:	855a                	mv	a0,s6
+4201383e:	d082                	sw	zero,96(sp)
+42013840:	7a77f0ef          	jal	420937e6 <esp_http_client_get_response_header>
+42013844:	ca0513e3          	bnez	a0,420134ea <stream_task+0x6a8>
+42013848:	5906                	lw	s2,96(sp)
+4201384a:	00090e63          	beqz	s2,42013866 <stream_task+0xa24>
+4201384e:	3c1267b7          	lui	a5,0x3c126
+42013852:	34878593          	addi	a1,a5,840 # 3c126348 <_esp_libc_clock_array_end+0x61f8>
+42013856:	854a                	mv	a0,s2
+42013858:	fdfed097          	auipc	ra,0xfdfed
+4201385c:	b20080e7          	jalr	-1248(ra) # 40000378 <strstr>
+42013860:	4485                	li	s1,1
+42013862:	2a050063          	beqz	a0,42013b02 <stream_task+0xcc0>
+42013866:	c8a6                	sw	s1,80(sp)
+42013868:	b149                	j	420134ea <stream_task+0x6a8>
+4201386a:	6985                	lui	s3,0x1
+4201386c:	7965                	lui	s2,0xffff9
+4201386e:	80098993          	addi	s3,s3,-2048 # 800 <ALIGN_VECTOR_TABLE+0x700>
+42013872:	1965                	addi	s2,s2,-7 # ffff8ff9 <SYSTEM+0x9ff38ff9>
+42013874:	d00d8793          	addi	a5,s11,-768
+42013878:	0330000f          	fence	rw,rw
+4201387c:	439c                	lw	a5,0(a5)
+4201387e:	0230000f          	fence	r,rw
+42013882:	11812a83          	lw	s5,280(sp)
+42013886:	1f579c63          	bne	a5,s5,42013a7e <stream_task+0xc3c>
+4201388a:	5612                	lw	a2,36(sp)
+4201388c:	86ce                	mv	a3,s3
+4201388e:	85da                	mv	a1,s6
+42013890:	00e8                	addi	a0,sp,76
+42013892:	05b000ef          	jal	420140ec <stream_http_read>
+42013896:	84aa                	mv	s1,a0
+42013898:	d00d8793          	addi	a5,s11,-768
+4201389c:	0330000f          	fence	rw,rw
+420138a0:	439c                	lw	a5,0(a5)
+420138a2:	0230000f          	fence	r,rw
+420138a6:	11812a83          	lw	s5,280(sp)
+420138aa:	1d579a63          	bne	a5,s5,42013a7e <stream_task+0xc3c>
+420138ae:	0b250763          	beq	a0,s2,4201395c <stream_task+0xb1a>
+420138b2:	2e054163          	bltz	a0,42013b94 <stream_task+0xd52>
+420138b6:	e93d                	bnez	a0,4201392c <stream_task+0xaea>
+420138b8:	855a                	mv	a0,s6
+420138ba:	0aa800ef          	jal	42093964 <esp_http_client_is_complete_data_received>
+420138be:	34051663          	bnez	a0,42013c0a <stream_task+0xdc8>
+420138c2:	156090ef          	jal	4201ca18 <runtime_settings_get_watchdog>
+420138c6:	c50d                	beqz	a0,420138f0 <stream_task+0xaae>
+420138c8:	fe36e097          	auipc	ra,0xfe36e
+420138cc:	b0c080e7          	jalr	-1268(ra) # 403813d4 <esp_timer_get_time>
+420138d0:	47d2                	lw	a5,20(sp)
+420138d2:	40f50733          	sub	a4,a0,a5
+420138d6:	47e2                	lw	a5,24(sp)
+420138d8:	00e53533          	sltu	a0,a0,a4
+420138dc:	40f587b3          	sub	a5,a1,a5
+420138e0:	8f89                	sub	a5,a5,a0
+420138e2:	0087c763          	blt	a5,s0,420138f0 <stream_task+0xaae>
+420138e6:	d2f41de3          	bne	s0,a5,42013620 <stream_task+0x7de>
+420138ea:	5782                	lw	a5,32(sp)
+420138ec:	d2f77ae3          	bgeu	a4,a5,42013620 <stream_task+0x7de>
+420138f0:	4529                	li	a0,10
+420138f2:	00106097          	auipc	ra,0x106
+420138f6:	6fa080e7          	jalr	1786(ra) # 42119fec <vTaskDelay>
+420138fa:	bfad                	j	42013874 <stream_task+0xa32>
+420138fc:	e53a0a93          	addi	s5,s4,-429
+42013900:	e68a0713          	addi	a4,s4,-408
+42013904:	001aba93          	seqz	s5,s5
+42013908:	00173713          	seqz	a4,a4
+4201390c:	00eaeab3          	or	s5,s5,a4
+42013910:	0a0a9963          	bnez	s5,420139c2 <stream_task+0xb80>
+42013914:	e0ca0793          	addi	a5,s4,-500
+42013918:	855a                	mv	a0,s6
+4201391a:	0647ba13          	sltiu	s4,a5,100
+4201391e:	420800ef          	jal	42093d3e <esp_http_client_close>
+42013922:	380a8163          	beqz	s5,42013ca4 <stream_task+0xe62>
+42013926:	6a9d                	lui	s5,0x7
+42013928:	0a85                	addi	s5,s5,1 # 7001 <CSR_UINTSTATUS+0x6350>
+4201392a:	ba59                	j	420132c0 <stream_task+0x47e>
+4201392c:	fe36e097          	auipc	ra,0xfe36e
+42013930:	aa8080e7          	jalr	-1368(ra) # 403813d4 <esp_timer_get_time>
+42013934:	87aa                	mv	a5,a0
+42013936:	5612                	lw	a2,36(sp)
+42013938:	11812503          	lw	a0,280(sp)
+4201393c:	cc2e                	sw	a1,24(sp)
+4201393e:	04f10713          	addi	a4,sp,79
+42013942:	86a6                	mv	a3,s1
+42013944:	088c                	addi	a1,sp,80
+42013946:	ca3e                	sw	a5,20(sp)
+42013948:	b80ff0ef          	jal	42012cc8 <send_stream_audio>
+4201394c:	c521                	beqz	a0,42013994 <stream_task+0xb52>
+4201394e:	11812503          	lw	a0,280(sp)
+42013952:	8626                	mv	a2,s1
+42013954:	108c                	addi	a1,sp,96
+42013956:	a59fd0ef          	jal	420113ae <stream_bitrate_add.part.0>
+4201395a:	bf29                	j	42013874 <stream_task+0xa32>
+4201395c:	0bc090ef          	jal	4201ca18 <runtime_settings_get_watchdog>
+42013960:	f0050ae3          	beqz	a0,42013874 <stream_task+0xa32>
+42013964:	fe36e097          	auipc	ra,0xfe36e
+42013968:	a70080e7          	jalr	-1424(ra) # 403813d4 <esp_timer_get_time>
+4201396c:	47d2                	lw	a5,20(sp)
+4201396e:	40f50733          	sub	a4,a0,a5
+42013972:	47e2                	lw	a5,24(sp)
+42013974:	00e53533          	sltu	a0,a0,a4
+42013978:	40f587b3          	sub	a5,a1,a5
+4201397c:	8f89                	sub	a5,a5,a0
+4201397e:	ee87cbe3          	blt	a5,s0,42013874 <stream_task+0xa32>
+42013982:	ccf412e3          	bne	s0,a5,42013646 <stream_task+0x804>
+42013986:	5782                	lw	a5,32(sp)
+42013988:	caf77fe3          	bgeu	a4,a5,42013646 <stream_task+0x804>
+4201398c:	b5e5                	j	42013874 <stream_task+0xa32>
+4201398e:	57a2                	lw	a5,40(sp)
+42013990:	4b32                	lw	s6,12(sp)
+42013992:	d23e                	sw	a5,36(sp)
+42013994:	fe376097          	auipc	ra,0xfe376
+42013998:	b0a080e7          	jalr	-1270(ra) # 4038949e <esp_log_timestamp>
+4201399c:	3c1267b7          	lui	a5,0x3c126
+420139a0:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420139a4:	3c1267b7          	lui	a5,0x3c126
+420139a8:	86aa                	mv	a3,a0
+420139aa:	85ba                	mv	a1,a4
+420139ac:	45878613          	addi	a2,a5,1112 # 3c126458 <_esp_libc_clock_array_end+0x6308>
+420139b0:	4509                	li	a0,2
+420139b2:	fe376097          	auipc	ra,0xfe376
+420139b6:	9e4080e7          	jalr	-1564(ra) # 40389396 <esp_log>
+420139ba:	440d                	li	s0,3
+420139bc:	11812a83          	lw	s5,280(sp)
+420139c0:	b171                	j	4201364c <stream_task+0x80a>
+420139c2:	855a                	mv	a0,s6
+420139c4:	8a56                	mv	s4,s5
+420139c6:	378800ef          	jal	42093d3e <esp_http_client_close>
+420139ca:	5afd                	li	s5,-1
+420139cc:	b8d5                	j	420132c0 <stream_task+0x47e>
+420139ce:	3fc9a7b7          	lui	a5,0x3fc9a
+420139d2:	11812583          	lw	a1,280(sp)
+420139d6:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+420139da:	8626                	mv	a2,s1
+420139dc:	5e2030ef          	jal	42016fbe <native_state_set_bitrate>
+420139e0:	fe376097          	auipc	ra,0xfe376
+420139e4:	abe080e7          	jalr	-1346(ra) # 4038949e <esp_log_timestamp>
+420139e8:	3c126737          	lui	a4,0x3c126
+420139ec:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420139f0:	3c126637          	lui	a2,0x3c126
+420139f4:	86aa                	mv	a3,a0
+420139f6:	87a6                	mv	a5,s1
+420139f8:	85ba                	mv	a1,a4
+420139fa:	3b060613          	addi	a2,a2,944 # 3c1263b0 <_esp_libc_clock_array_end+0x6260>
+420139fe:	450d                	li	a0,3
+42013a00:	fe376097          	auipc	ra,0xfe376
+42013a04:	996080e7          	jalr	-1642(ra) # 40389396 <esp_log>
+42013a08:	be91                	j	4201355c <stream_task+0x71a>
+42013a0a:	3fc9a7b7          	lui	a5,0x3fc9a
+42013a0e:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42013a12:	85a2                	mv	a1,s0
+42013a14:	257030ef          	jal	4201746a <native_state_set_title>
+42013a18:	d00d8793          	addi	a5,s11,-768
+42013a1c:	0330000f          	fence	rw,rw
+42013a20:	439c                	lw	a5,0(a5)
+42013a22:	0230000f          	fence	r,rw
+42013a26:	0d379363          	bne	a5,s3,42013aec <stream_task+0xcaa>
+42013a2a:	fe376097          	auipc	ra,0xfe376
+42013a2e:	a74080e7          	jalr	-1420(ra) # 4038949e <esp_log_timestamp>
+42013a32:	3c126737          	lui	a4,0x3c126
+42013a36:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42013a3a:	3c126637          	lui	a2,0x3c126
+42013a3e:	86aa                	mv	a3,a0
+42013a40:	87a2                	mv	a5,s0
+42013a42:	85ba                	mv	a1,a4
+42013a44:	3d860613          	addi	a2,a2,984 # 3c1263d8 <_esp_libc_clock_array_end+0x6288>
+42013a48:	450d                	li	a0,3
+42013a4a:	fe376097          	auipc	ra,0xfe376
+42013a4e:	94c080e7          	jalr	-1716(ra) # 40389396 <esp_log>
+42013a52:	b349                	j	420137d4 <stream_task+0x992>
+42013a54:	4472                	lw	s0,28(sp)
+42013a56:	c856                	sw	s5,16(sp)
+42013a58:	b699                	j	4201359e <stream_task+0x75c>
+42013a5a:	4a05                	li	s4,1
+42013a5c:	3fc9a7b7          	lui	a5,0x3fc9a
+42013a60:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42013a64:	3c1267b7          	lui	a5,0x3c126
+42013a68:	2d478693          	addi	a3,a5,724 # 3c1262d4 <_esp_libc_clock_array_end+0x6184>
+42013a6c:	4601                	li	a2,0
+42013a6e:	4b6030ef          	jal	42016f24 <native_state_set_audio>
+42013a72:	4501                	li	a0,0
+42013a74:	7fe040ef          	jal	42018272 <network_service_set_streaming>
+42013a78:	891ff06f          	j	42013308 <stream_task+0x4c6>
+42013a7c:	4b32                	lw	s6,12(sp)
+42013a7e:	4405                	li	s0,1
+42013a80:	b6f1                	j	4201364c <stream_task+0x80a>
+42013a82:	5782                	lw	a5,32(sp)
+42013a84:	b0f76de3          	bltu	a4,a5,4201359e <stream_task+0x75c>
+42013a88:	4b32                	lw	s6,12(sp)
+42013a8a:	be75                	j	42013646 <stream_task+0x804>
+42013a8c:	77e5                	lui	a5,0xffff9
+42013a8e:	17e5                	addi	a5,a5,-7 # ffff8ff9 <SYSTEM+0x9ff38ff9>
+42013a90:	7a65                	lui	s4,0xffff9
+42013a92:	97aa                	add	a5,a5,a0
+42013a94:	ef950713          	addi	a4,a0,-263
+42013a98:	1a79                	addi	s4,s4,-2 # ffff8ffe <SYSTEM+0x9ff38ffe>
+42013a9a:	00173713          	seqz	a4,a4
+42013a9e:	9a2a                	add	s4,s4,a0
+42013aa0:	0017b793          	seqz	a5,a5
+42013aa4:	8fd9                	or	a5,a5,a4
+42013aa6:	002a3a13          	sltiu	s4,s4,2
+42013aaa:	00fa6a33          	or	s4,s4,a5
+42013aae:	fe376097          	auipc	ra,0xfe376
+42013ab2:	9f0080e7          	jalr	-1552(ra) # 4038949e <esp_log_timestamp>
+42013ab6:	c82a                	sw	a0,16(sp)
+42013ab8:	8556                	mv	a0,s5
+42013aba:	b37ee0ef          	jal	420025f0 <esp_err_to_name>
+42013abe:	c62a                	sw	a0,12(sp)
+42013ac0:	855a                	mv	a0,s6
+42013ac2:	60f7f0ef          	jal	420938d0 <esp_http_client_get_errno>
+42013ac6:	47b2                	lw	a5,12(sp)
+42013ac8:	46c2                	lw	a3,16(sp)
+42013aca:	3c126737          	lui	a4,0x3c126
+42013ace:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42013ad2:	3c126637          	lui	a2,0x3c126
+42013ad6:	882a                	mv	a6,a0
+42013ad8:	85ba                	mv	a1,a4
+42013ada:	1b860613          	addi	a2,a2,440 # 3c1261b8 <_esp_libc_clock_array_end+0x6068>
+42013ade:	4505                	li	a0,1
+42013ae0:	fe376097          	auipc	ra,0xfe376
+42013ae4:	8b6080e7          	jalr	-1866(ra) # 40389396 <esp_log>
+42013ae8:	fd8ff06f          	j	420132c0 <stream_task+0x47e>
+42013aec:	3fc9a7b7          	lui	a5,0x3fc9a
+42013af0:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42013af4:	3c1397b7          	lui	a5,0x3c139
+42013af8:	dd878593          	addi	a1,a5,-552 # 3c138dd8 <_esp_libc_clock_array_end+0x18c88>
+42013afc:	16f030ef          	jal	4201746a <native_state_set_title>
+42013b00:	b9d1                	j	420137d4 <stream_task+0x992>
+42013b02:	3c1267b7          	lui	a5,0x3c126
+42013b06:	35078593          	addi	a1,a5,848 # 3c126350 <_esp_libc_clock_array_end+0x6200>
+42013b0a:	854a                	mv	a0,s2
+42013b0c:	fdfed097          	auipc	ra,0xfdfed
+42013b10:	86c080e7          	jalr	-1940(ra) # 40000378 <strstr>
+42013b14:	d40519e3          	bnez	a0,42013866 <stream_task+0xa24>
+42013b18:	3c1267b7          	lui	a5,0x3c126
+42013b1c:	35478593          	addi	a1,a5,852 # 3c126354 <_esp_libc_clock_array_end+0x6204>
+42013b20:	854a                	mv	a0,s2
+42013b22:	fdfed097          	auipc	ra,0xfdfed
+42013b26:	856080e7          	jalr	-1962(ra) # 40000378 <strstr>
+42013b2a:	4489                	li	s1,2
+42013b2c:	d2051de3          	bnez	a0,42013866 <stream_task+0xa24>
+42013b30:	3c1267b7          	lui	a5,0x3c126
+42013b34:	35878593          	addi	a1,a5,856 # 3c126358 <_esp_libc_clock_array_end+0x6208>
+42013b38:	854a                	mv	a0,s2
+42013b3a:	fdfed097          	auipc	ra,0xfdfed
+42013b3e:	83e080e7          	jalr	-1986(ra) # 40000378 <strstr>
+42013b42:	d20512e3          	bnez	a0,42013866 <stream_task+0xa24>
+42013b46:	3c1267b7          	lui	a5,0x3c126
+42013b4a:	36078593          	addi	a1,a5,864 # 3c126360 <_esp_libc_clock_array_end+0x6210>
+42013b4e:	854a                	mv	a0,s2
+42013b50:	fdfed097          	auipc	ra,0xfdfed
+42013b54:	828080e7          	jalr	-2008(ra) # 40000378 <strstr>
+42013b58:	448d                	li	s1,3
+42013b5a:	d00516e3          	bnez	a0,42013866 <stream_task+0xa24>
+42013b5e:	3c1267b7          	lui	a5,0x3c126
+42013b62:	36878593          	addi	a1,a5,872 # 3c126368 <_esp_libc_clock_array_end+0x6218>
+42013b66:	854a                	mv	a0,s2
+42013b68:	fdfed097          	auipc	ra,0xfdfed
+42013b6c:	810080e7          	jalr	-2032(ra) # 40000378 <strstr>
+42013b70:	4491                	li	s1,4
+42013b72:	ce051ae3          	bnez	a0,42013866 <stream_task+0xa24>
+42013b76:	3c1267b7          	lui	a5,0x3c126
+42013b7a:	854a                	mv	a0,s2
+42013b7c:	36c78593          	addi	a1,a5,876 # 3c12636c <_esp_libc_clock_array_end+0x621c>
+42013b80:	fdfec097          	auipc	ra,0xfdfec
+42013b84:	7f8080e7          	jalr	2040(ra) # 40000378 <strstr>
+42013b88:	00a034b3          	snez	s1,a0
+42013b8c:	048a                	slli	s1,s1,0x2
+42013b8e:	c8a6                	sw	s1,80(sp)
+42013b90:	baa9                	j	420134ea <stream_task+0x6a8>
+42013b92:	4b32                	lw	s6,12(sp)
+42013b94:	3c1267b7          	lui	a5,0x3c126
+42013b98:	3f878513          	addi	a0,a5,1016 # 3c1263f8 <_esp_libc_clock_array_end+0x62a8>
+42013b9c:	ed2fd0ef          	jal	4201126e <log_runtime_memory>
+42013ba0:	fe376097          	auipc	ra,0xfe376
+42013ba4:	8fe080e7          	jalr	-1794(ra) # 4038949e <esp_log_timestamp>
+42013ba8:	3c1267b7          	lui	a5,0x3c126
+42013bac:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42013bb0:	3c1267b7          	lui	a5,0x3c126
+42013bb4:	86aa                	mv	a3,a0
+42013bb6:	85ba                	mv	a1,a4
+42013bb8:	41078613          	addi	a2,a5,1040 # 3c126410 <_esp_libc_clock_array_end+0x62c0>
+42013bbc:	4509                	li	a0,2
+42013bbe:	fe375097          	auipc	ra,0xfe375
+42013bc2:	7d8080e7          	jalr	2008(ra) # 40389396 <esp_log>
+42013bc6:	4409                	li	s0,2
+42013bc8:	11812a83          	lw	s5,280(sp)
+42013bcc:	b441                	j	4201364c <stream_task+0x80a>
+42013bce:	4472                	lw	s0,28(sp)
+42013bd0:	c802                	sw	zero,16(sp)
+42013bd2:	89d2                	mv	s3,s4
+42013bd4:	b2e9                	j	4201359e <stream_task+0x75c>
+42013bd6:	fe376097          	auipc	ra,0xfe376
+42013bda:	8c8080e7          	jalr	-1848(ra) # 4038949e <esp_log_timestamp>
+42013bde:	3c1267b7          	lui	a5,0x3c126
+42013be2:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42013be6:	3c126637          	lui	a2,0x3c126
+42013bea:	86aa                	mv	a3,a0
+42013bec:	85ba                	mv	a1,a4
+42013bee:	11460613          	addi	a2,a2,276 # 3c126114 <_esp_libc_clock_array_end+0x5fc4>
+42013bf2:	4505                	li	a0,1
+42013bf4:	fe375097          	auipc	ra,0xfe375
+42013bf8:	7a2080e7          	jalr	1954(ra) # 40389396 <esp_log>
+42013bfc:	4501                	li	a0,0
+42013bfe:	00106097          	auipc	ra,0x106
+42013c02:	ff6080e7          	jalr	-10(ra) # 42119bf4 <vTaskDelete>
+42013c06:	a84ff06f          	j	42012e8a <stream_task+0x48>
+42013c0a:	11812a83          	lw	s5,280(sp)
+42013c0e:	4405                	li	s0,1
+42013c10:	bc35                	j	4201364c <stream_task+0x80a>
+42013c12:	fe376097          	auipc	ra,0xfe376
+42013c16:	88c080e7          	jalr	-1908(ra) # 4038949e <esp_log_timestamp>
+42013c1a:	8aaa                	mv	s5,a0
+42013c1c:	855a                	mv	a0,s6
+42013c1e:	4b37f0ef          	jal	420938d0 <esp_http_client_get_errno>
+42013c22:	3c126737          	lui	a4,0x3c126
+42013c26:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42013c2a:	3c126637          	lui	a2,0x3c126
+42013c2e:	882a                	mv	a6,a0
+42013c30:	87d2                	mv	a5,s4
+42013c32:	86d6                	mv	a3,s5
+42013c34:	85ba                	mv	a1,a4
+42013c36:	1f460613          	addi	a2,a2,500 # 3c1261f4 <_esp_libc_clock_array_end+0x60a4>
+42013c3a:	4505                	li	a0,1
+42013c3c:	fe375097          	auipc	ra,0xfe375
+42013c40:	75a080e7          	jalr	1882(ra) # 40389396 <esp_log>
+42013c44:	855a                	mv	a0,s6
+42013c46:	0f8800ef          	jal	42093d3e <esp_http_client_close>
+42013c4a:	fe376097          	auipc	ra,0xfe376
+42013c4e:	854080e7          	jalr	-1964(ra) # 4038949e <esp_log_timestamp>
+42013c52:	8a2a                	mv	s4,a0
+42013c54:	651d                	lui	a0,0x7
+42013c56:	0511                	addi	a0,a0,4 # 7004 <CSR_UINTSTATUS+0x6353>
+42013c58:	999ee0ef          	jal	420025f0 <esp_err_to_name>
+42013c5c:	3c126737          	lui	a4,0x3c126
+42013c60:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42013c64:	3c126637          	lui	a2,0x3c126
+42013c68:	882a                	mv	a6,a0
+42013c6a:	121c                	addi	a5,sp,288
+42013c6c:	86d2                	mv	a3,s4
+42013c6e:	85ba                	mv	a1,a4
+42013c70:	23860613          	addi	a2,a2,568 # 3c126238 <_esp_libc_clock_array_end+0x60e8>
+42013c74:	4505                	li	a0,1
+42013c76:	fe375097          	auipc	ra,0xfe375
+42013c7a:	720080e7          	jalr	1824(ra) # 40389396 <esp_log>
+42013c7e:	d00d8793          	addi	a5,s11,-768
+42013c82:	0330000f          	fence	rw,rw
+42013c86:	439c                	lw	a5,0(a5)
+42013c88:	0230000f          	fence	r,rw
+42013c8c:	11812583          	lw	a1,280(sp)
+42013c90:	dcb785e3          	beq	a5,a1,42013a5a <stream_task+0xc18>
+42013c94:	855a                	mv	a0,s6
+42013c96:	0a8800ef          	jal	42093d3e <esp_http_client_close>
+42013c9a:	855a                	mv	a0,s6
+42013c9c:	2da800ef          	jal	42093f76 <esp_http_client_cleanup>
+42013ca0:	e78ff06f          	j	42013318 <stream_task+0x4d6>
+42013ca4:	5afd                	li	s5,-1
+42013ca6:	e1aff06f          	j	420132c0 <stream_task+0x47e>
+42013caa:	4b32                	lw	s6,12(sp)
+42013cac:	11812a83          	lw	s5,280(sp)
+42013cb0:	4405                	li	s0,1
+42013cb2:	ba69                	j	4201364c <stream_task+0x80a>
+42013cb4:	fe375097          	auipc	ra,0xfe375
+42013cb8:	7ea080e7          	jalr	2026(ra) # 4038949e <esp_log_timestamp>
+42013cbc:	8a2a                	mv	s4,a0
+42013cbe:	8556                	mv	a0,s5
+42013cc0:	931ee0ef          	jal	420025f0 <esp_err_to_name>
+42013cc4:	3c126737          	lui	a4,0x3c126
+42013cc8:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42013ccc:	3c126637          	lui	a2,0x3c126
+42013cd0:	87aa                	mv	a5,a0
+42013cd2:	86d2                	mv	a3,s4
+42013cd4:	85ba                	mv	a1,a4
+42013cd6:	2a060613          	addi	a2,a2,672 # 3c1262a0 <_esp_libc_clock_array_end+0x6150>
+42013cda:	4505                	li	a0,1
+42013cdc:	fe375097          	auipc	ra,0xfe375
+42013ce0:	6ba080e7          	jalr	1722(ra) # 40389396 <esp_log>
+42013ce4:	4a01                	li	s4,0
+42013ce6:	ddaff06f          	j	420132c0 <stream_task+0x47e>
+42013cea:	d4079c63          	bnez	a5,42013242 <stream_task+0x400>
+42013cee:	d2071c63          	bnez	a4,42013226 <stream_task+0x3e4>
+42013cf2:	11812583          	lw	a1,280(sp)
+42013cf6:	d00d8793          	addi	a5,s11,-768
+42013cfa:	0330000f          	fence	rw,rw
+42013cfe:	439c                	lw	a5,0(a5)
+42013d00:	0230000f          	fence	r,rw
+42013d04:	9af59663          	bne	a1,a5,42012eb0 <stream_task+0x6e>
+42013d08:	d50ff06f          	j	42013258 <stream_task+0x416>
+42013d0c:	eb447263          	bgeu	s0,s4,420133b0 <stream_task+0x56e>
+42013d10:	8a22                	mv	s4,s0
+42013d12:	8aa6                	mv	s5,s1
+42013d14:	e9cff06f          	j	420133b0 <stream_task+0x56e>
+42013d18:	3e800993          	li	s3,1000
+42013d1c:	e6aff06f          	j	42013386 <stream_task+0x544>
+42013d20:	d00d8793          	addi	a5,s11,-768
+42013d24:	0330000f          	fence	rw,rw
+42013d28:	439c                	lw	a5,0(a5)
+42013d2a:	0230000f          	fence	r,rw
+42013d2e:	d0fa1a63          	bne	s4,a5,42013242 <stream_task+0x400>
+42013d32:	3fc9a7b7          	lui	a5,0x3fc9a
+42013d36:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42013d3a:	3c1257b7          	lui	a5,0x3c125
+42013d3e:	85d2                	mv	a1,s4
+42013d40:	4f478693          	addi	a3,a5,1268 # 3c1254f4 <_esp_libc_clock_array_end+0x53a4>
+42013d44:	4601                	li	a2,0
+42013d46:	1de030ef          	jal	42016f24 <native_state_set_audio>
+42013d4a:	4501                	li	a0,0
+42013d4c:	526040ef          	jal	42018272 <network_service_set_streaming>
+42013d50:	cf2ff06f          	j	42013242 <stream_task+0x400>
+

@@ -1,0 +1,286 @@
+{
+  "lifecycle": {
+    "experiment": "qemu_late_sbr",
+    "ordinary_pcm": [
+      {
+        "case": "lc_44100_stereo",
+        "repeats": 3,
+        "frames": 72,
+        "channel_samples": 147456,
+        "max_error_lsb": 0,
+        "pcm_fnv1a": "830cc1d8"
+      },
+      {
+        "case": "lc_22050_mono",
+        "repeats": 3,
+        "frames": 39,
+        "channel_samples": 39936,
+        "max_error_lsb": 0,
+        "pcm_fnv1a": "e71fe2d0"
+      },
+      {
+        "case": "lc_48000_stereo",
+        "repeats": 3,
+        "frames": 78,
+        "channel_samples": 159744,
+        "max_error_lsb": 0,
+        "pcm_fnv1a": "757b7f1a"
+      },
+      {
+        "case": "he_44100_stereo",
+        "repeats": 3,
+        "frames": 42,
+        "channel_samples": 172032,
+        "max_error_lsb": 0,
+        "pcm_fnv1a": "72a522ac"
+      },
+      {
+        "case": "he_48000_stereo",
+        "repeats": 3,
+        "frames": 45,
+        "channel_samples": 184320,
+        "max_error_lsb": 0,
+        "pcm_fnv1a": "22097ca9"
+      },
+      {
+        "case": "hev2_44100_stereo",
+        "repeats": 3,
+        "frames": 45,
+        "channel_samples": 184320,
+        "max_error_lsb": 0,
+        "pcm_fnv1a": "65841ae2"
+      }
+    ],
+    "ordinary_channel_samples": 887808,
+    "precision_pass": true,
+    "precision_limit_lsb": 0,
+    "summaries": [],
+    "precision_scope": "Ordinary LC/HE/HEv2 streams vs unchanged controller with identical compact storage",
+    "transition_pcm_qualified": false,
+    "reverse_transition_qualified": false,
+    "production_qualified": false,
+    "pointers": {
+      "checks": 1186037,
+      "core": 4004,
+      "frames": 3782,
+      "ps": 1364,
+      "smoothing": 2625,
+      "allocations": 696,
+      "frees": 696,
+      "negative_cases": 10,
+      "envelopes": 1891,
+      "resets": 14,
+      "io": 2002,
+      "copies": 79106
+    },
+    "pointer_boundaries": {
+      "applied": 2738,
+      "decode_io": 3782,
+      "ps_bits": 1140,
+      "release_negative_cases": 6,
+      "boundary_negative_cases": 5
+    },
+    "stack_bytes": 16384,
+    "stack_min_free_bytes": 2824,
+    "parities": [
+      13,
+      26
+    ],
+    "retention_format_pass": true,
+    "retention_parities": 2,
+    "output_poison_independent": true,
+    "output_poison_channel_samples": 189440
+  },
+  "fill": {
+    "fill_pass": true,
+    "precision_qualified": false,
+    "hardware_tested": false,
+    "summaries": [],
+    "valid_comparisons": 69376,
+    "native_overrun_bits": 2148,
+    "regression": {
+      "faults_pass": true,
+      "precision_qualified": false,
+      "hardware_tested": false,
+      "summaries": [],
+      "late_oom_cases": 4,
+      "malformed_cases": 4,
+      "recovery_frames": 120,
+      "metadata": {
+        "metadata_pass": true,
+        "precision_qualified": false,
+        "summaries": [],
+        "frames": 104,
+        "resets": 1,
+        "cases": [
+          {
+            "case": "hev2_44100_stereo",
+            "label": "HE-AACv2",
+            "source_channels": 2,
+            "pcm_channels": 2,
+            "rate": 44100,
+            "frames": 15
+          },
+          {
+            "case": "he_mono_metadata",
+            "label": "HE-AAC",
+            "source_channels": 1,
+            "pcm_channels": 2,
+            "rate": 32000,
+            "frames": 11
+          },
+          {
+            "case": "lc_48000_stereo",
+            "label": "AAC",
+            "source_channels": 2,
+            "pcm_channels": 2,
+            "rate": 48000,
+            "frames": 26
+          },
+          {
+            "case": "he_48000_stereo",
+            "label": "HE-AAC",
+            "source_channels": 2,
+            "pcm_channels": 2,
+            "rate": 48000,
+            "frames": 15
+          },
+          {
+            "case": "hev2_44100_stereo",
+            "label": "HE-AACv2",
+            "source_channels": 2,
+            "pcm_channels": 2,
+            "rate": 44100,
+            "frames": 15
+          },
+          {
+            "case": "he_mono_metadata",
+            "label": "HE-AAC",
+            "source_channels": 1,
+            "pcm_channels": 2,
+            "rate": 32000,
+            "frames": 11
+          },
+          {
+            "case": "he_mono_metadata",
+            "label": "HE-AAC",
+            "source_channels": 1,
+            "pcm_channels": 2,
+            "rate": 32000,
+            "frames": 11
+          }
+        ]
+      },
+      "outcomes": [
+        {
+          "case": "kind=late_oom parity=1 allocation=owner",
+          "public_error": -2,
+          "pcm_bytes": 0
+        },
+        {
+          "case": "kind=late_oom parity=1 allocation=control",
+          "public_error": -2,
+          "pcm_bytes": 0
+        },
+        {
+          "case": "kind=late_oom parity=0 allocation=owner",
+          "public_error": -2,
+          "pcm_bytes": 0
+        },
+        {
+          "case": "kind=late_oom parity=0 allocation=control",
+          "public_error": -2,
+          "pcm_bytes": 0
+        },
+        {
+          "case": "kind=malformed case=header_only",
+          "public_error": 0,
+          "pcm_bytes": 0
+        },
+        {
+          "case": "kind=malformed case=sbr_truncated",
+          "public_error": 0,
+          "pcm_bytes": 0
+        },
+        {
+          "case": "kind=malformed case=sbr_count_overrun",
+          "public_error": 0,
+          "pcm_bytes": 0
+        },
+        {
+          "case": "kind=malformed case=fill_count_overrun",
+          "public_error": 0,
+          "pcm_bytes": 0
+        }
+      ]
+    }
+  },
+  "comparisons": [
+    {
+      "case": "late",
+      "reference": "tests\\results\\esp32c3-aac-metadata-20261004\\reference\\late.pcm.gz",
+      "channel_samples": 189440,
+      "reference_sha256": "431e73ec513b5284dd8e3e163ec9cbc2acd6ce73e4c1357f79986ac112e92de1",
+      "candidate_sha256": "3a4fb4edf29b7631c161833b5c881348e6571e6ca6e906f3d0e39ee62ddb1bc9",
+      "limit_lsb": 3,
+      "max_error_lsb": 2,
+      "different": 74,
+      "rms_error_lsb": 0.02309004845897552,
+      "histogram": {
+        "0": 189366,
+        "1": 65,
+        "2": 9
+      },
+      "passed": true
+    },
+    {
+      "case": "late",
+      "reference": "tests\\results\\esp32c3-aac-metadata-20261004\\pc19\\late.pcm.gz",
+      "channel_samples": 189440,
+      "reference_sha256": "3a4fb4edf29b7631c161833b5c881348e6571e6ca6e906f3d0e39ee62ddb1bc9",
+      "candidate_sha256": "3a4fb4edf29b7631c161833b5c881348e6571e6ca6e906f3d0e39ee62ddb1bc9",
+      "limit_lsb": 0,
+      "max_error_lsb": 0,
+      "different": 0,
+      "rms_error_lsb": 0.0,
+      "histogram": {
+        "0": 189440
+      },
+      "passed": true
+    },
+    {
+      "case": "gaps",
+      "reference": "tests\\results\\esp32c3-aac-metadata-20261004\\reference\\gaps.pcm.gz",
+      "channel_samples": 675840,
+      "reference_sha256": "c48871fb2fc67e482f30543376f560f891cb9e64cc49e74ee4c0f0670ec6fe0b",
+      "candidate_sha256": "cd2fb3a8b80767cc614f55245eb0a7d2f116cc426608e8049f2fb29d6324dacd",
+      "limit_lsb": 3,
+      "max_error_lsb": 2,
+      "different": 834,
+      "rms_error_lsb": 0.04208478657856823,
+      "histogram": {
+        "0": 675006,
+        "1": 713,
+        "2": 121
+      },
+      "passed": true
+    },
+    {
+      "case": "gaps",
+      "reference": "tests\\results\\esp32c3-aac-metadata-20261004\\pc19\\gaps.pcm.gz",
+      "channel_samples": 675840,
+      "reference_sha256": "cd2fb3a8b80767cc614f55245eb0a7d2f116cc426608e8049f2fb29d6324dacd",
+      "candidate_sha256": "cd2fb3a8b80767cc614f55245eb0a7d2f116cc426608e8049f2fb29d6324dacd",
+      "limit_lsb": 0,
+      "max_error_lsb": 0,
+      "different": 0,
+      "rms_error_lsb": 0.0,
+      "histogram": {
+        "0": 675840
+      },
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "scope": "Pinned synthetic transition and absent/resumed-SBR corpus; no all-input guarantee or physical PCM capture."
+}

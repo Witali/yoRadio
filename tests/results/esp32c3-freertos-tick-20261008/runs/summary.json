@@ -1,0 +1,1080 @@
+{
+  "complete": true,
+  "cases": [
+    {
+      "tick_ms": 1,
+      "case": "flac-https-60",
+      "board": {
+        "version": "idf61-9a97-dmaprof",
+        "partition": "app0",
+        "max_size": 1900544,
+        "app_elf_sha256": "bfeb06c3114b1c1c3dc8a377eb091c8c33bcf4df58a92adbabea5dd3b06250f9"
+      },
+      "original_acceptance": [
+        {
+          "name": "load-idle-baseline:stress-flac-48000-2ch-16bit-610s",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133000,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 132968,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.141
+        },
+        {
+          "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-610s",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Runtime failure during file playback",
+          "seconds": 61.219
+        },
+        {
+          "name": "load-idle-recovery:stress-flac-48000-2ch-16bit-610s",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 132964,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 132964,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 132964,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.125
+        },
+        {
+          "name": "restore-board",
+          "result": "PASS",
+          "evidence": {
+            "left_stopped": true
+          },
+          "seconds": 0.188
+        }
+      ],
+      "interrupted": false,
+      "duration_seconds": 60.09399999998277,
+      "warmup_seconds": 10,
+      "cpu": {
+        "observed_seconds": 45.815999999999995,
+        "windows": 9,
+        "peak_percent": 100.0,
+        "busy_mean_percent": 100.0,
+        "idle_mean_percent": 0.0,
+        "decode_mean_percent": 19.75613322856644,
+        "stream_mean_percent": 34.64504539898726,
+        "output_mean_percent": 6.21128645014842,
+        "wifi_mean_percent": 20.21047014143531,
+        "tcpip_mean_percent": 14.566027152086608,
+        "web_mean_percent": 2.6327003666841278,
+        "at_least_85_percent": {
+          "seconds": 45.815999999999995,
+          "observed_time_percent": 100.0
+        },
+        "at_least_95_percent": {
+          "seconds": 45.815999999999995,
+          "observed_time_percent": 100.0
+        },
+        "at_least_99.9_percent": {
+          "seconds": 45.815999999999995,
+          "observed_time_percent": 100.0
+        }
+      },
+      "cpu_malformed": [],
+      "cpu_gaps": [],
+      "decoder_windows": 9,
+      "decoded_audio_wall_ratio": 0.9658817557875223,
+      "dma": {
+        "samples": 10,
+        "start": 157308.859,
+        "end": 157353.968,
+        "observed_seconds": 45.10899999999674,
+        "coverage_complete": true,
+        "maximum_sample_gap_seconds": 5.0310000000172295,
+        "delta": {
+          "q_overruns": 154,
+          "writes": 4082,
+          "written_bytes": 8359936,
+          "write_us": 24271845,
+          "errors": 0
+        },
+        "maximum_write_us_since_boot": 20490,
+        "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+        "acoustic_continuity_qualified": false,
+        "written_audio_wall_ratio": 0.9652471421077053,
+        "overruns_per_second": 3.4139528697158243
+      },
+      "heap": {
+        "heap": {
+          "min": 57564,
+          "median": 58376.0
+        },
+        "largest": {
+          "min": 38912,
+          "median": 38912.0
+        }
+      },
+      "watchdog_new_fault_rows": 11,
+      "watchdog_rows": [
+        {
+          "at": 157303.718,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=1"
+        },
+        {
+          "at": 157308.796,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=2"
+        },
+        {
+          "at": 157313.875,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=3"
+        },
+        {
+          "at": 157318.843,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=4"
+        },
+        {
+          "at": 157323.718,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=5"
+        },
+        {
+          "at": 157328.703,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=6"
+        },
+        {
+          "at": 157333.703,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=7"
+        },
+        {
+          "at": 157338.843,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=8"
+        },
+        {
+          "at": 157343.796,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=9"
+        },
+        {
+          "at": 157348.828,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=10"
+        },
+        {
+          "at": 157353.718,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=11"
+        }
+      ],
+      "minimum_rssi": -61,
+      "median_rssi": -61.0,
+      "maximum_http_ms": 140.00000001396984,
+      "allocation_fault_rows": [],
+      "hashes": {
+        "report": "abac45cc5c944d438a50304af7452f2760226105e722e32c552ab0d44dcffc5e",
+        "status": "48aee6e5eeca8f0ae9c0e9d6d0cc0c6e0b78073768c084c37ecaaadedba2f6e8",
+        "performance": "95064e367dae9e9aef72684a04eba4e277006a4ffb153daec6a1bc65141ef86b"
+      }
+    },
+    {
+      "tick_ms": 1,
+      "case": "aac-alternate-90",
+      "board": {
+        "version": "idf61-9a97-dmaprof",
+        "partition": "app0",
+        "max_size": 1900544,
+        "app_elf_sha256": "bfeb06c3114b1c1c3dc8a377eb091c8c33bcf4df58a92adbabea5dd3b06250f9"
+      },
+      "original_acceptance": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 132964,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 132968,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.375
+        },
+        {
+          "name": "tls-record:alternate",
+          "result": "PASS",
+          "evidence": {
+            "samples": 455,
+            "rate": 44100,
+            "channels": 2,
+            "record_counts": {
+              "1048": 22,
+              "16408": 21
+            },
+            "first_large_at": 157386.687,
+            "mean_busy": 71.11666666666667,
+            "peak_busy": 75.6,
+            "minimum_heap": 26116.0,
+            "minimum_largest": 17408.0,
+            "audio_wall_ratio": 1.0019851524691068,
+            "first_full_pcm_seconds": 0.9219999999913853
+          },
+          "seconds": 91.281
+        },
+        {
+          "name": "idle-recovery",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133020,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 133020,
+                "largest": 106496,
+                "tasks": 17
+              },
+              {
+                "heap": 133020,
+                "largest": 106496,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.453
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.0
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "evidence": {
+            "stopped": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 0.86
+        }
+      ],
+      "interrupted": false,
+      "duration_seconds": 90.14000000001397,
+      "warmup_seconds": 10,
+      "cpu": {
+        "observed_seconds": 76.08300000000001,
+        "windows": 15,
+        "peak_percent": 75.6,
+        "busy_mean_percent": 74.76246730544274,
+        "idle_mean_percent": 25.23753269455726,
+        "decode_mean_percent": 51.140813322292765,
+        "stream_mean_percent": 0.4399484773208206,
+        "output_mean_percent": 8.05337460405084,
+        "wifi_mean_percent": 5.833439796012249,
+        "tcpip_mean_percent": 3.7731227738128097,
+        "web_mean_percent": 2.519298660673212,
+        "at_least_85_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        },
+        "at_least_95_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        },
+        "at_least_99.9_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        }
+      },
+      "cpu_malformed": [],
+      "cpu_gaps": [],
+      "decoder_windows": 15,
+      "decoded_audio_wall_ratio": 1.001584427342689,
+      "dma": {
+        "samples": 16,
+        "start": 157396.765,
+        "end": 157471.875,
+        "observed_seconds": 75.10999999998603,
+        "coverage_complete": true,
+        "maximum_sample_gap_seconds": 5.01600000000326,
+        "delta": {
+          "q_overruns": 0,
+          "writes": 7053,
+          "written_bytes": 14444544,
+          "write_us": 63719263,
+          "errors": 0
+        },
+        "maximum_write_us_since_boot": 20490,
+        "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+        "acoustic_continuity_qualified": false,
+        "written_audio_wall_ratio": 1.0016242843830914,
+        "overruns_per_second": 0.0
+      },
+      "heap": {
+        "heap": {
+          "min": 26136,
+          "median": 26164.0
+        },
+        "largest": {
+          "min": 17408,
+          "median": 17408.0
+        }
+      },
+      "watchdog_new_fault_rows": 0,
+      "watchdog_rows": [],
+      "minimum_rssi": -72,
+      "median_rssi": -61.0,
+      "maximum_http_ms": 141.00000000325963,
+      "allocation_fault_rows": [],
+      "hashes": {
+        "report": "87a0805c08626a5f162fa589f13c2e64a57c8a783f8213fa1a91f13f0f66877e",
+        "status": "e0c60b71cc2331a531a8af1e1402a6a158c0a500962d93dd605d8d8590565fa5",
+        "performance": "736d0086592c89cb6f6f894aeb7340910c490196fa242aa4637053e05cca4dfb"
+      }
+    },
+    {
+      "tick_ms": 2,
+      "case": "flac-https-60",
+      "board": {
+        "version": "idf61-9a97-tick2",
+        "partition": "app0",
+        "max_size": 1900544,
+        "app_elf_sha256": "aefca58b0cc5d5a06882dea5eb8a75e95f7b968828beb6ab11541175de83fb53"
+      },
+      "original_acceptance": [
+        {
+          "name": "load-idle-baseline:stress-flac-48000-2ch-16bit-610s",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 132996,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 132972,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.344
+        },
+        {
+          "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-610s",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Runtime failure during file playback",
+          "seconds": 61.313
+        },
+        {
+          "name": "load-idle-recovery:stress-flac-48000-2ch-16bit-610s",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 132972,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 132972,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 132972,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.562
+        },
+        {
+          "name": "restore-board",
+          "result": "PASS",
+          "evidence": {
+            "left_stopped": true
+          },
+          "seconds": 0.25
+        }
+      ],
+      "interrupted": false,
+      "duration_seconds": 60.155999999988126,
+      "warmup_seconds": 10,
+      "cpu": {
+        "observed_seconds": 46.022,
+        "windows": 9,
+        "peak_percent": 100.0,
+        "busy_mean_percent": 100.0,
+        "idle_mean_percent": 0.0,
+        "decode_mean_percent": 19.68966146625527,
+        "stream_mean_percent": 34.488470731389334,
+        "output_mean_percent": 6.188913997653295,
+        "wifi_mean_percent": 20.4886054495676,
+        "tcpip_mean_percent": 14.655603841640954,
+        "web_mean_percent": 2.6442657859284693,
+        "at_least_85_percent": {
+          "seconds": 46.022,
+          "observed_time_percent": 100.0
+        },
+        "at_least_95_percent": {
+          "seconds": 46.022,
+          "observed_time_percent": 100.0
+        },
+        "at_least_99.9_percent": {
+          "seconds": 46.022,
+          "observed_time_percent": 100.0
+        }
+      },
+      "cpu_malformed": [],
+      "cpu_gaps": [],
+      "decoder_windows": 9,
+      "decoded_audio_wall_ratio": 0.9670769162781448,
+      "dma": {
+        "samples": 10,
+        "start": 158299.234,
+        "end": 158344.343,
+        "observed_seconds": 45.10899999999674,
+        "coverage_complete": true,
+        "maximum_sample_gap_seconds": 5.0310000000172295,
+        "delta": {
+          "q_overruns": 145,
+          "writes": 4090,
+          "written_bytes": 8376320,
+          "write_us": 24381232,
+          "errors": 0
+        },
+        "maximum_write_us_since_boot": 18860,
+        "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+        "acoustic_continuity_qualified": false,
+        "written_audio_wall_ratio": 0.9671388562519635,
+        "overruns_per_second": 3.214436143563601
+      },
+      "heap": {
+        "heap": {
+          "min": 57716,
+          "median": 58882.0
+        },
+        "largest": {
+          "min": 32768,
+          "median": 32768.0
+        }
+      },
+      "watchdog_new_fault_rows": 11,
+      "watchdog_rows": [
+        {
+          "at": 158294.093,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=1"
+        },
+        {
+          "at": 158299.093,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=2"
+        },
+        {
+          "at": 158304.093,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=3"
+        },
+        {
+          "at": 158309.218,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=4"
+        },
+        {
+          "at": 158314.14,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=5"
+        },
+        {
+          "at": 158319.187,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=6"
+        },
+        {
+          "at": 158324.125,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=7"
+        },
+        {
+          "at": 158329.14,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=8"
+        },
+        {
+          "at": 158334.171,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=9"
+        },
+        {
+          "at": 158339.125,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=10"
+        },
+        {
+          "at": 158344.218,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=11"
+        }
+      ],
+      "minimum_rssi": -56,
+      "median_rssi": -56.0,
+      "maximum_http_ms": 125.0,
+      "allocation_fault_rows": [],
+      "hashes": {
+        "report": "12e81e99fdb7119398aa69fcfe016b037dd57a45030671c24ebe0f09a7dc8ff4",
+        "status": "e573c7aa3dfe21fbcf3de18e73de09c63165c4351444ef20948e87b2b76b5070",
+        "performance": "53bdf2212b680ef9e303ed971f13434e23e3ac27f51503f75a8fa2bb2a24d434"
+      }
+    },
+    {
+      "tick_ms": 2,
+      "case": "aac-alternate-90",
+      "board": {
+        "version": "idf61-9a97-tick2",
+        "partition": "app0",
+        "max_size": 1900544,
+        "app_elf_sha256": "aefca58b0cc5d5a06882dea5eb8a75e95f7b968828beb6ab11541175de83fb53"
+      },
+      "original_acceptance": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 132972,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 132972,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.641
+        },
+        {
+          "name": "tls-record:alternate",
+          "result": "PASS",
+          "evidence": {
+            "samples": 458,
+            "rate": 44100,
+            "channels": 2,
+            "record_counts": {
+              "1048": 22,
+              "16408": 21
+            },
+            "first_large_at": 158377.562,
+            "mean_busy": 70.05555555555556,
+            "peak_busy": 74.5,
+            "minimum_heap": 26224.0,
+            "minimum_largest": 18432.0,
+            "audio_wall_ratio": 1.0019498443648323,
+            "first_full_pcm_seconds": 0.8910000000032596
+          },
+          "seconds": 91.219
+        },
+        {
+          "name": "idle-recovery",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133020,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 133020,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 133020,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.391
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.0
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "evidence": {
+            "stopped": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 0.735
+        }
+      ],
+      "interrupted": false,
+      "duration_seconds": 90.10899999999674,
+      "warmup_seconds": 10,
+      "cpu": {
+        "observed_seconds": 76.036,
+        "windows": 15,
+        "peak_percent": 74.5,
+        "busy_mean_percent": 73.5600452417276,
+        "idle_mean_percent": 26.439954758272396,
+        "decode_mean_percent": 49.88025935083382,
+        "stream_mean_percent": 0.4335183334210111,
+        "output_mean_percent": 8.026550581303592,
+        "wifi_mean_percent": 5.727074017570624,
+        "tcpip_mean_percent": 3.8537640065232255,
+        "web_mean_percent": 2.539881108948393,
+        "at_least_85_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        },
+        "at_least_95_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        },
+        "at_least_99.9_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        }
+      },
+      "cpu_malformed": [],
+      "cpu_gaps": [],
+      "decoder_windows": 15,
+      "decoded_audio_wall_ratio": 1.0015577568301646,
+      "dma": {
+        "samples": 16,
+        "start": 158387.656,
+        "end": 158462.765,
+        "observed_seconds": 75.10900000002584,
+        "coverage_complete": true,
+        "maximum_sample_gap_seconds": 5.01600000000326,
+        "delta": {
+          "q_overruns": 0,
+          "writes": 7053,
+          "written_bytes": 14444544,
+          "write_us": 64426500,
+          "errors": 0
+        },
+        "maximum_write_us_since_boot": 19657,
+        "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+        "acoustic_continuity_qualified": false,
+        "written_audio_wall_ratio": 1.0016376199919332,
+        "overruns_per_second": 0.0
+      },
+      "heap": {
+        "heap": {
+          "min": 26224,
+          "median": 26272.0
+        },
+        "largest": {
+          "min": 18432,
+          "median": 18432.0
+        }
+      },
+      "watchdog_new_fault_rows": 0,
+      "watchdog_rows": [],
+      "minimum_rssi": -67,
+      "median_rssi": -65,
+      "maximum_http_ms": 141.00000000325963,
+      "allocation_fault_rows": [],
+      "hashes": {
+        "report": "4b1dc4a43450873b7311abd72b607584f1c2c1922d84bd0621f28c5423fd1f3f",
+        "status": "5b4efecd039b5d5e3ba12d9629019897dc03115f78991b454f395970347d3978",
+        "performance": "82cfae80834010caf32dca638e685cc514e9fee64a002a48b2bcab3f11cbf516"
+      }
+    },
+    {
+      "tick_ms": 5,
+      "case": "flac-https-60",
+      "board": {
+        "version": "idf61-9a97-tick5",
+        "partition": "app0",
+        "max_size": 1900544,
+        "app_elf_sha256": "d3fdcf30421dda87e8c895664a16da448d5552250993831d1428e53b1cd1133c"
+      },
+      "original_acceptance": [
+        {
+          "name": "load-idle-baseline:stress-flac-48000-2ch-16bit-610s",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 132996,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 132976,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.375
+        },
+        {
+          "name": "cpu-under-http-load:stress-flac-48000-2ch-16bit-610s",
+          "result": "FAIL",
+          "exception_chain": [
+            {
+              "type": "Failure"
+            }
+          ],
+          "reason": "Runtime failure during file playback",
+          "seconds": 61.25
+        },
+        {
+          "name": "load-idle-recovery:stress-flac-48000-2ch-16bit-610s",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 132976,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 132984,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 132984,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.422
+        },
+        {
+          "name": "restore-board",
+          "result": "PASS",
+          "evidence": {
+            "left_stopped": true
+          },
+          "seconds": 0.281
+        }
+      ],
+      "interrupted": false,
+      "duration_seconds": 60.10899999999674,
+      "warmup_seconds": 10,
+      "cpu": {
+        "observed_seconds": 45.82000000000001,
+        "windows": 9,
+        "peak_percent": 100.0,
+        "busy_mean_percent": 99.99999999999999,
+        "idle_mean_percent": 0.0,
+        "decode_mean_percent": 19.400621999127015,
+        "stream_mean_percent": 34.42171540811872,
+        "output_mean_percent": 6.044565691837624,
+        "wifi_mean_percent": 20.344980357922303,
+        "tcpip_mean_percent": 15.111097773897859,
+        "web_mean_percent": 2.7104103011785248,
+        "at_least_85_percent": {
+          "seconds": 45.82000000000001,
+          "observed_time_percent": 100.0
+        },
+        "at_least_95_percent": {
+          "seconds": 45.82000000000001,
+          "observed_time_percent": 100.0
+        },
+        "at_least_99.9_percent": {
+          "seconds": 45.82000000000001,
+          "observed_time_percent": 100.0
+        }
+      },
+      "cpu_malformed": [],
+      "cpu_gaps": [],
+      "decoder_windows": 9,
+      "decoded_audio_wall_ratio": 0.9546027185324345,
+      "dma": {
+        "samples": 10,
+        "start": 158573.25,
+        "end": 158618.39,
+        "observed_seconds": 45.14000000001397,
+        "coverage_complete": true,
+        "maximum_sample_gap_seconds": 5.047000000020489,
+        "delta": {
+          "q_overruns": 200,
+          "writes": 4040,
+          "written_bytes": 8273920,
+          "write_us": 23835122,
+          "errors": 0
+        },
+        "maximum_write_us_since_boot": 19009,
+        "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+        "acoustic_continuity_qualified": false,
+        "written_audio_wall_ratio": 0.9546595776101018,
+        "overruns_per_second": 4.4306601683637155
+      },
+      "heap": {
+        "heap": {
+          "min": 57312,
+          "median": 59288.0
+        },
+        "largest": {
+          "min": 34816,
+          "median": 34816.0
+        }
+      },
+      "watchdog_new_fault_rows": 11,
+      "watchdog_rows": [
+        {
+          "at": 158568.109,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=1"
+        },
+        {
+          "at": 158573.078,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=2"
+        },
+        {
+          "at": 158578.093,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=3"
+        },
+        {
+          "at": 158583.203,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=4"
+        },
+        {
+          "at": 158588.187,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=5"
+        },
+        {
+          "at": 158593.171,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=6"
+        },
+        {
+          "at": 158598.187,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=7"
+        },
+        {
+          "at": 158603.109,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=8"
+        },
+        {
+          "at": 158608.14,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=9"
+        },
+        {
+          "at": 158613.078,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=10"
+        },
+        {
+          "at": 158618.218,
+          "line": "Runtime watchdog timeout: task_watchdog=true events=11"
+        }
+      ],
+      "minimum_rssi": -65,
+      "median_rssi": -65.0,
+      "maximum_http_ms": 140.00000001396984,
+      "allocation_fault_rows": [],
+      "hashes": {
+        "report": "7d2db7d3cc498eb078adb0c318f2ca55bfb6e0a4e1466d269886dcbefa127f67",
+        "status": "85619fb1e7aaeb4296cd244f830ff9e839307c967eb120d7e1421591ad1d1f6f",
+        "performance": "481144eede2a2f57abbe8606b436704899039b3e96390388c30704ec63daeba9"
+      }
+    },
+    {
+      "tick_ms": 5,
+      "case": "aac-alternate-90",
+      "board": {
+        "version": "idf61-9a97-tick5",
+        "partition": "app0",
+        "max_size": 1900544,
+        "app_elf_sha256": "d3fdcf30421dda87e8c895664a16da448d5552250993831d1428e53b1cd1133c"
+      },
+      "original_acceptance": [
+        {
+          "name": "idle-before",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 132984,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 132996,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.531
+        },
+        {
+          "name": "tls-record:alternate",
+          "result": "PASS",
+          "evidence": {
+            "samples": 458,
+            "rate": 44100,
+            "channels": 2,
+            "record_counts": {
+              "1048": 22,
+              "16408": 21
+            },
+            "first_large_at": 158651.421,
+            "mean_busy": 70.37222222222222,
+            "peak_busy": 74.6,
+            "minimum_heap": 26284.0,
+            "minimum_largest": 18432.0,
+            "audio_wall_ratio": 1.0020675477239354,
+            "first_full_pcm_seconds": 0.9530000000086147
+          },
+          "seconds": 91.328
+        },
+        {
+          "name": "idle-recovery",
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "heap": 133000,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 133000,
+                "largest": 110592,
+                "tasks": 17
+              },
+              {
+                "heap": 133000,
+                "largest": 110592,
+                "tasks": 17
+              }
+            ]
+          },
+          "seconds": 12.516
+        },
+        {
+          "name": "runtime",
+          "result": "PASS",
+          "evidence": null,
+          "seconds": 0.0
+        },
+        {
+          "name": "restore",
+          "result": "PASS",
+          "evidence": {
+            "stopped": true,
+            "wifi_unchanged": true,
+            "playlist_unchanged": true,
+            "settings_unchanged": true
+          },
+          "seconds": 0.687
+        }
+      ],
+      "interrupted": false,
+      "duration_seconds": 90.17200000002049,
+      "warmup_seconds": 10,
+      "cpu": {
+        "observed_seconds": 76.04000000000002,
+        "windows": 15,
+        "peak_percent": 74.6,
+        "busy_mean_percent": 73.88216070489216,
+        "idle_mean_percent": 26.11783929510784,
+        "decode_mean_percent": 49.86050105207785,
+        "stream_mean_percent": 0.432982640715413,
+        "output_mean_percent": 8.1,
+        "wifi_mean_percent": 5.820186743819042,
+        "tcpip_mean_percent": 3.953563913729616,
+        "web_mean_percent": 2.5396370331404525,
+        "at_least_85_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        },
+        "at_least_95_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        },
+        "at_least_99.9_percent": {
+          "seconds": 0,
+          "observed_time_percent": 0.0
+        }
+      },
+      "cpu_malformed": [],
+      "cpu_gaps": [],
+      "decoder_windows": 15,
+      "decoded_audio_wall_ratio": 1.001611099275671,
+      "dma": {
+        "samples": 16,
+        "start": 158661.5,
+        "end": 158736.593,
+        "observed_seconds": 75.09299999999348,
+        "coverage_complete": true,
+        "maximum_sample_gap_seconds": 5.032000000006519,
+        "delta": {
+          "q_overruns": 0,
+          "writes": 7053,
+          "written_bytes": 14444544,
+          "write_us": 64264917,
+          "errors": 0
+        },
+        "maximum_write_us_since_boot": 19009,
+        "note": "Replay staged-output counters inside recorded sustained-playback windows.\n\nQueue overruns indicate delayed descriptor reuse, not an exact acoustic gap\ncount. Idle/ramp activity also increments the counters. The observed delta\ncovers only the first through last selected samples, without extrapolation.\nWrite duration includes copying, waiting and preemption; it is not CPU time.",
+        "acoustic_continuity_qualified": false,
+        "written_audio_wall_ratio": 1.001851038046243,
+        "overruns_per_second": 0.0
+      },
+      "heap": {
+        "heap": {
+          "min": 26284,
+          "median": 26304.0
+        },
+        "largest": {
+          "min": 18432,
+          "median": 18432.0
+        }
+      },
+      "watchdog_new_fault_rows": 0,
+      "watchdog_rows": [],
+      "minimum_rssi": -65,
+      "median_rssi": -58,
+      "maximum_http_ms": 140.00000001396984,
+      "allocation_fault_rows": [],
+      "hashes": {
+        "report": "9ae22d797a7230d2ee7f29cb2810f2d7cf3f67bef6344239e2c3f93b2f53bc5a",
+        "status": "5ad9958d65dc4e3905fbfff1b7a02f999c2778e70d4256842e15e4cbb8146dad",
+        "performance": "722f7b7f4985e04bda3170a3cd34bef65c95f5fe29bfe7c6bdf84097944c5349"
+      }
+    }
+  ],
+  "note": "Config-only FreeRTOS tick experiment. Original runtime/heap gates retained. CPU and decoder results use complete intervals after warmup. DMA ratios use actual written bytes between selected counter samples, not audible-gap counts. Watchdog rows count newly observed fault updates, not an assumption that absolute counters reset."
+}

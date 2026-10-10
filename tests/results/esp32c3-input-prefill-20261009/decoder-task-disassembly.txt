@@ -1,0 +1,1917 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-input-prefill500\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4201182c <decoder_task>:
+             full, !current);
+    return current;
+}
+#endif
+
+static void decoder_task(void *argument) {
+4201182c:	716d                	addi	sp,sp,-272
+4201182e:	10812423          	sw	s0,264(sp)
+42011832:	10912223          	sw	s1,260(sp)
+42011836:	11212023          	sw	s2,256(sp)
+4201183a:	dfce                	sw	s3,252(sp)
+4201183c:	ddd2                	sw	s4,248(sp)
+4201183e:	dbd6                	sw	s5,244(sp)
+42011840:	d9da                	sw	s6,240(sp)
+42011842:	d7de                	sw	s7,236(sp)
+42011844:	cfee                	sw	s11,220(sp)
+42011846:	10112623          	sw	ra,268(sp)
+4201184a:	d5e2                	sw	s8,232(sp)
+4201184c:	d3e6                	sw	s9,228(sp)
+4201184e:	d1ea                	sw	s10,224(sp)
+    (void)argument;
+    esp_audio_err_t registration_result = decoder_register_codecs();
+42011850:	51a020ef          	jal	42013d6a <decoder_register_codecs>
+42011854:	3fc9a737          	lui	a4,0x3fc9a
+    stats->audio_us += frames * 1000000ULL / info->sample_rate;
+42011858:	000f47b7          	lui	a5,0xf4
+4201185c:	ce870713          	addi	a4,a4,-792 # 3fc99ce8 <s_bitrate_updated_us>
+42011860:	24078793          	addi	a5,a5,576 # f4240 <CSR_UINTSTATUS+0xf358f>
+    uint8_t *output = NULL;
+    size_t output_size = 0;
+    esp_audio_simple_dec_handle_t decoder = NULL;
+42011864:	de02                	sw	zero,60(sp)
+    custom_legacy_decoder_t *legacy_decoder = NULL;
+#endif
+    uint32_t generation = 0;
+    uint32_t failed_generation = 0;
+    native_codec_t codec = NATIVE_CODEC_AUTO;
+    decode_stats_t stats = {0};
+42011866:	d102                	sw	zero,160(sp)
+42011868:	d302                	sw	zero,164(sp)
+4201186a:	d502                	sw	zero,168(sp)
+4201186c:	d702                	sw	zero,172(sp)
+4201186e:	d902                	sw	zero,176(sp)
+42011870:	db02                	sw	zero,180(sp)
+42011872:	dd02                	sw	zero,184(sp)
+42011874:	df02                	sw	zero,188(sp)
+42011876:	c182                	sw	zero,192(sp)
+42011878:	c382                	sw	zero,196(sp)
+4201187a:	c582                	sw	zero,200(sp)
+4201187c:	c782                	sw	zero,204(sp)
+    esp_audio_simple_dec_info_t stream_info = {0};
+4201187e:	c282                	sw	zero,68(sp)
+42011880:	c482                	sw	zero,72(sp)
+42011882:	c682                	sw	zero,76(sp)
+42011884:	c882                	sw	zero,80(sp)
+    bool stream_info_ready = false;
+42011886:	02010d23          	sb	zero,58(sp)
+    esp_audio_err_t registration_result = decoder_register_codecs();
+4201188a:	842a                	mv	s0,a0
+    bool first_frame_memory_logged = false;
+4201188c:	d23a                	sw	a4,36(sp)
+    stats->audio_us += frames * 1000000ULL / info->sample_rate;
+4201188e:	d43e                	sw	a5,40(sp)
+    native_aac_decoder_t *aac_decoder = NULL;
+42011890:	4981                	li	s3,0
+    size_t output_size = 0;
+42011892:	4a81                	li	s5,0
+    uint8_t *output = NULL;
+42011894:	4901                	li	s2,0
+    bool first_frame_memory_logged = false;
+42011896:	ce02                	sw	zero,28(sp)
+    native_codec_t codec = NATIVE_CODEC_AUTO;
+42011898:	4b01                	li	s6,0
+    uint32_t generation = 0;
+4201189a:	4481                	li	s1,0
+    custom_flac_decoder_t *flac_decoder = NULL;
+4201189c:	4b81                	li	s7,0
+4201189e:	3fc9aa37          	lui	s4,0x3fc9a
+420118a2:	3fc9adb7          	lui	s11,0x3fc9a
+// Call only after closing the old decoder and copying its PCM into the queue.
+// AAC also shrinks a workspace retained from another codec. Other codecs keep
+// their existing high-water capacity and their needed_size growth contract.
+static inline bool decoder_pcm_prepare(uint8_t **buffer, size_t *capacity,
+                                       bool aac) {
+    size_t required = aac ? NATIVE_AAC_PCM_FRAME_BYTES : DECODE_BUFFER_INITIAL;
+420118a6:	cc02                	sw	zero,24(sp)
+#endif
+
+    while (true) {
+        rx_buffer_diagnostic_poll();
+#if defined(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER) || defined(CONFIG_YORADIO_TLS_LARGE_BLOCK_RESERVE)
+        tls_input_reserve_poll();
+420118a8:	3d7160ef          	jal	4202847e <tls_input_reserve_poll>
+#endif
+        uint32_t current_generation = atomic_load(&s_generation);
+420118ac:	d00a0793          	addi	a5,s4,-768 # 3fc99d00 <s_generation>
+420118b0:	0330000f          	fence	rw,rw
+420118b4:	0007ac83          	lw	s9,0(a5)
+420118b8:	0230000f          	fence	r,rw
+        if (generation != current_generation) {
+420118bc:	429c8c63          	beq	s9,s1,42011cf4 <decoder_task+0x4c8>
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+            bool had_legacy_decoder = legacy_decoder != NULL;
+#endif
+            native_codec_t target_codec = (native_codec_t)atomic_load(
+420118c0:	3fc9a7b7          	lui	a5,0x3fc9a
+420118c4:	cfc78793          	addi	a5,a5,-772 # 3fc99cfc <s_decoder_target_codec>
+420118c8:	0330000f          	fence	rw,rw
+420118cc:	4384                	lw	s1,0(a5)
+420118ce:	0230000f          	fence	r,rw
+                &s_decoder_target_codec);
+            if (decoder) esp_audio_simple_dec_close(decoder);
+420118d2:	5572                	lw	a0,60(sp)
+420118d4:	c119                	beqz	a0,420118da <decoder_task+0xae>
+420118d6:	50c270ef          	jal	42038de2 <esp_audio_simple_dec_close>
+            decoder = NULL;
+            native_aac_decoder_destroy(aac_decoder);
+420118da:	854e                	mv	a0,s3
+            decoder = NULL;
+420118dc:	de02                	sw	zero,60(sp)
+            native_aac_decoder_destroy(aac_decoder);
+420118de:	4ee020ef          	jal	42013dcc <native_aac_decoder_destroy>
+            aac_decoder = NULL;
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+            if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
+420118e2:	000b8563          	beqz	s7,420118ec <decoder_task+0xc0>
+420118e6:	855e                	mv	a0,s7
+420118e8:	654230ef          	jal	42034f3c <custom_flac_decoder_destroy>
+            }
+#endif
+            // The simple decoder is already closed. Its reusable PCM buffer
+            // is useful for another official decoder, but not for a custom
+            // one. An unknown target is released conservatively.
+            if (target_codec == NATIVE_CODEC_AUTO ||
+420118ec:	44048a63          	beqz	s1,42011d40 <decoder_task+0x514>
+            // is explicitly known to be compatible. AUTO is released before
+            // TLS because its type can be learned only from the stream.
+            generation = current_generation;
+            failed_generation = 0;
+            codec = NATIVE_CODEC_AUTO;
+            memset(&stream_info, 0, sizeof(stream_info));
+420118f0:	c282                	sw	zero,68(sp)
+420118f2:	c482                	sw	zero,72(sp)
+420118f4:	c682                	sw	zero,76(sp)
+420118f6:	c882                	sw	zero,80(sp)
+            stream_info_ready = false;
+420118f8:	02010d23          	sb	zero,58(sp)
+            first_frame_memory_logged = false;
+            atomic_store(&s_decoder_released_generation,
+420118fc:	3fc9a7b7          	lui	a5,0x3fc9a
+42011900:	cf878793          	addi	a5,a5,-776 # 3fc99cf8 <s_decoder_released_generation>
+42011904:	0310000f          	fence	rw,w
+42011908:	0197a023          	sw	s9,0(a5)
+4201190c:	0330000f          	fence	rw,rw
+            flac_decoder = NULL;
+42011910:	4b81                	li	s7,0
+            generation = current_generation;
+42011912:	84e6                	mv	s1,s9
+            failed_generation = 0;
+42011914:	cc02                	sw	zero,24(sp)
+            codec = NATIVE_CODEC_AUTO;
+42011916:	4b01                	li	s6,0
+            first_frame_memory_logged = false;
+42011918:	ce02                	sw	zero,28(sp)
+            aac_decoder = NULL;
+4201191a:	4981                	li	s3,0
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+                                 && !legacy_decoder
+#endif
+        );
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+        encoded_packet_t *packet = adaptive_input_receive(s_encoded, &item_size, 0);
+4201191c:	d08da503          	lw	a0,-760(s11) # 3fc99d08 <s_encoded>
+42011920:	4601                	li	a2,0
+42011922:	008c                	addi	a1,sp,64
+        size_t item_size = 0;
+42011924:	c082                	sw	zero,64(sp)
+        encoded_packet_t *packet = adaptive_input_receive(s_encoded, &item_size, 0);
+42011926:	778160ef          	jal	4202809e <adaptive_input_receive>
+4201192a:	8caa                	mv	s9,a0
+        if (!packet) {
+4201192c:	40050063          	beqz	a0,42011d2c <decoder_task+0x500>
+#else
+        encoded_packet_t *packet = pipeline_receive(
+            s_encoded, &item_size, pdMS_TO_TICKS(20), &stats.input_empty);
+#endif
+        if (!packet) continue;
+        if (packet->generation != atomic_load(&s_generation)) {
+42011930:	000ca703          	lw	a4,0(s9)
+42011934:	d00a0793          	addi	a5,s4,-768
+42011938:	0330000f          	fence	rw,rw
+4201193c:	439c                	lw	a5,0(a5)
+4201193e:	0230000f          	fence	r,rw
+42011942:	3cf71f63          	bne	a4,a5,42011d20 <decoder_task+0x4f4>
+            encoded_return(s_encoded, packet);
+            continue;
+        }
+        if (packet->generation == failed_generation) {
+42011946:	000ca783          	lw	a5,0(s9)
+4201194a:	4762                	lw	a4,24(sp)
+4201194c:	3ce78a63          	beq	a5,a4,42011d20 <decoder_task+0x4f4>
+            encoded_return(s_encoded, packet);
+            continue;
+        }
+        if (packet->codec == NATIVE_CODEC_AUTO && packet->end_of_stream) {
+42011950:	004ca703          	lw	a4,4(s9)
+42011954:	e709                	bnez	a4,4201195e <decoder_task+0x132>
+42011956:	00acc703          	lbu	a4,10(s9)
+4201195a:	5e071563          	bnez	a4,42011f44 <decoder_task+0x718>
+            // Empty HTTP body: there was no first chunk to identify a codec.
+            return_decoded_packet(packet, failed_generation);
+            continue;
+        }
+        if (registration_result != ESP_AUDIO_ERR_OK) {
+4201195e:	12041a63          	bnez	s0,42011a92 <decoder_task+0x266>
+                failed_generation = packet->generation;
+                return_decoded_packet(packet, failed_generation);
+                continue;
+            }
+        }
+        if (packet->generation != generation || packet->codec != codec) {
+42011962:	14978163          	beq	a5,s1,42011aa4 <decoder_task+0x278>
+            if (decoder) esp_audio_simple_dec_close(decoder);
+42011966:	5572                	lw	a0,60(sp)
+42011968:	c119                	beqz	a0,4201196e <decoder_task+0x142>
+4201196a:	478270ef          	jal	42038de2 <esp_audio_simple_dec_close>
+            decoder = NULL;
+            native_aac_decoder_destroy(aac_decoder);
+4201196e:	854e                	mv	a0,s3
+            decoder = NULL;
+42011970:	de02                	sw	zero,60(sp)
+            native_aac_decoder_destroy(aac_decoder);
+42011972:	45a020ef          	jal	42013dcc <native_aac_decoder_destroy>
+            aac_decoder = NULL;
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+            if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
+42011976:	000b8563          	beqz	s7,42011980 <decoder_task+0x154>
+4201197a:	855e                	mv	a0,s7
+4201197c:	5c0230ef          	jal	42034f3c <custom_flac_decoder_destroy>
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+            if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
+            legacy_decoder = NULL;
+#endif
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+            if (packet->data_size && !packet->end_of_stream &&
+42011980:	008cd783          	lhu	a5,8(s9)
+42011984:	c789                	beqz	a5,4201198e <decoder_task+0x162>
+42011986:	00acc783          	lbu	a5,10(s9)
+4201198a:	4c078963          	beqz	a5,42011e5c <decoder_task+0x630>
+    s_bitrate_updated_us = 0;
+4201198e:	5712                	lw	a4,36(sp)
+                !prefill_encoded_input(packet->generation)) {
+                encoded_return(s_encoded, packet);
+                continue;
+            }
+#endif
+            generation = packet->generation;
+42011990:	000ca483          	lw	s1,0(s9)
+            codec = packet->codec;
+42011994:	004cab03          	lw	s6,4(s9)
+    s_published_bitrate_bps = 0;
+42011998:	3fc9a7b7          	lui	a5,0x3fc9a
+4201199c:	ce07a823          	sw	zero,-784(a5) # 3fc99cf0 <s_published_bitrate_bps>
+    s_bitrate_updated_us = 0;
+420119a0:	4801                	li	a6,0
+420119a2:	4781                	li	a5,0
+420119a4:	c31c                	sw	a5,0(a4)
+            stream_info_ready = false;
+420119a6:	02010d23          	sb	zero,58(sp)
+    s_bitrate_updated_us = 0;
+420119aa:	01072223          	sw	a6,4(a4)
+            first_frame_memory_logged = false;
+            reset_decoder_bitrate_tracking();
+            decode_stats_reset(&stats, generation, codec, esp_timer_get_time());
+420119ae:	fe370097          	auipc	ra,0xfe370
+420119b2:	a26080e7          	jalr	-1498(ra) # 403813d4 <esp_timer_get_time>
+    *stats = (decode_stats_t){
+420119b6:	d52a                	sw	a0,168(sp)
+420119b8:	d902                	sw	zero,176(sp)
+420119ba:	db02                	sw	zero,180(sp)
+420119bc:	dd02                	sw	zero,184(sp)
+420119be:	df02                	sw	zero,188(sp)
+420119c0:	c182                	sw	zero,192(sp)
+420119c2:	c382                	sw	zero,196(sp)
+420119c4:	c582                	sw	zero,200(sp)
+420119c6:	c782                	sw	zero,204(sp)
+420119c8:	d126                	sw	s1,160(sp)
+420119ca:	d35a                	sw	s6,164(sp)
+420119cc:	d72e                	sw	a1,172(sp)
+            decoder_heap_before =
+                heap_caps_get_free_size(MALLOC_CAP_8BIT);
+            first_frame_memory_reported = false;
+#endif
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+            if (codec == NATIVE_CODEC_FLAC) {
+420119ce:	478d                	li	a5,3
+420119d0:	36fb0e63          	beq	s6,a5,42011d4c <decoder_task+0x520>
+420119d4:	4789                	li	a5,2
+420119d6:	44fb0863          	beq	s6,a5,42011e26 <decoder_task+0x5fa>
+    if (!aac && *capacity >= required) return true;
+420119da:	640d                	lui	s0,0x3
+420119dc:	0c8afde3          	bgeu	s5,s0,420122b6 <decoder_task+0xa8a>
+    uint8_t *resized = realloc(*buffer, required);
+420119e0:	85a2                	mv	a1,s0
+420119e2:	854a                	mv	a0,s2
+420119e4:	95df70ef          	jal	42009340 <realloc>
+    if (!resized) return false;
+420119e8:	0c050ce3          	beqz	a0,420122c0 <decoder_task+0xa94>
+                    state_set_audio(generation, false, "NO MEMORY");
+                    failed_generation = generation;
+                    encoded_return(s_encoded, packet);
+                    continue;
+                }
+                esp_audio_simple_dec_cfg_t cfg = {
+420119ec:	c702                	sw	zero,140(sp)
+420119ee:	c902                	sw	zero,144(sp)
+420119f0:	cb02                	sw	zero,148(sp)
+    *buffer = resized;
+420119f2:	892a                	mv	s2,a0
+    *capacity = required;
+420119f4:	8aa2                	mv	s5,s0
+    switch (codec) {
+420119f6:	4791                	li	a5,4
+420119f8:	08fb02e3          	beq	s6,a5,4201227c <decoder_task+0xa50>
+                esp_audio_simple_dec_cfg_t cfg = {
+420119fc:	203357b7          	lui	a5,0x20335
+42011a00:	04d78793          	addi	a5,a5,77 # 2033504d <CSR_UINTSTATUS+0x2033439c>
+                if (codec == NATIVE_CODEC_AAC) {
+                    if (!aac_decoder) aac_decoder = native_aac_decoder_create();
+                    open_result = aac_decoder ? ESP_AUDIO_ERR_OK : ESP_AUDIO_ERR_MEM_LACK;
+                } else
+#endif
+                open_result = esp_audio_simple_dec_open(&cfg, &decoder);
+42011a04:	186c                	addi	a1,sp,60
+42011a06:	0128                	addi	a0,sp,136
+                esp_audio_simple_dec_cfg_t cfg = {
+42011a08:	c53e                	sw	a5,136(sp)
+                open_result = esp_audio_simple_dec_open(&cfg, &decoder);
+42011a0a:	63d150ef          	jal	42027846 <__wrap_esp_audio_simple_dec_open>
+42011a0e:	842a                	mv	s0,a0
+                if (open_result != ESP_AUDIO_ERR_OK) {
+42011a10:	080502e3          	beqz	a0,42012294 <decoder_task+0xa68>
+                    ESP_LOGE(TAG, "%s decoder open failed: %d",
+42011a14:	fe378097          	auipc	ra,0xfe378
+42011a18:	a8a080e7          	jalr	-1398(ra) # 4038949e <esp_log_timestamp>
+    switch (codec) {
+42011a1c:	3c1267b7          	lui	a5,0x3c126
+                    ESP_LOGE(TAG, "%s decoder open failed: %d",
+42011a20:	4985                	li	s3,1
+42011a22:	86aa                	mv	a3,a0
+    switch (codec) {
+42011a24:	ad878793          	addi	a5,a5,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+42011a28:	1b3b1ee3          	bne	s6,s3,420123e4 <decoder_task+0xbb8>
+                    ESP_LOGE(TAG, "%s decoder open failed: %d",
+42011a2c:	3c126737          	lui	a4,0x3c126
+42011a30:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42011a34:	3c126637          	lui	a2,0x3c126
+42011a38:	85ba                	mv	a1,a4
+42011a3a:	8822                	mv	a6,s0
+42011a3c:	dc860613          	addi	a2,a2,-568 # 3c125dc8 <_esp_libc_clock_array_end+0x5c78>
+42011a40:	4505                	li	a0,1
+42011a42:	fe378097          	auipc	ra,0xfe378
+42011a46:	954080e7          	jalr	-1708(ra) # 40389396 <esp_log>
+                             codec_name(codec), open_result);
+                    state_set_audio(generation,
+42011a4a:	3c126737          	lui	a4,0x3c126
+42011a4e:	57f9                	li	a5,-2
+42011a50:	cac70693          	addi	a3,a4,-852 # 3c125cac <_esp_libc_clock_array_end+0x5b5c>
+42011a54:	36f40ae3          	beq	s0,a5,420125c8 <decoder_task+0xd9c>
+    native_state_set_audio(s_state, generation, running, format);
+42011a58:	3fc9a7b7          	lui	a5,0x3fc9a
+42011a5c:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42011a60:	4601                	li	a2,0
+42011a62:	85a6                	mv	a1,s1
+42011a64:	79f040ef          	jal	42016a02 <native_state_set_audio>
+// audio owns copies (send_pcm), so close can release this workspace before the
+// generation-tagged terminal marker is forwarded to the output queue.
+static inline void decoder_resources_release(
+    esp_audio_simple_dec_handle_t *simple, native_aac_decoder_t **aac,
+    uint8_t **pcm, size_t *capacity) {
+    if (*simple) esp_audio_simple_dec_close(*simple);
+42011a68:	5572                	lw	a0,60(sp)
+42011a6a:	c501                	beqz	a0,42011a72 <decoder_task+0x246>
+42011a6c:	376270ef          	jal	42038de2 <esp_audio_simple_dec_close>
+    *simple = NULL;
+42011a70:	de02                	sw	zero,60(sp)
+    if (*aac) native_aac_decoder_destroy(*aac);
+    *aac = NULL;
+    free(*pcm);
+42011a72:	854a                	mv	a0,s2
+42011a74:	8d1f70ef          	jal	42009344 <cfree>
+    *pcm = NULL;
+    *capacity = 0;
+42011a78:	4a81                	li	s5,0
+                        false,
+                        open_result == ESP_AUDIO_ERR_MEM_LACK
+                            ? "NO MEMORY" : "DECODER ERROR");
+                    failed_generation = generation;
+42011a7a:	cc26                	sw	s1,24(sp)
+    *pcm = NULL;
+42011a7c:	4901                	li	s2,0
+            flac_decoder = NULL;
+42011a7e:	4b81                	li	s7,0
+            first_frame_memory_logged = false;
+42011a80:	ce02                	sw	zero,28(sp)
+            return_decoded_packet(packet, failed_generation);
+            continue;
+        }
+#endif
+        if (!decoder && !aac_decoder) {
+            encoded_return(s_encoded, packet);
+42011a82:	d08da503          	lw	a0,-760(s11)
+42011a86:	85e6                	mv	a1,s9
+            continue;
+42011a88:	4981                	li	s3,0
+            encoded_return(s_encoded, packet);
+42011a8a:	712160ef          	jal	4202819c <adaptive_input_return>
+            continue;
+42011a8e:	4401                	li	s0,0
+42011a90:	bd21                	j	420118a8 <decoder_task+0x7c>
+            registration_result = decoder_register_codecs();
+42011a92:	2d8020ef          	jal	42013d6a <decoder_register_codecs>
+42011a96:	842a                	mv	s0,a0
+            if (registration_result != ESP_AUDIO_ERR_OK) {
+42011a98:	08051de3          	bnez	a0,42012332 <decoder_task+0xb06>
+        if (packet->generation != generation || packet->codec != codec) {
+42011a9c:	000ca783          	lw	a5,0(s9)
+42011aa0:	ec9793e3          	bne	a5,s1,42011966 <decoder_task+0x13a>
+42011aa4:	004ca783          	lw	a5,4(s9)
+42011aa8:	eb679fe3          	bne	a5,s6,42011966 <decoder_task+0x13a>
+        if (codec == NATIVE_CODEC_FLAC) {
+42011aac:	478d                	li	a5,3
+42011aae:	0cfb0ce3          	beq	s6,a5,42012386 <decoder_task+0xb5a>
+        if (!decoder && !aac_decoder) {
+42011ab2:	57f2                	lw	a5,60(sp)
+42011ab4:	00f9e7b3          	or	a5,s3,a5
+42011ab8:	d7e9                	beqz	a5,42011a82 <decoder_task+0x256>
+        }
+        esp_audio_simple_dec_raw_t raw = {
+            .buffer = packet->data,
+            .len = packet->data_size,
+42011aba:	008cd783          	lhu	a5,8(s9)
+            .buffer = packet->data,
+42011abe:	00bc8713          	addi	a4,s9,11
+        esp_audio_simple_dec_raw_t raw = {
+42011ac2:	de82                	sw	zero,124(sp)
+42011ac4:	c102                	sw	zero,128(sp)
+42011ac6:	c302                	sw	zero,132(sp)
+42011ac8:	dcbe                	sw	a5,120(sp)
+42011aca:	daba                	sw	a4,116(sp)
+            .eos = packet->end_of_stream,
+42011acc:	00acc703          	lbu	a4,10(s9)
+                esp_audio_simple_dec_info_t latest_info = {0};
+                esp_audio_err_t info_result = aac_decoder
+                    ? native_aac_decoder_get_info(aac_decoder, &latest_info)
+                    : esp_audio_simple_dec_get_info(decoder, &latest_info);
+                if (info_result == ESP_AUDIO_ERR_OK) {
+                    bool format_is_pcm = codec == NATIVE_CODEC_AAC;
+42011ad0:	ffeb0693          	addi	a3,s6,-2
+42011ad4:	0016b693          	seqz	a3,a3
+            .eos = packet->end_of_stream,
+42011ad8:	00e03733          	snez	a4,a4
+                    bool format_is_pcm = codec == NATIVE_CODEC_AAC;
+42011adc:	d036                	sw	a3,32(sp)
+            .eos = packet->end_of_stream,
+42011ade:	06e10e23          	sb	a4,124(sp)
+        while (raw.len || raw.eos || retry_pcm) {
+42011ae2:	54098f63          	beqz	s3,42012040 <decoder_task+0x814>
+42011ae6:	4c72                	lw	s8,28(sp)
+42011ae8:	e789                	bnez	a5,42011af2 <decoder_task+0x2c6>
+42011aea:	07c14783          	lbu	a5,124(sp)
+42011aee:	1c078a63          	beqz	a5,42011cc2 <decoder_task+0x496>
+            esp_audio_simple_dec_out_t frame = {
+42011af2:	4781                	li	a5,0
+42011af4:	4801                	li	a6,0
+42011af6:	cebe                	sw	a5,92(sp)
+42011af8:	d0c2                	sw	a6,96(sp)
+42011afa:	caca                	sw	s2,84(sp)
+42011afc:	ccd6                	sw	s5,88(sp)
+            raw.consumed = 0;
+42011afe:	c102                	sw	zero,128(sp)
+            int64_t decode_started_us = esp_timer_get_time();
+42011b00:	fe370097          	auipc	ra,0xfe370
+42011b04:	8d4080e7          	jalr	-1836(ra) # 403813d4 <esp_timer_get_time>
+42011b08:	842a                	mv	s0,a0
+                ? native_aac_decoder_process(aac_decoder, &raw, &frame)
+42011b0a:	08d0                	addi	a2,sp,84
+42011b0c:	18cc                	addi	a1,sp,116
+42011b0e:	854e                	mv	a0,s3
+42011b10:	2f2020ef          	jal	42013e02 <native_aac_decoder_process>
+42011b14:	8d2a                	mv	s10,a0
+                (uint32_t)(esp_timer_get_time() - decode_started_us);
+42011b16:	fe370097          	auipc	ra,0xfe370
+42011b1a:	8be080e7          	jalr	-1858(ra) # 403813d4 <esp_timer_get_time>
+            stats.decode_us += decode_call_us;
+42011b1e:	57ca                	lw	a5,176(sp)
+42011b20:	56da                	lw	a3,180(sp)
+            uint32_t decode_call_us =
+42011b22:	8d01                	sub	a0,a0,s0
+            stats.decode_us += decode_call_us;
+42011b24:	00a78733          	add	a4,a5,a0
+42011b28:	00f737b3          	sltu	a5,a4,a5
+42011b2c:	97b6                	add	a5,a5,a3
+42011b2e:	db3e                	sw	a5,180(sp)
+            ++stats.calls;
+42011b30:	478e                	lw	a5,192(sp)
+            stats.decode_us += decode_call_us;
+42011b32:	d93a                	sw	a4,176(sp)
+            if (decode_call_us > stats.max_call_us) {
+42011b34:	471e                	lw	a4,196(sp)
+            ++stats.calls;
+42011b36:	0785                	addi	a5,a5,1
+42011b38:	c1be                	sw	a5,192(sp)
+            if (decode_call_us > stats.max_call_us) {
+42011b3a:	00a77363          	bgeu	a4,a0,42011b40 <decoder_task+0x314>
+                stats.max_call_us = decode_call_us;
+42011b3e:	c3aa                	sw	a0,196(sp)
+            if ((stats.calls & 31U) == 0U) vTaskDelay(1);
+42011b40:	8bfd                	andi	a5,a5,31
+42011b42:	44078263          	beqz	a5,42011f86 <decoder_task+0x75a>
+            if (generation != atomic_load(&s_generation)) break;
+42011b46:	d00a0793          	addi	a5,s4,-768
+42011b4a:	0330000f          	fence	rw,rw
+42011b4e:	439c                	lw	a5,0(a5)
+42011b50:	0230000f          	fence	r,rw
+42011b54:	16979763          	bne	a5,s1,42011cc2 <decoder_task+0x496>
+            if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
+42011b58:	57e1                	li	a5,-8
+42011b5a:	40fd0063          	beq	s10,a5,42011f5a <decoder_task+0x72e>
+            if (result != ESP_AUDIO_ERR_OK) {
+42011b5e:	440d1463          	bnez	s10,42011fa6 <decoder_task+0x77a>
+            if (raw.consumed > raw.len) {
+42011b62:	478a                	lw	a5,128(sp)
+42011b64:	5766                	lw	a4,120(sp)
+42011b66:	10f760e3          	bltu	a4,a5,42012466 <decoder_task+0xc3a>
+            raw.len -= raw.consumed;
+42011b6a:	8f1d                	sub	a4,a4,a5
+            stats.input_bytes += (uint32_t)raw.consumed;
+42011b6c:	46ae                	lw	a3,200(sp)
+            raw.len -= raw.consumed;
+42011b6e:	dcba                	sw	a4,120(sp)
+            raw.buffer += raw.consumed;
+42011b70:	5756                	lw	a4,116(sp)
+            stats.input_bytes += (uint32_t)raw.consumed;
+42011b72:	96be                	add	a3,a3,a5
+42011b74:	c5b6                	sw	a3,200(sp)
+            raw.buffer += raw.consumed;
+42011b76:	97ba                	add	a5,a5,a4
+            if (frame.decoded_size) {
+42011b78:	5706                	lw	a4,96(sp)
+            raw.buffer += raw.consumed;
+42011b7a:	dabe                	sw	a5,116(sp)
+            if (frame.decoded_size) {
+42011b7c:	10070c63          	beqz	a4,42011c94 <decoder_task+0x468>
+                    ? native_aac_decoder_get_info(aac_decoder, &latest_info)
+42011b80:	10cc                	addi	a1,sp,100
+42011b82:	854e                	mv	a0,s3
+                esp_audio_simple_dec_info_t latest_info = {0};
+42011b84:	d282                	sw	zero,100(sp)
+42011b86:	d482                	sw	zero,104(sp)
+42011b88:	d682                	sw	zero,108(sp)
+42011b8a:	d882                	sw	zero,112(sp)
+                    ? native_aac_decoder_get_info(aac_decoder, &latest_info)
+42011b8c:	59e020ef          	jal	4201412a <native_aac_decoder_get_info>
+                if (info_result == ESP_AUDIO_ERR_OK) {
+42011b90:	40051163          	bnez	a0,42011f92 <decoder_task+0x766>
+                    bool format_is_pcm = codec == NATIVE_CODEC_AAC;
+42011b94:	5782                	lw	a5,32(sp)
+                    const char *label = aac_decoder
+                        ? native_aac_decoder_label(aac_decoder, &latest_info,
+42011b96:	03b10613          	addi	a2,sp,59
+42011b9a:	10cc                	addi	a1,sp,100
+42011b9c:	854e                	mv	a0,s3
+                    bool format_is_pcm = codec == NATIVE_CODEC_AAC;
+42011b9e:	02f10da3          	sb	a5,59(sp)
+                        ? native_aac_decoder_label(aac_decoder, &latest_info,
+42011ba2:	596020ef          	jal	42014138 <native_aac_decoder_label>
+                                                   &format_is_pcm)
+                        : codec_name(codec);
+                    stream_info_ready = update_stream_info(
+                        generation, label, &latest_info,
+                        &stream_info, &stream_info_ready, 0,
+                        aac_decoder && !format_is_pcm ? native_aac_decoder_source_channels(aac_decoder) : 0, false,
+42011ba6:	03b14683          	lbu	a3,59(sp)
+                        ? native_aac_decoder_label(aac_decoder, &latest_info,
+42011baa:	842a                	mv	s0,a0
+                    stream_info_ready = update_stream_info(
+42011bac:	4501                	li	a0,0
+                        aac_decoder && !format_is_pcm ? native_aac_decoder_source_channels(aac_decoder) : 0, false,
+42011bae:	48068163          	beqz	a3,42012030 <decoder_task+0x804>
+    if (generation != atomic_load(&s_generation) || !latest->sample_rate ||
+42011bb2:	d00a0793          	addi	a5,s4,-768
+42011bb6:	0330000f          	fence	rw,rw
+42011bba:	4398                	lw	a4,0(a5)
+42011bbc:	0230000f          	fence	r,rw
+        !latest->channel || !latest->bits_per_sample) return false;
+42011bc0:	4781                	li	a5,0
+    if (generation != atomic_load(&s_generation) || !latest->sample_rate ||
+42011bc2:	06971163          	bne	a4,s1,42011c24 <decoder_task+0x3f8>
+42011bc6:	5716                	lw	a4,100(sp)
+42011bc8:	cf31                	beqz	a4,42011c24 <decoder_task+0x3f8>
+        !latest->channel || !latest->bits_per_sample) return false;
+42011bca:	06914803          	lbu	a6,105(sp)
+    if (generation != atomic_load(&s_generation) || !latest->sample_rate ||
+42011bce:	04080b63          	beqz	a6,42011c24 <decoder_task+0x3f8>
+        !latest->channel || !latest->bits_per_sample) return false;
+42011bd2:	06814603          	lbu	a2,104(sp)
+42011bd6:	c639                	beqz	a2,42011c24 <decoder_task+0x3f8>
+    *current = *latest;
+42011bd8:	55a6                	lw	a1,104(sp)
+42011bda:	57b6                	lw	a5,108(sp)
+42011bdc:	c2ba                	sw	a4,68(sp)
+42011bde:	c4ae                	sw	a1,72(sp)
+42011be0:	55c6                	lw	a1,112(sp)
+42011be2:	c6be                	sw	a5,76(sp)
+    *ready = true;
+42011be4:	4785                	li	a5,1
+    native_stream_info_t info = {
+42011be6:	08012923          	sw	zero,146(sp)
+42011bea:	08012b23          	sw	zero,150(sp)
+42011bee:	08011d23          	sh	zero,154(sp)
+42011bf2:	c522                	sw	s0,136(sp)
+42011bf4:	c73a                	sw	a4,140(sp)
+    *current = *latest;
+42011bf6:	c8ae                	sw	a1,80(sp)
+    *ready = true;
+42011bf8:	02f10d23          	sb	a5,58(sp)
+    native_stream_info_t info = {
+42011bfc:	7e050163          	beqz	a0,420123de <decoder_task+0xbb2>
+    native_state_set_stream_info(s_state, generation, &info);
+42011c00:	3fc9a7b7          	lui	a5,0x3fc9a
+    native_stream_info_t info = {
+42011c04:	08a10823          	sb	a0,144(sp)
+    native_state_set_stream_info(s_state, generation, &info);
+42011c08:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+    native_stream_info_t info = {
+42011c0c:	08c108a3          	sb	a2,145(sp)
+    native_state_set_stream_info(s_state, generation, &info);
+42011c10:	85a6                	mv	a1,s1
+42011c12:	0130                	addi	a2,sp,136
+    native_stream_info_t info = {
+42011c14:	cb3a                	sw	a4,148(sp)
+42011c16:	09010c23          	sb	a6,152(sp)
+42011c1a:	08d10d23          	sb	a3,154(sp)
+    native_state_set_stream_info(s_state, generation, &info);
+42011c1e:	6d5040ef          	jal	42016af2 <native_state_set_stream_info>
+    return true;
+42011c22:	4785                	li	a5,1
+                        format_is_pcm);
+                    state_set_decoder_bitrate(generation, latest_info.bitrate);
+42011c24:	55b6                	lw	a1,108(sp)
+42011c26:	8526                	mv	a0,s1
+                    stream_info_ready = update_stream_info(
+42011c28:	02f10d23          	sb	a5,58(sp)
+                    state_set_decoder_bitrate(generation, latest_info.bitrate);
+42011c2c:	e90ff0ef          	jal	420112bc <state_set_decoder_bitrate>
+                } else {
+                    // Never send a frame with another frame's stale layout.
+                    stream_info_ready = false;
+                }
+                if (stream_info_ready) {
+42011c30:	03a14783          	lbu	a5,58(sp)
+42011c34:	c3a5                	beqz	a5,42011c94 <decoder_task+0x468>
+                        benchmark_log_memory("first-frame", codec,
+                                             decoder_heap_before, 0);
+                        first_frame_memory_reported = true;
+                    }
+#endif
+                    if (!first_frame_memory_logged) {
+42011c36:	360c0163          	beqz	s8,42011f98 <decoder_task+0x76c>
+    size_t sample_bytes = (info->bits_per_sample + 7U) / 8U;
+42011c3a:	04814503          	lbu	a0,72(sp)
+    size_t frame_bytes = sample_bytes * info->channel;
+42011c3e:	04914783          	lbu	a5,73(sp)
+                        log_runtime_memory("after first decoded frame");
+                        first_frame_memory_logged = true;
+                    }
+                    decode_stats_add_audio(&stats, &stream_info,
+                                           frame.decoded_size);
+42011c42:	5406                	lw	s0,96(sp)
+    size_t sample_bytes = (info->bits_per_sample + 7U) / 8U;
+42011c44:	051d                	addi	a0,a0,7
+42011c46:	810d                	srli	a0,a0,0x3
+    size_t frame_bytes = sample_bytes * info->channel;
+42011c48:	02f50533          	mul	a0,a0,a5
+    if (!frame_bytes || !info->sample_rate) return;
+42011c4c:	c91d                	beqz	a0,42011c82 <decoder_task+0x456>
+42011c4e:	4616                	lw	a2,68(sp)
+42011c50:	ca0d                	beqz	a2,42011c82 <decoder_task+0x456>
+    uint64_t frames = pcm_bytes / frame_bytes;
+42011c52:	02a45533          	divu	a0,s0,a0
+    stats->audio_us += frames * 1000000ULL / info->sample_rate;
+42011c56:	57a2                	lw	a5,40(sp)
+42011c58:	4681                	li	a3,0
+42011c5a:	02f535b3          	mulhu	a1,a0,a5
+42011c5e:	02f50533          	mul	a0,a0,a5
+42011c62:	fdfef097          	auipc	ra,0xfdfef
+42011c66:	c4a080e7          	jalr	-950(ra) # 400008ac <__udivdi3>
+42011c6a:	57ea                	lw	a5,184(sp)
+42011c6c:	56fa                	lw	a3,188(sp)
+    stats->pcm_bytes += (uint32_t)pcm_bytes;
+42011c6e:	473e                	lw	a4,204(sp)
+    stats->audio_us += frames * 1000000ULL / info->sample_rate;
+42011c70:	953e                	add	a0,a0,a5
+42011c72:	96ae                	add	a3,a3,a1
+42011c74:	00f537b3          	sltu	a5,a0,a5
+42011c78:	97b6                	add	a5,a5,a3
+    stats->pcm_bytes += (uint32_t)pcm_bytes;
+42011c7a:	9722                	add	a4,a4,s0
+    stats->audio_us += frames * 1000000ULL / info->sample_rate;
+42011c7c:	df3e                	sw	a5,188(sp)
+42011c7e:	dd2a                	sw	a0,184(sp)
+    stats->pcm_bytes += (uint32_t)pcm_bytes;
+42011c80:	c7ba                	sw	a4,204(sp)
+                    if (!send_pcm(&stats, generation, &stream_info, output,
+42011c82:	86a2                	mv	a3,s0
+42011c84:	864a                	mv	a2,s2
+42011c86:	00cc                	addi	a1,sp,68
+42011c88:	8526                	mv	a0,s1
+42011c8a:	a55ff0ef          	jal	420116de <send_pcm.isra.0>
+42011c8e:	8c2a                	mv	s8,a0
+42011c90:	06050fe3          	beqz	a0,4201250e <decoder_task+0xce2>
+                        ESP_LOGW(TAG, "PCM buffer stalled");
+                        break;
+                    }
+                }
+            }
+            decode_stats_report(&stats, esp_timer_get_time());
+42011c94:	fe36f097          	auipc	ra,0xfe36f
+42011c98:	740080e7          	jalr	1856(ra) # 403813d4 <esp_timer_get_time>
+42011c9c:	862e                	mv	a2,a1
+42011c9e:	85aa                	mv	a1,a0
+42011ca0:	1108                	addi	a0,sp,160
+42011ca2:	a10ff0ef          	jal	42010eb2 <decode_stats_report>
+            if (!raw.consumed && !frame.decoded_size && !raw.eos) {
+42011ca6:	5706                	lw	a4,96(sp)
+42011ca8:	478a                	lw	a5,128(sp)
+42011caa:	07c14683          	lbu	a3,124(sp)
+42011cae:	8fd9                	or	a5,a5,a4
+42011cb0:	28079f63          	bnez	a5,42011f4e <decoder_task+0x722>
+42011cb4:	120680e3          	beqz	a3,420125d4 <decoder_task+0xda8>
+42011cb8:	4701                	li	a4,0
+                failed_generation = generation;
+                break;
+            }
+            // EOF can drain several cached Ogg packets. Keep the decoder and
+            // its PCM workspace alive until a successful call yields no PCM.
+            if (raw.eos ? (!raw.len && !frame.decoded_size) : raw.len == 0) break;
+42011cba:	57e6                	lw	a5,120(sp)
+42011cbc:	8f5d                	or	a4,a4,a5
+42011cbe:	e20715e3          	bnez	a4,42011ae8 <decoder_task+0x2bc>
+42011cc2:	ce62                	sw	s8,28(sp)
+        }
+        if (packet->end_of_stream || failed_generation == generation) {
+42011cc4:	00acc783          	lbu	a5,10(s9)
+42011cc8:	34079363          	bnez	a5,4201200e <decoder_task+0x7e2>
+42011ccc:	47e2                	lw	a5,24(sp)
+42011cce:	34978063          	beq	a5,s1,4201200e <decoder_task+0x7e2>
+            decoder_resources_release(&decoder, &aac_decoder, &output, &output_size);
+        }
+        return_decoded_packet(packet, failed_generation);
+42011cd2:	45e2                	lw	a1,24(sp)
+42011cd4:	8566                	mv	a0,s9
+42011cd6:	4401                	li	s0,0
+42011cd8:	95dff0ef          	jal	42011634 <return_decoded_packet>
+        tls_input_reserve_poll();
+42011cdc:	7a2160ef          	jal	4202847e <tls_input_reserve_poll>
+        uint32_t current_generation = atomic_load(&s_generation);
+42011ce0:	d00a0793          	addi	a5,s4,-768
+42011ce4:	0330000f          	fence	rw,rw
+42011ce8:	0007ac83          	lw	s9,0(a5)
+42011cec:	0230000f          	fence	r,rw
+        if (generation != current_generation) {
+42011cf0:	bc9c98e3          	bne	s9,s1,420118c0 <decoder_task+0x94>
+        if (failed_generation && failed_generation == generation) {
+42011cf4:	47e2                	lw	a5,24(sp)
+42011cf6:	c20783e3          	beqz	a5,4201191c <decoder_task+0xf0>
+42011cfa:	c29791e3          	bne	a5,s1,4201191c <decoder_task+0xf0>
+    if (*simple) esp_audio_simple_dec_close(*simple);
+42011cfe:	5572                	lw	a0,60(sp)
+42011d00:	c119                	beqz	a0,42011d06 <decoder_task+0x4da>
+42011d02:	0e0270ef          	jal	42038de2 <esp_audio_simple_dec_close>
+    *simple = NULL;
+42011d06:	de02                	sw	zero,60(sp)
+    if (*aac) native_aac_decoder_destroy(*aac);
+42011d08:	00098563          	beqz	s3,42011d12 <decoder_task+0x4e6>
+42011d0c:	854e                	mv	a0,s3
+42011d0e:	0be020ef          	jal	42013dcc <native_aac_decoder_destroy>
+    free(*pcm);
+42011d12:	854a                	mv	a0,s2
+42011d14:	e30f70ef          	jal	42009344 <cfree>
+    *aac = NULL;
+42011d18:	4981                	li	s3,0
+    *capacity = 0;
+42011d1a:	4a81                	li	s5,0
+    *pcm = NULL;
+42011d1c:	4901                	li	s2,0
+}
+42011d1e:	befd                	j	4201191c <decoder_task+0xf0>
+            encoded_return(s_encoded, packet);
+42011d20:	d08da503          	lw	a0,-760(s11)
+42011d24:	85e6                	mv	a1,s9
+42011d26:	476160ef          	jal	4202819c <adaptive_input_return>
+            continue;
+42011d2a:	bebd                	j	420118a8 <decoder_task+0x7c>
+            packet = adaptive_input_receive(s_encoded, &item_size, pdMS_TO_TICKS(20));
+42011d2c:	d08da503          	lw	a0,-760(s11)
+42011d30:	4651                	li	a2,20
+42011d32:	008c                	addi	a1,sp,64
+42011d34:	36a160ef          	jal	4202809e <adaptive_input_receive>
+42011d38:	8caa                	mv	s9,a0
+        if (!packet) continue;
+42011d3a:	be051be3          	bnez	a0,42011930 <decoder_task+0x104>
+42011d3e:	b6ad                	j	420118a8 <decoder_task+0x7c>
+                free(output);
+42011d40:	854a                	mv	a0,s2
+42011d42:	e02f70ef          	jal	42009344 <cfree>
+                output_size = 0;
+42011d46:	4a81                	li	s5,0
+                output = NULL;
+42011d48:	4901                	li	s2,0
+42011d4a:	b65d                	j	420118f0 <decoder_task+0xc4>
+                free(output);
+42011d4c:	854a                	mv	a0,s2
+42011d4e:	df6f70ef          	jal	42009344 <cfree>
+                flac_decoder = custom_flac_decoder_create();
+42011d52:	18a230ef          	jal	42034edc <custom_flac_decoder_create>
+42011d56:	8baa                	mv	s7,a0
+                if (!flac_decoder) {
+42011d58:	62050a63          	beqz	a0,4201238c <decoder_task+0xb60>
+            aac_decoder = NULL;
+42011d5c:	4981                	li	s3,0
+                output_size = 0;
+42011d5e:	4a81                	li	s5,0
+                output = NULL;
+42011d60:	4901                	li	s2,0
+            first_frame_memory_logged = false;
+42011d62:	ce02                	sw	zero,28(sp)
+                custom_flac_feed_stats_t feed_stats = {0};
+42011d64:	4661                	li	a2,24
+42011d66:	4581                	li	a1,0
+42011d68:	0128                	addi	a0,sp,136
+42011d6a:	fdfee097          	auipc	ra,0xfdfee
+42011d6e:	5ea080e7          	jalr	1514(ra) # 40000354 <memset>
+                custom_flac_output_context_t context = {
+42011d72:	111c                	addi	a5,sp,160
+42011d74:	dcbe                	sw	a5,120(sp)
+42011d76:	00dc                	addi	a5,sp,68
+42011d78:	debe                	sw	a5,124(sp)
+42011d7a:	03a10793          	addi	a5,sp,58
+42011d7e:	c13e                	sw	a5,128(sp)
+42011d80:	daa6                	sw	s1,116(sp)
+                int result = custom_flac_decoder_feed(
+42011d82:	00acc683          	lbu	a3,10(s9)
+42011d86:	008cd603          	lhu	a2,8(s9)
+42011d8a:	42012737          	lui	a4,0x42012
+42011d8e:	00d036b3          	snez	a3,a3
+42011d92:	18dc                	addi	a5,sp,116
+42011d94:	66e70713          	addi	a4,a4,1646 # 4201266e <custom_flac_output>
+42011d98:	00bc8593          	addi	a1,s9,11
+42011d9c:	08810813          	addi	a6,sp,136
+42011da0:	855e                	mv	a0,s7
+42011da2:	1c0230ef          	jal	42034f62 <custom_flac_decoder_feed>
+                stats.decode_us += feed_stats.decode_us;
+42011da6:	57ca                	lw	a5,176(sp)
+42011da8:	472a                	lw	a4,136(sp)
+42011daa:	565a                	lw	a2,180(sp)
+42011dac:	45ba                	lw	a1,140(sp)
+                stats.calls += feed_stats.decode_calls;
+42011dae:	468e                	lw	a3,192(sp)
+                stats.decode_us += feed_stats.decode_us;
+42011db0:	973e                	add	a4,a4,a5
+                int result = custom_flac_decoder_feed(
+42011db2:	842a                	mv	s0,a0
+                stats.calls += feed_stats.decode_calls;
+42011db4:	454a                	lw	a0,144(sp)
+                stats.decode_us += feed_stats.decode_us;
+42011db6:	962e                	add	a2,a2,a1
+42011db8:	00f737b3          	sltu	a5,a4,a5
+42011dbc:	97b2                	add	a5,a5,a2
+                if (feed_stats.max_call_us > stats.max_call_us) {
+42011dbe:	45da                	lw	a1,148(sp)
+42011dc0:	461e                	lw	a2,196(sp)
+                stats.calls += feed_stats.decode_calls;
+42011dc2:	96aa                	add	a3,a3,a0
+                stats.decode_us += feed_stats.decode_us;
+42011dc4:	d93a                	sw	a4,176(sp)
+42011dc6:	db3e                	sw	a5,180(sp)
+                stats.calls += feed_stats.decode_calls;
+42011dc8:	c1b6                	sw	a3,192(sp)
+                if (feed_stats.max_call_us > stats.max_call_us) {
+42011dca:	00b67363          	bgeu	a2,a1,42011dd0 <decoder_task+0x5a4>
+                    stats.max_call_us = feed_stats.max_call_us;
+42011dce:	c3ae                	sw	a1,196(sp)
+                stats.input_bytes += feed_stats.input_bytes;
+42011dd0:	47ae                	lw	a5,200(sp)
+42011dd2:	476a                	lw	a4,152(sp)
+42011dd4:	97ba                	add	a5,a5,a4
+42011dd6:	c5be                	sw	a5,200(sp)
+                if (!first_frame_memory_logged && stream_info_ready) {
+42011dd8:	47f2                	lw	a5,28(sp)
+42011dda:	60078b63          	beqz	a5,420123f0 <decoder_task+0xbc4>
+            first_frame_memory_logged = false;
+42011dde:	4785                	li	a5,1
+42011de0:	ce3e                	sw	a5,28(sp)
+                decode_stats_report(&stats, esp_timer_get_time());
+42011de2:	fe36f097          	auipc	ra,0xfe36f
+42011de6:	5f2080e7          	jalr	1522(ra) # 403813d4 <esp_timer_get_time>
+42011dea:	862e                	mv	a2,a1
+42011dec:	85aa                	mv	a1,a0
+42011dee:	1108                	addi	a0,sp,160
+42011df0:	8c2ff0ef          	jal	42010eb2 <decode_stats_report>
+                if (result < 0 && generation == atomic_load(&s_generation)) {
+42011df4:	00045b63          	bgez	s0,42011e0a <decoder_task+0x5de>
+42011df8:	d00a0793          	addi	a5,s4,-768
+42011dfc:	0330000f          	fence	rw,rw
+42011e00:	439c                	lw	a5,0(a5)
+42011e02:	0230000f          	fence	r,rw
+42011e06:	76978663          	beq	a5,s1,42012572 <decoder_task+0xd46>
+            if (packet->end_of_stream || failed_generation == generation) {
+42011e0a:	00acc783          	lbu	a5,10(s9)
+42011e0e:	5c079363          	bnez	a5,420123d4 <decoder_task+0xba8>
+42011e12:	47e2                	lw	a5,24(sp)
+42011e14:	5c978063          	beq	a5,s1,420123d4 <decoder_task+0xba8>
+            return_decoded_packet(packet, failed_generation);
+42011e18:	45e2                	lw	a1,24(sp)
+42011e1a:	8566                	mv	a0,s9
+            continue;
+42011e1c:	4b0d                	li	s6,3
+            return_decoded_packet(packet, failed_generation);
+42011e1e:	817ff0ef          	jal	42011634 <return_decoded_packet>
+            continue;
+42011e22:	4401                	li	s0,0
+42011e24:	b451                	j	420118a8 <decoder_task+0x7c>
+    if (*capacity == required) return true;
+42011e26:	6589                	lui	a1,0x2
+42011e28:	46ba8e63          	beq	s5,a1,420122a4 <decoder_task+0xa78>
+    uint8_t *resized = realloc(*buffer, required);
+42011e2c:	854a                	mv	a0,s2
+42011e2e:	d12f70ef          	jal	42009340 <realloc>
+42011e32:	842a                	mv	s0,a0
+    if (!resized) return false;
+42011e34:	020503e3          	beqz	a0,4201265a <decoder_task+0xe2e>
+                esp_audio_simple_dec_cfg_t cfg = {
+42011e38:	204347b7          	lui	a5,0x20434
+42011e3c:	14178793          	addi	a5,a5,321 # 20434141 <CSR_UINTSTATUS+0x20433490>
+42011e40:	c702                	sw	zero,140(sp)
+42011e42:	c902                	sw	zero,144(sp)
+42011e44:	cb02                	sw	zero,148(sp)
+42011e46:	c53e                	sw	a5,136(sp)
+                    if (!aac_decoder) aac_decoder = native_aac_decoder_create();
+42011e48:	759010ef          	jal	42013da0 <native_aac_decoder_create>
+42011e4c:	89aa                	mv	s3,a0
+                    open_result = aac_decoder ? ESP_AUDIO_ERR_OK : ESP_AUDIO_ERR_MEM_LACK;
+42011e4e:	5c050263          	beqz	a0,42012412 <decoder_task+0xbe6>
+        if (!decoder && !aac_decoder) {
+42011e52:	8922                	mv	s2,s0
+42011e54:	6a89                	lui	s5,0x2
+            flac_decoder = NULL;
+42011e56:	4b81                	li	s7,0
+            first_frame_memory_logged = false;
+42011e58:	ce02                	sw	zero,28(sp)
+42011e5a:	b185                	j	42011aba <decoder_task+0x28e>
+                !prefill_encoded_input(packet->generation)) {
+42011e5c:	000ca983          	lw	s3,0(s9)
+    const int64_t started_us = esp_timer_get_time();
+42011e60:	fe36f097          	auipc	ra,0xfe36f
+42011e64:	574080e7          	jalr	1396(ra) # 403813d4 <esp_timer_get_time>
+42011e68:	842a                	mv	s0,a0
+42011e6a:	d02e                	sw	a1,32(sp)
+    while (atomic_load(&s_generation) == generation) {
+42011e6c:	8c2e                	mv	s8,a1
+42011e6e:	a82d                	j	42011ea8 <decoder_task+0x67c>
+        adaptive_input_stats_t capacity = adaptive_input_stats(s_encoded);
+42011e70:	d08da583          	lw	a1,-760(s11)
+42011e74:	607150ef          	jal	42027c7a <adaptive_input_stats>
+        full = capacity.occupied >= capacity.resident;
+42011e78:	4bea                	lw	s7,152(sp)
+42011e7a:	4d3a                	lw	s10,140(sp)
+        if (full || esp_timer_get_time() - started_us >= maximum_us) break;
+42011e7c:	3fabfb63          	bgeu	s7,s10,42012272 <decoder_task+0xa46>
+42011e80:	fe36f097          	auipc	ra,0xfe36f
+42011e84:	554080e7          	jalr	1364(ra) # 403813d4 <esp_timer_get_time>
+42011e88:	408507b3          	sub	a5,a0,s0
+42011e8c:	00f53533          	sltu	a0,a0,a5
+42011e90:	418585b3          	sub	a1,a1,s8
+42011e94:	8d89                	sub	a1,a1,a0
+        vTaskDelay(poll_ticks);
+42011e96:	4529                	li	a0,10
+        if (full || esp_timer_get_time() - started_us >= maximum_us) break;
+42011e98:	3cb04d63          	bgtz	a1,42012272 <decoder_task+0xa46>
+42011e9c:	3c058563          	beqz	a1,42012266 <decoder_task+0xa3a>
+        vTaskDelay(poll_ticks);
+42011ea0:	00108097          	auipc	ra,0x108
+42011ea4:	b2c080e7          	jalr	-1236(ra) # 421199cc <vTaskDelay>
+    while (atomic_load(&s_generation) == generation) {
+42011ea8:	d00a0793          	addi	a5,s4,-768
+42011eac:	0330000f          	fence	rw,rw
+42011eb0:	439c                	lw	a5,0(a5)
+42011eb2:	0230000f          	fence	r,rw
+        adaptive_input_stats_t capacity = adaptive_input_stats(s_encoded);
+42011eb6:	0128                	addi	a0,sp,136
+    while (atomic_load(&s_generation) == generation) {
+42011eb8:	fb378ce3          	beq	a5,s3,42011e70 <decoder_task+0x644>
+42011ebc:	4881                	li	a7,0
+    bool current = atomic_load(&s_generation) == generation;
+42011ebe:	d646                	sw	a7,44(sp)
+42011ec0:	d00a0793          	addi	a5,s4,-768
+42011ec4:	0330000f          	fence	rw,rw
+42011ec8:	0007ac03          	lw	s8,0(a5)
+42011ecc:	0230000f          	fence	r,rw
+    ESP_LOGI(TAG, "PERF INPUT_PREFILL: generation=%lu elapsed_ms=%lu full=%u cancelled=%u",
+42011ed0:	fe377097          	auipc	ra,0xfe377
+42011ed4:	5ce080e7          	jalr	1486(ra) # 4038949e <esp_log_timestamp>
+42011ed8:	8baa                	mv	s7,a0
+42011eda:	fe36f097          	auipc	ra,0xfe36f
+42011ede:	4fa080e7          	jalr	1274(ra) # 403813d4 <esp_timer_get_time>
+42011ee2:	5782                	lw	a5,32(sp)
+42011ee4:	40850433          	sub	s0,a0,s0
+42011ee8:	00853533          	sltu	a0,a0,s0
+42011eec:	8d9d                	sub	a1,a1,a5
+42011eee:	8d89                	sub	a1,a1,a0
+42011ef0:	3e800613          	li	a2,1000
+42011ef4:	4681                	li	a3,0
+42011ef6:	8522                	mv	a0,s0
+42011ef8:	fdfef097          	auipc	ra,0xfdfef
+42011efc:	8bc080e7          	jalr	-1860(ra) # 400007b4 <__divdi3>
+42011f00:	413c07b3          	sub	a5,s8,s3
+42011f04:	00f037b3          	snez	a5,a5
+42011f08:	c03e                	sw	a5,0(sp)
+42011f0a:	58b2                	lw	a7,44(sp)
+42011f0c:	3c1267b7          	lui	a5,0x3c126
+42011f10:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42011f14:	3c126637          	lui	a2,0x3c126
+42011f18:	882a                	mv	a6,a0
+42011f1a:	86de                	mv	a3,s7
+42011f1c:	85ba                	mv	a1,a4
+42011f1e:	87ce                	mv	a5,s3
+42011f20:	d1060613          	addi	a2,a2,-752 # 3c125d10 <_esp_libc_clock_array_end+0x5bc0>
+42011f24:	450d                	li	a0,3
+42011f26:	fe377097          	auipc	ra,0xfe377
+42011f2a:	470080e7          	jalr	1136(ra) # 40389396 <esp_log>
+            if (packet->data_size && !packet->end_of_stream &&
+42011f2e:	a73c00e3          	beq	s8,s3,4201198e <decoder_task+0x162>
+                encoded_return(s_encoded, packet);
+42011f32:	d08da503          	lw	a0,-760(s11)
+42011f36:	85e6                	mv	a1,s9
+            aac_decoder = NULL;
+42011f38:	4981                	li	s3,0
+                encoded_return(s_encoded, packet);
+42011f3a:	262160ef          	jal	4202819c <adaptive_input_return>
+            flac_decoder = NULL;
+42011f3e:	4b81                	li	s7,0
+                continue;
+42011f40:	4401                	li	s0,0
+42011f42:	b29d                	j	420118a8 <decoder_task+0x7c>
+            return_decoded_packet(packet, failed_generation);
+42011f44:	45e2                	lw	a1,24(sp)
+42011f46:	8566                	mv	a0,s9
+42011f48:	eecff0ef          	jal	42011634 <return_decoded_packet>
+            continue;
+42011f4c:	bab1                	j	420118a8 <decoder_task+0x7c>
+            if (raw.eos ? (!raw.len && !frame.decoded_size) : raw.len == 0) break;
+42011f4e:	d60696e3          	bnez	a3,42011cba <decoder_task+0x48e>
+42011f52:	57e6                	lw	a5,120(sp)
+42011f54:	b8079fe3          	bnez	a5,42011af2 <decoder_task+0x2c6>
+42011f58:	b3ad                	j	42011cc2 <decoder_task+0x496>
+                    stats.input_bytes += raw.consumed;
+42011f5a:	470a                	lw	a4,128(sp)
+                    raw.buffer += raw.consumed;
+42011f5c:	57d6                	lw	a5,116(sp)
+                    stats.input_bytes += raw.consumed;
+42011f5e:	46ae                	lw	a3,200(sp)
+                if (frame.needed_size <= output_size ||
+42011f60:	4476                	lw	s0,92(sp)
+                    raw.buffer += raw.consumed;
+42011f62:	97ba                	add	a5,a5,a4
+42011f64:	dabe                	sw	a5,116(sp)
+                    raw.len -= raw.consumed;
+42011f66:	57e6                	lw	a5,120(sp)
+                    stats.input_bytes += raw.consumed;
+42011f68:	96ba                	add	a3,a3,a4
+42011f6a:	c5b6                	sw	a3,200(sp)
+                    raw.len -= raw.consumed;
+42011f6c:	8f99                	sub	a5,a5,a4
+42011f6e:	dcbe                	sw	a5,120(sp)
+                if (frame.needed_size <= output_size ||
+42011f70:	568aff63          	bgeu	s5,s0,420124ee <decoder_task+0xcc2>
+    uint8_t *resized = realloc(*buffer, required);
+42011f74:	85a2                	mv	a1,s0
+42011f76:	854a                	mv	a0,s2
+42011f78:	bc8f70ef          	jal	42009340 <realloc>
+    if (!resized) return false;
+42011f7c:	56050963          	beqz	a0,420124ee <decoder_task+0xcc2>
+    *capacity = required;
+42011f80:	8aa2                	mv	s5,s0
+    *buffer = resized;
+42011f82:	892a                	mv	s2,a0
+42011f84:	b6bd                	j	42011af2 <decoder_task+0x2c6>
+            if ((stats.calls & 31U) == 0U) vTaskDelay(1);
+42011f86:	4505                	li	a0,1
+42011f88:	00108097          	auipc	ra,0x108
+42011f8c:	a44080e7          	jalr	-1468(ra) # 421199cc <vTaskDelay>
+42011f90:	be5d                	j	42011b46 <decoder_task+0x31a>
+                    stream_info_ready = false;
+42011f92:	02010d23          	sb	zero,58(sp)
+                if (stream_info_ready) {
+42011f96:	b9fd                	j	42011c94 <decoder_task+0x468>
+                        log_runtime_memory("after first decoded frame");
+42011f98:	3c1267b7          	lui	a5,0x3c126
+42011f9c:	e3478513          	addi	a0,a5,-460 # 3c125e34 <_esp_libc_clock_array_end+0x5ce4>
+42011fa0:	ab8ff0ef          	jal	42011258 <log_runtime_memory>
+                        first_frame_memory_logged = true;
+42011fa4:	b959                	j	42011c3a <decoder_task+0x40e>
+42011fa6:	846a                	mv	s0,s10
+42011fa8:	ce62                	sw	s8,28(sp)
+                ESP_LOGW(TAG, "%s decode error: %d", codec_name(codec),
+42011faa:	4a89                	li	s5,2
+42011fac:	fe377097          	auipc	ra,0xfe377
+42011fb0:	4f2080e7          	jalr	1266(ra) # 4038949e <esp_log_timestamp>
+    switch (codec) {
+42011fb4:	5b5b0063          	beq	s6,s5,42012554 <decoder_task+0xd28>
+42011fb8:	4791                	li	a5,4
+42011fba:	58fb0863          	beq	s6,a5,4201254a <decoder_task+0xd1e>
+        case NATIVE_CODEC_MP3: return "MP3";
+42011fbe:	3c1267b7          	lui	a5,0x3c126
+    switch (codec) {
+42011fc2:	4705                	li	a4,1
+        case NATIVE_CODEC_MP3: return "MP3";
+42011fc4:	ad878793          	addi	a5,a5,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+    switch (codec) {
+42011fc8:	00eb0663          	beq	s6,a4,42011fd4 <decoder_task+0x7a8>
+        default: return "auto";
+42011fcc:	3c1267b7          	lui	a5,0x3c126
+42011fd0:	adc78793          	addi	a5,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+                ESP_LOGW(TAG, "%s decode error: %d", codec_name(codec),
+42011fd4:	3c126737          	lui	a4,0x3c126
+42011fd8:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42011fdc:	3c126637          	lui	a2,0x3c126
+42011fe0:	86aa                	mv	a3,a0
+42011fe2:	85ba                	mv	a1,a4
+42011fe4:	8822                	mv	a6,s0
+42011fe6:	e6860613          	addi	a2,a2,-408 # 3c125e68 <_esp_libc_clock_array_end+0x5d18>
+42011fea:	4509                	li	a0,2
+42011fec:	fe377097          	auipc	ra,0xfe377
+42011ff0:	3aa080e7          	jalr	938(ra) # 40389396 <esp_log>
+    native_state_set_audio(s_state, generation, running, format);
+42011ff4:	3fc9a7b7          	lui	a5,0x3fc9a
+42011ff8:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42011ffc:	3c1267b7          	lui	a5,0x3c126
+42012000:	cbc78693          	addi	a3,a5,-836 # 3c125cbc <_esp_libc_clock_array_end+0x5b6c>
+42012004:	85a6                	mv	a1,s1
+42012006:	4601                	li	a2,0
+42012008:	1fb040ef          	jal	42016a02 <native_state_set_audio>
+                failed_generation = generation;
+4201200c:	cc26                	sw	s1,24(sp)
+    if (*simple) esp_audio_simple_dec_close(*simple);
+4201200e:	5572                	lw	a0,60(sp)
+42012010:	c119                	beqz	a0,42012016 <decoder_task+0x7ea>
+42012012:	5d1260ef          	jal	42038de2 <esp_audio_simple_dec_close>
+    *simple = NULL;
+42012016:	de02                	sw	zero,60(sp)
+    if (*aac) native_aac_decoder_destroy(*aac);
+42012018:	00098563          	beqz	s3,42012022 <decoder_task+0x7f6>
+4201201c:	854e                	mv	a0,s3
+4201201e:	5af010ef          	jal	42013dcc <native_aac_decoder_destroy>
+    free(*pcm);
+42012022:	854a                	mv	a0,s2
+42012024:	b20f70ef          	jal	42009344 <cfree>
+    *aac = NULL;
+42012028:	4981                	li	s3,0
+    *capacity = 0;
+4201202a:	4a81                	li	s5,0
+    *pcm = NULL;
+4201202c:	4901                	li	s2,0
+}
+4201202e:	b155                	j	42011cd2 <decoder_task+0x4a6>
+                        aac_decoder && !format_is_pcm ? native_aac_decoder_source_channels(aac_decoder) : 0, false,
+42012030:	854e                	mv	a0,s3
+42012032:	15e020ef          	jal	42014190 <native_aac_decoder_source_channels>
+                    stream_info_ready = update_stream_info(
+42012036:	03b14683          	lbu	a3,59(sp)
+4201203a:	0ff57513          	zext.b	a0,a0
+4201203e:	be95                	j	42011bb2 <decoder_task+0x386>
+            if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
+42012040:	4472                	lw	s0,28(sp)
+42012042:	5d61                	li	s10,-8
+42012044:	8c4e                	mv	s8,s3
+        while (raw.len || raw.eos || retry_pcm) {
+42012046:	e789                	bnez	a5,42012050 <decoder_task+0x824>
+42012048:	07c14783          	lbu	a5,124(sp)
+4201204c:	1e078063          	beqz	a5,4201222c <decoder_task+0xa00>
+            esp_audio_simple_dec_out_t frame = {
+42012050:	4781                	li	a5,0
+42012052:	4801                	li	a6,0
+42012054:	cebe                	sw	a5,92(sp)
+42012056:	d0c2                	sw	a6,96(sp)
+42012058:	caca                	sw	s2,84(sp)
+4201205a:	ccd6                	sw	s5,88(sp)
+            raw.consumed = 0;
+4201205c:	c102                	sw	zero,128(sp)
+            int64_t decode_started_us = esp_timer_get_time();
+4201205e:	fe36f097          	auipc	ra,0xfe36f
+42012062:	376080e7          	jalr	886(ra) # 403813d4 <esp_timer_get_time>
+42012066:	ce2a                	sw	a0,28(sp)
+                : esp_audio_simple_dec_process(decoder, &raw, &frame);
+42012068:	5572                	lw	a0,60(sp)
+4201206a:	08d0                	addi	a2,sp,84
+4201206c:	18cc                	addi	a1,sp,116
+4201206e:	165150ef          	jal	420279d2 <__wrap_esp_audio_simple_dec_process>
+42012072:	89aa                	mv	s3,a0
+                (uint32_t)(esp_timer_get_time() - decode_started_us);
+42012074:	fe36f097          	auipc	ra,0xfe36f
+42012078:	360080e7          	jalr	864(ra) # 403813d4 <esp_timer_get_time>
+            uint32_t decode_call_us =
+4201207c:	47f2                	lw	a5,28(sp)
+            stats.decode_us += decode_call_us;
+4201207e:	56da                	lw	a3,180(sp)
+            uint32_t decode_call_us =
+42012080:	8d1d                	sub	a0,a0,a5
+            stats.decode_us += decode_call_us;
+42012082:	57ca                	lw	a5,176(sp)
+42012084:	00a78733          	add	a4,a5,a0
+42012088:	00f737b3          	sltu	a5,a4,a5
+4201208c:	97b6                	add	a5,a5,a3
+4201208e:	db3e                	sw	a5,180(sp)
+            ++stats.calls;
+42012090:	478e                	lw	a5,192(sp)
+            stats.decode_us += decode_call_us;
+42012092:	d93a                	sw	a4,176(sp)
+            if (decode_call_us > stats.max_call_us) {
+42012094:	471e                	lw	a4,196(sp)
+            ++stats.calls;
+42012096:	0785                	addi	a5,a5,1
+42012098:	c1be                	sw	a5,192(sp)
+            if (decode_call_us > stats.max_call_us) {
+4201209a:	00a77363          	bgeu	a4,a0,420120a0 <decoder_task+0x874>
+                stats.max_call_us = decode_call_us;
+4201209e:	c3aa                	sw	a0,196(sp)
+            if ((stats.calls & 31U) == 0U) vTaskDelay(1);
+420120a0:	8bfd                	andi	a5,a5,31
+420120a2:	1a078963          	beqz	a5,42012254 <decoder_task+0xa28>
+            if (generation != atomic_load(&s_generation)) break;
+420120a6:	d00a0793          	addi	a5,s4,-768
+420120aa:	0330000f          	fence	rw,rw
+420120ae:	439c                	lw	a5,0(a5)
+420120b0:	0230000f          	fence	r,rw
+420120b4:	16979c63          	bne	a5,s1,4201222c <decoder_task+0xa00>
+            if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
+420120b8:	19a98263          	beq	s3,s10,4201223c <decoder_task+0xa10>
+            if (result != ESP_AUDIO_ERR_OK) {
+420120bc:	48099363          	bnez	s3,42012542 <decoder_task+0xd16>
+            if (raw.consumed > raw.len) {
+420120c0:	478a                	lw	a5,128(sp)
+420120c2:	5766                	lw	a4,120(sp)
+420120c4:	46f76c63          	bltu	a4,a5,4201253c <decoder_task+0xd10>
+            raw.len -= raw.consumed;
+420120c8:	8f1d                	sub	a4,a4,a5
+            stats.input_bytes += (uint32_t)raw.consumed;
+420120ca:	46ae                	lw	a3,200(sp)
+            raw.len -= raw.consumed;
+420120cc:	dcba                	sw	a4,120(sp)
+            raw.buffer += raw.consumed;
+420120ce:	5756                	lw	a4,116(sp)
+            stats.input_bytes += (uint32_t)raw.consumed;
+420120d0:	96be                	add	a3,a3,a5
+420120d2:	c5b6                	sw	a3,200(sp)
+            raw.buffer += raw.consumed;
+420120d4:	97ba                	add	a5,a5,a4
+            if (frame.decoded_size) {
+420120d6:	5706                	lw	a4,96(sp)
+            raw.buffer += raw.consumed;
+420120d8:	dabe                	sw	a5,116(sp)
+            if (frame.decoded_size) {
+420120da:	12070363          	beqz	a4,42012200 <decoder_task+0x9d4>
+                    : esp_audio_simple_dec_get_info(decoder, &latest_info);
+420120de:	5572                	lw	a0,60(sp)
+420120e0:	10cc                	addi	a1,sp,100
+                esp_audio_simple_dec_info_t latest_info = {0};
+420120e2:	d282                	sw	zero,100(sp)
+420120e4:	d482                	sw	zero,104(sp)
+420120e6:	d682                	sw	zero,108(sp)
+420120e8:	d882                	sw	zero,112(sp)
+                    : esp_audio_simple_dec_get_info(decoder, &latest_info);
+420120ea:	481260ef          	jal	42038d6a <esp_audio_simple_dec_get_info>
+                if (info_result == ESP_AUDIO_ERR_OK) {
+420120ee:	16051963          	bnez	a0,42012260 <decoder_task+0xa34>
+                    bool format_is_pcm = codec == NATIVE_CODEC_AAC;
+420120f2:	5782                	lw	a5,32(sp)
+420120f4:	02f10da3          	sb	a5,59(sp)
+    switch (codec) {
+420120f8:	4789                	li	a5,2
+420120fa:	3efb0063          	beq	s6,a5,420124da <decoder_task+0xcae>
+420120fe:	4791                	li	a5,4
+42012100:	3cfb0863          	beq	s6,a5,420124d0 <decoder_task+0xca4>
+        case NATIVE_CODEC_MP3: return "MP3";
+42012104:	3c126737          	lui	a4,0x3c126
+    switch (codec) {
+42012108:	4785                	li	a5,1
+        case NATIVE_CODEC_MP3: return "MP3";
+4201210a:	ad870593          	addi	a1,a4,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+    switch (codec) {
+4201210e:	2efb1d63          	bne	s6,a5,42012408 <decoder_task+0xbdc>
+    if (generation != atomic_load(&s_generation) || !latest->sample_rate ||
+42012112:	d00a0793          	addi	a5,s4,-768
+42012116:	0330000f          	fence	rw,rw
+4201211a:	439c                	lw	a5,0(a5)
+4201211c:	0230000f          	fence	r,rw
+42012120:	06979463          	bne	a5,s1,42012188 <decoder_task+0x95c>
+42012124:	5796                	lw	a5,100(sp)
+42012126:	c3b5                	beqz	a5,4201218a <decoder_task+0x95e>
+        !latest->channel || !latest->bits_per_sample) return false;
+42012128:	06914683          	lbu	a3,105(sp)
+    if (generation != atomic_load(&s_generation) || !latest->sample_rate ||
+4201212c:	ceb1                	beqz	a3,42012188 <decoder_task+0x95c>
+4201212e:	06815703          	lhu	a4,104(sp)
+        !latest->channel || !latest->bits_per_sample) return false;
+42012132:	06814503          	lbu	a0,104(sp)
+42012136:	00875613          	srli	a2,a4,0x8
+4201213a:	0722                	slli	a4,a4,0x8
+4201213c:	963a                	add	a2,a2,a4
+4201213e:	c529                	beqz	a0,42012188 <decoder_task+0x95c>
+    native_stream_info_t info = {
+42012140:	08012b23          	sw	zero,150(sp)
+42012144:	08012923          	sw	zero,146(sp)
+    *current = *latest;
+42012148:	c2be                	sw	a5,68(sp)
+    native_stream_info_t info = {
+4201214a:	08c11823          	sh	a2,144(sp)
+4201214e:	c73e                	sw	a5,140(sp)
+    *current = *latest;
+42012150:	5626                	lw	a2,104(sp)
+    native_stream_info_t info = {
+42012152:	cb3e                	sw	a5,148(sp)
+    native_state_set_stream_info(s_state, generation, &info);
+42012154:	3fc9a7b7          	lui	a5,0x3fc9a
+    *current = *latest;
+42012158:	5746                	lw	a4,112(sp)
+    native_state_set_stream_info(s_state, generation, &info);
+4201215a:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+    native_stream_info_t info = {
+4201215e:	08d10c23          	sb	a3,152(sp)
+42012162:	5782                	lw	a5,32(sp)
+    *current = *latest;
+42012164:	56b6                	lw	a3,108(sp)
+    native_stream_info_t info = {
+42012166:	08011d23          	sh	zero,154(sp)
+4201216a:	c52e                	sw	a1,136(sp)
+    *current = *latest;
+4201216c:	c4b2                	sw	a2,72(sp)
+    *ready = true;
+4201216e:	4985                	li	s3,1
+    native_state_set_stream_info(s_state, generation, &info);
+42012170:	0130                	addi	a2,sp,136
+42012172:	85a6                	mv	a1,s1
+    native_stream_info_t info = {
+42012174:	08f10d23          	sb	a5,154(sp)
+    *current = *latest;
+42012178:	c6b6                	sw	a3,76(sp)
+4201217a:	c8ba                	sw	a4,80(sp)
+    *ready = true;
+4201217c:	03310d23          	sb	s3,58(sp)
+    native_state_set_stream_info(s_state, generation, &info);
+42012180:	173040ef          	jal	42016af2 <native_state_set_stream_info>
+    return true;
+42012184:	87ce                	mv	a5,s3
+42012186:	a011                	j	4201218a <decoder_task+0x95e>
+        !latest->channel || !latest->bits_per_sample) return false;
+42012188:	4781                	li	a5,0
+                    state_set_decoder_bitrate(generation, latest_info.bitrate);
+4201218a:	55b6                	lw	a1,108(sp)
+4201218c:	8526                	mv	a0,s1
+                    stream_info_ready = update_stream_info(
+4201218e:	02f10d23          	sb	a5,58(sp)
+                    state_set_decoder_bitrate(generation, latest_info.bitrate);
+42012192:	92aff0ef          	jal	420112bc <state_set_decoder_bitrate>
+                if (stream_info_ready) {
+42012196:	03a14783          	lbu	a5,58(sp)
+4201219a:	c3bd                	beqz	a5,42012200 <decoder_task+0x9d4>
+                    if (!first_frame_memory_logged) {
+4201219c:	10040663          	beqz	s0,420122a8 <decoder_task+0xa7c>
+    size_t sample_bytes = (info->bits_per_sample + 7U) / 8U;
+420121a0:	04814503          	lbu	a0,72(sp)
+    size_t frame_bytes = sample_bytes * info->channel;
+420121a4:	04914783          	lbu	a5,73(sp)
+                                           frame.decoded_size);
+420121a8:	5406                	lw	s0,96(sp)
+    size_t sample_bytes = (info->bits_per_sample + 7U) / 8U;
+420121aa:	051d                	addi	a0,a0,7
+420121ac:	810d                	srli	a0,a0,0x3
+    size_t frame_bytes = sample_bytes * info->channel;
+420121ae:	02f50533          	mul	a0,a0,a5
+    if (!frame_bytes || !info->sample_rate) return;
+420121b2:	cd15                	beqz	a0,420121ee <decoder_task+0x9c2>
+420121b4:	4616                	lw	a2,68(sp)
+420121b6:	ce05                	beqz	a2,420121ee <decoder_task+0x9c2>
+    uint64_t frames = pcm_bytes / frame_bytes;
+420121b8:	02a45533          	divu	a0,s0,a0
+    stats->audio_us += frames * 1000000ULL / info->sample_rate;
+420121bc:	000f47b7          	lui	a5,0xf4
+420121c0:	24078793          	addi	a5,a5,576 # f4240 <CSR_UINTSTATUS+0xf358f>
+420121c4:	4681                	li	a3,0
+420121c6:	02f535b3          	mulhu	a1,a0,a5
+420121ca:	02f50533          	mul	a0,a0,a5
+420121ce:	fdfee097          	auipc	ra,0xfdfee
+420121d2:	6de080e7          	jalr	1758(ra) # 400008ac <__udivdi3>
+420121d6:	57ea                	lw	a5,184(sp)
+420121d8:	56fa                	lw	a3,188(sp)
+    stats->pcm_bytes += (uint32_t)pcm_bytes;
+420121da:	473e                	lw	a4,204(sp)
+    stats->audio_us += frames * 1000000ULL / info->sample_rate;
+420121dc:	953e                	add	a0,a0,a5
+420121de:	96ae                	add	a3,a3,a1
+420121e0:	00f537b3          	sltu	a5,a0,a5
+420121e4:	97b6                	add	a5,a5,a3
+    stats->pcm_bytes += (uint32_t)pcm_bytes;
+420121e6:	9722                	add	a4,a4,s0
+    stats->audio_us += frames * 1000000ULL / info->sample_rate;
+420121e8:	df3e                	sw	a5,188(sp)
+420121ea:	dd2a                	sw	a0,184(sp)
+    stats->pcm_bytes += (uint32_t)pcm_bytes;
+420121ec:	c7ba                	sw	a4,204(sp)
+                    if (!send_pcm(&stats, generation, &stream_info, output,
+420121ee:	86a2                	mv	a3,s0
+420121f0:	864a                	mv	a2,s2
+420121f2:	00cc                	addi	a1,sp,68
+420121f4:	8526                	mv	a0,s1
+420121f6:	ce8ff0ef          	jal	420116de <send_pcm.isra.0>
+420121fa:	842a                	mv	s0,a0
+420121fc:	30050863          	beqz	a0,4201250c <decoder_task+0xce0>
+            decode_stats_report(&stats, esp_timer_get_time());
+42012200:	fe36f097          	auipc	ra,0xfe36f
+42012204:	1d4080e7          	jalr	468(ra) # 403813d4 <esp_timer_get_time>
+42012208:	862e                	mv	a2,a1
+4201220a:	85aa                	mv	a1,a0
+4201220c:	1108                	addi	a0,sp,160
+4201220e:	ca5fe0ef          	jal	42010eb2 <decode_stats_report>
+            if (!raw.consumed && !frame.decoded_size && !raw.eos) {
+42012212:	5706                	lw	a4,96(sp)
+42012214:	478a                	lw	a5,128(sp)
+42012216:	07c14683          	lbu	a3,124(sp)
+4201221a:	8fd9                	or	a5,a5,a4
+4201221c:	eb99                	bnez	a5,42012232 <decoder_task+0xa06>
+4201221e:	42068163          	beqz	a3,42012640 <decoder_task+0xe14>
+42012222:	4701                	li	a4,0
+            if (raw.eos ? (!raw.len && !frame.decoded_size) : raw.len == 0) break;
+42012224:	57e6                	lw	a5,120(sp)
+42012226:	8f5d                	or	a4,a4,a5
+42012228:	e0071fe3          	bnez	a4,42012046 <decoder_task+0x81a>
+4201222c:	89e2                	mv	s3,s8
+4201222e:	ce22                	sw	s0,28(sp)
+42012230:	bc51                	j	42011cc4 <decoder_task+0x498>
+42012232:	faed                	bnez	a3,42012224 <decoder_task+0x9f8>
+42012234:	57e6                	lw	a5,120(sp)
+42012236:	e0079de3          	bnez	a5,42012050 <decoder_task+0x824>
+4201223a:	bfcd                	j	4201222c <decoder_task+0xa00>
+                if (frame.needed_size <= output_size ||
+4201223c:	49f6                	lw	s3,92(sp)
+4201223e:	3f3afe63          	bgeu	s5,s3,4201263a <decoder_task+0xe0e>
+    uint8_t *resized = realloc(*buffer, required);
+42012242:	85ce                	mv	a1,s3
+42012244:	854a                	mv	a0,s2
+42012246:	8faf70ef          	jal	42009340 <realloc>
+    if (!resized) return false;
+4201224a:	3e050863          	beqz	a0,4201263a <decoder_task+0xe0e>
+    *buffer = resized;
+4201224e:	892a                	mv	s2,a0
+    *capacity = required;
+42012250:	8ace                	mv	s5,s3
+42012252:	bbfd                	j	42012050 <decoder_task+0x824>
+            if ((stats.calls & 31U) == 0U) vTaskDelay(1);
+42012254:	4505                	li	a0,1
+42012256:	00107097          	auipc	ra,0x107
+4201225a:	776080e7          	jalr	1910(ra) # 421199cc <vTaskDelay>
+4201225e:	b5a1                	j	420120a6 <decoder_task+0x87a>
+                    stream_info_ready = false;
+42012260:	02010d23          	sb	zero,58(sp)
+                if (stream_info_ready) {
+42012264:	bf71                	j	42012200 <decoder_task+0x9d4>
+        if (full || esp_timer_get_time() - started_us >= maximum_us) break;
+42012266:	0007a737          	lui	a4,0x7a
+4201226a:	11f70713          	addi	a4,a4,287 # 7a11f <CSR_UINTSTATUS+0x7946e>
+4201226e:	c2f779e3          	bgeu	a4,a5,42011ea0 <decoder_task+0x674>
+        full = capacity.occupied >= capacity.resident;
+42012272:	01abb7b3          	sltu	a5,s7,s10
+42012276:	0017c893          	xori	a7,a5,1
+4201227a:	b191                	j	42011ebe <decoder_task+0x692>
+                esp_audio_simple_dec_cfg_t cfg = {
+4201227c:	204747b7          	lui	a5,0x20474
+42012280:	74f78793          	addi	a5,a5,1871 # 2047474f <CSR_UINTSTATUS+0x20473a9e>
+                open_result = esp_audio_simple_dec_open(&cfg, &decoder);
+42012284:	186c                	addi	a1,sp,60
+42012286:	0128                	addi	a0,sp,136
+                esp_audio_simple_dec_cfg_t cfg = {
+42012288:	c53e                	sw	a5,136(sp)
+                open_result = esp_audio_simple_dec_open(&cfg, &decoder);
+4201228a:	5bc150ef          	jal	42027846 <__wrap_esp_audio_simple_dec_open>
+4201228e:	842a                	mv	s0,a0
+                if (open_result != ESP_AUDIO_ERR_OK) {
+42012290:	1c051063          	bnez	a0,42012450 <decoder_task+0xc24>
+        if (!decoder && !aac_decoder) {
+42012294:	5bf2                	lw	s7,60(sp)
+            first_frame_memory_logged = false;
+42012296:	ce02                	sw	zero,28(sp)
+        if (!decoder && !aac_decoder) {
+42012298:	fe0b8563          	beqz	s7,42011a82 <decoder_task+0x256>
+            aac_decoder = NULL;
+4201229c:	4981                	li	s3,0
+            flac_decoder = NULL;
+4201229e:	4b81                	li	s7,0
+420122a0:	81bff06f          	j	42011aba <decoder_task+0x28e>
+    if (*capacity == required) return true;
+420122a4:	844a                	mv	s0,s2
+420122a6:	be49                	j	42011e38 <decoder_task+0x60c>
+                        log_runtime_memory("after first decoded frame");
+420122a8:	3c1267b7          	lui	a5,0x3c126
+420122ac:	e3478513          	addi	a0,a5,-460 # 3c125e34 <_esp_libc_clock_array_end+0x5ce4>
+420122b0:	fa9fe0ef          	jal	42011258 <log_runtime_memory>
+                        first_frame_memory_logged = true;
+420122b4:	b5f5                	j	420121a0 <decoder_task+0x974>
+                esp_audio_simple_dec_cfg_t cfg = {
+420122b6:	c702                	sw	zero,140(sp)
+420122b8:	c902                	sw	zero,144(sp)
+420122ba:	cb02                	sw	zero,148(sp)
+    switch (codec) {
+420122bc:	f3aff06f          	j	420119f6 <decoder_task+0x1ca>
+                    ESP_LOGE(TAG, "%s PCM buffer allocation failed",
+420122c0:	fe377097          	auipc	ra,0xfe377
+420122c4:	1de080e7          	jalr	478(ra) # 4038949e <esp_log_timestamp>
+    switch (codec) {
+420122c8:	4791                	li	a5,4
+                    ESP_LOGE(TAG, "%s PCM buffer allocation failed",
+420122ca:	4405                	li	s0,1
+420122cc:	86aa                	mv	a3,a0
+    switch (codec) {
+420122ce:	20fb0b63          	beq	s6,a5,420124e4 <decoder_task+0xcb8>
+        case NATIVE_CODEC_MP3: return "MP3";
+420122d2:	3c1267b7          	lui	a5,0x3c126
+420122d6:	ad878793          	addi	a5,a5,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+    switch (codec) {
+420122da:	008b0663          	beq	s6,s0,420122e6 <decoder_task+0xaba>
+        default: return "auto";
+420122de:	3c1267b7          	lui	a5,0x3c126
+420122e2:	adc78793          	addi	a5,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+                    ESP_LOGE(TAG, "%s PCM buffer allocation failed",
+420122e6:	3c126737          	lui	a4,0x3c126
+420122ea:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+420122ee:	3c126637          	lui	a2,0x3c126
+420122f2:	85ba                	mv	a1,a4
+420122f4:	d9860613          	addi	a2,a2,-616 # 3c125d98 <_esp_libc_clock_array_end+0x5c48>
+420122f8:	4505                	li	a0,1
+420122fa:	fe377097          	auipc	ra,0xfe377
+420122fe:	09c080e7          	jalr	156(ra) # 40389396 <esp_log>
+    native_state_set_audio(s_state, generation, running, format);
+42012302:	3fc9a7b7          	lui	a5,0x3fc9a
+42012306:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+4201230a:	3c1267b7          	lui	a5,0x3c126
+4201230e:	ca078693          	addi	a3,a5,-864 # 3c125ca0 <_esp_libc_clock_array_end+0x5b50>
+42012312:	85a6                	mv	a1,s1
+42012314:	4601                	li	a2,0
+42012316:	6ec040ef          	jal	42016a02 <native_state_set_audio>
+                    encoded_return(s_encoded, packet);
+4201231a:	d08da503          	lw	a0,-760(s11)
+4201231e:	85e6                	mv	a1,s9
+            aac_decoder = NULL;
+42012320:	4981                	li	s3,0
+                    encoded_return(s_encoded, packet);
+42012322:	67b150ef          	jal	4202819c <adaptive_input_return>
+            flac_decoder = NULL;
+42012326:	4b81                	li	s7,0
+                    failed_generation = generation;
+42012328:	cc26                	sw	s1,24(sp)
+            first_frame_memory_logged = false;
+4201232a:	ce02                	sw	zero,28(sp)
+                    continue;
+4201232c:	4401                	li	s0,0
+4201232e:	d7aff06f          	j	420118a8 <decoder_task+0x7c>
+                ESP_LOGE(TAG, "Decoder registration failed: %d", registration_result);
+42012332:	fe377097          	auipc	ra,0xfe377
+42012336:	16c080e7          	jalr	364(ra) # 4038949e <esp_log_timestamp>
+4201233a:	3c126737          	lui	a4,0x3c126
+4201233e:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42012342:	3c126637          	lui	a2,0x3c126
+42012346:	85ba                	mv	a1,a4
+42012348:	86aa                	mv	a3,a0
+4201234a:	87a2                	mv	a5,s0
+4201234c:	ccc60613          	addi	a2,a2,-820 # 3c125ccc <_esp_libc_clock_array_end+0x5b7c>
+42012350:	4505                	li	a0,1
+42012352:	fe377097          	auipc	ra,0xfe377
+42012356:	044080e7          	jalr	68(ra) # 40389396 <esp_log>
+    native_state_set_audio(s_state, generation, running, format);
+4201235a:	3fc9a7b7          	lui	a5,0x3fc9a
+4201235e:	000ca583          	lw	a1,0(s9)
+42012362:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42012366:	3c1267b7          	lui	a5,0x3c126
+4201236a:	cfc78693          	addi	a3,a5,-772 # 3c125cfc <_esp_libc_clock_array_end+0x5bac>
+4201236e:	4601                	li	a2,0
+42012370:	692040ef          	jal	42016a02 <native_state_set_audio>
+                failed_generation = packet->generation;
+42012374:	000ca783          	lw	a5,0(s9)
+                return_decoded_packet(packet, failed_generation);
+42012378:	8566                	mv	a0,s9
+4201237a:	85be                	mv	a1,a5
+                failed_generation = packet->generation;
+4201237c:	cc3e                	sw	a5,24(sp)
+                return_decoded_packet(packet, failed_generation);
+4201237e:	ab6ff0ef          	jal	42011634 <return_decoded_packet>
+                continue;
+42012382:	d26ff06f          	j	420118a8 <decoder_task+0x7c>
+            if (flac_decoder) {
+42012386:	a80b82e3          	beqz	s7,42011e0a <decoder_task+0x5de>
+4201238a:	bae9                	j	42011d64 <decoder_task+0x538>
+                    ESP_LOGE(TAG, "Custom FLAC decoder allocation failed");
+4201238c:	fe377097          	auipc	ra,0xfe377
+42012390:	112080e7          	jalr	274(ra) # 4038949e <esp_log_timestamp>
+42012394:	3c1267b7          	lui	a5,0x3c126
+42012398:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+4201239c:	3c1267b7          	lui	a5,0x3c126
+420123a0:	86aa                	mv	a3,a0
+420123a2:	85ba                	mv	a1,a4
+420123a4:	d6478613          	addi	a2,a5,-668 # 3c125d64 <_esp_libc_clock_array_end+0x5c14>
+420123a8:	4505                	li	a0,1
+420123aa:	fe377097          	auipc	ra,0xfe377
+420123ae:	fec080e7          	jalr	-20(ra) # 40389396 <esp_log>
+    native_state_set_audio(s_state, generation, running, format);
+420123b2:	3fc9a7b7          	lui	a5,0x3fc9a
+420123b6:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+420123ba:	3c1267b7          	lui	a5,0x3c126
+420123be:	ca078693          	addi	a3,a5,-864 # 3c125ca0 <_esp_libc_clock_array_end+0x5b50>
+420123c2:	85a6                	mv	a1,s1
+420123c4:	4601                	li	a2,0
+420123c6:	63c040ef          	jal	42016a02 <native_state_set_audio>
+            aac_decoder = NULL;
+420123ca:	4981                	li	s3,0
+                    failed_generation = generation;
+420123cc:	cc26                	sw	s1,24(sp)
+                output = NULL;
+420123ce:	4901                	li	s2,0
+                output_size = 0;
+420123d0:	4a81                	li	s5,0
+            first_frame_memory_logged = false;
+420123d2:	ce02                	sw	zero,28(sp)
+                custom_flac_decoder_destroy(flac_decoder);
+420123d4:	855e                	mv	a0,s7
+420123d6:	367220ef          	jal	42034f3c <custom_flac_decoder_destroy>
+                flac_decoder = NULL;
+420123da:	4b81                	li	s7,0
+420123dc:	bc35                	j	42011e18 <decoder_task+0x5ec>
+    native_stream_info_t info = {
+420123de:	8542                	mv	a0,a6
+420123e0:	821ff06f          	j	42011c00 <decoder_task+0x3d4>
+        default: return "auto";
+420123e4:	3c1267b7          	lui	a5,0x3c126
+420123e8:	adc78793          	addi	a5,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+420123ec:	e40ff06f          	j	42011a2c <decoder_task+0x200>
+                if (!first_frame_memory_logged && stream_info_ready) {
+420123f0:	03a14783          	lbu	a5,58(sp)
+420123f4:	ce3e                	sw	a5,28(sp)
+420123f6:	9e0786e3          	beqz	a5,42011de2 <decoder_task+0x5b6>
+                    log_runtime_memory("after first FLAC frame");
+420123fa:	3c1267b7          	lui	a5,0x3c126
+420123fe:	df078513          	addi	a0,a5,-528 # 3c125df0 <_esp_libc_clock_array_end+0x5ca0>
+42012402:	e57fe0ef          	jal	42011258 <log_runtime_memory>
+                    first_frame_memory_logged = true;
+42012406:	bae1                	j	42011dde <decoder_task+0x5b2>
+        default: return "auto";
+42012408:	3c1267b7          	lui	a5,0x3c126
+4201240c:	adc78593          	addi	a1,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+42012410:	b309                	j	42012112 <decoder_task+0x8e6>
+                    ESP_LOGE(TAG, "%s decoder open failed: %d",
+42012412:	fe377097          	auipc	ra,0xfe377
+42012416:	08c080e7          	jalr	140(ra) # 4038949e <esp_log_timestamp>
+4201241a:	3c1267b7          	lui	a5,0x3c126
+4201241e:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42012422:	3c126637          	lui	a2,0x3c126
+42012426:	3c1267b7          	lui	a5,0x3c126
+4201242a:	86aa                	mv	a3,a0
+4201242c:	ac878793          	addi	a5,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+42012430:	85ba                	mv	a1,a4
+42012432:	dc860613          	addi	a2,a2,-568 # 3c125dc8 <_esp_libc_clock_array_end+0x5c78>
+42012436:	5879                	li	a6,-2
+42012438:	4505                	li	a0,1
+4201243a:	fe377097          	auipc	ra,0xfe377
+4201243e:	f5c080e7          	jalr	-164(ra) # 40389396 <esp_log>
+                    state_set_audio(generation,
+42012442:	3c1267b7          	lui	a5,0x3c126
+                    ESP_LOGE(TAG, "%s decoder open failed: %d",
+42012446:	8922                	mv	s2,s0
+                    state_set_audio(generation,
+42012448:	ca078693          	addi	a3,a5,-864 # 3c125ca0 <_esp_libc_clock_array_end+0x5b50>
+4201244c:	e0cff06f          	j	42011a58 <decoder_task+0x22c>
+                    ESP_LOGE(TAG, "%s decoder open failed: %d",
+42012450:	fe377097          	auipc	ra,0xfe377
+42012454:	04e080e7          	jalr	78(ra) # 4038949e <esp_log_timestamp>
+        case NATIVE_CODEC_OGG: return "OGG";
+42012458:	3c1267b7          	lui	a5,0x3c126
+                    ESP_LOGE(TAG, "%s decoder open failed: %d",
+4201245c:	86aa                	mv	a3,a0
+        case NATIVE_CODEC_OGG: return "OGG";
+4201245e:	ad478793          	addi	a5,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+42012462:	dcaff06f          	j	42011a2c <decoder_task+0x200>
+42012466:	ce62                	sw	s8,28(sp)
+                ESP_LOGE(TAG, "%s decoder consumed invalid input size %lu/%lu",
+42012468:	fe377097          	auipc	ra,0xfe377
+4201246c:	036080e7          	jalr	54(ra) # 4038949e <esp_log_timestamp>
+    switch (codec) {
+42012470:	4789                	li	a5,2
+                ESP_LOGE(TAG, "%s decoder consumed invalid input size %lu/%lu",
+42012472:	4405                	li	s0,1
+    switch (codec) {
+42012474:	0efb0a63          	beq	s6,a5,42012568 <decoder_task+0xd3c>
+42012478:	4791                	li	a5,4
+4201247a:	0efb0263          	beq	s6,a5,4201255e <decoder_task+0xd32>
+        case NATIVE_CODEC_MP3: return "MP3";
+4201247e:	3c1267b7          	lui	a5,0x3c126
+42012482:	ad878793          	addi	a5,a5,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+    switch (codec) {
+42012486:	008b0663          	beq	s6,s0,42012492 <decoder_task+0xc66>
+        default: return "auto";
+4201248a:	3c1267b7          	lui	a5,0x3c126
+4201248e:	adc78793          	addi	a5,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+                ESP_LOGE(TAG, "%s decoder consumed invalid input size %lu/%lu",
+42012492:	58e6                	lw	a7,120(sp)
+42012494:	480a                	lw	a6,128(sp)
+42012496:	3c126737          	lui	a4,0x3c126
+4201249a:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+4201249e:	3c126637          	lui	a2,0x3c126
+420124a2:	86aa                	mv	a3,a0
+420124a4:	85ba                	mv	a1,a4
+420124a6:	e8c60613          	addi	a2,a2,-372 # 3c125e8c <_esp_libc_clock_array_end+0x5d3c>
+420124aa:	4505                	li	a0,1
+420124ac:	fe377097          	auipc	ra,0xfe377
+420124b0:	eea080e7          	jalr	-278(ra) # 40389396 <esp_log>
+    native_state_set_audio(s_state, generation, running, format);
+420124b4:	3fc9a7b7          	lui	a5,0x3fc9a
+420124b8:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+420124bc:	3c1267b7          	lui	a5,0x3c126
+420124c0:	ec878693          	addi	a3,a5,-312 # 3c125ec8 <_esp_libc_clock_array_end+0x5d78>
+420124c4:	85a6                	mv	a1,s1
+420124c6:	4601                	li	a2,0
+420124c8:	53a040ef          	jal	42016a02 <native_state_set_audio>
+                failed_generation = generation;
+420124cc:	cc26                	sw	s1,24(sp)
+420124ce:	b681                	j	4201200e <decoder_task+0x7e2>
+        case NATIVE_CODEC_OGG: return "OGG";
+420124d0:	3c1267b7          	lui	a5,0x3c126
+420124d4:	ad478593          	addi	a1,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+420124d8:	b92d                	j	42012112 <decoder_task+0x8e6>
+    switch (codec) {
+420124da:	3c1267b7          	lui	a5,0x3c126
+420124de:	ac878593          	addi	a1,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+420124e2:	b905                	j	42012112 <decoder_task+0x8e6>
+420124e4:	3c1267b7          	lui	a5,0x3c126
+420124e8:	ad478793          	addi	a5,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+420124ec:	bbed                	j	420122e6 <decoder_task+0xaba>
+420124ee:	ce62                	sw	s8,28(sp)
+    native_state_set_audio(s_state, generation, running, format);
+420124f0:	3fc9a7b7          	lui	a5,0x3fc9a
+420124f4:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+420124f8:	3c1267b7          	lui	a5,0x3c126
+420124fc:	e5078693          	addi	a3,a5,-432 # 3c125e50 <_esp_libc_clock_array_end+0x5d00>
+42012500:	4601                	li	a2,0
+42012502:	85a6                	mv	a1,s1
+42012504:	4fe040ef          	jal	42016a02 <native_state_set_audio>
+                    failed_generation = generation;
+42012508:	cc26                	sw	s1,24(sp)
+4201250a:	b611                	j	4201200e <decoder_task+0x7e2>
+4201250c:	89e2                	mv	s3,s8
+                        ESP_LOGW(TAG, "PCM buffer stalled");
+4201250e:	fe377097          	auipc	ra,0xfe377
+42012512:	f90080e7          	jalr	-112(ra) # 4038949e <esp_log_timestamp>
+42012516:	3c1267b7          	lui	a5,0x3c126
+4201251a:	ae478713          	addi	a4,a5,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+4201251e:	3c1267b7          	lui	a5,0x3c126
+42012522:	86aa                	mv	a3,a0
+42012524:	edc78613          	addi	a2,a5,-292 # 3c125edc <_esp_libc_clock_array_end+0x5d8c>
+42012528:	85ba                	mv	a1,a4
+4201252a:	4509                	li	a0,2
+4201252c:	fe377097          	auipc	ra,0xfe377
+42012530:	e6a080e7          	jalr	-406(ra) # 40389396 <esp_log>
+                        break;
+42012534:	4785                	li	a5,1
+42012536:	ce3e                	sw	a5,28(sp)
+42012538:	f8cff06f          	j	42011cc4 <decoder_task+0x498>
+4201253c:	89e2                	mv	s3,s8
+4201253e:	ce22                	sw	s0,28(sp)
+42012540:	b725                	j	42012468 <decoder_task+0xc3c>
+42012542:	ce22                	sw	s0,28(sp)
+42012544:	844e                	mv	s0,s3
+42012546:	89e2                	mv	s3,s8
+42012548:	b48d                	j	42011faa <decoder_task+0x77e>
+    switch (codec) {
+4201254a:	3c1267b7          	lui	a5,0x3c126
+4201254e:	ad478793          	addi	a5,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+42012552:	b449                	j	42011fd4 <decoder_task+0x7a8>
+        case NATIVE_CODEC_AAC: return "AAC";
+42012554:	3c1267b7          	lui	a5,0x3c126
+42012558:	ac878793          	addi	a5,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+4201255c:	bca5                	j	42011fd4 <decoder_task+0x7a8>
+    switch (codec) {
+4201255e:	3c1267b7          	lui	a5,0x3c126
+42012562:	ad478793          	addi	a5,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+42012566:	b735                	j	42012492 <decoder_task+0xc66>
+        case NATIVE_CODEC_AAC: return "AAC";
+42012568:	3c1267b7          	lui	a5,0x3c126
+4201256c:	ac878793          	addi	a5,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+42012570:	b70d                	j	42012492 <decoder_task+0xc66>
+                    ESP_LOGW(TAG, "Custom FLAC decode error: %d", result);
+42012572:	fe377097          	auipc	ra,0xfe377
+42012576:	f2c080e7          	jalr	-212(ra) # 4038949e <esp_log_timestamp>
+4201257a:	3c126737          	lui	a4,0x3c126
+4201257e:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+42012582:	3c126637          	lui	a2,0x3c126
+42012586:	86aa                	mv	a3,a0
+42012588:	87a2                	mv	a5,s0
+4201258a:	85ba                	mv	a1,a4
+4201258c:	e0860613          	addi	a2,a2,-504 # 3c125e08 <_esp_libc_clock_array_end+0x5cb8>
+42012590:	4509                	li	a0,2
+42012592:	fe377097          	auipc	ra,0xfe377
+42012596:	e04080e7          	jalr	-508(ra) # 40389396 <esp_log>
+                    state_set_audio(generation, false,
+4201259a:	3c126737          	lui	a4,0x3c126
+                                    result == -5 || result == -6 ? "NO MEMORY" : "decode failed");
+4201259e:	0419                	addi	s0,s0,6 # 3006 <CSR_UINTSTATUS+0x2355>
+                    state_set_audio(generation, false,
+420125a0:	4785                	li	a5,1
+420125a2:	cbc70693          	addi	a3,a4,-836 # 3c125cbc <_esp_libc_clock_array_end+0x5b6c>
+420125a6:	0087e663          	bltu	a5,s0,420125b2 <decoder_task+0xd86>
+420125aa:	3c1267b7          	lui	a5,0x3c126
+420125ae:	ca078693          	addi	a3,a5,-864 # 3c125ca0 <_esp_libc_clock_array_end+0x5b50>
+    native_state_set_audio(s_state, generation, running, format);
+420125b2:	3fc9a7b7          	lui	a5,0x3fc9a
+420125b6:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+420125ba:	4601                	li	a2,0
+420125bc:	85a6                	mv	a1,s1
+420125be:	444040ef          	jal	42016a02 <native_state_set_audio>
+                    failed_generation = generation;
+420125c2:	cc26                	sw	s1,24(sp)
+420125c4:	847ff06f          	j	42011e0a <decoder_task+0x5de>
+                    state_set_audio(generation,
+420125c8:	3c1267b7          	lui	a5,0x3c126
+420125cc:	ca078693          	addi	a3,a5,-864 # 3c125ca0 <_esp_libc_clock_array_end+0x5b50>
+420125d0:	c88ff06f          	j	42011a58 <decoder_task+0x22c>
+420125d4:	ce62                	sw	s8,28(sp)
+                ESP_LOGE(TAG, "%s decoder made no input progress",
+420125d6:	fe377097          	auipc	ra,0xfe377
+420125da:	ec8080e7          	jalr	-312(ra) # 4038949e <esp_log_timestamp>
+    switch (codec) {
+420125de:	4789                	li	a5,2
+                ESP_LOGE(TAG, "%s decoder made no input progress",
+420125e0:	4405                	li	s0,1
+420125e2:	86aa                	mv	a3,a0
+    switch (codec) {
+420125e4:	06fb0663          	beq	s6,a5,42012650 <decoder_task+0xe24>
+420125e8:	4791                	li	a5,4
+420125ea:	04fb0e63          	beq	s6,a5,42012646 <decoder_task+0xe1a>
+        case NATIVE_CODEC_MP3: return "MP3";
+420125ee:	3c1267b7          	lui	a5,0x3c126
+420125f2:	ad878793          	addi	a5,a5,-1320 # 3c125ad8 <_esp_libc_clock_array_end+0x5988>
+    switch (codec) {
+420125f6:	008b0663          	beq	s6,s0,42012602 <decoder_task+0xdd6>
+        default: return "auto";
+420125fa:	3c1267b7          	lui	a5,0x3c126
+420125fe:	adc78793          	addi	a5,a5,-1316 # 3c125adc <_esp_libc_clock_array_end+0x598c>
+                ESP_LOGE(TAG, "%s decoder made no input progress",
+42012602:	3c126737          	lui	a4,0x3c126
+42012606:	ae470713          	addi	a4,a4,-1308 # 3c125ae4 <_esp_libc_clock_array_end+0x5994>
+4201260a:	3c126637          	lui	a2,0x3c126
+4201260e:	85ba                	mv	a1,a4
+42012610:	efc60613          	addi	a2,a2,-260 # 3c125efc <_esp_libc_clock_array_end+0x5dac>
+42012614:	4505                	li	a0,1
+42012616:	fe377097          	auipc	ra,0xfe377
+4201261a:	d80080e7          	jalr	-640(ra) # 40389396 <esp_log>
+    native_state_set_audio(s_state, generation, running, format);
+4201261e:	3fc9a7b7          	lui	a5,0x3fc9a
+42012622:	d107a503          	lw	a0,-752(a5) # 3fc99d10 <s_state>
+42012626:	3c1267b7          	lui	a5,0x3c126
+4201262a:	f2c78693          	addi	a3,a5,-212 # 3c125f2c <_esp_libc_clock_array_end+0x5ddc>
+4201262e:	85a6                	mv	a1,s1
+42012630:	4601                	li	a2,0
+42012632:	3d0040ef          	jal	42016a02 <native_state_set_audio>
+                failed_generation = generation;
+42012636:	cc26                	sw	s1,24(sp)
+42012638:	bad9                	j	4201200e <decoder_task+0x7e2>
+4201263a:	89e2                	mv	s3,s8
+4201263c:	ce22                	sw	s0,28(sp)
+4201263e:	bd4d                	j	420124f0 <decoder_task+0xcc4>
+42012640:	89e2                	mv	s3,s8
+42012642:	ce22                	sw	s0,28(sp)
+42012644:	bf49                	j	420125d6 <decoder_task+0xdaa>
+    switch (codec) {
+42012646:	3c1267b7          	lui	a5,0x3c126
+4201264a:	ad478793          	addi	a5,a5,-1324 # 3c125ad4 <_esp_libc_clock_array_end+0x5984>
+4201264e:	bf55                	j	42012602 <decoder_task+0xdd6>
+        case NATIVE_CODEC_AAC: return "AAC";
+42012650:	3c1267b7          	lui	a5,0x3c126
+42012654:	ac878793          	addi	a5,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+42012658:	b76d                	j	42012602 <decoder_task+0xdd6>
+                    ESP_LOGE(TAG, "%s PCM buffer allocation failed",
+4201265a:	fe377097          	auipc	ra,0xfe377
+4201265e:	e44080e7          	jalr	-444(ra) # 4038949e <esp_log_timestamp>
+        case NATIVE_CODEC_AAC: return "AAC";
+42012662:	3c1267b7          	lui	a5,0x3c126
+                    ESP_LOGE(TAG, "%s PCM buffer allocation failed",
+42012666:	86aa                	mv	a3,a0
+        case NATIVE_CODEC_AAC: return "AAC";
+42012668:	ac878793          	addi	a5,a5,-1336 # 3c125ac8 <_esp_libc_clock_array_end+0x5978>
+4201266c:	b9ad                	j	420122e6 <decoder_task+0xaba>

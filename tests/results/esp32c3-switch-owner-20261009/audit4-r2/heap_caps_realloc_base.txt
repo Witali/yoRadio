@@ -1,0 +1,154 @@
+42005aa6:	7139                	addi	sp,sp,-64
+42005aa8:	dc22                	sw	s0,56(sp)
+42005aaa:	ce2e                	sw	a1,28(sp)
+42005aac:	cc32                	sw	a2,24(sp)
+42005aae:	4791                	li	a5,4
+42005ab0:	086c                	addi	a1,sp,28
+42005ab2:	842a                	mv	s0,a0
+42005ab4:	0830                	addi	a2,sp,24
+42005ab6:	1068                	addi	a0,sp,44
+42005ab8:	de06                	sw	ra,60(sp)
+42005aba:	da26                	sw	s1,52(sp)
+42005abc:	d63e                	sw	a5,44(sp)
+42005abe:	71f000ef          	jal	420069dc <esp_heap_adjust_alignment_to_hw>
+42005ac2:	45f2                	lw	a1,28(sp)
+42005ac4:	12040463          	beqz	s0,42005bec <heap_caps_realloc_base+0x146>
+42005ac8:	12058763          	beqz	a1,42005bf6 <heap_caps_realloc_base+0x150>
+42005acc:	000647b7          	lui	a5,0x64
+42005ad0:	12b7e563          	bltu	a5,a1,42005bfa <heap_caps_realloc_base+0x154>
+42005ad4:	bfc80737          	lui	a4,0xbfc80
+42005ad8:	3fc9a7b7          	lui	a5,0x3fc9a
+42005adc:	9722                	add	a4,a4,s0
+42005ade:	000606b7          	lui	a3,0x60
+42005ae2:	bbc7a783          	lw	a5,-1092(a5) # 3fc99bbc <registered_heaps>
+42005ae6:	04d77263          	bgeu	a4,a3,42005b2a <heap_caps_realloc_base+0x84>
+42005aea:	cf89                	beqz	a5,42005b04 <heap_caps_realloc_base+0x5e>
+42005aec:	ffc42683          	lw	a3,-4(s0)
+42005af0:	4fc8                	lw	a0,28(a5)
+42005af2:	c519                	beqz	a0,42005b00 <heap_caps_realloc_base+0x5a>
+42005af4:	47d8                	lw	a4,12(a5)
+42005af6:	00e6c563          	blt	a3,a4,42005b00 <heap_caps_realloc_base+0x5a>
+42005afa:	4b98                	lw	a4,16(a5)
+42005afc:	0ae6c463          	blt	a3,a4,42005ba4 <heap_caps_realloc_base+0xfe>
+42005b00:	539c                	lw	a5,32(a5)
+42005b02:	f7fd                	bnez	a5,42005af0 <heap_caps_realloc_base+0x4a>
+42005b04:	3c1236b7          	lui	a3,0x3c123
+42005b08:	3c13f637          	lui	a2,0x3c13f
+42005b0c:	3c123537          	lui	a0,0x3c123
+42005b10:	5c868693          	addi	a3,a3,1480 # 3c1235c8 <_esp_libc_clock_array_end+0x3478>
+42005b14:	6a460613          	addi	a2,a2,1700 # 3c13f6a4 <__func__.0>
+42005b18:	5b650513          	addi	a0,a0,1462 # 3c1235b6 <_esp_libc_clock_array_end+0x3466>
+42005b1c:	0f700593          	li	a1,247
+42005b20:	fe381097          	auipc	ra,0xfe381
+42005b24:	f3c080e7          	jalr	-196(ra) # 40386a5c <__assert_func>
+42005b28:	539c                	lw	a5,32(a5)
+42005b2a:	10078163          	beqz	a5,42005c2c <heap_caps_realloc_base+0x186>
+42005b2e:	4fc8                	lw	a0,28(a5)
+42005b30:	dd65                	beqz	a0,42005b28 <heap_caps_realloc_base+0x82>
+42005b32:	47d8                	lw	a4,12(a5)
+42005b34:	fee44ae3          	blt	s0,a4,42005b28 <heap_caps_realloc_base+0x82>
+42005b38:	4b98                	lw	a4,16(a5)
+42005b3a:	fee457e3          	bge	s0,a4,42005b28 <heap_caps_realloc_base+0x82>
+42005b3e:	4805                	li	a6,1
+42005b40:	4681                	li	a3,0
+42005b42:	4e01                	li	t3,0
+42005b44:	4398                	lw	a4,0(a5)
+42005b46:	0047a303          	lw	t1,4(a5)
+42005b4a:	0087a883          	lw	a7,8(a5)
+42005b4e:	4662                	lw	a2,24(sp)
+42005b50:	00676733          	or	a4,a4,t1
+42005b54:	01176733          	or	a4,a4,a7
+42005b58:	8f71                	and	a4,a4,a2
+42005b5a:	04c71863          	bne	a4,a2,42005baa <heap_caps_realloc_base+0x104>
+42005b5e:	04080663          	beqz	a6,42005baa <heap_caps_realloc_base+0x104>
+42005b62:	5732                	lw	a4,44(sp)
+42005b64:	4691                	li	a3,4
+42005b66:	06e6f263          	bgeu	a3,a4,42005bca <heap_caps_realloc_base+0x124>
+42005b6a:	853a                	mv	a0,a4
+42005b6c:	c63e                	sw	a5,12(sp)
+42005b6e:	3595                	jal	420059d2 <heap_caps_aligned_alloc_base>
+42005b70:	84aa                	mv	s1,a0
+42005b72:	c541                	beqz	a0,42005bfa <heap_caps_realloc_base+0x154>
+42005b74:	47b2                	lw	a5,12(sp)
+42005b76:	4fc8                	lw	a0,28(a5)
+42005b78:	85a2                	mv	a1,s0
+42005b7a:	9d9fd0ef          	jal	42003552 <multi_heap_get_allocated_size>
+42005b7e:	c549                	beqz	a0,42005c08 <heap_caps_realloc_base+0x162>
+42005b80:	4672                	lw	a2,28(sp)
+42005b82:	00c57363          	bgeu	a0,a2,42005b88 <heap_caps_realloc_base+0xe2>
+42005b86:	862a                	mv	a2,a0
+42005b88:	85a2                	mv	a1,s0
+42005b8a:	8526                	mv	a0,s1
+42005b8c:	fe381097          	auipc	ra,0xfe381
+42005b90:	048080e7          	jalr	72(ra) # 40386bd4 <memcpy>
+42005b94:	8522                	mv	a0,s0
+42005b96:	3b75                	jal	42005952 <heap_caps_free>
+42005b98:	50f2                	lw	ra,60(sp)
+42005b9a:	5462                	lw	s0,56(sp)
+42005b9c:	8526                	mv	a0,s1
+42005b9e:	54d2                	lw	s1,52(sp)
+42005ba0:	6121                	addi	sp,sp,64
+42005ba2:	8082                	ret
+42005ba4:	4801                	li	a6,0
+42005ba6:	4e05                	li	t3,1
+42005ba8:	bf71                	j	42005b44 <heap_caps_realloc_base+0x9e>
+42005baa:	5532                	lw	a0,44(sp)
+42005bac:	ca3e                	sw	a5,20(sp)
+42005bae:	c636                	sw	a3,12(sp)
+42005bb0:	c872                	sw	t3,16(sp)
+42005bb2:	3505                	jal	420059d2 <heap_caps_aligned_alloc_base>
+42005bb4:	84aa                	mv	s1,a0
+42005bb6:	c131                	beqz	a0,42005bfa <heap_caps_realloc_base+0x154>
+42005bb8:	47d2                	lw	a5,20(sp)
+42005bba:	4e42                	lw	t3,16(sp)
+42005bbc:	4fc8                	lw	a0,28(a5)
+42005bbe:	fa0e0de3          	beqz	t3,42005b78 <heap_caps_realloc_base+0xd2>
+42005bc2:	45b2                	lw	a1,12(sp)
+42005bc4:	98ffd0ef          	jal	42003552 <multi_heap_get_allocated_size>
+42005bc8:	bf5d                	j	42005b7e <heap_caps_realloc_base+0xd8>
+42005bca:	862e                	mv	a2,a1
+42005bcc:	85a2                	mv	a1,s0
+42005bce:	c63e                	sw	a5,12(sp)
+42005bd0:	aebfd0ef          	jal	420036ba <multi_heap_realloc>
+42005bd4:	84aa                	mv	s1,a0
+42005bd6:	c505                	beqz	a0,42005bfe <heap_caps_realloc_base+0x158>
+42005bd8:	420297b7          	lui	a5,0x42029
+42005bdc:	3e878793          	addi	a5,a5,1000 # 420293e8 <esp_heap_trace_alloc_hook>
+42005be0:	dfc5                	beqz	a5,42005b98 <heap_caps_realloc_base+0xf2>
+42005be2:	4662                	lw	a2,24(sp)
+42005be4:	45f2                	lw	a1,28(sp)
+42005be6:	003230ef          	jal	420293e8 <esp_heap_trace_alloc_hook>
+42005bea:	b77d                	j	42005b98 <heap_caps_realloc_base+0xf2>
+42005bec:	4662                	lw	a2,24(sp)
+42005bee:	5532                	lw	a0,44(sp)
+42005bf0:	33cd                	jal	420059d2 <heap_caps_aligned_alloc_base>
+42005bf2:	84aa                	mv	s1,a0
+42005bf4:	b755                	j	42005b98 <heap_caps_realloc_base+0xf2>
+42005bf6:	8522                	mv	a0,s0
+42005bf8:	3ba9                	jal	42005952 <heap_caps_free>
+42005bfa:	4481                	li	s1,0
+42005bfc:	bf71                	j	42005b98 <heap_caps_realloc_base+0xf2>
+42005bfe:	5732                	lw	a4,44(sp)
+42005c00:	4662                	lw	a2,24(sp)
+42005c02:	45f2                	lw	a1,28(sp)
+42005c04:	47b2                	lw	a5,12(sp)
+42005c06:	b795                	j	42005b6a <heap_caps_realloc_base+0xc4>
+42005c08:	3c1236b7          	lui	a3,0x3c123
+42005c0c:	3c13f637          	lui	a2,0x3c13f
+42005c10:	3c123537          	lui	a0,0x3c123
+42005c14:	60468693          	addi	a3,a3,1540 # 3c123604 <_esp_libc_clock_array_end+0x34b4>
+42005c18:	6a460613          	addi	a2,a2,1700 # 3c13f6a4 <__func__.0>
+42005c1c:	5b650513          	addi	a0,a0,1462 # 3c1235b6 <_esp_libc_clock_array_end+0x3466>
+42005c20:	13900593          	li	a1,313
+42005c24:	fe381097          	auipc	ra,0xfe381
+42005c28:	e38080e7          	jalr	-456(ra) # 40386a5c <__assert_func>
+42005c2c:	3c1236b7          	lui	a3,0x3c123
+42005c30:	3c13f637          	lui	a2,0x3c13f
+42005c34:	3c123537          	lui	a0,0x3c123
+42005c38:	5c868693          	addi	a3,a3,1480 # 3c1235c8 <_esp_libc_clock_array_end+0x3478>
+42005c3c:	6a460613          	addi	a2,a2,1700 # 3c13f6a4 <__func__.0>
+42005c40:	5b650513          	addi	a0,a0,1462 # 3c1235b6 <_esp_libc_clock_array_end+0x3466>
+42005c44:	10000593          	li	a1,256
+42005c48:	fe381097          	auipc	ra,0xfe381
+42005c4c:	e14080e7          	jalr	-492(ra) # 40386a5c <__assert_func>
+

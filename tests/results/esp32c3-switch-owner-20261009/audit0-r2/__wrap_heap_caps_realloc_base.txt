@@ -1,0 +1,61 @@
+42029378:	1101                	addi	sp,sp,-32
+4202937a:	cc22                	sw	s0,24(sp)
+4202937c:	ce06                	sw	ra,28(sp)
+4202937e:	842a                	mv	s0,a0
+42029380:	c62e                	sw	a1,12(sp)
+42029382:	c432                	sw	a2,8(sp)
+42029384:	fe35f097          	auipc	ra,0xfe35f
+42029388:	c8a080e7          	jalr	-886(ra) # 4038800e <vPortEnterCritical>
+4202938c:	4622                	lw	a2,8(sp)
+4202938e:	45b2                	lw	a1,12(sp)
+42029390:	8522                	mv	a0,s0
+42029392:	f14dc0ef          	jal	42005aa6 <heap_caps_realloc_base>
+42029396:	c119                	beqz	a0,4202939c <__wrap_heap_caps_realloc_base+0x24>
+42029398:	00a41c63          	bne	s0,a0,420293b0 <__wrap_heap_caps_realloc_base+0x38>
+4202939c:	c42a                	sw	a0,8(sp)
+4202939e:	fe35f097          	auipc	ra,0xfe35f
+420293a2:	cac080e7          	jalr	-852(ra) # 4038804a <vPortExitCritical>
+420293a6:	40f2                	lw	ra,28(sp)
+420293a8:	4462                	lw	s0,24(sp)
+420293aa:	4522                	lw	a0,8(sp)
+420293ac:	6105                	addi	sp,sp,32
+420293ae:	8082                	ret
+420293b0:	d475                	beqz	s0,4202939c <__wrap_heap_caps_realloc_base+0x24>
+420293b2:	500017b7          	lui	a5,0x50001
+420293b6:	ab878593          	addi	a1,a5,-1352 # 50000ab8 <owners>
+420293ba:	872e                	mv	a4,a1
+420293bc:	4781                	li	a5,0
+420293be:	08000613          	li	a2,128
+420293c2:	a021                	j	420293ca <__wrap_heap_caps_realloc_base+0x52>
+420293c4:	0785                	addi	a5,a5,1
+420293c6:	fcc78be3          	beq	a5,a2,4202939c <__wrap_heap_caps_realloc_base+0x24>
+420293ca:	4314                	lw	a3,0(a4)
+420293cc:	0761                	addi	a4,a4,24
+420293ce:	fed41be3          	bne	s0,a3,420293c4 <__wrap_heap_caps_realloc_base+0x4c>
+420293d2:	500018b7          	lui	a7,0x50001
+420293d6:	50001837          	lui	a6,0x50001
+420293da:	aa48a603          	lw	a2,-1372(a7) # 50000aa4 <live>
+420293de:	a9882683          	lw	a3,-1384(a6) # 50000a98 <free_events>
+420293e2:	00179713          	slli	a4,a5,0x1
+420293e6:	97ba                	add	a5,a5,a4
+420293e8:	078e                	slli	a5,a5,0x3
+420293ea:	97ae                	add	a5,a5,a1
+420293ec:	167d                	addi	a2,a2,-1
+420293ee:	00168713          	addi	a4,a3,1
+420293f2:	c42a                	sw	a0,8(sp)
+420293f4:	0007a023          	sw	zero,0(a5)
+420293f8:	0007a223          	sw	zero,4(a5)
+420293fc:	0007a423          	sw	zero,8(a5)
+42029400:	0007a623          	sw	zero,12(a5)
+42029404:	0007a823          	sw	zero,16(a5)
+42029408:	0007aa23          	sw	zero,20(a5)
+4202940c:	aac8a223          	sw	a2,-1372(a7)
+42029410:	a8e82c23          	sw	a4,-1384(a6)
+42029414:	fe35f097          	auipc	ra,0xfe35f
+42029418:	c36080e7          	jalr	-970(ra) # 4038804a <vPortExitCritical>
+4202941c:	40f2                	lw	ra,28(sp)
+4202941e:	4462                	lw	s0,24(sp)
+42029420:	4522                	lw	a0,8(sp)
+42029422:	6105                	addi	sp,sp,32
+42029424:	8082                	ret
+

@@ -1,0 +1,63 @@
+42028626:	c145                	beqz	a0,420286c6 <adaptive_input_set_limit+0xa0>
+42028628:	1101                	addi	sp,sp,-32
+4202862a:	cc22                	sw	s0,24(sp)
+4202862c:	ca26                	sw	s1,20(sp)
+4202862e:	842a                	mv	s0,a0
+42028630:	ce06                	sw	ra,28(sp)
+42028632:	84ae                	mv	s1,a1
+42028634:	fe360097          	auipc	ra,0xfe360
+42028638:	9da080e7          	jalr	-1574(ra) # 4038800e <vPortEnterCritical>
+4202863c:	4c1c                	lw	a5,24(s0)
+4202863e:	0697ef63          	bltu	a5,s1,420286bc <adaptive_input_set_limit+0x96>
+42028642:	4858                	lw	a4,20(s0)
+42028644:	06f76a63          	bltu	a4,a5,420286b8 <adaptive_input_set_limit+0x92>
+42028648:	d05c                	sw	a5,36(s0)
+4202864a:	fe360097          	auipc	ra,0xfe360
+4202864e:	a00080e7          	jalr	-1536(ra) # 4038804a <vPortExitCritical>
+42028652:	4844                	lw	s1,20(s0)
+42028654:	cca9                	beqz	s1,420286ae <adaptive_input_set_limit+0x88>
+42028656:	c84a                	sw	s2,16(sp)
+42028658:	00449913          	slli	s2,s1,0x4
+4202865c:	c452                	sw	s4,8(sp)
+4202865e:	c64e                	sw	s3,12(sp)
+42028660:	9922                	add	s2,s2,s0
+42028662:	4a09                	li	s4,2
+42028664:	fe360097          	auipc	ra,0xfe360
+42028668:	9aa080e7          	jalr	-1622(ra) # 4038800e <vPortEnterCritical>
+4202866c:	4c5c                	lw	a5,28(s0)
+4202866e:	5058                	lw	a4,36(s0)
+42028670:	14fd                	addi	s1,s1,-1
+42028672:	4981                	li	s3,0
+42028674:	02f77163          	bgeu	a4,a5,42028696 <adaptive_input_set_limit+0x70>
+42028678:	02892703          	lw	a4,40(s2)
+4202867c:	01471d63          	bne	a4,s4,42028696 <adaptive_input_set_limit+0x70>
+42028680:	02092423          	sw	zero,40(s2)
+42028684:	5018                	lw	a4,32(s0)
+42028686:	02092983          	lw	s3,32(s2)
+4202868a:	17fd                	addi	a5,a5,-1
+4202868c:	02092023          	sw	zero,32(s2)
+42028690:	0705                	addi	a4,a4,1
+42028692:	cc5c                	sw	a5,28(s0)
+42028694:	d018                	sw	a4,32(s0)
+42028696:	fe360097          	auipc	ra,0xfe360
+4202869a:	9b4080e7          	jalr	-1612(ra) # 4038804a <vPortExitCritical>
+4202869e:	854e                	mv	a0,s3
+420286a0:	e3de00ef          	jal	420094dc <cfree>
+420286a4:	1941                	addi	s2,s2,-16
+420286a6:	fcdd                	bnez	s1,42028664 <adaptive_input_set_limit+0x3e>
+420286a8:	4942                	lw	s2,16(sp)
+420286aa:	49b2                	lw	s3,12(sp)
+420286ac:	4a22                	lw	s4,8(sp)
+420286ae:	40f2                	lw	ra,28(sp)
+420286b0:	4462                	lw	s0,24(sp)
+420286b2:	44d2                	lw	s1,20(sp)
+420286b4:	6105                	addi	sp,sp,32
+420286b6:	8082                	ret
+420286b8:	87ba                	mv	a5,a4
+420286ba:	b779                	j	42028648 <adaptive_input_set_limit+0x22>
+420286bc:	4858                	lw	a4,20(s0)
+420286be:	87a6                	mv	a5,s1
+420286c0:	f8f774e3          	bgeu	a4,a5,42028648 <adaptive_input_set_limit+0x22>
+420286c4:	bfd5                	j	420286b8 <adaptive_input_set_limit+0x92>
+420286c6:	8082                	ret
+

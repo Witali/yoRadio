@@ -1,0 +1,137 @@
+42029120:	1101                	addi	sp,sp,-32
+42029122:	cc22                	sw	s0,24(sp)
+42029124:	ce06                	sw	ra,28(sp)
+42029126:	c42a                	sw	a0,8(sp)
+42029128:	842e                	mv	s0,a1
+4202912a:	fe35f097          	auipc	ra,0xfe35f
+4202912e:	ee4080e7          	jalr	-284(ra) # 4038800e <vPortEnterCritical>
+42029132:	500017b7          	lui	a5,0x50001
+42029136:	ab47a783          	lw	a5,-1356(a5) # 50000ab4 <first>
+4202913a:	12078463          	beqz	a5,42029262 <esp_heap_trace_alloc_hook+0x142>
+4202913e:	4522                	lw	a0,8(sp)
+42029140:	12050163          	beqz	a0,42029262 <esp_heap_trace_alloc_hook+0x142>
+42029144:	50001737          	lui	a4,0x50001
+42029148:	ab072703          	lw	a4,-1360(a4) # 50000ab0 <last>
+4202914c:	10e57b63          	bgeu	a0,a4,42029262 <esp_heap_trace_alloc_hook+0x142>
+42029150:	00f57563          	bgeu	a0,a5,4202915a <esp_heap_trace_alloc_hook+0x3a>
+42029154:	8f89                	sub	a5,a5,a0
+42029156:	1087f663          	bgeu	a5,s0,42029262 <esp_heap_trace_alloc_hook+0x142>
+4202915a:	50001737          	lui	a4,0x50001
+4202915e:	a9c72783          	lw	a5,-1380(a4) # 50000a9c <alloc_events>
+42029162:	50001837          	lui	a6,0x50001
+42029166:	ab880813          	addi	a6,a6,-1352 # 50000ab8 <owners>
+4202916a:	0785                	addi	a5,a5,1
+4202916c:	08000593          	li	a1,128
+42029170:	a8f72e23          	sw	a5,-1380(a4)
+42029174:	862e                	mv	a2,a1
+42029176:	8742                	mv	a4,a6
+42029178:	4781                	li	a5,0
+4202917a:	a031                	j	42029186 <esp_heap_trace_alloc_hook+0x66>
+4202917c:	e291                	bnez	a3,42029180 <esp_heap_trace_alloc_hook+0x60>
+4202917e:	85be                	mv	a1,a5
+42029180:	0785                	addi	a5,a5,1
+42029182:	10c78763          	beq	a5,a2,42029290 <esp_heap_trace_alloc_hook+0x170>
+42029186:	4314                	lw	a3,0(a4)
+42029188:	0761                	addi	a4,a4,24
+4202918a:	fed519e3          	bne	a0,a3,4202917c <esp_heap_trace_alloc_hook+0x5c>
+4202918e:	00179693          	slli	a3,a5,0x1
+42029192:	00f68733          	add	a4,a3,a5
+42029196:	070e                	slli	a4,a4,0x3
+42029198:	9742                	add	a4,a4,a6
+4202919a:	4318                	lw	a4,0(a4)
+4202919c:	cb71                	beqz	a4,42029270 <esp_heap_trace_alloc_hook+0x150>
+4202919e:	500015b7          	lui	a1,0x50001
+420291a2:	aac5a603          	lw	a2,-1364(a1) # 50000aac <serial>
+420291a6:	00f68733          	add	a4,a3,a5
+420291aa:	070e                	slli	a4,a4,0x3
+420291ac:	9742                	add	a4,a4,a6
+420291ae:	0605                	addi	a2,a2,1
+420291b0:	c63e                	sw	a5,12(sp)
+420291b2:	c436                	sw	a3,8(sp)
+420291b4:	aac5a623          	sw	a2,-1364(a1)
+420291b8:	c710                	sw	a2,8(a4)
+420291ba:	00072623          	sw	zero,12(a4)
+420291be:	00072823          	sw	zero,16(a4)
+420291c2:	00072a23          	sw	zero,20(a4)
+420291c6:	c308                	sw	a0,0(a4)
+420291c8:	c340                	sw	s0,4(a4)
+420291ca:	fe35f097          	auipc	ra,0xfe35f
+420291ce:	f40080e7          	jalr	-192(ra) # 4038810a <xPortInIsrContext>
+420291d2:	500017b7          	lui	a5,0x50001
+420291d6:	ab878813          	addi	a6,a5,-1352 # 50000ab8 <owners>
+420291da:	46a2                	lw	a3,8(sp)
+420291dc:	47b2                	lw	a5,12(sp)
+420291de:	cd4d                	beqz	a0,42029298 <esp_heap_trace_alloc_hook+0x178>
+420291e0:	3c12b537          	lui	a0,0x3c12b
+420291e4:	f8450513          	addi	a0,a0,-124 # 3c12af84 <_esp_libc_clock_array_end+0xae34>
+420291e8:	04900613          	li	a2,73
+420291ec:	00f68733          	add	a4,a3,a5
+420291f0:	070e                	slli	a4,a4,0x3
+420291f2:	9742                	add	a4,a4,a6
+420291f4:	00c70623          	sb	a2,12(a4)
+420291f8:	00154603          	lbu	a2,1(a0)
+420291fc:	c23d                	beqz	a2,42029262 <esp_heap_trace_alloc_hook+0x142>
+420291fe:	00c706a3          	sb	a2,13(a4)
+42029202:	00254603          	lbu	a2,2(a0)
+42029206:	ce31                	beqz	a2,42029262 <esp_heap_trace_alloc_hook+0x142>
+42029208:	00c70723          	sb	a2,14(a4)
+4202920c:	00354603          	lbu	a2,3(a0)
+42029210:	ca29                	beqz	a2,42029262 <esp_heap_trace_alloc_hook+0x142>
+42029212:	00c707a3          	sb	a2,15(a4)
+42029216:	00454603          	lbu	a2,4(a0)
+4202921a:	c621                	beqz	a2,42029262 <esp_heap_trace_alloc_hook+0x142>
+4202921c:	00c70823          	sb	a2,16(a4)
+42029220:	00554603          	lbu	a2,5(a0)
+42029224:	ce1d                	beqz	a2,42029262 <esp_heap_trace_alloc_hook+0x142>
+42029226:	00c708a3          	sb	a2,17(a4)
+4202922a:	00654603          	lbu	a2,6(a0)
+4202922e:	ca15                	beqz	a2,42029262 <esp_heap_trace_alloc_hook+0x142>
+42029230:	00c70923          	sb	a2,18(a4)
+42029234:	00754603          	lbu	a2,7(a0)
+42029238:	c60d                	beqz	a2,42029262 <esp_heap_trace_alloc_hook+0x142>
+4202923a:	00c709a3          	sb	a2,19(a4)
+4202923e:	00854603          	lbu	a2,8(a0)
+42029242:	c205                	beqz	a2,42029262 <esp_heap_trace_alloc_hook+0x142>
+42029244:	00c70a23          	sb	a2,20(a4)
+42029248:	00954603          	lbu	a2,9(a0)
+4202924c:	ca19                	beqz	a2,42029262 <esp_heap_trace_alloc_hook+0x142>
+4202924e:	00c70aa3          	sb	a2,21(a4)
+42029252:	00a54703          	lbu	a4,10(a0)
+42029256:	c711                	beqz	a4,42029262 <esp_heap_trace_alloc_hook+0x142>
+42029258:	97b6                	add	a5,a5,a3
+4202925a:	078e                	slli	a5,a5,0x3
+4202925c:	97c2                	add	a5,a5,a6
+4202925e:	00e78b23          	sb	a4,22(a5)
+42029262:	4462                	lw	s0,24(sp)
+42029264:	40f2                	lw	ra,28(sp)
+42029266:	6105                	addi	sp,sp,32
+42029268:	fe35f317          	auipc	t1,0xfe35f
+4202926c:	de230067          	jr	-542(t1) # 4038804a <vPortExitCritical>
+42029270:	50001637          	lui	a2,0x50001
+42029274:	aa462703          	lw	a4,-1372(a2) # 50000aa4 <live>
+42029278:	500015b7          	lui	a1,0x50001
+4202927c:	aa05a883          	lw	a7,-1376(a1) # 50000aa0 <peak>
+42029280:	0705                	addi	a4,a4,1
+42029282:	aae62223          	sw	a4,-1372(a2)
+42029286:	f0e8fce3          	bgeu	a7,a4,4202919e <esp_heap_trace_alloc_hook+0x7e>
+4202928a:	aae5a023          	sw	a4,-1376(a1)
+4202928e:	bf01                	j	4202919e <esp_heap_trace_alloc_hook+0x7e>
+42029290:	02f58263          	beq	a1,a5,420292b4 <esp_heap_trace_alloc_hook+0x194>
+42029294:	87ae                	mv	a5,a1
+42029296:	bde5                	j	4202918e <esp_heap_trace_alloc_hook+0x6e>
+42029298:	c636                	sw	a3,12(sp)
+4202929a:	c43e                	sw	a5,8(sp)
+4202929c:	7a0f10ef          	jal	4211aa3c <pcTaskGetName>
+420292a0:	00054603          	lbu	a2,0(a0)
+420292a4:	50001737          	lui	a4,0x50001
+420292a8:	47a2                	lw	a5,8(sp)
+420292aa:	46b2                	lw	a3,12(sp)
+420292ac:	ab870813          	addi	a6,a4,-1352 # 50000ab8 <owners>
+420292b0:	fe15                	bnez	a2,420291ec <esp_heap_trace_alloc_hook+0xcc>
+420292b2:	bf45                	j	42029262 <esp_heap_trace_alloc_hook+0x142>
+420292b4:	50001737          	lui	a4,0x50001
+420292b8:	aa872783          	lw	a5,-1368(a4) # 50000aa8 <lost>
+420292bc:	0785                	addi	a5,a5,1
+420292be:	aaf72423          	sw	a5,-1368(a4)
+420292c2:	b745                	j	42029262 <esp_heap_trace_alloc_hook+0x142>
+

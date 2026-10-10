@@ -73,12 +73,76 @@ static void lease_failure_tests(void) {
 }
 #endif
 int main(int argc,char **argv){
-    assert(argc==2);assert(native_audio_output_init()==0);
-#ifdef CONFIG_YORADIO_PIPELINE_PROFILE
+    assert(argc==2);
+#ifdef BASELINE
+    test_callback_registration_result = ESP_FAIL;
+    assert(native_audio_output_init() == ESP_FAIL && !s_pdm && !s_pdm_running);
+    test_callback_registration_result = ESP_OK;
+#endif
+    assert(native_audio_output_init()==0);
+#if defined(CONFIG_YORADIO_PIPELINE_PROFILE) || defined(BASELINE)
     uint32_t overruns = native_audio_output_dma_overruns();
     assert(test_callbacks.on_send_q_ovf);
     assert(!test_callbacks.on_send_q_ovf(&channel, NULL, NULL));
     assert(native_audio_output_dma_overruns() == overruns + 1);
+#endif
+#ifdef BASELINE
+    assert(native_audio_output_health().available);
+    assert(native_audio_output_health().completion_queue_drops == overruns + 1);
+    assert(native_audio_output_health().write_errors == 0);
+    // Only the test sets counters: production must retain them across Stop/Play.
+    s_dma_overruns = UINT32_MAX;
+    assert(!test_callbacks.on_send_q_ovf(&channel, NULL, NULL));
+    assert(native_audio_output_health().completion_queue_drops == 0);
+    s_dma_overruns = overruns + 1;
+    int16_t health_pcm[1024] = {0};
+    assert(pdm_write_block(health_pcm, 512) == ESP_OK);
+    assert(native_audio_output_health().write_errors == 0);
+    channel.dma.curr_ptr = NULL; queue.fail = true;
+    assert(pdm_write_block(health_pcm, 512) == ESP_ERR_TIMEOUT);
+    assert(native_audio_output_health().write_errors == 1);
+    queue.fail = false; test_short_write_bytes = 1024;
+    assert(pdm_write_block(health_pcm, 512) == ESP_FAIL);
+    assert(native_audio_output_health().write_errors == 2);
+    s_dma_write_errors = UINT32_MAX;
+    assert(pdm_write_block(health_pcm, 512) == ESP_FAIL);
+    assert(native_audio_output_health().write_errors == 0);
+    test_short_write_bytes = 0;
+    s_dma_write_errors = 2;
+    assert(native_audio_output_suspend() == ESP_OK);
+    assert(native_audio_output_init() == ESP_OK);
+    assert(native_audio_output_health().write_errors == 2);
+    assert(native_audio_output_health().completion_queue_drops == overruns + 1);
+#else
+    assert(!native_audio_output_health().available);
+#endif
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+    // Real staged write path: counters must retain SDK errors and wall time,
+    // and reading/reporting must not reset an ISR-owned cumulative counter.
+    int16_t profile_pcm[1024] = {0};
+    memset(&s_dma_write_profile, 0, sizeof(s_dma_write_profile));
+    test_write_delay_us = 37;
+    assert(pdm_write_block(profile_pcm, 512) == ESP_OK);
+    assert(s_dma_write_profile.writes == 1 && s_dma_write_profile.written_bytes == 2048);
+    assert(s_dma_write_profile.write_us == 37 && s_dma_write_profile.max_write_us == 37);
+    channel.dma.curr_ptr = NULL;
+    queue.fail = true;
+    test_write_delay_us = 61;
+    assert(pdm_write_block(profile_pcm, 512) == ESP_ERR_TIMEOUT);
+    assert(s_dma_write_profile.writes == 2 && s_dma_write_profile.errors == 1);
+    assert(s_dma_write_profile.written_bytes == 2048 && s_dma_write_profile.write_us == 98);
+    assert(s_dma_write_profile.max_write_us == 61);
+    queue.fail = false;
+    test_short_write_bytes = 1024;
+    assert(pdm_write_block(profile_pcm, 512) == ESP_FAIL);
+    assert(s_dma_write_profile.writes == 3 && s_dma_write_profile.errors == 2);
+    assert(s_dma_write_profile.written_bytes == 3072);
+    test_short_write_bytes = 0;
+    staged_dma_report();
+    assert(native_audio_output_dma_overruns() == overruns + 1);
+    queue.fail = false;
+    test_write_delay_us = 0;
+    test_now_us = 0;
 #endif
     driver_failure_tests();
 #ifndef BASELINE
@@ -93,7 +157,7 @@ int main(int argc,char **argv){
     for(unsigned v=0;v<4;++v)for(int b=-16;b<=16;b+=16)
     for(unsigned norm=0;norm<2;++norm){
         volume=volumes[v];balance=b;normalize=norm;
-        s_input_sample_rate=0;assert(native_audio_output_configure(rates[r])==0);
+        native_audio_output_discard_pcm();assert(native_audio_output_configure(rates[r])==0);
         size_t begin=captured;unsigned calls=normalizer_calls;
         for(unsigned c=0;c<sizeof(chunks)/sizeof(chunks[0]);++c){
 #ifdef BASELINE
@@ -114,11 +178,7 @@ int main(int argc,char **argv){
 #endif
         }
 #ifdef BASELINE
-        if(s_buffered_frames){
-            memset(s_frame_buffer+s_buffered_frames*2,0,(512-s_buffered_frames)*4);
-            assert(pdm_write_block(s_frame_buffer,512)==0);
-        }
-        s_buffered_frames=0;
+        assert(native_audio_output_flush_pcm()==0);
 #else
         assert(native_audio_output_flush_pcm()==0 && !outstanding);
 #endif

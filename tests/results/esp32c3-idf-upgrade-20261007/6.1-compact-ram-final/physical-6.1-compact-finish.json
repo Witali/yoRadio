@@ -1,0 +1,67 @@
+[
+  {
+    "name": "install-6.1-compact-tls-production",
+    "code": 0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-tls-production\\app.bin",
+      "--output",
+      ".build\\idf-upgrade\\install-6.1-compact-tls-production.json"
+    ]
+  },
+  {
+    "name": "physical-6.1-compact-tls-quiet-check",
+    "code": 0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/quiet-public.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-tls-production\\app.bin",
+      "--case",
+      "groovesalad-64-aac",
+      "--case",
+      "groovesalad-16-aac",
+      "--aac-reference-command",
+      ".build\\idf-upgrade\\faad-reference-command.json",
+      "--output",
+      ".build\\idf-upgrade\\physical-6.1-compact-tls-quiet-check"
+    ]
+  },
+  {
+    "name": "install-6.1-compact-ram-resume",
+    "code": 0,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/install.py",
+      "--firmware",
+      "firmware\\development\\esp32c3-idf-6.1-compact-ram-profile\\app.bin",
+      "--output",
+      ".build\\idf-upgrade\\install-6.1-compact-ram-resume.json"
+    ]
+  },
+  {
+    "name": "physical-6.1-compact-ram-resumed-stage",
+    "code": 1,
+    "command": [
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+      "-X",
+      "utf8",
+      ".build/idf-upgrade/physical-stage.py",
+      "--version",
+      "6.1-compact-ram",
+      "--resume-public",
+      "--matrix-recheck",
+      ".build\\idf-upgrade\\physical-6.1-compact-ram-eof-recheck\\report.json",
+      "--aac-reference-command",
+      ".build\\idf-upgrade\\faad-reference-command.json"
+    ]
+  }
+]

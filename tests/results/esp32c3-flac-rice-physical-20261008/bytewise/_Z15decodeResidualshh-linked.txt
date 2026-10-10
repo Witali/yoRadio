@@ -1,0 +1,355 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-flac-rice-bytewise\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+42036340 <_Z15decodeResidualshh>:
+42036340:	711d                	addi	sp,sp,-96
+42036342:	caa6                	sw	s1,84(sp)
+42036344:	3fc9a4b7          	lui	s1,0x3fc9a
+42036348:	e6048783          	lb	a5,-416(s1) # 3fc99e60 <m_readError>
+4203634c:	ce86                	sw	ra,92(sp)
+4203634e:	dc62                	sw	s8,56(sp)
+42036350:	1a079f63          	bnez	a5,4203650e <_Z15decodeResidualshh+0x1ce>
+42036354:	3fc9a8b7          	lui	a7,0x3fc9a
+42036358:	e508c783          	lbu	a5,-432(a7) # 3fc99e50 <m_bitBufferLen>
+4203635c:	4705                	li	a4,1
+4203635e:	34f76e63          	bltu	a4,a5,420366ba <_Z15decodeResidualshh+0x37a>
+42036362:	3fc9aeb7          	lui	t4,0x3fc9a
+42036366:	e6cea683          	lw	a3,-404(t4) # 3fc99e6c <m_bytesAvail>
+4203636a:	18d05f63          	blez	a3,42036508 <_Z15decodeResidualshh+0x1c8>
+4203636e:	3fc9af37          	lui	t5,0x3fc9a
+42036372:	3fc9a737          	lui	a4,0x3fc9a
+42036376:	e64f2603          	lw	a2,-412(t5) # 3fc99e64 <m_rIndex>
+4203637a:	e7072e03          	lw	t3,-400(a4) # 3fc99e70 <m_inptr>
+4203637e:	3fc9a837          	lui	a6,0x3fc9a
+42036382:	e5880813          	addi	a6,a6,-424 # 3fc99e58 <m_bitBuffer>
+42036386:	00082703          	lw	a4,0(a6)
+4203638a:	00482303          	lw	t1,4(a6)
+4203638e:	9e32                	add	t3,t3,a2
+42036390:	000e4e03          	lbu	t3,0(t3)
+42036394:	00871f93          	slli	t6,a4,0x8
+42036398:	0322                	slli	t1,t1,0x8
+4203639a:	8361                	srli	a4,a4,0x18
+4203639c:	16fd                	addi	a3,a3,-1
+4203639e:	0605                	addi	a2,a2,1
+420363a0:	01cfefb3          	or	t6,t6,t3
+420363a4:	971a                	add	a4,a4,t1
+420363a6:	07a1                	addi	a5,a5,8
+420363a8:	e6dea623          	sw	a3,-404(t4)
+420363ac:	e6cf2223          	sw	a2,-412(t5)
+420363b0:	01f82023          	sw	t6,0(a6)
+420363b4:	00e82223          	sw	a4,4(a6)
+420363b8:	ffe78313          	addi	t1,a5,-2
+420363bc:	0ff37313          	zext.b	t1,t1
+420363c0:	e4688823          	sb	t1,-432(a7)
+420363c4:	fe030693          	addi	a3,t1,-32
+420363c8:	2a06c763          	bltz	a3,42036676 <_Z15decodeResidualshh+0x336>
+420363cc:	00d756b3          	srl	a3,a4,a3
+420363d0:	0026f613          	andi	a2,a3,2
+420363d4:	30061863          	bnez	a2,420366e4 <_Z15decodeResidualshh+0x3a4>
+420363d8:	8a8d                	andi	a3,a3,3
+420363da:	2e068963          	beqz	a3,420366cc <_Z15decodeResidualshh+0x38c>
+420363de:	4695                	li	a3,5
+420363e0:	cc36                	sw	a3,24(sp)
+420363e2:	46fd                	li	a3,31
+420363e4:	ca36                	sw	a3,20(sp)
+420363e6:	3fc9a637          	lui	a2,0x3fc9a
+420363ea:	468d                	li	a3,3
+420363ec:	e7a65c03          	lhu	s8,-390(a2) # 3fc99e7a <m_blockSize>
+420363f0:	0466e663          	bltu	a3,t1,4203643c <_Z15decodeResidualshh+0xfc>
+420363f4:	3fc9ae37          	lui	t3,0x3fc9a
+420363f8:	e6ce2683          	lw	a3,-404(t3) # 3fc99e6c <m_bytesAvail>
+420363fc:	26d05763          	blez	a3,4203666a <_Z15decodeResidualshh+0x32a>
+42036400:	3fc9aeb7          	lui	t4,0x3fc9a
+42036404:	3fc9a337          	lui	t1,0x3fc9a
+42036408:	e64ea603          	lw	a2,-412(t4) # 3fc99e64 <m_rIndex>
+4203640c:	e7032303          	lw	t1,-400(t1) # 3fc99e70 <m_inptr>
+42036410:	018fdf13          	srli	t5,t6,0x18
+42036414:	0722                	slli	a4,a4,0x8
+42036416:	9332                	add	t1,t1,a2
+42036418:	00034303          	lbu	t1,0(t1)
+4203641c:	0fa2                	slli	t6,t6,0x8
+4203641e:	16fd                	addi	a3,a3,-1
+42036420:	006fefb3          	or	t6,t6,t1
+42036424:	977a                	add	a4,a4,t5
+42036426:	0605                	addi	a2,a2,1
+42036428:	00678313          	addi	t1,a5,6
+4203642c:	01f82023          	sw	t6,0(a6)
+42036430:	e6cea223          	sw	a2,-412(t4)
+42036434:	00e82223          	sw	a4,4(a6)
+42036438:	e6de2623          	sw	a3,-404(t3)
+4203643c:	1371                	addi	t1,t1,-4
+4203643e:	0ff37313          	zext.b	t1,t1
+42036442:	e4688823          	sb	t1,-432(a7)
+42036446:	fe030793          	addi	a5,t1,-32
+4203644a:	2407c163          	bltz	a5,4203668c <_Z15decodeResidualshh+0x34c>
+4203644e:	00f757b3          	srl	a5,a4,a5
+42036452:	8bbd                	andi	a5,a5,15
+42036454:	4705                	li	a4,1
+42036456:	00f71733          	sll	a4,a4,a5
+4203645a:	ce3a                	sw	a4,28(sp)
+4203645c:	177d                	addi	a4,a4,-1
+4203645e:	01877733          	and	a4,a4,s8
+42036462:	40fc5c33          	sra	s8,s8,a5
+42036466:	24071863          	bnez	a4,420366b6 <_Z15decodeResidualshh+0x376>
+4203646a:	25855663          	bge	a0,s8,420366b6 <_Z15decodeResidualshh+0x376>
+4203646e:	d66e                	sw	s11,44(sp)
+42036470:	8daa                	mv	s11,a0
+42036472:	4562                	lw	a0,24(sp)
+42036474:	cca2                	sw	s0,88(sp)
+42036476:	c4d2                	sw	s4,72(sp)
+42036478:	c2d6                	sw	s5,68(sp)
+4203647a:	c0da                	sw	s6,64(sp)
+4203647c:	de5e                	sw	s7,60(sp)
+4203647e:	da66                	sw	s9,52(sp)
+42036480:	c8ca                	sw	s2,80(sp)
+42036482:	c6ce                	sw	s3,76(sp)
+42036484:	c82e                	sw	a1,16(sp)
+42036486:	c602                	sw	zero,12(sp)
+42036488:	c202                	sw	zero,4(sp)
+4203648a:	a7bff0ef          	jal	42035f04 <_Z8readUinth>
+4203648e:	47d2                	lw	a5,20(sp)
+42036490:	3fc9aa37          	lui	s4,0x3fc9a
+42036494:	3fc96ab7          	lui	s5,0x3fc96
+42036498:	e58a0a13          	addi	s4,s4,-424 # 3fc99e58 <m_bitBuffer>
+4203649c:	224a8a93          	addi	s5,s5,548 # 3fc96224 <_ZN12_GLOBAL__N_1L13samplesBufferE>
+420364a0:	8462                	mv	s0,s8
+420364a2:	3fc9ab37          	lui	s6,0x3fc9a
+420364a6:	3fc9abb7          	lui	s7,0x3fc9a
+420364aa:	3fc9acb7          	lui	s9,0x3fc9a
+420364ae:	0af55063          	bge	a0,a5,4203654e <_Z15decodeResidualshh+0x20e>
+420364b2:	47c2                	lw	a5,16(sp)
+420364b4:	0ff57993          	zext.b	s3,a0
+420364b8:	00379913          	slli	s2,a5,0x3
+420364bc:	008dc563          	blt	s11,s0,420364c6 <_Z15decodeResidualshh+0x186>
+420364c0:	a09d                	j	42036526 <_Z15decodeResidualshh+0x1e6>
+420364c2:	068d8263          	beq	s11,s0,42036526 <_Z15decodeResidualshh+0x1e6>
+420364c6:	854e                	mv	a0,s3
+420364c8:	c2fff0ef          	jal	420360f6 <_Z17readRiceSignedInth>
+420364cc:	00add713          	srli	a4,s11,0xa
+420364d0:	974a                	add	a4,a4,s2
+420364d2:	070a                	slli	a4,a4,0x2
+420364d4:	9756                	add	a4,a4,s5
+420364d6:	4318                	lw	a4,0(a4)
+420364d8:	3ffdf693          	andi	a3,s11,1023
+420364dc:	068a                	slli	a3,a3,0x2
+420364de:	e6048603          	lb	a2,-416(s1)
+420364e2:	9736                	add	a4,a4,a3
+420364e4:	c308                	sw	a0,0(a4)
+420364e6:	0d85                	addi	s11,s11,1
+420364e8:	de69                	beqz	a2,420364c2 <_Z15decodeResidualshh+0x182>
+420364ea:	4466                	lw	s0,88(sp)
+420364ec:	4946                	lw	s2,80(sp)
+420364ee:	49b6                	lw	s3,76(sp)
+420364f0:	4a26                	lw	s4,72(sp)
+420364f2:	4a96                	lw	s5,68(sp)
+420364f4:	4b06                	lw	s6,64(sp)
+420364f6:	5bf2                	lw	s7,60(sp)
+420364f8:	5cd2                	lw	s9,52(sp)
+420364fa:	5db2                	lw	s11,44(sp)
+420364fc:	40f6                	lw	ra,92(sp)
+420364fe:	44d6                	lw	s1,84(sp)
+42036500:	5c62                	lw	s8,56(sp)
+42036502:	8532                	mv	a0,a2
+42036504:	6125                	addi	sp,sp,96
+42036506:	8082                	ret
+42036508:	57d1                	li	a5,-12
+4203650a:	e6f48023          	sb	a5,-416(s1)
+4203650e:	3fc9a7b7          	lui	a5,0x3fc9a
+42036512:	e7a7dc03          	lhu	s8,-390(a5) # 3fc99e7a <m_blockSize>
+42036516:	4791                	li	a5,4
+42036518:	cc3e                	sw	a5,24(sp)
+4203651a:	47bd                	li	a5,15
+4203651c:	ca3e                	sw	a5,20(sp)
+4203651e:	4785                	li	a5,1
+42036520:	ce3e                	sw	a5,28(sp)
+42036522:	b7a1                	j	4203646a <_Z15decodeResidualshh+0x12a>
+42036524:	5d42                	lw	s10,48(sp)
+42036526:	4792                	lw	a5,4(sp)
+42036528:	4772                	lw	a4,28(sp)
+4203652a:	0785                	addi	a5,a5,1
+4203652c:	c23e                	sw	a5,4(sp)
+4203652e:	18e78263          	beq	a5,a4,420366b2 <_Z15decodeResidualshh+0x372>
+42036532:	47b2                	lw	a5,12(sp)
+42036534:	4562                	lw	a0,24(sp)
+42036536:	001c1413          	slli	s0,s8,0x1
+4203653a:	943e                	add	s0,s0,a5
+4203653c:	418407b3          	sub	a5,s0,s8
+42036540:	c63e                	sw	a5,12(sp)
+42036542:	8dbe                	mv	s11,a5
+42036544:	9c1ff0ef          	jal	42035f04 <_Z8readUinth>
+42036548:	47d2                	lw	a5,20(sp)
+4203654a:	f6f544e3          	blt	a0,a5,420364b2 <_Z15decodeResidualshh+0x172>
+4203654e:	e6048603          	lb	a2,-416(s1)
+42036552:	e675                	bnez	a2,4203663e <_Z15decodeResidualshh+0x2fe>
+42036554:	3fc9a8b7          	lui	a7,0x3fc9a
+42036558:	e508c583          	lbu	a1,-432(a7) # 3fc99e50 <m_bitBufferLen>
+4203655c:	4711                	li	a4,4
+4203655e:	16b76c63          	bltu	a4,a1,420366d6 <_Z15decodeResidualshh+0x396>
+42036562:	e6cb2683          	lw	a3,-404(s6) # 3fc99e6c <m_bytesAvail>
+42036566:	0cd05963          	blez	a3,42036638 <_Z15decodeResidualshh+0x2f8>
+4203656a:	e64ba603          	lw	a2,-412(s7) # 3fc99e64 <m_rIndex>
+4203656e:	e70ca503          	lw	a0,-400(s9) # 3fc99e70 <m_inptr>
+42036572:	000a2703          	lw	a4,0(s4)
+42036576:	004a2803          	lw	a6,4(s4)
+4203657a:	9532                	add	a0,a0,a2
+4203657c:	00054303          	lbu	t1,0(a0)
+42036580:	0822                	slli	a6,a6,0x8
+42036582:	00871513          	slli	a0,a4,0x8
+42036586:	8361                	srli	a4,a4,0x18
+42036588:	16fd                	addi	a3,a3,-1
+4203658a:	05a1                	addi	a1,a1,8
+4203658c:	0605                	addi	a2,a2,1
+4203658e:	00656533          	or	a0,a0,t1
+42036592:	9742                	add	a4,a4,a6
+42036594:	0ff5f593          	zext.b	a1,a1
+42036598:	e6db2623          	sw	a3,-404(s6)
+4203659c:	e6cba223          	sw	a2,-412(s7)
+420365a0:	00aa2023          	sw	a0,0(s4)
+420365a4:	00ea2223          	sw	a4,4(s4)
+420365a8:	15ed                	addi	a1,a1,-5
+420365aa:	0ff5f593          	zext.b	a1,a1
+420365ae:	e4b88823          	sb	a1,-432(a7)
+420365b2:	f68ddae3          	bge	s11,s0,42036526 <_Z15decodeResidualshh+0x1e6>
+420365b6:	fe058693          	addi	a3,a1,-32
+420365ba:	0e06c363          	bltz	a3,420366a0 <_Z15decodeResidualshh+0x360>
+420365be:	00d75533          	srl	a0,a4,a3
+420365c2:	897d                	andi	a0,a0,31
+420365c4:	12050263          	beqz	a0,420366e8 <_Z15decodeResidualshh+0x3a8>
+420365c8:	0ff57793          	zext.b	a5,a0
+420365cc:	c43e                	sw	a5,8(sp)
+420365ce:	47c2                	lw	a5,16(sp)
+420365d0:	3fc969b7          	lui	s3,0x3fc96
+420365d4:	02000593          	li	a1,32
+420365d8:	d86a                	sw	s10,48(sp)
+420365da:	22498993          	addi	s3,s3,548 # 3fc96224 <_ZN12_GLOBAL__N_1L13samplesBufferE>
+420365de:	40a58d33          	sub	s10,a1,a0
+420365e2:	00379913          	slli	s2,a5,0x3
+420365e6:	a019                	j	420365ec <_Z15decodeResidualshh+0x2ac>
+420365e8:	f3b40ee3          	beq	s0,s11,42036524 <_Z15decodeResidualshh+0x1e4>
+420365ec:	4522                	lw	a0,8(sp)
+420365ee:	917ff0ef          	jal	42035f04 <_Z8readUinth>
+420365f2:	00add713          	srli	a4,s11,0xa
+420365f6:	974a                	add	a4,a4,s2
+420365f8:	070a                	slli	a4,a4,0x2
+420365fa:	974e                	add	a4,a4,s3
+420365fc:	4318                	lw	a4,0(a4)
+420365fe:	3ffdf693          	andi	a3,s11,1023
+42036602:	01a51533          	sll	a0,a0,s10
+42036606:	068a                	slli	a3,a3,0x2
+42036608:	e6048603          	lb	a2,-416(s1)
+4203660c:	41a55533          	sra	a0,a0,s10
+42036610:	9736                	add	a4,a4,a3
+42036612:	c308                	sw	a0,0(a4)
+42036614:	0d85                	addi	s11,s11,1
+42036616:	da69                	beqz	a2,420365e8 <_Z15decodeResidualshh+0x2a8>
+42036618:	4466                	lw	s0,88(sp)
+4203661a:	40f6                	lw	ra,92(sp)
+4203661c:	4946                	lw	s2,80(sp)
+4203661e:	49b6                	lw	s3,76(sp)
+42036620:	4a26                	lw	s4,72(sp)
+42036622:	4a96                	lw	s5,68(sp)
+42036624:	4b06                	lw	s6,64(sp)
+42036626:	5bf2                	lw	s7,60(sp)
+42036628:	5cd2                	lw	s9,52(sp)
+4203662a:	5d42                	lw	s10,48(sp)
+4203662c:	5db2                	lw	s11,44(sp)
+4203662e:	44d6                	lw	s1,84(sp)
+42036630:	5c62                	lw	s8,56(sp)
+42036632:	8532                	mv	a0,a2
+42036634:	6125                	addi	sp,sp,96
+42036636:	8082                	ret
+42036638:	5651                	li	a2,-12
+4203663a:	e6c48023          	sb	a2,-416(s1)
+4203663e:	ee8dd4e3          	bge	s11,s0,42036526 <_Z15decodeResidualshh+0x1e6>
+42036642:	47c2                	lw	a5,16(sp)
+42036644:	00add693          	srli	a3,s11,0xa
+42036648:	00379713          	slli	a4,a5,0x3
+4203664c:	9736                	add	a4,a4,a3
+4203664e:	3fc966b7          	lui	a3,0x3fc96
+42036652:	070a                	slli	a4,a4,0x2
+42036654:	22468693          	addi	a3,a3,548 # 3fc96224 <_ZN12_GLOBAL__N_1L13samplesBufferE>
+42036658:	9736                	add	a4,a4,a3
+4203665a:	4318                	lw	a4,0(a4)
+4203665c:	3ffdf793          	andi	a5,s11,1023
+42036660:	078a                	slli	a5,a5,0x2
+42036662:	97ba                	add	a5,a5,a4
+42036664:	0007a023          	sw	zero,0(a5)
+42036668:	b549                	j	420364ea <_Z15decodeResidualshh+0x1aa>
+4203666a:	57d1                	li	a5,-12
+4203666c:	e6f48023          	sb	a5,-416(s1)
+42036670:	4785                	li	a5,1
+42036672:	ce3e                	sw	a5,28(sp)
+42036674:	bbdd                	j	4203646a <_Z15decodeResidualshh+0x12a>
+42036676:	46fd                	li	a3,31
+42036678:	406686b3          	sub	a3,a3,t1
+4203667c:	00171613          	slli	a2,a4,0x1
+42036680:	00d61633          	sll	a2,a2,a3
+42036684:	006fd6b3          	srl	a3,t6,t1
+42036688:	96b2                	add	a3,a3,a2
+4203668a:	b399                	j	420363d0 <_Z15decodeResidualshh+0x90>
+4203668c:	46fd                	li	a3,31
+4203668e:	0706                	slli	a4,a4,0x1
+42036690:	406686b3          	sub	a3,a3,t1
+42036694:	006fd7b3          	srl	a5,t6,t1
+42036698:	00d71733          	sll	a4,a4,a3
+4203669c:	97ba                	add	a5,a5,a4
+4203669e:	bb55                	j	42036452 <_Z15decodeResidualshh+0x112>
+420366a0:	46fd                	li	a3,31
+420366a2:	0706                	slli	a4,a4,0x1
+420366a4:	8e8d                	sub	a3,a3,a1
+420366a6:	00b55533          	srl	a0,a0,a1
+420366aa:	00d71733          	sll	a4,a4,a3
+420366ae:	953a                	add	a0,a0,a4
+420366b0:	bf09                	j	420365c2 <_Z15decodeResidualshh+0x282>
+420366b2:	4601                	li	a2,0
+420366b4:	bd1d                	j	420364ea <_Z15decodeResidualshh+0x1aa>
+420366b6:	565d                	li	a2,-9
+420366b8:	b591                	j	420364fc <_Z15decodeResidualshh+0x1bc>
+420366ba:	3fc9a837          	lui	a6,0x3fc9a
+420366be:	e5880813          	addi	a6,a6,-424 # 3fc99e58 <m_bitBuffer>
+420366c2:	00082f83          	lw	t6,0(a6)
+420366c6:	00482703          	lw	a4,4(a6)
+420366ca:	b1fd                	j	420363b8 <_Z15decodeResidualshh+0x78>
+420366cc:	4691                	li	a3,4
+420366ce:	cc36                	sw	a3,24(sp)
+420366d0:	46bd                	li	a3,15
+420366d2:	ca36                	sw	a3,20(sp)
+420366d4:	bb09                	j	420363e6 <_Z15decodeResidualshh+0xa6>
+420366d6:	3fc9a737          	lui	a4,0x3fc9a
+420366da:	e5870713          	addi	a4,a4,-424 # 3fc99e58 <m_bitBuffer>
+420366de:	4308                	lw	a0,0(a4)
+420366e0:	4358                	lw	a4,4(a4)
+420366e2:	b5d9                	j	420365a8 <_Z15decodeResidualshh+0x268>
+420366e4:	5661                	li	a2,-8
+420366e6:	bd19                	j	420364fc <_Z15decodeResidualshh+0x1bc>
+420366e8:	47c2                	lw	a5,16(sp)
+420366ea:	00add713          	srli	a4,s11,0xa
+420366ee:	3fc969b7          	lui	s3,0x3fc96
+420366f2:	00379913          	slli	s2,a5,0x3
+420366f6:	974a                	add	a4,a4,s2
+420366f8:	070a                	slli	a4,a4,0x2
+420366fa:	22498993          	addi	s3,s3,548 # 3fc96224 <_ZN12_GLOBAL__N_1L13samplesBufferE>
+420366fe:	974e                	add	a4,a4,s3
+42036700:	4318                	lw	a4,0(a4)
+42036702:	3ffdf693          	andi	a3,s11,1023
+42036706:	068a                	slli	a3,a3,0x2
+42036708:	9736                	add	a4,a4,a3
+4203670a:	00072023          	sw	zero,0(a4)
+4203670e:	a029                	j	42036718 <_Z15decodeResidualshh+0x3d8>
+42036710:	4318                	lw	a4,0(a4)
+42036712:	9736                	add	a4,a4,a3
+42036714:	00072023          	sw	zero,0(a4)
+42036718:	0d85                	addi	s11,s11,1
+4203671a:	00add713          	srli	a4,s11,0xa
+4203671e:	974a                	add	a4,a4,s2
+42036720:	070a                	slli	a4,a4,0x2
+42036722:	3ffdf693          	andi	a3,s11,1023
+42036726:	974e                	add	a4,a4,s3
+42036728:	068a                	slli	a3,a3,0x2
+4203672a:	fe8d93e3          	bne	s11,s0,42036710 <_Z15decodeResidualshh+0x3d0>
+4203672e:	bbe5                	j	42036526 <_Z15decodeResidualshh+0x1e6>

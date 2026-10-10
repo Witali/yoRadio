@@ -3,6 +3,7 @@ import hashlib
 from pathlib import Path
 import sys
 import unittest
+from evidence_sources import historical_source
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools/esp32c3_tests'))
 from summarize_memory import summarize
@@ -23,8 +24,8 @@ class MemorySummaryTests(unittest.TestCase):
         manifest=json.loads((EVIDENCE/'diagnostics-implementation.json').read_text())
         for path,digest in manifest['files'].items():
             snapshot=manifest.get('snapshots',{}).get(path)
-            source=EVIDENCE/snapshot if snapshot else ROOT/path
-            self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(),digest,path)
+            data=(EVIDENCE/snapshot).read_bytes() if snapshot else historical_source(ROOT,path,digest)
+            self.assertEqual(hashlib.sha256(data).hexdigest(),digest,path)
 
     def test_fallback_and_no_pcm_stay_failed(self):
         result = summarize(*self.inputs('profile'))

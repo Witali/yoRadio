@@ -1,4 +1,5 @@
 #include "native_audio_output.h"
+#include "audio_pipeline_probe.h"
 
 #include <limits.h>
 #include <stdbool.h>
@@ -11,6 +12,7 @@
 #include "driver/gpio.h"
 #include "driver/i2s_pdm.h"
 #include "esp_check.h"
+#include "esp_attr.h"
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
@@ -18,6 +20,14 @@
 #include "native_audio_normalizer.h"
 #include "native_audio_settings.h"
 #include "soc/soc_caps.h"
+
+#ifdef CONFIG_YORADIO_PDM_INTEGER_FIR
+#ifndef CONFIG_YORADIO_PDM_INTEGER_RATE_COMPENSATION
+#error FIR requires the audited integer-rate compensation configuration
+#endif
+#include "native_pcm_fir.h"
+static pcm_fir_state_t s_pcm_fir;
+#endif
 
 #if SOC_I2S_PDM_MAX_TX_LINES < 2
 #error ESP32-C3 stereo PDM requires two hardware TX data lines
@@ -30,6 +40,20 @@
 #define PDM_BIAS_SETTLE_MS 2U
 #define RESAMPLER_SCALE 32768U
 #define RESAMPLER_FRACTION_MULTIPLIER_Q16 44739U
+#ifdef CONFIG_YORADIO_PDM_INTEGER_RATE_COMPENSATION
+#ifdef CONFIG_YORADIO_PDM_FRACTIONAL_CLOCK
+#error Integer-rate compensation must not be combined with the fractional PDM clock
+#endif
+// The audited integer DAC clock is 160 MHz / (2 * 13 * 128) = 625000/13 Hz.
+// Keep rational phase units so every input rate follows that clock without
+// a cumulative sample-count error or a new buffer. The driver validates it.
+#define RESAMPLER_OUTPUT_RATE_NUMERATOR 625000U
+#define RESAMPLER_OUTPUT_RATE_DENOMINATOR 13U
+#define RESAMPLER_FRACTION_MULTIPLIER_Q32 225179981U
+#else
+#define RESAMPLER_OUTPUT_RATE_NUMERATOR PDM_OUTPUT_SAMPLE_RATE
+#define RESAMPLER_OUTPUT_RATE_DENOMINATOR 1U
+#endif
 #define SAMPLE_GAIN_SCALE 32768U
 #define VOLUME_DENOMINATOR 254U
 #define BALANCE_DENOMINATOR 16U
@@ -49,6 +73,57 @@ static int64_t s_stats_started_us;
 static uint64_t s_stats_audio_us;
 static uint64_t s_stats_normalize_us;
 static uint32_t s_stats_packets;
+
+static DRAM_ATTR volatile uint32_t s_dma_overruns;
+static volatile uint32_t s_dma_write_errors;
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+DRAM_ATTR volatile audio_pipeline_probe_t s_audio_pipeline_probe;
+#endif
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+static struct {
+    uint64_t written_bytes, write_us, max_write_us;
+    uint32_t writes, errors;
+} s_dma_write_profile;
+#endif
+
+static bool IRAM_ATTR dma_queue_overrun(i2s_chan_handle_t channel,
+    i2s_event_data_t *event, void *context) {
+    (void)channel;
+    (void)event;
+    (void)context;
+    // One ISR writer; never reset from the output task. The normal build
+    // has no logging, heap, clock access or atomic library calls here.
+    ++s_dma_overruns;
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    audio_pipeline_probe_overrun((uint32_t)esp_timer_get_time());
+#endif
+    return false;
+}
+
+uint32_t native_audio_output_dma_overruns(void) {
+    return s_dma_overruns;
+}
+
+native_audio_output_health_t native_audio_output_health(void) {
+    return (native_audio_output_health_t){
+        .available = true,
+        .completion_queue_drops = s_dma_overruns,
+        .write_errors = s_dma_write_errors,
+    };
+}
+
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+static void staged_dma_report(void) {
+    ESP_LOGI(TAG,
+        "PERF STAGED_DMA: q_overruns=%lu writes=%lu written_bytes=%llu "
+        "write_us=%llu max_write_us=%llu errors=%lu",
+        (unsigned long)s_dma_overruns, (unsigned long)s_dma_write_profile.writes,
+        (unsigned long long)s_dma_write_profile.written_bytes,
+        (unsigned long long)s_dma_write_profile.write_us,
+        (unsigned long long)s_dma_write_profile.max_write_us,
+        (unsigned long)s_dma_write_profile.errors);
+}
+#endif
 
 typedef struct {
     bool valid;
@@ -102,6 +177,9 @@ static void hold_pdm_low(void) {
 }
 
 static void reset_resampler(void) {
+#ifdef CONFIG_YORADIO_PDM_INTEGER_FIR
+    pcm_fir_reset(&s_pcm_fir);
+#endif
     s_resampler_has_previous = false;
     s_previous_left = 0;
     s_previous_right = 0;
@@ -132,7 +210,21 @@ static esp_err_t pdm_write_block(const int16_t *samples, size_t frames) {
     if (!s_pdm || !s_pdm_running) return ESP_ERR_INVALID_STATE;
     size_t written = 0;
     size_t bytes = frames * 2U * sizeof(*samples);
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+    int64_t started_us = esp_timer_get_time();
+#endif
     esp_err_t result = i2s_channel_write(s_pdm, samples, bytes, &written, 1000);
+    if (result != ESP_OK || written != bytes) ++s_dma_write_errors;
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+    uint64_t elapsed_us = (uint64_t)(esp_timer_get_time() - started_us);
+    ++s_dma_write_profile.writes;
+    s_dma_write_profile.written_bytes += written;
+    s_dma_write_profile.write_us += elapsed_us;
+    if (elapsed_us > s_dma_write_profile.max_write_us) {
+        s_dma_write_profile.max_write_us = elapsed_us;
+    }
+    if (result != ESP_OK || written != bytes) ++s_dma_write_profile.errors;
+#endif
     if (result != ESP_OK) return result;
     return written == bytes ? ESP_OK : ESP_FAIL;
 }
@@ -173,6 +265,12 @@ static esp_err_t pdm_begin(void) {
         },
     };
     esp_err_t result = i2s_channel_init_pdm_tx_mode(s_pdm, &pdm_config);
+    if (result == ESP_OK) {
+        const i2s_event_callbacks_t callbacks = {
+            .on_send_q_ovf = dma_queue_overrun,
+        };
+        result = i2s_channel_register_event_callback(s_pdm, &callbacks, NULL);
+    }
     if (result != ESP_OK) {
         i2s_del_channel(s_pdm);
         s_pdm = NULL;
@@ -232,6 +330,7 @@ static esp_err_t pdm_begin(void) {
     return ESP_OK;
 }
 
+#ifndef CONFIG_YORADIO_PDM_INTEGER_FIR
 static int16_t interpolate_sample(int16_t previous, int16_t current,
                                   uint32_t fraction) {
     int32_t delta = (int32_t)current - previous;
@@ -241,36 +340,53 @@ static int16_t interpolate_sample(int16_t previous, int16_t current,
     return (int16_t)((int32_t)previous +
                      scaled / (int32_t)RESAMPLER_SCALE);
 }
+#endif
 
 static esp_err_t pdm_write_resampled(int16_t left, int16_t right) {
-    if (s_input_sample_rate == PDM_OUTPUT_SAMPLE_RATE) {
+#ifdef CONFIG_YORADIO_PDM_INTEGER_FIR
+    return pcm_fir_push(&s_pcm_fir, left, right,
+                        s_input_sample_rate * PCM_FIR_RATE_DENOMINATOR,
+                        false, pdm_queue_frame);
+#else
+    const uint32_t input_step =
+        s_input_sample_rate * RESAMPLER_OUTPUT_RATE_DENOMINATOR;
+    if (input_step == RESAMPLER_OUTPUT_RATE_NUMERATOR) {
         return pdm_queue_frame(left, right);
     }
     if (!s_resampler_has_previous) {
         s_resampler_has_previous = true;
         s_previous_left = left;
         s_previous_right = right;
-        s_resampler_next_phase = s_input_sample_rate;
+        s_resampler_next_phase = input_step;
         return pdm_queue_frame(left, right);
     }
 
     uint32_t phase = s_resampler_next_phase;
-    while (phase <= PDM_OUTPUT_SAMPLE_RATE) {
+    while (phase <= RESAMPLER_OUTPUT_RATE_NUMERATOR) {
+#ifdef CONFIG_YORADIO_PDM_INTEGER_RATE_COMPENSATION
+        // round(phase * 32768 / 625000). A rounded Q32 reciprocal uses the
+        // high half of the RV32 multiply, without a per-frame division.
+        uint32_t fraction = (uint32_t)(
+            ((uint64_t)phase * RESAMPLER_FRACTION_MULTIPLIER_Q32 +
+             (UINT64_C(1) << 31)) >> 32);
+#else
         // round(phase * 32768 / 48000), using a Q16 reciprocal. This hot path
         // runs once per 48 kHz output frame, so avoid a hardware division.
         uint32_t fraction =
             (phase * RESAMPLER_FRACTION_MULTIPLIER_Q16 + 32768U) >> 16;
+#endif
         ESP_RETURN_ON_ERROR(
             pdm_queue_frame(interpolate_sample(s_previous_left, left, fraction),
                             interpolate_sample(s_previous_right, right,
                                                fraction)),
             TAG, "write resampled stereo PDM");
-        phase += s_input_sample_rate;
+        phase += input_step;
     }
-    s_resampler_next_phase = phase - PDM_OUTPUT_SAMPLE_RATE;
+    s_resampler_next_phase = phase - RESAMPLER_OUTPUT_RATE_NUMERATOR;
     s_previous_left = left;
     s_previous_right = right;
     return ESP_OK;
+#endif
 }
 
 esp_err_t native_audio_output_init(void) {
@@ -289,8 +405,8 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
     }
     ESP_RETURN_ON_ERROR(pdm_begin(), TAG, "start fixed-rate stereo PDM");
     if (input_sample_rate != s_input_sample_rate) {
+        ESP_RETURN_ON_ERROR(native_audio_output_flush_pcm(), TAG, "flush old PCM rate");
         s_input_sample_rate = input_sample_rate;
-        s_buffered_frames = 0;
         reset_resampler();
         native_audio_normalizer_set_sample_rate(input_sample_rate);
         ESP_LOGI(TAG, "Stereo PDM resampler input changed to %lu Hz",
@@ -390,6 +506,9 @@ esp_err_t native_audio_output_write_pcm(uint8_t *data, size_t size,
                  (unsigned long long)(tenths / 10ULL),
                  (unsigned long long)(tenths % 10ULL),
                  (unsigned long)s_stats_packets);
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+        staged_dma_report();
+#endif
         s_stats_started_us = now_us;
         s_stats_audio_us = 0;
         s_stats_normalize_us = 0;
@@ -421,6 +540,40 @@ int8_t native_audio_output_get_balance(void) {
     return native_audio_settings_get_balance();
 }
 
+void native_audio_output_discard_pcm(void) {
+    s_buffered_frames = 0;
+    reset_resampler();
+}
+
+esp_err_t native_audio_output_flush_pcm(void) {
+    esp_err_t result = ESP_OK;
+#ifdef CONFIG_YORADIO_PDM_INTEGER_FIR
+    result = pcm_fir_drain(&s_pcm_fir,
+                           s_input_sample_rate * PCM_FIR_RATE_DENOMINATOR,
+                           pdm_queue_frame);
+    if (result != ESP_OK) {
+        s_buffered_frames = 0;
+        reset_resampler();
+    }
+#endif
+    size_t tail_frames = s_buffered_frames;
+    if (tail_frames) {
+        // The output task is the sole owner. Consume this tail once, even on
+        // a partial/failed driver write, so a later stream cannot replay it.
+        memset(s_frame_buffer + tail_frames * 2U, 0,
+               (PDM_DMA_FRAMES - tail_frames) * 2U * sizeof(*s_frame_buffer));
+        s_buffered_frames = 0;
+        result = pdm_write_block(s_frame_buffer, PDM_DMA_FRAMES);
+        if (result != ESP_OK) reset_resampler();
+    }
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+    ESP_LOGI(TAG, "PERF PCM_FLUSH: frames=%lu result=%d",
+             (unsigned long)tail_frames, (int)result);
+    staged_dma_report();
+#endif
+    return result;
+}
+
 void native_audio_output_idle(void) {
     // DMA descriptors auto-clear to PCM zero; only the level LED must decay.
     audio_level_led_update_peak(0);
@@ -429,6 +582,9 @@ void native_audio_output_idle(void) {
 esp_err_t native_audio_output_suspend(void) {
     if (!s_pdm) return ESP_OK;
     s_buffered_frames = 0;
+#ifdef CONFIG_YORADIO_PDM_INTEGER_FIR
+    pcm_fir_reset(&s_pcm_fir);
+#endif
     uint32_t count = ramp_frames();
     for (uint32_t first = 0; first < count; first += PDM_DMA_FRAMES) {
         fill_ramp(PDM_DMA_FRAMES, first, count, false);
