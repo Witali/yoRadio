@@ -13,13 +13,19 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#if CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+static DRAM_ATTR volatile uint32_t s_allocation_failures;
 
-#define CPU_PROFILE_INTERVAL_MS 5000U
-#define CPU_PROFILE_MAX_TASKS 32U
-#define CPU_PROFILE_STACK_BYTES 4096U
-
-static const char *const TAG = "cpu_profile";
+static void IRAM_ATTR record_allocation_failure(size_t size, uint32_t caps,
+                                                const char *function) {
+    (void)size;
+    (void)caps;
+    (void)function;
+    // C3 is single-core. Preserve the previous interrupt level so task and
+    // ISR callers cannot lose an increment. No heap, logging or Flash data.
+    UBaseType_t saved_level = portSET_INTERRUPT_MASK_FROM_ISR();
+    ++s_allocation_failures;
+    portCLEAR_INTERRUPT_MASK_FROM_ISR(saved_level);
+}
 
 #if CONFIG_ESP_TASK_WDT_EN
 // One ISR writer and one sampler on this single-core C3. Aligned 32-bit
@@ -30,7 +36,25 @@ static DRAM_ATTR volatile uint32_t s_task_watchdog_events;
 void IRAM_ATTR esp_task_wdt_isr_user_handler(void) {
     ++s_task_watchdog_events;
 }
+#endif
 
+cpu_profiler_faults_t cpu_profiler_faults(void) {
+    cpu_profiler_faults_t result = {.allocation_failures = s_allocation_failures};
+#if CONFIG_ESP_TASK_WDT_EN
+    result.task_watchdog_events = s_task_watchdog_events;
+#endif
+    return result;
+}
+
+#if CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+
+#define CPU_PROFILE_INTERVAL_MS 5000U
+#define CPU_PROFILE_MAX_TASKS 32U
+#define CPU_PROFILE_STACK_BYTES 4096U
+
+static const char *const TAG = "cpu_profile";
+
+#if CONFIG_ESP_TASK_WDT_EN
 static void report_task_watchdog(void) {
     static uint32_t reported;
     uint32_t current = s_task_watchdog_events;
@@ -54,6 +78,7 @@ void cpu_profiler_memory(const char *stage) {
 }
 
 static void allocation_failed(size_t size, uint32_t caps, const char *function) {
+    record_allocation_failure(size, caps, function);
     ESP_LOGE(TAG, "PERF allocation failed: requested=%u caps=0x%lx function=%s free=%u largest=%u",
              (unsigned)size, (unsigned long)caps, function,
              (unsigned)heap_caps_get_free_size(caps),
@@ -235,6 +260,8 @@ esp_err_t cpu_profiler_start(void) {
 
 #else
 
-esp_err_t cpu_profiler_start(void) { return ESP_OK; }
+esp_err_t cpu_profiler_start(void) {
+    return heap_caps_register_failed_alloc_callback(record_allocation_failure);
+}
 
 #endif

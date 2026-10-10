@@ -12,10 +12,13 @@
 #include "display_settings.h"
 #include "board_config.h"
 #include "esp_check.h"
+#include "esp_heap_caps.h"
 #include "esp_http_server.h"
 #include "esp_log.h"
 #include "esp_netif.h"
+#include "esp_random.h"
 #include "esp_system.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/task.h"
@@ -33,6 +36,8 @@
 
 static const char *const TAG = "web";
 static native_state_t *s_state;
+// Technical session identity only; regenerated before HTTP starts on each boot.
+static uint64_t s_health_boot_id;
 static QueueHandle_t s_static_request_queue;
 static TaskHandle_t
     s_static_worker_tasks[CONFIG_YORADIO_WEB_STATIC_WORKERS];
@@ -108,6 +113,35 @@ static esp_err_t status_handler(httpd_req_t *request) {
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return httpd_resp_sendstr(request, body);
+}
+
+static esp_err_t health_handler(httpd_req_t *request) {
+    // Snapshot on demand: no sampler task, retained buffers or console output.
+    // Use the same 8-bit allocation capability as the existing heap profiler.
+    multi_heap_info_t heap;
+    heap_caps_get_info(&heap, MALLOC_CAP_8BIT);
+    cpu_profiler_faults_t faults = cpu_profiler_faults();
+    char body[384];
+    int length = snprintf(body, sizeof(body),
+        "{\"schema\":1,\"boot_id\":\"%016llx\",\"uptime_ms\":%llu,"
+        "\"reset_reason\":%u,\"heap\":%lu,\"largest\":%lu,"
+        "\"minimum_heap\":%lu,\"tasks\":%lu,"
+        "\"allocation_failures\":%lu,\"task_watchdog_events\":%lu}",
+        (unsigned long long)s_health_boot_id,
+        (unsigned long long)(esp_timer_get_time() / 1000),
+        (unsigned)esp_reset_reason(), (unsigned long)heap.total_free_bytes,
+        (unsigned long)heap.largest_free_block,
+        (unsigned long)heap.minimum_free_bytes,
+        (unsigned long)uxTaskGetNumberOfTasks(),
+        (unsigned long)faults.allocation_failures,
+        (unsigned long)faults.task_watchdog_events);
+    if (length < 0 || (size_t)length >= sizeof(body)) {
+        return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,
+                                   "Health response overflow");
+    }
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    return httpd_resp_send(request, body, length);
 }
 
 static esp_err_t reconnect_handler(httpd_req_t *request) {
@@ -805,6 +839,7 @@ static esp_err_t sleep_guarded_recovery_wifi_handler(httpd_req_t *request) {
 
 esp_err_t web_service_start(native_state_t *state) {
     s_state = state;
+    esp_fill_random(&s_health_boot_id, sizeof(s_health_boot_id));
     ESP_RETURN_ON_ERROR(start_static_workers(), TAG,
                         "start static content workers");
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -824,6 +859,10 @@ esp_err_t web_service_start(native_state_t *state) {
         .uri = "/api/native/status",
         .method = HTTP_GET,
         .handler = status_handler,
+    };
+    httpd_uri_t health = {
+        .uri = "/api/native/health", .method = HTTP_GET,
+        .handler = health_handler,
     };
     httpd_uri_t ota = {
         .uri = "/update", .method = HTTP_POST, .handler = web_ota_handler,
@@ -879,6 +918,8 @@ esp_err_t web_service_start(native_state_t *state) {
     };
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &status), TAG,
                         "Status route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &health), TAG,
+                        "Health route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &ota), TAG,
                         "OTA route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &ota_info), TAG,

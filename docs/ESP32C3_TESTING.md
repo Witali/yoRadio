@@ -4,6 +4,11 @@ This document defines the acceptance tests added after the 2026-09-30 audit.
 **A test exists, a test ran, and a test passed are three different states.**
 Keep failed measurements. Never accept AAC-core fallback as successful HE-AAC.
 
+For quiet production images, the [health endpoint](ESP32C3_PRODUCTION_HEALTH.md)
+provides heap, boot identity and lifetime allocation/watchdog counters without
+UART profiling. These observations complement format and recovery checks;
+they do not provide DMA, PCM-quality or all decoder-error evidence.
+
 For processor capabilities, hardware cycle counters, cache-aware measurements
 and the applicable ESP-IDF 6.1 speed guidance, read the
 [ESP32-C3 optimization reference](ESP32C3_OPTIMIZATION_REFERENCE.md).
