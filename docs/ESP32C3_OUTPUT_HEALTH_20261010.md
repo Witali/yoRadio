@@ -114,3 +114,8 @@ The [subsequent HTTPS frame-growth campaign](ESP32C3_AAC_TLS_HEADROOM_20261010.m
 completes all six AAC files, with no allocation/watchdog/output events, even
 when the HE-AAC largest block again reaches 7,424 B. Its 15/16 verdict retains
 the same headroom failure; the specific tested frame growth succeeds.
+
+The [quiet TLS-record campaign](ESP32C3_QUIET_TLS_RECORDS_20261010.md) reuses
+the separate laboratory-CA image to test actual maximum-size TLS application
+records, growth and alternation with both HE-AAC profiles. It keeps independent
+output and memory gates and preserves the earlier qualification failures.

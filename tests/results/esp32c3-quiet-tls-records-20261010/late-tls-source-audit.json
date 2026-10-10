@@ -1,0 +1,35 @@
+{
+  "scope": "Source inspection, not a runtime allocation measurement",
+  "files": {
+    "components/esp-tls/esp_tls_mbedtls.c": {
+      "sha256": "cacc35f509cfda8779d058ff7ed6e01ce2218967443079f90281dc8718510055",
+      "matches": [
+        {
+          "line": 1003,
+          "text": "mbedtls_ssl_conf_renegotiation(&tls->conf, MBEDTLS_SSL_RENEGOTIATION_ENABLED);"
+        },
+        {
+          "line": 1024,
+          "text": "mbedtls_ssl_conf_renegotiation(&tls->conf, MBEDTLS_SSL_RENEGOTIATION_ENABLED);"
+        }
+      ]
+    },
+    "components/mbedtls/port/dynamic/esp_ssl_tls.c": {
+      "sha256": "791079366d124d52aea2256fdf52fa0704a1ec4526fdb012104e6f0cd4044756",
+      "matches": [
+        {
+          "line": 138,
+          "text": "ssl->transform_negotiate = mbedtls_calloc( 1, sizeof(mbedtls_ssl_transform) );"
+        },
+        {
+          "line": 144,
+          "text": "ssl->session_negotiate = mbedtls_calloc( 1, sizeof(mbedtls_ssl_session) );"
+        },
+        {
+          "line": 149,
+          "text": "ssl->handshake = mbedtls_calloc( 1, sizeof(mbedtls_ssl_handshake_params) );"
+        }
+      ]
+    }
+  }
+}

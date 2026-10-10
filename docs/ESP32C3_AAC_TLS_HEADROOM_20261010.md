@@ -108,3 +108,9 @@ applicable allocation requirements are demonstrated. Any reserve/pool change
 must preserve leased input, format support and PCM quality, and be checked for
 new output service events. No firmware allocator change is made by this
 experiment.
+
+The follow-up [quiet TLS-record campaign](ESP32C3_QUIET_TLS_RECORDS_20261010.md)
+separates TLS record-size changes from ADTS frame growth. It uses measured
+1/16 KiB records with HE-AAC/HE-AACv2 and independent output/memory gates.
+The preserved 7,424-byte results above remain unchanged; application-record
+tests do not establish the memory required by a late TLS renegotiation.
