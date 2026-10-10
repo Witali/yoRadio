@@ -6,9 +6,21 @@ ROOT=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--idf',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
+p.add_argument('--diagnostic', action='store_true')
 args=p.parse_args()
 args.output.mkdir(parents=True,exist_ok=True)
-(args.output/'sdkconfig.h').write_text('#pragma once\n')
+(args.output/'sdkconfig.h').write_text('#pragma once\n' +
+    ('#define CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC 1\n' if args.diagnostic else ''))
+if args.diagnostic:
+    (args.output/'esp_timer.h').write_text('#pragma once\n#include <stdint.h>\nint64_t esp_timer_get_time(void);\n')
+    (args.output/'freertos').mkdir(exist_ok=True)
+    (args.output/'freertos/FreeRTOS.h').write_text('''#pragma once
+typedef unsigned UBaseType_t;
+extern unsigned test_interrupt_mask;
+static inline unsigned test_mask(void) { unsigned old=test_interrupt_mask; test_interrupt_mask=31; return old; }
+#define portSET_INTERRUPT_MASK_FROM_ISR() test_mask()
+#define portCLEAR_INTERRUPT_MASK_FROM_ISR(previous) (test_interrupt_mask=(previous))
+''')
 sdk=args.idf/'components/esp_http_client/esp_http_client.c'
 source=sdk.read_text()
 start=source.index('int esp_http_client_read(')
@@ -84,10 +96,11 @@ if build.returncode:raise SystemExit(build.returncode)
 run=subprocess.run(['wsl.exe','--exec',linux(binary)],capture_output=True,text=True,timeout=30)
 (args.output/'run.log').write_text(run.stdout+run.stderr)
 report=dict(result='PASS' if run.returncode==0 and 'STREAM_HTTP_READER_PASS' in run.stdout else 'FAIL',
+    diagnostic=args.diagnostic,
     idf=str(args.idf), sdk_source_sha256=hashlib.sha256(sdk.read_bytes()).hexdigest(),
     extracted_function_sha256=hashlib.sha256(function.encode()).hexdigest(),
     sources_sha256={str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest()
-        for path in (harness,main/'stream_http_reader.c',main/'stream_http_reader.h',main/'tls_stream_eof.c',Path(__file__))},
+        for path in (harness,main/'stream_http_reader.c',main/'stream_http_reader.h',main/'audio_pipeline_probe.h',main/'tls_stream_eof.c',Path(__file__))},
     tls_adapter_sha256=hashlib.sha256(tls_read.encode()).hexdigest(),
     parser_sha256=hashlib.sha256((parser/'http_parser.c').read_bytes()).hexdigest(),
     body_callbacks_sha256=hashlib.sha256(body.encode()).hexdigest(),

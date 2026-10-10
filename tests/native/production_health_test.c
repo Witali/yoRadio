@@ -101,6 +101,9 @@ int main(void) {
     for (unsigned n=0;n<17;++n) audio_pipeline_probe_overrun(UINT32_MAX);
     assert(s_audio_pipeline_probe.sequence==8);
     audio_pipeline_probe_t snapshot=s_audio_pipeline_probe;
+    // Exercise the longest signed and unsigned failure fields in bounded JSON.
+    s_audio_pipeline_probe.stream_failure=(audio_stream_failure_t){
+        UINT32_MAX,UINT32_MAX,INT32_MIN,INT32_MIN,INT32_MIN,INT32_MIN};
     char tiny[8]="{}";
     assert(audio_pipeline_probe_append(tiny,sizeof(tiny),2,&snapshot)==-1);
     assert(audio_pipeline_probe_append(tiny,sizeof(tiny),INT_MAX,&snapshot)==-1);

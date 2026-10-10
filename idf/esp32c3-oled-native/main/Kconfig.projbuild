@@ -178,8 +178,10 @@ config YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
     depends on IDF_TARGET_ESP32C3 && !YORADIO_DIRECT_DMA_PCM && !YORADIO_QEMU
     default n
     help
-        Laboratory diagnostic: use 516 static bytes for phase counts and
-        the last 16 overrun observations, exposed through native health.
+        Laboratory diagnostic: use 540 static bytes for phase counts,
+        the last 16 overrun observations and the last HTTP/TLS read failure,
+        exposed through native health. Failure evidence contains only numeric
+        error codes and a timestamp; no stream bytes, URLs or credentials.
         Read the system timer at queue/read checkpoints and in the ISR.
         No sampler task, allocation or UART logging. Flags show call phases,
         not scheduler state; ages wrap after 2^32 microseconds. It changes ISR

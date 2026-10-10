@@ -29,6 +29,19 @@ class PipelineHealth(unittest.TestCase):
         self.output['completion_queue_drops'] = 0
         validate_pipeline(self.probe,self.output)
 
+    def test_optional_stream_failure_numeric_copy(self):
+        failure = dict(sequence=2**32-1, timestamp_us=2**32-1, http_result=-1,
+                       esp_tls_error=32797, tls_code=120, system_errno=104, extra='ignored')
+        self.probe['stream_failure'] = failure
+        value = validate_pipeline(self.probe, self.output)['stream_failure']
+        self.assertNotIn('extra', value)
+        self.assertEqual(value['http_result'], -1)
+        for change in (dict(sequence=-1), dict(timestamp_us=True), dict(tls_code=2**31),
+                       dict(http_result='-1'), dict(system_errno=None)):
+            self.probe['stream_failure'] = dict(failure, **change)
+            with self.subTest(change=change), self.assertRaises(Failure):
+                validate_pipeline(self.probe, self.output)
+
     def test_invalid_data_fail_closed(self):
         cases = [dict(sequence=True), dict(timer_hz=0), dict(events=[]),
                  dict(phase_drops=[0]*8), dict(events=self.probe['events']*17),

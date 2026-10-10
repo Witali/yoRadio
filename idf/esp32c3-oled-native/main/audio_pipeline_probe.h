@@ -23,11 +23,16 @@ typedef struct {
     uint32_t output_age, pcm_age, input_age, network_age;
 } audio_pipeline_probe_event_t;
 typedef struct {
+    uint32_t sequence, timestamp_us;
+    int32_t http_result, esp_tls_error, tls_code, system_errno;
+} audio_stream_failure_t;
+typedef struct {
     uint32_t output_wait, decoder_wait, stream_read;
     uint32_t output_us, pcm_us, input_us, network_us;
     uint32_t sequence, valid_count;
     uint32_t phase_drops[AUDIO_PROBE_PHASE_COUNT];
     audio_pipeline_probe_event_t events[AUDIO_PROBE_EVENTS];
+    audio_stream_failure_t stream_failure;
 } audio_pipeline_probe_t;
 extern volatile audio_pipeline_probe_t s_audio_pipeline_probe;
 
@@ -58,7 +63,7 @@ static inline __attribute__((always_inline)) void audio_pipeline_probe_overrun(u
         ++s_audio_pipeline_probe.valid_count;
     }
 }
-_Static_assert(sizeof(audio_pipeline_probe_t) == 516U, "Bound diagnostic RAM");
+_Static_assert(sizeof(audio_pipeline_probe_t) == 540U, "Bound diagnostic RAM");
 _Static_assert((AUDIO_PROBE_EVENTS & (AUDIO_PROBE_EVENTS - 1U)) == 0,
                "Event capacity must be a power of two");
 
@@ -90,7 +95,12 @@ static inline int audio_pipeline_probe_append(char *body, size_t capacity,
             (unsigned long)event->pcm_age, (unsigned long)event->input_age,
             (unsigned long)event->network_age);
     }
-    PROBE_APPEND("]}}");
+    const audio_stream_failure_t *failure = &probe->stream_failure;
+    PROBE_APPEND("],\"stream_failure\":{\"sequence\":%lu,\"timestamp_us\":%lu,"
+                 "\"http_result\":%ld,\"esp_tls_error\":%ld,\"tls_code\":%ld,\"system_errno\":%ld}}}",
+        (unsigned long)failure->sequence, (unsigned long)failure->timestamp_us,
+        (long)failure->http_result, (long)failure->esp_tls_error,
+        (long)failure->tls_code, (long)failure->system_errno);
 #undef PROBE_APPEND
     return length;
 }

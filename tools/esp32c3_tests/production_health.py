@@ -30,8 +30,17 @@ def validate_pipeline(probe, output):
         require(event[0] == ((sequence - len(events) + 1 + index) & COUNTER_MASK) and
                 event[2] < 8, 'Invalid pipeline event order or phase')
     require(events or sequence == 0, 'Missing pipeline event history')
-    return dict(timer_hz=probe['timer_hz'], sequence=sequence,
-                phase_drops=list(histogram), events=[list(e) for e in events])
+    result = dict(timer_hz=probe['timer_hz'], sequence=sequence,
+                  phase_drops=list(histogram), events=[list(e) for e in events])
+    if 'stream_failure' in probe:
+        failure = probe['stream_failure']
+        require(type(failure) is dict and all(word(failure.get(k))
+                for k in ('sequence', 'timestamp_us')), 'Invalid stream failure identity')
+        codes = ('http_result', 'esp_tls_error', 'tls_code', 'system_errno')
+        require(all(type(failure.get(k)) is int and -(1 << 31) <= failure[k] < (1 << 31)
+                    for k in codes), 'Invalid stream failure codes')
+        result['stream_failure'] = {k: failure[k] for k in ('sequence', 'timestamp_us', *codes)}
+    return result
 
 
 def validate_output(output):

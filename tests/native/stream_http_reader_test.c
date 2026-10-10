@@ -10,6 +10,12 @@
 #include "esp_tls_errors.h"
 #include "http_parser.h"
 #include "mbedtls/ssl.h"
+#include "audio_pipeline_probe.h"
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+volatile audio_pipeline_probe_t s_audio_pipeline_probe;
+unsigned test_interrupt_mask = 7;
+int64_t esp_timer_get_time(void) { return UINT32_MAX + 123LL; }
+#endif
 
 enum { ERR_TCP_TRANSPORT_CONNECTION_FAILED=-2,
        ERR_TCP_TRANSPORT_CONNECTION_CLOSED_BY_FIN=-1,
@@ -43,6 +49,7 @@ static void esp_http_client_cached_buf_cleanup(esp_http_buffer_t *b) { b->raw_da
 static int esp_transport_read(struct fake_client *c,char *buffer,int size,int timeout) {
     (void)timeout;++c->calls;assert(!c->closes && c->next<256);
     step_t step=c->steps[c->next++];assert(step.bytes<=size);
+    if(step.bytes<0) errno=ECONNRESET;
     if(step.bytes>0) {
         if(step.data)memcpy(buffer,step.data,(size_t)step.bytes);
         else memset(buffer,0x4b,(size_t)step.bytes);
@@ -52,7 +59,7 @@ static int esp_transport_read(struct fake_client *c,char *buffer,int size,int ti
 }
 esp_err_t esp_http_client_get_and_clear_last_tls_error(esp_http_client_handle_t c,int *code,int *flags) {
     ++c->error_queries;if(code)*code=c->tls_code;if(flags)*flags=0;
-    int result=c->tls_error;c->tls_error=c->tls_code=0;return result;
+    int result=c->tls_error;c->tls_error=c->tls_code=0;errno=EDOM;return result;
 }
 esp_err_t esp_http_client_close(esp_http_client_handle_t c) { ++c->closes; return ESP_OK; }
 static int esp_transport_translate_error(int error) {return error;}
@@ -121,12 +128,25 @@ static void test_partial_fatal(unsigned initial,bool cached,int tls_error) {
     c.steps[!cached && initial ? 1:0]=(step_t){.bytes=ERR_TCP_TRANSPORT_CONNECTION_FAILED,.tls_error=tls_error};
     int result=stream_http_read(&reader,&c,output,sizeof(output));
     assert(result==(initial?(int)initial:ESP_FAIL));assert(reader.failed && c.closes==1);
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    audio_stream_failure_t failure=s_audio_pipeline_probe.stream_failure;
+    assert(failure.sequence>0 && failure.timestamp_us==122);
+    assert(failure.http_result==result && failure.esp_tls_error==ESP_ERR_MBEDTLS_SSL_READ_FAILED);
+    assert(failure.tls_code==tls_error && failure.system_errno==ECONNRESET);
+    assert(test_interrupt_mask==7);
+#endif
     for(unsigned i=0;i<initial;++i)assert(output[i]==0x4b);
     unsigned calls=c.calls,queries=c.error_queries;
     for(unsigned i=0;i<3;++i)assert(stream_http_read(&reader,&c,output,sizeof(output))==ESP_FAIL);
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    assert(s_audio_pipeline_probe.stream_failure.sequence==failure.sequence);
+#endif
     assert(c.calls==calls && c.error_queries==queries);++cases;
 }
 static void test_retry(int temporary,unsigned initial) {
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    uint32_t failures=s_audio_pipeline_probe.stream_failure.sequence;
+#endif
     struct fake_client c;response_t r;esp_http_buffer_t b;setup(&c,&r,&b);
     stream_http_reader_t reader={0};char output[128];
     if(initial)c.steps[0]=(step_t){.bytes=(int)initial,.tls_error=0};
@@ -135,6 +155,9 @@ static void test_retry(int temporary,unsigned initial) {
     assert(stream_http_read(&reader,&c,output,sizeof(output))==(initial?(int)initial:-ESP_ERR_HTTP_EAGAIN));
     assert(!reader.failed && !c.closes);
     assert(stream_http_read(&reader,&c,output,sizeof(output))==128);assert(!reader.failed && !c.closes);++cases;
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    assert(s_audio_pipeline_probe.stream_failure.sequence==failures);
+#endif
 }
 static void test_framing(const char *headers,const char *wire,const char *expected,
                          bool complete,unsigned fragment,int transport_error,int tls_error) {
