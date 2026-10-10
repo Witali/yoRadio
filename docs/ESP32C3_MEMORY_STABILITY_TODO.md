@@ -19,13 +19,24 @@ bracket has zero increments. Neither the diagnostic combination nor the
 separately built quiet image is production-qualified. Next attribute the
 remaining heap owner and TCP handshake failure with the retained probes.
 
+The [owner/TCP follow-up](ESP32C3_TLS_HEAP_OWNER_20261010.md) now identifies
+one persistent 92-byte `radio_stream` allocation splitting the largest free
+region after first AAC/TLS use. It matches the SDK mutex size; lazy hardware
+MPI-lock initialization is a source-grounded hypothesis awaiting a controlled
+early-initialization test. Heavy FLAC completes 600 seconds with zero DMA
+counter increments on the instrumented image. TCP connect timeouts do not
+recur, but four missing TCP records invalidate its whole trace. The short
+AAC repeat retains its recovery failure and one early DMA counter increment.
+Next test the allocation's cause without weakening recovery thresholds;
+final quiet-image qualification and intermittent TCP diagnosis remain open.
+
 Latest [integer-clock cross-codec qualification](ESP32C3_INTEGER_QUALIFICATION_20261009.md)
 passes the HTTPS matrix and 33 codec switches. Ten-minute HE-AACv2 retains one
-initial-idle TCP timeout and 11 late delayed-DMA notifications. The next
-candidate combines the hardware fractional divider with the retained TLS
-reserve, 250/500 ms input prefill and four extra FLAC input slots. Qualify
-that combination before claiming continuous AAC output. Diagnostic results
-do not qualify a separately built quiet production candidate.
+initial-idle TCP timeout and 11 late delayed-DMA notifications. The integrated
+trial above combines the hardware fractional divider with the retained TLS
+reserve, 250/500 ms input prefill and four extra FLAC input slots. Its retained
+failures still require resolution. Diagnostic results do not qualify a
+separately built quiet production candidate.
 
 The [rational-rate resampler experiment](ESP32C3_INTEGER_RATE_COMPENSATION_20261009.md)
 now passes sample-count and memory-safety host checks, but its linear

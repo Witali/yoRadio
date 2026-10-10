@@ -1,0 +1,94 @@
+$1 = 92
+Symbol "s_crypto_mpi_lock" is static storage at address 0x3fc99ec8.
+Symbol "s_crypto_sha_aes_lock" is static storage at address 0x3fc99ec4.
+Dump of assembler code for function esp_crypto_mpi_lock_acquire:
+   0x42073b76 <+0>:	lui	a0,0x3fc9a
+   0x42073b7a <+4>:	addi	a0,a0,-312 # 0x3fc99ec8 <s_crypto_mpi_lock>
+   0x42073b7e <+8>:	auipc	t1,0xfe30d
+   0x42073b82 <+12>:	jr	1034(t1) # 0x40380f88 <_lock_acquire>
+End of assembler dump.
+Dump of assembler code for function xQueueCreateMutex:
+   0x4211a55c <+0>:	addi	sp,sp,-16
+   0x4211a55e <+2>:	sw	s1,4(sp)
+   0x4211a560 <+4>:	mv	s1,a0
+   0x4211a562 <+6>:	li	a0,92
+   0x4211a566 <+10>:	sw	s0,8(sp)
+   0x4211a568 <+12>:	sw	ra,12(sp)
+   0x4211a56a <+14>:	auipc	ra,0xffeef
+   0x4211a56e <+18>:	jalr	-568(ra) # 0x42009332 <pvPortMalloc>
+   0x4211a572 <+22>:	mv	s0,a0
+   0x4211a574 <+24>:	beqz	a0,0x4211a5a8 <xQueueCreateMutex+76>
+   0x4211a576 <+26>:	sb	zero,70(a0)
+   0x4211a57a <+30>:	li	a1,1
+   0x4211a57c <+32>:	sw	a0,0(s0)
+   0x4211a57e <+34>:	sw	a1,60(a0)
+   0x4211a580 <+36>:	sw	zero,64(a0)
+   0x4211a584 <+40>:	jal	0x42119f24 <xQueueGenericReset>
+   0x4211a588 <+44>:	mv	a0,s0
+   0x4211a58a <+46>:	sb	s1,80(s0)
+   0x4211a58e <+50>:	sw	zero,72(s0)
+   0x4211a592 <+54>:	sw	zero,8(s0)
+   0x4211a596 <+58>:	sw	zero,0(s0)
+   0x4211a59a <+62>:	sw	zero,12(s0)
+   0x4211a59e <+66>:	li	a3,0
+   0x4211a5a0 <+68>:	li	a2,0
+   0x4211a5a2 <+70>:	li	a1,0
+   0x4211a5a4 <+72>:	jal	0x4211a312 <xQueueGenericSend>
+   0x4211a5a8 <+76>:	lw	ra,12(sp)
+   0x4211a5aa <+78>:	mv	a0,s0
+   0x4211a5ac <+80>:	lw	s0,8(sp)
+   0x4211a5ae <+82>:	lw	s1,4(sp)
+   0x4211a5b0 <+84>:	addi	sp,sp,16
+   0x4211a5b2 <+86>:	ret
+End of assembler dump.
+Dump of assembler code for function xQueueGenericCreate:
+   0x4211a136 <+0>:	addi	sp,sp,-32
+   0x4211a138 <+2>:	sw	ra,28(sp)
+   0x4211a13a <+4>:	sw	s0,24(sp)
+   0x4211a13c <+6>:	sw	s1,20(sp)
+   0x4211a13e <+8>:	beqz	a0,0x4211a19e <xQueueGenericCreate+104>
+   0x4211a140 <+10>:	mulhu	a5,a0,a1
+   0x4211a144 <+14>:	mv	s0,a0
+   0x4211a146 <+16>:	bnez	a5,0x4211a19e <xQueueGenericCreate+104>
+   0x4211a148 <+18>:	mul	a0,a0,a1
+   0x4211a14c <+22>:	li	a5,-93
+   0x4211a150 <+26>:	bltu	a5,a0,0x4211a19e <xQueueGenericCreate+104>
+   0x4211a154 <+30>:	addi	a0,a0,92
+   0x4211a158 <+34>:	mv	s1,a2
+   0x4211a15a <+36>:	sw	a1,12(sp)
+   0x4211a15c <+38>:	auipc	ra,0xffeef
+   0x4211a160 <+42>:	jalr	470(ra) # 0x42009332 <pvPortMalloc>
+   0x4211a164 <+46>:	mv	a5,a0
+   0x4211a166 <+48>:	beqz	a0,0x4211a18c <xQueueGenericCreate+86>
+   0x4211a168 <+50>:	lw	a1,12(sp)
+   0x4211a16a <+52>:	sb	zero,70(a0)
+   0x4211a16e <+56>:	mv	a4,a0
+   0x4211a170 <+58>:	bnez	a1,0x4211a198 <xQueueGenericCreate+98>
+   0x4211a172 <+60>:	sw	a1,64(a5)
+   0x4211a174 <+62>:	sw	a4,0(a5)
+   0x4211a176 <+64>:	sw	s0,60(a5)
+   0x4211a178 <+66>:	mv	a0,a5
+   0x4211a17a <+68>:	li	a1,1
+   0x4211a17c <+70>:	sw	a5,12(sp)
+   0x4211a17e <+72>:	jal	0x42119f24 <xQueueGenericReset>
+   0x4211a182 <+76>:	lw	a5,12(sp)
+   0x4211a184 <+78>:	sb	s1,80(a5)
+   0x4211a188 <+82>:	sw	zero,72(a5)
+   0x4211a18c <+86>:	lw	ra,28(sp)
+   0x4211a18e <+88>:	lw	s0,24(sp)
+   0x4211a190 <+90>:	lw	s1,20(sp)
+   0x4211a192 <+92>:	mv	a0,a5
+   0x4211a194 <+94>:	addi	sp,sp,32
+   0x4211a196 <+96>:	ret
+   0x4211a198 <+98>:	addi	a4,a0,92
+   0x4211a19c <+102>:	j	0x4211a172 <xQueueGenericCreate+60>
+   0x4211a19e <+104>:	lui	a3,0x3c124
+   0x4211a1a2 <+108>:	lui	a2,0x3c140
+   0x4211a1a6 <+112>:	lui	a0,0x3c124
+   0x4211a1aa <+116>:	addi	a3,a3,320 # 0x3c124140
+   0x4211a1ae <+120>:	addi	a2,a2,-1504 # 0x3c13fa20 <__func__.21>
+   0x4211a1b2 <+124>:	addi	a0,a0,114 # 0x3c124072
+   0x4211a1b6 <+128>:	li	a1,573
+   0x4211a1ba <+132>:	auipc	ra,0xfe26d
+   0x4211a1be <+136>:	jalr	-1886(ra) # 0x40386a5c <__assert_func>
+End of assembler dump.
