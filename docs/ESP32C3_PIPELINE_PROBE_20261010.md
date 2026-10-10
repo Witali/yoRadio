@@ -54,6 +54,15 @@ HE-AACv2. Do not adopt it by default solely because these cases improve:
 higher bitrates, other codecs, memory headroom and recovery still need checks.
 This is a buffering hypothesis to test, not a completed repair.
 
+### Follow-up: one-second prefill
+
+The subsequent [1000 ms campaign](ESP32C3_PREFILL1000_RENEGOTIATION_20261010.md)
+passes 34/34 checks across HE-AAC and HE-AACv2 with both TLS record sizes.
+All four measured playback windows have zero completion-queue drops and
+write errors, with unchanged static RAM/IRAM and codec arithmetic. This is
+a candidate mitigation for the measured pause; normal-trust multi-codec,
+recovery and memory-headroom qualification remain open before changing defaults.
+
 ## Diagnostic implementation and audit
 
 The optional probe uses 516 static bytes; alignment makes the linked DRAM
