@@ -23,6 +23,7 @@
 #include "freertos/queue.h"
 #include "freertos/task.h"
 #include "network_service.h"
+#include "native_audio_output.h"
 #include "radio_control.h"
 #include "web_pages_bridge.h"
 #include "web_ota.h"
@@ -121,12 +122,14 @@ static esp_err_t health_handler(httpd_req_t *request) {
     multi_heap_info_t heap;
     heap_caps_get_info(&heap, MALLOC_CAP_8BIT);
     cpu_profiler_faults_t faults = cpu_profiler_faults();
-    char body[384];
+    native_audio_output_health_t output = native_audio_output_health();
+    char body[512];
     int length = snprintf(body, sizeof(body),
         "{\"schema\":1,\"boot_id\":\"%016llx\",\"uptime_ms\":%llu,"
         "\"reset_reason\":%u,\"heap\":%lu,\"largest\":%lu,"
         "\"minimum_heap\":%lu,\"tasks\":%lu,"
-        "\"allocation_failures\":%lu,\"task_watchdog_events\":%lu}",
+        "\"allocation_failures\":%lu,\"task_watchdog_events\":%lu,"
+        "\"output\":{\"available\":%s,\"completion_queue_drops\":%lu,\"write_errors\":%lu}}",
         (unsigned long long)s_health_boot_id,
         (unsigned long long)(esp_timer_get_time() / 1000),
         (unsigned)esp_reset_reason(), (unsigned long)heap.total_free_bytes,
@@ -134,7 +137,10 @@ static esp_err_t health_handler(httpd_req_t *request) {
         (unsigned long)heap.minimum_free_bytes,
         (unsigned long)uxTaskGetNumberOfTasks(),
         (unsigned long)faults.allocation_failures,
-        (unsigned long)faults.task_watchdog_events);
+        (unsigned long)faults.task_watchdog_events,
+        output.available ? "true" : "false",
+        (unsigned long)output.completion_queue_drops,
+        (unsigned long)output.write_errors);
     if (length < 0 || (size_t)length >= sizeof(body)) {
         return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,
                                    "Health response overflow");

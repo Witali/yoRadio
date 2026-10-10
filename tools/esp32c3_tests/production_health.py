@@ -6,6 +6,17 @@ from common import Board, require
 
 NUMERIC = ('uptime_ms', 'reset_reason', 'heap', 'largest', 'minimum_heap',
            'tasks', 'allocation_failures', 'task_watchdog_events')
+OUTPUT_COUNTERS = ('completion_queue_drops', 'write_errors')
+COUNTER_MASK = (1 << 32) - 1
+
+
+def validate_output(output):
+    require(type(output) is dict and type(output.get('available')) is bool,
+            'Invalid output health availability')
+    for key in OUTPUT_COUNTERS:
+        require(type(output.get(key)) is int and 0 <= output[key] <= COUNTER_MASK,
+                'Missing or invalid output counter: ' + key)
+    return {key: output[key] for key in ('available', *OUTPUT_COUNTERS)}
 
 
 def read_health(board):
@@ -20,7 +31,35 @@ def read_health(board):
     require(raw['tasks'] > 0 and raw['largest'] <= raw['heap'] and
             raw['minimum_heap'] <= raw['heap'], 'Inconsistent heap snapshot')
     # Never retain extra fields or response bodies from the device.
-    return {key: raw[key] for key in ('schema', 'boot_id', *NUMERIC)}
+    result = {key: raw[key] for key in ('schema', 'boot_id', *NUMERIC)}
+    # Schema 1 firmware predates output telemetry; basic health stays compatible.
+    if 'output' in raw:
+        result['output'] = validate_output(raw['output'])
+    return result
+
+
+def output_window(samples):
+    """Measure a caller-selected sustained-play window, excluding Start/Stop.
+
+    Missing measurements fail closed. Modular increments handle uint32 wrap;
+    a reboot is rejected by check_health. Compare adjacent samples so any
+    observed increments cannot cancel out at the window endpoints.
+    """
+    check_health(samples)
+    require(len(samples) >= 2, 'Need two output observations')
+    require(samples[-1]['uptime_ms'] > samples[0]['uptime_ms'],
+            'No elapsed output observation time')
+    totals = {key: 0 for key in OUTPUT_COUNTERS}
+    previous = None
+    for row in samples:
+        output = validate_output(row.get('output'))
+        require(output['available'], 'Output health is unavailable on this backend')
+        if previous is not None:
+            for key in OUTPUT_COUNTERS:
+                totals[key] += (output[key] - previous[key]) & COUNTER_MASK
+        previous = output
+    return dict(samples=len(samples),
+                elapsed_ms=samples[-1]['uptime_ms']-samples[0]['uptime_ms'], **totals)
 
 
 def check_health(samples):

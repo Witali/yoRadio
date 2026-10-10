@@ -73,12 +73,14 @@ static uint64_t s_stats_audio_us;
 static uint64_t s_stats_normalize_us;
 static uint32_t s_stats_packets;
 
-#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
 static DRAM_ATTR volatile uint32_t s_dma_overruns;
+static volatile uint32_t s_dma_write_errors;
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
 static struct {
     uint64_t written_bytes, write_us, max_write_us;
     uint32_t writes, errors;
 } s_dma_write_profile;
+#endif
 
 static bool IRAM_ATTR dma_queue_overrun(i2s_chan_handle_t channel,
     i2s_event_data_t *event, void *context) {
@@ -95,6 +97,15 @@ uint32_t native_audio_output_dma_overruns(void) {
     return s_dma_overruns;
 }
 
+native_audio_output_health_t native_audio_output_health(void) {
+    return (native_audio_output_health_t){
+        .available = true,
+        .completion_queue_drops = s_dma_overruns,
+        .write_errors = s_dma_write_errors,
+    };
+}
+
+#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
 static void staged_dma_report(void) {
     ESP_LOGI(TAG,
         "PERF STAGED_DMA: q_overruns=%lu writes=%lu written_bytes=%llu "
@@ -196,6 +207,7 @@ static esp_err_t pdm_write_block(const int16_t *samples, size_t frames) {
     int64_t started_us = esp_timer_get_time();
 #endif
     esp_err_t result = i2s_channel_write(s_pdm, samples, bytes, &written, 1000);
+    if (result != ESP_OK || written != bytes) ++s_dma_write_errors;
 #ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
     uint64_t elapsed_us = (uint64_t)(esp_timer_get_time() - started_us);
     ++s_dma_write_profile.writes;
@@ -246,14 +258,12 @@ static esp_err_t pdm_begin(void) {
         },
     };
     esp_err_t result = i2s_channel_init_pdm_tx_mode(s_pdm, &pdm_config);
-#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
     if (result == ESP_OK) {
         const i2s_event_callbacks_t callbacks = {
             .on_send_q_ovf = dma_queue_overrun,
         };
         result = i2s_channel_register_event_callback(s_pdm, &callbacks, NULL);
     }
-#endif
     if (result != ESP_OK) {
         i2s_del_channel(s_pdm);
         s_pdm = NULL;

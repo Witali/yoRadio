@@ -7,9 +7,21 @@
 #include "esp_err.h"
 #include "sdkconfig.h"
 
+typedef struct {
+    bool available;
+    uint32_t completion_queue_drops;
+    uint32_t write_errors;
+} native_audio_output_health_t;
+
+// Lifetime uint32 counters (modulo 2^32), read as aligned words on C3.
+// Completion-queue drops indicate delayed service, not an acoustic gap count.
+// Startup, idle and Stop may contribute: compare only sustained-play windows.
+// The experimental direct-DMA backend currently reports unavailable.
+native_audio_output_health_t native_audio_output_health(void);
+
 #if defined(CONFIG_YORADIO_PIPELINE_PROFILE) || defined(CONFIG_YORADIO_STAGED_DMA_PROFILE)
-// Monotonic counter; one ISR writer, aligned word read on the single-core C3.
-// Queue overrun means a completed descriptor was discarded before reuse.
+// Lifetime modulo-2^32 counter; one ISR writer, aligned word read on C3.
+// Queue overrun means a completion notification was discarded before reuse.
 uint32_t native_audio_output_dma_overruns(void);
 #endif
 

@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools/esp32c3_tests'))
 from common import Failure
-from production_health import HealthBoard, NUMERIC, check_health, read_health
+from production_health import HealthBoard, NUMERIC, check_health, read_health, output_window
 
 
 def sample(**updates):
@@ -47,6 +47,37 @@ class HealthTests(unittest.TestCase):
         self.assertEqual(check_health([sample(), sample(uptime_ms=3000)])['samples'], 2)
         with self.assertRaises(Failure):
             check_health([])
+
+    def test_optional_output_filters_extra_fields_and_rejects_invalid_counters(self):
+        output = dict(available=True, completion_queue_drops=7, write_errors=2)
+        board = Mock(json=Mock(return_value=sample(output=dict(output, private='secret'))))
+        self.assertEqual(read_health(board)['output'], output)
+        for field in ('completion_queue_drops', 'write_errors'):
+            for value in (None, True, -1, 2**32, '0'):
+                with self.subTest(field=field, value=value), self.assertRaises(Failure):
+                    read_health(Mock(json=Mock(return_value=sample(output=dict(output, **{field:value})))))
+        for value in (None, {}, dict(output, available=1)):
+            with self.assertRaises(Failure):
+                read_health(Mock(json=Mock(return_value=sample(output=value))))
+
+    def test_output_window_excludes_past_events_and_counts_wrap(self):
+        def row(ms, drops, errors=2):
+            return sample(uptime_ms=ms, output=dict(available=True,
+                          completion_queue_drops=drops, write_errors=errors))
+        result = output_window([row(2000, 7), row(4000, 7)])
+        self.assertEqual(result, dict(samples=2, elapsed_ms=2000,
+                                     completion_queue_drops=0, write_errors=0))
+        result = output_window([row(2000, 2**32-1), row(3000, 0), row(4000, 2, 3)])
+        self.assertEqual(result['completion_queue_drops'], 3)
+        self.assertEqual(result['write_errors'], 1)
+
+    def test_output_window_rejects_missing_unavailable_and_rebooted_evidence(self):
+        first = sample(output=dict(available=True, completion_queue_drops=0, write_errors=0))
+        for last in (sample(uptime_ms=3000),
+                     dict(first, uptime_ms=3000, output=dict(first['output'], available=False)),
+                     dict(first, uptime_ms=3000, boot_id='fedcba9876543210'), first):
+            with self.assertRaises(Failure):
+                output_window([first, last])
 
 
 if __name__ == '__main__':

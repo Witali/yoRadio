@@ -32,6 +32,10 @@ static esp_err_t heap_caps_register_failed_alloc_callback(void (*fn)(size_t,uint
 }
 /* PROFILER_SOURCE */
 
+/* OUTPUT_HEALTH_TYPE */
+static native_audio_output_health_t output_sample;
+static native_audio_output_health_t native_audio_output_health(void) { return output_sample; }
+
 typedef struct { size_t total_free_bytes, largest_free_block, minimum_free_bytes; } multi_heap_info_t;
 static multi_heap_info_t heap_sample;
 static void heap_caps_get_info(multi_heap_info_t *h, unsigned caps) { assert(caps==1); *h=heap_sample; }
@@ -41,7 +45,7 @@ static unsigned esp_reset_reason(void) { return UINT32_MAX; }
 static unsigned uxTaskGetNumberOfTasks(void) { return UINT32_MAX; }
 static uint64_t s_health_boot_id = UINT64_MAX;
 typedef struct { int unused; } httpd_req_t;
-static char response[384];
+static char response[512];
 static esp_err_t httpd_resp_send(httpd_req_t *r, const char *body, int length) {
     (void)r; assert(length>=0 && (size_t)length<sizeof(response));
     memcpy(response,body,(size_t)length);response[length]=0;return 0;
@@ -75,6 +79,10 @@ int main(void) {
     s_allocation_failures=UINT32_MAX;
     uptime_us=INT64_MAX;
     heap_sample=(multi_heap_info_t){UINT32_MAX,UINT32_MAX,UINT32_MAX};
+    output_sample=(native_audio_output_health_t){true,UINT32_MAX,UINT32_MAX};
+    assert(health_handler(NULL)==0);
+    puts(response);
+    output_sample.available=false;
     assert(health_handler(NULL)==0);
     puts(response);
     puts("PASS: quiet counters, registration errors, interrupt mask restoration, watchdog and bounded JSON");

@@ -74,17 +74,47 @@ static void lease_failure_tests(void) {
 #endif
 int main(int argc,char **argv){
     assert(argc==2);
-#ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
+#ifdef BASELINE
     test_callback_registration_result = ESP_FAIL;
     assert(native_audio_output_init() == ESP_FAIL && !s_pdm && !s_pdm_running);
     test_callback_registration_result = ESP_OK;
 #endif
     assert(native_audio_output_init()==0);
-#if defined(CONFIG_YORADIO_PIPELINE_PROFILE) || defined(CONFIG_YORADIO_STAGED_DMA_PROFILE)
+#if defined(CONFIG_YORADIO_PIPELINE_PROFILE) || defined(BASELINE)
     uint32_t overruns = native_audio_output_dma_overruns();
     assert(test_callbacks.on_send_q_ovf);
     assert(!test_callbacks.on_send_q_ovf(&channel, NULL, NULL));
     assert(native_audio_output_dma_overruns() == overruns + 1);
+#endif
+#ifdef BASELINE
+    assert(native_audio_output_health().available);
+    assert(native_audio_output_health().completion_queue_drops == overruns + 1);
+    assert(native_audio_output_health().write_errors == 0);
+    // Only the test sets counters: production must retain them across Stop/Play.
+    s_dma_overruns = UINT32_MAX;
+    assert(!test_callbacks.on_send_q_ovf(&channel, NULL, NULL));
+    assert(native_audio_output_health().completion_queue_drops == 0);
+    s_dma_overruns = overruns + 1;
+    int16_t health_pcm[1024] = {0};
+    assert(pdm_write_block(health_pcm, 512) == ESP_OK);
+    assert(native_audio_output_health().write_errors == 0);
+    channel.dma.curr_ptr = NULL; queue.fail = true;
+    assert(pdm_write_block(health_pcm, 512) == ESP_ERR_TIMEOUT);
+    assert(native_audio_output_health().write_errors == 1);
+    queue.fail = false; test_short_write_bytes = 1024;
+    assert(pdm_write_block(health_pcm, 512) == ESP_FAIL);
+    assert(native_audio_output_health().write_errors == 2);
+    s_dma_write_errors = UINT32_MAX;
+    assert(pdm_write_block(health_pcm, 512) == ESP_FAIL);
+    assert(native_audio_output_health().write_errors == 0);
+    test_short_write_bytes = 0;
+    s_dma_write_errors = 2;
+    assert(native_audio_output_suspend() == ESP_OK);
+    assert(native_audio_output_init() == ESP_OK);
+    assert(native_audio_output_health().write_errors == 2);
+    assert(native_audio_output_health().completion_queue_drops == overruns + 1);
+#else
+    assert(!native_audio_output_health().available);
 #endif
 #ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
     // Real staged write path: counters must retain SDK errors and wall time,

@@ -52,6 +52,11 @@ static uint64_t s_stats_audio_us;
 static uint64_t s_stats_normalize_us;
 static uint32_t s_stats_packets;
 
+native_audio_output_health_t native_audio_output_health(void) {
+    // Do not present unmeasured errors as a healthy direct-DMA pipeline.
+    return (native_audio_output_health_t){.available = false};
+}
+
 #ifdef CONFIG_YORADIO_PIPELINE_PROFILE
 static DRAM_ATTR volatile uint32_t s_dma_overruns;
 
