@@ -153,8 +153,7 @@ static esp_err_t health_handler(httpd_req_t *request) {
         (unsigned long)output.completion_queue_drops,
         (unsigned long)output.write_errors);
 #ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
-    length = audio_pipeline_probe_append(body, sizeof(body), length, &probe,
-                                         CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ);
+    length = audio_pipeline_probe_append(body, sizeof(body), length, &probe);
 #endif
     if (length < 0 || (size_t)length >= sizeof(body)) {
         return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,

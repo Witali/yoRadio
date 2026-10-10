@@ -27,20 +27,24 @@ ready to run but not yet have returned from the instrumented call. In
 particular, phase 7 alone does not prove that the network starved the decoder.
 
 The last 16 overrun observations are returned in chronological order as
-`[sequence, cycle, phases, output_age, pcm_age, input_age, network_age]`:
+`[sequence, timestamp_us, phases, output_age, pcm_age, input_age, network_age]`:
 
-- `output_age`: cycles since the output task entered or returned from its
+- `output_age`: microseconds since the output task entered or returned from its
   latest PCM receive call. It normally polls an empty queue every 5 ms.
-- `pcm_age`: cycles since the output task accepted its latest current PCM
+- `pcm_age`: microseconds since the output task accepted its latest current PCM
   packet, after any sample-rate configuration.
-- `input_age`: cycles since the decoder received a nonempty encoded packet.
-- `network_age`: cycles since a positive HTTP body read returned.
+- `input_age`: microseconds since the decoder received a nonempty encoded packet.
+- `network_age`: microseconds since a positive HTTP body read returned.
 
-All ages use the hardware CPU cycle counter. Divide by `cpu_mhz` to get
-microseconds only when the CPU clock is fixed at that frequency. Laboratory
-builds require disabled power management. Counter values and ages wrap modulo
-2^32; at 160 MHz an age wraps after about 26.84 seconds. Do not interpret long
-idle ages as elapsed wall time. A nonempty HTTP read can contain ICY metadata,
+All ages use the hardware system timer through `esp_timer_get_time()`, with
+`timer_hz=1000000`. It measures elapsed time including WFI waits. The C3 CPU
+cycle counter stops during WFI and would undercount these waits; see
+[TRM register mpcER, CYCLE field](https://espressif.com/sites/default/files/documentation/esp32-c3_technical_reference_manual_en.pdf#page=39).
+The [ESP Timer API](https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32c3/api-reference/system/esp_timer.html#obtaining-current-time)
+documents the lightweight timer read for tasks and ISRs. The linked timer
+read and its dependencies must remain in IRAM/ROM. Ages wrap modulo 2^32
+microseconds, about 71.58 minutes. Do not interpret longer idle ages as elapsed
+wall time. A nonempty HTTP read can contain ICY metadata,
 and an encoded packet may later be rejected after a station change; select
 sustained-play windows with an unchanged stream generation.
 

@@ -180,9 +180,9 @@ config YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
     help
         Laboratory diagnostic: use 516 static bytes for phase counts and
         the last 16 overrun observations, exposed through native health.
-        Read the CPU cycle counter at queue/read checkpoints and in the ISR.
+        Read the system timer at queue/read checkpoints and in the ISR.
         No sampler task, allocation or UART logging. Flags show call phases,
-        not scheduler state; cycle ages wrap after 2^32 cycles. It changes ISR
+        not scheduler state; ages wrap after 2^32 microseconds. It changes ISR
         cost and memory layout, so keep disabled in production qualification.
 
 config YORADIO_STAGED_DMA_PROFILE

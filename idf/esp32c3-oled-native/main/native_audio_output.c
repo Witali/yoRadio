@@ -91,11 +91,11 @@ static bool IRAM_ATTR dma_queue_overrun(i2s_chan_handle_t channel,
     (void)channel;
     (void)event;
     (void)context;
-    // One ISR writer; never reset from the output task. No logging, heap,
-    // clock access or atomic library calls while servicing the interrupt.
+    // One ISR writer; never reset from the output task. The normal build
+    // has no logging, heap, clock access or atomic library calls here.
     ++s_dma_overruns;
 #ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
-    audio_pipeline_probe_overrun(esp_cpu_get_cycle_count());
+    audio_pipeline_probe_overrun((uint32_t)esp_timer_get_time());
 #endif
     return false;
 }

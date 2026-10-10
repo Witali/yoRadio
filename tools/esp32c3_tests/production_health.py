@@ -15,8 +15,8 @@ def validate_pipeline(probe, output):
     def word(value):
         return type(value) is int and 0 <= value <= COUNTER_MASK
     require(type(probe) is dict, 'Invalid pipeline diagnostic')
-    require(type(probe.get('cpu_mhz')) is int and probe['cpu_mhz'] in (80, 160),
-            'Invalid diagnostic CPU frequency')
+    require(type(probe.get('timer_hz')) is int and probe['timer_hz'] == 1_000_000,
+            'Invalid diagnostic timer frequency')
     sequence = probe.get('sequence')
     require(word(sequence) and output['available'] and
             sequence == output['completion_queue_drops'], 'Inconsistent pipeline sequence')
@@ -30,7 +30,7 @@ def validate_pipeline(probe, output):
         require(event[0] == ((sequence - len(events) + 1 + index) & COUNTER_MASK) and
                 event[2] < 8, 'Invalid pipeline event order or phase')
     require(events or sequence == 0, 'Missing pipeline event history')
-    return dict(cpu_mhz=probe['cpu_mhz'], sequence=sequence,
+    return dict(timer_hz=probe['timer_hz'], sequence=sequence,
                 phase_drops=list(histogram), events=[list(e) for e in events])
 
 

@@ -791,7 +791,7 @@ static void stream_task(void *argument) {
             int received = stream_http_read(&reader, client, (char *)buffer,
                                             STREAM_CHUNK_SIZE);
             AUDIO_PROBE_FLAG(stream_read, 0U);
-            if (received > 0) AUDIO_PROBE_TICK(network_cycle);
+            if (received > 0) AUDIO_PROBE_STAMP(network_us);
             // Stop/station change may happen while the socket read is blocked.
             // Never pass data returned by that obsolete read to ICY or audio.
             if (atomic_load(&s_generation) != command.generation) break;
@@ -1199,7 +1199,7 @@ static void decoder_task(void *argument) {
 #endif
         AUDIO_PROBE_FLAG(decoder_wait, 0U);
         if (!packet) continue;
-        if (packet->data_size) AUDIO_PROBE_TICK(input_cycle);
+        if (packet->data_size) AUDIO_PROBE_STAMP(input_us);
         if (packet->generation != atomic_load(&s_generation)) {
             encoded_return(s_encoded, packet);
             continue;
@@ -1734,12 +1734,12 @@ static void output_task(void *argument) {
         }
 #endif
         size_t item_size = 0;
-        AUDIO_PROBE_TICK(output_cycle);
+        AUDIO_PROBE_STAMP(output_us);
         AUDIO_PROBE_FLAG(output_wait, 1U);
         pcm_packet_t *packet = pipeline_receive(s_pcm, &item_size,
                                                  pdMS_TO_TICKS(5), &flow.empty);
         AUDIO_PROBE_FLAG(output_wait, 0U);
-        AUDIO_PROBE_TICK(output_cycle);
+        AUDIO_PROBE_STAMP(output_us);
         if (!packet) {
             native_audio_output_idle();
 #ifdef CONFIG_YORADIO_PIPELINE_PROFILE
@@ -1787,7 +1787,7 @@ static void output_task(void *argument) {
             }
             sample_rate = packet->sample_rate;
         }
-        AUDIO_PROBE_TICK(pcm_cycle);
+        AUDIO_PROBE_STAMP(pcm_us);
 #ifdef CONFIG_YORADIO_PIPELINE_PROFILE
         if (!flow.start_us) output_flow_reset(&flow, true);
         int64_t submit_start = esp_timer_get_time();

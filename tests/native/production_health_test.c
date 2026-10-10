@@ -83,12 +83,12 @@ int main(void) {
     heap_sample=(multi_heap_info_t){UINT32_MAX,UINT32_MAX,UINT32_MAX};
     output_sample=(native_audio_output_health_t){true,UINT32_MAX,UINT32_MAX};
 #ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
-    // Check every phase, ring overwrite and unsigned sequence/cycle wrap.
+    // Check every phase, ring overwrite and unsigned sequence/timer wrap.
     for (unsigned n=0;n<40;++n) {
         s_audio_pipeline_probe.output_wait=n & 1;
         s_audio_pipeline_probe.decoder_wait=n & 2;
         s_audio_pipeline_probe.stream_read=n & 4;
-        s_audio_pipeline_probe.output_cycle=UINT32_MAX-4;
+        s_audio_pipeline_probe.output_us=UINT32_MAX-4;
         audio_pipeline_probe_overrun(3);
         assert(s_audio_pipeline_probe.events[(n+1)&15].output_age==8);
         assert(s_audio_pipeline_probe.events[(n+1)&15].phases==(n&7));
@@ -102,8 +102,8 @@ int main(void) {
     assert(s_audio_pipeline_probe.sequence==8);
     audio_pipeline_probe_t snapshot=s_audio_pipeline_probe;
     char tiny[8]="{}";
-    assert(audio_pipeline_probe_append(tiny,sizeof(tiny),2,&snapshot,160)==-1);
-    assert(audio_pipeline_probe_append(tiny,sizeof(tiny),INT_MAX,&snapshot,160)==-1);
+    assert(audio_pipeline_probe_append(tiny,sizeof(tiny),2,&snapshot)==-1);
+    assert(audio_pipeline_probe_append(tiny,sizeof(tiny),INT_MAX,&snapshot)==-1);
     output_sample.completion_queue_drops=8;
 #endif
     assert(health_handler(NULL)==0);
