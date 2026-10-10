@@ -9,6 +9,30 @@ provides heap, boot identity and lifetime allocation/watchdog counters without
 UART profiling. These observations complement format and recovery checks;
 they do not provide DMA, PCM-quality or all decoder-error evidence.
 
+### Finite public HTTPS files on the quiet image
+
+Use `public_file_probe.py` to download the public FFmpeg FLAC, Vorbis and Opus
+fixtures with TLS verification and decode each completely with host FFmpeg.
+The manifest pins encoded/PCM hashes, frame counts, native rate and channels.
+Keep the downloaded media in the ignored build directory; do not commit it.
+
+```powershell
+python tools/esp32c3_tests/public_file_probe.py --output .build/public-file-references
+python tools/esp32c3_tests/public_file_acceptance.py --board http://BOARD_IP --firmware firmware/development/esp32c3-idf-6.1-r9a97-quiet-mpi-health/app.bin --references .build/public-file-references/references.json --output .build/public-file-results
+```
+
+Install and verify the specified quiet health image before the second command;
+the runner itself does not flash. It checks automatic/explicit codec selection,
+one continuous playing-status interval, format, duration against decoded frame
+count, EOF, a stopped tail, health counters, memory headroom and Stop recovery.
+An early EOF, a missing EOF or stopped/resumed playback fails. HTTP timing and
+heap gates remain 2 seconds and 16/8 KiB free/largest respectively. Settings
+are compared only in memory. These are status/health tests, not bit-exact PCM
+or analog continuity measurements. Restore the previous image after testing.
+
+`python tests/test-public-file-acceptance.py` checks that the verifier rejects
+early/missing EOF, interrupted playback, incorrect format and invalid timings.
+
 For processor capabilities, hardware cycle counters, cache-aware measurements
 and the applicable ESP-IDF 6.1 speed guidance, read the
 [ESP32-C3 optimization reference](ESP32C3_OPTIMIZATION_REFERENCE.md).
