@@ -73,6 +73,11 @@ ELF SHA-256: `c313596b699973d3000b768edec9781848bd1741b033da765b6e0a40382c2cd5`.
 
 ## Remaining qualification
 
+Follow-up: [public HTTPS qualification](ESP32C3_PREFILL1000_PUBLIC_20261010.md)
+of this exact image passed 6/10 original gates. HE-AAC memory/output checks and
+a public MP3 read failure remain unresolved; the local and OTA passes below
+are not evidence that the overall goal is complete.
+
 Production defaults are unchanged. These local HTTP and OTA checks do not
 close the earlier real-HTTPS contiguous-memory headroom or response-time
 failures. Next run public HTTPS stations on this exact image, then exercise

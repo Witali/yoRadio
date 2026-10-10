@@ -1,0 +1,99 @@
+{
+  "replay": "PASS",
+  "phases": {
+    "local": {
+      "passed": 42,
+      "total": 42,
+      "failures": []
+    },
+    "ota": {
+      "passed": 15,
+      "total": 15,
+      "failures": []
+    }
+  },
+  "replayed_local_gates": [
+    "initial-idle",
+    "http:mp3-320:auto",
+    "http:mp3-320:mp3",
+    "http:flac-level8:auto",
+    "http:flac-level8:flac",
+    "http:vorbis-q10:auto",
+    "http:vorbis-q10:vorbis",
+    "http:opus-510:auto",
+    "http:opus-510:opus",
+    "http:aac-lc-320:auto",
+    "http:aac-lc-320:aac",
+    "http:lc-44100-stereo:auto",
+    "http:lc-44100-stereo:aac",
+    "http:lc-22050-mono:auto",
+    "http:lc-22050-mono:aac",
+    "http:lc-48000-stereo:auto",
+    "http:lc-48000-stereo:aac",
+    "http:he-44100-stereo:auto",
+    "http:he-44100-stereo:aac",
+    "http:he-48000-stereo:auto",
+    "http:he-48000-stereo:aac",
+    "http:hev2-44100-stereo:auto",
+    "http:hev2-44100-stereo:aac",
+    "idle:http",
+    "recovery:http",
+    "transition:changing",
+    "transition:implicit-sbr",
+    "stop-play-generation",
+    "idle:transitions",
+    "recovery:transitions",
+    "network:drop",
+    "network:stall",
+    "network:error",
+    "network:redirect",
+    "network:jitter",
+    "idle:network",
+    "recovery:network",
+    "idle:websocket",
+    "recovery:websocket",
+    "lifetime-health"
+  ],
+  "recorded_only_local_gates": [
+    "websocket-format-and-reconnect",
+    "stop-and-settings"
+  ],
+  "ota_scope": "Live HTTP rejection/acceptance, image/partition and settings checks; exchanges are not replayed",
+  "health": {
+    "samples": 1070,
+    "boot_id": "7d0feff6529b4751",
+    "minimum_heap": 25128,
+    "minimum_largest": 9216,
+    "allocation_failures": 0,
+    "task_watchdog_events": 0
+  },
+  "sdk_lifetime_minimum_heap": 17028,
+  "idle_medians": {
+    "initial": {
+      "heap": 139984,
+      "largest": 114688,
+      "tasks": 16
+    },
+    "http": {
+      "heap": 139720,
+      "largest": 114688,
+      "tasks": 16
+    },
+    "transitions": {
+      "heap": 139720,
+      "largest": 114688,
+      "tasks": 16
+    },
+    "network": {
+      "heap": 139716,
+      "largest": 114688,
+      "tasks": 16
+    },
+    "websocket": {
+      "heap": 139716,
+      "largest": 114688,
+      "tasks": 16
+    }
+  },
+  "exact_listened_image_restored": true
+}
