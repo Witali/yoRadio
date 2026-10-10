@@ -109,3 +109,8 @@ do not prove analog continuity or universal station compatibility, and this
 long-playback run covers one public HE-AAC stream.
 
 [Raw evidence, frozen sources and offline replay](../tests/results/esp32c3-output-health-20261010/README.md).
+
+The [subsequent HTTPS frame-growth campaign](ESP32C3_AAC_TLS_HEADROOM_20261010.md)
+completes all six AAC files, with no allocation/watchdog/output events, even
+when the HE-AAC largest block again reaches 7,424 B. Its 15/16 verdict retains
+the same headroom failure; the specific tested frame growth succeeds.
