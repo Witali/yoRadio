@@ -3,7 +3,7 @@
 Goal: keep HTTPS radio playback reliable on the ESP32-C3 OLED board by
 avoiding repeated allocation and release of large heap blocks.
 
-## Remaining qualification work, 2026-10-09
+## Remaining qualification work, 2026-10-10
 
 On `codex/esp32c3-idf-upgrade`, full-rate compact AAC/SBR/PS is already
 implemented; the retained PC19 PCM comparisons meet the 3-LSB allowance.
@@ -12,23 +12,24 @@ The remaining release work concerns the complete network/audio application:
 
 Latest [integer-clock cross-codec qualification](ESP32C3_INTEGER_QUALIFICATION_20261009.md)
 passes the HTTPS matrix and 33 codec switches. Ten-minute HE-AACv2 retains one
-initial-idle TCP timeout and 11 late delayed-DMA notifications. Compare rate
-compensation in the resampler against the nominal integer PDM clock before
-claiming continuous AAC output. This diagnostic image does not qualify the
-separately built quiet production candidate.
+initial-idle TCP timeout and 11 late delayed-DMA notifications. The next
+candidate combines the hardware fractional divider with the retained TLS
+reserve, 250/500 ms input prefill and four extra FLAC input slots. Qualify
+that combination before claiming continuous AAC output. Diagnostic results
+do not qualify a separately built quiet production candidate.
 
 The [rational-rate resampler experiment](ESP32C3_INTEGER_RATE_COMPENSATION_20261009.md)
 now passes sample-count and memory-safety host checks, but its linear
 interpolation loses 4.23 dB RMS at 20 kHz for 48 kHz input. It stays disabled
-and has not been flashed. Implement and measure the higher-quality FIR
-candidate before treating software clock compensation as a production fix.
+and has not been flashed.
 
 The [32-tap FIR candidate](ESP32C3_FIR_RATE_20261009.md) now passes 122 host
 quality cases (at most 1 LSB versus its double-precision finite-kernel oracle)
 and 95 lifecycle cases. A diagnostic image is built with +120 B linked BSS
-and unchanged AAC/FLAC objects. It remains disabled pending physical CPU,
-memory and continuity qualification; the oracle bound is not an ideal-signal
-or analog-output accuracy claim.
+and unchanged AAC/FLAC objects. Its completed
+[physical tests](ESP32C3_FIR_PHYSICAL_20261010.md) fail: FLAC and HE-AACv2
+produce watchdog events and fail to keep pace. It remains disabled. The
+host oracle bound is not an ideal-signal or analog-output accuracy claim.
 
 1. Resolve or bound heavy-FLAC input starvation and delayed DMA service.
    Compare buffering against reproducible delivery interruptions, not just
@@ -49,8 +50,13 @@ or analog-output accuracy claim.
    this check. Preserve full AAC features and rates; CPU percentage alone
    remains informational.
 
-The [exact nominal 48 kHz option](ESP32C3_PDM_CLOCK_20261009.md) separately
-awaits listening or analog output-noise measurements. It remains default-off.
+The [exact nominal 48 kHz option](ESP32C3_PDM_CLOCK_20261009.md) has now passed
+the user's [subjective listening comparison](ESP32C3_PDM_LISTENING_20261010.md):
+no noticeable sound difference. That installed image changes only the clock
+relative to the previous production source; it does not include the latest
+memory and queue experiments. Quantitative analog noise measurements remain
+unperformed. The repository default remains off until the combined firmware
+is qualified.
 The AP display and WebUI Deep Sleep switch are separate feature items in the
 [board TODO](ESP32C3_OLED_NATIVE_TODO.md).
 
