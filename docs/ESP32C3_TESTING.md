@@ -1425,5 +1425,30 @@ The legacy WebSocket message with `id: "heap"` reports compressed-input buffer
 fill percentage, from `audio_service_buffer_fill_percent()`. It is not free RAM.
 In particular, zero while stopped does not mean the heap is exhausted. Use
 the diagnostic `PERF CPU`/heap records for free-memory and largest-block
-measurements. A quiet image without those diagnostics has no equivalent RAM
-measurement through this legacy field.
+measurements, or `/api/native/health` on recent quiet images. This endpoint
+reports actual free heap, largest block, allocation/watchdog faults and, on
+the staged output backend, lifetime completion-queue/write-error counters.
+
+### Quiet TLS record stress
+
+`tools/esp32c3_tests/quiet_tls_records.py` runs without UART or optional CPU
+profiling. It requires an explicitly labelled laboratory image containing
+the supplied test CA in addition to normal public trust roots. The caller
+must install that image and restore the original application/settings after
+the test; the runner only starts/stops playback and verifies settings.
+
+```text
+python -B tools/esp32c3_tests/quiet_tls_records.py --board http://BOARD_IP --host SERVER_IP --firmware LAB_APP --ca CA_PEM --cert SERVER_PEM --key LOCAL_KEY --seconds 75 --output NEW_RESULTS
+```
+
+Defaults test HE-AAC and HE-AACv2 at real-time delivery with 1 KiB records,
+16 KiB records, growth after 30 seconds and alternating sizes. `--case` and
+`--mode` can be repeated to narrow a campaign; each observation is bounded
+to 60..600 seconds. Actual encrypted record sizes and completed server writes
+are recorded. Startup, format, continuous status, output counters, memory,
+response time and Stop recovery have separate gates. The 15-second startup
+window is excluded only from steady output deltas. Failed gates remain saved.
+This does not exercise TLS renegotiation or measure the analog output.
+
+Host checks: `tests/test-quiet-tls-records.py`,
+`tests/test-tls-record-server.py` and `tests/test-sustained-output.py`.
