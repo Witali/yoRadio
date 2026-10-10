@@ -343,6 +343,19 @@ if(YORADIO_CODEC_BENCHMARK)
 endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
 
+# Boot-only laboratory timing, followed by the normal application so native
+# OTA remains available. Generated corpus data is required explicitly.
+if(YORADIO_HARDWARE_FLAC_CLZ_TEST)
+  if(NOT EXISTS "${YORADIO_CLZ_DISTRIBUTION_DIR}/observed_distribution.h")
+    message(FATAL_ERROR "CLZ test requires YORADIO_CLZ_DISTRIBUTION_DIR with observed_distribution.h")
+  endif()
+  set(CLZ_TEST_ROOT "${YORADIO_ROOT}/../tests/native/flac_clz")
+  target_sources(${COMPONENT_LIB} PRIVATE "${CLZ_TEST_ROOT}/boot_benchmark.cpp")
+  target_include_directories(${COMPONENT_LIB} PRIVATE
+    "${CLZ_TEST_ROOT}" "${YORADIO_CLZ_DISTRIBUTION_DIR}")
+  target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=app_main")
+endif()
+
 if(CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT OR CONFIG_YORADIO_AAC_LATE_SBR)
   target_include_directories(${COMPONENT_LIB} PRIVATE "${YORADIO_ROOT}/../tools/codec_benchmark")
 endif()
