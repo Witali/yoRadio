@@ -37,6 +37,34 @@ or analog continuity measurements. Restore the previous image after testing.
 `python tests/test-public-file-acceptance.py` checks that the verifier rejects
 early/missing EOF, interrupted playback, incorrect format and invalid timings.
 
+### AAC frame growth after decoder startup
+
+`tools/audio_test_server/generate_aac_growth.py` makes an original/DSE-extended
+pair from a retained synthetic ADTS fixture. Default duration is 35 seconds;
+growth starts after 15 seconds without changing the audio configuration.
+Use a fresh output directory:
+
+```powershell
+python tools/audio_test_server/generate_aac_growth.py --input tests/fixtures/aac_stream_format/he-44100-stereo.aac --output .build/he-growth
+python tests/test-aac-growth-fixtures.py
+```
+
+The generator accepts unprotected, single-block ADTS with explicit mono/stereo
+LC-core configuration. Each complete raw block stays within 768 bytes per core
+channel; DSE prefixes preserve byte alignment and the original audio elements.
+This follows [ISO/IEC 14496-3:2001](https://www.ossrs.net/lts/zh-cn/assets/files/ISO_IEC_14496-3-AAC-2001-7f4d0b3622b322cb72c78f85d91c449f.pdf),
+tables 4.10/4.57 and sections 4.5.2.1.1/4.5.3.1. The 13-bit ADTS length limit
+alone does not establish validity of a single-block mono/stereo payload.
+
+Before board use, fully decode both files with FFmpeg and pristine FAAD and
+require unchanged PCM within each decoder, frame count, SBR/PS activity and
+format. `tools/esp32c3_tests/aac_growth.py` consumes the verified paired
+manifest/references, tests baseline/growth over local HTTP, checks EOF and
+health, and records memory windows before/after growth. The two portions are
+paced separately to avoid sending the small-frame warmup too quickly.
+The caller must restore the previous firmware. HTTP evidence alone does not
+qualify TLS pressure, exact PCM output on the board or DMA continuity.
+
 For processor capabilities, hardware cycle counters, cache-aware measurements
 and the applicable ESP-IDF 6.1 speed guidance, read the
 [ESP32-C3 optimization reference](ESP32C3_OPTIMIZATION_REFERENCE.md).

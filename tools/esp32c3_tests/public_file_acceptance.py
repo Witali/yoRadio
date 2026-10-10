@@ -44,7 +44,7 @@ def check_finite_playback(samples, spec):
                        'pcm_sample_rate', 'pcm_channels')
     while first <= active[-1]:
         state = samples[first]
-        if not (state.get('format') in ('connected', spec['label']) and
+        if not (state.get('format') in ('connected', spec.get('container_label', spec['label'])) and
                 all(state.get(key) == 0 for key in metadata_fields) and
                 state.get('format_is_pcm') is False and
                 state.get('channels_are_core') is False):

@@ -57,6 +57,13 @@ class FileTests(unittest.TestCase):
             with self.subTest(kind=kind), self.assertRaises(Failure):
                 check_finite_playback(rows, SPEC)
 
+    def test_distinct_container_label_must_be_explicit(self):
+        rows = samples()
+        pending_format(rows[3], 'AAC')
+        with self.assertRaises(Failure): check_finite_playback(rows, SPEC)
+        self.assertEqual(check_finite_playback(rows, dict(SPEC, container_label='AAC'))[
+            'pending_format_samples'], 1)
+
     def test_missing_early_and_interrupted_playback(self):
         for kind in ('absent', 'early', 'missing-eof', 'resumed', 'late-start'):
             rows = samples()
