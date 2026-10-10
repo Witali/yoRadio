@@ -16,9 +16,46 @@ def samples():
                  format='FLAC', channels_are_core=False) for i in range(80)]
 
 
+def pending_format(row, label='FLAC'):
+    row.update(audio=True, format=label, sample_rate=0, channels=0,
+               bits_per_sample=0, pcm_sample_rate=0, pcm_channels=0,
+               format_is_pcm=False, channels_are_core=False)
+
+
 class FileTests(unittest.TestCase):
     def test_complete_file(self):
         self.assertEqual(check_finite_playback(samples(), SPEC)['observed_playback_seconds'], 30)
+
+    def test_connection_and_container_prefix_before_pcm(self):
+        rows = samples()
+        pending_format(rows[2], 'connected')
+        pending_format(rows[3])
+        result = check_finite_playback(rows, SPEC)
+        self.assertEqual(result['pending_format_samples'], 2)
+        self.assertEqual(result['first_playback_seconds'], 2)
+        self.assertEqual(result['observed_playback_seconds'], 30)
+
+    def test_pending_metadata_cannot_hide_faults(self):
+        for kind in ('never-ready', 'lost-metadata', 'wrong-initial-rate',
+                     'wrong-container', 'partial-metadata', 'interrupted-startup',
+                     'late-metadata', 'slow-startup-reply'):
+            rows = samples()
+            if kind == 'never-ready':
+                for row in rows:
+                    if row['audio']: pending_format(row)
+            elif kind == 'lost-metadata': pending_format(rows[20])
+            elif kind == 'wrong-initial-rate': rows[4]['pcm_sample_rate'] = 22050
+            elif kind == 'wrong-container': pending_format(rows[3], 'MP3')
+            elif kind == 'partial-metadata':
+                pending_format(rows[3]); rows[3]['channels'] = 2
+            elif kind == 'interrupted-startup': pending_format(rows[2])
+            elif kind == 'late-metadata':
+                for row in rows[:32]:
+                    if row['audio']: pending_format(row)
+            elif kind == 'slow-startup-reply':
+                pending_format(rows[3]); rows[3]['request_ms'] = 2000
+            with self.subTest(kind=kind), self.assertRaises(Failure):
+                check_finite_playback(rows, SPEC)
 
     def test_missing_early_and_interrupted_playback(self):
         for kind in ('absent', 'early', 'missing-eof', 'resumed', 'late-start'):

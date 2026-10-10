@@ -35,10 +35,25 @@ def check_finite_playback(samples, spec):
             'Invalid request timing')
     active = [i for i, s in enumerate(samples) if s['audio']]
     require(len(active) >= 10, 'No sustained file playback')
+    require(active == list(range(active[0], active[-1] + 1)), 'Playback stopped and resumed')
     first = active[0]
+    # HTTP open / initial container detection sets audio=true before PCM exists.
+    # Skip only this known, entirely unset metadata prefix. Wrong nonzero values
+    # and metadata disappearing after decoding starts must still fail.
+    metadata_fields = ('sample_rate', 'channels', 'bits_per_sample',
+                       'pcm_sample_rate', 'pcm_channels')
+    while first <= active[-1]:
+        state = samples[first]
+        if not (state.get('format') in ('connected', spec['label']) and
+                all(state.get(key) == 0 for key in metadata_fields) and
+                state.get('format_is_pcm') is False and
+                state.get('channels_are_core') is False):
+            break
+        first += 1
+    decoded = [i for i in active if i >= first]
+    require(len(decoded) >= 10, 'No sustained decoded file playback')
     require(times[first] <= 15, 'No playback within 15 seconds')
-    require(all(matches(samples[i], spec) for i in active), 'Wrong decoded file format')
-    require(active == list(range(first, active[-1] + 1)), 'Playback stopped and resumed')
+    require(all(matches(samples[i], spec) for i in decoded), 'Wrong decoded file format')
     ended = active[-1] + 1
     require(ended < len(samples), 'Finite file never reached EOF')
     require(len(samples) - ended >= 3 and times[-1] - times[ended] >= 2,
@@ -49,7 +64,8 @@ def check_finite_playback(samples, spec):
     require(max(s['request_ms'] for s in samples) < 2000, 'WebUI response exceeded 2 seconds')
     return dict(first_playback_seconds=times[first], first_stopped_seconds=times[ended],
                 observed_playback_seconds=elapsed, reference_seconds=duration,
-                format_samples=len(active), maximum_status_and_health_ms=max(s['request_ms'] for s in samples))
+                format_samples=len(decoded), pending_format_samples=first - active[0],
+                maximum_status_and_health_ms=max(s['request_ms'] for s in samples))
 
 
 def load_references(path):
