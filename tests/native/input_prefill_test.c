@@ -5,7 +5,10 @@
 #include <stdio.h>
 #include <stdatomic.h>
 
-enum { STREAM_CHUNK_SIZE = 2048, CONFIG_YORADIO_INPUT_PREFILL_MS = 500 };
+enum { STREAM_CHUNK_SIZE = 2048 };
+#ifndef CONFIG_YORADIO_INPUT_PREFILL_MS
+#define CONFIG_YORADIO_INPUT_PREFILL_MS 500
+#endif
 #ifndef CONFIG_YORADIO_INPUT_PREFILL_MIN_MS
 #define CONFIG_YORADIO_INPUT_PREFILL_MIN_MS 0
 #endif
@@ -63,6 +66,7 @@ static void reset(unsigned generation) {
 }
 
 int main(void) {
+    const int64_t maximum_us = CONFIG_YORADIO_INPUT_PREFILL_MS * 1000LL;
     const int64_t minimum_us = CONFIG_YORADIO_INPUT_PREFILL_MIN_MS * 1000LL;
     const int64_t rounded_minimum = (minimum_us + 9999) / 10000 * 10000;
     reset(7); // A fast producer observes only the configured minimum delay.
@@ -71,7 +75,7 @@ int main(void) {
     assert(prefill_encoded_input(7) && now_us == fast_time && sleeps == fast_time / 10000);
 
     reset(7); // Sparse input/short finite data cannot wait forever.
-    assert(prefill_encoded_input(7) && now_us == 500000 && sleeps == 50);
+    assert(prefill_encoded_input(7) && now_us == maximum_us && sleeps == maximum_us / 10000);
 
     reset(7); // Stop or replacement cancels before decoder creation.
     cancel_at_us = 35000;
@@ -89,15 +93,15 @@ int main(void) {
 
     reset(7); // A coarse tick cannot turn the loop into a busy spin.
     tick_ms = 20;
-    assert(prefill_encoded_input(7) && now_us == 500000 && sleeps == 25);
+    assert(prefill_encoded_input(7) && now_us == maximum_us && sleeps == maximum_us / 20000);
 
     reset(7); // Cancellation wins even if the queue becomes full together.
     full_at_us = cancel_at_us = 10000;
     assert(!prefill_encoded_input(7) && now_us == 10000);
 
     reset(7); // A late producer still exits before the maximum when possible.
-    full_at_us = 470000;
-    int64_t late_time = rounded_minimum > 470000 ? rounded_minimum : 470000;
+    full_at_us = maximum_us - 30000;
+    int64_t late_time = rounded_minimum > full_at_us ? rounded_minimum : full_at_us;
     assert(prefill_encoded_input(7) && now_us == late_time);
 
     reset(7); // Minimum delay is rounded up by polling, including coarse ticks.
