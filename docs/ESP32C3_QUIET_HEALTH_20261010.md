@@ -117,6 +117,22 @@ before closing this item. Existing mocked-codec framing tests do not establish
 that result. Details are retained in the subsequent archive's
 [headroom review](../tests/results/esp32c3-public-files-20261010/headroom-review.json).
 
+The subsequent [AAC growth campaign](../tests/results/esp32c3-aac-growth-20261010/README.md)
+passes **15/15** physical HTTP checks. AAC-LC, HE-AAC and HE-AACv2 each play
+baseline and DSE-extended files, growing the frame after 15 seconds. FFmpeg
+and pristine FAAD independently retain byte-identical PCM within each decoder.
+All 520 health samples have zero allocation/watchdog faults and one boot ID;
+minimum sampled free/largest memory is 24,808/11,264 B. Stop recovery and exact
+listened-image restoration pass.
+
+This also narrows the earlier allocation argument: 8,191 B is the ADTS length
+ceiling, not a demonstrated requirement for ordinary single-block mono/stereo
+AAC. These bounded raw blocks grow to 1,543 B (stereo core) or 775 B (mono
+core), yielding retained capacities of 1,664 or 896 B. Total heap consumption
+increases more than those capacities alone; higher network bitrate is a
+changed variable, and attribution remains open. HTTP does not reproduce TLS
+pressure, so the earlier HTTPS headroom verdict remains unchanged.
+
 ## Completed public HTTPS fixtures
 
 FFmpeg's public collections provide independently decoded references for
