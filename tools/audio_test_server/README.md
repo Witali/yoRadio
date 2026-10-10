@@ -239,3 +239,21 @@ Any board can use these files through the existing server's
 `--fixture-manifest .build/pcm-tail-fixtures/manifest.json` option.
 The C3-specific [PCM-tail runner](../../docs/ESP32C3_TESTING.md#pcm-tail-submission-and-eof)
 also checks the driver-submitted frame count and final playback status.
+
+## Matched MP3 rate controls
+
+Generate original synthetic stereo MP3 at 256 kbit/s, 44.1 and 48 kHz:
+
+```powershell
+python -m tools.audio_test_server.generate_mp3_fixtures --output .build/mp3-rate-controls --seconds 130
+python -m tools.audio_test_server.server --fixture-manifest .build/mp3-rate-controls/manifest.json --pacing-ratio 1.0
+```
+
+FFmpeg and FFprobe must be on PATH. Use a new output directory. The generator
+verifies format, duration and a complete FFmpeg decode, and records file hashes
+and encoder commands. Any board can play `/file/mp3-256-44100-stereo` and
+`/file/mp3-256-48000-stereo` on that server. These are finite files; stop a
+90-second observation before their EOF. The `/stream/` endpoint is for AAC.
+
+See the [C3 transport comparison](../../docs/ESP32C3_MP3_TRANSPORT_CONTROLS_20261010.md)
+for hardware results and the limits of comparing local files with public radio.
