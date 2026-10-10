@@ -194,5 +194,13 @@ Both controllers restore `idf61-listen48-8c1f2d`, verify the exact ELF
 confirm settings persistence and record three stopped observations.
 No serial recovery is used. The candidate remains **not production-qualified**.
 
+The subsequent [quiet output-health campaign](ESP32C3_OUTPUT_HEALTH_20261010.md)
+adds two lightweight I2S counters and completes a 600-second public HE-AAC
+HTTPS observation. Across the 584.019-second sustained window it records no
+completion-queue drops or write errors, and no lifetime OOM/watchdog events.
+The result is 7/8 checks: a single 7,424-byte largest-block sample fails the
+unchanged 8,192-byte headroom budget. Exact listened-image restoration passes.
+This is a new candidate and does not retroactively change earlier verdicts.
+
 Byte-exact evidence, all failed cases and offline replay instructions:
 [qualification archive](../tests/results/esp32c3-quiet-health-20261010/README.md).

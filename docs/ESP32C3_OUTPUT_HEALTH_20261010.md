@@ -44,7 +44,7 @@ and disabled, using AddressSanitizer and UndefinedBehaviorSanitizer. Actual
 output C is exercised for callback registration failure, ISR counter wrap,
 successful/short/failed writes, and persistence across suspend/reinitialize.
 The staged and direct backends, with and without profiling, retain identical
-PCM and case metadata (864 rate/channel/volume/balance/normalization cases per
+PCM and case metadata (432 rate/channel/volume/balance/normalization cases per
 variant). Host tests do not establish physical interrupt timing.
 
 The Python reader rejects malformed counters, filters unknown fields, accepts
@@ -52,15 +52,60 @@ older basic-health responses, and rejects absent/unavailable output telemetry
 for output measurements. Window deltas exclude historical events and handle
 counter wrap; reboots and zero-duration windows fail closed.
 
-## Remaining physical work
+## Completed build and physical qualification
 
-Build a quiet QIO/80 MHz image with the previously listened nominal 48 kHz
-fractional divider, unchanged codec arithmetic and public trust roots. Audit
-the overflow ISR's IRAM placement and absence of helper calls. Save the image
-under `firmware/development/` before testing it.
+The saved candidate is
+`firmware/development/esp32c3-idf-6.1-r9a97-quiet-output-health/app.bin`,
+app SHA-256 `ada20228227e7fc6af79de6ba01d26b4da2b98b140a1faca4ab9c398f53df99d`,
+ELF SHA-256 `322c5db5d8c903185e0464b64662fb4b3092bd76d5e3cdca0ff58d3251425964`.
+It retains the previous quiet image's entire sdkconfig: QIO/80 MHz, awake,
+nominal 48 kHz fractional clock, public trust roots, full compact AAC and
+the existing TLS/input reserve policy. It has no optional runtime profiler.
 
-Measure HE-AAC over public HTTPS for a bounded ten-minute playback, separating
-startup from sustained output, and preserve all queue/write, heap, watchdog,
-format and transport failures. Restore and verify the exact listened image
-after the campaign. No analog continuity or universal station compatibility
-claim follows from these counters alone.
+The 18-byte overflow ISR is a leaf function in IRAM: load, increment, store
+and return, with no calls. Its code fits existing section padding. Persistent
+DRAM grows by 8 bytes. All 119 audited AAC/FLAC code/constant sections in 18
+objects match the previous candidate. Comparing all 50 application objects,
+only output and WebUI change; 48 objects retain identical code/constants.
+
+The physical public HTTPS HE-AAC 64 kbit/s test completes **7/8 checks**:
+
+| Measurement | Result |
+| --- | --- |
+| Requested playback observation | 600 seconds; first PCM at 2.45 s |
+| Independently checked format | HE-AAC, 44.1 kHz stereo, no PS in reference |
+| Sustained output window, excluding 15 s startup | 584.019 s, 507 paired samples |
+| Completion-queue drops / write errors in that window | **0 / 0** |
+| Lifetime allocation failures / watchdog events | **0 / 0**, one boot identity, 540 health samples |
+| Minimum sampled free heap / largest block | **20,684 / 7,424 B** |
+| SDK lifetime minimum free heap, including transients | 12,920 B |
+| Longest combined status + health response | 200.19 ms |
+| RSSI range | -83 to -67 dBm |
+| Idle median free heap, before / after | 139,968 / 139,716 B |
+| Idle largest block / task count, before and after | 114,688 B / 16 |
+
+The sole failure is the unchanged contiguous-memory headroom gate: at 76.475 s
+one sample has a largest block of 7,424 B, below the 8,192 B budget, while total
+free heap is 24,668 B. This is **not an observed allocation failure**. There
+are no output-counter events around it. Startup/idle queue events are retained
+in the raw lifetime counters and excluded only from the sustained-play delta.
+
+Format, output, response time, complete collection, memory recovery, settings
+and lifetime health pass. The historical seven-second WebUI delay did not recur
+in this test; one successful run does not establish its cause or resolution.
+
+The controller restores the exact listened `idf61-listen48-8c1f2d` image
+(ELF `76e863160ad21acba7ce86eeaca27f9fb6d58ebf4d3a79ca42ef7b42ae40885b`),
+verifies Wi-Fi/playlist/settings persistence and three stopped observations.
+It exits with failure to retain the failed memory gate. An offline replay
+reproduces all measured verdicts and verifies restoration.
+
+## Remaining work
+
+Investigate required allocation sizes and lifetimes under TLS, including valid
+AAC frame growth, before changing input reserves or accepting a lower headroom
+budget. The candidate remains **not production-qualified**. These counters
+do not prove analog continuity or universal station compatibility, and this
+long-playback run covers one public HE-AAC stream.
+
+[Raw evidence, frozen sources and offline replay](../tests/results/esp32c3-output-health-20261010/README.md).

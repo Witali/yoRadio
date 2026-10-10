@@ -1,0 +1,18 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-quiet-output-health\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4201c922 <native_audio_output_health>:
+4201c922:	3fc8d737          	lui	a4,0x3fc8d
+4201c926:	3fc997b7          	lui	a5,0x3fc99
+4201c92a:	f5472683          	lw	a3,-172(a4) # 3fc8cf54 <s_dma_overruns>
+4201c92e:	f687a783          	lw	a5,-152(a5) # 3fc98f68 <s_dma_write_errors>
+4201c932:	4705                	li	a4,1
+4201c934:	c154                	sw	a3,4(a0)
+4201c936:	c118                	sw	a4,0(a0)
+4201c938:	c51c                	sw	a5,8(a0)
+4201c93a:	8082                	ret

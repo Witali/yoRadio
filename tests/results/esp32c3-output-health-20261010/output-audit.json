@@ -1,0 +1,30 @@
+{
+  "result": "PASS",
+  "elf_sha256": "322c5db5d8c903185e0464b64662fb4b3092bd76d5e3cdca0ff58d3251425964",
+  "output_symbols": {
+    "dma_queue_overrun": {
+      "bytes": 18,
+      "section": ".iram0.text"
+    },
+    "s_dma_overruns": {
+      "bytes": 4,
+      "section": ".dram0.data"
+    },
+    "s_dma_write_errors": {
+      "bytes": 4,
+      "section": ".dram0.bss"
+    },
+    "native_audio_output_health": {
+      "bytes": 26,
+      "section": ".flash.text"
+    }
+  },
+  "section_deltas": {
+    ".iram0.text": 18,
+    ".iram0.text_end": -18,
+    ".dram0.data": 8,
+    ".flash.text": 546,
+    ".flash.rodata": 80
+  },
+  "scope": "Linked state, IRAM and leaf callback; hardware timing still requires physical test"
+}

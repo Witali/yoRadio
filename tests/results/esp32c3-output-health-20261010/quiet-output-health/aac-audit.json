@@ -1,0 +1,56 @@
+{
+  "app_sha256": "ada20228227e7fc6af79de6ba01d26b4da2b98b140a1faca4ab9c398f53df99d",
+  "elf_sha256": "322c5db5d8c903185e0464b64662fb4b3092bd76d5e3cdca0ff58d3251425964",
+  "sdkconfig_sha256": "1ad968f263f72d18170234caa890f589859c90974fedea8cb236a0b37da290ce",
+  "app_bytes": 1456016,
+  "types": {
+    "native_aac_decoder": 204,
+    "aac_high_owner_t": 32744,
+    "aac_high_runtime_t": 160
+  },
+  "linked_calls": {
+    "compact5_PVMP4AudioDecodeFrame": [
+      "aac_late_sbr_select",
+      "__wrap_get_sbr_bitstream",
+      "__wrap_getfill"
+    ],
+    "__wrap_get_sbr_bitstream": [
+      "aac_fill_sbr",
+      "aac_late_sbr_after_fill"
+    ],
+    "aac_late_sbr_select": [
+      "aac_late_sbr_retain"
+    ]
+  },
+  "features": [
+    "AAC_PLUS",
+    "AAC_COMPACT_SBR",
+    "AAC_HIGH_HISTORY",
+    "AAC_HIGH_HISTORY_PC19",
+    "AAC_SMOOTHING_HISTORY",
+    "AAC_LOW_WORKSPACE",
+    "AAC_ASYMMETRIC_OWNER",
+    "AAC_LATE_SBR"
+  ],
+  "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+  "layout_sha256": "a3cb0ea5f4b000c9b6c11c67d60255e87ca6c83db6fc95284fdc668ce8172a40",
+  "branch_patch": {
+    "experiment": "qemu_missing_sbr_retention",
+    "input_sha256": "841917bf358fded2909d7bceb65de782da32674794ce7226c2717884a563b861",
+    "bridge_source_sha256": "91b9a5cb50760b4f3ca74a217e4c1210a454f3c17a4320b90f8709c4c47de9f8",
+    "output_sha256": "dde9f78c13f8c947f9004732df6456b2ad1a618ecf21bf3d12735bae3109fb5b",
+    "section": ".text.PVMP4AudioDecodeFrame",
+    "branch_offset": 552,
+    "original": "5a071b63",
+    "replacement": "0000006f",
+    "active_label": ".L245",
+    "active_offset": 2014,
+    "disable_offset": 556,
+    "branch_target": "aac_late_sbr_select",
+    "changed_native_bytes": 4,
+    "bridge_stack_bytes": 64,
+    "structure_offsets_changed": false
+  },
+  "hardware_tested": false,
+  "production_qualified": false
+}
