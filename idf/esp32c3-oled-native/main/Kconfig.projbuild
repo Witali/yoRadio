@@ -173,6 +173,18 @@ config YORADIO_PIPELINE_PROFILE
         Works with staged and direct output. Staged output reports PCM-empty
         and total submission time, without claiming a separate DMA wait time.
 
+config YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    bool "Record pipeline checkpoints at DMA queue overruns"
+    depends on IDF_TARGET_ESP32C3 && !YORADIO_DIRECT_DMA_PCM && !YORADIO_QEMU
+    default n
+    help
+        Laboratory diagnostic: use 516 static bytes for phase counts and
+        the last 16 overrun observations, exposed through native health.
+        Read the CPU cycle counter at queue/read checkpoints and in the ISR.
+        No sampler task, allocation or UART logging. Flags show call phases,
+        not scheduler state; cycle ages wrap after 2^32 cycles. It changes ISR
+        cost and memory layout, so keep disabled in production qualification.
+
 config YORADIO_STAGED_DMA_PROFILE
     bool "Measure staged PCM writes and DMA queue overruns"
     depends on !YORADIO_DIRECT_DMA_PCM && !YORADIO_QEMU

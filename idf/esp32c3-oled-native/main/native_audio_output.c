@@ -1,4 +1,5 @@
 #include "native_audio_output.h"
+#include "audio_pipeline_probe.h"
 
 #include <limits.h>
 #include <stdbool.h>
@@ -75,6 +76,9 @@ static uint32_t s_stats_packets;
 
 static DRAM_ATTR volatile uint32_t s_dma_overruns;
 static volatile uint32_t s_dma_write_errors;
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+DRAM_ATTR volatile audio_pipeline_probe_t s_audio_pipeline_probe;
+#endif
 #ifdef CONFIG_YORADIO_STAGED_DMA_PROFILE
 static struct {
     uint64_t written_bytes, write_us, max_write_us;
@@ -90,6 +94,9 @@ static bool IRAM_ATTR dma_queue_overrun(i2s_chan_handle_t channel,
     // One ISR writer; never reset from the output task. No logging, heap,
     // clock access or atomic library calls while servicing the interrupt.
     ++s_dma_overruns;
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    audio_pipeline_probe_overrun(esp_cpu_get_cycle_count());
+#endif
     return false;
 }
 

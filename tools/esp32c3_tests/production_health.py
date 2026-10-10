@@ -10,6 +10,30 @@ OUTPUT_COUNTERS = ('completion_queue_drops', 'write_errors')
 COUNTER_MASK = (1 << 32) - 1
 
 
+def validate_pipeline(probe, output):
+    """Keep only bounded numeric diagnostics; missing events stay missing."""
+    def word(value):
+        return type(value) is int and 0 <= value <= COUNTER_MASK
+    require(type(probe) is dict, 'Invalid pipeline diagnostic')
+    require(type(probe.get('cpu_mhz')) is int and probe['cpu_mhz'] in (80, 160),
+            'Invalid diagnostic CPU frequency')
+    sequence = probe.get('sequence')
+    require(word(sequence) and output['available'] and
+            sequence == output['completion_queue_drops'], 'Inconsistent pipeline sequence')
+    histogram, events = probe.get('phase_drops'), probe.get('events')
+    require(type(histogram) is list and len(histogram) == 8 and all(map(word, histogram)) and
+            (sum(histogram) & COUNTER_MASK) == sequence, 'Invalid pipeline phase counts')
+    require(type(events) is list and len(events) <= 16, 'Invalid pipeline event capacity')
+    for index, event in enumerate(events):
+        require(type(event) is list and len(event) == 7 and all(map(word, event)),
+                'Invalid pipeline event')
+        require(event[0] == ((sequence - len(events) + 1 + index) & COUNTER_MASK) and
+                event[2] < 8, 'Invalid pipeline event order or phase')
+    require(events or sequence == 0, 'Missing pipeline event history')
+    return dict(cpu_mhz=probe['cpu_mhz'], sequence=sequence,
+                phase_drops=list(histogram), events=[list(e) for e in events])
+
+
 def validate_output(output):
     require(type(output) is dict and type(output.get('available')) is bool,
             'Invalid output health availability')
@@ -35,6 +59,8 @@ def read_health(board):
     # Schema 1 firmware predates output telemetry; basic health stays compatible.
     if 'output' in raw:
         result['output'] = validate_output(raw['output'])
+    if 'pipeline' in raw:
+        result['pipeline'] = validate_pipeline(raw['pipeline'], validate_output(raw.get('output')))
     return result
 
 

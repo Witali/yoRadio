@@ -24,6 +24,7 @@
 #include "freertos/task.h"
 #include "network_service.h"
 #include "native_audio_output.h"
+#include "audio_pipeline_probe.h"
 #include "radio_control.h"
 #include "web_pages_bridge.h"
 #include "web_ota.h"
@@ -122,8 +123,18 @@ static esp_err_t health_handler(httpd_req_t *request) {
     multi_heap_info_t heap;
     heap_caps_get_info(&heap, MALLOC_CAP_8BIT);
     cpu_profiler_faults_t faults = cpu_profiler_faults();
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    // The diagnostic event sequence and output counter must describe the
+    // same ISR boundary. Serialize the copied data after restoring IRQs.
+    UBaseType_t previous_mask = portSET_INTERRUPT_MASK_FROM_ISR();
+    native_audio_output_health_t output = native_audio_output_health();
+    audio_pipeline_probe_t probe = s_audio_pipeline_probe;
+    portCLEAR_INTERRUPT_MASK_FROM_ISR(previous_mask);
+    char body[2048];
+#else
     native_audio_output_health_t output = native_audio_output_health();
     char body[512];
+#endif
     int length = snprintf(body, sizeof(body),
         "{\"schema\":1,\"boot_id\":\"%016llx\",\"uptime_ms\":%llu,"
         "\"reset_reason\":%u,\"heap\":%lu,\"largest\":%lu,"
@@ -141,6 +152,10 @@ static esp_err_t health_handler(httpd_req_t *request) {
         output.available ? "true" : "false",
         (unsigned long)output.completion_queue_drops,
         (unsigned long)output.write_errors);
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    length = audio_pipeline_probe_append(body, sizeof(body), length, &probe,
+                                         CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ);
+#endif
     if (length < 0 || (size_t)length >= sizeof(body)) {
         return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,
                                    "Health response overflow");

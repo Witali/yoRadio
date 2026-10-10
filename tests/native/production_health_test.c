@@ -32,6 +32,8 @@ static esp_err_t heap_caps_register_failed_alloc_callback(void (*fn)(size_t,uint
 }
 /* PROFILER_SOURCE */
 
+/* PIPELINE_PROBE_SOURCE */
+
 /* OUTPUT_HEALTH_TYPE */
 static native_audio_output_health_t output_sample;
 static native_audio_output_health_t native_audio_output_health(void) { return output_sample; }
@@ -45,7 +47,7 @@ static unsigned esp_reset_reason(void) { return UINT32_MAX; }
 static unsigned uxTaskGetNumberOfTasks(void) { return UINT32_MAX; }
 static uint64_t s_health_boot_id = UINT64_MAX;
 typedef struct { int unused; } httpd_req_t;
-static char response[512];
+static char response[2048];
 static esp_err_t httpd_resp_send(httpd_req_t *r, const char *body, int length) {
     (void)r; assert(length>=0 && (size_t)length<sizeof(response));
     memcpy(response,body,(size_t)length);response[length]=0;return 0;
@@ -80,9 +82,35 @@ int main(void) {
     uptime_us=INT64_MAX;
     heap_sample=(multi_heap_info_t){UINT32_MAX,UINT32_MAX,UINT32_MAX};
     output_sample=(native_audio_output_health_t){true,UINT32_MAX,UINT32_MAX};
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    // Check every phase, ring overwrite and unsigned sequence/cycle wrap.
+    for (unsigned n=0;n<40;++n) {
+        s_audio_pipeline_probe.output_wait=n & 1;
+        s_audio_pipeline_probe.decoder_wait=n & 2;
+        s_audio_pipeline_probe.stream_read=n & 4;
+        s_audio_pipeline_probe.output_cycle=UINT32_MAX-4;
+        audio_pipeline_probe_overrun(3);
+        assert(s_audio_pipeline_probe.events[(n+1)&15].output_age==8);
+        assert(s_audio_pipeline_probe.events[(n+1)&15].phases==(n&7));
+    }
+    assert(s_audio_pipeline_probe.valid_count==16);
+    for (unsigned n=0;n<8;++n) assert(s_audio_pipeline_probe.phase_drops[n]==5);
+    s_audio_pipeline_probe.sequence=UINT32_MAX-8;
+    memset((void *)s_audio_pipeline_probe.phase_drops,0,sizeof(s_audio_pipeline_probe.phase_drops));
+    s_audio_pipeline_probe.phase_drops[7]=UINT32_MAX-8;
+    for (unsigned n=0;n<17;++n) audio_pipeline_probe_overrun(UINT32_MAX);
+    assert(s_audio_pipeline_probe.sequence==8);
+    audio_pipeline_probe_t snapshot=s_audio_pipeline_probe;
+    char tiny[8]="{}";
+    assert(audio_pipeline_probe_append(tiny,sizeof(tiny),2,&snapshot,160)==-1);
+    assert(audio_pipeline_probe_append(tiny,sizeof(tiny),INT_MAX,&snapshot,160)==-1);
+    output_sample.completion_queue_drops=8;
+#endif
     assert(health_handler(NULL)==0);
     puts(response);
+#ifndef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
     output_sample.available=false;
+#endif
     assert(health_handler(NULL)==0);
     puts(response);
     puts("PASS: quiet counters, registration errors, interrupt mask restoration, watchdog and bounded JSON");
