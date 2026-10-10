@@ -67,6 +67,53 @@ are not implemented savings and do not yet resolve the SBR allocation deficit.
 
 ## Further memory research priorities
 
+### Pipeline synchronization and clock drift — 2026-10-10
+
+The current staged-output path already uses bounded queues and event-driven
+backpressure: network input -> compressed packets -> decoder -> 8 KiB PCM
+ring -> output task -> four 512-frame DMA descriptors. `send_pcm()` waits
+for room instead of overwriting queued samples. If the compressed queue is
+full, `send_encoded()` waits and stops reading, applying TCP backpressure.
+`i2s_channel_write()` waits for reusable descriptors; hardware clocking sets
+the average output pace. Queue timeouts bound waits; they do not delay a
+task after data or space becomes available. Output priority is 8 versus
+decoder priority 7 with `CONFIG_YORADIO_OUTPUT_TASK_FIRST=y`.
+
+At 48 kHz, stereo, 16-bit PCM, the four DMA descriptors represent 42.67 ms.
+The PCM ring's 8 KiB is another theoretical 42.67 ms before packet headers,
+alignment and ring fragmentation; this is not guaranteed usable headroom.
+Compressed-input time coverage depends on codec bitrate and packet sizes.
+The 250/500 ms input-prefill configuration controls waiting time, not a
+guaranteed amount of buffered audio. Current staged output does not wait
+for three decoded-audio DMA buffers at every Play; that separate prefill
+behavior belongs to the disabled direct-DMA experiment. Idle descriptors
+auto-clear to PCM zero if new audio does not arrive in time.
+
+The fixed-ratio resampler converts the decoded source rate to nominal
+48 kHz. There is no adaptive clock-drift controller. The fractional divider
+removes the known nominal 0.1603% output-rate mismatch; it cannot remove
+crystal tolerance or an independently clocked live source's drift. A full
+PCM queue is normally evidence of a decoder producing faster than real time,
+not a memory overflow or proof that the station clock is too fast.
+
+Further investigation, only if the integrated 48 kHz traces show a need:
+
+- Distinguish abrupt delivery/CPU stalls from a sustained trend in buffered
+  audio duration. Correlate compressed-input availability, PCM waits, DMA
+  counters and decoder execution. Compressed-byte fill percentage alone is
+  not audio duration for variable-bitrate material.
+- Test reproducible jitter and slightly mismatched source pacing separately.
+  Include TCP backpressure and buffering outside the application in the
+  interpretation; a paced host sender can itself block and hide drift.
+- If sustained clock drift is demonstrated, evaluate a bounded, slowly
+  varying resampling ratio with a dead band and limits. Do not steer it
+  solely from instantaneous PCM fill, because decoder bursts and ordinary
+  backpressure determine that fill. Measure PCM quality and CPU impact.
+- Handle a genuine prolonged underrun with an explicit rebuffering policy
+  if needed. Do not periodically pause DMA as a clock correction, and do
+  not expect clock adaptation to repair insufficient decoder throughput or
+  a disconnected station.
+
 The [RX-only implementation and extended control tests](ESP32C3_TLS_RX_RESERVE_20261008.md)
 record the optional implementation, host/link checks and remaining physical
 gates. The preceding reserve image still fails the ten-minute AAC heap-trend
