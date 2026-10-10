@@ -2,6 +2,11 @@
 
 ## Decision
 
+Follow-up: [HTTP/TLS diagnostics](ESP32C3_PUBLIC_READ_DIAGNOSTIC_20261010.md)
+reproduced MP3 transport EOF twice. An independent FFmpeg client also ended
+prematurely in the second attempt. HE-AAC events mainly showed upstream data
+starvation. This narrows the diagnosis; the original failures below are retained.
+
 The overall playback/memory-stability goal remains open. The exact normal-trust
 candidate passed **6/10**
 original gates in this campaign. Retain the failed checks; do not promote the
