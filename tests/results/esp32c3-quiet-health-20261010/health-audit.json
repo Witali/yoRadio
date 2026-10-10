@@ -1,0 +1,35 @@
+{
+  "result": "PASS",
+  "elf_sha256": "6524f1457d6009ee1c229e86bc64a2ff3361fd7df3810b1d2b652b9f0c2ce751",
+  "callbacks": {
+    "record_allocation_failure": {
+      "section": ".iram0.text",
+      "bytes": 30
+    },
+    "esp_task_wdt_isr_user_handler": {
+      "section": ".iram0.text",
+      "bytes": 16
+    }
+  },
+  "counter_and_identity_bytes": {
+    "s_health_boot_id": 8,
+    "s_allocation_failures": 4,
+    "s_task_watchdog_events": 4
+  },
+  "section_changes": {
+    ".iram0.text": 46,
+    ".iram0.text_end": -46,
+    ".dram0.data": 8,
+    ".dram0.bss": 8,
+    ".flash.text": 400,
+    ".flash.rodata": 208,
+    ".dram0.heap_start": 8
+  },
+  "calls_in_order": [
+    "esp_crypto_mpi_lock_acquire",
+    "esp_crypto_mpi_lock_release",
+    "native_state_init",
+    "cpu_profiler_start"
+  ],
+  "scope": "IRAM callbacks and quiet linked build; target behavior still requires board tests"
+}

@@ -1,0 +1,14 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-quiet-mpi-health\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+4038135e <esp_task_wdt_isr_user_handler>:
+4038135e:	3fc8d737          	lui	a4,0x3fc8d
+40381362:	f4c72783          	lw	a5,-180(a4) # 3fc8cf4c <s_task_watchdog_events>
+40381366:	0785                	addi	a5,a5,1
+40381368:	f4f72623          	sw	a5,-180(a4)
+4038136c:	8082                	ret
+
+Disassembly of section .flash.text:

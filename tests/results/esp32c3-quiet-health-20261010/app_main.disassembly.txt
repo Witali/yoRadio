@@ -1,0 +1,187 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-quiet-mpi-health\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4200f0fa <app_main>:
+4200f0fa:	7179                	addi	sp,sp,-48
+4200f0fc:	d606                	sw	ra,44(sp)
+4200f0fe:	d422                	sw	s0,40(sp)
+4200f100:	d226                	sw	s1,36(sp)
+4200f102:	5ec040ef          	jal	420136ee <deep_sleep_clock_boot>
+4200f106:	5315a0ef          	jal	42069e36 <esp_crypto_mpi_lock_acquire>
+4200f10a:	53d5a0ef          	jal	42069e46 <esp_crypto_mpi_lock_release>
+4200f10e:	3fc8f537          	lui	a0,0x3fc8f
+4200f112:	00050513          	mv	a0,a0
+4200f116:	5e0040ef          	jal	420136f6 <native_state_init>
+4200f11a:	255030ef          	jal	42012b6e <cpu_profiler_start>
+4200f11e:	10051763          	bnez	a0,4200f22c <app_main+0x132>
+4200f122:	8eefa0ef          	jal	42009210 <nvs_flash_init>
+4200f126:	18b1d0ef          	jal	4202cab0 <native_audio_settings_init>
+4200f12a:	12051363          	bnez	a0,4200f250 <app_main+0x156>
+4200f12e:	72c080ef          	jal	4201785a <runtime_settings_init>
+4200f132:	14051163          	bnez	a0,4200f274 <app_main+0x17a>
+4200f136:	3c114737          	lui	a4,0x3c114
+4200f13a:	3c1147b7          	lui	a5,0x3c114
+4200f13e:	15470713          	addi	a4,a4,340 # 3c114154 <_esp_libc_clock_array_end+0x4004>
+4200f142:	15c78793          	addi	a5,a5,348 # 3c11415c <_esp_libc_clock_array_end+0x400c>
+4200f146:	44a1                	li	s1,8
+4200f148:	0808                	addi	a0,sp,16
+4200f14a:	c83a                	sw	a4,16(sp)
+4200f14c:	ca3e                	sw	a5,20(sp)
+4200f14e:	ce02                	sw	zero,28(sp)
+4200f150:	cc26                	sw	s1,24(sp)
+4200f152:	3fc8f437          	lui	s0,0x3fc8f
+4200f156:	009170ef          	jal	4202695e <esp_vfs_spiffs_register>
+4200f15a:	e9040513          	addi	a0,s0,-368 # 3fc8ee90 <s_display>
+4200f15e:	163050ef          	jal	42014ac0 <oled_display_init>
+4200f162:	12051b63          	bnez	a0,4200f298 <app_main+0x19e>
+4200f166:	e9040513          	addi	a0,s0,-368
+4200f16a:	7e0070ef          	jal	4201694a <oled_display_show_boot_logo>
+4200f16e:	14051763          	bnez	a0,4200f2bc <app_main+0x1c2>
+4200f172:	fe372097          	auipc	ra,0xfe372
+4200f176:	102080e7          	jalr	258(ra) # 40381274 <esp_timer_get_time>
+4200f17a:	0016e7b7          	lui	a5,0x16e
+4200f17e:	36078793          	addi	a5,a5,864 # 16e360 <CSR_UINTSTATUS+0x16d6af>
+4200f182:	97aa                	add	a5,a5,a0
+4200f184:	00a7b733          	sltu	a4,a5,a0
+4200f188:	3fc996b7          	lui	a3,0x3fc99
+4200f18c:	e9868693          	addi	a3,a3,-360 # 3fc98e98 <s_boot_logo_until_us>
+4200f190:	972e                	add	a4,a4,a1
+4200f192:	e9040513          	addi	a0,s0,-368
+4200f196:	c2d8                	sw	a4,4(a3)
+4200f198:	c29c                	sw	a5,0(a3)
+4200f19a:	1e1030ef          	jal	42012b7a <display_settings_init>
+4200f19e:	14051163          	bnez	a0,4200f2e0 <app_main+0x1e6>
+4200f1a2:	80000437          	lui	s0,0x80000
+4200f1a6:	3c1145b7          	lui	a1,0x3c114
+4200f1aa:	4200e537          	lui	a0,0x4200e
+4200f1ae:	4781                	li	a5,0
+4200f1b0:	fff40813          	addi	a6,s0,-1 # 7fffffff <SYSTEM+0x1ff3ffff>
+4200f1b4:	1d058593          	addi	a1,a1,464 # 3c1141d0 <_esp_libc_clock_array_end+0x4080>
+4200f1b8:	03650513          	addi	a0,a0,54 # 4200e036 <display_task>
+4200f1bc:	4705                	li	a4,1
+4200f1be:	4681                	li	a3,0
+4200f1c0:	6605                	lui	a2,0x1
+4200f1c2:	2b1f90ef          	jal	42108c72 <xTaskCreatePinnedToCore>
+4200f1c6:	4785                	li	a5,1
+4200f1c8:	12f51e63          	bne	a0,a5,4200f304 <app_main+0x20a>
+4200f1cc:	c62a                	sw	a0,12(sp)
+4200f1ce:	6605                	lui	a2,0x1
+4200f1d0:	3c1145b7          	lui	a1,0x3c114
+4200f1d4:	4200f537          	lui	a0,0x4200f
+4200f1d8:	8726                	mv	a4,s1
+4200f1da:	80060613          	addi	a2,a2,-2048 # 800 <ALIGN_VECTOR_TABLE+0x700>
+4200f1de:	1d858593          	addi	a1,a1,472 # 3c1141d8 <_esp_libc_clock_array_end+0x4088>
+4200f1e2:	c7850513          	addi	a0,a0,-904 # 4200ec78 <button_task>
+4200f1e6:	fff40813          	addi	a6,s0,-1
+4200f1ea:	4781                	li	a5,0
+4200f1ec:	4681                	li	a3,0
+4200f1ee:	285f90ef          	jal	42108c72 <xTaskCreatePinnedToCore>
+4200f1f2:	48b2                	lw	a7,12(sp)
+4200f1f4:	84aa                	mv	s1,a0
+4200f1f6:	15151f63          	bne	a0,a7,4200f354 <app_main+0x25a>
+4200f1fa:	3c1145b7          	lui	a1,0x3c114
+4200f1fe:	4200e537          	lui	a0,0x4200e
+4200f202:	6609                	lui	a2,0x2
+4200f204:	fff40813          	addi	a6,s0,-1
+4200f208:	80060613          	addi	a2,a2,-2048 # 1800 <CSR_UINTSTATUS+0xb4f>
+4200f20c:	2e458593          	addi	a1,a1,740 # 3c1142e4 <_esp_libc_clock_array_end+0x4194>
+4200f210:	f8650513          	addi	a0,a0,-122 # 4200df86 <services_task>
+4200f214:	4781                	li	a5,0
+4200f216:	470d                	li	a4,3
+4200f218:	4681                	li	a3,0
+4200f21a:	259f90ef          	jal	42108c72 <xTaskCreatePinnedToCore>
+4200f21e:	10951763          	bne	a0,s1,4200f32c <app_main+0x232>
+4200f222:	50b2                	lw	ra,44(sp)
+4200f224:	5422                	lw	s0,40(sp)
+4200f226:	5492                	lw	s1,36(sp)
+4200f228:	6145                	addi	sp,sp,48
+4200f22a:	8082                	ret
+4200f22c:	3c114737          	lui	a4,0x3c114
+4200f230:	3c1206b7          	lui	a3,0x3c120
+4200f234:	3c1145b7          	lui	a1,0x3c114
+4200f238:	10470713          	addi	a4,a4,260 # 3c114104 <_esp_libc_clock_array_end+0x3fb4>
+4200f23c:	3f068693          	addi	a3,a3,1008 # 3c1203f0 <__func__.4>
+4200f240:	f0458593          	addi	a1,a1,-252 # 3c113f04 <_esp_libc_clock_array_end+0x3db4>
+4200f244:	3c200613          	li	a2,962
+4200f248:	fe379097          	auipc	ra,0xfe379
+4200f24c:	94a080e7          	jalr	-1718(ra) # 40387b92 <_esp_error_check_failed>
+4200f250:	3c114737          	lui	a4,0x3c114
+4200f254:	3c1206b7          	lui	a3,0x3c120
+4200f258:	3c1145b7          	lui	a1,0x3c114
+4200f25c:	11c70713          	addi	a4,a4,284 # 3c11411c <_esp_libc_clock_array_end+0x3fcc>
+4200f260:	3f068693          	addi	a3,a3,1008 # 3c1203f0 <__func__.4>
+4200f264:	f0458593          	addi	a1,a1,-252 # 3c113f04 <_esp_libc_clock_array_end+0x3db4>
+4200f268:	3ce00613          	li	a2,974
+4200f26c:	fe379097          	auipc	ra,0xfe379
+4200f270:	926080e7          	jalr	-1754(ra) # 40387b92 <_esp_error_check_failed>
+4200f274:	3c114737          	lui	a4,0x3c114
+4200f278:	3c1206b7          	lui	a3,0x3c120
+4200f27c:	3c1145b7          	lui	a1,0x3c114
+4200f280:	13c70713          	addi	a4,a4,316 # 3c11413c <_esp_libc_clock_array_end+0x3fec>
+4200f284:	3f068693          	addi	a3,a3,1008 # 3c1203f0 <__func__.4>
+4200f288:	f0458593          	addi	a1,a1,-252 # 3c113f04 <_esp_libc_clock_array_end+0x3db4>
+4200f28c:	3cf00613          	li	a2,975
+4200f290:	fe379097          	auipc	ra,0xfe379
+4200f294:	902080e7          	jalr	-1790(ra) # 40387b92 <_esp_error_check_failed>
+4200f298:	3c114737          	lui	a4,0x3c114
+4200f29c:	3c1206b7          	lui	a3,0x3c120
+4200f2a0:	3c1145b7          	lui	a1,0x3c114
+4200f2a4:	16470713          	addi	a4,a4,356 # 3c114164 <_esp_libc_clock_array_end+0x4014>
+4200f2a8:	3f068693          	addi	a3,a3,1008 # 3c1203f0 <__func__.4>
+4200f2ac:	f0458593          	addi	a1,a1,-252 # 3c113f04 <_esp_libc_clock_array_end+0x3db4>
+4200f2b0:	3e700613          	li	a2,999
+4200f2b4:	fe379097          	auipc	ra,0xfe379
+4200f2b8:	8de080e7          	jalr	-1826(ra) # 40387b92 <_esp_error_check_failed>
+4200f2bc:	3c114737          	lui	a4,0x3c114
+4200f2c0:	3c1206b7          	lui	a3,0x3c120
+4200f2c4:	3c1145b7          	lui	a1,0x3c114
+4200f2c8:	18470713          	addi	a4,a4,388 # 3c114184 <_esp_libc_clock_array_end+0x4034>
+4200f2cc:	3f068693          	addi	a3,a3,1008 # 3c1203f0 <__func__.4>
+4200f2d0:	f0458593          	addi	a1,a1,-252 # 3c113f04 <_esp_libc_clock_array_end+0x3db4>
+4200f2d4:	3e800613          	li	a2,1000
+4200f2d8:	fe379097          	auipc	ra,0xfe379
+4200f2dc:	8ba080e7          	jalr	-1862(ra) # 40387b92 <_esp_error_check_failed>
+4200f2e0:	3c114737          	lui	a4,0x3c114
+4200f2e4:	3c1206b7          	lui	a3,0x3c120
+4200f2e8:	3c1145b7          	lui	a1,0x3c114
+4200f2ec:	1ac70713          	addi	a4,a4,428 # 3c1141ac <_esp_libc_clock_array_end+0x405c>
+4200f2f0:	3f068693          	addi	a3,a3,1008 # 3c1203f0 <__func__.4>
+4200f2f4:	f0458593          	addi	a1,a1,-252 # 3c113f04 <_esp_libc_clock_array_end+0x3db4>
+4200f2f8:	3eb00613          	li	a2,1003
+4200f2fc:	fe379097          	auipc	ra,0xfe379
+4200f300:	896080e7          	jalr	-1898(ra) # 40387b92 <_esp_error_check_failed>
+4200f304:	3c114737          	lui	a4,0x3c114
+4200f308:	3c1206b7          	lui	a3,0x3c120
+4200f30c:	3c1145b7          	lui	a1,0x3c114
+4200f310:	1e470713          	addi	a4,a4,484 # 3c1141e4 <_esp_libc_clock_array_end+0x4094>
+4200f314:	3f068693          	addi	a3,a3,1008 # 3c1203f0 <__func__.4>
+4200f318:	f0458593          	addi	a1,a1,-252 # 3c113f04 <_esp_libc_clock_array_end+0x3db4>
+4200f31c:	3ed00613          	li	a2,1005
+4200f320:	10100513          	li	a0,257
+4200f324:	fe379097          	auipc	ra,0xfe379
+4200f328:	86e080e7          	jalr	-1938(ra) # 40387b92 <_esp_error_check_failed>
+4200f32c:	3c114737          	lui	a4,0x3c114
+4200f330:	3c1206b7          	lui	a3,0x3c120
+4200f334:	3c1145b7          	lui	a1,0x3c114
+4200f338:	2f070713          	addi	a4,a4,752 # 3c1142f0 <_esp_libc_clock_array_end+0x41a0>
+4200f33c:	3f068693          	addi	a3,a3,1008 # 3c1203f0 <__func__.4>
+4200f340:	f0458593          	addi	a1,a1,-252 # 3c113f04 <_esp_libc_clock_array_end+0x3db4>
+4200f344:	3f800613          	li	a2,1016
+4200f348:	10100513          	li	a0,257
+4200f34c:	fe379097          	auipc	ra,0xfe379
+4200f350:	846080e7          	jalr	-1978(ra) # 40387b92 <_esp_error_check_failed>
+4200f354:	3c114737          	lui	a4,0x3c114
+4200f358:	3c1206b7          	lui	a3,0x3c120
+4200f35c:	3c1145b7          	lui	a1,0x3c114
+4200f360:	25870713          	addi	a4,a4,600 # 3c114258 <_esp_libc_clock_array_end+0x4108>
+4200f364:	3f068693          	addi	a3,a3,1008 # 3c1203f0 <__func__.4>
+4200f368:	f0458593          	addi	a1,a1,-252 # 3c113f04 <_esp_libc_clock_array_end+0x3db4>
+4200f36c:	3f200613          	li	a2,1010
+4200f370:	10100513          	li	a0,257
+4200f374:	fe379097          	auipc	ra,0xfe379
+4200f378:	81e080e7          	jalr	-2018(ra) # 40387b92 <_esp_error_check_failed>

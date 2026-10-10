@@ -1,0 +1,19 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-quiet-mpi-health\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+40381340 <record_allocation_failure>:
+40381340:	1141                	addi	sp,sp,-16
+40381342:	c606                	sw	ra,12(sp)
+40381344:	3e5060ef          	jal	40387f28 <xPortSetInterruptMaskFromISR>
+40381348:	3fc8d737          	lui	a4,0x3fc8d
+4038134c:	f5072783          	lw	a5,-176(a4) # 3fc8cf50 <s_allocation_failures>
+40381350:	40b2                	lw	ra,12(sp)
+40381352:	0785                	addi	a5,a5,1
+40381354:	f4f72823          	sw	a5,-176(a4)
+40381358:	0141                	addi	sp,sp,16
+4038135a:	2b90606f          	j	40387e12 <vPortClearInterruptMaskFromISR>
+
+Disassembly of section .flash.text:

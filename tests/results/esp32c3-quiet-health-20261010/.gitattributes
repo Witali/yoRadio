@@ -1,0 +1,9 @@
+* -text whitespace=cr-at-eol
+*.log -diff
+*/logs/** -diff
+build-logs/** -diff -whitespace
+# Preserve byte-exact snapshots of existing source/tool output.
+build-sources/** -whitespace
+native-health/*.c -whitespace
+*.disassembly.txt -whitespace
+*/allocator-audit.disassembly.txt -whitespace

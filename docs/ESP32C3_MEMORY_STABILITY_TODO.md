@@ -36,6 +36,18 @@ weakening recovery thresholds. The optional initialization remains off by
 default; final quiet-image qualification and intermittent TCP diagnosis
 remain open. The earlier failures above stay part of the control evidence.
 
+The [quiet production health qualification](ESP32C3_QUIET_HEALTH_20261010.md)
+now records 42/42 local HTTP/lifecycle checks and 13/13 OTA checks.
+Public HTTPS retains two original failed gates (8/10): one 7.029-second
+paired status/health observation and one HE-AAC minimum largest block
+of 7,936 B, below the unchanged 8,192 B budget. All five public source
+formats match independent references; there are no recorded allocation
+failures or watchdog events in the public campaign. Device timestamps
+place about 4.9 seconds of the slow response after health snapshot
+construction; transport attribution remains open. Keep these failures
+and qualify the remaining exact-image HTTPS, certificate-error and
+sustained-playback scope before enabling the integrated defaults.
+
 Latest [integer-clock cross-codec qualification](ESP32C3_INTEGER_QUALIFICATION_20261009.md)
 passes the HTTPS matrix and 33 codec switches. Ten-minute HE-AACv2 retains one
 initial-idle TCP timeout and 11 late delayed-DMA notifications. The integrated
