@@ -5,7 +5,7 @@ import sys
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools/esp32c3_tests'))
 from common import Failure
-from quiet_tls_records import check_record_window, check_format, check_response
+from quiet_tls_records import check_record_window, check_format, check_response, check_renegotiation
 
 
 def observation():
@@ -45,6 +45,24 @@ class QuietRecordTests(unittest.TestCase):
         with self.assertRaises(Failure):check_format(states,spec,75)
         self.assertEqual(check_response([dict(request_ms=1999)])['maximum_ms'],1999)
         with self.assertRaises(Failure):check_response([dict(request_ms=2000)])
+
+    def test_hello_request_or_new_connection_is_not_renegotiation(self):
+        obs=observation();e=obs['events'][0]
+        e.update(started_at=0,session_cache_enabled=False,session_tickets_enabled=False,
+            renegotiation_requests=[dict(at=30,before=0)],
+            renegotiation_completions=[dict(at=30.6,after=1,pending=False)],
+            handshake_callbacks=[dict(at=0,renegotiations=0,pending=False,version='TLSv1.2',cipher=e['cipher']),
+                                 dict(at=30,renegotiations=1,pending=True,version='TLSv1.2',cipher=e['cipher']),
+                                 dict(at=30.5,renegotiations=1,pending=False,version='TLSv1.2',cipher=e['cipher'])])
+        self.assertEqual(check_renegotiation(obs,5,75,30)['completed_handshakes'],2)
+        for field,value in [('renegotiation_completions',[]),('handshake_callbacks',e['handshake_callbacks'][:-1]),
+                            ('session_cache_enabled',True),('session_tickets_enabled',True)]:
+            broken=copy.deepcopy(obs);broken['events'][0][field]=value
+            with self.subTest(field=field),self.assertRaises(Failure):check_renegotiation(broken,5,75,30)
+        for first,end,after in ((31,75,30),(5,35,30),(5,75,31)):
+            with self.assertRaises(Failure):check_renegotiation(obs,first,end,after)
+        obs['events'].append(copy.deepcopy(e))
+        with self.assertRaises(Failure):check_renegotiation(obs,5,75,30)
 
 
 if __name__ == '__main__':unittest.main()

@@ -1452,3 +1452,18 @@ This does not exercise TLS renegotiation or measure the analog output.
 
 Host checks: `tests/test-quiet-tls-records.py`,
 `tests/test-tls-record-server.py` and `tests/test-sustained-output.py`.
+
+The optional `--renegotiate-seconds 30 --mode small` variant uses pyOpenSSL to
+request one TLS 1.2 renegotiation after PCM playback has started. Install
+`tools/audio_test_server/requirements-tls-renegotiation.txt` in a separate host
+test environment, keeping the ESP-IDF environment unchanged. Session tickets
+and the server session cache are disabled, so the test exercises a full peer
+handshake rather than session resumption. The runner requires completed
+handshakes before/after the request and subsequent audio writes on the same
+connection. An OpenSSL HANDSHAKE_DONE callback with renegotiation still pending
+can merely mean HelloRequest was sent; it is retained but is not completion.
+The other format, output, memory, response and recovery gates remain active.
+
+`tests/test-tls-renegotiation-server.py` verifies certificate-checked loopback
+transfer with byte-identical audio, and a client refusal that must not count
+as a completed renegotiation. This host-only dependency is not part of firmware.

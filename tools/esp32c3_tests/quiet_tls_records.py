@@ -57,6 +57,34 @@ def check_response(states):
     return dict(maximum_ms=maximum)
 
 
+def check_renegotiation(observation,first_pcm,end,after_seconds):
+    events = observation['events']
+    require(len(events)==1, 'Renegotiation used a new connection')
+    event = events[0]
+    require(event.get('session_cache_enabled') is False and event.get('session_tickets_enabled') is False,
+            'Session resumption was not disabled')
+    requests = event.get('renegotiation_requests',[])
+    completed = event.get('renegotiation_completions',[])
+    handshakes = [h for h in event.get('handshake_callbacks',[]) if h.get('pending') is False]
+    require(len(requests)==len(completed)==1 and len(handshakes)==2,
+            'Missing completed renegotiation (HelloRequest alone is insufficient)')
+    request,done = requests[0],completed[0]
+    require(request['before']==0 and done['after']==1 and done['pending'] is False and
+            [h['renegotiations'] for h in handshakes]==[0,1], 'Incomplete renegotiation state')
+    require(all(h['version']=='TLSv1.2' and h['cipher']=='ECDHE-RSA-AES128-GCM-SHA256' for h in handshakes),
+            'Unexpected handshake protocol/cipher')
+    require(handshakes[0]['at'] < first_pcm < request['at'] <= handshakes[1]['at'] <= done['at'] < end-10,
+            'Renegotiation was not between full-rate playback windows')
+    interval = 16384/event['target_audio_bytes_per_second']
+    require(after_seconds <= request['at']-event['started_at'] <= after_seconds+interval+2,
+            'Unexpected renegotiation timing')
+    writes = [w for w in event['writes'] if w['phase'].startswith('body-')]
+    require(any(w['at'] < request['at'] for w in writes) and any(w['at'] > done['at'] for w in writes),
+            'Missing audio writes before or after renegotiation')
+    return dict(request_at=request['at'],completed_at=done['at'],duration_ms=(done['at']-request['at'])*1000,
+                completed_handshakes=len(handshakes),post_handshake_seconds=end-done['at'])
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ('board','host'):
@@ -67,8 +95,13 @@ def main():
     p.add_argument('--mode',action='append',choices=('small','large','grow','alternate'))
     p.add_argument('--seconds',type=int,default=75)
     p.add_argument('--port',type=int,default=8772)
+    p.add_argument('--renegotiate-seconds',type=float,
+                   help='Use optional pyOpenSSL backend for one server-initiated TLS 1.2 renegotiation')
     a = p.parse_args()
     require(not a.output.exists() and 60 <= a.seconds <= 600, 'Use fresh output and 60..600 seconds')
+    if a.renegotiate_seconds is not None:
+        require(WARMUP_SECONDS+5 <= a.renegotiate_seconds <= a.seconds-20,
+                'Renegotiate between measured playback windows')
     config = a.firmware.with_name('sdkconfig').read_text()
     manifest = json.loads(a.firmware.with_name('manifest.json').read_text())
     transport_config(config,manifest,a.ca,a.cert,a.key)
@@ -93,6 +126,9 @@ def main():
         test_ca_sha256=sha(a.ca.read_bytes()),leaf_certificate_sha256=sha(a.cert.read_bytes()),
         fixture_hashes={n:s['sha256'] for n,s in specs.items()},
         pacing_ratio=1.0,warmup_seconds=WARMUP_SECONDS,record_observations={},windows={})
+    if a.renegotiate_seconds is not None:
+        from audio_test_server.tls_renegotiation import RenegotiationServer,backend_versions
+        report.data.update(renegotiate_seconds=a.renegotiate_seconds,tls_backend=backend_versions())
     last_checkpoint = 0
     def checkpoint(completed,batch):
         nonlocal last_checkpoint
@@ -125,6 +161,8 @@ def main():
         first = next((suite.observations[-1]['started_at']+s['seconds']
                       for s in states if matches(s,specs[name])),float('inf'))
         case(key+':records',lambda:check_record_window(observation,mode,specs[name],first,observation['captured_at']))
+        if a.renegotiate_seconds is not None:
+            case(key+':renegotiation',lambda:check_renegotiation(observation,first,observation['captured_at'],a.renegotiate_seconds))
         case(key+':output',lambda:check_output(measured))
         case(key+':memory',lambda:check_memory(measured))
         case(key+':response',lambda:check_response(states))
@@ -136,9 +174,11 @@ def main():
                 initial = b.health_samples[-3:]
                 require(all(r.get('output',{}).get('available') is True for r in initial), 'Missing output health')
                 report.data['idle'] = dict(initial=initial)
-                with RecordServer(a.host,a.port,specs,a.cert,a.key,
+                server_type = RecordServer if a.renegotiate_seconds is None else RenegotiationServer
+                options = {} if a.renegotiate_seconds is None else dict(renegotiate_seconds=a.renegotiate_seconds)
+                with server_type(a.host,a.port,specs,a.cert,a.key,
                                   seconds=a.seconds+OBSERVATION_TAIL_SECONDS,grow_seconds=30,
-                                  pacing_ratio=1.0) as server:
+                                  pacing_ratio=1.0,**options) as server:
                     try:
                         for name in names:
                             for mode in modes:

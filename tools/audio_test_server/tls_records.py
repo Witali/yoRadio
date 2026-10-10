@@ -108,21 +108,28 @@ class Channel:
 
 class RecordServer:
     def __init__(self, host, port, fixtures, cert, key, *, seconds=90, grow_seconds=30,
-                 pacing_ratio=1.02):
+                 pacing_ratio=1.02, tls_context=None, channel_type=Channel,
+                 renegotiate_seconds=None):
         if not 0 <= grow_seconds <= seconds or not 0 < seconds <= MAX_SERVER_SECONDS:
             raise ValueError('Invalid bounded test duration')
         if (type(pacing_ratio) not in (int, float) or
                 not math.isfinite(pacing_ratio) or pacing_ratio <= 0):
             raise ValueError('pacing_ratio must be finite and positive')
+        if renegotiate_seconds is not None and not 0 < renegotiate_seconds < seconds:
+            raise ValueError('Renegotiation must occur within the observation')
+        if renegotiate_seconds is not None and not callable(getattr(channel_type,'renegotiate',None)):
+            raise ValueError('TLS channel does not implement renegotiation')
         self.closed = threading.Event()
         self.events = []
         outer = self
-        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        context.minimum_version = context.maximum_version = ssl.TLSVersion.TLSv1_2
-        # This yields 24 bytes of explicit nonce/tag overhead per record, so
-        # measured encrypted lengths prove the selected plaintext record size.
-        context.set_ciphers('ECDHE-RSA-AES128-GCM-SHA256')
-        context.load_cert_chain(cert, key)
+        context = tls_context
+        if context is None:
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            context.minimum_version = context.maximum_version = ssl.TLSVersion.TLSv1_2
+            # This yields 24 bytes of explicit nonce/tag overhead per record, so
+            # measured encrypted lengths prove the selected plaintext record size.
+            context.set_ciphers('ECDHE-RSA-AES128-GCM-SHA256')
+            context.load_cert_chain(cert, key)
 
         class Handler(socketserver.BaseRequestHandler):
             def handle(self):
@@ -131,7 +138,7 @@ class RecordServer:
                              pacing_ratio=pacing_ratio, clock='time.perf_counter')
                 outer.events.append(event)
                 self.request.settimeout(10)
-                channel = Channel(self.request, context, event)
+                channel = channel_type(self.request, context, event)
                 try:
                     channel.handshake()
                     parts = urlsplit(channel.request()).path.strip('/').split('/')
@@ -151,7 +158,12 @@ class RecordServer:
                     data, offset, index = spec['data'], 0, 0
                     bps = len(data) / spec['seconds'] * pacing_ratio
                     event['target_audio_bytes_per_second'] = bps
+                    renegotiated = False
                     while not outer.closed.is_set() and time.perf_counter() - started < seconds:
+                        if (renegotiate_seconds is not None and not renegotiated and
+                                time.perf_counter() - started >= renegotiate_seconds):
+                            channel.renegotiate()
+                            renegotiated = True
                         large = mode == 'large' or mode == 'grow' and time.perf_counter() - started >= grow_seconds or mode == 'alternate' and index % 2
                         count = MAX_RECORD_PLAINTEXT if large else SMALL_RECORD_PLAINTEXT
                         payload = bytearray()
@@ -168,7 +180,7 @@ class RecordServer:
                     event['complete'] = True
                 except ssl.SSLError as error:
                     event['error'] = type(error).__name__
-                    event['tls_reason'] = error.reason
+                    event['tls_reason'] = getattr(error,'reason',None)
                 except (OSError, EOFError, ValueError) as error:
                     event['error'] = type(error).__name__
                 finally:
