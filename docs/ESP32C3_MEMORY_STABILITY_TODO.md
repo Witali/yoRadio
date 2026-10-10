@@ -21,14 +21,20 @@ remaining heap owner and TCP handshake failure with the retained probes.
 
 The [owner/TCP follow-up](ESP32C3_TLS_HEAP_OWNER_20261010.md) now identifies
 one persistent 92-byte `radio_stream` allocation splitting the largest free
-region after first AAC/TLS use. It matches the SDK mutex size; lazy hardware
-MPI-lock initialization is a source-grounded hypothesis awaiting a controlled
-early-initialization test. Heavy FLAC completes 600 seconds with zero DMA
+region after first AAC/TLS use. It matches the SDK mutex size, motivating the
+controlled early-initialization test below. Heavy FLAC completes 600 seconds with zero DMA
 counter increments on the instrumented image. TCP connect timeouts do not
 recur, but four missing TCP records invalidate its whole trace. The short
 AAC repeat retains its recovery failure and one early DMA counter increment.
-Next test the allocation's cause without weakening recovery thresholds;
-final quiet-image qualification and intermittent TCP diagnosis remain open.
+The subsequent [early MPI-lock initialization trial](ESP32C3_EARLY_MPI_LOCK_20261010.md)
+passes fresh-boot full-record AAC/TLS on both diagnostic configurations
+(5/5 each) and 34/34 matrix, switch, transition and recovery checks on the
+lighter one. The watched region returns to one free block, and largest
+allocatable capacity remains 114,688 B after Stop instead of 102,400 B.
+This preserves contiguous capacity without reducing decoder storage or
+weakening recovery thresholds. The optional initialization remains off by
+default; final quiet-image qualification and intermittent TCP diagnosis
+remain open. The earlier failures above stay part of the control evidence.
 
 Latest [integer-clock cross-codec qualification](ESP32C3_INTEGER_QUALIFICATION_20261009.md)
 passes the HTTPS matrix and 33 codec switches. Ten-minute HE-AACv2 retains one

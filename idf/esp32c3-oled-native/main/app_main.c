@@ -12,6 +12,9 @@
 #include "driver/gpio.h"
 #include "encoder_input.h"
 #include "esp_check.h"
+#ifdef CONFIG_YORADIO_TLS_EARLY_MPI_LOCK
+#include "esp_crypto_lock.h"
+#endif
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_spiffs.h"
@@ -945,6 +948,13 @@ static void services_task(void *argument) {
 void app_main(void) {
 #ifndef YORADIO_CODEC_BENCHMARK
     deep_sleep_clock_boot();
+#ifdef CONFIG_YORADIO_TLS_EARLY_MPI_LOCK
+    // Create the SDK's lifetime mutex before temporary TLS/audio allocations
+    // can surround it. Use the normal lock API; never replace or free the lock.
+    // FreeRTOS is running here, after the deep-sleep clock's fast sleep path.
+    esp_crypto_mpi_lock_acquire();
+    esp_crypto_mpi_lock_release();
+#endif
 #endif
     ESP_LOGI(TAG, "Starting pure ESP-IDF ESP32-C3 OLED yoRadio");
     native_state_init(&s_state);

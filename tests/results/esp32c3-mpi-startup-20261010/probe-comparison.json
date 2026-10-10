@@ -1,0 +1,126 @@
+{
+  "baseline_archive": "tests/results/esp32c3-frac4-attribution-20261010/physical/hev2-tls-grow",
+  "baseline": {
+    "idle-before": {
+      "result": "PASS",
+      "medians": {
+        "heap": 129348.0,
+        "largest": 114688.0,
+        "tasks": 17.0
+      }
+    },
+    "playback": {
+      "samples": 388,
+      "rate": 44100,
+      "channels": 2,
+      "record_counts": {
+        "1048": 118,
+        "16408": 11
+      },
+      "first_large_at": 3356.2367631,
+      "mean_busy": 56.57333333333333,
+      "peak_busy": 61.5,
+      "minimum_heap": 22208.0,
+      "minimum_largest": 15360.0,
+      "audio_wall_ratio": 1.000484178747401,
+      "first_full_pcm_seconds": 1.586704600000303
+    },
+    "idle-recovery": {
+      "result": "FAIL",
+      "reason": "Persistent largest loss: 12288.0 bytes"
+    },
+    "raw_final_idle": {
+      "samples": [
+        {
+          "heap": 129000,
+          "largest": 102400,
+          "tasks": 17
+        },
+        {
+          "heap": 129000,
+          "largest": 102400,
+          "tasks": 17
+        },
+        {
+          "heap": 129000,
+          "largest": 102400,
+          "tasks": 17
+        }
+      ],
+      "medians": {
+        "heap": 129000,
+        "largest": 102400,
+        "tasks": 17
+      }
+    },
+    "input_sha256": {
+      "report.json": "ccd8adb708d0979e25b35305260f9a81808af35838ec7fb39d535df6346005c9",
+      "performance.json": "de2ad9880178610c7f82bfa4d863d1d85719d8850759bf7f7091cd702bca82b4",
+      "status.json": "116343d5e48b755770d0128ea74e1bfc6c2fc90018eaed22b28dcee223eafad7"
+    }
+  },
+  "early_mpi_probe": {
+    "idle-before": {
+      "result": "PASS",
+      "medians": {
+        "heap": 129244.0,
+        "largest": 114688.0,
+        "tasks": 17.0
+      }
+    },
+    "playback": {
+      "samples": 386,
+      "rate": 44100,
+      "channels": 2,
+      "record_counts": {
+        "1048": 118,
+        "16408": 11
+      },
+      "first_large_at": 4624.7098219,
+      "mean_busy": 56.68,
+      "peak_busy": 61.3,
+      "minimum_heap": 22212.0,
+      "minimum_largest": 19456.0,
+      "audio_wall_ratio": 1.0006694298451766,
+      "first_full_pcm_seconds": 1.429968899999949
+    },
+    "idle-recovery": {
+      "result": "PASS",
+      "medians": {
+        "heap": 128972,
+        "largest": 114688,
+        "tasks": 17
+      }
+    },
+    "raw_final_idle": {
+      "samples": [
+        {
+          "heap": 128972,
+          "largest": 114688,
+          "tasks": 17
+        },
+        {
+          "heap": 128972,
+          "largest": 114688,
+          "tasks": 17
+        },
+        {
+          "heap": 128972,
+          "largest": 114688,
+          "tasks": 17
+        }
+      ],
+      "medians": {
+        "heap": 128972,
+        "largest": 114688,
+        "tasks": 17
+      }
+    },
+    "input_sha256": {
+      "report.json": "6b1320754d02e2beda67cbce46dba6ee80e44b90a3a35b4de0d112070de05e9f",
+      "performance.json": "ddcad4e90688051e0a442f45da5fcc4d204c49e8be315cd77c22710264b46af2",
+      "status.json": "de3dfb1440aaa28297c0b8e04b81fcc95f5a45135cc9af39dd70d89428eedabe"
+    }
+  },
+  "note": "Same watched raw range and initial size. Recovery improvement is contiguous capacity, not total RAM saved; no runtime allocation call stack is captured. The original failed verdict is retained."
+}
