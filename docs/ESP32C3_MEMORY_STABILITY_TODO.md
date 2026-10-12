@@ -39,6 +39,11 @@ further codec compression and speed work are not release requirements.
   failed controls and distinguish host command errors from board failures.
 - [ ] Diagnose the intermittent WebUI TCP-connect timeout with correlated
   evidence. Successful later observations alone do not establish a fix.
+- [ ] Attribute the repeated active-playback Opus heap decline. Five diagnostic
+  Opus/HE-AACv2 cycles retain one 2,184-byte decline, with full settled recovery
+  and negative heap/RX-credit correlation. Correlation is not ownership. Three
+  missing TCP events also leave one phase trace unqualified; preserve the
+  [capture limitations](ESP32C3_HTTP_REQUEST_BUFFER.md#correlated-tcpwi-fi-and-opus-follow-up).
 - [ ] Close the short Vorbis memory-budget discrepancy with retained active
   and settled memory evidence; current longer controls do not show a leak.
 

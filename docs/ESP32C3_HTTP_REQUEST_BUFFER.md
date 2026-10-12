@@ -384,3 +384,52 @@ Original firmware, station and settings were restored. The
 gate, successful controls, fixture generation manifest and restoration.
 `offline_replay.py` uses frozen test sources and reproduces the original review
 without downloading or regenerating audio. Large fixture audio stays in `.build/`.
+
+### Correlated TCP/Wi-Fi and Opus follow-up
+
+The diagnostic image `r9a97-radio-wifi-probe` (app SHA-256
+`16916c58d97820955595a5d31cf16b92a9d65f3d7db267584c04e8bd2f000da2`)
+completed five cycles: 60 seconds of Opus 510 kbit/s, 24 seconds covering
+HE-AACv2 playback/EOF, then 10 seconds idle. Logging/runtime statistics change
+timing and memory relative to quiet production; this is diagnostic evidence.
+
+All ten playback cases passed format, observation transport and measured
+output checks. All five HE-AACv2 EOF checks and all five settled-memory
+recovery checks passed. Lifetime allocation failures/watchdogs: 0/0, one boot.
+No steady-window completion-queue increments or write errors were observed.
+
+| Opus cycle | First → last steady free-heap median, B | Memory gate | Paired heap/RX samples | Heap vs uncredited RX correlation |
+|---|---:|---|---:|---:|
+| 1 | 76,392 → 76,392 | PASS | 42 | −0.700 |
+| 2 | 76,388 → 74,204 | FAIL | 43 | −0.744 |
+| 3 | 76,460 → 75,756 | PASS | 43 | −0.644 |
+| 4 | 74,196 → 76,452 | PASS | 44 | −0.804 |
+| 5 | 76,452 → 76,452 | PASS | 43 | −0.765 |
+
+The 2,184-byte decline in cycle 2 exceeds the unchanged 2,048-byte gate.
+Idle free heap recovered from an initial median of 132,024 B to 132,084 B;
+the largest free block stayed 102,400 B. Negative correlation supports
+investigating receive-queue occupancy, but does not identify allocation owners
+or prove absence of a leak. TCP credit counts payload, not uniquely allocated
+RAM; it must not be subtracted from heap measurements to turn a failure into
+a pass. Paired snapshots passed their own coverage checks in all five cycles.
+
+The capture contains 6,053 CRC-valid TCP/Wi-Fi frames and no malformed frames
+or reported serial interruptions. However, event sequences 1701–1703 are
+missing during Opus cycle 2, while the device ring-drop count stays zero.
+Consequently 15/16 phase trace windows qualify, and that Opus trace does not.
+CRC validity alone is insufficient to establish complete delivery. The
+observed Wi-Fi events are startup connection and IP acquisition; incomplete
+coverage prevents claiming that no Wi-Fi event could have been lost.
+
+There were no failed observation requests within the 488.695-second campaign.
+Two five-second connect timeouts occurred outside it, in the install/restore
+OTA boot-wait periods; neither has a complete diagnostic bracket. These must
+not be presented as an in-playback timeout or evidence fixing the earlier
+production timeout. Original application, settings, station and playback were
+restored and verified.
+
+[Raw capture and replay](../tests/results/esp32c3-radio-wifi-capture/) retain
+the failed memory gate, missing trace events, per-phase coverage, paired
+snapshots and restoration. `review.py` replays acceptance using frozen test
+sources; its PASS means evidence consistency, not that all case gates passed.
