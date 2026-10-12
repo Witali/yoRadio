@@ -1,0 +1,94 @@
+{
+  "mp3-plain": {
+    "fixture": "mp3-256-44100-stereo",
+    "fixture_sha256": "f68f9ef51370876266ce402a7322c6e7c77664d1ad122c6d6243e97a07ddf600",
+    "interval": 0,
+    "format": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 137,
+        "rate": 44100,
+        "channels": 2
+      }
+    },
+    "output": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 137,
+        "elapsed_ms": 74535,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      }
+    },
+    "memory": {
+      "result": "FAIL",
+      "reason": "Progressive heap loss"
+    }
+  },
+  "mp3-icy": {
+    "fixture": "mp3-256-44100-stereo",
+    "fixture_sha256": "f68f9ef51370876266ce402a7322c6e7c77664d1ad122c6d6243e97a07ddf600",
+    "interval": 45000,
+    "format": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 137,
+        "rate": 44100,
+        "channels": 2
+      }
+    },
+    "output": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 137,
+        "elapsed_ms": 74623,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      }
+    },
+    "memory": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 137,
+        "boot_id": "95ee1506ad2a63f2",
+        "minimum_heap": 79116,
+        "minimum_largest": 63488,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      }
+    }
+  },
+  "hev2-icy": {
+    "fixture": "hev2-44100-stereo",
+    "fixture_sha256": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e",
+    "interval": 45000,
+    "format": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 135,
+        "rate": 44100,
+        "channels": 2
+      }
+    },
+    "output": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 135,
+        "elapsed_ms": 74684,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      }
+    },
+    "memory": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 135,
+        "boot_id": "95ee1506ad2a63f2",
+        "minimum_heap": 35052,
+        "minimum_largest": 24576,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      }
+    }
+  }
+}
