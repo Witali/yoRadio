@@ -1,0 +1,25 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-radio-rx-copy\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+42028ce6 <__wrap_wlanif_input>:
+42028ce6:	1101                	addi	sp,sp,-32
+42028ce8:	cc22                	sw	s0,24(sp)
+42028cea:	01422883          	lw	a7,20(tp) # 14 <copy_scope>
+42028cee:	ce06                	sw	ra,28(sp)
+42028cf0:	00810813          	addi	a6,sp,8
+42028cf4:	4705                	li	a4,1
+42028cf6:	c446                	sw	a7,8(sp)
+42028cf8:	01022a23          	sw	a6,20(tp) # 14 <copy_scope>
+42028cfc:	c63a                	sw	a4,12(sp)
+42028cfe:	563640ef          	jal	4208da60 <wlanif_input>
+42028d02:	47a2                	lw	a5,8(sp)
+42028d04:	40f2                	lw	ra,28(sp)
+42028d06:	00f22a23          	sw	a5,20(tp) # 14 <copy_scope>
+42028d0a:	4462                	lw	s0,24(sp)
+42028d0c:	6105                	addi	sp,sp,32
+42028d0e:	8082                	ret

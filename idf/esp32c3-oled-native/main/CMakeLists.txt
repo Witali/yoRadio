@@ -314,8 +314,13 @@ if(CONFIG_YORADIO_HEAP_FRAGMENT_PROBE)
 endif()
 if(CONFIG_YORADIO_RX_BUFFER_DIAGNOSTICS)
   target_sources(${COMPONENT_LIB} PRIVATE "rx_buffer_diagnostic.c")
-  target_link_options(${COMPONENT_LIB} INTERFACE
-    "-Wl,--wrap=esp_pbuf_allocate" "-Wl,--wrap=esp_netif_free_rx_buffer")
+  if(CONFIG_LWIP_L2_TO_L3_COPY)
+    target_link_options(${COMPONENT_LIB} INTERFACE
+      "-Wl,--wrap=wlanif_input" "-Wl,--wrap=pbuf_alloc" "-Wl,--wrap=mem_free")
+  else()
+    target_link_options(${COMPONENT_LIB} INTERFACE
+      "-Wl,--wrap=esp_pbuf_allocate" "-Wl,--wrap=esp_netif_free_rx_buffer")
+  endif()
 endif()
 if(CONFIG_YORADIO_DIRECT_DMA_PCM AND NOT CONFIG_YORADIO_QEMU)
   # The generator uses the installed driver's typed DMA state. Refuse an

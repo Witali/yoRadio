@@ -1,5 +1,6 @@
 #include "rx_buffer_diagnostic.h"
 #include <inttypes.h>
+#include <stdbool.h>
 #include <string.h>
 #include "esp_heap_caps.h"
 #include "esp_log.h"
@@ -9,6 +10,8 @@
 #include "esp_rom_crc.h"
 #include "freertos/FreeRTOS.h"
 #include "lwip/esp_pbuf_ref.h"
+#include "lwip/opt.h"
+#include "lwip/pbuf.h"
 
 // Observe the public netif ownership transfer; never dereference packet data
 // or interpret the driver's opaque L2 handle. No changes to packet lifetimes.
@@ -33,7 +36,7 @@ static uint32_t record_crc(const void *record, size_t size) {
     return esp_rom_crc32_le(0, record, size);
 }
 typedef struct {
-    void *l2, *payload;
+    void *release_key, *payload;
     struct pbuf *metadata;
     uint32_t id;
 } rx_owner_t;
@@ -41,39 +44,99 @@ static rx_owner_t owners[RX_TRACK_SLOTS];
 static portMUX_TYPE lock = portMUX_INITIALIZER_UNLOCKED;
 static uint32_t allocations, releases, lost, live, peak, untracked_releases;
 
-struct pbuf *__real_esp_pbuf_allocate(esp_netif_t *, void *, size_t, void *);
-struct pbuf *__wrap_esp_pbuf_allocate(esp_netif_t *netif, void *buffer,
-                                     size_t len, void *l2) {
-    struct pbuf *p = __real_esp_pbuf_allocate(netif, buffer, len, l2);
-    if (!p) return p;
+static void record_owner(void *release_key, void *payload, struct pbuf *metadata) {
     portENTER_CRITICAL(&lock);
     ++allocations;
     unsigned slot = 0;
     while (slot < RX_TRACK_SLOTS && owners[slot].metadata) ++slot;
     for (unsigned i = 0; i < RX_TRACK_SLOTS; ++i)
-        if (owners[i].metadata && owners[i].l2 == l2) slot = RX_TRACK_SLOTS;
+        if (owners[i].metadata && owners[i].release_key == release_key) slot = RX_TRACK_SLOTS;
     if (slot < RX_TRACK_SLOTS) {
-        owners[slot] = (rx_owner_t){l2, buffer, p, allocations};
+        owners[slot] = (rx_owner_t){release_key, payload, metadata, allocations};
         if (++live > peak) peak = live;
     } else ++lost;
     portEXIT_CRITICAL(&lock);
+}
+
+// Caller holds the owner lock. Do not inspect packet data or freed storage.
+static bool release_owner_locked(const void *release_key) {
+    unsigned slot = 0;
+    while (slot < RX_TRACK_SLOTS &&
+           (!owners[slot].metadata || owners[slot].release_key != release_key)) ++slot;
+    if (slot < RX_TRACK_SLOTS) {
+        owners[slot] = (rx_owner_t){0};
+        --live;
+        ++releases;
+        return true;
+    }
+    return false;
+}
+
+#ifdef CONFIG_LWIP_L2_TO_L3_COPY
+#if !MEM_LIBC_MALLOC
+#error "RX copy diagnostics require the audited libc-backed lwIP allocator"
+#endif
+// The original wlanif_input allocates one PBUF_RAM copy before handing it to
+// lwIP. Scope by task so unrelated TCP/TX allocations never become RX owners.
+typedef struct rx_copy_scope {
+    struct rx_copy_scope *previous;
+    bool allocation_pending;
+} rx_copy_scope_t;
+static _Thread_local rx_copy_scope_t *copy_scope;
+esp_err_t __real_wlanif_input(void *, void *, size_t, void *);
+esp_err_t __wrap_wlanif_input(void *netif, void *buffer, size_t len, void *l2) {
+    rx_copy_scope_t scope = {.previous = copy_scope, .allocation_pending = true};
+    copy_scope = &scope;
+    esp_err_t result = __real_wlanif_input(netif, buffer, len, l2);
+    copy_scope = scope.previous;
+    return result;
+}
+
+struct pbuf *__real_pbuf_alloc(pbuf_layer, u16_t, pbuf_type);
+struct pbuf *__wrap_pbuf_alloc(pbuf_layer layer, u16_t len, pbuf_type type) {
+    const bool receiving = copy_scope && copy_scope->allocation_pending &&
+                           layer == PBUF_RAW && type == PBUF_RAM;
+    // Consume only the original copy allocation, including its failure. Any
+    // allocations from a downstream input callback have independent owners.
+    if (receiving) copy_scope->allocation_pending = false;
+    struct pbuf *p = __real_pbuf_alloc(layer, len, type);
+    if (p && receiving) record_owner(p, p->payload, p);
+    return p;
+}
+
+void __real_mem_free(void *);
+void __wrap_mem_free(void *pointer) {
+    // Observe actual deallocation, not pbuf_free entry: referenced buffers and
+    // chained tails can remain alive. This also covers internal pbuf.c calls.
+    // In the pinned MEM_LIBC_MALLOC path mem_trim does not move allocations.
+    portENTER_CRITICAL(&lock);
+    if (release_owner_locked(pointer)) {
+        // C3 only: keep removal and real free indivisible to the paired heap
+        // snapshot. The libc-backed mem_free neither allocates nor logs.
+        __real_mem_free(pointer);
+        portEXIT_CRITICAL(&lock);
+        return;
+    }
+    portEXIT_CRITICAL(&lock);
+    __real_mem_free(pointer);
+}
+#else
+struct pbuf *__real_esp_pbuf_allocate(esp_netif_t *, void *, size_t, void *);
+struct pbuf *__wrap_esp_pbuf_allocate(esp_netif_t *netif, void *buffer,
+                                     size_t len, void *l2) {
+    struct pbuf *p = __real_esp_pbuf_allocate(netif, buffer, len, l2);
+    if (p) record_owner(l2, buffer, p);
     return p;
 }
 
 void __real_esp_netif_free_rx_buffer(void *, void *);
 void __wrap_esp_netif_free_rx_buffer(void *netif, void *l2) {
     portENTER_CRITICAL(&lock);
-    unsigned slot = 0;
-    while (slot < RX_TRACK_SLOTS &&
-           (!owners[slot].metadata || owners[slot].l2 != l2)) ++slot;
-    if (slot < RX_TRACK_SLOTS) {
-        owners[slot] = (rx_owner_t){0};
-        --live;
-        ++releases;
-    } else ++untracked_releases; // Failed pbuf creation can legitimately do this.
+    if (!release_owner_locked(l2)) ++untracked_releases;
     portEXIT_CRITICAL(&lock);
     __real_esp_netif_free_rx_buffer(netif, l2);
 }
+#endif
 
 typedef struct {
     rx_owner_t owner;
@@ -125,7 +188,8 @@ void rx_buffer_diagnostic_poll(void) {
     // C3 is single-core. This short critical section prevents a recorded RX
     // pointer from being freed/reused between the owner copy and heap walk.
     // The wrapped allocator has already released heap locks before taking our
-    // lock; the free wrapper releases our lock before calling the real free.
+    // lock. Copied pbufs are removed and freed under the same owner lock;
+    // the legacy L2 wrapper removes its owner before releasing the driver buffer.
     // No logging, allocation or heap API calls occur in containing_block.
     portENTER_CRITICAL(&lock);
     for (unsigned i = 0; i < RX_TRACK_SLOTS; ++i)

@@ -1,0 +1,79 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-radio-rx-copy\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4208da60 <wlanif_input>:
+4208da60:	4d5c                	lw	a5,28(a0)
+4208da62:	7179                	addi	sp,sp,-48
+4208da64:	d04a                	sw	s2,32(sp)
+4208da66:	ce4e                	sw	s3,28(sp)
+4208da68:	d606                	sw	ra,44(sp)
+4208da6a:	8936                	mv	s2,a3
+4208da6c:	89be                	mv	s3,a5
+4208da6e:	c1ad                	beqz	a1,4208dad0 <wlanif_input+0x70>
+4208da70:	d422                	sw	s0,40(sp)
+4208da72:	03954783          	lbu	a5,57(a0)
+4208da76:	842a                	mv	s0,a0
+4208da78:	01f79693          	slli	a3,a5,0x1f
+4208da7c:	01f6d793          	srli	a5,a3,0x1f
+4208da80:	c7b9                	beqz	a5,4208dace <wlanif_input+0x6e>
+4208da82:	c62e                	sw	a1,12(sp)
+4208da84:	01061593          	slli	a1,a2,0x10
+4208da88:	c432                	sw	a2,8(sp)
+4208da8a:	81c1                	srli	a1,a1,0x10
+4208da8c:	28000613          	li	a2,640
+4208da90:	4501                	li	a0,0
+4208da92:	d226                	sw	s1,36(sp)
+4208da94:	a7c9b0ef          	jal	42028d10 <__wrap_pbuf_alloc>
+4208da98:	84aa                	mv	s1,a0
+4208da9a:	c539                	beqz	a0,4208dae8 <wlanif_input+0x88>
+4208da9c:	4622                	lw	a2,8(sp)
+4208da9e:	45b2                	lw	a1,12(sp)
+4208daa0:	4148                	lw	a0,4(a0)
+4208daa2:	fe2f9097          	auipc	ra,0xfe2f9
+4208daa6:	132080e7          	jalr	306(ra) # 40386bd4 <memcpy>
+4208daaa:	85ca                	mv	a1,s2
+4208daac:	854e                	mv	a0,s3
+4208daae:	badff0ef          	jal	4208d65a <esp_netif_free_rx_buffer>
+4208dab2:	481c                	lw	a5,16(s0)
+4208dab4:	85a2                	mv	a1,s0
+4208dab6:	8526                	mv	a0,s1
+4208dab8:	9782                	jalr	a5
+4208daba:	87aa                	mv	a5,a0
+4208dabc:	4501                	li	a0,0
+4208dabe:	ef95                	bnez	a5,4208dafa <wlanif_input+0x9a>
+4208dac0:	5422                	lw	s0,40(sp)
+4208dac2:	5492                	lw	s1,36(sp)
+4208dac4:	50b2                	lw	ra,44(sp)
+4208dac6:	5902                	lw	s2,32(sp)
+4208dac8:	49f2                	lw	s3,28(sp)
+4208daca:	6145                	addi	sp,sp,48
+4208dacc:	8082                	ret
+4208dace:	5422                	lw	s0,40(sp)
+4208dad0:	00090663          	beqz	s2,4208dadc <wlanif_input+0x7c>
+4208dad4:	85ca                	mv	a1,s2
+4208dad6:	854e                	mv	a0,s3
+4208dad8:	b83ff0ef          	jal	4208d65a <esp_netif_free_rx_buffer>
+4208dadc:	557d                	li	a0,-1
+4208dade:	50b2                	lw	ra,44(sp)
+4208dae0:	5902                	lw	s2,32(sp)
+4208dae2:	49f2                	lw	s3,28(sp)
+4208dae4:	6145                	addi	sp,sp,48
+4208dae6:	8082                	ret
+4208dae8:	854e                	mv	a0,s3
+4208daea:	85ca                	mv	a1,s2
+4208daec:	b6fff0ef          	jal	4208d65a <esp_netif_free_rx_buffer>
+4208daf0:	10100513          	li	a0,257
+4208daf4:	5422                	lw	s0,40(sp)
+4208daf6:	5492                	lw	s1,36(sp)
+4208daf8:	b7f1                	j	4208dac4 <wlanif_input+0x64>
+4208dafa:	8526                	mv	a0,s1
+4208dafc:	c00f00ef          	jal	4207defc <pbuf_free>
+4208db00:	557d                	li	a0,-1
+4208db02:	5422                	lw	s0,40(sp)
+4208db04:	5492                	lw	s1,36(sp)
+4208db06:	bfe1                	j	4208dade <wlanif_input+0x7e>

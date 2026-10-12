@@ -1,0 +1,241 @@
+#include "rx_buffer_diagnostic.h"
+#include <inttypes.h>
+#include <stdbool.h>
+#include <string.h>
+#include "esp_heap_caps.h"
+#include "esp_log.h"
+#include "esp_netif.h"
+#include "esp_netif_net_stack.h"
+#include "esp_timer.h"
+#include "esp_rom_crc.h"
+#include "freertos/FreeRTOS.h"
+#include "lwip/esp_pbuf_ref.h"
+#include "lwip/opt.h"
+#include "lwip/pbuf.h"
+
+// Observe the public netif ownership transfer; never dereference packet data
+// or interpret the driver's opaque L2 handle. No changes to packet lifetimes.
+enum { RX_TRACK_SLOTS = 32 };
+#define RX_SNAPSHOT_INTERVAL_US 5000000LL
+
+// Version 3 owner records append heap measurements from the same critical
+// section as the live RX range walk. Block records remain version 2. CRC32
+// covers the uint32 fields in order, little endian; no packet contents escape.
+typedef struct {
+    uint32_t sequence, live, peak, allocations, releases, lost, unmatched;
+    uint32_t payload, metadata, missing, walk_us;
+    uint32_t heap_free, heap_largest;
+} rx_owner_record_t;
+typedef struct {
+    uint32_t sequence, id, payload, payload_bytes, metadata, metadata_bytes;
+} rx_block_record_t;
+_Static_assert(sizeof(rx_owner_record_t) == 13 * sizeof(uint32_t), "No wire CRC padding");
+_Static_assert(sizeof(rx_block_record_t) == 6 * sizeof(uint32_t), "No wire CRC padding");
+
+static uint32_t record_crc(const void *record, size_t size) {
+    return esp_rom_crc32_le(0, record, size);
+}
+typedef struct {
+    void *release_key, *payload;
+    struct pbuf *metadata;
+    uint32_t id;
+} rx_owner_t;
+static rx_owner_t owners[RX_TRACK_SLOTS];
+static portMUX_TYPE lock = portMUX_INITIALIZER_UNLOCKED;
+static uint32_t allocations, releases, lost, live, peak, untracked_releases;
+
+static void record_owner(void *release_key, void *payload, struct pbuf *metadata) {
+    portENTER_CRITICAL(&lock);
+    ++allocations;
+    unsigned slot = 0;
+    while (slot < RX_TRACK_SLOTS && owners[slot].metadata) ++slot;
+    for (unsigned i = 0; i < RX_TRACK_SLOTS; ++i)
+        if (owners[i].metadata && owners[i].release_key == release_key) slot = RX_TRACK_SLOTS;
+    if (slot < RX_TRACK_SLOTS) {
+        owners[slot] = (rx_owner_t){release_key, payload, metadata, allocations};
+        if (++live > peak) peak = live;
+    } else ++lost;
+    portEXIT_CRITICAL(&lock);
+}
+
+// Caller holds the owner lock. Do not inspect packet data or freed storage.
+static bool release_owner_locked(const void *release_key) {
+    unsigned slot = 0;
+    while (slot < RX_TRACK_SLOTS &&
+           (!owners[slot].metadata || owners[slot].release_key != release_key)) ++slot;
+    if (slot < RX_TRACK_SLOTS) {
+        owners[slot] = (rx_owner_t){0};
+        --live;
+        ++releases;
+        return true;
+    }
+    return false;
+}
+
+#ifdef CONFIG_LWIP_L2_TO_L3_COPY
+#if !MEM_LIBC_MALLOC
+#error "RX copy diagnostics require the audited libc-backed lwIP allocator"
+#endif
+// The original wlanif_input allocates one PBUF_RAM copy before handing it to
+// lwIP. Scope by task so unrelated TCP/TX allocations never become RX owners.
+typedef struct rx_copy_scope {
+    struct rx_copy_scope *previous;
+    bool allocation_pending;
+} rx_copy_scope_t;
+static _Thread_local rx_copy_scope_t *copy_scope;
+esp_err_t __real_wlanif_input(void *, void *, size_t, void *);
+esp_err_t __wrap_wlanif_input(void *netif, void *buffer, size_t len, void *l2) {
+    rx_copy_scope_t scope = {.previous = copy_scope, .allocation_pending = true};
+    copy_scope = &scope;
+    esp_err_t result = __real_wlanif_input(netif, buffer, len, l2);
+    copy_scope = scope.previous;
+    return result;
+}
+
+struct pbuf *__real_pbuf_alloc(pbuf_layer, u16_t, pbuf_type);
+struct pbuf *__wrap_pbuf_alloc(pbuf_layer layer, u16_t len, pbuf_type type) {
+    const bool receiving = copy_scope && copy_scope->allocation_pending &&
+                           layer == PBUF_RAW && type == PBUF_RAM;
+    // Consume only the original copy allocation, including its failure. Any
+    // allocations from a downstream input callback have independent owners.
+    if (receiving) copy_scope->allocation_pending = false;
+    struct pbuf *p = __real_pbuf_alloc(layer, len, type);
+    if (p && receiving) record_owner(p, p->payload, p);
+    return p;
+}
+
+void __real_mem_free(void *);
+void __wrap_mem_free(void *pointer) {
+    // Observe actual deallocation, not pbuf_free entry: referenced buffers and
+    // chained tails can remain alive. This also covers internal pbuf.c calls.
+    // In the pinned MEM_LIBC_MALLOC path mem_trim does not move allocations.
+    portENTER_CRITICAL(&lock);
+    if (release_owner_locked(pointer)) {
+        // C3 only: keep removal and real free indivisible to the paired heap
+        // snapshot. The libc-backed mem_free neither allocates nor logs.
+        __real_mem_free(pointer);
+        portEXIT_CRITICAL(&lock);
+        return;
+    }
+    portEXIT_CRITICAL(&lock);
+    __real_mem_free(pointer);
+}
+#else
+struct pbuf *__real_esp_pbuf_allocate(esp_netif_t *, void *, size_t, void *);
+struct pbuf *__wrap_esp_pbuf_allocate(esp_netif_t *netif, void *buffer,
+                                     size_t len, void *l2) {
+    struct pbuf *p = __real_esp_pbuf_allocate(netif, buffer, len, l2);
+    if (p) record_owner(l2, buffer, p);
+    return p;
+}
+
+void __real_esp_netif_free_rx_buffer(void *, void *);
+void __wrap_esp_netif_free_rx_buffer(void *netif, void *l2) {
+    portENTER_CRITICAL(&lock);
+    if (!release_owner_locked(l2)) ++untracked_releases;
+    portEXIT_CRITICAL(&lock);
+    __real_esp_netif_free_rx_buffer(netif, l2);
+}
+#endif
+
+typedef struct {
+    rx_owner_t owner;
+    uintptr_t payload_allocation, metadata_allocation;
+    size_t payload_bytes, metadata_bytes;
+} rx_row_t;
+typedef struct { rx_row_t rows[RX_TRACK_SLOTS]; size_t count; } rx_snapshot_t;
+_Static_assert(sizeof(rx_snapshot_t) <= 1100, "Bound decoder diagnostic stack");
+
+static bool containing_block(walker_heap_into_t heap, walker_block_info_t block,
+                              void *context) {
+    (void)heap;
+    if (!block.used) return true;
+    rx_snapshot_t *snapshot = context;
+    uintptr_t first = (uintptr_t)block.ptr, end = first + block.size;
+    for (size_t i = 0; i < snapshot->count; ++i) {
+        rx_row_t *row = &snapshot->rows[i];
+        uintptr_t payload = (uintptr_t)row->owner.payload;
+        uintptr_t metadata = (uintptr_t)row->owner.metadata;
+        if (payload >= first && payload < end) {
+            row->payload_allocation = first;
+            row->payload_bytes = block.size;
+        }
+        if (metadata >= first && metadata < end) {
+            row->metadata_allocation = first;
+            row->metadata_bytes = block.size;
+        }
+    }
+    return true;
+}
+
+static bool already_counted(const rx_snapshot_t *snapshot, size_t before,
+                            uintptr_t allocation) {
+    for (size_t i = 0; i < before; ++i)
+        if (snapshot->rows[i].payload_allocation == allocation ||
+            snapshot->rows[i].metadata_allocation == allocation) return true;
+    return false;
+}
+
+void rx_buffer_diagnostic_poll(void) {
+    static int64_t previous;
+    static uint32_t sequence;
+    int64_t now = esp_timer_get_time();
+    if (now - previous < RX_SNAPSHOT_INTERVAL_US) return;
+    previous = now;
+    rx_snapshot_t snapshot = {0};
+    multi_heap_info_t heap;
+    uint32_t made, freed, dropped, high, unmatched;
+    // C3 is single-core. This short critical section prevents a recorded RX
+    // pointer from being freed/reused between the owner copy and heap walk.
+    // The wrapped allocator has already released heap locks before taking our
+    // lock. Copied pbufs are removed and freed under the same owner lock;
+    // the legacy L2 wrapper removes its owner before releasing the driver buffer.
+    // No logging, allocation or heap API calls occur in containing_block.
+    portENTER_CRITICAL(&lock);
+    for (unsigned i = 0; i < RX_TRACK_SLOTS; ++i)
+        if (owners[i].metadata) snapshot.rows[snapshot.count++].owner = owners[i];
+    made = allocations; freed = releases; dropped = lost;
+    high = peak; unmatched = untracked_releases;
+    heap_caps_walk(MALLOC_CAP_8BIT, containing_block, &snapshot);
+    // C3 is single-core: other tasks cannot change these heap regions between
+    // the owner walk and this measurement. Counts exclude allocator headers;
+    // they still cannot account for allocations owned by other subsystems.
+    heap_caps_get_info(&heap, MALLOC_CAP_8BIT);
+    portEXIT_CRITICAL(&lock);
+    int64_t walked = esp_timer_get_time() - now;
+    size_t payload_bytes = 0, metadata_bytes = 0, missing = 0;
+    for (size_t i = 0; i < snapshot.count; ++i) {
+        const rx_row_t *row = &snapshot.rows[i];
+        if (!already_counted(&snapshot, i, row->payload_allocation))
+            payload_bytes += row->payload_bytes;
+        if (row->metadata_allocation != row->payload_allocation &&
+            !already_counted(&snapshot, i, row->metadata_allocation))
+            metadata_bytes += row->metadata_bytes;
+        if (!row->payload_bytes || !row->metadata_bytes) ++missing;
+    }
+    const rx_owner_record_t header = {
+        .sequence = ++sequence, .live = snapshot.count, .peak = high,
+        .allocations = made, .releases = freed, .lost = dropped, .unmatched = unmatched,
+        .payload = payload_bytes, .metadata = metadata_bytes, .missing = missing,
+        .walk_us = walked > UINT32_MAX ? UINT32_MAX : (uint32_t)walked,
+        .heap_free = heap.total_free_bytes, .heap_largest = heap.largest_free_block,
+    };
+    ESP_LOGI("rx_owner", "PERF RX_OWNER3: %u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%08" PRIx32,
+        (unsigned)header.sequence, (unsigned)header.live, (unsigned)header.peak,
+        (unsigned)header.allocations, (unsigned)header.releases,
+        (unsigned)header.lost, (unsigned)header.unmatched,
+        (unsigned)header.payload, (unsigned)header.metadata,
+        (unsigned)header.missing, (unsigned)header.walk_us,
+        (unsigned)header.heap_free, (unsigned)header.heap_largest,
+        record_crc(&header, sizeof(header)));
+    for (size_t i = 0; i < snapshot.count; ++i) {
+        const rx_row_t *r = &snapshot.rows[i];
+        const rx_block_record_t block = {.sequence = sequence, .id = r->owner.id,
+            .payload = r->payload_allocation, .payload_bytes = r->payload_bytes,
+            .metadata = r->metadata_allocation, .metadata_bytes = r->metadata_bytes};
+        ESP_LOGI("rx_owner", "PERF RX_BLOCK2: %u,%u,%08" PRIx32 ",%u,%08" PRIx32 ",%u,%08" PRIx32,
+            (unsigned)block.sequence, (unsigned)block.id, block.payload,
+            (unsigned)block.payload_bytes, block.metadata, (unsigned)block.metadata_bytes,
+            record_crc(&block, sizeof(block)));
+    }
+}

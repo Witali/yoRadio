@@ -1554,3 +1554,46 @@ the saved diagnostic image was **not flashed** and cannot support RX ownership
 conclusions. Adapt tracking to copied pbuf allocations and their actual final
 release, including chains/reference counts, while preserving production copy
 mode. Object compilation and host tests alone do not establish effective hooks.
+
+### Copied Wi-Fi RX ownership diagnostics
+
+The replacement `r9a97-radio-rx-copy` diagnostic keeps production's
+`CONFIG_LWIP_L2_TO_L3_COPY=y`. A task-local, nestable `wlanif_input` scope
+records only its first `PBUF_RAW/PBUF_RAM` copy allocation. Allocations made
+by downstream callbacks or another task remain outside that scope. The
+final libc-backed lwIP `mem_free` removes the owner and frees its storage
+under the same C3 critical section, so the paired heap snapshot cannot see
+that allocation between removal and release. Referenced pbufs and shared
+chain tails remain tracked until their actual final release. Packet data,
+reference counts and delivery behavior are unchanged. The legacy zero-copy
+configuration retains its original hooks.
+
+The owner table is 512 bytes; the task-local scope pointer is 4 bytes before
+task TLS alignment. This is optional diagnostic overhead, not a production
+memory optimization. It observes netif copies, not all TCP/TLS allocations.
+The pinned libc-backed `mem_trim` does not relocate allocations; another
+allocator implementation requires a new lifetime audit.
+
+```text
+python -B -X utf8 tests/test-rx-copy-diagnostic.py --output NEW_HOST_RESULTS
+python -B -X utf8 tests/check-rx-copy-link.py --elf BUILD/yoradio_esp32c3_oled_native.elf --objdump PATH_TO_RISCV_OBJDUMP --output NEW_LINK_RESULTS
+```
+
+The host runner compiles actual SDK `wlanif_input`, `pbuf_free` and libc
+`mem_free` bodies with the actual diagnostic source and platform doubles.
+ASan/UBSan checks cover failed allocation/input, retained references, chains,
+shared tails, nesting, task isolation, paired heap accounting and poisoned
+freed storage. Host call-name redirection models linker wrapping only.
+The separate ELF audit derives the netstack input member offset from DWARF,
+checks station/AP function pointers, and verifies real allocation/free call
+edges and delegation to the original functions. It rejects the older image
+whose allocation hook was absent.
+
+[Saved build and host evidence](../tests/results/esp32c3-radio-rx-copy-build/)
+includes the passing link audit for ELF
+`a8588d1a3b027f43482109c0d9985e560d2025f0d84b1d3fb53d9c148600d58f`.
+The artifact is `firmware/development/esp32c3-idf-6.1-r9a97-radio-rx-copy/app.bin`.
+The production configuration, public trust bundle and 17,058-byte TLS reserve
+are preserved apart from the explicitly recorded diagnostic flags. These
+checks establish effective instrumentation, not physical memory attribution
+or production qualification.

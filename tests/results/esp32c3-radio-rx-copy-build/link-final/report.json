@@ -1,0 +1,57 @@
+{
+  "result": "PASS",
+  "elf_sha256": "a8588d1a3b027f43482109c0d9985e560d2025f0d84b1d3fb53d9c148600d58f",
+  "checks": {
+    "owner_table_bytes": 512,
+    "task_local_scope_bytes": 4,
+    "netstack_input_member_offset": 4,
+    "netstack_wrapped_inputs": {
+      "sta": "0x42028ce6",
+      "ap": "0x42028ce6"
+    },
+    "__wrap_wlanif_input_calls": [
+      "wlanif_input"
+    ],
+    "wlanif_input_calls": [
+      "__wrap_pbuf_alloc",
+      "memcpy",
+      "esp_netif_free_rx_buffer",
+      "esp_netif_free_rx_buffer",
+      "esp_netif_free_rx_buffer",
+      "wlanif_input+0x64",
+      "pbuf_free",
+      "wlanif_input+0x7e"
+    ],
+    "__wrap_pbuf_alloc_calls": [
+      "pbuf_alloc",
+      "vPortEnterCritical",
+      "__wrap_pbuf_alloc+0x64",
+      "__wrap_pbuf_alloc+0x76",
+      "vPortExitCritical",
+      "pbuf_alloc",
+      "__wrap_pbuf_alloc+0xc2"
+    ],
+    "pbuf_free_calls": [
+      "pbuf_free+0x2e",
+      "sys_arch_protect",
+      "sys_arch_unprotect",
+      "__wrap_mem_free",
+      "__wrap_memp_free",
+      "pbuf_free+0x24",
+      "__wrap_memp_free",
+      "pbuf_free+0x24",
+      "__assert_func",
+      "__assert_func",
+      "__assert_func",
+      "__assert_func"
+    ],
+    "__wrap_mem_free_calls": [
+      "vPortEnterCritical",
+      "__wrap_mem_free+0x2a",
+      "mem_free",
+      "vPortExitCritical",
+      "mem_free"
+    ]
+  },
+  "scope": "Linked SDK input pointer and allocation/final-free call edges; no hardware timing claim"
+}
