@@ -1,5 +1,9 @@
 # Small TV QEMU validation
 
+The latest [modular profiles and board compatibility checks](modular/README.md)
+cover shared SPI/SD, configurable GPIO, CYD and C3 OLED regressions. Historical
+clock/offline evidence below remains available for comparison.
+
 The experimental `esp32c2` machine in `C:\Work\QEMU-ESP32`, branch
 `codex/esp32c2-small-tv`, runs both applications with a 240×240 ST7789 and an
 isolated Wi-Fi network. Tested networking model: `ae70de5e72`.
@@ -113,7 +117,7 @@ them for 10 seconds. Saved `*-smoke-uart.log` files belong to the shorter run.
   metadata uses the C3 metadata layout.
 - Analog calibration uses completion flags, not RF measurements.
 
-Bluetooth, SD, ADC, low-power modes, security, full machine checkpoints and
+Bluetooth, ADC, low-power modes, security, full machine checkpoints and
 electrical GPIO/SPI timing remain outside validation. Specifications can be
 checked against the [Espressif ESP8684 datasheet](https://documentation.espressif.com/esp8684_datasheet_en.html)
 and C2 headers/ROM ELF in the pinned ESP-IDF source.

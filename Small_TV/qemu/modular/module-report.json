@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "checks": {
+    "profile_validation": {
+      "unsupported_bus": true,
+      "flash_gpio": true,
+      "conflicting_pins": true,
+      "always_selected_shared_bus": true,
+      "duplicate_id": true
+    },
+    "c2_shared_spi": {
+      "lcd_sd_transfer": true,
+      "topology": "shared_bus",
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "cs_isolation": true,
+      "wrong_sck_blocked": true,
+      "wrong_miso_blocked": true,
+      "sd_snapshot_unchanged": true
+    },
+    "c3_shared_spi": {
+      "lcd_sd_transfer": true,
+      "topology": "shared_bus",
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "cs_isolation": true,
+      "wrong_sck_blocked": true,
+      "wrong_miso_blocked": true,
+      "sd_snapshot_unchanged": true
+    },
+    "esp32_dual_spi": {
+      "lcd_sd_transfer": true,
+      "topology": "two_hosts",
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "cs_isolation": true,
+      "wrong_sck_blocked": true,
+      "wrong_miso_blocked": true,
+      "sd_snapshot_unchanged": true
+    },
+    "c2_i2c": {
+      "alternate_gpio_oled": true,
+      "wrong_scl_nack": true
+    },
+    "c3_i2c": {
+      "alternate_gpio_oled": true,
+      "wrong_scl_nack": true
+    },
+    "legacy_cyd_mmio": {
+      "legacy_flags": true,
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "sd_idle_high": true,
+      "snapshot_unchanged": true
+    }
+  },
+  "qemu_sha256": {
+    "riscv32": "b536afeb712e68073461e0bef4d147ebef28726d42a8dfad2ff868c5e5c27b31",
+    "xtensa": "929b4d723d4bf10ee0c7fbd6b461a79a989f735ff7a40d212ebc193b26ea2eb1"
+  }
+}

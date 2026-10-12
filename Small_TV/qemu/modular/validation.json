@@ -1,0 +1,147 @@
+{
+  "passed": true,
+  "tested_at_utc": "2026-10-12T22:34:25.052473+00:00",
+  "qemu_source_commit": "bca9cac8ef8d13d5af50e438d07a6a4c343f9c39",
+  "qemu_core_commit": "8170bc9d71",
+  "qemu_sha256": {
+    "riscv32": "b536afeb712e68073461e0bef4d147ebef28726d42a8dfad2ff868c5e5c27b31",
+    "xtensa": "929b4d723d4bf10ee0c7fbd6b461a79a989f735ff7a40d212ebc193b26ea2eb1"
+  },
+  "installed_executables_match": true,
+  "checks": {
+    "modular_mmio": true,
+    "legacy_cyd_boot": true,
+    "cyd_console_pixels_match_previous_qemu": true,
+    "legacy_c3_oled_boot": true,
+    "c3_modular_boot": true,
+    "c3_pixels_match_default": true,
+    "original_small_tv_clock": true,
+    "reconstructed_small_tv_clock": true,
+    "generic_launcher": true
+  },
+  "hardware_profiles": {
+    "c3-oled.json": {
+      "schema": 1,
+      "soc": "esp32c3",
+      "devices": [
+        {
+          "id": "oled",
+          "bus": "i2c0",
+          "model": "ssd1306",
+          "address": "0x3c",
+          "pins": {
+            "scl": 6,
+            "sda": 5
+          },
+          "properties": {
+            "visible-width": 72,
+            "visible-height": 40,
+            "column-offset": 28,
+            "magnify": 4
+          }
+        }
+      ]
+    },
+    "esp32-dual-spi.json": {
+      "schema": 1,
+      "soc": "esp32",
+      "devices": [
+        {
+          "id": "lcd",
+          "bus": "spi2",
+          "model": "st7789",
+          "pins": {
+            "sck": 14,
+            "mosi": 13,
+            "cs": 15,
+            "dc": 2,
+            "backlight": 21
+          },
+          "properties": {
+            "visible-width": 320,
+            "controls": false
+          }
+        },
+        {
+          "id": "sd",
+          "bus": "spi3",
+          "model": "sd",
+          "pins": {
+            "sck": 18,
+            "mosi": 23,
+            "miso": 19,
+            "cs": 5
+          },
+          "image": "../../.cache/esp-boards/sd.img"
+        }
+      ]
+    },
+    "small-tv-c2-sd.json": {
+      "schema": 1,
+      "soc": "esp32c2",
+      "devices": [
+        {
+          "id": "lcd",
+          "bus": "spi2",
+          "model": "st7789",
+          "pins": {
+            "sck": 4,
+            "mosi": 6,
+            "dc": 5,
+            "reset": 1,
+            "backlight": 18,
+            "cs": 3
+          },
+          "backlight_active_low": true,
+          "properties": {
+            "visible-width": 240,
+            "controls": false,
+            "panel-inverted": true
+          }
+        },
+        {
+          "id": "sd",
+          "bus": "spi2",
+          "model": "sd",
+          "pins": {
+            "sck": 4,
+            "mosi": 6,
+            "miso": 2,
+            "cs": 10
+          },
+          "image": "../../.cache/esp-boards/sd.img"
+        }
+      ]
+    },
+    "small-tv-c2.json": {
+      "schema": 1,
+      "soc": "esp32c2",
+      "devices": [
+        {
+          "id": "lcd",
+          "bus": "spi2",
+          "model": "st7789",
+          "pins": {
+            "sck": 4,
+            "mosi": 6,
+            "dc": 5,
+            "reset": 1,
+            "backlight": 18
+          },
+          "backlight_active_low": true,
+          "properties": {
+            "visible-width": 240,
+            "controls": false,
+            "panel-inverted": true
+          }
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Transaction-level GPIO/SPI/I2C; no electrical timing or SPI bit banging",
+    "Legacy CYD minimal image has a black LCD in both binaries; controls account for console pixels. Application screen and radio playback are unverified; LCD/SD MMIO exchanges pass.",
+    "Neither stock Small TV application currently drives LCD CS3 or uses SD",
+    "Guest virtual time can lag host time under CPU load"
+  ]
+}

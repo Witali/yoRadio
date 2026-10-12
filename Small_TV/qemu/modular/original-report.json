@@ -1,0 +1,126 @@
+{
+  "hardware_profile": {
+    "schema": 1,
+    "soc": "esp32c2",
+    "machine": "esp32c2,default-peripherals=off",
+    "arguments": [
+      "-device",
+      "{\"driver\":\"esp-spi-module\",\"id\":\"lcd\",\"bus\":\"/spi2/spi\",\"gpio\":\"/machine/gpio\",\"spi-host\":2,\"cs\":0,\"model\":\"st7789\",\"sck\":4,\"mosi\":6,\"miso\":-1,\"cs-gpio\":-1,\"dc-gpio\":5,\"reset-gpio\":1,\"backlight-gpio\":18,\"backlight-active-low\":true,\"properties\":\"{\\\"visible-width\\\":240,\\\"controls\\\":false,\\\"panel-inverted\\\":true}\"}"
+    ],
+    "sd_images": [],
+    "profile": "C:\\Work\\QEMU-ESP32\\configs\\boards\\small-tv-c2.json",
+    "sha256": "ad88920762bd2199abb91ba0eed69d3ed62e7e381a10e228f49457b5ff84abb4"
+  },
+  "firmware": "original",
+  "passed": true,
+  "checks": {
+    "machine_still_running": true,
+    "rom_and_bootloader": true,
+    "lcd_240x240": true,
+    "lcd_has_content": true,
+    "no_panic_or_watchdog": true,
+    "ntp_reply_sent": true,
+    "guest_clock_set_by_sntp": true,
+    "no_panic_after_reset": true,
+    "reset_reboots": true,
+    "source_flash_unchanged": true,
+    "source_artifacts_unchanged": true
+  },
+  "duration_seconds": 60,
+  "network": "clock",
+  "guest_clock_unix": 1791844059.262529,
+  "original_expected_screen": "Clock with synchronized date/time",
+  "prepared": {
+    "network": "clock",
+    "firmware": "original",
+    "prepared_flash_sha256": "6280404abc45e7835e3fd12b11326fcbb597c4ae7285532dcfc3ae42792f5de6",
+    "rom": {
+      "elf_sha256": "289ce00e79c024d9efeb29a7fbc2d21853a1cbc383a2b9c2ece85c54fa829dd9",
+      "binary_sha256": "8b4564baedd26ee59c90f3df65b3de2955c1920909602890a91c8c513b6d50f0",
+      "segments": [
+        {
+          "physical_address": "0x40000000",
+          "bytes": 533424
+        },
+        {
+          "physical_address": "0x400823b0",
+          "bytes": 44
+        },
+        {
+          "physical_address": "0x400823dc",
+          "bytes": 4
+        },
+        {
+          "physical_address": "0x400823e0",
+          "bytes": 121
+        },
+        {
+          "physical_address": "0x4008245c",
+          "bytes": 4
+        },
+        {
+          "physical_address": "0x40082460",
+          "bytes": 4
+        },
+        {
+          "physical_address": "0x40082464",
+          "bytes": 20
+        },
+        {
+          "physical_address": "0x40082478",
+          "bytes": 4
+        },
+        {
+          "physical_address": "0x4008247c",
+          "bytes": 4
+        },
+        {
+          "physical_address": "0x40082480",
+          "bytes": 4
+        },
+        {
+          "physical_address": "0x40082484",
+          "bytes": 4
+        },
+        {
+          "physical_address": "0x40082488",
+          "bytes": 60
+        },
+        {
+          "physical_address": "0x400824c4",
+          "bytes": 356
+        },
+        {
+          "physical_address": "0x40082628",
+          "bytes": 584
+        },
+        {
+          "physical_address": "0x40082870",
+          "bytes": 8
+        },
+        {
+          "physical_address": "0x40082878",
+          "bytes": 4
+        },
+        {
+          "physical_address": "0x4008287c",
+          "bytes": 4
+        },
+        {
+          "physical_address": "0x40082c00",
+          "bytes": 49696
+        },
+        {
+          "physical_address": "0x4008fbac",
+          "bytes": 1108
+        }
+      ]
+    },
+    "sources": {
+      "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+    }
+  },
+  "error": null,
+  "qemu_sha256": "b536afeb712e68073461e0bef4d147ebef28726d42a8dfad2ff868c5e5c27b31",
+  "tested_at_utc": "2026-10-12T22:27:49.337099+00:00"
+}
