@@ -59,6 +59,7 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--host', required=True)
     parser.add_argument('--port', type=int, default=8772)
+    parser.add_argument('--case-filter', action='append', help='Run only names containing one of these strings')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     board = Board(args.board)
@@ -92,6 +93,8 @@ def main():
         time.sleep(2)
 
     def case(name, action):
+        if args.case_filter and not any(value in name for value in args.case_filter):
+            return
         row = {'name': name, 'before': read_health(board)}
         report['cases'].append(row)
         started = time.perf_counter()
@@ -141,10 +144,11 @@ def main():
             rows = list(executor.map(one, list(assets) * 4))
         return {'requests': rows, 'all_exact': True}
 
-    def rejected(path, body, declared=None, disconnect=False):
+    def rejected(path, body, declared=None, disconnect=False, allowed=(400,)):
         code = post(board,path,body,declared=declared,disconnect=disconnect)
         time.sleep(1)
-        require(disconnect or code == 400, 'Malformed upload was not rejected')
+        report['cases'][-1]['http_status'] = code
+        require(disconnect or code in allowed, 'Malformed upload was not rejected')
         require(board.request('/data/playlist.csv',timeout=30) == private['playlist'],
                 'Rejected upload changed the playlist')
         require(all(board.request(path,timeout=30) == data for path,data in assets.items()),
@@ -193,7 +197,8 @@ def main():
             if label == 'candidate':
                 case('candidate:truncated', lambda:rejected('/upload',form([('plfile','playlist.csv',b'partial')],False)))
                 case('candidate:disconnect', lambda:rejected('/upload',form([('plfile','playlist.csv',b'partial')],False),declared=50000,disconnect=True))
-                case('candidate:oversized', lambda:rejected('/upload',b'',declared=98305))
+                case('candidate:oversized', lambda:rejected('/upload',b'x',declared=98305))
+                case('candidate:oversized-header-only', lambda:rejected('/upload',b'',declared=98305,allowed=(400,408)))
                 case('candidate:duplicate-asset', lambda:rejected('/webboard',form([('www','style.css.gz',b'bad'),('www','style.css.gz',b'bad')])) )
                 case('candidate:invalid-wifi-form', lambda:rejected('/',form([('ssid','',b'x'*33),('pass','',b'')])) )
                 case('candidate:board-multipart', board_upload)
@@ -217,7 +222,8 @@ def main():
                     if name not in specs:
                         continue
                     def playback(n=name):
-                        board.play(f'http://{args.host}:{args.port}/stream/{n}')
+                        mode = 'stream' if specs[n]['codec'] == 'aac' else 'file'
+                        board.play(f'http://{args.host}:{args.port}/{mode}/{n}')
                         deadline = time.monotonic()+15
                         while time.monotonic() < deadline:
                             if matches(board.status(),specs[n]): break
