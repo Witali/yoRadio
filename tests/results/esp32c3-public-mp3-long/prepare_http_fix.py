@@ -1,0 +1,11 @@
+from pathlib import Path
+root=Path('.build/c3-mp3-long')
+text=(root/'physical.py').read_text()
+text=text.replace("'15000000','-tls_verify','1',", "'15000000',*(['-tls_verify','1'] if url.startswith('https://') else []),")
+assert text!=(root/'physical.py').read_text()
+text=text.replace("for transport in ('http','https'):","for transport in ('http',):")
+text=text.replace('esp32c3-idf-6.1-r9a97-quiet-http-txrelease','esp32c3-idf-6.1-r9a97-production-radio')
+text=text.replace('.build/c3-http-request-buffer/quiet-http-txrelease/build-audit.json','.build/c3-production-radio/production-radio/build-audit.json')
+dest=Path('.build/c3-production-radio-mp3-http');dest.mkdir(exist_ok=False)
+(dest/'physical.py').write_text(text)
+print('Prepared corrected HTTP-only production-image comparison; not started')

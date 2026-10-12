@@ -298,3 +298,35 @@ This is object-level evidence, not a claim of identical linked images.
 snapshots, build logs, configuration, link audits and object comparison. This
 exact new binary has **not yet been tested on hardware**. Prior OTA and playback
 results apply to `quiet-http-txrelease`, not automatically to this rebuild.
+
+## Ten-minute public MP3 controls, 2026-10-12
+
+The same `quiet-http-txrelease` binary was observed for 600 seconds each on
+`ice5.somafm.com/groovesalad-256-mp3`, first HTTP and then HTTPS. Steady gates
+exclude the first 15 seconds; firmware fault counters cover the whole run.
+The source reference was probed through HTTPS for both cases. That reference
+does not independently establish HTTP route equivalence.
+
+| Transport | Observation / format / output / memory / WebUI | Min sampled free / largest, B | Concurrent FFmpeg |
+|---|---|---:|---|
+| HTTP | PASS / PASS / PASS / PASS / PASS | 86,768 / 73,728 | FAIL, 0.000 decoded s |
+| HTTPS | PASS / PASS / PASS / PASS / PASS | 81,920 / 65,536 | PASS, 605.000 decoded s |
+
+The HTTP host control failed before decoding: FFmpeg rejected `tls_verify`
+on a plain HTTP input. This is a test-command failure, not a board decoding
+failure or a completed independent comparison. The corrected controller adds
+that option only for HTTPS; a separate three-second HTTP command check passed.
+The original controller and failure remain retained. A complete simultaneous
+HTTP host/board comparison is still required.
+
+HTTPS FFmpeg uses certificate verification. Separate live clients can receive
+different content/start points; their results do not prove bit-identical input.
+Queue-drop totals include deliberate idle periods; only steady-window deltas
+are used for output acceptance. These are digital counters, not an analog
+listening measurement. Passing runs do not establish a fix for historical
+intermittent MP3 stops or WebUI TCP-connect failures.
+
+Original application, settings, selected station and decoded playback were
+restored and verified. [Raw evidence and replay](../tests/results/esp32c3-public-mp3-long/)
+retain each case outcome, host failure, corrected command check and restoration.
+Public audio and private FFmpeg stderr are not archived.
