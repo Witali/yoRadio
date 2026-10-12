@@ -65,3 +65,63 @@ HTTP lifecycle regression, and OTA checks pass. A 4,096-byte freed allocation
 does not promise a 4,096-byte increase in the largest free block: allocator
 coalescing and subsequent network/decoder allocations determine that result.
 No production default is changed by this experiment.
+
+## Physical comparison, 2026-10-12
+
+Application-only OTA compared the installed `idf61-production-prefill1000`
+with `idf61-quiet-http-txrelease`. Each case ran for 60 seconds; steady-state
+checks exclude the first 15 seconds. The local HE-AAC fixture is identical in
+both cases, paced at 1x. The public HTTPS source is a live 64-kbit/s HE-AAC
+station; FFprobe and FAAD independently check its format. All cases below
+reported 44.1 kHz stereo without reducing AAC profile support or precision.
+
+| Firmware / transport | Minimum free heap | Minimum largest block | Memory gate | Completion queue drops / write errors |
+|---|---:|---:|---|---:|
+| Installed baseline / local HTTP | 33,064 B | 19,456 B | PASS | 0 / 0 |
+| Installed baseline / public HTTPS | 20,412 B | 7,424 B | FAIL: largest block below 8,192 B | 0 / 0 |
+| Request-buffer release / local HTTP | 38,052 B | 24,576 B | PASS | 0 / 0 |
+| Request-buffer release / public HTTPS | 24,848 B | 10,752 B | PASS | 0 / 0 |
+| Rebooted baseline control / local HTTP | 33,808 B | 20,480 B | PASS | 0 / 0 |
+| Rebooted baseline control / public HTTPS | 20,676 B | 6,656 B | FAIL: largest block below 8,192 B | 0 / 0 |
+
+All six cases passed format and steady observation-transport checks, with
+zero recorded allocation failures, watchdog events or unexpected reboots.
+The failed baseline memory gate is a reserve threshold, not an observed OOM.
+These output counters do not establish analog continuity or audible quality.
+
+The observed minimum-free-heap increases are 4,988 B locally and 4,436 B over
+public HTTPS. They are not exact causal measurements of the freed allocation:
+the initial baseline had a longer session history, the candidate rebooted
+during OTA, and live program/network traffic differs between sequential cases.
+The host allocator test establishes the specific 4,096-byte release.
+
+After restoring/rebooting production, the same two cases were repeated to
+control for the candidate's fresh boot. Compared with this baseline, candidate
+minimum free heap increased by 4,244 B locally and 4,172 B over HTTPS; local
+median free heap increased by exactly 4,244 B (36,060 to 40,304 B). HTTPS largest
+block increased from 6,656 to 10,752 B. This supports a useful approximately
+4-KiB gain after accounting for reboot, while remaining a short sequential
+comparison with different live audio and allocation histories. The baseline
+still failed the HTTPS reserve threshold after reboot; the candidate passed.
+
+Two earlier attempts were incomplete due to 5-second WebUI TCP-connect timeouts
+on the baseline: one during local playback, one before playback while stopped.
+Neither installed the candidate; original firmware/settings/station restoration
+was verified for both. The subsequent observation controller retains transport
+errors as failed checks while continuing bounded collection; acceptance limits
+and request timeouts are unchanged. The completed four-case campaign had no
+such errors inside its playback windows. These repeats do not resolve the
+earlier intermittent WebUI connection failure.
+
+The candidate application is 1,456,160 bytes, 224 bytes larger than baseline.
+Application SHA-256:
+`ee0278e97d9b0d4abd1e217ec2e657896e6e562ba51f5638aeb431e1acfdbebc`.
+Production application, selected station and settings were restored and verified
+after the comparison. Source snapshots, build/link audits, host tests, raw
+observations and independent replay are retained in the
+[evidence archive](../tests/results/esp32c3-http-request-buffer/).
+
+Still required before enabling the key by default: all-codec/HTTP lifecycle
+regression (including redirects, EOF, interrupted streams and repeated starts),
+OTA rejection/recovery coverage on this candidate, and bounded longer playback
+on the heavy HTTPS cases. This comparison does not qualify production as a whole.

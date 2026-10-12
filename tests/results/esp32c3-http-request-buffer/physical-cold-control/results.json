@@ -1,0 +1,88 @@
+{
+  "baseline:local-he": {
+    "variant": "baseline",
+    "local": true,
+    "spec": {
+      "seconds": 11.702857142857143,
+      "rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "codec": "aac",
+      "profile": "HE-AAC",
+      "mime": "audio/aac",
+      "sha256": "cec9c7851b2b8ee001c804e2ed1e544b772d3c107990a49a7f4dd853f219b4c9",
+      "source_sha256": "2ed01ee61355830629905867f1885eae99123bc73daad161ba1a5959a4f5e11a",
+      "label": "HE-AAC "
+    },
+    "transport": {
+      "result": "PASS",
+      "errors": []
+    },
+    "format": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 81,
+        "rate": 44100,
+        "channels": 2
+      }
+    },
+    "output": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 81,
+        "elapsed_ms": 44282,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      }
+    },
+    "memory": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 81,
+        "boot_id": "90bc4fc571ce6089",
+        "minimum_heap": 33808,
+        "minimum_largest": 20480,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      }
+    }
+  },
+  "baseline:public-he": {
+    "variant": "baseline",
+    "local": false,
+    "spec": {
+      "codec": "aac",
+      "profile": "HE-AAC",
+      "rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "label": "HE-AAC ",
+      "source_channels": 2
+    },
+    "transport": {
+      "result": "PASS",
+      "errors": []
+    },
+    "format": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 82,
+        "rate": 44100,
+        "channels": 2
+      }
+    },
+    "output": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 82,
+        "elapsed_ms": 44594,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      }
+    },
+    "memory": {
+      "result": "FAIL",
+      "reason": "In-playback memory below existing budget"
+    }
+  }
+}

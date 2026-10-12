@@ -1,0 +1,720 @@
+#include "websocket_service.h"
+
+#include <stdatomic.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "audio_service.h"
+#include "deep_sleep_clock.h"
+#include "board_config.h"
+#include "display_settings.h"
+#include "esp_check.h"
+#include "esp_log.h"
+#include "esp_netif.h"
+#include "esp_system.h"
+#include "esp_timer.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "web_tcp_probe.h"
+#include "native_audio_output.h"
+#include "native_audio_settings.h"
+#include "network_service.h"
+#include "runtime_settings.h"
+#include "time_service.h"
+#include "radio_control.h"
+
+#define WS_STATUS_POLL_MS 100
+#define WS_STATUS_HEARTBEAT_MS 2000
+
+static const char *const TAG = "websocket";
+static httpd_handle_t s_server;
+static native_state_t *s_state;
+
+typedef struct {
+    bool audio_running;
+    uint8_t volume;
+    int8_t balance;
+    uint32_t bitrate_kbps;
+    uint32_t sample_rate_hz;
+    uint8_t channels;
+    uint8_t bits_per_sample;
+    uint32_t pcm_sample_rate_hz;
+    uint8_t pcm_channels;
+    uint16_t current_item;
+    bool station_uppercase;
+    char station[144];
+    char title[192];
+    char codec[16];
+    char stream_format[48];
+} webui_status_key_t;
+
+// Keep persistent broadcast workspace in BSS so the board-configured task
+// stack remains headroom for nested HTTP/WebSocket calls.
+static char s_broadcast_status[1280];
+static char s_broadcast_current[48];
+static webui_status_key_t s_previous_status_key;
+static webui_status_key_t s_current_status_key;
+static atomic_bool s_playlist_changed_pending;
+static atomic_uint s_status_send_pending;
+static atomic_uint s_current_send_pending;
+static size_t s_last_ws_clients;
+
+static void json_escape(const char *source, char *target, size_t target_size) {
+    size_t written = 0;
+    while (*source && written + 1 < target_size) {
+        unsigned char value = (unsigned char)*source++;
+        if ((value == '"' || value == '\\') && written + 2 < target_size) {
+            target[written++] = '\\';
+            target[written++] = (char)value;
+        } else if (value >= 0x20) {
+            target[written++] = (char)value;
+        }
+    }
+    target[written] = '\0';
+}
+
+static esp_err_t ws_send_request(httpd_req_t *request, const char *text) {
+    httpd_ws_frame_t frame = {
+        .final = true,
+        .fragmented = false,
+        .type = HTTPD_WS_TYPE_TEXT,
+        .payload = (uint8_t *)text,
+        .len = strlen(text),
+    };
+    return httpd_ws_send_frame(request, &frame);
+}
+
+static void ws_send_complete(esp_err_t result, int socket, void *argument) {
+    atomic_uint *pending = argument;
+    atomic_fetch_sub(pending, 1U);
+    if (result != ESP_OK && s_server) {
+        httpd_sess_trigger_close(s_server, socket);
+    }
+}
+
+static esp_err_t ws_send_async(int socket, const char *text,
+                               atomic_uint *pending) {
+    httpd_ws_frame_t frame = {
+        .final = true,
+        .fragmented = false,
+        .type = HTTPD_WS_TYPE_TEXT,
+        .payload = (uint8_t *)text,
+        .len = strlen(text),
+    };
+    atomic_fetch_add(pending, 1U);
+    esp_err_t result = httpd_ws_send_data_async(
+        s_server, socket, &frame, ws_send_complete, pending);
+    if (result != ESP_OK) atomic_fetch_sub(pending, 1U);
+    return result;
+}
+
+static size_t broadcast_text(const char *text, atomic_uint *pending) {
+    if (!s_server || !text || !pending) return 0;
+    size_t count = CONFIG_LWIP_MAX_SOCKETS;
+    int sockets[CONFIG_LWIP_MAX_SOCKETS];
+    if (httpd_get_client_list(s_server, &count, sockets) != ESP_OK) return 0;
+    size_t delivered = 0;
+    size_t clients = 0;
+    for (size_t index = 0; index < count; ++index) {
+        if (httpd_ws_get_fd_info(s_server, sockets[index]) ==
+            HTTPD_WS_CLIENT_WEBSOCKET) {
+            ++clients;
+            if (ws_send_async(sockets[index], text, pending) == ESP_OK) {
+                ++delivered;
+            }
+        }
+    }
+    s_last_ws_clients = clients;
+    return delivered;
+}
+
+static void format_status(char *output, size_t output_size) {
+    native_state_t state;
+    native_state_snapshot(s_state, &state);
+    char name[300];
+    char title[400];
+    char format[120];
+    char current_name[144];
+    radio_control_current_name(current_name, sizeof(current_name));
+    json_escape(current_name, name, sizeof(name));
+    json_escape(state.title, title, sizeof(title));
+    json_escape(state.stream_format, format, sizeof(format));
+    snprintf(output, output_size,
+             "{\"payload\":[{\"id\":\"nameset\",\"value\":\"%s\"},"
+             "{\"id\":\"meta\",\"value\":\"%s\"},"
+             "{\"id\":\"volume\",\"value\":%u},"
+             "{\"id\":\"balance\",\"value\":%d},"
+             "{\"id\":\"rssi\",\"value\":%d},"
+             "{\"id\":\"heap\",\"value\":%u},"
+             "{\"id\":\"bitrate\",\"value\":%lu},"
+             "{\"id\":\"fmt\",\"value\":\"%s\"},"
+             "{\"id\":\"upst\",\"value\":%u},"
+             "{\"id\":\"playerwrap\",\"value\":\"%s\"}]}",
+             name, title, native_audio_output_get_volume(),
+             native_audio_output_get_balance(), state.wifi_rssi,
+             (unsigned)(state.audio_running
+                            ? audio_service_buffer_fill_percent()
+                            : 0U),
+             (unsigned long)state.bitrate_kbps, format,
+             display_settings_get_station_uppercase() ? 1U : 0U,
+             state.audio_running ? "playing" : "stopped");
+}
+
+static void capture_status_key(webui_status_key_t *key) {
+    native_state_t state;
+    memset(key, 0, sizeof(*key));
+    native_state_snapshot(s_state, &state);
+    key->audio_running = state.audio_running;
+    key->volume = native_audio_output_get_volume();
+    key->balance = native_audio_output_get_balance();
+    key->bitrate_kbps = state.bitrate_kbps;
+    key->sample_rate_hz = state.sample_rate_hz;
+    key->channels = state.channels;
+    key->bits_per_sample = state.bits_per_sample;
+    key->pcm_sample_rate_hz = state.pcm_sample_rate_hz;
+    key->pcm_channels = state.pcm_channels;
+    key->current_item = radio_control_current_item();
+    key->station_uppercase = display_settings_get_station_uppercase();
+    radio_control_current_name(key->station, sizeof(key->station));
+    strlcpy(key->title, state.title, sizeof(key->title));
+    strlcpy(key->codec, state.codec, sizeof(key->codec));
+    strlcpy(key->stream_format, state.stream_format,
+            sizeof(key->stream_format));
+}
+
+static esp_err_t send_initial_state(httpd_req_t *request) {
+    char status[1280];
+    char current[48];
+    format_status(status, sizeof(status));
+    ESP_RETURN_ON_ERROR(ws_send_request(request, status), TAG,
+                        "send WebUI status");
+    snprintf(current, sizeof(current), "{\"current\":%u}",
+             radio_control_current_item());
+    ESP_RETURN_ON_ERROR(ws_send_request(request, current), TAG,
+                        "send WebUI station index");
+    ESP_RETURN_ON_ERROR(ws_send_request(request, "{\"sdinit\":0}"), TAG,
+                        "send WebUI storage state");
+    ESP_RETURN_ON_ERROR(
+        ws_send_request(request, "{\"playermode\":\"modeweb\"}"), TAG,
+        "send WebUI player mode");
+    return ESP_OK;
+}
+
+static esp_err_t send_system_settings(httpd_req_t *request) {
+    char mdns[24];
+    runtime_settings_get_mdns_name(mdns, sizeof(mdns));
+    native_state_t state;
+    native_state_snapshot(s_state, &state);
+    char address[20] = "192.168.4.1";
+    if (state.network_mode == NATIVE_NETWORK_CLIENT && state.ipv4) {
+        esp_ip4_addr_t ip = {.addr = state.ipv4};
+        snprintf(address, sizeof(address), IPSTR, IP2STR(&ip));
+    }
+    char settings[512];
+    snprintf(settings, sizeof(settings),
+             "{\"sst\":%u,\"aif\":%u,\"vu\":0,\"softr\":%u,\"vut\":0,"
+             "\"mdns\":\"%s\",\"ipaddr\":\"%s\",\"abuff\":%u,"
+             "\"abuffmax\":%u,"
+             "\"mp3decoder\":0,\"normalize\":%u,\"normgain\":%u,"
+             "\"normtarget\":%d,\"normtime\":%u,\"telnet\":0,"
+             "\"watchdog\":%u,\"stationtimeout\":%u}",
+             radio_control_smartstart_enabled() ? 1U : 0U,
+             runtime_settings_get_audio_info() ? 1U : 0U,
+             runtime_settings_get_softap_delay_min(), mdns, address,
+             runtime_settings_get_audio_buffer_blocks(),
+             RUNTIME_MAX_AUDIO_BUFFER_BLOCKS,
+             native_audio_settings_get_normalization() ? 1U : 0U,
+             native_audio_settings_get_normalization_gain_db(),
+             native_audio_settings_get_normalization_target_dbfs(),
+             native_audio_settings_get_normalization_time_ms(),
+             runtime_settings_get_watchdog() ? 1U : 0U,
+             runtime_settings_get_station_timeout_sec());
+    return ws_send_request(request, settings);
+}
+
+static esp_err_t send_screen_settings(httpd_req_t *request) {
+    char settings[256];
+    unsigned brightness = display_settings_get_brightness();
+    snprintf(settings, sizeof(settings),
+             "{\"flip\":0,\"inv\":0,\"nump\":%u,\"tsf\":0,"
+             "\"tsd\":0,\"upst\":%u,\"dspon\":%u,\"br\":%u,\"con\":55,"
+             "\"scre\":%u,\"scrt\":%u,\"scrb\":%u,\"scrpe\":%u,"
+             "\"scrpt\":%u,\"scrpb\":%u}",
+             display_settings_get_numbered_playlist() ? 1U : 0U,
+             display_settings_get_station_uppercase() ? 1U : 0U,
+             display_settings_get_screen_on() ? 1U : 0U, brightness,
+             display_settings_get_screensaver_enabled() ? 1U : 0U,
+             display_settings_get_screensaver_timeout(),
+             display_settings_get_screensaver_blank() ? 1U : 0U,
+             display_settings_get_screensaver_playing_enabled() ? 1U : 0U,
+             display_settings_get_screensaver_playing_timeout(),
+             display_settings_get_screensaver_playing_blank() ? 1U : 0U);
+    return ws_send_request(request, settings);
+}
+
+static esp_err_t send_timezone_settings(httpd_req_t *request) {
+    char sntp1[35];
+    char sntp2[35];
+    char settings[256];
+    runtime_settings_get_sntp1(sntp1, sizeof(sntp1));
+    runtime_settings_get_sntp2(sntp2, sizeof(sntp2));
+    snprintf(settings, sizeof(settings),
+             "{\"tzh\":%d,\"tzm\":%u,\"sntp1\":\"%s\","
+             "\"sntp2\":\"%s\",\"timeint\":%u,\"timeintrtc\":24}",
+             runtime_settings_get_timezone_hour(),
+             runtime_settings_get_timezone_minute(), sntp1, sntp2,
+             runtime_settings_get_time_sync_interval_min());
+    return ws_send_request(request, settings);
+}
+
+static esp_err_t send_weather_settings(httpd_req_t *request) {
+    return ws_send_request(request,
+                           "{\"wen\":0,\"wlat\":\"\",\"wlon\":\"\","
+                           "\"wkey\":\"\",\"wint\":60}");
+}
+
+static esp_err_t send_control_settings(httpd_req_t *request) {
+    char settings[96];
+    snprintf(settings, sizeof(settings),
+             "{\"vols\":%u,\"enca\":%u,\"irtl\":10,\"skipup\":1}",
+             runtime_settings_get_volume_steps(),
+             runtime_settings_get_encoder_acceleration());
+    return ws_send_request(request, settings);
+}
+
+static esp_err_t send_active_settings(httpd_req_t *request, bool client_mode) {
+    if (!client_mode) {
+        return ws_send_request(request, "{\"act\":[\"group_wifi\"]}");
+    }
+    // Weather is intentionally excluded by the ESP32-C3 OLED build profile.
+    ESP_RETURN_ON_ERROR(ws_send_request(
+        request,
+        "{\"act\":[\"group_wifi\",\"group_system\",\"group_display\","
+        "\"group_oled\",\"group_timezone\",\"group_controls\","
+#ifdef CONFIG_YORADIO_ROTARY_ENCODER
+        "\"group_encoder\","
+#endif
+        "\"group_buffer\",\"group_wortc\"]}"), TAG,
+        "Send active WebUI groups");
+    // C3 has neither a telnet console, an on-device station-list cursor, nor
+    // the optional ESP-IDF mDNS responder component. Keep the DHCP hostname,
+    // but do not expose no-op controls or a misleading .local link.
+    return ws_send_request(request,
+        "{\"hide\":[\"telnet\",\"skipup\",\"mdnsnamerow\","
+        "\"radiolink\"]}");
+}
+
+static void reboot_task(void *argument) {
+    (void)argument;
+    vTaskDelay(pdMS_TO_TICKS(300));
+    esp_restart();
+}
+
+static void schedule_reboot(void) {
+    if (xTaskCreate(reboot_task, "web_reboot", BOARD_TASK_STACK_WIFI_REBOOT,
+                    NULL, 3, NULL) != pdPASS) {
+        ESP_LOGE(TAG, "Could not schedule WebUI reboot");
+    }
+}
+
+static void log_setting_error(const char *name, esp_err_t result) {
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "%s update failed: %s", name, esp_err_to_name(result));
+    }
+}
+
+static void handle_command(httpd_req_t *request, char *command) {
+    char *separator = strchr(command, '=');
+    char *value = separator ? separator + 1 : (char *)"";
+    if (separator) *separator = '\0';
+
+    if (strcmp(command, "ping") == 0) {
+        ws_send_request(request, "{\"pong\":1}");
+    } else if (strcmp(command, "getindex") == 0) {
+        send_initial_state(request);
+    } else if (strcmp(command, "getactive") == 0) {
+        native_state_t state;
+        native_state_snapshot(s_state, &state);
+        bool client_mode = state.network_mode == NATIVE_NETWORK_CLIENT;
+        send_active_settings(request, client_mode);
+    } else if (strcmp(command, "getsystem") == 0) {
+        send_system_settings(request);
+    } else if (strcmp(command, "getscreen") == 0) {
+        send_screen_settings(request);
+    } else if (strcmp(command, "gettimezone") == 0) {
+        send_timezone_settings(request);
+    } else if (strcmp(command, "getweather") == 0) {
+        send_weather_settings(request);
+    } else if (strcmp(command, "getcontrols") == 0) {
+        send_control_settings(request);
+    } else if (strcmp(command, "submitplaylist") == 0) {
+        // The HTTP upload handler emits the file event only after the new
+        // playlist has been written successfully.
+    } else if (strcmp(command, "submitplaylistdone") == 0) {
+        // The shared WebUI acknowledges that it has reloaded playlist.csv.
+    } else if (strcmp(command, "play") == 0) {
+        display_settings_note_activity();
+        radio_control_play((uint16_t)strtoul(value, NULL, 10));
+        send_initial_state(request);
+    } else if (strcmp(command, "stop") == 0) {
+        display_settings_note_activity();
+        radio_control_stop();
+        send_initial_state(request);
+    } else if (strcmp(command, "toggle") == 0) {
+        display_settings_note_activity();
+        radio_control_toggle();
+        send_initial_state(request);
+    } else if (strcmp(command, "prev") == 0 ||
+               strcmp(command, "next") == 0) {
+        display_settings_note_activity();
+        if (strcmp(command, "prev") == 0) radio_control_previous();
+        else radio_control_next();
+        send_initial_state(request);
+    } else if (strcmp(command, "volume") == 0) {
+        display_settings_note_activity();
+        unsigned volume = strtoul(value, NULL, 10);
+        native_audio_output_set_volume(volume > 254 ? 254 : (uint8_t)volume);
+        send_initial_state(request);
+    } else if (strcmp(command, "smartstart") == 0) {
+        esp_err_t result = radio_control_set_smartstart_enabled(
+            strtoul(value, NULL, 10) != 0);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Smart Start update failed: %s",
+                     esp_err_to_name(result));
+        }
+
+    } else if (strcmp(command, "audioinfo") == 0) {
+        log_setting_error("Audio info", runtime_settings_set_audio_info(
+                                            strtoul(value, NULL, 10) != 0U));
+    } else if (strcmp(command, "softap") == 0) {
+        unsigned minutes = strtoul(value, NULL, 10);
+        if (minutes > 30U) minutes = 30U;
+        log_setting_error("SoftAP delay",
+                          runtime_settings_set_softap_delay_min(minutes));
+    } else if (strcmp(command, "abuff") == 0) {
+        unsigned blocks = strtoul(value, NULL, 10);
+        if (blocks < RUNTIME_MIN_AUDIO_BUFFER_BLOCKS) {
+            blocks = RUNTIME_MIN_AUDIO_BUFFER_BLOCKS;
+        }
+        if (blocks > RUNTIME_MAX_AUDIO_BUFFER_BLOCKS) {
+            blocks = RUNTIME_MAX_AUDIO_BUFFER_BLOCKS;
+        }
+        log_setting_error("Audio buffer",
+                          runtime_settings_set_audio_buffer_blocks(blocks));
+    } else if (strcmp(command, "watchdog") == 0) {
+        log_setting_error("Watchdog", runtime_settings_set_watchdog(
+                                          strtoul(value, NULL, 10) != 0U));
+    } else if (strcmp(command, "stationtimeout") == 0) {
+        char *end;
+        unsigned long seconds = strtoul(value, &end, 10);
+        if (!value[0] || *end || seconds < RUNTIME_MIN_STATION_TIMEOUT_SEC ||
+            seconds > RUNTIME_MAX_STATION_TIMEOUT_SEC) {
+            ws_send_request(request,
+                "{\"commandError\":\"Station timeout must be 1 to 120 seconds.\"}");
+        } else {
+            log_setting_error("Station timeout",
+                runtime_settings_set_station_timeout_sec((uint8_t)seconds));
+        }
+    } else if (strcmp(command, "mdnsname") == 0) {
+        log_setting_error("mDNS", runtime_settings_set_mdns_name(value));
+    } else if (strcmp(command, "reboot") == 0 ||
+               strcmp(command, "rebootmdns") == 0) {
+        ws_send_request(request, "{\"rebooting\":1}");
+        schedule_reboot();
+    } else if (strcmp(command, "tzh") == 0) {
+        long hour = strtol(value, NULL, 10);
+        if (hour < -12) hour = -12;
+        if (hour > 14) hour = 14;
+        esp_err_t result = runtime_settings_set_timezone_hour((int8_t)hour);
+        if (result == ESP_OK) result = time_service_apply();
+        log_setting_error("Timezone hour", result);
+    } else if (strcmp(command, "tzm") == 0) {
+        unsigned minute = strtoul(value, NULL, 10);
+        if (minute > 45U) minute = 45U;
+        minute = (minute / 15U) * 15U;
+        esp_err_t result =
+            runtime_settings_set_timezone_minute((uint8_t)minute);
+        if (result == ESP_OK) result = time_service_apply();
+        log_setting_error("Timezone minute", result);
+    } else if (strcmp(command, "sntp1") == 0 ||
+               strcmp(command, "sntp2") == 0) {
+        esp_err_t result = strcmp(command, "sntp1") == 0
+                               ? runtime_settings_set_sntp1(value)
+                               : runtime_settings_set_sntp2(value);
+        if (result == ESP_OK) result = time_service_apply();
+        log_setting_error("SNTP server", result);
+    } else if (strcmp(command, "timeint") == 0) {
+        unsigned interval = strtoul(value, NULL, 10);
+        if (interval < 15U) interval = 15U;
+        if (interval > 1440U) interval = 1440U;
+        esp_err_t result = runtime_settings_set_time_sync_interval_min(
+            (uint16_t)interval);
+        if (result == ESP_OK) result = time_service_apply();
+        log_setting_error("SNTP interval", result);
+    } else if (strcmp(command, "volsteps") == 0) {
+        unsigned steps = strtoul(value, NULL, 10);
+        if (steps < 1U) steps = 1U;
+        if (steps > 10U) steps = 10U;
+        log_setting_error("Volume steps",
+                          runtime_settings_set_volume_steps((uint8_t)steps));
+    } else if (strcmp(command, "encacc") == 0) {
+        unsigned acceleration = strtoul(value, NULL, 10);
+        if (acceleration > RUNTIME_MAX_ENCODER_ACCELERATION) {
+            acceleration = RUNTIME_MAX_ENCODER_ACCELERATION;
+        }
+        log_setting_error(
+            "Encoder acceleration",
+            runtime_settings_set_encoder_acceleration((uint16_t)acceleration));
+    } else if (strcmp(command, "normalization") == 0) {
+        esp_err_t result = native_audio_settings_set_normalization(
+            strtoul(value, NULL, 10) != 0U);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Normalization update failed: %s",
+                     esp_err_to_name(result));
+        }
+    } else if (strcmp(command, "normgain") == 0) {
+        unsigned gain_db = strtoul(value, NULL, 10);
+        if (gain_db > 20U) gain_db = 20U;
+        esp_err_t result = native_audio_settings_set_normalization_gain_db(
+            (uint8_t)gain_db);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Normalization gain update failed: %s",
+                     esp_err_to_name(result));
+        }
+    } else if (strcmp(command, "normtarget") == 0) {
+        long target_dbfs = strtol(value, NULL, 10);
+        if (target_dbfs < -20) target_dbfs = -20;
+        if (target_dbfs > 0) target_dbfs = 0;
+        esp_err_t result =
+            native_audio_settings_set_normalization_target_dbfs(
+                (int8_t)target_dbfs);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Normalization target update failed: %s",
+                     esp_err_to_name(result));
+        }
+    } else if (strcmp(command, "normtime") == 0) {
+        unsigned long time_ms = strtoul(value, NULL, 10);
+        if (time_ms < 100U) time_ms = 100U;
+        if (time_ms > 10000U) time_ms = 10000U;
+        esp_err_t result = native_audio_settings_set_normalization_time_ms(
+            (uint16_t)time_ms);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Normalization time update failed: %s",
+                     esp_err_to_name(result));
+        }
+    } else if (strcmp(command, "screenon") == 0) {
+        log_setting_error("Screen power", display_settings_set_screen_on(
+                                              strtoul(value, NULL, 10) != 0U,
+                                              true));
+    } else if (strcmp(command, "numplaylist") == 0) {
+        log_setting_error("Numbered playlist",
+                          display_settings_set_numbered_playlist(
+                              strtoul(value, NULL, 10) != 0U, true));
+    } else if (strcmp(command, "screensaverenabled") == 0) {
+        log_setting_error("Stopped screensaver",
+                          display_settings_set_screensaver_enabled(
+                              strtoul(value, NULL, 10) != 0U));
+    } else if (strcmp(command, "screensavertimeout") == 0) {
+        unsigned timeout = strtoul(value, NULL, 10);
+        if (timeout < 5U) timeout = 5U;
+        if (timeout > 65520U) timeout = 65520U;
+        log_setting_error("Stopped screensaver timeout",
+                          display_settings_set_screensaver_timeout(timeout));
+    } else if (strcmp(command, "screensaverblank") == 0) {
+        log_setting_error("Stopped screensaver blank",
+                          display_settings_set_screensaver_blank(
+                              strtoul(value, NULL, 10) != 0U));
+    } else if (strcmp(command, "screensaverplayingenabled") == 0) {
+        log_setting_error("Playing screensaver",
+                          display_settings_set_screensaver_playing_enabled(
+                              strtoul(value, NULL, 10) != 0U));
+    } else if (strcmp(command, "screensaverplayingtimeout") == 0) {
+        unsigned timeout = strtoul(value, NULL, 10);
+        if (timeout < 1U) timeout = 1U;
+        if (timeout > 1080U) timeout = 1080U;
+        log_setting_error(
+            "Playing screensaver timeout",
+            display_settings_set_screensaver_playing_timeout(timeout));
+    } else if (strcmp(command, "screensaverplayingblank") == 0) {
+        log_setting_error("Playing screensaver blank",
+                          display_settings_set_screensaver_playing_blank(
+                              strtoul(value, NULL, 10) != 0U));
+    } else if (strcmp(command, "brightness") == 0 ||
+               strcmp(command, "dim") == 0) {
+        unsigned brightness = strtoul(value, NULL, 10);
+        if (brightness > 100) brightness = 100;
+        esp_err_t result = display_settings_set_brightness(
+            (uint8_t)brightness, true);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Brightness update failed: %s",
+                     esp_err_to_name(result));
+        }
+    } else if (strcmp(command, "stationuppercase") == 0) {
+        esp_err_t result = display_settings_set_station_uppercase(
+            strtoul(value, NULL, 10) != 0, true);
+        if (result != ESP_OK) {
+            ESP_LOGW(TAG, "Station uppercase update failed: %s",
+                     esp_err_to_name(result));
+        }
+    } else if (strcmp(command, "volp") == 0 ||
+               strcmp(command, "volm") == 0) {
+        display_settings_note_activity();
+        int volume = native_audio_output_get_volume();
+        int steps = runtime_settings_get_volume_steps();
+        volume += strcmp(command, "volp") == 0 ? steps : -steps;
+        if (volume < 0) volume = 0;
+        if (volume > 254) volume = 254;
+        native_audio_output_set_volume((uint8_t)volume);
+        send_initial_state(request);
+    } else if (strcmp(command, "balance") == 0) {
+        display_settings_note_activity();
+        int balance = strtol(value, NULL, 10);
+        if (balance < -16) balance = -16;
+        if (balance > 16) balance = 16;
+        native_audio_output_set_balance((int8_t)balance);
+        send_initial_state(request);
+    }
+}
+
+static esp_err_t websocket_handler_awake(httpd_req_t *request) {
+    if (request->method == HTTP_GET) {
+        ESP_LOGI(TAG, "WebUI client connected on socket %d",
+                 httpd_req_to_sockfd(request));
+        return ESP_OK;
+    }
+
+    httpd_ws_frame_t frame = {0};
+    ESP_RETURN_ON_ERROR(httpd_ws_recv_frame(request, &frame, 0), TAG,
+                        "read WebSocket frame size");
+    if (frame.type != HTTPD_WS_TYPE_TEXT || frame.len == 0 || frame.len > 255) {
+        return ESP_OK;
+    }
+    char payload[256];
+    frame.payload = (uint8_t *)payload;
+    ESP_RETURN_ON_ERROR(httpd_ws_recv_frame(request, &frame, sizeof(payload) - 1),
+                        TAG, "read WebSocket frame");
+    payload[frame.len] = '\0';
+    handle_command(request, payload);
+    return ESP_OK;
+}
+
+static esp_err_t websocket_handler(httpd_req_t *request) {
+    if (!deep_sleep_clock_begin_activity()) return ESP_FAIL;
+    esp_err_t result = websocket_handler_awake(request);
+    deep_sleep_clock_end_activity();
+    return result;
+}
+
+typedef struct {
+    int64_t started_us;
+    uint64_t active_us;
+    uint32_t polls;
+    uint32_t publications;
+    uint32_t deliveries;
+} ws_profile_t;
+
+static void profile_status_cycle(ws_profile_t *profile, int64_t cycle_started_us,
+                                 uint32_t publications,
+                                 uint32_t deliveries) {
+    int64_t now_us = esp_timer_get_time();
+    if (!profile->started_us) profile->started_us = cycle_started_us;
+    profile->active_us += (uint64_t)(now_us - cycle_started_us);
+    ++profile->polls;
+    profile->publications += publications;
+    profile->deliveries += deliveries;
+    uint64_t window_us = (uint64_t)(now_us - profile->started_us);
+    if (window_us < 5000000ULL) return;
+    uint64_t tenths = profile->active_us * 1000ULL / window_us;
+    ESP_LOGI(TAG,
+             "PERF WS: active %llu us (%llu.%llu%%), polls %lu, "
+             "publications %lu, deliveries %lu, clients %u",
+             (unsigned long long)profile->active_us,
+             (unsigned long long)(tenths / 10ULL),
+             (unsigned long long)(tenths % 10ULL),
+             (unsigned long)profile->polls,
+             (unsigned long)profile->publications,
+             (unsigned long)profile->deliveries,
+             (unsigned)s_last_ws_clients);
+    memset(profile, 0, sizeof(*profile));
+    profile->started_us = now_us;
+}
+
+static void status_task(void *argument) {
+    (void)argument;
+    bool have_previous = false;
+    TickType_t last_sent = 0;
+    ws_profile_t profile = {0};
+    while (true) {
+        vTaskDelay(pdMS_TO_TICKS(WS_STATUS_POLL_MS));
+        int64_t cycle_started_us = esp_timer_get_time();
+        web_tcp_probe_poll();
+        uint32_t publications = 0;
+        uint32_t deliveries = 0;
+        capture_status_key(&s_current_status_key);
+        TickType_t now = xTaskGetTickCount();
+        bool changed = !have_previous ||
+                       memcmp(&s_current_status_key, &s_previous_status_key,
+                              sizeof(s_current_status_key)) != 0;
+        bool heartbeat = !last_sent ||
+                         now - last_sent >=
+                             pdMS_TO_TICKS(WS_STATUS_HEARTBEAT_MS);
+        if (atomic_exchange(&s_playlist_changed_pending, false)) {
+            ESP_LOGI(TAG, "Broadcasting playlist changed event");
+            deliveries += (uint32_t)broadcast_text(
+                "{\"file\":\"/data/playlist.csv\"}",
+                &s_status_send_pending);
+            ++publications;
+        }
+        if ((changed || heartbeat) &&
+            atomic_load(&s_status_send_pending) == 0U) {
+            bool station_changed = !have_previous ||
+                                   s_current_status_key.current_item !=
+                                       s_previous_status_key.current_item;
+            format_status(s_broadcast_status, sizeof(s_broadcast_status));
+            bool publish_current = station_changed &&
+                atomic_load(&s_current_send_pending) == 0U;
+            if (publish_current) {
+                snprintf(s_broadcast_current, sizeof(s_broadcast_current),
+                         "{\"current\":%u}",
+                         s_current_status_key.current_item);
+            }
+            deliveries += (uint32_t)broadcast_text(
+                s_broadcast_status, &s_status_send_pending);
+            ++publications;
+            if (publish_current) {
+                deliveries += (uint32_t)broadcast_text(
+                    s_broadcast_current, &s_current_send_pending);
+                ++publications;
+            }
+            s_previous_status_key = s_current_status_key;
+            have_previous = true;
+            last_sent = now;
+        }
+        profile_status_cycle(&profile, cycle_started_us, publications,
+                             deliveries);
+    }
+}
+
+void websocket_service_notify_playlist_changed(void) {
+    atomic_store(&s_playlist_changed_pending, true);
+}
+
+esp_err_t websocket_service_register(httpd_handle_t server,
+                                     native_state_t *state) {
+    s_server = server;
+    s_state = state;
+    httpd_uri_t websocket = {
+        .uri = "/ws",
+        .method = HTTP_GET,
+        .handler = websocket_handler,
+        .is_websocket = true,
+        .handle_ws_control_frames = false,
+    };
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &websocket), TAG,
+                        "register native WebSocket route");
+    ESP_RETURN_ON_FALSE(xTaskCreate(status_task, "websocket_status",
+                                    BOARD_TASK_STACK_WEBSOCKET_STATUS,
+                                    NULL, 2, NULL) == pdPASS,
+                        ESP_ERR_NO_MEM, TAG, "start WebSocket status task");
+    return ESP_OK;
+}
