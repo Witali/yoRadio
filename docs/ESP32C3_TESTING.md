@@ -1602,3 +1602,12 @@ The production configuration, public trust bundle and 17,058-byte TLS reserve
 are preserved apart from the explicitly recorded diagnostic flags. These
 checks establish effective instrumentation, not physical memory attribution
 or production qualification.
+
+The [physical copied-RX campaign](ESP32C3_RX_COPY_20261012.md) retains three
+Opus runs and a ten-minute HE-AAC/HTTPS run. All steady output checks passed;
+the Opus trend and HE-AAC headroom failures remain recorded. Paired RX owners
+explain nearly all heap variation in the first two Opus runs, while the third
+has an unexplained residual. Six HE-AAC snapshots lack block records, so the
+full trace and that ownership phase fail completeness validation. Independently
+complete Opus phases remain usable; missing records are not silently dropped.
+Original firmware/settings/station restoration was verified.

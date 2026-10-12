@@ -1,0 +1,81 @@
+import json
+from pathlib import Path
+root=Path(__file__).resolve().parent
+r=json.loads((root/'physical-review.json').read_text())
+gates=r['playback_gates']
+paired=r['phases']
+health=json.loads((root/'physical/health.json').read_text())
+statuses=json.loads((root/'physical/status.json').read_text())
+he=next(b for b in statuses if b['case']=='public-he-https-600s')
+he_rows=[h for h in health if he['started_at']+15<=h['at']<=he['ended_at']]
+lines=['# Copied Wi-Fi RX ownership on ESP32-C3 — 2026-10-12', '',
+    '## Scope and method', '',
+    'The production copy mode was preserved. The diagnostic image tracks the',
+    'PBUF_RAM copy made by `wlanif_input` through its actual final `mem_free`.',
+    'Five-second snapshots measure RX allocation capacity and heap free/largest',
+    'under the same critical section. No packet contents are retained.', '',
+    'This is a diagnostic image with extra RAM/logging overhead. It cannot',
+    'replace qualification of the quiet production image. Host ASan/UBSan and',
+    'the linked netstack/allocation/free call audit passed before installation.', '',
+    '## Physical playback results', '',
+    '| Case | Duration | Format | Transport | Output | Memory |',
+    '|---|---:|---|---|---|---|']
+for name,case in gates.items():
+    lines.append('| '+name+' | '+('600 s' if name=='he-https' else '60 s')+' | '+
+        ' | '.join(case[k]['result'] for k in ('format','transport','output','memory'))+' |')
+lines+=['', 'All original memory thresholds remain in force; failed gates are retained.',
+    'Output checks compare counter increments during decoded steady playback,',
+    'excluding Start/Stop. They do not measure analog sound quality.', '',
+    f"Lifetime health across the campaign: {r['health']['allocation_failures']} allocation failures,",
+    f"{r['health']['task_watchdog_events']} task-watchdog events; boot identity remained consistent.",
+    f"HE-AAC steady sampled free heap minimum: {min(h['heap'] for h in he_rows)} bytes;",
+    f"largest-block minimum: {min(h['largest'] for h in he_rows)} bytes.",
+    f"Firmware heap low-water (including startup/transitions): {min(h['minimum_heap'] for h in health)} bytes.", '',
+    '## Opus: measured queued packets explain the observed heap swings', '',
+    '| Run | Paired snapshots | Heap span, B | RX capacity span, B | Heap + RX span, B | Heap/RX correlation |',
+    '|---|---:|---:|---:|---:|---:|']
+for name,p in paired.items():
+    if not name.startswith('opus:'):continue
+    spans=[p['paired'][k]['max']-p['paired'][k]['min'] for k in ('heap_free','rx_capacity','heap_plus_rx')]
+    lines.append(f"| {name} | {p['samples']} | "+' | '.join(map(str,spans))+
+                 f" | {p['heap_rx_correlation']:.6f} |")
+lines+=['', 'These are actual live RX allocations, not TCP receive-window estimates.',
+    'In runs 1 and 2 the near-constant sum explains the sampled heap variation',
+    'by queued packets, including the run with the failed trend gate.',
+    'Run 3 also contains a 3,312-byte residual swing not explained by these RX',
+    'owners. Its origin remains unassigned; do not generalize the first two runs.',
+    'The sum',
+    'excludes allocator headers and other owners and is never used to waive a',
+    'memory gate. Stop recovery is evaluated separately in the saved results.', '',
+    '## HE-AAC and remaining limits', '',
+    'The largest contiguous block still needs investigation. RX capacity totals',
+    'alone do not identify which allocations divide the free address ranges.',
+    'Five-second snapshots can miss shorter headroom dips. A lack of allocation',
+    'failures in this run does not establish all future allocation requirements.',
+    'The earlier quiet production HE-AAC minimum of 7,168 bytes remains a failed',
+    'headroom check; this instrumented run does not replace it.', '',
+    'The whole RX trace FAILED completeness validation. Six HE-AAC snapshots',
+    'lack block records (sequences 52, 64, 104, 116, 123 and 151). Header counters',
+    'are not a substitute for those missing records. The entire HE-AAC ownership',
+    'phase remains unqualified; no bad records were dropped to produce a pass.',
+    'The separately bounded Opus phases pass strict CRC, sequence, ownership',
+    'and range checks. The table above describes only those valid phases.',
+    'No USB disconnect/reopen was recorded during observation, which does not',
+    'prove lossless log delivery. The cause of missing lines is not established.', '',
+    'Original firmware, settings and the original playing station were restored',
+    'and verified. Remaining work includes quiet-production HTTPS file cases,',
+    'contiguous HE-AAC headroom, and the previously observed intermittent WebUI',
+    'timeouts. No acceptance threshold was reduced.', '',
+    '## Evidence', '',
+    '- [Physical review and retained gates](../tests/results/esp32c3-radio-rx-copy-physical/physical-review.json)',
+    '- [Raw observations and replay scripts](../tests/results/esp32c3-radio-rx-copy-physical/)',
+    '- [Host and ELF link checks](../tests/results/esp32c3-radio-rx-copy-build/)', '']
+Path('docs/ESP32C3_RX_COPY_20261012.md').write_text('\n'.join(lines))
+art=Path('firmware/development/esp32c3-idf-6.1-r9a97-radio-rx-copy/manifest.json')
+m=json.loads(art.read_text())
+m.update(hardware_tested=True,diagnostic_effective=True,diagnostic_capture_qualified=False,production_qualified=False,
+    physical_report='tests/results/esp32c3-radio-rx-copy-physical/physical-review.json',
+    qualification='Copied RX tracking verified in complete Opus phases. HE-AAC ownership trace incomplete (six snapshots missing block records); playback/memory gates retained separately. Does not qualify quiet production.',
+    original_image_restored=True)
+art.write_text(json.dumps(m,indent=2)+'\n')
+print('Wrote diagnostic results and updated hardware-test metadata')

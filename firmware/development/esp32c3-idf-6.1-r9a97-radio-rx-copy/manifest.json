@@ -10,14 +10,14 @@
     "bytes": 1619792
   },
   "build_directory": "idf\\esp32c3-oled-native\\build-idf-6.1-r9a97-radio-rx-copy",
-  "qualification": "Build only; RX ownership diagnostics alter timing and RAM. Linked copy-mode wrappers verified; physical RX attribution pending.",
+  "qualification": "Copied RX tracking verified in complete Opus phases. HE-AAC ownership trace incomplete (six snapshots missing block records); playback/memory gates retained separately. Does not qualify quiet production.",
   "sdkconfig_sha256": "55ea1ce8a3d4c69e461f2dc1fe829809f9409dbf0ec2e6024c41c31f953b4a27",
   "elf_sha256": "a8588d1a3b027f43482109c0d9985e560d2025f0d84b1d3fb53d9c148600d58f",
   "project_version_at_build": "idf61-radio-rx-copy",
   "idf_git_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
   "laboratory_only": true,
   "production_qualified": false,
-  "hardware_tested": false,
+  "hardware_tested": true,
   "config_changes": {
     "CONFIG_CONSOLE_UART_NONE": [
       "y",
@@ -253,5 +253,9 @@
   "rx_owner_table_bytes": 512,
   "tls_rx_reserve_bytes": 17058,
   "trust_bundle_sha256": "a60bf79ef8943cdcb3d9cc8889a35c7b411fe0136132e79b855742e2eb52dc6d",
-  "bootloader_sha256": "9b440b0a18bf0942ae546f9ecf0e91973df1df77463c74ee094835a330c455e6"
+  "bootloader_sha256": "9b440b0a18bf0942ae546f9ecf0e91973df1df77463c74ee094835a330c455e6",
+  "diagnostic_effective": true,
+  "diagnostic_capture_qualified": false,
+  "physical_report": "tests/results/esp32c3-radio-rx-copy-physical/physical-review.json",
+  "original_image_restored": true
 }
