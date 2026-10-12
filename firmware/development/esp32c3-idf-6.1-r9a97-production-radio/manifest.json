@@ -312,5 +312,199 @@
         ]
       }
     ]
+  },
+  "opus_cycles_report": "tests/results/esp32c3-production-radio-opus/review.json",
+  "opus_cycles": {
+    "opus:auto:1": {
+      "checks": {
+        "collection": {
+          "result": "PASS",
+          "reason": null
+        },
+        "transport": {
+          "result": "PASS",
+          "errors": []
+        },
+        "format": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 39,
+            "rate": 48000,
+            "channels": 2
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 39,
+            "elapsed_ms": 44255,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 39,
+            "boot_id": "69c5115071a74b31",
+            "minimum_heap": 81088,
+            "minimum_largest": 65536,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0
+          }
+        }
+      },
+      "recovery": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "health": {
+        "samples": 52,
+        "boot_id": "69c5115071a74b31",
+        "minimum_heap": 81088,
+        "minimum_largest": 65536,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "metrics": {
+        "heap": {
+          "minimum": 81088,
+          "first": 84260,
+          "last": 84268
+        },
+        "largest": {
+          "minimum": 65536,
+          "first": 65536,
+          "last": 65536
+        }
+      }
+    },
+    "opus:auto:2": {
+      "checks": {
+        "collection": {
+          "result": "PASS",
+          "reason": null
+        },
+        "transport": {
+          "result": "PASS",
+          "errors": []
+        },
+        "format": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 39,
+            "rate": 48000,
+            "channels": 2
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 39,
+            "elapsed_ms": 44080,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "memory": {
+          "result": "FAIL",
+          "reason": "Progressive heap loss"
+        }
+      },
+      "recovery": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "health": {
+        "samples": 52,
+        "boot_id": "69c5115071a74b31",
+        "minimum_heap": 81088,
+        "minimum_largest": 65536,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "metrics": {
+        "heap": {
+          "minimum": 81088,
+          "first": 84268,
+          "last": 82048
+        },
+        "largest": {
+          "minimum": 65536,
+          "first": 65536,
+          "last": 65536
+        }
+      }
+    },
+    "opus:auto:3": {
+      "checks": {
+        "collection": {
+          "result": "PASS",
+          "reason": null
+        },
+        "transport": {
+          "result": "PASS",
+          "errors": []
+        },
+        "format": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 39,
+            "rate": 48000,
+            "channels": 2
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 39,
+            "elapsed_ms": 44272,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 39,
+            "boot_id": "69c5115071a74b31",
+            "minimum_heap": 81136,
+            "minimum_largest": 63488,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0
+          }
+        }
+      },
+      "recovery": {
+        "result": "PASS",
+        "evidence": null
+      },
+      "health": {
+        "samples": 52,
+        "boot_id": "69c5115071a74b31",
+        "minimum_heap": 81136,
+        "minimum_largest": 63488,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "metrics": {
+        "heap": {
+          "minimum": 81136,
+          "first": 84220,
+          "last": 84160
+        },
+        "largest": {
+          "minimum": 63488,
+          "first": 63488,
+          "last": 63488
+        }
+      },
+      "terminal": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 4
+        }
+      }
+    }
   }
 }

@@ -351,3 +351,36 @@ Original production, settings and station were restored and verified.
 retain outcomes and the controller. Hardware testing is now recorded for this
 exact binary; complete production qualification remains false. This HTTP
 matrix does not replace exact-image HTTPS/OTA or sustained-playback checks.
+
+### Production Opus memory follow-up
+
+The same production image ran three sequential AUTO Opus cycles on a
+continuous 90-second synthetic 48 kHz stereo file (510 kbit/s CBR). FFmpeg
+decoded the complete file without error before board testing. Each cycle
+observed 60 seconds, using the unchanged 15-second warmup and memory gates.
+After each Stop, idle recovery was measured against the initial idle window.
+The final cycle additionally ran to EOF.
+
+| Cycle | First → last steady free-heap median, B | Minimum free / largest, B | Memory gate | Stop recovery |
+|---|---:|---:|---|---|
+| 1 | 84,260 → 84,268 | 81,088 / 65,536 | PASS | PASS |
+| 2 | 84,268 → 82,048 | 81,088 / 65,536 | FAIL | PASS |
+| 3 | 84,220 → 84,160 | 81,136 / 63,488 | PASS | PASS |
+
+All three cycles passed format, observation transport and steady output gates:
+zero completion-queue increments and write errors. No allocation failures,
+watchdog events or unexpected reboots were recorded. Final EOF passed.
+Cycle 2 retains its **2,220-byte median decline**, exceeding the unchanged
+2,048-byte threshold. This is not a fully passing memory qualification.
+
+Initial → final idle heap medians: 139,844 → 139,920 B; largest blocks: 110,592 → 110,592 B.
+The three cycles do not show accumulating post-stop memory loss. They do not
+identify the owners responsible for active-playback fluctuations. Correlate
+network receive queues and heap observations before attributing them to a
+codec leak or changing the gate. The original short Opus failure also remains.
+
+Original firmware, station and settings were restored. The
+[archive](../tests/results/esp32c3-production-radio-opus/) preserves the failed
+gate, successful controls, fixture generation manifest and restoration.
+`offline_replay.py` uses frozen test sources and reproduces the original review
+without downloading or regenerating audio. Large fixture audio stays in `.build/`.

@@ -1,0 +1,42 @@
+{
+  "generator": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "source_sha256": "7a335548ba85d3ba6ce48ef9cabcbc19cf13727e77f0bac4199f1f21d14529bc",
+  "source_filter": [
+    "anoisesrc=color=white:amplitude=0.34:sample_rate=48000:duration=90:seed=12345[nl]",
+    "anoisesrc=color=pink:amplitude=0.34:sample_rate=48000:duration=90:seed=67890[nr]",
+    "sine=frequency=997:sample_rate=48000:duration=90:beep_factor=2[tl]",
+    "sine=frequency=1601:sample_rate=48000:duration=90:beep_factor=2[tr]",
+    "[nl][tl]amix=inputs=2:weights='0.72 0.28':normalize=0[left]",
+    "[nr][tr]amix=inputs=2:weights='0.72 0.28':normalize=0[right]",
+    "[left][right]amerge=inputs=2,alimiter=limit=0.95[out]"
+  ],
+  "source_bits": 16,
+  "fixtures": [
+    {
+      "name": "stress-opus-48000-2ch-16bit-90s",
+      "file": "stress-opus-48000-2ch-16bit-90s.ogg",
+      "seconds": 90.0065,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "opus",
+      "mime": "audio/ogg",
+      "profile": "opus",
+      "sha256": "fd6762a43dfdd6539b335d24f0e1223f48013d9c1f326cf1017b0de901cdfb27",
+      "bytes": 5768780,
+      "average_kbps": 512.7434129757295,
+      "encoder_options": [
+        "-c:a",
+        "libopus",
+        "-b:a",
+        "510k",
+        "-vbr",
+        "off",
+        "-application",
+        "audio",
+        "-frame_duration",
+        "20"
+      ]
+    }
+  ]
+}
