@@ -3,6 +3,53 @@
 Goal: keep HTTPS radio playback reliable on the ESP32-C3 OLED board by
 avoiding repeated allocation and release of large heap blocks.
 
+## Current release checkpoint, 2026-10-12
+
+This section takes precedence over historical experiment checkboxes below.
+The goal remains reliable playback of all supported radio formats, with full
+AAC output rates/features, no crashes and no allocation failures. Optional
+further codec compression and speed work are not release requirements.
+
+- [x] Recover the completed HTTP request buffer: the opt-in implementation
+  releases exactly 4,096 payload bytes after accepted GET response headers.
+  Host lifecycle/sanitizer checks and physical A/B controls are recorded in
+  [HTTP request-buffer qualification](ESP32C3_HTTP_REQUEST_BUFFER.md).
+- [x] Exercise that candidate's codec/HTTP lifecycle matrix: 31/33 passed.
+  Keep the short Vorbis heap-trend failure and interrupted AAC observation.
+  Sustained Vorbis and repeated AAC transitions subsequently passed; those
+  follow-ups do not rewrite the original two failures.
+- [x] Exercise that same candidate's OTA acceptance: 15/15 passed, including
+  rejected/damaged uploads, interrupted upload and update during HE-AAC play.
+- [x] Complete its 600-second public HE-AAC HTTPS test with zero recorded
+  allocation failures, watchdogs, unexpected reboots, steady completion-queue
+  drops or write errors. Sampled free/largest minima: 24,712/11,264 bytes;
+  firmware lifetime free-heap low-water: 15,168 bytes. This does not establish
+  an absolute 16-KiB free-heap floor or qualify every HTTPS source.
+- [x] Make the measured configuration reproducible with
+  `build-production.ps1 -TestedRadioProfile`, including fresh/reused config
+  checks. A clean build is saved as `esp32c3-idf-6.1-r9a97-production-radio`;
+  config and object/link comparisons passed. See
+  [build evidence](../tests/results/esp32c3-production-radio-build/).
+- [ ] Qualify the exact new production binary on hardware; do not transfer
+  playback/OTA results from the earlier binary merely because configs match.
+  Cover all formats, transitions, terminal status, source failures, TLS
+  certificate/record handling, repeated OTA and sustained heavy playback.
+- [ ] Resolve or attribute the intermittent public MP3 interruption, with
+  simultaneous independent host decoding over HTTP and HTTPS. Preserve
+  failed controls and distinguish host command errors from board failures.
+- [ ] Diagnose the intermittent WebUI TCP-connect timeout with correlated
+  evidence. Successful later observations alone do not establish a fix.
+- [ ] Close the short Vorbis memory-budget discrepancy with retained active
+  and settled memory evidence; current longer controls do not show a leak.
+
+The new build has app SHA-256
+`e526eb7dc072fe58c61d5424942f20933b9e8288d948574f6833eb38ab43e211`.
+Its manifest remains `hardware_tested=false`, `production_qualified=false`.
+The earlier tested `quiet-http-txrelease` image has SHA-256
+`ee0278e97d9b0d4abd1e217ec2e657896e6e562ba51f5638aeb431e1acfdbebc`.
+Keep acceptance scoped to the actual image and tests, rather than to a profile
+name. Neither image is yet qualified as completion of the full goal.
+
 ## Remaining qualification work, 2026-10-10
 
 On `codex/esp32c3-idf-upgrade`, full-rate compact AAC/SBR/PS is already
