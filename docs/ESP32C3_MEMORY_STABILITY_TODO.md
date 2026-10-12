@@ -37,6 +37,11 @@ further codec compression and speed work are not release requirements.
 - [ ] Resolve or attribute the intermittent public MP3 interruption, with
   simultaneous independent host decoding over HTTP and HTTPS. Preserve
   failed controls and distinguish host command errors from board failures.
+- [x] Repeat the previously broken HTTP host control on the exact production
+  image: 600-second board observation and 605-second FFmpeg decode both pass,
+  with zero observed stops, allocation/watchdog faults or steady output-counter
+  increments. The historical interruption did not recur; its cause remains
+  open. See [MP3 HTTP control](ESP32C3_HTTP_REQUEST_BUFFER.md#production-mp3-http-control).
 - [ ] Diagnose the intermittent WebUI TCP-connect timeout with correlated
   evidence. Successful later observations alone do not establish a fix.
 - [ ] Attribute the repeated active-playback Opus heap decline. Five diagnostic

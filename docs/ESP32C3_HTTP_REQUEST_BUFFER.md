@@ -295,9 +295,10 @@ disassembly confirms that instruction difference references the changed path.
 This is object-level evidence, not a claim of identical linked images.
 
 [Build evidence](../tests/results/esp32c3-production-radio-build/) retains source
-snapshots, build logs, configuration, link audits and object comparison. This
-exact new binary has **not yet been tested on hardware**. Prior OTA and playback
-results apply to `quiet-http-txrelease`, not automatically to this rebuild.
+snapshots, build logs, configuration, link audits and object comparison. The
+subsequent hardware results for this exact binary are recorded below. Prior
+OTA and playback results for `quiet-http-txrelease` do not automatically qualify
+this rebuild.
 
 ## Ten-minute public MP3 controls, 2026-10-12
 
@@ -316,8 +317,8 @@ The HTTP host control failed before decoding: FFmpeg rejected `tls_verify`
 on a plain HTTP input. This is a test-command failure, not a board decoding
 failure or a completed independent comparison. The corrected controller adds
 that option only for HTTPS; a separate three-second HTTP command check passed.
-The original controller and failure remain retained. A complete simultaneous
-HTTP host/board comparison is still required.
+The original controller and failure remain retained. The subsequent exact-image
+HTTP host/board comparison is recorded below.
 
 HTTPS FFmpeg uses certificate verification. Separate live clients can receive
 different content/start points; their results do not prove bit-identical input.
@@ -433,3 +434,40 @@ restored and verified.
 the failed memory gate, missing trace events, per-phase coverage, paired
 snapshots and restoration. `review.py` replays acceptance using frozen test
 sources; its PASS means evidence consistency, not that all case gates passed.
+
+### Production MP3 HTTP control
+
+The exact `production-radio` image completed the corrected 600-second public
+MP3 HTTP test. Both the board and independent FFmpeg client used
+`http://ice5.somafm.com/groovesalad-256-mp3`; FFprobe also checked that HTTP
+route. TLS-only options were omitted from the HTTP commands. Both clients
+passed, closing the missing HTTP control from the earlier campaign.
+
+| Measurement | Result |
+|---|---:|
+| Board observations / steady observations | 522 / 509 |
+| Format | MP3, 44.1 kHz, stereo |
+| Steady output interval | 583.893 s |
+| Steady completion-queue increments / write errors | 0 / 0 |
+| Allocation failures / watchdog events / unexpected reboots | 0 / 0 / 0 |
+| Minimum sampled free heap / largest free block | 86,836 / 69,632 B |
+| Firmware free-heap low-water since boot | 76,812 B |
+| First → last steady free-heap median | 91,500 → 92,996 B |
+| Maximum paired status/health request | 327.89 ms |
+| Failed observation requests / observed playback stops | 0 / 0 |
+| Independent FFmpeg decoded duration / errors | 605.000 s / 0 |
+| Settled memory recovery / original-image restoration | PASS / PASS |
+
+The last board sample is at 599.027 seconds; collection spans the requested
+600-second loop and passes the existing sampling-coverage tolerance. Steady
+checks exclude the first 15 seconds. The independent live clients may receive
+different start points/content; this is not a bit-identical PCM comparison.
+No reproduction of the historical intermittent stop was observed, so its
+cause is still unproven. This result qualifies this bounded MP3 HTTP case,
+not all sources, HTTPS, or the complete release.
+
+[Measurements and frozen-source replay](../tests/results/esp32c3-production-radio-mp3-http/)
+retain both client results and verification of restored image, station,
+decoded playback and settings. Public broadcast audio and private stderr are
+not archived. `offline_replay.py` reproduces the reviewed result from the
+saved observations and test sources.
