@@ -160,6 +160,10 @@ settings sector. Web pages are embedded in the application. No SPIFFS,
 LittleFS, SimpleFS or FAT filesystem was identified. These areas are
 already included in the full flash backup; see the
 [storage layout report](analysis/storage.md) for offsets and evidence.
+The [extracted image inventory](assets/README.md) includes a visual overview,
+the five photos, five animated GIF previews, weather icons and status
+graphics recovered from this snapshot. Exported images have source
+metadata removed; the flash backup remains unchanged.
 
 ## Security review
 

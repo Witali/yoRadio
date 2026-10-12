@@ -40,7 +40,11 @@ All range ends in this table are exclusive.
 | Built-in animation 2 | `0x2E1000` | `0x313000` | 200 KiB; same format |
 | Built-in animation 3 | `0x313000` | `0x345000` | 200 KiB; same format |
 | Built-in animation 4 | `0x345000` | `0x377000` | 200 KiB; same format |
-| Weather / display assets | `0x377000` onward | Complete boundary not established | Fixed-address assets, including references at `0x3BA800`, `0x3BE400`, `0x3C2000` and `0x3C5C00` |
+| Weather icons | `0x377000` | `0x3BA800` | 18 fixed 15 KiB slots; 60 x 60 BMP icons |
+| Thermometer | `0x3BA800` | `0x3BE400` | 25 x 25 JPEG; following slot boundary inferred from spacing |
+| Wind symbol | `0x3BE400` | `0x3C2000` | 25 x 25 JPEG; following slot boundary inferred from spacing |
+| Yellow indicator bar | `0x3C2000` | `0x3C5C00` | 40 x 6 JPEG; following slot boundary inferred from spacing |
+| Blue indicator bar | `0x3C5C00` | Not established | 40 x 6 JPEG |
 | Application settings sector | `0x3E7000` | `0x3E8000` | 4 KiB sector; settings structure uses `0x1BC` bytes |
 
 The five photo slots are confirmed by `/start_upload` at `0x4200DDA4`:
@@ -85,5 +89,8 @@ the partition table and direct storage code are the stronger evidence.
 See [storage-map.json](storage-map.json) for checked signatures and offsets,
 the [security decompilation](security/security-decompiled.c) for the
 storage handlers, and the [hardware report](README.md) for the image map.
+The [extracted image inventory](../assets/README.md) shows all five photos,
+five animations, 18 weather icons and four status graphics; individual
+source lengths and hashes are recorded in its manifest.
 Partition type interpretation follows [Espressif's partition-table
 documentation](https://docs.espressif.com/projects/esp-idf/en/v5.4.3/esp32c2/api-guides/partition-tables.html).
