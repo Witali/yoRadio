@@ -1,6 +1,8 @@
 /* Execute the production media/settings/HTTP code with in-memory platform I/O.
  * These tests do not validate ESP-IDF timing, Wi-Fi, TLS or physical display. */
 #include <assert.h>
+#include <math.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +13,8 @@
 #include "services.h"
 #include "web.h"
 #include "dns_packet.h"
+#include "factory_settings.h"
+#include "esp_flash.h"
 #include "esp_partition.h"
 #include "nvs.h"
 #include "freertos/semphr.h"
@@ -18,6 +22,7 @@
 static unsigned checks;
 #define CHECK(condition) do {++checks;if (!(condition)) {fprintf(stderr,"Check failed at %s:%d: %s\n",__FILE__,__LINE__,#condition);exit(1);}} while (0)
 static uint8_t flash_bytes[0x1e7000],saved_nvs[1024];
+static uint8_t factory_sector[4096];
 static size_t saved_nvs_length;
 static int64_t clock_us;
 static unsigned rendered_pixels,registered_routes,restart_requests,weather_requests;
@@ -39,6 +44,12 @@ esp_err_t nvs_get_blob(nvs_handle_t handle,const char *key,void *data,size_t *le
 esp_err_t nvs_set_blob(nvs_handle_t handle,const char *key,const void *data,size_t length)
 {(void)handle;(void)key;assert(length<=sizeof(saved_nvs));memcpy(saved_nvs,data,length);saved_nvs_length=length;return ESP_OK;}
 esp_err_t nvs_commit(nvs_handle_t handle) {(void)handle;return ESP_OK;}
+esp_err_t esp_flash_read(esp_flash_t *chip,void *data,uint32_t offset,uint32_t length)
+{(void)chip;if(offset!=FACTORY_SETTINGS_OFFSET || length>sizeof(factory_sector))return ESP_ERR_INVALID_SIZE;memcpy(data,factory_sector,length);return ESP_OK;}
+esp_err_t esp_flash_write(esp_flash_t *chip,const void *data,uint32_t offset,uint32_t length)
+{(void)chip;if(offset!=FACTORY_SETTINGS_OFFSET || length>sizeof(factory_sector))return ESP_ERR_INVALID_SIZE;memcpy(factory_sector,data,length);return ESP_OK;}
+esp_err_t esp_flash_erase_region(esp_flash_t *chip,uint32_t offset,uint32_t length)
+{(void)chip;assert(offset==FACTORY_SETTINGS_OFFSET && length==4096);memset(factory_sector,255,sizeof(factory_sector));return ESP_OK;}
 const esp_partition_t *esp_partition_find_first(unsigned type,unsigned subtype,const char *label)
 {(void)type;assert(subtype==0x40 && !strcmp(label,"assets"));return &partition;}
 esp_err_t esp_partition_read(const esp_partition_t *p,size_t offset,void *data,size_t length)
@@ -111,12 +122,72 @@ static void test_settings(void)
     post("/SetNightStartTime","{\"StartTime\":18}",200);post("/SetNightStopTime","{\"StopTime\":12}",200);
     prepare("/settings","{\"hourFormat\":0}",16,"application/json");request.origin="http://evil.example";web_settings_post(&request);CHECK(request.status==400);
     post("/configure","{\"ssid\":\"Home\",\"password\":\"12345678\"}",200);CHECK(restart_requests==1);
-    CHECK(settings_flush()==ESP_OK);CHECK(settings_init()==ESP_OK);settings_snapshot(&s);CHECK(!strcmp(s.ssid,"Home"));
+    CHECK(settings_flush()==ESP_OK);CHECK(settings_init()==ESP_OK);settings_snapshot(&s);CHECK(!strcmp(s.ssid,"Home") && s.wifi_mode==1);
     CHECK(rgb888_from_rgb565(rgb565_from_rgb888(0xffffff))==0xffffff);
     CHECK(rgb888_from_rgb565(rgb565_from_rgb888(0xff0000))==0xff0000);
 }
 
 static uint32_t le32(const uint8_t *data) {return data[0]|((uint32_t)data[1]<<8)|((uint32_t)data[2]<<16)|((uint32_t)data[3]<<24);}
+static void test_factory_settings(void)
+{
+    /* Exercise an independent original-sector fixture, including mode 2 with
+     * an existing SSID: it must stay in setup after a failed station attempt. */
+    CHECK(sizeof(tv_settings_t)==344);
+    CHECK(offsetof(tv_settings_t,wifi_mode)==323);
+    CHECK(offsetof(tv_settings_t,photo_size)==324);
+    tv_settings_t s; settings_snapshot(&s);
+    uint8_t raw[FACTORY_SETTINGS_BYTES]; memset(raw,255,sizeof(raw));
+    CHECK(!factory_settings_decode(raw,&s));
+    memcpy(raw+4,"synthetic-ap\0",13);
+    memcpy(raw+0x45,"\0",1);
+    memcpy(raw+0x86,"10.0.2.2\0",9);
+    memcpy(raw+0xc7,"GB\0",3);
+    memcpy(raw+0xdb,"London\0",7);
+    memcpy(raw+0x11c,"fixture-key\0",12);
+    raw[0x160]=2; raw[0x161]=raw[0x162]=raw[0x163]=0;
+    raw[0x168]=1; raw[0x169]=raw[0x16a]=raw[0x16b]=0;
+    raw[0x1a4]=5; raw[0x1a5]=raw[0x1a6]=raw[0x1a7]=0;
+    memcpy(factory_sector,raw,sizeof(raw));
+    CHECK(settings_init()==ESP_OK); settings_snapshot(&s);
+    CHECK(!strcmp(s.ssid,"synthetic-ap") && !s.password[0] && s.wifi_mode==2);
+    CHECK(!strcmp(s.ntp,"10.0.2.2") && !strcmp(s.country,"GB") && !strcmp(s.city,"London"));
+    CHECK(!strcmp(s.weather_key,"fixture-key") && s.theme==1 && s.photo_mask==5);
+    CHECK(s.colors[0]==0xf800 && s.photo_seconds==5); /* erased fields use defaults */
+    s.theme=3; CHECK(settings_replace(&s)==ESP_OK); CHECK(settings_flush()==ESP_OK);
+    CHECK(le32(factory_sector+0x160)==2 && le32(factory_sector+0x168)==3);
+    CHECK(le32(factory_sector)==5 && le32(factory_sector+0x1a4)==5);
+    CHECK(le32(factory_sector+0x1a8)==s.photo_size[0]);
+    CHECK(!strcmp((char *)factory_sector+0xdb,"London"));
+    CHECK(factory_sector[FACTORY_SETTINGS_BYTES]==255);
+    /* Legacy NVS uses the same blob size but had no explicit mode byte. */
+    memset(factory_sector,255,sizeof(factory_sector));
+    saved_nvs[323]=0;
+    CHECK(settings_init()==ESP_OK); settings_snapshot(&s); CHECK(s.wifi_mode==1);
+}
+
+static void test_weather(void)
+{
+    /* Values come from a synthetic OpenWeather Kelvin payload, not live data. */
+    tv_settings_t s; settings_snapshot(&s);
+    const char body[]={"{\"main\":{\"temp\":293.99,\"humidity\":73,\"temp_min\":292.2,\"temp_max\":295.8},"
+        "\"wind\":{\"speed\":3.7,\"deg\":350},\"timezone\":3600,"
+        "\"weather\":[{\"icon\":\"02d\",\"main\":\"Clouds\",\"description\":\"scattered clouds\"}]}"};
+    weather_snapshot_t weather;
+    CHECK(weather_parse_response(body,strlen(body),&s,&weather));
+    CHECK(weather.valid && weather.temperature_c==20 && weather.humidity==73);
+    CHECK(fabs(weather.temperature_min_c-19.05)<0.000001 && fabs(weather.temperature_max_c-22.65)<0.000001);
+    CHECK(weather.wind_mps==3.7 && weather.timezone_seconds==3600);
+    CHECK(!strcmp(weather.main,"Clouds") && !strcmp(weather.description,"scattered cloud"));
+    CHECK(!strcmp(weather.wind_direction,"North") && !strcmp(weather.icon,"02d"));
+    CHECK(!strcmp(weather.city,"London") && !strcmp(weather.country,"GB"));
+    CHECK(!weather_parse_response("{}",2,&s,&weather));
+    CHECK(!weather_parse_response(body,10,&s,&weather));
+    const char invalid[]={"{\"main\":{\"temp\":293,\"humidity\":101},\"wind\":{\"speed\":1},\"weather\":[{\"icon\":\"02d\"}]}"};
+    CHECK(!weather_parse_response(invalid,strlen(invalid),&s,&weather));
+    const char cold[]={"{\"main\":{\"temp\":270.9,\"humidity\":0},\"wind\":{\"speed\":0,\"deg\":90},\"weather\":[{\"icon\":\"13n\"}]}"};
+    CHECK(weather_parse_response(cold,strlen(cold),&s,&weather));
+    CHECK(weather.temperature_c==-2 && !strcmp(weather.wind_direction,"East"));
+}
 static void test_assets(void)
 {
     CHECK(media_init()==ESP_OK);tv_settings_t s;settings_snapshot(&s);
@@ -194,10 +265,11 @@ static void test_dns(void)
 
 int main(int argc,char **argv)
 {
+    memset(factory_sector,255,sizeof(factory_sector));
     CHECK(argc==2);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
     CHECK(web_start()==ESP_OK);CHECK(registered_routes==40);
     for(unsigned i=0;i<registered_routes;++i)for(unsigned j=i+1;j<registered_routes;++j)CHECK(route_table[i]->method!=route_table[j]->method || strcmp(route_table[i]->uri,route_table[j]->uri));
-    test_settings();test_assets();test_uploads();test_multipart();test_dns();
-    printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; production settings, flash uploads and HTTP handlers\n",checks);
+    test_settings();test_factory_settings();test_weather();test_assets();test_uploads();test_multipart();test_dns();
+    printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers\n",checks);
     return 0;
 }

@@ -121,13 +121,45 @@ def generate_font(output: Path):
     (output / "font6x12.h").write_text(text+"\n};\n",encoding="utf-8",newline="\n")
 
 
+def generate_factory_bitmaps(output: Path):
+    folder = ROOT / 'resources/factory'
+    manifest = json.loads((folder / 'manifest.json').read_text(encoding='utf-8'))
+    header = ('#pragma once\n#include <stdint.h>\n'
+              'typedef struct {const uint8_t *data; unsigned width,height,stride,first,count;} factory_font_table_t;\n'
+              'typedef struct {const uint8_t *data; unsigned width,height,stride;} factory_symbol_table_t;\n')
+    source = '#include "factory_bitmaps.h"\n'
+    records = {row['name']: row for row in manifest['tables']}
+    for row in manifest['tables']:
+        data = (folder / (row['name'] + '.bin')).read_bytes()
+        if len(data) != row['bytes'] or hashlib.sha256(data).hexdigest() != row['sha256']:
+            raise ValueError('Factory bitmap hash mismatch: ' + row['name'])
+        source += 'static const uint8_t bitmap_' + row['name'] + '[] = {\n'
+        source += '\n'.join(','.join(hex(v) for v in data[i:i+32]) + ',' for i in range(0,len(data),32))
+        source += '\n};\n'
+    font_names = ['ascii16','ascii24','ascii32','digits40','digits64','digits80']
+    header += '#define FACTORY_FONT_COUNT 6\nextern const factory_font_table_t factory_fonts[6];\n'
+    source += 'const factory_font_table_t factory_fonts[6] = {\n'
+    for name in font_names:
+        row = records[name]
+        source += '{bitmap_%s,%d,%d,%d,%d,%d},\n' % (name,row['width'],row['height'],row['stride'],row['first'],row['count'])
+    source += '};\n'
+    header += '#define FACTORY_SYMBOL_COUNT 6\nextern const factory_symbol_table_t factory_symbols[6];\n'
+    source += 'const factory_symbol_table_t factory_symbols[6] = {\n'
+    units = records['temperature_units']
+    for index in range(2):
+        source += '{bitmap_temperature_units+%d,24,24,3},\n' % (index*72)
+    for name in ['startup_border','startup_cap','simple_plate','digit_plate']:
+        row = records[name]
+        source += '{bitmap_%s,%d,%d,%d},\n' % (name,row['width'],row['height'],row['stride'])
+    source += '};\n'
+    (output / 'factory_bitmaps.h').write_text(header,encoding='utf-8',newline='\n')
+    (output / 'factory_bitmaps.c').write_text(source,encoding='utf-8',newline='\n')
+
+
 def generate_pages(output: Path):
     text = "/* Recovered, sanitized UTF-8 pages. Generated; edit local_site/pages. */\n#include <stddef.h>\n"
     for page in ("setup", "settings", "photo"):
         html = (ROOT.parent / "local_site/pages" / (page+".html")).read_text(encoding="utf-8")
-        # Firmware-only usability changes; the archived/local-site pages stay intact.
-        html = html.replace("</nav>", ' &middot; <a href="/advanced">Advanced</a></nav>', 1)
-        html = html.replace("Show Temperature in Celsius", "Show Temperature in Fahrenheit")
         data = html.encode("utf-8")
         text += "const unsigned char web_"+page+"[] = {\n"
         text += "\n".join(",".join(str(v) for v in data[pos:pos+32])+"," for pos in range(0,len(data),32))
@@ -142,12 +174,13 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     pack_assets(args.output)
     generate_font(args.output)
+    generate_factory_bitmaps(args.output)
     generate_pages(args.output)
     compiled = sorted((ROOT / "app").rglob("*.c")) + sorted((ROOT / "app").rglob("*.h"))
     compiled += sorted((ROOT / "third_party").rglob("*.c")) + sorted((ROOT / "third_party").rglob("*.h"))
     compiled += [ROOT / "CMakeLists.txt", ROOT / "app/CMakeLists.txt", ROOT / "sdkconfig.defaults", ROOT / "partitions.csv"]
     records = [{"file":str(path.relative_to(ROOT)).replace("\\","/"), "sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for path in compiled]
-    for name in ("web_pages.c", "font6x12.h", "asset_defaults.h"):
+    for name in ("web_pages.c", "font6x12.h", "factory_bitmaps.c", "factory_bitmaps.h", "asset_defaults.h"):
         records.append({"file":"generated/"+name,"sha256":hashlib.sha256((args.output/name).read_bytes()).hexdigest()})
     canonical = json.dumps(records, separators=(",",":"),sort_keys=True).encode("utf-8")
     (args.output/"source-manifest.json").write_text(json.dumps({"aggregate_sha256":hashlib.sha256(canonical).hexdigest(),"files":records},indent=2)+"\n",encoding="utf-8",newline="\n")

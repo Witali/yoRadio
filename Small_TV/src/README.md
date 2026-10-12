@@ -8,25 +8,27 @@ byte-identical rebuild of the manufacturer's unavailable source.
 The successful build is archived in
 [`firmware/development/small-tv-esp32c2-reconstructed`](../../firmware/development/small-tv-esp32c2-reconstructed).
 Compilation and host tests are verified; boot, panel orientation, brightness,
-Wi-Fi/SNTP/HTTPS and runtime heap/stack use still require a physical board test.
+Wi-Fi/SNTP/Internet weather and runtime heap/stack use still require a physical board test.
 This work did not flash or reset the device. OTA is deliberately absent.
 
-The unchanged archived application also passes QEMU ESP32-C2 boot, LCD,
-animation, Wi-Fi association, DHCP, UDP NTP and reset tests. The emulator seeds
+The earlier archived application passed QEMU ESP32-C2 boot, LCD,
+animation, Wi-Fi association, DHCP, UDP NTP and reset tests. Current scene
+comparisons are recorded separately in [the parity checkpoint](../qemu/parity/README.md).
+Full behavioral identity is still work in progress. The emulator seeds
 synthetic settings in a working flash copy and provides an isolated time server
 using host UTC. [Screens and reports](../qemu/README.md) document the result and
-virtual-time limitations; physical-board and Internet/HTTPS checks remain pending.
+virtual-time limitations; physical-board and Internet weather checks remain pending.
 
 ## Source organization and names
 
 | Directory | Responsibility |
 |---|---|
 | `app/app_main.c` | Initialization and task startup |
-| `app/settings/` | Versioned NVS settings, validation, RGB565 conversions |
+| `app/settings/` | Factory raw-sector compatibility, NVS migration, validation and RGB565 |
 | `app/display/` | ST7789 hardware SPI, LEDC backlight, four clock themes |
 | `app/media/` | Flash assets, streaming JPEG/BMP, validated photo uploads |
 | `app/network/` | Station/AP mode, real Wi-Fi scan, bounded captive DNS |
-| `app/services/` | SNTP, timezone selection, HTTPS weather and cached results |
+| `app/services/` | SNTP, factory timezone selection, HTTP/Kelvin weather and cached results |
 | `app/web/` | Recovered HTTP contracts, pages, settings and photo APIs |
 | `third_party/` | Pinned cJSON, TJpgDec and licensed Spleen font |
 | `reference/` | 176 exported functions split into 16 logical pseudocode modules |
@@ -43,6 +45,16 @@ or decompiler aliases. Guessing an attractive name is not evidence of its
 meaning. The executable files in `app/` use real C types and descriptive
 functions, configuration fields, buffers and state variables. SDK code is
 provided by ESP-IDF rather than stubbed out or mapped to old machine addresses.
+
+All 121 production C functions have an entry comment explaining their purpose.
+Comments also explain byte-padded/LSB-first fonts, fixed raw-sector offsets,
+timer thresholds, photo fades, MIME binary parsing and DNS packet bounds.
+Where machine instructions were checked directly, comments cite their original
+addresses. [Assembly audit](reference/assembly/README.md) separates those checks
+from inference based on the Ghidra export.
+`tools/assist_c_port.py` is a paused draft: it parses instructions, finds CFG
+blocks/natural loops and renders branch conditions. Its complete C-draft emitter
+and command-line interface have not yet been implemented or tested.
 
 The broader export used for organization came from the existing analyzed
 factory ELF, including application functions and SDK callers. Its SHA-256
@@ -86,9 +98,12 @@ idf.py -B ../../.build/small-tv-esp32c2 --no-ccache -D SDKCONFIG=../../.build/sm
 
 Resource preparation uses only the Python standard library. It repacks the
 sanitized extracted JPEGs, reconstructs BMP weather icons from PNG pixels,
-rebuilds the custom animation headers, generates the font and embeds the
+rebuilds the custom animation headers, embeds the extracted factory font tables and the
 recovered UTF-8 HTML. It never reads the private settings or the original
 full-flash dump. Generated data stays in the ignored `.build/` directory.
+The one-time `tools/extract_factory_bitmaps.py` extractor verifies the dump hash
+and copies only the identified public drawing tables into `resources/factory/`.
+Ordinary builds use those checked-in tables and verify their manifest hashes.
 
 `build.ps1` saves `app.bin`, `bootloader.bin`, `partition-table.bin`,
 `assets.bin`, actual `sdkconfig`, image hashes, asset hashes and a manifest
@@ -142,33 +157,45 @@ The native program implements all 34 recovered method/URI pairs listed in
 
 At first start, join the open `Small_TV` access point and open
 `http://192.168.43.1/`. The setup page scans real networks and saves station
-credentials. Failed station connections make the setup AP available after
-20 seconds, with retries continuing. Configuration changes persist in a new
-NVS namespace; they do not migrate the manufacturer's raw settings sector.
-Restart requests wait for persistence and a response opportunity.
+credentials. After four failed station retries, the program saves factory Wi-Fi
+mode 2 and restarts into setup. Its safety timeout also covers a missing event.
+An existing mode-2 sector enters setup even when it retains an SSID. The original
+444-byte sector at `0x3e7000` takes precedence over the earlier native NVS blob;
+settings changes update both formats. The new mode byte reuses padding, keeping
+the NVS layout at 344 bytes. Restart requests wait for persistence and a response
+opportunity. No original settings, credentials or keys are embedded in sources.
 
 `/advanced` configures the NTP server, the owner's OpenWeatherMap key and
 the night brightness schedule. The factory's embedded weather key is not
-copied into these sources. Weather requests use certificate-verified HTTPS
-after SNTP has established a usable date; updates run every 30 minutes and
-after city/key changes. The recovered 109-entry country/POSIX-TZ table is
-used initially. A weather result for the current city supplies its UTC
-offset, refreshed at each successful request.
+copied into these sources. Weather follows the original HTTP endpoint with
+Kelvin values: Celsius truncates toward zero before Fahrenheit conversion;
+min/max retain double precision. Text is limited to 15 bytes and wind bearings
+use the original sixteen sectors. The recovered 109-entry country/POSIX-TZ table
+sets local time; the weather UTC offset does not replace it. Requests retry
+after about 3.1 seconds and successful updates repeat after 1801 timer seconds
+(about 1981.1 real seconds at the recovered 11-tick cadence).
 
 Four themes render a classic digital clock/weather view, simple digital
 clock, photo slideshow and analog dial. Five animations contain 98 frames;
 five photos, 18 weather icons and four status images are packed. The
-native layouts and Spleen ASCII font approximate the original graphics;
-they do not reproduce the original font tables, non-ASCII glyphs or slideshow
-fade sequence. The status images remain available as assets, while the new
-weather view renders its values with text.
+renderer now uses the original 16/24/32/40/64/80-pixel bitmap tables, unit symbols,
+clock plates, coordinates, colors, unpadded date, blinking colon and transparent
+IP footer. Classic animation is at `(160,160)`; photos occupy the full screen.
+The slideshow applies duty levels `300,600,1000,600,300,0`, changing the photo
+at duty 1000. Digital fields and analog hands update incrementally, following
+the recovered dispatch flags. Analog stroke offsets round rather than truncate.
+Setup text and the `Ver:0.0.2` progress screen are restored. The earlier extra
+seconds/IP overlay and clock-on-photo strip are removed. Spleen remains only
+for the diagnostic `display_text` helper, not the normal factory UI.
 
 The `timeSync` compatibility flag is stored as in the recovered handler:
 the original page supplies no browser timestamp. Time is synchronized by
 SNTP. `clickCount` is stored for API compatibility; the advanced page is
 directly accessible. The original UI's Celsius label contradicted its
 `tempUnit=1` Fahrenheit implementation; the embedded firmware copy corrects
-the label. Local-site and archived source HTML files are unchanged.
+the label in an earlier reconstruction; the normal pages now retain the exact
+recovered HTML, including that original label. `/advanced` remains an extra
+directly accessible page for the owner's NTP/weather configuration.
 
 The reconstruction corrects unsafe DNS bounds, image-buffer overlap,
 unbounded/misordered chunks, the `/wifireset` credential-copy defect, and
@@ -188,18 +215,23 @@ the original unauthenticated access model.
 & .\Small_TV\src\tests\run.ps1
 ```
 
-The test runner compiles the actual settings, media, upload, HTTP and DNS
+The test runner compiles the actual settings, Kelvin weather parser, media, upload, HTTP and DNS
 packet C sources with MSVC. Its platform adapter supplies in-memory flash,
 NVS and HTTP I/O; these are host-test dependencies, not production stubs.
 It exercises all 107 JPEGs, all 98 animation frames, 18 BMPs, settings and
 RGB565 conversion, complete/partial/duplicate/out-of-order uploads, privacy
 metadata, multipart binary data, bad request values, source-origin checks,
-route registration and malformed/truncated DNS. The result is recorded in
+route registration, factory-sector/NVS migration, explicit Wi-Fi mode, negative
+temperature truncation and malformed/truncated DNS. The result is recorded in
 [`validation.json`](validation.json).
 
 ESP32-C2 compilation/linking and esptool image validation cover the real
 SDK calls and target format. Host tests do not establish hardware operation,
-Wi-Fi/TLS behavior, electrical polarity or adequate runtime heap/stack headroom.
+Wi-Fi/Internet behavior, electrical polarity or adequate runtime heap/stack headroom.
+
+[Current QEMU comparison](../qemu/parity/README.md) keeps actual SPI framebuffer
+captures and measured differences for setup and all four themes. It does not
+constitute a proof that every path of every SDK/application function is identical.
 
 TJpgDec is vendored from
 [Espressif's esp_jpeg component](https://github.com/espressif/idf-extra-components/tree/43de626f617b2a18a67f12bf09e68223df9fef9a/esp_jpeg).
