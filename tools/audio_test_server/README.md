@@ -285,3 +285,25 @@ Run `python tests/test-audio-icy-server.py`. It checks split boundaries,
 negotiation, length/accounting, both CLI entry points, and (when FFmpeg is on
 PATH) exact PCM equivalence between plain and ICY MP3 with empty, short and
 maximum-length metadata. It tests framing, not RF/network reliability.
+
+## Direct-versus-relay transport diagnosis
+
+`audio_test_server.relay.AudioRelay(host, port, source, seconds=180)` is a
+context manager exposing the configured source at `/stream`. It accepts one
+HTTP(S) source without credentials/query/fragment, forwards the client's ICY
+request and audio/ICY response bytes, and verifies upstream HTTPS certificates.
+It does not decode, reconnect, save broadcast audio or change the firmware.
+HTTP transfer framing is decoded by Python; the downstream body is delimited
+by connection close. Upstream redirects/non-200 responses fail with 502.
+
+Each request is bounded to 1..600 seconds plus blocking I/O (5-second socket
+timeouts). Events include received/sent counts and hashes, upstream status,
+maximum read duration and downstream write timing. A failed final downstream
+write can leave received greater than sent; writes do not prove board receipt.
+No raw audio, song titles, credentials or response bodies enter reports.
+
+This is a diagnostic control, not a production proxy. It changes TCP endpoints,
+buffering and timing; sequential direct/relay connections need not receive
+identical live content or reach the same resolved origin address. Success
+through the relay alone cannot identify the cause of a direct interruption.
+Run `python tests/test-audio-relay.py` for byte, ICY, EOF and accounting checks.
