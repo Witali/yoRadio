@@ -11,6 +11,10 @@ Compilation and host tests are verified; boot, panel orientation, brightness,
 Wi-Fi/SNTP/HTTPS and runtime heap/stack use still require a physical board test.
 This work did not flash or reset the device. OTA is deliberately absent.
 
+The unchanged archived build also passes an offline QEMU ESP32-C2 boot, LCD,
+animation and reset test. [Screens and reports](../qemu/README.md) document that
+result; they do not replace the physical-board and networking checks above.
+
 ## Source organization and names
 
 | Directory | Responsibility |

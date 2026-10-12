@@ -1,5 +1,10 @@
 # Small TV ESP32-C2 smart clock
 
+The factory dump and our reconstructed firmware also run in the experimental
+ESP32-C2 QEMU profile with a 240×240 ST7789 display. See
+[QEMU validation and launch instructions](qemu/README.md) for the saved screens,
+tests and current networking limits.
+
 This directory documents the connected Small_TV desktop Wi-Fi clock and
 preserves its original flash contents. The device has a white wedge-shaped
 plastic enclosure, an inclined colour display with a green border, circular
