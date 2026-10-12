@@ -277,7 +277,8 @@ config YORADIO_RX_BUFFER_DIAGNOSTICS
         Track the public netif receive ownership handoff without changing codec
         settings. Bound the table at 32 buffers and report overflow. Match live
         pointers to heap allocation ranges without reading packet contents.
-        Uses about 0.6 KiB static RAM and 1.1 KiB of decoder stack between calls.
+        Uses about 0.6 KiB static RAM and 1.3 KiB of decoder stack between calls.
+        Samples free/largest heap in the same critical section as RX ownership.
         The locked heap walk and USB logs change timing; not a CPU benchmark.
 
 config YORADIO_HEAP_FRAGMENT_PROBE

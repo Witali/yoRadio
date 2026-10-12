@@ -24,6 +24,13 @@ typedef struct { void *start; } walker_heap_into_t;
 typedef struct { void *ptr; size_t size; bool used; } walker_block_info_t;
 static walker_block_info_t blocks[70];
 static size_t block_count;
+typedef struct { size_t total_free_bytes, largest_free_block; } multi_heap_info_t;
+static void heap_caps_get_info(multi_heap_info_t *info, unsigned caps) {
+    assert(caps==MALLOC_CAP_8BIT && locked && !walking);
+    size_t used=0;
+    for(size_t i=0;i<block_count;++i) if(blocks[i].used) used+=blocks[i].size;
+    *info=(multi_heap_info_t){.total_free_bytes=100000-used,.largest_free_block=64000};
+}
 static void heap_caps_walk(unsigned caps, bool (*visit)(walker_heap_into_t,walker_block_info_t,void *), void *data) {
     assert(caps==1 && locked && !walking); walking=true;
     for(size_t i=0;i<block_count;++i) assert(visit((walker_heap_into_t){0},blocks[i],data));

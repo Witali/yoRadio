@@ -15,17 +15,18 @@
 enum { RX_TRACK_SLOTS = 32 };
 #define RX_SNAPSHOT_INTERVAL_US 5000000LL
 
-// Version 2 records use the same fields as the original verbose format. CRC32
-// covers their uint32 values in this order, little endian on ESP32-C3; no packet
-// contents are transmitted. This halves a typical snapshot's USB log burst.
+// Version 3 owner records append heap measurements from the same critical
+// section as the live RX range walk. Block records remain version 2. CRC32
+// covers the uint32 fields in order, little endian; no packet contents escape.
 typedef struct {
     uint32_t sequence, live, peak, allocations, releases, lost, unmatched;
     uint32_t payload, metadata, missing, walk_us;
+    uint32_t heap_free, heap_largest;
 } rx_owner_record_t;
 typedef struct {
     uint32_t sequence, id, payload, payload_bytes, metadata, metadata_bytes;
 } rx_block_record_t;
-_Static_assert(sizeof(rx_owner_record_t) == 11 * sizeof(uint32_t), "No wire CRC padding");
+_Static_assert(sizeof(rx_owner_record_t) == 13 * sizeof(uint32_t), "No wire CRC padding");
 _Static_assert(sizeof(rx_block_record_t) == 6 * sizeof(uint32_t), "No wire CRC padding");
 
 static uint32_t record_crc(const void *record, size_t size) {
@@ -119,6 +120,7 @@ void rx_buffer_diagnostic_poll(void) {
     if (now - previous < RX_SNAPSHOT_INTERVAL_US) return;
     previous = now;
     rx_snapshot_t snapshot = {0};
+    multi_heap_info_t heap;
     uint32_t made, freed, dropped, high, unmatched;
     // C3 is single-core. This short critical section prevents a recorded RX
     // pointer from being freed/reused between the owner copy and heap walk.
@@ -131,6 +133,10 @@ void rx_buffer_diagnostic_poll(void) {
     made = allocations; freed = releases; dropped = lost;
     high = peak; unmatched = untracked_releases;
     heap_caps_walk(MALLOC_CAP_8BIT, containing_block, &snapshot);
+    // C3 is single-core: other tasks cannot change these heap regions between
+    // the owner walk and this measurement. Counts exclude allocator headers;
+    // they still cannot account for allocations owned by other subsystems.
+    heap_caps_get_info(&heap, MALLOC_CAP_8BIT);
     portEXIT_CRITICAL(&lock);
     int64_t walked = esp_timer_get_time() - now;
     size_t payload_bytes = 0, metadata_bytes = 0, missing = 0;
@@ -148,13 +154,16 @@ void rx_buffer_diagnostic_poll(void) {
         .allocations = made, .releases = freed, .lost = dropped, .unmatched = unmatched,
         .payload = payload_bytes, .metadata = metadata_bytes, .missing = missing,
         .walk_us = walked > UINT32_MAX ? UINT32_MAX : (uint32_t)walked,
+        .heap_free = heap.total_free_bytes, .heap_largest = heap.largest_free_block,
     };
-    ESP_LOGI("rx_owner", "PERF RX_OWNER2: %u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%08" PRIx32,
+    ESP_LOGI("rx_owner", "PERF RX_OWNER3: %u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%08" PRIx32,
         (unsigned)header.sequence, (unsigned)header.live, (unsigned)header.peak,
         (unsigned)header.allocations, (unsigned)header.releases,
         (unsigned)header.lost, (unsigned)header.unmatched,
         (unsigned)header.payload, (unsigned)header.metadata,
-        (unsigned)header.missing, (unsigned)header.walk_us, record_crc(&header, sizeof(header)));
+        (unsigned)header.missing, (unsigned)header.walk_us,
+        (unsigned)header.heap_free, (unsigned)header.heap_largest,
+        record_crc(&header, sizeof(header)));
     for (size_t i = 0; i < snapshot.count; ++i) {
         const rx_row_t *r = &snapshot.rows[i];
         const rx_block_record_t block = {.sequence = sequence, .id = r->owner.id,

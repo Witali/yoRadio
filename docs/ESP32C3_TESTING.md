@@ -1514,3 +1514,32 @@ reserve, QIO configuration, fractional output, normal CA trust and no deep
 sleep. Extra logging/runtime statistics change diagnostic timing and memory;
 this image is not a production replacement. Physical correlation remains
 pending; the quiet production image and its recorded results are unchanged.
+
+### Pairing RX ownership with heap measurements
+
+With `CONFIG_YORADIO_RX_BUFFER_DIAGNOSTICS`, `PERF RX_OWNER3` appends
+`heap_free` and `heap_largest` to the eleven version-2 owner fields. The
+CRC covers all thirteen uint32 fields in order. `PERF RX_BLOCK2` is unchanged;
+the reader continues to accept legacy and version-2 captures.
+
+The C3 probe collects both heap values inside the same critical section as
+the owner/range walk. This removes task scheduling between those measurements
+without retaining packet contents or changing buffer lifetimes. Only the
+diagnostic build includes this source file; production configuration remains
+unchanged. The pinned RV32 compiler reports a 1,264-byte poll stack frame.
+The additional heap walk affects diagnostic timing and is not a benchmark.
+
+RX range totals describe heap payload capacity for live netif buffers. They
+exclude allocator headers and allocations owned by other subsystems. Pairing
+does not make these totals a complete explanation of heap use, and subtracting
+them must not replace the original playback memory acceptance checks. Missing
+owners, corrupt CRCs, inconsistent heap values or missing sequences still
+invalidate the evidence.
+
+Validation: `tests/test-rx-ownership.py`, `tests/test-rx-ownership-evidence.py`,
+`tests/test-rx-transport-evidence.py` (17 cases), plus
+`tests/test-rx-buffer-diagnostic.py` compiling the actual C probe under
+ASan/UBSan. The C harness verifies that heap sampling occurs under the owner
+lock and that emitted paired values match its independently modeled heap.
+[Host and RV32 object evidence](../tests/results/esp32c3-rx-paired-heap-host/)
+does not establish physical attribution of the Opus heap fluctuation.

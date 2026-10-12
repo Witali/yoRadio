@@ -1,0 +1,31 @@
+{
+  "scope": "Observed session test outcomes; native/target logs retained separately",
+  "python_cases": [
+    {
+      "test": "tests/test-rx-ownership.py",
+      "cases": 6,
+      "result": "PASS",
+      "sha256": "28ee3fc091db5f6cc45d8c90adc41734b732f4977fb4e34880c7b071ceaaadd1"
+    },
+    {
+      "test": "tests/test-rx-ownership-evidence.py",
+      "cases": 5,
+      "result": "PASS",
+      "sha256": "689dcaaeff4c7f3aafe7b5d863363bc24ad7d571dcb49410cb548af180f5765f"
+    },
+    {
+      "test": "tests/test-rx-transport-evidence.py",
+      "cases": 6,
+      "result": "PASS",
+      "sha256": "7319db95706144767974b5e7f63a85b073796589e63b1f075b8097eb8083329d"
+    }
+  ],
+  "host_sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "rv32_poll_stack_bytes": 1264,
+  "initial_target_launch": "Compiler was not launched: POSIX parsing removed Windows path separators; corrected path compile passed",
+  "physical_attribution": false,
+  "production_changed": false
+}
