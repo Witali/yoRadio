@@ -330,3 +330,24 @@ Original application, settings, selected station and decoded playback were
 restored and verified. [Raw evidence and replay](../tests/results/esp32c3-public-mp3-long/)
 retain each case outcome, host failure, corrected command check and restoration.
 Public audio and private FFmpeg stderr are not archived.
+
+## Production rebuild HTTP regression, 2026-10-12
+
+The exact `production-radio` application above was installed by OTA and
+verified by embedded ELF hash before running the same 33-case HTTP matrix.
+Result: **31/33 PASS**. Failed cases remain:
+
+- `file-eof:opus-510:auto`: Progressive heap loss.
+- `file-eof:hev2-44100-stereo:aac`: URLError.
+
+The matrix covers eleven finite fixtures in automatic/explicit codec modes,
+two AAC transitions, Stop/Play, dropped/stalled/error sources, redirect/jitter,
+WebSocket reconnect, settled memory recovery and lifetime health. A failure
+inside a finite-file case can prevent its later EOF checks; it must not be
+counted as full EOF coverage for that case.
+
+Original production, settings and station were restored and verified.
+[Raw observations and replay](../tests/results/esp32c3-production-radio-regression/)
+retain outcomes and the controller. Hardware testing is now recorded for this
+exact binary; complete production qualification remains false. This HTTP
+matrix does not replace exact-image HTTPS/OTA or sustained-playback checks.

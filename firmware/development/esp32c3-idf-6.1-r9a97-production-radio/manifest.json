@@ -10,7 +10,7 @@
     "bytes": 1456144
   },
   "build_directory": "idf\\esp32c3-oled-native\\build-idf-6.1-r9a97-production-radio",
-  "qualification": "Fresh build from the measured defaults; build/link/configuration checks passed. This exact application has not been installed or tested on hardware. Earlier hardware results concern the quiet-http-txrelease image.",
+  "qualification": "Exact production rebuild physically exercised for HTTP codec/EOF/network/lifecycle checks. Failures retained in report; exact-image HTTPS, OTA and sustained qualification remain pending. Original application/settings/station restored.",
   "sdkconfig_sha256": "a62f4ea356ff0fed10a66aac688524a1da4a194bc426e222bbd42330a0ecb3ca",
   "elf_sha256": "d583ef1b8b51686498a7b2bc3445445d5f2779f14f0a65f5f644e68489407a52",
   "project_version_at_build": "idf61-production-radio",
@@ -18,7 +18,7 @@
   "laboratory_only": false,
   "production_profile": true,
   "production_qualified": false,
-  "hardware_tested": false,
+  "hardware_tested": true,
   "clock_mode": "fractional",
   "integer_rate_compensation": false,
   "fir": false,
@@ -282,5 +282,35 @@
   "source_note": "Quiet production profile generated from defaults with -TestedRadioProfile; full compact AAC, QIO 80 MHz, fractional output, one-second prefill, no deep sleep.",
   "build_audit": "tests/results/esp32c3-production-radio-build/production-radio/build-audit.json",
   "object_comparison": "tests/results/esp32c3-production-radio-build/normalized-object-review.json",
-  "reproduction_command": "idf/esp32c3-oled-native/build-production.ps1 -TestedRadioProfile"
+  "reproduction_command": "idf/esp32c3-oled-native/build-production.ps1 -TestedRadioProfile",
+  "regression_report": "tests/results/esp32c3-production-radio-regression/review.json",
+  "http_regression": {
+    "cases": 33,
+    "passed": 31,
+    "failures": [
+      {
+        "name": "file-eof:opus-510:auto",
+        "result": "FAIL",
+        "reason": "Progressive heap loss",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ]
+      },
+      {
+        "name": "file-eof:hev2-44100-stereo:aac",
+        "result": "FAIL",
+        "reason": "URLError",
+        "exception_chain": [
+          {
+            "type": "URLError"
+          },
+          {
+            "type": "TimeoutError"
+          }
+        ]
+      }
+    ]
+  }
 }

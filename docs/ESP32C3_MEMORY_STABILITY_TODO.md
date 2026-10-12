@@ -44,7 +44,9 @@ further codec compression and speed work are not release requirements.
 
 The new build has app SHA-256
 `e526eb7dc072fe58c61d5424942f20933b9e8288d948574f6833eb38ab43e211`.
-Its manifest remains `hardware_tested=false`, `production_qualified=false`.
+Its [HTTP matrix](ESP32C3_HTTP_REQUEST_BUFFER.md#production-rebuild-http-regression-2026-10-12)
+now records 31/33 passes; hardware testing is recorded, while
+`production_qualified=false` remains. Failed cases require follow-up.
 The earlier tested `quiet-http-txrelease` image has SHA-256
 `ee0278e97d9b0d4abd1e217ec2e657896e6e562ba51f5638aeb431e1acfdbebc`.
 Keep acceptance scoped to the actual image and tests, rather than to a profile

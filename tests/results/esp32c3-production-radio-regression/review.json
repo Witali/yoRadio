@@ -1,0 +1,65 @@
+{
+  "review": "PASS",
+  "controller_cases": 33,
+  "passed": 31,
+  "failures": [
+    {
+      "name": "file-eof:opus-510:auto",
+      "result": "FAIL",
+      "reason": "Progressive heap loss",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ]
+    },
+    {
+      "name": "file-eof:hev2-44100-stereo:aac",
+      "result": "FAIL",
+      "reason": "URLError",
+      "exception_chain": [
+        {
+          "type": "URLError"
+        },
+        {
+          "type": "TimeoutError"
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "file-eof:mp3-320:auto": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:mp3-320:mp3": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:flac-level8:auto": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:flac-level8:flac": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:vorbis-q10:auto": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:vorbis-q10:vorbis": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:opus-510:opus": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:aac-lc-320:auto": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:aac-lc-320:aac": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:lc-44100-stereo:auto": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:lc-44100-stereo:aac": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:lc-22050-mono:auto": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:lc-22050-mono:aac": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:lc-48000-stereo:auto": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:lc-48000-stereo:aac": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:he-44100-stereo:auto": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:he-44100-stereo:aac": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:he-48000-stereo:auto": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:he-48000-stereo:aac": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "file-eof:hev2-44100-stereo:auto": "Replayed format, steady output/memory, terminal state; WebSocket assertion recorded by controller",
+    "transition:changing": "Replayed full-rate transitions",
+    "transition:implicit-sbr": "Replayed full-rate transitions",
+    "stop-play-generation": "Replayed restarted format",
+    "network:drop": "Replayed stop and recovery format",
+    "network:stall": "Replayed stop and recovery format",
+    "network:error": "Replayed stop and recovery format",
+    "network:redirect": "Controller assertion retained with status/server evidence",
+    "network:jitter": "Controller assertion retained with status/server evidence",
+    "websocket-format-reconnect": "Controller assertion retained with status/server evidence",
+    "settled-heap": "Replayed settled memory/task recovery",
+    "lifetime-health": "Replayed lifetime health"
+  },
+  "restoration": true,
+  "scope": "Replay validates recorded checks, not complete protocol/analog coverage."
+}
