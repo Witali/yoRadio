@@ -152,6 +152,15 @@ restoration reference for this device. Similar-looking SmallTV products
 also use ESP8266 or classic ESP32 boards, so their firmware and pinouts
 do not establish compatibility with this ESP32-C2 unit.
 
+## Image and settings storage
+
+The stock firmware uses fixed flash areas for five 100 KiB JPEG photo
+slots, five 200 KiB custom animation containers and an application
+settings sector. Web pages are embedded in the application. No SPIFFS,
+LittleFS, SimpleFS or FAT filesystem was identified. These areas are
+already included in the full flash backup; see the
+[storage layout report](analysis/storage.md) for offsets and evidence.
+
 ## Security review
 
 The [static security audit](analysis/security/README.md) found no clear
