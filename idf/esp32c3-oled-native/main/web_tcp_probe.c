@@ -15,11 +15,14 @@
 #include "lwip/priv/tcp_priv.h"
 
 enum { WEB_TCP_EVENTS = 64, WEB_TCP_NO_PCB = UINT8_MAX,
-       WEB_TCP_RX = 0, WEB_TCP_TX = 1, WEB_TCP_POLL_US = 1000000 };
+       WEB_TCP_RX = 0, WEB_TCP_TX = 1, WEB_TCP_WIFI = 2,
+       WEB_TCP_POLL_US = 1000000 };
 typedef struct {
     uint32_t sequence, at_us;
-    uint16_t remote_port;
-    uint8_t direction, flags, before, after;
+    union { uint16_t remote_port; uint16_t wifi_reason; };
+    uint8_t direction;
+    union { uint8_t flags; uint8_t wifi_event; };
+    uint8_t before, after;
     int8_t result;
     uint8_t pending;
 } web_tcp_event_t;
@@ -67,6 +70,13 @@ static void record(web_tcp_event_t event) {
         ++s_write;
     }
     portEXIT_CRITICAL(&s_lock);
+}
+
+void web_tcp_probe_record_wifi(web_tcp_wifi_event_t event, uint16_t reason) {
+    // Share the bounded ring, sequence and loss counter with TCP events.
+    // The event-loop task does no printing and allocates no memory here.
+    record((web_tcp_event_t){.direction = WEB_TCP_WIFI,
+                            .wifi_event = (uint8_t)event, .wifi_reason = reason});
 }
 
 static uint8_t state_for(uint16_t remote_port, const ip_addr_t *remote_ip) {
@@ -155,12 +165,17 @@ void web_tcp_probe_poll(void) {
         uint32_t dropped = s_dropped;
         portEXIT_CRITICAL(&s_lock);
         if (!available) break;
-        emit_frame('C', event.sequence, event.at_us,
-                   (uint32_t)event.remote_port | ((uint32_t)event.direction << 16) |
-                   ((uint32_t)event.flags << 24),
-                   (uint32_t)event.before | ((uint32_t)event.after << 8) |
-                   ((uint32_t)(uint8_t)event.result << 16) | ((uint32_t)event.pending << 24),
-                   dropped);
+        if (event.direction == WEB_TCP_WIFI) {
+            emit_frame('W', event.sequence, event.at_us, event.wifi_event,
+                       event.wifi_reason, dropped);
+        } else {
+            emit_frame('C', event.sequence, event.at_us,
+                       (uint32_t)event.remote_port | ((uint32_t)event.direction << 16) |
+                       ((uint32_t)event.flags << 24),
+                       (uint32_t)event.before | ((uint32_t)event.after << 8) |
+                       ((uint32_t)(uint8_t)event.result << 16) | ((uint32_t)event.pending << 24),
+                       dropped);
+        }
         last_emitted_sequence = event.sequence;
     }
     static int64_t previous_us;

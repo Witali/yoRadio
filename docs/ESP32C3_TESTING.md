@@ -1467,3 +1467,50 @@ The other format, output, memory, response and recovery gates remain active.
 `tests/test-tls-renegotiation-server.py` verifies certificate-checked loopback
 transfer with byte-identical audio, and a client refusal that must not count
 as a completed renegotiation. This host-only dependency is not part of firmware.
+
+### Correlating Wi-Fi events with TCP timeouts
+
+With `CONFIG_YORADIO_WEB_TCP_PROBE`, Wi-Fi connected/disconnected and got-IP
+callbacks now enqueue numeric events in the existing 64-entry, 1,024-byte
+TCP ring. They share its sequence and dropped-event count. The callbacks
+allocate no memory and do not print; the existing consumer emits the records.
+SSID, BSSID, IP addresses, credentials and packet payload are not retained.
+
+`PERF TW2` has the same 58-byte framing and CRC as `TC2`:
+
+| Word | Meaning |
+|---|---|
+| 1 | Shared TCP/Wi-Fi event sequence |
+| 2 | Device timestamp in microseconds, low 32 bits |
+| 3 | Event: 1 = station connected, 2 = station disconnected, 3 = got IP |
+| 4 | Espressif disconnect reason; zero for other events or absent event data |
+| 5 | Shared ring dropped-event count |
+
+The parser returns Wi-Fi records separately as `window(...)["wifi"]` while
+checking one shared sequence across TCP and Wi-Fi events. Missing Wi-Fi records
+must invalidate the trace just like missing TCP records; snapshots/watermarks
+alone do not prove no disconnect happened. Older parsers cannot qualify a trace
+containing these new event sequences. Timestamp wrap and incomplete observation
+edges remain subject to the existing trace-window limits.
+
+Use `tests/test-web-tcp.py` and `tests/run-web-tcp-probe.py --output NEW_DIRECTORY`.
+The latter compiles the actual firmware probe with platform doubles and checks
+ASan/UBSan, ownership, both backlog modes, ring overflow/wrap and CRC decoding
+of 73 emitted frames per mode. These host tests do not establish physical
+network timing or fix the intermittent WebUI connection failure.
+
+The hook is disabled in production. A compiler comparison with the original
+production command/config verified identical `.text`, `.rodata`, `.data` and
+`.bss` sections for `network_service.c` after the guarded hooks were added.
+A separate diagnostic image is required for physical capture.
+
+The build and host evidence is retained in
+[the TCP/Wi-Fi probe archive](../tests/results/esp32c3-web-wifi-probe-build/).
+The separate application is saved as
+`firmware/development/esp32c3-idf-6.1-r9a97-radio-wifi-probe/app.bin`
+(SHA-256 `16916c58d97820955595a5d31cf16b92a9d65f3d7db267584c04e8bd2f000da2`).
+Build checks confirm the unchanged 1,024-byte event ring, full 17,058-byte TLS
+reserve, QIO configuration, fractional output, normal CA trust and no deep
+sleep. Extra logging/runtime statistics change diagnostic timing and memory;
+this image is not a production replacement. Physical correlation remains
+pending; the quiet production image and its recorded results are unchanged.

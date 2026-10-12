@@ -173,6 +173,17 @@ int main(void) {
     web_tcp_probe_poll(); assert(logs == 69 && s_read == s_write);
     web_tcp_probe_log_listener(0x10203040, 1007, 3, 4, 1, 5, 2, 1);
     assert(logs == 70 && strncmp(last_log,"PERF TL2:",9)==0);
+    // Wi-Fi events use the same fixed ring and sequence, without TCP calls.
+    unsigned prior_input = input_calls, prior_output = output_calls;
+    uint32_t prior_sequence = s_sequence;
+    web_tcp_probe_record_wifi(WEB_TCP_WIFI_CONNECTED, 0);
+    web_tcp_probe_record_wifi(WEB_TCP_WIFI_DISCONNECTED, 202);
+    web_tcp_probe_record_wifi(WEB_TCP_WIFI_GOT_IP, 0);
+    assert(s_write - s_read == 3 && s_sequence == prior_sequence + 3);
+    assert(s_events[(s_read + 1) % WEB_TCP_EVENTS].wifi_reason == 202);
+    assert(input_calls == prior_input && output_calls == prior_output);
+    web_tcp_probe_poll();
+    assert(logs == 73 && s_read == s_write && strncmp(last_log,"PERF TW2:",9)==0);
     puts("PASS TCP probe: input ownership, exact forwarding, states, filters, bounded ring and wrap");
     return 0;
 }

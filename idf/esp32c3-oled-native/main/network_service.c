@@ -17,6 +17,7 @@
 #include "freertos/task.h"
 #include "runtime_settings.h"
 #include "time_service.h"
+#include "web_tcp_probe.h"
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
@@ -103,7 +104,16 @@ static void event_handler(void *arg, esp_event_base_t base, int32_t id,
     if (atomic_load(&s_stopping_for_sleep)) return;
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
+#ifdef CONFIG_YORADIO_WEB_TCP_PROBE
+    } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_CONNECTED) {
+        web_tcp_probe_record_wifi(WEB_TCP_WIFI_CONNECTED, 0);
+#endif
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
+#ifdef CONFIG_YORADIO_WEB_TCP_PROBE
+        const wifi_event_sta_disconnected_t *event = event_data;
+        web_tcp_probe_record_wifi(WEB_TCP_WIFI_DISCONNECTED,
+                                  event ? event->reason : 0);
+#endif
         if (s_have_credentials &&
             s_retries++ < WIFI_RETRIES_PER_CREDENTIAL) {
             ESP_LOGW(TAG, "Wi-Fi network %u/%u retry %d/%d",
@@ -127,6 +137,9 @@ static void event_handler(void *arg, esp_event_base_t base, int32_t id,
             xEventGroupSetBits(s_wifi_events, WIFI_FAILED_BIT);
         }
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
+#ifdef CONFIG_YORADIO_WEB_TCP_PROBE
+        web_tcp_probe_record_wifi(WEB_TCP_WIFI_GOT_IP, 0);
+#endif
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
         wifi_ap_record_t access_point = {0};
         s_retries = 0;

@@ -67,5 +67,30 @@ class TcpFrames(unittest.TestCase):
               frame('C',[0,2,32000,0,0],1.2),frame('S',[0,3,0,0,0],2)]
         self.assertEqual(window(rows,.9,2.1)['events'][0]['seq'],0)
 
+    def test_wifi_mapping_and_validation(self):
+        self.assertEqual(parse(frame('W',[7,1234,2,202,0])),
+                         dict(at=1.0,kind='wifi',seq=7,us=1234,event=2,reason=202,dropped=0))
+        for event,reason in ((0,0),(4,0),(1,202),(3,1),(2,65536)):
+            with self.subTest(event=event,reason=reason):
+                with self.assertRaises(ValueError):parse(frame('W',[7,1234,event,reason,0]))
+        row=frame('W',[7,1234,2,202,0])
+        with self.assertRaisesRegex(ValueError,'CRC'):
+            parse(dict(at=1,line=row['line'][:-1]+('1' if row['line'][-1]!='1' else '0')))
+
+    def test_wifi_and_tcp_share_loss_detection(self):
+        rows=[frame('S',[10,100,0,0,10],1),frame('L',[3,1000,0,0x01000501,0],1.1),
+              frame('W',[11,200,2,202,0],1.2),frame('C',[12,220,32000,0,0],1.3),
+              frame('W',[13,240,1,0,0],1.4),frame('W',[14,260,3,0,0],1.5),
+              frame('S',[14,300,0,0,14],2)]
+        result=window(rows,.9,2.1)
+        self.assertEqual([w['event'] for w in result['wifi']],[2,1,3])
+        self.assertEqual([e['seq'] for e in result['events']],[12])
+        for offset in (2,4,5):
+            with self.subTest(missing=offset):
+                with self.assertRaisesRegex(ValueError,'Missing|watermark exposes'):
+                    window(rows[:offset]+rows[offset+1:],.9,2.1)
+        lost=rows.copy();lost[2]=frame('W',[11,200,2,202,1],1.2)
+        with self.assertRaisesRegex(ValueError,'ring dropped'):window(lost,.9,2.1)
+
 
 if __name__=='__main__':unittest.main()
