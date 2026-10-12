@@ -1,0 +1,40 @@
+# Small TV comparison checkpoint
+
+Work was paused at the user's request on 2026-10-13. The reconstruction now uses
+the factory fonts, layouts, settings sector, timer thresholds, photo fades and
+rounded analog strokes. Complete function/behavior identity is **not established**.
+
+`compare.py` boots both unmodified applications with matching synthetic factory
+settings, isolated NTP, a disabled weather-key sentinel and no external Internet.
+Its default photo mask enables only the first photo to isolate image rendering
+from slideshow phase. It does not patch guest instructions, PC or RAM. All VMs
+were stopped. `comparison.json` records build/source hashes and actual captures.
+
+| Scene | Best whole-frame equality | Best fixed-region equality |
+|---|---:|---:|
+| Setup instructions | 100% | 100% |
+| Classic digital/weather | 99.42% | 99.90% |
+| Simple digital | 93.42% | 97.76% |
+| First selected photo | 100% | 100% |
+| Analog dial | 98.91% | 99.02% |
+
+These are measurements, not pass thresholds. Three actual captures from each
+guest are retained; min/max values are in JSON. Fixed regions exclude live
+digits, animation or hands as defined in the script. Captures occur at different
+host/guest clock instants and can interrupt an SPI redraw. The remaining
+differences, particularly the simple-clock fixed region, still require analysis;
+they are not all attributed to timing.
+
+Both applications ran these scenes without a recorded panic. The current
+native image compiled successfully and passed 1249 host checks. Prior full
+boot/DHCP/NTP/reset reports belong to their recorded older application hashes.
+The immutable factory dump hash remains
+`5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4`.
+
+```powershell
+& .idf/python-3.12.10/tools/python.exe Small_TV/qemu/parity/compare.py
+```
+
+`*-original-*.png` and `*-reconstructed-*.png` are raw SPI framebuffer captures
+encoded as metadata-free PNGs. Production firmware is saved under
+`firmware/development/small-tv-esp32c2-reconstructed/`.

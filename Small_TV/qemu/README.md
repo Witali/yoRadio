@@ -1,5 +1,9 @@
 # Small TV QEMU validation
 
+The [current factory-UI comparison checkpoint](parity/README.md) contains the
+restored fonts/layouts and five scene comparisons. Work was paused at the user's
+request; complete behavioral identity and the C-port assistant remain unfinished.
+
 The latest [modular profiles and board compatibility checks](modular/README.md)
 cover shared SPI/SD, configurable GPIO, CYD and C3 OLED regressions. Historical
 clock/offline evidence below remains available for comparison.
