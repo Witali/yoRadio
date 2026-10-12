@@ -18,6 +18,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--sdk-root', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--diagnostic', action='store_true', help='Exercise diagnostic accounting with a synthetic clock')
     a = p.parse_args()
     a.output.mkdir(parents=True, exist_ok=False)
     files = [ROOT / 'idf/esp32c3-oled-native/main' / name for name in
@@ -35,7 +36,13 @@ def main():
         hashes[str(source)] = hashlib.sha256(data).hexdigest()
     (a.output / 'sdkconfig.h').write_text(
         '#define CONFIG_YORADIO_SHARED_DECODER_ARENA 1\n'
-        '#define CONFIG_YORADIO_SHARED_DECODER_ARENA_BYTES 98304\n')
+        '#define CONFIG_YORADIO_SHARED_DECODER_ARENA_BYTES 98304\n' +
+        ('#define CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC 1\n' if a.diagnostic else ''))
+    (a.output / 'esp_timer.h').write_text('''#pragma once
+#include <stdint.h>
+// Synthetic increments verify bookkeeping only, not target latency.
+static inline int64_t esp_timer_get_time(void) { static int64_t tick; return ++tick; }
+''')
     (a.output / 'freertos').mkdir()
     (a.output / 'freertos/FreeRTOS.h').write_text('''#pragma once
 #include <pthread.h>

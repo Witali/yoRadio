@@ -5,6 +5,21 @@
 #include "esp_attr.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+#include "esp_timer.h"
+#define ARENA_TIMING_START() uint32_t timing_started = (uint32_t)esp_timer_get_time()
+// Called under the arena lock. Includes allocator/copy/heap-walk time, but
+// excludes lock entry/exit and this accounting. Diagnostic builds only.
+#define ARENA_TIMING_END(operation) do { \
+    uint32_t elapsed = (uint32_t)esp_timer_get_time() - timing_started; \
+    decoder_arena_timing_t *timing = &stats.timing[operation]; \
+    ++timing->calls; \
+    if (elapsed > timing->max_us) timing->max_us = elapsed; \
+} while (0)
+#else
+#define ARENA_TIMING_START() ((void)0)
+#define ARENA_TIMING_END(operation) ((void)0)
+#endif
 
 /* This heap is deliberately NOT registered with heap_caps. Its bytes are
  * reserved before boot allocations and never lent to TLS, Wi-Fi or DMA.
@@ -58,6 +73,7 @@ void *IRAM_ATTR __wrap_malloc(size_t size) {
     if (!use_arena()) return __real_malloc(size);
     if (!size) return NULL;
     portENTER_CRITICAL(&lock);
+    ARENA_TIMING_START();
     void *base = arena && size <= SIZE_MAX - OVERHEAD ?
         multi_heap_malloc(arena, size + OVERHEAD) : NULL;
     void *result = NULL;
@@ -67,6 +83,7 @@ void *IRAM_ATTR __wrap_malloc(size_t size) {
         account(0, size);
         ++stats.blocks;
     } else ++stats.failures;
+    ARENA_TIMING_END(ARENA_MALLOC);
     portEXIT_CRITICAL(&lock);
     return result;
 }
@@ -87,10 +104,12 @@ void *IRAM_ATTR __wrap_calloc(size_t count, size_t size) {
 void IRAM_ATTR __wrap_free(void *pointer) {
     if (!decoder_arena_owns(pointer)) { __real_free(pointer); return; }
     portENTER_CRITICAL(&lock);
+    ARENA_TIMING_START();
     allocation_t old = *header(pointer);
     account(old.requested, 0);
     --stats.blocks;
     multi_heap_free(arena, old.base);
+    ARENA_TIMING_END(ARENA_FREE);
     portEXIT_CRITICAL(&lock);
 }
 
@@ -100,6 +119,7 @@ void *IRAM_ATTR __wrap_realloc(void *pointer, size_t size) {
     if (!decoder_arena_owns(pointer)) return __real_realloc(pointer, size);
     if (!size) { __wrap_free(pointer); return NULL; }
     portENTER_CRITICAL(&lock);
+    ARENA_TIMING_START();
     allocation_t old = *header(pointer);
     size_t offset = (unsigned char *)pointer - (unsigned char *)old.base;
     void *base = size <= SIZE_MAX - OVERHEAD ?
@@ -114,6 +134,7 @@ void *IRAM_ATTR __wrap_realloc(void *pointer, size_t size) {
         *header(result) = (allocation_t){base, size};
         account(old.requested, size);
     } else ++stats.failures;
+    ARENA_TIMING_END(ARENA_REALLOC);
     portEXIT_CRITICAL(&lock);
     return result;
 }
@@ -125,6 +146,7 @@ size_t IRAM_ATTR __wrap_heap_caps_get_allocated_size(void *pointer) {
 
 decoder_arena_stats_t decoder_arena_stats(void) {
     portENTER_CRITICAL(&lock);
+    ARENA_TIMING_START();
     decoder_arena_stats_t result = stats;
     result.capacity = sizeof(storage);
     if (arena) {
@@ -133,6 +155,10 @@ decoder_arena_stats_t decoder_arena_stats(void) {
         result.free_bytes = info.total_free_bytes;
         result.largest = info.largest_free_block;
     }
+    ARENA_TIMING_END(ARENA_SNAPSHOT);
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    memcpy(result.timing, stats.timing, sizeof(result.timing));
+#endif
     portEXIT_CRITICAL(&lock);
     return result;
 }

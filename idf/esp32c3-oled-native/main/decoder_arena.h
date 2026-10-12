@@ -2,10 +2,18 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "sdkconfig.h"
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+#include <stdint.h>
+enum { ARENA_MALLOC, ARENA_FREE, ARENA_REALLOC, ARENA_SNAPSHOT, ARENA_OPERATIONS };
+typedef struct { uint32_t calls, max_us; } decoder_arena_timing_t;
+#endif
 
 typedef struct {
     size_t capacity, live, peak, blocks, free_bytes, largest;
     unsigned failures;
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    decoder_arena_timing_t timing[ARENA_OPERATIONS];
+#endif
 } decoder_arena_stats_t;
 
 #ifdef CONFIG_YORADIO_SHARED_DECODER_ARENA

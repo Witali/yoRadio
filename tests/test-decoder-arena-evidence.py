@@ -6,6 +6,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools/esp32c3_tests'))
 from common import Board, Failure
 from decoder_arena_experiment import ArenaBoard, arena_check, check_transition_memory
+from production_health import check_health
 
 class Evidence(unittest.TestCase):
     def test_transition_growth_keeps_absolute_headroom_gate(self):
@@ -32,6 +33,35 @@ class Evidence(unittest.TestCase):
         self.assertEqual(calls, ['/api/native/status', '/api/native/health'])
         self.assertEqual(board.arenas, [arena])
         self.assertEqual(len(board.health_samples), 1)
+        self.assertEqual(board.timings, [None])
+
+    def test_timing_rejects_malformed_measurements(self):
+        valid = {k: [12, 200] for k in ('malloc', 'free', 'realloc', 'snapshot')}
+        for timing in (valid, {**valid, 'realloc': [12, -1]},
+                       {**valid, 'snapshot': [True, 2]}, {**valid, 'malloc': [1]}):
+            with patch.object(Board, 'json', return_value={'arena_timing': timing}):
+                board = ArenaBoard('http://test.invalid')
+                if timing == valid:
+                    board.json('/api/native/health')
+                    self.assertEqual(board.latest_timing, valid)
+                else:
+                    with self.assertRaises(Failure): board.json('/api/native/health')
+
+    def test_fault_collection_keeps_failure_and_rejects_reboots(self):
+        fault = dict(schema=1, boot_id='0123456789abcdef', uptime_ms=100,
+                     reset_reason=1, heap=65536, largest=32768, minimum_heap=60000,
+                     tasks=16, allocation_failures=3, task_watchdog_events=0)
+        def response(board, path, data=None, timeout=5):
+            return dict(firmware='esp32c3-oled-native', audio=True) if path.endswith('/status') else fault
+        with patch.object(Board, 'json', response):
+            strict = ArenaBoard('http://test.invalid')
+            with self.assertRaises(Failure): strict.status()
+            diagnostic = ArenaBoard('http://test.invalid', collect_after_fault=True)
+            diagnostic.status()
+            self.assertEqual(diagnostic.health_samples[0]['allocation_failures'], 3)
+            with self.assertRaises(Failure): check_health(diagnostic.health_samples)
+            fault['boot_id'] = 'fedcba9876543210'
+            with self.assertRaises(Failure): diagnostic.status()
 
     def test_reuse_after_previous_case_failure(self):
         active = [dict(live=100, peak=200, blocks=1, failures=1)]

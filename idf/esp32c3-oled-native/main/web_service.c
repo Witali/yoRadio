@@ -118,6 +118,7 @@ static esp_err_t status_handler(httpd_req_t *request) {
 }
 
 #include "decoder_arena.h"
+#include "tls_input_reserve.h"
 static esp_err_t health_handler(httpd_req_t *request) {
     // Snapshot on demand: no sampler task, retained buffers or console output.
     // Use the same 8-bit allocation capability as the existing heap profiler.
@@ -131,7 +132,9 @@ static esp_err_t health_handler(httpd_req_t *request) {
     native_audio_output_health_t output = native_audio_output_health();
     audio_pipeline_probe_t probe = s_audio_pipeline_probe;
     portCLEAR_INTERRUPT_MASK_FROM_ISR(previous_mask);
-    char body[2048];
+    // Bound the full 16-event history, input and optional arena counters at
+    // uint32 maxima. Both diagnostic variants use the same stack workspace.
+    char body[2560];
 #else
     native_audio_output_health_t output = native_audio_output_health();
 #ifdef CONFIG_YORADIO_SHARED_DECODER_ARENA
@@ -169,8 +172,32 @@ static esp_err_t health_handler(httpd_req_t *request) {
             (unsigned)arena.largest, arena.failures);
         length = added < 0 ? -1 : length + added;
     }
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    if (length > 0 && (size_t)length < sizeof(body)) {
+        --length;
+        int added = snprintf(body + length, sizeof(body) - length,
+            ",\"arena_timing\":{\"malloc\":[%lu,%lu],\"free\":[%lu,%lu],"
+            "\"realloc\":[%lu,%lu],\"snapshot\":[%lu,%lu]}}",
+            (unsigned long)arena.timing[ARENA_MALLOC].calls, (unsigned long)arena.timing[ARENA_MALLOC].max_us,
+            (unsigned long)arena.timing[ARENA_FREE].calls, (unsigned long)arena.timing[ARENA_FREE].max_us,
+            (unsigned long)arena.timing[ARENA_REALLOC].calls, (unsigned long)arena.timing[ARENA_REALLOC].max_us,
+            (unsigned long)arena.timing[ARENA_SNAPSHOT].calls, (unsigned long)arena.timing[ARENA_SNAPSHOT].max_us);
+        length = added < 0 ? -1 : length + added;
+    }
+#endif
 #endif
 #ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    if (length > 0 && (size_t)length < sizeof(body)) {
+        adaptive_input_stats_t input = tls_input_reserve_input_stats();
+        --length;
+        int added = snprintf(body + length, sizeof(body) - length,
+            ",\"input_queue\":{\"resident\":%u,\"occupied\":%u,\"minimum\":%u,"
+            "\"limit\":%u,\"packet_capacity\":%u}}", input.resident, input.occupied,
+            input.minimum, input.limit, (unsigned)input.packet_capacity);
+        length = added < 0 ? -1 : length + added;
+    }
+#endif
     length = audio_pipeline_probe_append(body, sizeof(body), length, &probe);
 #endif
     if (length < 0 || (size_t)length >= sizeof(body)) {

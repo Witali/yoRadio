@@ -88,5 +88,11 @@ int main(void) {
     assert(final.live == 0 && final.blocks == 0);
     assert(final.free_bytes == empty.free_bytes && final.largest == empty.largest);
     assert(final.failures == 602);
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    for (unsigned i = 0; i < ARENA_OPERATIONS; ++i) {
+        assert(final.timing[i].calls > 0);
+        assert(final.timing[i].max_us == 1); // Synthetic host clock, not latency.
+    }
+#endif
     printf("PASS: domain isolation, ISR bypass, alignment, realloc, exhaustion, coalescing, concurrent reuse; peak=%zu failures=%u\n", final.peak, final.failures);
 }

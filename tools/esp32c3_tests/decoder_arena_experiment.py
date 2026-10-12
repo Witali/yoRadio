@@ -12,17 +12,20 @@ import subprocess
 
 from common import Board, Failure, check_playback, exception_details, fixtures, require, sha
 from ota import image_info, multipart, snapshot, upload, verify_snapshot, wait_image
-from production_health import HealthBoard, check_health
+from production_health import HealthBoard, check_health, read_health
 from sustained_output import check_output, check_memory
 from run import Suite, Capture
-from audio_test_server.server import Server
+from audio_test_server.server import Server, pause_argument
 
 ARENA_FIELDS = ('capacity', 'live', 'peak', 'blocks', 'free', 'largest', 'failures')
 
 class ArenaBoard(HealthBoard):
-    def __init__(self, origin):
+    def __init__(self, origin, collect_after_fault=False):
         super().__init__(origin)
+        self.collect_after_fault = collect_after_fault
         self.arenas = []
+        self.timings = []
+        self.inputs = []
 
     def json(self, path, data=None, timeout=5):
         response = super().json(path, data, timeout)
@@ -35,11 +38,39 @@ class ArenaBoard(HealthBoard):
             require(raw['live'] <= raw['peak'] <= raw['capacity'] and
                     raw['largest'] <= raw['free'] <= raw['capacity'], 'Inconsistent arena counters')
         self.latest_arena = raw
+        timing = response.get('arena_timing')
+        if timing is not None:
+            require(type(timing) is dict and all(type(timing.get(k)) is list and
+                    len(timing[k]) == 2 and all(type(v) is int and 0 <= v < 2**32 for v in timing[k])
+                    for k in ('malloc', 'free', 'realloc', 'snapshot')), 'Invalid arena timing')
+            timing = {k: timing[k] for k in ('malloc', 'free', 'realloc', 'snapshot')}
+        self.latest_timing = timing
+        queue = response.get('input_queue')
+        if queue is not None:
+            keys = ('resident', 'occupied', 'minimum', 'limit', 'packet_capacity')
+            require(type(queue) is dict and all(type(queue.get(k)) is int and queue[k] >= 0
+                    for k in keys), 'Invalid input queue diagnostic')
+            queue = {k: queue[k] for k in keys}
+            require(queue['occupied'] <= queue['resident'], 'Inconsistent input queue occupancy')
+        self.latest_input = queue
         return response
 
     def status(self):
-        state = super().status()
+        if self.collect_after_fault:
+            # Diagnostic collection only: retain actual fault counters. All
+            # acceptance gates below still reject these faulty measurements.
+            state = Board.status(self)
+            started = time.perf_counter()
+            health = read_health(self)
+            self.health_samples.append(dict(at=time.perf_counter(),
+                request_ms=(time.perf_counter()-started)*1000, **health))
+            check_health([dict(h, allocation_failures=0, task_watchdog_events=0)
+                          for h in (self.health_samples[0], *self.health_samples[-2:])])
+        else:
+            state = super().status()
         self.arenas.append(self.latest_arena)
+        self.timings.append(self.latest_timing)
+        self.inputs.append(self.latest_input)
         return state
 
 class ObservedSuite(Suite):
@@ -102,11 +133,18 @@ def main():
     p.add_argument('--resume-candidate', action='store_true', help='Resume after an independently verified USB recovery')
     p.add_argument('--recovery-port', help='Optional native C3 USB watchdog recovery after a failed OTA boot check')
     p.add_argument('--cases', nargs='+')
+    p.add_argument('--repeat', type=int, default=1, help='Repeat each fixture, retaining every trial')
+    p.add_argument('--collect-after-fault', action='store_true',
+                   help='Keep collecting diagnostics after fault counters; acceptance still FAILS')
+    p.add_argument('--delivery-pause', type=pause_argument, action='append', default=[],
+                   help='Inject a host delivery pause at BYTE_OFFSET:SECONDS (diagnosis, not qualification)')
     p.add_argument('--https-url', help='Optional public HE-AAC reference stream; not stored in reports')
     p.add_argument('--https-seconds', type=int, default=60)
     a = p.parse_args()
+    require(1 <= a.repeat <= 100, 'Repeat must be within 1..100')
     require(not a.https_url or a.https_seconds >= 45, 'HTTPS observation must last at least 45 seconds')
     a.output.mkdir(parents=True, exist_ok=False)
+    (a.output / 'controller-used.py').write_bytes(Path(__file__).read_bytes())
     def save(name, data):
         (a.output / name).write_text(json.dumps(data, indent=2) + '\n')
     board = Board(a.board)
@@ -134,6 +172,7 @@ def main():
     save('initial.json', dict(original=original, restore=restored_image,
          candidate=image_info(a.candidate.read_bytes()), baseline=image_info(a.baseline.read_bytes()),
          controller_sha256=sha(Path(__file__).read_bytes()),
+         repeat=a.repeat, delivery_pauses=a.delivery_pause, collect_after_fault=a.collect_after_fault,
          fixtures={n:{k:v for k,v in specs[n].items() if k not in ('data', 'segments')} for n in names}))
     def install(path):
         raw = path.read_bytes()
@@ -162,21 +201,24 @@ def main():
     if a.candidate_only: phases = phases[1:]
     if a.baseline_only: phases = phases[:1]
     results = {}
+    b = None
     try:
-        with Server(a.host, a.port, specs, pacing_ratio=1.0, delivery_stats=True) as server:
+        with Server(a.host, a.port, specs, pacing_ratio=1.0, delivery_stats=True,
+                    delivery_pauses=a.delivery_pause) as server:
             for label, app in phases:
                 print('INSTALL', label, flush=True)
                 save(label + '-installed.json', dict(identity=install(app),
                      persistence=verify_snapshot(board, settings)))
-                b = ArenaBoard(a.board)
+                b = ArenaBoard(a.board, a.collect_after_fault)
                 suite = ObservedSuite(b, f'http://{a.host}:{a.port}', specs, Capture(None), a.output / label)
                 b.stop(); suite.observe(4, 'idle')
-                for name in names:
-                    print(label, name, flush=True)
+                for name, trial in ((n, t) for n in names for t in range(1, a.repeat + 1)):
+                    case = name if a.repeat == 1 else f'{name}:trial-{trial}'
+                    print(label, case, flush=True)
                     begin = len(b.health_samples)
                     failures_before = b.arenas[-1]['failures'] if b.arenas[-1] else 0
                     suite.start(name)
-                    states = suite.observe(max(7, specs[name]['seconds'] - 3), name)
+                    states = suite.observe(max(7, specs[name]['seconds'] - 3), case)
                     end = len(b.health_samples)
                     if name in ('changing', 'implicit-sbr'):
                         from common import check_transitions
@@ -187,10 +229,10 @@ def main():
                         format_check = lambda: check_playback(states, specs[name])
                         memory_check = check_memory
                     steady = [h for s,h in zip(states,b.health_samples[begin:end]) if s['seconds'] >= 3]
-                    tail = suite.observe(8, name + ':eof')
+                    tail = suite.observe(8, case + ':eof')
                     b.stop(); idle_start = len(b.arenas)
-                    suite.observe(4, name + ':stop')
-                    key = label + ':' + name
+                    suite.observe(4, case + ':stop')
+                    key = label + ':' + case
                     results[key] = dict(format=evaluate(format_check), output=evaluate(lambda:check_output(steady)),
                         memory=evaluate(lambda:memory_check(steady)),
                         eof=dict(result='PASS' if any(not s['audio'] for s in tail) else 'FAIL'))
@@ -201,9 +243,11 @@ def main():
                     save('results.json', results)
                     save(label + '-health.json', b.health_samples)
                     save(label + '-arena.json', b.arenas)
+                    save(label + '-timing.json', b.timings)
+                    save(label + '-input.json', b.inputs)
                     save('server.json', server.events)
                     print(key, {k:v['result'] for k,v in results[key].items()}, flush=True)
-                save(label + '-health-check.json', check_health(b.health_samples))
+                save(label + '-health-check.json', evaluate(lambda:check_health(b.health_samples)))
                 if a.https_url:
                     print(label, 'HTTPS HE-AAC', flush=True)
                     from public_streams import probe
@@ -232,6 +276,13 @@ def main():
             save('summary.json', dict(result='PASS' if all(v['result']=='PASS'
                  for row in results.values() for v in row.values()) else 'FAIL', cases=len(results)))
     except Exception as error:
+        if b is not None:
+            # HealthBoard retains the offending row before raising. Preserve
+            # it even when the first idle observation after OTA fails.
+            save(label + '-health.json', b.health_samples)
+            save(label + '-arena.json', b.arenas)
+            save(label + '-timing.json', b.timings)
+            save(label + '-input.json', b.inputs)
         save('controller-failure.json', dict(exception_chain=exception_details(error)))
         raise
     finally:
