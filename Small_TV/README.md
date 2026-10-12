@@ -72,7 +72,59 @@ and the [ESP-IDF ULP support note](https://docs.espressif.com/projects/esp-idf/e
 An audio output for a YoRadio port would therefore need its own design;
 no radio firmware or audio output has been tested on this unit.
 
-## Display and board references
+## Display configuration recovered from the stock firmware
+
+Static analysis of this device's archived dump on 2026-10-12 recovered
+the ST7789 display routines and the following GPIO assignments. The
+analysis used RISC-V disassembly and Ghidra decompilation, with structure
+layouts checked against the firmware's ESP-IDF 5.5.4 headers.
+
+| Display signal | Firmware configuration |
+| --- | --- |
+| SPI clock / SCK | GPIO4 |
+| SPI data / MOSI | GPIO6 |
+| Data / command | GPIO5; low for commands, high for data |
+| Reset | GPIO1; low for 100 ms, then high for 100 ms |
+| Chip select | No GPIO assigned (`spics_io_num = -1`) |
+| Backlight | GPIO18, LEDC channel 0 / timer 0, 1 kHz, 13-bit PWM |
+| MISO | Not configured (`miso_io_num = -1`) |
+
+The display uses **hardware SPI2**, requested at **40 MHz, mode 3**, with
+automatic DMA allocation. It is not driven by software bit-banging.
+The drawing routines limit coordinates to 0..239 in both axes, establishing
+a 240 x 240 software viewport. Initialization selects RGB565 (`0x3A: 0x55`),
+RGB order without axis reversal (`0x36: 0x00`), and display inversion on
+(`0x21`). These are ST7789-family settings; the firmware does not read a
+controller ID, so the exact ST7789 suffix and panel part number remain
+unverified.
+
+Only the absence of a driven CS GPIO is established by the firmware;
+the reported connection to ground needs a PCB check. The stock LEDC
+configuration has `output_invert = 0`, and its brightness setter computes
+`duty = level * 8191 / 1000`. Electrical backlight polarity should therefore
+be checked on this unit rather than copied from another board's settings.
+
+See [the firmware analysis report](analysis/README.md) for code addresses,
+decompiled routines, peripheral checks and the GPIO availability table.
+
+## GPIOs available for extensions
+
+No external-device assignment was found in the stock application for
+**GPIO0, GPIO2, GPIO3, GPIO7 and GPIO10**. These are candidates for an
+extension, subject to checking the PCB traces and accessible pads; GPIO7
+also has a JTAG alternative function.
+
+GPIO8 and GPIO9 have no identified application use but are boot strapping
+pins. GPIO19/RX and GPIO20/TX are reserved for UART0 and the USB-UART
+bridge. GPIO11..17 are dedicated to in-package flash on this ESP8684H.
+The remaining GPIO1, GPIO4, GPIO5, GPIO6 and GPIO18 serve the display.
+
+The peripheral audit found no additional external sensor, button input,
+RTC, SD card, touch controller or audio-output initialization. This does
+not exclude dormant hardware; weather data is requested from an Internet
+service, not evidence of a local weather sensor.
+
+## External board references
 
 A [first-hand ESP32-C2 weather-clock teardown by J0k3r2k1](https://community.home-assistant.io/t/installing-esphome-on-new-smart-weather-clock-wifi-weather-station-display/1006172)
 reports an ST7789V SPI display, 240 x 240 pixels, 4 MB flash and a 26 MHz
@@ -81,23 +133,11 @@ crystal. The memory and crystal match our serial diagnostics. The
 also describes a 1.54-inch panel, a CH340C USB-UART bridge and an
 AMS1117-3.3 regulator.
 
-The following display connections are reported by both projects. They
-are a starting point for investigation, not a verified pinout of our
-unopened device:
-
-| Display signal | Reported connection |
-| --- | --- |
-| SPI clock / SCK | GPIO4 |
-| SPI data / MOSI | GPIO6 |
-| Data / command | GPIO5 |
-| Reset | GPIO1 |
-| Chip select | Ground, permanently selected |
-| Backlight | GPIO18, active-low |
-
-Both references use SPI mode 3. Their RGB/BGR colour settings differ, so
-colour order, inversion and orientation need verification on our panel.
-The display controller, diagonal, GPIO wiring, exact CH340 package and
-regulator marking have not been checked on this device's PCB.
+The reported SCK, MOSI, D/C, reset and backlight GPIO numbers match the
+stock firmware. Both references use SPI mode 3. Their RGB/BGR and backlight
+polarity settings differ from, or are not established by, our firmware
+configuration above. The display diagonal, exact CH340 package, regulator
+marking and physical wiring have not been checked on this device's PCB.
 
 J0k3r2k1's teardown describes two screws hidden under a rubber strip,
 after which the board and display slide out together. Our photograph
@@ -143,7 +183,9 @@ the complete backup file.
 
 Device appearance and label details above come from the owner's four
 photographs. Controller, revision, flash, crystal and USB adapter details
-come from the serial diagnostics recorded in `manifest.json`. Display and
-teardown details are attributed to the external projects and remain
-unverified on this unit. The conversation in the supplied ZIP was used
-as a list of leads, not as independently verified hardware documentation.
+come from the serial diagnostics recorded in `manifest.json`. Display
+configuration and firmware GPIO use come from static analysis of our
+own dump. Physical teardown details are attributed to external projects
+and remain unverified on this unit. The conversation in the supplied ZIP
+was used as a list of leads, not as independently verified hardware
+documentation.
