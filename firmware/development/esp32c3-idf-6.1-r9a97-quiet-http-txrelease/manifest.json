@@ -10,7 +10,7 @@
     "bytes": 1456160
   },
   "build_directory": "idf\\esp32c3-oled-native\\build-idf-6.1-r9a97-quiet-http-txrelease",
-  "qualification": "Experimental: physical HE-AAC memory comparison and 33-case HTTP codec regression retained, including two original failures and targeted follow-ups. Longer heavy HTTPS playback and candidate OTA regression remain pending. Original production restored.",
+  "qualification": "Measured opt-in configuration: 15/15 OTA checks and 600-second public HE-AAC HTTPS gates passed, following codec regression and targeted controls. Earlier public MP3 interruption/WebUI timeout remain unresolved. Original production restored; complete production goal not qualified.",
   "sdkconfig_sha256": "a62f4ea356ff0fed10a66aac688524a1da4a194bc426e222bbd42330a0ecb3ca",
   "elf_sha256": "7de7f32a495936052d8611a061112fc8d71edaed43e88e3c512831c310094b22",
   "project_version_at_build": "idf61-quiet-http-txrelease",
@@ -585,5 +585,73 @@
       }
     ]
   },
-  "vorbis_followup_report": "tests/results/esp32c3-http-buffer-regression/vorbis-review.json"
+  "vorbis_followup_report": "tests/results/esp32c3-http-buffer-regression/vorbis-review.json",
+  "ota_soak_report": "tests/results/esp32c3-http-buffer-ota-soak/review.json",
+  "ota_regression": {
+    "cases": 15,
+    "passed": 15,
+    "failures": []
+  },
+  "https_he_aac_600s": {
+    "checks": {
+      "transport": {
+        "result": "PASS",
+        "errors": []
+      },
+      "format": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 505,
+          "rate": 44100,
+          "channels": 2
+        }
+      },
+      "output": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 505,
+          "elapsed_ms": 583979,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        }
+      },
+      "memory": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 505,
+          "boot_id": "69f8279a43118233",
+          "minimum_heap": 24712,
+          "minimum_largest": 11264,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0
+        }
+      }
+    },
+    "health": {
+      "samples": 505,
+      "boot_id": "69f8279a43118233",
+      "minimum_heap": 24712,
+      "minimum_largest": 11264,
+      "allocation_failures": 0,
+      "task_watchdog_events": 0
+    },
+    "metrics": {
+      "heap": {
+        "minimum": 24712,
+        "median": 27964,
+        "first": 27584,
+        "last": 29500
+      },
+      "largest": {
+        "minimum": 11264,
+        "median": 15872,
+        "first": 15360,
+        "last": 16384
+      }
+    },
+    "response_maximum_ms": 254.85980000030395,
+    "lifetime_heap_low_water": 15168
+  },
+  "reproduction_command": "idf/esp32c3-oled-native/build-production.ps1 -TestedRadioProfile",
+  "reproduction_profile_commit": "3be3d5c9"
 }

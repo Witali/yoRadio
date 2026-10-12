@@ -121,10 +121,9 @@ after the comparison. Source snapshots, build/link audits, host tests, raw
 observations and independent replay are retained in the
 [evidence archive](../tests/results/esp32c3-http-request-buffer/).
 
-Still required before enabling the key by default: all-codec/HTTP lifecycle
-regression (including redirects, EOF, interrupted streams and repeated starts),
-OTA rejection/recovery coverage on this candidate, and bounded longer playback
-on the heavy HTTPS cases. This comparison does not qualify production as a whole.
+At this stage, codec/HTTP lifecycle regression, OTA rejection/recovery and
+longer HTTPS playback were pending. The following sections record those
+follow-ups. This initial comparison alone did not qualify production as a whole.
 
 ## Codec and HTTP regression, 2026-10-12
 
@@ -203,3 +202,71 @@ Both follow-ups were independently replayed from saved evidence, and original
 production/settings/station restoration was checked again. The original
 matrix remains **31/33**, with these additional successful controls reported
 separately. No firmware source or default was changed during this campaign.
+
+## OTA and ten-minute HTTPS qualification, 2026-10-12
+
+The same application SHA-256 was temporarily installed again. All **15/15 OTA
+checks passed**: wrong chip/project, corrupt/truncated/extra-byte images, missing
+multipart boundary, SPIFFS target, oversized request, disconnect, stalled upload,
+two ordinary updates, update during confirmed HE-AAC 44.1 kHz stereo playback,
+slow upload, and saved-settings verification after reboot. Updates targeted
+application slots only; NVS/SPIFFS and bootloader were not rewritten. Physical
+power-cut recovery was not part of this software-controlled suite.
+
+The candidate then played the public HE-AAC HTTPS source for **600 seconds**.
+FFprobe/FAAD confirmed its format before the run. Sampling used one-second
+intervals plus request time; steady gates excluded the first 15 seconds.
+
+| Measurement | Result |
+|---|---:|
+| Steady decoded-format observations | 505, all HE-AAC 44.1 kHz stereo |
+| Steady output interval | 583.979 s |
+| Completion queue drops / write errors | 0 / 0 |
+| Allocation failures / watchdog events / unexpected reboots | 0 / 0 / 0 |
+| Minimum **sampled** free heap / largest block | 24,712 / 11,264 B |
+| Firmware heap low-water mark since boot | 15,168 B |
+| First → last steady free-heap median | 27,584 → 29,500 B |
+| First → last steady largest-block median | 15,360 → 16,384 B |
+| Maximum status + health request duration | 254.86 ms |
+| Failed observation requests | 0 |
+| Settled memory recovery | PASS |
+
+The firmware low-water mark includes transient allocations between polls and
+is lower than the sampled minimum. The existing in-playback gate applies to
+sampled values; passing it does not establish a 16-KiB absolute free-heap floor.
+No allocation failure was reported. The output counters establish the measured
+digital behavior, not an analog listening assessment.
+
+Original production image, settings, station and decoded playback were restored
+after both stages. An offline replay checks the reports against raw observations
+and captured sources in the [OTA/soak archive](../tests/results/esp32c3-http-buffer-ota-soak/).
+This run advances HE-AAC/OTA qualification; it does not resolve the earlier
+intermittent public MP3 interruption or prove that the historical WebUI timeout
+was fixed. The feature remains opt-in while the production profile is qualified.
+
+## Reproducible measured profile
+
+A fresh ordinary `build-production.ps1` configuration differed from the tested
+image in 26 resolved values, including renamed aliases: QIO, TLS reserve,
+adaptive input, prefill, fractional output and SRAM-placement policies were
+not all selected by that command. Therefore its name alone did not identify
+the configuration used for these measurements.
+
+Use `build-production.ps1 -TestedRadioProfile` to select the 20 primary settings
+in `sdkconfig.radio-tested.defaults`, in addition to the normal base/quiet
+defaults. It uses a separate default build/output directory. Explicit selection
+also applies those settings to an existing configuration, removing legacy
+aliases; unrelated settings remain. See [production commands](../idf/esp32c3-oled-native/PRODUCTION.md).
+
+Real ESP-IDF reconfiguration verified three cases:
+
+- Fresh selected profile: byte-identical to the tested `sdkconfig`.
+- Existing ordinary configuration updated with the switch: byte-identical too.
+- Fresh ordinary command without the switch: unchanged from its previous hash.
+
+The selected configuration SHA-256 is
+`a62f4ea356ff0fed10a66aac688524a1da4a194bc426e222bbd42330a0ecb3ca`.
+The configuration audit did not compile or flash another application and makes
+no claim of byte-identical firmware images. Its configurations and source
+snapshots are included in the OTA/soak archive. “Tested” names the measured
+configuration and does not mark the complete production goal achieved.
