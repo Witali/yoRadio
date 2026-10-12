@@ -152,6 +152,16 @@ restoration reference for this device. Similar-looking SmallTV products
 also use ESP8266 or classic ESP32 boards, so their firmware and pinouts
 do not establish compatibility with this ESP32-C2 unit.
 
+## Security review
+
+The [static security audit](analysis/security/README.md) found no clear
+malware indicators in the reviewed application paths. It did find
+unauthenticated HTTP management, an open setup access point, plaintext
+weather requests and unsafe DNS/image-transfer buffer handling. This is
+not a complete proof of firmware safety; no live exploit or traffic test
+was performed. The report includes decompiled handlers and instruction
+evidence. The archived dump was preserved unchanged.
+
 ## Original firmware backup
 
 Complete flash snapshot read from the connected device on 2026-10-10 at
