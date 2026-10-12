@@ -1,0 +1,706 @@
+{
+  "input_sha256": {
+    "candidate/status.json": "b3b7ef2971be4f57719ca1d29c192231c30955e11b1f80fa142319912405ceb5",
+    "candidate-health.json": "80846ab0e4993471e98608ea209ceac3617aac180dc1d79a95dddeac1dae2fdf",
+    "candidate-arena.json": "9420efa1db55a53260f6bac706fe919ae4c3ea9db1d1cb64e0c229b9d951cd4f",
+    "candidate-timing.json": "388fd3c1b78087823245af7bb9ab5f803ea61aae5858da67123b5391c3e1f2f0",
+    "candidate-input.json": "2f6823dcb98b895839e720e3fc542a42bdb3df091e08d38130cbedc61ffca717",
+    "server.json": "57a3ccc0f5649e33c7a94015f2a188d05bacd26a0b5cd2cfb8f525608cabd50d"
+  },
+  "cases": {
+    "flac-level8:trial-1": {
+      "output": {
+        "samples": 10,
+        "elapsed_ms": 4591,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      },
+      "rssi_range": [
+        -68,
+        -58
+      ],
+      "min_heap": 22368,
+      "min_largest": 8192,
+      "observation_errors": [],
+      "drop_intervals": [],
+      "faults": {
+        "allocation_failures": [
+          1,
+          1
+        ],
+        "task_watchdog_events": [
+          0,
+          0
+        ]
+      },
+      "arena": {
+        "live_range": [
+          53024,
+          53024
+        ],
+        "failures_delta": 0
+      },
+      "allocator": {
+        "malloc": {
+          "calls_delta": 0,
+          "lifetime_max_us": 28
+        },
+        "free": {
+          "calls_delta": 0,
+          "lifetime_max_us": 0
+        },
+        "realloc": {
+          "calls_delta": 0,
+          "lifetime_max_us": 192
+        },
+        "snapshot": {
+          "calls_delta": 9,
+          "lifetime_max_us": 23
+        }
+      },
+      "pipeline": {
+        "output": {
+          "samples": 10,
+          "elapsed_ms": 4591,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        },
+        "timer_hz": 1000000,
+        "phase_drops": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "retained_events": 0,
+        "overwritten_events": 0,
+        "events": [],
+        "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+      },
+      "input_queue_ranges": {
+        "resident": [
+          4,
+          4
+        ],
+        "occupied": [
+          2,
+          4
+        ],
+        "minimum": [
+          4,
+          4
+        ],
+        "limit": [
+          8,
+          8
+        ],
+        "packet_capacity": [
+          2060,
+          2060
+        ]
+      },
+      "server": [
+        {
+          "mode": "file",
+          "fixture": "flac-level8",
+          "sent": 1771852,
+          "complete": true,
+          "pacing_ratio": 1.0,
+          "clock": "time.perf_counter",
+          "pauses": [
+            {
+              "after_bytes": 900000,
+              "requested_seconds": 0.45,
+              "started_at": 17161.7677463,
+              "completed": true,
+              "ended_at": 17162.2322011,
+              "elapsed_seconds": 0.46445289999974193
+            }
+          ],
+          "pause_schedule": [
+            {
+              "after_bytes": 900000,
+              "seconds": 0.45
+            }
+          ],
+          "delivery": {
+            "clock": "time.perf_counter",
+            "started_at": 17155.7446872,
+            "finished": true,
+            "windows": [
+              {
+                "started_at": 17155.7446872,
+                "ended_at": 17156.7737391,
+                "bytes": 84992,
+                "writes": 83,
+                "write_seconds": 0.505147500000021,
+                "max_write_seconds": 0.5024870000015653,
+                "max_late_seconds": 0.015917755186819704
+              },
+              {
+                "started_at": 17156.7737391,
+                "ended_at": 17157.7992512,
+                "bytes": 175104,
+                "writes": 171,
+                "write_seconds": 1.0217979000153719,
+                "max_write_seconds": 0.06480680000095163,
+                "max_late_seconds": 0.5014634213184763
+              },
+              {
+                "started_at": 17157.7992512,
+                "ended_at": 17158.8556914,
+                "bytes": 167936,
+                "writes": 164,
+                "write_seconds": 1.0527654999823426,
+                "max_write_seconds": 0.06900010000026668,
+                "max_late_seconds": 0.45859797794764745
+              },
+              {
+                "started_at": 17158.8556914,
+                "ended_at": 17159.8842044,
+                "bytes": 160768,
+                "writes": 157,
+                "write_seconds": 1.0252202000119723,
+                "max_write_seconds": 0.07984379999834346,
+                "max_late_seconds": 0.4637496502691647
+              },
+              {
+                "started_at": 17159.8842044,
+                "ended_at": 17160.8976382,
+                "bytes": 171008,
+                "writes": 167,
+                "write_seconds": 1.0095428000313404,
+                "max_write_seconds": 0.06976829999985057,
+                "max_late_seconds": 0.4930720690135786
+              },
+              {
+                "started_at": 17160.8976382,
+                "ended_at": 17162.2323235,
+                "bytes": 141216,
+                "writes": 138,
+                "write_seconds": 0.8672719000423967,
+                "max_write_seconds": 0.0707299999994575,
+                "max_late_seconds": 0.9001609846236533
+              },
+              {
+                "started_at": 17162.2323235,
+                "ended_at": 17163.2711971,
+                "bytes": 237568,
+                "writes": 232,
+                "write_seconds": 1.0347488000261365,
+                "max_write_seconds": 0.06598510000185343,
+                "max_late_seconds": 0.8939404945194838
+              },
+              {
+                "started_at": 17163.2711971,
+                "ended_at": 17164.3267611,
+                "bytes": 165888,
+                "writes": 162,
+                "write_seconds": 1.0520908000071358,
+                "max_write_seconds": 0.069546700000501,
+                "max_late_seconds": 0.4727914641807729
+              },
+              {
+                "started_at": 17164.3267611,
+                "ended_at": 17165.3827574,
+                "bytes": 169984,
+                "writes": 166,
+                "write_seconds": 1.0524981999733427,
+                "max_write_seconds": 0.06452350000108709,
+                "max_late_seconds": 0.487396783886652
+              },
+              {
+                "started_at": 17165.3827574,
+                "ended_at": 17166.4298524,
+                "bytes": 169984,
+                "writes": 166,
+                "write_seconds": 1.0438103999913437,
+                "max_write_seconds": 0.06588299999930314,
+                "max_late_seconds": 0.4925301713337831
+              },
+              {
+                "started_at": 17166.4298524,
+                "ended_at": 17167.2098342,
+                "bytes": 127404,
+                "writes": 125,
+                "write_seconds": 0.7773196000125608,
+                "max_write_seconds": 0.06611049999992247,
+                "max_late_seconds": 0.4919055171085347
+              }
+            ],
+            "dropped_windows": 0,
+            "ended_at": 17167.2098342
+          },
+          "seconds": 11.465144400001009
+        }
+      ]
+    },
+    "flac-level8:trial-2": {
+      "output": {
+        "samples": 10,
+        "elapsed_ms": 4667,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      },
+      "rssi_range": [
+        -72,
+        -60
+      ],
+      "min_heap": 22368,
+      "min_largest": 8192,
+      "observation_errors": [],
+      "drop_intervals": [],
+      "faults": {
+        "allocation_failures": [
+          1,
+          1
+        ],
+        "task_watchdog_events": [
+          0,
+          0
+        ]
+      },
+      "arena": {
+        "live_range": [
+          53024,
+          53024
+        ],
+        "failures_delta": 0
+      },
+      "allocator": {
+        "malloc": {
+          "calls_delta": 0,
+          "lifetime_max_us": 36
+        },
+        "free": {
+          "calls_delta": 0,
+          "lifetime_max_us": 20
+        },
+        "realloc": {
+          "calls_delta": 0,
+          "lifetime_max_us": 192
+        },
+        "snapshot": {
+          "calls_delta": 9,
+          "lifetime_max_us": 23
+        }
+      },
+      "pipeline": {
+        "output": {
+          "samples": 10,
+          "elapsed_ms": 4667,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        },
+        "timer_hz": 1000000,
+        "phase_drops": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "retained_events": 0,
+        "overwritten_events": 0,
+        "events": [],
+        "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+      },
+      "input_queue_ranges": {
+        "resident": [
+          4,
+          4
+        ],
+        "occupied": [
+          3,
+          4
+        ],
+        "minimum": [
+          4,
+          4
+        ],
+        "limit": [
+          8,
+          8
+        ],
+        "packet_capacity": [
+          2060,
+          2060
+        ]
+      },
+      "server": [
+        {
+          "mode": "file",
+          "fixture": "flac-level8",
+          "sent": 1771852,
+          "complete": true,
+          "pacing_ratio": 1.0,
+          "clock": "time.perf_counter",
+          "pauses": [
+            {
+              "after_bytes": 900000,
+              "requested_seconds": 0.45,
+              "started_at": 17183.98423,
+              "completed": true,
+              "ended_at": 17184.4432596,
+              "elapsed_seconds": 0.4590258999996877
+            }
+          ],
+          "pause_schedule": [
+            {
+              "after_bytes": 900000,
+              "seconds": 0.45
+            }
+          ],
+          "delivery": {
+            "clock": "time.perf_counter",
+            "started_at": 17177.9650496,
+            "finished": true,
+            "windows": [
+              {
+                "started_at": 17177.9650496,
+                "ended_at": 17178.9932157,
+                "bytes": 84992,
+                "writes": 83,
+                "write_seconds": 0.497223500002292,
+                "max_write_seconds": 0.4948030999985349,
+                "max_late_seconds": 0.015403566128952662
+              },
+              {
+                "started_at": 17178.9932157,
+                "ended_at": 17180.0170403,
+                "bytes": 173056,
+                "writes": 169,
+                "write_seconds": 1.020496099958109,
+                "max_write_seconds": 0.06731430000218097,
+                "max_late_seconds": 0.5005588213170995
+              },
+              {
+                "started_at": 17180.0170403,
+                "ended_at": 17181.0734538,
+                "bytes": 172032,
+                "writes": 168,
+                "write_seconds": 1.053061800015712,
+                "max_write_seconds": 0.06700840000121389,
+                "max_late_seconds": 0.4549805810856924
+              },
+              {
+                "started_at": 17181.0734538,
+                "ended_at": 17182.1293498,
+                "bytes": 167936,
+                "writes": 164,
+                "write_seconds": 1.0525311999954283,
+                "max_write_seconds": 0.0660507000029611,
+                "max_late_seconds": 0.4614942653934122
+              },
+              {
+                "started_at": 17182.1293498,
+                "ended_at": 17183.1835295,
+                "bytes": 169984,
+                "writes": 166,
+                "write_seconds": 1.0507232999916596,
+                "max_write_seconds": 0.06724039999971865,
+                "max_late_seconds": 0.4620739080310159
+              },
+              {
+                "started_at": 17183.1835295,
+                "ended_at": 17184.4433603,
+                "bytes": 133024,
+                "writes": 130,
+                "write_seconds": 0.7980264999969222,
+                "max_write_seconds": 0.065805400001409,
+                "max_late_seconds": 0.8908545846243214
+              },
+              {
+                "started_at": 17184.4433603,
+                "ended_at": 17185.4917478,
+                "bytes": 238592,
+                "writes": 233,
+                "write_seconds": 1.0445991999731632,
+                "max_write_seconds": 0.06752819999746862,
+                "max_late_seconds": 0.8846128945187957
+              },
+              {
+                "started_at": 17185.4917478,
+                "ended_at": 17186.5481539,
+                "bytes": 167936,
+                "writes": 164,
+                "write_seconds": 1.0530529000243405,
+                "max_write_seconds": 0.06916910000290954,
+                "max_late_seconds": 0.47702521575047285
+              },
+              {
+                "started_at": 17186.5481539,
+                "ended_at": 17187.6033385,
+                "bytes": 167936,
+                "writes": 164,
+                "write_seconds": 1.0519332000149006,
+                "max_write_seconds": 0.07060479999927338,
+                "max_late_seconds": 0.4844673906445678
+              },
+              {
+                "started_at": 17187.6033385,
+                "ended_at": 17188.6571296,
+                "bytes": 171008,
+                "writes": 167,
+                "write_seconds": 1.0503747000147996,
+                "max_write_seconds": 0.06698269999833428,
+                "max_late_seconds": 0.48714722338627325
+              },
+              {
+                "started_at": 17188.6571296,
+                "ended_at": 17189.4303419,
+                "bytes": 125356,
+                "writes": 123,
+                "write_seconds": 0.7707603000053496,
+                "max_write_seconds": 0.06461900000067544,
+                "max_late_seconds": 0.48548161397047807
+              }
+            ],
+            "dropped_windows": 0,
+            "ended_at": 17189.4303419
+          },
+          "seconds": 11.465289899999334
+        }
+      ]
+    },
+    "flac-level8:trial-3": {
+      "output": {
+        "samples": 10,
+        "elapsed_ms": 4531,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      },
+      "rssi_range": [
+        -69,
+        -59
+      ],
+      "min_heap": 22360,
+      "min_largest": 8192,
+      "observation_errors": [],
+      "drop_intervals": [],
+      "faults": {
+        "allocation_failures": [
+          1,
+          1
+        ],
+        "task_watchdog_events": [
+          0,
+          0
+        ]
+      },
+      "arena": {
+        "live_range": [
+          53024,
+          53024
+        ],
+        "failures_delta": 0
+      },
+      "allocator": {
+        "malloc": {
+          "calls_delta": 0,
+          "lifetime_max_us": 36
+        },
+        "free": {
+          "calls_delta": 0,
+          "lifetime_max_us": 28
+        },
+        "realloc": {
+          "calls_delta": 0,
+          "lifetime_max_us": 192
+        },
+        "snapshot": {
+          "calls_delta": 9,
+          "lifetime_max_us": 28
+        }
+      },
+      "pipeline": {
+        "output": {
+          "samples": 10,
+          "elapsed_ms": 4531,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        },
+        "timer_hz": 1000000,
+        "phase_drops": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "retained_events": 0,
+        "overwritten_events": 0,
+        "events": [],
+        "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+      },
+      "input_queue_ranges": {
+        "resident": [
+          4,
+          4
+        ],
+        "occupied": [
+          0,
+          4
+        ],
+        "minimum": [
+          4,
+          4
+        ],
+        "limit": [
+          8,
+          8
+        ],
+        "packet_capacity": [
+          2060,
+          2060
+        ]
+      },
+      "server": [
+        {
+          "mode": "file",
+          "fixture": "flac-level8",
+          "sent": 1771852,
+          "complete": true,
+          "pacing_ratio": 1.0,
+          "clock": "time.perf_counter",
+          "pauses": [
+            {
+              "after_bytes": 900000,
+              "requested_seconds": 0.45,
+              "started_at": 17206.0025396,
+              "completed": true,
+              "ended_at": 17206.4594283,
+              "elapsed_seconds": 0.45688589999917895
+            }
+          ],
+          "pause_schedule": [
+            {
+              "after_bytes": 900000,
+              "seconds": 0.45
+            }
+          ],
+          "delivery": {
+            "clock": "time.perf_counter",
+            "started_at": 17199.9808722,
+            "finished": true,
+            "windows": [
+              {
+                "started_at": 17199.9808722,
+                "ended_at": 17201.0155553,
+                "bytes": 84992,
+                "writes": 83,
+                "write_seconds": 0.5152626000090095,
+                "max_write_seconds": 0.5126968000004126,
+                "max_late_seconds": 0.015764929685246898
+              },
+              {
+                "started_at": 17201.0155553,
+                "ended_at": 17202.0391214,
+                "bytes": 175104,
+                "writes": 171,
+                "write_seconds": 1.0200815000243892,
+                "max_write_seconds": 0.09428269999989425,
+                "max_late_seconds": 0.5070856213169463
+              },
+              {
+                "started_at": 17202.0391214,
+                "ended_at": 17203.0916283,
+                "bytes": 171008,
+                "writes": 167,
+                "write_seconds": 1.0489679000420438,
+                "max_write_seconds": 0.0987834000006842,
+                "max_late_seconds": 0.47045748164964607
+              },
+              {
+                "started_at": 17203.0916283,
+                "ended_at": 17204.1441505,
+                "bytes": 164864,
+                "writes": 161,
+                "write_seconds": 1.0489607000017713,
+                "max_write_seconds": 0.06627410000146483,
+                "max_late_seconds": 0.45708307480890653
+              },
+              {
+                "started_at": 17204.1441505,
+                "ended_at": 17205.1890105,
+                "bytes": 172032,
+                "writes": 168,
+                "write_seconds": 1.0414216999997734,
+                "max_write_seconds": 0.06879449999905773,
+                "max_late_seconds": 0.4661147528386209
+              },
+              {
+                "started_at": 17205.1890105,
+                "ended_at": 17206.4595362,
+                "bytes": 133024,
+                "writes": 130,
+                "write_seconds": 0.8106935000432713,
+                "max_write_seconds": 0.06360850000055507,
+                "max_late_seconds": 0.891197384622501
+              },
+              {
+                "started_at": 17206.4595362,
+                "ended_at": 17207.5048679,
+                "bytes": 237568,
+                "writes": 232,
+                "write_seconds": 1.0415053999786323,
+                "max_write_seconds": 0.06807689999914146,
+                "max_late_seconds": 0.8849667945178226
+              },
+              {
+                "started_at": 17207.5048679,
+                "ended_at": 17208.5605981,
+                "bytes": 167936,
+                "writes": 164,
+                "write_seconds": 1.0523473999855923,
+                "max_write_seconds": 0.06704059999901801,
+                "max_late_seconds": 0.4803073964394571
+              },
+              {
+                "started_at": 17208.5605981,
+                "ended_at": 17209.6161233,
+                "bytes": 167936,
+                "writes": 164,
+                "write_seconds": 1.0522601000011491,
+                "max_write_seconds": 0.06645099999877857,
+                "max_late_seconds": 0.48724967760790605
+              },
+              {
+                "started_at": 17209.6161233,
+                "ended_at": 17210.6752814,
+                "bytes": 173056,
+                "writes": 169,
+                "write_seconds": 1.0557410999681451,
+                "max_write_seconds": 0.06574650000038673,
+                "max_late_seconds": 0.48981317133439006
+              },
+              {
+                "started_at": 17210.6752814,
+                "ended_at": 17211.4514928,
+                "bytes": 124332,
+                "writes": 122,
+                "write_seconds": 0.7736183000124583,
+                "max_write_seconds": 0.06625480000002426,
+                "max_late_seconds": 0.4917914108300465
+              }
+            ],
+            "dropped_windows": 0,
+            "ended_at": 17211.4514928
+          },
+          "seconds": 11.470620000000054
+        }
+      ]
+    }
+  },
+  "scope": "Steady observations >=3 s; excludes startup, EOF and Stop. Not analog continuity."
+}

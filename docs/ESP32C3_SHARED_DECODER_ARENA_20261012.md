@@ -1,5 +1,9 @@
 # ESP32-C3 shared decoder arena experiment
 
+Follow-up: [FLAC DMA investigation, October 13](ESP32C3_ARENA_FLAC_DMA_20261013.md)
+separates input starvation from allocator latency and repeats the missing
+no-arena FLAC control. The original failures below remain unchanged.
+
 ## Scope
 
 `CONFIG_YORADIO_SHARED_DECODER_ARENA=y` reserves one private heap in static

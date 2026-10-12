@@ -4,6 +4,11 @@ This document defines the acceptance tests added after the 2026-09-30 audit.
 **A test exists, a test ran, and a test passed are three different states.**
 Keep failed measurements. Never accept AAC-core fallback as successful HE-AAC.
 
+For repeated FLAC delivery-pause tests with the shared decoder arena, see
+[the DMA investigation](ESP32C3_ARENA_FLAC_DMA_20261013.md). It distinguishes
+completion notifications, allocator latency and input starvation, retaining
+startup allocation failures even when diagnostic collection continues.
+
 For quiet production images, the [health endpoint](ESP32C3_PRODUCTION_HEALTH.md)
 provides heap, boot identity and lifetime allocation/watchdog counters without
 UART profiling. These observations complement format and recovery checks;
