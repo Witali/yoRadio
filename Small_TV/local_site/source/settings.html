@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 页面基础设置 -->
+    <title>Smart Weather Clock</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:,">
+    <style>
+        /* 全局样式设置 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* 主体样式 */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        
+        /* 容器样式 */
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto 30px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            color: #333;
+        }
+        
+        /* 二级标题样式 */
+        h2 {
+            margin: 25px 0 15px;
+            font-size: 1.5rem;
+            color: #444;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 8px;
+        }
+        
+        /* 表单组样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        /* 标签样式 */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        /* 输入框和选择框通用样式 */
+        input[type="text"],
+        input[type="password"],
+        input[type="range"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        /* 选择框自定义下拉箭头 */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 1em;
+        }
+        
+        /* 输入框焦点状态 */
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        
+        /* 滑动条样式 */
+        
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 8px;
+            background: #ddd;
+            border-radius: 5px;
+            padding: 0;
+        }
+        
+        /* 滑动条滑块样式 */
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        /* 开关控件样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 22px;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        
+        /* 开关隐藏原生输入框 */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        /* 开关滑块样式 */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 22px;
+        }
+        
+        /* 开关滑块按钮 */
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        /* 开关激活状态 */
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        
+        /* 开关激活时滑块位置 */
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* 按钮样式 */
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 5px 0;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        
+        /* 按钮悬停状态 */
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        /* 颜色选择器容器 */
+        .color-pickers {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        /* 颜色选择器样式 */
+        .color-pickers input[type="color"] {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        /* 段落样式 */
+        p {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        /* 移动端响应式设计 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            input, select, button {
+                padding: 10px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 主标题 -->
+        <h1>Smart Weather Clock</h1>
+        
+        <!-- ===================== 城市设置部分 ===================== -->
+        <div class="form-group">
+            <h2>City Settings</h2>
+            <form id="cityForm">
+                <input type='text' name='city' id='cityInput' placeholder="Enter city Example:London,GB">
+                <button type="submit">Submit</button>
+            </form>
+            
+        </div>
+        
+        <!-- ===================== 时钟设置部分 ===================== -->
+        <div class="form-group">
+            <h2>Clock Settings</h2>
+
+				<!-- Temperature unit toggle switch -->
+				<p>
+				    Show Temperature in Celsius
+				    <label class='switch'>
+				        <input type="checkbox" id="temp-unit-switch">
+				        <span class="slider round"></span>
+				    </label>
+				</p>
+				<!-- 12/24 hour format toggle switch -->
+				<p>
+				    12-Hour Clock:
+				    <label class='switch'>
+				        <input type="checkbox" id="hour-format-switch">
+				        <span class="slider round"></span>
+				    </label>
+				</p>
+				<!-- Mile display toggle switch -->
+				<p>
+				    Mile display:
+				    <label class='switch'>
+				        <input type="checkbox" id="mile-display-switch">
+				        <span class="slider round"></span>
+				    </label>
+				</p>
+				<!-- Time sync toggle switch -->
+				<p>
+				    Sync phone or PC time:
+				    <label class='switch'>
+				        <input type="checkbox" id="time-sync-switch">
+				        <span class="slider round"></span>
+				    </label>
+				</p>
+            <!-- 时间格式选择 -->
+            <p>
+                Time format:
+                <select id="timelist" name="option"  onchange="updatetimeselect(this.value)">
+                    <option value="0">MM/DD/YYYY</option>
+                    <option value="1">DD/MM/YYYY</option>
+                    <option value="2">YYYY/MM/DD</option>
+                </select>
+            </p>
+        </div>
+
+        
+        <!-- ===================== 亮度设置部分 ===================== -->
+        <div class="form-group">
+            <h2>Brightness</h2>
+            <form method="post" action="/led">
+                <label for="ledBrightness">Daytime Brightness:</label>
+                <input type='range' id='ledBrightness' name='ledBrightness' min='2' max='99'>
+            </form>
+        </div>
+        
+        <!-- ===================== 颜色设置部分 ===================== -->
+        <div class="form-group">
+            <h2>Clock Color Select</h2>
+            <div class="color-pickers">
+                <input type="color" id="colorPicker0" value="#ffffff">
+                <input type="color" id="colorPicker1" value="#4CAF50">
+                <input type="color" id="colorPicker2" value="#ff0000">
+            </div>
+            <!-- 夜间模式开关 -->
+            <!--<p>
+                Night Mode
+                <label class='switch'>
+                    <input type="checkbox" id="Nightmode">
+                    <span class="slider round"></span>
+                </label>
+            </p>-->
+            <!-- 夜间模式开始时间 -->
+            <!--<p>
+                Start Time:
+                <select id="starttime" name="option" onchange="updatestarttimeselect(this.value)">
+                    <option value="18">18:00</option>
+                    <option value="19">19:00</option>
+                    <option value="20">20:00</option>
+                    <option value="21">21:00</option>
+                    <option value="22">22:00</option>
+                    <option value="23">23:00</option>
+                </select>
+            </p>-->
+            <!-- 夜间模式结束时间 -->
+            <!--<p>
+                Stop Time:
+                <select id="stoptime" name="option" onchange="updatestoptimeselect(this.value)">
+                    <option value="5">05:00</option>
+                    <option value="6">06:00</option>
+                    <option value="7">07:00</option>
+                    <option value="8">08:00</option>
+                    <option value="9">09:00</option>
+                    <option value="10">10:00</option>
+                    <option value="11">11:00</option>
+                    <option value="12">12:00</option>
+                </select>
+            </p>-->
+            <!-- 夜间模式亮度 -->
+            <!-- <label for="NightBrightness">Night Mode Brightness:</label>
+            <input type='range' id='NightBrightness' name='NightBrightness' min='2' max='99'>-->
+        </div>
+        
+        <!-- ===================== WiFi设置部分 ===================== -->
+        <!--<div class="form-group">
+            <h2>WiFi Settings</h2>
+            <form id="wifiscanForm">-->
+                <!-- WiFi网络列表 -->
+                <!--<select id="wifi_list" onchange="document.getElementById('new_ssid').value=this.value">
+                    <option value=''>Select WiFi Network</option>
+                </select>-->
+                <!-- 刷新WiFi列表按钮 -->
+                <!--<button type="button" onclick="refreshList()">Refresh WiFi List</button>-->
+                <!-- WiFi SSID输入 -->
+                <!--<label for='new_ssid'>WiFi SSID:</label>
+                <input type='text' name='new_ssid' id='new_ssid' placeholder="Enter WiFi SSID">-->
+                <!-- WiFi密码输入 -->
+                <!--<label for='password'>Password:</label>
+                <input type='password' name='password' id='password' placeholder="Enter WiFi Password">
+                <button type="submit">Connect</button>
+            </form>-->
+            <!-- 系统重启按钮 -->
+            <!--<button type="button" onclick="restartESP()">System Restart</button>-->
+            <!-- 固件更新按钮 -->
+            <!--<button type="button" onclick="location.href='/update'">Enter FW Update</button>-->
+        <!--</div>-->
+        
+        <!-- ===================== GIF设置部分 ===================== -->
+        <div class="form-group">
+            <h2>GIF Select</h2>
+            <!-- GIF选择下拉框 -->
+            <select id="giflist" name="option" onchange="updateGifSelection(this.value)">
+                <option value="0">GIF File 1</option>
+                <option value="1">GIF File 2</option>
+                <option value="2">GIF File 3</option>
+                <option value="3">GIF File 4</option>
+                <option value="4">GIF File 5</option>
+            </select>
+            <button type="button" onclick="openConversionTool()">Conversion Tool</button>
+            <!-- 主题选择 -->
+            <p>
+                Theme:
+                <select id="themeselect" name="clockoption" onchange="updateclockselect(this.value)">
+                    <option value="0">Classic</option>
+                    <option value="1">Simple</option>
+                    <option value="2">Photo</option>
+                    <option value="3">Dial</option>
+                </select>
+                <button type="button" onclick="location.href='/photo'">Enter Photo Setting</button>
+            </p>
+            <!-- GIF文件上传 -->
+            <!--<input type="file" name="File1" id="imageFile1" style="margin-top: 10px;">-->
+            <!--<p>Only converted GIF can be uploaded.</p>-->
+            <!-- 三个功能按钮 -->
+            <!--<button type="button" onclick="openConvertedGIF()">Converted GIF</button>-->
+            <!--<p>If you have a favorite GIF want to upload, it needs to be converted firstly.</p>-->
+            <!--<button type="button" onclick="openConversionTool()">Conversion Tool</button>-->
+            <!--<button type="button" onclick="openTutorial()">Conversion Tutorial</button>-->
+        </div>
+
+        
+        <!-- ===================== 高级设置部分 ===================== -->
+       <!--<div class="form-group">-->
+            <!--<h2>Advanced Settings</h2>-->
+            <!--<form id="advancedSettingsForm">-->
+                <!-- NTP服务器设置 -->
+                <!--<label for="ntp">NTP Server:</label>-->
+                <!--<input type="text" id="ntp" name="ntp" value="pool.ntp.org">-->
+                <!-- OpenWeatherMap API密钥 -->
+                <!--<label for="openweathermapKey">OpenWeatherMap Key:</label>-->
+                <!--<input type="text" id="openweathermapKey" name="openweathermapKey" placeholder="Enter your API key">-->
+                <!-- 保存设置按钮（初始禁用） -->
+                <!--<button type="submit" id="submitButton">Save Settings</button>-->
+                <!--<p>Enable the submit button by clicking the number below 10 times within 3 seconds.</p>-->
+                <!-- 点击计数器 -->
+                <!--<div id="clickCounter" style="font-size: 40px; text-align: center;">0</div>-->
+            <!--</form>-->
+        <!--</div>-->
+    </div>
+
+    <!-- ===================== JavaScript代码 ===================== -->
+    <script>
+        /*****************************************************************
+         * WiFi网络相关功能
+         *****************************************************************/
+        
+        /**
+         * 刷新WiFi网络列表
+         * 对应控件：Refresh WiFi List按钮
+         */
+        // 页面加载时自动刷新
+        function refreshList() {
+            // 发送请求获取WiFi列表
+            fetch('/scan')
+                .then(response => response.json())
+                .then(networks => {
+                    const select = document.getElementById('wifi_list');
+                    // 清空现有选项
+                    select.innerHTML = '<option value="">Select WiFi Network</option>';
+                    // 添加扫描到的网络
+                    networks.forEach(network => {
+                        const option = document.createElement('option');
+                        option.value = network.ssid;
+                        // 显示SSID和信号强度
+                        option.textContent = network.ssid + (network.rssi ? ` (${Math.abs(network.rssi)}dBm)` : '');
+                        select.appendChild(option);
+                    });
+                });
+        }
+
+        // 页面加载时自动刷新WiFi列表
+        document.addEventListener('DOMContentLoaded', refreshList);
+        /*****************************************************************
+         * GIF控件
+         * 对应控件：select 选择不同GIF图片
+         *****************************************************************/
+         
+				// 页面加载时获取当前GIF设置
+				document.addEventListener('DOMContentLoaded', function() {
+				    fetch('/getgifvalue')
+				        .then(response => response.text())
+				        .then(currentGif => {
+				            const gifSelect = document.getElementById('giflist');
+				            gifSelect.value = currentGif;
+				        })
+				        .catch(error => {
+				            console.error('Error fetching current GIF:', error);
+				        });
+				});
+				
+				// 更新GIF选择
+				function updateGifSelection(selectedValue) {
+				    fetch('/setgifvalue', {
+				        method: 'POST',
+				        headers: {
+				            'Content-Type': 'application/json',
+				        },
+				        body: JSON.stringify({ gif: selectedValue })
+				    })
+				    .then(response => {
+				        if (!response.ok) throw new Error('Failed to update GIF');
+				        console.log('GIF updated to:', selectedValue);
+				    })
+				    .catch(error => {
+				        console.error('Error:', error);
+				        alert('Failed to update GIF selection');
+				    });
+				}
+        /*****************************************************************
+         * clock set控件
+         * 对应控件：select 选择不同时钟模式
+         *****************************************************************/
+				// 页面加载时获取当前clock设置
+				document.addEventListener('DOMContentLoaded', function() {
+				    fetch('/getclocktype')
+				        .then(response => response.text())
+				        .then(currentclocktype => {
+				            const clocktypeSelect = document.getElementById('themeselect');
+				            clocktypeSelect.value = currentclocktype;
+				        })
+				        .catch(error => {
+				            console.error('Error fetching current clock type:', error);
+				        });
+				});
+				
+				// 更新clock选择
+				function updateclockselect(selectedValue) {
+				    fetch('/setclocktype', {
+				        method: 'POST',
+				        headers: {
+				            'Content-Type': 'application/json',
+				        },
+				        body: JSON.stringify({ clocktype: selectedValue })
+				    })
+				    .then(response => {
+				        if (!response.ok) throw new Error('Failed to update clock type');
+				        console.log('Clock type updated to:', selectedValue);
+				    })
+				    .catch(error => {
+				        console.error('Error:', error);
+				        alert('Failed to update clock type selection');
+				    });
+				}
+        /*****************************************************************
+         * 开关控件
+         * 对应控件：开关功能选择
+         *****************************************************************/
+				function initSwitches() {
+				    fetch('/getsettings')
+				        .then(response => response.json())
+				        .then(data => {
+				            document.getElementById('temp-unit-switch').checked = data.tempUnit;
+				            document.getElementById('hour-format-switch').checked = data.hourFormat;
+				            document.getElementById('mile-display-switch').checked = data.mileDisplay;
+				            document.getElementById('time-sync-switch').checked = data.timeSync;
+				            //document.getElementById('Nightmode').checked = data.nightmode;
+				        })
+				        .catch(error => {
+				            console.error('Error:', error);
+				            // 默认值
+				            document.getElementById('temp-unit-switch').checked = true;  // 1=Celsius
+				            document.getElementById('hour-format-switch').checked = true; // 1=12-hour
+				            document.getElementById('mile-display-switch').checked = true; // 1=On
+				            document.getElementById('time-sync-switch').checked = false; // 0=Off
+				            //document.getElementById('Nightmode').checked = false; // 0=Off
+				        });
+				}
+				
+				// 发送开关状态到ESP8266
+				function sendSwitchStates() {
+				    const states = {
+				        tempUnit: document.getElementById('temp-unit-switch').checked ? 1 : 0,
+				        hourFormat: document.getElementById('hour-format-switch').checked ? 1 : 0,
+				        mileDisplay: document.getElementById('mile-display-switch').checked ? 1 : 0,
+				        timeSync: document.getElementById('time-sync-switch').checked ? 1 : 0,
+				        //nightmode: document.getElementById('Nightmode').checked ? 1 : 0
+				    };
+				
+				    fetch('/settings', {
+				        method: 'POST',
+				        headers: {'Content-Type': 'application/json'},
+				        body: JSON.stringify(states)
+				    }).catch(error => console.error('Error:', error));
+				}
+				
+				// 初始化
+				document.addEventListener('DOMContentLoaded', function() {
+				    initSwitches();
+				    document.querySelectorAll('.switch input').forEach(switchEl => {
+				        switchEl.addEventListener('change', sendSwitchStates);
+				    });
+				});
+
+        /*****************************************************************
+         * 时间模式控件
+         * 对应控件：select 选择不同时间显示模式
+         *****************************************************************/
+				// 页面加载时获取当前时间控件设置
+				document.addEventListener('DOMContentLoaded', function() {
+				    fetch('/GetTimeModeValue')
+				        .then(response => response.text())
+				        .then(currentTimeMode => {
+				            const TimeModeSelect = document.getElementById('timelist');
+				            TimeModeSelect.value = currentTimeMode;
+				        })
+				        .catch(error => {
+				            console.error('Error fetching current time mode:', error);
+				        });
+				});
+				
+				// 更新时间控件
+				function updatetimeselect(selectedValue) {
+				    fetch('/SetTimeModeValue', {
+				        method: 'POST',
+				        headers: {
+				            'Content-Type': 'application/json',
+				        },
+				        body: JSON.stringify({ timemode: selectedValue })
+				    })
+				    .then(response => {
+				        if (!response.ok) throw new Error('Failed to update time mode');
+				        console.log('time mode updated to:', selectedValue);
+				    })
+				    .catch(error => {
+				        console.error('Error:', error);
+				        alert('Failed to update time mode selection');
+				    });
+				}
+        /*****************************************************************
+         * submit控件
+         * 对应控件：提交city设置的内容
+         *****************************************************************/
+		document.getElementById('cityForm').addEventListener('submit', function(e) {
+		    e.preventDefault();
+		    const city = document.getElementById('cityInput').value.trim();
+		    
+		    if (!city) {
+		        alert('Please enter a city name');
+		        return;
+		    }
+		    
+		    // 使用POST请求，通过请求体发送数据
+		    fetch('/updateCity', {
+		        method: 'POST',
+		        headers: {
+		            'Content-Type': 'application/json'  // 使用JSON格式
+		        },
+		        body: JSON.stringify({ city: city })  // 自动处理编码
+		    })
+		    .then(response => {
+		        if (response.ok) {
+		            alert('City updated successfully');
+		        } else {
+		            throw new Error('Failed to update city');
+		        }
+		    })
+		    .catch(error => {
+		        console.error('Error:', error);
+		        alert('Failed to update city');
+		    });
+		});
+        
+        /*****************************************************************
+         * ledBrightness控件
+         * 对应控件：设置当前亮度值
+         *****************************************************************/
+        const brightnessSlider = document.getElementById('ledBrightness');
+        // 页面加载时获取初始亮度值
+        fetch('/get_led_brightness')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to get brightness');
+                return response.json();
+            })
+            .then(data => {
+                brightnessSlider.value = data.brightness;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                brightnessSlider.value = 50; // 默认值
+            });
+        // 实时发送亮度值
+        brightnessSlider.addEventListener('input', function() {
+            fetch('/set_led_brightness', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'ledBrightness=' + this.value
+            }).catch(error => console.error('Error:', error));
+        });
+        
+        /*****************************************************************
+         * 颜色选择控件
+         * 对应控件：设置时分秒的颜色
+         *****************************************************************/
+        // 初始化颜色选择器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取初始颜色值
+            fetch('/get_clock_colors')
+                .then(response => response.json())
+	            .then(data => {
+                    document.getElementById('colorPicker0').value = data.color0 || '#ff0000';
+                    document.getElementById('colorPicker1').value = data.color1 || '#ffff00';
+                    document.getElementById('colorPicker2').value = data.color2 || '#ffffff';
+                })
+                .catch(error => {
+                    console.error('Error fetching colors:', error);
+                    // 使用默认值
+                    document.getElementById('colorPicker0').value = '#ff0000';
+                    document.getElementById('colorPicker1').value = '#ffff00';
+                    document.getElementById('colorPicker2').value = '#ffffff';
+                });
+
+            // 为每个颜色选择器添加事件监听
+            document.querySelectorAll('.color-pickers input[type="color"]').forEach((picker, index) => {
+                picker.addEventListener('change', function() {
+                    updateClockColor(index, this.value);
+                });
+            });
+        });
+
+        // 更新时钟颜色
+        function updateClockColor(index, color) {
+            fetch('/set_clock_color', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    index: index,
+                    color: color
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to update color');
+                console.log(`Color ${index} updated to: ${color}`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update color');
+            });
+        }
+        /*****************************************************************
+         * 晚间模式起始时间控件
+         * 对应控件：select 选择不同起始时间
+         *****************************************************************/
+				// 页面加载时获取当前时间控件设置
+				document.addEventListener('DOMContentLoaded', function() {
+				    fetch('/GetNightStartTime')
+				        .then(response => response.text())
+				        .then(currentStartTime => {
+				            const StartTimeSelect = document.getElementById('starttime');
+				            StartTimeSelect.value = currentStartTime;
+				        })
+				        .catch(error => {
+				            console.error('Error fetching night mode start time:', error);
+				        });
+				});
+				
+				// 更新时间控件
+				function updatestarttimeselect(selectedValue) {
+				    fetch('/SetNightStartTime', {
+				        method: 'POST',
+				        headers: {
+				            'Content-Type': 'application/json',
+				        },
+				        body: JSON.stringify({ StartTime: selectedValue })
+				    })
+				    .then(response => {
+				        if (!response.ok) throw new Error('Failed to update start time');
+				        console.log('start time updated to:', selectedValue);
+				    })
+				    .catch(error => {
+				        console.error('Error:', error);
+				        alert('Failed to update night mode start time selection');
+				    });
+				}
+        /*****************************************************************
+         * 晚间模式结束时间控件
+         * 对应控件：select 选择不同结束时间
+         *****************************************************************/
+				// 页面加载时获取当前时间控件设置
+				document.addEventListener('DOMContentLoaded', function() {
+				    fetch('/GetNightStopTime')
+			        .then(response => response.text())
+			        .then(currentStopTime => {
+			            const StopTimeSelect = document.getElementById('stoptime');
+			            StopTimeSelect.value = currentStopTime;
+			        })
+			        .catch(error => {
+			            console.error('Error fetching night mode stop time:', error);
+			        });
+				});
+				
+				// 更新时间控件
+				function updatestoptimeselect(selectedValue) {
+				    fetch('/SetNightStopTime', {
+				        method: 'POST',
+				        headers: {
+				            'Content-Type': 'application/json',
+				        },
+				        body: JSON.stringify({ StopTime: selectedValue })
+				    })
+				    .then(response => {
+				        if (!response.ok) throw new Error('Failed to update stop time');
+				        console.log('stop time updated to:', selectedValue);
+				    })
+				    .catch(error => {
+				        console.error('Error:', error);
+				        alert('Failed to update night mode stop time selection');
+				    });
+				}
+        /*****************************************************************
+         * NightBrightness
+         * 对应控件：设置晚间模式亮度值
+         *****************************************************************/
+        const NightbrightnessSlider = document.getElementById('NightBrightness');
+        // 页面加载时获取初始亮度值
+        fetch('/get_night_brightness')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to get brightness');
+                return response.json();
+            })
+            .then(data => {
+                NightbrightnessSlider.value = data.brightness;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                NightbrightnessSlider.value = 50; // 默认值
+            });
+        // 实时发送亮度值
+        NightbrightnessSlider.addEventListener('input', function() {
+            fetch('/set_night_brightness', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'NightBrightness=' + this.value
+            }).catch(error => console.error('Error:', error));
+        });
+
+        /*****************************************************************
+         * NightBrightness
+         * 对应控件：设置晚间模式亮度值
+         *****************************************************************/
+        // 表单提交处理
+        document.getElementById('wifiscanForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const ssid = document.getElementById('new_ssid').value;
+            const password = document.getElementById('password').value;
+            
+            // 发送数据到ESP8266
+            fetch('/wifireset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ssid: ssid,
+                    password: password,
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+	                alert('Configuration saved successfully!');
+//	                document.getElementById('wifiscanForm').style.display = 'none';
+//	                document.querySelector('.container').innerHTML += '<h3 style="text-align:center;margin-top:20px;">Configuration complete! You may close this page.</h3>';
+	                setTimeout(() => { window.location.href = 'about:blank'; }, 3000);
+                } else {
+                    throw new Error('Failed to save settings');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to save settings');
+            });
+        });
+        /*****************************************************************
+         * GIF相关功能
+         * 对应控件：GIF Select部分的三个按钮
+         *****************************************************************/
+        
+        // 打开已转换GIF
+        function openConvertedGIF() {
+            window.open('/converted-gifs', '_blank');
+        }
+        
+        // 打开GIF转换工具
+        function openConversionTool() {
+            window.open('https://ezgif.com/', '_blank');
+        }
+        
+        // 打开转换教程
+        function openTutorial() {
+            window.open('/gif-tutorial', '_blank');
+        }
+
+        /*****************************************************************
+         * 系统控制功能
+         * 对应控件：System Restart按钮
+         *****************************************************************/
+        function restartESP() {
+            if (confirm('Are you sure you want to restart the device?')) {
+                fetch('/restart', { method: 'POST' })
+                    .then(() => alert('Device is restarting...'));
+            }
+        }
+
+        /*****************************************************************
+         * 安全提交按钮功能（点击10次激活）
+         * 对应控件：Advanced Settings中的点击计数器和保存按钮
+         *****************************************************************/
+        let clickCount = 0;
+        let clickTimer;
+        const counter = document.getElementById('clickCounter');
+        
+        // 计数器点击事件
+        counter.addEventListener('click', function() {
+            clickCount++;
+            counter.textContent = clickCount;
+            
+            // 达到10次后激活按钮
+//            if (clickCount >= 10) {
+//                document.getElementById('submitButton').disabled = false;
+//                counter.style.color = '#4CAF50';
+//            }
+            
+            // 重置计时器
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => {
+                clickCount = 0;
+                counter.textContent = '0';
+                counter.style.color = '';
+            }, 3000);
+        });
+        // 表单提交处理
+        document.getElementById('advancedSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const ntpServer = document.getElementById('ntp').value;
+            const apiKey = document.getElementById('openweathermapKey').value;
+            const clicks = clickCount;
+            
+            // 发送数据到ESP8266
+            fetch('/advancedset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ntp: ntpServer,
+                    openweathermapKey: apiKey,
+                    clickCount: clicks
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Settings saved successfully!');
+                    // 重置表单和计数器
+                    clickCount = 0;
+                    document.getElementById('clickCounter').textContent = '0';
+//                    submitButton.disabled = true;
+                } else {
+                    throw new Error('Failed to save settings');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to save settings');
+            });
+        });
+        /*****************************************************************
+         * 通用值发送功能
+         * 用于各种设置控件的值发送到服务器
+         *****************************************************************/
+        /*function sendvalue(element, value) {
+            fetch('/setvalue', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: element.id,
+                    value: value
+                })
+            });
+        }*/
+
+        /*****************************************************************
+         * LED亮度控制
+         * 对应控件：Daytime Brightness滑动条
+         *****************************************************************/
+        /*function updateLEDBrightness(value) {
+            sendvalue(document.getElementById('ledBrightness'), value);
+        }*/
+
+        /*****************************************************************
+         * 城市设置相关
+         * 对应控件：City Settings输入框
+         *****************************************************************/
+        /*function showCity() {
+            const city = document.getElementById('cityInput').value;
+            console.log('City changed:', city);
+        }*/
+
+        /*****************************************************************
+         * WiFi连接提示
+         * 对应控件：WiFi Connect按钮
+         *****************************************************************/
+        /*function showMessage() {
+            alert('Connecting to WiFi...');
+        }*/
+    </script>
+</body>
+</html>

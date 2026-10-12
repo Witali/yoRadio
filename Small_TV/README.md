@@ -165,6 +165,16 @@ the five photos, five animated GIF previews, weather icons and status
 graphics recovered from this snapshot. Exported images have source
 metadata removed; the flash backup remains unchanged.
 
+## Local copy of the firmware web interface
+
+[The local site](local_site/README.md) serves the three recovered HTML
+pages with a stateful emulator of their HTTP API. Run
+`Small_TV/local_site/start.ps1` in PowerShell, then open
+`http://127.0.0.1:8765/`. Settings, photo previews and image uploads work
+locally; Wi-Fi connection and restart operations update simulated state.
+The recovered pages and API behavior were checked in the browser and
+with integration tests covering all 34 registered firmware routes.
+
 ## Security review
 
 The [static security audit](analysis/security/README.md) found no clear
