@@ -12,6 +12,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "ota_upload.h"
+#include "websocket_service.h"
 #include "lwip/sockets.h"
 #include "lwip/tcp.h"
 
@@ -31,13 +32,6 @@ static void finish_rejection(httpd_req_t *request) {
                       errno != EINTR)) break;
         vTaskDelay(1);
     }
-}
-
-static void ota_reboot(void *argument) {
-    (void)argument;
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    esp_restart();
 }
 
 static bool boundary_from_request(httpd_req_t *request, char *boundary,
@@ -78,7 +72,6 @@ esp_err_t web_ota_handler(httpd_req_t *request) {
     }
     display_settings_note_activity();
     ota_upload_t *upload = calloc(1, sizeof(*upload));
-    TaskHandle_t reboot = NULL;
     const char *error = "Not enough memory for OTA";
     bool ok = false;
     char boundary[71];
@@ -113,18 +106,16 @@ esp_err_t web_ota_handler(httpd_req_t *request) {
         vTaskDelay(1);
     }
     if (!ota_upload_finish(upload)) goto done;
-    // Allocate the reboot task before changing the boot selector. It cannot
-    // run until the response has been queued, even if sending it fails.
-    error = "Not enough memory to schedule reboot";
-    if (xTaskCreate(ota_reboot, "ota_reboot", 2048, NULL, 3, &reboot) != pdPASS)
-        goto done;
+    // This task was created at startup; no allocation can fail between
+    // selecting the verified image and scheduling its reboot after response.
+    error = "Reboot service unavailable";
+    if (!websocket_service_reboot_ready()) goto done;
     if (!ota_upload_activate(upload)) goto done;
     s_reboot_pending = true;
     ok = true;
 done:
     if (!ok) {
         if (upload && upload->error) error = upload->error;
-        if (reboot) vTaskDelete(reboot);
         if (upload) ota_upload_abort(upload);
         httpd_resp_set_status(request, "400 Bad Request");
     }
@@ -133,7 +124,7 @@ done:
     if (ok) {
         // Retain the activity lease until restart: there must be no deep sleep
         // between changing otadata and booting the new application.
-        xTaskNotifyGive(reboot);
+        websocket_service_request_reboot(1000);
     } else {
         finish_rejection(request);
         display_settings_note_activity();

@@ -304,17 +304,23 @@ static esp_err_t send_active_settings(httpd_req_t *request, bool client_mode) {
         "\"radiolink\"]}");
 }
 
-static void reboot_task(void *argument) {
-    (void)argument;
-    vTaskDelay(pdMS_TO_TICKS(300));
-    esp_restart();
-}
+// The status task exists before HTTP routes become available. Reboot requests
+// need no late heap allocation; first request wins and cannot be postponed.
+static atomic_bool s_reboot_ready;
+static atomic_uint s_reboot_at;
 
-static void schedule_reboot(void) {
-    if (xTaskCreate(reboot_task, "web_reboot", BOARD_TASK_STACK_WIFI_REBOOT,
-                    NULL, 3, NULL) != pdPASS) {
-        ESP_LOGE(TAG, "Could not schedule WebUI reboot");
-    }
+bool websocket_service_reboot_ready(void) {
+    return atomic_load(&s_reboot_ready);
+}
+void websocket_service_request_reboot(unsigned delay_ms) {
+    uint32_t at = (uint32_t)xTaskGetTickCount() + pdMS_TO_TICKS(delay_ms);
+    if (!at) at = 1; // Zero means no pending request, including tick wraparound.
+    unsigned expected = 0;
+    atomic_compare_exchange_strong(&s_reboot_at, &expected, at);
+}
+static void poll_reboot(void) {
+    unsigned at = atomic_load(&s_reboot_at);
+    if (at && (int32_t)((uint32_t)xTaskGetTickCount() - at) >= 0) esp_restart();
 }
 
 static void log_setting_error(const char *name, esp_err_t result) {
@@ -420,7 +426,7 @@ static void handle_command(httpd_req_t *request, char *command) {
     } else if (strcmp(command, "reboot") == 0 ||
                strcmp(command, "rebootmdns") == 0) {
         ws_send_request(request, "{\"rebooting\":1}");
-        schedule_reboot();
+        websocket_service_request_reboot(300);
     } else if (strcmp(command, "tzh") == 0) {
         long hour = strtol(value, NULL, 10);
         if (hour < -12) hour = -12;
@@ -647,6 +653,7 @@ static void status_task(void *argument) {
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(WS_STATUS_POLL_MS));
         int64_t cycle_started_us = esp_timer_get_time();
+        poll_reboot();
         web_tcp_probe_poll();
         uint32_t publications = 0;
         uint32_t deliveries = 0;
@@ -716,5 +723,6 @@ esp_err_t websocket_service_register(httpd_handle_t server,
                                     BOARD_TASK_STACK_WEBSOCKET_STATUS,
                                     NULL, 2, NULL) == pdPASS,
                         ESP_ERR_NO_MEM, TAG, "start WebSocket status task");
+    atomic_store(&s_reboot_ready, true);
     return ESP_OK;
 }

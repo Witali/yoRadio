@@ -308,10 +308,12 @@ esp_err_t network_service_save_credentials(const char *ssid,
                                                  (size_t)length);
 }
 
-esp_err_t network_service_save_credentials_file(const uint8_t *data,
-                                                size_t size) {
+esp_err_t network_service_validate_credentials_file(const uint8_t *data,
+                                                    size_t size) {
     ESP_RETURN_ON_FALSE(data && size && size < 800U, ESP_ERR_INVALID_SIZE, TAG,
                         "Wi-Fi file is empty or too large");
+    ESP_RETURN_ON_FALSE(!memchr(data, 0, size), ESP_ERR_INVALID_ARG, TAG,
+                        "Wi-Fi file contains a NUL byte");
     char content[800];
     memcpy(content, data, size);
     content[size] = '\0';
@@ -342,6 +344,13 @@ esp_err_t network_service_save_credentials_file(const uint8_t *data,
     ESP_RETURN_ON_FALSE(count > 0, ESP_ERR_INVALID_ARG, TAG,
                         "Wi-Fi file has no networks");
 
+    return ESP_OK;
+}
+
+esp_err_t network_service_save_credentials_file(const uint8_t *data,
+                                                size_t size) {
+    ESP_RETURN_ON_ERROR(network_service_validate_credentials_file(data, size),
+                        TAG, "Invalid Wi-Fi file");
     const char *path = "/spiffs/data/wifi.csv";
     const char *temporary_path = "/spiffs/data/wifi.csv.tmp";
     FILE *file = fopen(temporary_path, "wb");
@@ -363,6 +372,6 @@ esp_err_t network_service_save_credentials_file(const uint8_t *data,
     s_have_credentials = read_credentials(&s_station_config);
     ESP_RETURN_ON_FALSE(s_have_credentials, ESP_FAIL, TAG,
                         "Reload saved Wi-Fi networks");
-    ESP_LOGI(TAG, "Saved %u Wi-Fi network(s)", (unsigned)count);
+    ESP_LOGI(TAG, "Saved %u Wi-Fi network(s)", (unsigned)s_credential_count);
     return ESP_OK;
 }

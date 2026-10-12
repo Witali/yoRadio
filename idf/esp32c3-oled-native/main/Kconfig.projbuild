@@ -381,6 +381,17 @@ config YORADIO_WEB_STATIC_WORKERS
         files in parallel. The main HTTP task remains available for WebSocket
         traffic while static responses are in progress.
 
+config YORADIO_WEB_FILE_CHUNK_BYTES
+    int "WebUI file streaming buffer bytes per worker"
+    range 2048 8192
+    default 2048
+    help
+        Private buffer on each static worker's startup-allocated stack.
+        Two default workers reserve 4 KiB of file buffers in total. Setting
+        4096 reserves 8 KiB total, and increases their stack allocations by
+        4 KiB. No file-sized or per-download payload allocation is needed.
+        Recheck heap and task stack high-water marks before increasing this.
+
 config YORADIO_QEMU
     bool "Build the headless QEMU smoke-test profile"
     default n

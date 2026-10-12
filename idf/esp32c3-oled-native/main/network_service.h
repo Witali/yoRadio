@@ -16,3 +16,6 @@ esp_err_t network_service_save_credentials(const char *ssid,
 esp_err_t network_service_save_credentials_file(const uint8_t *data,
                                                 size_t size);
 
+
+esp_err_t network_service_validate_credentials_file(const uint8_t *data,
+                                                    size_t size);

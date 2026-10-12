@@ -125,6 +125,7 @@ set(NATIVE_SRCS
   "web_pages_bridge.cpp"
   "web_service.c"
   "web_ota.c"
+  "web_upload.c"
   "websocket_service.c")
 
 if(CONFIG_YORADIO_NETWORK_HEAP_PROFILE)
