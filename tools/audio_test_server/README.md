@@ -257,3 +257,31 @@ and encoder commands. Any board can play `/file/mp3-256-44100-stereo` and
 
 See the [C3 transport comparison](../../docs/ESP32C3_MP3_TRANSPORT_CONTROLS_20261010.md)
 for hardware results and the limits of comparing local files with public radio.
+
+## ICY metadata controls
+
+Use the same encoded fixture with synthetic song-title metadata, as in an
+Icecast/Shoutcast stream:
+
+```powershell
+python -m tools.audio_test_server.server --fixture-manifest .build/mp3-rate-controls/manifest.json --pacing-ratio 1.0 --icy-interval 45000
+```
+
+The server inserts metadata only if the client requests `Icy-MetaData: 1`.
+It returns `icy-metaint` and cycles through two synthetic titles and an empty
+metadata update. `--icy-interval 0` (default) leaves existing delivery unchanged.
+Both `/file/` and AAC `/stream/` work; audio bytes and their pacing are unchanged.
+Framing follows the [FFmpeg reference reader](https://ffmpeg.org/doxygen/8.0/http_8c_source.html):
+each metadata length byte counts 16-byte blocks, with zero meaning no update.
+
+Python callers can supply `icy_metadata=(...)` with byte strings up to 4,080
+bytes each to exercise long or empty metadata. File Content-Length includes
+these insertions. Server event `sent` and delivery-pause offsets still count
+audio bytes; `wire_sent`, `icy_metadata_bytes` (including length bytes) and
+`icy_insertions` describe the completed framed writes. Delivery statistics
+count wire bytes, including metadata. Pacing deadlines count audio duration.
+
+Run `python tests/test-audio-icy-server.py`. It checks split boundaries,
+negotiation, length/accounting, both CLI entry points, and (when FFmpeg is on
+PATH) exact PCM equivalence between plain and ICY MP3 with empty, short and
+maximum-length metadata. It tests framing, not RF/network reliability.
