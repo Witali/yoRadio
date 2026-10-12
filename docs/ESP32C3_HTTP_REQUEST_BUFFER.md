@@ -125,3 +125,81 @@ Still required before enabling the key by default: all-codec/HTTP lifecycle
 regression (including redirects, EOF, interrupted streams and repeated starts),
 OTA rejection/recovery coverage on this candidate, and bounded longer playback
 on the heavy HTTPS cases. This comparison does not qualify production as a whole.
+
+## Codec and HTTP regression, 2026-10-12
+
+The same candidate binary was installed temporarily for 33 checks. Eleven
+finite fixtures cover MP3 320 kbit/s, FLAC level 8, Vorbis q10, Opus 510 kbit/s,
+AAC-LC 320 kbit/s, LC at 22.05/44.1/48 kHz, HE-AAC at 44.1/48 kHz, and
+HE-AACv2 at 44.1 kHz. Each runs with automatic and explicit codec selection.
+Positive file cases check native PCM rate/channels/profile, sampled output
+counters and memory, stable EOF with cleared PCM fields, and the WebSocket
+terminal state. These are transport/runtime tests, not fresh PCM precision tests.
+
+| Group | Result |
+|---|---:|
+| File format / output / memory / EOF / WebSocket terminal state | 21/22 PASS |
+| In-stream AAC profile/rate transitions | 1/2 PASS |
+| Rapid Stop/Play generation | 1/1 PASS |
+| Dropped/stalled/error source recovery, redirect, jitter | 5/5 PASS |
+| WebSocket format and reconnect | 1/1 PASS |
+| Settled heap recovery and lifetime health | 2/2 PASS |
+| **Total** | **31/33 PASS** |
+
+The two failures are preserved in the
+[regression evidence](../tests/results/esp32c3-http-buffer-regression/):
+
+- `vorbis-q10:auto`: the short steady window failed the existing 2,048-byte
+  first/last heap-median criterion. Free heap oscillated between 70,400 and
+  73,288 B; the largest block stayed at 57,344..59,392 B, with no allocation
+  failure. The test exited before its EOF checks. Explicit Vorbis selection
+  subsequently passed the complete file test. A short-window decline alone
+  does not establish a leak.
+- `transition:changing`: WebUI TCP connection timed out before the full AAC
+  transition sequence could be observed. The other `implicit-sbr` sequence
+  passed. The timeout does not establish an AAC decoding failure, and the
+  interrupted sequence is not counted as passed.
+
+The final idle heap median was 139,704 B versus 139,844 B initially (140 B
+lower); largest free block stayed at 114,688 B and task count at 16. No allocation
+failure, watchdog event or unexpected reboot was recorded across the campaign.
+Thus the series passes the existing settled recovery limits, while retaining
+the short-window Vorbis failure and incomplete transition observation.
+
+Raw status/health/server records, numerical HTTP phase tracing, source snapshots
+and an offline replay are retained. The replay verifies recorded evidence; its
+own success does not turn the two failed cases into passes. Original production,
+station and settings were restored after the matrix.
+
+### Targeted follow-ups
+
+A deterministic 90-second Vorbis q10 fixture (48 kHz stereo, approximately
+507 kbit/s) was generated with the shared stress generator. Each firmware
+played its first 60 seconds at 1x, with the existing 15-second warmup and
+unchanged sustained memory/output gates. This is one continuous Ogg stream,
+not concatenated short files. Generator settings, encoded hash and manifest
+are archived; the replaceable large audio and source WAV stay under `.build/`.
+
+| Vorbis firmware | Minimum free heap / largest block | First → last steady heap median | Format / output / memory / observation transport |
+|---|---:|---:|---|
+| Baseline | 66,276 / 51,200 B | 66,984 → 68,524 B | PASS / PASS / PASS / PASS |
+| Request-buffer release | 70,336 / 53,248 B | 71,032 → 70,404 B | PASS / PASS / PASS / PASS |
+
+The minimum and overall median free heap both improved by 4,060 B in this
+comparison. Neither run recorded allocation failures, watchdog events, queue
+drops or write errors in the steady window. The short-fixture heap failure
+did not reproduce as a sustained-budget failure. Together with the matrix's
+settled recovery, this provides no evidence of a persistent memory loss in
+these runs; it is not an unbounded leak-proof claim.
+
+The interrupted `changing` sequence was also repeated on the candidate:
+AAC-LC 44.1 kHz → AAC-LC 48 kHz → HE-AAC 48 kHz → HE-AACv2 44.1 kHz.
+All four formats were confirmed in order; 87 status/health observations
+recorded no transport error, allocation failure, watchdog or reboot. Minimum
+free heap was 39,072 B, largest block 24,576 B. This confirms the sequence in
+the repeat, while leaving the earlier intermittent WebUI timeout unresolved.
+
+Both follow-ups were independently replayed from saved evidence, and original
+production/settings/station restoration was checked again. The original
+matrix remains **31/33**, with these additional successful controls reported
+separately. No firmware source or default was changed during this campaign.

@@ -10,7 +10,7 @@
     "bytes": 1456160
   },
   "build_directory": "idf\\esp32c3-oled-native\\build-idf-6.1-r9a97-quiet-http-txrelease",
-  "qualification": "Experimental: two 60-second HE-AAC physical cases passed format, output counters, transport and memory gates; original production restored. All-codec, HTTP lifecycle and longer playback regression pending.",
+  "qualification": "Experimental: physical HE-AAC memory comparison and 33-case HTTP codec regression retained, including two original failures and targeted follow-ups. Longer heavy HTTPS playback and candidate OTA regression remain pending. Original production restored.",
   "sdkconfig_sha256": "a62f4ea356ff0fed10a66aac688524a1da4a194bc426e222bbd42330a0ecb3ca",
   "elf_sha256": "7de7f32a495936052d8611a061112fc8d71edaed43e88e3c512831c310094b22",
   "project_version_at_build": "idf61-quiet-http-txrelease",
@@ -548,5 +548,42 @@
       }
     },
     "restoration": true
-  }
+  },
+  "regression_report": "tests/results/esp32c3-http-buffer-regression/review.json",
+  "http_regression": {
+    "cases": 33,
+    "passed": 31,
+    "failures": [
+      {
+        "name": "file-eof:vorbis-q10:auto",
+        "result": "FAIL",
+        "reason": "Progressive heap loss",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ]
+      },
+      {
+        "name": "transition:changing",
+        "result": "FAIL",
+        "reason": "URLError",
+        "exception_chain": [
+          {
+            "type": "URLError"
+          },
+          {
+            "type": "TimeoutError"
+          },
+          {
+            "type": "URLError"
+          },
+          {
+            "type": "TimeoutError"
+          }
+        ]
+      }
+    ]
+  },
+  "vorbis_followup_report": "tests/results/esp32c3-http-buffer-regression/vorbis-review.json"
 }
