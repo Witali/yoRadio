@@ -6,6 +6,7 @@ param(
     [string]$FirmwareOutputDirectory = "",
     [switch]$NoFirmwareExport,
     [switch]$Setup,
+    [switch]$TestedRadioProfile,
     [switch]$DeepSleepClock,
     [switch]$Rtc32kCrystal,
     [Parameter(ValueFromRemainingArguments = $true)]
@@ -13,6 +14,14 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+if ($TestedRadioProfile) {
+    if (-not $PSBoundParameters.ContainsKey("BuildDirectory")) {
+        $BuildDirectory = "build-production-radio-tested"
+    }
+    if (-not $PSBoundParameters.ContainsKey("Sdkconfig")) {
+        $Sdkconfig = "$BuildDirectory/sdkconfig"
+    }
+}
 if ($DeepSleepClock -or $Rtc32kCrystal) {
     if (-not $PSBoundParameters.ContainsKey("BuildDirectory")) {
         if ($DeepSleepClock) { $BuildDirectory += "-deep-sleep-clock" }
@@ -32,6 +41,9 @@ $buildArguments = @{
         "sdkconfig.production.defaults"
     )
     IdfArguments = $IdfArguments
+}
+if ($TestedRadioProfile) {
+    $buildArguments.SdkconfigDefaults += "sdkconfig.radio-tested.defaults"
 }
 if (-not [string]::IsNullOrWhiteSpace($DependencyRoot)) {
     $buildArguments.DependencyRoot = $DependencyRoot
@@ -55,6 +67,22 @@ if (Test-Path -LiteralPath $productionConfigPath -PathType Leaf) {
         $productionConfig = [regex]::Replace($productionConfig, $pattern, '')
         $productionConfig = $productionConfig.TrimEnd() + [Environment]::NewLine +
             '# CONFIG_' + $option + ' is not set' + [Environment]::NewLine
+    }
+    if ($TestedRadioProfile) {
+        # Explicit profile selection applies to reused directories as well.
+        # Drop renamed aliases so they cannot restore older values on load.
+        $profileLines = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'sdkconfig.radio-tested.defaults') |
+            Where-Object { $_ -match '^(?:CONFIG_[A-Z0-9_]+=|# CONFIG_[A-Z0-9_]+ is not set$)' })
+        $profileKeys = @($profileLines | ForEach-Object {
+            [regex]::Match($_, 'CONFIG_([A-Z0-9_]+)').Groups[1].Value
+        }) + @('FLASHMODE_DIO', 'FLASHMODE_QIO', 'FLASHMODE_DOUT', 'FLASHMODE_QOUT',
+               'L2_TO_L3_COPY', 'TCP_WND_DEFAULT', 'TCP_RECVMBOX_SIZE')
+        foreach ($option in $profileKeys) {
+            $pattern = '(?m)^(?:CONFIG_' + $option + '=.*|# CONFIG_' + $option + ' is not set)\r?\n?'
+            $productionConfig = [regex]::Replace($productionConfig, $pattern, '')
+        }
+        $productionConfig = $productionConfig.TrimEnd() + [Environment]::NewLine +
+            ($profileLines -join [Environment]::NewLine) + [Environment]::NewLine
     }
     [IO.File]::WriteAllText($productionConfigPath, $productionConfig,
                           [Text.UTF8Encoding]::new($false))
@@ -94,6 +122,9 @@ if ($buildExitCode -eq 0 -and $shouldExportApplication -and -not $NoFirmwareExpo
         $FirmwareOutputDirectory
     } else {
         Join-Path $repositoryRoot $FirmwareOutputDirectory
+    }
+    if ($TestedRadioProfile -and [string]::IsNullOrWhiteSpace($FirmwareOutputDirectory)) {
+        $resolvedFirmwareOutput += '-radio-tested'
     }
 
     New-Item -ItemType Directory -Force -Path $resolvedFirmwareOutput | Out-Null
