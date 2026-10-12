@@ -34,6 +34,11 @@ further codec compression and speed work are not release requirements.
   playback/OTA results from the earlier binary merely because configs match.
   Cover all formats, transitions, terminal status, source failures, TLS
   certificate/record handling, repeated OTA and sustained heavy playback.
+  Its own OTA suite now passes 15/15. The 600-second HE-AAC HTTPS run retains
+  two below-budget largest-block samples (7,168 and 7,936 B), despite zero
+  allocation/watchdog/output faults and successful recovery. Preserve this
+  [contiguous-headroom failure](ESP32C3_HTTP_REQUEST_BUFFER.md#production-ota-and-he-aac-https-qualification)
+  and investigate allocation ownership before qualifying the image.
 - [ ] Resolve or attribute the intermittent public MP3 interruption, with
   simultaneous independent host decoding over HTTP and HTTPS. Preserve
   failed controls and distinguish host command errors from board failures.

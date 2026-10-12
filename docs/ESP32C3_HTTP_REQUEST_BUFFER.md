@@ -471,3 +471,48 @@ retain both client results and verification of restored image, station,
 decoded playback and settings. Public broadcast audio and private stderr are
 not archived. `offline_replay.py` reproduces the reviewed result from the
 saved observations and test sources.
+
+### Production OTA and HE-AAC HTTPS qualification
+
+The exact `production-radio` binary passed **15/15 OTA checks**, including
+wrong/damaged images, interrupted and stalled uploads, two ordinary updates,
+update during confirmed HE-AAC playback, a slow valid upload, and saved-settings
+verification. Only application partitions were updated.
+
+The following 600-second public HE-AAC HTTPS test passed format, transport and
+output checks, but **failed the unchanged memory-headroom gate**. FFprobe and
+an unquantized FAAD reference confirmed the source's HE-AAC 44.1 kHz stereo
+format before playback; the short reference is not a PCM comparison of the
+complete live broadcast.
+
+| Measurement | Result |
+|---|---:|
+| Steady decoded-format observations | 506 |
+| Steady output interval | 584.367 s |
+| Completion-queue increments / write errors | 0 / 0 |
+| Allocation failures / watchdogs / unexpected reboots | 0 / 0 / 0 |
+| Failed observation requests | 0 |
+| Maximum paired status/health response | 265.07 ms |
+| Minimum sampled free heap / largest block | 24,752 / 7,168 B |
+| Firmware free-heap low-water since boot | 15,420 B |
+| First → last steady free-heap median | 28,116 → 27,608 B |
+| First → last steady largest-block median | 13,824 → 12,288 B |
+| Memory gate | FAIL: largest free block below 8,192 B |
+| Settled recovery / exact-image restoration | PASS / PASS |
+
+Two separate below-budget samples occurred: at 419.477 seconds, free heap was
+27,940 B and the largest block 7,168 B; at 561.018 seconds, the values were
+26,668 B and 7,936 B. Neighboring samples met the threshold. These isolated
+observations do not measure the exact duration of either dip. They demonstrate
+reduced contiguous capacity while total free memory remains larger; allocation
+ownership and the required remedy are still unproven. No allocation failure
+was recorded, and the failing gate remains retained.
+
+Initial → final idle medians were 139,876 → 139,872 B free and
+114,688 → 114,688 B largest, with 16 tasks throughout. Original application,
+settings, station and decoded playback were restored. The production image
+remains unqualified as completion of the full goal.
+
+[OTA, playback and headroom evidence](../tests/results/esp32c3-production-radio-ota-soak/)
+includes frozen test sources and the two low-capacity sample windows. Review
+PASS denotes replay consistency; the memory test itself remains FAIL.

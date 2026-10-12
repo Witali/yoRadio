@@ -10,7 +10,7 @@
     "bytes": 1456144
   },
   "build_directory": "idf\\esp32c3-oled-native\\build-idf-6.1-r9a97-production-radio",
-  "qualification": "Exact production rebuild physically exercised for HTTP codec/EOF/network/lifecycle checks. Failures retained in report; exact-image HTTPS, OTA and sustained qualification remain pending. Original application/settings/station restored.",
+  "qualification": "Exact-image HTTP matrix 31/33; repeated Opus retains one active heap-trend failure. MP3 HTTP/independent FFmpeg and OTA 15/15 passed. HE-AAC HTTPS 600 s passed format/transport/output but failed largest-block headroom at 7168 B. Original application/settings/station restored. Full production qualification remains false.",
   "sdkconfig_sha256": "a62f4ea356ff0fed10a66aac688524a1da4a194bc426e222bbd42330a0ecb3ca",
   "elf_sha256": "d583ef1b8b51686498a7b2bc3445445d5f2779f14f0a65f5f644e68489407a52",
   "project_version_at_build": "idf61-production-radio",
@@ -506,5 +506,65 @@
         }
       }
     }
-  }
+  },
+  "ota_soak_report": "tests/results/esp32c3-production-radio-ota-soak/review.json",
+  "ota_qualification": {
+    "cases": 15,
+    "passed": 15,
+    "failures": []
+  },
+  "he_https_600s": {
+    "checks": {
+      "transport": {
+        "result": "PASS",
+        "errors": []
+      },
+      "format": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 506,
+          "rate": 44100,
+          "channels": 2
+        }
+      },
+      "output": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 506,
+          "elapsed_ms": 584367,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        }
+      },
+      "memory": {
+        "result": "FAIL",
+        "reason": "In-playback memory below existing budget"
+      }
+    },
+    "health": {
+      "samples": 506,
+      "boot_id": "a8702fd4f0ae30b7",
+      "minimum_heap": 24752,
+      "minimum_largest": 7168,
+      "allocation_failures": 0,
+      "task_watchdog_events": 0
+    },
+    "metrics": {
+      "heap": {
+        "minimum": 24752,
+        "median": 28168.0,
+        "first": 28116,
+        "last": 27608
+      },
+      "largest": {
+        "minimum": 7168,
+        "median": 14336.0,
+        "first": 13824,
+        "last": 12288
+      }
+    },
+    "response_maximum_ms": 265.07049999963783,
+    "lifetime_heap_low_water": 15420
+  },
+  "mp3_http_report": "tests/results/esp32c3-production-radio-mp3-http/review.json"
 }
