@@ -1,7 +1,7 @@
 # Small TV ESP32-C2 smart clock
 
 The factory dump and our reconstructed firmware also run in the experimental
-ESP32-C2 QEMU profile with a 240×240 ST7789 display. See
+ESP32-C2 QEMU profile with a 240×240 ST7789 display and simulated Wi-Fi/NTP. See
 [QEMU validation and launch instructions](qemu/README.md) for the saved screens,
 tests and current networking limits.
 

@@ -1,36 +1,64 @@
 # Small TV QEMU validation
 
-An experimental `esp32c2` machine and its Windows launcher have been added to
-`C:\Work\QEMU-ESP32` on branch `codex/esp32c2-small-tv`. See that repository's
-`README-small-tv-esp32c2.md` for build, launch, reset, screenshot and GDB commands.
-The tested model commit is `2fbfbf8756`; binary and firmware checksums are recorded
-in [validation.json](validation.json) and the individual reports.
+The experimental `esp32c2` machine in `C:\Work\QEMU-ESP32`, branch
+`codex/esp32c2-small-tv`, runs both applications with a 240×240 ST7789 and an
+isolated Wi-Fi network. Tested networking model: `ae70de5e72`.
+[clock-validation.json](clock-validation.json) records the binary hash and
+captures. See QEMU's `README-small-tv-esp32c2.md` for build and GDB instructions.
 
-| Firmware | Verified result |
+## Wi-Fi and synchronization
+
+| Component | Verified behavior |
 |---|---|
-| Factory 4 MiB dump | Real ROM and IDF v5.5.4 boot; first draws `Connecting to WiFi`, version `0.0.2`, then the `Small_TV / 192.168.43.1` setup instructions |
-| Reconstructed firmware | Real ROM and pinned ESP-IDF boot; `app_main` completes, AP DHCP starts, clock and JPEG animation draw |
-| Existing C3 production firmware | Its OLED radio UI still renders with the same final QEMU binary |
+| Virtual AP | Open `yoRadio-QEMU`, channel 1; guest driver performs authentication and association |
+| Transport | C2 MAC/DMA and interrupts, shared 802.11 frontend; SLIRP DHCP assigns `10.0.2.15` |
+| Local services | ARP, DNS, UDP NTP; firmware time-server names resolve to `10.0.2.2` |
+| Time source | Current host UTC, sent in regular NTP responses |
+| Guest clock | Both applications accept SNTP and store the epoch offset in RTC STORE2/3 |
+| Internet | SLIRP `restrict=on`; other DNS names, including weather, receive NXDOMAIN |
 
-Both C2 images ran for 30 seconds, displayed content at 240×240, reported no
-panic/watchdog failure, and booted again after a QMP reset. The reconstructed
-animation changed between captured frames. A separate run of the combined test
-wrapper repeated the checks for 10 seconds per variant. Source artifact and base
-flash hashes stayed unchanged. The saved UART logs belong to that shorter wrapper
-run; the main JSON reports and screenshots belong to the 30-second runs.
+Both applications passed **45-second headless runs**, LCD-content checks,
+watchdog/panic checks and reset/reboot checks. The reconstruction additionally
+passed association, station DHCP and animation checks. The NTP check reads the
+RTC offset and compares it with the server timestamp in the same virtual time
+scale; the displayed clock alone is not the evidence. The final binary also
+passed the existing C3 production firmware's separate 20-second boot/OLED test.
 
-The factory firmware reaches its **Wi-Fi setup screen**. The reconstruction is **waiting
-for time synchronization**, while its offline UI and animation work. These are
-successful boot/display tests, not successful Internet, SNTP, weather or HTTP
-tests. C2 Wi-Fi MAC packet DMA is not implemented; there is no simulated AP/NAT
-path, and the guest AP's `192.168.43.1` is not reachable from the host. No physical
-board was flashed, reset or otherwise accessed during these tests.
+- [Factory report](original-clock-report.json) and [UART log](original-clock-uart.log)
+- [Reconstructed report](reconstructed-clock-report.json) and [UART log](reconstructed-clock-uart.log)
+- [C3 regression](c3-network-regression.json)
 
-| Factory firmware | Reconstructed firmware |
+| Factory application | Reconstructed application |
 |---|---|
-| ![Factory connection screen](original.png) | ![Reconstructed clock and animation](reconstructed.png) |
+| ![Factory NTP clock](original-clock.png) | ![Reconstructed NTP clock](reconstructed-clock.png) |
 
-## Run or control the VM
+Screenshots come from a separate headless run with the same final binary and
+settings. Each is a single actual framebuffer capture, selected between SPI
+redraws. The factory displays `Getting Weather` because weather cannot resolve;
+the reconstruction uses an empty key and displays `Set city and weather key`.
+
+## Flash and virtual time
+
+Application/bootloader instructions and assets are unchanged. The launcher copies
+the archive, clears working NVS at `0x9000..0xefff` and seeds synthetic settings.
+Factory settings occupy the raw sector at `0x3e7000`; the reconstruction uses
+`small_tv/configuration` in NVS. Owner credentials, calibration identity and
+weather keys are excluded. The factory receives a nonempty `disabled` key
+sentinel to prevent fallback to its compiled vendor key. Source hashes remain
+unchanged; no physical board was accessed and no OTA was added.
+
+Fixed instruction-count time uses `-icount shift=3,align=off,sleep=on`.
+Watchdogs remain enabled. Automatic clock adaptation and the former host-clock
+launch mode produced interrupt watchdog panics; final checks use the stable
+fixed mode. Under emulator load, virtual seconds may lag wall seconds. NTP sets
+current time at synchronization; long runs can subsequently drift relative to
+the host. RF behavior, power consumption and cycle timing are not modeled.
+
+The authorized SDL windows were closed at the user's request. Final network
+checks and captures use `-Display none`, so prolonged SDL stability is not
+established. All test VMs were stopped.
+
+## Run or control
 
 ```powershell
 Set-Location C:\Work\QEMU-ESP32
@@ -40,41 +68,52 @@ Set-Location C:\Work\QEMU-ESP32
 .\run-small-tv-esp32c2.ps1 -Firmware reconstructed -Action status
 .\run-small-tv-esp32c2.ps1 -Firmware reconstructed -Action reset
 .\run-small-tv-esp32c2.ps1 -Firmware reconstructed -Action stop
-.\test-small-tv-esp32c2.ps1
+.\test-small-tv-esp32c2.ps1 -TestSeconds 45
 ```
 
-The default snapshot mode isolates guest flash writes in QEMU. `-Persistent`
-retains writes only in a working copy under `.cache/`; the original dump and our
-archived binaries are never used as writable drives. Each variant has a separate
-state directory and a localhost QMP endpoint. The automated verification used
-`-Display none` and framebuffer captures. The Windows setup enables the SDL2
-backend for visible LCD windows.
+The default network profile is `clock`. Add `-Network offline` to launch and
+control commands for earlier offline behavior. SDL is the default display.
+Each profile/variant has a separate directory under `.cache/small-tv-c2/`.
+Snapshot mode discards guest writes; `-Persistent` retains them in the working
+copy. Original dump and firmware archive are never writable drives.
 
-## Differences that the C2 model needs
+Reconstructed settings use the pinned ESP-IDF Python environment's official NVS
+generator. Internet weather, HTTPS and host access to the guest web server are
+outside these checks.
 
-- C2 ROM is 576 KiB, with the correct DROM alias and ROM data initialization
-  templates; it is generated from Espressif's genuine revision-2 ROM ELF.
-- SRAM is 272 KiB including the 16 KiB cache; C3's larger RAM and RTC RAM mapping
-  are not carried into the C2 machine.
-- C2's fixed PMPADDR3–15 regions must exist before ROM/bootloader execution;
-  PMP state must also be cleared on reset.
-- The MMU has 64 entries and a different invalid bit. Both firmwares configure
-  64 KiB pages; the model also reads the C2 page-size configuration register.
-- C2 has 43 interrupt sources, different matrix register offsets, one GDMA
-  channel pair, and different RTC register offsets.
-- With a 26 MHz crystal, SYSTIMER runs at 10.4 MHz and APB at 40 MHz. Reusing a
-  fixed 16 MHz SYSTIMER would skew software time and delays.
-- ST7789 uses SPI2 FIFO/DMA, GPIO5 D/C and GPIO1 Reset. GPIO18 LEDC duty controls
-  average display brightness using the inferred active-low mapping. The virtual
-  LCD remains selected because the firmware configures `CS=-1`; this does not
-  establish the physical board's CS wiring.
-- C2 analog calibration and MAC-reset handshakes need different register
-  addresses. Compatibility completion flags allow startup; they do not simulate
-  analog measurements or provide Wi-Fi packet transport.
+## Earlier offline evidence
 
-These observations explain emulator compatibility and supplement the existing
-firmware analysis. SPI waveforms/GPIO-matrix electrical routing, Bluetooth, SD,
-ADC, power consumption, low-power modes, security features and complete machine
-snapshots remain outside this validation. Hardware specifications can be checked
-against the [Espressif ESP8684 datasheet](https://documentation.espressif.com/esp8684_datasheet_en.html)
-and the ESP32-C2 headers of our pinned ESP-IDF source.
+[validation.json](validation.json), [factory report](original-report.json),
+[reconstructed report](reconstructed-report.json), [wrapper report](wrapper-validation.json)
+and [C3 report](c3-regression.json) belong to the model before C2 transport.
+Both images passed 30-second boot/display and reset checks; the wrapper repeated
+them for 10 seconds. Saved `*-smoke-uart.log` files belong to the shorter run.
+
+| Earlier factory setup | Earlier reconstructed offline UI |
+|---|---|
+| ![Factory setup](original.png) | ![Unsynchronized clock](reconstructed.png) |
+
+## C2 compatibility observations
+
+- Genuine revision-2 ROM is 576 KiB with the correct DROM alias and ROM data
+  templates. SRAM is 272 KiB including 16 KiB cache; C3 RTC RAM is absent.
+- Fixed PMPADDR3–15 regions exist before ROM execution, and PMP resets cleanly.
+  The 64-entry MMU has a different invalid bit/page-size register; both guests
+  select 64 KiB pages.
+- C2 has 43 IRQ sources, one GDMA channel pair and different RTC offsets.
+  With 26 MHz XTAL, SYSTIMER is 10.4 MHz and APB is 40 MHz.
+- SPI2 FIFO/DMA drives ST7789: SCK4, MOSI6, D/C5, Reset1, backlight18. LEDC duty
+  represents average active-low brightness. `CS=-1` keeps the virtual LCD
+  selected; physical CS wiring remains unconfirmed.
+- Wi-Fi MAC base is `0x60047000`. RX reload/base/next/last offsets are
+  `0x64/0x68/0x6c/0x70`; TX PLCP0 is `0xce8`, with 8-byte queue spacing. TX
+  completion bits start at bit 16.
+- Station-address filters start at `0x30/0x38`, BSSID filters at `0x00/0x08`.
+  Radio frequency writes at `0x6004e8c4` update the AP receive channel. C2 RX
+  metadata uses the C3 metadata layout.
+- Analog calibration uses completion flags, not RF measurements.
+
+Bluetooth, SD, ADC, low-power modes, security, full machine checkpoints and
+electrical GPIO/SPI timing remain outside validation. Specifications can be
+checked against the [Espressif ESP8684 datasheet](https://documentation.espressif.com/esp8684_datasheet_en.html)
+and C2 headers/ROM ELF in the pinned ESP-IDF source.

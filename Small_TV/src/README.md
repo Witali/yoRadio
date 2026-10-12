@@ -11,9 +11,11 @@ Compilation and host tests are verified; boot, panel orientation, brightness,
 Wi-Fi/SNTP/HTTPS and runtime heap/stack use still require a physical board test.
 This work did not flash or reset the device. OTA is deliberately absent.
 
-The unchanged archived build also passes an offline QEMU ESP32-C2 boot, LCD,
-animation and reset test. [Screens and reports](../qemu/README.md) document that
-result; they do not replace the physical-board and networking checks above.
+The unchanged archived application also passes QEMU ESP32-C2 boot, LCD,
+animation, Wi-Fi association, DHCP, UDP NTP and reset tests. The emulator seeds
+synthetic settings in a working flash copy and provides an isolated time server
+using host UTC. [Screens and reports](../qemu/README.md) document the result and
+virtual-time limitations; physical-board and Internet/HTTPS checks remain pending.
 
 ## Source organization and names
 
