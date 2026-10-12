@@ -19,6 +19,9 @@
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
 #include "stream_http_reader.h"
+#ifdef CONFIG_YORADIO_HTTP_RELEASE_REQUEST_BUFFER
+#include "http_request_buffer.h"
+#endif
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #ifdef YORADIO_CODEC_BENCHMARK
@@ -722,6 +725,14 @@ static void stream_task(void *argument) {
             continue;
         }
         const int64_t availability_timeout_us = (int64_t)retry.timeout_sec * 1000000;
+#ifdef CONFIG_YORADIO_HTTP_RELEASE_REQUEST_BUFFER
+        // Only this stream task owns the synchronous GET handle. Redirects
+        // have completed; the RX parser and cached body use separate storage.
+        esp_err_t released = yoradio_http_client_release_request_buffer(client);
+        if (released != ESP_OK) {
+            ESP_LOGW(TAG, "HTTP request buffer retained: %s", esp_err_to_name(released));
+        }
+#endif
         retry = (stream_retry_t){0};
         if (strncmp(command.url, "https://", 8) == 0) {
             log_runtime_memory("after TLS handshake");

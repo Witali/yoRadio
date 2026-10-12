@@ -15,6 +15,16 @@ config YORADIO_TLS_EARLY_MPI_LOCK
         Keep disabled until fresh-boot TLS, repeated handshakes, codec changes,
         settled memory recovery and the final quiet configuration are checked.
 
+config YORADIO_HTTP_RELEASE_REQUEST_BUFFER
+    bool "Release completed HTTP GET request buffer (experimental)"
+    default n
+    help
+        Free the request-header TX buffer after the stream accepts final GET
+        response headers. Response/TLS buffers retain their owners. A later
+        request allocates the original full TX size again. The generated SDK
+        copy is restricted to an audited revision. Keep disabled until reuse,
+        redirects, allocation failures, all codecs and OTA are qualified.
+
 config YORADIO_TLS_LARGE_BLOCK_RESERVE
     bool "Reserve one large TLS allocation in static RAM (experimental)"
     depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_INTERNAL_MEM_ALLOC && MBEDTLS_DYNAMIC_BUFFER
