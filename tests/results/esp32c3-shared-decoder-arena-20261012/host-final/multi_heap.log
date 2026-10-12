@@ -1,0 +1,24 @@
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-decoder-arena/host-final/multi_heap.c: In function ‘multi_heap_get_allocated_size_impl’:
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-decoder-arena/host-final/multi_heap.c:133:63: warning: unused parameter ‘heap’ [-Wunused-parameter]
+  133 | size_t multi_heap_get_allocated_size_impl(multi_heap_handle_t heap, void *p)
+      |                                           ~~~~~~~~~~~~~~~~~~~~^~~~
+In file included from /mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-decoder-arena/host-final/multi_heap.c:23:
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-decoder-arena/host-final/multi_heap.c: In function ‘multi_heap_dump_tlsf’:
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-decoder-arena/host-final/multi_heap.c:366:30: warning: format ‘%d’ expects argument of type ‘int’, but argument 4 has type ‘size_t’ {aka ‘long unsigned int’} [-Wformat=]
+  366 |     MULTI_HEAP_STDERR_PRINTF("Block %p data, size: %d bytes, Free: %s \n", (void *)ptr, size, used ? "No" : "Yes");
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~               ~~~~
+      |                                                                                         |
+      |                                                                                         size_t {aka long unsigned int}
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-decoder-arena/host-final/multi_heap_platform.h:91:60: note: in definition of macro ‘MULTI_HEAP_STDERR_PRINTF’
+   91 | #define MULTI_HEAP_STDERR_PRINTF(MSG, ...) fprintf(stderr, MSG, __VA_ARGS__)
+      |                                                            ^~~
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-decoder-arena/host-final/multi_heap.c:366:53: note: format string is defined here
+  366 |     MULTI_HEAP_STDERR_PRINTF("Block %p data, size: %d bytes, Free: %s \n", (void *)ptr, size, used ? "No" : "Yes");
+      |                                                    ~^
+      |                                                     |
+      |                                                     int
+      |                                                    %ld
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-decoder-arena/host-final/multi_heap.c: In function ‘multi_heap_get_info_tlsf’:
+/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/c3-decoder-arena/host-final/multi_heap.c:398:70: warning: unused parameter ‘ptr’ [-Wunused-parameter]
+  398 | __attribute__((noinline)) static bool multi_heap_get_info_tlsf(void* ptr, size_t size, int used, void* user)
+      |                                                                ~~~~~~^~~

@@ -1,0 +1,26 @@
+{
+  "result": "PASS",
+  "elf_sha256": "0e14ca6699a3a34834d49dd62bf3c0a171a7946ae5ea53529b401dea110b2ec6",
+  "edges": {
+    "media_lib_module_malloc": "__wrap_malloc",
+    "media_lib_module_calloc": "__wrap_calloc",
+    "media_lib_module_realloc": "__wrap_realloc",
+    "media_lib_free": "__wrap_free",
+    "_Znwj": "__wrap_malloc",
+    "_ZdlPv": "__wrap_free",
+    "decoder_task": "decoder_arena_select",
+    "audio_service_start": "decoder_arena_init",
+    "esp_mbedtls_mem_calloc": "heap_caps_calloc"
+  },
+  "configuration_changes": {
+    "CONFIG_YORADIO_SHARED_DECODER_ARENA_BYTES": [
+      null,
+      "102400"
+    ],
+    "CONFIG_YORADIO_SHARED_DECODER_ARENA": [
+      null,
+      "y"
+    ]
+  },
+  "limitation": "Call edges and wrapper placement; no claim that all SDK allocations use libc."
+}
