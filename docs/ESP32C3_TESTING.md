@@ -1628,3 +1628,16 @@ and `tests/check-decoder-arena-link.py` before physical qualification.
 arena usage, format/EOF results and restoration evidence. Include streams
 whose AAC parameters change during playback: passing isolated files does
 not prove that a fixed arena can service reallocations across transitions.
+
+## Bounded WebUI transfers and OTA reboot
+
+Run `python -B -X utf8 tests/run-esp32c3-web-memory.py` for the actual C3
+multipart parser, form and upload sink under ASan/UBSan. Run the native-IDF,
+static-worker and WebUI OTA JavaScript tests listed in the
+[memory report](ESP32C3_WEB_MEMORY_20261013.md).
+`tools/esp32c3_tests/web_memory.py` compares explicit baseline/candidate images,
+checks exact file transfers, malformed uploads, reboots and OTA, and restores
+the original app/settings. It requires an initially stopped board. The fixture
+server's `/stream/` route is AAC-only; use `/file/flac-level8` for the finite
+FLAC fixture. Frozen failed trials and corrected reruns are retained in the
+report. These focused tests do not replace the full codec/HTTPS matrix.

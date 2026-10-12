@@ -30,6 +30,12 @@ lifetimes. Other startup trials still had allocation failures. See
      per worker (8 KiB total) only with memory/throughput evidence. Never share
      an unprotected buffer between simultaneous requests. Do not count moving
      stack storage to static RAM as a memory saving.
+   - Final user preference: keep download chunks at 2 KiB per worker. For rare
+     SPIFFS uploads allocate one **2 KiB staging buffer on demand**, reuse it
+     across the request's files, and free it before publication. Do not reserve
+     this payload buffer at boot. A failed allocation must leave live files
+     unchanged. OTA retains its separate existing 4 KiB buffer and direct
+     partition writes; it does not pass through SPIFFS.
    - Measure removed request-sized heap allocation, persistent RAM changes,
      stack high-water marks, and residual SDK/filesystem allocations separately.
 2. **Guarantee the minimum audio input queue at startup.** Reserve a bounded
@@ -57,4 +63,9 @@ lifetimes. Other startup trials still had allocation failures. See
 
 ## Progress
 
-- Plan saved; step 1 in progress. No default decoder/network pool changes.
+- Step 1 implemented and focused host/physical validation completed. Uploads
+  now use a temporary 2 KiB buffer; downloads retain their existing 2 KiB
+  chunks. The maximum removed request-body allocation is 96,257 bytes larger
+  than the replacement buffer. See [measurements, failures and limits](ESP32C3_WEB_MEMORY_20261013.md).
+- Original firmware/settings restored. Steps 2-4 remain pending; no default
+  decoder/network pool changes and no claim of full production qualification.

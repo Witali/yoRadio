@@ -1,0 +1,51 @@
+baseline:parallel-downloads PASS
+baseline:playlist-16384 FAIL
+baseline:playlist-65536 PASS
+baseline:playlist-96000 FAIL
+baseline:playback-downloads:he-48000-stereo PASS
+baseline:playback-downloads:flac-level8 FAIL
+candidate:parallel-downloads FAIL
+candidate:playlist-16384 FAIL
+candidate:playlist-65536 FAIL
+candidate:playlist-96000 FAIL
+candidate:truncated FAIL
+candidate:disconnect FAIL
+candidate:oversized FAIL
+candidate:duplicate-asset FAIL
+candidate:invalid-wifi-form FAIL
+candidate:board-multipart FAIL
+candidate:wifi-upload-reboot FAIL
+candidate:websocket-reboot FAIL
+candidate:corrupt-ota FAIL
+candidate:ota-roundtrip FAIL
+candidate:playback-downloads:he-48000-stereo FAIL
+candidate:playback-downloads:flac-level8 FAIL
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\web_memory.py", line 255, in <module>
+    main()
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\web_memory.py", line 244, in main
+    restore_playlist()
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\web_memory.py", line 114, in restore_playlist
+    require(board.request('/data/playlist.csv',timeout=30) == private['playlist'],
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tools\esp32c3_tests\common.py", line 101, in request
+    with urlopen(Request(self.origin + path, data=data), timeout=timeout) as r:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 521, in open
+    response = meth(req, response)
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 630, in http_response
+    response = self.parent.error(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 559, in error
+    return self._call_chain(*args)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\urllib\request.py", line 639, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 404: Not Found
