@@ -1,5 +1,24 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_SHARED_DECODER_ARENA
+    bool "Reserve one reusable heap for the decoder task (experimental)"
+    default n
+    help
+        Route decoder-task libc allocations into a private coalescing heap.
+        Global codec registration stays on the system heap. Pointer ownership
+        determines free/realloc even from other tasks. Exhaustion fails without
+        falling back to system RAM. Wi-Fi, TLS and DMA keep separate storage.
+        Compare every format, switching, EOF, errors and OTA before enabling.
+
+config YORADIO_SHARED_DECODER_ARENA_BYTES
+    int "Shared decoder arena capacity in bytes"
+    depends on YORADIO_SHARED_DECODER_ARENA
+    range 32768 163840
+    default 98304
+    help
+        Experimental budget including allocator metadata and PCM workspace;
+        96 KiB is a starting point, not a proven maximum for every input.
+
 config YORADIO_TLS_EARLY_MPI_LOCK
     bool "Initialize the TLS hardware MPI mutex at startup (experimental)"
     depends on IDF_TARGET_ESP32C3 && ESP_TLS_USING_MBEDTLS && MBEDTLS_HARDWARE_MPI

@@ -272,6 +272,12 @@ idf_component_register(
 
 yoradio_aac_profile()
 yoradio_vorbis_repair()
+if(CONFIG_YORADIO_SHARED_DECODER_ARENA)
+  target_sources(${COMPONENT_LIB} PRIVATE "decoder_arena.c")
+  target_link_options(${COMPONENT_LIB} INTERFACE
+    "-Wl,--wrap=malloc" "-Wl,--wrap=calloc" "-Wl,--wrap=realloc"
+    "-Wl,--wrap=free" "-Wl,--wrap=heap_caps_get_allocated_size")
+endif()
 if(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER)
   target_sources(${COMPONENT_LIB} PRIVATE "adaptive_input.c")
 endif()

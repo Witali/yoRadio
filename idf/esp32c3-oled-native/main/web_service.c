@@ -117,6 +117,7 @@ static esp_err_t status_handler(httpd_req_t *request) {
     return httpd_resp_sendstr(request, body);
 }
 
+#include "decoder_arena.h"
 static esp_err_t health_handler(httpd_req_t *request) {
     // Snapshot on demand: no sampler task, retained buffers or console output.
     // Use the same 8-bit allocation capability as the existing heap profiler.
@@ -133,7 +134,11 @@ static esp_err_t health_handler(httpd_req_t *request) {
     char body[2048];
 #else
     native_audio_output_health_t output = native_audio_output_health();
+#ifdef CONFIG_YORADIO_SHARED_DECODER_ARENA
+    char body[768];
+#else
     char body[512];
+#endif
 #endif
     int length = snprintf(body, sizeof(body),
         "{\"schema\":1,\"boot_id\":\"%016llx\",\"uptime_ms\":%llu,"
@@ -152,6 +157,19 @@ static esp_err_t health_handler(httpd_req_t *request) {
         output.available ? "true" : "false",
         (unsigned long)output.completion_queue_drops,
         (unsigned long)output.write_errors);
+#ifdef CONFIG_YORADIO_SHARED_DECODER_ARENA
+    decoder_arena_stats_t arena = decoder_arena_stats();
+    if (length > 0 && (size_t)length < sizeof(body)) {
+        --length; // Replace the outer closing brace with an additional object.
+        int added = snprintf(body + length, sizeof(body) - length,
+            ",\"decoder_arena\":{\"capacity\":%u,\"live\":%u,\"peak\":%u,"
+            "\"blocks\":%u,\"free\":%u,\"largest\":%u,\"failures\":%u}}",
+            (unsigned)arena.capacity, (unsigned)arena.live, (unsigned)arena.peak,
+            (unsigned)arena.blocks, (unsigned)arena.free_bytes,
+            (unsigned)arena.largest, arena.failures);
+        length = added < 0 ? -1 : length + added;
+    }
+#endif
 #ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
     length = audio_pipeline_probe_append(body, sizeof(body), length, &probe);
 #endif

@@ -4,6 +4,7 @@
 #include "decoder_pcm.h"
 #include "decoder_resources.h"
 #include "decoder_registration.h"
+#include "decoder_arena.h"
 
 #include <stdatomic.h>
 #include <stdlib.h>
@@ -1103,6 +1104,7 @@ static bool prefill_encoded_input(uint32_t generation) {
 static void decoder_task(void *argument) {
     (void)argument;
     esp_audio_err_t registration_result = decoder_register_codecs();
+    decoder_arena_select(true);
     uint8_t *output = NULL;
     size_t output_size = 0;
     esp_audio_simple_dec_handle_t decoder = NULL;
@@ -1225,7 +1227,9 @@ static void decoder_task(void *argument) {
             continue;
         }
         if (registration_result != ESP_AUDIO_ERR_OK) {
+            decoder_arena_select(false);
             registration_result = decoder_register_codecs();
+            decoder_arena_select(true);
             if (registration_result != ESP_AUDIO_ERR_OK) {
                 ESP_LOGE(TAG, "Decoder registration failed: %d", registration_result);
                 state_set_audio(packet->generation, false, "DECODER INIT ERROR");
@@ -1828,6 +1832,7 @@ static void output_task(void *argument) {
 }
 
 esp_err_t audio_service_start(native_state_t *state) {
+    if (!decoder_arena_init()) return ESP_ERR_NO_MEM;
     s_state = state;
 #ifdef CONFIG_YORADIO_DEEP_SLEEP_CLOCK
     s_output_suspended = xSemaphoreCreateBinary();

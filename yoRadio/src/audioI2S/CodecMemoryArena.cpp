@@ -31,7 +31,11 @@ bool contains(const void* pointer) {
 bool CodecArenaReserve() {
     if(arena) return true;
 
-#if defined(CONFIG_IDF_TARGET_ESP32S3) && defined(BOARD_HAS_PSRAM)
+#if defined(CONFIG_YORADIO_SHARED_DECODER_ARENA)
+    // The native decoder task routes this backing allocation to the shared
+    // heap. Retain Helix's existing owner/lifetime rules inside that block.
+    arena = static_cast<uint8_t*>(malloc(kCodecArenaCapacity));
+#elif defined(CONFIG_IDF_TARGET_ESP32S3) && defined(BOARD_HAS_PSRAM)
     arena = static_cast<uint8_t*>(
         heap_caps_malloc(kCodecArenaCapacity, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT)
     );
