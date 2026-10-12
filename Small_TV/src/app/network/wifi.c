@@ -1,0 +1,106 @@
+#include "network.h"
+#include "settings.h"
+#include <stdatomic.h>
+#include <stdio.h>
+#include <string.h>
+#include "esp_event.h"
+#include "esp_netif.h"
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+static esp_netif_t *station_netif,*ap_netif;
+static atomic_bool connected,ap_active,scanning,restarting;
+static bool station_configured;
+
+static void wifi_event(void *context,esp_event_base_t base,int32_t id,void *data)
+{
+    (void)context; (void)data;
+    if (base==IP_EVENT && id==IP_EVENT_STA_GOT_IP) atomic_store(&connected,true);
+    else if (base==WIFI_EVENT && id==WIFI_EVENT_STA_DISCONNECTED) {
+        atomic_store(&connected,false);
+        if (station_configured && !atomic_load(&scanning)) esp_wifi_connect();
+    } else if (base==WIFI_EVENT && id==WIFI_EVENT_STA_START && station_configured) esp_wifi_connect();
+}
+
+static esp_err_t start_access_point(void)
+{
+    if (atomic_load(&ap_active)) return ESP_OK;
+    esp_err_t result=esp_wifi_set_mode(WIFI_MODE_APSTA);
+    if (result==ESP_OK) atomic_store(&ap_active,true);
+    return result;
+}
+
+static void fallback_task(void *unused)
+{
+    (void)unused; unsigned offline_seconds=0;
+    for (;;) {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        if (network_connected()) offline_seconds=0;
+        else if (++offline_seconds>=20 && !network_ap_active()) start_access_point();
+    }
+}
+
+esp_err_t network_init(void)
+{
+    ESP_ERROR_CHECK(esp_netif_init()); ESP_ERROR_CHECK(esp_event_loop_create_default());
+    station_netif=esp_netif_create_default_wifi_sta(); ap_netif=esp_netif_create_default_wifi_ap();
+    if (!station_netif || !ap_netif) return ESP_ERR_NO_MEM;
+    esp_netif_ip_info_t ip={0};
+    esp_netif_set_ip4_addr(&ip.ip,192,168,43,1); esp_netif_set_ip4_addr(&ip.gw,192,168,43,1); esp_netif_set_ip4_addr(&ip.netmask,255,255,255,0);
+    ESP_ERROR_CHECK(esp_netif_dhcps_stop(ap_netif)); ESP_ERROR_CHECK(esp_netif_set_ip_info(ap_netif,&ip));
+    esp_netif_dns_info_t dns={.ip.type=ESP_IPADDR_TYPE_V4}; dns.ip.u_addr.ip4=ip.ip;
+    ESP_ERROR_CHECK(esp_netif_set_dns_info(ap_netif,ESP_NETIF_DNS_MAIN,&dns));
+    uint8_t offer_dns=1;
+    ESP_ERROR_CHECK(esp_netif_dhcps_option(ap_netif,ESP_NETIF_OP_SET,ESP_NETIF_DOMAIN_NAME_SERVER,&offer_dns,sizeof(offer_dns)));
+    ESP_ERROR_CHECK(esp_netif_dhcps_start(ap_netif));
+    wifi_init_config_t config=WIFI_INIT_CONFIG_DEFAULT(); ESP_ERROR_CHECK(esp_wifi_init(&config));
+    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
+    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT,ESP_EVENT_ANY_ID,wifi_event,NULL));
+    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT,IP_EVENT_STA_GOT_IP,wifi_event,NULL));
+    tv_settings_t s; settings_snapshot(&s); station_configured=s.ssid[0]!=0;
+    wifi_config_t station={0}; memcpy(station.sta.ssid,s.ssid,strlen(s.ssid)); memcpy(station.sta.password,s.password,strlen(s.password));
+    station.sta.threshold.authmode=s.password[0]?WIFI_AUTH_WPA2_PSK:WIFI_AUTH_OPEN;
+    wifi_config_t ap={.ap={.ssid="Small_TV",.ssid_len=8,.channel=1,.max_connection=3,.authmode=WIFI_AUTH_OPEN}};
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP,&ap));
+    if (station_configured) ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA,&station));
+    if (station_configured) ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    ESP_ERROR_CHECK(esp_wifi_start()); atomic_store(&ap_active,!station_configured);
+    dns_start();
+    return xTaskCreate(fallback_task,"wifi_fallback",2048,NULL,2,NULL)==pdPASS?ESP_OK:ESP_ERR_NO_MEM;
+}
+
+bool network_connected(void) {return atomic_load(&connected);}
+bool network_ap_active(void) {return atomic_load(&ap_active);}
+
+void network_address(char *out,size_t size)
+{
+    esp_netif_ip_info_t ip;
+    if (network_connected() && esp_netif_get_ip_info(station_netif,&ip)==ESP_OK) snprintf(out,size,IPSTR,IP2STR(&ip.ip));
+    else snprintf(out,size,"192.168.43.1");
+}
+
+esp_err_t network_scan(wifi_ap_record_t *records,uint16_t *count)
+{
+    atomic_store(&scanning,true);
+    wifi_scan_config_t config={.show_hidden=false};
+    esp_err_t result=esp_wifi_scan_start(&config,true);
+    if (result==ESP_OK) result=esp_wifi_scan_get_ap_records(count,records);
+    else esp_wifi_clear_ap_list();
+    atomic_store(&scanning,false);
+    if (station_configured && !network_connected()) esp_wifi_connect();
+    return result;
+}
+
+static void restart_task(void *unused)
+{
+    (void)unused; vTaskDelay(pdMS_TO_TICKS(800));
+    if (settings_flush()==ESP_OK) esp_restart();
+    atomic_store(&restarting,false); vTaskDelete(NULL);
+}
+
+void network_restart_later(void)
+{
+    if (!atomic_exchange(&restarting,true) && xTaskCreate(restart_task,"restart",2048,NULL,3,NULL)!=pdPASS) atomic_store(&restarting,false);
+}

@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.22)
+set(IDF_TARGET esp32c2)
+set(EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/app")
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(small_tv_reconstructed VERSION 0.1.0)

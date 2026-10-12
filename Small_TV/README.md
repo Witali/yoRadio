@@ -175,6 +175,19 @@ locally; Wi-Fi connection and restart operations update simulated state.
 The recovered pages and API behavior were checked in the browser and
 with integration tests covering all 34 registered firmware routes.
 
+## Reconstructed standalone firmware
+
+[`src/`](src/README.md) contains the modular ESP32-C2 ESP-IDF reconstruction,
+with descriptive names and an original-address symbol map. The broader
+176-function export is organized into 16 reference modules; the executable
+C implementation uses real SDK APIs. It builds the clock, display/backlight,
+settings, image playback/upload, Wi-Fi/DNS, SNTP, weather and recovered HTTP
+interface. Build artifacts are saved under
+[`firmware/development/small-tv-esp32c2-reconstructed`](../firmware/development/small-tv-esp32c2-reconstructed).
+Build and host tests are verified; the reconstructed firmware has not been
+tested on the physical device. OTA is absent. See the source README for
+the memory layout, compatibility differences and build instructions.
+
 ## Security review
 
 The [static security audit](analysis/security/README.md) found no clear
