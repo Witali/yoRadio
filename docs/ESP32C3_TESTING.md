@@ -1543,3 +1543,14 @@ ASan/UBSan. The C harness verifies that heap sampling occurs under the owner
 lock and that emitted paired values match its independently modeled heap.
 [Host and RV32 object evidence](../tests/results/esp32c3-rx-paired-heap-host/)
 does not establish physical attribution of the Opus heap fluctuation.
+
+The first complete `r9a97-radio-rx-owner` build exposed a configuration limit:
+production enables `CONFIG_LWIP_L2_TO_L3_COPY`, where `wlanif_input` uses
+`pbuf_alloc(PBUF_RAW, len, PBUF_RAM)` and releases the original Wi-Fi buffer
+immediately. The legacy `esp_pbuf_allocate` allocation hook is absent from
+the linked ELF, although the free hook and polling function remain. The
+[link audit failed](../tests/results/esp32c3-radio-rx-owner-build/build-audit-failure.json);
+the saved diagnostic image was **not flashed** and cannot support RX ownership
+conclusions. Adapt tracking to copied pbuf allocations and their actual final
+release, including chains/reference counts, while preserving production copy
+mode. Object compilation and host tests alone do not establish effective hooks.
