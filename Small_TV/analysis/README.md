@@ -227,3 +227,31 @@ The Java script applies the audited names and structures to this image
 and exports the selected C-like functions and call references. The scripts
 do not reconstruct every possible indirectly called driver, execute the
 application or prove physical continuity to unused GPIOs.
+
+## REA compatibility probe (2026-10-13)
+
+[REA (Reverse Engineer Anything)](https://rea.tools/) provides agent/CLI access
+to native-analysis engines, including Ghidra. A local, isolated npm installation
+of `rea-agents@6.4.0` was tested with the existing factory analysis ELF. The
+`inspect --provider ghidra` command returned `target_unavailable` with reason
+`unsupported ELF architecture`; that release's ELF classifier has no EM_RISCV
+entry. The package and probe logs remain under ignored `.build/rea-pilot/`.
+
+Current upstream source already adds a RISC-V lane, but its
+[documented Ghidra profile](https://github.com/morluto/rea/blob/main/docs/ghidra-riscv.md)
+admits only ELF32/64 executable images with the double-float ABI. Both our
+analysis ELF and compiled reconstruction declare `e_machine=243` and
+`e_flags=0x1` (RVC, soft-float ABI), so that profile also excludes this case.
+Changing the header to claim a different ABI would not establish correct
+function calling conventions. Supporting Small TV requires a verified
+soft-float profile, rather than merely enabling the architecture name.
+
+There are separate host prerequisites: REA requires Ghidra 12.1.x, while the
+existing installation is 12.0.4; its
+[Windows Ghidra provider](https://github.com/morluto/rea/blob/main/docs/windows-ghidra-p0.md)
+admits x86/x64 PE targets rather than this RISC-V ELF. A Linux/WSL workflow
+would address the host restriction, but not the missing ABI support. The probe
+did not change firmware bytes, existing Ghidra projects or agent MCP settings.
+Direct Ghidra analysis and the addressed assembly audit remain the established
+workflow for this target. The upstream-source observation is distinct from
+what the published npm release actually supports.
