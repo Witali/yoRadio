@@ -270,3 +270,31 @@ The configuration audit did not compile or flash another application and makes
 no claim of byte-identical firmware images. Its configurations and source
 snapshots are included in the OTA/soak archive. “Tested” names the measured
 configuration and does not mark the complete production goal achieved.
+
+### Fresh application build, 2026-10-12
+
+A clean build using `build-production.ps1 -TestedRadioProfile` now completes
+successfully. Its `sdkconfig` is byte-identical to the measured candidate,
+with the same SHA-256 above. The saved image is
+`firmware/development/esp32c3-idf-6.1-r9a97-production-radio/app.bin`:
+
+- App SHA-256: `e526eb7dc072fe58c61d5424942f20933b9e8288d948574f6833eb38ab43e211`.
+- Embedded ELF SHA-256: `d583ef1b8b51686498a7b2bc3445445d5f2779f14f0a65f5f644e68489407a52`.
+- Size: 1,456,144 bytes, within the 1,900,544-byte OTA slot.
+
+Build/link checks confirm the full compact AAC configuration, 17,058-byte TLS
+reserve, HTTP request-buffer release, adaptive input ownership, normal CA trust,
+quiet output and disabled deep sleep. AAC/FLAC object comparison matches all
+18 objects and 119 nonempty text/constant sections against the earlier baseline.
+
+A broader comparison covers 964 application object files: 11,389 text/constant
+sections match byte-for-byte. Six sections differ: application/bootloader build
+metadata, three generated assertion path strings, and the HTTP assertion's
+string-address addend (57 to 53). SDK HTTP overlay source is identical; retained
+disassembly confirms that instruction difference references the changed path.
+This is object-level evidence, not a claim of identical linked images.
+
+[Build evidence](../tests/results/esp32c3-production-radio-build/) retains source
+snapshots, build logs, configuration, link audits and object comparison. This
+exact new binary has **not yet been tested on hardware**. Prior OTA and playback
+results apply to `quiet-http-txrelease`, not automatically to this rebuild.

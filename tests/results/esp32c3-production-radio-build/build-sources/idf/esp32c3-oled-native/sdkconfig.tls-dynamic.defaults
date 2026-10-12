@@ -1,0 +1,7 @@
+# Optional ESP32-C3 radio RAM experiment. Keep full TLS record capacity and
+# certificate/configuration lifetime; only change TX/RX buffer allocation.
+CONFIG_MBEDTLS_DYNAMIC_BUFFER=y
+CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=16384
+CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN=4096
+# CONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA is not set
+# CONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT is not set

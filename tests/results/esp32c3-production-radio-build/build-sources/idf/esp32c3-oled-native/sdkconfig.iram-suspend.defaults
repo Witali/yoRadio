@@ -1,0 +1,12 @@
+# Additional opt-in experiment for the tested XMC-D JEDEC 0x464016 board.
+# IDF's generic driver advertises suspend support for this manufacturer ID.
+# Requires an IDF >=4.3 bootloader and hardware Flash/OTA qualification.
+CONFIG_SPI_FLASH_AUTO_SUSPEND=y
+# CONFIG_SPI_FLASH_FORCE_ENABLE_XMC_C_SUSPEND is not set
+# CONFIG_SPI_FLASH_ROM_IMPL is not set
+# CONFIG_SPI_FLASH_PLACE_FUNCTIONS_IN_IRAM is not set
+# CONFIG_LOG_IN_IRAM is not set
+# CONFIG_ESP_ROM_PRINT_IN_IRAM is not set
+# CONFIG_ESP_TIMER_IN_IRAM is not set
+# CONFIG_ESP_SYSTEM_IN_IRAM is not set
+CONFIG_FREERTOS_PLACE_ISR_FUNCTIONS_INTO_FLASH=y
