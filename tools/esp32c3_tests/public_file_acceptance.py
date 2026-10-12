@@ -8,7 +8,6 @@ import argparse
 import json
 import math
 from pathlib import Path
-import statistics
 import time
 from urllib.parse import urlsplit
 
@@ -17,6 +16,7 @@ from ota import image_info, snapshot, verify_snapshot
 from production_health import HealthBoard, check_health
 from public_streams import public_url
 from run import Capture, Suite
+from sustained_output import check_memory, check_output
 from trace_transport import TransportTrace
 
 
@@ -93,6 +93,12 @@ def load_references(path):
     return manifest
 
 
+def check_finite_health(steady):
+    """Apply memory and output gates to the selected decoded-playback window."""
+    require(len(steady) >= 10, 'Missing in-playback health evidence')
+    return dict(health=check_memory(steady), output=check_output(steady))
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--board', required=True)
@@ -150,14 +156,7 @@ def main():
             steady = [r for r in board.health_samples
                       if start + played['first_playback_seconds'] + 3 <= r['at'] <=
                       start + played['first_stopped_seconds'] - 1]
-            require(len(steady) >= 10, 'Missing in-playback health evidence')
-            require(min(r['heap'] for r in steady) >= 16384 and min(r['largest'] for r in steady) >= 8192,
-                    'In-playback memory below existing budget')
-            for key, tolerance in (('heap', 2048), ('largest', 4096)):
-                require(statistics.median(r[key] for r in steady[:3]) -
-                        statistics.median(r[key] for r in steady[-3:]) <= tolerance,
-                        'Progressive ' + key + ' loss during file playback')
-            return dict(playback=played, health=check_health(steady))
+            return dict(playback=played, **check_finite_health(steady))
         finally:
             board.stop()
 

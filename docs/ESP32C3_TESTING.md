@@ -25,6 +25,10 @@ Install and verify the specified quiet health image before the second command;
 the runner itself does not flash. It checks automatic/explicit codec selection,
 one continuous playing-status interval, format, duration against decoded frame
 count, EOF, a stopped tail, health counters, memory headroom and Stop recovery.
+During the selected decoded-playback window it also requires available output
+telemetry and zero increments of I2S completion-queue drops and write errors.
+Nonzero lifetime totals from startup/idle do not fail this window, but missing
+measurements, reboot or any new output error do. Memory thresholds are unchanged.
 The initial connection/container state may have `audio=true` before PCM
 metadata exists. Only that known, entirely unset prefix is allowed; decoded
 format and duration checks begin at the first populated metadata sample.
@@ -36,6 +40,7 @@ or analog continuity measurements. Restore the previous image after testing.
 
 `python tests/test-public-file-acceptance.py` checks that the verifier rejects
 early/missing EOF, interrupted playback, incorrect format and invalid timings.
+It also rejects output failures even when format/duration and heap are valid.
 
 ### AAC frame growth after decoder startup
 

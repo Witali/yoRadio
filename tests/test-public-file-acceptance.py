@@ -5,7 +5,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools/esp32c3_tests'))
 from common import Failure
-from public_file_acceptance import check_finite_playback
+from public_file_acceptance import check_finite_playback, check_finite_health
 
 SPEC = dict(codec='flac', rate=44100, channels=2, bits=16, label='FLAC', seconds=30.0)
 
@@ -23,6 +23,39 @@ def pending_format(row, label='FLAC'):
 
 
 class FileTests(unittest.TestCase):
+    def test_output_errors_fail_even_with_valid_format_duration_and_heap(self):
+        # A file can report the correct format/duration while the output loses
+        # completions. Lifetime counters may already include startup/idle drops;
+        # only new errors in the selected decoded-playback window fail this gate.
+        def health():
+            return [dict(boot_id='0123456789abcdef', uptime_ms=10000+i*500,
+                heap=64000, largest=32768, allocation_failures=0, task_watchdog_events=0,
+                output=dict(available=True, completion_queue_drops=100, write_errors=0))
+                for i in range(12)]
+        self.assertEqual(check_finite_health(health())['output']['completion_queue_drops'], 0)
+        check_finite_playback(samples(), SPEC)
+        for kind in ('completion_queue_drops', 'write_errors', 'missing', 'unavailable', 'reboot'):
+            rows=health()
+            if kind in ('completion_queue_drops','write_errors'):
+                for row in rows[6:]: row['output'][kind] += 1
+            elif kind == 'missing': del rows[6]['output']
+            elif kind == 'unavailable': rows[6]['output']['available']=False
+            else: rows[6]['boot_id']='fedcba9876543210'
+            with self.subTest(kind=kind), self.assertRaises(Failure):
+                check_finite_health(rows)
+
+    def test_finite_memory_gates_remain_required(self):
+        for kind in ('heap','largest','allocation_failures','task_watchdog_events','trend','sparse'):
+            rows=[dict(boot_id='0123456789abcdef',uptime_ms=10000+i*500,
+                heap=64000,largest=32768,allocation_failures=0,task_watchdog_events=0,
+                output=dict(available=True,completion_queue_drops=0,write_errors=0)) for i in range(12)]
+            if kind in ('heap','largest'): rows[6][kind]=1000
+            elif kind in ('allocation_failures','task_watchdog_events'): rows[6][kind]=1
+            elif kind == 'trend':
+                for row in rows[-3:]: row['heap']-=2049
+            else: rows=rows[:9]
+            with self.subTest(kind=kind), self.assertRaises(Failure): check_finite_health(rows)
+
     def test_complete_file(self):
         self.assertEqual(check_finite_playback(samples(), SPEC)['observed_playback_seconds'], 30)
 
