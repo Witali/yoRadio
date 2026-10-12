@@ -124,6 +124,47 @@ RTC, SD card, touch controller or audio-output initialization. This does
 not exclude dormant hardware; weather data is requested from an Internet
 service, not evidence of a local weather sensor.
 
+### Proposed shared-SPI microSD extension
+
+ESP32-C2 supports SD/microSD cards through ESP-IDF's
+[SD SPI host driver](https://docs.espressif.com/projects/esp-idf/en/stable/esp32c2/api-reference/peripherals/sdspi_host.html),
+with FAT filesystems available through `esp_vfs_fat_sdspi_mount()`. A card
+provides file storage for photos, animations, audio or logs; it does not
+increase the chip's SRAM or automatically enlarge its application partition.
+
+The display and card can share SPI2's clock/data lines if each has an
+independently controlled CS. The owner proposed connecting the display CS
+to a spare GPIO. The following is a **proposed wiring allocation**, not a
+verified PCB connection or an implemented firmware configuration:
+
+| Signal | Proposed GPIO | Connection |
+|---|---:|---|
+| Shared SCK | 4 | Display SCK and microSD CLK |
+| Shared MOSI | 6 | Display data input and microSD CMD/DI |
+| MISO | 2 | microSD DAT0/DO; display output need not be connected |
+| Display CS | 3 | Display CS, after checking and removing any fixed low connection |
+| microSD CS | 10 | microSD DAT3/CS |
+
+GPIO0 and GPIO7 remain candidates for additional device CS lines in this
+allocation. Their physical accessibility and any board connections must
+still be checked. All unselected devices must release MISO. The card and
+ESP32 use 3.3 V signaling, a common ground and appropriate card pull-ups.
+
+ESP-IDF gives each SPI device its own CS, clock and mode configuration;
+the recovered display's mode 3 can coexist with the SD driver's mode 0.
+See the [SPI master documentation](https://docs.espressif.com/projects/esp-idf/en/stable/esp32c2/api-reference/peripherals/spi_master.html).
+The bus bandwidth is shared, so transfers occur in turn. The SD driver
+defaults to a 20 MHz maximum request; achieved throughput depends on the
+card, wiring and competing display traffic.
+
+Implementation would add MISO and display CS to the bus/device settings,
+initialize the shared bus once, attach/mount the card and adapt media reads
+to files. On power-up, keep all other CS lines high and initialize the card
+into SPI mode before sending display traffic, following
+[Espressif's shared-bus sequence](https://docs.espressif.com/projects/esp-idf/en/stable/esp32c2/api-reference/peripherals/sdspi_share.html).
+The current factory and reconstructed firmware have no SD-card support;
+this feasibility note makes no firmware or hardware change.
+
 ## External board references
 
 A [first-hand ESP32-C2 weather-clock teardown by J0k3r2k1](https://community.home-assistant.io/t/installing-esphome-on-new-smart-weather-clock-wifi-weather-station-display/1006172)
