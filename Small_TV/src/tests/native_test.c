@@ -26,10 +26,14 @@ static uint8_t factory_sector[4096];
 static size_t saved_nvs_length;
 static int64_t clock_us;
 static unsigned rendered_pixels,registered_routes,restart_requests,weather_requests;
+static unsigned route_success[48],route_errors[48];
+static bool connected;
+static esp_err_t scan_result=ESP_OK,write_result=ESP_OK;
+static esp_err_t (*not_found)(httpd_req_t *,httpd_err_code_t);
 static const esp_partition_t partition={ASSETS_BASE,sizeof(flash_bytes)};
 static const httpd_uri_t *route_table[48];
-const unsigned char web_setup[]={0},web_settings[]={0},web_photo[]={0};
-const size_t web_setup_length=0,web_settings_length=0,web_photo_length=0;
+extern const unsigned char web_setup[],web_settings[],web_photo[];
+extern const size_t web_setup_length,web_settings_length,web_photo_length;
 
 int64_t esp_timer_get_time(void) {return clock_us;}
 SemaphoreHandle_t xSemaphoreCreateMutex(void) {return (void *)1;}
@@ -47,7 +51,7 @@ esp_err_t nvs_commit(nvs_handle_t handle) {(void)handle;return ESP_OK;}
 esp_err_t esp_flash_read(esp_flash_t *chip,void *data,uint32_t offset,uint32_t length)
 {(void)chip;if(offset!=FACTORY_SETTINGS_OFFSET || length>sizeof(factory_sector))return ESP_ERR_INVALID_SIZE;memcpy(data,factory_sector,length);return ESP_OK;}
 esp_err_t esp_flash_write(esp_flash_t *chip,const void *data,uint32_t offset,uint32_t length)
-{(void)chip;if(offset!=FACTORY_SETTINGS_OFFSET || length>sizeof(factory_sector))return ESP_ERR_INVALID_SIZE;memcpy(factory_sector,data,length);return ESP_OK;}
+{(void)chip;if(write_result!=ESP_OK)return write_result;if(offset!=FACTORY_SETTINGS_OFFSET || length>sizeof(factory_sector))return ESP_ERR_INVALID_SIZE;memcpy(factory_sector,data,length);return ESP_OK;}
 esp_err_t esp_flash_erase_region(esp_flash_t *chip,uint32_t offset,uint32_t length)
 {(void)chip;assert(offset==FACTORY_SETTINGS_OFFSET && length==4096);memset(factory_sector,255,sizeof(factory_sector));return ESP_OK;}
 const esp_partition_t *esp_partition_find_first(unsigned type,unsigned subtype,const char *label)
@@ -60,16 +64,17 @@ esp_err_t esp_partition_erase_range(const esp_partition_t *p,size_t offset,size_
 {if(offset>p->size || length>p->size-offset || offset%4096 || length%4096)return ESP_ERR_INVALID_SIZE;memset(flash_bytes+offset,255,length);return ESP_OK;}
 void display_blit(int x,int y,int width,int height,const uint16_t *pixels)
 {assert(x>=0 && y>=0 && width>0 && height>0 && x+width<=240 && y+height<=240 && pixels);rendered_pixels+=width*height;}
-bool network_connected(void) {return false;}
+bool network_connected(void) {return connected;}
 bool network_ap_active(void) {return true;}
 void network_restart_later(void) {++restart_requests;}
 void weather_request_update(void) {++weather_requests;}
 esp_err_t network_scan(wifi_ap_record_t *records,uint16_t *count)
-{assert(*count>=1);strcpy((char *)records[0].ssid,"native test");records[0].rssi=-42;*count=1;return ESP_OK;}
+{if(scan_result!=ESP_OK)return scan_result;assert(*count>=1);strcpy((char *)records[0].ssid,"native test");records[0].rssi=-42;*count=1;return ESP_OK;}
 
 esp_err_t httpd_resp_set_status(httpd_req_t *req,const char *status) {req->status=strtoul(status,NULL,10);return ESP_OK;}
-esp_err_t httpd_resp_set_type(httpd_req_t *req,const char *type) {(void)req;(void)type;return ESP_OK;}
-esp_err_t httpd_resp_set_hdr(httpd_req_t *req,const char *name,const char *value) {(void)req;(void)name;(void)value;return ESP_OK;}
+esp_err_t httpd_resp_set_type(httpd_req_t *req,const char *type) {strcpy(req->response_type,type);return ESP_OK;}
+esp_err_t httpd_resp_set_hdr(httpd_req_t *req,const char *name,const char *value)
+{if(!strcmp(name,"Location"))strcpy(req->location,value);if(!strcmp(name,"Cache-Control"))strcpy(req->cache_control,value);return ESP_OK;}
 esp_err_t httpd_resp_send(httpd_req_t *req,const char *data,int length)
 {if(length<0)length=(int)strlen(data);assert((size_t)length<sizeof(req->response));memcpy(req->response,data,length);req->response[length]=0;req->response_length=length;return ESP_OK;}
 esp_err_t httpd_resp_send_err(httpd_req_t *req,httpd_err_code_t code,const char *message) {req->status=code;return httpd_resp_send(req,message,-1);}
@@ -79,7 +84,7 @@ size_t httpd_req_get_hdr_value_len(httpd_req_t *req,const char *name) {const cha
 esp_err_t httpd_req_get_hdr_value_str(httpd_req_t *req,const char *name,char *out,size_t capacity)
 {const char *value=header(req,name);if(!value || strlen(value)>=capacity)return ESP_ERR_INVALID_SIZE;strcpy(out,value);return ESP_OK;}
 int httpd_req_recv(httpd_req_t *req,char *out,size_t length)
-{if(length>req->content_len-req->position)length=req->content_len-req->position;if(length>137)length=137;memcpy(out,req->input+req->position,length);req->position+=length;return (int)length;}
+{if(req->recv_timeouts){--req->recv_timeouts;return HTTPD_SOCK_ERR_TIMEOUT;}if(req->recv_disconnect)return 0;if(length>req->content_len-req->position)length=req->content_len-req->position;if(length>137)length=137;memcpy(out,req->input+req->position,length);req->position+=length;return (int)length;}
 esp_err_t httpd_req_get_url_query_str(httpd_req_t *req,char *out,size_t capacity)
 {const char *query=strchr(req->uri,'?');if(!query || strlen(query+1)>=capacity)return ESP_ERR_INVALID_SIZE;strcpy(out,query+1);return ESP_OK;}
 esp_err_t httpd_query_key_value(const char *query,const char *key,char *out,size_t capacity)
@@ -89,15 +94,28 @@ esp_err_t httpd_stop(httpd_handle_t server) {(void)server;return ESP_OK;}
 esp_err_t httpd_register_uri_handler(httpd_handle_t server,const httpd_uri_t *uri)
 {(void)server;assert(registered_routes<48);route_table[registered_routes++]=uri;return ESP_OK;}
 esp_err_t httpd_register_err_handler(httpd_handle_t server,httpd_err_code_t code,esp_err_t (*handler)(httpd_req_t *,httpd_err_code_t))
-{(void)server;(void)code;(void)handler;return ESP_OK;}
+{(void)server;assert(code==HTTPD_404_NOT_FOUND);not_found=handler;return ESP_OK;}
 
 static httpd_req_t request;
 static void prepare(const char *uri,const void *body,size_t length,const char *type)
 {memset(&request,0,sizeof(request));request.uri=uri;request.input=body;request.content_len=length;request.content_type=type;request.host="192.168.43.1";request.status=200;}
+static void dispatch(httpd_method_t method)
+{
+    /* Exercise the registered method/URI handler, retaining successful/error coverage. */
+    size_t length=strcspn(request.uri,"?");
+    for(unsigned i=0;i<registered_routes;++i)
+        if(route_table[i]->method==method && strlen(route_table[i]->uri)==length && !memcmp(route_table[i]->uri,request.uri,length))
+        {
+            route_table[i]->handler(&request);
+            if(request.status==200)++route_success[i];else ++route_errors[i];
+            return;
+        }
+    CHECK(not_found!=NULL);not_found(&request,HTTPD_404_NOT_FOUND);
+}
 static const char *post(const char *uri,const char *json,unsigned expected)
-{prepare(uri,json,strlen(json),"application/json");web_settings_post(&request);CHECK(request.status==expected);return request.response;}
+{prepare(uri,json,strlen(json),"application/json");dispatch(HTTP_POST);CHECK(request.status==expected);return request.response;}
 static const char *get(const char *uri)
-{prepare(uri,"",0,NULL);web_settings_get(&request);CHECK(request.status==200);return request.response;}
+{prepare(uri,"",0,NULL);dispatch(HTTP_GET);CHECK(request.status==200);return request.response;}
 
 static void test_settings(void)
 {
@@ -263,13 +281,17 @@ static void test_dns(void)
     CHECK(captive_dns_reply(packet,513,512)==0);
 }
 
+#include "http_contracts.inc"
+
 int main(int argc,char **argv)
 {
     memset(factory_sector,255,sizeof(factory_sector));
-    CHECK(argc==2);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
+    CHECK(argc==2 || argc==3);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
     CHECK(web_start()==ESP_OK);CHECK(registered_routes==40);
     for(unsigned i=0;i<registered_routes;++i)for(unsigned j=i+1;j<registered_routes;++j)CHECK(route_table[i]->method!=route_table[j]->method || strcmp(route_table[i]->uri,route_table[j]->uri));
-    test_settings();test_factory_settings();test_weather();test_assets();test_uploads();test_multipart();test_dns();
+    test_settings();test_factory_settings();test_weather();test_assets();test_http_contracts();test_uploads();test_multipart();test_dns();
+    for(unsigned i=0;i<registered_routes;++i)CHECK(route_success[i]>0);
+    if(argc==3)write_native_report(argv[2]);
     printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers\n",checks);
     return 0;
 }

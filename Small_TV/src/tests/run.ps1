@@ -14,10 +14,11 @@ $arguments=@("/nologo","/std:c11","/W3","/D_CRT_SECURE_NO_WARNINGS","/DCJSON_NES
 foreach($include in @("tests/stubs","app/include","third_party/tjpgd","third_party/cjson")) {$arguments+='/I"'+(Join-Path $project $include)+'"'}
 $arguments+='/I"'+$resources+'"'
 foreach($source in $sources) {$arguments+='"'+(Join-Path $project $source)+'"'}
+$arguments+='"'+(Join-Path $resources "web_pages.c")+'"'
 $arguments+='/Fe"'+(Join-Path $output "native_test.exe")+'"'
 $batch=Join-Path $output "compile.cmd"
 [IO.File]::WriteAllText($batch,"@echo off`r`ncall `"$VsDevCmd`" -arch=x64 -host_arch=x64 >nul`r`nif errorlevel 1 exit /b 1`r`ncd /d `"$output`"`r`ncl "+($arguments -join ' ')+"`r`nexit /b %errorlevel%`r`n")
 & cmd.exe /d /c $batch
 if ($LASTEXITCODE) {throw "Native test compilation failed"}
-& (Join-Path $output "native_test.exe") (Join-Path $resources "assets.bin")
+& (Join-Path $output "native_test.exe") (Join-Path $resources "assets.bin") (Join-Path $output "report.json")
 if ($LASTEXITCODE) {throw "Native tests failed"}
