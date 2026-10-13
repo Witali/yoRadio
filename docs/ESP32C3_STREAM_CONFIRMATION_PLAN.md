@@ -712,3 +712,37 @@ original firmware, watchdog setting and all other private settings, stopped.
 This is HTTP control-path evidence, not TLS record or analog qualification.
 Results, checked decoder counters, source snapshots and raw-file hashes:
 [early-owner-public-controls-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-public-controls-01/summary.json).
+
+### Public-root image: HTTPS sources and network faults (2026-10-13)
+
+The next exact-image campaign records **19/20 checks passed**, with the failure
+retained. Four public sources complete their requested 60-second observations:
+Groove Salad 64/32-kbit HE-AAC at 44.1 kHz, 16-kbit HE-AAC at 32 kHz, and
+256-kbit MP3 at 44.1 kHz. Independent FAAD inspection identifies the 16-kbit
+source as mono SBR without PS, rendered through stereo PCM; do not label it
+HE-AACv2. All four have zero new measured output completion drops/write errors.
+The firmware remains on one boot throughout the campaign and records zero
+allocation, decoder and task-watchdog faults.
+
+The 128-kbit AAC-LC observation is **incomplete**: request 137 times out in TCP
+connect after 5.015 seconds, before an HTTP response is received. The final
+saved playback status is at 30.231 seconds and still reports AAC PCM,
+44.1 kHz stereo. Its latest health sample has 64,076 free bytes, a 34,816-byte
+largest block and zero decoder/allocation faults. The 42.381-second case duration
+includes reference/setup and failure cleanup; it is not 42 seconds of verified
+playback. No post-timeout, pre-Stop output bracket was captured, so these data
+cannot establish uninterrupted sound during the missing interval or attribute
+the TCP failure. Later passes do not resolve this failure.
+
+HTTP drop, stall, server error, redirect and jitter cases all pass, including
+launching a replacement AAC stream after the failed source. WebSocket format
+and player state agree with REST across two reconnects. Settled heap recovery
+passes after each suite. Original firmware/settings are verified restored,
+stopped. Raw failure chain, request phases, health/status observations and
+controller sources are retained:
+[early-owner-public-suite-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-public-suite-01/summary.json).
+
+Next capture status/health immediately after a transport observation failure,
+before Stop changes the output counters. Preserve the original failed result
+even if that bounded diagnostic request succeeds. Correlated TCP evidence and
+repeat playback remain necessary; no production qualification yet.

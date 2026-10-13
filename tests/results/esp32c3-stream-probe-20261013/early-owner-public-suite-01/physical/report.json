@@ -1,0 +1,2664 @@
+{
+  "board": {
+    "version": "idf61-early-owner-public",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "b9e61a369486dc5b4404f218433dc00a01d4f348d9302467ae1e84c35a9d2118"
+  },
+  "cases": [
+    {
+      "name": "initial-idle",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "at": 73848.0429371,
+            "request_ms": 62.60929998825304,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 17776,
+            "reset_reason": 3,
+            "heap": 139468,
+            "largest": 110592,
+            "minimum_heap": 110976,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 1205,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          },
+          {
+            "at": 73849.303638,
+            "request_ms": 65.11440000031143,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 19036,
+            "reset_reason": 3,
+            "heap": 139468,
+            "largest": 110592,
+            "minimum_heap": 110976,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 1324,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          },
+          {
+            "at": 73850.4920488,
+            "request_ms": 77.26529998762999,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 20226,
+            "reset_reason": 3,
+            "heap": 139468,
+            "largest": 110592,
+            "minimum_heap": 110976,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 1435,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          }
+        ]
+      },
+      "seconds": 12.312
+    },
+    {
+      "name": "https:groovesalad-128-aac",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "URLError"
+        },
+        {
+          "type": "TimeoutError"
+        }
+      ],
+      "reason": "URLError",
+      "seconds": 42.381
+    },
+    {
+      "name": "https:groovesalad-64-aac",
+      "result": "PASS",
+      "evidence": {
+        "reference": {
+          "spec": {
+            "codec": "aac",
+            "profile": "HE-AAC",
+            "rate": 44100,
+            "channels": 2,
+            "bits": 16,
+            "label": "HE-AAC ",
+            "source_channels": 2
+          },
+          "ffprobe_spec": {
+            "codec": "aac",
+            "profile": "HE-AAC",
+            "rate": 44100,
+            "channels": 2,
+            "bits": 16,
+            "label": "HE-AAC "
+          },
+          "input_sha256": "dac53fa25a3b677da49343964a82bf3ab74ad2d6cfea4445822c86882be687cb",
+          "input_bytes": 40368,
+          "frames": 108,
+          "faad": {
+            "samples": 438272,
+            "frames": 108,
+            "rate": 44100,
+            "channels": 2,
+            "ps_frames": 0,
+            "different": 0,
+            "over_two": 0,
+            "over_five": 0,
+            "maximum": 0,
+            "square_error": 0,
+            "square_signal": 10014564462988,
+            "scope": 0,
+            "float_scale": 1,
+            "history": [
+              {
+                "pairs": 0,
+                "changed_components": 0,
+                "saturated": 0,
+                "out_of_range": 0,
+                "rms_native": 0,
+                "peak_native": 0,
+                "exponents": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "pairs": 0,
+                "changed_components": 0,
+                "saturated": 0,
+                "out_of_range": 0,
+                "rms_native": 0,
+                "peak_native": 0,
+                "exponents": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          },
+          "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+          "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+          "tls_verify": true
+        },
+        "playback": {
+          "samples": 82,
+          "rate": 44100,
+          "channels": 2
+        },
+        "health": {
+          "samples": 82,
+          "boot_id": "08a4fb8c4a7cb480",
+          "minimum_heap": 24420,
+          "minimum_largest": 9216,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "legacy_floor_pass": true,
+          "legacy_floor_enforced": false
+        },
+        "output_window": {
+          "samples": 82,
+          "elapsed_ms": 44816,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        },
+        "first_pcm_seconds": 2.322524200004409,
+        "max_status_and_health_ms": 264.0118999988772
+      },
+      "seconds": 64.934
+    },
+    {
+      "name": "https:groovesalad-32-aac",
+      "result": "PASS",
+      "evidence": {
+        "reference": {
+          "spec": {
+            "codec": "aac",
+            "profile": "HE-AAC",
+            "rate": 44100,
+            "channels": 2,
+            "bits": 16,
+            "label": "HE-AAC ",
+            "source_channels": 2
+          },
+          "ffprobe_spec": {
+            "codec": "aac",
+            "profile": "HE-AAC",
+            "rate": 44100,
+            "channels": 2,
+            "bits": 16,
+            "label": "HE-AAC "
+          },
+          "input_sha256": "b7e19126d76a588b1f4c2c6f561e9553aadd5cc9d02743ac02efbdb007d5f216",
+          "input_bytes": 20041,
+          "frames": 108,
+          "faad": {
+            "samples": 438272,
+            "frames": 108,
+            "rate": 44100,
+            "channels": 2,
+            "ps_frames": 0,
+            "different": 0,
+            "over_two": 0,
+            "over_five": 0,
+            "maximum": 0,
+            "square_error": 0,
+            "square_signal": 7593352781950,
+            "scope": 0,
+            "float_scale": 1,
+            "history": [
+              {
+                "pairs": 0,
+                "changed_components": 0,
+                "saturated": 0,
+                "out_of_range": 0,
+                "rms_native": 0,
+                "peak_native": 0,
+                "exponents": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "pairs": 0,
+                "changed_components": 0,
+                "saturated": 0,
+                "out_of_range": 0,
+                "rms_native": 0,
+                "peak_native": 0,
+                "exponents": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          },
+          "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+          "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+          "tls_verify": true
+        },
+        "playback": {
+          "samples": 82,
+          "rate": 44100,
+          "channels": 2
+        },
+        "health": {
+          "samples": 83,
+          "boot_id": "08a4fb8c4a7cb480",
+          "minimum_heap": 25072,
+          "minimum_largest": 11264,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "legacy_floor_pass": true,
+          "legacy_floor_enforced": false
+        },
+        "output_window": {
+          "samples": 83,
+          "elapsed_ms": 44960,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        },
+        "first_pcm_seconds": 2.2755099999922095,
+        "max_status_and_health_ms": 185.80250001105014
+      },
+      "seconds": 65.068
+    },
+    {
+      "name": "https:groovesalad-16-aac",
+      "result": "PASS",
+      "evidence": {
+        "reference": {
+          "spec": {
+            "codec": "aac",
+            "profile": "HE-AAC",
+            "rate": 32000,
+            "channels": 2,
+            "bits": 16,
+            "label": "HE-AAC ",
+            "source_channels": 1
+          },
+          "ffprobe_spec": {
+            "codec": "aac",
+            "profile": "HE-AACv2",
+            "rate": 32000,
+            "channels": 2,
+            "bits": 16,
+            "label": "HE-AACv2 "
+          },
+          "input_sha256": "32c5a5ebe7291e8450ca91ecf52b7d81b2de6bc34a5bd264e284070392c274ff",
+          "input_bytes": 10121,
+          "frames": 79,
+          "faad": {
+            "samples": 159744,
+            "frames": 79,
+            "rate": 32000,
+            "channels": 1,
+            "ps_frames": 0,
+            "different": 0,
+            "over_two": 0,
+            "over_five": 0,
+            "maximum": 0,
+            "square_error": 0,
+            "square_signal": 2504050897884,
+            "scope": 0,
+            "float_scale": 1,
+            "history": [
+              {
+                "pairs": 0,
+                "changed_components": 0,
+                "saturated": 0,
+                "out_of_range": 0,
+                "rms_native": 0,
+                "peak_native": 0,
+                "exponents": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "pairs": 0,
+                "changed_components": 0,
+                "saturated": 0,
+                "out_of_range": 0,
+                "rms_native": 0,
+                "peak_native": 0,
+                "exponents": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          },
+          "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+          "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+          "tls_verify": true
+        },
+        "playback": {
+          "samples": 82,
+          "rate": 32000,
+          "channels": 2
+        },
+        "health": {
+          "samples": 83,
+          "boot_id": "08a4fb8c4a7cb480",
+          "minimum_heap": 24728,
+          "minimum_largest": 10240,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "legacy_floor_pass": true,
+          "legacy_floor_enforced": false
+        },
+        "output_window": {
+          "samples": 83,
+          "elapsed_ms": 44727,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        },
+        "first_pcm_seconds": 2.2868464999919524,
+        "max_status_and_health_ms": 281.5841999981785
+      },
+      "seconds": 64.532
+    },
+    {
+      "name": "https:groovesalad-256-mp3",
+      "result": "PASS",
+      "evidence": {
+        "reference": {
+          "spec": {
+            "codec": "mp3",
+            "profile": null,
+            "rate": 44100,
+            "channels": 2,
+            "bits": 16,
+            "label": "MP3"
+          },
+          "tls_verify": true
+        },
+        "playback": {
+          "samples": 82,
+          "rate": 44100,
+          "channels": 2
+        },
+        "health": {
+          "samples": 82,
+          "boot_id": "08a4fb8c4a7cb480",
+          "minimum_heap": 83028,
+          "minimum_largest": 65536,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "legacy_floor_pass": true,
+          "legacy_floor_enforced": false
+        },
+        "output_window": {
+          "samples": 82,
+          "elapsed_ms": 44542,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        },
+        "first_pcm_seconds": 2.309358300000895,
+        "max_status_and_health_ms": 270.226199994795
+      },
+      "seconds": 61.56
+    },
+    {
+      "name": "idle:public",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "at": 74159.8143021,
+            "request_ms": 149.97430000221357,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 329460,
+            "reset_reason": 3,
+            "heap": 139488,
+            "largest": 110592,
+            "minimum_heap": 16220,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 5769,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          },
+          {
+            "at": 74161.0069501,
+            "request_ms": 66.70709999161772,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 330749,
+            "reset_reason": 3,
+            "heap": 139488,
+            "largest": 110592,
+            "minimum_heap": 16220,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 5890,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          },
+          {
+            "at": 74162.2116999,
+            "request_ms": 75.42880000255536,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 331953,
+            "reset_reason": 3,
+            "heap": 139488,
+            "largest": 110592,
+            "minimum_heap": 16220,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 6003,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          }
+        ]
+      },
+      "seconds": 13.193
+    },
+    {
+      "name": "recovery:public",
+      "result": "PASS",
+      "evidence": {
+        "compared_with": "initial",
+        "free_loss_tolerance": 2048,
+        "largest_loss_tolerance": 4096
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "network:drop",
+      "result": "PASS",
+      "evidence": {
+        "recovered": true
+      },
+      "seconds": 29.479
+    },
+    {
+      "name": "network:stall",
+      "result": "PASS",
+      "evidence": {
+        "recovered": true
+      },
+      "seconds": 29.693
+    },
+    {
+      "name": "network:error",
+      "result": "PASS",
+      "evidence": {
+        "recovered": true
+      },
+      "seconds": 17.238
+    },
+    {
+      "name": "network:redirect",
+      "result": "PASS",
+      "evidence": {
+        "samples": 13,
+        "rate": 48000,
+        "channels": 2,
+        "serial_capture_enabled": false
+      },
+      "seconds": 18.604
+    },
+    {
+      "name": "network:jitter",
+      "result": "PASS",
+      "evidence": {
+        "samples": 13,
+        "rate": 48000,
+        "channels": 2,
+        "serial_capture_enabled": false
+      },
+      "seconds": 18.569
+    },
+    {
+      "name": "idle:network",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "at": 74285.7843355,
+            "request_ms": 59.71299999509938,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 455532,
+            "reset_reason": 3,
+            "heap": 139408,
+            "largest": 110592,
+            "minimum_heap": 16220,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 12913,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          },
+          {
+            "at": 74287.0766139,
+            "request_ms": 80.382300002384,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 456819,
+            "reset_reason": 3,
+            "heap": 139396,
+            "largest": 110592,
+            "minimum_heap": 16220,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 13034,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          },
+          {
+            "at": 74288.2517926,
+            "request_ms": 80.63110000512097,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 457990,
+            "reset_reason": 3,
+            "heap": 139408,
+            "largest": 110592,
+            "minimum_heap": 16220,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 13144,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          }
+        ]
+      },
+      "seconds": 12.324
+    },
+    {
+      "name": "recovery:network",
+      "result": "PASS",
+      "evidence": {
+        "compared_with": "initial",
+        "free_loss_tolerance": 2048,
+        "largest_loss_tolerance": 4096
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "websocket-format-and-reconnect",
+      "result": "PASS",
+      "evidence": {
+        "reconnects": 2,
+        "format_matches_rest": true
+      },
+      "seconds": 8.708
+    },
+    {
+      "name": "idle:websocket",
+      "result": "PASS",
+      "evidence": {
+        "samples": [
+          {
+            "at": 74306.7595536,
+            "request_ms": 55.45100000745151,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 476504,
+            "reset_reason": 3,
+            "heap": 139408,
+            "largest": 110592,
+            "minimum_heap": 16220,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 14258,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          },
+          {
+            "at": 74307.9873124,
+            "request_ms": 148.1391999986954,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 477640,
+            "reset_reason": 3,
+            "heap": 139408,
+            "largest": 110592,
+            "minimum_heap": 16220,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 14365,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          },
+          {
+            "at": 74309.1424806,
+            "request_ms": 77.94820000708569,
+            "schema": 1,
+            "boot_id": "08a4fb8c4a7cb480",
+            "uptime_ms": 478885,
+            "reset_reason": 3,
+            "heap": 139408,
+            "largest": 110592,
+            "minimum_heap": 16220,
+            "tasks": 16,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "output": {
+              "available": true,
+              "completion_queue_drops": 14481,
+              "write_errors": 0
+            },
+            "last_allocation_failure": {
+              "size": 0,
+              "caps": 0
+            },
+            "decoder_failure": {
+              "sequence": 0,
+              "codec": 0,
+              "stage": 0,
+              "result": 0,
+              "completion": 0,
+              "input_bytes": 0,
+              "allocation_sequence": 0
+            }
+          }
+        ]
+      },
+      "seconds": 12.116
+    },
+    {
+      "name": "recovery:websocket",
+      "result": "PASS",
+      "evidence": {
+        "compared_with": "initial",
+        "free_loss_tolerance": 2048,
+        "largest_loss_tolerance": 4096
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "stop-and-settings",
+      "result": "PASS",
+      "evidence": {
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 0.5
+    },
+    {
+      "name": "lifetime-health",
+      "result": "PASS",
+      "evidence": {
+        "samples": 736,
+        "boot_id": "08a4fb8c4a7cb480",
+        "minimum_heap": 24420,
+        "minimum_largest": 9216,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "seconds": 0.001
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "cpu_budget_percent": null,
+  "created_utc": "2026-10-13T14:01:13.139681+00:00",
+  "host_clock": {
+    "api": "time.perf_counter",
+    "implementation": "QueryPerformanceCounter()",
+    "monotonic": true,
+    "adjustable": false,
+    "resolution": 1e-07
+  },
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/aac_growth.py": "8a9ccaf1be1944aa7812dcbf99c874d1c2f47de7eebc500387cb0768abb24cb6",
+    "tools/esp32c3_tests/aac_reference.py": "7fb171138167be63ae8503c3c39ca1f664feb13eaea3d89727d4ea617e59aaf3",
+    "tools/esp32c3_tests/allocations.py": "b2478abdad5627c08a9af520c4ab776e0232b51edfd70006905dec96a1095ea7",
+    "tools/esp32c3_tests/audit_stream_probe.py": "52733421019a91b751b33005cc703175b023e9ae9e8e0688529f45f8a36e19f3",
+    "tools/esp32c3_tests/common.py": "e2dde169d19f12e82f774b74ade6ae7de073cc08c24f97fe11ff3843d2fc0df9",
+    "tools/esp32c3_tests/compare_latency.py": "4530ec501fb350e9b7bf1c6b4c63724754296fe835c346e6ebc18354db25c394",
+    "tools/esp32c3_tests/compare_output_dma.py": "04de602acaed8846b3dc0c37a8ca11b061a436be1730cfadd4c2b408591e56b0",
+    "tools/esp32c3_tests/compare_output_priority.py": "073979d7a6ddd40ab324b6d06c80c35131cc180a26a1a8bc5f11780e3a1153cc",
+    "tools/esp32c3_tests/compare_output_priority_matrix.py": "680840fb1beb2d4c6a9708e460803411820f82107e1679c4d39eb8023f8962fb",
+    "tools/esp32c3_tests/connection_retry.py": "1f09f000f72d605bc70e89754783c8dabe885dee7ff224f331578ba44791947e",
+    "tools/esp32c3_tests/decoder_arena_experiment.py": "2cd3a9085027728bbea932dcbc318ea1304df00a7632e512c09f0bfa5f12980f",
+    "tools/esp32c3_tests/decoder_arena_flac_review.py": "7b94de0e5cd732de942582cce9abb90355fb53d5d5e7d0f74e9b4aee118337c3",
+    "tools/esp32c3_tests/diagnostic.py": "bb9e7477ab73d6d323befd6f0f50180b319abeee8f50d70fc20d58beadeb546b",
+    "tools/esp32c3_tests/flac_truncation.py": "b24a3ae36165f63ac1dd0d988a98752083b35946dd8bc16b37c3fce1fc8400ce",
+    "tools/esp32c3_tests/flash_constants.py": "7bf7955d7c1d1cf2fa6806baa4ef4413c151610c0bd40eace96e3972b4350ae5",
+    "tools/esp32c3_tests/flash_mode.py": "16ada30f8abf9d66937e82e21e041c4aabceccd319f0c756109becaa61532ffb",
+    "tools/esp32c3_tests/frame_router_control.py": "6691c0f560de2978ede827cda1a535fc9560ad6ec9833e7f73183b369198a66f",
+    "tools/esp32c3_tests/heap_fragment.py": "998c454faad743f4fa14bd3be960ede6944a4a5e522e45d749b42120f07fd803",
+    "tools/esp32c3_tests/heap_idle.py": "eb36a08b01bfc973398477c8e2eee4dbe5a9706cc464424bb68496ff56fc4a21",
+    "tools/esp32c3_tests/heap_receive_correlation.py": "0fbe6924928b89aecf6d37cf4b8a6368e3eaf0746b55a989b24fed73de62b212",
+    "tools/esp32c3_tests/http_headers.py": "845395d01169e27be0211d2deeef1a42f9ce486f5f6756a2e16b16cace269d29",
+    "tools/esp32c3_tests/icy_metadata.py": "96d0551eab277692dc742631a196126e127890fe8edf0e9a59db6108e1c97bc5",
+    "tools/esp32c3_tests/iram_inventory.py": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f",
+    "tools/esp32c3_tests/load_windows.py": "eee95396e81156bb4ae8b74a1e165d0fa4f3912ff1d0a1dbb1d86584d28b9df2",
+    "tools/esp32c3_tests/memory.py": "94bed682722b011f0d3f039d3ee656225c99b76cbee419473a29245b86e77922",
+    "tools/esp32c3_tests/network_memory.py": "c77cef3021fb54c9b08f07c1ee25f3938cefc97e176724689ef2b005957d2aca",
+    "tools/esp32c3_tests/ota.py": "b85f04e302067ca1b7f9b68eb727ef3fcdb3b0350f666b7f62acd52f3db75494",
+    "tools/esp32c3_tests/ota_diagnostic.py": "1ef7902be1cd8b686a8952a41d9aa80941b0e1301ac29b9a6670a7b28e568af8",
+    "tools/esp32c3_tests/ota_transition.py": "53c57eefae9400104980023a1edf2ca6e6ca6e527f7f86ad2b167cd01db5681f",
+    "tools/esp32c3_tests/output_priority_matrix.py": "d5ed53dfcd71d757576cb5e6649e14aef4b476622460d5e3bab63baa7b14c475",
+    "tools/esp32c3_tests/pcm_tail.py": "9c0f8ed7c87d51ce5948ff13be3175b6b76c099ca4ac238458bd6fd660285ff0",
+    "tools/esp32c3_tests/pdm_clock.py": "9858b6b13dd76cc6d083d8f854e5a285984fca54156b7e1d8c5c1c4844cdec02",
+    "tools/esp32c3_tests/pipeline_flow.py": "0de43140ad727f21d5068d611a5c31fa3c62de9451175ab1bf0033454307c239",
+    "tools/esp32c3_tests/pipeline_flow_study.py": "bf464bbdbb6b3d67d019e68b8ea1861cc34df89f4e2f2df7c272266a210d1e82",
+    "tools/esp32c3_tests/pipeline_probe.py": "ffa4ab9b93cb7f6c92898df386b9bd2dd8b24ec5639e311a22ad566fa531abe7",
+    "tools/esp32c3_tests/pool_settle.py": "fb98ed089b6121a198a21fc90750fe763e60a95f6a3bd569b04fc46597fe4818",
+    "tools/esp32c3_tests/prefix_control.py": "f8eef54d73595aa7cf338fb4c17f0a08c5a6149055ec3767584fb2dcc6d91a99",
+    "tools/esp32c3_tests/production_health.py": "05cde02d4d695a4a568dd287f9aa9e88f25359be8f186e0df553b1f91c025bf1",
+    "tools/esp32c3_tests/public_file_acceptance.py": "971dbbf74e2a78cf1f0238b29033f733d132f253fffa1d6c46139025a47c447e",
+    "tools/esp32c3_tests/public_file_probe.py": "013d64833d21979175a672144c21155aed56b44e44312a8271868aa98bf90f64",
+    "tools/esp32c3_tests/public_streams.py": "1ebe4680459eaf051bdf3a8cb383f41982b28c6f0df00b4c926da70421de35c7",
+    "tools/esp32c3_tests/quiet_acceptance.py": "7af834166211cc34cc586821d63b3b2dea22e5bbf710e98850d6ab39028c7946",
+    "tools/esp32c3_tests/quiet_tls_records.py": "30dac5c859a9a1f8cffa5d6addba0afc79193f5fbd973c9edc5e5d401ad29069",
+    "tools/esp32c3_tests/radio_flac_study.py": "25c55f49cf95a2117c499a90da6b53f3a0212b76a82b36ac1fb9f3dd7ea07a76",
+    "tools/esp32c3_tests/reboot_tls.py": "32d936becc6f4cfae90490d9f7a8104d7b26d0161672de8af08f81fa7fbf31cb",
+    "tools/esp32c3_tests/reference_eof.py": "7828d8746c12f98d174d32ce1e5c2251e71b331e35d7b2dffd69c6a66e23974f",
+    "tools/esp32c3_tests/run.py": "9c4ba6d635337fd62b3d91fcf9bc11905e5e95a9e0b2a09b2fb09b5126c4cd42",
+    "tools/esp32c3_tests/rx_ownership.py": "05ad01b7bb3e7a7b511dc5d1f271b54be4d84b1cc40b686fd186c343c9380a37",
+    "tools/esp32c3_tests/serial_lines.py": "6fc25767619e102ad3847fb23363d15941a38e7032ef678b610700b8dfe4985b",
+    "tools/esp32c3_tests/staged_dma.py": "84412aaaae33491863411207c01c7b9c8702a9e232a899459d91845bb4d5e1fc",
+    "tools/esp32c3_tests/stream_memory_study.py": "11cb8f9db1ab21c12b32b608e3502b502574e735b0ac3b8d9b9003fe15554fe4",
+    "tools/esp32c3_tests/stream_probe.py": "f742639237b42e7eb722712428e9375f66d6e72372d0d66779ea486faede97b6",
+    "tools/esp32c3_tests/stream_probe_cases.py": "527e6d6b24f3e6e12278f0133002dce6e4e2c04c8207adab3aad240c5b925212",
+    "tools/esp32c3_tests/summarize_codec_sequence.py": "90f94232cbdd247be4ac21f73a9aebcc726f3d49186c2233109b1454f63a2166",
+    "tools/esp32c3_tests/summarize_load.py": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133",
+    "tools/esp32c3_tests/summarize_memory.py": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae",
+    "tools/esp32c3_tests/summarize_public.py": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+    "tools/esp32c3_tests/summarize_public_windows.py": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709",
+    "tools/esp32c3_tests/summarize_radio_flac.py": "72d66f872f1b511d9964e16cb72e7885791dd7bb8a9499ac0244678bf7135c47",
+    "tools/esp32c3_tests/summarize_rx_ownership.py": "0e62d6da908502efbfd4111aa7491b9f8a195219ac325a10862c93ab9e116685",
+    "tools/esp32c3_tests/summarize_stream_memory.py": "d32c496ce429750a5565b4396bcc1030b5319ebe33eee9940e390cb62d788697",
+    "tools/esp32c3_tests/summarize_sustained.py": "6f3a7786ec5c36935a2fd7714c8add9a9ccbf686b887eaa074e55e325e814245",
+    "tools/esp32c3_tests/summarize_terminal_cpu.py": "db99ad6e55f2b3e671106cdb2c3902225704d9167a2e65ef662fe23c726c69bd",
+    "tools/esp32c3_tests/summarize_terminal_memory.py": "f351cf6f73e9d256a406e8a7da5b65ab46e354b0cefca7543536f3ebac077bda",
+    "tools/esp32c3_tests/sustained_output.py": "114a426ab88f65ebd642c921846d48b5165b61c17246d54dddd84d650e96be94",
+    "tools/esp32c3_tests/terminal_memory.py": "e920df2d0150a1e93e982c1fa06578444879e35c2158fee270ebd2f041bbe478",
+    "tools/esp32c3_tests/tls_error_codes.py": "d7b8baa6309ed2d14b8c825ebdd29b3e7461bc8cfea565a8268e5e69d638f6f4",
+    "tools/esp32c3_tests/tls_framing.py": "3012905396ee1a455e3ce6e14c4fa2e756ef379d7c749722526dba64cd4aed0e",
+    "tools/esp32c3_tests/tls_path.py": "52d1199afc26194e266252f7fd6a141875c03190a5abfb3e68068f957f7fbe42",
+    "tools/esp32c3_tests/tls_records.py": "2e93a2aed22785da0e7ba9f0fbd352c61b5680d1900ea8e08d703095dd69536d",
+    "tools/esp32c3_tests/trace_transport.py": "bfe205282071de4a0a561d137d52bd056eaea9ce7abe706bdc2a7e6d94960f47",
+    "tools/esp32c3_tests/transport.py": "124917ee9999594b628eb9d4f1b7fd045001e97d54faee19e5f07342a230142c",
+    "tools/esp32c3_tests/verify_adaptive_input_link.py": "d2c2bbe2c2cde72665828318aab4ee6f02e7245852fb57cbfd0ca9cf3e5ee247",
+    "tools/esp32c3_tests/verify_gcm_byte_link.py": "d46f80cabf959514832f70b50ca6817714039e4091195575b8af16da9235b5f1",
+    "tools/esp32c3_tests/verify_http_link.py": "caf7314d37464b1f4aeb7bdaa0e49cd84fb901bfacbef3c9dfc5caceb1124f73",
+    "tools/esp32c3_tests/verify_tls_path_link.py": "75f102153680aac6a11092bfeec9cc0b04ba899080c0d56ab473f757087cff6e",
+    "tools/esp32c3_tests/web_memory.py": "12bd0829a64bf967b906ff2adee24454100808dc9f0319de81f1d3a5632f8e77",
+    "tools/esp32c3_tests/web_tcp.py": "c65c64c4e9009aed29aceb458c8efb3c4ff59ad40daa7fe6a11d054215cfef91",
+    "tools/audio_test_server/fixtures.py": "cc605a2043820d05a44f77d1b4e3115defc82c723fc581464c048f3c79680aff",
+    "tools/audio_test_server/generate.py": "21f37cb2f4a8d5c3881227199d8ee3fae8e373bd7c13373ec75baf44d339b0c8",
+    "tools/audio_test_server/generate_aac_growth.py": "abaff04a4c5d537e172f39e770bbe48843c326b642da241fce16ce5d6821db6d",
+    "tools/audio_test_server/generate_flac_depths.py": "6f15589438a6fd31fb937e95e7f840a3288ff083c5e3771b6e9b486cede9f4c1",
+    "tools/audio_test_server/generate_flac_high_depth.py": "55417b00036c9256c5229fe51447be47b238dafa45b9f14e124771c09d515068",
+    "tools/audio_test_server/generate_mp3_fixtures.py": "2723637eaabb17669461cfc6ddaf7f4284209d6500507fc0c9cbaeba19fc8104",
+    "tools/audio_test_server/generate_pcm_tails.py": "a928505b88ea9c439bcf87aa0626de7ed2395129f9caf6b79e6081cc902d9c23",
+    "tools/audio_test_server/generate_stress.py": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e",
+    "tools/audio_test_server/icy.py": "b555054037f882075508225481f224afaf76fc3659580d3801d438d545ae6fb8",
+    "tools/audio_test_server/make_test_certificate.py": "6771a7840b4c704c0e7f5ea50c14beeee110edfca63f171bbe8ca9beecd3330a",
+    "tools/audio_test_server/record_test_ca.py": "de680e4970d042e9d18744c9779822897c6b5e8930a75aa7cc9184dace79aaeb",
+    "tools/audio_test_server/relay.py": "14723e79f14911d36816068700e800b1b3c9f745043ce565fc813d0674b4cc0d",
+    "tools/audio_test_server/server.py": "715a08a25c3eb625346a10bde807b9e4fc257a9eb9a94e4e5ee56fdaf012f381",
+    "tools/audio_test_server/tls_framing.py": "83d067b29e473d24817f505977a491668c4c789560221e4868e1eec50b744930",
+    "tools/audio_test_server/tls_records.py": "159c68b5a28dec43861f3357da9ae38a77f5d6c579179eb331616e2dc36eaa9b",
+    "tools/audio_test_server/tls_renegotiation.py": "ed2537fed9f4037c7cb576da34d486b27b848e5a88ceb1a59d94c365d6585126"
+  },
+  "image": {
+    "app_elf_sha256": "b9e61a369486dc5b4404f218433dc00a01d4f348d9302467ae1e84c35a9d2118",
+    "sha256": "219bfe1b4bd84e385825d5ee3b6e3468c7bf485a189c3765a11e511e1d459336",
+    "bytes": 1470752
+  },
+  "sdkconfig_sha256": "9a2cdc6afd87987d44d115e86e1a2e4aacfd4516c72203c6e471b33a2d31cfcb",
+  "fixture_hashes": {
+    "mp3-320": "6d8d1a363390c3ba01965ab034a298d58cf4ef4c6e6599cf7d0a7c8b70acc80c",
+    "flac-level8": "d9a54de9e470158428bb340d2278baa6a36a5f5571ea8083af390ec46ca39aad",
+    "vorbis-q10": "09d6cfa599f2c4a25f5745e5c8a605b5a1583a42d7990b9e5242b8990adff12f",
+    "opus-510": "53b3ee1b3c883d4a282fa88d0ad42361a8d00eddb5d4ebe9e50657336c5b2a11",
+    "aac-lc-320": "1b8ee7e7476c2ab5393a6bfffb895f5efd9ab9b83799123ff64cdfa0bc5bc4a5",
+    "lc-44100-stereo": "5705b8cb1ffcdf9414205bc962eec42b8f72ad48030601b4c1fbf3ed171fceb7",
+    "lc-22050-mono": "3709216e19cd58f1892f6287b950aa4ae83c2cb485ba5d284a01e9865f142b21",
+    "lc-48000-stereo": "8b054b26ffdb49e78a50a905aee78952ae822d292e86a3c99972030d642c0982",
+    "he-44100-stereo": "cec9c7851b2b8ee001c804e2ed1e544b772d3c107990a49a7f4dd853f219b4c9",
+    "he-48000-stereo": "c2ac6e74fb70efc3cbff67f50a06586fca634ceed97df05f60b410272d92f0c2",
+    "hev2-44100-stereo": "86422b5b60f17410fbcc28327910586ea003191140d7c58c7dd0d7c35c1ba26e",
+    "changing": "d279f54c7ff0c14f9dbfb4cdf9f211857cf576d100510e53e872cbd01334a4da",
+    "implicit-sbr": "404d2cf6713e1f1f4ed9a7b252ed3f3c4f724968b34926e3f3e2b1095855c745",
+    "mp3-he-mp3": "1c44c850e3d99e7e30022296d49743956603e811facc338a3181fcfb6808d1c7",
+    "aac-mp3-hev2": "ec94a5d73be63cee143c8437d4ebf22478200bf5d1c3f68da44af2ce2ec562fc"
+  },
+  "suites": [
+    "public",
+    "network",
+    "websocket"
+  ],
+  "scope": "Quiet format/EOF, heap, allocation/watchdog and reboot detection; public cases also check decoder faults and sampled output counters. No PCM/acoustic claim",
+  "public_memory_policy": "faults-and-recovery",
+  "health_http_requests_per_status": 1,
+  "serial_capture_enabled": false,
+  "public_seconds": 60,
+  "idle": {
+    "initial": [
+      {
+        "at": 73848.0429371,
+        "request_ms": 62.60929998825304,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 17776,
+        "reset_reason": 3,
+        "heap": 139468,
+        "largest": 110592,
+        "minimum_heap": 110976,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1205,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 73849.303638,
+        "request_ms": 65.11440000031143,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 19036,
+        "reset_reason": 3,
+        "heap": 139468,
+        "largest": 110592,
+        "minimum_heap": 110976,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1324,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 73850.4920488,
+        "request_ms": 77.26529998762999,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 20226,
+        "reset_reason": 3,
+        "heap": 139468,
+        "largest": 110592,
+        "minimum_heap": 110976,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1435,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      }
+    ],
+    "public": [
+      {
+        "at": 74159.8143021,
+        "request_ms": 149.97430000221357,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 329460,
+        "reset_reason": 3,
+        "heap": 139488,
+        "largest": 110592,
+        "minimum_heap": 16220,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 5769,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 74161.0069501,
+        "request_ms": 66.70709999161772,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 330749,
+        "reset_reason": 3,
+        "heap": 139488,
+        "largest": 110592,
+        "minimum_heap": 16220,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 5890,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 74162.2116999,
+        "request_ms": 75.42880000255536,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 331953,
+        "reset_reason": 3,
+        "heap": 139488,
+        "largest": 110592,
+        "minimum_heap": 16220,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 6003,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      }
+    ],
+    "network": [
+      {
+        "at": 74285.7843355,
+        "request_ms": 59.71299999509938,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 455532,
+        "reset_reason": 3,
+        "heap": 139408,
+        "largest": 110592,
+        "minimum_heap": 16220,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 12913,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 74287.0766139,
+        "request_ms": 80.382300002384,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 456819,
+        "reset_reason": 3,
+        "heap": 139396,
+        "largest": 110592,
+        "minimum_heap": 16220,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 13034,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 74288.2517926,
+        "request_ms": 80.63110000512097,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 457990,
+        "reset_reason": 3,
+        "heap": 139408,
+        "largest": 110592,
+        "minimum_heap": 16220,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 13144,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      }
+    ],
+    "websocket": [
+      {
+        "at": 74306.7595536,
+        "request_ms": 55.45100000745151,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 476504,
+        "reset_reason": 3,
+        "heap": 139408,
+        "largest": 110592,
+        "minimum_heap": 16220,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 14258,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 74307.9873124,
+        "request_ms": 148.1391999986954,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 477640,
+        "reset_reason": 3,
+        "heap": 139408,
+        "largest": 110592,
+        "minimum_heap": 16220,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 14365,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 74309.1424806,
+        "request_ms": 77.94820000708569,
+        "schema": 1,
+        "boot_id": "08a4fb8c4a7cb480",
+        "uptime_ms": 478885,
+        "reset_reason": 3,
+        "heap": 139408,
+        "largest": 110592,
+        "minimum_heap": 16220,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 14481,
+          "write_errors": 0
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      }
+    ]
+  },
+  "actions": [
+    {
+      "name": "initial-idle",
+      "started_at": 73839.1828193,
+      "ended_at": 73851.4951914
+    },
+    {
+      "name": "https:groovesalad-128-aac",
+      "started_at": 73851.5021398,
+      "ended_at": 73893.8848473
+    },
+    {
+      "name": "https:groovesalad-64-aac",
+      "started_at": 73893.8886937,
+      "ended_at": 73958.8246502
+    },
+    {
+      "name": "https:groovesalad-32-aac",
+      "started_at": 73958.832585,
+      "ended_at": 74023.9022105
+    },
+    {
+      "name": "https:groovesalad-16-aac",
+      "started_at": 74023.9107114,
+      "ended_at": 74088.4437264
+    },
+    {
+      "name": "https:groovesalad-256-mp3",
+      "started_at": 74088.4529671,
+      "ended_at": 74150.0145286
+    },
+    {
+      "name": "idle:public",
+      "started_at": 74150.0254457,
+      "ended_at": 74163.2196123
+    },
+    {
+      "name": "recovery:public",
+      "started_at": 74163.2309414,
+      "ended_at": 74163.2322299
+    },
+    {
+      "name": "network:drop",
+      "started_at": 74163.243269,
+      "ended_at": 74192.7242269
+    },
+    {
+      "name": "network:stall",
+      "started_at": 74192.7365542,
+      "ended_at": 74222.4317204
+    },
+    {
+      "name": "network:error",
+      "started_at": 74222.4535767,
+      "ended_at": 74239.6938554
+    },
+    {
+      "name": "network:redirect",
+      "started_at": 74239.7179432,
+      "ended_at": 74258.3234385
+    },
+    {
+      "name": "network:jitter",
+      "started_at": 74258.3391291,
+      "ended_at": 74276.9113925
+    },
+    {
+      "name": "idle:network",
+      "started_at": 74276.9405461,
+      "ended_at": 74289.2661668
+    },
+    {
+      "name": "recovery:network",
+      "started_at": 74289.2833824,
+      "ended_at": 74289.2853041
+    },
+    {
+      "name": "websocket-format-and-reconnect",
+      "started_at": 74289.3017977,
+      "ended_at": 74298.0125785
+    },
+    {
+      "name": "idle:websocket",
+      "started_at": 74298.0390712,
+      "ended_at": 74310.1594862
+    },
+    {
+      "name": "recovery:websocket",
+      "started_at": 74310.1898296,
+      "ended_at": 74310.1922093
+    },
+    {
+      "name": "stop-and-settings",
+      "started_at": 74310.5672174,
+      "ended_at": 74311.0702665
+    },
+    {
+      "name": "lifetime-health",
+      "started_at": 74311.0989984,
+      "ended_at": 74311.1042021
+    }
+  ],
+  "public_manifest_sha256": "a095ed8e01ab76dae105024e3a8ba0f72b3c2d9044155b0864568c76f0b6e36a",
+  "public_urls": {
+    "groovesalad-128-aac": "https://ice5.somafm.com/groovesalad-128-aac",
+    "groovesalad-64-aac": "https://ice5.somafm.com/groovesalad-64-aac",
+    "groovesalad-32-aac": "https://ice5.somafm.com/groovesalad-32-aac",
+    "groovesalad-16-aac": "https://ice5.somafm.com/groovesalad-16-aac",
+    "groovesalad-256-mp3": "https://ice5.somafm.com/groovesalad-256-mp3"
+  },
+  "references": {
+    "groovesalad-128-aac": {
+      "spec": {
+        "codec": "aac",
+        "profile": "LC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "AAC PCM"
+      },
+      "ffprobe_spec": {
+        "codec": "aac",
+        "profile": "LC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "AAC PCM"
+      },
+      "input_sha256": "2268ebfe389842daac2cd77747a4c1cfda0a1b6a05c6da56eb3d8e3f4b8c33c1",
+      "input_bytes": 80200,
+      "frames": 216,
+      "faad": {
+        "samples": 440320,
+        "frames": 216,
+        "rate": 44100,
+        "channels": 2,
+        "ps_frames": 0,
+        "different": 0,
+        "over_two": 0,
+        "over_five": 0,
+        "maximum": 0,
+        "square_error": 0,
+        "square_signal": 4329813425531,
+        "scope": 0,
+        "float_scale": 1,
+        "history": [
+          {
+            "pairs": 0,
+            "changed_components": 0,
+            "saturated": 0,
+            "out_of_range": 0,
+            "rms_native": 0,
+            "peak_native": 0,
+            "exponents": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "pairs": 0,
+            "changed_components": 0,
+            "saturated": 0,
+            "out_of_range": 0,
+            "rms_native": 0,
+            "peak_native": 0,
+            "exponents": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+      "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+      "tls_verify": true
+    },
+    "groovesalad-64-aac": {
+      "spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC ",
+        "source_channels": 2
+      },
+      "ffprobe_spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC "
+      },
+      "input_sha256": "dac53fa25a3b677da49343964a82bf3ab74ad2d6cfea4445822c86882be687cb",
+      "input_bytes": 40368,
+      "frames": 108,
+      "faad": {
+        "samples": 438272,
+        "frames": 108,
+        "rate": 44100,
+        "channels": 2,
+        "ps_frames": 0,
+        "different": 0,
+        "over_two": 0,
+        "over_five": 0,
+        "maximum": 0,
+        "square_error": 0,
+        "square_signal": 10014564462988,
+        "scope": 0,
+        "float_scale": 1,
+        "history": [
+          {
+            "pairs": 0,
+            "changed_components": 0,
+            "saturated": 0,
+            "out_of_range": 0,
+            "rms_native": 0,
+            "peak_native": 0,
+            "exponents": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "pairs": 0,
+            "changed_components": 0,
+            "saturated": 0,
+            "out_of_range": 0,
+            "rms_native": 0,
+            "peak_native": 0,
+            "exponents": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+      "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+      "tls_verify": true
+    },
+    "groovesalad-32-aac": {
+      "spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC ",
+        "source_channels": 2
+      },
+      "ffprobe_spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC "
+      },
+      "input_sha256": "b7e19126d76a588b1f4c2c6f561e9553aadd5cc9d02743ac02efbdb007d5f216",
+      "input_bytes": 20041,
+      "frames": 108,
+      "faad": {
+        "samples": 438272,
+        "frames": 108,
+        "rate": 44100,
+        "channels": 2,
+        "ps_frames": 0,
+        "different": 0,
+        "over_two": 0,
+        "over_five": 0,
+        "maximum": 0,
+        "square_error": 0,
+        "square_signal": 7593352781950,
+        "scope": 0,
+        "float_scale": 1,
+        "history": [
+          {
+            "pairs": 0,
+            "changed_components": 0,
+            "saturated": 0,
+            "out_of_range": 0,
+            "rms_native": 0,
+            "peak_native": 0,
+            "exponents": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "pairs": 0,
+            "changed_components": 0,
+            "saturated": 0,
+            "out_of_range": 0,
+            "rms_native": 0,
+            "peak_native": 0,
+            "exponents": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+      "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+      "tls_verify": true
+    },
+    "groovesalad-16-aac": {
+      "spec": {
+        "codec": "aac",
+        "profile": "HE-AAC",
+        "rate": 32000,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AAC ",
+        "source_channels": 1
+      },
+      "ffprobe_spec": {
+        "codec": "aac",
+        "profile": "HE-AACv2",
+        "rate": 32000,
+        "channels": 2,
+        "bits": 16,
+        "label": "HE-AACv2 "
+      },
+      "input_sha256": "32c5a5ebe7291e8450ca91ecf52b7d81b2de6bc34a5bd264e284070392c274ff",
+      "input_bytes": 10121,
+      "frames": 79,
+      "faad": {
+        "samples": 159744,
+        "frames": 79,
+        "rate": 32000,
+        "channels": 1,
+        "ps_frames": 0,
+        "different": 0,
+        "over_two": 0,
+        "over_five": 0,
+        "maximum": 0,
+        "square_error": 0,
+        "square_signal": 2504050897884,
+        "scope": 0,
+        "float_scale": 1,
+        "history": [
+          {
+            "pairs": 0,
+            "changed_components": 0,
+            "saturated": 0,
+            "out_of_range": 0,
+            "rms_native": 0,
+            "peak_native": 0,
+            "exponents": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "pairs": 0,
+            "changed_components": 0,
+            "saturated": 0,
+            "out_of_range": 0,
+            "rms_native": 0,
+            "peak_native": 0,
+            "exponents": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "command_sha256": "40e96850c2699577385a58052e548305dcf10244297373c6eb8f7a74eadc8600",
+      "scope": "Five-second live-source observation; no acoustic or PCM-equivalence claim",
+      "tls_verify": true
+    },
+    "groovesalad-256-mp3": {
+      "spec": {
+        "codec": "mp3",
+        "profile": null,
+        "rate": 44100,
+        "channels": 2,
+        "bits": 16,
+        "label": "MP3"
+      },
+      "tls_verify": true
+    }
+  },
+  "server_events": [
+    {
+      "mode": "drop",
+      "fixture": "lc-48000-stereo",
+      "sent": 49152,
+      "complete": false,
+      "pacing_ratio": 1.0,
+      "clock": "time.perf_counter",
+      "delivery": {
+        "clock": "time.perf_counter",
+        "started_at": 74164.2508086,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 74164.2508086,
+            "ended_at": 74165.2680783,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 0.0005312999855959788,
+            "max_write_seconds": 4.9299997044727206e-05,
+            "max_late_seconds": 0.01551727662445046
+          },
+          {
+            "started_at": 74165.2680783,
+            "ended_at": 74166.2827838,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0006067999784136191,
+            "max_write_seconds": 0.00012059998698532581,
+            "max_late_seconds": 0.01515965060389135
+          },
+          {
+            "started_at": 74166.2827838,
+            "ended_at": 74167.2791306,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 0.00048669998068362474,
+            "max_write_seconds": 7.029999687802047e-05,
+            "max_late_seconds": 0.015159342816332355
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 74167.2791306
+      },
+      "seconds": 3.028319000004558
+    },
+    {
+      "mode": "file",
+      "fixture": "lc-22050-mono",
+      "sent": 182272,
+      "complete": false,
+      "pacing_ratio": null,
+      "clock": "time.perf_counter",
+      "delivery": {
+        "clock": "time.perf_counter",
+        "started_at": 74185.5430025,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 74185.5430025,
+            "ended_at": 74186.5734082,
+            "bytes": 82944,
+            "writes": 81,
+            "write_seconds": 1.0302574999222998,
+            "max_write_seconds": 0.8084231999964686,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74186.5734082,
+            "ended_at": 74187.7707179,
+            "bytes": 20480,
+            "writes": 20,
+            "write_seconds": 1.1971770000091055,
+            "max_write_seconds": 0.25555489999533165,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74187.7707179,
+            "ended_at": 74188.7937494,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0229454000218539,
+            "max_write_seconds": 0.27437910001026466,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74188.7937494,
+            "ended_at": 74189.9587547,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.1648753000044962,
+            "max_write_seconds": 0.22106569999596104,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74189.9587547,
+            "ended_at": 74190.9706271,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0117627000145148,
+            "max_write_seconds": 0.20487639999191742,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74190.9706271,
+            "ended_at": 74191.9945936,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0238286999810953,
+            "max_write_seconds": 0.22869319999881554,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74191.9945936,
+            "ended_at": 74192.6951689,
+            "bytes": 11264,
+            "writes": 11,
+            "write_seconds": 0.5211622999922838,
+            "max_write_seconds": 0.2416568000044208,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 74192.6951689
+      },
+      "seconds": 7.152164200000698
+    },
+    {
+      "mode": "stall",
+      "fixture": "lc-48000-stereo",
+      "sent": 49152,
+      "complete": false,
+      "pacing_ratio": 1.0,
+      "clock": "time.perf_counter",
+      "delivery": {
+        "clock": "time.perf_counter",
+        "started_at": 74193.7203706,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 74193.7203706,
+            "ended_at": 74194.7390667,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 0.0008157999691320583,
+            "max_write_seconds": 9.800000407267362e-05,
+            "max_late_seconds": 0.014654976621386595
+          },
+          {
+            "started_at": 74194.7390667,
+            "ended_at": 74195.7508188,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0006782999698771164,
+            "max_write_seconds": 0.0001407999952789396,
+            "max_late_seconds": 0.015000458399299532
+          },
+          {
+            "started_at": 74195.7508188,
+            "ended_at": 74211.7599614,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 0.000627699977485463,
+            "max_write_seconds": 0.00011619999713730067,
+            "max_late_seconds": 0.013661342818522826
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 74211.7599614
+      },
+      "seconds": 18.039586900005816
+    },
+    {
+      "mode": "file",
+      "fixture": "lc-22050-mono",
+      "sent": 188416,
+      "complete": false,
+      "pacing_ratio": null,
+      "clock": "time.perf_counter",
+      "delivery": {
+        "clock": "time.perf_counter",
+        "started_at": 74214.8272074,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 74214.8272074,
+            "ended_at": 74215.8612417,
+            "bytes": 82944,
+            "writes": 81,
+            "write_seconds": 1.0338847000093665,
+            "max_write_seconds": 0.9009125000011409,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74215.8612417,
+            "ended_at": 74216.933668,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.072286400012672,
+            "max_write_seconds": 0.24061690000235103,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74216.933668,
+            "ended_at": 74217.9537748,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 1.019975000017439,
+            "max_write_seconds": 0.2647016999981133,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74217.9537748,
+            "ended_at": 74218.9580976,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.0041803999920376,
+            "max_write_seconds": 0.2754306999995606,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74218.9580976,
+            "ended_at": 74220.1325634,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.174302799961879,
+            "max_write_seconds": 0.1744734999956563,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74220.1325634,
+            "ended_at": 74221.1572939,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.024560100020608,
+            "max_write_seconds": 0.2136041999910958,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74221.1572939,
+            "ended_at": 74222.1804274,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0229490000056103,
+            "max_write_seconds": 0.2382054000045173,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74222.1804274,
+            "ended_at": 74222.4128904,
+            "bytes": 3072,
+            "writes": 3,
+            "write_seconds": 0.027548500002012588,
+            "max_write_seconds": 0.027516499991179444,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 74222.4128904
+      },
+      "seconds": 7.585679700001492
+    },
+    {
+      "mode": "file",
+      "fixture": "lc-22050-mono",
+      "sent": 191488,
+      "complete": false,
+      "pacing_ratio": null,
+      "clock": "time.perf_counter",
+      "delivery": {
+        "clock": "time.perf_counter",
+        "started_at": 74232.0232824,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 74232.0232824,
+            "ended_at": 74233.0537311,
+            "bytes": 82944,
+            "writes": 81,
+            "write_seconds": 1.0302785000239965,
+            "max_write_seconds": 0.8437036999966949,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74233.0537311,
+            "ended_at": 74234.1162991,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.0624192999966908,
+            "max_write_seconds": 0.17154939999454655,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74234.1162991,
+            "ended_at": 74235.1434359,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.027004899980966,
+            "max_write_seconds": 0.19964409999374766,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74235.1434359,
+            "ended_at": 74236.1654046,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0218309999909252,
+            "max_write_seconds": 0.21894279999833088,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74236.1654046,
+            "ended_at": 74237.1787012,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.013174700026866,
+            "max_write_seconds": 0.240742499998305,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74237.1787012,
+            "ended_at": 74238.1995544,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 1.0207388999988325,
+            "max_write_seconds": 0.26042799999413546,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74238.1995544,
+            "ended_at": 74239.2124433,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.0127706000203034,
+            "max_write_seconds": 0.2686402000108501,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74239.2124433,
+            "ended_at": 74239.6821973,
+            "bytes": 7168,
+            "writes": 7,
+            "write_seconds": 0.42966800001158845,
+            "max_write_seconds": 0.18047669999941718,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 74239.6821973
+      },
+      "seconds": 7.658913599996595
+    },
+    {
+      "mode": "file",
+      "fixture": "lc-48000-stereo",
+      "sent": 198264,
+      "complete": true,
+      "pacing_ratio": null,
+      "clock": "time.perf_counter",
+      "delivery": {
+        "clock": "time.perf_counter",
+        "started_at": 74240.6565243,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 74240.6565243,
+            "ended_at": 74241.7119849,
+            "bytes": 82944,
+            "writes": 81,
+            "write_seconds": 1.0552568000275642,
+            "max_write_seconds": 0.9983241000009002,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74241.7119849,
+            "ended_at": 74242.7126031,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 1.0005335999740055,
+            "max_write_seconds": 0.26470110000809655,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74242.7126031,
+            "ended_at": 74243.7126283,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 0.9999216999858618,
+            "max_write_seconds": 0.15710140000737738,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74243.7126283,
+            "ended_at": 74244.8687423,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.1560177999781445,
+            "max_write_seconds": 0.15960790000099223,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74244.8687423,
+            "ended_at": 74245.8927451,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0239149999833899,
+            "max_write_seconds": 0.17927860000054352,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74245.8927451,
+            "ended_at": 74246.8952996,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0024209000257542,
+            "max_write_seconds": 0.18160619999980554,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74246.8952996,
+            "ended_at": 74247.9024336,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0069934999773977,
+            "max_write_seconds": 0.18896440000389703,
+            "max_late_seconds": 0
+          },
+          {
+            "started_at": 74247.9024336,
+            "ended_at": 74248.715533,
+            "bytes": 14968,
+            "writes": 15,
+            "write_seconds": 0.8129738999705296,
+            "max_write_seconds": 0.2086711000010837,
+            "max_late_seconds": 0
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 74248.715533
+      },
+      "seconds": 8.059007400006521
+    },
+    {
+      "mode": "jitter",
+      "fixture": "lc-48000-stereo",
+      "sent": 198264,
+      "complete": true,
+      "pacing_ratio": 1.0,
+      "clock": "time.perf_counter",
+      "delivery": {
+        "clock": "time.perf_counter",
+        "started_at": 74259.2887949,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 74259.2887949,
+            "ended_at": 74260.3080377,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0005938000249443576,
+            "max_write_seconds": 0.00019530000281520188,
+            "max_late_seconds": 0.012357914267340675
+          },
+          {
+            "started_at": 74260.3080377,
+            "ended_at": 74261.3306965,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 0.0005540999700315297,
+            "max_write_seconds": 5.18000015290454e-05,
+            "max_late_seconds": 0.014415767509490252
+          },
+          {
+            "started_at": 74261.3306965,
+            "ended_at": 74262.3420291,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 0.0007237000099848956,
+            "max_write_seconds": 0.00010000000474974513,
+            "max_late_seconds": 0.014690758398501202
+          },
+          {
+            "started_at": 74262.3420291,
+            "ended_at": 74263.3553401,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 0.0008976999524747953,
+            "max_write_seconds": 0.00010679999832063913,
+            "max_late_seconds": 0.013269318107631989
+          },
+          {
+            "started_at": 74263.3553401,
+            "ended_at": 74264.3683143,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 0.0007566999993287027,
+            "max_write_seconds": 0.00017299999308306724,
+            "max_late_seconds": 0.014543654426233843
+          },
+          {
+            "started_at": 74264.3683143,
+            "ended_at": 74265.3816809,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 0.0005089000042062253,
+            "max_write_seconds": 6.070001109037548e-05,
+            "max_late_seconds": 0.015577221944113262
+          },
+          {
+            "started_at": 74265.3816809,
+            "ended_at": 74266.4082768,
+            "bytes": 15360,
+            "writes": 15,
+            "write_seconds": 0.0005781000072602183,
+            "max_write_seconds": 8.869999146554619e-05,
+            "max_late_seconds": 0.015282497231964953
+          },
+          {
+            "started_at": 74266.4082768,
+            "ended_at": 74267.4906349,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0006473999674199149,
+            "max_write_seconds": 7.6299998909235e-05,
+            "max_late_seconds": 0.015777456952491775
+          },
+          {
+            "started_at": 74267.4906349,
+            "ended_at": 74268.5548034,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0007541000086348504,
+            "max_write_seconds": 0.00017559999832883477,
+            "max_late_seconds": 0.015190633566817269
+          },
+          {
+            "started_at": 74268.5548034,
+            "ended_at": 74269.6430835,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0009037000127136707,
+            "max_write_seconds": 8.33000085549429e-05,
+            "max_late_seconds": 0.013661316654179245
+          },
+          {
+            "started_at": 74269.6430835,
+            "ended_at": 74270.7171818,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0011119000118924305,
+            "max_write_seconds": 0.00020219999714754522,
+            "max_late_seconds": 0.011939060786971822
+          },
+          {
+            "started_at": 74270.7171818,
+            "ended_at": 74271.7951105,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0010461000056238845,
+            "max_write_seconds": 0.0001033000007737428,
+            "max_late_seconds": 0.013671165943378583
+          },
+          {
+            "started_at": 74271.7951105,
+            "ended_at": 74272.3681698,
+            "bytes": 7800,
+            "writes": 8,
+            "write_seconds": 0.0006058999861124903,
+            "max_write_seconds": 0.00010799999290611595,
+            "max_late_seconds": 0.010548726975684986
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 74272.3681698
+      },
+      "seconds": 13.079372699998203
+    },
+    {
+      "mode": "stream",
+      "fixture": "lc-48000-stereo",
+      "sent": 124928,
+      "complete": false,
+      "pacing_ratio": 1.0,
+      "clock": "time.perf_counter",
+      "delivery": {
+        "clock": "time.perf_counter",
+        "started_at": 74290.2901075,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 74290.2901075,
+            "ended_at": 74291.3009716,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 0.0008279999747173861,
+            "max_write_seconds": 0.00010569998994469643,
+            "max_late_seconds": 0.01598086883313954
+          },
+          {
+            "started_at": 74291.3009716,
+            "ended_at": 74292.3162396,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0009832999639911577,
+            "max_write_seconds": 0.00016679998952895403,
+            "max_late_seconds": 0.013347051935852505
+          },
+          {
+            "started_at": 74292.3162396,
+            "ended_at": 74293.3275407,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0009999000030802563,
+            "max_write_seconds": 0.00014620000729337335,
+            "max_late_seconds": 0.013186480471631512
+          },
+          {
+            "started_at": 74293.3275407,
+            "ended_at": 74294.3940543,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 0.0009741000249050558,
+            "max_write_seconds": 0.000152299995534122,
+            "max_late_seconds": 0.013387709026574157
+          },
+          {
+            "started_at": 74294.3940543,
+            "ended_at": 74295.4071859,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0011295999720459804,
+            "max_write_seconds": 0.00015439999697264284,
+            "max_late_seconds": 0.013456699918606319
+          },
+          {
+            "started_at": 74295.4071859,
+            "ended_at": 74296.4072424,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0011008999863406643,
+            "max_write_seconds": 0.00014560000272467732,
+            "max_late_seconds": 0.015149183018365875
+          },
+          {
+            "started_at": 74296.4072424,
+            "ended_at": 74297.4204429,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.0009683999669505283,
+            "max_write_seconds": 0.0001235999952768907,
+            "max_late_seconds": 0.014330673904623836
+          },
+          {
+            "started_at": 74297.4204429,
+            "ended_at": 74297.9811608,
+            "bytes": 8192,
+            "writes": 8,
+            "write_seconds": 0.0006752999761374667,
+            "max_write_seconds": 0.0003550000110408291,
+            "max_late_seconds": 0.016376780389691703
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 74297.9811608
+      },
+      "seconds": 7.691052199996193
+    }
+  ]
+}

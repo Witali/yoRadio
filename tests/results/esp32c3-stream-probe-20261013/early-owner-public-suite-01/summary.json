@@ -1,0 +1,124 @@
+{
+  "passed": false,
+  "cases": [
+    {
+      "name": "initial-idle",
+      "result": "PASS"
+    },
+    {
+      "name": "https:groovesalad-128-aac",
+      "result": "FAIL",
+      "reason": "URLError"
+    },
+    {
+      "name": "https:groovesalad-64-aac",
+      "result": "PASS"
+    },
+    {
+      "name": "https:groovesalad-32-aac",
+      "result": "PASS"
+    },
+    {
+      "name": "https:groovesalad-16-aac",
+      "result": "PASS"
+    },
+    {
+      "name": "https:groovesalad-256-mp3",
+      "result": "PASS"
+    },
+    {
+      "name": "idle:public",
+      "result": "PASS"
+    },
+    {
+      "name": "recovery:public",
+      "result": "PASS"
+    },
+    {
+      "name": "network:drop",
+      "result": "PASS"
+    },
+    {
+      "name": "network:stall",
+      "result": "PASS"
+    },
+    {
+      "name": "network:error",
+      "result": "PASS"
+    },
+    {
+      "name": "network:redirect",
+      "result": "PASS"
+    },
+    {
+      "name": "network:jitter",
+      "result": "PASS"
+    },
+    {
+      "name": "idle:network",
+      "result": "PASS"
+    },
+    {
+      "name": "recovery:network",
+      "result": "PASS"
+    },
+    {
+      "name": "websocket-format-and-reconnect",
+      "result": "PASS"
+    },
+    {
+      "name": "idle:websocket",
+      "result": "PASS"
+    },
+    {
+      "name": "recovery:websocket",
+      "result": "PASS"
+    },
+    {
+      "name": "stop-and-settings",
+      "result": "PASS"
+    },
+    {
+      "name": "lifetime-health",
+      "result": "PASS"
+    }
+  ],
+  "failed_request_phases": [
+    {
+      "request": 137,
+      "phase": "connect",
+      "at": 73888.8041758,
+      "socket_attempts": [
+        {
+          "at": 73888.804253,
+          "result": "FAIL",
+          "local_port": 50601,
+          "ms": 5014.643600006821
+        }
+      ],
+      "result": "FAIL",
+      "error_type": "TimeoutError",
+      "ms": 5014.826099999482
+    },
+    {
+      "request": 137,
+      "phase": "request_including_connect",
+      "at": 73888.8041485,
+      "result": "FAIL",
+      "error_type": "TimeoutError",
+      "ms": 5014.923900002032
+    }
+  ],
+  "restoration_verified": true,
+  "health": {
+    "boot_ids": [
+      "08a4fb8c4a7cb480"
+    ],
+    "allocation_failures": 0,
+    "decoder_failures": 0,
+    "task_watchdog_events": 0
+  },
+  "public_observation_seconds": 60,
+  "production_qualified": false,
+  "scope": "Five public HTTPS variants plus HTTP source failures and WebSocket checks on the exact public-root image. Preserve incomplete observations and failed requests; successful later cases do not establish their cause or a fix. No analog continuity or full production qualification claim."
+}
