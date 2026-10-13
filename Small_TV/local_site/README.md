@@ -53,8 +53,11 @@ colours, image switches and display interval persist across page and
 server restarts. RGB colours are quantized through RGB565, as in the
 firmware; a chosen `#123456`, for example, reads back as `#103452`.
 Initial values follow the recovered firmware's validated defaults.
-The original brightness slider tops out at 99 even though the default
-brightness getter returns 100, so its first displayed value is 99.
+The working brightness slider spans the actual 0..100% API range, including
+the default 100%. Temperature and wind toggles are captioned according to the
+factory values (`tempUnit=1` is Fahrenheit; `mileDisplay=1` is km/h). The
+unsupported browser-time toggle is disabled and explains that network time
+is used. Its API field remains available for raw-settings compatibility.
 
 The initial photo previews use the five recovered, metadata-free JPEGs.
 The original browser script crops an uploaded picture to 240 x 240,

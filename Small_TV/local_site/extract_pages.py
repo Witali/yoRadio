@@ -24,6 +24,82 @@ def recover() -> None:
         (ROOT / "source" / f"{name}.html").write_bytes(raw)
         page = raw.decode("gb18030").replace("\r\n", "\n")
         if name == "settings":
+            # Raw-sector flags are part of the factory API: 1 selects Fahrenheit
+            # and km/h, despite the opposite captions in the original HTML.
+            # The browser-time flag is stored only; no timestamp is ever sent.
+            fixes = {
+                'Show Temperature in Celsius': 'Show Temperature in Fahrenheit',
+                '1=Celsius': '1=Fahrenheit',
+                'Mile display:': 'Wind speed in km/h:',
+                'Sync phone or PC time:': 'Browser time sync (unavailable):',
+                '<input type="checkbox" id="temp-unit-switch">':
+                    '<input type="checkbox" id="temp-unit-switch" aria-label="Show temperature in Fahrenheit" disabled>',
+                '<input type="checkbox" id="hour-format-switch">':
+                    '<input type="checkbox" id="hour-format-switch" aria-label="12-hour clock" disabled>',
+                '<input type="checkbox" id="mile-display-switch">':
+                    '<input type="checkbox" id="mile-display-switch" aria-label="Wind speed in km/h" disabled>',
+                '<input type="checkbox" id="time-sync-switch">':
+                    '<input type="checkbox" id="time-sync-switch" aria-label="Browser time sync" disabled '
+                    'title="Time is synchronized automatically over Wi-Fi.">',
+            }
+            for original, corrected in fixes.items():
+                if page.count(original) != 1:
+                    raise ValueError(f'Missing or ambiguous factory settings control: {original}')
+                page = page.replace(original, corrected, 1)
+            # The firmware accepts 0..100%; the original 2..99 slider silently
+            # clamps the saved default 100% to 99 before the user touches it.
+            page = page.replace("min='2' max='99'", "min='0' max='100'")
+            # Loading errors must not invent checked defaults and accidentally
+            # overwrite other saved flags when one switch is changed.
+            start = page.index('function initSwitches() {')
+            end = page.index('// 发送开关状态到ESP8266', start)
+            page = page[:start] + '''function initSwitches() {
+                    // Read actual flags before permitting a combined settings write.
+                    const controls = ['temp-unit-switch', 'hour-format-switch', 'mile-display-switch'];
+                    const status = document.getElementById('switch-status');
+                    controls.forEach(id => document.getElementById(id).disabled = true);
+                    status.textContent = 'Loading clock settings…';
+                    fetch('/getsettings')
+                        .then(response => {
+                            if (!response.ok) throw new Error('Cannot load clock settings');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (!data || !['tempUnit', 'hourFormat', 'mileDisplay', 'timeSync'].every(
+                                key => data[key] === 0 || data[key] === 1)) {
+                                throw new Error('Invalid clock settings');
+                            }
+                            document.getElementById('temp-unit-switch').checked = data.tempUnit === 1;
+                            document.getElementById('hour-format-switch').checked = data.hourFormat === 1;
+                            document.getElementById('mile-display-switch').checked = data.mileDisplay === 1;
+                            document.getElementById('time-sync-switch').checked = data.timeSync === 1;
+                            controls.forEach(id => document.getElementById(id).disabled = false);
+                            status.textContent = '';
+                        })
+                        .catch(error => {
+                            console.error('Error loading clock settings:', error);
+                            status.textContent = 'Clock settings could not be loaded. Reload to retry.';
+                        });
+                }
+
+                ''' + page[end:]
+            page = page.replace('<!-- 时间格式选择 -->',
+                                '<p id="switch-status" role="status" aria-live="polite"></p>\n'
+                                '                <!-- 时间格式选择 -->', 1)
+            page = page.replace("function refreshList() {",
+                                "function refreshList() {\n"
+                                "            if (!document.getElementById('wifi_list')) return;", 1)
+            # These controls are commented out in the factory settings page.
+            # Do not occupy HTTP sessions or scan/disconnect Wi-Fi for absent UI.
+            for endpoint, control in [('GetNightStartTime', 'starttime'),
+                                      ('GetNightStopTime', 'stoptime')]:
+                page = page.replace(f"fetch('/{endpoint}')",
+                                    f"if (!document.getElementById('{control}')) return;\n"
+                                    f"                    fetch('/{endpoint}')", 1)
+            # This initializer is at script scope, unlike the two DOM callbacks
+            # above; short-circuit its promise chain instead of returning.
+            page = page.replace("fetch('/get_night_brightness')",
+                                "NightbrightnessSlider && fetch('/get_night_brightness')", 1)
             page = page.replace("const select = document.getElementById('wifi_list');",
                                 "const select = document.getElementById('wifi_list');\n"
                                 "                    if (!select) return;")

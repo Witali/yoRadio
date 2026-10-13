@@ -203,10 +203,11 @@ for the diagnostic `display_text` helper, not the normal factory UI.
 The `timeSync` compatibility flag is stored as in the recovered handler:
 the original page supplies no browser timestamp. Time is synchronized by
 SNTP. `clickCount` is stored for API compatibility; the advanced page is
-directly accessible. The original UI's Celsius label contradicted its
-`tempUnit=1` Fahrenheit implementation; the embedded firmware copy corrects
-the label in an earlier reconstruction; the normal pages now retain the exact
-recovered HTML, including that original label. `/advanced` remains an extra
+directly accessible. The working pages correct the original opposite Celsius
+and mile captions: `tempUnit=1` means Fahrenheit, `mileDisplay=1` means km/h.
+Brightness covers 0..100%, and the unsupported browser-time control is disabled.
+Switches become editable only after valid settings load; six HTTP sessions
+support the settings page's parallel requests. `/advanced` remains an extra
 directly accessible page for the owner's NTP/weather configuration.
 
 The reconstruction corrects unsafe DNS bounds, image-buffer overlap,

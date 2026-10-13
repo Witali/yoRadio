@@ -33,6 +33,15 @@ static void test_http_pages(void)
         CHECK(request.response_length == web_settings_length);
         CHECK(!memcmp(request.response, web_settings, web_settings_length));
     }
+    /* Captions must describe the actual raw flags; the bounded brightness
+     * control must represent both firmware endpoints without browser clamping. */
+    CHECK(strstr((const char *)web_settings,"Show Temperature in Fahrenheit"));
+    CHECK(!strstr((const char *)web_settings,"Show Temperature in Celsius"));
+    CHECK(strstr((const char *)web_settings,"Wind speed in km/h:"));
+    CHECK(strstr((const char *)web_settings,"name='ledBrightness' min='0' max='100'"));
+    CHECK(strstr((const char *)web_settings,"aria-label=\"Browser time sync\" disabled"));
+    CHECK(strstr((const char *)web_settings,"Clock settings could not be loaded. Reload to retry."));
+    CHECK(!strstr((const char *)web_settings,"checked = true;  // 1=Fahrenheit"));
     for (unsigned i = 0; i < 2; ++i)
     {
         get(i ? "/photo.html" : "/photo");

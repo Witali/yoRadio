@@ -259,9 +259,9 @@
 
 				<!-- Temperature unit toggle switch -->
 				<p>
-				    Show Temperature in Celsius
+				    Show Temperature in Fahrenheit
 				    <label class='switch'>
-				        <input type="checkbox" id="temp-unit-switch">
+				        <input type="checkbox" id="temp-unit-switch" aria-label="Show temperature in Fahrenheit" disabled>
 				        <span class="slider round"></span>
 				    </label>
 				</p>
@@ -269,27 +269,28 @@
 				<p>
 				    12-Hour Clock:
 				    <label class='switch'>
-				        <input type="checkbox" id="hour-format-switch">
+				        <input type="checkbox" id="hour-format-switch" aria-label="12-hour clock" disabled>
 				        <span class="slider round"></span>
 				    </label>
 				</p>
 				<!-- Mile display toggle switch -->
 				<p>
-				    Mile display:
+				    Wind speed in km/h:
 				    <label class='switch'>
-				        <input type="checkbox" id="mile-display-switch">
+				        <input type="checkbox" id="mile-display-switch" aria-label="Wind speed in km/h" disabled>
 				        <span class="slider round"></span>
 				    </label>
 				</p>
 				<!-- Time sync toggle switch -->
 				<p>
-				    Sync phone or PC time:
+				    Browser time sync (unavailable):
 				    <label class='switch'>
-				        <input type="checkbox" id="time-sync-switch">
+				        <input type="checkbox" id="time-sync-switch" aria-label="Browser time sync" disabled title="Time is synchronized automatically over Wi-Fi.">
 				        <span class="slider round"></span>
 				    </label>
 				</p>
-            <!-- 时间格式选择 -->
+            <p id="switch-status" role="status" aria-live="polite"></p>
+                <!-- 时间格式选择 -->
             <p>
                 Time format:
                 <select id="timelist" name="option"  onchange="updatetimeselect(this.value)">
@@ -306,7 +307,7 @@
             <h2>Brightness</h2>
             <form method="post" action="/led">
                 <label for="ledBrightness">Daytime Brightness:</label>
-                <input type='range' id='ledBrightness' name='ledBrightness' min='2' max='99'>
+                <input type='range' id='ledBrightness' name='ledBrightness' min='0' max='100'>
             </form>
         </div>
 
@@ -354,7 +355,7 @@
             </p>-->
             <!-- 夜间模式亮度 -->
             <!-- <label for="NightBrightness">Night Mode Brightness:</label>
-            <input type='range' id='NightBrightness' name='NightBrightness' min='2' max='99'>-->
+            <input type='range' id='NightBrightness' name='NightBrightness' min='0' max='100'>-->
         </div>
 
         <!-- ===================== WiFi设置部分 ===================== -->
@@ -446,6 +447,7 @@
          */
         // 页面加载时自动刷新
         function refreshList() {
+            if (!document.getElementById('wifi_list')) return;
             // 发送请求获取WiFi列表
             fetch('/scan')
                 .then(response => response.json())
@@ -543,27 +545,35 @@
          * 对应控件：开关功能选择
          *****************************************************************/
 				function initSwitches() {
-				    fetch('/getsettings')
-				        .then(response => response.json())
-				        .then(data => {
-				            document.getElementById('temp-unit-switch').checked = data.tempUnit;
-				            document.getElementById('hour-format-switch').checked = data.hourFormat;
-				            document.getElementById('mile-display-switch').checked = data.mileDisplay;
-				            document.getElementById('time-sync-switch').checked = data.timeSync;
-				            //document.getElementById('Nightmode').checked = data.nightmode;
-				        })
-				        .catch(error => {
-				            console.error('Error:', error);
-				            // 默认值
-				            document.getElementById('temp-unit-switch').checked = true;  // 1=Celsius
-				            document.getElementById('hour-format-switch').checked = true; // 1=12-hour
-				            document.getElementById('mile-display-switch').checked = true; // 1=On
-				            document.getElementById('time-sync-switch').checked = false; // 0=Off
-				            //document.getElementById('Nightmode').checked = false; // 0=Off
-				        });
-				}
+                    // Read actual flags before permitting a combined settings write.
+                    const controls = ['temp-unit-switch', 'hour-format-switch', 'mile-display-switch'];
+                    const status = document.getElementById('switch-status');
+                    controls.forEach(id => document.getElementById(id).disabled = true);
+                    status.textContent = 'Loading clock settings…';
+                    fetch('/getsettings')
+                        .then(response => {
+                            if (!response.ok) throw new Error('Cannot load clock settings');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (!data || !['tempUnit', 'hourFormat', 'mileDisplay', 'timeSync'].every(
+                                key => data[key] === 0 || data[key] === 1)) {
+                                throw new Error('Invalid clock settings');
+                            }
+                            document.getElementById('temp-unit-switch').checked = data.tempUnit === 1;
+                            document.getElementById('hour-format-switch').checked = data.hourFormat === 1;
+                            document.getElementById('mile-display-switch').checked = data.mileDisplay === 1;
+                            document.getElementById('time-sync-switch').checked = data.timeSync === 1;
+                            controls.forEach(id => document.getElementById(id).disabled = false);
+                            status.textContent = '';
+                        })
+                        .catch(error => {
+                            console.error('Error loading clock settings:', error);
+                            status.textContent = 'Clock settings could not be loaded. Reload to retry.';
+                        });
+                }
 
-				// 发送开关状态到ESP8266
+                // 发送开关状态到ESP8266
 				function sendSwitchStates() {
 				    const states = {
 				        tempUnit: document.getElementById('temp-unit-switch').checked ? 1 : 0,
@@ -743,7 +753,8 @@
          *****************************************************************/
 				// 页面加载时获取当前时间控件设置
 				document.addEventListener('DOMContentLoaded', function() {
-				    fetch('/GetNightStartTime')
+				    if (!document.getElementById('starttime')) return;
+                    fetch('/GetNightStartTime')
 				        .then(response => response.text())
 				        .then(currentStartTime => {
 				            const StartTimeSelect = document.getElementById('starttime');
@@ -778,7 +789,8 @@
          *****************************************************************/
 				// 页面加载时获取当前时间控件设置
 				document.addEventListener('DOMContentLoaded', function() {
-				    fetch('/GetNightStopTime')
+				    if (!document.getElementById('stoptime')) return;
+                    fetch('/GetNightStopTime')
 			        .then(response => response.text())
 			        .then(currentStopTime => {
 			            const StopTimeSelect = document.getElementById('stoptime');
@@ -813,7 +825,7 @@
          *****************************************************************/
         const NightbrightnessSlider = document.getElementById('NightBrightness');
         // 页面加载时获取初始亮度值
-        fetch('/get_night_brightness')
+        NightbrightnessSlider && fetch('/get_night_brightness')
             .then(response => {
                 if (!response.ok) throw new Error('Failed to get brightness');
                 return response.json();

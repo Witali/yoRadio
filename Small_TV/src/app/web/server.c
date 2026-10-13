@@ -265,7 +265,10 @@ esp_err_t web_start(void)
     config.max_uri_handlers = 48;
     config.stack_size = 6144;
     config.lru_purge_enable = true;
-    config.max_open_sockets = 4;
+    /* The recovered page starts six parallel visible-control GETs. Four
+     * sessions caused LRU eviction during browser startup and false defaults;
+     * six fit LWIP's ten slots alongside listener/control/weather sockets. */
+    config.max_open_sockets = 6;
     config.recv_wait_timeout = 5;
     config.send_wait_timeout = 5;
     httpd_handle_t server;
