@@ -7,12 +7,33 @@ from common import check_transitions, fixtures, matches, require, sha
 from stream_probe_cases import validate_schedule
 
 
+def check_decoder_faults(case, *, required=False):
+    """Check every retained health row, including terminal/failure diagnostics."""
+    samples = [case[key] for key in ('before', 'after', 'active_before',
+               'active_after', 'failure_health') if key in case]
+    samples.extend(case.get('transition_health', []))
+    require(samples, case['name']+': missing health samples')
+    checked = missing = 0
+    for sample in samples:
+        fault = sample.get('decoder_failure')
+        if fault is None:
+            missing += 1
+            require(not required, case['name']+': missing decoder fault evidence')
+            continue
+        require(isinstance(fault, dict) and type(fault.get('sequence')) is int and
+                fault['sequence'] == 0, case['name']+': decoder fault or invalid counter')
+        checked += 1
+    return dict(checked=checked, missing=missing)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--results',type=Path,required=True)
     parser.add_argument('--controller',type=Path,required=True)
     parser.add_argument('--expected-cases',type=int,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--require-decoder-health',action='store_true',
+                        help='Reject missing decoder counters as well as recorded faults')
     args=parser.parse_args()
     r=json.loads(args.results.read_text())
     require(sha(args.controller.read_bytes())==r['controller_sha256'],'Controller hash differs')
@@ -35,6 +56,7 @@ def main():
     previous=None
     for case in r['cases']:
         name=case['name'];require(case['result']=='PASS',name+': recorded failure')
+        decoder_health=check_decoder_faults(case,required=args.require_decoder_health)
         source_name=sources[name]
         before,after=case['before'],case['after']
         if previous is not None:
@@ -76,6 +98,7 @@ def main():
                 require(sample['output']['available'] is True and sample['output']==active[0]['output'],
                         name+': active output counters changed')
         rows.append(dict(name=name,result='PASS',active_samples=len(active),
+            decoder_health=decoder_health,
             sampled_min_heap=min((h['heap'] for h in active),default=None),
             sampled_min_largest=min((h['largest'] for h in active),default=None),
             idle_after_heap=after['heap'],idle_after_largest=after['largest'],

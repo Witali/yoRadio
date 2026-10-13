@@ -1841,7 +1841,7 @@ After a matrix finishes, recheck its saved evidence without contacting the board
 ```sh
 python tools/esp32c3_tests/audit_stream_probe.py --results RUN_DIR/results.json \
   --controller tools/esp32c3_tests/stream_probe.py --expected-cases 20 \
-  --output RUN_DIR/audit.json
+  --require-decoder-health --output RUN_DIR/audit.json
 ```
 
 The audit checks format/profile transitions, EOF, complete server delivery,
@@ -1849,6 +1849,14 @@ restarts, allocation/watchdog counters, sampled active output counters and
 firmware/settings restoration. HTTPS runs additionally require negotiated TLS
 evidence. These finite tests do not establish acoustic quality or long-run
 continuity. Never run multiple hardware controllers simultaneously.
+
+For current firmware, require decoder health as in the command above. Every
+retained before/after, active, transition and failure health sample must contain
+a zero decoder-failure sequence. Without this option, historical reports may
+omit the field; the audit reports missing coverage and still rejects any
+recorded decoder fault. A stable format or successful EOF cannot override a
+decoder fault. Regression checks: `python tests/test-stream-probe-audit.py`
+and `python tests/test-stream-probe-repeats.py`.
 
 ## Bounded WebUI transfers and OTA reboot
 
