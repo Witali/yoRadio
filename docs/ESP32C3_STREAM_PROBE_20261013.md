@@ -48,10 +48,49 @@ pass 55 tests. ESP-IDF 6.1 `9a97f6c5` successfully builds `idf61-stream-probe`
 using the previous production-derived WebUI config.
 
 The [saved image](../firmware/development/esp32c3-idf-6.1-r9a97-stream-probe/app.bin)
-is build/host-tested only, not deployed or production-qualified. Physical
-HTTP/HTTPS tests with missing MIME, fragmented headers, ID3, EOF and watchdog
-disabled remain required. Cross-codec switching, misleading MIME and stronger
-multi-frame confirmation remain open in the plan.
+was initially build/host-tested only. The subsequent physical HTTP campaign
+below tests the same image; it is still not production-qualified. HTTPS
+detection and watchdog-disabled deadline tests remain required. Cross-codec
+switching, misleading MIME and stronger multi-frame confirmation remain open.
+
+## Corpus and physical follow-up
+
+Test implementation: `93dc6183`; firmware implementation: `cefbeb93`.
+The host test now processes eleven hash-verified original synthetic encoded
+files, including MP3, FLAC, Vorbis, Opus, LC, HE and HEv2. For each file it
+checks 1-, 7- and 2,048-byte reads, both unchanged and with an additional ID3
+tag containing misleading sync bytes. All **66 cases passed** under ASan/UBSan.
+After legitimate tags are removed, every byte submitted by the actual
+`send_stream_audio()` function matches the source audio. This establishes
+transport byte preservation, not an independent PCM decoder comparison.
+
+`tools/esp32c3_tests/stream_probe.py` installed the saved app through WebUI OTA
+and served finite HTTP files with **no Content-Type header**. Server writes
+paused at each of the first nine byte boundaries (20 ms per pause). TCP may
+coalesce writes; every possible split is covered separately by host tests.
+
+| Physical scenario | Result |
+|---|---|
+| MP3 320 kbit/s, FLAC level 8, Vorbis q10, Opus 510 kbit/s | 4/4 passed |
+| AAC-LC 48 kHz, HE-AAC 48 kHz, HE-AACv2 44.1 kHz | 3/3 passed |
+| HE-AAC and HE-AACv2 preceded by ID3 with false MP3 sync bytes | 2/2 passed |
+| Unknown zeros, partial sync, truncated ID3 | 3/3 explicitly rejected |
+
+All nine positive cases repeatedly reported the expected format, remained
+playing during a three-second active counter window, and ended with
+`stream ended`. Negative cases ended with `unknown audio format`. No new
+allocation failures, watchdog events or restarts were recorded. Active-window
+output counters did not increase; idle/EOF counter growth was excluded.
+This short check is not a long-duration or analog-audio continuity test.
+
+The original `idf61-production-prefill1000` application was restored and its
+hash verified; playback is stopped as initially. Wi-Fi, playlist and settings
+were compared in RAM and are unchanged. No private data/hashes are saved.
+Raw [physical evidence](../tests/results/esp32c3-stream-probe-20261013/physical-01/)
+and [corpus evidence](../tests/results/esp32c3-stream-probe-20261013/corpus-01/)
+include exact runner sources and checksums. The earlier build-only evidence
+remains unchanged. The fixture server's new `mime=None` behavior passed an
+exact-byte HTTP test and six existing HTTP/HTTPS server regression tests.
 
 ## Format references
 
