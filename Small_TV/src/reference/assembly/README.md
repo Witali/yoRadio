@@ -16,6 +16,8 @@ Direct instruction checks during the current work confirmed:
 | `0x42009644`, `0x42009b32`, `0x420a74e6` | Float narrowing of atan2/tick angles and rounded offsets restored; the vendor's swapped sin/cos stroke pair deliberately corrected |
 | `0x4200a5be`, `0x4200aa1e`, `0x4200acae` | Original glyph pointers, padded rows, LSB-first pixels, spacing and decorative dimensions |
 | `0x4200afcc`, `0x4200b738`, `0x4200bd8c` | Conditional field updates instead of full-screen repainting |
+| `0x4200b5cc`, `0x42008e08`, `0x4200aebe` | Byte GIF cursor, terminator restart and persistence across selection/theme changes |
+| `0x4200950e` | Whole-glyph rejection at the panel edge; visible-column/row clipping deliberately corrected |
 | `0x4200bf9c` | The simple clock handles weekday 1..7 and repeats its date buffer for standard Sunday 0; this confirmed bug is corrected at the user's request |
 | `0x4200bc36` | Six fade levels and photo replacement at duty 1000 |
 | `0x4200fd94`–`0x4200fda0` | Kelvin subtraction followed by ROM `__fixdfsi`, truncating Celsius toward zero |
@@ -31,6 +33,11 @@ the simple and analog renderer instructions against the compiled C. The report
 retains literal factory pixel differences and separately verifies the deliberate
 Sunday and stroke-geometry corrections. It does not claim complete program or
 timing equivalence.
+
+[Classic execution](../../../qemu/parity/classic-checks.md) compares 261 field/media
+cases and 1,545 animation transitions. Media output is a recorded boundary;
+the partial-glyph correction retains the literal difference and has four
+independent visible-bitmap checks.
 
 [Control execution](../../../qemu/parity/control-checks.md) verifies every
 counter/flag in four traces spanning 79,296 calls to `0x4200826a`, plus 13,440

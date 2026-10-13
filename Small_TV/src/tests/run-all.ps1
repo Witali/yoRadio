@@ -58,6 +58,14 @@ else {
         $groups.Add(@{name="machine_control";status=$(if($control.passed){"passed"}else{"failed"});result=$control})
     }else{$groups.Add(@{name="machine_control";status="failed";error="No fresh control report"})}
 }
+if ($SkipMachine) {$groups.Add(@{name="machine_classic";status="not_run";reason="Explicit -SkipMachine"})}
+else {
+    $classicReport=Join-Path $OutputDirectory "classic.json"
+    Invoke-TestGroup "machine_classic" {
+        & $PythonPath (Join-Path $PSScriptRoot "classic_oracle.py") --output $classicReport
+        if($LASTEXITCODE){throw "Classic renderer/animation machine comparison failed"}
+    } $classicReport
+}
 if ($SkipQemu) {$groups.Add(@{name="qemu";status="not_run";reason="Explicit -SkipQemu"})}
 else {
     $qemuFolder=Join-Path $OutputDirectory "qemu"

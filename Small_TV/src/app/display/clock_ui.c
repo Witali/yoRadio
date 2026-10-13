@@ -2,6 +2,7 @@
 #include "factory_ui.h"
 #include "factory_timer.h"
 #include "factory_photo.h"
+#include "factory_animation.h"
 #include "media.h"
 #include "network.h"
 #include "services.h"
@@ -94,11 +95,17 @@ static struct tm factory_local_time(time_t now, bool *valid)
 
 static void clock_task(void *unused)
 {
-    /* Run the startup/setup/theme state machine and factory animation/fade timers. */
+    /* Run the startup/setup/theme state machine and factory animation/fade timers.
+     * FIXED_RECONSTRUCTION: retain the GIF cursor across selection/theme changes
+     * as in 0x4200b5cc and 0x42008e08; resetting it changes the next frame.
+     * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
+     * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
+     * after the photo fade rather than 0x4200bc36's full-brightness ending. */
 
     (void)unused;
     uint32_t generation = 0, weather_generation = 0;
-    unsigned animation = 0, description = 0;
+    factory_animation_t animation = {0};
+    unsigned description = 0;
     factory_photo_t slideshow = {0};
     time_t last_second = 0;
     unsigned phase = 0, progress = 0, previous_theme = 255;
@@ -159,7 +166,8 @@ static void clock_task(void *unused)
             {
                 display_fill(0, 0, 240, 240, 0);
                 changed = true;
-                animation = 0;
+                /* 0x42008e08/0x4200aebe retain the animation cursor across
+                 * theme switches; only initial boot starts it at zero. */
                 description = 0;
                 timer_raise(TV_TIMER_SECOND | TV_TIMER_DESCRIPTION | TV_TIMER_MINUTE |
                             (settings.theme == 2 ? TV_TIMER_PHOTO : 0));
@@ -178,18 +186,19 @@ static void clock_task(void *unused)
             }
             if (settings.theme == 0)
             {
+                int frame = factory_animation_next(&animation,
+                                                    media_animation_frames(settings.animation));
                 bool periodic_status =
                     timer_snapshot(TV_TIMER_MINUTE, settings.photo_seconds).pending != 0;
                 if (changed || now != last_second || periodic_status)
-                    factory_draw_classic(&settings, &local, &weather, description, animation,
+                    factory_draw_classic(&settings, &local, &weather, description,
+                                         frame < 0 ? 0 : (unsigned)frame,
                                          reset_theme, periodic_status);
                 else
                 {
-                    unsigned frames = media_animation_frames(settings.animation);
-                    if (frames)
-                        media_draw_animation(settings.animation, animation % frames, 160, 160);
+                    if (frame >= 0)
+                        media_draw_animation(settings.animation, (unsigned)frame, 160, 160);
                 }
-                ++animation;
             }
             else if (settings.theme == 1)
             {

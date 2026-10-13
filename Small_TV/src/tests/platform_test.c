@@ -1137,6 +1137,55 @@ static void test_timer_driver_failures(void)
     }
 }
 
+static void animation_scenario(void)
+{
+    /* Follow the factory cursor across a shorter GIF and a temporary theme switch. */
+    ++clock_step;
+    if (clock_step == 202)
+    {
+        CHECK(animation_calls == 21 && last_animation == 2 && last_frame == 20);
+        preferences.animation = 1; /* 25 -> 15 frames, old cursor is 21. */
+        ++preferences_generation;
+    }
+    if (clock_step == 203)
+    {
+        CHECK(last_animation == 1 && last_frame == 0);
+        preferences.theme = 1;
+        ++preferences_generation;
+    }
+    if (clock_step > 203 && clock_step <= 209)
+        CHECK(animation_calls == 22);
+    if (clock_step == 209)
+    {
+        preferences.theme = 0;
+        ++preferences_generation;
+    }
+    if (clock_step == 210)
+    {
+        CHECK(animation_calls == 23 && last_frame == 1);
+        longjmp(blocked, 1);
+    }
+    tick_clock(1);
+}
+
+static void test_clock_animation_selection(void)
+{
+    /* Exercise the real clock task, not just a helper, against an observed factory trace. */
+    preferences.wifi_mode = 1;
+    preferences.animation = 2;
+    strcpy(preferences.ssid, "fixture");
+    CHECK(clock_ui_timer_init() == ESP_OK);
+    CHECK(network_init() == ESP_OK);
+    got_ip();
+    weather_start();
+    strcpy(preferences.weather_key, "fixture-key");
+    run_task("weather_http", seed_weather);
+    CHECK(display_init() == ESP_OK);
+    clock_ui_start();
+    run_task("clock_display", animation_scenario);
+    CHECK(clock_step == 210);
+}
+
 int main(int argc, char **argv)
 {
     /* Select a fresh-process scenario and save a machine-readable result only after success. */
@@ -1166,7 +1215,8 @@ int main(int argc, char **argv)
                  {"display_protocol_clipping", test_display},
                  {"ui_transitions", test_ui_transitions},
                  {"clock_coordinator", test_clock_coordinator},
-                 {"timer_driver_failures", test_timer_driver_failures}};
+                 {"timer_driver_failures", test_timer_driver_failures},
+                 {"clock_animation_selection", test_clock_animation_selection}};
     bool found = false;
     for (unsigned i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
         if (!strcmp(argv[1], cases[i].name))

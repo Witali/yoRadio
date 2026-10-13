@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -32,7 +32,8 @@ def main():
         raise ValueError('Firmware changed after the run')
     machine = groups['machine']['result']
     controls = groups['machine_control']['result']
-    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, groups['integrity']['result'])):
+    classic = groups['machine_classic']['result']
+    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, groups['integrity']['result'])):
         raise ValueError('Groups tested different applications')
     qemu = groups['qemu']['result']
     if not qemu['http_initial_setup']['passed']:
@@ -63,6 +64,12 @@ def main():
                           'scope': machine['scope']}
     summary['machine_control'] = {key: controls[key] for key in ('passed', 'timer_traces', 'slideshow', 'scope')}
     summary['machine_control']['simple_event_frames'] = controls['simple_events']['frames']
+    summary['machine_classic'] = {'passed':classic['passed'],'literal_factory_pixels_equal':classic['literal_equal'],
+                                  'renderer_cases':len(classic['renderer_cases']),
+                                  'animation_transitions':len(classic['animation']['cases']),
+                                  'animation_guards':len(classic['animation']['guards']),
+                                  'glyph_geometry_checks':classic['glyph_geometry_checks'],
+                                  'approved_fixes':classic['approved_fixes'],'scope':classic['scope']}
     summary['qemu'] = {'passed': qemu['passed'], 'qemu_sha256': qemu['qemu_sha256'],
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
                        'helper_sha256': qemu['helper_sha256'],
