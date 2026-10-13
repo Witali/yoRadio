@@ -1636,6 +1636,13 @@ Initial AUTO codec selection additionally has
 the experimental bounded two-header confirmation core. This does not yet test
 firmware queue integration; see the [confirmation plan and measured limits](ESP32C3_STREAM_CONFIRMATION_PLAN.md).
 
+`tests/run-stream-staging.py --output NEW_DIRECTORY --corpus CONFIRMATION_DIRECTORY`
+tests the storage layer with the actual adaptive queue and host RTOS/heap doubles.
+Use the output of `run-stream-confirm.py` as the corpus directory. It checks
+lease lifetime, bounded lookahead, cancellation, reclamation, nonblocking
+backpressure and exact bytes. It does not yet exercise the firmware connection
+owner or certify Stop/EOF handling on the device.
+
 `tests/run-esp32c3-stream-probe.py`: sanitizer coverage of the production
 prefix parser and audio submission function, fragmented signatures, ID3,
 unknown input and exact byte replay. See [scope and open hardware gates](ESP32C3_STREAM_PROBE_20261013.md).

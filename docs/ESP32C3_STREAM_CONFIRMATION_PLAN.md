@@ -88,6 +88,52 @@ the old decoder based only on one speculative header.
 
 ## Ordered remaining work
 
+### Queue storage implemented and tested (2026-10-13)
+
+`stream_staging.h` now owns up to four unpublished leases from the actual
+adaptive input queue plus ten lookahead bytes. It supports bounded append/read,
+removal of proven junk or received metadata, cancellation, and ownership
+transfer of an original packet pointer. It rejects a queue with fewer than
+four guaranteed slots. Acquisition is nonblocking: a short append returns the
+accepted byte count so the connection owner can retain the rest and enforce
+its deadline. It never allocates a new frame buffer.
+
+The state occupies **64 bytes on ESP32-C3**, including its ten-byte lookahead.
+This standalone implementation does not yet replace the existing probe's
+header storage. All six wrapper operations compile to a 930-byte text object,
+zero data/BSS, using GCC 15.2 at `-Os`; reported static wrapper stack frames
+range from 0 to 80 bytes, excluding queue/library callees. These are object
+measurements, not a final firmware size or runtime high-water measurement.
+
+Tests compile the actual adaptive queue and staging code with pthread RTOS and
+heap doubles under ASan/UBSan. They cover 20,000 randomized append/erase/transfer/
+cancel operations, overlapping reclamation attempts, reclamation of four spare
+slots while four candidate leases stay protected, a maximum 8191-byte ADTS
+frame plus its next header, full-queue backpressure, repeated cancellation,
+exact payload preservation and original-pointer transfer. The simulated queue
+allocator is forced to fail throughout the main storage exercise: no additional
+allocation is required after queue creation. All allocations are released at
+test teardown. The same 31 AAC/MP3 confirmation cases also pass through this
+actual queue storage with 1/7/2048-byte delivery, matching the prior core results.
+
+Reproduce:
+
+```sh
+python tests/run-stream-confirm.py --output .build/confirmation-fresh
+python tests/run-stream-staging.py --output .build/staging-fresh --corpus .build/confirmation-fresh
+```
+
+[Frozen storage evidence](../tests/results/esp32c3-stream-probe-20261013/staging-01/)
+includes sources, logs, corpus hashes and target compilation evidence.
+
+**Still not connected to `audio_service.c`.** The packet-transfer test proves
+storage ownership only: the caller still has to split at the selected codec's
+frame boundary and replay lookahead through the frame walker. It must never
+mark an entire retained packet as one codec when it contains a codec transition.
+The tests do not yet prove actual Stop/generation handling, EOF/tag lifecycle,
+control-marker capacity, HTTP/HTTPS behavior or physical playback continuity.
+The following integration steps remain required.
+
 1. **Startup staging adapter.** Reserve/reuse existing packet leases, expose a
    bounded read callback, and publish the confirmed first frame exactly once.
    Replay retained lookahead without copying into a fifth full-sized slot.
