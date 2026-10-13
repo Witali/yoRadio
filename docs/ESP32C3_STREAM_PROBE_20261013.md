@@ -199,6 +199,57 @@ the ephemeral TLS test CA is absent. Compiler-reported stack frames remain
 these are individual frames, not measured total stack high-water marks.
 The follow-up image has not been installed on the board or production-qualified.
 
+## Frame boundary walker for the next integration stage
+
+`main/stream_frames.h` is an experimental allocation-free MP3/ADTS walker,
+**not yet called by the firmware's audio path**. It starts at a known frame
+boundary, collects at most seven header bytes across input reads, calculates
+the frame length and skips exactly that payload before examining another
+header. Payload sync patterns cannot trigger codec switching. It reports each
+frame's family/core parameters and passes its original bytes synchronously to
+a sink. No caller pointer survives a call. Host state is 16 bytes, with no
+full-frame buffer. This is not a RAM improvement measurement of the firmware.
+
+MPEG-1/2/2.5 Layer III bitrate, padding and sample-count handling were checked
+against [FFmpeg's MPEG header parser](https://www.ffmpeg.org/doxygen/7.0/mpegaudiodecheader_8c_source.html).
+ADTS frame length, raw-block count and core-rate interpretation were checked
+against [its ADTS parser](https://www.ffmpeg.org/doxygen/7.0/adts__header_8c_source.html).
+PCE channel configuration remains unknown until decoded; SBR/PS output rate
+and channels must continue to come from `native_aac_decoder`.
+
+`tests/run-esp32c3-stream-frames.py` compares every frame offset/length with
+ffprobe for 26 files (1,310 frames): eight existing MP3/AAC fixtures and 18
+generated MP3 files covering all nine MPEG rates, mono/CBR and stereo/VBR.
+Each file is replayed with 1-, 7- and 2,048-byte reads with exact byte checks.
+A mixed MP3/AAC sequence adds 1,457 frames, compared with concatenated
+per-file reference boundaries, using the same three read sizes. ASan/UBSan
+also covers every split of a synthetic mixed stream, every truncation,
+sync-shaped payload, callback failure and 100,000 random headers.
+
+Explicit limits: free-format MP3 returns a distinct unresolved-length result
+and retains its header; it is not rejected as invalid or assigned a guessed
+length. Inter-frame tags, damaged-boundary resynchronization and container
+transitions are not handled by this strict walker. It does not validate CRC
+or decode audio, prove PCM continuity, or implement live decoder switching.
+
+Integration work, based on `audio_service.c` ownership paths:
+
+1. Coalesce frame spans into existing encoded-packet leases. Never allocate a
+   full ADTS frame just to classify it, or consume a queue slot per header.
+   `prefill_encoded_input()` currently measures occupied slots, so fragmenting
+   packets would falsely signal a full audio queue.
+2. Add an internal decoder-drain marker before a codec-family change.
+   `return_decoded_packet()` currently forwards every nonzero end marker to
+   PCM; the new marker must drain/release the old decoder without stopping
+   queued playback. Verify the last old frame and first new frame by PCM.
+3. Open the new decoder only after old allocations are released; retain the
+   existing generation cancellation and PCM layout on each output packet.
+   Avoid the initial one-second prefill delay on a live family transition.
+4. Specify and test free-format, ID3, corruption and conflicting-MIME policy
+   before enabling the router. Preserve existing FLAC/Ogg and AAC SBR/PS paths.
+5. Test both directions on host and hardware, including repeated changes,
+   Stop/replacement, EOF, heap recovery and output counters under HTTPS.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)

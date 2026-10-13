@@ -1644,6 +1644,13 @@ initially be stopped and the restore image must match. It restores the app
 and watchdog setting and compares private settings in RAM before reporting
 success. Recorded failed checks produce a failing exit status after restore.
 
+`tests/run-esp32c3-stream-frames.py` tests the separate experimental frame
+boundary walker under ASan/UBSan and compares offsets/lengths with ffprobe.
+It needs GCC (WSL on Windows), ffmpeg with libmp3lame and ffprobe. The runner
+uses existing MP3/AAC fixtures, creates additional synthetic MP3 files under
+`.build/c3-stream-frames` and verifies mixed-family byte replay. It does not
+install firmware or exercise decoder/PCM queue transitions.
+
 ## Bounded WebUI transfers and OTA reboot
 
 Run `python -B -X utf8 tests/run-esp32c3-web-memory.py` for the actual C3
