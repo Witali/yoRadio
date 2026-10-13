@@ -30,6 +30,12 @@ progressive heap loss and settled recovery remain gates. Use
 `--enforce-legacy-heap-floor` to reproduce the older budget policy explicitly.
 The report records which policy was selected; historical results are unchanged.
 
+The public HTTPS cases in `quiet_acceptance.py` reuse the same memory and
+active-output checks, including decoder-failure counters when available. Their
+report records `public_memory_policy`; the same legacy-floor switch is
+available for reproducing historical results. This change does not reinterpret
+older saved failures or change the other suites' existing checks.
+
 ### Real AAC heap-pressure regression in QEMU
 
 Build the QEMU AAC fault profile with `CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER=y`,
