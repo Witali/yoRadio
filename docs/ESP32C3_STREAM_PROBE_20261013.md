@@ -646,8 +646,10 @@ and malformed/incomplete captures; harmless queue repacketization is accepted.
 [Frozen captures, runner, configuration and source hashes](../tests/results/esp32c3-stream-probe-20261013/pipeline-pcm-01/)
 include compressed full logs/PCM and the first failed QIO startup attempt. That
 attempt ended before application decoding; the successful run used DIO in QEMU.
-QIO/all-mode emulator support is a separate follow-up, and physical QIO settings
-were not changed. The physical board was not accessed during this check.
+The [QEMU Flash follow-up](ESP32C3_QEMU_FLASH_20261013.md) subsequently fixed
+application QIO startup, added selectable GD/Winbond capacities and tested six
+SPI read modes. The preserved QIO image now produces the same MP3 PCM on both
+families. Physical QIO settings were not changed, and the board was not accessed.
 
 This closes byte-exact pre-resampler PCM boundaries for these two sequences and
 their tagged variants. It is not an independent decoder fidelity reference, a
