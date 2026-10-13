@@ -692,3 +692,23 @@ This closes the exact-image finite HTTP matrix gap. It does not replace
 HTTPS format coverage, cancellation/source-failure controls, sustained heavy
 codec playback or the remaining routing recovery work. Production qualification
 and default enablement remain open.
+
+### Public-root image: cancellation and settled recovery (2026-10-13)
+
+The same public-root binary passes six HTTP control cases with the station
+watchdog temporarily disabled: deadline, Stop and replacement during a delayed
+header, repeated while an 8191-byte candidate holds four input leases. The
+fault connection remains incomplete, so HTTP EOF cannot explain the timeout.
+
+| Input held by fault source | Deadline | Stop response | Replacement reaches stable HE-AAC | Settled heap median before / after |
+| --- | ---: | ---: | ---: | ---: |
+| First bytes of header | 10.21 s | 0.126 s | 2.116 s | 139,732 / 139,732 B |
+| Four-lease candidate | 10.53 s | 0.139 s | 2.077 s | 139,588 / 139,588 B |
+
+Both runs return the largest free block to 110,592 bytes and record zero
+allocation, decoder and watchdog faults. The replacement's sampled active
+output counters do not increase. Each run stays on one boot and restores the
+original firmware, watchdog setting and all other private settings, stopped.
+This is HTTP control-path evidence, not TLS record or analog qualification.
+Results, checked decoder counters, source snapshots and raw-file hashes:
+[early-owner-public-controls-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-public-controls-01/summary.json).
