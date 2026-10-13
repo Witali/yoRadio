@@ -3,6 +3,12 @@
 Goal: keep HTTPS radio playback reliable on the ESP32-C3 OLED board by
 avoiding repeated allocation and release of large heap blocks.
 
+Research update, 2026-10-13: [fragmentation methods, 1 KiB segmented input and
+span iterators](ESP32C3_MEMORY_RESERVATION_PLAN_20261013.md#fragmentation-review-segmented-buffers-and-iterators-2026-10-13).
+Keep total buffered bytes constant; audit the eight-slot ADTS startup window
+and every pointer owner before implementation. TLS/SBR remain separate
+contiguous-allocation problems. No new buffer size is enabled by this review.
+
 ## Current release checkpoint, 2026-10-12
 
 This section takes precedence over historical experiment checkboxes below.
