@@ -575,6 +575,54 @@ Wi-Fi, playlist and settings equality was verified. The remaining gates are
 sample-exact PCM boundaries, HTTPS, longer playback/repeated changes and
 parser confidence/recovery before changing the default.
 
+### HTTPS frame-router matrix
+
+The laboratory `idf61-router-tls-lab` image passed all 16 finite HTTPS cases:
+MP3, FLAC, Vorbis, Opus, AAC-LC, HE-AAC, HE-AACv2, both HE variants with initial
+ID3, three negative prefix cases, and all four parameter/codec-transition
+sequences. Every case negotiated TLS 1.2 with
+`ECDHE-RSA-AES256-GCM-SHA384`. All 13 positive cases completed the exact server
+body and reached the expected EOF; the three negative cases were explicitly
+rejected as unknown audio. All expected transition formats were observed.
+
+The laboratory configuration adds only the test CA enable/path to the enabled
+HTTP router configuration. The full public root bundle, certificate verification
+and 16,384-byte TLS input-record limit are retained. The extra CA is laboratory
+trust only; this artifact is not a production release.
+
+| HTTPS case | Active health samples | Lowest sampled free heap | Lowest sampled largest block |
+|---|---:|---:|---:|
+| FLAC level 8 | 2 | 59,952 B | 45,056 B |
+| HE-AAC 48 kHz stereo | 2 | 36,728 B | 23,552 B |
+| HE-AACv2 44.1 kHz stereo | 2 | 34,728 B | 23,552 B |
+| AAC parameter changes (`changing`) | 76 | 33,912 B | 19,456 B |
+| Implicit SBR change | 56 | 28,596 B | 18,432 B |
+| MP3 → HE-AAC → MP3 | 54 | 27,188 B | 12,288 B |
+| AAC-LC → MP3 → HE-AACv2 | 55 | 36,748 B | 23,552 B |
+
+These are sampled active-playback values, not absolute transient minima or a
+guarantee for other stations. No reset, allocation failure or task-watchdog
+event occurred. The offline audit checks every retained active health sample,
+requires available output counters and confirms that they stayed unchanged.
+Completion-queue drops increased over the wider intervals including startup
+and idle/EOF, as in HTTP; no lifetime-zero-overrun claim is made. After each
+case the observed largest block returned to 110,592 B; post-case free heap
+ranged from 139,744 to 140,052 B. This short matrix is not a long-run leak test.
+
+[Frozen HTTPS evidence and reproducible offline audit](../tests/results/esp32c3-stream-probe-20261013/frame-router-tls-01/)
+includes the exact executed controller, source hashes, TLS negotiation and
+complete-body evidence, health snapshots and per-case summary. Run `python -B
+audit.py` from that evidence directory to recheck the recorded gates without
+contacting the board. The laboratory image is archived in
+[`firmware/development/esp32c3-idf-6.1-r9a97-frame-router-tls-lab/`](../firmware/development/esp32c3-idf-6.1-r9a97-frame-router-tls-lab/).
+The original `idf61-production-prefill1000` app was restored, playback stopped,
+and Wi-Fi, playlist and settings equality verified in memory.
+
+This closes the finite HTTPS matrix for this candidate. Remaining gates before
+enabling the router by default include sample-exact PCM boundaries, longer
+playback/repeated changes, multi-header confidence, bounded corruption recovery
+and metadata-tail handling, plus conflicting MIME/container policies.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)

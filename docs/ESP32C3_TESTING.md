@@ -1665,6 +1665,19 @@ audio quality or prove sample-exact PCM boundaries and every possible underrun.
 The general `run.py --suite transitions` also includes the mixed-family fixtures;
 its mixed streams use AUTO, while existing AAC-only streams retain AAC hints.
 
+For the same matrix over HTTPS, add `--tls-cert <server.pem>`,
+`--tls-key <server.key>` and `--tls-ca <ca.pem>` to `stream_probe.py`, together
+with `--transitions --codec-transitions` for all 16 cases. The server certificate
+must be valid for the host address. Build a separate laboratory candidate with
+the test CA added to the full certificate bundle; retain certificate verification
+and the 16,384-byte TLS input-record limit. Its manifest must set
+`laboratory_only: true` and `extra_trust_ca_sha256` to the supplied CA's SHA-256.
+The runner requires negotiated TLS evidence for each passing case and complete
+body delivery for positive cases. Keep the private key outside tracked files.
+Restore the original production app after testing; the extra laboratory trust
+anchor is not part of a production release. Short finite-file checks do not
+replace long-running HTTPS, PCM-boundary or malformed-record tests.
+
 `tools/esp32c3_tests/frame_router_control.py` adds Stop/replacement tests after
 MP3 → HE-AAC and HE-AAC → MP3 changes. Supply `--board`, `--host`, `--candidate`,
 `--restore` and a new `--output` directory. It defaults to two cycles (eight
