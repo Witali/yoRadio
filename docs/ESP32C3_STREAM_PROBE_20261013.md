@@ -623,6 +623,38 @@ enabling the router by default include sample-exact PCM boundaries, longer
 playback/repeated changes, multi-header confidence, bounded corruption recovery
 and metadata-tail handling, plus conflicting MIME/container policies.
 
+### Real-decoder PCM boundary capture in QEMU
+
+The production flash-input, initial signature probe, frame router, decoder task,
+PCM queue and output task were exercised together in a dedicated QEMU build.
+Only the output device was replaced with a capture sink, before gain/resampling.
+Four isolated references contained 64 complete frames each: MP3 (294,912 PCM
+bytes), AAC-LC (262,144), HE-AAC (524,288) and HE-AACv2 (524,288). Their sample
+counts and layouts were checked against the known fixture frame sizes.
+
+| Mixed sequence | PCM bytes | Without ID3 | With ID3 before each segment |
+|---|---:|---|---|
+| MP3 → HE-AAC → MP3 | 1,114,112 | Byte-exact | Byte-exact |
+| AAC-LC → MP3 → HE-AACv2 | 1,081,344 | Byte-exact | Byte-exact |
+
+Each mixed output matched the concatenated isolated outputs with identical
+sample values, order, length, rate and channel layout. There was exactly one
+terminal flush, after all PCM, with no decoder error. Host negative controls
+confirmed rejection of missing/reordered samples, a 1-LSB change, wrong layouts
+and malformed/incomplete captures; harmless queue repacketization is accepted.
+
+[Frozen captures, runner, configuration and source hashes](../tests/results/esp32c3-stream-probe-20261013/pipeline-pcm-01/)
+include compressed full logs/PCM and the first failed QIO startup attempt. That
+attempt ended before application decoding; the successful run used DIO in QEMU.
+QIO/all-mode emulator support is a separate follow-up, and physical QIO settings
+were not changed. The physical board was not accessed during this check.
+
+This closes byte-exact pre-resampler PCM boundaries for these two sequences and
+their tagged variants. It is not an independent decoder fidelity reference, a
+hardware DMA/acoustic test, or proof for all possible format changes. Long-run
+stability and parser confidence/recovery remain open before enabling the router
+by default.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)
