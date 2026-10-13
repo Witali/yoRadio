@@ -1665,6 +1665,19 @@ audio quality or prove sample-exact PCM boundaries and every possible underrun.
 The general `run.py --suite transitions` also includes the mixed-family fixtures;
 its mixed streams use AUTO, while existing AAC-only streams retain AAC hints.
 
+`tools/esp32c3_tests/frame_router_control.py` adds Stop/replacement tests after
+MP3 → HE-AAC and HE-AAC → MP3 changes. Supply `--board`, `--host`, `--candidate`,
+`--restore` and a new `--output` directory. It defaults to two cycles (eight
+actions); `--cycles` accepts 1–5. The candidate sdkconfig must enable the frame
+router. It uses ffprobe to locate the fourth packet of the second codec and
+the shared server to pause inside that packet. Both decoded formats must be
+observed before the control action; successful server writes are not treated
+as proof of a precise firmware instruction or lease state. Stop must remain
+stopped, replacement must settle to HE-AACv2, and each case must return heap,
+largest block and task count to the baseline bounds. The runner restores the
+original app/settings even after a failed case. Do not run alongside other
+board controllers; fixture ports are 8773/8774.
+
 ## Bounded WebUI transfers and OTA reboot
 
 Run `python -B -X utf8 tests/run-esp32c3-web-memory.py` for the actual C3
