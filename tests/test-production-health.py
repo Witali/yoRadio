@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools/esp32c3_tests'))
 from common import Failure
-from production_health import HealthBoard, NUMERIC, check_health, read_health, output_window
+from production_health import HealthBoard, NUMERIC, capture_failure_snapshot, check_health, read_health, output_window
 
 
 def sample(**updates):
@@ -16,6 +16,38 @@ def sample(**updates):
 
 
 class HealthTests(unittest.TestCase):
+    def test_failure_snapshot_reads_once_and_does_not_change_playback(self):
+        board = HealthBoard('http://unused.invalid')
+        board.health_samples.append(sample())
+        with patch('production_health.Board.status', return_value={'audio':True}) as status, \
+             patch('production_health.read_health', return_value=sample(uptime_ms=3000)), \
+             patch.object(board, 'stop') as stop, patch.object(board, 'play') as play:
+            result = capture_failure_snapshot(board)
+        self.assertEqual(result['status'], {'audio':True})
+        self.assertEqual(len(result['health']), 1)
+        self.assertEqual(result['health'][0]['uptime_ms'], 3000)
+        status.assert_called_once()
+        stop.assert_not_called()
+        play.assert_not_called()
+
+    def test_failure_snapshot_keeps_new_fault_sample_even_when_validation_fails(self):
+        board = HealthBoard('http://unused.invalid')
+        with patch('production_health.Board.status', return_value={'audio':True}), \
+             patch('production_health.read_health', return_value=sample(allocation_failures=1)):
+            result = capture_failure_snapshot(board)
+        self.assertEqual(result['health'][0]['allocation_failures'], 1)
+        self.assertEqual(result['exception_chain'][0]['type'], 'Failure')
+
+    def test_failed_diagnostic_does_not_reuse_stale_health_or_leak_error_text(self):
+        board = HealthBoard('http://unused.invalid')
+        board.health_samples.append(sample())
+        with patch('production_health.Board.status', side_effect=TimeoutError('private URL')) as status:
+            result = capture_failure_snapshot(board)
+        self.assertEqual(result['health'], [])
+        self.assertNotIn('status', result)
+        self.assertEqual(result['exception_chain'], [{'type':'TimeoutError'}])
+        status.assert_called_once()
+
     def test_failure_diagnostics_survive_cleanup_and_filter_private_fields(self):
         failure = dict(sequence=1, codec=2, stage=2, result=-2, completion=7,
                        input_bytes=1234, allocation_sequence=1)

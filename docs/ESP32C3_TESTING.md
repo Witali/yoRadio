@@ -36,6 +36,16 @@ report records `public_memory_policy`; the same legacy-floor switch is
 available for reproducing historical results. This change does not reinterpret
 older saved failures or change the other suites' existing checks.
 
+If a public case fails after playback is requested, `quiet_acceptance.py`
+performs one bounded status/health diagnostic observation before Stop and
+stores it in `failure_snapshots`. It keeps the original failure result even
+when this observation succeeds. If the diagnostic request also fails, retain
+its sanitized exception chain and any newly collected fault sample; never
+substitute an earlier sample. This supports comparison of output counters
+across a transport gap without changing playback first. It is not an automatic
+retry of the test or proof of analog continuity. Host coverage:
+`python tests/test-production-health.py`.
+
 ### Real AAC heap-pressure regression in QEMU
 
 Build the QEMU AAC fault profile with `CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER=y`,

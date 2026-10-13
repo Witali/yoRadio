@@ -2,7 +2,7 @@
 import re
 import time
 
-from common import Board, require
+from common import Board, exception_details, require
 
 NUMERIC = ('uptime_ms', 'reset_reason', 'heap', 'largest', 'minimum_heap',
            'tasks', 'allocation_failures', 'task_watchdog_events')
@@ -127,6 +127,24 @@ def check_health(samples):
                 minimum_heap=min(r['heap'] for r in samples),
                 minimum_largest=min(r['largest'] for r in samples),
                 allocation_failures=0, task_watchdog_events=0)
+
+
+def capture_failure_snapshot(board):
+    """One diagnostic status/health observation before the caller stops playback.
+
+    This never retries playback or converts the original failure into a pass.
+    HealthBoard uses a bounded timeout for each of its two HTTP requests.
+    """
+    started = time.perf_counter()
+    first = len(board.health_samples)
+    result = dict(started_at=started)
+    try:
+        result['status'] = board.status()
+    except Exception as error:
+        result['exception_chain'] = exception_details(error)
+    result['health'] = board.health_samples[first:]
+    result['ended_at'] = time.perf_counter()
+    return result
 
 
 class HealthBoard(Board):

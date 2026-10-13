@@ -742,7 +742,10 @@ stopped. Raw failure chain, request phases, health/status observations and
 controller sources are retained:
 [early-owner-public-suite-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-public-suite-01/summary.json).
 
-Next capture status/health immediately after a transport observation failure,
-before Stop changes the output counters. Preserve the original failed result
-even if that bounded diagnostic request succeeds. Correlated TCP evidence and
-repeat playback remain necessary; no production qualification yet.
+The public runner now captures one bounded status/health observation after a
+failure, before Stop changes output counters, and still re-raises the original
+failure. Host tests cover a healthy observation, a newly reported allocation
+fault, and failure of the diagnostic request itself without reusing stale
+health. This instrumentation was added after the retained campaign and cannot
+fill its missing interval retrospectively. Correlated TCP evidence and repeat
+playback remain necessary; no production qualification yet.

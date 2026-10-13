@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 
 from common import Report, check_playback, check_recovery_heap, fixtures, require, sha
 from ota import image_info, snapshot, verify_snapshot
-from production_health import HealthBoard, check_health
+from production_health import HealthBoard, capture_failure_snapshot, check_health
 from public_streams import DEFAULT_MANIFEST, probe, public_url
 from run import Capture, Suite
 from trace_transport import TransportTrace
@@ -92,6 +92,10 @@ def main():
             output=check_output(steady)
             return dict(reference=reference,playback=playback,health=memory,output_window=output,
                 first_pcm_seconds=first,max_status_and_health_ms=max(s['request_ms'] for s in states))
+        except Exception:
+            report.data.setdefault('failure_snapshots',{})[name]=capture_failure_snapshot(b)
+            report.save()
+            raise
         finally:b.stop()
 
     with (a.output/'request-phases.jsonl').open('x',encoding='utf-8') as log:
