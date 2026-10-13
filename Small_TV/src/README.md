@@ -56,6 +56,8 @@ the reason and cites the original address when established. SDK replacement and
 unverified hypotheses are not classified as confirmed factory corrections.
 The [correction marker convention](CORRECTION_MARKERS.md) documents their usage,
 examples and the functions already marked.
+The [working context](WORKING_NOTES.md) preserves the current recommendations
+and next checks; the [work journal](WORK_LOG.md) records findings and validation.
 Comments also explain byte-padded/LSB-first fonts, fixed raw-sector offsets,
 timer thresholds, photo fades, MIME binary parsing and DNS packet bounds.
 Where machine instructions were checked directly, comments cite their original
