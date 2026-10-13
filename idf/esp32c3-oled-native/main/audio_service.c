@@ -977,7 +977,8 @@ static bool send_pcm_end(uint32_t generation, uint8_t reason) {
 
 static void return_decoded_packet(encoded_packet_t *packet,
                                   uint32_t failed_generation) {
-    if (packet->end_of_stream && packet->generation != failed_generation) {
+    if (audio_completion_is_terminal(packet->end_of_stream) &&
+        packet->generation != failed_generation) {
         send_pcm_end(packet->generation, packet->end_of_stream);
     }
     encoded_return(s_encoded, packet);
@@ -1268,7 +1269,9 @@ static void decoder_task(void *argument) {
             legacy_decoder = NULL;
 #endif
 #if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
-            if (packet->data_size && !packet->end_of_stream &&
+            // Only a new connection needs prefill. A codec change within the
+            // same generation follows a drain marker and keeps queued PCM live.
+            if (codec == NATIVE_CODEC_AUTO && packet->data_size && !packet->end_of_stream &&
                 !prefill_encoded_input(packet->generation)) {
                 encoded_return(s_encoded, packet);
                 continue;

@@ -374,6 +374,44 @@ change successfully. The development image `idf61-id3-boundaries` is saved at
 with the build log, source commit, image hashes and unchanged sdkconfig hash.
 It has not been installed on the board or qualified for production.
 
+## Follow-up: decoder-segment drain contract
+
+`AUDIO_DRAIN_CODEC` is a new internal encoded-queue marker. Like EOF, its
+nonzero value asks the current decoder to flush buffered output and release
+its resources. Unlike a terminal stream marker, `return_decoded_packet()`
+does not forward it to the PCM queue. Already queued PCM remains live, and
+the output task does not flush/stop the DMA stream merely because a decoder
+segment ended. True EOF and transport errors retain their terminal behavior.
+
+The decoder's prefill gate now applies only when its old codec is AUTO.
+Generation changes already reset that field to AUTO before processing new
+packets. A live family change after a drain does not wait a second time for
+the connection's startup prefill. Resource release completes synchronously
+in the consumer before the next queued segment can open another decoder.
+No extra data buffer or persistent state was added for this contract.
+
+Tests in [codec-drain-01](../tests/results/esp32c3-stream-probe-20261013/codec-drain-01/):
+
+- `run-esp32c3-eof.py` extracts the actual queue/completion operations and
+  prefill gate. It checks old PCM, internal drain, subsequent PCM and final
+  EOF ordering, cancellation, decode-failure status and live-switch prefill.
+  Its stale extraction of the network terminal branch was updated; the
+  current encoded-queue aliases and PCM-tail flush are modelled explicitly.
+- `run-codec-segment-drain.py`: 24 ASan/UBSan cases execute the actual generic
+  decoder loop and `return_decoded_packet`, with deterministic SDK/native-AAC
+  substitutes. They cover multiple cached PCM outputs on drain/EOF, workspace
+  growth, normal input, cancellation and errors. Freed decoder/PCM workspace
+  does not invalidate the copied queued output.
+- `run-custom-decoder-terminal.py`: 20 ASan/UBSan ownership cases now include
+  the internal drain for custom FLAC, AAC and MP3 branches. Each branch emits
+  its final callbacks before destroying its workspace; arena-busy and repeated
+  terminal cleanup checks remain covered.
+
+These are queue/lifetime tests, **not real decoder PCM or timing validation**.
+No producer sends `AUDIO_DRAIN_CODEC` yet. The frame walker still needs the
+coalescing queue adapter, recovery/confidence policy and hardware tests with
+real MP3/AAC transitions before live switching can be claimed to work.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)
