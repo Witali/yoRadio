@@ -4,6 +4,16 @@
 [приоритеты ESP32-C3](ESP32C3_ESP8266_IMPROVEMENTS_PLAN.md).
 Он дополняет этот TODO; актуальное состояние отмечено в пунктах ниже.
 
+## Будущая поддержка производителей Flash в QEMU — 2026-10-13
+
+- [ ] Поддержать все семь семейств из списка Espressif: ISSI, GigaDevice (GD),
+  Macronix (MXIC), Fudan Microelectronics (FM), Winbond, XMC и BOYA.
+- [ ] Использовать общее ядро SPI NOR, а различия производителей и конкретных
+  микросхем реализовывать отдельными профилями/оверлеями. Проверять их по
+  даташитам, включая размеры, JEDEC ID, QE, команды и регистры состояния.
+  Подробная архитектура и критерии проверки:
+  [план расширения QEMU Flash](ESP32C3_QEMU_FLASH_20261013.md#future-improvement-common-spi-nor-core-and-manufacturer-overlays).
+
 ## Будущая поддержка xHE-AAC / USAC — 2026-10-13
 
 - [ ] Добавить воспроизведение xHE-AAC (USAC, Audio Object Type 42) в радио.

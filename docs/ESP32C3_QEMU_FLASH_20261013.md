@@ -64,7 +64,53 @@ lists ISSI, GD, MXIC, FM, Winbond, XMC and BOYA for QIO/QOUT, and supports
 slow/fast/DIO/DOUT on most 24-bit-address parts. This is a family support list,
 not certification of every optional feature or ordering suffix.
 
-## Validation
+## Future improvement: common SPI NOR core and manufacturer overlays
+
+Target coverage is **all seven manufacturer families** listed by Espressif:
+
+| Manufacturer | Planned coverage |
+|---|---|
+| ISSI | Explicit selectable profile, beyond the existing legacy default |
+| GigaDevice (GD) | Extend the existing GD25Q family model |
+| Macronix (MXIC) | Add a selectable profile |
+| Fudan Microelectronics (FM) | Add a selectable profile |
+| Winbond | Extend the existing W25Q family model |
+| XMC | Add a selectable profile |
+| BOYA | Add a selectable profile |
+
+This is a future implementation plan, not a claim that all profiles already
+exist. Use the [ESP-IDF support list](https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32c3/api-reference/peripherals/spi_flash/index.html#support-for-features-of-flash-chips)
+to choose families; verify each concrete part and revision against its
+manufacturer datasheet before claiming compatibility.
+
+- [ ] Reuse and extend the existing QEMU SPI NOR implementation as a **shared
+  core**: command/transaction parsing, backing storage, read/program/erase
+  operations, page and address boundaries, and common state-machine mechanics.
+  Keep ESP32-C3 controller/cache behavior separate from flash-chip behavior.
+- [ ] Implement differences as small **manufacturer/part overlays** (profiles
+  with data tables and narrowly scoped callbacks), rather than copied complete
+  chip implementations. Profiles supply JEDEC/SFDP identity, supported commands,
+  status-register layout, QE/WEL/BUSY and protection semantics, write-enable
+  rules, reset/power-down behavior, dummy/mode cycles and optional suspend/resume.
+  Share behavior only where the relevant datasheets agree.
+- [ ] Select manufacturer/part and capacity explicitly at startup. Describe
+  supported capacities, voltage/revision variants and address modes in the
+  profile; reject unsupported combinations. Preserve current defaults and
+  image-size validation. A larger capacity must not silently reuse a smaller
+  part's JEDEC ID or addressing rules.
+- [ ] Record datasheet title, revision, source link and command/register
+  references alongside every profile. Mark unimplemented optional features
+  explicitly; do not inherit Winbond or GigaDevice behavior without evidence.
+- [ ] Run a shared conformance matrix for every supported profile and size:
+  slow/fast SPI, DOUT/DIO/QOUT/QIO where supported, QE disabled/enabled, register
+  writes, program/erase protection, page/end-of-chip boundaries, reset and
+  invalid commands. Add profile-specific assertions for each documented
+  difference and retain regression tests for existing families/defaults.
+- [ ] Verify ESP-IDF detection, boot and application flash access for each
+  implemented profile, followed by decoder PCM comparisons against the current
+  reference. Emulator success does not certify physical-chip timing.
+
+## Validation of the current implementation
 
 | Test | Result |
 |---|---|
