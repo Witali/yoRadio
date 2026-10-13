@@ -41,6 +41,8 @@
 | `factory_animation_next`, `clock_task` | Сохранение курсора GIF; обновление времени и восстановление настроенной яркости после фото |
 | `factory_draw_simple`, `thick_line` | Воскресенье, устаревающие цифры минут и геометрия толстых стрелок |
 | `display_init`, `display_bitmap` | Последняя координата панели 239 и отрисовка видимой части символа у края |
+| `draw_classic_status`, `factory_draw_classic`, `centered_at`, `display_factory_text_bounded` | Полная очистка города/погодных полей, удаление старой или недекодированной иконки, ограничение текста границами поля |
+| `display_bitmap_region`, `display_factory_text_window`, `scrolling_label`, `factory_scroll_tick`, `factory_scroll_description_ready`, `clock_task` | Запрошенная прокрутка длинных строк туда и обратно, паузы, сброс при смене текста/темы и удержание длинного описания до завершения первого прохода |
 | `backlight_init`, `backlight_set_level`, `backlight_update` | Последовательность включения LEDC, пропуск неизменившегося уровня и восстановление яркости после фото |
 | `captive_dns_reply` | Проверка границ DNS-пакета |
 | `web_settings_get`, `read_brightness`, `web_settings_post`, `web_scan` | Формат ответа, диапазон яркости, сохранение Wi-Fi и пустой результат сканирования |

@@ -11,8 +11,9 @@ steps, valid/missing weather, weekdays, date formats, 12/24-hour boundaries,
 label lengths, calendar rollovers and incremental updates with retained pixels.
 Every framebuffer pixel produced by the text/window algorithms is compared.
 JPEG/BMP output calls are recorded by asset identity and coordinates; this check
-does not decode media pixels. Decoder tests and whole-firmware QEMU captures
-cover that separate boundary.
+does not decode media pixels. The separate [weather/field oracle](weather-checks.md)
+executes both actual BMP decoders and checks incremental cleanup/scrolling.
+JPEG decoding remains outside these two machine comparisons.
 
 ## Persistent animation cursor
 
@@ -40,12 +41,14 @@ AUIPC/JALR pair at `0x4200b632`/`0x4200b636`. The ROM symbol with the same
 ## Glyph clipping correction
 
 Factory blitter `0x4200950e` rejects an entire rectangle if its right/bottom end
-exceeds 239. In `Thunderstorm`, the last `r` begins at x=236: the literal factory
-frame loses 17 visible pixels. Our `display_bitmap` retains those visible columns.
+exceeds 239. In the earlier factory-centered `Thunderstorm` rendering, the last
+`r` begins at x=236 and loses 17 visible pixels. Our `display_bitmap` retains
+visible columns; direct glyph-edge checks continue to verify this low-level rule.
 
 The report preserves this literal difference and separately compares a reference
-that clips only this partially visible rectangle, using the bitmap already
-computed by factory instructions. Fully visible blits still execute unchanged.
+that clips already computed glyph rectangles. The current reference also declares
+complete city/title cleanup and field centering/clipping corrections; long fields
+start at their left scroll endpoint. Literal factory differences remain visible.
 Four independent checks require the exact visible bits of the original `r`
 bitmap at right/bottom boundaries. No comparison region is masked.
 

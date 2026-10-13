@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "started_utc": "2026-10-13T15:33:05.6168175Z",
-  "finished_utc": "2026-10-13T15:44:06.5114776Z",
+  "started_utc": "2026-10-13T16:22:49.5118817Z",
+  "finished_utc": "2026-10-13T16:35:16.2940765Z",
   "passed": true,
   "automatic_profile": "host_machine_qemu",
   "all_functionality_verified": false,
-  "source_sha256": "7a63db9d80d8bbfbccb8a3a92fde6e9c18f88afc3db02b2c31156bca3b26d4fe",
-  "app_sha256": "3c60563a3d759d3973dd92b52d4a8f5fedd70ca00346214ed54ec8e61b7f2c78",
+  "source_sha256": "cb3eced62ff074e180a8e61d557e169420be07781e7632b029e85a4f82e77f9c",
+  "app_sha256": "d89542e62f823c0862c6e4d15b618ecc5e416ea5d87a9d21b7ae7d00cc591bd5",
   "test_inputs": [
     {
       "sha256": "c9187b43a2c83c8c8a433343c4a10026ee630c5a656773cd362e7b51a3a3e6dc",
@@ -17,7 +17,7 @@
       "file": "Small_TV/src/tests/backlight_oracle.py"
     },
     {
-      "sha256": "f36fd95973f2183287daa026eb2504501bd497d13561718a6acee3aaab9d5d09",
+      "sha256": "66b717175fd49d2e3e11437ceb475130920463f64f48a55bc468227ebad6c8b9",
       "file": "Small_TV/src/tests/classic_oracle.py"
     },
     {
@@ -45,11 +45,11 @@
       "file": "Small_TV/src/tests/oracle-requirements.txt"
     },
     {
-      "sha256": "cf6922933422988bfa85741d32482e075e8c3f71db31ac9833955857830db3af",
+      "sha256": "150018004b253cd0b1ec62ea1feea7e199d10b61510cbdf250190743eab681af",
       "file": "Small_TV/src/tests/platform_test.c"
     },
     {
-      "sha256": "fbdb6a290232718a517a48f4da622a6e4daf594f0d8f3ed004eb5813b3a2bf46",
+      "sha256": "c4b291ff2977df634c76a650a433913f9c768a65c0fbab8b83d400d0d630ea37",
       "file": "Small_TV/src/tests/publish-report.py"
     },
     {
@@ -57,7 +57,7 @@
       "file": "Small_TV/src/tests/qemu_suite.py"
     },
     {
-      "sha256": "36fb7a171b6fc2cab92742c01fde867fbad1108b3715dd99b0e893c8ab8f62a2",
+      "sha256": "5179238a3e0ee417691573d1b53b1ede3a2c8401d5a5ee669c6f24d1cd9a5a33",
       "file": "Small_TV/src/tests/run-all.ps1"
     },
     {
@@ -65,7 +65,7 @@
       "file": "Small_TV/src/tests/run-machine-oracle.ps1"
     },
     {
-      "sha256": "6d491c35fd9ac2e007c9bd3186dc1c6dfce985b3ac25142567d9b5929ebb8c2f",
+      "sha256": "41261ed758966c70f782e5521cb29364642c7151d70d1fcfdc2c1a001b04ed5e",
       "file": "Small_TV/src/tests/run-platform.ps1"
     },
     {
@@ -163,6 +163,10 @@
     {
       "sha256": "48a832b06b8fc5b04533d5897f535174c76c472df7cc78c00c7be540ef188182",
       "file": "Small_TV/src/tests/weather_qemu.py"
+    },
+    {
+      "sha256": "ccc566ba5ab138340c269c34b5e12cefbf16e881d3c08b1c1da7b286af76f724",
+      "file": "Small_TV/src/tests/weather_render_oracle.py"
     }
   ],
   "notes": [
@@ -427,6 +431,8 @@
     ]
   },
   "platform": {
+    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation.",
+    "passed": true,
     "cases": [
       {
         "case": "wifi_setup",
@@ -494,6 +500,16 @@
         "checks": 315
       },
       {
+        "case": "text_field_windows",
+        "passed": true,
+        "checks": 462630
+      },
+      {
+        "case": "weather_field_cleanup",
+        "passed": true,
+        "checks": 62393
+      },
+      {
         "case": "clock_coordinator",
         "passed": true,
         "checks": 20320
@@ -507,10 +523,13 @@
         "case": "clock_animation_selection",
         "passed": true,
         "checks": 227
+      },
+      {
+        "case": "clock_text_scroll",
+        "passed": true,
+        "checks": 19
       }
-    ],
-    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation.",
-    "passed": true
+    ]
   },
   "frontend": {
     "passed": true,
@@ -582,8 +601,8 @@
     "cases": 6,
     "failures": 0,
     "errors": 0,
-    "source_sha256": "7a63db9d80d8bbfbccb8a3a92fde6e9c18f88afc3db02b2c31156bca3b26d4fe",
-    "app_sha256": "3c60563a3d759d3973dd92b52d4a8f5fedd70ca00346214ed54ec8e61b7f2c78",
+    "source_sha256": "cb3eced62ff074e180a8e61d557e169420be07781e7632b029e85a4f82e77f9c",
+    "app_sha256": "d89542e62f823c0862c6e4d15b618ecc5e416ea5d87a9d21b7ae7d00cc591bd5",
     "factory_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
   },
   "machine": {
@@ -591,8 +610,8 @@
     "literal_factory_pixels_equal": false,
     "renderer_cases": 316,
     "geometry_checks": 4,
-    "source_sha256": "7a63db9d80d8bbfbccb8a3a92fde6e9c18f88afc3db02b2c31156bca3b26d4fe",
-    "native_elf_sha256": "6c55baf54a83ea188a92f34deb3620f1a4bd2f21b22f6c5ee4f749677c4872ae",
+    "source_sha256": "cb3eced62ff074e180a8e61d557e169420be07781e7632b029e85a4f82e77f9c",
+    "native_elf_sha256": "9977310c6d9f910861edd6bc468066f5cc10c5653d5ce40b6cdadc0a5f0cf2e9",
     "approved_fixes": {
       "simple-sunday-standard-tm-wday": "Display Sun for standard tm_wday 0; factory 0 repeats the date, while factory 7 draws Sun",
       "analog-perpendicular-stroke-offsets": "Use cos/sin for x/y after atan2+pi/2; the original sin/cos collapses axis-aligned thick strokes"
@@ -1110,7 +1129,7 @@
       ],
       "first_failures": [],
       "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-      "native_elf_sha256": "6c55baf54a83ea188a92f34deb3620f1a4bd2f21b22f6c5ee4f749677c4872ae",
+      "native_elf_sha256": "9977310c6d9f910861edd6bc468066f5cc10c5653d5ce40b6cdadc0a5f0cf2e9",
       "approved_fix": "photo fade must restore configured duty even when the original schedule cache did not change",
       "scope": "Executed LEDC initialization, duty arithmetic and conditional schedule call traces; successful driver boundaries are captured. RF, electrical PWM and SDK locking are outside scope."
     }
@@ -1148,9 +1167,35 @@
       }
     ],
     "approved_fixes": {
-      "clip-partially-visible-glyph": "Factory 0x4200950e rejects an entire glyph if its rectangle crosses 239; retain its computed bitmap and clip only the visible columns/rows."
+      "clip-partially-visible-glyph": "Factory 0x4200950e rejects an entire glyph if its rectangle crosses 239; retain its computed bitmap and clip only the visible columns/rows.",
+      "bounded-clean-classic-fields": "City/title/icon cleanup and bounded field glyphs; overflowing labels start at the left scroll endpoint. Later motion is a requested extension, tested separately."
     },
     "scope": "Exact executed classic text/window pixels and media-request identities; media output is recorded, not decoded. Executed animation cursor/header selection; task scheduling and physical timing remain outside scope."
+  },
+  "machine_weather": {
+    "passed": true,
+    "app_sha256": "d89542e62f823c0862c6e4d15b618ecc5e416ea5d87a9d21b7ae7d00cc591bd5",
+    "source_sha256": "cb3eced62ff074e180a8e61d557e169420be07781e7632b029e85a4f82e77f9c",
+    "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+    "native_elf_sha256": "9977310c6d9f910861edd6bc468066f5cc10c5653d5ce40b6cdadc0a5f0cf2e9",
+    "approved_fixes": [
+      "clear-city-full-height",
+      "clear-weather-title",
+      "clear-unavailable-weather-icon",
+      "bound-text-to-field"
+    ],
+    "requested_changes": [
+      "bidirectional-field-scroll"
+    ],
+    "scope": "Both real BMP decoders and LCD pixels; flash/allocation/mutex boundaries adapted. JPEG output remains recorded. Incremental native pixels compared with fresh rendering and a separately declared corrected factory reference. Scroll frames checked against factory bitmaps and independent phase expectations; injected real-decoder read failures. Only explicit status-update events and active 100-ms scroll steps are modeled here.",
+    "case_counts": {
+      "bmp": 18,
+      "decoder-read-error": 4,
+      "incremental": 10,
+      "scroll": 191,
+      "short": 1,
+      "theme-reset": 1
+    }
   },
   "qemu": {
     "passed": true,
@@ -1165,7 +1210,7 @@
     },
     "http_initial_setup": {
       "passed": true,
-      "tested_at_utc": "2026-10-13T17:36:55.922574+02:00",
+      "tested_at_utc": "2026-10-13T18:28:03.746814+02:00",
       "flows": {
         "original": {
           "firmware": "original",
@@ -1243,31 +1288,31 @@
           "sources": {
             "images": [
               {
-                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "offset": "0x0",
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "file": "bootloader.bin",
                 "bytes": 19248
               },
               {
-                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "offset": "0x8000",
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "file": "partition-table.bin",
                 "bytes": 3072
               },
               {
-                "sha256": "3c60563a3d759d3973dd92b52d4a8f5fedd70ca00346214ed54ec8e61b7f2c78",
                 "offset": "0x10000",
+                "sha256": "d89542e62f823c0862c6e4d15b618ecc5e416ea5d87a9d21b7ae7d00cc591bd5",
                 "file": "app.bin",
-                "bytes": 1021472
+                "bytes": 1022336
               },
               {
-                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "offset": "0x200000",
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "file": "assets.bin",
                 "bytes": 1994752
               }
             ],
-            "source_sha256": "7a63db9d80d8bbfbccb8a3a92fde6e9c18f88afc3db02b2c31156bca3b26d4fe"
+            "source_sha256": "cb3eced62ff074e180a8e61d557e169420be07781e7632b029e85a4f82e77f9c"
           },
           "web_endpoints": [
             {
@@ -1322,10 +1367,10 @@
     },
     "weather_http": {
       "passed": true,
-      "tested_at_utc": "2026-10-13T17:37:58.585447+02:00",
+      "tested_at_utc": "2026-10-13T18:29:03.374227+02:00",
       "scope": "Real guest DNS/TCP/HTTP via isolated loopback fixture; parsed synthetic weather and stable LCD regions. No Internet service, physical RF or full-program equivalence.",
       "native_layout": {
-        "address": 1070266696,
+        "address": 1070267000,
         "size": 232,
         "fields": {
           "valid": 0,
@@ -1343,8 +1388,8 @@
           "wind_direction": 201,
           "generation": 224
         },
-        "request_state_address": 1070282680,
-        "elf_sha256": "6c55baf54a83ea188a92f34deb3620f1a4bd2f21b22f6c5ee4f749677c4872ae"
+        "request_state_address": 1070282984,
+        "elf_sha256": "9977310c6d9f910861edd6bc468066f5cc10c5653d5ce40b6cdadc0a5f0cf2e9"
       },
       "flows": {
         "original": {
@@ -1498,31 +1543,31 @@
           "sources": {
             "images": [
               {
-                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "offset": "0x0",
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "file": "bootloader.bin",
                 "bytes": 19248
               },
               {
-                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "offset": "0x8000",
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "file": "partition-table.bin",
                 "bytes": 3072
               },
               {
-                "sha256": "3c60563a3d759d3973dd92b52d4a8f5fedd70ca00346214ed54ec8e61b7f2c78",
                 "offset": "0x10000",
+                "sha256": "d89542e62f823c0862c6e4d15b618ecc5e416ea5d87a9d21b7ae7d00cc591bd5",
                 "file": "app.bin",
-                "bytes": 1021472
+                "bytes": 1022336
               },
               {
-                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "offset": "0x200000",
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "file": "assets.bin",
                 "bytes": 1994752
               }
             ],
-            "source_sha256": "7a63db9d80d8bbfbccb8a3a92fde6e9c18f88afc3db02b2c31156bca3b26d4fe"
+            "source_sha256": "cb3eced62ff074e180a8e61d557e169420be07781e7632b029e85a4f82e77f9c"
           },
           "weather_services": true,
           "native_rejects_non_200_json": true,
@@ -1691,12 +1736,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.470433
+            "virtual_seconds": 46.610364
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.464182
+            "virtual_seconds": 46.351698
           }
         },
         "equal_pixels_min": 1.0,
@@ -1708,16 +1753,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.880105
+            "virtual_seconds": 46.881549
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.360381
+            "virtual_seconds": 46.38982
           }
         },
-        "equal_pixels_min": 0.9768923611111111,
-        "equal_pixels_max": 0.9833506944444445
+        "equal_pixels_min": 0.9747222222222223,
+        "equal_pixels_max": 0.9862326388888889
       },
       "simple": {
         "passed": true,
@@ -1725,16 +1770,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.980504
+            "virtual_seconds": 46.60445
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.530461
+            "virtual_seconds": 46.760161
           }
         },
-        "equal_pixels_min": 0.9830902777777778,
-        "equal_pixels_max": 0.9857291666666667
+        "equal_pixels_min": 0.98953125,
+        "equal_pixels_max": 0.9921701388888889
       },
       "photo": {
         "passed": true,
@@ -1742,12 +1787,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.900559
+            "virtual_seconds": 46.981012
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.723896
+            "virtual_seconds": 46.850483
           }
         },
         "equal_pixels_min": 0.0003298611111111111,
@@ -1759,24 +1804,24 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.550294
+            "virtual_seconds": 46.571789
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.209199
+            "virtual_seconds": 46.319644
           }
         },
-        "equal_pixels_min": 0.9821006944444445,
-        "equal_pixels_max": 0.9882986111111111
+        "equal_pixels_min": 0.9848611111111111,
+        "equal_pixels_max": 0.9911631944444445
       }
     }
   },
   "not_run": [
     {
-      "reason": "Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately",
       "status": "not_run",
-      "name": "hardware_browser_soak"
+      "name": "hardware_browser_soak",
+      "reason": "Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately"
     }
   ]
 }

@@ -19,6 +19,8 @@ Direct instruction checks during the current work confirmed:
 | `0x4200afcc`, `0x4200b738`, `0x4200bd8c` | Conditional field updates instead of full-screen repainting |
 | `0x4200b5cc`, `0x42008e08`, `0x4200aebe` | Byte GIF cursor, terminator restart and persistence across selection/theme changes |
 | `0x4200950e` | Whole-glyph rejection at the panel edge; visible-column/row clipping deliberately corrected |
+| `0x4200aefc`, `0x4200abee`, `0x4200b340` | Incomplete city clear, panel-only text bounds and uncleared weather-title margins deliberately corrected |
+| `0x42010eca`–`0x42011040` | Both BMP decoders executed for all 18 icons; actual flash/allocation/release call targets and row conversion checked |
 | `0x4200bf9c` | The simple clock handles weekday 1..7 and repeats its date buffer for standard Sunday 0; this confirmed bug is corrected at the user's request |
 | `0x4200bc36` | Six fade levels and photo replacement at duty 1000 |
 | `0x4200fd94`–`0x4200fda0` | Kelvin subtraction followed by ROM `__fixdfsi`, truncating Celsius toward zero |
@@ -44,6 +46,11 @@ independent visible-bitmap checks.
 counter/flag in four traces spanning 79,296 calls to `0x4200826a`, plus 13,440
 fade/selection transitions at `0x4200bc36`/`0x4200bb4c`. `0x4200bd8c` relies only
 on the minute flag; stale digits are deliberately corrected by real rollover.
+
+[Weather/field execution](../../../qemu/parity/weather-checks.md) adds retained
+frames, explicit field corrections, real BMP read errors and independently checked
+scroll pixels. `helper_at_42010eca.asm` uses an explicitly bounded excerpt ending
+after the decoder's final branch, rather than the much later next known symbol.
 
 `../../tools/disassemble_factory.py` reproduces exports with an explicit local
 objdump path and a list of addresses or bounded IROM ranges.
