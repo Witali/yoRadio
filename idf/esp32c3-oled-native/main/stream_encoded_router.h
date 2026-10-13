@@ -1,7 +1,8 @@
 #pragma once
 
 // Private audio_service adapter, included after send_encoded. One producer
-// (stream_task) owns this state. No lease survives a send_stream_audio call.
+// (stream_task) owns this state. No output lease survives a send_stream_audio
+// call; startup candidate leases are owned separately by stream_start.
 #include "stream_frames.h"
 
 static struct {
@@ -14,6 +15,11 @@ typedef struct {
     uint32_t generation;
     native_codec_t *codec;
     encoded_packet_t *packet;
+    // Nonzero only when replaying unpublished candidate storage. The caller
+    // attaches control storage of at least header + this payload capacity.
+    // Small copies into that separate FIFO node avoid waiting for a fifth
+    // full data slot while all four candidate leases are held.
+    size_t control_payload_bytes;
 } stream_route_context_t;
 
 static void stream_route_reset(void) {
@@ -38,29 +44,42 @@ static bool stream_route_flush(stream_route_context_t *ctx) {
     return true;
 }
 
+static bool stream_route_acquire(stream_route_context_t *ctx) {
+    if (ctx->packet) return true;
+    size_t capacity = ctx->control_payload_bytes ? ctx->control_payload_bytes : STREAM_CHUNK_SIZE;
+    while (atomic_load(&s_generation) == ctx->generation) {
+        BaseType_t acquired = ctx->control_payload_bytes
+            ? adaptive_input_acquire_control(s_encoded, (void **)&ctx->packet,
+                sizeof(encoded_packet_t) + capacity, pdMS_TO_TICKS(250))
+            : encoded_acquire(s_encoded, (void **)&ctx->packet,
+                sizeof(encoded_packet_t) + capacity, pdMS_TO_TICKS(250));
+        if (acquired != pdTRUE) continue;
+        if (atomic_load(&s_generation) != ctx->generation) {
+            stream_route_cancel(ctx);
+            return false;
+        }
+        ctx->packet->generation = ctx->generation;
+        ctx->packet->codec = *ctx->codec;
+        ctx->packet->end_of_stream = AUDIO_CONTINUE;
+        ctx->packet->data_size = 0;
+        return true;
+    }
+    return false;
+}
+
 static bool stream_route_emit(void *opaque, const uint8_t *data, size_t size) {
     stream_route_context_t *ctx = opaque;
     while (size) {
         if (atomic_load(&s_generation) != ctx->generation) return false;
-        if (!ctx->packet) {
-            while (encoded_acquire(s_encoded, (void **)&ctx->packet,
-                    sizeof(encoded_packet_t) + STREAM_CHUNK_SIZE,
-                    pdMS_TO_TICKS(250)) != pdTRUE) {
-                if (atomic_load(&s_generation) != ctx->generation) return false;
-            }
-            if (atomic_load(&s_generation) != ctx->generation) return false;
-            ctx->packet->generation = ctx->generation;
-            ctx->packet->codec = *ctx->codec;
-            ctx->packet->end_of_stream = AUDIO_CONTINUE;
-            ctx->packet->data_size = 0;
-        }
-        size_t count = STREAM_CHUNK_SIZE - ctx->packet->data_size;
+        if (!stream_route_acquire(ctx)) return false;
+        size_t capacity = ctx->control_payload_bytes ? ctx->control_payload_bytes : STREAM_CHUNK_SIZE;
+        size_t count = capacity - ctx->packet->data_size;
         if (count > size) count = size;
         memcpy(ctx->packet->data + ctx->packet->data_size, data, count);
         ctx->packet->data_size += count;
         data += count;
         size -= count;
-        if (ctx->packet->data_size == STREAM_CHUNK_SIZE && !stream_route_flush(ctx))
+        if (ctx->packet->data_size == capacity && !stream_route_flush(ctx))
             return false;
     }
     return true;
@@ -70,9 +89,14 @@ static bool stream_route_begin(void *opaque, const stream_frame_info_t *info) {
     stream_route_context_t *ctx = opaque;
     native_codec_t next = info->codec == STREAM_FRAME_MP3 ? NATIVE_CODEC_MP3 : NATIVE_CODEC_AAC;
     if (s_frame_router.started && next != *ctx->codec) {
-        if (!stream_route_flush(ctx) ||
-            !send_encoded(ctx->generation, *ctx->codec, NULL, 0, AUDIO_DRAIN_CODEC))
+        if (!stream_route_flush(ctx)) return false;
+        if (ctx->control_payload_bytes) {
+            if (!stream_route_acquire(ctx)) return false;
+            ctx->packet->end_of_stream = AUDIO_DRAIN_CODEC;
+            if (!stream_route_flush(ctx)) return false;
+        } else if (!send_encoded(ctx->generation, *ctx->codec, NULL, 0, AUDIO_DRAIN_CODEC)) {
             return false;
+        }
     }
     *ctx->codec = next;
     s_frame_router.started = true;
@@ -81,7 +105,8 @@ static bool stream_route_begin(void *opaque, const stream_frame_info_t *info) {
 
 static bool stream_route_feed(stream_route_context_t *ctx, const uint8_t *data, size_t size) {
     if (*ctx->codec != NATIVE_CODEC_MP3 && *ctx->codec != NATIVE_CODEC_AAC)
-        return !size || send_encoded(ctx->generation, *ctx->codec, data, size, AUDIO_CONTINUE);
+        return !size || (ctx->control_payload_bytes ? stream_route_emit(ctx, data, size)
+            : send_encoded(ctx->generation, *ctx->codec, data, size, AUDIO_CONTINUE));
     if (s_frame_router.bypass) {
         if (stream_route_emit(ctx, data, size)) return true;
     } else {

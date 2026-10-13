@@ -107,10 +107,22 @@ config YORADIO_FRAME_ROUTER
     help
         Coalesce frame spans into existing input leases and drain the old
         decoder before changing codec family. Skip inter-frame ID3 tags.
-        No full-frame allocation. Strict boundary mode: corruption/resync and
-        multi-header confidence are not yet implemented. Free-format MP3
+        No full-frame allocation. Strict boundary mode: recovery after lost
+        alignment is not yet implemented. Free-format MP3
         falls back to the existing decoder for the rest of the connection.
         Keep disabled until live-transition and all-codec tests qualify it.
+
+config YORADIO_STREAM_CONFIRM
+    bool "Confirm startup audio with a second frame header (experimental)"
+    depends on YORADIO_FRAME_ROUTER
+    default n
+    help
+        Retain a candidate frame in four existing input packet leases and check
+        its next boundary before selecting MP3/AAC. Replay through a separate
+        128-byte control payload, avoiding a fifth full packet allocation.
+        Requires at least four guaranteed input slots. Bounded startup only;
+        recovery during established playback is not implemented here.
+        Keep disabled until network, cancellation and physical playback tests pass.
 
 config YORADIO_INPUT_MIN_BLOCKS
     int "Minimum compressed-input capacity (1600-byte units)"

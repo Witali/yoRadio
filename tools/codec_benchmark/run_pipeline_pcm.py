@@ -97,7 +97,9 @@ def main():
     sources = [Path(__file__).resolve(), ROOT/'tests/native/qemu_pipeline_pcm_capture.c']
     sources += [ROOT/'idf/esp32c3-oled-native/main'/name for name in
                 ('CMakeLists.txt','audio_service.c','stream_probe.h','stream_frames.h',
-                 'stream_tags.h','stream_encoded_router.h','native_aac_decoder.c','audio_completion.h')]
+                 'stream_tags.h','stream_encoded_router.h','native_aac_decoder.c','audio_completion.h',
+                 'stream_start.h','stream_staging.h','stream_confirm.h','adaptive_input.c','adaptive_input.h')]
+    report['startup_confirmation'] = 'CONFIG_YORADIO_STREAM_CONFIRM=y' in cfg
     report['source_sha256'] = {s.relative_to(ROOT).as_posix(): hashlib.sha256(s.read_bytes()).hexdigest()
                                for s in sources}
     def save():
@@ -148,6 +150,14 @@ def main():
             if shape != [(fixtures[name]['rate'], fixtures[name]['channels'], expected_bytes)]:
                 raise ValueError('Reference lost samples or has wrong PCM layout: '+name)
             report['cases'][name]['reference_shape_verified'] = True
+        if report['startup_confirmation']:
+            for name, prefix, target in (
+                ('false-mp3-before-he-aac', b'\xff\xfb\x90\0'+bytes(28), 'he-48000-stereo'),
+                ('false-aac-before-mp3', b'\xff\xf1\x4c\x80\x01\x9f\xfc'+bytes(25), 'mp3-320'),
+            ):
+                observed = capture(name, prefix+segments[target])
+                report['cases'][name] = compare(references[target], observed); save()
+                print('EXACT', name, flush=True)
         # ID3v1/v1.1 is metadata after a complete MP3 stream/track. Include
         # sync-shaped values to ensure none of its 128 bytes reach a decoder.
         mp3_tail = b'TAG' + (b'ID3\xff\xfb\x90\x00\xff\xf1' * 14)[:125].ljust(125,b'\0')

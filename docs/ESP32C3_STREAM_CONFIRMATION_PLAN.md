@@ -3,9 +3,11 @@
 ## Current state (2026-10-13)
 
 `stream_confirm.h` implements and tests a bounded confirmation core over a
-caller-owned byte window. **It is not yet called by `audio_service.c`.** The
-production initial probe still accepts one header, and the frame router remains
-experimental. This document does not certify false-sync recovery in firmware.
+caller-owned byte window. `audio_service.c` now calls it through `stream_start.h`
+when **`CONFIG_YORADIO_STREAM_CONFIRM=y`** and the frame router is enabled.
+Both options remain experimental and off by default. Production therefore
+still uses the original single-header initial probe. Startup confirmation does
+not implement recovery after lost alignment during established playback.
 
 The previous FFmpeg comparison identified false MP3 headers before AAC and false
 AAC headers before MP3 as unresolved failures. The new core rejects those
@@ -81,10 +83,13 @@ from TLS reclamation, and can cancel them. A confidence adapter must explicitly
 own these leases across network reads. The present ordinary frame adapter's
 rule that no lease survives `send_stream_audio` must not be silently changed.
 
-**Deadlock risk:** holding all four slots while trying to enqueue an old-codec
-drain marker waits forever: the decoder cannot consume unpublished leases.
-Do not publish an unconfirmed candidate just to make room, and do not drain
-the old decoder based only on one speculative header.
+Holding all four slots while trying to enqueue an old-codec drain marker can
+deadlock: the decoder cannot consume unpublished leases. A confirmed frame can
+also end partway through a held packet, with bytes of another codec still in
+its suffix. The integration uses a separate small control FIFO element for
+both short replay fragments and drain markers. No unconfirmed bytes are
+published to make room, and a whole held packet is never blindly labelled as
+one codec.
 
 ## Ordered remaining work
 
@@ -126,34 +131,119 @@ python tests/run-stream-staging.py --output .build/staging-fresh --corpus .build
 [Frozen storage evidence](../tests/results/esp32c3-stream-probe-20261013/staging-01/)
 includes sources, logs, corpus hashes and target compilation evidence.
 
-**Still not connected to `audio_service.c`.** The packet-transfer test proves
+The original packet-transfer test proves
 storage ownership only: the caller still has to split at the selected codec's
 frame boundary and replay lookahead through the frame walker. It must never
 mark an entire retained packet as one codec when it contains a codec transition.
-The tests do not yet prove actual Stop/generation handling, EOF/tag lifecycle,
-control-marker capacity, HTTP/HTTPS behavior or physical playback continuity.
-The following integration steps remain required.
+Those storage tests alone do not prove actual Stop/generation handling, EOF/tag
+lifecycle, control-marker capacity, HTTP/HTTPS behavior or physical continuity.
 
-1. **Startup staging adapter.** Reserve/reuse existing packet leases, expose a
-   bounded read callback, and publish the confirmed first frame exactly once.
-   Replay retained lookahead without copying into a fifth full-sized slot.
-   Verify the actual queue minimum/target instead of assuming four free slots.
-2. **Lifetime and terminal handling.** Cancel every held lease on generation
-   change, Stop, HTTP failure, probe timeout and rejected candidates. Preserve
-   exact bytes on retry/rescan. Resolve single-frame EOF before enqueueing the
-   terminal marker; distinguish incomplete tags/frames from clean EOF. Never
-   block awaiting input while the required queue storage is unavailable.
-3. **Metadata removal.** Stream-skip bodies without retaining them. Charge the
-   total metadata budget, enforce the existing ID3v1 context/duplicate rules,
-   and test truncated bodies, false signatures in tags and oversized lengths.
-4. **Codec-change/recovery staging.** Reuse the same core at lost alignment and
-   codec changes only after solving marker capacity. Evaluate a small reserved
-   control-only queue entry versus another allocation-free ordering mechanism;
-   prove that a full set of held data leases cannot block a required drain.
-5. **Integration gates.** Actual adaptive-queue tests with concurrent decoder
-   consumption, TLS reclamation, cancellation and allocation failures; QEMU
-   PCM equality on existing and false-prefix fixtures; complete HTTP/HTTPS
-   format/control regression and longer playback/heap recovery on C3.
+### Startup adapter and control FIFO (2026-10-13)
+
+The adaptive queue accepts one caller-owned control storage area, independent
+of its data slots but ordered in the same FIFO. Normal acquire and TLS reclaim
+never take it; it is excluded from resident/occupied audio-prefill statistics.
+The queue does not free caller storage. The C3 queue descriptor adds a 20-byte
+slot plus a four-byte capacity field, even when no control storage is attached.
+
+`stream_start.h` retains candidates in the four existing data leases. If at
+least one data slot is guaranteed to remain outside the held window, confirmed
+bytes use ordinary packet coalescing. When all guaranteed data slots are held,
+replay falls back to **128-byte control payloads**. This uses copies at startup;
+it is not zero-copy playback. In the fallback, both replay data and codec-drain
+markers use the independent slot, so four held candidates cannot prevent the
+consumer from receiving them. No decoder pointer references a held candidate
+lease, and TLS reclamation cannot lower the guaranteed data-slot floor.
+
+The first implementation used the small control payload for every startup.
+QEMU showed an extra **964 bytes** in MP3's first-frame decoder allocation
+delta (41,912 instead of 40,948 bytes). Preferring ordinary coalescing restored
+the **40,948-byte** decoder delta for that fixture. A pathological candidate
+that occupies all slots still uses short fragments; its decoder-side memory
+and latency need qualification under physical TLS pressure.
+
+The adapter handles single-frame EOF, streams ID3 bodies without retaining
+them, bounds consecutive metadata/search work, rejects duplicate ID3v1 tails
+after the same candidate, and cancels held leases on failures and connection
+reset. A generation check and a ten-second deadline bound startup storage
+acquisition. HTTP EOF finalization and flash-fixture EOF both call the adapter
+before the terminal marker; read failures retain their error reason.
+
+Host evidence:
+
+- The actual adaptive queue passes **60,000 concurrent packets** (30,000 normal
+  and 30,000 mixed normal/control), with FIFO, invalid ownership, all 16 data
+  indices, allocation failures, TLS reclamation and shrink/restore checks.
+- The actual router replays MP3/AAC/MP3 with four data leases held, 128-byte
+  control fragments, exact bytes and two ordered drain markers. Concurrent
+  generation cancellation succeeds with input chunks of 1, 7 and 2048 bytes.
+- The actual `send_stream_audio`/`finish_stream_audio` functions pass the 31-file
+  corpus with exact encoded replay and clean EOF at all three chunk sizes.
+  Unit checks cover single-frame EOF, a wrong MIME hint, large ID3 bodies,
+  every truncated ID3v1 tail length, duplicate/oversized tags, maximum ADTS,
+  empty input, FLAC/Ogg/free-format encoded pass-through, reset/generation
+  cancellation, read failure and deadline expiry. ASan/UBSan report no errors.
+
+These host tests use RTOS/heap doubles and a capturing consumer. They do not
+exercise an HTTP socket, a hardware decoder task or physical audio output.
+
+```sh
+python tests/run-adaptive-input.py --output .build/control-fresh
+python tests/run-stream-staging-router.py --output .build/router-fresh
+python tests/run-stream-start.py --output .build/start-fresh --corpus .build/confirmation-fresh
+```
+
+### QEMU PCM and memory qualification
+
+The final `idf61-confirm-start` C3 benchmark image passes **13/13 PCM captures**:
+MP3, AAC-LC, HE-AAC, HE-AACv2, both false-prefix directions, ID3v1 tails and
+the existing mixed-codec sequences with/without tags. The two false-prefix
+captures equal their clean-stream references. All **11 overlapping cases**
+also match the previous `idf61-id3v1-pcm` firmware byte for byte, including
+sample count, channel layout and rate. No decoded-quality tolerance was needed.
+
+| First decoded frame (QEMU) | Previous free heap | Final free heap | Difference | Final largest block |
+|---|---:|---:|---:|---:|
+| MP3 320 kbit/s | 228,556 | 228,300 | -256 | 114,688 |
+| HE-AAC 48 kHz stereo | 174,008 | 173,752 | -256 | 114,688 |
+| HE-AACv2 44.1 kHz stereo | 174,136 | 173,880 | -256 | 114,688 |
+
+Decoder stack high-water values are unchanged in these fixtures. MP3's
+first-frame decoder allocation delta returns to the previous 40,948 bytes;
+the rejected all-small-fragment variant used 41,912 bytes. Both versions log
+a 1000 ms input-prefill interval in QEMU; this is not a physical startup or CPU
+timing result. The largest block at decoder **open** can differ despite an
+equal first-frame largest block, so this table does not certify fragmentation
+or TLS margins on hardware.
+
+Linked named startup state is 96 bytes, control storage is 140 bytes, and its
+attachment flag is one byte. Queue bookkeeping adds 24 bytes on C3. The measured
+256-byte free-heap change includes linker layout/alignment effects; it is not
+the arithmetic sum of the symbol sizes. The final QEMU-only app is 1,003,840
+bytes, 5,808 bytes larger than the previous 998,032-byte benchmark image.
+
+[Frozen integration evidence](../tests/results/esp32c3-stream-probe-20261013/startup-integration-01/)
+contains host sources/logs, compressed QEMU traces with PCM, build identity and
+the exact prior-firmware comparison. [Control-queue evidence](../tests/results/esp32c3-stream-probe-20261013/control-queue-01/)
+records the separate 60,000-packet regression. Every archived file is covered
+by a SHA-256 manifest; QEMU PCM bytes can be recovered from the compressed
+capture logs with the existing parser. The physical board was not reflashed.
+
+## Remaining qualification
+
+1. Extend real-decoder QEMU fixtures to a false maximum-length ADTS candidate
+   before MP3/HE-AAC, forcing all four staging slots and the small-fragment
+   fallback. The current synthetic full-slot host test proves FIFO/lifetime,
+   but does not measure the real decoder's memory in that worst case.
+2. Run complete HTTP/HTTPS format/control regressions on C3, including Stop
+   during candidate collection, stalls and incomplete tags, TLS pressure,
+   repeat connections, actual queue target below four, and heap recovery.
+3. Verify decoded FLAC/Ogg and free-format playback with this option enabled;
+   host byte-preservation checks alone do not prove decoding or output quality.
+4. Implement confidence at codec changes and bounded recovery after lost
+   alignment. Startup success does not establish those behaviors. Keep every
+   existing codec/profile and avoid discarding real payload after false sync.
+5. Qualify longer physical playback and startup latency before enabling defaults.
 
 Do not enable the new path by default until these gates pass. A passing core
 test does not prove queue lifetimes, physical memory pressure or sound continuity.

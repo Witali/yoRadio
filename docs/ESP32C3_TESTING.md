@@ -1631,7 +1631,8 @@ not prove that a fixed arena can service reallocations across transitions.
 
 ## Initial stream signature detection
 
-Initial AUTO codec selection additionally has
+Initial AUTO codec selection has several independent test layers:
+
 `tests/run-stream-confirm.py --output NEW_DIRECTORY`: sanitizer coverage of
 the experimental bounded two-header confirmation core. This does not yet test
 firmware queue integration; see the [confirmation plan and measured limits](ESP32C3_STREAM_CONFIRMATION_PLAN.md).
@@ -1642,6 +1643,21 @@ Use the output of `run-stream-confirm.py` as the corpus directory. It checks
 lease lifetime, bounded lookahead, cancellation, reclamation, nonblocking
 backpressure and exact bytes. It does not yet exercise the firmware connection
 owner or certify Stop/EOF handling on the device.
+
+With experimental `CONFIG_YORADIO_STREAM_CONFIRM=y`, run
+`tests/run-stream-start.py --output NEW_DIRECTORY --corpus CONFIRMATION_DIRECTORY`.
+This compiles the actual send/finish functions, startup adapter and adaptive
+queue with host RTOS/heap doubles and a concurrent capturing consumer. It
+checks exact encoded replay, short-file EOF, wrong MIME hints, metadata bounds,
+truncation, generation/reset cancellation and deadline expiry. For the full-slot
+replay/drain liveness test run
+`tests/run-stream-staging-router.py --output NEW_DIRECTORY`; this holds all four
+candidate data slots while consuming independent 128-byte control fragments.
+These host tests do not establish HTTP/TLS behavior or physical continuity.
+
+`tools/codec_benchmark/run_pipeline_pcm.py` automatically adds both false-header
+directions when its QEMU firmware has startup confirmation enabled. It requires
+their decoded PCM to match the clean MP3/HE-AAC references byte for byte.
 
 `tests/run-esp32c3-stream-probe.py`: sanitizer coverage of the production
 prefix parser and audio submission function, fragmented signatures, ID3,

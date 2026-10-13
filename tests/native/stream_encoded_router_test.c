@@ -12,6 +12,7 @@
 #define STREAM_CHUNK_SIZE 2048
 #define pdTRUE 1
 #define pdMS_TO_TICKS(x) (x)
+typedef int BaseType_t;
 typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC,
                NATIVE_CODEC_FLAC, NATIVE_CODEC_OGG } native_codec_t;
 typedef struct { uint32_t generation; native_codec_t codec; uint16_t data_size;
@@ -46,6 +47,9 @@ static int encoded_commit(void *queue,void *p) {
         captured_size+=packet->data_size;
     }
     leased=false;return pdTRUE;
+}
+static int adaptive_input_acquire_control(void *queue,void **packet,size_t size,unsigned timeout) {
+    return encoded_acquire(queue,packet,size,timeout);
 }
 static bool adaptive_input_cancel(void *queue,void *p) {
     (void)queue;assert(leased && p==storage);leased=false;return true;
