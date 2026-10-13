@@ -207,7 +207,9 @@ class Server:
                 icy = IcyFramer(icy_interval, icy_metadata) if (
                     icy_interval and self.headers.get('Icy-MetaData') == '1') else None
                 self.send_response(200)
-                self.send_header('Content-Type', spec['mime'])
+                # None intentionally tests clients that must identify the body.
+                if spec['mime'] is not None:
+                    self.send_header('Content-Type', spec['mime'])
                 if icy:
                     self.send_header('icy-metaint', str(icy_interval))
                 if mode != 'stream':

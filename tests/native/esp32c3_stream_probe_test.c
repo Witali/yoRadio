@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "stream_probe.h"
 #include "audio_completion.h"
 
@@ -9,10 +10,19 @@ static uint8_t captured[8192];
 static size_t captured_size;
 static bool reject_output;
 static native_codec_t captured_codec;
+static const uint8_t *corpus_expected;
+static size_t corpus_size;
 static bool send_encoded(uint32_t generation, native_codec_t codec,
                          const void *data, size_t size, unsigned end) {
     assert(generation == 42 && !end && codec != NATIVE_CODEC_AUTO);
     if (reject_output) return false;
+    if (corpus_expected) {
+        assert(captured_size + size <= corpus_size);
+        assert(memcmp(corpus_expected + captured_size, data, size) == 0);
+        captured_size += size;
+        captured_codec = codec;
+        return true;
+    }
     assert(captured_size + size <= sizeof(captured));
     memcpy(captured + captured_size, data, size);
     captured_size += size;
@@ -46,7 +56,42 @@ static void replay(const uint8_t *data, size_t size, size_t skip,
     }
 }
 
-int main(void) {
+static void corpus(const char *path, native_codec_t expected) {
+    FILE *file=fopen(path,"rb"); assert(file);
+    assert(fseek(file,0,SEEK_END)==0); long length=ftell(file); assert(length>0);
+    rewind(file);
+    uint8_t *bytes=malloc((size_t)length+52); assert(bytes);
+    assert(fread(bytes+52,1,(size_t)length,file)==(size_t)length); fclose(file);
+    // ID3v2.4 with footer and misleading MP3/ADTS payload must not select a codec.
+    memset(bytes,0,52); memcpy(bytes,"ID3",3); bytes[3]=4; bytes[5]=0x10; bytes[9]=32;
+    const uint8_t bait[]={0xff,0xfb,0x90,0,0xff,0xf1,0x4c,0x80,1,0x9f,0xfc};
+    memcpy(bytes+10,bait,sizeof(bait));
+    const size_t chunks[]={1,7,2048};
+    // Fixtures may already have an ID3 prefix. Compute the expected audio start
+    // independently using the specified synchsafe tag size, never the probe.
+    size_t original_skip=0;
+    while ((size_t)length-original_skip>=10 && memcmp(bytes+52+original_skip,"ID3",3)==0) {
+        const uint8_t *p=bytes+52+original_skip;
+        size_t count=10+((size_t)p[6]<<21)+((size_t)p[7]<<14)+((size_t)p[8]<<7)+p[9];
+        if (p[3]==4 && (p[5]&0x10)) count+=10;
+        assert(count<=(size_t)length-original_skip); original_skip+=count;
+    }
+    corpus_expected=bytes+52+original_skip; corpus_size=(size_t)length-original_skip;
+    for (unsigned tag=0;tag<2;++tag) for(size_t c=0;c<sizeof(chunks)/sizeof(chunks[0]);++c) {
+        stream_probe_t probe={0}; native_codec_t codec=NATIVE_CODEC_AUTO; bool first=true;
+        captured_size=0; const uint8_t *input=bytes+(tag?0:52);
+        size_t size=(size_t)length+(tag?52:0);
+        for(size_t offset=0;offset<size;) {
+            size_t chunk=size-offset; if(chunk>chunks[c])chunk=chunks[c];
+            assert(send_stream_audio(42,&codec,input+offset,chunk,&first,&probe)); offset+=chunk;
+        }
+        assert(!first && codec==expected && captured_codec==expected && captured_size==corpus_size);
+    }
+    printf("Corpus passed: codec=%u input=%ld audio=%zu cases=6\n",(unsigned)expected,length,corpus_size);
+    corpus_expected=NULL; free(bytes);
+}
+
+int main(int argc, char **argv) {
     const uint8_t mp3[] = {0xff,0xfb,0x90,0x00,1,2,3,4,5,6,7,8};
     const uint8_t aac[] = {0xff,0xf1,0x4c,0x80,0x01,0x9f,0xfc,1,2,3,4,5};
     const uint8_t flac[] = {'f','L','a','C',0,0,0,34,1,2,3,4};
@@ -124,5 +169,7 @@ int main(void) {
         }
     }
     printf("Stream probe/send passed: split headers, exact replay, ID3, bounds, failures; state=%zu bytes\n",sizeof(stream_probe_t));
+    assert(argc%2==1);
+    for(int i=1;i<argc;i+=2) corpus(argv[i],(native_codec_t)atoi(argv[i+1]));
     return 0;
 }

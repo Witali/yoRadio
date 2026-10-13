@@ -34,9 +34,23 @@ def main():
         '-fsanitize=address,undefined', '-fno-omit-frame-pointer',
         '-I', native(MAIN), '-I', native(OUT),
         native(ROOT / 'tests/native/esp32c3_stream_probe_test.c'), '-o', native(binary)])
-    output = run([native(binary)])
+    fixtures = []
+    folder = ROOT / 'tests/fixtures/esp32c3_calibration'
+    mapping = {'mp3': 1, 'aac': 2, 'flac': 3, 'vorbis': 4, 'opus': 4}
+    for entry in json.loads((folder/'manifest.json').read_text())['fixtures']:
+        fixtures.append((folder/entry['file'], mapping[entry['codec']], entry['sha256']))
+    folder = ROOT / 'tests/fixtures/aac_stream_format'
+    for name, entry in json.loads((folder/'manifest.json').read_text())['files'].items():
+        fixtures.append((folder/name, 2, entry['sha256']))
+    command = [native(binary)]
+    for path, codec, digest in fixtures:
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == digest, path
+        command.extend([native(path), str(codec)])
+    output = run(command)
     result = {'compiler': run(['gcc', '--version']).splitlines()[0],
               'compile': compile_log, 'test': output,
+              'corpus': [{'file': path.relative_to(ROOT).as_posix(), 'codec': codec,
+                          'sha256': digest, 'cases': 6} for path, codec, digest in fixtures],
               'source_sha256': {name: hashlib.sha256((MAIN/name).read_bytes()).hexdigest()
                   for name in ('stream_probe.h', 'audio_service.c', 'audio_completion.h')}}
     (OUT / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
