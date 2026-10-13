@@ -44,7 +44,9 @@ further codec compression and speed work are not release requirements.
   two below-budget largest-block samples (7,168 and 7,936 B), despite zero
   allocation/watchdog/output faults and successful recovery. Preserve this
   [contiguous-headroom failure](ESP32C3_HTTP_REQUEST_BUFFER.md#production-ota-and-he-aac-https-qualification)
-  and investigate allocation ownership before qualifying the image.
+  as historical evidence. Under the 2026-10-13 acceptance policy, those two
+  absolute-budget samples alone do not block qualification; real playback,
+  allocation and recovery faults remain the deciding criteria.
 - [ ] Resolve or attribute the intermittent public MP3 interruption, with
   simultaneous independent host decoding over HTTP and HTTPS. Preserve
   failed controls and distinguish host command errors from board failures.
@@ -72,6 +74,11 @@ The earlier tested `quiet-http-txrelease` image has SHA-256
 `ee0278e97d9b0d4abd1e217ec2e657896e6e562ba51f5638aeb431e1acfdbebc`.
 Keep acceptance scoped to the actual image and tests, rather than to a profile
 name. Neither image is yet qualified as completion of the full goal.
+
+The later early-owner candidate and its physical/QEMU comparisons are tracked
+in [the stream-confirmation plan](ESP32C3_STREAM_CONFIRMATION_PLAN.md). Its new
+public-root image must retain its own hardware results; the earlier laboratory
+image's passing format matrix is not qualification of a different binary.
 
 ## Remaining qualification work, 2026-10-10
 

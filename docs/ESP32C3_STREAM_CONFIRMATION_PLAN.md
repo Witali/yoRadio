@@ -624,3 +624,43 @@ after releasing the artificial pressure; Wi-Fi/TLS allocation competition and
 sustained physical playback are still separate requirements. Retained results,
 configuration, source snapshots and hashes:
 [early-owner-pressure-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-pressure-01/summary.json).
+
+### Public-root early-owner image: ten-minute HE-AAC test (2026-10-13)
+
+The production-style `idf61-early-owner-public` image removes the laboratory
+CA while retaining normal public certificate verification. It retains the
+experimental startup confirmation and early-owner options; repository defaults
+are unchanged. Its app SHA-256 is
+`219bfe1b4bd84e385825d5ee3b6e3468c7bf485a189c3765a11e511e1d459336`.
+This exact image passes a 600-second physical HTTPS playback test of SomaFM
+Groove Salad, independently identified by FFprobe and FAAD as HE-AAC,
+44.1 kHz stereo. This source is HE-AAC, not HE-AACv2.
+
+| Measurement | Result |
+| --- | ---: |
+| Status samples / samples after 15-second warmup | 521 / 508 |
+| New completion-queue drops / write errors in measured playback window | 0 / 0 |
+| Allocation / decoder / watchdog faults | 0 / 0 / 0 |
+| Minimum sampled free heap / largest block after warmup | 24,476 / 8,192 bytes |
+| Lifetime minimum free heap reported by firmware | 17,248 bytes |
+| Settled free-heap median before playback / after Stop | 139,456 / 139,456 bytes |
+| Settled largest-block median before playback / after Stop | 110,592 / 110,592 bytes |
+| Maximum paired status/health observation time | 307 ms |
+
+All eight report checks pass. Completion counters include idle/startup events;
+the zero above is the delta across the 584.212-second measured playback window,
+not a zero lifetime counter. No reboot or sampled playback interruption occurs.
+The heap floor is recorded as a diagnostic rather than a mandatory threshold;
+progressive loss and settled recovery checks still apply.
+
+A concurrent, independent FFmpeg connection decodes 610 seconds of media with
+exit code zero and an empty error log. The connections are not packet-aligned,
+and decoded media duration is not wall-clock coverage. This is not a PCM
+equivalence or analog continuity test. Original firmware and private settings
+are verified restored, with playback stopped.
+
+Saved image: `firmware/development/esp32c3-idf-6.1-r9a97-early-owner-public/`.
+Evidence and source snapshots:
+[early-owner-public-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-public-01/summary.json).
+The earlier laboratory image's format/transition matrix is not transferred to
+this different binary. Full production qualification remains open.
