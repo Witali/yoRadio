@@ -103,6 +103,7 @@ def main():
                   machine_classic_report='../qemu/parity/classic-validation.json',
                   machine_classic_cases=classic['renderer_cases'] if isinstance(classic['renderer_cases'], int) else len(classic['renderer_cases']),
                   machine_animation_transitions=classic.get('animation_transitions', len(classic.get('animation', {}).get('cases', []))),
+                  machine_backlight_comparisons=groups['machine_control']['backlight']['comparisons'],
                   machine_glyph_geometry_checks=len(classic['glyph_geometry_checks']))
     report['work_status'] = 'Reconstructed firmware; confirmed factory corrections are marked and tested'
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

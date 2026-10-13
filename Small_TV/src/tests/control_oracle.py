@@ -200,12 +200,16 @@ def main():
     args = parser.parse_args()
     app_sha = verify_inputs()
     factory, native = Machine('factory'), Machine('native')
+    from backlight_oracle import run_checks as backlight_checks
+    backlight = backlight_checks()
+    if not backlight['passed']:
+        raise AssertionError('Executed backlight call traces differ')
     report = {'factory_elf_sha256':factory.source_sha, 'native_elf_sha256':native.source_sha,
               'app_sha256':app_sha, 'timer_traces':timer_checks(factory, native),
               'slideshow':slideshow_checks(factory, native),
-              'simple_events':simple_event_checks(), 'passed':True,
+              'simple_events':simple_event_checks(), 'backlight':backlight, 'passed':True,
               'adapters':{'factory':factory.executed_adapters, 'native':native.executed_adapters},
-              'scope':'Exact machine-code timer/slideshow control transitions; output boundaries adapted; task scheduling and pixel decoding unverified here'}
+              'scope':'Exact machine-code timer/slideshow control transitions and LEDC initialization/schedule traces; output boundaries adapted; task scheduling, electrical PWM and pixel decoding unverified here'}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
 

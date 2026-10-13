@@ -64,6 +64,9 @@ def main():
                           'scope': machine['scope']}
     summary['machine_control'] = {key: controls[key] for key in ('passed', 'timer_traces', 'slideshow', 'scope')}
     summary['machine_control']['simple_event_frames'] = controls['simple_events']['frames']
+    if not controls['backlight']['passed']:
+        raise ValueError('Executed backlight trace comparison failed')
+    summary['machine_control']['backlight'] = controls['backlight']
     summary['machine_classic'] = {'passed':classic['passed'],'literal_factory_pixels_equal':classic['literal_equal'],
                                   'renderer_cases':len(classic['renderer_cases']),
                                   'animation_transitions':len(classic['animation']['cases']),

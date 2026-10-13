@@ -676,15 +676,19 @@ static esp_err_t driver_result = ESP_OK;
 static ledc_timer_config_t ledc_timer;
 static ledc_channel_config_t ledc_channel;
 static unsigned duty, duty_updates;
+static unsigned ledc_timer_calls, ledc_channel_calls;
+static esp_err_t ledc_channel_result;
 esp_err_t ledc_timer_config(const ledc_timer_config_t *config)
 {
+    ++ledc_timer_calls;
     ledc_timer = *config;
     return driver_result;
 }
 esp_err_t ledc_channel_config(const ledc_channel_config_t *config)
 {
+    ++ledc_channel_calls;
     ledc_channel = *config;
-    return ESP_OK;
+    return ledc_channel_result;
 }
 esp_err_t ledc_set_duty(int mode, int channel, unsigned value)
 {
@@ -703,10 +707,22 @@ static void test_backlight(void)
     /* Assert board PWM configuration and strict boundaries for every minute of a day. */
     driver_result = ESP_FAIL;
     CHECK(backlight_init() == ESP_FAIL);
+    CHECK(ledc_timer_calls == 1 && ledc_channel_calls == 0 && duty_updates == 0);
     driver_result = ESP_OK;
+    ledc_channel_result = ESP_ERR_NO_MEM;
+    CHECK(backlight_init() == ESP_ERR_NO_MEM);
+    CHECK(ledc_timer_calls == 2 && ledc_channel_calls == 1 && duty_updates == 0);
+    ledc_channel_result = ESP_OK;
     CHECK(backlight_init() == ESP_OK);
     CHECK(ledc_timer.freq_hz == 1000 && ledc_timer.duty_resolution == LEDC_TIMER_13_BIT &&
-          ledc_channel.gpio_num == 18 && ledc_channel.duty == 819);
+          ledc_channel.gpio_num == 18 && ledc_channel.duty == 0);
+    CHECK(duty == 819 && duty_updates == 1);
+    unsigned unchanged_updates = duty_updates;
+    preferences.day_level = 100;
+    preferences.night_mode = 0;
+    for (unsigned repeat = 0; repeat < 20; ++repeat)
+        backlight_update(&preferences, 12, 0, true);
+    CHECK(duty_updates == unchanged_updates);
     backlight_set_level(0);
     CHECK(duty == 0);
     backlight_set_level(1000);
@@ -733,6 +749,12 @@ static void test_backlight(void)
     preferences.night_mode = 0;
     backlight_update(&preferences, 23, 59, false);
     CHECK(duty == 819);
+    unchanged_updates = duty_updates;
+    backlight_set_level(0); /* A fade must invalidate the old scheduled duty. */
+    backlight_update(&preferences, 23, 59, false);
+    CHECK(duty == 819 && duty_updates == unchanged_updates + 2);
+    backlight_update(&preferences, 23, 59, false);
+    CHECK(duty_updates == unchanged_updates + 2);
 }
 
 static uint16_t panel[240 * 240];

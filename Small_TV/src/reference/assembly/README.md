@@ -13,6 +13,7 @@ Direct instruction checks during the current work confirmed:
 | `0x4200826a` | Unsigned timer thresholds: 181 startup ticks, 11 ticks per timer second, 3 description seconds and 1801 weather seconds |
 | `0x42008a34`, `0x42008a96` | RGB565 bit replication and RGB888 truncation/masks |
 | `0x42008c4c` | Strict unsigned minute comparisons for night brightness; no SNTP-validity gate |
+| `0x42008d62`, `0x42008bd2`, `0x42008c4c` | Zero-duty channel setup followed by explicit set/update, integer PWM mapping and no writes for unchanged scheduled brightness |
 | `0x42009644`, `0x42009b32`, `0x420a74e6` | Float narrowing of atan2/tick angles and rounded offsets restored; the vendor's swapped sin/cos stroke pair deliberately corrected |
 | `0x4200a5be`, `0x4200aa1e`, `0x4200acae` | Original glyph pointers, padded rows, LSB-first pixels, spacing and decorative dimensions |
 | `0x4200afcc`, `0x4200b738`, `0x4200bd8c` | Conditional field updates instead of full-screen repainting |

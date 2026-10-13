@@ -283,6 +283,10 @@ main-loop iterations and periodic requests use the global timer flag, instead
 of a worker deadline measured from its last response. Photo rotation preserves
 next-slot/fade state and restores configured day/night brightness after a fade,
 correcting the vendor's full-brightness override in photo mode.
+The control gate also compares 144,246 executed LEDC calls/decisions. Backlight
+initialization follows zero-duty channel setup with explicit set/update, and
+scheduled brightness skips unchanged levels. The common setter tracks the
+actually applied level, preserving configured brightness after photo fades.
 
 ```powershell
 & .\Small_TV\src\tests\run.ps1
