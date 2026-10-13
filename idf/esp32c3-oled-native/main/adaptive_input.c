@@ -221,12 +221,12 @@ void *adaptive_input_receive(adaptive_input_t *input, size_t *size,
     return NULL;
 }
 
-bool adaptive_input_return(adaptive_input_t *input, void *packet) {
+static bool release_lease(adaptive_input_t *input, void *packet, slot_state_t expected) {
     if (!input || !packet) return false;
     portENTER_CRITICAL(&input->lock);
     for (unsigned i = 0; i < input->target; ++i) {
         input_slot_t *slot = &input->slots[i];
-        if (slot->data != packet || slot->state != READING) continue;
+        if (slot->data != packet || slot->state != expected) continue;
         bool release = should_retire_slot(input, i);
         if (release) {
             slot->data = NULL;
@@ -242,6 +242,14 @@ bool adaptive_input_return(adaptive_input_t *input, void *packet) {
     }
     portEXIT_CRITICAL(&input->lock);
     return false;
+}
+
+bool adaptive_input_return(adaptive_input_t *input, void *packet) {
+    return release_lease(input, packet, READING);
+}
+
+bool adaptive_input_cancel(adaptive_input_t *input, void *packet) {
+    return release_lease(input, packet, WRITING);
 }
 
 bool adaptive_input_release_one(adaptive_input_t *input) {

@@ -294,6 +294,33 @@ static void test_deferred_limit(void) {
 }
 
 int main(void) {
+    {
+        adaptive_input_t *cancel_queue=adaptive_input_create(16000,8000,PACKET_CAPACITY);
+        assert(cancel_queue);void *leases[8];size_t received_size;
+        for(unsigned i=0;i<8;++i)
+            assert(adaptive_input_acquire(cancel_queue,&leases[i],PACKET_CAPACITY,0)==pdTRUE);
+        adaptive_input_set_limit(cancel_queue,4);
+        for(unsigned i=4;i<8;++i)assert(adaptive_input_cancel(cancel_queue,leases[i]));
+        assert(adaptive_input_stats(cancel_queue).resident==4);
+        for(unsigned i=0;i<4;++i) {
+            assert(!adaptive_input_return(cancel_queue,leases[i])); // Still WRITING.
+            assert(adaptive_input_commit(cancel_queue,leases[i])==pdTRUE);
+            assert(!adaptive_input_cancel(cancel_queue,leases[i])); // READY.
+        }
+        for(unsigned i=0;i<4;++i) {
+            void *p=adaptive_input_receive(cancel_queue,&received_size,0);
+            assert(p==leases[i] && received_size==PACKET_CAPACITY);
+            assert(!adaptive_input_cancel(cancel_queue,p)); // READING.
+            assert(adaptive_input_return(cancel_queue,p));
+        }
+        assert(adaptive_input_acquire(cancel_queue,&leases[0],32,0)==pdTRUE);
+        assert(adaptive_input_cancel(cancel_queue,leases[0]));
+        assert(!adaptive_input_cancel(cancel_queue,leases[0])); // IDLE.
+        assert(adaptive_input_commit(cancel_queue,leases[0])==pdFALSE);
+        assert(!adaptive_input_stats(cancel_queue).occupied);
+        assert(!adaptive_input_receive(cancel_queue,&received_size,0));
+        cleanup(cancel_queue);
+    }
     test_retained_baseline();
     test_deferred_limit();
     assert(!adaptive_input_create(1000, 0, PACKET_CAPACITY));
