@@ -1,23 +1,27 @@
 {
   "schema_version": 1,
-  "started_utc": "2026-10-13T14:47:38.6287600Z",
-  "finished_utc": "2026-10-13T14:58:40.3266620Z",
+  "started_utc": "2026-10-13T15:33:05.6168175Z",
+  "finished_utc": "2026-10-13T15:44:06.5114776Z",
   "passed": true,
   "automatic_profile": "host_machine_qemu",
   "all_functionality_verified": false,
-  "source_sha256": "93872cddca130376c11d22e9b67da6b282646dbdc8bbeac82e5e28b90c1c02d6",
-  "app_sha256": "46a94eccd9d90b2fc98e2d7aa9c1926c658d3d5d39ed2cda591be4311677ecdd",
+  "source_sha256": "7a63db9d80d8bbfbccb8a3a92fde6e9c18f88afc3db02b2c31156bca3b26d4fe",
+  "app_sha256": "3c60563a3d759d3973dd92b52d4a8f5fedd70ca00346214ed54ec8e61b7f2c78",
   "test_inputs": [
     {
       "sha256": "c9187b43a2c83c8c8a433343c4a10026ee630c5a656773cd362e7b51a3a3e6dc",
       "file": "Small_TV/src/tests/artifact_test.py"
     },
     {
+      "sha256": "e82766a5b4eab35605d25c63095445fa4c1ada1b2833a50638c54e293f50ea19",
+      "file": "Small_TV/src/tests/backlight_oracle.py"
+    },
+    {
       "sha256": "f36fd95973f2183287daa026eb2504501bd497d13561718a6acee3aaab9d5d09",
       "file": "Small_TV/src/tests/classic_oracle.py"
     },
     {
-      "sha256": "63d9a99111dacebdaabf964bae6f65f4351954cdc2de99bac61936a4b96551e7",
+      "sha256": "d58c6efd78e7a7d19ed8574cd2da7bed831072741ab28f67cd2c7a2111f6cc0a",
       "file": "Small_TV/src/tests/control_oracle.py"
     },
     {
@@ -41,11 +45,11 @@
       "file": "Small_TV/src/tests/oracle-requirements.txt"
     },
     {
-      "sha256": "1127b663ae93a2e64c614ad42188dcdf8db4893c4c43bfc7d4a9f9105af96e51",
+      "sha256": "cf6922933422988bfa85741d32482e075e8c3f71db31ac9833955857830db3af",
       "file": "Small_TV/src/tests/platform_test.c"
     },
     {
-      "sha256": "94ecfbf24f633e7322df36bd9c6cb2e88ca60673e7839d4177f1356fae8336c7",
+      "sha256": "fbdb6a290232718a517a48f4da622a6e4daf594f0d8f3ed004eb5813b3a2bf46",
       "file": "Small_TV/src/tests/publish-report.py"
     },
     {
@@ -423,7 +427,6 @@
     ]
   },
   "platform": {
-    "passed": true,
     "cases": [
       {
         "case": "wifi_setup",
@@ -478,7 +481,7 @@
       {
         "case": "backlight_schedule",
         "passed": true,
-        "checks": 138250
+        "checks": 138257
       },
       {
         "case": "display_protocol_clipping",
@@ -506,7 +509,8 @@
         "checks": 227
       }
     ],
-    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation."
+    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation.",
+    "passed": true
   },
   "frontend": {
     "passed": true,
@@ -578,8 +582,8 @@
     "cases": 6,
     "failures": 0,
     "errors": 0,
-    "source_sha256": "93872cddca130376c11d22e9b67da6b282646dbdc8bbeac82e5e28b90c1c02d6",
-    "app_sha256": "46a94eccd9d90b2fc98e2d7aa9c1926c658d3d5d39ed2cda591be4311677ecdd",
+    "source_sha256": "7a63db9d80d8bbfbccb8a3a92fde6e9c18f88afc3db02b2c31156bca3b26d4fe",
+    "app_sha256": "3c60563a3d759d3973dd92b52d4a8f5fedd70ca00346214ed54ec8e61b7f2c78",
     "factory_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
   },
   "machine": {
@@ -587,8 +591,8 @@
     "literal_factory_pixels_equal": false,
     "renderer_cases": 316,
     "geometry_checks": 4,
-    "source_sha256": "93872cddca130376c11d22e9b67da6b282646dbdc8bbeac82e5e28b90c1c02d6",
-    "native_elf_sha256": "76d9678faa6b18f98556ce43800aaaca43dcc292206e4906fa12b745355802ee",
+    "source_sha256": "7a63db9d80d8bbfbccb8a3a92fde6e9c18f88afc3db02b2c31156bca3b26d4fe",
+    "native_elf_sha256": "6c55baf54a83ea188a92f34deb3620f1a4bd2f21b22f6c5ee4f749677c4872ae",
     "approved_fixes": {
       "simple-sunday-standard-tm-wday": "Display Sun for standard tm_wday 0; factory 0 repeats the date, while factory 7 draws Sun",
       "analog-perpendicular-stroke-offsets": "Use cos/sin for x/y after atan2+pi/2; the original sin/cos collapses axis-aligned thick strokes"
@@ -635,8 +639,481 @@
       "passed": true,
       "present_mask": 31
     },
-    "scope": "Exact machine-code timer/slideshow control transitions; output boundaries adapted; task scheduling and pixel decoding unverified here",
-    "simple_event_frames": 60
+    "scope": "Exact machine-code timer/slideshow control transitions and LEDC initialization/schedule traces; output boundaries adapted; task scheduling, electrical PWM and pixel decoding unverified here",
+    "simple_event_frames": 60,
+    "backlight": {
+      "passed": true,
+      "initialization": {
+        "factory": [
+          [
+            "timer",
+            0,
+            13,
+            0,
+            1000,
+            0
+          ],
+          [
+            "channel",
+            18,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "set",
+            0,
+            0,
+            819
+          ],
+          [
+            "update",
+            0,
+            0
+          ]
+        ],
+        "native": [
+          [
+            "timer",
+            0,
+            13,
+            0,
+            1000,
+            0
+          ],
+          [
+            "channel",
+            18,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            "set",
+            0,
+            0,
+            819
+          ],
+          [
+            "update",
+            0,
+            0
+          ]
+        ],
+        "passed": true
+      },
+      "direct_levels": 1001,
+      "comparisons": 144246,
+      "schedules": [
+        {
+          "start": 18,
+          "stop": 5,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 18,
+          "stop": 6,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 18,
+          "stop": 7,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 18,
+          "stop": 8,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 18,
+          "stop": 9,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 18,
+          "stop": 10,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 18,
+          "stop": 11,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 18,
+          "stop": 12,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 19,
+          "stop": 5,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 19,
+          "stop": 6,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 19,
+          "stop": 7,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 19,
+          "stop": 8,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 19,
+          "stop": 9,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 19,
+          "stop": 10,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 19,
+          "stop": 11,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 19,
+          "stop": 12,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 20,
+          "stop": 5,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 20,
+          "stop": 6,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 20,
+          "stop": 7,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 20,
+          "stop": 8,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 20,
+          "stop": 9,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 20,
+          "stop": 10,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 20,
+          "stop": 11,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 20,
+          "stop": 12,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 21,
+          "stop": 5,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 21,
+          "stop": 6,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 21,
+          "stop": 7,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 21,
+          "stop": 8,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 21,
+          "stop": 9,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 21,
+          "stop": 10,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 21,
+          "stop": 11,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 21,
+          "stop": 12,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 22,
+          "stop": 5,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 22,
+          "stop": 6,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 22,
+          "stop": 7,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 22,
+          "stop": 8,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 22,
+          "stop": 9,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 22,
+          "stop": 10,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 22,
+          "stop": 11,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 22,
+          "stop": 12,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 23,
+          "stop": 5,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 23,
+          "stop": 6,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 23,
+          "stop": 7,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 23,
+          "stop": 8,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 23,
+          "stop": 9,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 23,
+          "stop": 10,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 23,
+          "stop": 11,
+          "calls": 2880,
+          "passed": true
+        },
+        {
+          "start": 23,
+          "stop": 12,
+          "calls": 2880,
+          "passed": true
+        }
+      ],
+      "guards": [
+        {
+          "input": 1001,
+          "passed": true
+        },
+        {
+          "input": 2000,
+          "passed": true
+        },
+        {
+          "input": 4294967295,
+          "passed": true
+        }
+      ],
+      "photo_restore": [
+        {
+          "configured_level": 0,
+          "literal_factory_duty": 0,
+          "native_duty": 0,
+          "factory": [],
+          "native": [],
+          "passed": true
+        },
+        {
+          "configured_level": 1,
+          "literal_factory_duty": 0,
+          "native_duty": 8,
+          "factory": [],
+          "native": [
+            [
+              "set",
+              0,
+              0,
+              8
+            ],
+            [
+              "update",
+              0,
+              0
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "configured_level": 100,
+          "literal_factory_duty": 0,
+          "native_duty": 819,
+          "factory": [],
+          "native": [
+            [
+              "set",
+              0,
+              0,
+              819
+            ],
+            [
+              "update",
+              0,
+              0
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "configured_level": 500,
+          "literal_factory_duty": 0,
+          "native_duty": 4095,
+          "factory": [],
+          "native": [
+            [
+              "set",
+              0,
+              0,
+              4095
+            ],
+            [
+              "update",
+              0,
+              0
+            ]
+          ],
+          "passed": true
+        },
+        {
+          "configured_level": 1000,
+          "literal_factory_duty": 0,
+          "native_duty": 8191,
+          "factory": [],
+          "native": [
+            [
+              "set",
+              0,
+              0,
+              8191
+            ],
+            [
+              "update",
+              0,
+              0
+            ]
+          ],
+          "passed": true
+        }
+      ],
+      "first_failures": [],
+      "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+      "native_elf_sha256": "6c55baf54a83ea188a92f34deb3620f1a4bd2f21b22f6c5ee4f749677c4872ae",
+      "approved_fix": "photo fade must restore configured duty even when the original schedule cache did not change",
+      "scope": "Executed LEDC initialization, duty arithmetic and conditional schedule call traces; successful driver boundaries are captured. RF, electrical PWM and SDK locking are outside scope."
+    }
   },
   "machine_classic": {
     "passed": true,
@@ -681,14 +1158,14 @@
     "profile_sha256": "ad88920762bd2199abb91ba0eed69d3ed62e7e381a10e228f49457b5ff84abb4",
     "scope": "Real firmware boot/reset/DHCP/SNTP, localhost HTTP setup and synthetic weather HTTP/value/LCD checks. Whole-frame scene similarity is measured, not a parity gate. No physical hardware or Internet weather service.",
     "helper_sha256": {
-      "small_tv_vm.py": "e57226a8afca926022132a81c618f4012a42fc691d0425313e2c3ab376309fb4",
-      "small_tv_network.py": "8ecfe92031f4f9bfd6713b5acf0f1b7de82f4fc8ea639544166ea3ef1047225e",
-      "small_tv_web.py": "f29bf122fdfa65605a5c3cba477dcd3583748700f9d8c98de7ee734fa9073335",
-      "small_tv_http_test.py": "d545d0b9a5abaed1f4dfa50761e1caeadf7fb7e5680ef1304033d60d12094cfd"
+      "small_tv_vm.py": "919a9d03d8321d370e03ed844f1b99dcb5c57bf3fef5f6614e23c5702f9d0cb7",
+      "small_tv_network.py": "a52db718c8131c06b4b41f1c3a1471862fae65798594ef21f62dcea649846ab9",
+      "small_tv_web.py": "b4e57f78e2b8b46ed566497080690731cbb7501a92251ed11897fb692f3bc180",
+      "small_tv_http_test.py": "6432f640705184f3b725f4f33ed783b1e6dce4b955076363dfb580bc9b0ae58f"
     },
     "http_initial_setup": {
       "passed": true,
-      "tested_at_utc": "2026-10-13T16:51:26.754258+02:00",
+      "tested_at_utc": "2026-10-13T17:36:55.922574+02:00",
       "flows": {
         "original": {
           "firmware": "original",
@@ -766,31 +1243,31 @@
           "sources": {
             "images": [
               {
-                "file": "bootloader.bin",
-                "offset": "0x0",
                 "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+                "offset": "0x0",
+                "file": "bootloader.bin",
                 "bytes": 19248
               },
               {
-                "file": "partition-table.bin",
-                "offset": "0x8000",
                 "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                "offset": "0x8000",
+                "file": "partition-table.bin",
                 "bytes": 3072
               },
               {
-                "file": "app.bin",
+                "sha256": "3c60563a3d759d3973dd92b52d4a8f5fedd70ca00346214ed54ec8e61b7f2c78",
                 "offset": "0x10000",
-                "sha256": "46a94eccd9d90b2fc98e2d7aa9c1926c658d3d5d39ed2cda591be4311677ecdd",
-                "bytes": 1021440
+                "file": "app.bin",
+                "bytes": 1021472
               },
               {
-                "file": "assets.bin",
-                "offset": "0x200000",
                 "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+                "offset": "0x200000",
+                "file": "assets.bin",
                 "bytes": 1994752
               }
             ],
-            "source_sha256": "93872cddca130376c11d22e9b67da6b282646dbdc8bbeac82e5e28b90c1c02d6"
+            "source_sha256": "7a63db9d80d8bbfbccb8a3a92fde6e9c18f88afc3db02b2c31156bca3b26d4fe"
           },
           "web_endpoints": [
             {
@@ -845,7 +1322,7 @@
     },
     "weather_http": {
       "passed": true,
-      "tested_at_utc": "2026-10-13T16:52:31.461046+02:00",
+      "tested_at_utc": "2026-10-13T17:37:58.585447+02:00",
       "scope": "Real guest DNS/TCP/HTTP via isolated loopback fixture; parsed synthetic weather and stable LCD regions. No Internet service, physical RF or full-program equivalence.",
       "native_layout": {
         "address": 1070266696,
@@ -867,7 +1344,7 @@
           "generation": 224
         },
         "request_state_address": 1070282680,
-        "elf_sha256": "76d9678faa6b18f98556ce43800aaaca43dcc292206e4906fa12b745355802ee"
+        "elf_sha256": "6c55baf54a83ea188a92f34deb3620f1a4bd2f21b22f6c5ee4f749677c4872ae"
       },
       "flows": {
         "original": {
@@ -1021,31 +1498,31 @@
           "sources": {
             "images": [
               {
-                "file": "bootloader.bin",
-                "offset": "0x0",
                 "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+                "offset": "0x0",
+                "file": "bootloader.bin",
                 "bytes": 19248
               },
               {
-                "file": "partition-table.bin",
-                "offset": "0x8000",
                 "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                "offset": "0x8000",
+                "file": "partition-table.bin",
                 "bytes": 3072
               },
               {
-                "file": "app.bin",
+                "sha256": "3c60563a3d759d3973dd92b52d4a8f5fedd70ca00346214ed54ec8e61b7f2c78",
                 "offset": "0x10000",
-                "sha256": "46a94eccd9d90b2fc98e2d7aa9c1926c658d3d5d39ed2cda591be4311677ecdd",
-                "bytes": 1021440
+                "file": "app.bin",
+                "bytes": 1021472
               },
               {
-                "file": "assets.bin",
-                "offset": "0x200000",
                 "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+                "offset": "0x200000",
+                "file": "assets.bin",
                 "bytes": 1994752
               }
             ],
-            "source_sha256": "93872cddca130376c11d22e9b67da6b282646dbdc8bbeac82e5e28b90c1c02d6"
+            "source_sha256": "7a63db9d80d8bbfbccb8a3a92fde6e9c18f88afc3db02b2c31156bca3b26d4fe"
           },
           "weather_services": true,
           "native_rejects_non_200_json": true,
@@ -1214,12 +1691,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.580412
+            "virtual_seconds": 46.470433
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.580767
+            "virtual_seconds": 46.464182
           }
         },
         "equal_pixels_min": 1.0,
@@ -1231,16 +1708,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.910958
+            "virtual_seconds": 46.880105
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.409609
+            "virtual_seconds": 46.360381
           }
         },
-        "equal_pixels_min": 0.9761284722222222,
-        "equal_pixels_max": 0.9968229166666667
+        "equal_pixels_min": 0.9768923611111111,
+        "equal_pixels_max": 0.9833506944444445
       },
       "simple": {
         "passed": true,
@@ -1248,16 +1725,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.600944
+            "virtual_seconds": 46.980504
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.649925
+            "virtual_seconds": 46.530461
           }
         },
-        "equal_pixels_min": 0.9973611111111111,
-        "equal_pixels_max": 1.0
+        "equal_pixels_min": 0.9830902777777778,
+        "equal_pixels_max": 0.9857291666666667
       },
       "photo": {
         "passed": true,
@@ -1265,12 +1742,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.670542
+            "virtual_seconds": 46.900559
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.765139
+            "virtual_seconds": 46.723896
           }
         },
         "equal_pixels_min": 0.0003298611111111111,
@@ -1282,24 +1759,24 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.360149
+            "virtual_seconds": 46.550294
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.31496
+            "virtual_seconds": 46.209199
           }
         },
-        "equal_pixels_min": 0.9841145833333333,
-        "equal_pixels_max": 0.9903298611111111
+        "equal_pixels_min": 0.9821006944444445,
+        "equal_pixels_max": 0.9882986111111111
       }
     }
   },
   "not_run": [
     {
+      "reason": "Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately",
       "status": "not_run",
-      "name": "hardware_browser_soak",
-      "reason": "Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately"
+      "name": "hardware_browser_soak"
     }
   ]
 }
