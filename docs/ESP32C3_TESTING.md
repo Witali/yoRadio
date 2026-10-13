@@ -1651,6 +1651,20 @@ uses existing MP3/AAC fixtures, creates additional synthetic MP3 files under
 `.build/c3-stream-frames` and verifies mixed-family byte replay. It does not
 install firmware or exercise decoder/PCM queue transitions.
 
+For the experimental `CONFIG_YORADIO_FRAME_ROUTER` path, run
+`tests/run-stream-encoded-router.py` and `tests/run-codec-segment-drain.py`.
+The physical `tools/esp32c3_tests/stream_probe.py` runner accepts
+`--codec-transitions` for MP3 → HE-AAC → MP3 and AAC-LC → MP3 → HE-AACv2.
+Use `--case-filter mp3-he-mp3 --case-filter aac-mp3-hev2` to isolate these
+two cases, or combine with `--transitions` for the wider regression. Supply
+the same board/host/candidate/restore/output arguments as for prefix control.
+It verifies format order, EOF, complete server delivery, reset/allocation/
+watchdog and available output counters, then restores the original app and
+checks private settings in memory. These diagnostics do not measure analog
+audio quality or prove sample-exact PCM boundaries and every possible underrun.
+The general `run.py --suite transitions` also includes the mixed-family fixtures;
+its mixed streams use AUTO, while existing AAC-only streams retain AAC hints.
+
 ## Bounded WebUI transfers and OTA reboot
 
 Run `python -B -X utf8 tests/run-esp32c3-web-memory.py` for the actual C3

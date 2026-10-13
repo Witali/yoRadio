@@ -22,6 +22,8 @@ def main():
     parser.add_argument('--tls-key', type=Path)
     parser.add_argument('--tls-ca', type=Path)
     parser.add_argument('--transitions', action='store_true')
+    parser.add_argument('--codec-transitions', action='store_true',
+                        help='Include real MP3/AAC family changes in one connection')
     parser.add_argument('--case-filter', action='append')
     args = parser.parse_args()
     secure = args.tls_cert is not None
@@ -79,6 +81,9 @@ def main():
         specs[name] = dict(data=data, seconds=.1, codec='aac', mime=None, sha256=sha(data))
     if args.transitions:
         for name in ('changing','implicit-sbr'):
+            specs[name]=dict(available[name],mime=None)
+    if args.codec_transitions:
+        for name in ('mp3-he-mp3','aac-mp3-hev2'):
             specs[name]=dict(available[name],mime=None)
     if args.case_filter:
         specs={name:spec for name,spec in specs.items() if any(s in name for s in args.case_filter)}
@@ -157,6 +162,13 @@ def main():
                     save(); print(name,row['result'],flush=True)
                     board.stop(); time.sleep(.5)
             report['server']=server.events
+            for row in report['cases']:
+                if row['result']=='PASS' and row['name'] not in negative:
+                    expected_bytes=len(specs[row['name']]['data'])
+                    complete=any(e.get('fixture')==row['name'] and e.get('complete') is True
+                                 and e.get('sent')==expected_bytes for e in server.events)
+                    if not complete:
+                        row['result']='FAIL'; row['check']='Server did not complete the expected audio body'
             if secure:
                 for row in report['cases']:
                     events=[e for e in server.events if e.get('fixture')==row['name']]

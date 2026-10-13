@@ -110,7 +110,7 @@ class Suite:
             self.board.stop()
 
     def transition(self, name, expected):
-        self.start(name, hint='aac')
+        self.start(name, hint=self.specs[name]['codec'])
         try:
             samples = self.observe(self.specs[name]['seconds']-1, name)
             check_transitions(samples, [self.specs[n] for n in expected])
