@@ -32,7 +32,83 @@ static void feed(stream_frames_t *s, sink_t *sink, const uint8_t *data, size_t n
     assert(stream_frames_feed(s,data,n,&count,begin,emit,sink)==STREAM_FRAME_MORE);
     assert(count==n);
 }
+
+static void tag_header(uint8_t *p, unsigned version, uint32_t body, bool footer) {
+    memcpy(p,"ID3",3); p[3]=version; p[4]=0; p[5]=footer ? 0x10 : 0;
+    p[6]=(body>>21)&127; p[7]=(body>>14)&127;
+    p[8]=(body>>7)&127; p[9]=body&127;
+}
+
+static void tags(void) {
+    const uint8_t audio[]={0xff,0xf1,0x4c,0x80,0x01,0x9f,0xfc,1,2,3,4,5};
+    uint8_t expected[24]; memcpy(expected,audio,12); memcpy(expected+12,audio,12);
+    for(unsigned version=2;version<=4;++version) {
+        for(unsigned footer=0;footer<=(version==4);++footer) {
+            uint8_t tag[32]; tag_header(tag,version,12,footer);
+            memcpy(tag+10,audio,12); // Valid sync in tag must never reach decoder.
+            if(footer) {memcpy(tag+22,tag,10);memcpy(tag+22,"3DI",3);}
+            size_t length=22+10*footer;
+            uint8_t input[120]; size_t size=0;
+            memcpy(input+size,tag,length);size+=length;
+            memcpy(input+size,audio,12);size+=12;
+            memcpy(input+size,tag,length);size+=length;
+            memcpy(input+size,audio,12);size+=12;
+            memcpy(input+size,tag,length);size+=length;
+            for(size_t split=0;split<=size+1;++split) {
+                stream_frames_t state={0};sink_t sink={.expected=expected,.size=24};
+                if(split<=size) {
+                    feed(&state,&sink,input,split);feed(&state,&sink,input+split,size-split);
+                } else for(size_t i=0;i<size;++i) feed(&state,&sink,input+i,1);
+                assert(stream_frames_complete(&state) && sink.frames==2 && sink.delivered==24);
+            }
+            for(size_t end=1;end<length;++end) {
+                stream_frames_t state={0};sink_t sink={0};
+                feed(&state,&sink,tag,end);
+                assert(!stream_frames_complete(&state) && !sink.frames && !sink.delivered);
+            }
+        }
+    }
+    // Reject malformed envelopes and oversize tags, with sticky failures.
+    for(unsigned mutation=0;mutation<10;++mutation) {
+        uint8_t tag[10];tag_header(tag,4,0,false);
+        if(mutation==0) tag[3]=5;
+        if(mutation==1) tag[4]=255;
+        if(mutation==2) tag[5]=1;
+        if(mutation>=3 && mutation<=6) tag[mutation+3]=128;
+        if(mutation==7) {tag[3]=2;tag[5]=0x20;}
+        if(mutation==8) {tag[3]=3;tag[5]=0x10;}
+        if(mutation==9) tag_header(tag,4,STREAM_ID3_RUN_BYTES,false);
+        stream_frames_t state={0};sink_t sink={0};size_t count;
+        assert(stream_frames_feed(&state,tag,10,&count,begin,emit,&sink)==STREAM_FRAME_INVALID);
+        assert(count==10 && !sink.frames && !sink.delivered);
+        assert(stream_frames_feed(&state,audio,12,&count,begin,emit,&sink)==STREAM_FRAME_INVALID && !count);
+    }
+    // Consume a full resource-bound run using a small reusable chunk. A second
+    // tag exceeds the run bound, but an intervening audio frame resets it.
+    uint8_t tag[10],chunk[257]={0};
+    tag_header(tag,4,STREAM_ID3_RUN_BYTES-10,false);
+    stream_frames_t state={0};sink_t sink={.expected=audio,.size=12};
+    feed(&state,&sink,tag,10);
+    while(state.skip) feed(&state,&sink,chunk,state.skip<sizeof(chunk)?state.skip:sizeof(chunk));
+    assert(stream_frames_complete(&state));
+    stream_frames_t limited=state; size_t count;
+    uint8_t empty[10];tag_header(empty,4,0,false);
+    assert(stream_frames_feed(&limited,empty,10,&count,begin,emit,&sink)==STREAM_FRAME_INVALID);
+    feed(&state,&sink,audio,12);assert(state.tag_bytes==0);
+    feed(&state,&sink,tag,10);
+    while(state.skip) feed(&state,&sink,chunk,state.skip<sizeof(chunk)?state.skip:sizeof(chunk));
+    assert(stream_frames_complete(&state) && sink.frames==1 && sink.delivered==12);
+    // Adjacent empty tags and ID3-looking bytes inside an audio payload.
+    state=(stream_frames_t){0};sink=(sink_t){0};
+    for(unsigned i=0;i<100;++i) feed(&state,&sink,empty,10);
+    assert(stream_frames_complete(&state) && state.tag_bytes==1000);
+    uint8_t bait[12];memcpy(bait,audio,12);memcpy(bait+7,"ID3",3);
+    sink=(sink_t){.expected=bait,.size=12};feed(&state,&sink,bait,12);
+    assert(stream_frames_complete(&state) && sink.frames==1 && sink.delivered==12);
+    puts("ID3 PASS splits/truncation/versions/footer/bounds/payload isolation");
+}
 static void unit(void) {
+    tags();
     stream_frame_info_t info;
     const uint8_t mp3[]={0xff,0xfb,0x90,0};
     const uint8_t mpeg2[]={0xff,0xf3,0x80,0xc0};
@@ -111,6 +187,28 @@ int main(int argc,char **argv) {
         }
         assert(stream_frames_complete(&state) && sink.delivered==(size_t)size);
         printf("CORPUS PASS chunk=%zu frames=%zu bytes=%zu\n",chunks[run],sink.frames,sink.delivered);
+        // Repeat the real compressed payload with a tag before every frame.
+        // Emit must reproduce exactly the original bytes, including transitions.
+        state=(stream_frames_t){0};sink=(sink_t){.expected=data,.size=(size_t)size};
+        for(size_t offset=0;offset<(size_t)size;) {
+            stream_frame_info_t info;
+            assert(stream_frame_header(data+offset,(size_t)size-offset,&info)==STREAM_FRAME_READY);
+            uint8_t tag[27];tag_header(tag,4,7,true);
+            memcpy(tag+10,"ID3\xff\xfb\x90\x00",7);
+            memcpy(tag+17,tag,10);memcpy(tag+17,"3DI",3);
+            for(size_t pos=0;pos<sizeof(tag);) {
+                size_t count=sizeof(tag)-pos;if(count>chunks[run])count=chunks[run];
+                feed(&state,&sink,tag+pos,count);pos+=count;
+            }
+            assert(info.bytes<=(size_t)size-offset);
+            for(size_t pos=0;pos<info.bytes;) {
+                size_t count=info.bytes-pos;if(count>chunks[run])count=chunks[run];
+                feed(&state,&sink,data+offset+pos,count);pos+=count;
+            }
+            offset+=info.bytes;
+        }
+        assert(stream_frames_complete(&state) && sink.delivered==(size_t)size);
+        printf("TAGGED CORPUS PASS chunk=%zu frames=%zu bytes=%zu\n",chunks[run],sink.frames,sink.delivered);
     }
     free(data);return 0;
 }

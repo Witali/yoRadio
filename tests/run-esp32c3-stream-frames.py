@@ -41,7 +41,7 @@ def main():
                   ffprobe=run(['ffprobe', '-version']).splitlines()[0],
                   ffmpeg=run(['ffmpeg', '-version']).splitlines()[0], cases=[],
                   source_sha256={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
-                                 for p in (source, header)})
+                                 for p in (source, header, header.parent/'stream_tags.h')})
     corpus = []
     folder = ROOT / 'tests/fixtures/esp32c3_calibration'
     for spec in json.loads((folder/'manifest.json').read_text())['fixtures']:
@@ -81,7 +81,8 @@ def main():
         assert sum(r[1] for r in rows)==len(data)-skip
         references.append((data[skip:],rows))
         report['cases'].append(dict(name=path.name,sha256=digest,frames=len(rows),
-            bytes=len(data)-skip,chunk_cases=3,reference='ffprobe pos/size',result='PASS',
+            bytes=len(data)-skip,chunk_cases=3,tagged_chunk_cases=3,
+            reference='ffprobe pos/size; inter-frame tags reproduce original bytes',result='PASS',
             generation_command=command))
         print(path.name, 'PASS', len(rows), 'frames', flush=True)
     # Independent oracle is the concatenation of the individual ffprobe packet
@@ -95,7 +96,7 @@ def main():
     output=linux([native(binary),native(path)])
     actual=[list(map(int,line.split()[1:])) for line in output.splitlines() if line.startswith('FRAME ')]
     assert actual==expected
-    report['mixed']=dict(frames=len(actual),bytes=len(mixed),chunk_cases=3,
+    report['mixed']=dict(frames=len(actual),bytes=len(mixed),chunk_cases=3,tagged_chunk_cases=3,
         sha256=hashlib.sha256(mixed).hexdigest(),result='PASS',
         reference='concatenated per-file ffprobe boundaries; no decoder or queue test')
     (OUT/'results.json').write_text(json.dumps(report,indent=2)+'\n')

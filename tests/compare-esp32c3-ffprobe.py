@@ -71,7 +71,7 @@ def main():
     report=dict(ffprobe=execute(['ffprobe','-version']).stdout.splitlines()[0],cases=[],
         scope='Current C headers versus complete ffprobe demux/parser pipeline; not equivalent APIs',
         source_sha256={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
-            for p in (source,main/'stream_probe.h',main/'stream_frames.h')})
+            for p in (source,main/'stream_probe.h',main/'stream_frames.h',main/'stream_tags.h')})
     for name,data in cases.items():
         path=OUT/name;path.write_bytes(data) # No filename-extension format hint.
         ours=json.loads(linux([native(binary),native(path)]))

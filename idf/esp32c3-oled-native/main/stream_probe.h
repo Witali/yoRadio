@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include "stream_tags.h"
 
 // Initial elementary-stream/container probe, after HTTP/ICY removal.
 // This does not parse frames of an already selected codec or switch codecs.
@@ -12,9 +13,9 @@ enum {
     STREAM_PROBE_ADTS_HEADER_BYTES = 7,
     STREAM_PROBE_FLAC_PREFIX_BYTES = 8,
     STREAM_PROBE_OGG_PREFIX_BYTES = 5,
-    STREAM_PROBE_HEADER_BYTES = 10,
+    STREAM_PROBE_HEADER_BYTES = STREAM_ID3_HEADER_BYTES,
     STREAM_PROBE_SEARCH_BYTES = 4096,
-    STREAM_PROBE_TAG_BYTES = 1024 * 1024,
+    STREAM_PROBE_TAG_BYTES = STREAM_ID3_RUN_BYTES,
     STREAM_PROBE_TIMEOUT_MS = 10000,
 };
 typedef enum {
@@ -98,25 +99,14 @@ static inline stream_probe_result_t stream_probe_feed(stream_probe_t *probe,
         while (probe->used && probe->result == STREAM_PROBE_MORE) {
             if (probe->used >= 3 && memcmp(probe->header, "ID3", 3) == 0) {
                 if (probe->used < STREAM_PROBE_HEADER_BYTES) break;
-                const uint8_t *p = probe->header;
-                // ID3v2.2/2.3/2.4 sizes are synchsafe and exclude the header.
-                // A v2.4 footer, when flagged, adds ten further bytes.
-                unsigned reserved_flags = p[3] == 2 ? 0x3f : p[3] == 3 ? 0x1f : 0x0f;
-                if (p[3] < 2 || p[3] > 4 || p[4] == 0xff ||
-                    (p[5] & reserved_flags) || ((p[6] | p[7] | p[8] | p[9]) & 0x80)) {
-                    probe->result = STREAM_PROBE_INVALID;
-                    break;
-                }
-                uint32_t body = ((uint32_t)p[6] << 21) | ((uint32_t)p[7] << 14) |
-                                ((uint32_t)p[8] << 7) | p[9];
-                uint32_t tail = p[3] == 4 && (p[5] & 0x10) ? 10U : 0U;
-                uint32_t total = STREAM_PROBE_HEADER_BYTES + body + tail;
-                if (total > STREAM_PROBE_TAG_BYTES - probe->tag_bytes) {
+                uint32_t total;
+                if (!stream_id3_size(probe->header, &total) ||
+                    total > STREAM_PROBE_TAG_BYTES - probe->tag_bytes) {
                     probe->result = STREAM_PROBE_INVALID;
                     break;
                 }
                 probe->tag_bytes += total;
-                probe->skip = body + tail;
+                probe->skip = total - STREAM_PROBE_HEADER_BYTES;
                 probe->used = 0;
                 break;
             }

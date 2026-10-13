@@ -328,6 +328,46 @@ frames need separate handling. Retain reference tests, but add decoded-PCM
 and live transition checks. No upstream code was copied into firmware;
 downloaded LGPL source remains reference material under `.build`.
 
+## Follow-up: incremental inter-frame ID3
+
+The experimental walker now skips ID3v2.2/2.3/2.4 envelopes at known frame
+boundaries. A shared `stream_tags.h` validates the header version, reserved
+flags and synchsafe size for both initial probing and the walker. The optional
+v2.4 footer adds ten bytes. Tag contents, extended headers, CRC and footer
+contents are not validated or interpreted; their encoded bytes are skipped.
+This follows the size rules in [ID3v2.4 section 3.1](https://id3.org/id3v2.4.0-structure),
+[ID3v2.3](https://id3.org/id3v2.3.0) and [ID3v2.2](https://id3.org/id3v2-00).
+
+No tag-body allocation or input pointer retention is needed. On the sanitizer
+host the walker state grows from 16 to 28 bytes; initial-probe state remains
+40 bytes. The application limit of 1 MiB counts consecutive tags including
+headers/footers and resets after an audio frame. It is not a lifetime quota
+or the ID3 format's maximum. Partial header/body/footer keeps EOF incomplete.
+An audio-looking header inside a tag does not trigger a codec change, and
+an ID3-looking sequence inside audio is delivered unchanged.
+
+Validation, saved in [id3-boundaries-01](../tests/results/esp32c3-stream-probe-20261013/id3-boundaries-01/):
+
+- ASan/UBSan unit checks cover every two-part split, one-byte input, all three
+  supported versions, optional footer, every tag truncation, malformed flags
+  and sizes, sticky errors, adjacent tags, the exact resource bound and its
+  reset after an audio frame.
+- The 26-file corpus contains 1,310 audio frames. Reads of 1, 7 and 2,048 bytes
+  pass both clean and with a tag before every frame. Emitted bytes equal the
+  original compressed data, including AAC-LC, HE-AAC and HE-AACv2 fixtures.
+- The 1,457-frame mixed MP3/AAC sequence also passes clean and tagged, at all
+  three read sizes. Existing ffprobe packet-boundary comparisons still pass.
+- The production initial probe/send regression passes all 66 corpus cases.
+- Repeating the nine-case ffprobe audit changes the inter-frame ID3 case from
+  rejection after one frame to all 15 frames / 5,121 audio bytes, complete.
+  The original audit above remains historical evidence; its other recovery,
+  false-sync, free-format and ID3v1 limitations remain unresolved.
+
+This is preparation for the live queue adapter. The walker is still not called
+by production audio_service; these results do not establish live codec changes
+or board playback qualification. The production initial probe only shares the
+same envelope-size calculation, preserving its previous behavior.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)

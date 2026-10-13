@@ -3,9 +3,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "stream_tags.h"
 
 // Experimental boundary walker. Not yet connected to audio_service.
-// Input starts at a known elementary-stream frame boundary, after ID3/ICY.
+// Input starts at a known elementary-stream frame/tag boundary, after ICY.
 // Never search a frame payload for sync words. AAC rates/channels here describe
 // the ADTS core; decoded SBR/PS/PCE metadata remains authoritative for the UI.
 enum {
@@ -106,9 +107,11 @@ static inline stream_frame_result_t stream_frame_header(const uint8_t *p,
 typedef bool (*stream_frame_begin_fn)(void *, const stream_frame_info_t *);
 typedef bool (*stream_frame_data_fn)(void *, const uint8_t *, size_t);
 typedef struct {
-    uint8_t header[STREAM_FRAME_ADTS_FIXED_BYTES];
+    uint8_t header[STREAM_ID3_HEADER_BYTES];
     uint8_t used;
     uint16_t remaining;
+    uint32_t skip;
+    uint32_t tag_bytes; // Consecutive metadata only; reset at each audio frame.
     stream_frame_result_t result;
 } stream_frames_t;
 
@@ -119,6 +122,13 @@ static inline stream_frame_result_t stream_frames_feed(stream_frames_t *s,
     // Errors are sticky. Reset explicitly before retrying a different stream.
     if (s->result != STREAM_FRAME_MORE) return s->result;
     while (*consumed < size) {
+        if (s->skip) {
+            size_t count = size - *consumed;
+            if (count > s->skip) count = s->skip;
+            *consumed += count;
+            s->skip -= (uint32_t)count;
+            continue;
+        }
         if (s->remaining) {
             size_t count = size - *consumed;
             if (count > s->remaining) count = s->remaining;
@@ -131,6 +141,19 @@ static inline stream_frame_result_t stream_frames_feed(stream_frames_t *s,
             continue;
         }
         s->header[s->used++] = data[(*consumed)++];
+        if (stream_id3_prefix(s->header, s->used)) {
+            if (s->used < STREAM_ID3_HEADER_BYTES) continue;
+            uint32_t total;
+            if (!stream_id3_size(s->header, &total) ||
+                total > STREAM_ID3_RUN_BYTES - s->tag_bytes) {
+                s->result = STREAM_FRAME_INVALID;
+                break;
+            }
+            s->tag_bytes += total;
+            s->skip = total - STREAM_ID3_HEADER_BYTES;
+            s->used = 0;
+            continue;
+        }
         stream_frame_info_t info;
         stream_frame_result_t result = stream_frame_header(s->header, s->used, &info);
         if (result == STREAM_FRAME_MORE) continue;
@@ -143,11 +166,12 @@ static inline stream_frame_result_t stream_frames_feed(stream_frames_t *s,
             break;
         }
         s->remaining = info.bytes - s->used;
+        s->tag_bytes = 0;
         s->used = 0;
     }
     return s->result;
 }
 
 static inline bool stream_frames_complete(const stream_frames_t *s) {
-    return s->result == STREAM_FRAME_MORE && !s->used && !s->remaining;
+    return s->result == STREAM_FRAME_MORE && !s->used && !s->remaining && !s->skip;
 }

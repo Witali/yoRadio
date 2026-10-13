@@ -52,7 +52,7 @@ def main():
               'corpus': [{'file': path.relative_to(ROOT).as_posix(), 'codec': codec,
                           'sha256': digest, 'cases': 6} for path, codec, digest in fixtures],
               'source_sha256': {name: hashlib.sha256((MAIN/name).read_bytes()).hexdigest()
-                  for name in ('stream_probe.h', 'audio_service.c', 'audio_completion.h')}}
+                  for name in ('stream_probe.h', 'stream_tags.h', 'audio_service.c', 'audio_completion.h')}}
     (OUT / 'results.json').write_text(json.dumps(result, indent=2) + '\n')
     print(output, end='')
 
