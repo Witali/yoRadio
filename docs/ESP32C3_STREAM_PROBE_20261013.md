@@ -264,6 +264,70 @@ Integration work, based on `audio_service.c` ownership paths:
 5. Test both directions on host and hardware, including repeated changes,
    Stop/replacement, EOF, heap recovery and output counters under HTTPS.
 
+## Comparison with ffprobe / FFmpeg 8.1.1
+
+The installed reference is ffprobe 8.1.1 (Gyan full build). Nine upstream
+files were read at tag `n8.1.1`, commit
+`239f2c733de417201d7ad3b3b8b0d9b63285b2b1`; their URLs and byte hashes are
+recorded in the [audit evidence](../tests/results/esp32c3-stream-probe-20261013/ffmpeg-audit-01/).
+ffprobe delegates to demuxers/parsers and, for stream information, decoders.
+Our initial probe and experimental boundary walker are smaller, different
+layers; matching packet boundaries does not imply matching recovery or PCM.
+
+| Area | Upstream behavior | Our status / decision |
+|---|---|---|
+| Frame geometry | MPEG version/rate/bitrate/padding and ADTS length/raw blocks | Matches on the 26-file corpus; preserve this arithmetic |
+| Format confidence | MP3 demux probe scores consecutive frames; seven initial frames earn its high score. AAC uses three. MP3 startup also looks for two compatible headers | Our initial probe trusts one header. Add bounded multi-header confirmation using existing input storage, with explicit short-file/EOF behavior |
+| VBR and parameter changes | MPEG parser comparison mask excludes bitrate/padding; it tracks header confidence separately from parameter publication | Do not mistake changing bitrate/padding for another codec. Do not freeze decoded rate/channels based on initial headers |
+| Recovery | MPEG/AAC parsers scan for sync when alignment is lost; AAC demuxer also handles ID3 between frames | Strict walker currently stops. Add bounded recovery and incremental tag skipping before production integration |
+| HE-AAC metadata | Common AAC parser deliberately avoids treating ADTS rate/channels as decoded output parameters | Preserve our native decoder's SBR/PS/PCE metadata; ADTS alone cannot label HE-AAC output correctly |
+| Free-format MP3 | Low-level header reader returns unresolved length; the higher-level helper and demuxer check do not establish that length | Our distinct FREE_FORMAT result is appropriate. Upstream is not a drop-in solution to full free-format support |
+| Memory | `ff_combine_frame()` grows a buffer with `av_fast_realloc`; MP3 startup requests about 64 KiB of seek-back capacity | Reuse our queue and bounded header state. Do not import FFmpeg's buffering architecture into C3 |
+
+Primary code references:
+[MP3 probing/startup](https://github.com/FFmpeg/FFmpeg/blob/n8.1.1/libavformat/mp3dec.c),
+[MPEG parser](https://github.com/FFmpeg/FFmpeg/blob/n8.1.1/libavcodec/mpegaudio_parser.c),
+[AAC demuxer and inter-frame tags](https://github.com/FFmpeg/FFmpeg/blob/n8.1.1/libavformat/aacdec.c),
+[AAC metadata policy](https://github.com/FFmpeg/FFmpeg/blob/n8.1.1/libavcodec/aac_ac3_parser.c),
+[MPEG header reader](https://github.com/FFmpeg/FFmpeg/blob/n8.1.1/libavcodec/mpegaudiodecheader.c),
+[frame assembly](https://github.com/FFmpeg/FFmpeg/blob/n8.1.1/libavcodec/parser.c).
+
+### Reproduced differences, not a passing qualification matrix
+
+`tests/compare-esp32c3-ffprobe.py` compiles our actual headers under ASan/UBSan
+and compares nine controlled inputs with the full ffprobe pipeline. Inputs
+have no filename-extension hints. No firmware or board changes are involved.
+
+| Input | Our initial probe / strict walker | ffprobe observation |
+|---|---|---|
+| Clean HE-AAC / MP3 | Complete; 15 / 460 frame headers | Same packet counts; 48 kHz stereo |
+| False MP3 header then valid AAC | Initially chooses MP3; walker later rejects | Chooses AAC and reports 15 packets, **but rate/channels remain zero**; not successful decoding evidence |
+| False AAC header then valid MP3 | Initially chooses AAC; walker later rejects | MP3, 460 packets, 48 kHz stereo |
+| ID3 between AAC frames | Walker stops after first frame | All 15 packets and correct HE-AAC parameters |
+| Junk between AAC frames | Walker stops after first frame | Resynchronizes; 15 packets, correct parameters |
+| ID3v1 after MP3 | 460 frames emitted, then walker rejects tail | 460 packets; tail metadata is not audio |
+| AAC payload shortened by three bytes | Explicit incomplete state | Still 15 packets and known parameters; packet count alone is not an integrity check |
+| MP3 with bitrate-index-zero headers | Recognized MP3, explicit unresolved frame length | AUTO fails; forced MP3 reports zero rate/channels and `Header missing` despite exit code zero |
+
+The last case changes only bitrate-index bits in the known 320 kb/s fixture;
+it does not certify all free-format bitstreams. The earlier exploratory run
+used `.bin` names, which allowed ffprobe's unrelated bintext extension fallback;
+the retained final comparison removes extension hints. Tests must check valid
+metadata and decoded output, not just ffprobe's exit code or codec name.
+
+Keep intentional stricter checks: our ADTS validator requires layer zero and
+space for the CRC field when present; the low-level FFmpeg ADTS header reader
+skips the layer field and checks a seven-byte minimum. Our MP3 probe rejects
+reserved emphasis, while FFmpeg's fast header check is more permissive. These
+differences do not justify weakening validation without a real compatibility
+case. CRC verification of payloads is still a separate, unimplemented gate.
+
+Priority: multi-header confidence, inter-frame ID3 and bounded resync, then
+coalesced queue integration and decoder draining. EOF tails and truncated
+frames need separate handling. Retain reference tests, but add decoded-PCM
+and live transition checks. No upstream code was copied into firmware;
+downloaded LGPL source remains reference material under `.build`.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)
