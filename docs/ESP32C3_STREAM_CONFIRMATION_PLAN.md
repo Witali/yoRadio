@@ -557,3 +557,9 @@ Before default enablement: repeat the full physical format matrix (including
 FLAC/Vorbis/Opus and profile/rate changes), cancellation/TLS controls, LC and
 late-SBR memory-pressure cases, and sustained-play/startup behavior. The general
 stream-confirmation gates above remain open. No production qualification yet.
+
+Acceptance priority agreed on 2026-10-13: a lower free-RAM minimum alone is not
+a reason to reject this candidate. Prefer demonstrated playback stability with
+no allocation failures, restarts, watchdog events or output errors. Retain heap
+measurements for diagnosis and check repeated-session recovery for leaks. See
+[the testing acceptance policy](ESP32C3_TESTING.md#acceptance-priority-playback-stability-2026-10-13).

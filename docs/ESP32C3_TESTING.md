@@ -4,6 +4,26 @@ This document defines the acceptance tests added after the 2026-09-30 audit.
 **A test exists, a test ran, and a test passed are three different states.**
 Keep failed measurements. Never accept AAC-core fallback as successful HE-AAC.
 
+## Acceptance priority: playback stability (2026-10-13)
+
+The primary criteria are continuous, correct playback, no unexpected restart,
+no watchdog events, no allocation failures, and no new output errors during
+decoded playback. A low absolute free-heap or largest-free-block value alone
+does not reject a candidate. Record these values as diagnostics and compare
+them across the same workloads; do not impose an arbitrary RAM floor as a
+production requirement.
+
+Some older runners below still enforce numerical heap budgets. Preserve their
+raw PASS/FAIL results and report a budget-only failure separately from an actual
+playback or allocation failure. This priority does not waive a measured failure
+or establish stability beyond the tested workload. Check recovery after Stop
+and repeated sessions as well: progressive unrecovered memory loss can indicate
+a leak, which is different from a low but stable free-memory level.
+
+The current stream-confirmation matrix has no absolute free-RAM floor. Its
+allocation, restart, watchdog and active-output checks remain strict. Prefix
+control tests check settled heap recovery, not an absolute minimum RAM value.
+
 For repeated FLAC delivery-pause tests with the shared decoder arena, see
 [the DMA investigation](ESP32C3_ARENA_FLAC_DMA_20261013.md). It distinguishes
 completion notifications, allocator latency and input starvation, retaining
