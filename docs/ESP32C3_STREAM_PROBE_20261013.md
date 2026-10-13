@@ -49,8 +49,9 @@ using the previous production-derived WebUI config.
 
 The [saved image](../firmware/development/esp32c3-idf-6.1-r9a97-stream-probe/app.bin)
 was initially build/host-tested only. The subsequent physical HTTP campaign
-below tests the same image; it is still not production-qualified. HTTPS
-detection and watchdog-disabled deadline tests remain required. Cross-codec
+below tests the same image; it is still not production-qualified. A subsequent
+laboratory HTTPS campaign is recorded below; watchdog-disabled deadline tests
+remain required. Cross-codec
 switching, misleading MIME and stronger multi-frame confirmation remain open.
 
 ## Corpus and physical follow-up
@@ -91,6 +92,57 @@ and [corpus evidence](../tests/results/esp32c3-stream-probe-20261013/corpus-01/)
 include exact runner sources and checksums. The earlier build-only evidence
 remains unchanged. The fixture server's new `mime=None` behavior passed an
 exact-byte HTTP test and six existing HTTP/HTTPS server regression tests.
+
+## HTTPS and AAC transitions
+
+Runner `ef732899` adds verified laboratory TLS and ordered format-transition
+checks. Two continuous AUTO/no-MIME HTTP cases passed on `idf61-stream-probe`:
+
+- `changing`: LC 44.1 kHz stereo → LC 48 kHz stereo → HE 48 kHz stereo →
+  HEv2 44.1 kHz stereo.
+- `implicit-sbr`: LC 22.05 kHz mono → HEv2 44.1 kHz stereo → LC 48 kHz stereo.
+  The first transition retains the same ADTS core configuration.
+
+Each format required repeated observations in order, followed by correct EOF.
+Active transition health had 77 and 59 samples respectively. All format,
+allocation, watchdog, restart and output-counter checks passed.
+
+The separate `idf61-probe-tls-lab` image, ELF SHA-256
+`220c3310596f0d58bcc2e9db78cbd263cc0881f5d70d2d5e986bf02e0419f8f0`,
+adds one ephemeral test CA. Its enabled sdkconfig differs only in the custom
+CA switch/path; full public roots, peer verification, 16 KiB TLS RX capacity,
+codec options, buffers and compact-storage precision are unchanged. It is
+**laboratory-only**, not a production replacement. No operating-system trust
+store was changed, and no private keys are committed.
+
+On this image **14/14 HTTPS cases passed**: the original 12 no-MIME cases plus
+both AAC transitions. All connections have server-side negotiated evidence:
+TLS 1.2, `ECDHE-RSA-AES256-GCM-SHA384`. The TLS server writes normally contain
+1,024 audio bytes, with fragmented initial writes; this is not a maximum TLS
+record-size or handshake-variant matrix.
+
+| Observation | System free heap | Largest free block |
+|---|---:|---:|
+| HTTP changing, sampled minimum | 37,028 B | 22,528 B |
+| HTTP implicit SBR, sampled minimum | 31,160 B | 20,480 B |
+| HTTPS HE-AAC, active-window end | 36,752 B | 23,552 B |
+| HTTPS HE-AACv2, active-window end | 37,036 B | 23,552 B |
+| HTTPS changing, sampled minimum | 34,408 B | 22,528 B |
+| HTTPS implicit SBR, sampled minimum | 29,732 B | 20,480 B |
+
+These are observations, not guaranteed bounds or isolated TLS allocation
+costs. No allocation failure/watchdog event was recorded; compared active
+output counters stayed unchanged. No unexpected restart occurred. Both runs
+restored the original `idf61-production-prefill1000` image/hash and stopped
+state; in-memory comparisons verified Wi-Fi, playlist and settings unchanged.
+
+Evidence: [HTTP transitions](../tests/results/esp32c3-stream-probe-20261013/transitions-http-01/),
+[HTTPS matrix, public test CA and exact configuration delta](../tests/results/esp32c3-stream-probe-20261013/physical-tls-01/),
+and [labelled laboratory artifact](../firmware/development/esp32c3-idf-6.1-r9a97-stream-probe-tls-lab/manifest.json).
+These tests cover changes within AAC, not MP3 ↔ AAC family switching.
+Long public-station playback, watchdog-disabled initial-probe timeout,
+misleading MIME, stronger frame confirmation and cross-codec switching remain
+open. No full production qualification is claimed.
 
 ## Format references
 
