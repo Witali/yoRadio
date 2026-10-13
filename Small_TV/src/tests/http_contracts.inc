@@ -49,6 +49,9 @@ static void test_http_pages(void)
     CHECK(strstr(request.response, "native test") && strstr(request.response, "-42"));
     CHECK(!strcmp(request.response_type, "application/json; charset=utf-8") &&
           !strcmp(request.cache_control, "no-store"));
+    scan_count = 0;
+    CHECK(!strcmp(get("/scan"), "[]"));
+    scan_count = 1;
     scan_result = ESP_FAIL;
     prepare("/scan", "", 0, NULL);
     dispatch(HTTP_GET);

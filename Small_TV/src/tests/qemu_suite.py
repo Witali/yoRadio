@@ -34,7 +34,7 @@ def main():
                               hardware_profile=str(profile), network='clock', display='none',
                               persistent=False, paused=False, gdb_port=0, seconds=args.seconds)
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
-              'boot_reset': {}, 'scenes': {}, 'errors': [],
+              'boot_reset': {}, 'http_initial_setup': {}, 'scenes': {}, 'errors': [],
               'scope': 'Real firmware boot/reset/DHCP/SNTP and scene liveness; whole-frame similarity is measured, not a parity gate. No physical hardware or successful guest weather HTTP.'}
     try:
         for variant in ('original', 'reconstructed'):
@@ -43,6 +43,9 @@ def main():
             report['boot_reset'][variant] = result
             check(result['passed'], f'{variant}: boot/reset/SNTP checks failed')
             print('PASS QEMU boot/reset/SNTP:', variant, flush=True)
+        from small_tv_http_test import run_suite
+        report['http_initial_setup'] = run_suite(options, args.output / 'http-initial-setup')
+        check(report['http_initial_setup']['passed'], 'Real guest HTTP/AP->STA setup failed')
         scene_output = args.output / 'scenes'
         subprocess.run([sys.executable, str(ROOT / 'Small_TV/qemu/parity/compare.py'),
                         '--qemu-root', str(args.qemu_root), '--yoradio', str(ROOT),
@@ -84,6 +87,8 @@ def main():
     finally:
         report['qemu_sha256'] = hashlib.sha256(Path(options.qemu).read_bytes()).hexdigest()
         report['profile_sha256'] = hashlib.sha256(profile.read_bytes()).hexdigest()
+        report['helper_sha256'] = {name: hashlib.sha256((args.qemu_root / 'tools' / name).read_bytes()).hexdigest()
+                                  for name in ('small_tv_vm.py', 'small_tv_network.py', 'small_tv_web.py', 'small_tv_http_test.py')}
         (args.output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
 
 

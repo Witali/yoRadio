@@ -1,8 +1,50 @@
 # Small TV QEMU validation
 
 The [current factory-UI comparison checkpoint](parity/README.md) contains the
-restored fonts/layouts and five scene comparisons. Work was paused at the user's
-request; complete behavioral identity and the C-port assistant remain unfinished.
+restored fonts/layouts and five scene comparisons. Reconstruction is active;
+complete behavioral identity and the C-port assistant remain unfinished.
+
+## Localhost HTTP and initial Wi-Fi setup
+
+The launcher now exposes actual firmware HTTP through separate consecutive
+loopback ports. For an explicit setup range:
+
+```powershell
+& C:\Work\QEMU-ESP32\run-small-tv-esp32c2.ps1 -Network setup `
+    -Firmware reconstructed -HttpBasePort 18080 -Persistent -Display none
+```
+
+| Browser address | Role |
+|---|---|
+| `http://127.0.0.1:18080` | Setup access point |
+| `http://127.0.0.1:18081` | Station after Wi-Fi configuration |
+
+Select the open **yoRadio-QEMU** network and leave its password empty. The
+firmware saves credentials, reboots, receives DHCP and serves its working UI
+at the second port. `-Action status -Network setup` lists the current mapping.
+`-HttpBasePort 0` chooses a free block from 18080; several VMs get separate
+blocks. `-HttpBasePort -1` disables forwarding. The default `clock` profile
+starts directly in station mode and exposes one loopback HTTP port. Browser
+access does not require knowing or assigning the virtual board's IP to the host.
+
+[HTTP integration evidence](http-initial-setup-validation.json) checks both
+firmware images' setup/configure/reboot/persistence and two simultaneous station
+VMs with independent settings. Native scan is mandatory. The original's flow
+uses manual SSID entry: its unchanged `/scan` can dereference `malloc(0)` when
+there are no results (`0x4200f484`), so this path is explicitly excluded rather
+than counted as passing. Its `/configure` also depends on the compact JSON
+emitted by its browser; native parsing accepts whitespace normally.
+
+The native setup keeps an idle STA alongside the AP, allowing ESP-IDF scan;
+STA does not connect before credentials are saved. This agrees with the factory
+`initialize_wifi_softap_at_4200d06e` selecting APSTA. QEMU fixes keep the virtual
+AP client's MAC consistent through DHCP and distinguish RX LAST from RX NEXT.
+External scan responses select the configured STA MAC slot. These checks use
+real guest TCP/HTTP and SDK code, with an open synthetic Wi-Fi network; browser
+JavaScript, RF/WPA encryption and Internet weather are still separate checks.
+
+Run the [complete functional suite](../src/tests/README.md) to include these
+network checks with machine-code comparisons and screen regressions.
 
 The latest [modular profiles and board compatibility checks](modular/README.md)
 cover shared SPI/SD, configurable GPIO, CYD and C3 OLED regressions. Historical

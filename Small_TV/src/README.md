@@ -228,6 +228,13 @@ QEMU boot/reset/SNTP/scene tests. Its report distinguishes passed, failed and
 unexecuted groups. Physical-board/browser/soak acceptance scenarios are documented
 separately and are not reported as passing automated tests.
 
+QEMU now also checks real localhost HTTP setup, Wi-Fi scan, saved credentials,
+AP-to-STA reboot and persistence. Setup uses an idle STA alongside the AP because
+ESP-IDF cannot scan in AP-only mode; it does not connect without saved credentials.
+This matches the factory APSTA initialization at `0x4200d06e`. The factory's
+zero-result `/scan` null dereference and literal `/configure` JSON parser are
+documented in the [network test scope](../qemu/README.md).
+
 The [machine-level renderer checks](../qemu/parity/machine-checks.md) execute
 the immutable factory instructions and the actual compiled C ELF in RV32
 Unicorn. They compare every framebuffer pixel for controlled simple/analog

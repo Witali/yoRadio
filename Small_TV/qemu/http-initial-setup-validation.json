@@ -1,0 +1,162 @@
+{
+  "passed": true,
+  "tested_at_utc": "2026-10-13T11:38:03.087947+00:00",
+  "flows": {
+    "original": {
+      "firmware": "original",
+      "passed": true,
+      "checks": {
+        "consecutive_separate_loopback_ports": true,
+        "initial_credentials_empty_setup_mode": true,
+        "real_setup_html": true,
+        "settings_saved_via_real_http": true,
+        "configure_post_accepted": true,
+        "station_web_interface_after_reboot": true,
+        "station_clock_set": true,
+        "credentials_persisted_in_guest_flash": true,
+        "real_dhcp_station_address": true,
+        "no_panic_after_initial_configure": true,
+        "persistent_cold_boot_skips_setup": true,
+        "no_panic_after_persistent_cold_boot": true,
+        "reset_preserves_http_settings": true,
+        "no_panic_or_watchdog": true,
+        "immutable_source_artifacts_unchanged": true
+      },
+      "sources": {
+        "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+      },
+      "web_endpoints": [
+        {
+          "name": "setup",
+          "guest_address": "192.168.43.1",
+          "guest_port": 80,
+          "host_address": "127.0.0.1",
+          "host_port": 18080,
+          "url": "http://127.0.0.1:18080"
+        },
+        {
+          "name": "station",
+          "guest_address": "192.168.43.15",
+          "guest_port": 80,
+          "host_address": "127.0.0.1",
+          "host_port": 18081,
+          "url": "http://127.0.0.1:18081"
+        }
+      ],
+      "scan": {
+        "status": "not_run_in_factory_setup_flow",
+        "reason": "Confirmed vendor /scan zero-result null dereference at 0x4200f484; native scan is a required check"
+      }
+    },
+    "reconstructed": {
+      "firmware": "reconstructed",
+      "passed": true,
+      "checks": {
+        "consecutive_separate_loopback_ports": true,
+        "initial_credentials_empty_setup_mode": true,
+        "real_setup_html": true,
+        "real_wifi_scan": true,
+        "invalid_credentials_rejected": true,
+        "invalid_credentials_do_not_restart": true,
+        "foreign_origin_rejected": true,
+        "ordinary_json_whitespace_accepted": true,
+        "settings_saved_via_real_http": true,
+        "configure_post_accepted": true,
+        "station_web_interface_after_reboot": true,
+        "station_clock_set": true,
+        "credentials_persisted_in_guest_flash": true,
+        "real_dhcp_station_address": true,
+        "no_panic_after_initial_configure": true,
+        "persistent_cold_boot_skips_setup": true,
+        "no_panic_after_persistent_cold_boot": true,
+        "reset_preserves_http_settings": true,
+        "no_panic_or_watchdog": true,
+        "immutable_source_artifacts_unchanged": true
+      },
+      "sources": {
+        "images": [
+          {
+            "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+            "file": "bootloader.bin",
+            "offset": "0x0",
+            "bytes": 19248
+          },
+          {
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+            "file": "partition-table.bin",
+            "offset": "0x8000",
+            "bytes": 3072
+          },
+          {
+            "sha256": "b4533104327d2399d110d975dada0a1c492004660063e8d476d87dccd48c3347",
+            "file": "app.bin",
+            "offset": "0x10000",
+            "bytes": 1009968
+          },
+          {
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+            "file": "assets.bin",
+            "offset": "0x200000",
+            "bytes": 1994752
+          }
+        ],
+        "source_sha256": "7b902debf3d42d96201ecc20e6f8ff05b2175a0c5f79aad5451aba7831e2ff15"
+      },
+      "web_endpoints": [
+        {
+          "name": "setup",
+          "guest_address": "192.168.43.1",
+          "guest_port": 80,
+          "host_address": "127.0.0.1",
+          "host_port": 18080,
+          "url": "http://127.0.0.1:18080"
+        },
+        {
+          "name": "station",
+          "guest_address": "192.168.43.15",
+          "guest_port": 80,
+          "host_address": "127.0.0.1",
+          "host_port": 18081,
+          "url": "http://127.0.0.1:18081"
+        }
+      ]
+    }
+  },
+  "station_isolation": {
+    "passed": true,
+    "separate_ports": true,
+    "real_station_http": true,
+    "settings_isolated": true,
+    "web_endpoints": [
+      [
+        {
+          "name": "station",
+          "guest_address": "10.0.2.15",
+          "guest_port": 80,
+          "host_address": "127.0.0.1",
+          "host_port": 18080,
+          "url": "http://127.0.0.1:18080"
+        }
+      ],
+      [
+        {
+          "name": "station",
+          "guest_address": "10.0.2.15",
+          "guest_port": 80,
+          "host_address": "127.0.0.1",
+          "host_port": 18081,
+          "url": "http://127.0.0.1:18081"
+        }
+      ]
+    ]
+  },
+  "scope": "Real HTTP/TCP, open synthetic Wi-Fi, DHCP, raw settings persistence, reboot and SNTP; no browser JS, real RF or WPA handshake.",
+  "qemu_sha256": "c1cdaccbc96e76ba1f0a9ea7f6134c7f82b96b14fcb4eec954342a0e782d092a",
+  "qemu_source_commit": "4f652500a35775b04e7b9a113e899c3f1fc1f1b7",
+  "helper_sha256": {
+    "small_tv_vm.py": "2b4b02197c856b71bfcd74d0c8a613b2c4d0198c65215d71403dc59390464ee3",
+    "small_tv_network.py": "8ecfe92031f4f9bfd6713b5acf0f1b7de82f4fc8ea639544166ea3ef1047225e",
+    "small_tv_web.py": "7ae4536f4f30ec51d5a811b73bbedf5d73e3af3a8af9201ae92705ab926200d4",
+    "small_tv_http_test.py": "566d38e67606b88d9a1be7cfbc49ffeda1cffb399969c56814f2e28fe856b4fb"
+  }
+}

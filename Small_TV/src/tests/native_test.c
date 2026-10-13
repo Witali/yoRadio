@@ -28,6 +28,7 @@ static int64_t clock_us;
 static unsigned rendered_pixels,registered_routes,restart_requests,weather_requests;
 static unsigned route_success[48],route_errors[48];
 static bool connected;
+static uint16_t scan_count=1;
 static esp_err_t scan_result=ESP_OK,write_result=ESP_OK;
 static esp_err_t (*not_found)(httpd_req_t *,httpd_err_code_t);
 static const esp_partition_t partition={ASSETS_BASE,sizeof(flash_bytes)};
@@ -69,7 +70,7 @@ bool network_ap_active(void) {return true;}
 void network_restart_later(void) {++restart_requests;}
 void weather_request_update(void) {++weather_requests;}
 esp_err_t network_scan(wifi_ap_record_t *records,uint16_t *count)
-{if(scan_result!=ESP_OK)return scan_result;assert(*count>=1);strcpy((char *)records[0].ssid,"native test");records[0].rssi=-42;*count=1;return ESP_OK;}
+{if(scan_result!=ESP_OK)return scan_result;assert(*count>=scan_count);if(scan_count){strcpy((char *)records[0].ssid,"native test");records[0].rssi=-42;}*count=scan_count;return ESP_OK;}
 
 esp_err_t httpd_resp_set_status(httpd_req_t *req,const char *status) {req->status=strtoul(status,NULL,10);return ESP_OK;}
 esp_err_t httpd_resp_set_type(httpd_req_t *req,const char *type) {strcpy(req->response_type,type);return ESP_OK;}

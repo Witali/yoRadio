@@ -32,8 +32,11 @@ def main():
     if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, groups['integrity']['result'])):
         raise ValueError('Groups tested different applications')
     qemu = groups['qemu']['result']
+    if not qemu['http_initial_setup']['passed']:
+        raise ValueError('Real HTTP initial setup did not pass')
     qemu_sources = [qemu['boot_reset']['reconstructed']['prepared']['sources']]
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
+    qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -55,6 +58,8 @@ def main():
     summary['machine_control']['simple_event_frames'] = controls['simple_events']['frames']
     summary['qemu'] = {'passed': qemu['passed'], 'qemu_sha256': qemu['qemu_sha256'],
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
+                       'helper_sha256': qemu['helper_sha256'],
+                       'http_initial_setup': qemu['http_initial_setup'],
                        'boot_reset': {name: {key: row[key] for key in ('passed', 'checks', 'duration_seconds', 'network')}
                                       for name, row in qemu['boot_reset'].items()},
                        'scenes': {name: {'passed': True,

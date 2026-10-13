@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "started_utc": "2026-10-13T10:23:20.3147859Z",
-  "finished_utc": "2026-10-13T10:31:34.2722048Z",
+  "started_utc": "2026-10-13T11:32:34.7647148Z",
+  "finished_utc": "2026-10-13T11:44:51.0732483Z",
   "passed": true,
   "automatic_profile": "host_machine_qemu",
   "all_functionality_verified": false,
-  "source_sha256": "fcd37ca1beb561f79d311f79c645fabc8e3d74bc3bd547baabf2b1e86a149110",
-  "app_sha256": "24b7df1d92f018afc0b64a931ab0bdd7a5cc77d29f0d199b631cc7f586a27d92",
+  "source_sha256": "7b902debf3d42d96201ecc20e6f8ff05b2175a0c5f79aad5451aba7831e2ff15",
+  "app_sha256": "b4533104327d2399d110d975dada0a1c492004660063e8d476d87dccd48c3347",
   "test_inputs": [
     {
       "file": "Small_TV/src/tests/artifact_test.py",
@@ -18,7 +18,7 @@
     },
     {
       "file": "Small_TV/src/tests/http_contracts.inc",
-      "sha256": "b6cef406952596ca8a63cca1587e8065e1660d3a8e9198b4dd1843a2e01640ea"
+      "sha256": "afc754b59b5ad03f5564446a5ec32a06b0923beb3c6a21751b95d768c3bdb7ec"
     },
     {
       "file": "Small_TV/src/tests/machine_oracle.py",
@@ -26,7 +26,7 @@
     },
     {
       "file": "Small_TV/src/tests/native_test.c",
-      "sha256": "0e05ba7c308555bee25a04e1fb6d2297a1e2b11c38bfb198d1c1cd2dbe7b2572"
+      "sha256": "d92eb21a7f43e5a165bce741bb8722651f026fbde49ba312424495a6b0846661"
     },
     {
       "file": "Small_TV/src/tests/oracle-requirements.txt",
@@ -34,15 +34,15 @@
     },
     {
       "file": "Small_TV/src/tests/platform_test.c",
-      "sha256": "a2a675d900ce8cb010f8f82250b3374e9f16b22d0cd80d9191fddc7de87549c6"
+      "sha256": "1c3c29a025ee358a7ccf7bcc9b880e4b26f1497a0c892dcc35c944cbc23cd7db"
     },
     {
       "file": "Small_TV/src/tests/publish-report.py",
-      "sha256": "c79e90c9e6549720d2e57692c618eb195bb0e2c134a12df276d8a3fd72229c08"
+      "sha256": "b301c0a3b018f4a506ec50eabb6080c0dd6fe7d7325b807ef493110dc881bcbc"
     },
     {
       "file": "Small_TV/src/tests/qemu_suite.py",
-      "sha256": "647d047003bf09199a3d28fa61b60cd9a6370c095a7926fc4906f92719075f22"
+      "sha256": "aff756476cd32c8d6feff3f3afaaf7223537525eb7fdb55fa2074775889903b0"
     },
     {
       "file": "Small_TV/src/tests/run-all.ps1",
@@ -156,7 +156,7 @@
   ],
   "native": {
     "passed": true,
-    "checks": 2916,
+    "checks": 2918,
     "groups": [
       "settings",
       "factory_settings",
@@ -339,7 +339,7 @@
       {
         "method": "GET",
         "uri": "/scan",
-        "successes": 1,
+        "successes": 2,
         "errors": 1
       },
       {
@@ -411,12 +411,13 @@
     ]
   },
   "platform": {
+    "passed": true,
     "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation.",
     "cases": [
       {
         "case": "wifi_setup",
         "passed": true,
-        "checks": 10
+        "checks": 11
       },
       {
         "case": "wifi_reconnect_scan",
@@ -488,16 +489,15 @@
         "passed": true,
         "checks": 8
       }
-    ],
-    "passed": true
+    ]
   },
   "integrity": {
     "passed": true,
     "cases": 6,
     "failures": 0,
     "errors": 0,
-    "source_sha256": "fcd37ca1beb561f79d311f79c645fabc8e3d74bc3bd547baabf2b1e86a149110",
-    "app_sha256": "24b7df1d92f018afc0b64a931ab0bdd7a5cc77d29f0d199b631cc7f586a27d92",
+    "source_sha256": "7b902debf3d42d96201ecc20e6f8ff05b2175a0c5f79aad5451aba7831e2ff15",
+    "app_sha256": "b4533104327d2399d110d975dada0a1c492004660063e8d476d87dccd48c3347",
     "factory_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
   },
   "machine": {
@@ -505,8 +505,8 @@
     "literal_factory_pixels_equal": false,
     "renderer_cases": 316,
     "geometry_checks": 4,
-    "source_sha256": "fcd37ca1beb561f79d311f79c645fabc8e3d74bc3bd547baabf2b1e86a149110",
-    "native_elf_sha256": "4df7d92ad47f3ce88e6ab9bb61449a90ec27309c043ce8d0d3aa65946799909a",
+    "source_sha256": "7b902debf3d42d96201ecc20e6f8ff05b2175a0c5f79aad5451aba7831e2ff15",
+    "native_elf_sha256": "13a7e322c41c1ac2b7cc7e78b05165b959e0adfebd27bb655f42a9fee958811a",
     "approved_fixes": {
       "simple-sunday-standard-tm-wday": "Display Sun for standard tm_wday 0; factory 0 repeats the date, while factory 7 draws Sun",
       "analog-perpendicular-stroke-offsets": "Use cos/sin for x/y after atan2+pi/2; the original sin/cos collapses axis-aligned thick strokes"
@@ -558,9 +558,170 @@
   },
   "qemu": {
     "passed": true,
-    "qemu_sha256": "b536afeb712e68073461e0bef4d147ebef28726d42a8dfad2ff868c5e5c27b31",
+    "qemu_sha256": "c1cdaccbc96e76ba1f0a9ea7f6134c7f82b96b14fcb4eec954342a0e782d092a",
     "profile_sha256": "ad88920762bd2199abb91ba0eed69d3ed62e7e381a10e228f49457b5ff84abb4",
     "scope": "Real firmware boot/reset/DHCP/SNTP and scene liveness; whole-frame similarity is measured, not a parity gate. No physical hardware or successful guest weather HTTP.",
+    "helper_sha256": {
+      "small_tv_vm.py": "2b4b02197c856b71bfcd74d0c8a613b2c4d0198c65215d71403dc59390464ee3",
+      "small_tv_network.py": "8ecfe92031f4f9bfd6713b5acf0f1b7de82f4fc8ea639544166ea3ef1047225e",
+      "small_tv_web.py": "7ae4536f4f30ec51d5a811b73bbedf5d73e3af3a8af9201ae92705ab926200d4",
+      "small_tv_http_test.py": "566d38e67606b88d9a1be7cfbc49ffeda1cffb399969c56814f2e28fe856b4fb"
+    },
+    "http_initial_setup": {
+      "passed": true,
+      "tested_at_utc": "2026-10-13T13:38:03.087947+02:00",
+      "flows": {
+        "original": {
+          "firmware": "original",
+          "passed": true,
+          "checks": {
+            "consecutive_separate_loopback_ports": true,
+            "initial_credentials_empty_setup_mode": true,
+            "real_setup_html": true,
+            "settings_saved_via_real_http": true,
+            "configure_post_accepted": true,
+            "station_web_interface_after_reboot": true,
+            "station_clock_set": true,
+            "credentials_persisted_in_guest_flash": true,
+            "real_dhcp_station_address": true,
+            "no_panic_after_initial_configure": true,
+            "persistent_cold_boot_skips_setup": true,
+            "no_panic_after_persistent_cold_boot": true,
+            "reset_preserves_http_settings": true,
+            "no_panic_or_watchdog": true,
+            "immutable_source_artifacts_unchanged": true
+          },
+          "sources": {
+            "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+          },
+          "web_endpoints": [
+            {
+              "name": "setup",
+              "guest_address": "192.168.43.1",
+              "guest_port": 80,
+              "host_address": "127.0.0.1",
+              "host_port": 18080,
+              "url": "http://127.0.0.1:18080"
+            },
+            {
+              "name": "station",
+              "guest_address": "192.168.43.15",
+              "guest_port": 80,
+              "host_address": "127.0.0.1",
+              "host_port": 18081,
+              "url": "http://127.0.0.1:18081"
+            }
+          ],
+          "scan": {
+            "status": "not_run_in_factory_setup_flow",
+            "reason": "Confirmed vendor /scan zero-result null dereference at 0x4200f484; native scan is a required check"
+          }
+        },
+        "reconstructed": {
+          "firmware": "reconstructed",
+          "passed": true,
+          "checks": {
+            "consecutive_separate_loopback_ports": true,
+            "initial_credentials_empty_setup_mode": true,
+            "real_setup_html": true,
+            "real_wifi_scan": true,
+            "invalid_credentials_rejected": true,
+            "invalid_credentials_do_not_restart": true,
+            "foreign_origin_rejected": true,
+            "ordinary_json_whitespace_accepted": true,
+            "settings_saved_via_real_http": true,
+            "configure_post_accepted": true,
+            "station_web_interface_after_reboot": true,
+            "station_clock_set": true,
+            "credentials_persisted_in_guest_flash": true,
+            "real_dhcp_station_address": true,
+            "no_panic_after_initial_configure": true,
+            "persistent_cold_boot_skips_setup": true,
+            "no_panic_after_persistent_cold_boot": true,
+            "reset_preserves_http_settings": true,
+            "no_panic_or_watchdog": true,
+            "immutable_source_artifacts_unchanged": true
+          },
+          "sources": {
+            "images": [
+              {
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+                "file": "bootloader.bin",
+                "offset": "0x0",
+                "bytes": 19248
+              },
+              {
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                "file": "partition-table.bin",
+                "offset": "0x8000",
+                "bytes": 3072
+              },
+              {
+                "sha256": "b4533104327d2399d110d975dada0a1c492004660063e8d476d87dccd48c3347",
+                "file": "app.bin",
+                "offset": "0x10000",
+                "bytes": 1009968
+              },
+              {
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+                "file": "assets.bin",
+                "offset": "0x200000",
+                "bytes": 1994752
+              }
+            ],
+            "source_sha256": "7b902debf3d42d96201ecc20e6f8ff05b2175a0c5f79aad5451aba7831e2ff15"
+          },
+          "web_endpoints": [
+            {
+              "name": "setup",
+              "guest_address": "192.168.43.1",
+              "guest_port": 80,
+              "host_address": "127.0.0.1",
+              "host_port": 18080,
+              "url": "http://127.0.0.1:18080"
+            },
+            {
+              "name": "station",
+              "guest_address": "192.168.43.15",
+              "guest_port": 80,
+              "host_address": "127.0.0.1",
+              "host_port": 18081,
+              "url": "http://127.0.0.1:18081"
+            }
+          ]
+        }
+      },
+      "station_isolation": {
+        "passed": true,
+        "separate_ports": true,
+        "real_station_http": true,
+        "settings_isolated": true,
+        "web_endpoints": [
+          [
+            {
+              "name": "station",
+              "guest_address": "10.0.2.15",
+              "guest_port": 80,
+              "host_address": "127.0.0.1",
+              "host_port": 18080,
+              "url": "http://127.0.0.1:18080"
+            }
+          ],
+          [
+            {
+              "name": "station",
+              "guest_address": "10.0.2.15",
+              "guest_port": 80,
+              "host_address": "127.0.0.1",
+              "host_port": 18081,
+              "url": "http://127.0.0.1:18081"
+            }
+          ]
+        ]
+      },
+      "scope": "Real HTTP/TCP, open synthetic Wi-Fi, DHCP, raw settings persistence, reboot and SNTP; no browser JS, real RF or WPA handshake.",
+      "qemu_sha256": "c1cdaccbc96e76ba1f0a9ea7f6134c7f82b96b14fcb4eec954342a0e782d092a"
+    },
     "boot_reset": {
       "original": {
         "passed": true,
@@ -610,12 +771,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.375189
+            "virtual_seconds": 46.431857
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.559785
+            "virtual_seconds": 46.565846
           }
         },
         "equal_pixels_min": 1.0,
@@ -627,16 +788,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.52506
+            "virtual_seconds": 46.549477
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.599196
+            "virtual_seconds": 46.529389
           }
         },
-        "equal_pixels_min": 0.9744791666666667,
-        "equal_pixels_max": 0.9934722222222222
+        "equal_pixels_min": 0.9752777777777778,
+        "equal_pixels_max": 0.9831423611111111
       },
       "simple": {
         "passed": true,
@@ -644,16 +805,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.767064
+            "virtual_seconds": 46.755169
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.877828
+            "virtual_seconds": 46.840246
           }
         },
-        "equal_pixels_min": 0.9973611111111111,
-        "equal_pixels_max": 1.0
+        "equal_pixels_min": 0.9381597222222222,
+        "equal_pixels_max": 0.9381597222222222
       },
       "photo": {
         "passed": true,
@@ -661,12 +822,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.852127
+            "virtual_seconds": 46.675277
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.683198
+            "virtual_seconds": 46.712818
           }
         },
         "equal_pixels_min": 1.0,
@@ -678,23 +839,23 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.485815
+            "virtual_seconds": 46.703043
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.648761
+            "virtual_seconds": 46.551301
           }
         },
-        "equal_pixels_min": 0.9832465277777778,
-        "equal_pixels_max": 0.9902951388888889
+        "equal_pixels_min": 0.9841493055555556,
+        "equal_pixels_max": 0.9856597222222222
       }
     }
   },
   "not_run": [
     {
-      "status": "not_run",
       "reason": "Physical board, real browser/RF/weather service and long-run memory checks require the manual acceptance scenarios in README.md",
+      "status": "not_run",
       "name": "hardware_browser_soak"
     }
   ]

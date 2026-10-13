@@ -1,0 +1,117 @@
+{
+  "passed": true,
+  "qemu_source_commit": "4f652500a35775b04e7b9a113e899c3f1fc1f1b7",
+  "qemu_sha256": {
+    "riscv32": "c1cdaccbc96e76ba1f0a9ea7f6134c7f82b96b14fcb4eec954342a0e782d092a",
+    "xtensa": "929b4d723d4bf10ee0c7fbd6b461a79a989f735ff7a40d212ebc193b26ea2eb1"
+  },
+  "modular_checks": {
+    "profile_validation": {
+      "unsupported_bus": true,
+      "flash_gpio": true,
+      "conflicting_pins": true,
+      "always_selected_shared_bus": true,
+      "duplicate_id": true
+    },
+    "c2_shared_spi": {
+      "lcd_sd_transfer": true,
+      "topology": "shared_bus",
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "cs_isolation": true,
+      "wrong_sck_blocked": true,
+      "wrong_miso_blocked": true,
+      "sd_snapshot_unchanged": true
+    },
+    "c3_shared_spi": {
+      "lcd_sd_transfer": true,
+      "topology": "shared_bus",
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "cs_isolation": true,
+      "wrong_sck_blocked": true,
+      "wrong_miso_blocked": true,
+      "sd_snapshot_unchanged": true
+    },
+    "esp32_dual_spi": {
+      "lcd_sd_transfer": true,
+      "topology": "two_hosts",
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "cs_isolation": true,
+      "wrong_sck_blocked": true,
+      "wrong_miso_blocked": true,
+      "sd_snapshot_unchanged": true
+    },
+    "c2_i2c": {
+      "alternate_gpio_oled": true,
+      "wrong_scl_nack": true
+    },
+    "c3_i2c": {
+      "alternate_gpio_oled": true,
+      "wrong_scl_nack": true
+    },
+    "legacy_cyd_mmio": {
+      "legacy_flags": true,
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "sd_idle_high": true,
+      "snapshot_unchanged": true
+    }
+  },
+  "legacy": {
+    "cyd": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "duration_seconds": 25,
+      "qemu_sha256": "929b4d723d4bf10ee0c7fbd6b461a79a989f735ff7a40d212ebc193b26ea2eb1",
+      "pixel_sha256": "4afa1d8c3cb4023eef448bc04e36e1ae6b4568da007c43777935b32a1ea995d7",
+      "cyd_boot_scope": "Boot, console and panic checks; LCD transactions are verified separately by QTest",
+      "source_flash_sha256": "1050294c50955df7a4b09e5a44950601b1da11a299b3aea6a30031353103b8a8"
+    },
+    "c3_oled": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "duration_seconds": 25,
+      "qemu_sha256": "c1cdaccbc96e76ba1f0a9ea7f6134c7f82b96b14fcb4eec954342a0e782d092a",
+      "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
+      "cyd_boot_scope": null,
+      "source_flash_sha256": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+    },
+    "c3_modular": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "duration_seconds": 25,
+      "qemu_sha256": "c1cdaccbc96e76ba1f0a9ea7f6134c7f82b96b14fcb4eec954342a0e782d092a",
+      "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
+      "cyd_boot_scope": null,
+      "source_flash_sha256": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+    }
+  },
+  "c3_pixels_match": true,
+  "limitations": [
+    "CYD boot/console and LCD/SD MMIO compatibility; full CYD radio/application-screen behavior is not established by the minimal image.",
+    "C3 OLED normal/modular boot framebuffers agree; physical boards are not used."
+  ]
+}
