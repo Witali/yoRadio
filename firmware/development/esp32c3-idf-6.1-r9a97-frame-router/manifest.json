@@ -10,13 +10,13 @@
     "bytes": 1464160
   },
   "build_directory": "idf\\esp32c3-oled-native\\build-idf-6.1-r9a97-web-memory",
-  "qualification": "Enabled build and host byte-routing/queue tests passed. Strict parser; no hardware codec-transition qualification. Production default remains off.",
+  "qualification": "Enabled build, host byte-routing/ownership tests and 16 physical HTTP cases passed (two mixed-family, fourteen regression). Original firmware and private settings restored and verified. Strict parser remains experimental; no PCM boundary, long-playback or HTTPS qualification.",
   "sdkconfig_sha256": "2d12a304ae3c0bf04f57c609cdcea5d5e6cff00e79a9590cc71a5a62432549ce",
   "elf_sha256": "2ff62e827ec54691506d90b7f51ed0ddd609ee655b4ea5c997c368d0b52773a1",
   "project_version_at_build": "idf61-frame-router",
   "idf_git_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
   "source_commit": "37c1031a3768870c815f72f7f41a8a8edb1bece5",
-  "hardware_tested": false,
+  "hardware_tested": true,
   "production_qualified": false,
   "experimental_frame_router": true,
   "evidence": "tests/results/esp32c3-stream-probe-20261013/encoded-router-01",
@@ -25,5 +25,9 @@
     "build.log": "bb51afca3a0ae9b5215716c1089796111258e9df16c7558cd98795cf4c3b72f3",
     "audio_service.c.su": "89838c2e4c3ec42176a86900d30636c038257f048feb9187ef7b1e2feed2b80e",
     "router-map.txt": "011a6f904d00916c88ec73ee70b74aa74722e7bc9efdd45f400256c1978fd70e"
-  }
+  },
+  "physical_evidence": [
+    "tests/results/esp32c3-stream-probe-20261013/frame-router-physical-01",
+    "tests/results/esp32c3-stream-probe-20261013/frame-router-regression-01"
+  ]
 }

@@ -490,7 +490,57 @@ stack frames, not the total call-chain depth or a runtime high-water measurement
 The image and these build measurements are saved under
 [`firmware/development/esp32c3-idf-6.1-r9a97-frame-router/`](../firmware/development/esp32c3-idf-6.1-r9a97-frame-router/).
 Its only added active sdkconfig setting relative to `r9a97-codec-drain` is
-`CONFIG_YORADIO_FRAME_ROUTER=y`. No board deployment has been made for it.
+`CONFIG_YORADIO_FRAME_ROUTER=y`. Subsequent hardware results are recorded below.
+
+## Physical frame-router follow-up
+
+The `idf61-frame-router` image was installed by native WebUI OTA on the C3
+and tested with two finite, paced HTTP connections, without a MIME hint.
+Each connection changes codec family while keeping the same play generation.
+The original application and private settings were verified after restoration.
+
+| Sequence | Result | Active health samples | Lowest sampled free heap | Lowest sampled largest block |
+|---|---|---:|---:|---:|
+| MP3 48 kHz stereo → HE-AAC 48 kHz stereo → MP3 48 kHz stereo | PASS | 54 | 31,096 B | 15,872 B |
+| AAC-LC 48 kHz stereo → MP3 48 kHz stereo → HE-AACv2 44.1 kHz stereo | PASS | 56 | 40,456 B | 30,720 B |
+
+Every expected decoded format was observed in sequence with consecutive
+confirmation samples. Both cases reached `stream ended`, retained the boot
+identity, and had no increase in allocation-failure or task-watchdog counters.
+Available output counters stayed unchanged within the sampled active-playback
+windows. Completion-queue drops did grow across the wider before/after interval
+that includes startup and idle/EOF; these are not zero-overrun lifetime runs.
+The server completed the exact 980,589 / 687,288-byte
+HTTP bodies. Idle snapshots after EOF were 140,024 / 140,032 bytes free with
+110,592-byte largest blocks; these snapshots are not a long-run leak test.
+
+[Frozen transition evidence](../tests/results/esp32c3-stream-probe-20261013/frame-router-physical-01/)
+contains the exact executed controller. After this run the reusable controller
+gained an explicit full-server-delivery acceptance check; the saved run's
+complete delivery was checked separately before archiving. Wi-Fi, playlist
+and settings equality is recorded only as booleans, never private contents.
+
+These tests exercise actual decoders and their PCM-derived status, but do not
+capture PCM samples or analog output. They do not prove exact sample continuity,
+absence of every possible underrun, HTTPS stability, recovery from corruption
+or long-running memory stability. Keep `CONFIG_YORADIO_FRAME_ROUTER` off by
+default until the remaining qualification work is complete.
+
+The same image then passed the complete 14-case HTTP regression: MP3, FLAC,
+Vorbis, Opus, AAC-LC, HE-AAC, HE-AACv2, both HE variants with an initial ID3,
+unknown bytes, partial header, truncated ID3, `changing` and `implicit-sbr`.
+The last two AAC transition cases had sampled heap/largest-block minima of
+37,116 / 23,552 bytes and 32,404 / 21,504 bytes respectively. Positive cases
+passed the new exact-server-delivery check as well as format/EOF checks.
+Allocation/watchdog counts and boot identity stayed unchanged; output checks
+apply to the active windows described above, not idle/startup lifetime totals.
+
+[Frozen 14-case evidence](../tests/results/esp32c3-stream-probe-20261013/frame-router-regression-01/)
+records the final restoration to `idf61-production-prefill1000`, stopped,
+with unchanged Wi-Fi, playlist and settings. The candidate manifest now records
+hardware testing, while `production_qualified` remains false. The combined
+16 passing cases do not close the remaining PCM-boundary, Stop/replacement
+under the new route, HTTPS, corruption-recovery or long-playback gates.
 
 ## Format references
 

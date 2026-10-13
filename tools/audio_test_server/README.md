@@ -33,8 +33,6 @@ the same option for its built-in HTTP and HTTPS servers. An external
 `--https-origin` must be configured separately. These settings do not alter the
 specialized `tls_records.py` server.
 
-Generate additional continuous files with FFmpeg/FFprobe:
-
 For codec-family changes in one finite connection, use `/file/mp3-he-mp3`
 (MP3 → HE-AAC → MP3) or `/file/aac-mp3-hev2` (AAC-LC → MP3 → HE-AACv2).
 These concatenate the verified original fixtures, including their metadata,
@@ -43,6 +41,8 @@ codec hint in the manifest. They require a player that supports changing codec
 families within one connection; they are not ordinary standalone AAC files.
 `tests/test-audio-codec-transition-fixtures.py` checks the exact HTTP body and
 length, metadata and unchanged existing AAC-only sequences.
+
+Generate additional continuous files with FFmpeg/FFprobe:
 
 ```powershell
 python tools/audio_test_server/generate.py --output .build/audio-60s --seconds 60
