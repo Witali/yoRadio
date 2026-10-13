@@ -170,7 +170,10 @@ the night brightness schedule. The factory's embedded weather key is not
 copied into these sources. Weather follows the original HTTP endpoint with
 Kelvin values: Celsius truncates toward zero before Fahrenheit conversion;
 min/max retain double precision. Text is limited to 15 bytes and wind bearings
-use the original sixteen sectors. The recovered 109-entry country/POSIX-TZ table
+use the original sixteen sectors and literal hyphenated direction labels.
+The QEMU weather fixture verifies real DNS/TCP/HTTP, cache values and four LCD
+regions for positive/negative responses; HTTP 503 JSON is rejected despite the
+factory parser accepting it. The recovered 109-entry country/POSIX-TZ table
 sets local time; the weather UTC offset does not replace it. Requests retry
 after about 3.1 seconds and successful updates repeat after 1801 timer seconds
 (about 1981.1 real seconds at the recovered 11-tick cadence).

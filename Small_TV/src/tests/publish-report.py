@@ -34,9 +34,12 @@ def main():
     qemu = groups['qemu']['result']
     if not qemu['http_initial_setup']['passed']:
         raise ValueError('Real HTTP initial setup did not pass')
+    if not qemu['weather_http']['passed']:
+        raise ValueError('Real weather HTTP/value/LCD comparison did not pass')
     qemu_sources = [qemu['boot_reset']['reconstructed']['prepared']['sources']]
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
     qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
+    qemu_sources.append(qemu['weather_http']['flows']['reconstructed']['sources'])
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -60,6 +63,7 @@ def main():
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
                        'helper_sha256': qemu['helper_sha256'],
                        'http_initial_setup': qemu['http_initial_setup'],
+                       'weather_http': qemu['weather_http'],
                        'boot_reset': {name: {key: row[key] for key in ('passed', 'checks', 'duration_seconds', 'network')}
                                       for name, row in qemu['boot_reset'].items()},
                        'scenes': {name: {'passed': True,

@@ -58,6 +58,33 @@ captures. See QEMU's `README-small-tv-esp32c2.md` for build and GDB instructions
 
 ## Wi-Fi and synchronization
 
+The [weather differential report](weather-http-validation.json) adds an opt-in
+loopback HTTP fixture. `-WeatherPort <port>` directs `api.openweathermap.org` to
+the virtual subnet's `.100:80`; SLIRP guestfwd carries the real guest TCP stream
+to `127.0.0.1:<port>`. DHCP advertises the isolated DNS replacement when the
+restricted backend supplies no DNS option. Other external names remain blocked.
+The local DNS option is also advertised in ordinary clock/setup profiles so
+named SNTP servers work after AP-to-STA reboot. The setup test requires a DNS
+reply for a named time server, as well as an accepted NTP response.
+The test server is started/stopped by `Small_TV/src/tests/weather_qemu.py`.
+It checks parsed values and four nonblank LCD regions for positive and negative
+weather, HTTP failure/retry, and refresh through the firmware's real web API.
+Neither application nor runtime RAM/PC is patched.
+
+Live factory responses exposed eight hyphenated wind direction labels missed
+by the earlier reconstruction. Their literal bytes at `0x3c0c3a68..0x3c0c3afc`
+and the half-open sector comparisons now agree. The factory also parses valid
+JSON from an HTTP 503 response: `0x42010988` checks the transport result but
+does not check HTTP status before the event parser at `0x4200fccc`. The native
+program deliberately rejects that vendor bug and retains its previous cache.
+
+| Factory with synthetic weather | Reconstruction with the same response |
+|---|---|
+| ![Factory weather](weather-original.png) | ![Reconstructed weather](weather-reconstructed.png) |
+
+These are actual metadata-free panel captures. The four weather regions are
+checked for equality; live clock/animation phase is not a whole-frame parity gate.
+
 | Component | Verified behavior |
 |---|---|
 | Virtual AP | Open `yoRadio-QEMU`, channel 1; guest driver performs authentication and association |
@@ -65,7 +92,7 @@ captures. See QEMU's `README-small-tv-esp32c2.md` for build and GDB instructions
 | Local services | ARP, DNS, UDP NTP; firmware time-server names resolve to `10.0.2.2` |
 | Time source | Current host UTC, sent in regular NTP responses |
 | Guest clock | Both applications accept SNTP and store the epoch offset in RTC STORE2/3 |
-| Internet | SLIRP `restrict=on`; other DNS names, including weather, receive NXDOMAIN |
+| Internet | SLIRP `restrict=on`; weather is blocked by default, or served by the explicit local fixture |
 
 Both applications passed **45-second headless runs**, LCD-content checks,
 watchdog/panic checks and reset/reboot checks. The reconstruction additionally
@@ -85,14 +112,15 @@ passed the existing C3 production firmware's separate 20-second boot/OLED test.
 Screenshots come from a separate headless run with the same final binary and
 settings. Each is a single actual framebuffer capture, selected between SPI
 redraws. The factory displays `Getting Weather` because weather cannot resolve;
-the reconstruction uses an empty key and displays `Set city and weather key`.
+the historical reconstruction used an empty key and displayed `Set city and weather key`.
+Current fixtures seed the same synthetic `disabled` key in both applications.
 
 ## Flash and virtual time
 
 Application/bootloader instructions and assets are unchanged. The launcher copies
 the archive, clears working NVS at `0x9000..0xefff` and seeds synthetic settings.
-Factory settings occupy the raw sector at `0x3e7000`; the reconstruction uses
-`small_tv/configuration` in NVS. Owner credentials, calibration identity and
+Factory settings occupy the raw sector at `0x3e7000`; the reconstruction imports
+that format and also stores `small_tv/configuration` in NVS. Owner credentials, calibration identity and
 weather keys are excluded. The factory receives a nonempty `disabled` key
 sentinel to prevent fallback to its compiled vendor key. Source hashes remain
 unchanged; no physical board was accessed and no OTA was added.
@@ -127,9 +155,9 @@ Each profile/variant has a separate directory under `.cache/small-tv-c2/`.
 Snapshot mode discards guest writes; `-Persistent` retains them in the working
 copy. Original dump and firmware archive are never writable drives.
 
-Reconstructed settings use the pinned ESP-IDF Python environment's official NVS
-generator. Internet weather, HTTPS and host access to the guest web server are
-outside these checks.
+Current launchers seed a sanitized raw settings sector without invoking an NVS
+generator. Localhost guest web access and synthetic weather have dedicated
+checks above; Internet weather and HTTPS remain outside those checks.
 
 ## Earlier offline evidence
 

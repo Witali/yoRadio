@@ -34,8 +34,8 @@ def main():
                               hardware_profile=str(profile), network='clock', display='none',
                               persistent=False, paused=False, gdb_port=0, seconds=args.seconds)
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
-              'boot_reset': {}, 'http_initial_setup': {}, 'scenes': {}, 'errors': [],
-              'scope': 'Real firmware boot/reset/DHCP/SNTP and scene liveness; whole-frame similarity is measured, not a parity gate. No physical hardware or successful guest weather HTTP.'}
+              'boot_reset': {}, 'http_initial_setup': {}, 'weather_http': {}, 'scenes': {}, 'errors': [],
+              'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP setup and synthetic weather HTTP/value/LCD checks. Whole-frame scene similarity is measured, not a parity gate. No physical hardware or Internet weather service.'}
     try:
         for variant in ('original', 'reconstructed'):
             options.firmware = variant
@@ -46,6 +46,9 @@ def main():
         from small_tv_http_test import run_suite
         report['http_initial_setup'] = run_suite(options, args.output / 'http-initial-setup')
         check(report['http_initial_setup']['passed'], 'Real guest HTTP/AP->STA setup failed')
+        from weather_qemu import run_suite as run_weather
+        report['weather_http'] = run_weather(options, args.output / 'weather-http')
+        check(report['weather_http']['passed'], 'Real guest weather HTTP/value/LCD checks failed')
         scene_output = args.output / 'scenes'
         subprocess.run([sys.executable, str(ROOT / 'Small_TV/qemu/parity/compare.py'),
                         '--qemu-root', str(args.qemu_root), '--yoradio', str(ROOT),
