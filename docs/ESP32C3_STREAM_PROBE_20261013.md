@@ -412,6 +412,11 @@ No producer sends `AUDIO_DRAIN_CODEC` yet. The frame walker still needs the
 coalescing queue adapter, recovery/confidence policy and hardware tests with
 real MP3/AAC transitions before live switching can be claimed to work.
 
+ESP-IDF 6.1 builds this contract successfully with the same sdkconfig as the
+preceding image. The unqualified development image `idf61-codec-drain` is
+saved in [`firmware/development/esp32c3-idf-6.1-r9a97-codec-drain/`](../firmware/development/esp32c3-idf-6.1-r9a97-codec-drain/),
+with its source commit, hashes and build log. No board deployment was made.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)
