@@ -12,6 +12,10 @@ the user's request. The results below remain the
 original captures at their recorded application hashes; they are not updated
 measurements of the newer firmware.
 
+[Timer/slideshow checks](control-checks.md) verify executed counter/event
+algorithms and real minute rollover, alongside newer QEMU runtime captures.
+Those reports retain their own application hashes and explicit limits.
+
 `compare.py` boots both unmodified applications with matching synthetic factory
 settings, isolated NTP, a disabled weather-key sentinel and no external Internet.
 Its default photo mask enables only the first photo to isolate image rendering

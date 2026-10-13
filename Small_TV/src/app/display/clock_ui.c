@@ -1,12 +1,78 @@
 #include "display.h"
 #include "factory_ui.h"
+#include "factory_timer.h"
+#include "factory_photo.h"
 #include "media.h"
 #include "network.h"
 #include "services.h"
 #include <time.h>
-#include "esp_timer.h"
+#include "esp_attr.h"
+#include "driver/gptimer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
+static factory_timer_t timer_state;
+static uint32_t photo_interval;
+static portMUX_TYPE timer_lock = portMUX_INITIALIZER_UNLOCKED;
+static gptimer_handle_t clock_timer;
+
+static bool IRAM_ATTR timer_alarm(gptimer_handle_t timer, const gptimer_alarm_event_data_t *event,
+                                  void *context)
+{
+    /* Keep counting during blocking work; defer all SPI drawing to its owner task. */
+    (void)timer;
+    (void)event;
+    (void)context;
+    portENTER_CRITICAL_ISR(&timer_lock);
+    factory_timer_tick(&timer_state, photo_interval);
+    portEXIT_CRITICAL_ISR(&timer_lock);
+    return false;
+}
+
+static factory_timer_t timer_snapshot(uint32_t consume, uint32_t interval)
+{
+    /* Atomically read counters and consume only the current renderer's events. */
+    portENTER_CRITICAL(&timer_lock);
+    photo_interval = interval;
+    factory_timer_t result = timer_state;
+    if (consume)
+        result.pending = factory_timer_take(&timer_state, consume);
+    portEXIT_CRITICAL(&timer_lock);
+    return result;
+}
+
+static void timer_raise(uint32_t events)
+{
+    /* Restore the same update flags that a factory theme initializer sets. */
+    portENTER_CRITICAL(&timer_lock);
+    timer_state.pending |= events;
+    portEXIT_CRITICAL(&timer_lock);
+}
+
+esp_err_t clock_ui_timer_init(void)
+{
+    /* Start the hardware timebase before network/services, as at 0x420083b6. */
+    tv_settings_t settings;
+    settings_snapshot(&settings);
+    photo_interval = settings.photo_seconds;
+    factory_timer_init(&timer_state, settings.wifi_mode == 1 && settings.ssid[0]);
+    gptimer_config_t config = {
+        .clk_src = GPTIMER_CLK_SRC_XTAL, .direction = GPTIMER_COUNT_UP, .resolution_hz = 1000000};
+    esp_err_t result = gptimer_new_timer(&config, &clock_timer);
+    if (result != ESP_OK)
+        return result;
+    gptimer_alarm_config_t alarm = {
+        .alarm_count = 100000, .reload_count = 0, .flags.auto_reload_on_alarm = true};
+    gptimer_event_callbacks_t callbacks = {.on_alarm = timer_alarm};
+    result = gptimer_set_alarm_action(clock_timer, &alarm);
+    if (result == ESP_OK)
+        result = gptimer_register_event_callbacks(clock_timer, &callbacks, NULL);
+    if (result == ESP_OK)
+        result = gptimer_enable(clock_timer);
+    if (result == ESP_OK)
+        result = gptimer_start(clock_timer);
+    return result;
+}
 
 static struct tm factory_local_time(time_t now, bool *valid)
 {
@@ -31,20 +97,20 @@ static void clock_task(void *unused)
     /* Run the startup/setup/theme state machine and factory animation/fade timers. */
 
     (void)unused;
-    const int64_t started = esp_timer_get_time();
     uint32_t generation = 0, weather_generation = 0;
-    unsigned animation = 0, photo = 0, description = 0, fade = 0;
-    int64_t next_photo = 0, next_description = 0, next_colon = 0;
+    unsigned animation = 0, description = 0;
+    factory_photo_t slideshow = {0};
     time_t last_second = 0;
     unsigned phase = 0, progress = 0, previous_theme = 255;
-    bool was_online = false, first_photo = true, previous_weather_valid = false;
+    bool was_online = false, previous_weather_valid = false;
+    unsigned weather_retry = 0;
     for (;;)
     {
         tv_settings_t settings;
         weather_snapshot_t weather;
         settings_snapshot(&settings);
         weather_snapshot(&weather);
-        const int64_t elapsed = esp_timer_get_time() - started;
+        factory_timer_t ticks = timer_snapshot(0, settings.photo_seconds);
         bool online = network_connected(), valid;
         char address[20];
         network_address(address, sizeof(address));
@@ -52,20 +118,33 @@ static void clock_task(void *unused)
         struct tm local = factory_local_time(now, &valid);
         uint32_t current_generation = settings_generation();
         bool changed = current_generation != generation || weather.generation != weather_generation;
-        if (media_upload_active() || (phase == 3 && weather_request_active()))
+        /* 0x42008e56 retries unsuccessful weather after 30 completed main-loop
+         * delays. A blocking HTTP request does not spend these retry steps. */
+        if (online && !weather.valid && !weather_request_active())
+        {
+            if (!weather_retry)
+            {
+                weather_retry = 30;
+                weather_request_update();
+            }
+            else
+                --weather_retry;
+        }
+        if (media_upload_active() || (!ticks.startup_active && weather_request_active()))
         {
             vTaskDelay(pdMS_TO_TICKS(100));
             continue;
         }
         /* The original 100-ms timer ends startup after 181 ticks. Its "second"
          * flags fire after eleven ticks: labels rotate every 3.3 seconds. */
-        if (elapsed < 18100000 && settings.wifi_mode == 1 && settings.ssid[0])
+        if (ticks.startup_active)
         {
-            unsigned current_progress = elapsed / 100000;
+            unsigned current_progress = ticks.startup_progress;
             if (phase != 1 || progress != current_progress || online != was_online)
                 factory_draw_startup(online ? address : NULL, current_progress);
             phase = 1;
             progress = current_progress;
+            timer_snapshot(TV_TIMER_STARTUP_DRAW, settings.photo_seconds);
         }
         else if (!online && network_ap_active())
         {
@@ -82,27 +161,28 @@ static void clock_task(void *unused)
                 changed = true;
                 animation = 0;
                 description = 0;
-                first_photo = true;
-                next_description = (elapsed / 3300000 + 1) * 3300000;
-                next_photo = elapsed;
+                timer_raise(TV_TIMER_SECOND | TV_TIMER_DESCRIPTION | TV_TIMER_MINUTE |
+                            (settings.theme == 2 ? TV_TIMER_PHOTO : 0));
             }
             phase = 3;
             if (!weather.valid || !previous_weather_valid)
                 description = 0;
-            if (elapsed >= next_description)
+            if (settings.theme == 0 &&
+                timer_snapshot(TV_TIMER_DESCRIPTION, settings.photo_seconds).pending)
             {
-                if (weather.valid && previous_weather_valid)
+                if (!reset_theme && weather.valid && previous_weather_valid)
                     description = (description + 1) % 10;
-                next_description = (elapsed / 3300000 + 1) * 3300000;
                 /* The description flag belongs to the classic theme. It must
                  * not start a new photo fade or reset the simple clock timer. */
                 changed = changed || settings.theme == 0;
             }
             if (settings.theme == 0)
             {
-                if (changed || now != last_second)
+                bool periodic_status =
+                    timer_snapshot(TV_TIMER_MINUTE, settings.photo_seconds).pending != 0;
+                if (changed || now != last_second || periodic_status)
                     factory_draw_classic(&settings, &local, &weather, description, animation,
-                                         reset_theme);
+                                         reset_theme, periodic_status);
                 else
                 {
                     unsigned frames = media_animation_frames(settings.animation);
@@ -113,58 +193,53 @@ static void clock_task(void *unused)
             }
             else if (settings.theme == 1)
             {
-                if (changed || elapsed >= next_colon)
-                {
-                    factory_draw_simple(&settings, &local, address, reset_theme);
-                    next_colon = (elapsed / 1100000 + 1) * 1100000;
-                }
+                uint32_t events =
+                    timer_snapshot(TV_TIMER_SECOND | TV_TIMER_MINUTE, settings.photo_seconds)
+                        .pending;
+                /* Correct the stock simple clock's stale-minute bug: its
+                 * 0x4200bd8c only paints digits on a 66-second timer flag.
+                 * Follow real minute/hour changes while retaining colon events. */
+                factory_draw_simple(&settings, &local, address, reset_theme,
+                                    events & TV_TIMER_SECOND, events & TV_TIMER_MINUTE);
             }
             else if (settings.theme == 2)
             {
-                if (!fade && (changed || elapsed >= next_photo))
-                    fade = 1;
-                if (fade)
+                uint32_t present = 0;
+                for (unsigned slot = 0; slot < PHOTO_COUNT; ++slot)
+                    if (settings.photo_size[slot])
+                        present |= 1u << slot;
+                factory_photo_action_t action;
+                factory_photo_step(&slideshow, settings.photo_mask, present,
+                                   (ticks.pending & TV_TIMER_PHOTO) || reset_theme, false, &action);
+                if (action.set_duty)
+                    backlight_set_level(action.duty);
+                if (action.photo >= -1)
                 {
-                    /* Higher duty dims this board. Change photos at duty 1000
-                     * (backlight off), then restore full brightness in six steps. */
-                    static const unsigned levels[] = {300, 600, 1000, 600, 300, 0};
-                    backlight_set_level(levels[fade - 1]);
-                    if (fade == 3)
+                    if (action.photo == -1)
                     {
-                        if (!first_photo)
-                            photo = (photo + 1) % PHOTO_COUNT;
-                        unsigned tries = 0;
-                        while (tries < PHOTO_COUNT && (!(settings.photo_mask & (1u << photo)) ||
-                                                       !settings.photo_size[photo]))
-                        {
-                            photo = (photo + 1) % PHOTO_COUNT;
-                            ++tries;
-                        }
-                        if (tries == PHOTO_COUNT)
-                        {
-                            display_fill(0, 0, 240, 240, 0);
-                            display_factory_text(5, 225, address, 16, 0xffff, 0, true);
-                        }
-                        else
-                            factory_draw_photo(photo, address);
-                        first_photo = false;
+                        display_fill(0, 0, 240, 240, 0);
+                        display_factory_text(5, 225, address, 16, 0xffff, 0, true);
                     }
-                    if (++fade == 7)
-                    {
-                        fade = 0;
-                        int64_t period = (int64_t)settings.photo_seconds * 1100000;
-                        next_photo = (elapsed / period + 1) * period;
-                    }
+                    else
+                        factory_draw_photo(action.photo, address);
+                }
+                if (action.finished)
+                {
+                    timer_snapshot(TV_TIMER_PHOTO, settings.photo_seconds);
+                    /* Correct the stock fade's full-brightness ending when
+                     * an explicit day/night brightness was requested. */
+                    backlight_update(&settings, local.tm_hour, local.tm_min, valid);
                 }
             }
-            else if (changed || elapsed >= next_colon)
+            else if (timer_snapshot(TV_TIMER_SECOND, settings.photo_seconds).pending || reset_theme)
             {
                 factory_draw_dial(&local, address, reset_theme);
-                next_colon = (elapsed / 1100000 + 1) * 1100000;
             }
             if (settings.theme != 2)
                 backlight_update(&settings, local.tm_hour, local.tm_min, valid);
             previous_theme = settings.theme;
+            if (timer_snapshot(TV_TIMER_WEATHER, settings.photo_seconds).pending)
+                weather_request_update();
         }
         generation = current_generation;
         weather_generation = weather.generation;

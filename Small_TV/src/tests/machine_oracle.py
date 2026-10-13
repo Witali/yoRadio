@@ -272,15 +272,16 @@ class Machine:
             self.cpu.mem_write(SCRATCH+0x200,struct.pack('<9i',second,minute,hour,13,9,126,weekday,285,0)+bytes(8))
             self.cpu.mem_write(SCRATCH+0x300,address)
 
-    def simple(self,reset=True,minute_update=True):
+    def simple(self,reset=True,minute_update=True,second_update=True):
         """Run the corresponding factory entry points or actual compiled C function."""
         if self.is_factory:
             if reset:
                 self.call(0x4200bd26)
-            self.cpu.mem_write(0x3fcc39f5,bytes([int(minute_update),1]))
+            self.cpu.mem_write(0x3fcc39f5,bytes([int(minute_update),int(second_update)]))
             self.call(0x4200bd8c)
         else:
-            self.call(self.symbols['factory_draw_simple'],SCRATCH,SCRATCH+0x200,SCRATCH+0x300,int(reset))
+            self.call(self.symbols['factory_draw_simple'],SCRATCH,SCRATCH+0x200,SCRATCH+0x300,
+                      int(reset),int(second_update),int(minute_update))
 
     def dial(self,reset=True):
         """Execute original analog geometry/math and the compiled C counterpart."""

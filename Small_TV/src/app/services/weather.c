@@ -11,7 +11,6 @@
 #include <stdatomic.h>
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
-#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
@@ -19,7 +18,12 @@
 static SemaphoreHandle_t weather_mutex;
 static weather_snapshot_t cached_weather;
 static TaskHandle_t weather_task_handle;
-static atomic_bool request_active;
+enum
+{
+    REQUEST_RUNNING = 1,
+    REQUEST_PENDING = 2
+};
+static atomic_uint request_state;
 typedef struct
 {
     char *body;
@@ -40,12 +44,15 @@ void weather_request_update(void)
 {
     /* Wake the weather worker after location/key settings change. */
     if (weather_task_handle)
+    {
+        atomic_fetch_or(&request_state, REQUEST_PENDING);
         xTaskNotifyGive(weather_task_handle);
+    }
 }
 bool weather_request_active(void)
 {
     /* Report a blocking request so the LCD follows the factory pause behavior. */
-    return atomic_load(&request_active);
+    return atomic_load(&request_state) != 0;
 }
 
 static esp_err_t weather_http_event(esp_http_client_event_t *event)
@@ -120,13 +127,15 @@ static esp_err_t fetch_weather(const tv_settings_t *s, weather_snapshot_t *out)
 
 static void weather_task(void *unused)
 {
-    /* Refresh weather on the factory retry/update schedule and reject stale results. */
+    /* Execute requests scheduled by the factory main loop and reject stale results. */
 
     (void)unused;
-    int64_t next_fetch = 0;
     char last_city[65] = "", last_country[3] = "", last_key[65] = "";
     for (;;)
     {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        atomic_fetch_or(&request_state, REQUEST_RUNNING);
+        atomic_fetch_and(&request_state, ~REQUEST_PENDING);
         tv_settings_t s;
         settings_snapshot(&s);
         if (strcmp(last_city, s.city) || strcmp(last_country, s.country) ||
@@ -135,18 +144,15 @@ static void weather_task(void *unused)
             strcpy(last_city, s.city);
             strcpy(last_country, s.country);
             strcpy(last_key, s.weather_key);
-            next_fetch = 0;
             xSemaphoreTake(weather_mutex, portMAX_DELAY);
             cached_weather.valid = false;
             ++cached_weather.generation;
             xSemaphoreGive(weather_mutex);
         }
-        if (network_connected() && s.weather_key[0] && esp_timer_get_time() >= next_fetch)
+        if (network_connected() && s.weather_key[0])
         {
             weather_snapshot_t fresh;
-            atomic_store(&request_active, true);
             esp_err_t fetched = fetch_weather(&s, &fresh);
-            atomic_store(&request_active, false);
             if (fetched == ESP_OK)
             {
                 tv_settings_t current;
@@ -159,13 +165,9 @@ static void weather_task(void *unused)
                     cached_weather = fresh;
                     xSemaphoreGive(weather_mutex);
                 }
-                next_fetch = esp_timer_get_time() + 1981100000LL;
             }
-            else
-                next_fetch = esp_timer_get_time() + 3100000;
         }
-        if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(1000)))
-            next_fetch = 0;
+        atomic_fetch_and(&request_state, ~REQUEST_RUNNING);
     }
 }
 

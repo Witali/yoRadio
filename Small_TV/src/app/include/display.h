@@ -12,3 +12,4 @@ esp_err_t backlight_init(void);
 void backlight_set_level(unsigned per_mille);
 void backlight_update(const tv_settings_t *s, int local_hour, int local_minute, bool clock_valid);
 void clock_ui_start(void);
+esp_err_t clock_ui_timer_init(void);

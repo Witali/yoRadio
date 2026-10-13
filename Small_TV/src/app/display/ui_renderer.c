@@ -123,7 +123,7 @@ static void description_label(char out[65], const tv_settings_t *s,
 
 void factory_draw_classic(const tv_settings_t *s, const struct tm *local,
                           const weather_snapshot_t *weather, unsigned description_step,
-                          unsigned animation_frame, bool reset)
+                          unsigned animation_frame, bool reset, bool force_status)
 {
     /* Update the classic fields selected by the original renderer at 0x4200b738. */
 
@@ -135,7 +135,7 @@ void factory_draw_classic(const tv_settings_t *s, const struct tm *local,
     bool minute = reset || local->tm_min != previous_time.tm_min ||
                   local->tm_hour != previous_time.tm_hour ||
                   local->tm_yday != previous_time.tm_yday;
-    bool status = preferences || minute || weather->generation != previous_weather;
+    bool status = force_status || preferences || minute || weather->generation != previous_weather;
     char text[65], date[24], address[20];
     network_address(address, sizeof(address));
     description_label(text, s, weather, address, description_step);
@@ -201,13 +201,13 @@ void factory_draw_classic(const tv_settings_t *s, const struct tm *local,
 }
 
 void factory_draw_simple(const tv_settings_t *s, const struct tm *local, const char *address,
-                         bool reset)
+                         bool reset, bool second_update, bool minute_update)
 {
     /* Update the simple clock using the factory 0x4200bd26/0x4200bd8c split. */
 
     static struct tm previous_time;
     static uint8_t previous_hour12, previous_date;
-    bool minute = reset || local->tm_min != previous_time.tm_min ||
+    bool minute = reset || minute_update || local->tm_min != previous_time.tm_min ||
                   local->tm_hour != previous_time.tm_hour ||
                   local->tm_yday != previous_time.tm_yday || s->hour12 != previous_hour12 ||
                   s->date_format != previous_date;
@@ -220,8 +220,9 @@ void factory_draw_simple(const tv_settings_t *s, const struct tm *local, const c
         display_factory_text(5, 225, address, 16, 0xffff, 0, true);
     }
     /* The timer at 0x4200826a sets this update flag after eleven 100-ms ticks. */
-    display_factory_text(100, 80, local->tm_sec & 1 ? " " : ":", 80, local->tm_sec & 1 ? 0 : 0xffff,
-                         0, false);
+    if (reset || second_update)
+        display_factory_text(100, 80, local->tm_sec & 1 ? " " : ":", 80,
+                             local->tm_sec & 1 ? 0 : 0xffff, 0, false);
     if (minute)
     {
         snprintf(text, sizeof(text), "%02d", displayed_hour(s, local));

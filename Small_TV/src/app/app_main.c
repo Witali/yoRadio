@@ -13,8 +13,9 @@ void app_main(void)
     /* Preserve the original dump and its calibration. No automatic NVS erase. */
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(settings_init());
-    ESP_ERROR_CHECK(backlight_init());
     ESP_ERROR_CHECK(display_init());
+    ESP_ERROR_CHECK(clock_ui_timer_init());
+    ESP_ERROR_CHECK(backlight_init());
     ESP_ERROR_CHECK(media_init());
     ESP_ERROR_CHECK(network_init());
     services_start();

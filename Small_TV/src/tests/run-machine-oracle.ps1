@@ -2,6 +2,7 @@
 param(
     [switch]$InstallDependencies,
     [switch]$Quick,
+    [switch]$Control,
     [string]$PythonPath,
     [string]$OutputDirectory
 )
@@ -30,3 +31,7 @@ if (!$Quick) { $arguments += "--extended" }
 if ($OutputDirectory) { $arguments += @("--output", $OutputDirectory) }
 & $PythonPath (Join-Path $PSScriptRoot "machine_oracle.py") @arguments
 if ($LASTEXITCODE) { throw "Renderer machine verification failed." }
+if ($Control) {
+    & $PythonPath (Join-Path $PSScriptRoot "control_oracle.py")
+    if ($LASTEXITCODE) { throw "Timer/slideshow machine verification failed." }
+}

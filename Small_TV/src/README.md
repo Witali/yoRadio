@@ -46,13 +46,13 @@ meaning. The executable files in `app/` use real C types and descriptive
 functions, configuration fields, buffers and state variables. SDK code is
 provided by ESP-IDF rather than stubbed out or mapped to old machine addresses.
 
-All 121 production C functions have an entry comment explaining their purpose.
+All 129 production C functions have an entry comment explaining their purpose.
 Comments also explain byte-padded/LSB-first fonts, fixed raw-sector offsets,
 timer thresholds, photo fades, MIME binary parsing and DNS packet bounds.
 Where machine instructions were checked directly, comments cite their original
 addresses. [Assembly audit](reference/assembly/README.md) separates those checks
 from inference based on the Ghidra export.
-`tools/assist_c_port.py` is a paused draft: it parses instructions, finds CFG
+`tools/assist_c_port.py` is an unfinished draft: it parses instructions, finds CFG
 blocks/natural loops and renders branch conditions. Its complete C-draft emitter
 and command-line interface have not yet been implemented or tested.
 
@@ -191,6 +191,8 @@ vendor bugs are corrected rather than reproduced; verification records these
 intentional differences separately from incomplete reconstruction.
 Analog strokes retain the correct perpendicular `cos/sin` offset pair, fixing
 the vendor's swapped pair that makes axis-aligned thick strokes collapse.
+The simple theme follows real hour/minute changes, correcting the factory's
+stale digits caused by its 66-second update flag. Colon events remain independent.
 Setup text and the `Ver:0.0.2` progress screen are restored. The earlier extra
 seconds/IP overlay and clock-on-photo strip are removed. Spleen remains only
 for the diagnostic `display_text` helper, not the normal factory UI.
@@ -227,9 +229,20 @@ is masked.
 These checks supplement the whole-board QEMU captures and do not establish
 network, service scheduling or hardware equivalence.
 
+[Control checks](../qemu/parity/control-checks.md) compare 79,296 timer ticks,
+13,440 slideshow transitions and 60 frames with independent second/minute flags
+against executed factory instructions. Hardware GPTimer now starts before
+network initialization. Its ISR only updates counters/flags; one task owns SPI.
+Events coalesce across blocking HTTP/upload work. Weather retries count completed
+main-loop iterations and periodic requests use the global timer flag, instead
+of a worker deadline measured from its last response. Photo rotation preserves
+next-slot/fade state and restores configured day/night brightness after a fade,
+correcting the vendor's full-brightness override in photo mode.
+
 ```powershell
 & .\Small_TV\src\tests\run.ps1
 & .\Small_TV\src\tests\run-machine-oracle.ps1
+& .\Small_TV\src\tests\run-machine-oracle.ps1 -Control
 ```
 
 The test runner compiles the actual settings, Kelvin weather parser, media, upload, HTTP and DNS

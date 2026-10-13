@@ -32,6 +32,11 @@ retains literal factory pixel differences and separately verifies the deliberate
 Sunday and stroke-geometry corrections. It does not claim complete program or
 timing equivalence.
 
+[Control execution](../../../qemu/parity/control-checks.md) verifies every
+counter/flag in four traces spanning 79,296 calls to `0x4200826a`, plus 13,440
+fade/selection transitions at `0x4200bc36`/`0x4200bb4c`. `0x4200bd8c` relies only
+on the minute flag; stale digits are deliberately corrected by real rollover.
+
 `../../tools/disassemble_factory.py` reproduces exports with an explicit local
 objdump path and a list of addresses or bounded IROM ranges.
 `../../tools/assist_c_port.py` is an unfinished library draft for the next stage:
