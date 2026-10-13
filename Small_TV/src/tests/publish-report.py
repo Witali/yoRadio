@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -33,7 +33,8 @@ def main():
     machine = groups['machine']['result']
     controls = groups['machine_control']['result']
     classic = groups['machine_classic']['result']
-    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, groups['integrity']['result'])):
+    weather = groups['machine_weather']['result']
+    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, groups['integrity']['result'])):
         raise ValueError('Groups tested different applications')
     qemu = groups['qemu']['result']
     if not qemu['http_initial_setup']['passed']:
@@ -73,6 +74,10 @@ def main():
                                   'animation_guards':len(classic['animation']['guards']),
                                   'glyph_geometry_checks':classic['glyph_geometry_checks'],
                                   'approved_fixes':classic['approved_fixes'],'scope':classic['scope']}
+    summary['machine_weather'] = {key:weather[key] for key in
+        ('passed','app_sha256','source_sha256','factory_elf_sha256','native_elf_sha256','approved_fixes','requested_changes','scope')}
+    summary['machine_weather']['case_counts'] = {
+        kind:sum(row['kind']==kind for row in weather['cases']) for kind in sorted({row['kind'] for row in weather['cases']})}
     summary['qemu'] = {'passed': qemu['passed'], 'qemu_sha256': qemu['qemu_sha256'],
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
                        'helper_sha256': qemu['helper_sha256'],

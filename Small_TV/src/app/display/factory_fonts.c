@@ -33,13 +33,13 @@ bool factory_symbol(unsigned symbol, tv_bitmap_t *out)
     return true;
 }
 
-void display_factory_text(int x, int y, const char *text, unsigned height, uint16_t color,
-                          uint16_t background, bool transparent)
+static void draw_text(int x, int y, int left, int right, bool complete_glyphs, const char *text,
+                      unsigned height, uint16_t color, uint16_t background, bool transparent)
 {
-    /* Draw factory glyphs with the spacing recovered at 0x4200aa1e/0x4200abee. */
+    /* Share factory decoding/spacing between panel-clipped and bounded labels. */
 
     const unsigned char *cursor = (const unsigned char *)text;
-    while (*cursor && x < 240)
+    while (*cursor && x < right)
     {
         unsigned advance = height / 2;
         tv_bitmap_t glyph;
@@ -58,19 +58,84 @@ void display_factory_text(int x, int y, const char *text, unsigned height, uint1
         {
             found = factory_glyph(*cursor++, height, &glyph);
         }
+        unsigned spacing = transparent && height == 16 && advance == 8 ? 5 : advance;
+        /* A transparent glyph can be wider than its advance. Require both to
+         * fit, and never draw half of a legacy two-byte temperature symbol. */
+        unsigned extent = found && glyph.width > spacing ? glyph.width : spacing;
+        if (complete_glyphs && extent > (unsigned)(right - x))
+            break;
         if (found)
-            display_bitmap(x, y, &glyph, color, background, transparent);
+        {
+            if (left >= 0)
+                display_bitmap_region(x, y, &glyph, left, y, right, y + height,
+                                       color, background, transparent);
+            else
+                display_bitmap(x, y, &glyph, color, background, transparent);
+        }
         else if (!transparent)
         {
             /* The factory uses a space with black ink to erase large digits. */
             extern void display_fill(int, int, int, int, uint16_t);
-            display_fill(x, y, advance, height, background);
+            int start = left >= 0 && x < left ? left : x;
+            int end = x + (int)advance;
+            if (end > right) end = right;
+            display_fill(start, y, end - start, height, background);
         }
-        if (transparent && height == 16 && advance == 8)
-            /* 0x4200aad0 subtracts three from the normal eight-pixel advance. */
-            advance = 5;
-        x += advance;
+        /* 0x4200aad0 subtracts three from the normal eight-pixel advance. */
+        x += spacing;
     }
+}
+
+void display_factory_text(int x, int y, const char *text, unsigned height, uint16_t color,
+                          uint16_t background, bool transparent)
+{
+    /* Preserve the recovered text API, including partial glyphs at the panel edge. */
+
+    draw_text(x, y, -1, 240, false, text, height, color, background, transparent);
+}
+
+void display_factory_text_bounded(int x, int y, int width, const char *text, unsigned height,
+                                  uint16_t color, uint16_t background, bool transparent)
+{
+    /* Draw complete glyphs within one field, stopping before its right edge.
+     * FIXED_FACTORY: 0x4200abee bounds text by the panel rather than the field;
+     * long city/weather labels can overwrite adjacent content. */
+
+    if (x < 0 || x >= 240 || width <= 0)
+        return;
+    if (width > 240 - x)
+        width = 240 - x;
+    draw_text(x, y, x, x + width, true, text, height, color, background, transparent);
+}
+
+unsigned display_factory_text_width(const char *text, unsigned height)
+{
+    /* Measure opaque factory text, including full-width two-byte unit symbols. */
+
+    unsigned width = 0;
+    const unsigned char *cursor = (const unsigned char *)text;
+    while (*cursor)
+    {
+        bool pair = cursor[0] >= 0x81 && cursor[1];
+        width += pair ? height : height / 2;
+        cursor += pair ? 2 : 1;
+    }
+    return width;
+}
+
+void display_factory_text_window(int x, int y, int width, unsigned offset, const char *text,
+                                 unsigned height, uint16_t color, uint16_t background)
+{
+    /* Draw a moving text prefix through a fixed, opaque field window.
+     * REQUESTED_CHANGE: retain partial glyphs at both edges during scrolling. */
+
+    if (x < 0 || x >= 240 || width <= 0)
+        return;
+    if (width > 240 - x) width = 240 - x;
+    unsigned length = display_factory_text_width(text, height);
+    unsigned limit = length > (unsigned)width ? length - width : 0;
+    if (offset > limit) offset = limit;
+    draw_text(x - (int)offset, y, x, x + width, false, text, height, color, background, false);
 }
 
 void display_factory_symbol(int x, int y, unsigned symbol, uint16_t color, uint16_t background)

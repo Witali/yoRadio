@@ -5,6 +5,7 @@ outputs are recorded media boundaries, not decoded pixels; independent decoder
 and QEMU tests cover those. Only synthetic preferences/weather enter the CPUs.
 """
 import argparse
+from array import array
 from dataclasses import dataclass, replace
 import datetime as dt
 import hashlib
@@ -65,6 +66,9 @@ class Inputs:
     direction: str = '-East-north-east'
     step: int = 0
     animation: int = 0
+    icon: str = '01d'
+    generation: int = 0
+    retained_icon: bool = False
 
 
 class ClassicMachine(Machine):
@@ -80,6 +84,7 @@ class ClassicMachine(Machine):
             self.adapt(0x42010eca, 'bmp-output-recorded', self.weather)
             if variant == 'factory-classic-corrected':
                 self.cpu.hook_add(UC_HOOK_CODE,self.clip_partial_glyph,begin=0x4200950e,end=0x4200950e)
+                self.install_field_corrections()
         else:
             self.settings_size, self.settings_fields = layout('tv_settings_t')
             self.weather_size, self.weather_fields = layout('weather_snapshot_t')
@@ -98,23 +103,62 @@ class ClassicMachine(Machine):
         Fully visible rectangles still execute the original blitter unchanged.
         """
         x0,y0,x1,y1 = (self.reg(index) for index in range(10,14))
-        if x0 >= 240 or y0 >= 240 or (x1 < 240 and y1 < 240):
-            return
         width,height = x1-x0+1,y1-y0+1
+        fields = {10:(0,180),40:(0,180),83:(160,240),150:(0,120),180:(80,152),210:(80,152)}
+        left,right = fields[y0] if height==24 and y0 in fields else (0,240)
+        visible_x0,visible_x1 = max(x0,left),min(x1,right-1)
+        visible_y=min(y1,239)
+        if visible_x0==x0 and visible_x1==x1 and visible_y==y1:
+            return
         if width <= 0 or height <= 0 or width*height*2 > 0x2800:
             raise AssertionError('Unexpected corrected glyph rectangle')
         data = bytes(cpu.mem_read(self.reg(14),width*height*2))
-        visible_x,visible_y = min(x1,239),min(y1,239)
-        for command,window in [(0x2a,(x0,visible_x)),(0x2b,(y0,visible_y))]:
-            self.panel.transfer(bytes([command]),False)
-            self.panel.transfer(struct.pack('>HH',*window),True)
-        self.panel.transfer(b'\x2c',False)
-        for row in range(visible_y-y0+1):
-            self.panel.transfer(data[row*width*2:(row*width+visible_x-x0+1)*2],True)
-        key = 'correct-partial-glyph-blit'
+        if visible_x1>=visible_x0 and visible_y>=y0:
+            for command,window in [(0x2a,(visible_x0,visible_x1)),(0x2b,(y0,visible_y))]:
+                self.panel.transfer(bytes([command]),False)
+                self.panel.transfer(struct.pack('>HH',*window),True)
+            self.panel.transfer(b'\x2c',False)
+            for row in range(visible_y-y0+1):
+                self.panel.transfer(data[(row*width+visible_x0-x0)*2:(row*width+visible_x1-x0+1)*2],True)
+        key = 'correct-field-glyph-blit' if right!=240 or left else 'correct-partial-glyph-blit'
         self.executed_adapters[key] = self.executed_adapters.get(key,0)+1
         cpu.reg_write(REGS[10],0)
         cpu.reg_write(rv.UC_RISCV_REG_PC,cpu.reg_read(REGS[1]))
+
+    def install_field_corrections(self):
+        """Declare city/title cleanup and field positioning separately from literal code."""
+        self.cpu.hook_add(UC_HOOK_CODE,self.correct_status,begin=0x4200b340,end=0x4200b340)
+        self.cpu.hook_add(UC_HOOK_CODE,self.correct_city,begin=0x4200aefc,end=0x4200aefc)
+        self.cpu.hook_add(UC_HOOK_CODE,self.correct_field_text,begin=0x4200abee,end=0x4200abee)
+
+    def erase_band(self,x,y,width,height):
+        """Clear only an explicitly corrected reference rectangle; never mask a comparison."""
+        for row in range(y,y+height):
+            self.panel.pixels[row*240+x:row*240+x+width]=array('H',[0])*width
+
+    def correct_status(self,cpu,pc,size,context):
+        """Repair title and invalid-icon clearing, retaining subsequent factory instructions."""
+        self.erase_band(160,83,80,24)
+        if not cpu.mem_read(0x3fcc39d7,1)[0]:
+            self.erase_band(180,10,60,60)
+        self.executed_adapters['correct-weather-bands']=self.executed_adapters.get('correct-weather-bands',0)+1
+
+    def correct_city(self,cpu,pc,size,context):
+        """Include all city glyph rows in the factory's undersized clear."""
+        self.erase_band(0,0,180,34)
+        self.executed_adapters['correct-city-height']=self.executed_adapters.get('correct-city-height',0)+1
+
+    def correct_field_text(self,cpu,pc,size,context):
+        """Center fitting strings; start overflowing fields at the left scroll endpoint."""
+        if self.reg(13)!=24 or self.reg(11) not in (10,40,83):
+            return
+        text=self.string(self.reg(12))
+        width=len(text)*12  # All controlled labels here contain ASCII characters.
+        left,field_width = (160,80) if self.reg(11)==83 else (0,180)
+        x=left+max(field_width-width,0)//2
+        if self.reg(10)!=x:
+            cpu.reg_write(REGS[10],x)
+            self.executed_adapters['correct-field-centering']=self.executed_adapters.get('correct-field-centering',0)+1
 
     def format_text(self):
         """Adapt printf text with RV32 vararg alignment; arithmetic remains machine code."""
@@ -196,14 +240,14 @@ class ClassicMachine(Machine):
         """Require the actual selected icon/coordinates, then record the BMP boundary."""
         if self.is_factory:
             x, y = self.reg(10), self.reg(11)
-            offset = int.from_bytes(self.cpu.mem_read(0x3fcc3aa8, 4), 'little')
-            if offset != 0x377000:
-                raise AssertionError('Wrong synthetic weather icon')
+            offset = self.reg(12)
+            code = next(row['code'] for row in self.assets['weather'] if int(row['flash_offset'],16)==offset)
         else:
             x, y = self.reg(11), self.reg(12)
-            if self.string(self.reg(10)) != b'01d':
-                raise AssertionError('Wrong synthetic weather icon')
-        self.media_calls.append([['weather', '01d'], x, y])
+            code = self.string(self.reg(10)).decode()
+            if code not in [row['code'] for row in self.assets['weather']]:
+                raise AssertionError('Unknown synthetic weather icon')
+        self.media_calls.append([['weather', code], x, y])
         return 0
 
     def animation(self):
@@ -211,7 +255,7 @@ class ClassicMachine(Machine):
         self.media_calls.append([['animation', self.reg(10), self.reg(11)], self.reg(12), self.reg(13)])
         return 0
 
-    def render(self, inputs, reset=True, cursor=0):
+    def render(self, inputs, reset=True, cursor=0, force_status=False):
         """Seed explicit ABI fields, then execute both composite renderer entry points."""
         self.seed(inputs.hour, inputs.minute, inputs.second, inputs.weekday,
                   inputs.date_format, inputs.hour12)
@@ -235,11 +279,14 @@ class ClassicMachine(Machine):
                 if len(text) > 19:
                     raise AssertionError('Synthetic weather text exceeds the factory buffer')
                 self.cpu.mem_write(address, text.encode() + b'\0')
-            self.cpu.mem_write(0x3fcc3aa8, struct.pack('<I', 0x377000 if inputs.valid else 0))
+            icon = next(int(row['flash_offset'],16) for row in self.assets['weather'] if row['code']==inputs.icon)
+            self.cpu.mem_write(0x3fcc3aa8, struct.pack('<I', icon if inputs.valid or inputs.retained_icon else 0))
             if reset:
                 self.call(0x4200aebe)
             self.cpu.mem_write(0x3fcc3a25, bytes([inputs.step]))
             self.cpu.mem_write(0x3fcc39f7, b'\x01')  # the declared description timer event
+            if force_status:
+                self.cpu.mem_write(0x3fcc39f5,b'\x01')
             self.call(0x4200b738)
         else:
             fields = self.settings_fields
@@ -253,11 +300,12 @@ class ClassicMachine(Machine):
                 inputs.hour, inputs.day, inputs.month - 1, inputs.year - 1900, inputs.weekday, yday, 0) + bytes(8))
             weather, fields = bytearray(self.weather_size), self.weather_fields
             weather[fields['valid']] = inputs.valid
+            struct.pack_into('<I',weather,fields['generation'],inputs.generation)
             for key, value in [('temperature_c', inputs.temperature), ('temperature_min_c', inputs.minimum),
                                ('temperature_max_c', inputs.maximum), ('wind_mps', inputs.wind)]:
                 struct.pack_into('<d', weather, fields[key], value)
             struct.pack_into('<i', weather, fields['humidity'], inputs.humidity)
-            for key, text in [('icon', '01d'), ('main', inputs.main), ('description', inputs.description),
+            for key, text in [('icon', inputs.icon), ('main', inputs.main), ('description', inputs.description),
                               ('wind_direction', inputs.direction)]:
                 value = text.encode()
                 weather[fields[key]:fields[key] + len(value)] = value
@@ -265,7 +313,7 @@ class ClassicMachine(Machine):
             frame = self.call(self.symbols['factory_animation_next'], CURSOR,
                               self.assets['animations'][inputs.animation]['frame_count'])
             self.call(self.symbols['factory_draw_classic'], SCRATCH, SCRATCH + 0x200, WEATHER,
-                      inputs.step, frame, int(reset), int(reset))
+                      inputs.step, frame, int(reset), int(reset or force_status))
 
 
 def renderer_checks(factory, native, corrected, output):
@@ -292,8 +340,8 @@ def renderer_checks(factory, native, corrected, output):
         if differences:
             corrected_difference = sum(a!=b for a,b in zip(corrected.panel.pixels,native.panel.pixels))
             if (corrected_difference==0 and corrected.media_calls==native.media_calls and
-                    corrected.executed_adapters.get('correct-partial-glyph-blit',0)):
-                row['approved_fix'] = 'clip-partially-visible-glyph'
+                    any(key.startswith('correct-') for key in corrected.executed_adapters)):
+                row['approved_fix'] = 'bounded-clean-classic-fields'
                 row['corrected_reference_different_pixels'] = 0
                 row['passed'] = True
         cases.append(row)
@@ -389,7 +437,8 @@ def main():
               'glyph_geometry_checks':glyphs,
               'literal_equal':not any(row['different_pixels'] for row in cases),
               'approved_fixes':{'clip-partially-visible-glyph':
-                  'Factory 0x4200950e rejects an entire glyph if its rectangle crosses 239; retain its computed bitmap and clip only the visible columns/rows.'},
+                  'Factory 0x4200950e rejects an entire glyph if its rectangle crosses 239; retain its computed bitmap and clip only the visible columns/rows.',
+                  'bounded-clean-classic-fields':'City/title/icon cleanup and bounded field glyphs; overflowing labels start at the left scroll endpoint. Later motion is a requested extension, tested separately.'},
               'adapters':{'factory':factory.executed_adapters,'native':native.executed_adapters,
                           'factory-classic-corrected':corrected.executed_adapters},
               'scope':'Exact executed classic text/window pixels and media-request identities; media output is recorded, not decoded. Executed animation cursor/header selection; task scheduling and physical timing remain outside scope.'}

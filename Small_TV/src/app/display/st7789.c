@@ -205,44 +205,48 @@ void display_line(int x0, int y0, int x1, int y1, uint16_t color)
     }
 }
 
-void display_bitmap(int x, int y, const tv_bitmap_t *bitmap, uint16_t color, uint16_t background,
-                    bool transparent)
+void display_bitmap_region(int x, int y, const tv_bitmap_t *bitmap, int left, int top,
+                            int right, int bottom, uint16_t color, uint16_t background,
+                            bool transparent)
 {
-    /* Render the factory LSB-first bitmap without allocating a framebuffer.
-     * FIXED_FACTORY: 0x4200950e drops an entire glyph when its right/bottom edge
-     * leaves the panel. Clip its visible columns/rows, preserving the source
-     * stride; the final 'r' in Thunderstorm at x=236 must remain visible. */
+    /* Clip a factory bitmap against a field and the panel, preserving source bits.
+     * REQUESTED_CHANGE: pixel clipping at both field edges allows smooth text
+     * scrolling without drawing into neighboring labels or the weather icon. */
 
-    if (x < 0 || y < 0 || x >= LCD_WIDTH || y >= LCD_HEIGHT)
+    if (left < 0) left = 0;
+    if (top < 0) top = 0;
+    if (right > LCD_WIDTH) right = LCD_WIDTH;
+    if (bottom > LCD_HEIGHT) bottom = LCD_HEIGHT;
+    int source_x = x < left ? left - x : 0, source_y = y < top ? top - y : 0;
+    int width = (int)bitmap->width - source_x, height = (int)bitmap->height - source_y;
+    x += source_x;
+    y += source_y;
+    if (x + width > right) width = right - x;
+    if (y + height > bottom) height = bottom - y;
+    if (width <= 0 || height <= 0)
         return;
     /* Factory rows are byte-padded and LSB-first. Width-12 glyphs use only
      * four bits of their second byte; MSB-first Spleen rows cannot substitute. */
-    unsigned width = bitmap->width, height = bitmap->height;
-    if (x + (int)width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + (int)height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
-    if (!width || !height)
-        return;
     if (transparent)
     {
-        for (unsigned row = 0; row < height; ++row)
+        for (int row = 0; row < height; ++row)
         {
-            const uint8_t *bits = bitmap->pixels + row * bitmap->stride;
-            for (unsigned column = 0; column < width; ++column)
-                if (bits[column / 8] & (1u << (column & 7)))
+            const uint8_t *bits = bitmap->pixels + (row + source_y) * bitmap->stride;
+            for (int column = 0; column < width; ++column)
+                if (bits[(column + source_x) / 8] & (1u << ((column + source_x) & 7)))
                     display_fill(x + column, y + row, 1, 1, color);
         }
         return;
     }
     lcd_window(x, y, width, height);
     size_t used = 0;
-    for (unsigned row = 0; row < height; ++row)
+    for (int row = 0; row < height; ++row)
     {
-        const uint8_t *bits = bitmap->pixels + row * bitmap->stride;
-        for (unsigned column = 0; column < width; ++column)
+        const uint8_t *bits = bitmap->pixels + (row + source_y) * bitmap->stride;
+        for (int column = 0; column < width; ++column)
         {
-            uint16_t pixel = (bits[column / 8] & (1u << (column & 7))) ? color : background;
+            unsigned source_column = column + source_x;
+            uint16_t pixel = (bits[source_column / 8] & (1u << (source_column & 7))) ? color : background;
             transfer_buffer[used++] = pixel >> 8;
             transfer_buffer[used++] = pixel;
             if (used == sizeof(transfer_buffer))
@@ -253,4 +257,17 @@ void display_bitmap(int x, int y, const tv_bitmap_t *bitmap, uint16_t color, uin
         }
     }
     lcd_transfer(transfer_buffer, used, true);
+}
+
+void display_bitmap(int x, int y, const tv_bitmap_t *bitmap, uint16_t color, uint16_t background,
+                    bool transparent)
+{
+    /* Render the factory bitmap with the recovered API's nonnegative origin.
+     * FIXED_FACTORY: 0x4200950e drops a whole glyph at the right/bottom edge;
+     * draw its visible pixels while preserving the source stride. */
+
+    if (x < 0 || y < 0)
+        return;
+    display_bitmap_region(x, y, bitmap, 0, 0, LCD_WIDTH, LCD_HEIGHT, color, background,
+                           transparent);
 }

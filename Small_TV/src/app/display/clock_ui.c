@@ -100,7 +100,8 @@ static void clock_task(void *unused)
      * as in 0x4200b5cc and 0x42008e08; resetting it changes the next frame.
      * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
      * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
-     * after the photo fade rather than 0x4200bc36's full-brightness ending. */
+     * after the photo fade rather than 0x4200bc36's full-brightness ending.
+     * REQUESTED_CHANGE: advance clipped text fields in the active display loop. */
 
     (void)unused;
     uint32_t generation = 0, weather_generation = 0;
@@ -175,12 +176,13 @@ static void clock_task(void *unused)
             phase = 3;
             if (!weather.valid || !previous_weather_valid)
                 description = 0;
-            if (settings.theme == 0 &&
+            if (settings.theme == 0 && (reset_theme || factory_scroll_description_ready()) &&
                 timer_snapshot(TV_TIMER_DESCRIPTION, settings.photo_seconds).pending)
             {
                 if (!reset_theme && weather.valid && previous_weather_valid)
                     description = (description + 1) % 10;
-                /* The description flag belongs to the classic theme. It must
+                /* A long label retains this event until its scroll completes.
+                 * The description flag belongs to the classic theme. It must
                  * not start a new photo fade or reset the simple clock timer. */
                 changed = changed || settings.theme == 0;
             }
@@ -199,6 +201,7 @@ static void clock_task(void *unused)
                     if (frame >= 0)
                         media_draw_animation(settings.animation, (unsigned)frame, 160, 160);
                 }
+                factory_scroll_tick();
             }
             else if (settings.theme == 1)
             {

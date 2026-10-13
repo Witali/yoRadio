@@ -6,6 +6,99 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef struct
+{
+    char text[65];
+    int x, y, width;
+    uint16_t color;
+    unsigned length, offset, pause;
+    bool returning, completed;
+} scrolling_label_t;
+
+static scrolling_label_t scrolling_labels[3];
+
+static void paint_scrolling_label(const scrolling_label_t *label)
+{
+    /* Erase and redraw only the label's own 24-row window at its current offset. */
+
+    display_fill(label->x, label->y, label->width, 24, 0);
+    if (label->length > (unsigned)label->width)
+        display_factory_text_window(label->x, label->y, label->width, label->offset,
+                                     label->text, 24, label->color, 0);
+    else
+    {
+        int margin = (label->width - label->length) / 2;
+        display_factory_text_bounded(label->x + margin, label->y, label->width - margin,
+                                     label->text, 24, label->color, 0, false);
+    }
+}
+
+static void scrolling_label(unsigned index, int x, int y, int width, const char *text,
+                             uint16_t color, bool reset)
+{
+    /* Cache one field's text and restart its motion on content or theme changes.
+     * REQUESTED_CHANGE: long city/description/weather labels move independently;
+     * strings that fit remain centered and stationary. */
+
+    scrolling_label_t *label = &scrolling_labels[index];
+    if (reset || strcmp(text, label->text))
+    {
+        snprintf(label->text, sizeof(label->text), "%s", text);
+        label->length = display_factory_text_width(label->text, 24);
+        label->offset = 0;
+        label->pause = 15;
+        label->returning = false;
+        label->completed = false;
+    }
+    label->x = x;
+    label->y = y;
+    label->width = width;
+    label->color = color;
+    paint_scrolling_label(label);
+}
+
+void factory_scroll_tick(void)
+{
+    /* Advance overflowing fields by two pixels per active 100-ms display loop.
+     * REQUESTED_CHANGE: pause for 15 steps at each end, then reverse direction.
+     * Blocking uploads/weather requests suspend drawing and therefore motion. */
+
+    for (unsigned i = 0; i < 3; ++i)
+    {
+        scrolling_label_t *label = &scrolling_labels[i];
+        if (label->width <= 0 || label->length <= (unsigned)label->width)
+            continue;
+        if (label->pause)
+        {
+            --label->pause;
+            continue;
+        }
+        unsigned limit = label->length - label->width;
+        if (label->returning)
+            label->offset = label->offset > 2 ? label->offset - 2 : 0;
+        else
+            label->offset = label->offset + 2 < limit ? label->offset + 2 : limit;
+        if (!label->offset || label->offset == limit)
+        {
+            if (!label->offset)
+                label->completed = true;
+            label->returning = !label->returning;
+            label->pause = 15;
+        }
+        paint_scrolling_label(label);
+    }
+}
+
+bool factory_scroll_description_ready(void)
+{
+    /* Permit message rotation after a long description has traveled there and back.
+     * REQUESTED_CHANGE: preserve the pending rotation event until the whole label
+     * has been visible; fitting labels retain the original message cadence. */
+
+    const scrolling_label_t *label = &scrolling_labels[1];
+    return label->width <= 0 || label->length <= (unsigned)label->width || label->completed;
+}
+
 static const char *weekday(int day)
 {
     /* Return the three-letter factory weekday label. */
@@ -35,14 +128,24 @@ static int displayed_hour(const tv_settings_t *s, const struct tm *local)
     return s->hour12 && local->tm_hour > 12 ? local->tm_hour - 12 : local->tm_hour;
 }
 
-static void centered(int width, int y, const char *text, uint16_t color)
+static void centered_at(int x, int width, int y, const char *text, uint16_t color)
 {
-    /* Center a 24-pixel factory label using the recovered length limit. */
+    /* Center the visible prefix of a 24-pixel label within its field.
+     * FIXED_FACTORY: capping the centering length alone still draws the whole
+     * string; also avoid the original city's eight-bit width wraparound. */
 
     unsigned length = strlen(text);
     if (length > (unsigned)width / 12)
         length = width / 12;
-    display_factory_text((width - length * 12) / 2, y, text, 24, color, 0, false);
+    int offset = (width - length * 12) / 2;
+    display_factory_text_bounded(x + offset, y, width - offset, text, 24, color, 0, false);
+}
+
+static void centered(int width, int y, const char *text, uint16_t color)
+{
+    /* Draw a centered factory label in a field starting at the left panel edge. */
+
+    centered_at(0, width, y, text, color);
 }
 
 void factory_draw_setup(void)
@@ -121,11 +224,50 @@ static void description_label(char out[65], const tv_settings_t *s,
     }
 }
 
+static void draw_classic_status(const tv_settings_t *s, const weather_snapshot_t *weather, bool reset)
+{
+    /* Redraw the city, weather title/icon and temperature/humidity fields.
+     * FIXED_FACTORY: 0x4200aefc clears only y=0..23 although its city glyphs
+     * occupy y=10..33. 0x4200b340 leaves old title margins and unavailable icons.
+     * Clear each complete field, including partial icon output after a read error. */
+
+    char text[65];
+    display_fill(0, 0, 180, 34, 0);
+    scrolling_label(0, 0, 10, 180, s->city, 0x07e0, reset);
+    scrolling_label(2, 160, 83, 80, weather->valid ? weather->main : "", 0xffe0, reset);
+    if (weather->valid)
+    {
+        if (media_draw_weather(weather->icon, 180, 10) != ESP_OK)
+            display_fill(180, 10, 60, 60, 0);
+    }
+    else
+        display_fill(180, 10, 60, 60, 0);
+    media_draw_jpeg(0x3ba800, 0x3c00, 10, 180);
+    media_draw_jpeg(0x3c2000, 0x3c00, 40, 186);
+    media_draw_jpeg(0x3be400, 0x3c00, 12, 210);
+    media_draw_jpeg(0x3c5c00, 0x3c00, 40, 216);
+    display_fill(80, 180, 72, 24, 0);
+    const char *unit = s->fahrenheit ? "\xa8\x48" : "\xa1\xe6";
+    if (weather->valid)
+        snprintf(text, sizeof(text), " %.0f%s", temperature(s, weather->temperature_c), unit);
+    else
+        snprintf(text, sizeof(text), " --%s", unit);
+    display_factory_text_bounded(80, 180, 72, text, 24, 0xffff, 0, false);
+    display_fill(80, 210, 72, 24, 0);
+    if (weather->valid)
+        snprintf(text, sizeof(text), " %d%%", weather->humidity);
+    else
+        strcpy(text, " --%");
+    display_factory_text_bounded(80, 210, 72, text, 24, 0xffff, 0, false);
+}
+
 void factory_draw_classic(const tv_settings_t *s, const struct tm *local,
                           const weather_snapshot_t *weather, unsigned description_step,
                           unsigned animation_frame, bool reset, bool force_status)
 {
-    /* Update the classic fields selected by the original renderer at 0x4200b738. */
+    /* Update the classic fields selected by the original renderer at 0x4200b738.
+     * FIXED_FACTORY: route status updates through complete field clearing so
+     * shorter labels or missing weather cannot preserve old text/icon pixels. */
 
     static tv_settings_t previous_settings;
     static struct tm previous_time;
@@ -141,8 +283,7 @@ void factory_draw_classic(const tv_settings_t *s, const struct tm *local,
     description_label(text, s, weather, address, description_step);
     if (reset || strcmp(text, previous_description))
     {
-        display_fill(0, 40, 180, 24, 0);
-        centered(180, 40, text, 0xffff);
+        scrolling_label(1, 0, 40, 180, text, 0xffff, reset);
         strcpy(previous_description, text);
     }
     /* 0x4200afcc redraws hours/colon each second, but minutes/date only on a
@@ -158,40 +299,10 @@ void factory_draw_classic(const tv_settings_t *s, const struct tm *local,
         display_factory_text(176, 110, weekday(local->tm_wday), 32, s->colors[2], 0, false);
         date_label(s, local, date);
         display_fill(0, 150, 120, 24, 0);
-        display_factory_text(0, 150, date, 24, 0xffff, 0, false);
+        display_factory_text_bounded(0, 150, 120, date, 24, 0xffff, 0, false);
     }
     if (status)
-    {
-        display_fill(0, 0, 180, 34, 0);
-        display_factory_text((180 - (uint8_t)(strlen(s->city) * 12)) / 2, 10, s->city, 24, 0x07e0,
-                             0, false);
-        if (weather->valid)
-        {
-            unsigned length = strlen(weather->main);
-            if (length > 6)
-                length = 6;
-            display_factory_text(160 + (80 - (int)length * 12) / 2, 83, weather->main, 24, 0xffe0,
-                                 0, false);
-            media_draw_weather(weather->icon, 180, 10);
-        }
-        media_draw_jpeg(0x3ba800, 0x3c00, 10, 180);
-        media_draw_jpeg(0x3c2000, 0x3c00, 40, 186);
-        media_draw_jpeg(0x3be400, 0x3c00, 12, 210);
-        media_draw_jpeg(0x3c5c00, 0x3c00, 40, 216);
-        display_fill(80, 180, 72, 24, 0);
-        const char *unit = s->fahrenheit ? "\xa8\x48" : "\xa1\xe6";
-        if (weather->valid)
-            snprintf(text, sizeof(text), " %.0f%s", temperature(s, weather->temperature_c), unit);
-        else
-            snprintf(text, sizeof(text), " --%s", unit);
-        display_factory_text(80, 180, text, 24, 0xffff, 0, false);
-        display_fill(80, 210, 72, 24, 0);
-        if (weather->valid)
-            snprintf(text, sizeof(text), " %d%%", weather->humidity);
-        else
-            strcpy(text, " --%");
-        display_factory_text(80, 210, text, 24, 0xffff, 0, false);
-    }
+        draw_classic_status(s, weather, reset);
     unsigned count = media_animation_frames(s->animation);
     if (count)
         media_draw_animation(s->animation, animation_frame % count, 160, 160);

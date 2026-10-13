@@ -582,7 +582,7 @@ static void test_weather_worker(void)
      * disable/offline. */
     station_start();
     got_ip();
-    strcpy(preferences.city, "New York/测试");
+    strcpy(preferences.city, "New York/\xe6\xb5\x8b\xe8\xaf\x95");
     strcpy(preferences.country, "US");
     strcpy(preferences.weather_key, "key&=x");
     weather_start();
@@ -901,6 +901,8 @@ static void test_display(void)
 }
 
 static unsigned animation_calls, weather_draws, jpeg_draws, photo_draws, last_animation, last_frame;
+static bool weather_pixels;
+static esp_err_t weather_draw_result;
 unsigned media_animation_frames(unsigned animation)
 {
     const unsigned counts[] = {19, 15, 25, 16, 23};
@@ -919,7 +921,10 @@ esp_err_t media_draw_weather(const char *code, int x, int y)
 {
     assert(strlen(code) == 3 && x == 180 && y == 10);
     ++weather_draws;
-    return ESP_OK;
+    /* Only the cleanup scenario models full/partial output at the decoder boundary. */
+    if (weather_pixels)
+        display_fill(x, y, 60, weather_draw_result == ESP_OK ? 60 : 5, 0x1234);
+    return weather_draw_result;
 }
 esp_err_t media_draw_jpeg(uint32_t address, size_t capacity, int x, int y)
 {
@@ -1001,6 +1006,113 @@ static void test_ui_transitions(void)
     for (unsigned slot = 0; slot < 5; ++slot)
         factory_draw_photo(slot, "10.0.2.15");
     CHECK(photo_draws == 5);
+}
+
+static void test_text_fields(void)
+{
+    /* Compare scrolling windows against a full unscrolled glyph raster and guard pixels. */
+    CHECK(display_init() == ESP_OK);
+    const char *text = "ABCDEFGHIJKLMNOPQRS";
+    display_factory_text(0, 0, text, 24, 0xffff, 0, false);
+    static uint16_t raster[24 * 240];
+    memcpy(raster, panel, sizeof(raster));
+    const unsigned offsets[] = {0, 1, 7, 12, 73, 148, 149, 0xffffffff};
+    for (unsigned test = 0; test < sizeof(offsets) / sizeof(offsets[0]); ++test)
+    {
+        display_fill(0, 0, 240, 240, 0x4567);
+        display_factory_text_window(20, 5, 80, offsets[test], text, 24, 0xffff, 0);
+        unsigned offset = offsets[test] < 148 ? offsets[test] : 148;
+        for (unsigned y = 0; y < 240; ++y)
+            for (unsigned x = 0; x < 240; ++x)
+                CHECK(panel[y * 240 + x] == (x >= 20 && x < 100 && y >= 5 && y < 29
+                    ? raster[(y - 5) * 240 + x - 20 + offset] : 0x4567));
+    }
+    unsigned before = transfers;
+    display_factory_text_window(20, 5, 0, 0, text, 24, 0xffff, 0);
+    display_factory_text_window(20, 5, -1, 0, text, 24, 0xffff, 0);
+    CHECK(transfers == before);
+    CHECK(display_factory_text_width("12\xa1\xe6", 24) == 48);
+    display_fill(0, 0, 240, 240, 0x4567);
+    display_factory_text_bounded(20, 5, 36, "12\xa1\xe6", 24, 0xffff, 0, false);
+    for (unsigned y = 5; y < 29; ++y)
+        for (unsigned x = 44; x < 80; ++x)
+            CHECK(panel[y * 240 + x] == 0x4567); /* Unit pair is never split. */
+    display_factory_text_window(200, 5, 80, 0xffffffff, text, 24, 0xffff, 0);
+    for (unsigned y = 5; y < 29; ++y)
+        for (unsigned x = 200; x < 240; ++x)
+            CHECK(panel[y * 240 + x] == raster[(y - 5) * 240 + x - 200 + 188]);
+}
+
+static void test_weather_field_cleanup(void)
+{
+    /* Test retained frames, both scroll endpoints, content reset and failed icon cleanup. */
+    CHECK(display_init() == ESP_OK);
+    weather_pixels = true;
+    struct tm local = {.tm_year=126,.tm_mon=9,.tm_mday=13,.tm_yday=285,
+                       .tm_wday=2,.tm_hour=7,.tm_min=14};
+    weather_snapshot_t weather = {.valid=true,.generation=1,.humidity=67,.temperature_c=26};
+    strcpy(weather.icon, "01d");
+    strcpy(weather.main, "Thunderstorm");
+    strcpy(weather.description, "ABCDEFGHIJKLMNOPQRS");
+    strcpy(preferences.city, "ABCDEFGHIJKLMNOPQRS");
+    factory_draw_classic(&preferences,&local,&weather,6,0,true,true);
+    CHECK(!factory_scroll_description_ready());
+    static uint16_t initial[240*240];
+    memcpy(initial,panel,sizeof(panel));
+    unsigned before = transfers;
+    for (unsigned tick=0; tick<15; ++tick) factory_scroll_tick();
+    CHECK(transfers == before && !memcmp(initial,panel,sizeof(panel)));
+    factory_scroll_tick();
+    CHECK(memcmp(initial,panel,sizeof(panel)) != 0);
+    /* The three independently clipped fields are the only possible changed pixels. */
+    for (unsigned y=0; y<240; ++y)
+        for (unsigned x=0; x<240; ++x)
+            if (!((x<180 && ((y>=10 && y<34)||(y>=40 && y<64))) ||
+                  (x>=160 && y>=83 && y<107)))
+                CHECK(panel[y*240+x] == initial[y*240+x]);
+    /* City and description travel 48px in 24 steps; the weather title needs 32. */
+    for (unsigned tick=1; tick<24; ++tick) factory_scroll_tick();
+    static uint16_t endpoint[24*180];
+    for (unsigned y=0; y<24; ++y) memcpy(endpoint+y*180,panel+(y+10)*240,180*2);
+    display_factory_text_window(0,10,180,48,preferences.city,24,0x07e0,0);
+    for (unsigned y=0; y<24; ++y) CHECK(!memcmp(endpoint+y*180,panel+(y+10)*240,180*2));
+    for (unsigned tick=24; tick<78; ++tick) factory_scroll_tick();
+    CHECK(factory_scroll_description_ready());
+    for (unsigned y=10; y<34; ++y) CHECK(!memcmp(panel+y*240,initial+y*240,180*2));
+    for (unsigned y=40; y<64; ++y) CHECK(!memcmp(panel+y*240,initial+y*240,180*2));
+    for (unsigned tick=78; tick<94; ++tick) factory_scroll_tick();
+    for (unsigned y=83; y<107; ++y) CHECK(!memcmp(panel+y*240+160,initial+y*240+160,80*2));
+    strcpy(preferences.city, "A");
+    strcpy(weather.main, "Fog");
+    strcpy(weather.description, "clear");
+    ++weather.generation;
+    factory_draw_classic(&preferences,&local,&weather,6,0,false,true);
+    CHECK(factory_scroll_description_ready());
+    memcpy(initial,panel,sizeof(panel));
+    for (unsigned tick=0; tick<100; ++tick) factory_scroll_tick();
+    CHECK(!memcmp(initial,panel,sizeof(panel)));
+    /* Clean rendering must match a frame updated from much longer strings. */
+    display_fill(0,0,240,240,0);
+    factory_draw_classic(&preferences,&local,&weather,6,0,true,true);
+    CHECK(!memcmp(initial,panel,sizeof(panel)));
+    const unsigned guards[] = {34*240+179,180,83*240+159,107*240+160,9*240+180,70*240+180};
+    for (unsigned i=0; i<sizeof(guards)/sizeof(guards[0]); ++i) panel[guards[i]]=0x5678;
+    weather_draw_result = ESP_FAIL;
+    factory_draw_classic(&preferences,&local,&weather,6,0,false,true);
+    for (unsigned y=10; y<70; ++y)
+        for (unsigned x=180; x<240; ++x) CHECK(panel[y*240+x]==0);
+    for (unsigned i=0; i<sizeof(guards)/sizeof(guards[0]); ++i) CHECK(panel[guards[i]]==0x5678);
+    weather_draw_result = ESP_OK;
+    factory_draw_classic(&preferences,&local,&weather,6,0,false,true);
+    weather.valid = false;
+    strcpy(preferences.city, "");
+    factory_draw_classic(&preferences,&local,&weather,6,0,false,true);
+    for (unsigned y=0; y<34; ++y)
+        for (unsigned x=0; x<180; ++x) CHECK(panel[y*240+x]==0);
+    for (unsigned y=83; y<107; ++y)
+        for (unsigned x=160; x<240; ++x) CHECK(panel[y*240+x]==0);
+    for (unsigned y=10; y<70; ++y)
+        for (unsigned x=180; x<240; ++x) CHECK(panel[y*240+x]==0);
 }
 
 static unsigned timer_calls, timer_failure, clock_step, blocked_transfers;
@@ -1208,6 +1320,54 @@ static void test_clock_animation_selection(void)
     CHECK(clock_step == 210);
 }
 
+static uint16_t clock_first_frame[240*240];
+static void clock_text_scenario(void)
+{
+    /* Follow actual display-loop motion, upload suspension and theme re-entry. */
+    ++clock_step;
+    if (clock_step == 1) memcpy(clock_first_frame,panel,sizeof(panel));
+    if (clock_step == 15) CHECK(!memcmp(clock_first_frame,panel,sizeof(panel)));
+    if (clock_step == 16) CHECK(memcmp(clock_first_frame,panel,sizeof(panel)) != 0);
+    if (clock_step == 20)
+    {
+        uploading = true;
+        blocked_transfers = transfers;
+        memcpy(clock_first_frame,panel,sizeof(panel));
+    }
+    if (clock_step > 20 && clock_step <= 25)
+        CHECK(transfers == blocked_transfers && !memcmp(clock_first_frame,panel,sizeof(panel)));
+    if (clock_step == 25) uploading = false;
+    if (clock_step == 26) CHECK(memcmp(clock_first_frame,panel,sizeof(panel)) != 0);
+    if (clock_step == 35) {preferences.theme=1; ++preferences_generation;}
+    if (clock_step == 40) {preferences.theme=0; ++preferences_generation;}
+    if (clock_step == 41) memcpy(clock_first_frame,panel,sizeof(panel));
+    if (clock_step == 55) CHECK(!memcmp(clock_first_frame,panel,sizeof(panel)));
+    if (clock_step == 56)
+    {
+        CHECK(memcmp(clock_first_frame,panel,sizeof(panel)) != 0);
+        longjmp(blocked,1);
+    }
+}
+
+static void test_clock_text_scroll(void)
+{
+    /* Run the production scheduler with long fields and no changing wall-clock seconds. */
+    strcpy(preferences.city,"ABCDEFGHIJKLMNOPQRS");
+    http_body="{\"main\":{\"temp\":293,\"humidity\":73},\"wind\":{\"speed\":3.7},"
+              "\"weather\":[{\"icon\":\"02d\",\"main\":\"Thunderstorm\",\"description\":\"clear\"}]}";
+    http_length=strlen(http_body);
+    CHECK(clock_ui_timer_init() == ESP_OK);
+    CHECK(network_init() == ESP_OK);
+    got_ip();
+    weather_start();
+    strcpy(preferences.weather_key,"fixture-key");
+    run_task("weather_http",seed_weather);
+    CHECK(display_init() == ESP_OK);
+    clock_ui_start();
+    run_task("clock_display",clock_text_scenario);
+    CHECK(clock_step==56);
+}
+
 int main(int argc, char **argv)
 {
     /* Select a fresh-process scenario and save a machine-readable result only after success. */
@@ -1236,9 +1396,12 @@ int main(int argc, char **argv)
                  {"backlight_schedule", test_backlight},
                  {"display_protocol_clipping", test_display},
                  {"ui_transitions", test_ui_transitions},
+                 {"text_field_windows", test_text_fields},
+                 {"weather_field_cleanup", test_weather_field_cleanup},
                  {"clock_coordinator", test_clock_coordinator},
                  {"timer_driver_failures", test_timer_driver_failures},
-                 {"clock_animation_selection", test_clock_animation_selection}};
+                 {"clock_animation_selection", test_clock_animation_selection},
+                 {"clock_text_scroll", test_clock_text_scroll}};
     bool found = false;
     for (unsigned i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
         if (!strcmp(argv[1], cases[i].name))

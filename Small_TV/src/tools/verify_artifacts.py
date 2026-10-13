@@ -37,7 +37,7 @@ def main():
             'A full passing suite is required')
     groups = {row['name']: row['result'] for row in suite['groups'] if row['status'] == 'passed'} \
         if 'groups' in suite else suite
-    for name in ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'qemu'):
+    for name in ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'qemu'):
         require(name in groups and groups[name]['passed'], 'Missing passing group: ' + name)
     for item in suite['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
@@ -105,6 +105,11 @@ def main():
                   machine_animation_transitions=classic.get('animation_transitions', len(classic.get('animation', {}).get('cases', []))),
                   machine_backlight_comparisons=groups['machine_control']['backlight']['comparisons'],
                   machine_glyph_geometry_checks=len(classic['glyph_geometry_checks']))
+    weather = groups['machine_weather']
+    require(weather['app_sha256'] == app_sha and weather['source_sha256'] == manifest['source_sha256'],
+            'Weather gate tested different application/source inputs')
+    report['machine_weather_report'] = '../qemu/parity/weather-render-validation.json'
+    report['machine_weather_cases'] = sum(weather['case_counts'].values()) if 'case_counts' in weather else len(weather['cases'])
     report['work_status'] = 'Reconstructed firmware; confirmed factory corrections are marked and tested'
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(f'Verified application {app_sha}: {len(app)} bytes, {partitions["factory"] - len(app)} bytes free')

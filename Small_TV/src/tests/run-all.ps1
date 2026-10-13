@@ -66,6 +66,14 @@ else {
         if($LASTEXITCODE){throw "Classic renderer/animation machine comparison failed"}
     } $classicReport
 }
+if ($SkipMachine) {$groups.Add(@{name="machine_weather";status="not_run";reason="Explicit -SkipMachine"})}
+else {
+    $weatherReport=Join-Path $OutputDirectory "weather-render.json"
+    Invoke-TestGroup "machine_weather" {
+        & $PythonPath (Join-Path $PSScriptRoot "weather_render_oracle.py") --output $weatherReport
+        if($LASTEXITCODE){throw "Weather decoder/field/scroll machine comparison failed"}
+    } $weatherReport
+}
 if ($SkipQemu) {$groups.Add(@{name="qemu";status="not_run";reason="Explicit -SkipQemu"})}
 else {
     $qemuFolder=Join-Path $OutputDirectory "qemu"
