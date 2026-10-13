@@ -206,6 +206,21 @@ static void test_weather(void)
     const char cold[]={"{\"main\":{\"temp\":270.9,\"humidity\":0},\"wind\":{\"speed\":0,\"deg\":90},\"weather\":[{\"icon\":\"13n\"}]}"};
     CHECK(weather_parse_response(cold,strlen(cold),&s,&weather));
     CHECK(weather.temperature_c==-2 && !strcmp(weather.wind_direction,"East"));
+    /* Literal factory strings and all half-open sector boundaries, including
+     * 348.75/360 wrapping to North. A Ghidra symbol name hides its hyphen. */
+    static const char *directions[]={"North","North-Northeast","Northeast","East-Northeast",
+        "East","East-Southeast","Southeast","South-Southeast","South","South-Southwest",
+        "Southwest","West-Southwest","West","West-Northwest","Northwest","North-Northwest"};
+    char directional[256];
+    for(unsigned i=0;i<16;++i){
+        const double angles[]={i*22.5, i*22.5+11.25, i*22.5+11.25-0.00001};
+        for(unsigned j=0;j<3;++j){
+            snprintf(directional,sizeof(directional),"{\"main\":{\"temp\":293,\"humidity\":50},"
+                "\"wind\":{\"speed\":1,\"deg\":%.5f},\"weather\":[{\"icon\":\"02d\"}]}",angles[j]);
+            CHECK(weather_parse_response(directional,strlen(directional),&s,&weather));
+            CHECK(!strcmp(weather.wind_direction,directions[j==1?(i+1)%16:i]));
+        }
+    }
 }
 static void test_assets(void)
 {

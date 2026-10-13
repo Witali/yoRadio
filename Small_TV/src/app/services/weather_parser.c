@@ -61,12 +61,13 @@ bool weather_parse_response(const char *body, size_t length, const tv_settings_t
         if (number(wind, "deg", 0, 360, &bearing))
         {
             /* 0x4200fe82..0x4201082c compares doubles against sixteen half-open
-             * sectors. A bearing exactly at 11.25 belongs to North Northeast. */
+             * sectors. The literal strings at 0x3c0c3a68..0x3c0c3afc include
+             * hyphens; exactly 11.25 belongs to North-Northeast. */
             static const char *directions[] = {
-                "North", "North Northeast", "Northeast", "East Northeast",
-                "East",  "East Southeast",  "Southeast", "South Southeast",
-                "South", "South Southwest", "Southwest", "West Southwest",
-                "West",  "West Northwest",  "Northwest", "North Northwest"};
+                "North", "North-Northeast", "Northeast", "East-Northeast",
+                "East",  "East-Southeast",  "Southeast", "South-Southeast",
+                "South", "South-Southwest", "Southwest", "West-Southwest",
+                "West",  "West-Northwest",  "Northwest", "North-Northwest"};
             unsigned index = (unsigned)((bearing + 11.25) / 22.5) % 16;
             snprintf(out->wind_direction, sizeof(out->wind_direction), "%s", directions[index]);
         }
