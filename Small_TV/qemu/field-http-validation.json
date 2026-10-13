@@ -1,0 +1,1045 @@
+{
+  "passed": true,
+  "tested_at_utc": "2026-10-13T17:18:29.159440+00:00",
+  "flows": {
+    "original": {
+      "passed": true,
+      "sources": {
+        "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+      },
+      "stages": {
+        "long_cache": {
+          "valid": true,
+          "temperature_c": 26,
+          "humidity": 67,
+          "temperature_min_c": 21.5,
+          "temperature_max_c": 29.5,
+          "wind_mps": 3.75,
+          "main": "Thunderstorm",
+          "description": "clear",
+          "wind_direction": "North-Northeast",
+          "icon_offset": 3817472
+        },
+        "short": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26,
+            "humidity": 67,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "main": "Fog",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon_offset": 3878912
+          },
+          "frame": {
+            "virtual_seconds": 29.870648,
+            "literal_ideal_differences": {
+              "city": 0,
+              "title": 0,
+              "icon": 0
+            }
+          }
+        },
+        "unavailable": {
+          "state": {
+            "valid": false,
+            "temperature_c": 26,
+            "humidity": 67,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "main": "Fog",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon_offset": 3878912
+          },
+          "frame": {
+            "virtual_seconds": 32.349998,
+            "literal_ideal_differences": {
+              "city": 0,
+              "title": 0,
+              "icon": 382
+            }
+          }
+        },
+        "recovery": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26,
+            "humidity": 67,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "main": "Rain",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon_offset": 3802112
+          },
+          "frame": {
+            "virtual_seconds": 34.891122,
+            "literal_ideal_differences": {
+              "city": 0,
+              "title": 0,
+              "icon": 0
+            }
+          }
+        },
+        "unknown_icon": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26,
+            "humidity": 67,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "main": "Clear",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon_offset": 0
+          },
+          "frame": {
+            "virtual_seconds": 37.419056,
+            "literal_ideal_differences": {
+              "city": 0,
+              "title": 0,
+              "icon": 0
+            }
+          }
+        }
+      },
+      "checks": {
+        "actual_city_http": true,
+        "known_response_cache": true,
+        "no_panic": true
+      },
+      "literal_long": {
+        "city_ideal_differences": 970,
+        "title_ideal_differences": 570
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "36bb2c567dbc99042838799eabb0de11eafc52a7095252fe0c7059e6f2933f47",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "837775d522d4883e8ffb9feb932c4cb6f7cf8e2eb678ca3a578ca0e701f1a5da",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "6e9c935f834d75350dce095f8178b6ff95bcaa36851d8cb606d454d0db79a3d8",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 503,
+          "body_sha256": "708ab39a79e958322d7199829d447d3438d38524657c99242f242855e273cda3",
+          "fragments": 1
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "c26a3940f11064fa88b8a80866ad07ea75a10ce76dad661bc2de15d1e34cd8c1",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "e475fd7a363b87afd751994f86039b301952ee1a6f9aba2efa192d26b7d8cb30",
+          "fragments": 5
+        }
+      ],
+      "not_applicable_factory": [
+        "requested scroll/phase/reset extension",
+        "corrected cleanup expectations; literal pixels recorded"
+      ]
+    },
+    "reconstructed": {
+      "passed": true,
+      "sources": {
+        "images": [
+          {
+            "offset": "0x0",
+            "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+            "bytes": 19248,
+            "file": "bootloader.bin"
+          },
+          {
+            "offset": "0x8000",
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+            "bytes": 3072,
+            "file": "partition-table.bin"
+          },
+          {
+            "offset": "0x10000",
+            "sha256": "5e12da8c5b20740316f17da954b7ce8bc250e06b04e2f1e4f1095ccf484acc44",
+            "bytes": 1022416,
+            "file": "app.bin"
+          },
+          {
+            "offset": "0x200000",
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+            "bytes": 1994752,
+            "file": "assets.bin"
+          }
+        ],
+        "source_sha256": "fdaf71adcda5d52aa288989fa7872115c53c328c3219818272e36e4dc301246d"
+      },
+      "stages": {
+        "long_cache": {
+          "valid": true,
+          "temperature_c": 26.0,
+          "temperature_min_c": 21.5,
+          "temperature_max_c": 29.5,
+          "wind_mps": 3.75,
+          "humidity": 67,
+          "main": "Thunderstorm",
+          "description": "clear",
+          "wind_direction": "North-Northeast",
+          "icon": "11d"
+        },
+        "short": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26.0,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "humidity": 67,
+            "main": "Fog",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon": "50d"
+          },
+          "frame": {
+            "labels": [
+              {
+                "text": "A",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 12,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Fog",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 36,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 40.153871,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 5,
+            "passed": true,
+            "attempts": 2
+          }
+        },
+        "unavailable": {
+          "state": {
+            "valid": false,
+            "temperature_c": 26.0,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "humidity": 67,
+            "main": "Fog",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon": "50d"
+          },
+          "frame": {
+            "labels": [
+              {
+                "text": "B",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 12,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Getting Weather",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 180,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 0,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 40.407459,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 7,
+            "passed": true,
+            "attempts": 1
+          }
+        },
+        "recovery": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26.0,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "humidity": 67,
+            "main": "Rain",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon": "10n"
+          },
+          "frame": {
+            "labels": [
+              {
+                "text": "B",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 12,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Rain",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 48,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 40.735754,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 8,
+            "passed": true,
+            "attempts": 2
+          }
+        },
+        "unknown_icon": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26.0,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "humidity": 67,
+            "main": "Clear",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon": "99x"
+          },
+          "frame": {
+            "labels": [
+              {
+                "text": "B",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 12,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Clear",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 60,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 41.076309,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 9,
+            "passed": true,
+            "attempts": 2
+          }
+        }
+      },
+      "checks": {
+        "actual_city_http": true,
+        "known_response_cache": true,
+        "no_panic": true,
+        "clipped_live_scroll": true,
+        "blocked_refresh_phase": true,
+        "theme_reset": true,
+        "short_and_missing_fields": true,
+        "unknown_icon_cleanup": true,
+        "recovery": true
+      },
+      "scroll": {
+        "passed": true,
+        "evidence": {
+          "0": {
+            "left": true,
+            "right": true,
+            "start": true,
+            "end": true,
+            "pause": true
+          },
+          "2": {
+            "left": true,
+            "right": true,
+            "start": true,
+            "end": true,
+            "pause": true
+          }
+        }
+      },
+      "refresh": {
+        "passed": true,
+        "before": {
+          "labels": [
+            {
+              "text": "ABCDEFGHIJKLMNOPQRS",
+              "x": 0,
+              "y": 10,
+              "width": 180,
+              "length": 228,
+              "offset": 8,
+              "pause": 0,
+              "color": 2016,
+              "returning": false,
+              "completed": true
+            },
+            {
+              "text": "clear",
+              "x": 0,
+              "y": 40,
+              "width": 180,
+              "length": 60,
+              "offset": 0,
+              "pause": 15,
+              "color": 65535,
+              "returning": false,
+              "completed": false
+            },
+            {
+              "text": "Thunderstorm",
+              "x": 160,
+              "y": 83,
+              "width": 80,
+              "length": 144,
+              "offset": 0,
+              "pause": 12,
+              "color": 65504,
+              "returning": false,
+              "completed": true
+            }
+          ],
+          "virtual_seconds": 37.38798,
+          "different_pixels": {
+            "field-0": 0,
+            "field-2": 0,
+            "icon": 0,
+            "guard-0": 0,
+            "guard-1": 0,
+            "guard-2": 0,
+            "guard-3": 0
+          },
+          "rendered_weather_generation": 4,
+          "passed": true,
+          "attempts": 74
+        },
+        "held": [
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 10,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "clear",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 60,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 11,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 37.720472,
+            "pixels_sha256": "dec945f7c9cc399f8fd33285097ab0a2f3540aec195d53261e47242a3150325e",
+            "rendered_weather_generation": 4
+          },
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 10,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "clear",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 60,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 11,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 37.821182,
+            "pixels_sha256": "dec945f7c9cc399f8fd33285097ab0a2f3540aec195d53261e47242a3150325e",
+            "rendered_weather_generation": 4
+          },
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 10,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "clear",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 60,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 11,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 37.921349,
+            "pixels_sha256": "dec945f7c9cc399f8fd33285097ab0a2f3540aec195d53261e47242a3150325e",
+            "rendered_weather_generation": 4
+          }
+        ],
+        "resumed": {
+          "labels": [
+            {
+              "text": "ABCDEFGHIJKLMNOPQRS",
+              "x": 0,
+              "y": 10,
+              "width": 180,
+              "length": 228,
+              "offset": 12,
+              "pause": 0,
+              "color": 2016,
+              "returning": false,
+              "completed": true
+            },
+            {
+              "text": "clear",
+              "x": 0,
+              "y": 40,
+              "width": 180,
+              "length": 60,
+              "offset": 0,
+              "pause": 15,
+              "color": 65535,
+              "returning": false,
+              "completed": false
+            },
+            {
+              "text": "Thunderstorm",
+              "x": 160,
+              "y": 83,
+              "width": 80,
+              "length": 144,
+              "offset": 0,
+              "pause": 10,
+              "color": 65504,
+              "returning": false,
+              "completed": true
+            }
+          ],
+          "virtual_seconds": 39.271001,
+          "different_pixels": {
+            "field-0": 0,
+            "field-2": 0,
+            "icon": 0,
+            "guard-0": 0,
+            "guard-1": 0,
+            "guard-2": 0,
+            "guard-3": 0
+          },
+          "rendered_weather_generation": 5,
+          "passed": true,
+          "attempts": 4
+        },
+        "published_generation": 5
+      },
+      "theme_reset": {
+        "labels": [
+          {
+            "text": "ABCDEFGHIJKLMNOPQRS",
+            "x": 0,
+            "y": 10,
+            "width": 180,
+            "length": 228,
+            "offset": 0,
+            "pause": 15,
+            "color": 2016,
+            "returning": false,
+            "completed": false
+          },
+          {
+            "text": "10.0.2.15",
+            "x": 0,
+            "y": 40,
+            "width": 180,
+            "length": 108,
+            "offset": 0,
+            "pause": 15,
+            "color": 65535,
+            "returning": false,
+            "completed": false
+          },
+          {
+            "text": "Thunderstorm",
+            "x": 160,
+            "y": 83,
+            "width": 80,
+            "length": 144,
+            "offset": 0,
+            "pause": 15,
+            "color": 65504,
+            "returning": false,
+            "completed": false
+          }
+        ],
+        "virtual_seconds": 39.814774,
+        "different_pixels": {
+          "field-0": 0,
+          "field-2": 0,
+          "icon": 0,
+          "guard-0": 0,
+          "guard-1": 0,
+          "guard-2": 0,
+          "guard-3": 0
+        },
+        "rendered_weather_generation": 5,
+        "passed": true,
+        "attempts": 1
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "36bb2c567dbc99042838799eabb0de11eafc52a7095252fe0c7059e6f2933f47",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "837775d522d4883e8ffb9feb932c4cb6f7cf8e2eb678ca3a578ca0e701f1a5da",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "837775d522d4883e8ffb9feb932c4cb6f7cf8e2eb678ca3a578ca0e701f1a5da",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "6e9c935f834d75350dce095f8178b6ff95bcaa36851d8cb606d454d0db79a3d8",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 503,
+          "body_sha256": "708ab39a79e958322d7199829d447d3438d38524657c99242f242855e273cda3",
+          "fragments": 1
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "c26a3940f11064fa88b8a80866ad07ea75a10ce76dad661bc2de15d1e34cd8c1",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "e475fd7a363b87afd751994f86039b301952ee1a6f9aba2efa192d26b7d8cb30",
+          "fragments": 5
+        }
+      ]
+    }
+  },
+  "cache_layout": {
+    "address": 1070267000,
+    "size": 232,
+    "fields": {
+      "valid": 0,
+      "temperature_c": 8,
+      "wind_mps": 16,
+      "temperature_min_c": 24,
+      "temperature_max_c": 32,
+      "humidity": 40,
+      "timezone_seconds": 44,
+      "icon": 48,
+      "description": 52,
+      "city": 117,
+      "country": 182,
+      "main": 185,
+      "wind_direction": 201,
+      "generation": 224
+    },
+    "request_state_address": 1070282984,
+    "elf_sha256": "f8fa92d86d30dad08b81b0eefd277cbd6b41d553b76729d842f36bb884754d48"
+  },
+  "scroll_layout": {
+    "address": 1070266664,
+    "size": 300,
+    "stride": 100,
+    "fields": {
+      "text": 0,
+      "x": 68,
+      "y": 72,
+      "width": 76,
+      "color": 80,
+      "length": 84,
+      "offset": 88,
+      "pause": 92,
+      "returning": 96,
+      "completed": 97
+    },
+    "rendered_weather_address": 1070282952
+  },
+  "qemu_sha256": "18f183bcffe9603f7c36966cafacb6c76e7bd8c42bdaadbcd75f8e380ee5cf00",
+  "scope": "Real guest HTTP/cache and exact city/title/icon pixels with immutable factory bitmaps, guard strips, scroll directions/pauses and blocked refresh/theme reset. QMP observations briefly pause/resume execution; no memory/register/program patches. Literal factory differences recorded separately. No physical timing or whole-program identity.",
+  "qemu_source_commit": "320055a3c0cac0871929452b8be96518d7068a6e",
+  "helper_sha256": {
+    "small_tv_vm.py": "919a9d03d8321d370e03ed844f1b99dcb5c57bf3fef5f6614e23c5702f9d0cb7",
+    "small_tv_network.py": "a52db718c8131c06b4b41f1c3a1471862fae65798594ef21f62dcea649846ab9",
+    "small_tv_web.py": "b4e57f78e2b8b46ed566497080690731cbb7501a92251ed11897fb692f3bc180",
+    "small_tv_http_test.py": "6432f640705184f3b725f4f33ed783b1e6dce4b955076363dfb580bc9b0ae58f"
+  },
+  "test_sha256": "20c1ddd3305fb3c71bc744842ed447d86fae63d3cd233ba33aec525121d3dc77",
+  "scroll_frames": [
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":15,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":15,"color":65504,"returning":false,"completed":false}],"virtual_seconds":25.35698,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":2,"passed":true,"attempts":2},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":15,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":15,"color":65504,"returning":false,"completed":false}],"virtual_seconds":25.395341,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":2,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":14,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":14,"color":65504,"returning":false,"completed":false}],"virtual_seconds":25.489883,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":13,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":13,"color":65504,"returning":false,"completed":false}],"virtual_seconds":25.542366,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":13,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":13,"color":65504,"returning":false,"completed":false}],"virtual_seconds":25.628805,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":12,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":12,"color":65504,"returning":false,"completed":false}],"virtual_seconds":25.710501,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":12,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":12,"color":65504,"returning":false,"completed":false}],"virtual_seconds":25.767842,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":11,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":11,"color":65504,"returning":false,"completed":false}],"virtual_seconds":25.869623,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":10,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":10,"color":65504,"returning":false,"completed":false}],"virtual_seconds":25.92026,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":10,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":10,"color":65504,"returning":false,"completed":false}],"virtual_seconds":25.993676,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":9,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":9,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.07072,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":8,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":8,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.130744,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":8,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":8,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.230017,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":7,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":7,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.270592,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":7,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":7,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.357425,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":6,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":6,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.430158,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":6,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":6,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.503135,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":5,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":5,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.590053,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":4,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":4,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.650393,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":4,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":4,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.732085,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":3,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":3,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.809991,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":3,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":3,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.866879,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":2,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":2,"color":65504,"returning":false,"completed":false}],"virtual_seconds":26.959893,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":1,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":1,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.01976,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":1,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":1,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.100066,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"10.0.2.15","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.181229,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":0,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":0,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.239792,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":2,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":2,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.320184,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":4,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":4,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.379949,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":4,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":4,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.470962,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":6,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":6,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.539546,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":6,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":6,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.609705,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":8,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":8,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.689595,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":10,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":10,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.744707,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":10,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":10,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.833585,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":12,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":12,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.899734,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":12,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":12,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":27.97077,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":14,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":14,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.05056,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":14,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":14,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.098847,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":16,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":16,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.180127,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":16,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":16,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.225673,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":18,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":18,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.290899,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":18,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":18,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.353157,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":20,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":20,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.440591,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":20,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":20,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.485631,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":22,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":22,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.570279,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":24,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":24,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.620879,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":24,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":24,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.706749,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":26,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":26,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.751419,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":26,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":26,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.830266,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":28,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":28,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.899579,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":28,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":28,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":28.970219,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":30,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":30,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.06006,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":32,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":32,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.11019,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":32,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":32,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.202573,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":34,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":34,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.250194,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":34,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":34,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.336028,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":36,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":36,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.390252,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":36,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":36,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.468741,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":38,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":38,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.550673,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":38,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":38,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.601009,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":40,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":40,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.680829,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":42,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":42,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.811403,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":2},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":44,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":44,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":29.940533,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":2},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":46,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":46,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.000824,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":46,"pause":0,"color":2016,"returning":false,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":46,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.085447,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":15,"color":2016,"returning":true,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":48,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.150504,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":15,"color":2016,"returning":true,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":48,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.217063,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":14,"color":2016,"returning":true,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":50,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.290805,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":14,"color":2016,"returning":true,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":50,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.350769,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":13,"color":2016,"returning":true,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":52,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.450948,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":12,"color":2016,"returning":true,"completed":false},{"text":"Wind Speed","x":0,"y":40,"width":180,"length":120,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":54,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.501435,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":12,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":54,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.58484,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":11,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":56,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.640833,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":11,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":56,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.721216,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":10,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":58,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.799837,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":9,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":60,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":30.939628,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":2},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":8,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":62,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":31.001417,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":8,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":62,"pause":0,"color":65504,"returning":false,"completed":false}],"virtual_seconds":31.080497,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":7,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":15,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.160005,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":7,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":15,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.215819,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":6,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":14,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.300908,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":6,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":14,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.359921,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":5,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":13,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.461753,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":4,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":12,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.511271,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":4,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":12,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.596199,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":3,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":11,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.670175,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":3,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":11,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.736642,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":2,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":10,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.830149,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":1,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":9,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.891409,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":1,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":9,"color":65504,"returning":true,"completed":false}],"virtual_seconds":31.973526,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":8,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.0416,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":48,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":8,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.109886,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":46,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":7,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.19993,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":46,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":7,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.239818,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":44,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":6,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.330911,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":42,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":5,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.380237,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":42,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":5,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.468789,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":40,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":4,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.539704,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":40,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":4,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.60563,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":38,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":3,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.699867,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":36,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":2,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.752749,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":36,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":2,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.841678,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":34,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":1,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.910129,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":34,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":1,"color":65504,"returning":true,"completed":false}],"virtual_seconds":32.980988,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":32,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":64,"pause":0,"color":65504,"returning":true,"completed":false}],"virtual_seconds":33.070546,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1},
+    {"labels":[{"text":"ABCDEFGHIJKLMNOPQRS","x":0,"y":10,"width":180,"length":228,"offset":30,"pause":0,"color":2016,"returning":true,"completed":false},{"text":"8.4mile/h","x":0,"y":40,"width":180,"length":108,"offset":0,"pause":15,"color":65535,"returning":false,"completed":false},{"text":"Thunderstorm","x":160,"y":83,"width":80,"length":144,"offset":62,"pause":0,"color":65504,"returning":true,"completed":false}],"virtual_seconds":33.124363,"different_pixels":{"field-0":0,"field-2":0,"icon":0,"guard-0":0,"guard-1":0,"guard-2":0,"guard-3":0},"rendered_weather_generation":4,"passed":true,"attempts":1}
+  ]
+}

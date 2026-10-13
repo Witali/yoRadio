@@ -17,6 +17,7 @@ Direct instruction checks during the current work confirmed:
 | `0x42009644`, `0x42009b32`, `0x420a74e6` | Float narrowing of atan2/tick angles and rounded offsets restored; the vendor's swapped sin/cos stroke pair deliberately corrected |
 | `0x4200a5be`, `0x4200aa1e`, `0x4200acae` | Original glyph pointers, padded rows, LSB-first pixels, spacing and decorative dimensions |
 | `0x4200afcc`, `0x4200b738`, `0x4200bd8c` | Conditional field updates instead of full-screen repainting |
+| `0x4200b850`, `0x4200b0b2`, `0x4200bd8c` | Calendar changes ignored when time/event gates do not change; omitted simple date-band erase deliberately corrected |
 | `0x4200b5cc`, `0x42008e08`, `0x4200aebe` | Byte GIF cursor, terminator restart and persistence across selection/theme changes |
 | `0x4200950e` | Whole-glyph rejection at the panel edge; visible-column/row clipping deliberately corrected |
 | `0x4200aefc`, `0x4200abee`, `0x4200b340` | Incomplete city clear, panel-only text bounds and uncleared weather-title margins deliberately corrected |
@@ -51,6 +52,10 @@ on the minute flag; stale digits are deliberately corrected by real rollover.
 frames, explicit field corrections, real BMP read errors and independently checked
 scroll pixels. `helper_at_42010eca.asm` uses an explicitly bounded excerpt ending
 after the decoder's final branch, rather than the much later next known symbol.
+
+[Calendar execution](../../../qemu/parity/calendar-checks.md) compares 96 retained
+frames against clean native and explicitly corrected factory output, including
+unchanged-second year jumps and leap-year day-number collisions.
 
 `../../tools/disassemble_factory.py` reproduces exports with an explicit local
 objdump path and a list of addresses or bounded IROM ranges.

@@ -76,3 +76,31 @@ reset, and the real production task during upload suspension/theme changes.
 These checks model explicit status events and active scroll steps. Physical SPI
 timing, concurrent scheduling, live weather service, JPEG decoder equivalence,
 long-run memory and whole-program identity remain outside their scope.
+
+## Real HTTP field transitions
+
+`src/tests/field_qemu.py` boots both complete images and changes the city through
+the actual `/updateCity` handler. A loopback service sends known weather bodies;
+the original program and native worker parse those bodies themselves. The native
+flow checks long city/title motion in both directions, endpoints and pauses,
+shortened labels, unavailable weather, a successful retry and an unknown icon code.
+
+Each accepted native city/title/icon frame matches independently decoded factory
+fonts and BMP pixels, including four adjacent guard strips. The RGB565-to-RGB888
+conversion follows the installed QEMU ST7789 surface's integer scaling. Transient
+captures during SPI repaint are retried; complete expected fields are required.
+QMP observations briefly stop/resume execution to read coherent state and pixels,
+without modifying guest memory, registers or instructions.
+
+A deliberately delayed service response must hold the complete framebuffer and
+scroll state. After publication, the test waits until the renderer acknowledges
+the new weather generation and checks that the existing scroll phase continues.
+Switching to the simple theme and back must reset the phase to its initial pause.
+
+The literal factory observations distinguish its different behavior: a city POST
+can reinitialize the screen, so short-label ghosts seen in direct incremental
+renderer calls are not assumed to appear in every HTTP flow. Failed weather still
+redraws the obsolete icon when its retained pointer is nonzero. Unknown icon
+selection and later recovery are recorded separately. The
+[HTTP field report](../field-http-validation.json) contains source identities,
+exact pixel differences and observed phases; scroll extensions are native checks.

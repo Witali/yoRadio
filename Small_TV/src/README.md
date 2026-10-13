@@ -46,7 +46,7 @@ meaning. The executable files in `app/` use real C types and descriptive
 functions, configuration fields, buffers and state variables. SDK code is
 provided by ESP-IDF rather than stubbed out or mapped to old machine addresses.
 
-All 141 production C functions have an entry comment explaining their purpose.
+All 142 production C functions have an entry comment explaining their purpose.
 Corrected functions also carry searchable entry-comment markers:
 `FIXED_FACTORY` identifies a deliberate correction of an original firmware bug;
 `FIXED_RECONSTRUCTION` identifies a repair of our C implementation to restore
@@ -64,6 +64,8 @@ Status refreshes preserve the phase; changed text or theme re-entry resets it.
 Missing/failed weather icons and shortened labels clear their complete regions.
 [Weather/scroll checks](../qemu/parity/weather-checks.md) distinguish confirmed
 factory fixes from this requested scrolling extension.
+[Calendar checks](../qemu/parity/calendar-checks.md) cover year/day-number jumps
+at unchanged local time and clean replacement of centered simple-clock dates.
 Comments also explain byte-padded/LSB-first fonts, fixed raw-sector offsets,
 timer thresholds, photo fades, MIME binary parsing and DNS packet bounds.
 Where machine instructions were checked directly, comments cite their original
