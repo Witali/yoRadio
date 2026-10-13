@@ -34,9 +34,11 @@ def payload(negative=False):
 
 class WeatherFixture:
     """Hold a loopback-only persistent HTTP stream for SLIRP's guestfwd chardev."""
-    def __init__(self):
+    def __init__(self, locations=None):
         self.lock = threading.Lock()
+        self.locations = set(locations or ['Shenzhen,CN'])
         self.status, self.body = 503, b'Synthetic service temporarily unavailable'
+        self.response_delay = 0
         self.requests, self.connections = [], []
         owner = self
         class Handler(BaseHTTPRequestHandler):
@@ -53,12 +55,13 @@ class WeatherFixture:
                 target = urlsplit(self.path)
                 fields = parse_qs(target.query)
                 with owner.lock:
-                    status, body = owner.status, owner.body
+                    status, body, delay = owner.status, owner.body, owner.response_delay
                     # Never retain a raw request URL, key, cookie or header.
                     owner.requests.append({'method':'GET', 'resource':target.path,
-                        'synthetic_location':fields.get('q') == ['Shenzhen,CN'],
+                        'synthetic_location':len(fields.get('q',[]))==1 and fields['q'][0] in owner.locations,
                         'synthetic_key':fields.get('appid') == ['disabled'],
                         'status':status, 'body_sha256':vm.digest(body), 'fragments':(len(body)+63)//64})
+                if delay: time.sleep(delay)
                 self.send_response(status)
                 self.send_header('Content-Type', 'application/json' if body.startswith(b'{') else 'text/plain')
                 self.send_header('Content-Length', str(len(body)))
@@ -76,10 +79,11 @@ class WeatherFixture:
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
 
-    def set_response(self, status, negative=False):
+    def set_response(self, status, negative=False, data=None, delay=0):
         """Atomically select the next HTTP status and complete synthetic JSON body."""
-        body = json.dumps(payload(negative), separators=(',', ':')).encode()
-        with self.lock: self.status, self.body = status, body
+        body = data if isinstance(data,bytes) else json.dumps(payload(negative) if data is None else data, separators=(',', ':')).encode()
+        with self.lock:
+            self.status, self.body, self.response_delay = status, body, delay
 
     def rows(self):
         """Copy completed request observations without exposing sensitive inputs."""

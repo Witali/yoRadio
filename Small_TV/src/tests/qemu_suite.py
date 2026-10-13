@@ -34,7 +34,7 @@ def main():
                               hardware_profile=str(profile), network='clock', display='none',
                               persistent=False, paused=False, gdb_port=0, seconds=args.seconds)
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
-              'boot_reset': {}, 'http_initial_setup': {}, 'weather_http': {}, 'scenes': {}, 'errors': [],
+              'boot_reset': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'scenes': {}, 'errors': [],
               'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP setup and synthetic weather HTTP/value/LCD checks. Whole-frame scene similarity is measured, not a parity gate. No physical hardware or Internet weather service.'}
     try:
         for variant in ('original', 'reconstructed'):
@@ -49,6 +49,9 @@ def main():
         from weather_qemu import run_suite as run_weather
         report['weather_http'] = run_weather(options, args.output / 'weather-http')
         check(report['weather_http']['passed'], 'Real guest weather HTTP/value/LCD checks failed')
+        from field_qemu import run_suite as run_fields
+        report['field_http'] = run_fields(options, args.output / 'field-http')
+        check(report['field_http']['passed'], 'Real guest field update/scroll checks failed')
         scene_output = args.output / 'scenes'
         subprocess.run([sys.executable, str(ROOT / 'Small_TV/qemu/parity/compare.py'),
                         '--qemu-root', str(args.qemu_root), '--yoradio', str(ROOT),

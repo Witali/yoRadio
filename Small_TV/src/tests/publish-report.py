@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -34,17 +34,22 @@ def main():
     controls = groups['machine_control']['result']
     classic = groups['machine_classic']['result']
     weather = groups['machine_weather']['result']
-    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, groups['integrity']['result'])):
+    calendar = groups['machine_calendar']['result']
+    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, groups['integrity']['result'])):
         raise ValueError('Groups tested different applications')
     qemu = groups['qemu']['result']
     if not qemu['http_initial_setup']['passed']:
         raise ValueError('Real HTTP initial setup did not pass')
     if not qemu['weather_http']['passed']:
         raise ValueError('Real weather HTTP/value/LCD comparison did not pass')
+    fields = qemu['field_http']
+    if not fields['passed'] or fields['qemu_sha256'] != qemu['qemu_sha256']:
+        raise ValueError('Real field HTTP/scroll comparison did not pass on this emulator')
     qemu_sources = [qemu['boot_reset']['reconstructed']['prepared']['sources']]
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
     qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
     qemu_sources.append(qemu['weather_http']['flows']['reconstructed']['sources'])
+    qemu_sources.append(fields['flows']['reconstructed']['sources'])
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -78,6 +83,9 @@ def main():
         ('passed','app_sha256','source_sha256','factory_elf_sha256','native_elf_sha256','approved_fixes','requested_changes','scope')}
     summary['machine_weather']['case_counts'] = {
         kind:sum(row['kind']==kind for row in weather['cases']) for kind in sorted({row['kind'] for row in weather['cases']})}
+    summary['machine_calendar'] = {key:calendar[key] for key in
+        ('passed','app_sha256','source_sha256','factory_elf_sha256','native_elf_sha256','approved_fixes','scope')}
+    summary['machine_calendar']['renderer_cases'] = len(calendar['cases'])
     summary['qemu'] = {'passed': qemu['passed'], 'qemu_sha256': qemu['qemu_sha256'],
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
                        'helper_sha256': qemu['helper_sha256'],
@@ -91,6 +99,19 @@ def main():
                                         'equal_pixels_min': row['equal_pixels_min'],
                                         'equal_pixels_max': row['equal_pixels_max']}
                                   for name, row in qemu['scenes'].items()}}
+    summary['qemu']['field_http'] = {key:fields[key] for key in ('passed','tested_at_utc','qemu_sha256','cache_layout','scroll_layout','scope')}
+    summary['qemu']['field_http']['flows'] = {}
+    for variant,row in fields['flows'].items():
+        reduced={key:row[key] for key in ('passed','sources','checks','stages')}
+        if variant=='reconstructed':
+            reduced['scroll']={key:row['scroll'][key] for key in ('passed','evidence')}
+            reduced['scroll']['observed_frames']=len(row['scroll']['frames'])
+            reduced['refresh']=row['refresh']
+            reduced['theme_reset']=row['theme_reset']
+        else:
+            reduced['literal_long']=row['literal_long']
+            reduced['not_applicable_factory']=row['not_applicable_factory']
+        summary['qemu']['field_http']['flows'][variant]=reduced
     summary['not_run'] = [row for row in report['groups'] if row['status'] == 'not_run']
     args.output.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print('Published verified functional evidence:', args.output)

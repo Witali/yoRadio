@@ -74,6 +74,14 @@ else {
         if($LASTEXITCODE){throw "Weather decoder/field/scroll machine comparison failed"}
     } $weatherReport
 }
+if ($SkipMachine) {$groups.Add(@{name="machine_calendar";status="not_run";reason="Explicit -SkipMachine"})}
+else {
+    $calendarReport=Join-Path $OutputDirectory "calendar.json"
+    Invoke-TestGroup "machine_calendar" {
+        & $PythonPath (Join-Path $PSScriptRoot "calendar_oracle.py") --output $calendarReport
+        if($LASTEXITCODE){throw "Calendar/date machine comparison failed"}
+    } $calendarReport
+}
 if ($SkipQemu) {$groups.Add(@{name="qemu";status="not_run";reason="Explicit -SkipQemu"})}
 else {
     $qemuFolder=Join-Path $OutputDirectory "qemu"
