@@ -220,6 +220,14 @@ the original unauthenticated access model.
 
 ## Validation
 
+The [functional test suite](tests/README.md) adds a single `tests/run-all.ps1`
+entry point, coverage of all 40 registered HTTP contracts, production Wi-Fi/
+weather/SNTP/clock-task execution with deterministic ESP-IDF adapters, LCD SPI
+protocol and backlight sweeps, archived-image integrity checks, and full-firmware
+QEMU boot/reset/SNTP/scene tests. Its report distinguishes passed, failed and
+unexecuted groups. Physical-board/browser/soak acceptance scenarios are documented
+separately and are not reported as passing automated tests.
+
 The [machine-level renderer checks](../qemu/parity/machine-checks.md) execute
 the immutable factory instructions and the actual compiled C ELF in RV32
 Unicorn. They compare every framebuffer pixel for controlled simple/analog

@@ -13,7 +13,7 @@
   "reference_functions": 176,
   "named_globals": 44,
   "named_local_parameter_aliases": 133,
-  "host_result": "PASS: 1249 checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers",
+  "host_result": "PASS: 2916 checks; 107 JPEGs, 98 animation frames, 18 BMPs; all 40 HTTP contracts, factory settings, Kelvin weather and flash uploads",
   "asset_pack_matches_sanitized_exports": true,
   "compiled_source_hashes_match_archive": true,
   "partition_table_md5_valid": true,
@@ -27,7 +27,7 @@
   "ota": false,
   "limitations": [
     "Controlled simple/analog renderer checks and historical QEMU captures do not establish full program, timing or service equivalence.",
-    "Full reset/DHCP/NTP reports belong to their recorded earlier application hashes.",
+    "Historical QEMU links retain their earlier application hashes; current boot/reset/DHCP/SNTP results are in the functional suite report.",
     "Hardware electrical behavior and runtime memory headroom remain unverified.",
     "The C-port assistant is an untested library draft without its CLI or complete C emitter.",
     "An upstream MSVC size_t-to-unsigned warning remains in TJpgDec; target compilation succeeds."
@@ -44,5 +44,10 @@
   "machine_slideshow_transitions": 13440,
   "machine_independent_clock_frames": 60,
   "qemu_timer_runtime_report": "../qemu/parity/timer-runtime/comparison.json",
-  "qemu_final_timer_runtime_report": "../qemu/parity/final-timer-runtime/comparison.json"
+  "qemu_final_timer_runtime_report": "../qemu/parity/final-timer-runtime/comparison.json",
+  "functional_suite_report": "tests/functional-validation.json",
+  "host_platform_scenarios": 15,
+  "host_platform_checks": 216664,
+  "manual_acceptance_scenarios": 10,
+  "manual_acceptance_executed": false
 }

@@ -4,7 +4,8 @@ param(
     [switch]$Quick,
     [switch]$Control,
     [string]$PythonPath,
-    [string]$OutputDirectory
+    [string]$OutputDirectory,
+    [string]$ControlOutputPath
 )
 $ErrorActionPreference = "Stop"
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.."))
@@ -32,6 +33,8 @@ if ($OutputDirectory) { $arguments += @("--output", $OutputDirectory) }
 & $PythonPath (Join-Path $PSScriptRoot "machine_oracle.py") @arguments
 if ($LASTEXITCODE) { throw "Renderer machine verification failed." }
 if ($Control) {
-    & $PythonPath (Join-Path $PSScriptRoot "control_oracle.py")
+    $controlArguments = @()
+    if ($ControlOutputPath) { $controlArguments += @("--output", $ControlOutputPath) }
+    & $PythonPath (Join-Path $PSScriptRoot "control_oracle.py") @controlArguments
     if ($LASTEXITCODE) { throw "Timer/slideshow machine verification failed." }
 }
