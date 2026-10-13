@@ -184,6 +184,13 @@ IP footer. Classic animation is at `(160,160)`; photos occupy the full screen.
 The slideshow applies duty levels `300,600,1000,600,300,0`, changing the photo
 at duty 1000. Digital fields and analog hands update incrementally, following
 the recovered dispatch flags. Analog stroke offsets round rather than truncate.
+The simple clock corrects the confirmed Sunday bug: standard `tm_wday == 0`
+displays `Sun` instead of repeating the date in green. Factory weekday 7 still
+maps to Sunday for compatibility. At the user's explicit request, confirmed
+vendor bugs are corrected rather than reproduced; verification records these
+intentional differences separately from incomplete reconstruction.
+Analog strokes retain the correct perpendicular `cos/sin` offset pair, fixing
+the vendor's swapped pair that makes axis-aligned thick strokes collapse.
 Setup text and the `Ver:0.0.2` progress screen are restored. The earlier extra
 seconds/IP overlay and clock-on-photo strip are removed. Spleen remains only
 for the diagnostic `display_text` helper, not the normal factory UI.
@@ -211,8 +218,18 @@ the original unauthenticated access model.
 
 ## Validation
 
+The [machine-level renderer checks](../qemu/parity/machine-checks.md) execute
+the immutable factory instructions and the actual compiled C ELF in RV32
+Unicorn. They compare every framebuffer pixel for controlled simple/analog
+clock inputs and preserve framebuffer history across updates. The Sunday and
+analog-stroke fixes have explicit, separately tested reference paths; no region
+is masked.
+These checks supplement the whole-board QEMU captures and do not establish
+network, service scheduling or hardware equivalence.
+
 ```powershell
 & .\Small_TV\src\tests\run.ps1
+& .\Small_TV\src\tests\run-machine-oracle.ps1
 ```
 
 The test runner compiles the actual settings, Kelvin weather parser, media, upload, HTTP and DNS

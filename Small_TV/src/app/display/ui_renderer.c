@@ -230,7 +230,11 @@ void factory_draw_simple(const tv_settings_t *s, const struct tm *local, const c
         display_factory_text(150, 80, text, 80, 0xffff, 0xc618, false);
         date_label(s, local, text);
         centered(240, 180, text, 0xffff);
-        display_factory_text(102, 204, weekday(local->tm_wday), 24, 0x07e0, 0, false);
+        /* 0x4200bf9c omits standard tm_wday==0 and mistakenly repeats the
+         * date on Sundays. Correct this confirmed factory bug; retain 7 as
+         * the factory's alternate Sunday value for compatibility. */
+        snprintf(text, sizeof(text), "%s", weekday(local->tm_wday));
+        display_factory_text(102, 204, text, 24, 0x07e0, 0, false);
     }
     previous_time = *local;
     previous_hour12 = s->hour12;
@@ -251,8 +255,10 @@ static void thick_line(int x0, int y0, int x1, int y1, unsigned width, uint16_t 
 {
     /* Draw the parallel strokes used by the factory analog clock. */
 
-    /* 0x42009644 narrows atan2 to float, then calls the rounding helper at
-     * 0x420a74e6 before fixdfsi. Truncating offsets makes the ticks too thin. */
+    /* Retain the float narrowing and rounding at 0x42009644, but correct
+     * its swapped sin/cos offsets: after adding pi/2, cos/sin moves strokes
+     * perpendicular to the line. The vendor bug collapses axis-aligned
+     * thick strokes into overlapping one-pixel lines. */
     double angle = (float)atan2(y1 - y0, x1 - x0) + 1.5707963267948966;
     for (int offset = -(int)(width / 2); offset <= (int)(width / 2); ++offset)
     {
@@ -290,7 +296,8 @@ void factory_draw_dial(const struct tm *local, const char *address, bool reset)
         {
             if (hour % 3 == 0)
                 continue;
-            double angle = hour * pi / 6;
+            /* 0x42009b32 narrows each tick angle to float before sin/cos. */
+            double angle = (float)(hour * pi / 6);
             thick_line((int)(120 + 105 * sin(angle)), (int)(120 - 105 * cos(angle)),
                        (int)(120 + 120 * sin(angle)), (int)(120 - 120 * cos(angle)), 4, 0xffff);
         }

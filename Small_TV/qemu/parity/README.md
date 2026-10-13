@@ -1,8 +1,16 @@
 # Small TV comparison checkpoint
 
-Work was paused at the user's request on 2026-10-13. The reconstruction now uses
+This historical QEMU checkpoint was paused at the user's request on 2026-10-13.
+Functional reconstruction has since resumed. The reconstruction now uses
 the factory fonts, layouts, settings sector, timer thresholds, photo fades and
 rounded analog strokes. Complete function/behavior identity is **not established**.
+
+Newer [machine-level renderer checks](machine-checks.md) use identical explicit
+inputs and execute both RV32 programs. They restore tick-angle narrowing while
+deliberately correcting the vendor's Sunday-label and stroke-geometry bugs at
+the user's request. The results below remain the
+original captures at their recorded application hashes; they are not updated
+measurements of the newer firmware.
 
 `compare.py` boots both unmodified applications with matching synthetic factory
 settings, isolated NTP, a disabled weather-key sentinel and no external Internet.
