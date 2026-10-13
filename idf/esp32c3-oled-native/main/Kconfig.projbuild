@@ -100,6 +100,18 @@ config YORADIO_ADAPTIVE_INPUT_BUFFER
         ring. This cannot guarantee a contiguous TLS allocation or enough jitter
         tolerance. Keep disabled until all-codec and long-playback tests pass.
 
+config YORADIO_FRAME_ROUTER
+    bool "Route MP3/AAC frame boundaries (experimental)"
+    depends on YORADIO_ADAPTIVE_INPUT_BUFFER
+    default n
+    help
+        Coalesce frame spans into existing input leases and drain the old
+        decoder before changing codec family. Skip inter-frame ID3 tags.
+        No full-frame allocation. Strict boundary mode: corruption/resync and
+        multi-header confidence are not yet implemented. Free-format MP3
+        falls back to the existing decoder for the rest of the connection.
+        Keep disabled until live-transition and all-codec tests qualify it.
+
 config YORADIO_INPUT_MIN_BLOCKS
     int "Minimum compressed-input capacity (1600-byte units)"
     depends on YORADIO_ADAPTIVE_INPUT_BUFFER

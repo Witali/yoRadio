@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "stream_tags.h"
 
-// Experimental boundary walker. Not yet connected to audio_service.
+// Experimental boundary walker, used by audio_service only with FRAME_ROUTER.
 // Input starts at a known elementary-stream frame/tag boundary, after ICY.
 // Never search a frame payload for sync words. AAC rates/channels here describe
 // the ADTS core; decoded SBR/PS/PCE metadata remains authoritative for the UI.
@@ -102,8 +102,8 @@ static inline stream_frame_result_t stream_frame_header(const uint8_t *p,
 
 // Callbacks are synchronous; payload pointers are borrowed for that call only.
 // begin can flush an old decoder before a different codec's bytes are emitted.
-// A queue adapter must coalesce these spans: one queue slot per header would
-// unnecessarily reduce the compressed-input capacity. No queue adapter yet.
+// The queue adapter coalesces these spans: one queue slot per header would
+// unnecessarily reduce the compressed-input capacity.
 typedef bool (*stream_frame_begin_fn)(void *, const stream_frame_info_t *);
 typedef bool (*stream_frame_data_fn)(void *, const uint8_t *, size_t);
 typedef struct {

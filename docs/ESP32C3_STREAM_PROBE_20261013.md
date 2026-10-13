@@ -417,6 +417,77 @@ preceding image. The unqualified development image `idf61-codec-drain` is
 saved in [`firmware/development/esp32c3-idf-6.1-r9a97-codec-drain/`](../firmware/development/esp32c3-idf-6.1-r9a97-codec-drain/),
 with its source commit, hashes and build log. No board deployment was made.
 
+## Follow-up: experimental encoded-queue integration
+
+`CONFIG_YORADIO_FRAME_ROUTER=y` now connects the boundary walker to
+`send_stream_audio()` for MP3/ADTS. It depends on the adaptive input queue and
+defaults **off**. This is a testable integration, not a production qualification.
+Both HTTP/ICY delivery and the flash benchmark path use it when enabled.
+
+`stream_encoded_router.h` combines header/payload spans in an existing
+2,048-byte encoded-packet lease. It commits on full packets, codec changes or
+the end of the current send call. A partially filled lease never survives a
+socket read. The assembled initial probe header joins the same packet as the
+rest of that read, instead of consuming a separate queue slot. No full frame,
+tag body or second staging buffer is allocated. Tiny network reads can still
+produce small packets; this does not claim to eliminate transport fragmentation.
+
+Before MP3/AAC family changes, the producer commits old bytes, enqueues
+`AUDIO_DRAIN_CODEC` for the old codec, then publishes new-codec bytes. The
+consumer's tested drain contract releases old resources before opening the
+next decoder. AAC profile/rate changes remain within the AAC decoder, whose
+decoded SBR/PS/PCE metadata stays authoritative. A first MP3/AAC header may
+correct an explicit MP3/AAC hint without draining an unopened decoder.
+
+The new `adaptive_input_cancel()` releases only the producer's uncommitted
+WRITING lease. READY and READING buffers cannot be cancelled. It follows the
+same deferred-shrink policy as consumer return and wakes waiters for space.
+Stop, failed packet commit and rejected input return the lease rather than
+leaving a permanent occupied slot. Already committed bytes remain owned by
+the queue and retain their generation cancellation checks.
+
+Limits remain explicit:
+
+- FLAC/Ogg keep their opaque send path. Conflicting MIME versus container
+  signatures and cross-container switching are not addressed here.
+- Free-format MP3 preserves its header/data and hands the rest of the
+  connection to the existing MP3 decoder. Further boundary switching in that
+  connection is disabled; this is no new decoder support claim.
+- Strict alignment remains: multi-header confidence, bounded resync, ID3v1
+  and APE tails still need implementation before enabling this by default.
+- Clean transport EOF with a partial routed frame/tag reports
+  `truncated audio frame`. Existing transport failures retain their reason.
+- No claim of gap-free playback or unchanged CPU load is made from host tests.
+
+Evidence in [encoded-router-01](../tests/results/esp32c3-stream-probe-20261013/encoded-router-01/):
+
+- The real `send_encoded()` / `send_stream_audio()` implementation and adapter
+  run under ASan/UBSan with a bounded, synchronous queue substitute. Every
+  two-part split and one-byte input preserve bytes and ordered drain markers.
+  One hundred short ADTS frames in one read use one packet; 3,600 bytes use
+  two packets. Failed commit, cancellation during/after acquire, parser
+  rejection, free-format fallback, opaque formats and truncated EOF are tested.
+- Actual MP3 + AAC-LC + HE-AAC + HE-AACv2 + MP3 fixtures with inter-segment ID3
+  produce exactly 900,120 original audio bytes at read sizes 1, 7 and 2,048.
+  The only drains occur at audio offsets 441,600 (old MP3) and 458,520 (old AAC).
+  The 2,048-byte run uses 444 queue commits including both drain markers.
+  These checks prove byte routing, not decoded PCM correctness.
+- The real adaptive queue's sanitizer suite passes cancellation/state/shrink
+  checks plus its existing 30,000 concurrent packet test and TLS-pressure cases.
+- The default-off initial probe regression retains its 66 passing corpus cases;
+  the decoder-drain and EOF host checks still pass.
+
+Next qualification: run actual decoders through repeated MP3/AAC transitions,
+compare boundary PCM, test Stop/replacement/EOF and allocation recovery on C3,
+then combine with recovery and confidence work. Keep the production default off
+until those checks and the other-codec/HTTPS regression pass.
+
+The enabled ESP-IDF 6.1 build succeeds. Linker map assigns 32 bytes of BSS to
+`s_frame_router`; no new heap buffer is reserved. Compiler `.su` reports 112
+bytes for `send_stream_audio.part.0` (previous build: 96), 48 for each emitted
+span/begin callback, and 896 for `stream_task`. These are individual static
+stack frames, not the total call-chain depth or a runtime high-water measurement.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)

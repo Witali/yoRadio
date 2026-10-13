@@ -449,10 +449,17 @@ static bool send_encoded(uint32_t generation, native_codec_t codec,
     return encoded_commit(s_encoded, packet) == pdTRUE;
 }
 
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+#include "stream_encoded_router.h"
+#endif
+
 static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
                               const uint8_t *data, size_t size,
                               bool *first_chunk, stream_probe_t *probe) {
     if (!size) return true;
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+    stream_route_context_t route = {.generation = generation, .codec = codec};
+#endif
     if (*first_chunk) {
         if (*codec == NATIVE_CODEC_AUTO) {
             size_t consumed = 0;
@@ -465,7 +472,11 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
                 default: return false;
             }
             // Replay the assembled header exactly once, before this read's tail.
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+            if (!stream_route_feed(&route, probe->header, probe->used))
+#else
             if (!send_encoded(generation, *codec, probe->header, probe->used, false))
+#endif
                 return false;
             data += consumed;
             size -= consumed;
@@ -473,7 +484,11 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
         *first_chunk = false;
         state_set_audio(generation, true, codec_name(*codec));
     }
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+    return stream_route_feed(&route, data, size) && stream_route_flush(&route);
+#else
     return !size || send_encoded(generation, *codec, data, size, false);
+#endif
 }
 
 static void stream_bitrate_add(uint32_t generation,
@@ -553,6 +568,9 @@ static void play_flash_fixture(const play_command_t *command,
     native_codec_t codec = command->requested_codec;
     bool first_chunk = true;
     stream_probe_t probe = {0};
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+    stream_route_reset();
+#endif
     uint32_t offset = 0;
     while (offset < command->fixture_size &&
            atomic_load(&s_generation) == command->generation) {
@@ -573,8 +591,11 @@ static void play_flash_fixture(const play_command_t *command,
         }
         offset += (uint32_t)chunk;
     }
-    send_encoded(command->generation, codec, NULL, 0,
-                 codec == NATIVE_CODEC_AUTO ? AUDIO_END_FORMAT_UNKNOWN : AUDIO_END_EOF);
+    uint8_t end_reason = codec == NATIVE_CODEC_AUTO ? AUDIO_END_FORMAT_UNKNOWN : AUDIO_END_EOF;
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+    end_reason = stream_route_end(codec, end_reason);
+#endif
+    send_encoded(command->generation, codec, NULL, 0, end_reason);
     ESP_LOGI(TAG, "Codec fixture complete: %lu/%lu bytes",
              (unsigned long)offset, (unsigned long)command->fixture_size);
 }
@@ -785,6 +806,9 @@ static void stream_task(void *argument) {
         size_t metadata_remaining = 0;
         bool first_chunk = true;
         stream_probe_t probe = {0};
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+        stream_route_reset();
+#endif
         int64_t probe_deadline_us = esp_timer_get_time() +
             (int64_t)STREAM_PROBE_TIMEOUT_MS * 1000;
         bool format_unknown = false;
@@ -909,6 +933,9 @@ static void stream_task(void *argument) {
                              : format_unknown ? AUDIO_END_FORMAT_UNKNOWN
                              : stream_stalled ? AUDIO_END_BUFFER_STALLED
                                                   : AUDIO_END_EOF;
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+        end_reason = stream_route_end(codec, end_reason);
+#endif
         send_encoded(command.generation, codec, NULL, 0, end_reason);
         dispose_http_client(client);
         if (atomic_load(&s_generation) == command.generation) {
