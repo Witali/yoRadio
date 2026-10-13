@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\run-esp32c3-stream-frames.py", line 107, in <module>
+    main()
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\run-esp32c3-stream-frames.py", line 39, in main
+    print(linux([native(binary)]), end='')
+          ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\run-esp32c3-stream-frames.py", line 28, in linux
+    return run(['wsl.exe', '--exec', *args] if os.name == 'nt' else args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32c3-idf-upgrade\tests\run-esp32c3-stream-frames.py", line 18, in run
+    raise RuntimeError(result.stdout + result.stderr)
+RuntimeError: test: /mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/tests/native/esp32c3_stream_frames_test.c:32: feed: Assertion `stream_frames_feed(s,data,n,&count,begin,emit,sink)==STREAM_FRAME_MORE' failed.
+

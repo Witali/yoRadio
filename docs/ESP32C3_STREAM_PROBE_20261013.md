@@ -657,6 +657,53 @@ hardware DMA/acoustic test, or proof for all possible format changes. Long-run
 stability and parser confidence/recovery remain open before enabling the router
 by default.
 
+## Follow-up: MP3 ID3v1 tails
+
+The strict walker previously emitted all 460 MP3 frames from the reference
+file, then rejected its legal ID3v1 metadata tail. The new regression reproduced
+that failure before the implementation changed.
+
+The walker now skips the fixed 128-byte `TAG` envelope only at a completed MP3
+frame boundary. [ID3v1/v1.1](https://id3.org/ID3v1) uses the same envelope size
+for both versions. No tag text is parsed or copied into a decoder. A complete
+tail can also separate concatenated tracks; the next track still goes through
+the normal frame parser and codec-drain path. This concatenation behavior is
+an application policy, not an extension of the ID3v1 format definition.
+
+TAG-like bytes inside compressed payloads are untouched. Startup TAG data,
+TAG after AAC and a second tail without another MP3 frame remain invalid.
+Partial tails produce `AUDIO_END_FRAME_TRUNCATED`; a complete tail retains
+normal EOF. The consecutive-metadata resource limit still applies.
+
+| Check | Result |
+|---|---|
+| ID3v1 and v1.1 at every two-part split and byte-by-byte | PASS |
+| All 127 nonempty truncated-tail lengths | Incomplete; actual router returns truncated EOF |
+| Tag content containing AAC, MP3 and ID3 signatures | No tag bytes emitted |
+| Codec context, metadata bound, next-track transition | PASS |
+| Existing 26-file frame corpus plus mixed stream, ASan/UBSan | PASS |
+| Real encoded mixed-codec replay, two tag variants × three chunk sizes | 6/6 PASS; ordered drains unchanged |
+| MP3 with ID3v1 versus ffprobe | 460 audio frames, 441,600 audio bytes, complete |
+| ESP-IDF 6.1 QEMU build | PASS; test-only image 998,032 bytes |
+| Full PCM matrix including three new ID3v1 cases | 11/11 PASS |
+
+In QEMU the standalone tagged MP3 produces the same 294,912 PCM bytes as the
+untagged reference. Tagged MP3 → HE-AAC → MP3 produces 1,114,112 identical
+bytes; AAC-LC → tagged MP3 → HE-AACv2 produces 1,081,344 identical bytes.
+Every capture has exactly one terminal flush and complete encoded delivery.
+
+No heap allocation or extra buffer was introduced. `last_codec` occupies
+existing padding: the host-tested walker remains 28 bytes; the C3 linker map
+still assigns 32 bytes to `s_frame_router`. This is structure/static-memory
+evidence, not a new physical heap-pressure or timing measurement.
+
+[Frozen tests, captures and hashes](../tests/results/esp32c3-stream-probe-20261013/id3v1-tails-01/)
+contain the pre-fix failure, sanitizer results, ffprobe comparison, source
+snapshots, QEMU PCM logs and build identity. The physical board was not changed.
+FRAME_ROUTER remains experimental/default-off. Multi-header confirmation,
+bounded recovery, APE tails and longer playback qualification are still open;
+free-format MP3 retains its existing decoder-owned bypass path.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)

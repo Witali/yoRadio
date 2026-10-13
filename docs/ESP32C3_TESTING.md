@@ -1703,6 +1703,13 @@ sample count, order, rate and channel layout, independent of queue packet sizes.
 This is a pipeline regression against the same decoder in isolated sessions,
 not an independent decoder accuracy reference or physical DMA timing test.
 
+The matrix also appends a complete 128-byte ID3v1 tail to standalone MP3 and
+each MP3 segment in both mixed sequences (11 cases total). Sync-shaped tag
+contents must not change decoded PCM. `tests/run-esp32c3-stream-frames.py`
+checks tag splits, v1/v1.1, payload isolation and truncation under sanitizers;
+`tests/run-stream-encoded-router.py` additionally checks the EOF reason for
+all 127 incomplete tail lengths and exact encoded replay with both tag types.
+
 Build a separate QEMU benchmark using `CONFIG_YORADIO_QEMU=y`,
 `CONFIG_YORADIO_FRAME_ROUTER=y`, queued PCM, UART console, DIO flash and
 `partitions-codec-benchmark.csv`. Pass CMake options

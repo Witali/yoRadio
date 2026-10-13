@@ -81,6 +81,15 @@ int main(int argc,char **argv) {
     assert(argc==1);
     uint8_t mp3[417];memset(mp3,0x55,sizeof(mp3));memcpy(mp3,"\xff\xfb\x90\x00",4);
     uint8_t aac[12]={0xff,0xf1,0x4c,0x80,1,0x9f,0xfc,1,2,3,4,5};
+    uint8_t tail[128]={0};memcpy(tail,"TAG",3);memcpy(tail+20,aac,sizeof(aac));
+    for(size_t tail_size=1;tail_size<=sizeof(tail);++tail_size) {
+        reset();stream_probe_t probe={0};native_codec_t codec=NATIVE_CODEC_AUTO;bool first=true;
+        assert(send_stream_audio(42,&codec,mp3,sizeof(mp3),&first,&probe));
+        assert(send_stream_audio(42,&codec,tail,tail_size,&first,&probe));
+        assert(!leased && !markers && captured_size==sizeof(mp3) && !memcmp(captured,mp3,sizeof(mp3)));
+        assert(stream_route_end(codec,AUDIO_END_EOF)==
+               (tail_size==sizeof(tail) ? AUDIO_END_EOF : AUDIO_END_FRAME_TRUNCATED));
+    }
     uint8_t input[868],expected[858];
     memcpy(expected,mp3,417);memcpy(expected+417,aac,12);memcpy(expected+429,aac,12);memcpy(expected+441,mp3,417);
     memcpy(input,mp3,417);memcpy(input+417,"ID3\x04\0\0\0\0\0\0",10);memcpy(input+427,expected+417,441);

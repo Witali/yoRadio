@@ -7,9 +7,16 @@
 
 enum {
     STREAM_ID3_HEADER_BYTES = 10,
+    STREAM_ID3V1_MAGIC_BYTES = 3,
+    STREAM_ID3V1_TAG_BYTES = 128,
     // Application resource bound, not the maximum allowed by ID3.
     STREAM_ID3_RUN_BYTES = 1024 * 1024,
 };
+
+static inline bool stream_id3v1_prefix(const uint8_t *p, size_t size) {
+    return memcmp(p, "TAG", size < STREAM_ID3V1_MAGIC_BYTES
+                            ? size : STREAM_ID3V1_MAGIC_BYTES) == 0;
+}
 
 static inline bool stream_id3_prefix(const uint8_t *p, size_t size) {
     return memcmp(p, "ID3", size < 3 ? size : 3) == 0;

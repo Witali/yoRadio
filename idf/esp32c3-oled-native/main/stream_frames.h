@@ -109,6 +109,7 @@ typedef bool (*stream_frame_data_fn)(void *, const uint8_t *, size_t);
 typedef struct {
     uint8_t header[STREAM_ID3_HEADER_BYTES];
     uint8_t used;
+    uint8_t last_codec; // Reuses struct padding; restrict ID3v1 to MP3 tails.
     uint16_t remaining;
     uint32_t skip;
     uint32_t tag_bytes; // Consecutive metadata only; reset at each audio frame.
@@ -141,6 +142,22 @@ static inline stream_frame_result_t stream_frames_feed(stream_frames_t *s,
             continue;
         }
         s->header[s->used++] = data[(*consumed)++];
+        // ID3v1/v1.1 is a fixed 128-byte MP3 tail. Recognize it only at a
+        // completed MP3 frame boundary, never by searching compressed data.
+        // The remaining bytes may contain any values, including codec sync.
+        if (s->last_codec == STREAM_FRAME_MP3 &&
+            stream_id3v1_prefix(s->header, s->used)) {
+            if (s->used < STREAM_ID3V1_MAGIC_BYTES) continue;
+            if (STREAM_ID3V1_TAG_BYTES > STREAM_ID3_RUN_BYTES - s->tag_bytes) {
+                s->result = STREAM_FRAME_INVALID;
+                break;
+            }
+            s->tag_bytes += STREAM_ID3V1_TAG_BYTES;
+            s->skip = STREAM_ID3V1_TAG_BYTES - STREAM_ID3V1_MAGIC_BYTES;
+            s->used = 0;
+            s->last_codec = 0; // Require another MP3 frame before another tail.
+            continue;
+        }
         if (stream_id3_prefix(s->header, s->used)) {
             if (s->used < STREAM_ID3_HEADER_BYTES) continue;
             uint32_t total;
@@ -166,6 +183,7 @@ static inline stream_frame_result_t stream_frames_feed(stream_frames_t *s,
             break;
         }
         s->remaining = info.bytes - s->used;
+        s->last_codec = info.codec;
         s->tag_bytes = 0;
         s->used = 0;
     }

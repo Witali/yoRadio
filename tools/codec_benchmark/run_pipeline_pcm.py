@@ -148,6 +148,12 @@ def main():
             if shape != [(fixtures[name]['rate'], fixtures[name]['channels'], expected_bytes)]:
                 raise ValueError('Reference lost samples or has wrong PCM layout: '+name)
             report['cases'][name]['reference_shape_verified'] = True
+        # ID3v1/v1.1 is metadata after a complete MP3 stream/track. Include
+        # sync-shaped values to ensure none of its 128 bytes reach a decoder.
+        mp3_tail = b'TAG' + (b'ID3\xff\xfb\x90\x00\xff\xf1' * 14)[:125].ljust(125,b'\0')
+        observed = capture('id3v1-mp3', segments['mp3-320'] + mp3_tail)
+        report['cases']['id3v1-mp3'] = compare(references['mp3-320'], observed); save()
+        print('EXACT id3v1-mp3', flush=True)
         for sequence in [('mp3-320','he-48000-stereo','mp3-320'),
                          ('lc-48000-stereo','mp3-320','hev2-44100-stereo')]:
             expected = [part for name in sequence for part in references[name]]
@@ -157,6 +163,11 @@ def main():
                 observed = capture(name,b''.join(tag+segments[n] for n in sequence))
                 report['cases'][name] = compare(expected,observed); save()
                 print('EXACT',name,flush=True)
+            name = 'id3v1-' + '-'.join(sequence)
+            observed = capture(name, b''.join(segments[n] + (mp3_tail if n == 'mp3-320' else b'')
+                                             for n in sequence))
+            report['cases'][name] = compare(expected, observed); save()
+            print('EXACT', name, flush=True)
         report['passed'] = True
     except Exception as error:
         report['passed'] = False; report['error'] = str(error); raise

@@ -107,7 +107,53 @@ static void tags(void) {
     assert(stream_frames_complete(&state) && sink.frames==1 && sink.delivered==12);
     puts("ID3 PASS splits/truncation/versions/footer/bounds/payload isolation");
 }
+static void id3v1_tails(void) {
+    enum { MP3_BYTES = 417, TAG_BYTES = 128 };
+    uint8_t mp3[MP3_BYTES], tag[TAG_BYTES], input[MP3_BYTES+TAG_BYTES];
+    memset(mp3,0x55,sizeof(mp3));memcpy(mp3,"\xff\xfb\x90\x00",4);
+    memcpy(mp3+100,"TAG",3); // Payload is never searched for metadata.
+    memset(tag,0,sizeof(tag));memcpy(tag,"TAG",3);
+    memcpy(tag+3,"\xff\xf1\x4c\x80\x01\x9f\xfc",7);
+    memcpy(tag+50,"ID3\x04\0\0\0\0\0\0",10);
+    for(unsigned version=0;version<2;++version) {
+        tag[125]=0;tag[126]=version ? 17 : 0;tag[127]=255;
+        memcpy(input,mp3,sizeof(mp3));memcpy(input+sizeof(mp3),tag,sizeof(tag));
+        for(size_t split=0;split<=sizeof(input)+1;++split) {
+            stream_frames_t state={0};sink_t sink={.expected=mp3,.size=sizeof(mp3)};
+            if(split<=sizeof(input)) {
+                feed(&state,&sink,input,split);feed(&state,&sink,input+split,sizeof(input)-split);
+            } else for(size_t i=0;i<sizeof(input);++i) feed(&state,&sink,input+i,1);
+            assert(stream_frames_complete(&state) && sink.frames==1 && sink.delivered==sizeof(mp3));
+        }
+    }
+    for(size_t length=1;length<TAG_BYTES;++length) {
+        stream_frames_t state={0};sink_t sink={.expected=mp3,.size=sizeof(mp3)};
+        feed(&state,&sink,mp3,sizeof(mp3));feed(&state,&sink,tag,length);
+        assert(!stream_frames_complete(&state) && sink.frames==1 && sink.delivered==sizeof(mp3));
+    }
+    // No ID3v1 heuristic at startup or after AAC. Both must remain invalid.
+    const uint8_t aac[]={0xff,0xf1,0x4c,0x80,1,0x9f,0xfc,1,2,3,4,5};
+    for(unsigned after_aac=0;after_aac<2;++after_aac) {
+        stream_frames_t state={0};sink_t sink={.expected=aac,.size=sizeof(aac)};size_t count;
+        if(after_aac) feed(&state,&sink,aac,sizeof(aac));
+        assert(stream_frames_feed(&state,tag,sizeof(tag),&count,begin,emit,&sink)==STREAM_FRAME_INVALID);
+    }
+    for(unsigned over=0;over<2;++over) {
+        stream_frames_t state={0};sink_t sink={.expected=mp3,.size=sizeof(mp3)};size_t count;
+        feed(&state,&sink,mp3,sizeof(mp3));state.tag_bytes=STREAM_ID3_RUN_BYTES-TAG_BYTES+over;
+        if(!over) {feed(&state,&sink,tag,sizeof(tag));assert(stream_frames_complete(&state));}
+        else assert(stream_frames_feed(&state,tag,sizeof(tag),&count,begin,emit,&sink)==STREAM_FRAME_INVALID);
+    }
+    // A concatenated next track can change format after a complete tail.
+    uint8_t expected[MP3_BYTES+sizeof(aac)];memcpy(expected,mp3,sizeof(mp3));memcpy(expected+sizeof(mp3),aac,sizeof(aac));
+    stream_frames_t state={0};sink_t sink={.expected=expected,.size=sizeof(expected)};
+    feed(&state,&sink,mp3,sizeof(mp3));feed(&state,&sink,tag,sizeof(tag));feed(&state,&sink,aac,sizeof(aac));
+    assert(stream_frames_complete(&state) && sink.frames==2 && sink.delivered==sizeof(expected));
+    puts("ID3v1 PASS splits/truncation/payload isolation/codec context/bounds/next track");
+}
+
 static void unit(void) {
+    id3v1_tails();
     tags();
     stream_frame_info_t info;
     const uint8_t mp3[]={0xff,0xfb,0x90,0};
