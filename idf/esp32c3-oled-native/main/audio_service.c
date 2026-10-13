@@ -1,4 +1,5 @@
 #include "audio_service.h"
+#include "cpu_profiler.h"
 #include "audio_pipeline_probe.h"
 #include "audio_completion.h"
 #include "decoder_pcm.h"
@@ -1437,6 +1438,8 @@ static void decoder_task(void *argument) {
                 if (codec == NATIVE_CODEC_AAC) {
                     aac_decoder = native_aac_decoder_create();
                     if (!aac_decoder) {
+                        cpu_profiler_decoder_failure(codec, DECODER_FAILURE_OPEN,
+                            ESP_AUDIO_ERR_MEM_LACK, packet->end_of_stream, packet->data_size);
                         state_set_audio(generation, false, "NO MEMORY");
                         failed_generation = generation;
                         encoded_return(s_encoded, packet);
@@ -1452,6 +1455,8 @@ static void decoder_task(void *argument) {
 #endif
                     ESP_LOGE(TAG, "%s PCM buffer allocation failed",
                              codec_name(codec));
+                    cpu_profiler_decoder_failure(codec, DECODER_FAILURE_PCM,
+                        ESP_AUDIO_ERR_MEM_LACK, packet->end_of_stream, packet->data_size);
                     state_set_audio(generation, false, "NO MEMORY");
                     failed_generation = generation;
                     encoded_return(s_encoded, packet);
@@ -1472,6 +1477,8 @@ static void decoder_task(void *argument) {
 #endif
                 open_result = esp_audio_simple_dec_open(&cfg, &decoder);
                 if (open_result != ESP_AUDIO_ERR_OK) {
+                    cpu_profiler_decoder_failure(codec, DECODER_FAILURE_OPEN,
+                        open_result, packet->end_of_stream, packet->data_size);
                     ESP_LOGE(TAG, "%s decoder open failed: %d",
                              codec_name(codec), open_result);
                     state_set_audio(generation,
@@ -1649,6 +1656,8 @@ static void decoder_task(void *argument) {
                 if (frame.needed_size <= output_size ||
                     !decoder_pcm_resize(&output, &output_size,
                                         frame.needed_size)) {
+                    cpu_profiler_decoder_failure(codec, DECODER_FAILURE_PCM,
+                        result, packet->end_of_stream, raw.len);
                     state_set_audio(generation, false, "PCM allocation failed");
                     failed_generation = generation;
                     break;
@@ -1657,6 +1666,8 @@ static void decoder_task(void *argument) {
                 continue;
             }
             if (result != ESP_AUDIO_ERR_OK) {
+                cpu_profiler_decoder_failure(codec, DECODER_FAILURE_PROCESS,
+                    result, packet->end_of_stream, raw.len);
                 ESP_LOGW(TAG, "%s decode error: %d", codec_name(codec),
                          result);
                 state_set_audio(generation, false, "decode failed");

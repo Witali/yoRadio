@@ -70,6 +70,22 @@ def read_health(board):
         result['output'] = validate_output(raw['output'])
     if 'pipeline' in raw:
         result['pipeline'] = validate_pipeline(raw['pipeline'], validate_output(raw.get('output')))
+    for key, fields in (
+        ('last_allocation_failure', ('size', 'caps')),
+        ('decoder_failure', ('sequence', 'codec', 'stage', 'result', 'completion',
+                             'input_bytes', 'allocation_sequence')),
+    ):
+        if key not in raw:
+            continue  # Older schema-1 firmware has counters only.
+        value = raw[key]
+        require(type(value) is dict, 'Invalid failure diagnostic: ' + key)
+        for field in fields:
+            signed = field == 'result'
+            require(type(value.get(field)) is int and
+                    (-(1 << 31) if signed else 0) <= value[field] <=
+                    ((1 << 31) - 1 if signed else COUNTER_MASK),
+                    'Invalid failure diagnostic: ' + key + '.' + field)
+        result[key] = {field: value[field] for field in fields}
     return result
 
 

@@ -127,13 +127,13 @@ static esp_err_t health_handler(httpd_req_t *request) {
     portCLEAR_INTERRUPT_MASK_FROM_ISR(previous_mask);
     // Bound the full 16-event history, input and optional arena counters at
     // uint32 maxima. Both diagnostic variants use the same stack workspace.
-    char body[2560];
+    char body[2816];
 #else
     native_audio_output_health_t output = native_audio_output_health();
 #ifdef CONFIG_YORADIO_SHARED_DECODER_ARENA
-    char body[768];
+    char body[1024];
 #else
-    char body[512];
+    char body[768];
 #endif
 #endif
     int length = snprintf(body, sizeof(body),
@@ -141,6 +141,9 @@ static esp_err_t health_handler(httpd_req_t *request) {
         "\"reset_reason\":%u,\"heap\":%lu,\"largest\":%lu,"
         "\"minimum_heap\":%lu,\"tasks\":%lu,"
         "\"allocation_failures\":%lu,\"task_watchdog_events\":%lu,"
+        "\"last_allocation_failure\":{\"size\":%lu,\"caps\":%lu},"
+        "\"decoder_failure\":{\"sequence\":%lu,\"codec\":%lu,\"stage\":%lu,"
+        "\"result\":%ld,\"completion\":%lu,\"input_bytes\":%lu,\"allocation_sequence\":%lu},"
         "\"output\":{\"available\":%s,\"completion_queue_drops\":%lu,\"write_errors\":%lu}}",
         (unsigned long long)s_health_boot_id,
         (unsigned long long)(esp_timer_get_time() / 1000),
@@ -150,6 +153,15 @@ static esp_err_t health_handler(httpd_req_t *request) {
         (unsigned long)uxTaskGetNumberOfTasks(),
         (unsigned long)faults.allocation_failures,
         (unsigned long)faults.task_watchdog_events,
+        (unsigned long)faults.allocation_size,
+        (unsigned long)faults.allocation_caps,
+        (unsigned long)faults.decoder_failures,
+        (unsigned long)faults.decoder_codec,
+        (unsigned long)faults.decoder_stage,
+        (long)faults.decoder_result,
+        (unsigned long)faults.decoder_completion,
+        (unsigned long)faults.decoder_input_bytes,
+        (unsigned long)faults.decoder_allocation_sequence,
         output.available ? "true" : "false",
         (unsigned long)output.completion_queue_drops,
         (unsigned long)output.write_errors);

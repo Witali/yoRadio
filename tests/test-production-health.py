@@ -16,6 +16,21 @@ def sample(**updates):
 
 
 class HealthTests(unittest.TestCase):
+    def test_failure_diagnostics_survive_cleanup_and_filter_private_fields(self):
+        failure = dict(sequence=1, codec=2, stage=2, result=-2, completion=7,
+                       input_bytes=1234, allocation_sequence=1)
+        raw = sample(allocation_failures=2, decoder_failure=dict(failure, private='secret'),
+                     last_allocation_failure=dict(size=20000, caps=1028, function='private'))
+        value = read_health(Mock(json=Mock(return_value=raw)))
+        self.assertEqual(value['decoder_failure'], failure)
+        self.assertEqual(value['last_allocation_failure'], dict(size=20000, caps=1028))
+        for key in ('decoder_failure', 'last_allocation_failure'):
+            for field in value[key]:
+                for bad in (None, True, '0', 2**32, -(2**31)-1):
+                    changed = dict(raw, **{key:dict(raw[key], **{field:bad})})
+                    with self.subTest(key=key, field=field, bad=bad), self.assertRaises(Failure):
+                        read_health(Mock(json=Mock(return_value=changed)))
+
     def test_read_filters_unknown_private_fields(self):
         board = Mock()
         board.json.return_value = sample(station='private', password='private')

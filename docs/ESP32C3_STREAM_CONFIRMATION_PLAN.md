@@ -399,3 +399,29 @@ decoder error merely to turn the status green.
 
 Do not enable the new path by default until these gates pass. A passing core
 test does not prove queue lifetimes, physical memory pressure or sound continuity.
+
+### Retained failure diagnostics (2026-10-13)
+
+Quiet firmware now retains the latest failed allocation's requested bytes and
+capability mask, plus the latest Espressif/native AAC decoder failure: codec,
+stage (1=open, 2=process, 3=PCM allocation), signed SDK result, original completion
+marker, unconsumed input bytes, and allocation-failure count at that instant.
+`completion=7` identifies a codec drain; it is not terminal EOF. See the native
+codec enum and `audio_completion.h` for the numeric definitions. A zero decoder
+sequence means no recorded failure. Custom FLAC/Helix/minimp3 adapters do not yet
+publish decoder failure details through this API; their heap failures still count.
+
+Both snapshots are copied with interrupts masked on single-core C3. The allocation
+callback never dereferences its function-name pointer, allocates or logs. Numeric
+records survive Stop/cleanup; a subsequent allocation failure can replace the
+last size/caps but cannot rewrite the decoder's captured allocation sequence.
+This is a last-event snapshot, not a complete allocation history or proof of cause.
+Additional retained storage is 36 bytes; health JSON workspace grows by 256 bytes
+inside the existing HTTP task stack. No new task or heap buffer is created.
+
+Validation: actual counter/handler C passes ASan/UBSan in four watchdog/probe
+combinations, including maximum-width JSON, interrupt-mask restoration and an
+allocation failure after decoder failure. Eight Python health tests and five
+pipeline tests pass, including bounded numeric filtering and older schema-1
+compatibility. ESP-IDF 6.1 candidate builds successfully. Physical reproduction
+with this diagnostic is still pending.
