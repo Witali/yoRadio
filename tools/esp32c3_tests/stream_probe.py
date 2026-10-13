@@ -171,6 +171,9 @@ def main():
         board.stop()
         report['restoration']=dict(image=board.info(),status=board.status(),**verify_snapshot(board,private))
         save(); print('RESTORED',flush=True)
+    require(len(report['cases']) == len(specs) and
+            all(row['result'] == 'PASS' for row in report['cases']),
+            'Stream probe checks failed; see saved results')
 
 
 if __name__=='__main__':
