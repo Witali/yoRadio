@@ -423,5 +423,21 @@ Validation: actual counter/handler C passes ASan/UBSan in four watchdog/probe
 combinations, including maximum-width JSON, interrupt-mask restoration and an
 allocation failure after decoder failure. Eight Python health tests and five
 pipeline tests pass, including bounded numeric filtering and older schema-1
-compatibility. ESP-IDF 6.1 candidate builds successfully. Physical reproduction
-with this diagnostic is still pending.
+compatibility. ESP-IDF 6.1 candidate builds successfully. Physical follow-up is recorded below.
+
+Physical follow-up: `startup-fault-01` passes all 20 HTTPS cases and the strict
+offline audit, including MP3 -> HE-AAC -> MP3 after the complete preceding workload.
+All observed allocation, decoder-failure and watchdog counters remain zero;
+recorded lifetime minimum heap is 19,108 bytes. Active output-counter checks pass.
+Original app and private settings are verified restored, playback stopped.
+The earlier failure did not recur; this diagnostic-only change is not a proven
+root-cause fix. The candidate remains laboratory-only and production-unqualified.
+Further repetitions with connection/codec history are required.
+
+The real generic decoder loop also passes 30 ASan/UBSan stub scenarios, checking
+that fatal process/PCM errors are recorded before cleanup with the original
+codec, return code and data/drain/EOF marker. C callbacks are verified in the ELF:
+allocation handler and both interrupt-mask helpers are in IRAM, retained state
+is in DRAM. Source snapshots, logs, image identity, physical results and SHA-256
+manifest: [startup-fault-01](../tests/results/esp32c3-stream-probe-20261013/startup-fault-01/summary.json).
+Test image: `firmware/development/esp32c3-idf-6.1-r9a97-startup-fault-tls-lab/app.bin`.

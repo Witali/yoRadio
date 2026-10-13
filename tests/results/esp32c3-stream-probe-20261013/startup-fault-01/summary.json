@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "production_qualified": false,
+  "scope": "20/20 HTTPS cases and strict offline audit pass with zero allocation/decoder/watchdog failures. Earlier intermittent HTTPS codec-transition failure did not reproduce; no root-cause fix or production qualification claimed. Original firmware and private settings restored.",
+  "candidate": {
+    "app_elf_sha256": "b45b952f62762b182dbb109f25fba23b3c97f664342dd44d70c6bf119c27923f",
+    "sha256": "ee787bcf9132f65ab47083d95af4877a997ee34c36cb7e32694e24d445fa49da",
+    "bytes": 1470752
+  },
+  "source_commit": "6b3b82f73bf55332a1cac25633b11f8270fddca4",
+  "cases": 20,
+  "allocation_failures": 0,
+  "decoder_failures": 0,
+  "task_watchdog_events": 0,
+  "lifetime_min_heap": 19108,
+  "additional_retained_bytes": 36,
+  "health_workspace_growth_bytes": 256,
+  "decoder_loop_cases": 30,
+  "host_sanitizer_variants": 4,
+  "restoration_verified": true,
+  "previous_failed_evidence": "../startup-tls-01/https/results.json",
+  "next_step": "Reproduce intermittent allocation failure across repeated codec changes and retained connection history; use decoder stage/result and failed allocation size/caps. Do not suppress decoder errors."
+}
