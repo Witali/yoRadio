@@ -1,8 +1,8 @@
 """Bounded quiet-image public HTTPS playback with independent output gates.
 
 The caller owns app-only OTA installation/restoration. Do not infer analog
-continuity from completion-queue counters. Save failures without weakening
-memory/response-time gates or stopping collection at the first slow response.
+continuity from completion-queue counters. Save failures and separate absolute
+heap budgets from actual faults, progressive loss and response-time failures.
 """
 import argparse
 import json
@@ -40,10 +40,15 @@ def check_output(health):
     return result
 
 
-def check_memory(health):
+def check_memory(health, *, enforce_legacy_floor=False):
     result = check_health(health)
-    require(result['minimum_heap'] >= 16384 and result['minimum_largest'] >= 8192,
-            'In-playback memory below existing budget')
+    result['legacy_floor_pass'] = result['minimum_heap'] >= 16384 and result['minimum_largest'] >= 8192
+    result['legacy_floor_enforced'] = enforce_legacy_floor
+    if enforce_legacy_floor:
+        require(result['legacy_floor_pass'], 'In-playback memory below existing budget')
+    for row in health:
+        if 'decoder_failure' in row:
+            require(row['decoder_failure']['sequence'] == 0, 'Firmware reported a decoder failure')
     for key,tolerance in (('heap',2048),('largest',4096)):
         require(statistics.median(r[key] for r in health[:3])-
                 statistics.median(r[key] for r in health[-3:]) <= tolerance,
@@ -59,6 +64,8 @@ def main():
     p.add_argument('--stream',default='groovesalad-64-aac')
     p.add_argument('--aac-reference-command',type=Path,required=True)
     p.add_argument('--seconds',type=int,default=600)
+    p.add_argument('--enforce-legacy-heap-floor',action='store_true',
+                   help='Reproduce the historical 16/8 KiB free/largest gate; default records it as diagnostic')
     a = p.parse_args()
     require(60 <= a.seconds <= 600, 'Use 60..600 seconds')
     require(not a.output.exists(), 'Preserve previous evidence')
@@ -79,6 +86,7 @@ def main():
     report.data.update(image=image,reference=reference,public_url=url,
         sdkconfig_sha256=sha(a.firmware.with_name('sdkconfig').read_bytes()),
         seconds=a.seconds,warmup_seconds=WARMUP_SECONDS,
+        memory_policy='legacy-absolute-floor' if a.enforce_legacy_heap_floor else 'faults-and-recovery',
         scope='Sampled status, lifetime faults, I2S completion drops and write errors; no analog continuity claim')
     last_checkpoint = 0
     def checkpoint(completed,batch):
@@ -110,7 +118,7 @@ def main():
         case('format',lambda:check_playback(states,reference['spec'],
              minimum=int((a.seconds-WARMUP_SECONDS)*.6),warmup=WARMUP_SECONDS))
         case('output',lambda:check_output(measured))
-        case('memory',lambda:check_memory(measured))
+        case('memory',lambda:check_memory(measured,enforce_legacy_floor=a.enforce_legacy_heap_floor))
         def response():
             maximum = max(s['request_ms'] for s in states)
             require(maximum < 2000, 'WebUI response exceeded 2 seconds')

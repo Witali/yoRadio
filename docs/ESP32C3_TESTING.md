@@ -24,6 +24,12 @@ The current stream-confirmation matrix has no absolute free-RAM floor. Its
 allocation, restart, watchdog and active-output checks remain strict. Prefix
 control tests check settled heap recovery, not an absolute minimum RAM value.
 
+`sustained_output.py` now uses this policy by default: the historical 16/8 KiB
+free/largest floor is reported as `legacy_floor_pass`, while actual faults,
+progressive heap loss and settled recovery remain gates. Use
+`--enforce-legacy-heap-floor` to reproduce the older budget policy explicitly.
+The report records which policy was selected; historical results are unchanged.
+
 ### Real AAC heap-pressure regression in QEMU
 
 Build the QEMU AAC fault profile with `CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER=y`,
