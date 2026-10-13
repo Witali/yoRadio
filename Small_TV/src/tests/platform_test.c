@@ -1368,6 +1368,65 @@ static void test_clock_text_scroll(void)
     CHECK(clock_step==56);
 }
 
+static void clock_calendar_scenario(void)
+{
+    /* Simulate a time-server year correction at unchanged local h/m/s/day number. */
+    ++clock_step;
+    if (clock_step==1)
+    {
+        fake_local.tm_year=126;
+        fake_local.tm_wday=4;
+        fake_time+=31536000;
+    }
+    if (clock_step==2)
+    {
+        static uint16_t incremental[240*240];
+        memcpy(incremental,panel,sizeof(panel));
+        weather_snapshot_t current;
+        weather_snapshot(&current);
+        char address[20];
+        network_address(address,sizeof(address));
+        display_fill(0,0,240,240,0);
+        if (preferences.theme==0)
+            factory_draw_classic(&preferences,&fake_local,&current,0,0,true,true);
+        else
+            factory_draw_simple(&preferences,&fake_local,address,true,true,true);
+        CHECK(!memcmp(incremental,panel,sizeof(panel)));
+        longjmp(blocked,1);
+    }
+}
+
+static void test_clock_calendar(unsigned theme)
+{
+    /* Exercise actual task dispatch after a real epoch jump, without a minute timer event. */
+    preferences.theme=theme;
+    preferences.date_format=2;
+    fake_local=(struct tm){.tm_year=125,.tm_mon=0,.tm_mday=1,.tm_yday=0,
+                          .tm_wday=3,.tm_hour=18,.tm_min=14,.tm_sec=7};
+    CHECK(clock_ui_timer_init()==ESP_OK);
+    CHECK(network_init()==ESP_OK);
+    got_ip();
+    weather_start();
+    strcpy(preferences.weather_key,"fixture-key");
+    run_task("weather_http",seed_weather);
+    CHECK(display_init()==ESP_OK);
+    clock_ui_start();
+    run_task("clock_display",clock_calendar_scenario);
+    CHECK(clock_step==2);
+}
+
+static void test_clock_calendar_classic(void)
+{
+    /* Run the classic date-jump task scenario in its own fresh process. */
+    test_clock_calendar(0);
+}
+
+static void test_clock_calendar_simple(void)
+{
+    /* Run the simple date-jump task scenario in its own fresh process. */
+    test_clock_calendar(1);
+}
+
 int main(int argc, char **argv)
 {
     /* Select a fresh-process scenario and save a machine-readable result only after success. */
@@ -1401,7 +1460,9 @@ int main(int argc, char **argv)
                  {"clock_coordinator", test_clock_coordinator},
                  {"timer_driver_failures", test_timer_driver_failures},
                  {"clock_animation_selection", test_clock_animation_selection},
-                 {"clock_text_scroll", test_clock_text_scroll}};
+                 {"clock_text_scroll", test_clock_text_scroll},
+                 {"clock_calendar_classic", test_clock_calendar_classic},
+                 {"clock_calendar_simple", test_clock_calendar_simple}};
     bool found = false;
     for (unsigned i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
         if (!strcmp(argv[1], cases[i].name))

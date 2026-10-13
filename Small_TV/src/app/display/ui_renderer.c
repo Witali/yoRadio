@@ -128,6 +128,16 @@ static int displayed_hour(const tv_settings_t *s, const struct tm *local)
     return s->hour12 && local->tm_hour > 12 ? local->tm_hour - 12 : local->tm_hour;
 }
 
+static bool calendar_changed(const struct tm *current, const struct tm *previous)
+{
+    /* Compare full dates after timezone/SNTP jumps, retaining day-of-year changes.
+     * FIXED_RECONSTRUCTION: the earlier rollover fix compared only tm_yday;
+     * equal day numbers in different years left the date and weekday stale. */
+
+    return current->tm_year != previous->tm_year || current->tm_mon != previous->tm_mon ||
+           current->tm_mday != previous->tm_mday || current->tm_yday != previous->tm_yday;
+}
+
 static void centered_at(int x, int width, int y, const char *text, uint16_t color)
 {
     /* Center the visible prefix of a 24-pixel label within its field.
@@ -267,7 +277,9 @@ void factory_draw_classic(const tv_settings_t *s, const struct tm *local,
 {
     /* Update the classic fields selected by the original renderer at 0x4200b738.
      * FIXED_FACTORY: route status updates through complete field clearing so
-     * shorter labels or missing weather cannot preserve old text/icon pixels. */
+     * shorter labels or missing weather cannot preserve old text/icon pixels.
+     * FIXED_RECONSTRUCTION: refresh the date on complete calendar changes,
+     * including a year jump at unchanged hour/minute/second and tm_yday. */
 
     static tv_settings_t previous_settings;
     static struct tm previous_time;
@@ -276,7 +288,7 @@ void factory_draw_classic(const tv_settings_t *s, const struct tm *local,
     bool preferences = reset || memcmp(s, &previous_settings, sizeof(*s));
     bool minute = reset || local->tm_min != previous_time.tm_min ||
                   local->tm_hour != previous_time.tm_hour ||
-                  local->tm_yday != previous_time.tm_yday;
+                  calendar_changed(local, &previous_time);
     bool status = force_status || preferences || minute || weather->generation != previous_weather;
     char text[65], date[24], address[20];
     network_address(address, sizeof(address));
@@ -317,13 +329,15 @@ void factory_draw_simple(const tv_settings_t *s, const struct tm *local, const c
     /* Update the simple clock using the factory 0x4200bd26/0x4200bd8c split.
      * FIXED_FACTORY: 0x4200bf9c repeats the date for standard Sunday (tm_wday=0);
      * render Sun instead. Also update digits on real minute/hour/date changes,
-     * because 0x4200bd8c's 66-second flag leaves stale time on screen. */
+     * because 0x4200bd8c's 66-second flag leaves stale time on screen. Erase the
+     * complete date band before shorter text replaces a longer date.
+     * FIXED_RECONSTRUCTION: include year/month/day rather than only tm_yday. */
 
     static struct tm previous_time;
     static uint8_t previous_hour12, previous_date;
     bool minute = reset || minute_update || local->tm_min != previous_time.tm_min ||
                   local->tm_hour != previous_time.tm_hour ||
-                  local->tm_yday != previous_time.tm_yday || s->hour12 != previous_hour12 ||
+                  calendar_changed(local, &previous_time) || s->hour12 != previous_hour12 ||
                   s->date_format != previous_date;
     char text[24];
     if (reset)
@@ -344,6 +358,7 @@ void factory_draw_simple(const tv_settings_t *s, const struct tm *local, const c
         snprintf(text, sizeof(text), "%02d", local->tm_min);
         display_factory_text(150, 80, text, 80, 0xffff, 0xc618, false);
         date_label(s, local, text);
+        display_fill(0, 180, 240, 24, 0);
         centered(240, 180, text, 0xffff);
         /* 0x4200bf9c omits standard tm_wday==0 and mistakenly repeats the
          * date on Sundays. Correct this confirmed factory bug; retain 7 as

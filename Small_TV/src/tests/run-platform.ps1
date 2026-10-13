@@ -21,7 +21,7 @@ $batch=Join-Path $output "compile.cmd"
 [IO.File]::WriteAllText($batch,"@echo off`r`ncall `"$VsDevCmd`" -arch=x64 -host_arch=x64 >nul`r`nif errorlevel 1 exit /b 1`r`ncd /d `"$output`"`r`ncl "+($arguments -join ' ')+"`r`nexit /b %errorlevel%`r`n")
 & cmd.exe /d /c $batch
 if ($LASTEXITCODE) {throw "Platform test compilation failed"}
-$cases=@("wifi_setup","wifi_reconnect_scan","wifi_open_station","wifi_fallback_timeout","wifi_failed_retries","restart_persistence_failure","wifi_allocation_failure","wifi_task_failure","weather_worker","time_worker","backlight_schedule","display_protocol_clipping","ui_transitions","text_field_windows","weather_field_cleanup","clock_coordinator","timer_driver_failures","clock_animation_selection","clock_text_scroll")
+$cases=@("wifi_setup","wifi_reconnect_scan","wifi_open_station","wifi_fallback_timeout","wifi_failed_retries","restart_persistence_failure","wifi_allocation_failure","wifi_task_failure","weather_worker","time_worker","backlight_schedule","display_protocol_clipping","ui_transitions","text_field_windows","weather_field_cleanup","clock_coordinator","timer_driver_failures","clock_animation_selection","clock_text_scroll","clock_calendar_classic","clock_calendar_simple")
 $results=@()
 foreach($case in $cases) {
     $path=Join-Path $output "$case.json"
