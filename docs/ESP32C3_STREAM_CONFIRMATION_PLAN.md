@@ -553,13 +553,37 @@ stopped. Evidence, source snapshots and checksums:
 Saved laboratory app:
 `firmware/development/esp32c3-idf-6.1-r9a97-early-owner-tls-lab/app.bin`.
 
-Before default enablement: repeat the full physical format matrix (including
-FLAC/Vorbis/Opus and profile/rate changes), cancellation/TLS controls, LC and
-late-SBR memory-pressure cases, and sustained-play/startup behavior. The general
-stream-confirmation gates above remain open. No production qualification yet.
+Before default enablement: LC and late-SBR memory-pressure cases, and
+sustained-play/startup behavior remain. The full physical format matrix and
+cancellation/TLS controls are now covered below. The general stream-confirmation
+gates above remain open. No production qualification yet.
 
 Acceptance priority agreed on 2026-10-13: a lower free-RAM minimum alone is not
 a reason to reject this candidate. Prefer demonstrated playback stability with
 no allocation failures, restarts, watchdog events or output errors. Retain heap
 measurements for diagnosis and check repeated-session recovery for leaks. See
 [the testing acceptance policy](ESP32C3_TESTING.md#acceptance-priority-playback-stability-2026-10-13).
+
+### Early-owner full HTTPS and cancellation follow-up (2026-10-13)
+
+The same saved laboratory image passes the full 20-case physical HTTPS matrix
+and its strict offline audit: MP3, FLAC, Vorbis, Opus, AAC-LC, HE-AAC and HE-AACv2,
+tagged and invalid prefixes, rate/profile changes, implicit SBR and codec changes.
+All cases share one boot. Recorded allocation failures, decoder failures and
+watchdog events are zero. Sampled active output counters remain unchanged;
+this does not establish analog continuity or zero lifetime completion drops.
+
+| Physical run | Passed | Allocation / decoder / watchdog failures | Minimum free heap, bytes |
+| --- | ---: | ---: | ---: |
+| Full HTTPS format/transition matrix | 20 / 20 | 0 / 0 / 0 | 19,212 |
+| Delayed TLS header: deadline, Stop, replacement | 3 / 3 | 0 / 0 / 0 | 27,208 |
+| Held candidate using four input blocks: same controls | 3 / 3 | 0 / 0 / 0 | 26,032 |
+
+Both cancellation runs pass settled heap recovery checks with the station
+watchdog disabled during the tests. Firmware and private settings are verified
+restored after each run, with playback stopped. Heap values are diagnostics,
+not pass/fail floors. These finite cases extend coverage; deliberate LC/late-SBR
+allocation pressure and longer playback qualification remain outstanding.
+
+Full results, controller snapshots, audit and hashes:
+[early-owner-full-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-full-01/summary.json).
