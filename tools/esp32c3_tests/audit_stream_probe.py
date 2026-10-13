@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from common import check_transitions, fixtures, matches, require, sha
+from stream_probe_cases import validate_schedule
 
 
 def main():
@@ -21,9 +22,7 @@ def main():
     require(not restored['status']['audio'],'Board not stopped after restoration')
     require(all(restored[k] is True for k in ('wifi_unchanged','playlist_unchanged','settings_unchanged')),
             'Private settings verification missing or failed')
-    names=[c['name'] for c in r['cases']]
-    require(len(names)==len(set(names))==args.expected_cases and set(names)==set(r['fixtures']),
-            'Case coverage differs')
+    sources=validate_schedule(r,args.expected_cases)
     available=fixtures();rows=[]
     negative={'unknown':'unknown audio format','partial':'unknown audio format',
               'truncated-id3':'unknown audio format'}
@@ -33,9 +32,16 @@ def main():
               'false-aac-before-mp3':'mp3-320',
               'false-large-adts-before-he-aac':'he-48000-stereo',
               'false-large-adts-before-mp3':'mp3-320'}
+    previous=None
     for case in r['cases']:
         name=case['name'];require(case['result']=='PASS',name+': recorded failure')
+        source_name=sources[name]
         before,after=case['before'],case['after']
+        if previous is not None:
+            require(before['boot_id']==previous['boot_id'] and
+                    before['uptime_ms']>=previous['uptime_ms'],name+': restart between cases')
+        require(after['uptime_ms']>=before['uptime_ms'],name+': uptime decreased')
+        previous=after
         for key in ('boot_id','allocation_failures','task_watchdog_events'):
             require(before[key]==after[key],name+': '+key+' changed')
         require(after['allocation_failures']==after['task_watchdog_events']==0,name+': runtime errors')
@@ -45,13 +51,13 @@ def main():
             require(events,name+': TLS negotiation evidence missing')
         observations=case['observations']
         active=case.get('transition_health',[])
-        if name in negative:
+        if source_name in negative:
             require(observations and not observations[-1]['audio'] and
-                    observations[-1]['format']==negative[name],name+': wrong rejection status')
+                    observations[-1]['format']==negative[source_name],name+': wrong rejection status')
         else:
             require(any(e.get('complete') is True and e['sent']==r['fixtures'][name]['bytes'] for e in events),
                     name+': complete body missing')
-            base=prefixes.get(name,name.removesuffix('-id3'))
+            base=prefixes.get(source_name,source_name.removesuffix('-id3'))
             spec=available[base]
             if 'sequence' in spec:
                 check_transitions(observations,[available[n] for n in spec['sequence']])

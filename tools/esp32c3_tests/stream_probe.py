@@ -7,6 +7,7 @@ import time
 from common import Board, Failure, check_transitions, exception_details, fixtures, matches, require, sha
 from ota import image_info, multipart, snapshot, upload, verify_snapshot, wait_image
 from production_health import read_health
+from stream_probe_cases import repeat_specs
 from audio_test_server.server import Server
 
 
@@ -25,9 +26,12 @@ def main():
     parser.add_argument('--codec-transitions', action='store_true',
                         help='Include real MP3/AAC family changes in one connection')
     parser.add_argument('--case-filter', action='append')
+    parser.add_argument('--repeat', type=int, default=1,
+                        help='Repeat the selected cases 1..20 times without rebooting')
     parser.add_argument('--startup-confirmation', action='store_true',
                         help='Require startup-confirmation firmware and test false prefixes/truncated startup')
     args = parser.parse_args()
+    require(1 <= args.repeat <= 20, 'Repetitions must be between 1 and 20')
     if args.startup_confirmation:
         cfg=args.candidate.with_name('sdkconfig').read_text()
         require('CONFIG_YORADIO_STREAM_CONFIRM=y' in cfg and 'CONFIG_YORADIO_FRAME_ROUTER=y' in cfg,
@@ -55,7 +59,7 @@ def main():
     private = snapshot(board)  # Never serialize credentials, stations or their hashes.
     report = dict(controller_sha256=sha(Path(__file__).read_bytes()), initial=original,
                   candidate=image_info(args.candidate.read_bytes()), transport='https' if secure else 'http',
-                  startup_confirmation=args.startup_confirmation,cases=[])
+                  startup_confirmation=args.startup_confirmation,repetitions=args.repeat,cases=[])
 
     def save():
         (args.output/'results.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
@@ -106,8 +110,10 @@ def main():
     if args.case_filter:
         specs={name:spec for name,spec in specs.items() if any(s in name for s in args.case_filter)}
     require(specs, 'No matching cases')
+    specs = repeat_specs(specs, args.repeat)
     report['fixtures'] = {name:dict(bytes=len(spec['data']), sha256=sha(spec['data']),
-                                  mime=None) for name,spec in specs.items()}
+                                  mime=None,source_name=spec['source_name'],iteration=spec['iteration'])
+                          for name,spec in specs.items()}
     save()
     try:
         install(args.candidate)
@@ -115,6 +121,7 @@ def main():
         with Server(args.host,args.port,specs,cert=args.tls_cert,key=args.tls_key,pacing_ratio=1.0,
                     delivery_pauses=[(i,.02) for i in range(1,10)]) as server:
             for name, spec in specs.items():
+                source_name = spec['source_name']
                 row = dict(name=name, before=read_health(board), observations=[])
                 report['cases'].append(row)
                 started = time.monotonic()
@@ -137,13 +144,13 @@ def main():
                         require(not state['audio'] and state['format']=='stream ended', 'Wrong transition EOF status')
                         require(len(health)>=3, 'Missing transition health samples')
                         require(health[0]['output']==health[-1]['output'], 'Output counters changed during transitions')
-                    elif name in negative:
+                    elif source_name in negative:
                         deadline = started+12
                         while time.monotonic()<deadline:
                             state=board.status(); row['observations'].append(state)
-                            if not state['audio'] and state['format']==negative_status[name]: break
+                            if not state['audio'] and state['format']==negative_status[source_name]: break
                             time.sleep(.2)
-                        require(not state['audio'] and state['format']==negative_status[name],
+                        require(not state['audio'] and state['format']==negative_status[source_name],
                                 'Malformed input did not report its expected terminal status')
                     else:
                         deadline=started+12
@@ -188,7 +195,7 @@ def main():
                     board.stop(); time.sleep(.5)
             report['server']=server.events
             for row in report['cases']:
-                if row['result']=='PASS' and row['name'] not in negative:
+                if row['result']=='PASS' and specs[row['name']]['source_name'] not in negative:
                     expected_bytes=len(specs[row['name']]['data'])
                     complete=any(e.get('fixture')==row['name'] and e.get('complete') is True
                                  and e.get('sent')==expected_bytes for e in server.events)

@@ -1815,3 +1815,27 @@ the original app/settings. It requires an initially stopped board. The fixture
 server's `/stream/` route is AAC-only; use `/file/flac-level8` for the finite
 FLAC fixture. Frozen failed trials and corrected reruns are retained in the
 report. These focused tests do not replace the full codec/HTTPS matrix.
+
+### Repeated connections on one boot
+
+`stream_probe.py --repeat N` repeats the selected cases in order, without
+reinstalling or rebooting between iterations (`N`: 1 through 20, default 1).
+Each iteration has a unique HTTP fixture path and report identity, so a completed
+response from an earlier iteration cannot satisfy a later test. Encoded bytes
+are shared on the host. This option does not change fixture pacing or firmware.
+
+For bounded HTTPS codec-history reproduction, add:
+
+```text
+--startup-confirmation --codec-transitions --case-filter false-large-adts \
+--case-filter mp3-he-mp3 --case-filter aac-mp3-hev2 --repeat 5
+```
+
+Use the existing candidate/restore, board, output and three TLS certificate
+arguments. This selects 20 cases: two maximum-length false-prefix starts and two
+codec-transition streams, repeated five times. App/settings restoration still
+runs once after the complete sequence. The offline auditor needs
+`--expected-cases 20`; it validates iteration order, payload identity, unique
+request names, and boot/uptime continuity between cases as well as within cases.
+Older single-pass reports remain readable. Six host tests cover schedule
+mutation and a synthetic inter-case reboot in an otherwise valid physical report.
