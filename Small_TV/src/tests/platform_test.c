@@ -335,7 +335,8 @@ static void test_wifi_setup(void)
     preferences.wifi_mode = 2;
     strcpy(preferences.ssid, "saved-but-offline");
     CHECK(network_init() == ESP_OK);
-    CHECK(network_ap_active() && !network_connected() && wifi_mode == WIFI_MODE_AP);
+    CHECK(network_ap_active() && !network_connected() && wifi_mode == WIFI_MODE_APSTA);
+    CHECK(connects == 0 && !sta_config.sta.ssid[0]);
     CHECK(ap_config.ap.authmode == WIFI_AUTH_OPEN && ap_config.ap.channel == 1 &&
           ap_config.ap.max_connection == 3);
     CHECK(ap_config.ap.ssid_len == 8 && !memcmp(ap_config.ap.ssid, "Small_TV", 8));

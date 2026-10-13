@@ -43,11 +43,13 @@ static void wifi_event(void *context, esp_event_base_t base, int32_t id, void *d
 
 static esp_err_t start_access_point(void)
 {
-    /* Make the factory setup access point available without duplicating initialization. */
+    /* Keep the setup AP and an idle station interface so the setup page can scan networks. */
 
     if (atomic_load(&ap_active))
         return ESP_OK;
-    esp_err_t result = esp_wifi_set_mode(WIFI_MODE_AP);
+    /* ESP-IDF cannot scan in WIFI_MODE_AP. STA_START does not connect while
+     * station_configured is false; the station exists only for explicit scans. */
+    esp_err_t result = esp_wifi_set_mode(WIFI_MODE_APSTA);
     if (result == ESP_OK)
         atomic_store(&ap_active, true);
     return result;
