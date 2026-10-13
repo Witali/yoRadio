@@ -10,13 +10,46 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools/codec_benchmark'))
 from generate_aac_faults import generate
-from run_aac_faults import parse_log
+from run_aac_faults import parse_log, parse_pressure
 
 FIXTURES = ROOT/'tests/fixtures/aac_faults'
 DATA = ROOT/'tests/results/esp32c3-aac-faults-20261004'
 
 
 class FaultTests(unittest.TestCase):
+    def test_pressure_sweep_rejects_missing_or_misleading_evidence(self):
+        rows = []
+        for early in (0,1):
+            rows.append(f'AAC_EARLY_PRESSURE_BEGIN real_heap=1 early={early}')
+            for target in range(32*1024, 112*1024+1, 4*1024):
+                ok = target >= 64*1024
+                rows.append(f'AAC_EARLY_PRESSURE_CASE early={early} target={target} available={target+128} '
+                            f'pending={early} lc_result={0 if ok else -2} lc_frames={13 if ok else 0} '
+                            'recovery_frames=15 heap_restored=1')
+            rows.append(f'AAC_EARLY_PRESSURE_PASS early={early} cases=21 lc_success=13 lc_failure=8 reserved={21*early} heap=valid')
+        rows.append('AAC_EARLY_PRESSURE_AB_PASS cases=42 no_lc_regression=1')
+        log = '\n'.join(rows)
+        self.assertEqual(parse_pressure(log)['recovery_frames'], 630)
+        for changed in (
+            '', log.replace(rows[2], ''), log+'\n'+rows[2],
+            log.replace('available=32896', 'available=100000'),
+            log.replace('heap_restored=1', 'heap_restored=0', 1),
+            log.replace('lc_result=0 lc_frames=13', 'lc_result=0 lc_frames=0', 1),
+            log.replace('lc_result=-2', 'lc_result=-8', 1),
+            log.replace('lc_success=13', 'lc_success=14'),
+            log.replace('recovery_frames=15', 'recovery_frames=0', 1),
+            log+'\nassert failed: pressure\n',
+            log.replace('AAC_EARLY_PRESSURE_AB_PASS cases=42 no_lc_regression=1', ''),
+            log.replace('early=1 target=65536 available=65664 pending=1 lc_result=0 lc_frames=13',
+                        'early=1 target=65536 available=65664 pending=1 lc_result=-2 lc_frames=0')
+               .replace('early=1 cases=21 lc_success=13 lc_failure=8',
+                        'early=1 cases=21 lc_success=12 lc_failure=9'),
+        ):
+            with self.assertRaises(ValueError):
+                parse_pressure(changed)
+        with self.assertRaises(ValueError):
+            parse_log((DATA/'diagnostics.log').read_text(), require_early_owner=True)
+
     def test_reproducible_fixtures(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)

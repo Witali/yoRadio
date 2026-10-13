@@ -24,6 +24,27 @@ The current stream-confirmation matrix has no absolute free-RAM floor. Its
 allocation, restart, watchdog and active-output checks remain strict. Prefix
 control tests check settled heap recovery, not an absolute minimum RAM value.
 
+### Real AAC heap-pressure regression in QEMU
+
+Build the QEMU AAC fault profile with `CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER=y`,
+`CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST=y` and its adapter/pointer-audit dependencies.
+Never flash this QEMU image onto a board. Then run:
+
+```powershell
+python tools/codec_benchmark/run_aac_faults.py --build BUILD_DIRECTORY --dependency-root DEPENDENCY_ROOT --output NEW_DIRECTORY --qemu QEMU_EXECUTABLE --bios QEMU_BIOS_DIRECTORY --wsl --require-early-owner
+python tests/test-aac-faults.py
+```
+
+The pressure test consumes real heap before AAC-LC creation at 21 capacity
+levels, with early reservation bypassed and enabled (42 cases). It requires
+complete LC frames for success, no regression at any successful control level,
+exact free-heap recovery, and full-rate stereo HE-AACv2 after pressure removal.
+It also retains the existing late-OOM and malformed-frame tests. The strict
+parser rejects missing, duplicated, mismatched or falsely successful cases.
+Expected failures under deliberately exhausted heap are fault-injection evidence,
+not successful radio playback. See the
+[measured comparison and limits](ESP32C3_STREAM_CONFIRMATION_PLAN.md#early-owner-real-allocator-pressure-comparison-2026-10-13).
+
 For repeated FLAC delivery-pause tests with the shared decoder arena, see
 [the DMA investigation](ESP32C3_ARENA_FLAC_DMA_20261013.md). It distinguishes
 completion notifications, allocator latency and input starvation, retaining

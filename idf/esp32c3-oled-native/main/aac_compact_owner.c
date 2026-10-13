@@ -108,8 +108,17 @@ static void ps_pointer(aac_compact_owner_t *state) {
 
 void *__real_media_lib_module_calloc(const char *,size_t,size_t);
 #ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+#ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
+static bool skip_prepare;
+void aac_compact_owner_test_skip_prepare(bool skip) {
+    assert(!context());skip_prepare=skip;
+}
+#endif
 void aac_compact_owner_prepare(aac_compact_owner_t *state) {
     assert(state && !state->owner && !state->pending_owner && !context());
+#ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
+    if(skip_prepare)return;
+#endif
     // Reserve the actual configured compact layout, before core/PCM split
     // the heap. An unsuccessful reservation must not prohibit AAC-LC.
     state->pending_owner = calloc(1, sizeof(owner_t));

@@ -587,3 +587,40 @@ allocation pressure and longer playback qualification remain outstanding.
 
 Full results, controller snapshots, audit and hashes:
 [early-owner-full-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-full-01/summary.json).
+
+### Early-owner real allocator pressure comparison (2026-10-13)
+
+The real RV32 AAC library now passes an additional QEMU A/B test. The same test
+image runs with early preparation bypassed, then enabled. Test-only allocations
+consume the normal 8-bit heap in 4096-byte blocks, leaving approximately
+32..112 KiB before decoder creation, in 4 KiB steps. No allocator return value
+is mocked in this sweep. The bypass and pending-owner accessor are compiled
+only into QEMU tests; production has no runtime bypass or extra state.
+
+| Outcome across 21 pressure levels | Preparation bypassed | Early owner |
+| --- | ---: | ---: |
+| Full AAC-LC fixture decoded | 13 | 13 |
+| Controlled failure with insufficient memory | 8 | 8 |
+| Successful HE-AACv2 after pressure removal | 21 | 21 |
+| Exact settled free-heap recovery | 21 | 21 |
+
+At every level where the control succeeds, the early-owner candidate succeeds.
+Successful LC output releases the unclaimed reservation. It then transitions
+to HE-AACv2 using the same decoder; failed LC attempts are destroyed before
+starting a fresh HE-AACv2 decoder. Each recovery decodes 15 frames (630 total).
+The first sampled successful LC level leaves 66,196 bytes before construction
+in both modes. This is an experimental capacity boundary for this image and
+fixture, **not a required minimum free-memory threshold for the radio**.
+
+The same run also passes four injected late owner/control allocation failures,
+four malformed-frame cases and their recoveries; two simultaneous HE-AACv2
+decoders match in sample count and PCM hash. The pointer audit balances 1305
+tracked allocations/frees and reports no invalid pointer targets. Heap integrity
+and PCM boundary guards pass; this configuration does not enable heap poisoning.
+
+These tests exercise actual DSP and allocation cleanup, but the pressure sweep
+does not compare PCM against an independent reference. HE recovery happens
+after releasing the artificial pressure; Wi-Fi/TLS allocation competition and
+sustained physical playback are still separate requirements. Retained results,
+configuration, source snapshots and hashes:
+[early-owner-pressure-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-pressure-01/summary.json).

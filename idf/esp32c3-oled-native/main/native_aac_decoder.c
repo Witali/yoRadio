@@ -142,6 +142,12 @@ void native_aac_decoder_test_footprint(native_aac_decoder_t *decoder,
     assert(decoder && requested && allocated);
     *requested=sizeof(*decoder);*allocated=heap_caps_get_allocated_size(decoder);
 }
+#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+bool native_aac_decoder_test_pending_owner(native_aac_decoder_t *decoder) {
+    assert(decoder);
+    return decoder->compact.pending_owner != NULL;
+}
+#endif
 #endif
 
 static bool reserve_frame(native_aac_decoder_t *decoder, size_t needed) {

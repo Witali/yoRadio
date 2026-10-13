@@ -75,8 +75,94 @@ static void release(native_aac_decoder_t *decoder) {
     assert(heap_caps_check_integrity_all(true));
 }
 
+#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+bool native_aac_decoder_test_pending_owner(native_aac_decoder_t *);
+void aac_compact_owner_test_skip_prepare(bool);
+// Consume real heap outside the decoder. This changes available capacity, not
+// allocator return values. No Wi-Fi/TLS timing claim follows from this test.
+enum { PRESSURE_BLOCK_BYTES=4096, PRESSURE_BLOCK_COUNT=128,
+       PRESSURE_MIN_FREE=32*1024, PRESSURE_MAX_FREE=112*1024,
+       PRESSURE_STEP=4*1024, LC_FIXTURE_FRAMES=13 };
+static void *pressure_blocks[PRESSURE_BLOCK_COUNT];
+static size_t pressure_begin(size_t target) {
+    unsigned used=0;
+    while(heap_caps_get_free_size(MALLOC_CAP_8BIT)>target+PRESSURE_BLOCK_BYTES) {
+        assert(used<PRESSURE_BLOCK_COUNT);
+        pressure_blocks[used]=heap_caps_malloc(PRESSURE_BLOCK_BYTES,MALLOC_CAP_8BIT);
+        assert(pressure_blocks[used]);++used;
+    }
+    return heap_caps_get_free_size(MALLOC_CAP_8BIT);
+}
+static void pressure_end(void) {
+    for(unsigned i=0;i<PRESSURE_BLOCK_COUNT;++i) {
+        free(pressure_blocks[i]);pressure_blocks[i]=NULL;
+    }
+}
+static uint32_t early_owner_pressure(uint8_t *pcm,bool early) {
+    unsigned successes=0, failures=0, reserved=0;
+    uint32_t success_mask=0;
+    aac_compact_owner_test_skip_prepare(!early);
+    // Warm libc/logging before checking exact settled allocation recovery.
+    printf("AAC_EARLY_PRESSURE_BEGIN real_heap=1 early=%u\n",early);fflush(stdout);
+    for(size_t target=PRESSURE_MIN_FREE;target<=PRESSURE_MAX_FREE;target+=PRESSURE_STEP) {
+        size_t baseline=heap_caps_get_free_size(MALLOC_CAP_8BIT);
+        size_t available=pressure_begin(target);
+        native_aac_decoder_t *decoder=native_aac_decoder_create();assert(decoder);
+        bool pending=native_aac_decoder_test_pending_owner(decoder);
+        reserved+=pending;
+        unsigned frames=0;
+        esp_audio_err_t result=ESP_AUDIO_ERR_OK;
+        for(const uint8_t *p=lc_22050_mono_start;p<lc_22050_mono_end;) {
+            size_t count=lc_22050_mono_end-p;if(count>31)count=31;
+            esp_audio_simple_dec_raw_t raw={.buffer=(uint8_t *)p,.len=count};
+            esp_audio_simple_dec_out_t out={.buffer=pcm,.len=NATIVE_AAC_PCM_FRAME_BYTES};
+            result=native_aac_decoder_process(decoder,&raw,&out);
+            guards(pcm);assert(raw.consumed<=count);
+            if(result!=ESP_AUDIO_ERR_OK) {
+                assert((result==ESP_AUDIO_ERR_MEM_LACK || result==ESP_AUDIO_ERR_FAIL) && !out.decoded_size);
+                break;
+            }
+            assert(raw.consumed || out.decoded_size);p+=raw.consumed;
+            if(out.decoded_size) {
+                esp_audio_simple_dec_info_t info;
+                assert(native_aac_decoder_get_info(decoder,&info)==ESP_AUDIO_ERR_OK);
+                assert(info.sample_rate==22050 && info.channel==1 && info.bits_per_sample==16);
+                assert(!native_aac_decoder_test_pending_owner(decoder));++frames;
+            }
+        }
+        pressure_end();
+        if(result==ESP_AUDIO_ERR_OK) {
+            assert(frames==LC_FIXTURE_FRAMES);++successes;
+            success_mask|=1u<<((target-PRESSURE_MIN_FREE)/PRESSURE_STEP);
+            // Preserve this LC decoder and its transform history for late SBR.
+            assert(decode(decoder,pcm,hev2_44100_stereo_start,hev2_44100_stereo_end,44100,2,VALID_STREAM)==15);
+        } else {
+            ++failures;
+            release(decoder);decoder=native_aac_decoder_create();assert(decoder);
+            assert(decode(decoder,pcm,hev2_44100_stereo_start,hev2_44100_stereo_end,44100,2,VALID_STREAM)==15);
+        }
+        release(decoder);
+        size_t recovered=heap_caps_get_free_size(MALLOC_CAP_8BIT);
+        assert(recovered==baseline);
+        printf("AAC_EARLY_PRESSURE_CASE early=%u target=%u available=%u pending=%u lc_result=%d lc_frames=%u recovery_frames=15 heap_restored=1\n",
+               early,(unsigned)target,(unsigned)available,pending,result,frames);fflush(stdout);
+    }
+    assert(successes && failures && (early ? reserved>0 : reserved==0));
+    printf("AAC_EARLY_PRESSURE_PASS early=%u cases=%u lc_success=%u lc_failure=%u reserved=%u heap=valid\n",
+           early,successes+failures,successes,failures,reserved);
+    aac_compact_owner_test_skip_prepare(false);
+    return success_mask;
+}
+#endif
+
 void qemu_aac_faults_test(void) {
     uint8_t *pcm=new_pcm();unsigned recoveries=0;
+#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+    uint32_t control=early_owner_pressure(pcm,false);
+    uint32_t candidate=early_owner_pressure(pcm,true);
+    assert(!(control & ~candidate));
+    printf("AAC_EARLY_PRESSURE_AB_PASS cases=42 no_lc_regression=1\n");
+#endif
     for(unsigned repeats=1;repeats<=2;++repeats) {
         for(unsigned fail=0;fail<2;++fail) {
             native_aac_decoder_t *decoder=native_aac_decoder_create();assert(decoder);
