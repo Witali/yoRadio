@@ -542,6 +542,39 @@ hardware testing, while `production_qualified` remains false. The combined
 16 passing cases do not close the remaining PCM-boundary, Stop/replacement
 under the new route, HTTPS, corruption-recovery or long-playback gates.
 
+### Stop/replacement after a codec-family change
+
+The same enabled image passed eight additional HTTP control cases: two cycles
+of Stop and replacement after MP3 → HE-AAC and HE-AAC → MP3. ffprobe placed
+the host pause inside the fourth packet of the second codec. Both decoded
+formats had to be observed before the action, with the server still short of
+that packet's end. This proves the control exercised a connection with an
+incomplete delivered frame after a real transition, not a precise instruction
+location or WRITING-lease state inside the firmware.
+
+| Check | Observed result |
+|---|---|
+| Stop confirmed, then remained stopped | 4/4; 0.140–0.156 s |
+| Replacement confirmed as HE-AACv2, then stayed stable | 4/4; 2.373–2.445 s including three confirming polls |
+| Idle free heap, median of three snapshots | 140,036 B before; 140,092 B after |
+| Idle largest block, same sampling | 110,592 B before and after |
+| Idle task count | 16 before and after |
+| Boot identity, allocation failures, task watchdog | Unchanged in each case |
+
+Each case also passed the existing recovery bounds (at most 2,048 B free-heap
+loss, 4,096 B largest-block loss, no task growth); observed median free heap
+never fell below the initial median. Available output counters were unchanged
+in replacement's two-second active windows. Idle and deliberate input stalls
+are not counted as uninterrupted-audio tests. Two cycles are not a long-run
+fragmentation or leak qualification.
+
+[Frozen controls and recovery evidence](../tests/results/esp32c3-stream-probe-20261013/frame-router-controls-01/)
+records all cases, server pauses, ffprobe version, timings and health snapshots.
+The original `idf61-production-prefill1000` app was restored and stopped;
+Wi-Fi, playlist and settings equality was verified. The remaining gates are
+sample-exact PCM boundaries, HTTPS, longer playback/repeated changes and
+parser confidence/recovery before changing the default.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)
