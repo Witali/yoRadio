@@ -1629,6 +1629,13 @@ arena usage, format/EOF results and restoration evidence. Include streams
 whose AAC parameters change during playback: passing isolated files does
 not prove that a fixed arena can service reallocations across transitions.
 
+## Initial stream signature detection
+
+Initial AUTO codec selection additionally has
+`tests/run-esp32c3-stream-probe.py`: sanitizer coverage of the production
+prefix parser and audio submission function, fragmented signatures, ID3,
+unknown input and exact byte replay. See [scope and open hardware gates](ESP32C3_STREAM_PROBE_20261013.md).
+
 ## Bounded WebUI transfers and OTA reboot
 
 Run `python -B -X utf8 tests/run-esp32c3-web-memory.py` for the actual C3

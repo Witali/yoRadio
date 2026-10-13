@@ -10,10 +10,12 @@ enum {
     AUDIO_END_READ_FAILED,
     AUDIO_END_BUFFER_STALLED,
     AUDIO_END_UNAVAILABLE,
+    AUDIO_END_FORMAT_UNKNOWN,
 };
 
 static inline const char *audio_completion_status(unsigned reason) {
     switch (reason) {
+        case AUDIO_END_FORMAT_UNKNOWN: return "unknown audio format";
         case AUDIO_END_READ_FAILED: return "stream read failed";
         case AUDIO_END_BUFFER_STALLED: return "buffer stalled";
         case AUDIO_END_UNAVAILABLE: return AUDIO_STATUS_STATION_UNAVAILABLE;

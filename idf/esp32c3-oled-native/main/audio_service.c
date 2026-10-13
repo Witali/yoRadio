@@ -20,6 +20,7 @@
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
 #include "stream_http_reader.h"
+#include "stream_probe.h"
 #ifdef CONFIG_YORADIO_HTTP_RELEASE_REQUEST_BUFFER
 #include "http_request_buffer.h"
 #endif
@@ -243,19 +244,6 @@ static uint32_t advance_generation(native_codec_t target_codec) {
     return generation;
 }
 
-static native_codec_t codec_from_signature(const uint8_t *data, size_t size) {
-    if (size >= 4 && memcmp(data, "fLaC", 4) == 0) return NATIVE_CODEC_FLAC;
-    if (size >= 4 && memcmp(data, "OggS", 4) == 0) return NATIVE_CODEC_OGG;
-    if (size >= 3 && memcmp(data, "ID3", 3) == 0) return NATIVE_CODEC_MP3;
-    if (size >= 2 && data[0] == 0xff && (data[1] & 0xf6) == 0xf0) {
-        return NATIVE_CODEC_AAC;
-    }
-    if (size >= 2 && data[0] == 0xff && (data[1] & 0xe0) == 0xe0) {
-        return NATIVE_CODEC_MP3;
-    }
-    return NATIVE_CODEC_MP3;
-}
-
 static esp_audio_simple_dec_type_t simple_decoder_type(native_codec_t codec) {
     switch (codec) {
         case NATIVE_CODEC_AAC:
@@ -463,15 +451,29 @@ static bool send_encoded(uint32_t generation, native_codec_t codec,
 
 static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
                               const uint8_t *data, size_t size,
-                              bool *first_chunk) {
+                              bool *first_chunk, stream_probe_t *probe) {
+    if (!size) return true;
     if (*first_chunk) {
-        *first_chunk = false;
         if (*codec == NATIVE_CODEC_AUTO) {
-            *codec = codec_from_signature(data, size);
+            size_t consumed = 0;
+            switch (stream_probe_feed(probe, data, size, &consumed)) {
+                case STREAM_PROBE_MORE: return true;
+                case STREAM_PROBE_MP3: *codec = NATIVE_CODEC_MP3; break;
+                case STREAM_PROBE_AAC: *codec = NATIVE_CODEC_AAC; break;
+                case STREAM_PROBE_FLAC: *codec = NATIVE_CODEC_FLAC; break;
+                case STREAM_PROBE_OGG: *codec = NATIVE_CODEC_OGG; break;
+                default: return false;
+            }
+            // Replay the assembled header exactly once, before this read's tail.
+            if (!send_encoded(generation, *codec, probe->header, probe->used, false))
+                return false;
+            data += consumed;
+            size -= consumed;
         }
+        *first_chunk = false;
         state_set_audio(generation, true, codec_name(*codec));
     }
-    return send_encoded(generation, *codec, data, size, false);
+    return !size || send_encoded(generation, *codec, data, size, false);
 }
 
 static void stream_bitrate_add(uint32_t generation,
@@ -550,6 +552,7 @@ static void play_flash_fixture(const play_command_t *command,
              codec_name(command->requested_codec));
     native_codec_t codec = command->requested_codec;
     bool first_chunk = true;
+    stream_probe_t probe = {0};
     uint32_t offset = 0;
     while (offset < command->fixture_size &&
            atomic_load(&s_generation) == command->generation) {
@@ -564,13 +567,14 @@ static void play_flash_fixture(const play_command_t *command,
             break;
         }
         if (!send_stream_audio(command->generation, &codec, buffer, chunk,
-                               &first_chunk)) {
+                               &first_chunk, &probe)) {
             ESP_LOGW(TAG, "Compressed codec fixture buffer stalled");
             break;
         }
         offset += (uint32_t)chunk;
     }
-    send_encoded(command->generation, codec, NULL, 0, AUDIO_END_EOF);
+    send_encoded(command->generation, codec, NULL, 0,
+                 codec == NATIVE_CODEC_AUTO ? AUDIO_END_FORMAT_UNKNOWN : AUDIO_END_EOF);
     ESP_LOGI(TAG, "Codec fixture complete: %lu/%lu bytes",
              (unsigned long)offset, (unsigned long)command->fixture_size);
 }
@@ -780,6 +784,10 @@ static void stream_task(void *argument) {
         size_t audio_until_metadata = metadata_interval;
         size_t metadata_remaining = 0;
         bool first_chunk = true;
+        stream_probe_t probe = {0};
+        int64_t probe_deadline_us = esp_timer_get_time() +
+            (int64_t)STREAM_PROBE_TIMEOUT_MS * 1000;
+        bool format_unknown = false;
         bool stream_stalled = false;
         bool stream_read_failed = false;
         bool stream_unavailable = false;
@@ -792,6 +800,10 @@ static void stream_task(void *argument) {
         bool input_growth_attempted = false;
 #endif
         while (atomic_load(&s_generation) == command.generation) {
+            if (codec == NATIVE_CODEC_AUTO && esp_timer_get_time() >= probe_deadline_us) {
+                format_unknown = true;
+                break;
+            }
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
             if (!input_growth_attempted && codec == NATIVE_CODEC_FLAC &&
                 atomic_load(&s_flac_input_ready_generation) == command.generation) {
@@ -841,7 +853,7 @@ static void stream_task(void *argument) {
                     if (!send_stream_audio(command.generation, &codec,
                                            buffer + offset,
                                            (size_t)received - offset,
-                                           &first_chunk)) {
+                                           &first_chunk, &probe)) {
                         stream_stalled = true;
                         break;
                     }
@@ -855,7 +867,7 @@ static void stream_task(void *argument) {
                                        : audio_until_metadata;
                     if (!send_stream_audio(command.generation, &codec,
                                            buffer + offset, chunk,
-                                           &first_chunk)) {
+                                           &first_chunk, &probe)) {
                         stream_stalled = true;
                         break;
                     }
@@ -885,13 +897,17 @@ static void stream_task(void *argument) {
                 }
             }
             if (stream_stalled) {
-                ESP_LOGW(TAG, "Compressed audio buffer stalled");
+                ESP_LOGW(TAG, "%s", probe.result == STREAM_PROBE_INVALID
+                         ? "Unknown audio format" : "Compressed audio buffer stalled");
                 break;
             }
         }
-        uint8_t end_reason = stream_stalled ? AUDIO_END_BUFFER_STALLED
-                             : stream_unavailable ? AUDIO_END_UNAVAILABLE
+        // An incomplete/unknown prefix must not enter a default MP3 decoder.
+        format_unknown = format_unknown || codec == NATIVE_CODEC_AUTO;
+        uint8_t end_reason = stream_unavailable ? AUDIO_END_UNAVAILABLE
                              : stream_read_failed ? AUDIO_END_READ_FAILED
+                             : format_unknown ? AUDIO_END_FORMAT_UNKNOWN
+                             : stream_stalled ? AUDIO_END_BUFFER_STALLED
                                                   : AUDIO_END_EOF;
         send_encoded(command.generation, codec, NULL, 0, end_reason);
         dispose_http_client(client);

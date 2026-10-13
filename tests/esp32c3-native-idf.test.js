@@ -519,7 +519,7 @@ test("native HTTPS station switching releases incompatible codec memory before T
   // PCM can exist even when open failed: release must not depend on a handle.
   assert.doesNotMatch(generationReset, /had_simple_decoder/);
   assert.match(generationReset, /atomic_store\(&s_decoder_released_generation/);
-  assert.match(audio, /codec_from_signature[\s\S]*"fLaC"[\s\S]*"OggS"[\s\S]*"ID3"/);
+  assert.match(audio, /stream_probe_feed\(probe, data, size, &consumed\)/);
   assert.match(
     audio,
     /advance_generation\(codec\)[\s\S]*requested_codec = codec/,
