@@ -60,8 +60,14 @@ unsupported browser-time toggle is disabled and explains that network time
 is used. Its API field remains available for raw-settings compatibility.
 
 The initial photo previews use the five recovered, metadata-free JPEGs.
-The original browser script crops an uploaded picture to 240 x 240,
-encodes it as JPEG, then transfers it in 4 KiB multipart chunks. The
+The working browser opens a crop dialog before uploading. Drag inside the
+square to move it, drag any corner to shrink/enlarge it, or use the
+horizontal/vertical position sliders and 1× to 4× zoom. Square proportions
+remain fixed for the LCD. Confirming
+resamples the selected area to 240 x 240 and encodes it as JPEG; Cancel or
+Escape leaves the saved photo untouched. Transparent pixels become white.
+JavaScript removes all APP/COM metadata, including Canvas ICC profiles, before
+transferring the JPEG in 4 KiB multipart chunks. The
 server validates the transfer, tolerates retries of the same chunk,
 checks its final length and JPEG dimensions, removes APP/COM metadata,
 and saves the result only when the upload is complete. A subsequent page
@@ -87,6 +93,10 @@ in the runtime directory but are no longer selected.
 - JavaScript references to commented-out Wi-Fi/night/advanced controls
   are guarded against missing elements. Those controls remain hidden,
   matching the captured firmware's active page.
+- Missing Wi-Fi controls do not trigger a background scan. Clock switches
+  remain disabled until actual settings load; an error is shown instead of
+  inventing checked defaults. The native HTTP server permits six simultaneous
+  sessions for the visible settings requests.
 - The duplicated setup response function is corrected so HTTP errors are
   handled, and successful setup returns to the local root page instead
   of navigating to `about:blank`.
@@ -105,6 +115,7 @@ To regenerate the pages from the exact verified dump:
 
 ```text
 python Small_TV/local_site/extract_pages.py
+node Small_TV/local_site/check_scripts.mjs
 ```
 
 The exporter checks the full dump SHA-256 and records original and local

@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'integrity', 'machine', 'machine_control', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -24,6 +24,9 @@ def main():
         data = (ROOT / row['file']).read_bytes()
         if hashlib.sha256(data).hexdigest() != row['sha256']:
             raise ValueError('Test changed after the run: ' + row['file'])
+    for row in groups['frontend']['result']['inputs']:
+        if hashlib.sha256((ROOT / row['file']).read_bytes()).hexdigest() != row['sha256']:
+            raise ValueError('Frontend changed after the run: ' + row['file'])
     app = ROOT / 'firmware/development/small-tv-esp32c2-reconstructed/app.bin'
     if hashlib.sha256(app.read_bytes()).hexdigest() != report['app_sha256']:
         raise ValueError('Firmware changed after the run')
@@ -49,6 +52,7 @@ def main():
                                            'source_sha256', 'app_sha256', 'test_inputs', 'notes')}
     summary['native'] = groups['native']['result']
     summary['platform'] = groups['platform']['result']
+    summary['frontend'] = groups['frontend']['result']
     summary['integrity'] = groups['integrity']['result']
     summary['machine'] = {'passed': machine['passed'], 'literal_factory_pixels_equal': machine['equal'],
                           'renderer_cases': len(machine['cases']),

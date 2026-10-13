@@ -1,0 +1,41 @@
+"""Compile embedded JavaScript and verify local JPEG/crop algorithms using Node."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+
+ROOT = Path(__file__).resolve().parents[3]
+SITE = ROOT / 'Small_TV/local_site'
+
+
+def main():
+    """Record content identities and reject pages that differ from the exporter."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--node', default=shutil.which('node') or r'C:\Program Files\nodejs\node.exe')
+    parser.add_argument('--output', required=True, type=Path)
+    args = parser.parse_args()
+    result = subprocess.run([args.node, str(SITE / 'check_scripts.mjs'), '--json'],
+                            check=True, capture_output=True, text=True)
+    report = json.loads(result.stdout)
+    manifest = json.loads((SITE / 'pages-manifest.json').read_text(encoding='utf-8'))
+    for page in report['pages']:
+        recorded = next(row for row in manifest['pages'] if row['name'] == page['page'])
+        if recorded['local_page_sha256'] != page['sha256']:
+            raise ValueError('Page changed without regeneration: ' + page['page'])
+    paths = ['check_scripts.mjs', 'jpeg_metadata.js', 'photo_crop.js', 'photo_crop.html',
+             'extract_pages.py', 'pages-manifest.json']
+    paths += ['pages/' + page['page'] + '.html' for page in report['pages']]
+    report['inputs'] = [{'file': (SITE / name).relative_to(ROOT).as_posix(),
+                        'sha256': hashlib.sha256((SITE / name).read_bytes()).hexdigest()}
+                       for name in paths]
+    report['scope'] = ('JavaScript syntax and DOM-independent crop/metadata checks; '
+                       'real browser Canvas and guest upload are recorded separately.')
+    args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+    print(f"PASS frontend: {report['scripts']} scripts, {report['metadata_checks']} JPEG checks, "
+          f"{report['crop_checks']} crop, {report['resize_checks']} resize checks")
+
+
+if __name__ == '__main__':
+    main()

@@ -147,7 +147,68 @@
         <button id="return-btn">RETURN</button>
     </div>
 
-    <script>
+    <style>
+    #crop-dialog { margin: auto; width: min(520px, 95vw); max-height: 95vh;
+        overflow: auto; padding: 20px; border: 0; border-radius: 12px; }
+    #crop-dialog::backdrop { background: rgba(0, 0, 0, .7); }
+    #crop-dialog h2 { margin-top: 0; }
+    #crop-preview { display: block; width: 100%; height: auto; background: #222;
+        touch-action: none; cursor: move; margin: 12px 0; }
+    #crop-dialog label { display: block; margin: 12px 0 8px; }
+    #crop-dialog input { margin-bottom: 8px; }
+    #crop-cancel { background: #555; }
+</style>
+<dialog id="crop-dialog" aria-labelledby="crop-title" aria-describedby="crop-help">
+    <h2 id="crop-title">Choose the area to keep</h2>
+    <p id="crop-help">Drag inside the square to move it; drag a corner to resize it. You can also use the sliders. The selected area will be saved as a 240 × 240 JPEG without metadata.</p>
+    <canvas id="crop-preview" width="480" height="360" aria-label="Photo with selected square"></canvas>
+    <label for="crop-zoom">Zoom</label>
+    <input id="crop-zoom" type="range" min="1" max="4" step="0.05" value="1">
+    <label for="crop-horizontal">Horizontal position</label>
+    <input id="crop-horizontal" type="range" min="0" max="100" step="1" value="50">
+    <label for="crop-vertical">Vertical position</label>
+    <input id="crop-vertical" type="range" min="0" max="100" step="1" value="50">
+    <button id="crop-confirm" type="button">Use selected area and upload</button>
+    <button id="crop-cancel" type="button">Cancel</button>
+</dialog>
+
+<script>
+/* Remove encoder metadata from the known sRGB Canvas JPEG, keeping pixel data.
+ * The device still validates baseline 240x240 dimensions, complete scans and EOI. */
+async function stripCanvasJpegMetadata(blob) {
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    if (bytes.length < 4 || bytes[0] !== 255 || bytes[1] !== 0xd8 ||
+        bytes[bytes.length - 2] !== 255 || bytes[bytes.length - 1] !== 0xd9) {
+        throw new Error('Canvas did not produce a complete JPEG');
+    }
+    const parts = [bytes.subarray(0, 2)];
+    let position = 2;
+    while (position + 4 <= bytes.length) {
+        if (bytes[position] !== 255 || bytes[position + 1] === 255) {
+            throw new Error('Invalid Canvas JPEG marker');
+        }
+        const marker = bytes[position + 1];
+        const length = (bytes[position + 2] << 8) | bytes[position + 3];
+        const end = position + 2 + length;
+        if (length < 2 || end > bytes.length) {
+            throw new Error('Truncated Canvas JPEG header');
+        }
+        if (marker === 0xda) {
+            // Entropy bytes include FF00 escapes: never search/edit them as
+            // header segments. Copy the complete encoded scan and EOI intact.
+            parts.push(bytes.subarray(position));
+            return new Blob(parts, {type: 'image/jpeg'});
+        }
+        // Canvas pixels already use sRGB. APP/COM can reveal EXIF, profiles,
+        // software or thumbnails; no such segment is needed by the LCD decoder.
+        if (!(marker >= 0xe0 && marker <= 0xef) && marker !== 0xfe) {
+            parts.push(bytes.subarray(position, end));
+        }
+        position = end;
+    }
+    throw new Error('Canvas JPEG has no image scan');
+}
+
         // 全局变量
         let currentSettings = {
             display_time: 5,
@@ -277,83 +338,201 @@
             } catch (e) { console.error(e); }
         }
 
-        /**
-         * 核心修改 1: 图片预处理函数
-         * 功能：读取任意图片 -> 裁剪为 240x240 (居中覆盖) -> 转为 JPG -> 压缩至 100KB 以内
-         */
-        function resizeAndCropImage(file) {
-            return new Promise((resolve, reject) => {
-                // 1. 基本检查
-                if (!file.type.match(/image.*/)) {
-                    reject(new Error("File is not an image"));
-                    return;
-                }
+/* Compute a square entirely inside the decoded image, using slider positions.
+ * Percentages cover the available travel after zoom, including both edges. */
+function squareCropBounds(width, height, zoom, horizontal, vertical) {
+    if (![width, height, zoom, horizontal, vertical].every(Number.isFinite) ||
+        width <= 0 || height <= 0 || zoom < 1 || zoom > 4 ||
+        horizontal < 0 || horizontal > 100 || vertical < 0 || vertical > 100) {
+        throw new Error('Invalid image crop');
+    }
+    const size = Math.min(width, height) / zoom;
+    return {x: (width - size) * horizontal / 100,
+        y: (height - size) * vertical / 100, size};
+}
 
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const img = new Image();
-                    img.onload = function() {
-                        // 2. 创建 Canvas 进行尺寸调整
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
+/* Resize about the opposite corner, keeping the LCD's square proportions.
+ * Project pointer movement onto the corner diagonal and clamp to the image
+ * edges and 1..4× zoom limits; crossing the anchor never flips the frame. */
+function resizeSquareCrop(crop, width, height, corner, dx, dy) {
+    if (!['nw','ne','sw','se'].includes(corner) ||
+        ![width,height,crop.x,crop.y,crop.size,dx,dy].every(Number.isFinite) ||
+        width <= 0 || height <= 0 || crop.size <= 0 || crop.x < 0 || crop.y < 0 ||
+        crop.x + crop.size > width || crop.y + crop.size > height) {
+        throw new Error('Invalid crop resize');
+    }
+    const sx = corner.endsWith('e') ? 1 : -1;
+    const sy = corner.startsWith('s') ? 1 : -1;
+    const anchorX = sx > 0 ? crop.x : crop.x + crop.size;
+    const anchorY = sy > 0 ? crop.y : crop.y + crop.size;
+    const maximum = Math.min(sx > 0 ? width - anchorX : anchorX,
+        sy > 0 ? height - anchorY : anchorY, Math.min(width,height));
+    const minimum = Math.min(width,height) / 4;
+    const size = Math.max(minimum, Math.min(maximum, crop.size + (sx*dx + sy*dy)/2));
+    return {x: sx > 0 ? anchorX : anchorX - size,
+        y: sy > 0 ? anchorY : anchorY - size, size};
+}
 
-                        const targetSize = 240;
-                        canvas.width = targetSize;
-                        canvas.height = targetSize;
+/* Let the user move/zoom a square before any upload request is sent.
+ * The full image is drawn with letterboxing; the selected source coordinates
+ * are independent of CSS size, so dragging also works on a phone. */
+function choosePhotoCrop(image) {
+    return new Promise((resolve, reject) => {
+        const dialog = document.getElementById('crop-dialog');
+        const preview = document.getElementById('crop-preview');
+        const context = preview.getContext('2d');
+        const zoom = document.getElementById('crop-zoom');
+        const horizontal = document.getElementById('crop-horizontal');
+        const vertical = document.getElementById('crop-vertical');
+        const confirm = document.getElementById('crop-confirm');
+        const cancel = document.getElementById('crop-cancel');
+        const width = image.naturalWidth, height = image.naturalHeight;
+        const scale = Math.min(preview.width / width, preview.height / height);
+        const offsetX = (preview.width - width * scale) / 2;
+        const offsetY = (preview.height - height * scale) / 2;
+        const listeners = [];
+        let drag = null;
+        zoom.value = '1'; horizontal.value = '50'; vertical.value = '50';
+        let selected = squareCropBounds(width, height, 1, 50, 50);
 
-                        // 3. 计算居中裁剪 (Cover 模式)
-                        let sourceWidth = img.width;
-                        let sourceHeight = img.height;
-                        let sourceX = 0;
-                        let sourceY = 0;
-
-                        const aspectRatio = sourceWidth / sourceHeight;
-
-                        if (sourceWidth > sourceHeight) {
-                            // 宽图：以高度为基准
-                            sourceWidth = sourceHeight; // 截取正方形
-                            sourceX = (img.width - sourceWidth) / 2; // 居中
-                        } else {
-                            // 长图：以宽度为基准
-                            sourceHeight = sourceWidth; // 截取正方形
-                            sourceY = (img.height - sourceHeight) / 2; // 居中
-                        }
-
-                        // 4. 在 Canvas 上绘制 (重采样)
-                        // drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-                        ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetSize, targetSize);
-
-                        // 5. 导出为 Blob (JPG)
-                        // 初始质量 0.9，240x240图片通常只有15-20KB
-                        canvas.toBlob((blob) => {
-                            if (!blob) {
-                                reject(new Error("Canvas to Blob failed"));
-                                return;
-                            }
-
-                            // 6. 再次检查大小 (安全网)
-                            if (blob.size > 100 * 1024) {
-                                // 如果极大概率不可能发生的情况发生了(比如全噪点图)，降低质量重试
-                                canvas.toBlob((blobRetry) => {
-                                    if (blobRetry.size > 100 * 1024) {
-                                        reject(new Error("Image too complex to compress under 100KB"));
-                                    } else {
-                                        resolve(blobRetry);
-                                    }
-                                }, 'image/jpeg', 0.6);
-                            } else {
-                                resolve(blob);
-                            }
-                        }, 'image/jpeg', 0.9);
-                    };
-                    img.onerror = () => reject(new Error("Failed to load image"));
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
+        function bounds() {
+            return selected;
         }
+        function selectFromControls() {
+            selected = squareCropBounds(width, height, Number(zoom.value),
+                Number(horizontal.value), Number(vertical.value));
+            redraw();
+        }
+        // Darken only the unselected pixels, leaving the source image visible.
+        function redraw() {
+            const crop = bounds();
+            const x = offsetX + crop.x * scale, y = offsetY + crop.y * scale;
+            const size = crop.size * scale;
+            context.clearRect(0, 0, preview.width, preview.height);
+            context.fillStyle = '#fff';
+            context.fillRect(offsetX, offsetY, width * scale, height * scale);
+            context.drawImage(image, offsetX, offsetY, width * scale, height * scale);
+            context.fillStyle = 'rgba(0,0,0,.6)';
+            context.fillRect(0, 0, preview.width, y);
+            context.fillRect(0, y + size, preview.width, preview.height - y - size);
+            context.fillRect(0, y, x, size);
+            context.fillRect(x + size, y, preview.width - x - size, size);
+            context.lineWidth = 2; context.strokeStyle = '#fff';
+            context.strokeRect(x, y, size, size);
+            // Visible corner handles keep a usable size at narrow CSS widths.
+            const handle = 12 * preview.width / preview.getBoundingClientRect().width;
+            context.fillStyle = '#fff';
+            for (const hx of [x,x+size]) for (const hy of [y,y+size]) {
+                context.fillRect(hx-handle/2,hy-handle/2,handle,handle);
+            }
+            horizontal.disabled = width === crop.size;
+            vertical.disabled = height === crop.size;
+        }
+        function listen(target, event, handler) {
+            target.addEventListener(event, handler);
+            listeners.push(() => target.removeEventListener(event, handler));
+        }
+        // Remove every handler on confirm/cancel so repeated uploads do not
+        // retain earlier images or invoke multiple upload promises.
+        function finish(accepted) {
+            const crop = accepted ? bounds() : null;
+            listeners.forEach(remove => remove());
+            if (drag && preview.hasPointerCapture(drag.id)) preview.releasePointerCapture(drag.id);
+            drag = null;
+            dialog.close();
+            if (accepted) resolve(crop);
+            else reject(new DOMException('Upload cancelled', 'AbortError'));
+        }
+        listen(zoom, 'input', selectFromControls);
+        listen(horizontal, 'input', selectFromControls);
+        listen(vertical, 'input', selectFromControls);
+        listen(confirm, 'click', () => finish(true));
+        listen(cancel, 'click', () => finish(false));
+        listen(dialog, 'cancel', event => { event.preventDefault(); finish(false); });
+        listen(preview, 'pointerdown', event => {
+            if (drag) return;
+            const crop = bounds();
+            const rectangle = preview.getBoundingClientRect();
+            const px = (event.clientX-rectangle.left)*preview.width/rectangle.width;
+            const py = (event.clientY-rectangle.top)*preview.height/rectangle.height;
+            const radius = 14 * preview.width / rectangle.width;
+            let corner = null;
+            for (const [name,cx,cy] of [['nw',crop.x,crop.y],['ne',crop.x+crop.size,crop.y],
+                ['sw',crop.x,crop.y+crop.size],['se',crop.x+crop.size,crop.y+crop.size]]) {
+                if (Math.hypot(px-offsetX-cx*scale,py-offsetY-cy*scale) <= radius) {
+                    corner = name; break;
+                }
+            }
+            drag = {id:event.pointerId, x:event.clientX, y:event.clientY, crop, corner};
+            preview.style.cursor = corner ? (corner==='nw' || corner==='se' ?
+                'nwse-resize' : 'nesw-resize') : 'move';
+            preview.setPointerCapture(event.pointerId);
+        });
+        listen(preview, 'pointermove', event => {
+            if (!drag || drag.id !== event.pointerId) return;
+            const rectangle = preview.getBoundingClientRect();
+            const dx = (event.clientX - drag.x) * preview.width / rectangle.width / scale;
+            const dy = (event.clientY - drag.y) * preview.height / rectangle.height / scale;
+            if (drag.corner) selected = resizeSquareCrop(drag.crop,width,height,drag.corner,dx,dy);
+            else selected = {x:Math.max(0,Math.min(width-drag.crop.size,drag.crop.x+dx)),
+                y:Math.max(0,Math.min(height-drag.crop.size,drag.crop.y+dy)),size:drag.crop.size};
+            // Keep exact source coordinates for export; range values are only
+            // a rounded display until the user actually moves a slider.
+            zoom.value = String(Math.min(width,height) / selected.size);
+            horizontal.value = String(width===selected.size ? 50 : selected.x*100/(width-selected.size));
+            vertical.value = String(height===selected.size ? 50 : selected.y*100/(height-selected.size));
+            redraw();
+        });
+        function endDrag(event) {
+            if (drag && drag.id === event.pointerId) {
+                if (preview.hasPointerCapture(drag.id)) preview.releasePointerCapture(drag.id);
+                drag = null;
+                preview.style.cursor = 'move';
+            }
+        }
+        listen(preview, 'pointerup', endDrag);
+        listen(preview, 'pointercancel', endDrag);
+        hideLoading();
+        dialog.showModal();
+        redraw();
+    });
+}
 
-        // 处理文件上传主逻辑
+/* Decode locally, ask which square to keep, and resample it to LCD dimensions.
+ * Canvas produces fresh JPEG pixels; stripCanvasJpegMetadata removes the
+ * encoder's APP/COM segments before the existing chunk upload begins. */
+async function resizeAndCropImage(file) {
+    if (!file.type.startsWith('image/')) throw new Error('File is not an image');
+    const image = new Image();
+    const url = URL.createObjectURL(file);
+    try {
+        await new Promise((resolve, reject) => {
+            image.onload = resolve;
+            image.onerror = () => reject(new Error('Failed to load image'));
+            image.src = url;
+        });
+        const crop = await choosePhotoCrop(image);
+        showLoading('Processing selected area…');
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 240;
+        const context = canvas.getContext('2d');
+        // JPEG has no alpha channel; transparent input gets a white background.
+        context.fillStyle = '#fff'; context.fillRect(0, 0, 240, 240);
+        context.drawImage(image, crop.x, crop.y, crop.size, crop.size, 0, 0, 240, 240);
+        const encode = quality => new Promise((resolve, reject) => {
+            canvas.toBlob(blob => blob ? resolve(blob) :
+                reject(new Error('Canvas JPEG encoding failed')), 'image/jpeg', quality);
+        });
+        let blob = await encode(0.9);
+        if (blob.size > 100 * 1024) blob = await encode(0.6);
+        if (blob.size > 100 * 1024) throw new Error('Image exceeds the 100KB slot');
+        return blob;
+    } finally {
+        URL.revokeObjectURL(url);
+    }
+}
+
+
         async function handleFileUpload(fileInput, fileNumber) {
             const rawFile = fileInput.files[0];
             if (!rawFile) return;
@@ -368,9 +547,10 @@
                 const processedBlob = await resizeAndCropImage(rawFile);
 
                 // 2. 将 Blob 转为 File 对象以便上传函数使用
-                const processedFile = new File([processedBlob], `file${fileNumber}.jpg`, { type: 'image/jpeg' });
+                const cleanBlob = await stripCanvasJpegMetadata(processedBlob);
+                const processedFile = new File([cleanBlob], `file${fileNumber}.jpg`, { type: 'image/jpeg' });
 
-                console.log(`Original: $${rawFile.size}B, Processed: $${processedFile.size}B`);
+                console.log(`Original: ${rawFile.size}B, Processed: ${processedFile.size}B`);
 
                 updateLoadingText(`Uploading file ${fileNumber}...`);
 
@@ -378,7 +558,7 @@
                 await uploadImageInChunks(processedFile, fileNumber);
 
                 // 4. 上传成功后，直接用处理后的图片更新预览图 (无需从服务器重新下载，体验更快)
-                const url = URL.createObjectURL(processedBlob);
+                const url = URL.createObjectURL(cleanBlob);
                 const thumb = document.getElementById(`thumbnail${fileNumber}`);
                 if(thumb) {
                     thumb.src = url;
@@ -395,8 +575,9 @@
                 }
 
             } catch (error) {
-                console.error('Upload process error:', error);
-                showStatus(`Error: ${error.message}`, 'error');
+                if (error.name !== 'AbortError') console.error('Upload process error:', error);
+                showStatus(error.name === 'AbortError' ? 'Upload cancelled' : `Error: ${error.message}`,
+                    error.name === 'AbortError' ? 'info' : 'error');
             } finally {
                 hideLoading();
             }
@@ -442,7 +623,7 @@
                 for(let retry = 0; retry < 5; retry++) {
                     try {
                         const progress = Math.round(((chunkIndex) / totalChunks) * 100);
-                        updateLoadingText(`Uploading... $${progress}% (File $${fileNumber})`);
+                        updateLoadingText(`Uploading... ${progress}% (File ${fileNumber})`);
 
                         const response = await fetch('/upload_chunk', {
                             method: 'POST',
@@ -465,7 +646,7 @@
                 }
 
                 if (!success) {
-                    throw new Error(`Chunk $${chunkIndex} failed after retries: $${lastError}`);
+                    throw new Error(`Chunk ${chunkIndex} failed after retries: ${lastError}`);
                 }
 
                 // **关键优化**: 每次成功上传一块后，暂停 50ms
@@ -563,7 +744,7 @@
             const statusDiv = document.getElementById('status');
             if (statusDiv) {
                 statusDiv.textContent = message;
-                statusDiv.className = type === 'success' ? 'status-success' : 'status-error';
+                statusDiv.className = type === 'success' ? 'status-success' : type === 'error' ? 'status-error' : '';
                 setTimeout(() => {
                     statusDiv.textContent = '';
                     statusDiv.className = '';

@@ -10,6 +10,7 @@ PAGES = {"setup": 0x26EDC, "settings": 0x2963B, "photo": 0x32E6E}
 
 
 def recover() -> None:
+    """Preserve original documents and regenerate browser copies with audited fixes."""
     flash = (ROOT.parent / "full-flash.bin").read_bytes()
     if hashlib.sha256(flash).hexdigest() != SHA256:
         raise ValueError("Unexpected flash snapshot")
@@ -112,6 +113,37 @@ def recover() -> None:
         if name == "setup":
             page = page.replace("function handleResponse(response)", "function readResponse(response)")
             page = page.replace(".then(handleResponse)", ".then(readResponse).then(handleResponse)")
+        if name == "photo":
+            # Keep the factory bytes in source/; working pages allow the user
+            # to select a source square instead of always taking the center.
+            crop_ui = (ROOT / 'photo_crop.html').read_text(encoding='utf-8')
+            crop_script = (ROOT / 'photo_crop.js').read_text(encoding='utf-8')
+            page = page.replace('<script>', crop_ui + '\n<script>', 1)
+            start = page.index('        function resizeAndCropImage(file) {')
+            start = page.rfind('        /**', 0, start)
+            end = page.index('        async function handleFileUpload', start)
+            if start < 0:
+                raise ValueError('Missing factory image processing block')
+            page = page[:start] + crop_script + '\n\n' + page[end:]
+            # Browser Canvas encoders may insert ICC APP2 even after EXIF was
+            # removed by drawing pixels. Strip all APP/COM before device upload.
+            cleaner = (ROOT / 'jpeg_metadata.js').read_text(encoding='utf-8')
+            page = page.replace('<script>', '<script>\n' + cleaner, 1)
+            original = 'const processedFile = new File([processedBlob],'
+            if page.count(original) != 1:
+                raise ValueError('Missing or ambiguous processed Canvas upload')
+            page = page.replace(original,
+                'const cleanBlob = await stripCanvasJpegMetadata(processedBlob);\n'
+                '                const processedFile = new File([cleanBlob],', 1)
+            page = page.replace('URL.createObjectURL(processedBlob)', 'URL.createObjectURL(cleanBlob)')
+            page = page.replace('$${', '${')
+            page = page.replace("console.error('Upload process error:', error);",
+                "if (error.name !== 'AbortError') console.error('Upload process error:', error);")
+            page = page.replace("showStatus(`Error: ${error.message}`, 'error');",
+                "showStatus(error.name === 'AbortError' ? 'Upload cancelled' : `Error: ${error.message}`,\n"
+                "                    error.name === 'AbortError' ? 'info' : 'error');", 1)
+            page = page.replace("type === 'success' ? 'status-success' : 'status-error'",
+                "type === 'success' ? 'status-success' : type === 'error' ? 'status-error' : ''", 1)
         page = page.replace("window.location.href = 'about:blank'", "window.location.href = '/'")
         nav = ('\n<nav aria-label="Pages" style="text-align:center;padding:10px;'
                'font:14px Arial,sans-serif;margin-bottom:12px">'

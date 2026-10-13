@@ -34,6 +34,11 @@ $nativeReport=Join-Path $repo ".build\small-tv-esp32c2\native-tests\report.json"
 Invoke-TestGroup "native" {& (Join-Path $PSScriptRoot "run.ps1") -VsDevCmd $VsDevCmd} $nativeReport
 $platformReport=Join-Path $repo ".build\small-tv-esp32c2\platform-tests\report.json"
 Invoke-TestGroup "platform" {& (Join-Path $PSScriptRoot "run-platform.ps1") -VsDevCmd $VsDevCmd} $platformReport
+$frontendReport=Join-Path $OutputDirectory "frontend.json"
+Invoke-TestGroup "frontend" {
+    & $PythonPath (Join-Path $PSScriptRoot "frontend_test.py") --output $frontendReport
+    if($LASTEXITCODE){throw "Frontend JavaScript tests failed"}
+} $frontendReport
 $integrityReport=Join-Path $OutputDirectory "integrity.json"
 Invoke-TestGroup "integrity" {
     & $PythonPath (Join-Path $PSScriptRoot "artifact_test.py") --output $integrityReport
@@ -61,7 +66,7 @@ else {
         if($LASTEXITCODE){throw "Full-firmware QEMU tests failed"}
     } (Join-Path $qemuFolder "report.json")
 }
-$groups.Add(@{name="hardware_browser_soak";status="not_run";reason="Physical board, real browser/RF/weather service and long-run memory checks require the manual acceptance scenarios in README.md"})
+$groups.Add(@{name="hardware_browser_soak";status="not_run";reason="Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately"})
 $archive=Join-Path $repo "firmware\development\small-tv-esp32c2-reconstructed"
 $manifest=Get-Content -Raw -LiteralPath (Join-Path $archive "manifest.json") | ConvertFrom-Json
 $testInputs=@(Get-ChildItem -LiteralPath $PSScriptRoot -Recurse -File | Where-Object {$_.Extension -in @('.c','.h','.inc','.ps1','.py','.txt')} | Sort-Object FullName | ForEach-Object {

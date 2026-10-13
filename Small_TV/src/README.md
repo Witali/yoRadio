@@ -210,6 +210,14 @@ Switches become editable only after valid settings load; six HTTP sessions
 support the settings page's parallel requests. `/advanced` remains an extra
 directly accessible page for the owner's NTP/weather configuration.
 
+The photo page now offers a square selection that can be moved by dragging
+inside it and resized by dragging any corner, with zoom and position sliders.
+Browser Canvas resamples the chosen region to 240×240 JPEG, and
+JavaScript strips APP/COM metadata before sending chunks to the board.
+Cancel/Escape sends no upload and preserves the slot. Native JPEG dimensions,
+baseline/scan completeness and privacy validation still apply. Original HTML
+bytes remain preserved under `../local_site/source/`.
+
 The reconstruction corrects unsafe DNS bounds, image-buffer overlap,
 unbounded/misordered chunks, the `/wifireset` credential-copy defect, and
 the panel's inclusive end-coordinate literal of 240 (now 239). Photo uploads
