@@ -487,6 +487,10 @@ The enabled ESP-IDF 6.1 build succeeds. Linker map assigns 32 bytes of BSS to
 bytes for `send_stream_audio.part.0` (previous build: 96), 48 for each emitted
 span/begin callback, and 896 for `stream_task`. These are individual static
 stack frames, not the total call-chain depth or a runtime high-water measurement.
+The image and these build measurements are saved under
+[`firmware/development/esp32c3-idf-6.1-r9a97-frame-router/`](../firmware/development/esp32c3-idf-6.1-r9a97-frame-router/).
+Its only added active sdkconfig setting relative to `r9a97-codec-drain` is
+`CONFIG_YORADIO_FRAME_ROUTER=y`. No board deployment has been made for it.
 
 ## Format references
 
