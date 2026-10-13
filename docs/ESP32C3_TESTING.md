@@ -1691,6 +1691,41 @@ largest block and task count to the baseline bounds. The runner restores the
 original app/settings even after a failed case. Do not run alongside other
 board controllers; fixture ports are 8773/8774.
 
+## Real-decoder PCM at codec-family boundaries (QEMU)
+
+`tools/codec_benchmark/run_pipeline_pcm.py` exercises the production flash-input,
+frame router, decoder task, PCM queue and output task. A test-only sink captures
+signed-16 PCM before output gain/resampling. It compares MP3 → HE-AAC → MP3
+and AAC-LC → MP3 → HE-AACv2 against separately decoded segments, both with
+and without ID3 at each segment boundary. Each segment contains the first 64
+packets located independently by ffprobe. Comparison requires identical bytes,
+sample count, order, rate and channel layout, independent of queue packet sizes.
+This is a pipeline regression against the same decoder in isolated sessions,
+not an independent decoder accuracy reference or physical DMA timing test.
+
+Build a separate QEMU benchmark using `CONFIG_YORADIO_QEMU=y`,
+`CONFIG_YORADIO_FRAME_ROUTER=y`, queued PCM, UART console, DIO flash and
+`partitions-codec-benchmark.csv`. Pass CMake options
+`-D YORADIO_CODEC_BENCHMARK=ON -D YORADIO_QEMU_PIPELINE_PCM_TEST=ON`.
+The CMake guard rejects a hardware or direct-DMA configuration. Benchmark
+fixture codec `0` selects AUTO so the real initial signature probe is tested.
+Never install this capture image on a board.
+
+```powershell
+python -B -X utf8 tests/test-pipeline-pcm-capture.py
+python -B -X utf8 tools/codec_benchmark/run_pipeline_pcm.py `
+  --build idf/esp32c3-oled-native/build-idf-6.1-r9a97-pipeline-pcm `
+  --output .build/pipeline-pcm-new `
+  --qemu /path/in/wsl/to/qemu-system-riscv32 --bios /path/in/wsl/to/qemu/firmware
+```
+
+Requires the IDF Python environment with esptool, WSL, ffprobe and Espressif's
+C3 QEMU. Use a new output directory. Missing capture/EOF, incomplete encoded
+delivery, decode failures and sample mismatches fail the run. The host test
+includes deliberate missing/reordered PCM, 1-LSB changes and layout errors;
+it also verifies that harmless repacketization is accepted. No physical board,
+network credentials or hardware settings are accessed by this runner.
+
 ## Bounded WebUI transfers and OTA reboot
 
 Run `python -B -X utf8 tests/run-esp32c3-web-memory.py` for the actual C3

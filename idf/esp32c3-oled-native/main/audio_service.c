@@ -1986,8 +1986,7 @@ static esp_err_t audio_service_play_fixture(size_t size,
         ESP_PARTITION_TYPE_DATA, (esp_partition_subtype_t)0x40,
         "codec_test");
     if (!partition || !size ||
-        size > partition->size - sizeof(codec_fixture_header_t) ||
-        codec == NATIVE_CODEC_AUTO) {
+        size > partition->size - sizeof(codec_fixture_header_t)) {
         return ESP_ERR_INVALID_ARG;
     }
     play_command_t command = {
@@ -2013,7 +2012,6 @@ static esp_err_t benchmark_autostart(void) {
                                             sizeof(header)), TAG,
                         "read codec fixture header");
     if (header.magic != CODEC_FIXTURE_MAGIC ||
-        header.codec <= NATIVE_CODEC_AUTO ||
         header.codec > NATIVE_CODEC_OGG || !header.size ||
         header.size > partition->size - sizeof(header)) {
         ESP_LOGE(TAG,

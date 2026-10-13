@@ -353,6 +353,20 @@ if(YORADIO_CODEC_BENCHMARK)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_CODEC_BENCHMARK=1)
 endif()
+
+# Capture the real decoder -> PCM queue -> output-task path without a device.
+# No test hooks are linked into ordinary QEMU or hardware firmware.
+if(YORADIO_QEMU_PIPELINE_PCM_TEST)
+  if(NOT CONFIG_YORADIO_QEMU OR NOT YORADIO_CODEC_BENCHMARK OR CONFIG_YORADIO_DIRECT_DMA_PCM)
+    message(FATAL_ERROR "Pipeline PCM capture requires QEMU, codec benchmark and queued PCM")
+  endif()
+  target_sources(${COMPONENT_LIB} PRIVATE
+    "${YORADIO_ROOT}/../tests/native/qemu_pipeline_pcm_capture.c")
+  foreach(symbol native_audio_output_init native_audio_output_configure
+      native_audio_output_write_pcm native_audio_output_flush_pcm native_state_set_audio)
+    target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${symbol}")
+  endforeach()
+endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
 
 # Boot-only laboratory timing, followed by the normal application so native
