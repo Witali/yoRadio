@@ -14,15 +14,22 @@
 #include "freertos/task.h"
 
 static DRAM_ATTR volatile uint32_t s_allocation_failures;
+static DRAM_ATTR volatile uint32_t s_allocation_size;
+static DRAM_ATTR volatile uint32_t s_allocation_caps;
+static DRAM_ATTR struct {
+    uint32_t decoder_failures, decoder_codec, decoder_stage;
+    int32_t decoder_result;
+    uint32_t decoder_completion, decoder_input_bytes, decoder_allocation_sequence;
+} s_decoder_failure;
 
 static void IRAM_ATTR record_allocation_failure(size_t size, uint32_t caps,
                                                 const char *function) {
-    (void)size;
-    (void)caps;
     (void)function;
     // C3 is single-core. Preserve the previous interrupt level so task and
     // ISR callers cannot lose an increment. No heap, logging or Flash data.
     UBaseType_t saved_level = portSET_INTERRUPT_MASK_FROM_ISR();
+    s_allocation_size = (uint32_t)size;
+    s_allocation_caps = caps;
     ++s_allocation_failures;
     portCLEAR_INTERRUPT_MASK_FROM_ISR(saved_level);
 }
@@ -39,11 +46,38 @@ void IRAM_ATTR esp_task_wdt_isr_user_handler(void) {
 #endif
 
 cpu_profiler_faults_t cpu_profiler_faults(void) {
-    cpu_profiler_faults_t result = {.allocation_failures = s_allocation_failures};
+    UBaseType_t saved_level = portSET_INTERRUPT_MASK_FROM_ISR();
+    cpu_profiler_faults_t result = {
+        .decoder_failures = s_decoder_failure.decoder_failures,
+        .decoder_codec = s_decoder_failure.decoder_codec,
+        .decoder_stage = s_decoder_failure.decoder_stage,
+        .decoder_result = s_decoder_failure.decoder_result,
+        .decoder_completion = s_decoder_failure.decoder_completion,
+        .decoder_input_bytes = s_decoder_failure.decoder_input_bytes,
+        .decoder_allocation_sequence = s_decoder_failure.decoder_allocation_sequence,
+    };
+    result.allocation_failures = s_allocation_failures;
+    result.allocation_size = s_allocation_size;
+    result.allocation_caps = s_allocation_caps;
 #if CONFIG_ESP_TASK_WDT_EN
     result.task_watchdog_events = s_task_watchdog_events;
 #endif
+    portCLEAR_INTERRUPT_MASK_FROM_ISR(saved_level);
     return result;
+}
+
+void cpu_profiler_decoder_failure(uint32_t codec, decoder_failure_stage_t stage,
+                                  int32_t result, uint32_t completion,
+                                  uint32_t input_bytes) {
+    UBaseType_t saved_level = portSET_INTERRUPT_MASK_FROM_ISR();
+    ++s_decoder_failure.decoder_failures;
+    s_decoder_failure.decoder_codec = codec;
+    s_decoder_failure.decoder_stage = stage;
+    s_decoder_failure.decoder_result = result;
+    s_decoder_failure.decoder_completion = completion;
+    s_decoder_failure.decoder_input_bytes = input_bytes;
+    s_decoder_failure.decoder_allocation_sequence = s_allocation_failures;
+    portCLEAR_INTERRUPT_MASK_FROM_ISR(saved_level);
 }
 
 #if CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS

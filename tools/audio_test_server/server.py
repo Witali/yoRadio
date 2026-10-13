@@ -10,6 +10,10 @@ import threading
 import time
 from time import perf_counter
 from urllib.parse import urlsplit
+if __package__:
+    from .icy import DEFAULT_METADATA, IcyFramer
+else:
+    from icy import DEFAULT_METADATA, IcyFramer
 
 
 class DeliveryStats:
@@ -116,7 +120,12 @@ def pause_argument(value):
 class Server:
     def __init__(self, host, port, fixtures, cert=None, key=None, *, unpaced_files=False,
                  delivery_stats=False, initial_failures=0, pacing_ratio=1.02,
-                 delivery_pauses=(), send_buffer_bytes=None):
+                 delivery_pauses=(), send_buffer_bytes=None, icy_interval=0,
+                 icy_metadata=DEFAULT_METADATA):
+        if type(icy_interval) is not int or icy_interval < 0:
+            raise ValueError('ICY interval must be a nonnegative integer')
+        if icy_interval:
+            IcyFramer(icy_interval, icy_metadata)
         if type(initial_failures) is not int or initial_failures < 0:
             raise ValueError('initial_failures must be a nonnegative integer')
         if (type(pacing_ratio) not in (int, float) or
@@ -195,16 +204,25 @@ class Server:
                     self.connection.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, send_buffer_bytes)
                     actual_send_buffer = self.connection.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
                 data = spec['data']
+                icy = IcyFramer(icy_interval, icy_metadata) if (
+                    icy_interval and self.headers.get('Icy-MetaData') == '1') else None
                 self.send_response(200)
-                self.send_header('Content-Type', spec['mime'])
+                # None intentionally tests clients that must identify the body.
+                if spec['mime'] is not None:
+                    self.send_header('Content-Type', spec['mime'])
+                if icy:
+                    self.send_header('icy-metaint', str(icy_interval))
                 if mode != 'stream':
-                    self.send_header('Content-Length', str(len(data)))
+                    self.send_header('Content-Length', str(icy.wire_length(len(data)) if icy else len(data)))
                 self.send_header('Connection', 'close')
                 self.end_headers()
                 unpaced = unpaced_files and mode == 'file'
                 event = dict(mode=mode, fixture=name, sent=0, complete=False,
                              pacing_ratio=None if unpaced else pacing_ratio,
                              clock='time.perf_counter')
+                if icy:
+                    event.update(icy_interval=icy_interval, icy_insertions=0,
+                                 icy_metadata_bytes=0, wire_sent=0)
                 if send_buffer_bytes is not None:
                     event.update(send_buffer_requested=send_buffer_bytes,
                                  send_buffer_actual=actual_send_buffer)
@@ -238,12 +256,17 @@ class Server:
                                     if not size:
                                         return
                                 chunk = payload[offset:offset+size]
+                                wire = icy.feed(chunk) if icy else chunk
                                 write_started = time.perf_counter() if delivery else 0
-                                self.wfile.write(chunk)
+                                self.wfile.write(wire)
                                 self.wfile.flush()
                                 event['sent'] += len(chunk)
+                                if icy:
+                                    event.update(icy_insertions=icy.insertions,
+                                                 icy_metadata_bytes=icy.metadata_bytes)
+                                    event['wire_sent'] += len(wire)
                                 if delivery:
-                                    delivery.write(len(chunk), write_started, time.perf_counter(),
+                                    delivery.write(len(wire), write_started, time.perf_counter(),
                                                    None if unpaced else deadline)
                                 deadline += len(chunk) / bps
                                 if mode == 'jitter' and offset % 8192 == 0:
@@ -288,7 +311,10 @@ class Server:
 
 
 def main():
-    from fixtures import load_fixtures
+    if __package__:
+        from .fixtures import load_fixtures
+    else:
+        from fixtures import load_fixtures
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--host', default='0.0.0.0')
     parser.add_argument('--port', type=int, default=8770)
@@ -307,6 +333,8 @@ def main():
                         help='Pause before BYTE_OFFSET:SECONDS; repeat in increasing byte order, up to 64 times')
     parser.add_argument('--send-buffer-bytes', type=int,
                         help='Optional SO_SNDBUF request (1024..1048576); actual OS value is recorded')
+    parser.add_argument('--icy-interval', type=int, default=0,
+                        help='Insert synthetic ICY metadata every N audio bytes when requested; 0 disables')
     parser.add_argument('--events-output', type=Path,
                         help='Save fixture server events when this process exits normally')
     args = parser.parse_args()
@@ -316,7 +344,7 @@ def main():
     with Server(args.host,args.port,specs,args.cert,args.key, unpaced_files=args.unpaced_files,
                 delivery_stats=args.delivery_stats, initial_failures=args.initial_failures,
                 pacing_ratio=args.pacing_ratio, delivery_pauses=args.delivery_pause,
-                send_buffer_bytes=args.send_buffer_bytes) as server:
+                send_buffer_bytes=args.send_buffer_bytes, icy_interval=args.icy_interval) as server:
         print(f"Serving {len(specs)} fixtures on port {args.port}; /manifest.json lists them", flush=True)
         try:
             threading.Event().wait()

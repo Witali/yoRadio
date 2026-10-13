@@ -519,7 +519,7 @@ test("native HTTPS station switching releases incompatible codec memory before T
   // PCM can exist even when open failed: release must not depend on a handle.
   assert.doesNotMatch(generationReset, /had_simple_decoder/);
   assert.match(generationReset, /atomic_store\(&s_decoder_released_generation/);
-  assert.match(audio, /codec_from_signature[\s\S]*"fLaC"[\s\S]*"OggS"[\s\S]*"ID3"/);
+  assert.match(audio, /stream_probe_feed\(probe, data, size, &consumed\)/);
   assert.match(
     audio,
     /advance_generation\(codec\)[\s\S]*requested_codec = codec/,
@@ -1089,7 +1089,7 @@ test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", ()
   assert.match(web, /\.uri = "\/upload"/);
   assert.match(web, /\.uri = "\/webboard"/);
   assert.match(web, /webboard_upload_handler/);
-  assert.match(web, /receive_multipart/);
+  assert.match(read("main", "web_upload.c"), /mp_feed/);
   assert.match(websocket, /\.uri = "\/ws"/);
   assert.match(websocket, /\.is_websocket = true/);
   assert.match(websocket, /httpd_ws_recv_frame/);
@@ -1165,11 +1165,11 @@ test("native WebUI reuses shared pages and recovers an empty filesystem", () => 
   assert.match(web, /yoradio_emptyfs_html\(\)/);
   assert.match(web, /yoradio_index_html\(\)/);
   assert.match(web, /open_nonempty_file/);
-  assert.match(web, /Rejecting uncompressed WebUI asset/);
+  assert.match(read("main", "web_file_form.h"), /strcmp\(name \+ n - 3, "\.gz"\)/);
   assert.match(web, /\/spiffs\/www\/%s\.gz/);
   assert.match(web, /Content-Encoding", "gzip"/);
-  assert.match(web, /strcmp\(field, "www"\)/);
-  assert.match(web, /strcmp\(field, "data"\)/);
+  assert.match(read("main", "web_file_form.h"), /strcmp\(field, "www"\)/);
+  assert.match(read("main", "web_file_form.h"), /strcmp\(field, "data"\)/);
   assert.match(web, /\.uri = "\/emergency"/);
 });
 
@@ -1193,14 +1193,9 @@ test("native playlist reload event is emitted only after a successful upload", (
     websocket,
     /websocket_service_notify_playlist_changed[\s\S]*?atomic_store\(&s_playlist_changed_pending, true\)/,
   );
-  assert.match(
-    web,
-    /httpd_resp_sendstr\(request, "OK"\)[\s\S]*?if \(is_playlist\) websocket_service_notify_playlist_changed\(\)/,
-  );
-  assert.match(
-    web,
-    /if \(upload\.playlist_saved\)[\s\S]*?websocket_service_notify_playlist_changed\(\)/,
-  );
+  const upload = read("main", "web_upload.c");
+  assert.match(upload, /if \(ok && form\.playlist\[i\]\) \{[\s\S]*playlist_saved = true/);
+  assert.match(upload, /if \(playlist_saved\) websocket_service_notify_playlist_changed\(\)/);
 });
 
 test("native SPIFFS image contains the shared WebUI and repository playlist", () => {

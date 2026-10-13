@@ -1,0 +1,34 @@
+{
+  "scope": "Compare real C3 mixed-codec PCM against independently decoded segments in QEMU.\n\nUses the benchmark flash input and production decoder/PCM queue/output task.\nThe test-only output sink captures before resampling/gain/DMA, without timing claims.\n",
+  "cases": {},
+  "fixtures": {
+    "mp3-320": {
+      "bytes": 61485,
+      "sha256": "fc8fc3daab65850150293324c44d74479c69bf4f9928ce6c4025913f820a9734"
+    }
+  },
+  "app_sha256": "2257ddfdb24b8469ccb5fe937e80ff6aa66d2ab013dd831906e18e9689cb355f",
+  "sdkconfig_sha256": "6f1bb5347a03e9589babcfeddf9310e07e8bca2267aa92fd6d566e8c3be2c24e",
+  "ffprobe": "ffprobe version 8.1.1-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+  "command": [
+    "wsl.exe",
+    "--exec",
+    "timeout",
+    "--kill-after=2",
+    "240",
+    "/mnt/c/Work/yoRadio/.worktree/esp32c3-stream-format/.build/qemu-cache-host/qemu-system-riscv32",
+    "-M",
+    "esp32c3",
+    "-nographic",
+    "-no-reboot",
+    "-snapshot",
+    "-icount",
+    "shift=0,align=off,sleep=off",
+    "-L",
+    "/mnt/c/Work/QEMU-ESP32/share/qemu",
+    "-drive",
+    "file=/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/pipeline-pcm-01/flash.bin,if=mtd,format=raw"
+  ],
+  "passed": false,
+  "error": "Incomplete encoded delivery: mp3-320"
+}

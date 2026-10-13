@@ -38,7 +38,7 @@ test("static files run asynchronously without blocking the WebSocket server", ()
     /index < CONFIG_YORADIO_WEB_STATIC_WORKERS[\s\S]*xTaskCreate\(static_worker_task/,
   );
   assert.match(web, /WEB_STATIC_QUEUE_DEPTH WEB_MAX_OPEN_SOCKETS/);
-  assert.match(board, /BOARD_TASK_STACK_WEB_STATIC 4096/);
+  assert.match(board, /BOARD_TASK_STACK_WEB_STATIC \(2048 \+ CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES\)/);
 
   const websocketRegistration = web.indexOf("websocket_service_register(server, state)");
   const staticRegistration = web.indexOf("httpd_register_uri_handler(server, &files)");
@@ -61,4 +61,11 @@ test("HTTP send timeout is applied without changing WebSocket scheduling", () =>
   );
   assert.match(websocket, /httpd_ws_send_data_async/);
   assert.doesNotMatch(websocket, /httpd_ws_send_data\(/);
+});
+
+test("registered HTTP routes fit the handler table including WebSocket", () => {
+  const web = read("main", "web_service.c");
+  const capacity = Number(web.match(/config\.max_uri_handlers = (\d+)/)[1]);
+  const declarations = [...web.matchAll(/httpd_uri_t \w+ = \{/g)].length;
+  assert.ok(capacity >= declarations + 1, "Wildcard files route must fit after WebSocket registration");
 });

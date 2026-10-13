@@ -1,0 +1,582 @@
+{
+  "controller_sha256": "12bd0829a64bf967b906ff2adee24454100808dc9f0319de81f1d3a5632f8e77",
+  "initial": {
+    "version": "idf61-production-prefill1000",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "73da8e2146c5b3691bcfc7a8fb46b34109e74099eac221df2b66e05a62b95245"
+  },
+  "initial_status": {
+    "firmware": "esp32c3-oled-native",
+    "network": "client",
+    "audio": false,
+    "format": "stopped",
+    "sample_rate": 0,
+    "channels": 0,
+    "bits_per_sample": 0,
+    "pcm_sample_rate": 0,
+    "pcm_channels": 0,
+    "format_is_pcm": false,
+    "channels_are_core": false,
+    "rssi": -63
+  },
+  "images": {
+    "baseline": {
+      "app_elf_sha256": "d583ef1b8b51686498a7b2bc3445445d5f2779f14f0a65f5f644e68489407a52",
+      "sha256": "e526eb7dc072fe58c61d5424942f20933b9e8288d948574f6833eb38ab43e211",
+      "bytes": 1456144
+    },
+    "candidate": {
+      "app_elf_sha256": "613d5d04ba8b3e48d87b61b59120a10a68839961f42daef2ec3f25c9fd9c4ef6",
+      "sha256": "fd4dd06a57aa9d388394d678132b97f0fde7b4e1a4ae9fd16bf5fcc1e0286fef",
+      "bytes": 1458672
+    },
+    "restore": {
+      "app_elf_sha256": "73da8e2146c5b3691bcfc7a8fb46b34109e74099eac221df2b66e05a62b95245",
+      "sha256": "8f086f439e00d9e4baf4fe603b1b64935c7ddd188bd6f5ea380a7202075bd664",
+      "bytes": 1455936
+    }
+  },
+  "cases": [
+    {
+      "name": "baseline:playback-downloads:flac-level8",
+      "before": {
+        "schema": 1,
+        "boot_id": "ca4379fd321434d3",
+        "uptime_ms": 7817,
+        "reset_reason": 3,
+        "heap": 123604,
+        "largest": 110592,
+        "minimum_heap": 113004,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 273,
+          "write_errors": 0
+        }
+      },
+      "playback_window": {
+        "before": {
+          "schema": 1,
+          "boot_id": "ca4379fd321434d3",
+          "uptime_ms": 9878,
+          "reset_reason": 3,
+          "heap": 64436,
+          "largest": 47104,
+          "minimum_heap": 55820,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 450,
+            "write_errors": 0
+          }
+        },
+        "after": {
+          "schema": 1,
+          "boot_id": "ca4379fd321434d3",
+          "uptime_ms": 15393,
+          "reset_reason": 3,
+          "heap": 64312,
+          "largest": 47104,
+          "minimum_heap": 37276,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 450,
+            "write_errors": 0
+          }
+        },
+        "status": {
+          "firmware": "esp32c3-oled-native",
+          "network": "client",
+          "audio": true,
+          "format": "FLAC 48 kHz stereo",
+          "sample_rate": 48000,
+          "channels": 2,
+          "bits_per_sample": 16,
+          "pcm_sample_rate": 48000,
+          "pcm_channels": 2,
+          "format_is_pcm": false,
+          "channels_are_core": false,
+          "rssi": -79
+        }
+      },
+      "measurement": {
+        "before": {
+          "schema": 1,
+          "boot_id": "ca4379fd321434d3",
+          "uptime_ms": 9878,
+          "reset_reason": 3,
+          "heap": 64436,
+          "largest": 47104,
+          "minimum_heap": 55820,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 450,
+            "write_errors": 0
+          }
+        },
+        "after": {
+          "schema": 1,
+          "boot_id": "ca4379fd321434d3",
+          "uptime_ms": 15393,
+          "reset_reason": 3,
+          "heap": 64312,
+          "largest": 47104,
+          "minimum_heap": 37276,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 450,
+            "write_errors": 0
+          }
+        },
+        "requests": [
+          {
+            "bytes": 4754,
+            "seconds": 0.07476279999900726
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.08898909999697935
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.15307910000046832
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.09461100000044098
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.14766299999973853
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.10663209999984247
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.09420329999920796
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.13615950000166777
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.08214089999819407
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.07123160000264761
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.0979529000032926
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.09587660000033793
+          }
+        ],
+        "all_exact": true
+      },
+      "result": "PASS",
+      "seconds": 7.820802999998705,
+      "after": {
+        "schema": 1,
+        "boot_id": "ca4379fd321434d3",
+        "uptime_ms": 15707,
+        "reset_reason": 3,
+        "heap": 139868,
+        "largest": 110592,
+        "minimum_heap": 37276,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 453,
+          "write_errors": 0
+        }
+      }
+    },
+    {
+      "name": "candidate:oversized",
+      "before": {
+        "schema": 1,
+        "boot_id": "6e63847b374b4d4b",
+        "uptime_ms": 7787,
+        "reset_reason": 3,
+        "heap": 123200,
+        "largest": 110592,
+        "minimum_heap": 113004,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 269,
+          "write_errors": 0
+        }
+      },
+      "http_status": 400,
+      "measurement": {
+        "http": 400,
+        "original_files_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 1.4754933000003803,
+      "after": {
+        "schema": 1,
+        "boot_id": "6e63847b374b4d4b",
+        "uptime_ms": 9328,
+        "reset_reason": 3,
+        "heap": 139792,
+        "largest": 110592,
+        "minimum_heap": 113004,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 413,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 464,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 4296
+      }
+    },
+    {
+      "name": "candidate:oversized-header-only",
+      "before": {
+        "schema": 1,
+        "boot_id": "6e63847b374b4d4b",
+        "uptime_ms": 9622,
+        "reset_reason": 3,
+        "heap": 139816,
+        "largest": 110592,
+        "minimum_heap": 113004,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 441,
+          "write_errors": 0
+        }
+      },
+      "http_status": 408,
+      "measurement": {
+        "http": 408,
+        "original_files_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 6.279120000002877,
+      "after": {
+        "schema": 1,
+        "boot_id": "6e63847b374b4d4b",
+        "uptime_ms": 15966,
+        "reset_reason": 3,
+        "heap": 139816,
+        "largest": 110592,
+        "minimum_heap": 113004,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1035,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 464,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 4296
+      }
+    },
+    {
+      "name": "candidate:playback-downloads:flac-level8",
+      "before": {
+        "schema": 1,
+        "boot_id": "6e63847b374b4d4b",
+        "uptime_ms": 16293,
+        "reset_reason": 3,
+        "heap": 139816,
+        "largest": 110592,
+        "minimum_heap": 113004,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1066,
+          "write_errors": 0
+        }
+      },
+      "playback_window": {
+        "before": {
+          "schema": 1,
+          "boot_id": "6e63847b374b4d4b",
+          "uptime_ms": 17736,
+          "reset_reason": 3,
+          "heap": 68032,
+          "largest": 49152,
+          "minimum_heap": 57004,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 1177,
+            "write_errors": 0
+          }
+        },
+        "after": {
+          "schema": 1,
+          "boot_id": "6e63847b374b4d4b",
+          "uptime_ms": 23201,
+          "reset_reason": 3,
+          "heap": 66448,
+          "largest": 49152,
+          "minimum_heap": 43340,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 1177,
+            "write_errors": 0
+          }
+        },
+        "status": {
+          "firmware": "esp32c3-oled-native",
+          "network": "client",
+          "audio": true,
+          "format": "FLAC 48 kHz stereo",
+          "sample_rate": 48000,
+          "channels": 2,
+          "bits_per_sample": 16,
+          "pcm_sample_rate": 48000,
+          "pcm_channels": 2,
+          "format_is_pcm": false,
+          "channels_are_core": false,
+          "rssi": -71
+        }
+      },
+      "measurement": {
+        "before": {
+          "schema": 1,
+          "boot_id": "6e63847b374b4d4b",
+          "uptime_ms": 17736,
+          "reset_reason": 3,
+          "heap": 68032,
+          "largest": 49152,
+          "minimum_heap": 57004,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 1177,
+            "write_errors": 0
+          }
+        },
+        "after": {
+          "schema": 1,
+          "boot_id": "6e63847b374b4d4b",
+          "uptime_ms": 23201,
+          "reset_reason": 3,
+          "heap": 66448,
+          "largest": 49152,
+          "minimum_heap": 43340,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 1177,
+            "write_errors": 0
+          }
+        },
+        "requests": [
+          {
+            "bytes": 4754,
+            "seconds": 0.07895900000221445
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.0866174000002502
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.10157049999907031
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.09600009999849135
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.1002546000017901
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.14849239999966812
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.08858699999836972
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.10503650000100606
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.09297270000024582
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.10128989999793703
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.0968167999999423
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.05324560000008205
+          }
+        ],
+        "all_exact": true
+      },
+      "result": "PASS",
+      "seconds": 7.188304899998911,
+      "after": {
+        "schema": 1,
+        "boot_id": "6e63847b374b4d4b",
+        "uptime_ms": 23557,
+        "reset_reason": 3,
+        "heap": 139824,
+        "largest": 110592,
+        "minimum_heap": 43340,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1180,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 464,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 4296
+      }
+    }
+  ],
+  "baseline_idle": {
+    "schema": 1,
+    "boot_id": "ca4379fd321434d3",
+    "uptime_ms": 7655,
+    "reset_reason": 3,
+    "heap": 123312,
+    "largest": 110592,
+    "minimum_heap": 113004,
+    "tasks": 16,
+    "allocation_failures": 0,
+    "task_watchdog_events": 0,
+    "output": {
+      "available": true,
+      "completion_queue_drops": 257,
+      "write_errors": 0
+    }
+  },
+  "candidate_idle": {
+    "schema": 1,
+    "boot_id": "6e63847b374b4d4b",
+    "uptime_ms": 7664,
+    "reset_reason": 3,
+    "heap": 123696,
+    "largest": 110592,
+    "minimum_heap": 113004,
+    "tasks": 16,
+    "allocation_failures": 0,
+    "task_watchdog_events": 0,
+    "output": {
+      "available": true,
+      "completion_queue_drops": 257,
+      "write_errors": 0
+    }
+  },
+  "web_memory": {
+    "download_chunk_bytes": 2048,
+    "download_workers": 2,
+    "static_stack_bytes_each": 4096,
+    "static_stack_free_min": 464,
+    "http_stack_bytes": 8192,
+    "http_stack_free_min": 4296
+  },
+  "web_memory_after_playback": {
+    "download_chunk_bytes": 2048,
+    "download_workers": 2,
+    "static_stack_bytes_each": 4096,
+    "static_stack_free_min": 464,
+    "http_stack_bytes": 8192,
+    "http_stack_free_min": 4296
+  },
+  "restoration": {
+    "image": {
+      "version": "idf61-production-prefill1000",
+      "partition": "app0",
+      "max_size": 1900544,
+      "app_elf_sha256": "73da8e2146c5b3691bcfc7a8fb46b34109e74099eac221df2b66e05a62b95245"
+    },
+    "wifi_unchanged": true,
+    "playlist_unchanged": true,
+    "settings_unchanged": true,
+    "assets_unchanged": true,
+    "status": {
+      "firmware": "esp32c3-oled-native",
+      "network": "client",
+      "audio": false,
+      "format": "stopped",
+      "sample_rate": 0,
+      "channels": 0,
+      "bits_per_sample": 0,
+      "pcm_sample_rate": 0,
+      "pcm_channels": 0,
+      "format_is_pcm": false,
+      "channels_are_core": false,
+      "rssi": -69
+    }
+  }
+}

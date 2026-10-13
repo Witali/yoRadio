@@ -125,6 +125,7 @@ set(NATIVE_SRCS
   "web_pages_bridge.cpp"
   "web_service.c"
   "web_ota.c"
+  "web_upload.c"
   "websocket_service.c")
 
 if(CONFIG_YORADIO_NETWORK_HEAP_PROFILE)
@@ -272,6 +273,12 @@ idf_component_register(
 
 yoradio_aac_profile()
 yoradio_vorbis_repair()
+if(CONFIG_YORADIO_SHARED_DECODER_ARENA)
+  target_sources(${COMPONENT_LIB} PRIVATE "decoder_arena.c")
+  target_link_options(${COMPONENT_LIB} INTERFACE
+    "-Wl,--wrap=malloc" "-Wl,--wrap=calloc" "-Wl,--wrap=realloc"
+    "-Wl,--wrap=free" "-Wl,--wrap=heap_caps_get_allocated_size")
+endif()
 if(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER)
   target_sources(${COMPONENT_LIB} PRIVATE "adaptive_input.c")
 endif()
@@ -314,8 +321,13 @@ if(CONFIG_YORADIO_HEAP_FRAGMENT_PROBE)
 endif()
 if(CONFIG_YORADIO_RX_BUFFER_DIAGNOSTICS)
   target_sources(${COMPONENT_LIB} PRIVATE "rx_buffer_diagnostic.c")
-  target_link_options(${COMPONENT_LIB} INTERFACE
-    "-Wl,--wrap=esp_pbuf_allocate" "-Wl,--wrap=esp_netif_free_rx_buffer")
+  if(CONFIG_LWIP_L2_TO_L3_COPY)
+    target_link_options(${COMPONENT_LIB} INTERFACE
+      "-Wl,--wrap=wlanif_input" "-Wl,--wrap=pbuf_alloc" "-Wl,--wrap=mem_free")
+  else()
+    target_link_options(${COMPONENT_LIB} INTERFACE
+      "-Wl,--wrap=esp_pbuf_allocate" "-Wl,--wrap=esp_netif_free_rx_buffer")
+  endif()
 endif()
 if(CONFIG_YORADIO_DIRECT_DMA_PCM AND NOT CONFIG_YORADIO_QEMU)
   # The generator uses the installed driver's typed DMA state. Refuse an
@@ -340,6 +352,20 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP_IDF_NATIVE=1)
 if(YORADIO_CODEC_BENCHMARK)
   target_compile_definitions(${COMPONENT_LIB} PRIVATE
     YORADIO_CODEC_BENCHMARK=1)
+endif()
+
+# Capture the real decoder -> PCM queue -> output-task path without a device.
+# No test hooks are linked into ordinary QEMU or hardware firmware.
+if(YORADIO_QEMU_PIPELINE_PCM_TEST)
+  if(NOT CONFIG_YORADIO_QEMU OR NOT YORADIO_CODEC_BENCHMARK OR CONFIG_YORADIO_DIRECT_DMA_PCM)
+    message(FATAL_ERROR "Pipeline PCM capture requires QEMU, codec benchmark and queued PCM")
+  endif()
+  target_sources(${COMPONENT_LIB} PRIVATE
+    "${YORADIO_ROOT}/../tests/native/qemu_pipeline_pcm_capture.c")
+  foreach(symbol native_audio_output_init native_audio_output_configure
+      native_audio_output_write_pcm native_audio_output_flush_pcm native_state_set_audio)
+    target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${symbol}")
+  endforeach()
 endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
 

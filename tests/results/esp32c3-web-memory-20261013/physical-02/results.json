@@ -1,0 +1,1585 @@
+{
+  "controller_sha256": "4bb56ab296e9358704a98bce57332c6f7d864cd28e7980135cf8cccd4950be31",
+  "initial": {
+    "version": "idf61-production-prefill1000",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "73da8e2146c5b3691bcfc7a8fb46b34109e74099eac221df2b66e05a62b95245"
+  },
+  "initial_status": {
+    "firmware": "esp32c3-oled-native",
+    "network": "client",
+    "audio": false,
+    "format": "stopped",
+    "sample_rate": 0,
+    "channels": 0,
+    "bits_per_sample": 0,
+    "pcm_sample_rate": 0,
+    "pcm_channels": 0,
+    "format_is_pcm": false,
+    "channels_are_core": false,
+    "rssi": -75
+  },
+  "images": {
+    "baseline": {
+      "app_elf_sha256": "d583ef1b8b51686498a7b2bc3445445d5f2779f14f0a65f5f644e68489407a52",
+      "sha256": "e526eb7dc072fe58c61d5424942f20933b9e8288d948574f6833eb38ab43e211",
+      "bytes": 1456144
+    },
+    "candidate": {
+      "app_elf_sha256": "613d5d04ba8b3e48d87b61b59120a10a68839961f42daef2ec3f25c9fd9c4ef6",
+      "sha256": "fd4dd06a57aa9d388394d678132b97f0fde7b4e1a4ae9fd16bf5fcc1e0286fef",
+      "bytes": 1458672
+    },
+    "restore": {
+      "app_elf_sha256": "73da8e2146c5b3691bcfc7a8fb46b34109e74099eac221df2b66e05a62b95245",
+      "sha256": "8f086f439e00d9e4baf4fe603b1b64935c7ddd188bd6f5ea380a7202075bd664",
+      "bytes": 1455936
+    }
+  },
+  "cases": [
+    {
+      "name": "baseline:parallel-downloads",
+      "before": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 7702,
+        "reset_reason": 3,
+        "heap": 121852,
+        "largest": 110592,
+        "minimum_heap": 111528,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 260,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "requests": [
+          {
+            "bytes": 4754,
+            "seconds": 0.599514999998064
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.5643507999993744
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.5600276000004669
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.09614789999977802
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.09233789999780129
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.057529300000169314
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.07333440000002156
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.07701410000299802
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.06505049999759649
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.4724266999983229
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.464635599997564
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.08228039999812609
+          }
+        ],
+        "all_exact": true
+      },
+      "result": "PASS",
+      "seconds": 1.1950804000007338,
+      "after": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 8981,
+        "reset_reason": 3,
+        "heap": 128392,
+        "largest": 110592,
+        "minimum_heap": 91528,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 379,
+          "write_errors": 0
+        }
+      }
+    },
+    {
+      "name": "baseline:playlist-57904",
+      "before": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 9071,
+        "reset_reason": 3,
+        "heap": 128392,
+        "largest": 110592,
+        "minimum_heap": 91528,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 388,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "payload_bytes": 57904,
+        "request_bytes": 58036,
+        "http": 500,
+        "exact": false,
+        "accepted": false
+      },
+      "result": "FAIL",
+      "seconds": 2.092211600000155,
+      "after": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 11340,
+        "reset_reason": 3,
+        "heap": 139884,
+        "largest": 110592,
+        "minimum_heap": 56356,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 579,
+          "write_errors": 0
+        }
+      }
+    },
+    {
+      "name": "baseline:playlist-65536",
+      "before": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 11416,
+        "reset_reason": 3,
+        "heap": 139884,
+        "largest": 110592,
+        "minimum_heap": 56356,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 586,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "payload_bytes": 65536,
+        "request_bytes": 65668,
+        "http": 500,
+        "exact": false,
+        "accepted": false
+      },
+      "result": "FAIL",
+      "seconds": 1.2917405999978655,
+      "after": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 12772,
+        "reset_reason": 3,
+        "heap": 139884,
+        "largest": 110592,
+        "minimum_heap": 50928,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 700,
+          "write_errors": 0
+        }
+      }
+    },
+    {
+      "name": "baseline:playlist-96000",
+      "before": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 12849,
+        "reset_reason": 3,
+        "heap": 139884,
+        "largest": 110592,
+        "minimum_heap": 50928,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 707,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "payload_bytes": 96000,
+        "request_bytes": 96132,
+        "http": 500,
+        "exact": false,
+        "accepted": false
+      },
+      "result": "FAIL",
+      "seconds": 1.49396699999852,
+      "after": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 14626,
+        "reset_reason": 3,
+        "heap": 139884,
+        "largest": 110592,
+        "minimum_heap": 22256,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 862,
+          "write_errors": 0
+        }
+      }
+    },
+    {
+      "name": "baseline:playback-downloads:he-48000-stereo",
+      "before": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 14772,
+        "reset_reason": 3,
+        "heap": 139884,
+        "largest": 110592,
+        "minimum_heap": 22256,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 875,
+          "write_errors": 0
+        }
+      },
+      "playback_window": {
+        "before": {
+          "schema": 1,
+          "boot_id": "308783b70c18c072",
+          "uptime_ms": 16874,
+          "reset_reason": 3,
+          "heap": 40088,
+          "largest": 21504,
+          "minimum_heap": 22256,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 1008,
+            "write_errors": 0
+          }
+        },
+        "after": {
+          "schema": 1,
+          "boot_id": "308783b70c18c072",
+          "uptime_ms": 22453,
+          "reset_reason": 3,
+          "heap": 39228,
+          "largest": 21504,
+          "minimum_heap": 12212,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 1008,
+            "write_errors": 0
+          }
+        },
+        "status": {
+          "firmware": "esp32c3-oled-native",
+          "network": "client",
+          "audio": true,
+          "format": "HE-AAC 48 kHz stereo",
+          "sample_rate": 48000,
+          "channels": 2,
+          "bits_per_sample": 16,
+          "pcm_sample_rate": 48000,
+          "pcm_channels": 2,
+          "format_is_pcm": false,
+          "channels_are_core": false,
+          "rssi": -64
+        }
+      },
+      "measurement": {
+        "before": {
+          "schema": 1,
+          "boot_id": "308783b70c18c072",
+          "uptime_ms": 16874,
+          "reset_reason": 3,
+          "heap": 40088,
+          "largest": 21504,
+          "minimum_heap": 22256,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 1008,
+            "write_errors": 0
+          }
+        },
+        "after": {
+          "schema": 1,
+          "boot_id": "308783b70c18c072",
+          "uptime_ms": 22453,
+          "reset_reason": 3,
+          "heap": 39228,
+          "largest": 21504,
+          "minimum_heap": 12212,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 1008,
+            "write_errors": 0
+          }
+        },
+        "requests": [
+          {
+            "bytes": 4754,
+            "seconds": 0.08948189999864553
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.11813320000146632
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.13090139999985695
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.11771009999938542
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.12443649999841
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.15229189999809023
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.11480640000081621
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.13157739999951445
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.09959689999959664
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.11092650000136928
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.1092891000007512
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.1078975000018545
+          }
+        ],
+        "all_exact": true
+      },
+      "result": "PASS",
+      "seconds": 7.907603600000584,
+      "after": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 22759,
+        "reset_reason": 3,
+        "heap": 139868,
+        "largest": 110592,
+        "minimum_heap": 12212,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1011,
+          "write_errors": 0
+        }
+      }
+    },
+    {
+      "name": "baseline:playback-downloads:flac-level8",
+      "before": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 22953,
+        "reset_reason": 3,
+        "heap": 139872,
+        "largest": 110592,
+        "minimum_heap": 12212,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1029,
+          "write_errors": 0
+        }
+      },
+      "result": "FAIL",
+      "errors": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "check": "Fixture did not start",
+      "seconds": 15.509111399998801,
+      "after": {
+        "schema": 1,
+        "boot_id": "308783b70c18c072",
+        "uptime_ms": 38564,
+        "reset_reason": 3,
+        "heap": 139872,
+        "largest": 110592,
+        "minimum_heap": 12212,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 2493,
+          "write_errors": 0
+        }
+      }
+    },
+    {
+      "name": "candidate:parallel-downloads",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 7788,
+        "reset_reason": 3,
+        "heap": 123052,
+        "largest": 110592,
+        "minimum_heap": 113004,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 278,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "requests": [
+          {
+            "bytes": 4754,
+            "seconds": 0.37978210000073886
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.3851700000013807
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.41315860000031535
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.048637699997925665
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.07206690000020899
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.05854209999961313
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.08264620000045397
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.07335799999782466
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.07081990000006044
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.04637630000070203
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.07095430000117631
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.05360379999910947
+          }
+        ],
+        "all_exact": true
+      },
+      "result": "PASS",
+      "seconds": 0.6023180000011052,
+      "after": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 8470,
+        "reset_reason": 3,
+        "heap": 128440,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 342,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 488,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 5856
+      }
+    },
+    {
+      "name": "candidate:playlist-57904",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 8626,
+        "reset_reason": 3,
+        "heap": 139828,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 357,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "payload_bytes": 57904,
+        "request_bytes": 58036,
+        "http": 200,
+        "exact": true,
+        "accepted": true
+      },
+      "result": "PASS",
+      "seconds": 3.132164799997554,
+      "after": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 12897,
+        "reset_reason": 3,
+        "heap": 139820,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 719,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 3296
+      }
+    },
+    {
+      "name": "candidate:playlist-65536",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 13063,
+        "reset_reason": 3,
+        "heap": 139820,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 735,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "payload_bytes": 65536,
+        "request_bytes": 65668,
+        "http": 200,
+        "exact": true,
+        "accepted": true
+      },
+      "result": "PASS",
+      "seconds": 21.040487700000085,
+      "after": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 35618,
+        "reset_reason": 3,
+        "heap": 139848,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 2806,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 3296
+      }
+    },
+    {
+      "name": "candidate:playlist-96000",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 36048,
+        "reset_reason": 3,
+        "heap": 139740,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 2847,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "payload_bytes": 96000,
+        "request_bytes": 96132,
+        "http": 200,
+        "exact": true,
+        "accepted": true
+      },
+      "result": "PASS",
+      "seconds": 4.8322404000027745,
+      "after": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 41075,
+        "reset_reason": 3,
+        "heap": 139848,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 3269,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 3296
+      }
+    },
+    {
+      "name": "candidate:truncated",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 41368,
+        "reset_reason": 3,
+        "heap": 139848,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 3296,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "http": 400,
+        "original_files_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 2.030020300000615,
+      "after": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 43464,
+        "reset_reason": 3,
+        "heap": 139840,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 3493,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 3296
+      }
+    },
+    {
+      "name": "candidate:disconnect",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 43622,
+        "reset_reason": 3,
+        "heap": 139840,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 3508,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "http": null,
+        "original_files_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 2.433392400002049,
+      "after": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 46156,
+        "reset_reason": 3,
+        "heap": 139840,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 3745,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 3296
+      }
+    },
+    {
+      "name": "candidate:oversized",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 46315,
+        "reset_reason": 3,
+        "heap": 139732,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 3760,
+          "write_errors": 0
+        }
+      },
+      "result": "FAIL",
+      "errors": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "check": "Malformed upload was not rejected",
+      "seconds": 6.032438400001411,
+      "after": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 52635,
+        "reset_reason": 3,
+        "heap": 139840,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 4353,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 3296
+      }
+    },
+    {
+      "name": "candidate:duplicate-asset",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 52941,
+        "reset_reason": 3,
+        "heap": 139840,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 4381,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "http": 400,
+        "original_files_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 1.3503812000017206,
+      "after": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 54358,
+        "reset_reason": 3,
+        "heap": 139844,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 4514,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 3296
+      }
+    },
+    {
+      "name": "candidate:invalid-wifi-form",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 54571,
+        "reset_reason": 3,
+        "heap": 139840,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 4534,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "http": 400,
+        "original_files_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 1.3718197000016517,
+      "after": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 56002,
+        "reset_reason": 3,
+        "heap": 139848,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 4668,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 3296
+      }
+    },
+    {
+      "name": "candidate:board-multipart",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 56149,
+        "reset_reason": 3,
+        "heap": 139848,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 4682,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 1.9997602999974333,
+      "after": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 58223,
+        "reset_reason": 3,
+        "heap": 139848,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 4858,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 3296
+      }
+    },
+    {
+      "name": "candidate:wifi-upload-reboot",
+      "before": {
+        "schema": 1,
+        "boot_id": "d09ec57880d8a09d",
+        "uptime_ms": 58362,
+        "reset_reason": 3,
+        "heap": 139848,
+        "largest": 110592,
+        "minimum_heap": 105332,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 4871,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 10.085888200002955,
+      "after": {
+        "schema": 1,
+        "boot_id": "b28c9c47ebfeb49e",
+        "uptime_ms": 8772,
+        "reset_reason": 3,
+        "heap": 139824,
+        "largest": 110592,
+        "minimum_heap": 107236,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 360,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 472,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 5472
+      }
+    },
+    {
+      "name": "candidate:websocket-reboot",
+      "before": {
+        "schema": 1,
+        "boot_id": "b28c9c47ebfeb49e",
+        "uptime_ms": 8965,
+        "reset_reason": 3,
+        "heap": 139824,
+        "largest": 110592,
+        "minimum_heap": 107236,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 378,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 9.369201699999394,
+      "after": {
+        "schema": 1,
+        "boot_id": "c10cc6b67ad49f47",
+        "uptime_ms": 8652,
+        "reset_reason": 3,
+        "heap": 139788,
+        "largest": 106496,
+        "minimum_heap": 106156,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 351,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 472,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 5472
+      }
+    },
+    {
+      "name": "candidate:corrupt-ota",
+      "before": {
+        "schema": 1,
+        "boot_id": "c10cc6b67ad49f47",
+        "uptime_ms": 8852,
+        "reset_reason": 3,
+        "heap": 139800,
+        "largest": 106496,
+        "minimum_heap": 106156,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 370,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 13.933915699999488,
+      "after": {
+        "schema": 1,
+        "boot_id": "c10cc6b67ad49f47",
+        "uptime_ms": 22883,
+        "reset_reason": 3,
+        "heap": 139800,
+        "largest": 106496,
+        "minimum_heap": 106156,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1300,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 472,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 5328
+      }
+    },
+    {
+      "name": "candidate:ota-roundtrip",
+      "before": {
+        "schema": 1,
+        "boot_id": "c10cc6b67ad49f47",
+        "uptime_ms": 23120,
+        "reset_reason": 3,
+        "heap": 139788,
+        "largest": 106496,
+        "minimum_heap": 106156,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1322,
+          "write_errors": 0
+        }
+      },
+      "measurement": {
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "result": "PASS",
+      "seconds": 23.16475619999983,
+      "after": {
+        "schema": 1,
+        "boot_id": "6d7dc20c47578685",
+        "uptime_ms": 8613,
+        "reset_reason": 3,
+        "heap": 139796,
+        "largest": 110592,
+        "minimum_heap": 106512,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 347,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 5472
+      }
+    },
+    {
+      "name": "candidate:playback-downloads:he-48000-stereo",
+      "before": {
+        "schema": 1,
+        "boot_id": "6d7dc20c47578685",
+        "uptime_ms": 8868,
+        "reset_reason": 3,
+        "heap": 139800,
+        "largest": 110592,
+        "minimum_heap": 106512,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 371,
+          "write_errors": 0
+        }
+      },
+      "playback_window": {
+        "before": {
+          "schema": 1,
+          "boot_id": "6d7dc20c47578685",
+          "uptime_ms": 10896,
+          "reset_reason": 3,
+          "heap": 37932,
+          "largest": 21504,
+          "minimum_heap": 28704,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 517,
+            "write_errors": 0
+          }
+        },
+        "after": {
+          "schema": 1,
+          "boot_id": "6d7dc20c47578685",
+          "uptime_ms": 16372,
+          "reset_reason": 3,
+          "heap": 39076,
+          "largest": 21504,
+          "minimum_heap": 17668,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 517,
+            "write_errors": 0
+          }
+        },
+        "status": {
+          "firmware": "esp32c3-oled-native",
+          "network": "client",
+          "audio": true,
+          "format": "HE-AAC 48 kHz stereo",
+          "sample_rate": 48000,
+          "channels": 2,
+          "bits_per_sample": 16,
+          "pcm_sample_rate": 48000,
+          "pcm_channels": 2,
+          "format_is_pcm": false,
+          "channels_are_core": false,
+          "rssi": -78
+        }
+      },
+      "measurement": {
+        "before": {
+          "schema": 1,
+          "boot_id": "6d7dc20c47578685",
+          "uptime_ms": 10896,
+          "reset_reason": 3,
+          "heap": 37932,
+          "largest": 21504,
+          "minimum_heap": 28704,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 517,
+            "write_errors": 0
+          }
+        },
+        "after": {
+          "schema": 1,
+          "boot_id": "6d7dc20c47578685",
+          "uptime_ms": 16372,
+          "reset_reason": 3,
+          "heap": 39076,
+          "largest": 21504,
+          "minimum_heap": 17668,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 517,
+            "write_errors": 0
+          }
+        },
+        "requests": [
+          {
+            "bytes": 4754,
+            "seconds": 0.057536599997547455
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.1434320000007574
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.053019200000562705
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.07948039999973844
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.165332299999136
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.07745040000008885
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.14606650000132504
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.096868299999187
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.11872809999840683
+          },
+          {
+            "bytes": 4754,
+            "seconds": 0.1094370999999228
+          },
+          {
+            "bytes": 7039,
+            "seconds": 0.08446230000117794
+          },
+          {
+            "bytes": 3117,
+            "seconds": 0.08377779999864288
+          }
+        ],
+        "all_exact": true
+      },
+      "result": "PASS",
+      "seconds": 7.6954996999993455,
+      "after": {
+        "schema": 1,
+        "boot_id": "6d7dc20c47578685",
+        "uptime_ms": 16735,
+        "reset_reason": 3,
+        "heap": 139788,
+        "largest": 110592,
+        "minimum_heap": 17668,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 519,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 5472
+      }
+    },
+    {
+      "name": "candidate:playback-downloads:flac-level8",
+      "before": {
+        "schema": 1,
+        "boot_id": "6d7dc20c47578685",
+        "uptime_ms": 17005,
+        "reset_reason": 3,
+        "heap": 139704,
+        "largest": 110592,
+        "minimum_heap": 17668,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 545,
+          "write_errors": 0
+        }
+      },
+      "result": "FAIL",
+      "errors": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "check": "Fixture did not start",
+      "seconds": 15.77000709999993,
+      "after": {
+        "schema": 1,
+        "boot_id": "6d7dc20c47578685",
+        "uptime_ms": 32852,
+        "reset_reason": 3,
+        "heap": 139792,
+        "largest": 110592,
+        "minimum_heap": 17668,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 2030,
+          "write_errors": 0
+        }
+      },
+      "web_memory": {
+        "download_chunk_bytes": 2048,
+        "download_workers": 2,
+        "static_stack_bytes_each": 4096,
+        "static_stack_free_min": 424,
+        "http_stack_bytes": 8192,
+        "http_stack_free_min": 5472
+      }
+    }
+  ],
+  "baseline_idle": {
+    "schema": 1,
+    "boot_id": "308783b70c18c072",
+    "uptime_ms": 7589,
+    "reset_reason": 3,
+    "heap": 124504,
+    "largest": 110592,
+    "minimum_heap": 111528,
+    "tasks": 16,
+    "allocation_failures": 0,
+    "task_watchdog_events": 0,
+    "output": {
+      "available": true,
+      "completion_queue_drops": 249,
+      "write_errors": 0
+    }
+  },
+  "candidate_idle": {
+    "schema": 1,
+    "boot_id": "d09ec57880d8a09d",
+    "uptime_ms": 7670,
+    "reset_reason": 3,
+    "heap": 123164,
+    "largest": 110592,
+    "minimum_heap": 113004,
+    "tasks": 16,
+    "allocation_failures": 0,
+    "task_watchdog_events": 0,
+    "output": {
+      "available": true,
+      "completion_queue_drops": 267,
+      "write_errors": 0
+    }
+  },
+  "web_memory": {
+    "download_chunk_bytes": 2048,
+    "download_workers": 2,
+    "static_stack_bytes_each": 4096,
+    "static_stack_free_min": 424,
+    "http_stack_bytes": 8192,
+    "http_stack_free_min": 5472
+  },
+  "web_memory_after_playback": {
+    "download_chunk_bytes": 2048,
+    "download_workers": 2,
+    "static_stack_bytes_each": 4096,
+    "static_stack_free_min": 424,
+    "http_stack_bytes": 8192,
+    "http_stack_free_min": 5472
+  },
+  "restoration": {
+    "image": {
+      "version": "idf61-production-prefill1000",
+      "partition": "app1",
+      "max_size": 1900544,
+      "app_elf_sha256": "73da8e2146c5b3691bcfc7a8fb46b34109e74099eac221df2b66e05a62b95245"
+    },
+    "wifi_unchanged": true,
+    "playlist_unchanged": true,
+    "settings_unchanged": true,
+    "assets_unchanged": true,
+    "status": {
+      "firmware": "esp32c3-oled-native",
+      "network": "client",
+      "audio": false,
+      "format": "stopped",
+      "sample_rate": 0,
+      "channels": 0,
+      "bits_per_sample": 0,
+      "pcm_sample_rate": 0,
+      "pcm_channels": 0,
+      "format_is_pcm": false,
+      "channels_are_core": false,
+      "rssi": -63
+    }
+  }
+}

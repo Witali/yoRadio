@@ -1,0 +1,28 @@
+
+idf/esp32c3-oled-native/build-idf-6.1-r9a97-startup-confirm/yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+40381340 <record_allocation_failure>:
+40381340:	1101                	addi	sp,sp,-32
+40381342:	cc22                	sw	s0,24(sp)
+40381344:	ce06                	sw	ra,28(sp)
+40381346:	842a                	mv	s0,a0
+40381348:	c62e                	sw	a1,12(sp)
+4038134a:	451060ef          	jal	40387f9a <xPortSetInterruptMaskFromISR>
+4038134e:	45b2                	lw	a1,12(sp)
+40381350:	3fc8d7b7          	lui	a5,0x3fc8d
+40381354:	f687a823          	sw	s0,-144(a5) # 3fc8cf70 <s_allocation_size>
+40381358:	3fc8d7b7          	lui	a5,0x3fc8d
+4038135c:	f6b7a623          	sw	a1,-148(a5) # 3fc8cf6c <s_allocation_caps>
+40381360:	3fc8d737          	lui	a4,0x3fc8d
+40381364:	f7472783          	lw	a5,-140(a4) # 3fc8cf74 <s_allocation_failures>
+40381368:	4462                	lw	s0,24(sp)
+4038136a:	40f2                	lw	ra,28(sp)
+4038136c:	0785                	addi	a5,a5,1
+4038136e:	f6f72a23          	sw	a5,-140(a4)
+40381372:	6105                	addi	sp,sp,32
+40381374:	3110606f          	j	40387e84 <vPortClearInterruptMaskFromISR>
+
+Disassembly of section .flash.text:

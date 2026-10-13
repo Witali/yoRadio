@@ -1,0 +1,66 @@
+{
+  "review": "PASS",
+  "ota": {
+    "cases": 15,
+    "passed": 15,
+    "failures": []
+  },
+  "soak": {
+    "checks": {
+      "transport": {
+        "result": "PASS",
+        "errors": []
+      },
+      "format": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 506,
+          "rate": 44100,
+          "channels": 2
+        }
+      },
+      "output": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 506,
+          "elapsed_ms": 584367,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        }
+      },
+      "memory": {
+        "result": "FAIL",
+        "reason": "In-playback memory below existing budget"
+      }
+    },
+    "health": {
+      "samples": 506,
+      "boot_id": "a8702fd4f0ae30b7",
+      "minimum_heap": 24752,
+      "minimum_largest": 7168,
+      "allocation_failures": 0,
+      "task_watchdog_events": 0
+    },
+    "metrics": {
+      "heap": {
+        "minimum": 24752,
+        "median": 28168.0,
+        "first": 28116,
+        "last": 27608
+      },
+      "largest": {
+        "minimum": 7168,
+        "median": 14336.0,
+        "first": 13824,
+        "last": 12288
+      }
+    },
+    "response_maximum_ms": 265.07049999963783,
+    "lifetime_heap_low_water": 15420
+  },
+  "recovery": {
+    "result": "PASS",
+    "evidence": null
+  },
+  "restoration": true
+}

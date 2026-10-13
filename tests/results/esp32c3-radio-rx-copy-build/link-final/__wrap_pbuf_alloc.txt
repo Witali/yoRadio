@@ -1,0 +1,88 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-radio-rx-copy\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+42028d10 <__wrap_pbuf_alloc>:
+42028d10:	01422783          	lw	a5,20(tp) # 14 <copy_scope>
+42028d14:	872e                	mv	a4,a1
+42028d16:	cbe1                	beqz	a5,42028de6 <__wrap_pbuf_alloc+0xd6>
+42028d18:	0047c683          	lbu	a3,4(a5)
+42028d1c:	c6e9                	beqz	a3,42028de6 <__wrap_pbuf_alloc+0xd6>
+42028d1e:	e561                	bnez	a0,42028de6 <__wrap_pbuf_alloc+0xd6>
+42028d20:	d8060693          	addi	a3,a2,-640
+42028d24:	e2e9                	bnez	a3,42028de6 <__wrap_pbuf_alloc+0xd6>
+42028d26:	1101                	addi	sp,sp,-32
+42028d28:	ce06                	sw	ra,28(sp)
+42028d2a:	cc22                	sw	s0,24(sp)
+42028d2c:	00078223          	sb	zero,4(a5)
+42028d30:	28000613          	li	a2,640
+42028d34:	2ee550ef          	jal	4207e022 <pbuf_alloc>
+42028d38:	c15d                	beqz	a0,42028dde <__wrap_pbuf_alloc+0xce>
+42028d3a:	415c                	lw	a5,4(a0)
+42028d3c:	c62a                	sw	a0,12(sp)
+42028d3e:	843e                	mv	s0,a5
+42028d40:	fe35f097          	auipc	ra,0xfe35f
+42028d44:	2ce080e7          	jalr	718(ra) # 4038800e <vPortEnterCritical>
+42028d48:	3fc9a7b7          	lui	a5,0x3fc9a
+42028d4c:	0407a883          	lw	a7,64(a5) # 3fc9a040 <allocations>
+42028d50:	3fc96837          	lui	a6,0x3fc96
+42028d54:	15480813          	addi	a6,a6,340 # 3fc96154 <owners>
+42028d58:	0885                	addi	a7,a7,1
+42028d5a:	0517a023          	sw	a7,64(a5)
+42028d5e:	4532                	lw	a0,12(sp)
+42028d60:	87c2                	mv	a5,a6
+42028d62:	00880713          	addi	a4,a6,8
+42028d66:	4681                	li	a3,0
+42028d68:	02000593          	li	a1,32
+42028d6c:	a021                	j	42028d74 <__wrap_pbuf_alloc+0x64>
+42028d6e:	0685                	addi	a3,a3,1
+42028d70:	00b68563          	beq	a3,a1,42028d7a <__wrap_pbuf_alloc+0x6a>
+42028d74:	4310                	lw	a2,0(a4)
+42028d76:	0741                	addi	a4,a4,16
+42028d78:	fa7d                	bnez	a2,42028d6e <__wrap_pbuf_alloc+0x5e>
+42028d7a:	20080613          	addi	a2,a6,512
+42028d7e:	a021                	j	42028d86 <__wrap_pbuf_alloc+0x76>
+42028d80:	07c1                	addi	a5,a5,16
+42028d82:	00c78c63          	beq	a5,a2,42028d9a <__wrap_pbuf_alloc+0x8a>
+42028d86:	4798                	lw	a4,8(a5)
+42028d88:	df65                	beqz	a4,42028d80 <__wrap_pbuf_alloc+0x70>
+42028d8a:	4398                	lw	a4,0(a5)
+42028d8c:	fea71ae3          	bne	a4,a0,42028d80 <__wrap_pbuf_alloc+0x70>
+42028d90:	07c1                	addi	a5,a5,16
+42028d92:	02000693          	li	a3,32
+42028d96:	fec798e3          	bne	a5,a2,42028d86 <__wrap_pbuf_alloc+0x76>
+42028d9a:	47fd                	li	a5,31
+42028d9c:	04d7e863          	bltu	a5,a3,42028dec <__wrap_pbuf_alloc+0xdc>
+42028da0:	3fc9a737          	lui	a4,0x3fc9a
+42028da4:	03472783          	lw	a5,52(a4) # 3fc9a034 <live>
+42028da8:	3fc9a637          	lui	a2,0x3fc9a
+42028dac:	0692                	slli	a3,a3,0x4
+42028dae:	03062583          	lw	a1,48(a2) # 3fc9a030 <peak>
+42028db2:	9836                	add	a6,a6,a3
+42028db4:	0785                	addi	a5,a5,1
+42028db6:	00a82023          	sw	a0,0(a6)
+42028dba:	00882223          	sw	s0,4(a6)
+42028dbe:	00a82423          	sw	a0,8(a6)
+42028dc2:	01182623          	sw	a7,12(a6)
+42028dc6:	02f72a23          	sw	a5,52(a4)
+42028dca:	00f5f463          	bgeu	a1,a5,42028dd2 <__wrap_pbuf_alloc+0xc2>
+42028dce:	02f62823          	sw	a5,48(a2)
+42028dd2:	c62a                	sw	a0,12(sp)
+42028dd4:	fe35f097          	auipc	ra,0xfe35f
+42028dd8:	276080e7          	jalr	630(ra) # 4038804a <vPortExitCritical>
+42028ddc:	4532                	lw	a0,12(sp)
+42028dde:	40f2                	lw	ra,28(sp)
+42028de0:	4462                	lw	s0,24(sp)
+42028de2:	6105                	addi	sp,sp,32
+42028de4:	8082                	ret
+42028de6:	85ba                	mv	a1,a4
+42028de8:	23a5506f          	j	4207e022 <pbuf_alloc>
+42028dec:	3fc9a737          	lui	a4,0x3fc9a
+42028df0:	03872783          	lw	a5,56(a4) # 3fc9a038 <lost>
+42028df4:	0785                	addi	a5,a5,1
+42028df6:	02f72c23          	sw	a5,56(a4)
+42028dfa:	bfe1                	j	42028dd2 <__wrap_pbuf_alloc+0xc2>

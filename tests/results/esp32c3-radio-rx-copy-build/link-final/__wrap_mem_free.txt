@@ -1,0 +1,54 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-radio-rx-copy\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+42028dfc <__wrap_mem_free>:
+42028dfc:	1101                	addi	sp,sp,-32
+42028dfe:	c62a                	sw	a0,12(sp)
+42028e00:	ce06                	sw	ra,28(sp)
+42028e02:	fe35f097          	auipc	ra,0xfe35f
+42028e06:	20c080e7          	jalr	524(ra) # 4038800e <vPortEnterCritical>
+42028e0a:	3fc965b7          	lui	a1,0x3fc96
+42028e0e:	15458593          	addi	a1,a1,340 # 3fc96154 <owners>
+42028e12:	4532                	lw	a0,12(sp)
+42028e14:	87ae                	mv	a5,a1
+42028e16:	4701                	li	a4,0
+42028e18:	02000613          	li	a2,32
+42028e1c:	a029                	j	42028e26 <__wrap_mem_free+0x2a>
+42028e1e:	0705                	addi	a4,a4,1
+42028e20:	07c1                	addi	a5,a5,16
+42028e22:	04c70763          	beq	a4,a2,42028e70 <__wrap_mem_free+0x74>
+42028e26:	4794                	lw	a3,8(a5)
+42028e28:	dafd                	beqz	a3,42028e1e <__wrap_mem_free+0x22>
+42028e2a:	4394                	lw	a3,0(a5)
+42028e2c:	fed519e3          	bne	a0,a3,42028e1e <__wrap_mem_free+0x22>
+42028e30:	3fc9a837          	lui	a6,0x3fc9a
+42028e34:	3fc9a637          	lui	a2,0x3fc9a
+42028e38:	03482683          	lw	a3,52(a6) # 3fc9a034 <live>
+42028e3c:	03c62783          	lw	a5,60(a2) # 3fc9a03c <releases>
+42028e40:	0712                	slli	a4,a4,0x4
+42028e42:	95ba                	add	a1,a1,a4
+42028e44:	16fd                	addi	a3,a3,-1
+42028e46:	0785                	addi	a5,a5,1
+42028e48:	0005a023          	sw	zero,0(a1)
+42028e4c:	0005a223          	sw	zero,4(a1)
+42028e50:	0005a423          	sw	zero,8(a1)
+42028e54:	0005a623          	sw	zero,12(a1)
+42028e58:	02d82a23          	sw	a3,52(a6)
+42028e5c:	02f62e23          	sw	a5,60(a2)
+42028e60:	1ca540ef          	jal	4207d02a <mem_free>
+42028e64:	40f2                	lw	ra,28(sp)
+42028e66:	6105                	addi	sp,sp,32
+42028e68:	fe35f317          	auipc	t1,0xfe35f
+42028e6c:	1e230067          	jr	482(t1) # 4038804a <vPortExitCritical>
+42028e70:	c62a                	sw	a0,12(sp)
+42028e72:	fe35f097          	auipc	ra,0xfe35f
+42028e76:	1d8080e7          	jalr	472(ra) # 4038804a <vPortExitCritical>
+42028e7a:	4532                	lw	a0,12(sp)
+42028e7c:	40f2                	lw	ra,28(sp)
+42028e7e:	6105                	addi	sp,sp,32
+42028e80:	1aa5406f          	j	4207d02a <mem_free>

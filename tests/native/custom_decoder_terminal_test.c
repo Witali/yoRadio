@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdatomic.h>
+#include "audio_completion.h"
 
 #define CONFIG_YORADIO_FLAC_DECODER_CUSTOM 1
 #define YORADIO_CUSTOM_LEGACY_DECODER 1
@@ -99,7 +100,7 @@ static void process(native_codec_t codec, uint32_t generation, uint32_t failed_g
 int main(void) {
     unsigned cases=0;
     for(int codec=NATIVE_CODEC_FLAC;codec<=NATIVE_CODEC_MP3;++codec)
-    for(unsigned mode=0;mode<5;++mode) {
+    for(unsigned mode=0;mode<6;++mode) {
         queued_size=returned=errors=feed_calls=0;feed_result=0;arena_busy=false;
         atomic_store(&s_generation,4);
         custom_flac_decoder_t *handle=make_decoder();
@@ -108,10 +109,11 @@ int main(void) {
         // normal data, EOF, transport-end, decode failure, and cancellation
         // during a callback (next generation owns the subsequent cleanup).
         if(mode==2)packet.end_of_stream=2;
-        if(mode>=3) { feed_result=-5;packet.end_of_stream=0; }
+        if(mode==3 || mode==4) { feed_result=-5;packet.end_of_stream=0; }
         if(mode==4)atomic_store(&s_generation,5);
+        if(mode==5)packet.end_of_stream=AUDIO_DRAIN_CODEC;
         process(codec,4,0,&packet,&handle);
-        bool terminal=mode>=1 && mode<=3;
+        bool terminal=(mode>=1 && mode<=3) || mode==5;
         assert(returned==1 && feed_calls==1);
         assert((handle==NULL)==terminal);
         assert(live_decoders==(terminal ? 0U:1U));

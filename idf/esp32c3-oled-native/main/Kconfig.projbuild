@@ -1,5 +1,24 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_SHARED_DECODER_ARENA
+    bool "Reserve one reusable heap for the decoder task (experimental)"
+    default n
+    help
+        Route decoder-task libc allocations into a private coalescing heap.
+        Global codec registration stays on the system heap. Pointer ownership
+        determines free/realloc even from other tasks. Exhaustion fails without
+        falling back to system RAM. Wi-Fi, TLS and DMA keep separate storage.
+        Compare every format, switching, EOF, errors and OTA before enabling.
+
+config YORADIO_SHARED_DECODER_ARENA_BYTES
+    int "Shared decoder arena capacity in bytes"
+    depends on YORADIO_SHARED_DECODER_ARENA
+    range 32768 163840
+    default 98304
+    help
+        Experimental budget including allocator metadata and PCM workspace;
+        96 KiB is a starting point, not a proven maximum for every input.
+
 config YORADIO_TLS_EARLY_MPI_LOCK
     bool "Initialize the TLS hardware MPI mutex at startup (experimental)"
     depends on IDF_TARGET_ESP32C3 && ESP_TLS_USING_MBEDTLS && MBEDTLS_HARDWARE_MPI
@@ -14,6 +33,16 @@ config YORADIO_TLS_EARLY_MPI_LOCK
         codec-only benchmarks do not initialize this otherwise unused lock.
         Keep disabled until fresh-boot TLS, repeated handshakes, codec changes,
         settled memory recovery and the final quiet configuration are checked.
+
+config YORADIO_HTTP_RELEASE_REQUEST_BUFFER
+    bool "Release completed HTTP GET request buffer (experimental)"
+    default n
+    help
+        Free the request-header TX buffer after the stream accepts final GET
+        response headers. Response/TLS buffers retain their owners. A later
+        request allocates the original full TX size again. The generated SDK
+        copy is restricted to an audited revision. Keep disabled until reuse,
+        redirects, allocation failures, all codecs and OTA are qualified.
 
 config YORADIO_TLS_LARGE_BLOCK_RESERVE
     bool "Reserve one large TLS allocation in static RAM (experimental)"
@@ -70,6 +99,30 @@ config YORADIO_ADAPTIVE_INPUT_BUFFER
         complete stream packets, so the effective size differs from the legacy
         ring. This cannot guarantee a contiguous TLS allocation or enough jitter
         tolerance. Keep disabled until all-codec and long-playback tests pass.
+
+config YORADIO_FRAME_ROUTER
+    bool "Route MP3/AAC frame boundaries (experimental)"
+    depends on YORADIO_ADAPTIVE_INPUT_BUFFER
+    default n
+    help
+        Coalesce frame spans into existing input leases and drain the old
+        decoder before changing codec family. Skip inter-frame ID3 tags.
+        No full-frame allocation. Strict boundary mode: recovery after lost
+        alignment is not yet implemented. Free-format MP3
+        falls back to the existing decoder for the rest of the connection.
+        Keep disabled until live-transition and all-codec tests qualify it.
+
+config YORADIO_STREAM_CONFIRM
+    bool "Confirm startup audio with a second frame header (experimental)"
+    depends on YORADIO_FRAME_ROUTER
+    default n
+    help
+        Retain a candidate frame in four existing input packet leases and check
+        its next boundary before selecting MP3/AAC. Replay through a separate
+        128-byte control payload, avoiding a fifth full packet allocation.
+        Requires at least four guaranteed input slots. Bounded startup only;
+        recovery during established playback is not implemented here.
+        Keep disabled until network, cancellation and physical playback tests pass.
 
 config YORADIO_INPUT_MIN_BLOCKS
     int "Minimum compressed-input capacity (1600-byte units)"
@@ -267,7 +320,8 @@ config YORADIO_RX_BUFFER_DIAGNOSTICS
         Track the public netif receive ownership handoff without changing codec
         settings. Bound the table at 32 buffers and report overflow. Match live
         pointers to heap allocation ranges without reading packet contents.
-        Uses about 0.6 KiB static RAM and 1.1 KiB of decoder stack between calls.
+        Uses about 0.6 KiB static RAM and 1.3 KiB of decoder stack between calls.
+        Samples free/largest heap in the same critical section as RX ownership.
         The locked heap walk and USB logs change timing; not a CPU benchmark.
 
 config YORADIO_HEAP_FRAGMENT_PROBE
@@ -350,6 +404,17 @@ config YORADIO_WEB_STATIC_WORKERS
         Number of asynchronous workers that may read SPIFFS and send WebUI
         files in parallel. The main HTTP task remains available for WebSocket
         traffic while static responses are in progress.
+
+config YORADIO_WEB_FILE_CHUNK_BYTES
+    int "WebUI file streaming buffer bytes per worker"
+    range 2048 8192
+    default 2048
+    help
+        Private buffer on each static worker's startup-allocated stack.
+        Two default workers reserve 4 KiB of file buffers in total. Setting
+        4096 reserves 8 KiB total, and increases their stack allocations by
+        4 KiB. No file-sized or per-download payload allocation is needed.
+        Recheck heap and task stack high-water marks before increasing this.
 
 config YORADIO_QEMU
     bool "Build the headless QEMU smoke-test profile"
@@ -701,6 +766,17 @@ config YORADIO_AAC_COMPACT_SBR
         Per-decoder ownership, repaired direct reset and close/reopen support.
         SBR allocation failure is an error, never accepted as core-only PCM.
         Experimental until full-radio memory, CPU and OTA gates are met.
+
+config YORADIO_AAC_COMPACT_EARLY_OWNER
+    bool "Reserve compact SBR owner before AAC core and PCM"
+    depends on YORADIO_AAC_COMPACT_SBR
+    default n
+    help
+        Allocation-order experiment using the selected compact layout size.
+        Transfer the pending block to the SDK on its SBR request; release
+        unused storage after real LC output or decoder destruction. Adds one
+        pointer per native AAC decoder. Does not change DSP or format support.
+        Requires repeated HTTPS, LC/late-SBR, lifetime and PCM qualification.
 
 config YORADIO_AAC_HIGH_HISTORY
     bool "Pack retained high-QMF history"

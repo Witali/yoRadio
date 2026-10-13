@@ -4,7 +4,8 @@
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 
-enum { INPUT_MAX_SLOTS = 16, NO_SLOT = INPUT_MAX_SLOTS };
+enum { INPUT_MAX_SLOTS = 16, CONTROL_SLOT = INPUT_MAX_SLOTS,
+       NO_SLOT = CONTROL_SLOT + 1 };
 typedef enum { ABSENT, ALLOCATING, IDLE, WRITING, READY, READING } slot_state_t;
 typedef struct {
     void *data;
@@ -20,7 +21,13 @@ struct adaptive_input {
     unsigned target, minimum, resident, released, limit;
     unsigned head, tail;
     input_slot_t slots[INPUT_MAX_SLOTS];
+    input_slot_t control;
+    size_t control_capacity;
 };
+
+static input_slot_t *input_slot(adaptive_input_t *input, unsigned index) {
+    return index == CONTROL_SLOT ? &input->control : &input->slots[index];
+}
 
 adaptive_input_stats_t adaptive_input_stats(adaptive_input_t *input) {
     adaptive_input_stats_t result = {0};
@@ -183,12 +190,13 @@ BaseType_t adaptive_input_acquire(adaptive_input_t *input, void **packet,
 BaseType_t adaptive_input_commit(adaptive_input_t *input, void *packet) {
     if (!input || !packet) return pdFALSE;
     portENTER_CRITICAL(&input->lock);
-    for (unsigned i = 0; i < input->target; ++i) {
-        input_slot_t *slot = &input->slots[i];
+    for (unsigned scan = 0; scan <= input->target; ++scan) {
+        unsigned i = scan == input->target ? CONTROL_SLOT : scan;
+        input_slot_t *slot = input_slot(input, i);
         if (slot->data != packet || slot->state != WRITING) continue;
         slot->state = READY;
         slot->next = NO_SLOT;
-        if (input->tail != NO_SLOT) input->slots[input->tail].next = i;
+        if (input->tail != NO_SLOT) input_slot(input, input->tail)->next = i;
         else input->head = i;
         input->tail = i;
         portEXIT_CRITICAL(&input->lock);
@@ -196,6 +204,45 @@ BaseType_t adaptive_input_commit(adaptive_input_t *input, void *packet) {
         return pdTRUE;
     }
     portEXIT_CRITICAL(&input->lock);
+    return pdFALSE;
+}
+
+bool adaptive_input_attach_control(adaptive_input_t *input, void *storage,
+                                    size_t capacity) {
+    if (!input || !storage || !capacity) return false;
+    portENTER_CRITICAL(&input->lock);
+    bool available = input->control.data == NULL;
+    for (unsigned i = 0; i < input->target; ++i)
+        if (input->slots[i].data == storage) available = false;
+    if (available) {
+        input->control = (input_slot_t){.data=storage, .state=IDLE, .next=NO_SLOT};
+        input->control_capacity = capacity;
+    }
+    portEXIT_CRITICAL(&input->lock);
+    return available;
+}
+
+BaseType_t adaptive_input_acquire_control(adaptive_input_t *input, void **packet,
+                                          size_t size, TickType_t timeout) {
+    if (packet) *packet = NULL;
+    if (!input || !packet || !size) return pdFALSE;
+    TickType_t start = xTaskGetTickCount();
+    do {
+        portENTER_CRITICAL(&input->lock);
+        if (size > input->control_capacity) {
+            portEXIT_CRITICAL(&input->lock);
+            return pdFALSE;
+        }
+        input_slot_t *slot = &input->control;
+        if (slot->state == IDLE) {
+            slot->state = WRITING;
+            slot->size = size;
+            *packet = slot->data;
+            portEXIT_CRITICAL(&input->lock);
+            return pdTRUE;
+        }
+        portEXIT_CRITICAL(&input->lock);
+    } while (wait_event(input->space_ready, start, timeout));
     return pdFALSE;
 }
 
@@ -207,7 +254,7 @@ void *adaptive_input_receive(adaptive_input_t *input, size_t *size,
     do {
         portENTER_CRITICAL(&input->lock);
         if (input->head != NO_SLOT) {
-            input_slot_t *slot = &input->slots[input->head];
+            input_slot_t *slot = input_slot(input, input->head);
             input->head = slot->next;
             if (input->head == NO_SLOT) input->tail = NO_SLOT;
             slot->state = READING;
@@ -221,13 +268,14 @@ void *adaptive_input_receive(adaptive_input_t *input, size_t *size,
     return NULL;
 }
 
-bool adaptive_input_return(adaptive_input_t *input, void *packet) {
+static bool release_lease(adaptive_input_t *input, void *packet, slot_state_t expected) {
     if (!input || !packet) return false;
     portENTER_CRITICAL(&input->lock);
-    for (unsigned i = 0; i < input->target; ++i) {
-        input_slot_t *slot = &input->slots[i];
-        if (slot->data != packet || slot->state != READING) continue;
-        bool release = should_retire_slot(input, i);
+    for (unsigned scan = 0; scan <= input->target; ++scan) {
+        unsigned i = scan == input->target ? CONTROL_SLOT : scan;
+        input_slot_t *slot = input_slot(input, i);
+        if (slot->data != packet || slot->state != expected) continue;
+        bool release = i != CONTROL_SLOT && should_retire_slot(input, i);
         if (release) {
             slot->data = NULL;
             --input->resident;
@@ -242,6 +290,14 @@ bool adaptive_input_return(adaptive_input_t *input, void *packet) {
     }
     portEXIT_CRITICAL(&input->lock);
     return false;
+}
+
+bool adaptive_input_return(adaptive_input_t *input, void *packet) {
+    return release_lease(input, packet, READING);
+}
+
+bool adaptive_input_cancel(adaptive_input_t *input, void *packet) {
+    return release_lease(input, packet, WRITING);
 }
 
 bool adaptive_input_release_one(adaptive_input_t *input) {

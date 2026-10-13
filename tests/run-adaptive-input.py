@@ -44,7 +44,7 @@ def main():
     (args.output / 'run.log').write_bytes(result)
     assert result.startswith(b'PASS adaptive input:')
     (args.output / 'report.json').write_text(json.dumps(dict(
-        passed=True, stress_packets=30000, sanitizers=['address', 'undefined'],
+        passed=True, stress_packets=60000, control_storage=True, sanitizers=['address', 'undefined'],
         scope='Actual queue and TLS pressure wrapper; pthread RTOS and simulated heap. Not physical TLS/PCM qualification.',
         sources={p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
     ), indent=2) + '\n')

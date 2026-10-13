@@ -1,0 +1,143 @@
+{
+  "pass": true,
+  "source_sha256": {
+    "idf/esp32c3-oled-native/main/rx_buffer_diagnostic.c": "1ee4488ef82ecb46f404b571d3bf1418902dacf338494f38935f999adf4f1b07",
+    "tests/native/rx_copy_diagnostic_test.c": "5bf138e3d241f1f764e8a78e992088f6ec264dc868e91772e5f442e28b17cc96",
+    "tests/test-rx-copy-diagnostic.py": "135247ee9f8ae5ce5396037b8c2fb43c93b70794572aba88e533cf3947beb5a7",
+    "sdk/components/esp_netif/lwip/netif/wlanif.c": "0e02a9c328e5a4b08d89793b0a11a878fc02be9de007592f0e95ee2048d8f714",
+    "sdk/components/lwip/lwip/src/core/pbuf.c": "951b1723eb1f919ca5cb408f19b00fcb9d464948a126631217ec96412dd1cc77",
+    "sdk/components/lwip/lwip/src/core/mem.c": "23644c0a3fdd12a75247ecb6870c908f03a6816507cefd23157cb1ee9e9cc125"
+  },
+  "ownership": {
+    "scope": "Live netif RX heap payload capacity; excludes allocator block headers, TCP copies and all other owners",
+    "snapshots": [
+      {
+        "seq": 1,
+        "live": 0,
+        "peak": 0,
+        "allocs": 0,
+        "frees": 0,
+        "lost": 0,
+        "unmatched": 0,
+        "payload": 0,
+        "metadata": 0,
+        "missing": 0,
+        "walk_us": 0,
+        "heap_free": 200000,
+        "heap_largest": 65536,
+        "at": 0,
+        "blocks": [],
+        "unique_blocks": 0,
+        "allocated_payload_bytes": 0
+      },
+      {
+        "seq": 2,
+        "live": 2,
+        "peak": 2,
+        "allocs": 4,
+        "frees": 2,
+        "lost": 0,
+        "unmatched": 0,
+        "payload": 110,
+        "metadata": 0,
+        "missing": 0,
+        "walk_us": 0,
+        "heap_free": 199890,
+        "heap_largest": 65536,
+        "at": 1,
+        "blocks": [
+          {
+            "seq": 2,
+            "id": 3,
+            "payload": 4287264,
+            "payload_bytes": 55,
+            "metadata": 4287264,
+            "metadata_bytes": 55
+          },
+          {
+            "seq": 2,
+            "id": 4,
+            "payload": 4287520,
+            "payload_bytes": 55,
+            "metadata": 4287520,
+            "metadata_bytes": 55
+          }
+        ],
+        "unique_blocks": 2,
+        "allocated_payload_bytes": 110
+      },
+      {
+        "seq": 3,
+        "live": 1,
+        "peak": 2,
+        "allocs": 6,
+        "frees": 5,
+        "lost": 0,
+        "unmatched": 0,
+        "payload": 55,
+        "metadata": 0,
+        "missing": 0,
+        "walk_us": 0,
+        "heap_free": 199945,
+        "heap_largest": 65536,
+        "at": 4,
+        "blocks": [
+          {
+            "seq": 3,
+            "id": 6,
+            "payload": 4287520,
+            "payload_bytes": 55,
+            "metadata": 4287520,
+            "metadata_bytes": 55
+          }
+        ],
+        "unique_blocks": 1,
+        "allocated_payload_bytes": 55
+      },
+      {
+        "seq": 4,
+        "live": 0,
+        "peak": 2,
+        "allocs": 9,
+        "frees": 9,
+        "lost": 0,
+        "unmatched": 0,
+        "payload": 0,
+        "metadata": 0,
+        "missing": 0,
+        "walk_us": 0,
+        "heap_free": 200000,
+        "heap_largest": 65536,
+        "at": 6,
+        "blocks": [],
+        "unique_blocks": 0,
+        "allocated_payload_bytes": 0
+      }
+    ],
+    "complete": true,
+    "maximum_live": 2,
+    "maximum_allocated_payload_bytes": 110,
+    "maximum_walk_us": 0,
+    "observed_size_histogram": {
+      "55": 3
+    }
+  },
+  "scope": "Host SDK input/free control flow and diagnostic lifetimes; no target timing or interposition claim",
+  "checks": [
+    "allocation failure",
+    "down interface",
+    "null input",
+    "rejected input",
+    "immediate consumption",
+    "retained references",
+    "chained final free",
+    "shared tail",
+    "nested input",
+    "unrelated callback allocation",
+    "other task allocation",
+    "scope restoration",
+    "paired heap",
+    "ASan poisoned freed blocks",
+    "UBSan"
+  ]
+}

@@ -5,7 +5,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SEQUENCES = {'changing': ['lc-44100-stereo','lc-48000-stereo','he-48000-stereo','hev2-44100-stereo'],
-             'implicit-sbr': ['lc-22050-mono','hev2-44100-stereo','lc-48000-stereo']}
+             'implicit-sbr': ['lc-22050-mono','hev2-44100-stereo','lc-48000-stereo'],
+             'mp3-he-mp3': ['mp3-320','he-48000-stereo','mp3-320'],
+             'aac-mp3-hev2': ['lc-48000-stereo','mp3-320','hev2-44100-stereo']}
 
 
 def require(condition, message):
@@ -52,9 +54,10 @@ def load_fixtures(extra_manifest=None):
             mime='audio/aac', sha256=sha(payload), source_sha256=sha(data))
     for name, sequence in SEQUENCES.items():
         payload = b''.join(result[n]['data'] for n in sequence)
+        mixed = len({result[n]['codec'] for n in sequence}) > 1
         result[name] = dict(data=payload, seconds=sum(result[n]['seconds'] for n in sequence),
-            segments=[result[n] for n in sequence], sequence=sequence, codec='aac',
-            mime='audio/aac', sha256=sha(payload))
+            segments=[result[n] for n in sequence], sequence=sequence, codec='auto' if mixed else 'aac',
+            mime=None if mixed else 'audio/aac', sha256=sha(payload))
     if extra_manifest:
         manifest_path = Path(extra_manifest).resolve()
         for entry in json.loads(manifest_path.read_text())['fixtures']:

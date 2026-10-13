@@ -4,6 +4,81 @@ This document defines the acceptance tests added after the 2026-09-30 audit.
 **A test exists, a test ran, and a test passed are three different states.**
 Keep failed measurements. Never accept AAC-core fallback as successful HE-AAC.
 
+## Acceptance priority: playback stability (2026-10-13)
+
+The primary criteria are continuous, correct playback, no unexpected restart,
+no watchdog events, no allocation failures, and no new output errors during
+decoded playback. A low absolute free-heap or largest-free-block value alone
+does not reject a candidate. Record these values as diagnostics and compare
+them across the same workloads; do not impose an arbitrary RAM floor as a
+production requirement.
+
+Some older runners below still enforce numerical heap budgets. Preserve their
+raw PASS/FAIL results and report a budget-only failure separately from an actual
+playback or allocation failure. This priority does not waive a measured failure
+or establish stability beyond the tested workload. Check recovery after Stop
+and repeated sessions as well: progressive unrecovered memory loss can indicate
+a leak, which is different from a low but stable free-memory level.
+
+The current stream-confirmation matrix has no absolute free-RAM floor. Its
+allocation, restart, watchdog and active-output checks remain strict. Prefix
+control tests check settled heap recovery, not an absolute minimum RAM value.
+
+`sustained_output.py` now uses this policy by default: the historical 16/8 KiB
+free/largest floor is reported as `legacy_floor_pass`, while actual faults,
+progressive heap loss and settled recovery remain gates. Use
+`--enforce-legacy-heap-floor` to reproduce the older budget policy explicitly.
+The report records which policy was selected; historical results are unchanged.
+
+The public HTTPS cases in `quiet_acceptance.py` reuse the same memory and
+active-output checks, including decoder-failure counters when available. Their
+report records `public_memory_policy`; the same legacy-floor switch is
+available for reproducing historical results. This change does not reinterpret
+older saved failures or change the other suites' existing checks.
+
+If a public case fails after playback is requested, `quiet_acceptance.py`
+performs one bounded status/health diagnostic observation before Stop and
+stores it in `failure_snapshots`. It keeps the original failure result even
+when this observation succeeds. If the diagnostic request also fails, retain
+its sanitized exception chain and any newly collected fault sample; never
+substitute an earlier sample. This supports comparison of output counters
+across a transport gap without changing playback first. It is not an automatic
+retry of the test or proof of analog continuity. Host coverage:
+`python tests/test-production-health.py`.
+
+For a focused investigation, select a source with
+`quiet_acceptance.py --suite public --public-case groovesalad-128-aac`
+(plus the usual board, firmware, host, reference and output arguments).
+Repeat `--public-case` to select several distinct sources; omit it for the full
+manifest. Reports retain only the selected URLs and actual executed cases.
+A focused run does not replace full format qualification.
+
+### Real AAC heap-pressure regression in QEMU
+
+Build the QEMU AAC fault profile with `CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER=y`,
+`CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST=y` and its adapter/pointer-audit dependencies.
+Never flash this QEMU image onto a board. Then run:
+
+```powershell
+python tools/codec_benchmark/run_aac_faults.py --build BUILD_DIRECTORY --dependency-root DEPENDENCY_ROOT --output NEW_DIRECTORY --qemu QEMU_EXECUTABLE --bios QEMU_BIOS_DIRECTORY --wsl --require-early-owner
+python tests/test-aac-faults.py
+```
+
+The pressure test consumes real heap before AAC-LC creation at 21 capacity
+levels, with early reservation bypassed and enabled (42 cases). It requires
+complete LC frames for success, no regression at any successful control level,
+exact free-heap recovery, and full-rate stereo HE-AACv2 after pressure removal.
+It also retains the existing late-OOM and malformed-frame tests. The strict
+parser rejects missing, duplicated, mismatched or falsely successful cases.
+Expected failures under deliberately exhausted heap are fault-injection evidence,
+not successful radio playback. See the
+[measured comparison and limits](ESP32C3_STREAM_CONFIRMATION_PLAN.md#early-owner-real-allocator-pressure-comparison-2026-10-13).
+
+For repeated FLAC delivery-pause tests with the shared decoder arena, see
+[the DMA investigation](ESP32C3_ARENA_FLAC_DMA_20261013.md). It distinguishes
+completion notifications, allocator latency and input starvation, retaining
+startup allocation failures even when diagnostic collection continues.
+
 For quiet production images, the [health endpoint](ESP32C3_PRODUCTION_HEALTH.md)
 provides heap, boot identity and lifetime allocation/watchdog counters without
 UART profiling. These observations complement format and recovery checks;
@@ -25,6 +100,10 @@ Install and verify the specified quiet health image before the second command;
 the runner itself does not flash. It checks automatic/explicit codec selection,
 one continuous playing-status interval, format, duration against decoded frame
 count, EOF, a stopped tail, health counters, memory headroom and Stop recovery.
+During the selected decoded-playback window it also requires available output
+telemetry and zero increments of I2S completion-queue drops and write errors.
+Nonzero lifetime totals from startup/idle do not fail this window, but missing
+measurements, reboot or any new output error do. Memory thresholds are unchanged.
 The initial connection/container state may have `audio=true` before PCM
 metadata exists. Only that known, entirely unset prefix is allowed; decoded
 format and duration checks begin at the first populated metadata sample.
@@ -36,6 +115,7 @@ or analog continuity measurements. Restore the previous image after testing.
 
 `python tests/test-public-file-acceptance.py` checks that the verifier rejects
 early/missing EOF, interrupted playback, incorrect format and invalid timings.
+It also rejects output failures even when format/duration and heap are valid.
 
 ### AAC frame growth after decoder startup
 
@@ -1467,3 +1547,373 @@ The other format, output, memory, response and recovery gates remain active.
 `tests/test-tls-renegotiation-server.py` verifies certificate-checked loopback
 transfer with byte-identical audio, and a client refusal that must not count
 as a completed renegotiation. This host-only dependency is not part of firmware.
+
+### Correlating Wi-Fi events with TCP timeouts
+
+With `CONFIG_YORADIO_WEB_TCP_PROBE`, Wi-Fi connected/disconnected and got-IP
+callbacks now enqueue numeric events in the existing 64-entry, 1,024-byte
+TCP ring. They share its sequence and dropped-event count. The callbacks
+allocate no memory and do not print; the existing consumer emits the records.
+SSID, BSSID, IP addresses, credentials and packet payload are not retained.
+
+`PERF TW2` has the same 58-byte framing and CRC as `TC2`:
+
+| Word | Meaning |
+|---|---|
+| 1 | Shared TCP/Wi-Fi event sequence |
+| 2 | Device timestamp in microseconds, low 32 bits |
+| 3 | Event: 1 = station connected, 2 = station disconnected, 3 = got IP |
+| 4 | Espressif disconnect reason; zero for other events or absent event data |
+| 5 | Shared ring dropped-event count |
+
+The parser returns Wi-Fi records separately as `window(...)["wifi"]` while
+checking one shared sequence across TCP and Wi-Fi events. Missing Wi-Fi records
+must invalidate the trace just like missing TCP records; snapshots/watermarks
+alone do not prove no disconnect happened. Older parsers cannot qualify a trace
+containing these new event sequences. Timestamp wrap and incomplete observation
+edges remain subject to the existing trace-window limits.
+
+Use `tests/test-web-tcp.py` and `tests/run-web-tcp-probe.py --output NEW_DIRECTORY`.
+The latter compiles the actual firmware probe with platform doubles and checks
+ASan/UBSan, ownership, both backlog modes, ring overflow/wrap and CRC decoding
+of 73 emitted frames per mode. These host tests do not establish physical
+network timing or fix the intermittent WebUI connection failure.
+
+The hook is disabled in production. A compiler comparison with the original
+production command/config verified identical `.text`, `.rodata`, `.data` and
+`.bss` sections for `network_service.c` after the guarded hooks were added.
+A separate diagnostic image is required for physical capture.
+
+The build and host evidence is retained in
+[the TCP/Wi-Fi probe archive](../tests/results/esp32c3-web-wifi-probe-build/).
+The separate application is saved as
+`firmware/development/esp32c3-idf-6.1-r9a97-radio-wifi-probe/app.bin`
+(SHA-256 `16916c58d97820955595a5d31cf16b92a9d65f3d7db267584c04e8bd2f000da2`).
+Build checks confirm the unchanged 1,024-byte event ring, full 17,058-byte TLS
+reserve, QIO configuration, fractional output, normal CA trust and no deep
+sleep. Extra logging/runtime statistics change diagnostic timing and memory;
+this image is not a production replacement. Physical correlation remains
+pending; the quiet production image and its recorded results are unchanged.
+
+### Pairing RX ownership with heap measurements
+
+With `CONFIG_YORADIO_RX_BUFFER_DIAGNOSTICS`, `PERF RX_OWNER3` appends
+`heap_free` and `heap_largest` to the eleven version-2 owner fields. The
+CRC covers all thirteen uint32 fields in order. `PERF RX_BLOCK2` is unchanged;
+the reader continues to accept legacy and version-2 captures.
+
+The C3 probe collects both heap values inside the same critical section as
+the owner/range walk. This removes task scheduling between those measurements
+without retaining packet contents or changing buffer lifetimes. Only the
+diagnostic build includes this source file; production configuration remains
+unchanged. The pinned RV32 compiler reports a 1,264-byte poll stack frame.
+The additional heap walk affects diagnostic timing and is not a benchmark.
+
+RX range totals describe heap payload capacity for live netif buffers. They
+exclude allocator headers and allocations owned by other subsystems. Pairing
+does not make these totals a complete explanation of heap use, and subtracting
+them must not replace the original playback memory acceptance checks. Missing
+owners, corrupt CRCs, inconsistent heap values or missing sequences still
+invalidate the evidence.
+
+Validation: `tests/test-rx-ownership.py`, `tests/test-rx-ownership-evidence.py`,
+`tests/test-rx-transport-evidence.py` (17 cases), plus
+`tests/test-rx-buffer-diagnostic.py` compiling the actual C probe under
+ASan/UBSan. The C harness verifies that heap sampling occurs under the owner
+lock and that emitted paired values match its independently modeled heap.
+[Host and RV32 object evidence](../tests/results/esp32c3-rx-paired-heap-host/)
+does not establish physical attribution of the Opus heap fluctuation.
+
+The first complete `r9a97-radio-rx-owner` build exposed a configuration limit:
+production enables `CONFIG_LWIP_L2_TO_L3_COPY`, where `wlanif_input` uses
+`pbuf_alloc(PBUF_RAW, len, PBUF_RAM)` and releases the original Wi-Fi buffer
+immediately. The legacy `esp_pbuf_allocate` allocation hook is absent from
+the linked ELF, although the free hook and polling function remain. The
+[link audit failed](../tests/results/esp32c3-radio-rx-owner-build/build-audit-failure.json);
+the saved diagnostic image was **not flashed** and cannot support RX ownership
+conclusions. Adapt tracking to copied pbuf allocations and their actual final
+release, including chains/reference counts, while preserving production copy
+mode. Object compilation and host tests alone do not establish effective hooks.
+
+### Copied Wi-Fi RX ownership diagnostics
+
+The replacement `r9a97-radio-rx-copy` diagnostic keeps production's
+`CONFIG_LWIP_L2_TO_L3_COPY=y`. A task-local, nestable `wlanif_input` scope
+records only its first `PBUF_RAW/PBUF_RAM` copy allocation. Allocations made
+by downstream callbacks or another task remain outside that scope. The
+final libc-backed lwIP `mem_free` removes the owner and frees its storage
+under the same C3 critical section, so the paired heap snapshot cannot see
+that allocation between removal and release. Referenced pbufs and shared
+chain tails remain tracked until their actual final release. Packet data,
+reference counts and delivery behavior are unchanged. The legacy zero-copy
+configuration retains its original hooks.
+
+The owner table is 512 bytes; the task-local scope pointer is 4 bytes before
+task TLS alignment. This is optional diagnostic overhead, not a production
+memory optimization. It observes netif copies, not all TCP/TLS allocations.
+The pinned libc-backed `mem_trim` does not relocate allocations; another
+allocator implementation requires a new lifetime audit.
+
+```text
+python -B -X utf8 tests/test-rx-copy-diagnostic.py --output NEW_HOST_RESULTS
+python -B -X utf8 tests/check-rx-copy-link.py --elf BUILD/yoradio_esp32c3_oled_native.elf --objdump PATH_TO_RISCV_OBJDUMP --output NEW_LINK_RESULTS
+```
+
+The host runner compiles actual SDK `wlanif_input`, `pbuf_free` and libc
+`mem_free` bodies with the actual diagnostic source and platform doubles.
+ASan/UBSan checks cover failed allocation/input, retained references, chains,
+shared tails, nesting, task isolation, paired heap accounting and poisoned
+freed storage. Host call-name redirection models linker wrapping only.
+The separate ELF audit derives the netstack input member offset from DWARF,
+checks station/AP function pointers, and verifies real allocation/free call
+edges and delegation to the original functions. It rejects the older image
+whose allocation hook was absent.
+
+[Saved build and host evidence](../tests/results/esp32c3-radio-rx-copy-build/)
+includes the passing link audit for ELF
+`a8588d1a3b027f43482109c0d9985e560d2025f0d84b1d3fb53d9c148600d58f`.
+The artifact is `firmware/development/esp32c3-idf-6.1-r9a97-radio-rx-copy/app.bin`.
+The production configuration, public trust bundle and 17,058-byte TLS reserve
+are preserved apart from the explicitly recorded diagnostic flags. These
+checks establish effective instrumentation, not physical memory attribution
+or production qualification.
+
+The [physical copied-RX campaign](ESP32C3_RX_COPY_20261012.md) retains three
+Opus runs and a ten-minute HE-AAC/HTTPS run. All steady output checks passed;
+the Opus trend and HE-AAC headroom failures remain recorded. Paired RX owners
+explain nearly all heap variation in the first two Opus runs, while the third
+has an unexplained residual. Six HE-AAC snapshots lack block records, so the
+full trace and that ownership phase fail completeness validation. Independently
+complete Opus phases remain usable; missing records are not silently dropped.
+Original firmware/settings/station restoration was verified.
+
+## Shared decoder arena experiment
+
+The optional shared decoder heap has separate host allocation tests,
+target linker checks and a physical OTA comparison runner. See
+[the experiment and its limits](ESP32C3_SHARED_DECODER_ARENA_20261012.md).
+Run `tests/test-decoder-arena.py`, `tests/test-decoder-arena-evidence.py`
+and `tests/check-decoder-arena-link.py` before physical qualification.
+`tools/esp32c3_tests/decoder_arena_experiment.py` retains per-codec health,
+arena usage, format/EOF results and restoration evidence. Include streams
+whose AAC parameters change during playback: passing isolated files does
+not prove that a fixed arena can service reallocations across transitions.
+
+## Initial stream signature detection
+
+Initial AUTO codec selection has several independent test layers:
+
+`tests/run-stream-confirm.py --output NEW_DIRECTORY`: sanitizer coverage of
+the experimental bounded two-header confirmation core. This does not yet test
+firmware queue integration; see the [confirmation plan and measured limits](ESP32C3_STREAM_CONFIRMATION_PLAN.md).
+
+`tests/run-stream-staging.py --output NEW_DIRECTORY --corpus CONFIRMATION_DIRECTORY`
+tests the storage layer with the actual adaptive queue and host RTOS/heap doubles.
+Use the output of `run-stream-confirm.py` as the corpus directory. It checks
+lease lifetime, bounded lookahead, cancellation, reclamation, nonblocking
+backpressure and exact bytes. It does not yet exercise the firmware connection
+owner or certify Stop/EOF handling on the device.
+
+With experimental `CONFIG_YORADIO_STREAM_CONFIRM=y`, run
+`tests/run-stream-start.py --output NEW_DIRECTORY --corpus CONFIRMATION_DIRECTORY`.
+This compiles the actual send/finish functions, startup adapter and adaptive
+queue with host RTOS/heap doubles and a concurrent capturing consumer. It
+checks exact encoded replay, short-file EOF, wrong MIME hints, metadata bounds,
+truncation, generation/reset cancellation and deadline expiry. For the full-slot
+replay/drain liveness test run
+`tests/run-stream-staging-router.py --output NEW_DIRECTORY`; this holds all four
+candidate data slots while consuming independent 128-byte control fragments.
+These host tests do not establish HTTP/TLS behavior or physical continuity.
+
+`tools/codec_benchmark/run_pipeline_pcm.py` automatically adds both false-header
+directions when its QEMU firmware has startup confirmation enabled. It requires
+their decoded PCM to match the clean MP3/HE-AAC references byte for byte.
+
+`tests/run-esp32c3-stream-probe.py`: sanitizer coverage of the production
+prefix parser and audio submission function, fragmented signatures, ID3,
+unknown input and exact byte replay. See [scope and open hardware gates](ESP32C3_STREAM_PROBE_20261013.md).
+
+`tools/esp32c3_tests/prefix_control.py` checks the initial-header deadline with
+the station watchdog disabled, Stop, stream replacement and settled heap
+recovery. Supply `--board`, `--host`, `--candidate`, `--restore` and a fresh
+`--output` directory; it uses HTTP fixture ports 8773/8774. The board must
+initially be stopped and the restore image must match. It restores the app
+and watchdog setting and compares private settings in RAM before reporting
+success. Recorded failed checks produce a failing exit status after restore.
+
+`tests/run-esp32c3-stream-frames.py` tests the separate experimental frame
+boundary walker under ASan/UBSan and compares offsets/lengths with ffprobe.
+It needs GCC (WSL on Windows), ffmpeg with libmp3lame and ffprobe. The runner
+uses existing MP3/AAC fixtures, creates additional synthetic MP3 files under
+`.build/c3-stream-frames` and verifies mixed-family byte replay. It does not
+install firmware or exercise decoder/PCM queue transitions.
+
+For the experimental `CONFIG_YORADIO_FRAME_ROUTER` path, run
+`tests/run-stream-encoded-router.py` and `tests/run-codec-segment-drain.py`.
+The physical `tools/esp32c3_tests/stream_probe.py` runner accepts
+`--codec-transitions` for MP3 → HE-AAC → MP3 and AAC-LC → MP3 → HE-AACv2.
+Use `--case-filter mp3-he-mp3 --case-filter aac-mp3-hev2` to isolate these
+two cases, or combine with `--transitions` for the wider regression. Supply
+the same board/host/candidate/restore/output arguments as for prefix control.
+It verifies format order, EOF, complete server delivery, reset/allocation/
+watchdog and available output counters, then restores the original app and
+checks private settings in memory. These diagnostics do not measure analog
+audio quality or prove sample-exact PCM boundaries and every possible underrun.
+The general `run.py --suite transitions` also includes the mixed-family fixtures;
+its mixed streams use AUTO, while existing AAC-only streams retain AAC hints.
+
+For the same matrix over HTTPS, add `--tls-cert <server.pem>`,
+`--tls-key <server.key>` and `--tls-ca <ca.pem>` to `stream_probe.py`, together
+with `--transitions --codec-transitions` for all 16 cases. The server certificate
+must be valid for the host address. Build a separate laboratory candidate with
+the test CA added to the full certificate bundle; retain certificate verification
+and the 16,384-byte TLS input-record limit. Its manifest must set
+`laboratory_only: true` and `extra_trust_ca_sha256` to the supplied CA's SHA-256.
+The runner requires negotiated TLS evidence for each passing case and complete
+body delivery for positive cases. Keep the private key outside tracked files.
+Restore the original production app after testing; the extra laboratory trust
+anchor is not part of a production release. Short finite-file checks do not
+replace long-running HTTPS, PCM-boundary or malformed-record tests.
+
+`tools/esp32c3_tests/frame_router_control.py` adds Stop/replacement tests after
+MP3 → HE-AAC and HE-AAC → MP3 changes. Supply `--board`, `--host`, `--candidate`,
+`--restore` and a new `--output` directory. It defaults to two cycles (eight
+actions); `--cycles` accepts 1–5. The candidate sdkconfig must enable the frame
+router. It uses ffprobe to locate the fourth packet of the second codec and
+the shared server to pause inside that packet. Both decoded formats must be
+observed before the control action; successful server writes are not treated
+as proof of a precise firmware instruction or lease state. Stop must remain
+stopped, replacement must settle to HE-AACv2, and each case must return heap,
+largest block and task count to the baseline bounds. The runner restores the
+original app/settings even after a failed case. Do not run alongside other
+board controllers; fixture ports are 8773/8774.
+
+## Real-decoder PCM at codec-family boundaries (QEMU)
+
+`tools/codec_benchmark/run_pipeline_pcm.py` exercises the production flash-input,
+frame router, decoder task, PCM queue and output task. A test-only sink captures
+signed-16 PCM before output gain/resampling. It compares MP3 → HE-AAC → MP3
+and AAC-LC → MP3 → HE-AACv2 against separately decoded segments, both with
+and without ID3 at each segment boundary. Each segment contains the first 64
+packets located independently by ffprobe. Comparison requires identical bytes,
+sample count, order, rate and channel layout, independent of queue packet sizes.
+This is a pipeline regression against the same decoder in isolated sessions,
+not an independent decoder accuracy reference or physical DMA timing test.
+
+The matrix also appends a complete 128-byte ID3v1 tail to standalone MP3 and
+each MP3 segment in both mixed sequences (11 cases total). Sync-shaped tag
+contents must not change decoded PCM. `tests/run-esp32c3-stream-frames.py`
+checks tag splits, v1/v1.1, payload isolation and truncation under sanitizers;
+`tests/run-stream-encoded-router.py` additionally checks the EOF reason for
+all 127 incomplete tail lengths and exact encoded replay with both tag types.
+
+Build a separate QEMU benchmark using `CONFIG_YORADIO_QEMU=y`,
+`CONFIG_YORADIO_FRAME_ROUTER=y`, queued PCM, UART console, DIO flash and
+`partitions-codec-benchmark.csv`. Pass CMake options
+`-D YORADIO_CODEC_BENCHMARK=ON -D YORADIO_QEMU_PIPELINE_PCM_TEST=ON`.
+The CMake guard rejects a hardware or direct-DMA configuration. Benchmark
+fixture codec `0` selects AUTO so the real initial signature probe is tested.
+Never install this capture image on a board.
+
+```powershell
+python -B -X utf8 tests/test-pipeline-pcm-capture.py
+python -B -X utf8 tools/codec_benchmark/run_pipeline_pcm.py `
+  --build idf/esp32c3-oled-native/build-idf-6.1-r9a97-pipeline-pcm `
+  --output .build/pipeline-pcm-new `
+  --qemu /path/in/wsl/to/qemu-system-riscv32 --bios /path/in/wsl/to/qemu/firmware
+```
+
+Requires the IDF Python environment with esptool, WSL, ffprobe and Espressif's
+C3 QEMU. Use a new output directory. Missing capture/EOF, incomplete encoded
+delivery, decode failures and sample mismatches fail the run. The host test
+includes deliberate missing/reordered PCM, 1-LSB changes and layout errors;
+it also verifies that harmless repacketization is accepted. No physical board,
+network credentials or hardware settings are accessed by this runner.
+
+### Startup confirmation, full window and profile publication
+
+With `CONFIG_YORADIO_STREAM_CONFIRM=y`, the PCM matrix adds four false-prefix
+cases, including an 8191-byte ADTS candidate before real HE-AAC/MP3. The full
+matrix has 15 captures; `--startup-only` selects the eight startup/reference
+captures. Host `tests/run-stream-start.py --output NEW_DIR --corpus CORPUS_DIR`
+also checks this full-window path and enforces a consumer-first schedule so
+provisional startup status cannot overwrite metadata published by the decoder.
+It rejects the previous production implementation deterministically.
+
+For the physical matrix, use the existing `stream_probe.py` runner with
+`--startup-confirmation --transitions --codec-transitions` (20 cases), explicit
+`--board`, `--host`, `--candidate`, `--restore`, and a new `--output` directory.
+The candidate must have confirmation and frame routing enabled. Use
+`prefix_control.py` with the same board/image arguments and `--hold-candidate`
+to test timeout, Stop and replacement while the server pauses after 8180 bytes
+of an incomplete maximum-length ADTS candidate. Repeat without this flag for
+a slowly arriving partial header. Server delivery is evidence of bytes sent,
+not direct instrumentation of the board's exact lease count.
+
+Both physical runners accept `--tls-cert SERVER.pem --tls-key SERVER.key
+--tls-ca CA.pem` together to serve the audio over HTTPS. Use a separate
+laboratory image whose manifest records `laboratory_only: true` and the
+supplied CA's SHA-256; retain full public roots, server verification and
+16384-byte TLS receive records. The control runner records negotiated TLS
+for both the incomplete input and replacement stream. Its WebUI control/OTA
+connection still uses the supplied `--board` URL. Keep private keys outside
+the saved results; archive only certificate identities and public certificates.
+
+After a matrix finishes, recheck its saved evidence without contacting the board:
+
+```sh
+python tools/esp32c3_tests/audit_stream_probe.py --results RUN_DIR/results.json \
+  --controller tools/esp32c3_tests/stream_probe.py --expected-cases 20 \
+  --require-decoder-health --output RUN_DIR/audit.json
+```
+
+The audit checks format/profile transitions, EOF, complete server delivery,
+restarts, allocation/watchdog counters, sampled active output counters and
+firmware/settings restoration. HTTPS runs additionally require negotiated TLS
+evidence. These finite tests do not establish acoustic quality or long-run
+continuity. Never run multiple hardware controllers simultaneously.
+
+For current firmware, require decoder health as in the command above. Every
+retained before/after, active, transition and failure health sample must contain
+a zero decoder-failure sequence. Without this option, historical reports may
+omit the field; the audit reports missing coverage and still rejects any
+recorded decoder fault. A stable format or successful EOF cannot override a
+decoder fault. Regression checks: `python tests/test-stream-probe-audit.py`
+and `python tests/test-stream-probe-repeats.py`.
+
+## Bounded WebUI transfers and OTA reboot
+
+Run `python -B -X utf8 tests/run-esp32c3-web-memory.py` for the actual C3
+multipart parser, form and upload sink under ASan/UBSan. Run the native-IDF,
+static-worker and WebUI OTA JavaScript tests listed in the
+[memory report](ESP32C3_WEB_MEMORY_20261013.md).
+`tools/esp32c3_tests/web_memory.py` compares explicit baseline/candidate images,
+checks exact file transfers, malformed uploads, reboots and OTA, and restores
+the original app/settings. It requires an initially stopped board. The fixture
+server's `/stream/` route is AAC-only; use `/file/flac-level8` for the finite
+FLAC fixture. Frozen failed trials and corrected reruns are retained in the
+report. These focused tests do not replace the full codec/HTTPS matrix.
+
+### Repeated connections on one boot
+
+`stream_probe.py --repeat N` repeats the selected cases in order, without
+reinstalling or rebooting between iterations (`N`: 1 through 20, default 1).
+Each iteration has a unique HTTP fixture path and report identity, so a completed
+response from an earlier iteration cannot satisfy a later test. Encoded bytes
+are shared on the host. This option does not change fixture pacing or firmware.
+
+For bounded HTTPS codec-history reproduction, add:
+
+```text
+--startup-confirmation --codec-transitions --case-filter false-large-adts \
+--case-filter mp3-he-mp3 --case-filter aac-mp3-hev2 --repeat 5
+```
+
+Use the existing candidate/restore, board, output and three TLS certificate
+arguments. This selects 20 cases: two maximum-length false-prefix starts and two
+codec-transition streams, repeated five times. App/settings restoration still
+runs once after the complete sequence. The offline auditor needs
+`--expected-cases 20`; it validates iteration order, payload identity, unique
+request names, and boot/uptime continuity between cases as well as within cases.
+Older single-pass reports remain readable. Six host tests cover schedule
+mutation and a synthetic inter-case reboot in an otherwise valid physical report.

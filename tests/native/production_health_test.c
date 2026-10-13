@@ -13,7 +13,7 @@
 #define HTTPD_500_INTERNAL_SERVER_ERROR 500
 typedef int esp_err_t;
 typedef unsigned UBaseType_t;
-typedef struct { uint32_t allocation_failures, task_watchdog_events; } cpu_profiler_faults_t;
+/* PROFILER_TYPES */
 static unsigned interrupt_level;
 static unsigned mask_calls;
 static unsigned mask_interrupts(void) {
@@ -47,7 +47,7 @@ static unsigned esp_reset_reason(void) { return UINT32_MAX; }
 static unsigned uxTaskGetNumberOfTasks(void) { return UINT32_MAX; }
 static uint64_t s_health_boot_id = UINT64_MAX;
 typedef struct { int unused; } httpd_req_t;
-static char response[2048];
+static char response[4096];
 static esp_err_t httpd_resp_send(httpd_req_t *r, const char *body, int length) {
     (void)r; assert(length>=0 && (size_t)length<sizeof(response));
     memcpy(response,body,(size_t)length);response[length]=0;return 0;
@@ -68,11 +68,27 @@ int main(void) {
     register_result=0;assert(cpu_profiler_start()==0 && failed_callback);
     for (unsigned mask=0;mask<20;++mask) {
         interrupt_level=mask;
-        failed_callback(1,0,NULL);
+        failed_callback(100+mask, mask, NULL);
         assert(interrupt_level==mask);
         assert(cpu_profiler_faults().allocation_failures==mask+1);
+        assert(cpu_profiler_faults().allocation_size==100+mask);
+        assert(cpu_profiler_faults().allocation_caps==mask);
+        assert(interrupt_level==mask);
     }
-    assert(mask_calls==20);
+    assert(mask_calls>=20);
+    cpu_profiler_decoder_failure(2, DECODER_FAILURE_PROCESS, -2, 7, 1234);
+    cpu_profiler_faults_t fault = cpu_profiler_faults();
+    assert(fault.decoder_failures==1 && fault.decoder_codec==2);
+    assert(fault.decoder_result==-2 && fault.decoder_stage==DECODER_FAILURE_PROCESS);
+    assert(fault.decoder_completion==7 && fault.decoder_input_bytes==1234);
+    assert(fault.decoder_allocation_sequence==20 && interrupt_level==19);
+    // Cleanup failures must not change the allocation sequence at decoder failure.
+    failed_callback(UINT32_MAX,UINT32_MAX,NULL);
+    assert(cpu_profiler_faults().decoder_allocation_sequence==20);
+    cpu_profiler_decoder_failure(UINT32_MAX, (decoder_failure_stage_t)UINT32_MAX,
+        INT32_MIN, UINT32_MAX, UINT32_MAX);
+    s_decoder_failure.decoder_failures=UINT32_MAX;
+    s_decoder_failure.decoder_allocation_sequence=UINT32_MAX;
 #if CONFIG_ESP_TASK_WDT_EN
     for (int i=0;i<17;++i) esp_task_wdt_isr_user_handler();
     assert(cpu_profiler_faults().task_watchdog_events==17);

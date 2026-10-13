@@ -30,10 +30,24 @@ class SustainedTests(unittest.TestCase):
         for row in (health(1000,drops=10),health(1000,errors=3)):
             with self.assertRaises(Failure):check_output([health(),row])
 
-    def test_memory_gate_not_waived_when_output_is_healthy(self):
+    def test_legacy_floor_can_be_reproduced_without_rejecting_stable_low_ram(self):
         rows=[health(s*1000) for s in range(6)]
         self.assertEqual(check_output(rows)['write_errors'],0)
         rows[-1]['largest']=7936
+        self.assertFalse(check_memory(rows)['legacy_floor_pass'])
+        with self.assertRaises(Failure):check_memory(rows,enforce_legacy_floor=True)
+        for row in rows:
+            row.update(heap=6000,largest=2048)
+        self.assertFalse(check_memory(rows)['legacy_floor_pass'])
+
+    def test_faults_and_progressive_loss_still_fail(self):
+        for change in ({'allocation_failures':1}, {'task_watchdog_events':1},
+                       {'decoder_failure':{'sequence':1}}, {'boot_id':'other'}):
+            rows=[health(s*1000) for s in range(6)]
+            rows[-1].update(change)
+            with self.assertRaises(Failure):check_memory(rows)
+        rows=[health(s*1000) for s in range(6)]
+        for row in rows[3:]:row['heap']-=3000
         with self.assertRaises(Failure):check_memory(rows)
 
 

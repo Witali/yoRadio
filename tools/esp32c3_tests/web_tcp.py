@@ -3,16 +3,17 @@ import math
 import re
 import zlib
 
-KINDS = {'C': 'event', 'L': 'listener', 'S': 'watermark'}
+KINDS = {'C': 'event', 'L': 'listener', 'S': 'watermark', 'W': 'wifi'}
 MAX_WATERMARK_GAP_SECONDS = 2.5
 COUNTER_MASK = (1 << 32) - 1
+WIFI_CONNECTED, WIFI_DISCONNECTED, WIFI_GOT_IP = 1, 2, 3
 
 
 def parse(row):
     line = row['line']
     if not any('PERF T'+kind+'2' in line for kind in KINDS):
         return None
-    match = re.fullmatch(r'PERF T([CLS])2:([0-9a-f]{48})', line)
+    match = re.fullmatch(r'PERF T([CLSW])2:([0-9a-f]{48})', line)
     if not match:
         raise ValueError('Malformed or merged TCP v2 frame')
     if zlib.crc32(line[:49].encode('ascii')) != int(line[49:], 16):
@@ -30,6 +31,10 @@ def parse(row):
                       result=error if error < 128 else error-256, pending=d >> 24, dropped=e)
         if result['dir'] not in (0, 1):
             raise ValueError('Invalid TCP direction')
+    elif match[1] == 'W':
+        result.update(seq=a, us=b, event=c, reason=d, dropped=e)
+        if c not in (WIFI_CONNECTED, WIFI_DISCONNECTED, WIFI_GOT_IP) or d > 65535 or (c != WIFI_DISCONNECTED and d):
+            raise ValueError('Invalid Wi-Fi event frame')
     elif match[1] == 'L':
         result.update(seq=a, age_ms=b, syn_rcvd=c & 65535, established=c >> 16,
                       listeners=d & 255, backlog=(d >> 8) & 255,
@@ -61,15 +66,15 @@ def window(rows, start, end):
         raise ValueError('Incomplete TCP watermark coverage')
     begin, finish = frames.index(marks[0]), frames.index(marks[-1])
     last = marks[0]['emitted']
-    events, listeners = [], []
+    events, listeners, wifi = [], [], []
     for frame in frames[begin:finish+1]:
         if frame.get('dropped', 0):
             raise ValueError('TCP ring dropped events')
-        if frame['kind'] == 'event':
+        if frame['kind'] in ('event', 'wifi'):
             if frame['seq'] != (last+1) & COUNTER_MASK:
                 raise ValueError('Missing or duplicate TCP event')
             last = frame['seq']
-            events.append(frame)
+            (wifi if frame['kind'] == 'wifi' else events).append(frame)
         elif frame['kind'] == 'watermark':
             if frame['emitted'] != last:
                 raise ValueError('TCP watermark exposes missing events')
@@ -84,4 +89,4 @@ def window(rows, start, end):
         raise ValueError('Incomplete listener coverage')
     return dict(start=marks[0]['at'], end=marks[-1]['at'],
                 first_edge_seconds=marks[0]['at']-start, last_edge_seconds=end-marks[-1]['at'],
-                events=events, listeners=listeners, watermarks=marks)
+                events=events, listeners=listeners, watermarks=marks, wifi=wifi)

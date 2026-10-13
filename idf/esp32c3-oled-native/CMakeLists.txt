@@ -15,6 +15,36 @@ set(EXTRA_COMPONENT_DIRS
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(yoradio_esp32c3_oled_native)
 
+if(CONFIG_YORADIO_HTTP_RELEASE_REQUEST_BUFFER)
+    idf_component_get_property(yoradio_http_lib esp_http_client COMPONENT_LIB)
+    idf_component_get_property(yoradio_http_dir esp_http_client COMPONENT_DIR)
+    idf_build_get_property(yoradio_http_python PYTHON)
+    set(yoradio_http_original "${yoradio_http_dir}/esp_http_client.c")
+    set(yoradio_http_generator "${CMAKE_CURRENT_LIST_DIR}/../../tools/patch_http_request_buffer.py")
+    set(yoradio_http_fixed "${CMAKE_BINARY_DIR}/yoradio_http/esp_http_client.c")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+        "${yoradio_http_original}" "${yoradio_http_generator}")
+    execute_process(COMMAND "${yoradio_http_python}" "${yoradio_http_generator}"
+        --input "${yoradio_http_original}" --output "${yoradio_http_fixed}"
+        RESULT_VARIABLE yoradio_http_patch_result)
+    if(NOT yoradio_http_patch_result EQUAL 0)
+        message(FATAL_ERROR "Cannot apply audited HTTP request-buffer release")
+    endif()
+    get_target_property(yoradio_http_sources ${yoradio_http_lib} SOURCES)
+    set(yoradio_http_replaced 0)
+    foreach(yoradio_source IN LISTS yoradio_http_sources)
+        if(yoradio_source MATCHES "(^|/)esp_http_client\\.c$")
+            list(REMOVE_ITEM yoradio_http_sources "${yoradio_source}")
+            math(EXPR yoradio_http_replaced "${yoradio_http_replaced}+1")
+        endif()
+    endforeach()
+    if(NOT yoradio_http_replaced EQUAL 1)
+        message(FATAL_ERROR "Expected exactly one HTTP client source to replace")
+    endif()
+    list(APPEND yoradio_http_sources "${yoradio_http_fixed}")
+    set_property(TARGET ${yoradio_http_lib} PROPERTY SOURCES "${yoradio_http_sources}")
+endif()
+
 if(CONFIG_YORADIO_PDM_FRACTIONAL_CLOCK OR CONFIG_YORADIO_PDM_CLOCK_DIAGNOSTICS
    OR CONFIG_YORADIO_PDM_INTEGER_RATE_COMPENSATION)
     idf_component_get_property(yoradio_pdm_lib esp_driver_i2s COMPONENT_LIB)

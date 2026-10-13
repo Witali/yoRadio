@@ -1,0 +1,26 @@
+{
+  "result": "FAIL",
+  "build_succeeded": true,
+  "flashed": false,
+  "reason": "Production uses L2-to-L3 copy; the diagnostic allocation hook esp_pbuf_allocate is absent from the linked image",
+  "image": {
+    "app_elf_sha256": "8f69afe0e6cdf5a23161bae5642be3cc27484756031850f169c9ccbf09d1470b",
+    "sha256": "34f8180c97c219d3bee436a20edeb002b3c74cb154379138bc26eba258c8974c",
+    "bytes": 1619536
+  },
+  "symbols": {
+    "owners": 512,
+    "pbuf_alloc": 448,
+    "esp_pbuf_allocate": null,
+    "__wrap_esp_pbuf_allocate": null,
+    "esp_netif_free_rx_buffer": 6,
+    "__wrap_esp_netif_free_rx_buffer": 148,
+    "rx_buffer_diagnostic_poll": 834
+  },
+  "next_action": "Observe the actual wlanif_input PBUF_RAW/PBUF_RAM allocation and final release paths; preserve copy mode and reference counts",
+  "source_sha256": {
+    "components/esp_netif/lwip/netif/wlanif.c": "0e02a9c328e5a4b08d89793b0a11a878fc02be9de007592f0e95ee2048d8f714",
+    "components/lwip/lwip/src/core/pbuf.c": "951b1723eb1f919ca5cb408f19b00fcb9d464948a126631217ec96412dd1cc77",
+    "components/lwip/lwip/src/core/mem.c": "23644c0a3fdd12a75247ecb6870c908f03a6816507cefd23157cb1ee9e9cc125"
+  }
+}

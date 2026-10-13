@@ -28,10 +28,9 @@
 #include "radio_control.h"
 #include "web_pages_bridge.h"
 #include "web_ota.h"
+#include "web_upload.h"
 #include "websocket_service.h"
 
-#define WEBBOARD_UPLOAD_MAX (96 * 1024)
-#define MULTIPART_HEADER_MAX 768
 #define WEB_MAX_OPEN_SOCKETS 7
 #define WEB_STATIC_QUEUE_DEPTH WEB_MAX_OPEN_SOCKETS
 #define WEB_STATIC_WORKER_PRIORITY 3
@@ -43,12 +42,6 @@ static uint64_t s_health_boot_id;
 static QueueHandle_t s_static_request_queue;
 static TaskHandle_t
     s_static_worker_tasks[CONFIG_YORADIO_WEB_STATIC_WORKERS];
-
-static void reboot_task(void *argument) {
-    (void)argument;
-    vTaskDelay(pdMS_TO_TICKS(750));
-    esp_restart();
-}
 
 static FILE *open_nonempty_file(const char *path) {
     FILE *file = fopen(path, "rb");
@@ -117,6 +110,8 @@ static esp_err_t status_handler(httpd_req_t *request) {
     return httpd_resp_sendstr(request, body);
 }
 
+#include "decoder_arena.h"
+#include "tls_input_reserve.h"
 static esp_err_t health_handler(httpd_req_t *request) {
     // Snapshot on demand: no sampler task, retained buffers or console output.
     // Use the same 8-bit allocation capability as the existing heap profiler.
@@ -130,16 +125,25 @@ static esp_err_t health_handler(httpd_req_t *request) {
     native_audio_output_health_t output = native_audio_output_health();
     audio_pipeline_probe_t probe = s_audio_pipeline_probe;
     portCLEAR_INTERRUPT_MASK_FROM_ISR(previous_mask);
-    char body[2048];
+    // Bound the full 16-event history, input and optional arena counters at
+    // uint32 maxima. Both diagnostic variants use the same stack workspace.
+    char body[2816];
 #else
     native_audio_output_health_t output = native_audio_output_health();
-    char body[512];
+#ifdef CONFIG_YORADIO_SHARED_DECODER_ARENA
+    char body[1024];
+#else
+    char body[768];
+#endif
 #endif
     int length = snprintf(body, sizeof(body),
         "{\"schema\":1,\"boot_id\":\"%016llx\",\"uptime_ms\":%llu,"
         "\"reset_reason\":%u,\"heap\":%lu,\"largest\":%lu,"
         "\"minimum_heap\":%lu,\"tasks\":%lu,"
         "\"allocation_failures\":%lu,\"task_watchdog_events\":%lu,"
+        "\"last_allocation_failure\":{\"size\":%lu,\"caps\":%lu},"
+        "\"decoder_failure\":{\"sequence\":%lu,\"codec\":%lu,\"stage\":%lu,"
+        "\"result\":%ld,\"completion\":%lu,\"input_bytes\":%lu,\"allocation_sequence\":%lu},"
         "\"output\":{\"available\":%s,\"completion_queue_drops\":%lu,\"write_errors\":%lu}}",
         (unsigned long long)s_health_boot_id,
         (unsigned long long)(esp_timer_get_time() / 1000),
@@ -149,10 +153,56 @@ static esp_err_t health_handler(httpd_req_t *request) {
         (unsigned long)uxTaskGetNumberOfTasks(),
         (unsigned long)faults.allocation_failures,
         (unsigned long)faults.task_watchdog_events,
+        (unsigned long)faults.allocation_size,
+        (unsigned long)faults.allocation_caps,
+        (unsigned long)faults.decoder_failures,
+        (unsigned long)faults.decoder_codec,
+        (unsigned long)faults.decoder_stage,
+        (long)faults.decoder_result,
+        (unsigned long)faults.decoder_completion,
+        (unsigned long)faults.decoder_input_bytes,
+        (unsigned long)faults.decoder_allocation_sequence,
         output.available ? "true" : "false",
         (unsigned long)output.completion_queue_drops,
         (unsigned long)output.write_errors);
+#ifdef CONFIG_YORADIO_SHARED_DECODER_ARENA
+    decoder_arena_stats_t arena = decoder_arena_stats();
+    if (length > 0 && (size_t)length < sizeof(body)) {
+        --length; // Replace the outer closing brace with an additional object.
+        int added = snprintf(body + length, sizeof(body) - length,
+            ",\"decoder_arena\":{\"capacity\":%u,\"live\":%u,\"peak\":%u,"
+            "\"blocks\":%u,\"free\":%u,\"largest\":%u,\"failures\":%u}}",
+            (unsigned)arena.capacity, (unsigned)arena.live, (unsigned)arena.peak,
+            (unsigned)arena.blocks, (unsigned)arena.free_bytes,
+            (unsigned)arena.largest, arena.failures);
+        length = added < 0 ? -1 : length + added;
+    }
 #ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    if (length > 0 && (size_t)length < sizeof(body)) {
+        --length;
+        int added = snprintf(body + length, sizeof(body) - length,
+            ",\"arena_timing\":{\"malloc\":[%lu,%lu],\"free\":[%lu,%lu],"
+            "\"realloc\":[%lu,%lu],\"snapshot\":[%lu,%lu]}}",
+            (unsigned long)arena.timing[ARENA_MALLOC].calls, (unsigned long)arena.timing[ARENA_MALLOC].max_us,
+            (unsigned long)arena.timing[ARENA_FREE].calls, (unsigned long)arena.timing[ARENA_FREE].max_us,
+            (unsigned long)arena.timing[ARENA_REALLOC].calls, (unsigned long)arena.timing[ARENA_REALLOC].max_us,
+            (unsigned long)arena.timing[ARENA_SNAPSHOT].calls, (unsigned long)arena.timing[ARENA_SNAPSHOT].max_us);
+        length = added < 0 ? -1 : length + added;
+    }
+#endif
+#endif
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    if (length > 0 && (size_t)length < sizeof(body)) {
+        adaptive_input_stats_t input = tls_input_reserve_input_stats();
+        --length;
+        int added = snprintf(body + length, sizeof(body) - length,
+            ",\"input_queue\":{\"resident\":%u,\"occupied\":%u,\"minimum\":%u,"
+            "\"limit\":%u,\"packet_capacity\":%u}}", input.resident, input.occupied,
+            input.minimum, input.limit, (unsigned)input.packet_capacity);
+        length = added < 0 ? -1 : length + added;
+    }
+#endif
     length = audio_pipeline_probe_append(body, sizeof(body), length, &probe);
 #endif
     if (length < 0 || (size_t)length >= sizeof(body)) {
@@ -162,6 +212,25 @@ static esp_err_t health_handler(httpd_req_t *request) {
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return httpd_resp_send(request, body, length);
+}
+
+static esp_err_t web_memory_handler(httpd_req_t *request) {
+    unsigned static_min = UINT32_MAX;
+    for (unsigned i = 0; i < CONFIG_YORADIO_WEB_STATIC_WORKERS; ++i) {
+        unsigned free = uxTaskGetStackHighWaterMark(s_static_worker_tasks[i]);
+        if (free < static_min) static_min = free;
+    }
+    char body[256];
+    snprintf(body, sizeof(body),
+        "{\"download_chunk_bytes\":%u,\"download_workers\":%u,"
+        "\"static_stack_bytes_each\":%u,\"static_stack_free_min\":%u,"
+        "\"http_stack_bytes\":8192,\"http_stack_free_min\":%u}",
+        CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES, CONFIG_YORADIO_WEB_STATIC_WORKERS,
+        BOARD_TASK_STACK_WEB_STATIC, static_min,
+        (unsigned)uxTaskGetStackHighWaterMark(NULL));
+    httpd_resp_set_type(request, "application/json");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    return httpd_resp_sendstr(request, body);
 }
 
 static esp_err_t reconnect_handler(httpd_req_t *request) {
@@ -219,268 +288,6 @@ static esp_err_t stop_handler(httpd_req_t *request) {
     return httpd_resp_sendstr(request, "{\"playing\":false}");
 }
 
-static const uint8_t *find_bytes(const uint8_t *start, const uint8_t *end,
-                                 const char *needle, size_t needle_size) {
-    if (needle_size == 0 || (size_t)(end - start) < needle_size) return NULL;
-    for (const uint8_t *cursor = start;
-         cursor + needle_size <= end; ++cursor) {
-        if (memcmp(cursor, needle, needle_size) == 0) return cursor;
-    }
-    return NULL;
-}
-
-typedef esp_err_t (*multipart_part_handler_t)(
-    const char *field, const char *filename, const uint8_t *data, size_t size,
-    void *context);
-
-static bool multipart_parameter(const char *headers, const char *name,
-                                char *value, size_t value_size) {
-    char prefix[40];
-    snprintf(prefix, sizeof(prefix), "%s=\"", name);
-    const char *start = strstr(headers, prefix);
-    if (!start) return false;
-    start += strlen(prefix);
-    const char *end = strchr(start, '"');
-    if (!end || end == start || (size_t)(end - start) >= value_size) {
-        return false;
-    }
-    memcpy(value, start, (size_t)(end - start));
-    value[end - start] = '\0';
-    return true;
-}
-
-static esp_err_t receive_multipart(httpd_req_t *request, size_t maximum_size,
-                                   multipart_part_handler_t handler,
-                                   void *context) {
-    if (request->content_len <= 0 ||
-        (size_t)request->content_len > maximum_size) {
-        return ESP_ERR_INVALID_SIZE;
-    }
-    char content_type[192];
-    if (httpd_req_get_hdr_value_str(request, "Content-Type", content_type,
-                                    sizeof(content_type)) != ESP_OK) {
-        return ESP_ERR_INVALID_ARG;
-    }
-    const char *boundary_value = strstr(content_type, "boundary=");
-    if (!boundary_value) return ESP_ERR_INVALID_ARG;
-    boundary_value += strlen("boundary=");
-    if (*boundary_value == '"') ++boundary_value;
-    size_t boundary_size = strcspn(boundary_value, "\";");
-    if (boundary_size == 0 || boundary_size > 70) return ESP_ERR_INVALID_ARG;
-
-    char boundary[76];
-    memcpy(boundary, "--", 2);
-    memcpy(boundary + 2, boundary_value, boundary_size);
-    boundary[boundary_size + 2] = '\0';
-    size_t marker_size = boundary_size + 2;
-    char next_boundary[80];
-    memcpy(next_boundary, "\r\n", 2);
-    memcpy(next_boundary + 2, boundary, marker_size + 1);
-    size_t next_marker_size = marker_size + 2;
-
-    size_t body_size = (size_t)request->content_len;
-    uint8_t *body = malloc(body_size + 1);
-    if (!body) return ESP_ERR_NO_MEM;
-    size_t total = 0;
-    while (total < body_size) {
-        int received = httpd_req_recv(request, (char *)body + total,
-                                      body_size - total);
-        if (received == HTTPD_SOCK_ERR_TIMEOUT) continue;
-        if (received <= 0) {
-            ESP_LOGE(TAG, "Multipart receive failed: %d after %u/%u bytes",
-                     received, (unsigned)total, (unsigned)body_size);
-            free(body);
-            return ESP_FAIL;
-        }
-        total += (size_t)received;
-    }
-    body[body_size] = '\0';
-
-    const uint8_t *body_end = body + body_size;
-    const uint8_t *cursor = find_bytes(body, body_end, boundary, marker_size);
-    esp_err_t result = cursor ? ESP_OK : ESP_ERR_INVALID_ARG;
-    while (result == ESP_OK && cursor && cursor < body_end) {
-        cursor += marker_size;
-        if (cursor + 2 <= body_end && memcmp(cursor, "--", 2) == 0) break;
-        if (cursor + 2 > body_end || memcmp(cursor, "\r\n", 2) != 0) {
-            result = ESP_ERR_INVALID_ARG;
-            break;
-        }
-        cursor += 2;
-        const uint8_t *headers_end =
-            find_bytes(cursor, body_end, "\r\n\r\n", 4);
-        if (!headers_end || (size_t)(headers_end - cursor) >=
-                                MULTIPART_HEADER_MAX) {
-            result = ESP_ERR_INVALID_ARG;
-            break;
-        }
-        char headers[MULTIPART_HEADER_MAX];
-        size_t headers_size = (size_t)(headers_end - cursor);
-        memcpy(headers, cursor, headers_size);
-        headers[headers_size] = '\0';
-        char field[32];
-        char filename[96] = "";
-        if (!multipart_parameter(headers, "name", field, sizeof(field))) {
-            result = ESP_ERR_INVALID_ARG;
-            break;
-        }
-        (void)multipart_parameter(headers, "filename", filename,
-                                  sizeof(filename));
-        const uint8_t *payload = headers_end + 4;
-        const uint8_t *next = find_bytes(payload, body_end, next_boundary,
-                                         next_marker_size);
-        if (!next) {
-            result = ESP_ERR_INVALID_ARG;
-            break;
-        }
-        result = handler(field, filename, payload, (size_t)(next - payload),
-                         context);
-        cursor = next + 2;
-    }
-    free(body);
-    return result;
-}
-
-static esp_err_t save_playlist(const uint8_t *data, size_t size) {
-    const char *temporary = "/spiffs/data/playlist.csv.tmp";
-    const char *destination = "/spiffs/data/playlist.csv";
-    FILE *file = fopen(temporary, "wb");
-    ESP_RETURN_ON_FALSE(file, ESP_FAIL, TAG, "open playlist upload");
-    bool complete = fwrite(data, 1, size, file) == size && fflush(file) == 0;
-    bool closed = fclose(file) == 0;
-    if (!complete || !closed) {
-        remove(temporary);
-        return ESP_FAIL;
-    }
-    remove(destination);
-    if (rename(temporary, destination) != 0) {
-        remove(temporary);
-        return ESP_FAIL;
-    }
-    ESP_RETURN_ON_ERROR(radio_control_reindex_playlist(), TAG,
-                        "rebuild playlist index");
-    return ESP_OK;
-}
-
-static esp_err_t save_wifi(const uint8_t *data, size_t size) {
-    return network_service_save_credentials_file(data, size);
-}
-
-static bool safe_upload_name(const char *filename, char *name,
-                             size_t name_size) {
-    const char *base = filename;
-    for (const char *cursor = filename; *cursor; ++cursor) {
-        if (*cursor == '/' || *cursor == '\\') base = cursor + 1;
-    }
-    size_t length = strlen(base);
-    if (length == 0 || length >= name_size || strstr(base, "..")) return false;
-    for (size_t index = 0; index < length; ++index) {
-        unsigned char value = (unsigned char)base[index];
-        if (!isalnum(value) && value != '.' && value != '_' && value != '-') {
-            return false;
-        }
-    }
-    memcpy(name, base, length + 1);
-    return true;
-}
-
-static esp_err_t write_uploaded_file(const char *path, const uint8_t *data,
-                                     size_t size) {
-    if (!size) return ESP_ERR_INVALID_SIZE;
-    FILE *file = fopen(path, "wb");
-    if (!file) {
-        ESP_LOGE(TAG, "Cannot create %s: errno %d", path, errno);
-        return ESP_FAIL;
-    }
-    bool complete = fwrite(data, 1, size, file) == size && fflush(file) == 0;
-    bool closed = fclose(file) == 0;
-    if (!complete || !closed) {
-        ESP_LOGE(TAG, "Cannot write %u bytes to %s: errno %d",
-                 (unsigned)size, path, errno);
-    }
-    return complete && closed ? ESP_OK : ESP_FAIL;
-}
-
-static esp_err_t save_web_asset(const char *filename, const uint8_t *data,
-                                size_t size) {
-    char name[96];
-    if (!safe_upload_name(filename, name, sizeof(name))) {
-        return ESP_ERR_INVALID_ARG;
-    }
-    size_t name_length = strlen(name);
-    if (name_length <= 3 || strcmp(name + name_length - 3, ".gz") != 0) {
-        ESP_LOGW(TAG, "Rejecting uncompressed WebUI asset: %s", name);
-        return ESP_ERR_NOT_SUPPORTED;
-    }
-    char path[224];
-    snprintf(path, sizeof(path), "/spiffs/www/%s", name);
-    char obsolete_raw[224];
-    memcpy(obsolete_raw, path, strlen(path) - 3);
-    obsolete_raw[strlen(path) - 3] = '\0';
-    // Remove legacy raw copies. Static WebUI resources are stored only as
-    // gzip files, just as they are transferred to the browser.
-    remove(obsolete_raw);
-    remove(path);
-    return write_uploaded_file(path, data, size);
-}
-
-static void clear_web_assets_for_recovery(void) {
-    static const char *const names[] = {
-        "theme.css",       "style.css",       "script.js",
-        "dragpl.js",       "player.html",     "options.html",
-        "logo.svg",        "updform.html",    "ir.css",
-        "ir.js",           "irrecord.html",
-    };
-    char path[224];
-    for (size_t index = 0; index < sizeof(names) / sizeof(names[0]); ++index) {
-        snprintf(path, sizeof(path), "/spiffs/www/%s", names[index]);
-        remove(path);
-        strlcat(path, ".gz", sizeof(path));
-        remove(path);
-    }
-}
-
-typedef struct {
-    unsigned saved;
-    bool wifi_saved;
-    bool playlist_saved;
-    bool web_storage_prepared;
-} webboard_upload_t;
-
-static esp_err_t webboard_part(const char *field, const char *filename,
-                               const uint8_t *data, size_t size,
-                               void *context) {
-    webboard_upload_t *upload = context;
-    if (strcmp(field, "submit") == 0) return ESP_OK;
-    if (!filename[0]) return ESP_ERR_INVALID_ARG;
-    esp_err_t result = ESP_ERR_INVALID_ARG;
-    if (strcmp(field, "www") == 0) {
-        if (!upload->web_storage_prepared) {
-            clear_web_assets_for_recovery();
-            upload->web_storage_prepared = true;
-        }
-        result = save_web_asset(filename, data, size);
-    } else if (strcmp(field, "data") == 0) {
-        char name[96];
-        if (!safe_upload_name(filename, name, sizeof(name))) {
-            return ESP_ERR_INVALID_ARG;
-        }
-        if (strcmp(name, "playlist.csv") == 0) {
-            result = save_playlist(data, size);
-            upload->playlist_saved = result == ESP_OK;
-        } else if (strcmp(name, "wifi.csv") == 0) {
-            result = save_wifi(data, size);
-            upload->wifi_saved = result == ESP_OK;
-        }
-    }
-    if (result != ESP_OK) {
-        ESP_LOGE(TAG, "Import failed for field %s file %s (%u bytes): %s",
-                 field, filename, (unsigned)size, esp_err_to_name(result));
-    }
-    if (result == ESP_OK) ++upload->saved;
-    return result;
-}
-
 static esp_err_t send_recovery_page(httpd_req_t *request) {
     httpd_resp_set_type(request, "text/html; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
@@ -491,152 +298,10 @@ static esp_err_t webboard_page_handler(httpd_req_t *request) {
     return send_recovery_page(request);
 }
 
-static esp_err_t webboard_upload_handler(httpd_req_t *request) {
-    webboard_upload_t upload = {0};
-    esp_err_t result = receive_multipart(request, WEBBOARD_UPLOAD_MAX,
-                                         webboard_part, &upload);
-    if (result != ESP_OK || upload.saved == 0) {
-        ESP_LOGW(TAG, "Web board upload failed: %s, saved %u file(s)",
-                 esp_err_to_name(result), upload.saved);
-        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
-                                   "Cannot import selected WebUI files");
-    }
-    ESP_LOGI(TAG, "Web board imported %u file(s); UI is %s", upload.saved,
-             web_ui_available() ? "complete" : "still incomplete");
-    httpd_resp_set_status(request, "303 See Other");
-    httpd_resp_set_hdr(request, "Location", "/");
-    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
-    ESP_RETURN_ON_ERROR(httpd_resp_sendstr(request, "Files imported"), TAG,
-                        "send WebUI import redirect");
-    if (upload.playlist_saved) {
-        websocket_service_notify_playlist_changed();
-    }
-    if (upload.wifi_saved) {
-        xTaskCreate(reboot_task, "wifi_reboot",
-                    BOARD_TASK_STACK_WIFI_REBOOT, NULL, 3, NULL);
-    }
-    return ESP_OK;
-}
-
 static esp_err_t emergency_handler(httpd_req_t *request) {
     httpd_resp_set_type(request, "text/html; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return httpd_resp_sendstr(request, yoradio_emergency_form());
-}
-
-typedef struct {
-    char ssid[33];
-    char password[65];
-    bool have_ssid;
-    bool have_password;
-} recovery_wifi_t;
-
-static esp_err_t recovery_wifi_part(const char *field, const char *filename,
-                                    const uint8_t *data, size_t size,
-                                    void *context) {
-    (void)filename;
-    recovery_wifi_t *wifi = context;
-    char *target = NULL;
-    size_t capacity = 0;
-    bool *present = NULL;
-    if (strcmp(field, "ssid") == 0) {
-        target = wifi->ssid;
-        capacity = sizeof(wifi->ssid);
-        present = &wifi->have_ssid;
-    } else if (strcmp(field, "pass") == 0) {
-        target = wifi->password;
-        capacity = sizeof(wifi->password);
-        present = &wifi->have_password;
-    } else if (strcmp(field, "submit") == 0) {
-        return ESP_OK;
-    } else {
-        return ESP_ERR_INVALID_ARG;
-    }
-    if (size >= capacity) return ESP_ERR_INVALID_SIZE;
-    memcpy(target, data, size);
-    target[size] = '\0';
-    *present = true;
-    return ESP_OK;
-}
-
-static esp_err_t recovery_wifi_handler(httpd_req_t *request) {
-    recovery_wifi_t wifi = {0};
-    esp_err_t result = receive_multipart(request, 4096, recovery_wifi_part,
-                                         &wifi);
-    if (result != ESP_OK || !wifi.have_ssid || !wifi.have_password ||
-        network_service_save_credentials(wifi.ssid, wifi.password) != ESP_OK) {
-        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
-                                   "Cannot save Wi-Fi credentials");
-    }
-    httpd_resp_set_type(request, "text/html; charset=utf-8");
-    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
-    ESP_RETURN_ON_ERROR(
-        httpd_resp_sendstr(
-            request,
-            "<!doctype html><meta charset=utf-8><meta http-equiv=refresh "
-            "content='5;url=/'><p>Wi-Fi saved. Rebooting...</p>"),
-        TAG, "send Wi-Fi recovery response");
-    xTaskCreate(reboot_task, "wifi_reboot", BOARD_TASK_STACK_WIFI_REBOOT,
-                NULL, 3, NULL);
-    return ESP_OK;
-}
-
-static esp_err_t upload_handler(httpd_req_t *request) {
-    if (request->content_len <= 0 || request->content_len > 96 * 1024) {
-        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
-                                   "Upload is empty or too large");
-    }
-    size_t size = (size_t)request->content_len;
-    uint8_t *body = malloc(size + 1);
-    if (!body) {
-        return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,
-                                   "Not enough memory for upload");
-    }
-    size_t received_total = 0;
-    while (received_total < size) {
-        int received = httpd_req_recv(request, (char *)body + received_total,
-                                      size - received_total);
-        if (received <= 0) {
-            free(body);
-            return ESP_FAIL;
-        }
-        received_total += received;
-    }
-    body[size] = '\0';
-
-    bool is_wifi = strstr((char *)body, "name=\"wifile\"") != NULL;
-    bool is_playlist = strstr((char *)body, "name=\"plfile\"") != NULL;
-    uint8_t *headers_end = (uint8_t *)strstr((char *)body, "\r\n\r\n");
-    if ((!is_wifi && !is_playlist) || !headers_end) {
-        free(body);
-        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
-                                   "Unsupported multipart upload");
-    }
-    uint8_t *payload = headers_end + 4;
-    const uint8_t *payload_end = find_bytes(payload, body + size, "\r\n--", 4);
-    if (!payload_end || payload_end <= payload) {
-        free(body);
-        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
-                                   "Malformed multipart upload");
-    }
-
-    esp_err_t result = is_wifi
-                           ? save_wifi(payload, payload_end - payload)
-                           : save_playlist(payload, payload_end - payload);
-    free(body);
-    if (result != ESP_OK) {
-        return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,
-                                   "Cannot store uploaded file");
-    }
-    httpd_resp_set_type(request, "text/plain");
-    ESP_RETURN_ON_ERROR(httpd_resp_sendstr(request, "OK"), TAG,
-                        "send upload response");
-    if (is_playlist) websocket_service_notify_playlist_changed();
-    if (is_wifi) {
-        xTaskCreate(reboot_task, "wifi_reboot",
-                    BOARD_TASK_STACK_WIFI_REBOOT, NULL, 3, NULL);
-    }
-    return ESP_OK;
 }
 
 static const char *content_type(const char *path) {
@@ -742,7 +407,9 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
     httpd_resp_set_hdr(request, "Connection", "close");
     if (gzip) httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
-    char chunk[2048];
+    // Private to this worker. Its entire stack is allocated at startup,
+    // before requests can arrive; no payload allocation occurs per download.
+    char chunk[CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES];
     size_t count;
     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
         if (httpd_resp_send_chunk(request, chunk, count) != ESP_OK) {
@@ -751,7 +418,9 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
             return ESP_FAIL;
         }
     }
+    bool read_failed = ferror(file) != 0;
     fclose(file);
+    if (read_failed) return ESP_FAIL; // Do not terminate a truncated body as success.
     return finish_static_response(
         request, httpd_resp_send_chunk(request, NULL, 0));
 }
@@ -845,16 +514,16 @@ static esp_err_t sleep_guarded_stop_handler(httpd_req_t *request) {
     return with_awake_request(request, stop_handler);
 }
 static esp_err_t sleep_guarded_upload_handler(httpd_req_t *request) {
-    return with_awake_request(request, upload_handler);
+    return with_awake_request(request, web_upload_handler);
 }
 static esp_err_t sleep_guarded_webboard_upload_handler(httpd_req_t *request) {
-    return with_awake_request(request, webboard_upload_handler);
+    return with_awake_request(request, web_board_upload_handler);
 }
 static esp_err_t sleep_guarded_emergency_handler(httpd_req_t *request) {
     return with_awake_request(request, emergency_handler);
 }
 static esp_err_t sleep_guarded_recovery_wifi_handler(httpd_req_t *request) {
-    return with_awake_request(request, recovery_wifi_handler);
+    return with_awake_request(request, web_wifi_upload_handler);
 }
 
 esp_err_t web_service_start(native_state_t *state) {
@@ -863,12 +532,12 @@ esp_err_t web_service_start(native_state_t *state) {
     ESP_RETURN_ON_ERROR(start_static_workers(), TAG,
                         "start static content workers");
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.stack_size = 8192;
+    config.stack_size = 8192; // Upload payload is a bounded, temporary heap buffer.
     // Browsers commonly fetch six assets in parallel. Keep those connections
     // plus the persistent WebSocket alive; with four sockets the LRU purge
     // closed /ws during page startup and the shared UI spinner never stopped.
     config.max_open_sockets = WEB_MAX_OPEN_SOCKETS;
-    config.max_uri_handlers = 14;
+    config.max_uri_handlers = 15; // Includes WebSocket, memory probe and final wildcard.
     config.lru_purge_enable = true;
     config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
     config.uri_match_fn = httpd_uri_match_wildcard;
@@ -963,6 +632,12 @@ esp_err_t web_service_start(native_state_t *state) {
     ESP_RETURN_ON_ERROR(
         httpd_register_uri_handler(server, &recovery_wifi), TAG,
         "Recovery Wi-Fi route registration failed");
+    httpd_uri_t memory = {
+        .uri = "/api/native/web-memory", .method = HTTP_GET,
+        .handler = web_memory_handler,
+    };
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &memory), TAG,
+                        "Web memory route registration failed");
     ESP_RETURN_ON_ERROR(websocket_service_register(server, state), TAG,
                         "WebSocket service registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &files), TAG,

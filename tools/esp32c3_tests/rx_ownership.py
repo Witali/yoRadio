@@ -8,6 +8,7 @@ import struct
 import zlib
 
 OWNER_FIELDS = 'seq live peak allocs frees lost unmatched payload metadata missing walk_us'.split()
+OWNER3_FIELDS = OWNER_FIELDS + ['heap_free', 'heap_largest']
 BLOCK_FIELDS = 'seq id payload payload_bytes metadata metadata_bytes'.split()
 
 
@@ -15,8 +16,9 @@ def fields(line, marker):
     if line.count('PERF ') != 1:
         raise ValueError('Merged/truncated telemetry line')
     required = OWNER_FIELDS if marker.startswith('PERF RX_OWNER') else BLOCK_FIELDS
+    if marker == 'PERF RX_OWNER3:': required = OWNER3_FIELDS
     tail = line.split(marker, 1)[1]
-    if marker.endswith('2:'):
+    if marker.endswith(('2:', '3:')):
         tokens = re.sub(r'\x1b\[[0-9;]*m', '', tail).strip().split(',')
         hex_fields = {'payload', 'metadata'} if required == BLOCK_FIELDS else set()
         if len(tokens) != len(required)+1 or not re.fullmatch(r'[0-9a-f]{8}', tokens[-1]):
@@ -45,9 +47,11 @@ def analyze(records):
         line = row['line']
         if 'serial capture interrupted' in line:
             raise ValueError('Interrupted telemetry capture')
-        if 'PERF RX_OWNER:' in line or 'PERF RX_OWNER2:' in line:
-            marker = 'PERF RX_OWNER2:' if 'PERF RX_OWNER2:' in line else 'PERF RX_OWNER:'
+        if any(marker in line for marker in ('PERF RX_OWNER:', 'PERF RX_OWNER2:', 'PERF RX_OWNER3:')):
+            marker = next(marker for marker in ('PERF RX_OWNER3:', 'PERF RX_OWNER2:', 'PERF RX_OWNER:') if marker in line)
             value = fields(line,marker)
+            if 'heap_free' in value and value['heap_largest'] > value['heap_free']:
+                raise ValueError('Inconsistent paired heap snapshot')
             if snapshots and value['seq'] != snapshots[-1]['seq'] + 1:
                 raise ValueError('Missing/reset/duplicate snapshot sequence')
             if snapshots and any(value[k] < snapshots[-1][k] for k in ('allocs','frees','peak','unmatched')):

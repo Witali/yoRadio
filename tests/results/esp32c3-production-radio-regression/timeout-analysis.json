@@ -1,0 +1,79 @@
+{
+  "case": {
+    "name": "file-eof:hev2-44100-stereo:aac",
+    "result": "FAIL",
+    "exception_chain": [
+      {
+        "type": "URLError"
+      },
+      {
+        "type": "TimeoutError"
+      }
+    ],
+    "reason": "URLError",
+    "seconds": 24.738
+  },
+  "failed_phases": [
+    {
+      "request": 1499,
+      "phase": "connect",
+      "at": 7924.7383486,
+      "socket_attempts": [
+        {
+          "at": 7924.7384321,
+          "result": "FAIL",
+          "local_port": 59321,
+          "ms": 5010.996300000443
+        }
+      ],
+      "result": "FAIL",
+      "error_type": "TimeoutError",
+      "ms": 5011.332300000504
+    },
+    {
+      "request": 1499,
+      "phase": "request_including_connect",
+      "at": 7924.738312,
+      "result": "FAIL",
+      "error_type": "TimeoutError",
+      "ms": 5011.453399999482
+    }
+  ],
+  "last_successful_status": {
+    "seconds": 9.34522779999952,
+    "request_ms": 171.55150000053254,
+    "firmware": "esp32c3-oled-native",
+    "network": "client",
+    "audio": false,
+    "format": "stream ended",
+    "sample_rate": 0,
+    "channels": 0,
+    "bits_per_sample": 0,
+    "pcm_sample_rate": 0,
+    "pcm_channels": 0,
+    "format_is_pcm": false,
+    "channels_are_core": false,
+    "rssi": -71
+  },
+  "last_health": {
+    "at": 7924.3381617,
+    "request_ms": 59.90800000017771,
+    "schema": 1,
+    "boot_id": "ae7b6b6c5a0508e4",
+    "uptime_ms": 454943,
+    "reset_reason": 3,
+    "heap": 139776,
+    "largest": 114688,
+    "minimum_heap": 30484,
+    "tasks": 16,
+    "allocation_failures": 0,
+    "task_watchdog_events": 0,
+    "output": {
+      "available": true,
+      "completion_queue_drops": 18650,
+      "write_errors": 0
+    }
+  },
+  "interpretation": "Host TCP connect timeout after observed correct terminal state; decoder fault, listener failure, Wi-Fi loss and network cause are not established.",
+  "next_measurement": "Correlate host ephemeral port and timestamp with retained board TCP probe; include Wi-Fi event timing. USB 303A:1001 is currently available."
+}

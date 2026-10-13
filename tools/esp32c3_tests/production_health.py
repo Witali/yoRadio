@@ -2,7 +2,7 @@
 import re
 import time
 
-from common import Board, require
+from common import Board, exception_details, require
 
 NUMERIC = ('uptime_ms', 'reset_reason', 'heap', 'largest', 'minimum_heap',
            'tasks', 'allocation_failures', 'task_watchdog_events')
@@ -70,6 +70,22 @@ def read_health(board):
         result['output'] = validate_output(raw['output'])
     if 'pipeline' in raw:
         result['pipeline'] = validate_pipeline(raw['pipeline'], validate_output(raw.get('output')))
+    for key, fields in (
+        ('last_allocation_failure', ('size', 'caps')),
+        ('decoder_failure', ('sequence', 'codec', 'stage', 'result', 'completion',
+                             'input_bytes', 'allocation_sequence')),
+    ):
+        if key not in raw:
+            continue  # Older schema-1 firmware has counters only.
+        value = raw[key]
+        require(type(value) is dict, 'Invalid failure diagnostic: ' + key)
+        for field in fields:
+            signed = field == 'result'
+            require(type(value.get(field)) is int and
+                    (-(1 << 31) if signed else 0) <= value[field] <=
+                    ((1 << 31) - 1 if signed else COUNTER_MASK),
+                    'Invalid failure diagnostic: ' + key + '.' + field)
+        result[key] = {field: value[field] for field in fields}
     return result
 
 
@@ -111,6 +127,24 @@ def check_health(samples):
                 minimum_heap=min(r['heap'] for r in samples),
                 minimum_largest=min(r['largest'] for r in samples),
                 allocation_failures=0, task_watchdog_events=0)
+
+
+def capture_failure_snapshot(board):
+    """One diagnostic status/health observation before the caller stops playback.
+
+    This never retries playback or converts the original failure into a pass.
+    HealthBoard uses a bounded timeout for each of its two HTTP requests.
+    """
+    started = time.perf_counter()
+    first = len(board.health_samples)
+    result = dict(started_at=started)
+    try:
+        result['status'] = board.status()
+    except Exception as error:
+        result['exception_chain'] = exception_details(error)
+    result['health'] = board.health_samples[first:]
+    result['ended_at'] = time.perf_counter()
+    return result
 
 
 class HealthBoard(Board):

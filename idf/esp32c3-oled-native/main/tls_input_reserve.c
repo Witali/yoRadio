@@ -13,6 +13,11 @@
 static _Atomic(adaptive_input_t *) s_input;
 static atomic_uint s_reclaimed, s_retries;
 static atomic_size_t s_last_request;
+#ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+adaptive_input_stats_t tls_input_reserve_input_stats(void) {
+    return adaptive_input_stats(atomic_load(&s_input));
+}
+#endif
 
 void tls_input_reserve_bind(adaptive_input_t *input) {
     atomic_store(&s_input, input);

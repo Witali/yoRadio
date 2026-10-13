@@ -5,7 +5,7 @@ import struct
 import zlib
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools/esp32c3_tests'))
-from rx_ownership import analyze, fields, OWNER_FIELDS, BLOCK_FIELDS
+from rx_ownership import analyze, fields, OWNER_FIELDS, OWNER3_FIELDS, BLOCK_FIELDS
 
 
 class OwnerChecks(unittest.TestCase):
@@ -33,6 +33,25 @@ class OwnerChecks(unittest.TestCase):
         compact = self.compact_rows()
         self.assertEqual(analyze(compact), analyze(self.rows()))
         self.assertLess(sum(len(r['line']) for r in compact), .6*sum(len(r['line']) for r in self.rows()))
+    def paired_rows(self, free=100000, largest=64000):
+        rows=self.compact_rows()
+        values=fields(rows[0]['line'],'PERF RX_OWNER2:')
+        values.update(heap_free=free,heap_largest=largest)
+        words=[values[k] for k in OWNER3_FIELDS]
+        crc=zlib.crc32(struct.pack('<'+'I'*len(words),*words))
+        rows[0]['line']='PERF RX_OWNER3: '+','.join(map(str,words))+f',{crc:08x}'
+        return rows
+    def test_paired_heap_preserves_owner_accounting(self):
+        result=analyze(self.paired_rows())
+        self.assertEqual(result['maximum_allocated_payload_bytes'],1788)
+        snapshot=result['snapshots'][0]
+        self.assertEqual((snapshot['heap_free'],snapshot['heap_largest']),(100000,64000))
+    def test_paired_heap_corruption_and_inconsistency_rejected(self):
+        for rows in (self.paired_rows(free=100,largest=101),
+                     self.paired_rows()):
+            if '100000' in rows[0]['line']:
+                rows[0]['line']=rows[0]['line'].replace('100000','100001')
+            with self.assertRaises(ValueError):analyze(rows)
     def test_changed_missing_reordered_values_and_crc_rejected(self):
         original = self.compact_rows()
         for before, after in [('1,2,2,5', '1,2,2,6'), ('00001000', '00001001'),

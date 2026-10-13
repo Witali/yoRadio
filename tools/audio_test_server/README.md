@@ -33,6 +33,15 @@ the same option for its built-in HTTP and HTTPS servers. An external
 `--https-origin` must be configured separately. These settings do not alter the
 specialized `tls_records.py` server.
 
+For codec-family changes in one finite connection, use `/file/mp3-he-mp3`
+(MP3 → HE-AAC → MP3) or `/file/aac-mp3-hev2` (AAC-LC → MP3 → HE-AACv2).
+These concatenate the verified original fixtures, including their metadata,
+and preserve each segment's pacing. They omit Content-Type and use the AUTO
+codec hint in the manifest. They require a player that supports changing codec
+families within one connection; they are not ordinary standalone AAC files.
+`tests/test-audio-codec-transition-fixtures.py` checks the exact HTTP body and
+length, metadata and unchanged existing AAC-only sequences.
+
 Generate additional continuous files with FFmpeg/FFprobe:
 
 ```powershell
@@ -257,3 +266,53 @@ and encoder commands. Any board can play `/file/mp3-256-44100-stereo` and
 
 See the [C3 transport comparison](../../docs/ESP32C3_MP3_TRANSPORT_CONTROLS_20261010.md)
 for hardware results and the limits of comparing local files with public radio.
+
+## ICY metadata controls
+
+Use the same encoded fixture with synthetic song-title metadata, as in an
+Icecast/Shoutcast stream:
+
+```powershell
+python -m tools.audio_test_server.server --fixture-manifest .build/mp3-rate-controls/manifest.json --pacing-ratio 1.0 --icy-interval 45000
+```
+
+The server inserts metadata only if the client requests `Icy-MetaData: 1`.
+It returns `icy-metaint` and cycles through two synthetic titles and an empty
+metadata update. `--icy-interval 0` (default) leaves existing delivery unchanged.
+Both `/file/` and AAC `/stream/` work; audio bytes and their pacing are unchanged.
+Framing follows the [FFmpeg reference reader](https://ffmpeg.org/doxygen/8.0/http_8c_source.html):
+each metadata length byte counts 16-byte blocks, with zero meaning no update.
+
+Python callers can supply `icy_metadata=(...)` with byte strings up to 4,080
+bytes each to exercise long or empty metadata. File Content-Length includes
+these insertions. Server event `sent` and delivery-pause offsets still count
+audio bytes; `wire_sent`, `icy_metadata_bytes` (including length bytes) and
+`icy_insertions` describe the completed framed writes. Delivery statistics
+count wire bytes, including metadata. Pacing deadlines count audio duration.
+
+Run `python tests/test-audio-icy-server.py`. It checks split boundaries,
+negotiation, length/accounting, both CLI entry points, and (when FFmpeg is on
+PATH) exact PCM equivalence between plain and ICY MP3 with empty, short and
+maximum-length metadata. It tests framing, not RF/network reliability.
+
+## Direct-versus-relay transport diagnosis
+
+`audio_test_server.relay.AudioRelay(host, port, source, seconds=180)` is a
+context manager exposing the configured source at `/stream`. It accepts one
+HTTP(S) source without credentials/query/fragment, forwards the client's ICY
+request and audio/ICY response bytes, and verifies upstream HTTPS certificates.
+It does not decode, reconnect, save broadcast audio or change the firmware.
+HTTP transfer framing is decoded by Python; the downstream body is delimited
+by connection close. Upstream redirects/non-200 responses fail with 502.
+
+Each request is bounded to 1..600 seconds plus blocking I/O (5-second socket
+timeouts). Events include received/sent counts and hashes, upstream status,
+maximum read duration and downstream write timing. A failed final downstream
+write can leave received greater than sent; writes do not prove board receipt.
+No raw audio, song titles, credentials or response bodies enter reports.
+
+This is a diagnostic control, not a production proxy. It changes TCP endpoints,
+buffering and timing; sequential direct/relay connections need not receive
+identical live content or reach the same resolved origin address. Success
+through the relay alone cannot identify the cause of a direct interruption.
+Run `python tests/test-audio-relay.py` for byte, ICY, EOF and accounting checks.

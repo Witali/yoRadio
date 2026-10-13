@@ -16,3 +16,6 @@ void tls_input_reserve_expand_flac(void);
 void tls_input_reserve_finish_connection(void);
 #endif
 void tls_input_reserve_poll(void);
+#if defined(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER) && defined(CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC)
+adaptive_input_stats_t tls_input_reserve_input_stats(void);
+#endif

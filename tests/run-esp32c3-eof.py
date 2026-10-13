@@ -46,13 +46,14 @@ size_t strlcpy(char *, const char *, size_t);
         'return_decoded_packet', 'finish_pcm_stream'))
     # Include the actual producer termination and output marker branch, so a
     # regression that moves completion back to the network task is exercised.
-    first = source.index('        uint8_t end_reason = stream_stalled')
+    first = source.index('        format_unknown = format_unknown || codec == NATIVE_CODEC_AUTO;')
     last = source.index('\n    }\n}', first)
     generated += '''
 static void finish_network(uint32_t generation, bool stream_read_failed) {
     struct { uint32_t generation; } command = {generation};
     bool stream_stalled = false;
     bool stream_unavailable = false;
+    bool format_unknown = false;
     native_codec_t codec = NATIVE_CODEC_AAC;
     void *client = NULL;
 ''' + source[first:last] + '\n}\n'
@@ -62,10 +63,19 @@ static void finish_network(uint32_t generation, bool stream_read_failed) {
 static void finish_output(pcm_packet_t *packet) {
     do {
 ''' + source[first:last] + '\n    } while (false);\n}\n'
+    start = source.index('#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0',
+                         source.index('if (packet->generation != generation || packet->codec != codec)'))
+    end = source.index('#endif', start)+len('#endif')
+    generated += '''
+#define CONFIG_YORADIO_INPUT_PREFILL_MS 1000
+static void check_segment_prefill(native_codec_t codec, encoded_packet_t *packet) {
+    do {
+''' + source[start:end] + '\n    } while (false);\n}\n'
     (tmp/'production.inc').write_text(generated)
     executable = tmp/'eof'
     subprocess.run([os.environ.get('CC','cc'), '-std=c11', '-O2', '-Wall',
-                    '-Wextra', '-Werror', '-I'+str(tmp), '-I'+str(MAIN),
+                    '-Wextra', '-Werror', '-fsanitize=address,undefined',
+                    '-fno-pie', '-no-pie', '-I'+str(tmp), '-I'+str(MAIN),
                     str(ROOT/'tests/native/esp32c3_eof_test.c'),
                     str(MAIN/'native_state.c'), '-o', str(executable)], check=True)
     subprocess.run([str(executable)], check=True)

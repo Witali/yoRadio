@@ -1,0 +1,13 @@
+# Quiet production image. Flashing over USB Serial/JTAG remains available via
+# the ROM bootloader, but the application does not initialize a console.
+CONFIG_ESP_CONSOLE_NONE=y
+
+# Compile out ESP-IDF and application logs, including bootloader output.
+CONFIG_LOG_DEFAULT_LEVEL_NONE=y
+CONFIG_LOG_DEFAULT_LEVEL=0
+CONFIG_LOG_MAXIMUM_LEVEL=0
+CONFIG_BOOTLOADER_LOG_LEVEL_NONE=y
+CONFIG_BOOTLOADER_LOG_LEVEL=0
+
+# Reboot on panic without sending a diagnostic dump to the console.
+CONFIG_ESP_SYSTEM_PANIC_SILENT_REBOOT=y

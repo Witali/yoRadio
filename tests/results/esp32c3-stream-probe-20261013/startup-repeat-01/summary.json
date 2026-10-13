@@ -1,0 +1,65 @@
+{
+  "passed": false,
+  "production_qualified": false,
+  "cases": 20,
+  "local_passes": 17,
+  "failures": [
+    {
+      "name": "mp3-he-mp3--repeat-2",
+      "check": "Missing full-rate transition 2/3",
+      "allocation": {
+        "size": 32744,
+        "caps": 6144
+      },
+      "decoder": {
+        "sequence": 1,
+        "codec": 2,
+        "stage": 2,
+        "result": -2,
+        "completion": 0,
+        "input_bytes": 723,
+        "allocation_sequence": 1
+      }
+    },
+    {
+      "name": "mp3-he-mp3--repeat-3",
+      "check": "Missing full-rate transition 2/3",
+      "allocation": {
+        "size": 32744,
+        "caps": 6144
+      },
+      "decoder": {
+        "sequence": 2,
+        "codec": 2,
+        "stage": 2,
+        "result": -2,
+        "completion": 0,
+        "input_bytes": 723,
+        "allocation_sequence": 2
+      }
+    },
+    {
+      "name": "mp3-he-mp3--repeat-5",
+      "check": "Missing full-rate transition 2/3",
+      "allocation": {
+        "size": 32744,
+        "caps": 6144
+      },
+      "decoder": {
+        "sequence": 3,
+        "codec": 2,
+        "stage": 2,
+        "result": -2,
+        "completion": 0,
+        "input_bytes": 723,
+        "allocation_sequence": 3
+      }
+    }
+  ],
+  "unique_boots": 1,
+  "allocation_failures": 3,
+  "watchdog_events": 0,
+  "lifetime_min_heap": 18732,
+  "restored": true,
+  "scope": "Five cycles without reboot; 3/5 MP3-to-HE transitions fail allocating the compact SBR owner. Subsequent new streams can start. Settled heap cannot identify transient total shortage versus fragmentation. No fix qualified."
+}

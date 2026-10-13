@@ -20,3 +20,24 @@ bootloader remains available for reflashing. Its short reset banner is emitted
 by mask ROM and cannot be removed by an application build.
 
 Use the regular `build.ps1` profile when serial diagnostics are needed.
+
+## Reproduce the measured ESP-IDF 6.1 radio candidate
+
+```powershell
+.\build-production.ps1 -TestedRadioProfile
+```
+
+This adds `sdkconfig.radio-tested.defaults`: QIO 80 MHz, fractional 48 kHz
+output, the measured TLS/input memory policy, one-second prefill, and release
+of the completed HTTP request buffer. It uses the SDK revision pinned in this
+project. The decoder profiles and precision stay unchanged.
+
+The switch uses a separate `build-production-radio-tested` directory by default
+and saves its image to `firmware/development/esp32c3-oled-native-production-radio-tested/app.bin`.
+An explicitly selected existing configuration receives these profile settings
+too; unrelated settings remain. The `-DeepSleepClock` and `-Rtc32kCrystal`
+switches still select their respective variants.
+
+“Tested” identifies the measured configuration, not complete production
+qualification. See the [results and remaining checks](../../docs/ESP32C3_HTTP_REQUEST_BUFFER.md).
+The ordinary production command retains its existing configuration policy.

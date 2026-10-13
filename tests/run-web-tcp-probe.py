@@ -42,7 +42,7 @@ def main():
         lines = output.decode().splitlines()
         assert lines[-1].startswith('PASS TCP probe:')
         frames = [parse(dict(at=i,line=line)) for i,line in enumerate(lines[:-1])]
-        assert len(frames) == 70 and all(frames)
+        assert len(frames) == 73 and all(frames)
         assert frames[0]['kind']=='event' and frames[0]['dir']==1 and frames[0]['flags']==18
         assert frames[1]['before']==255 and frames[1]['after']==3 and frames[1]['port']==32000
         assert frames[2]['before']==3 and frames[2]['after']==4
@@ -50,9 +50,13 @@ def main():
         assert frames[4]['kind']=='watermark' and frames[4]['emitted']==4 and frames[4]['queued']==0
         assert [f['port'] for f in frames[5:69]]==list(range(64))
         assert all(f['dropped']==5 for f in frames[5:69])
-        assert frames[-1]['kind']=='listener' and frames[-1]['seq']==0x10203040
-        assert frames[-1]['backlog']==5 and frames[-1]['pending']==2
-        print(lines[-1],'; 70 firmware frames independently decoded and CRC checked')
+        assert frames[69]['kind']=='listener' and frames[69]['seq']==0x10203040
+        assert frames[69]['backlog']==5 and frames[69]['pending']==2
+        wifi=frames[70:]
+        assert all(f['kind']=='wifi' and f['dropped']==5 for f in wifi)
+        assert [f['event'] for f in wifi]==[1,2,3] and [f['reason'] for f in wifi]==[0,202,0]
+        assert [f['seq'] for f in wifi]==[74,75,76]
+        print(lines[-1],'; 73 firmware frames independently decoded and CRC checked')
     (a.output/'report.json').write_text(json.dumps(dict(passed=True, backlog_variants=[0,1],
         scope='Actual wrappers; platform doubles, not real TCP or physical timing.',
         sources={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in files}),indent=2)+'\n')

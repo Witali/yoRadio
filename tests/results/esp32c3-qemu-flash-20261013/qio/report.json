@@ -1,0 +1,63 @@
+{
+  "qemu_sha256": "3e7051f4992cfa47198da7525db90859f1fd5a5ae7a49ce98b2c5f7dbeb9d724",
+  "flash_sha256": "de5c6f46801502e5bb620af1686259a70ad5ab589e35729afa4fc13bc3f3a3f1",
+  "reference_sha256": "b6fee75acf967f9c702a2f0a7b1062c7fe552061c10e977eca0428d2a709e74c",
+  "controller_sha256": "ec10f0f9553c8fbebccde30cbb6b96c0ba9f66810965b319b17864f43d553126",
+  "cases": [
+    {
+      "model": "gd25q",
+      "command": [
+        "/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/qemu-flash-build/qemu-system-riscv32",
+        "-M",
+        "esp32c3,flash-model=gd25q,flash-size=4M",
+        "-nographic",
+        "-no-reboot",
+        "-snapshot",
+        "-icount",
+        "shift=0,align=off,sleep=off",
+        "-L",
+        "/mnt/c/Work/QEMU-ESP32/share/qemu",
+        "-drive",
+        "file=/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/pipeline-pcm-01/flash.bin,if=mtd,format=raw"
+      ],
+      "exact": true,
+      "bytes": 294912,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 294912,
+          "sha256": "0ab207da1a629a24d04550f81f05b973b7d4b3c865ebbc0d9cd53cdca69c7851"
+        }
+      ]
+    },
+    {
+      "model": "w25q",
+      "command": [
+        "/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/qemu-flash-build/qemu-system-riscv32",
+        "-M",
+        "esp32c3,flash-model=w25q,flash-size=4M",
+        "-nographic",
+        "-no-reboot",
+        "-snapshot",
+        "-icount",
+        "shift=0,align=off,sleep=off",
+        "-L",
+        "/mnt/c/Work/QEMU-ESP32/share/qemu",
+        "-drive",
+        "file=/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/pipeline-pcm-01/flash.bin,if=mtd,format=raw"
+      ],
+      "exact": true,
+      "bytes": 294912,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 294912,
+          "sha256": "0ab207da1a629a24d04550f81f05b973b7d4b3c865ebbc0d9cd53cdca69c7851"
+        }
+      ]
+    }
+  ],
+  "passed": true
+}

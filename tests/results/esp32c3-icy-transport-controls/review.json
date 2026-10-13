@@ -1,0 +1,101 @@
+{
+  "review": "PASS",
+  "cases": {
+    "mp3-plain": {
+      "checks": {
+        "format": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 137,
+            "rate": 44100,
+            "channels": 2
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 137,
+            "elapsed_ms": 74535,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "memory": {
+          "result": "FAIL",
+          "reason": "Progressive heap loss"
+        }
+      },
+      "audio_bytes": 2891776,
+      "icy_insertions": 0
+    },
+    "mp3-icy": {
+      "checks": {
+        "format": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 137,
+            "rate": 44100,
+            "channels": 2
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 137,
+            "elapsed_ms": 74623,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 137,
+            "boot_id": "95ee1506ad2a63f2",
+            "minimum_heap": 79116,
+            "minimum_largest": 63488,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0
+          }
+        }
+      },
+      "audio_bytes": 2897920,
+      "icy_insertions": 64
+    },
+    "hev2-icy": {
+      "checks": {
+        "format": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 135,
+            "rate": 44100,
+            "channels": 2
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 135,
+            "elapsed_ms": 74684,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 135,
+            "boot_id": "95ee1506ad2a63f2",
+            "minimum_heap": 35052,
+            "minimum_largest": 24576,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0
+          }
+        }
+      },
+      "audio_bytes": 362373,
+      "icy_insertions": 8
+    }
+  },
+  "restoration": true
+}

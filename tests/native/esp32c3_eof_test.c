@@ -18,6 +18,18 @@ static void *s_encoded = (void *)1, *s_pcm = (void *)2;
 static void *encoded[8], *pcm[8];
 static unsigned encoded_count, pcm_count;
 static bool cancel_on_wait;
+static unsigned prefill_calls, flush_calls;
+static bool prefill_result=true;
+#define encoded_acquire xRingbufferSendAcquire
+#define encoded_commit xRingbufferSendComplete
+#define encoded_return vRingbufferReturnItem
+#define ESP_OK 0
+#define ESP_LOGW(...) ((void)0)
+typedef int esp_err_t;
+static int native_audio_output_flush_pcm(void) { ++flush_calls; return ESP_OK; }
+static bool prefill_encoded_input(uint32_t generation) {
+    assert(generation==atomic_load(&s_generation));++prefill_calls;return prefill_result;
+}
 
 size_t strlcpy(char *to, const char *from, size_t capacity) {
     size_t length = strlen(from);
@@ -118,6 +130,39 @@ int main(void) {
     assert(send_pcm_end(8, AUDIO_END_UNAVAILABLE));
     drain_pcm();
     assert(!state.audio_running && strcmp(state.stream_format,"station unavailable") == 0);
+    begin(9);
+    delayed_frame(9); // Last PCM from the old decoder precedes its drain marker.
+    unsigned before=pcm_count;
+    assert(send_encoded(9,NATIVE_CODEC_AAC,NULL,0,AUDIO_DRAIN_CODEC));
+    return_decoded_packet(encoded[--encoded_count],0);
+    assert(pcm_count==before && state.audio_running);
+    unsigned flush_before=flush_calls;
+    drain_pcm();
+    assert(state.audio_running && flush_calls==flush_before);
+    delayed_frame(9); // PCM from the next segment in the same connection.
+    assert(send_encoded(9,NATIVE_CODEC_MP3,NULL,0,AUDIO_END_EOF));
+    return_decoded_packet(encoded[--encoded_count],0);
+    drain_pcm();
+    assert(!state.audio_running && flush_calls==flush_before+1);
+    begin(10);
+    assert(send_encoded(10,NATIVE_CODEC_AAC,NULL,0,AUDIO_DRAIN_CODEC));
+    native_state_set_audio(s_state,10,false,"decode failed");
+    return_decoded_packet(encoded[--encoded_count],10);
+    assert(!pcm_count && !state.audio_running);
+    begin(11);
+    encoded_packet_t packet={.generation=11,.codec=NATIVE_CODEC_AAC,.data_size=12};
+    check_segment_prefill(NATIVE_CODEC_AUTO,&packet);
+    assert(prefill_calls==1);
+    check_segment_prefill(NATIVE_CODEC_MP3,&packet);
+    assert(prefill_calls==1); // No second startup delay on a live family change.
+    packet.end_of_stream=AUDIO_DRAIN_CODEC;
+    check_segment_prefill(NATIVE_CODEC_AUTO,&packet);
+    assert(prefill_calls==1);
+    for(unsigned reason=AUDIO_END_EOF;reason<=AUDIO_END_FORMAT_UNKNOWN;++reason)
+        assert(audio_completion_is_terminal(reason));
+    assert(!audio_completion_is_terminal(AUDIO_CONTINUE));
+    assert(!audio_completion_is_terminal(AUDIO_DRAIN_CODEC));
+    puts("PASS: codec drain keeps PCM/output live; real EOF flushes; same-connection switch skips prefill");
     puts("PASS: delayed HE-AAC PCM, ordered EOF, errors, empty stream, stale completion and cancellation");
     return 0;
 }

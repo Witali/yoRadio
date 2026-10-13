@@ -1,0 +1,105 @@
+
+idf\esp32c3-oled-native\build-idf-6.1-r9a97-radio-rx-copy\yoradio_esp32c3_oled_native.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .iram0.text:
+
+Disassembly of section .flash.text:
+
+4207defc <pbuf_free>:
+4207defc:	1101                	addi	sp,sp,-32
+4207defe:	ce06                	sw	ra,28(sp)
+4207df00:	cc22                	sw	s0,24(sp)
+4207df02:	ca26                	sw	s1,20(sp)
+4207df04:	c84a                	sw	s2,16(sp)
+4207df06:	c64e                	sw	s3,12(sp)
+4207df08:	c452                	sw	s4,8(sp)
+4207df0a:	0e050a63          	beqz	a0,4207dffe <pbuf_free+0x102>
+4207df0e:	84aa                	mv	s1,a0
+4207df10:	4901                	li	s2,0
+4207df12:	4989                	li	s3,2
+4207df14:	4a05                	li	s4,1
+4207df16:	a811                	j	4207df2a <pbuf_free+0x2e>
+4207df18:	489c                	lw	a5,16(s1)
+4207df1a:	cfd1                	beqz	a5,4207dfb6 <pbuf_free+0xba>
+4207df1c:	8526                	mv	a0,s1
+4207df1e:	9782                	jalr	a5
+4207df20:	0905                	addi	s2,s2,1
+4207df22:	0ff97913          	zext.b	s2,s2
+4207df26:	c039                	beqz	s0,4207df6c <pbuf_free+0x70>
+4207df28:	84a2                	mv	s1,s0
+4207df2a:	02a060ef          	jal	42083f54 <sys_arch_protect>
+4207df2e:	00e4c783          	lbu	a5,14(s1)
+4207df32:	c3a5                	beqz	a5,4207df92 <pbuf_free+0x96>
+4207df34:	17fd                	addi	a5,a5,-1
+4207df36:	0ff7f413          	zext.b	s0,a5
+4207df3a:	00848723          	sb	s0,14(s1)
+4207df3e:	04a060ef          	jal	42083f88 <sys_arch_unprotect>
+4207df42:	e40d                	bnez	s0,4207df6c <pbuf_free+0x70>
+4207df44:	00d4c783          	lbu	a5,13(s1)
+4207df48:	4080                	lw	s0,0(s1)
+4207df4a:	8b89                	andi	a5,a5,2
+4207df4c:	f7f1                	bnez	a5,4207df18 <pbuf_free+0x1c>
+4207df4e:	00c4c783          	lbu	a5,12(s1)
+4207df52:	8bbd                	andi	a5,a5,15
+4207df54:	03378563          	beq	a5,s3,4207df7e <pbuf_free+0x82>
+4207df58:	03478863          	beq	a5,s4,4207df88 <pbuf_free+0x8c>
+4207df5c:	efbd                	bnez	a5,4207dfda <pbuf_free+0xde>
+4207df5e:	8526                	mv	a0,s1
+4207df60:	0905                	addi	s2,s2,1
+4207df62:	e9baa0ef          	jal	42028dfc <__wrap_mem_free>
+4207df66:	0ff97913          	zext.b	s2,s2
+4207df6a:	fc5d                	bnez	s0,4207df28 <pbuf_free+0x2c>
+4207df6c:	40f2                	lw	ra,28(sp)
+4207df6e:	4462                	lw	s0,24(sp)
+4207df70:	44d2                	lw	s1,20(sp)
+4207df72:	49b2                	lw	s3,12(sp)
+4207df74:	4a22                	lw	s4,8(sp)
+4207df76:	854a                	mv	a0,s2
+4207df78:	4942                	lw	s2,16(sp)
+4207df7a:	6105                	addi	sp,sp,32
+4207df7c:	8082                	ret
+4207df7e:	85a6                	mv	a1,s1
+4207df80:	4539                	li	a0,14
+4207df82:	a3aa70ef          	jal	420251bc <__wrap_memp_free>
+4207df86:	bf69                	j	4207df20 <pbuf_free+0x24>
+4207df88:	85a6                	mv	a1,s1
+4207df8a:	4535                	li	a0,13
+4207df8c:	a30a70ef          	jal	420251bc <__wrap_memp_free>
+4207df90:	bf41                	j	4207df20 <pbuf_free+0x24>
+4207df92:	3c1326b7          	lui	a3,0x3c132
+4207df96:	3c175637          	lui	a2,0x3c175
+4207df9a:	3c132537          	lui	a0,0x3c132
+4207df9e:	bac68693          	addi	a3,a3,-1108 # 3c131bac <_esp_libc_clock_array_end+0x11a5c>
+4207dfa2:	e9860613          	addi	a2,a2,-360 # 3c174e98 <__func__.7>
+4207dfa6:	b5850513          	addi	a0,a0,-1192 # 3c131b58 <_esp_libc_clock_array_end+0x11a08>
+4207dfaa:	2f300593          	li	a1,755
+4207dfae:	fe309097          	auipc	ra,0xfe309
+4207dfb2:	aae080e7          	jalr	-1362(ra) # 40386a5c <__assert_func>
+4207dfb6:	3c1326b7          	lui	a3,0x3c132
+4207dfba:	3c175637          	lui	a2,0x3c175
+4207dfbe:	3c132537          	lui	a0,0x3c132
+4207dfc2:	bc468693          	addi	a3,a3,-1084 # 3c131bc4 <_esp_libc_clock_array_end+0x11a74>
+4207dfc6:	e9860613          	addi	a2,a2,-360 # 3c174e98 <__func__.7>
+4207dfca:	b5850513          	addi	a0,a0,-1192 # 3c131b58 <_esp_libc_clock_array_end+0x11a08>
+4207dfce:	30100593          	li	a1,769
+4207dfd2:	fe309097          	auipc	ra,0xfe309
+4207dfd6:	a8a080e7          	jalr	-1398(ra) # 40386a5c <__assert_func>
+4207dfda:	3c1326b7          	lui	a3,0x3c132
+4207dfde:	3c175637          	lui	a2,0x3c175
+4207dfe2:	3c132537          	lui	a0,0x3c132
+4207dfe6:	be868693          	addi	a3,a3,-1048 # 3c131be8 <_esp_libc_clock_array_end+0x11a98>
+4207dfea:	e9860613          	addi	a2,a2,-360 # 3c174e98 <__func__.7>
+4207dfee:	b5850513          	addi	a0,a0,-1192 # 3c131b58 <_esp_libc_clock_array_end+0x11a08>
+4207dff2:	31100593          	li	a1,785
+4207dff6:	fe309097          	auipc	ra,0xfe309
+4207dffa:	a66080e7          	jalr	-1434(ra) # 40386a5c <__assert_func>
+4207dffe:	3c1346b7          	lui	a3,0x3c134
+4207e002:	3c175637          	lui	a2,0x3c175
+4207e006:	3c132537          	lui	a0,0x3c132
+4207e00a:	a3c68693          	addi	a3,a3,-1476 # 3c133a3c <_esp_libc_clock_array_end+0x138ec>
+4207e00e:	e9860613          	addi	a2,a2,-360 # 3c174e98 <__func__.7>
+4207e012:	b5850513          	addi	a0,a0,-1192 # 3c131b58 <_esp_libc_clock_array_end+0x11a08>
+4207e016:	2de00593          	li	a1,734
+4207e01a:	fe309097          	auipc	ra,0xfe309
+4207e01e:	a42080e7          	jalr	-1470(ra) # 40386a5c <__assert_func>
