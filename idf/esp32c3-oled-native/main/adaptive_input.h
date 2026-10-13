@@ -19,6 +19,14 @@ void adaptive_input_destroy(adaptive_input_t *input); // Quiescent callers only.
 BaseType_t adaptive_input_acquire(adaptive_input_t *input, void **packet,
                                   size_t size, TickType_t timeout);
 BaseType_t adaptive_input_commit(adaptive_input_t *input, void *packet);
+// Optional caller-owned small control storage, attached once before use.
+// It joins the same FIFO, independently of the data slots. Never reclaimed,
+// counted as audio prefill, or freed by this queue. Storage must outlive input.
+// Commit/cancel/receive/return have the same lease rules as normal packets.
+bool adaptive_input_attach_control(adaptive_input_t *input, void *storage,
+                                    size_t capacity);
+BaseType_t adaptive_input_acquire_control(adaptive_input_t *input, void **packet,
+                                          size_t size, TickType_t timeout);
 // Producer only: give up an uncommitted WRITING lease. Queued/READING pointers
 // cannot be cancelled. The pointer is invalid after a successful cancellation.
 bool adaptive_input_cancel(adaptive_input_t *input, void *packet);

@@ -131,12 +131,20 @@ void *__real_esp_mbedtls_mem_calloc(size_t count, size_t size) {
 enum { PACKET_CAPACITY = 2060, STRESS_PACKETS = 30000 };
 static adaptive_input_t *queue;
 static atomic_bool done;
+static bool stress_control;
+enum { CONTROL_BYTES = 140, CONTROL_INTERVAL = 7 };
+static size_t stress_size(uint32_t n) {
+    return 4 + n % ((stress_control && n % CONTROL_INTERVAL == 0
+                     ? CONTROL_BYTES : PACKET_CAPACITY) - 3);
+}
 static void *producer(void *unused) {
     (void)unused;
     for (uint32_t n = 0; n < STRESS_PACKETS; ++n) {
-        size_t size = 4 + n % (PACKET_CAPACITY - 3);
+        size_t size = stress_size(n);
         void *p;
-        assert(adaptive_input_acquire(queue, &p, size, 5000));
+        assert(stress_control && n % CONTROL_INTERVAL == 0
+            ? adaptive_input_acquire_control(queue, &p, size, 5000)
+            : adaptive_input_acquire(queue, &p, size, 5000));
         memcpy(p, &n, sizeof(n));
         memset((uint8_t *)p + 4, (uint8_t)n, size - 4);
         assert(adaptive_input_commit(queue, p));
@@ -152,7 +160,7 @@ static void *consumer(void *unused) {
     for (uint32_t n = 0; n < STRESS_PACKETS; ++n) {
         size_t size;
         void *p = adaptive_input_receive(queue, &size, 5000);
-        assert(p && size == 4 + n % (PACKET_CAPACITY - 3));
+        assert(p && size == stress_size(n));
         uint32_t actual;
         memcpy(&actual, p, sizeof(actual));
         assert(actual == n);
@@ -188,6 +196,57 @@ static void pressure_setup(adaptive_input_t *q, size_t largest, bool merging) {
 
 static void shrink_during_allocation(void) {
     adaptive_input_set_limit(queue, 4);
+}
+
+static void test_control_storage(void) {
+    alignas(max_align_t) uint8_t control[CONTROL_BYTES];
+    adaptive_input_t *q=adaptive_input_create(4*PACKET_CAPACITY,4*PACKET_CAPACITY,PACKET_CAPACITY);
+    assert(q);
+    void *p=NULL;
+    assert(!adaptive_input_acquire_control(q,&p,1,0) && !p);
+    void *held[4];
+    for (unsigned i=0;i<4;++i) assert(adaptive_input_acquire(q,&held[i],PACKET_CAPACITY,0));
+    assert(!adaptive_input_attach_control(q,held[0],CONTROL_BYTES));
+    assert(!adaptive_input_attach_control(q,control,0));
+    assert(adaptive_input_attach_control(q,control,sizeof(control)));
+    assert(!adaptive_input_attach_control(q,control,sizeof(control)));
+    atomic_store(&fail_after,0);
+    assert(!adaptive_input_acquire(q,&p,1,0));
+    assert(!adaptive_input_acquire_control(q,&p,sizeof(control)+1,0));
+    assert(adaptive_input_acquire_control(q,&p,12,0) && p==control);
+    assert(adaptive_input_stats(q).occupied==4 && !adaptive_input_release_one(q));
+    assert(!adaptive_input_return(q,p));
+    assert(adaptive_input_cancel(q,p));assert(!adaptive_input_cancel(q,p));
+    assert(adaptive_input_acquire_control(q,&p,12,0));
+    memset(p,0x83,12);assert(adaptive_input_commit(q,p));
+    assert(!adaptive_input_cancel(q,p) && !adaptive_input_commit(q,p));
+    void *other=NULL;assert(!adaptive_input_acquire_control(q,&other,12,0) && !other);
+    size_t size;assert(adaptive_input_receive(q,&size,0)==p && size==12);
+    assert(!adaptive_input_acquire_control(q,&other,12,0));
+    for (unsigned i=0;i<12;++i) assert(control[i]==0x83);
+    assert(adaptive_input_return(q,p));assert(!adaptive_input_return(q,p));
+    for (unsigned i=0;i<4;++i) assert(adaptive_input_cancel(q,held[i]));
+    assert(!adaptive_input_stats(q).occupied);
+    cleanup(q); // Must not free caller-owned stack storage.
+    atomic_store(&fail_after,-1);
+    // All 16 data indices and the separate control index coexist in one FIFO.
+    q=adaptive_input_create(16*PACKET_CAPACITY,4*PACKET_CAPACITY,PACKET_CAPACITY);assert(q);
+    assert(adaptive_input_attach_control(q,control,sizeof(control)));
+    for (unsigned repeat=0;repeat<10;++repeat) {
+        for (unsigned i=0;i<17;++i) {
+            assert(i==8 ? adaptive_input_acquire_control(q,&p,4,0)
+                        : adaptive_input_acquire(q,&p,4,0));
+            memcpy(p,&i,4);assert(adaptive_input_commit(q,p));
+        }
+        assert(adaptive_input_stats(q).occupied==16 && !adaptive_input_release_one(q));
+        for (unsigned i=0;i<17;++i) {
+            unsigned value=UINT32_MAX;
+            p=adaptive_input_receive(q,&size,0);assert(p && size==4);
+            memcpy(&value,p,4);assert(value==i && (p==control)==(i==8));
+            assert(adaptive_input_return(q,p));
+        }
+    }
+    cleanup(q);
 }
 
 static void test_retained_baseline(void) {
@@ -422,13 +481,19 @@ int main(void) {
     tls = __wrap_esp_mbedtls_mem_calloc(1, 16749);
     assert(tls); free(tls);
 
-    queue = adaptive_input_create(16000, 8000, PACKET_CAPACITY);
-    pthread_t threads[3];
-    assert(!pthread_create(&threads[0], NULL, producer, NULL));
-    assert(!pthread_create(&threads[1], NULL, consumer, NULL));
-    assert(!pthread_create(&threads[2], NULL, reclaimer, NULL));
-    for (unsigned i = 0; i < 3; ++i) assert(!pthread_join(threads[i], NULL));
-    assert(adaptive_input_stats(queue).occupied == 0);
-    cleanup(queue);
-    puts("PASS adaptive input: ownership, FIFO, retained baseline, deferred limit, allocation race/faults, TLS pressure, tick wrap, 30000 concurrent packets");
+    test_control_storage();
+    alignas(max_align_t) uint8_t control[CONTROL_BYTES];
+    for (unsigned variant=0;variant<2;++variant) {
+        stress_control=variant!=0;atomic_store(&done,false);
+        queue = adaptive_input_create(16000, 8000, PACKET_CAPACITY);
+        if (stress_control) assert(adaptive_input_attach_control(queue,control,sizeof(control)));
+        pthread_t threads[3];
+        assert(!pthread_create(&threads[0], NULL, producer, NULL));
+        assert(!pthread_create(&threads[1], NULL, consumer, NULL));
+        assert(!pthread_create(&threads[2], NULL, reclaimer, NULL));
+        for (unsigned i = 0; i < 3; ++i) assert(!pthread_join(threads[i], NULL));
+        assert(adaptive_input_stats(queue).occupied == 0);
+        cleanup(queue);
+    }
+    puts("PASS adaptive input: ownership, FIFO, retained baseline, deferred limit, allocation race/faults, TLS pressure, tick wrap, independent control storage, 60000 concurrent packets");
 }
