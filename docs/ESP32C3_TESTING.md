@@ -1760,6 +1760,40 @@ includes deliberate missing/reordered PCM, 1-LSB changes and layout errors;
 it also verifies that harmless repacketization is accepted. No physical board,
 network credentials or hardware settings are accessed by this runner.
 
+### Startup confirmation, full window and profile publication
+
+With `CONFIG_YORADIO_STREAM_CONFIRM=y`, the PCM matrix adds four false-prefix
+cases, including an 8191-byte ADTS candidate before real HE-AAC/MP3. The full
+matrix has 15 captures; `--startup-only` selects the eight startup/reference
+captures. Host `tests/run-stream-start.py --output NEW_DIR --corpus CORPUS_DIR`
+also checks this full-window path and enforces a consumer-first schedule so
+provisional startup status cannot overwrite metadata published by the decoder.
+It rejects the previous production implementation deterministically.
+
+For the physical matrix, use the existing `stream_probe.py` runner with
+`--startup-confirmation --transitions --codec-transitions` (20 cases), explicit
+`--board`, `--host`, `--candidate`, `--restore`, and a new `--output` directory.
+The candidate must have confirmation and frame routing enabled. Use
+`prefix_control.py` with the same board/image arguments and `--hold-candidate`
+to test timeout, Stop and replacement while the server pauses after 8180 bytes
+of an incomplete maximum-length ADTS candidate. Repeat without this flag for
+a slowly arriving partial header. Server delivery is evidence of bytes sent,
+not direct instrumentation of the board's exact lease count.
+
+After a matrix finishes, recheck its saved evidence without contacting the board:
+
+```sh
+python tools/esp32c3_tests/audit_stream_probe.py --results RUN_DIR/results.json \
+  --controller tools/esp32c3_tests/stream_probe.py --expected-cases 20 \
+  --output RUN_DIR/audit.json
+```
+
+The audit checks format/profile transitions, EOF, complete server delivery,
+restarts, allocation/watchdog counters, sampled active output counters and
+firmware/settings restoration. HTTPS runs additionally require negotiated TLS
+evidence. These finite tests do not establish acoustic quality or long-run
+continuity. Never run multiple hardware controllers simultaneously.
+
 ## Bounded WebUI transfers and OTA reboot
 
 Run `python -B -X utf8 tests/run-esp32c3-web-memory.py` for the actual C3

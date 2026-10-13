@@ -51,6 +51,27 @@ def main():
             result=run(['timeout','30',host(binary),host(path),str(case['discard'])])
             assert result.startswith(b'PASS startup corpus:')
             (out/(case['name']+'.log')).write_bytes(result);cases.append(case)
+        for name in ('he-48000-stereo.aac','mp3-320.mp3'):
+            original_case=next(c for c in original['cases'] if c['name']==name)
+            clean=(args.corpus/(name+'.input')).read_bytes()
+            assert hashlib.sha256(clean).hexdigest()==original_case['sha256']
+            # Short AAC fixtures otherwise reach EOF before the false candidate
+            # fills four slots. Repeat complete elementary frames, not padding.
+            repeats=(8191+10+len(clean)-1)//len(clean)
+            clean*=repeats
+            data=b'\xff\xf1\x4c\x83\xff\xff\xfc'+bytes(25)+clean
+            path=out/('large-prefix-'+name+'.input');path.write_bytes(data)
+            try:
+                result=run(['timeout','30',host(binary),host(path),'32','require-control'])
+            except Exception as error:
+                if hasattr(error,'output'):
+                    (out/('large-prefix-'+name+'.failure.log')).write_bytes(error.output)
+                    print(error.output.decode())
+                raise
+            assert result.count(b'CONTROL chunk=')==3 and b'PASS startup corpus:' in result
+            (out/('large-prefix-'+name+'.log')).write_bytes(result)
+            cases.append(dict(name='large-prefix-'+name,sha256=hashlib.sha256(data).hexdigest(),
+                source_sha256=original_case['sha256'],source_repeats=repeats,required_control=True,passed=True))
     sources=[Path(__file__).resolve(),ROOT/'tests/run-adaptive-input.py',platform,test]+[source/name
         for name in ('audio_service.c','Kconfig.projbuild','adaptive_input.h','adaptive_input.c',
                      'stream_start.h','stream_staging.h','stream_encoded_router.h','stream_confirm.h',

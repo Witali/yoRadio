@@ -35,6 +35,9 @@ static bool stream_start_publish(uint32_t generation, native_codec_t *codec,
         case STREAM_PROBE_OGG: *codec=NATIVE_CODEC_OGG; break;
         default: return false;
     }
+    // Publish the provisional family before handing any bytes to the decoder.
+    // Replay can block long enough for it to publish a more precise profile.
+    state_set_audio(generation, true, codec_name(*codec));
     // Prefer normal coalescing when at least one data slot is guaranteed to
     // remain outside our unpublished window. Tiny fragments can make a codec
     // allocate its own frame accumulator. Use the small independent node only

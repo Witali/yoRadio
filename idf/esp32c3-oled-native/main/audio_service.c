@@ -490,6 +490,7 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
             stream_start_abort();
             if (result!=STREAM_CONFIRM_READY) {probe->result=STREAM_PROBE_INVALID;return false;}
             data+=consumed;size-=consumed;
+            *first_chunk = false; // stream_start_publish already set the provisional status.
         } else
 #endif
         if (*codec == NATIVE_CODEC_AUTO) {
@@ -502,6 +503,7 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
                 case STREAM_PROBE_OGG: *codec = NATIVE_CODEC_OGG; break;
                 default: return false;
             }
+            state_set_audio(generation, true, codec_name(*codec));
             // Replay the assembled header exactly once, before this read's tail.
 #ifdef CONFIG_YORADIO_FRAME_ROUTER
             if (!stream_route_feed(&route, probe->header, probe->used))
@@ -509,11 +511,12 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
             if (!send_encoded(generation, *codec, probe->header, probe->used, false))
 #endif
                 return false;
+            *first_chunk = false;
             data += consumed;
             size -= consumed;
         }
+        if (*first_chunk) state_set_audio(generation, true, codec_name(*codec));
         *first_chunk = false;
-        state_set_audio(generation, true, codec_name(*codec));
     }
 #ifdef CONFIG_YORADIO_FRAME_ROUTER
     return stream_route_feed(&route, data, size) && stream_route_flush(&route);
@@ -533,7 +536,6 @@ static inline uint8_t finish_stream_audio(uint32_t generation, native_codec_t *c
         stream_confirm_result_t result=stream_start_feed(generation,codec,NULL,0,&consumed,true);
         if (result==STREAM_CONFIRM_READY) {
             *first_chunk=false;
-            state_set_audio(generation,true,codec_name(*codec));
         } else {
             reason=incomplete || s_stream_start.skip || stream_staging_size(&s_stream_start.window)
                 ? AUDIO_END_FRAME_TRUNCATED : AUDIO_END_FORMAT_UNKNOWN;

@@ -12,7 +12,7 @@ from common import Board, Failure, check_recovery_heap, exception_details, fixtu
 from connection_retry import set_watchdog
 from ota import image_info, multipart, snapshot, upload, verify_snapshot, wait_image
 from production_health import read_health
-from audio_test_server.server import Server
+from audio_test_server.server import DeliveryPauses, Server
 
 
 def main():
@@ -22,7 +22,13 @@ def main():
     p.add_argument('--candidate',type=Path,required=True)
     p.add_argument('--restore',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--hold-candidate',action='store_true',
+                   help='Pause an 8191-byte ADTS candidate after 8180 bytes, holding four input leases')
     a=p.parse_args()
+    if a.hold_candidate:
+        cfg=a.candidate.with_name('sdkconfig').read_text()
+        require('CONFIG_YORADIO_STREAM_CONFIRM=y' in cfg,
+                'Held-candidate checks require startup confirmation')
     a.output.mkdir(parents=True,exist_ok=False)
     b=Board(a.board); original=b.info()
     require(not b.status()['audio'],'Board must initially be stopped')
@@ -30,7 +36,7 @@ def main():
             'Restore image does not match original')
     private=snapshot(b); watchdog=private['settings']['getsystem']['watchdog']
     report=dict(controller_sha256=sha(Path(__file__).read_bytes()),initial=original,
-                candidate=image_info(a.candidate.read_bytes()),cases=[])
+                candidate=image_info(a.candidate.read_bytes()),hold_candidate=a.hold_candidate,cases=[])
     def save():
         (a.output/'results.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     def install(path):
@@ -47,6 +53,17 @@ def main():
         return rows
     spec=dict(fixtures()['he-48000-stereo'],mime=None)
     require(spec['data'].startswith(b'\xff'), 'Expected ADTS fixture')
+    fault_spec=spec
+    pauses=[(i,2.0) for i in range(1,10)]
+    if a.hold_candidate:
+        # The controller cancels/times out before the rest of this deliberately
+        # undecodable candidate is delivered. Its declared length, not payload
+        # validity, is what forces four unpublished storage leases.
+        data=b'\xff\xf1\x4c\x83\xff\xff\xfc'+bytes(8184)+spec['data']
+        fault_spec=dict(spec,data=data,sha256=sha(data))
+        pauses=[(i,2.0) for i in range(8180,8190)]
+    # Reject invalid schedules before installing an image or changing settings.
+    DeliveryPauses.validate(pauses)
     save()
     try:
         install(a.candidate)
@@ -54,8 +71,8 @@ def main():
         require(b.settings()['getsystem']['watchdog']==0,'Watchdog is still enabled')
         report['watchdog_disabled_verified']=True
         report['idle_before']=idle()
-        with Server(a.host,8774,{'prefix':spec},delivery_stats=True,
-                    delivery_pauses=[(i,2.0) for i in range(1,10)],pacing_ratio=1.0) as slow, \
+        with Server(a.host,8774,{'prefix':fault_spec},delivery_stats=True,
+                    delivery_pauses=pauses,pacing_ratio=1.0) as slow, \
              Server(a.host,8773,{'audio':spec},pacing_ratio=1.0) as normal:
             for name in ('deadline-without-watchdog','stop-during-prefix','replace-during-prefix'):
                 row=dict(name=name,before=read_health(b),observations=[])
@@ -66,8 +83,13 @@ def main():
                     while len(slow.events)==previous and time.perf_counter()<limit: time.sleep(.05)
                     require(len(slow.events)>previous,'Fault request did not reach server')
                     event=slow.events[previous]; start=event['delivery']['started_at']
+                    if a.hold_candidate:
+                        limit=time.perf_counter()+8
+                        while event['sent']<8180 and time.perf_counter()<limit:time.sleep(.05)
+                        require(8180<=event['sent']<8190,'Did not reach the four-slot candidate pause')
                     time.sleep(.5)
-                    require(event['sent']<7,'Complete ADTS header arrived before control action')
+                    require(8180<=event['sent']<8190 if a.hold_candidate else event['sent']<7,
+                            'Startup candidate/header completed before control action')
                     require(not b.status().get('pcm_sample_rate'),'Unexpected decoded PCM before header')
                     if name=='deadline-without-watchdog':
                         while time.perf_counter()-start<14:
@@ -78,8 +100,8 @@ def main():
                         require(not state['audio'] and state['format']=='unknown audio format',
                                 'Unresolved prefix did not time out with watchdog disabled')
                         require(9.5<=row['deadline_seconds']<=13,'Unexpected probe deadline')
-                        require(event['sent']<7 and not event['complete'],
-                                'Test ended by header completion or HTTP EOF instead of timeout')
+                        require((8180<=event['sent']<8190 if a.hold_candidate else event['sent']<7) and not event['complete'],
+                                'Test ended by candidate/header completion or HTTP EOF instead of timeout')
                     elif name=='stop-during-prefix':
                         action=time.perf_counter(); b.stop()
                         for _ in range(6):

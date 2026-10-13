@@ -25,7 +25,13 @@ def main():
     parser.add_argument('--codec-transitions', action='store_true',
                         help='Include real MP3/AAC family changes in one connection')
     parser.add_argument('--case-filter', action='append')
+    parser.add_argument('--startup-confirmation', action='store_true',
+                        help='Require startup-confirmation firmware and test false prefixes/truncated startup')
     args = parser.parse_args()
+    if args.startup_confirmation:
+        cfg=args.candidate.with_name('sdkconfig').read_text()
+        require('CONFIG_YORADIO_STREAM_CONFIRM=y' in cfg and 'CONFIG_YORADIO_FRAME_ROUTER=y' in cfg,
+                'Startup cases require both confirmation and frame routing enabled')
     secure = args.tls_cert is not None
     require(secure == (args.tls_key is not None) == (args.tls_ca is not None),
             'Supply all TLS certificate/key/CA paths together')
@@ -48,7 +54,8 @@ def main():
             'Restore app does not match active firmware')
     private = snapshot(board)  # Never serialize credentials, stations or their hashes.
     report = dict(controller_sha256=sha(Path(__file__).read_bytes()), initial=original,
-                  candidate=image_info(args.candidate.read_bytes()), transport='https' if secure else 'http', cases=[])
+                  candidate=image_info(args.candidate.read_bytes()), transport='https' if secure else 'http',
+                  startup_confirmation=args.startup_confirmation,cases=[])
 
     def save():
         (args.output/'results.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
@@ -79,6 +86,17 @@ def main():
                 'truncated-id3': b'ID3\x04\x00\x00\x00\x00\x00\x20'}
     for name, data in negative.items():
         specs[name] = dict(data=data, seconds=.1, codec='aac', mime=None, sha256=sha(data))
+    negative_status={name:'unknown audio format' for name in negative}
+    if args.startup_confirmation:
+        negative_status.update(partial='truncated audio frame', **{'truncated-id3':'truncated audio frame'})
+        for name,prefix,target in (
+            ('false-mp3-before-he-aac',b'\xff\xfb\x90\0'+bytes(28),'he-48000-stereo'),
+            ('false-aac-before-mp3',b'\xff\xf1\x4c\x80\x01\x9f\xfc'+bytes(25),'mp3-320'),
+            ('false-large-adts-before-he-aac',b'\xff\xf1\x4c\x83\xff\xff\xfc'+bytes(25),'he-48000-stereo'),
+            ('false-large-adts-before-mp3',b'\xff\xf1\x4c\x83\xff\xff\xfc'+bytes(25),'mp3-320'),
+        ):
+            data=prefix+specs[target]['data']
+            specs[name]=dict(specs[target],data=data,sha256=sha(data))
     if args.transitions:
         for name in ('changing','implicit-sbr'):
             specs[name]=dict(available[name],mime=None)
@@ -123,10 +141,10 @@ def main():
                         deadline = started+12
                         while time.monotonic()<deadline:
                             state=board.status(); row['observations'].append(state)
-                            if not state['audio'] and state['format']=='unknown audio format': break
+                            if not state['audio'] and state['format']==negative_status[name]: break
                             time.sleep(.2)
-                        require(not state['audio'] and state['format']=='unknown audio format',
-                                'Unknown input was not rejected explicitly')
+                        require(not state['audio'] and state['format']==negative_status[name],
+                                'Malformed input did not report its expected terminal status')
                     else:
                         deadline=started+12
                         stable=0

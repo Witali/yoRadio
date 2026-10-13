@@ -12,24 +12,46 @@ static adaptive_input_t *s_encoded;
 static atomic_uint s_generation;
 static int64_t clock_offset;
 #define encoded_acquire adaptive_input_acquire
-#define encoded_commit adaptive_input_commit
+static atomic_uint consumed_data_packets;
+static unsigned committed_data_packets, provisional_updates;
+static atomic_bool decoder_metadata_published;
+static BaseType_t encoded_commit(adaptive_input_t *input, void *packet) {
+    bool data=((encoded_packet_t *)packet)->data_size != 0;
+    BaseType_t result=adaptive_input_commit(input,packet);
+    if (result==pdTRUE && data) {
+        unsigned expected=++committed_data_packets;
+        // Force the valid scheduling order that exposed the hardware race,
+        // including a one-frame file published only at EOF.
+        while (atomic_load(&consumed_data_packets)<expected) sched_yield();
+    }
+    return result;
+}
 static int64_t esp_timer_get_time(void) {return (int64_t)xTaskGetTickCount()*1000+clock_offset;}
 static void vTaskDelay(unsigned ticks) {struct timespec delay={ticks/1000,(ticks%1000)*1000000L};nanosleep(&delay,NULL);}
 static const char *codec_name(native_codec_t codec) {(void)codec;return "codec";}
-static void state_set_audio(unsigned generation,bool playing,const char *name) {(void)generation;assert(playing && name);}
+static void state_set_audio(unsigned generation,bool playing,const char *name) {
+    assert(generation==42 && playing && name);
+    assert(!atomic_load(&decoder_metadata_published));
+    ++provisional_updates;
+}
 /* PRODUCTION_SEND */
 
 static uint8_t capture[1024*1024];
 static size_t captured;
-static unsigned terminal,drains;
+static unsigned terminal,drains,control_packets;
 static void *consume(void *unused) {
     (void)unused;
     while (true) {
         size_t size;encoded_packet_t *p=adaptive_input_receive(s_encoded,&size,5000);assert(p);
+        if((void *)p==s_start_control) ++control_packets;
         assert(size>=sizeof(*p) && p->data_size<=size-sizeof(*p));
         assert(captured+p->data_size<=sizeof(capture));
         if(p->data_size)memcpy(capture+captured,p->data,p->data_size);
         captured+=p->data_size;
+        if(p->data_size) {
+            atomic_store(&decoder_metadata_published,true);
+            atomic_fetch_add(&consumed_data_packets,1);
+        }
         bool end=audio_completion_is_terminal(p->end_of_stream);
         if(end)terminal=p->end_of_stream;
         if(p->end_of_stream==AUDIO_DRAIN_CODEC)++drains;
@@ -38,7 +60,9 @@ static void *consume(void *unused) {
     }
 }
 static void begin(void) {
-    clock_offset=0;captured=terminal=drains=0;atomic_store(&s_generation,42);
+    clock_offset=0;captured=terminal=drains=control_packets=0;atomic_store(&s_generation,42);
+    committed_data_packets=provisional_updates=0;
+    atomic_store(&consumed_data_packets,0);atomic_store(&decoder_metadata_published,false);
     size_t capacity=sizeof(encoded_packet_t)+STREAM_CHUNK_SIZE;
     s_encoded=adaptive_input_create(4*capacity,4*capacity,capacity);assert(s_encoded);
     s_start_control_attached=false;stream_transport_reset();
@@ -65,17 +89,24 @@ static void run_case(const uint8_t *input,size_t bytes,const uint8_t *expected,
         fprintf(stderr,"input=%zu chunk=%zu initial=%u terminal=%u expected=%u bytes=%zu expected_bytes=%zu\n",
                 bytes,chunk,initial,terminal,expected_end,captured,expected_bytes);
     assert(terminal==expected_end && captured==expected_bytes);
+    assert(provisional_updates==(expected_bytes ? 1u : 0u));
     if(expected_bytes)assert(!memcmp(capture,expected,expected_bytes));
     finish();
 }
 int main(int argc,char **argv) {
     const size_t chunks[]={1,7,2048};
-    if(argc==3) {
+    if(argc==3 || argc==4) {
         FILE *file=fopen(argv[1],"rb");assert(file);assert(!fseek(file,0,SEEK_END));
         long size=ftell(file);assert(size>0);rewind(file);uint8_t *data=malloc(size);assert(data);
         assert(fread(data,1,size,file)==(size_t)size);fclose(file);
         size_t discard=strtoul(argv[2],NULL,10);assert(discard<(size_t)size);
-        for(unsigned i=0;i<3;++i)run_case(data,size,data+discard,size-discard,AUDIO_END_EOF,chunks[i],NATIVE_CODEC_AUTO);
+        for(unsigned i=0;i<3;++i) {
+            run_case(data,size,data+discard,size-discard,AUDIO_END_EOF,chunks[i],NATIVE_CODEC_AUTO);
+            if(argc==4) {
+                assert(!strcmp(argv[3],"require-control") && control_packets);
+                printf("CONTROL chunk=%zu packets=%u\n",chunks[i],control_packets);
+            }
+        }
         free(data);puts("PASS startup corpus: exact replay and clean EOF, chunks 1/7/2048");return 0;
     }
     assert(argc==1);

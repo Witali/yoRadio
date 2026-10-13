@@ -80,6 +80,8 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--qemu', required=True, help='WSL path to Espressif RISC-V QEMU')
     p.add_argument('--bios', required=True, help='WSL QEMU firmware directory')
+    p.add_argument('--startup-only', action='store_true',
+                   help='Capture clean references and startup false-prefix cases only')
     a = p.parse_args(); a.build = a.build.resolve(); a.output = a.output.resolve()
     a.output.mkdir(parents=True, exist_ok=False)
     cfg = (a.build / 'sdkconfig').read_text()
@@ -100,6 +102,9 @@ def main():
                  'stream_tags.h','stream_encoded_router.h','native_aac_decoder.c','audio_completion.h',
                  'stream_start.h','stream_staging.h','stream_confirm.h','adaptive_input.c','adaptive_input.h')]
     report['startup_confirmation'] = 'CONFIG_YORADIO_STREAM_CONFIRM=y' in cfg
+    if a.startup_only and not report['startup_confirmation']:
+        raise ValueError('--startup-only requires startup confirmation firmware')
+    report['startup_only'] = a.startup_only
     report['source_sha256'] = {s.relative_to(ROOT).as_posix(): hashlib.sha256(s.read_bytes()).hexdigest()
                                for s in sources}
     def save():
@@ -154,10 +159,17 @@ def main():
             for name, prefix, target in (
                 ('false-mp3-before-he-aac', b'\xff\xfb\x90\0'+bytes(28), 'he-48000-stereo'),
                 ('false-aac-before-mp3', b'\xff\xf1\x4c\x80\x01\x9f\xfc'+bytes(25), 'mp3-320'),
+                # Legal 8191-byte ADTS length, but a false frame boundary.
+                # Retaining this candidate exhausts the four guaranteed slots.
+                ('false-large-adts-before-he-aac', b'\xff\xf1\x4c\x83\xff\xff\xfc'+bytes(25), 'he-48000-stereo'),
+                ('false-large-adts-before-mp3', b'\xff\xf1\x4c\x83\xff\xff\xfc'+bytes(25), 'mp3-320'),
             ):
                 observed = capture(name, prefix+segments[target])
                 report['cases'][name] = compare(references[target], observed); save()
                 print('EXACT', name, flush=True)
+        if a.startup_only:
+            report['passed'] = True
+            return
         # ID3v1/v1.1 is metadata after a complete MP3 stream/track. Include
         # sync-shaped values to ensure none of its 128 bytes reach a decoder.
         mp3_tail = b'TAG' + (b'ID3\xff\xfb\x90\x00\xff\xf1' * 14)[:125].ljust(125,b'\0')

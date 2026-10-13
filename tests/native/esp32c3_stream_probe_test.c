@@ -32,6 +32,7 @@ static bool send_encoded(uint32_t generation, native_codec_t codec,
 static const char *codec_name(native_codec_t codec) { (void)codec; return "test"; }
 static void state_set_audio(uint32_t generation, bool playing, const char *name) {
     assert(generation == 42 && playing && name);
+    assert(captured_size == 0); // A decoder may publish metadata after the first send.
 }
 #include "stream-send-under-test.h"
 
@@ -177,7 +178,7 @@ int main(int argc, char **argv) {
     assert(consumed==2 && probe.used==2); // EOF here is unknown, never MP3.
     assert(strcmp(audio_completion_status(AUDIO_END_FORMAT_UNKNOWN),"unknown audio format")==0);
     native_codec_t codec=NATIVE_CODEC_AUTO; bool first=true;
-    probe=(stream_probe_t){0}; reject_output=true;
+    probe=(stream_probe_t){0}; reject_output=true; captured_size=0;
     assert(!send_stream_audio(42,&codec,aac,sizeof(aac),&first,&probe));
     assert(first); reject_output=false;
     // Explicit/MIME-selected codecs retain their existing decoder path.

@@ -229,17 +229,98 @@ records the separate 60,000-packet regression. Every archived file is covered
 by a SHA-256 manifest; QEMU PCM bytes can be recovered from the compressed
 capture logs with the existing parser. The physical board was not reflashed.
 
-## Remaining qualification
+## Full-window replay and metadata ordering (2026-10-13)
 
-1. Extend real-decoder QEMU fixtures to a false maximum-length ADTS candidate
-   before MP3/HE-AAC, forcing all four staging slots and the small-fragment
-   fallback. The current synthetic full-slot host test proves FIFO/lifetime,
-   but does not measure the real decoder's memory in that worst case.
-2. Run complete HTTP/HTTPS format/control regressions on C3, including Stop
+The maximum-length false ADTS prefix now has real-decoder coverage. The QEMU
+startup-only matrix passes 8/8 captures; replay after the false 8191-byte
+candidate produces exactly the clean-stream PCM for HE-AAC (524,288 bytes)
+and MP3 (294,912 bytes). The full-window MP3 path needs 964 additional bytes
+for its decoder accumulator versus ordinary coalesced startup; HE-AAC has
+the same first-frame heap as clean startup. These measurements use the
+previous `idf61-confirm-start` benchmark, before the status-only fix below.
+
+The host corpus has 33 cases. Both large-prefix fixtures exercise the
+independent control node, with 64 control packets for each input chunk size
+(1, 7 and 2048 bytes). The short HE-AAC host fixture must repeat complete
+frames to exceed the candidate window: the first test-design attempt reached
+EOF early and therefore did not exercise the required control fallback.
+
+The first physical HTTP matrix passed 19/20 cases. In the failing large-prefix
+HE-AAC case, the decoder reported 48 kHz stereo, but the stream task overwrote
+its profile with generic `AAC` after replay. Replay can block while the decoder
+already publishes metadata. The correction publishes the provisional family
+before committing any encoded bytes, including the EOF-only single-frame path
+and the legacy initial probe. Subsequent decoder metadata remains authoritative.
+
+A deterministic consumer-first host schedule reproduces the overwrite on the
+pre-fix code and passes on the corrected implementation under ASan/UBSan.
+It checks one provisional publication per accepted stream and exact replay;
+the pre-fix assertion failure is retained as a negative control.
+
+Evidence is collected in
+[startup-metadata-01](../tests/results/esp32c3-stream-probe-20261013/startup-metadata-01/),
+including the failed hardware trial and its exact application image. Physical
+requalification of the corrected image is tracked separately from QEMU PCM.
+
+The corrected physical HTTP matrix passes **20/20 cases**: MP3, FLAC,
+Vorbis, Opus, AAC-LC, HE-AAC, HE-AACv2, ID3-prefixed streams, three malformed
+inputs, four false prefixes, rate/profile changes and MP3/AAC family changes.
+The offline audit independently rechecks expected statuses, complete response
+bodies, stable metadata, unchanged boot identity, zero allocation/watchdog
+errors and unchanged output counters in sampled active intervals. Original
+firmware, private settings and stopped state were restored and verified.
+
+| HTTP case | Lowest sampled active free heap | Lowest sampled largest block |
+|---|---:|---:|
+| MP3 320 kbit/s | 83,680 | 69,632 |
+| FLAC level 8 | 64,248 | 49,152 |
+| HE-AAC 48 kHz stereo | 38,040 | 28,672 |
+| HE-AACv2 44.1 kHz stereo | 40,560 | 31,744 |
+| Large false ADTS before HE-AAC | 29,964 | 20,480 |
+| Large false ADTS before MP3 | 84,364 | 65,536 |
+
+These are sampled system values, not codec allocation sizes or absolute heap
+minima. They do not establish HTTPS headroom. Startup/idle/EOF completion
+counter changes are kept in the audit; no lifetime-zero-drop claim is made.
+The final legacy-path adjustment preserves the failed-send `first_chunk`
+contract and passes the default-mode corpus (11 files, six variants each).
+Rebuilding the confirmation-enabled hardware configuration after that adjustment
+produces **the identical app.bin**, as recorded in `rebuild-comparison.json`.
+
+The physical held-candidate control test also passes 3/3 cases with the station
+watchdog disabled. At 8180 bytes the server begins two-second pauses between
+successive bytes, keeping the declared 8191-byte candidate incomplete:
+
+| Action | Observed time |
+|---|---:|
+| Unresolved-format deadline | 10.49 s from server delivery start |
+| Stop | 0.146 s from control request |
+| Replacement with HE-AAC | 2.33 s until three matching status samples |
+
+Median settled heap is 139,760 bytes before and after, largest block 106,496
+bytes, and task count 16. No allocation/watchdog error or unexpected restart
+was recorded. The first controller attempt requested a single unsupported
+20-second server pause; it failed before playback cases, restored the board,
+and is retained separately. Schedules are now validated before installing an
+image. As elsewhere, server byte counts are not direct lease instrumentation.
+
+The matching partial-header controller passes another 3/3 cases: deadline
+10.69 s, Stop 0.212 s and HE-AAC replacement 2.08 s. Settled median heap
+(139,752 bytes), largest block (110,592 bytes) and task count (16) are identical
+before and after. Both control runs restore the original app and private
+settings and leave playback stopped. Together with the format matrix, this
+qualifies 26 finite HTTP scenarios on the saved candidate, not HTTPS or
+continuous playback.
+
+## Qualification status and remaining work
+
+1. HTTP format requalification of the metadata-order correction is complete;
+   maximum-length startup replay also has host and real-decoder QEMU coverage.
+2. Complete HTTP/HTTPS control regressions and the HTTPS format matrix on C3, including Stop
    during candidate collection, stalls and incomplete tags, TLS pressure,
    repeat connections, actual queue target below four, and heap recovery.
-3. Verify decoded FLAC/Ogg and free-format playback with this option enabled;
-   host byte-preservation checks alone do not prove decoding or output quality.
+3. HTTP FLAC/Vorbis/Opus playback passed. Add decoded free-format playback
+   and PCM-quality checks; host byte-preservation checks alone do not prove them.
 4. Implement confidence at codec changes and bounded recovery after lost
    alignment. Startup success does not establish those behaviors. Keep every
    existing codec/profile and avoid discarding real payload after false sync.
