@@ -1636,6 +1636,14 @@ Initial AUTO codec selection additionally has
 prefix parser and audio submission function, fragmented signatures, ID3,
 unknown input and exact byte replay. See [scope and open hardware gates](ESP32C3_STREAM_PROBE_20261013.md).
 
+`tools/esp32c3_tests/prefix_control.py` checks the initial-header deadline with
+the station watchdog disabled, Stop, stream replacement and settled heap
+recovery. Supply `--board`, `--host`, `--candidate`, `--restore` and a fresh
+`--output` directory; it uses HTTP fixture ports 8773/8774. The board must
+initially be stopped and the restore image must match. It restores the app
+and watchdog setting and compares private settings in RAM before reporting
+success. Recorded failed checks produce a failing exit status after restore.
+
 ## Bounded WebUI transfers and OTA reboot
 
 Run `python -B -X utf8 tests/run-esp32c3-web-memory.py` for the actual C3

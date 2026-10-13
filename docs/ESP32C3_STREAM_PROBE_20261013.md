@@ -50,8 +50,8 @@ using the previous production-derived WebUI config.
 The [saved image](../firmware/development/esp32c3-idf-6.1-r9a97-stream-probe/app.bin)
 was initially build/host-tested only. The subsequent physical HTTP campaign
 below tests the same image; it is still not production-qualified. A subsequent
-laboratory HTTPS campaign is recorded below; watchdog-disabled deadline tests
-remain required. Cross-codec
+laboratory HTTPS campaign and watchdog-disabled deadline tests are recorded
+below. Cross-codec
 switching, misleading MIME and stronger multi-frame confirmation remain open.
 
 ## Corpus and physical follow-up
@@ -140,9 +140,36 @@ Evidence: [HTTP transitions](../tests/results/esp32c3-stream-probe-20261013/tran
 [HTTPS matrix, public test CA and exact configuration delta](../tests/results/esp32c3-stream-probe-20261013/physical-tls-01/),
 and [labelled laboratory artifact](../firmware/development/esp32c3-idf-6.1-r9a97-stream-probe-tls-lab/manifest.json).
 These tests cover changes within AAC, not MP3 ↔ AAC family switching.
-Long public-station playback, watchdog-disabled initial-probe timeout,
-misleading MIME, stronger frame confirmation and cross-codec switching remain
+Long public-station playback, misleading MIME, stronger frame confirmation
+and cross-codec switching remain
 open. No full production qualification is claimed.
+
+## Incomplete prefix: deadline, Stop and replacement
+
+The HTTP prefix-control campaign on `idf61-stream-probe` passed all three
+cases with the station watchdog explicitly disabled and read back:
+
+| Case | Result | Observed response |
+|---|---|---:|
+| Incomplete ADTS header, connection still open | PASS: `unknown audio format` | 10.300 s from server delivery start |
+| Stop while waiting for header | PASS: stayed stopped | 0.145 s to first stopped observation |
+| Replace incomplete stream with valid HE-AAC | PASS: repeated correct format and steady output counters | 2.132 s to three confirmations |
+
+The fault server pauses two seconds after each initial byte; fewer than the
+seven ADTS header bytes had arrived when the deadline fired. HTTP EOF and
+header completion therefore cannot explain the timeout. No restart,
+allocation failure or task-watchdog counter increase occurred. Settled idle
+medians before and after were identical: 140,068 bytes free, largest block
+110,592 bytes and 16 tasks. These checks cover HTTP control and sampled heap
+recovery, not long playback, HTTPS cancellation or analog audio continuity.
+
+The original app hash, stopped state and private Wi-Fi/playlist/settings
+were verified after restoration, including the original watchdog setting.
+[Raw evidence and exact executed controller](../tests/results/esp32c3-stream-probe-20261013/prefix-control-01/)
+are frozen with checksums. The reusable runner
+`tools/esp32c3_tests/prefix_control.py` additionally returns failure after
+restoration if any recorded case or heap-recovery check failed; the frozen
+controller predates that exit-status guard.
 
 ## Format references
 
