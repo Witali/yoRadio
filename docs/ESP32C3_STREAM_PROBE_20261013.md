@@ -171,6 +171,34 @@ are frozen with checksums. The reusable runner
 restoration if any recorded case or heap-recovery check failed; the frozen
 controller predates that exit-status guard.
 
+## Short signatures after junk: follow-up correction
+
+`e3c06954` corrects an initial-probe delay: a complete four-byte MP3 header
+after one junk byte was not recognized until additional bytes arrived. The
+same fixed ten-byte search window affected short ADTS/FLAC/Ogg prefixes.
+The new regression failed on the previous parser. The parser now discards
+impossible candidates immediately and rechecks retained suffixes, retaining
+partial supported signatures across reads. ID3 size/skip validation and
+search/time bounds remain in place; no heap allocation or state growth is
+introduced. Supported prefix sizes have named constants.
+
+ASan/UBSan passes exact-header cases for all four formats after 1–24 junk
+bytes, every two-part split, byte-at-a-time reads, overlapping candidate
+prefixes, incomplete headers and an empty ID3 tag after junk. The existing
+66 encoded-corpus cases and 10,000 malformed-prefix trials also pass.
+[Before/after host evidence](../tests/results/esp32c3-stream-probe-20261013/prefix-resync-01/)
+retains the original assertion failure. Previous physical results above
+apply to the earlier firmware; they are not hardware qualification of this
+follow-up change.
+
+ESP-IDF 6.1 built the follow-up as `idf61-probe-resync` (1,460,096 bytes),
+saved under [firmware/development](../firmware/development/esp32c3-idf-6.1-r9a97-probe-resync/manifest.json).
+Enabled sdkconfig values match the original non-laboratory probe image;
+the ephemeral TLS test CA is absent. Compiler-reported stack frames remain
+896 bytes for `stream_task` and 96 bytes for `send_stream_audio.part.0`;
+these are individual frames, not measured total stack high-water marks.
+The follow-up image has not been installed on the board or production-qualified.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)
