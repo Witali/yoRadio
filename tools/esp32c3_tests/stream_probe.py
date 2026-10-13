@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import time
 
-from common import Board, Failure, exception_details, fixtures, matches, require, sha
+from common import Board, Failure, check_transitions, exception_details, fixtures, matches, require, sha
 from ota import image_info, multipart, snapshot, upload, verify_snapshot, wait_image
 from production_health import read_health
 from audio_test_server.server import Server
@@ -18,7 +18,26 @@ def main():
     parser.add_argument('--candidate', type=Path, required=True)
     parser.add_argument('--restore', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--tls-cert', type=Path)
+    parser.add_argument('--tls-key', type=Path)
+    parser.add_argument('--tls-ca', type=Path)
+    parser.add_argument('--transitions', action='store_true')
+    parser.add_argument('--case-filter', action='append')
     args = parser.parse_args()
+    secure = args.tls_cert is not None
+    require(secure == (args.tls_key is not None) == (args.tls_ca is not None),
+            'Supply all TLS certificate/key/CA paths together')
+    if secure:
+        manifest=json.loads(args.candidate.with_name('manifest.json').read_text())
+        cfg=args.candidate.with_name('sdkconfig').read_text()
+        require(manifest.get('laboratory_only') is True and
+                manifest.get('extra_trust_ca_sha256')==sha(args.tls_ca.read_bytes()),
+                'Use a labelled laboratory image trusting exactly the supplied CA')
+        require('CONFIG_MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE=y' in cfg and
+                'CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=y' in cfg and
+                'CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=16384' in cfg and
+                'CONFIG_ESP_TLS_INSECURE=y' not in cfg,
+                'Preserve certificate verification, public roots and TLS record capacity')
     args.output.mkdir(parents=True, exist_ok=False)
     board = Board(args.board)
     original = board.info()
@@ -27,7 +46,7 @@ def main():
             'Restore app does not match active firmware')
     private = snapshot(board)  # Never serialize credentials, stations or their hashes.
     report = dict(controller_sha256=sha(Path(__file__).read_bytes()), initial=original,
-                  candidate=image_info(args.candidate.read_bytes()), cases=[])
+                  candidate=image_info(args.candidate.read_bytes()), transport='https' if secure else 'http', cases=[])
 
     def save():
         (args.output/'results.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
@@ -58,21 +77,44 @@ def main():
                 'truncated-id3': b'ID3\x04\x00\x00\x00\x00\x00\x20'}
     for name, data in negative.items():
         specs[name] = dict(data=data, seconds=.1, codec='aac', mime=None, sha256=sha(data))
+    if args.transitions:
+        for name in ('changing','implicit-sbr'):
+            specs[name]=dict(available[name],mime=None)
+    if args.case_filter:
+        specs={name:spec for name,spec in specs.items() if any(s in name for s in args.case_filter)}
+    require(specs, 'No matching cases')
     report['fixtures'] = {name:dict(bytes=len(spec['data']), sha256=sha(spec['data']),
                                   mime=None) for name,spec in specs.items()}
     save()
     try:
         install(args.candidate)
         report['installed'] = board.info()
-        with Server(args.host,args.port,specs,pacing_ratio=1.0,
+        with Server(args.host,args.port,specs,cert=args.tls_cert,key=args.tls_key,pacing_ratio=1.0,
                     delivery_pauses=[(i,.02) for i in range(1,10)]) as server:
             for name, spec in specs.items():
                 row = dict(name=name, before=read_health(board), observations=[])
                 report['cases'].append(row)
                 started = time.monotonic()
                 try:
-                    board.play(f'http://{args.host}:{args.port}/file/{name}')
-                    if name in negative:
+                    scheme='https' if secure else 'http'
+                    board.play(f'{scheme}://{args.host}:{args.port}/file/{name}')
+                    if 'sequence' in spec:
+                        deadline=started+spec['seconds']+15
+                        health=[]; began=False
+                        while time.monotonic()<deadline:
+                            state=board.status(); row['observations'].append(state)
+                            began=began or bool(state.get('audio') and state.get('pcm_sample_rate'))
+                            if began and not state['audio']: break
+                            if state.get('audio') and state.get('pcm_sample_rate'):
+                                sample=read_health(board)
+                                if board.status()['audio']: health.append(sample)
+                            time.sleep(.4)
+                        row['transition_health']=health; row['eof']=state
+                        check_transitions(row['observations'],[available[n] for n in spec['sequence']])
+                        require(not state['audio'] and state['format']=='stream ended', 'Wrong transition EOF status')
+                        require(len(health)>=3, 'Missing transition health samples')
+                        require(health[0]['output']==health[-1]['output'], 'Output counters changed during transitions')
+                    elif name in negative:
                         deadline = started+12
                         while time.monotonic()<deadline:
                             state=board.status(); row['observations'].append(state)
@@ -115,6 +157,11 @@ def main():
                     save(); print(name,row['result'],flush=True)
                     board.stop(); time.sleep(.5)
             report['server']=server.events
+            if secure:
+                for row in report['cases']:
+                    events=[e for e in server.events if e.get('fixture')==row['name']]
+                    if row['result']=='PASS' and not any(e.get('tls_version') for e in events):
+                        row['result']='FAIL'; row['check']='Missing negotiated TLS evidence'
             save()
     finally:
         try:
