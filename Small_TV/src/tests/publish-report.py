@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -35,7 +35,10 @@ def main():
     classic = groups['machine_classic']['result']
     weather = groups['machine_weather']['result']
     calendar = groups['machine_calendar']['result']
-    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, groups['integrity']['result'])):
+    jpeg = groups['machine_jpeg']['result']
+    if not jpeg['complete_asset_set'] or len(jpeg['cases']) != 107:
+        raise ValueError('JPEG gate did not execute every public image')
+    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, jpeg, groups['integrity']['result'])):
         raise ValueError('Groups tested different applications')
     qemu = groups['qemu']['result']
     if not qemu['http_initial_setup']['passed']:
@@ -86,6 +89,13 @@ def main():
     summary['machine_calendar'] = {key:calendar[key] for key in
         ('passed','app_sha256','source_sha256','factory_elf_sha256','native_elf_sha256','approved_fixes','scope')}
     summary['machine_calendar']['renderer_cases'] = len(calendar['cases'])
+    summary['machine_jpeg'] = {key:jpeg[key] for key in
+        ('passed','app_sha256','source_sha256','factory_elf_sha256','native_elf_sha256',
+         'complete_asset_set','approved_fixes','scope')}
+    summary['machine_jpeg']['decoded_images'] = len(jpeg['cases'])
+    summary['machine_jpeg']['compared_pixels'] = sum(row['compared_pixels'] for row in jpeg['cases'])
+    summary['machine_jpeg']['error_validation_checks'] = len(jpeg['errors'])
+    summary['machine_jpeg']['placement_checks'] = len(jpeg['placements'])
     summary['qemu'] = {'passed': qemu['passed'], 'qemu_sha256': qemu['qemu_sha256'],
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
                        'helper_sha256': qemu['helper_sha256'],

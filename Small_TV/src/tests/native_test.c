@@ -65,6 +65,11 @@ esp_err_t esp_partition_erase_range(const esp_partition_t *p,size_t offset,size_
 {if(offset>p->size || length>p->size-offset || offset%4096 || length%4096)return ESP_ERR_INVALID_SIZE;memset(flash_bytes+offset,255,length);return ESP_OK;}
 void display_blit(int x,int y,int width,int height,const uint16_t *pixels)
 {assert(x>=0 && y>=0 && width>0 && height>0 && x+width<=240 && y+height<=240 && pixels);rendered_pixels+=width*height;}
+void display_fill(int x,int y,int width,int height,uint16_t color)
+{
+    /* Accept bounded JPEG error cleanup; the RV32 oracle checks actual pixels. */
+    assert(x>=0 && y>=0 && width>0 && height>0 && x+width<=240 && y+height<=240 && color==0);
+}
 bool network_connected(void) {return connected;}
 bool network_ap_active(void) {return true;}
 void network_restart_later(void) {++restart_requests;}

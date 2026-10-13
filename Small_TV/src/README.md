@@ -66,6 +66,9 @@ Missing/failed weather icons and shortened labels clear their complete regions.
 factory fixes from this requested scrolling extension.
 [Calendar checks](../qemu/parity/calendar-checks.md) cover year/day-number jumps
 at unchanged local time and clean replacement of centered simple-clock dates.
+[JPEG checks](../qemu/parity/jpeg-checks.md) execute both real decoders for all
+107 public images, restore byte-clipped IDCT colors and verify bounded cleanup
+after streaming errors, retries, validation and clipped placement.
 Comments also explain byte-padded/LSB-first fonts, fixed raw-sector offsets,
 timer thresholds, photo fades, MIME binary parsing and DNS packet bounds.
 Where machine instructions were checked directly, comments cite their original

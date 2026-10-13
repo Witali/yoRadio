@@ -93,20 +93,34 @@ static int jpeg_output_block(JDEC *decoder, void *pixels, JRECT *rect)
 
 static esp_err_t jpeg_decode_unlocked(jpeg_stream_t *stream, unsigned width, unsigned height)
 {
-    /* Decode a bounded baseline JPEG using a temporary work pool. */
+    /* Decode a bounded baseline JPEG using a temporary work pool.
+     * FIXED_RECONSTRUCTION: select byte-clipped IDCT in tjpgdcnf.h, matching
+     * the original 0x42011624..0x420116c6 before color conversion.
+     * FIXED_FACTORY: 0x4200c33e ignores flash errors; a failed streaming decode
+     * can leave old/new stripes mixed. Erase only the known image rectangle
+     * after decompression fails; validation and preparation never paint. */
 
     void *workspace = malloc(8192);
     if (!workspace)
         return ESP_ERR_NO_MEM;
     JDEC decoder;
     JRESULT result = jd_prepare(&decoder, jpeg_stream_read, workspace, 8192, stream);
-    if (result == JDR_OK && decoder.width <= LCD_WIDTH && decoder.height <= LCD_HEIGHT &&
-        (!width || decoder.width == width) && (!height || decoder.height == height))
+    bool dimensions_valid = result == JDR_OK && decoder.width <= LCD_WIDTH &&
+                            decoder.height <= LCD_HEIGHT &&
+                            (!width || decoder.width == width) &&
+                            (!height || decoder.height == height);
+    if (dimensions_valid)
         result = jd_decomp(&decoder, jpeg_output_block, 0);
     else if (result == JDR_OK)
         result = JDR_FMT1;
     free(workspace);
-    return result == JDR_OK && !stream->read_error ? ESP_OK : ESP_ERR_INVALID_ARG;
+    if (result != JDR_OK || stream->read_error)
+    {
+        if (dimensions_valid && !stream->discard)
+            display_fill(stream->x, stream->y, decoder.width, decoder.height, 0);
+        return ESP_ERR_INVALID_ARG;
+    }
+    return ESP_OK;
 }
 
 esp_err_t media_validate_jpeg_unlocked(uint32_t offset, size_t length, unsigned width,

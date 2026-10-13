@@ -82,6 +82,14 @@ else {
         if($LASTEXITCODE){throw "Calendar/date machine comparison failed"}
     } $calendarReport
 }
+if ($SkipMachine) {$groups.Add(@{name="machine_jpeg";status="not_run";reason="Explicit -SkipMachine"})}
+else {
+    $jpegReport=Join-Path $OutputDirectory "jpeg.json"
+    Invoke-TestGroup "machine_jpeg" {
+        & $PythonPath (Join-Path $PSScriptRoot "jpeg_oracle.py") --output $jpegReport
+        if($LASTEXITCODE){throw "JPEG decoder/error machine comparison failed"}
+    } $jpegReport
+}
 if ($SkipQemu) {$groups.Add(@{name="qemu";status="not_run";reason="Explicit -SkipQemu"})}
 else {
     $qemuFolder=Join-Path $OutputDirectory "qemu"

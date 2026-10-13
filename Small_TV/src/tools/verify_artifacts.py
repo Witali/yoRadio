@@ -37,7 +37,7 @@ def main():
             'A full passing suite is required')
     groups = {row['name']: row['result'] for row in suite['groups'] if row['status'] == 'passed'} \
         if 'groups' in suite else suite
-    for name in ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'qemu'):
+    for name in ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'qemu'):
         require(name in groups and groups[name]['passed'], 'Missing passing group: ' + name)
     for item in suite['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
@@ -116,6 +116,12 @@ def main():
     require(groups['qemu']['field_http']['passed'],'Real QEMU field update/scroll gate failed')
     report['machine_calendar_report'] = '../qemu/parity/calendar-validation.json'
     report['machine_calendar_cases'] = calendar['renderer_cases'] if 'renderer_cases' in calendar else len(calendar['cases'])
+    jpeg = groups['machine_jpeg']
+    require(jpeg['complete_asset_set'] and jpeg['app_sha256']==app_sha and
+            jpeg['source_sha256']==manifest['source_sha256'], 'JPEG gate did not test the complete current image set')
+    report['machine_jpeg_report'] = '../qemu/parity/jpeg-validation.json'
+    report['machine_jpeg_images'] = jpeg['decoded_images'] if 'decoded_images' in jpeg else len(jpeg['cases'])
+    report['machine_jpeg_error_checks'] = jpeg['error_validation_checks'] if 'error_validation_checks' in jpeg else len(jpeg['errors'])
     report['qemu_field_report'] = '../qemu/field-http-validation.json'
     report['work_status'] = 'Reconstructed firmware; confirmed factory corrections are marked and tested'
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

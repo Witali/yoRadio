@@ -237,7 +237,7 @@ class Machine:
             self.cpu.mem_write(destination,result[:capacity-1]+b'\0')
         return len(result)
 
-    def call(self,address,*arguments):
+    def call(self,address,*arguments,instruction_limit=20000000):
         """Invoke one machine function, failing on faults or an instruction deadline."""
         for index in range(1,32):
             self.cpu.reg_write(REGS[index],0)
@@ -247,7 +247,7 @@ class Machine:
         for index,value in enumerate(arguments):
             self.cpu.reg_write(REGS[10+index],value&0xffffffff)
         try:
-            self.cpu.emu_start(address,RETURN,count=20000000)
+            self.cpu.emu_start(address,RETURN,count=instruction_limit)
         except UcError as error:
             raise RuntimeError(f'{self.variant} PC {self.cpu.reg_read(rv.UC_RISCV_REG_PC):#x}: {error}; fault={self.fault}') from error
         if self.cpu.reg_read(rv.UC_RISCV_REG_PC)!=RETURN:
