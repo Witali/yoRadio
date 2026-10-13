@@ -441,3 +441,51 @@ allocation handler and both interrupt-mask helpers are in IRAM, retained state
 is in DRAM. Source snapshots, logs, image identity, physical results and SHA-256
 manifest: [startup-fault-01](../tests/results/esp32c3-stream-probe-20261013/startup-fault-01/summary.json).
 Test image: `firmware/development/esp32c3-idf-6.1-r9a97-startup-fault-tls-lab/app.bin`.
+
+### Next memory-placement experiment after repeated HTTPS failure
+
+The repeat controller now distinguishes per-case success from whole-run health
+and verifies that all cases share one boot. The completed five-iteration run
+has 17 local case passes and three failures: the second, third and fifth
+MP3 -> HE-AAC -> MP3 cases reproduce the failure with:
+`size=32744`, `caps=6144`, AAC codec 2, process stage 2, SDK result -2
+(`ESP_AUDIO_ERR_MEM_LACK`), completion marker 0 (ordinary data), and 723 remaining
+input bytes. The allocation and decoder failure sequences advance together.
+DWARF from the exact candidate ELF confirms `sizeof(owner_t)=32744` in
+`aac_compact_owner.c`; SDK caps are INTERNAL | DEFAULT. This locates the failed
+compact SBR allocation; it does not yet distinguish fragmentation from total
+free-memory exhaustion at that instant.
+
+All 20 cases share one boot; final allocation and decoder failure counts are
+both three, watchdog count is zero, and lifetime minimum heap is 18,732 bytes.
+Each failed stream stops with `decode failed`; starting the next fixture succeeds.
+This is recovery on a new Play request, not recovery within the failed stream.
+The strict offline audit rejects the matrix. Original firmware and all private
+settings are verified restored, with playback stopped. Source/controller
+snapshots, full results and allocation-size inspection are in
+[startup-repeat-01](../tests/results/esp32c3-stream-probe-20261013/startup-repeat-01/summary.json).
+The candidate manifest now records this repeat failure as well as the earlier
+single matrix pass; it remains unqualified.
+
+Next steps, keeping every AAC profile and unchanged PCM arithmetic:
+
+1. Capture available/largest matching-capability heap around this owner request
+   in the decoder task, before outer decoder cleanup. Keep the general IRAM
+   failed-allocation callback free of heap traversal and logging. Label whether
+   values precede or follow the allocation attempt; do not interpret settled
+   post-cleanup heap as the failed allocation's available memory.
+2. Test reserving the current compact `sizeof(owner_t)` earlier, before the
+   AAC PCM/core allocation sequence. The old EARLY_SBR_RESERVE feature targets
+   the original 55128-byte owner and is explicitly incompatible with compact
+   SBR; enabling that old flag would not be a valid comparison.
+3. If adding a compact pending owner, audit create, successful claim, LC-only
+   first output, implicit late SBR, profile reopen, failed open/process, Stop
+   and destroy. Pending storage must be freed exactly once or transferred to
+   the normal owner; preserve pointer-audit registration. Do not keep an
+   unused SBR reservation indefinitely for AAC-LC or hide failed HE as LC.
+4. Compare the same repeated HTTPS workload, the full format matrix and real
+   decoder PCM against the control. Allocation ordering must preserve exact
+   PCM; it does not justify relaxing the existing 3-LSB compact-history bound.
+   Check LC peak/steady heap as well as HE, so fixing HE does not regress LC/TLS.
+
+This is a pending placement experiment, not an implemented or qualified fix.
