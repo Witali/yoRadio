@@ -102,6 +102,9 @@ native_aac_decoder_t *native_aac_decoder_create(void) {
     if (decoder) {
         decoder->data = decoder->header;
         decoder->capacity = sizeof(decoder->header);
+#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+        aac_compact_owner_prepare(&decoder->compact);
+#endif
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
         aac_sbr_reserve_prepare(&decoder->reserve);
 #endif
@@ -115,6 +118,9 @@ native_aac_decoder_t *native_aac_decoder_create(void) {
 void native_aac_decoder_destroy(native_aac_decoder_t *decoder) {
     if (!decoder) return;
     if (decoder->codec) close_codec(decoder);
+#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+    aac_compact_owner_discard_pending(&decoder->compact);
+#endif
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
     aac_sbr_reserve_discard(&decoder->reserve);
 #endif
@@ -185,6 +191,10 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                 if (!decoder->codec || signature != decoder->signature) {
                     if (decoder->codec) {
                         close_codec(decoder);
+#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+                        aac_compact_owner_discard_pending(&decoder->compact);
+                        aac_compact_owner_prepare(&decoder->compact);
+#endif
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
                         aac_sbr_reserve_discard(&decoder->reserve);
                         aac_sbr_reserve_prepare(&decoder->reserve);
@@ -215,6 +225,18 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                         &config, &decoder->codec);
 #ifdef CONFIG_YORADIO_AAC_COMPACT_SBR
                     aac_compact_owner_leave();
+#endif
+#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+                    if (decoder->compact.pending_owner &&
+                        (result == ESP_AUDIO_ERR_MEM_LACK || result == ESP_AUDIO_ERR_FAIL)) {
+                        // Preserve LC opening under pressure, just as the legacy
+                        // reserve does. Keep the retry scoped to this owner too.
+                        aac_compact_owner_discard_pending(&decoder->compact);
+                        decoder->codec = NULL;
+                        aac_compact_owner_enter(&decoder->compact);
+                        result = esp_audio_simple_dec_open(&config, &decoder->codec);
+                        aac_compact_owner_leave();
+                    }
 #endif
 #ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
                     aac_scratch_reserve_leave();
@@ -277,6 +299,12 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                     output->decoded_size=0;
                     result=ESP_AUDIO_ERR_MEM_LACK;
                 }
+#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+                // LC returns unused storage after real PCM, not a parser-only
+                // call or buffer retry. Later implicit SBR still allocates normally.
+                if (result == ESP_AUDIO_ERR_OK && output->decoded_size)
+                    aac_compact_owner_discard_pending(&decoder->compact);
+#endif
 #endif
 #ifdef CONFIG_YORADIO_AAC_EARLY_SCRATCH_RESERVE
                 aac_scratch_reserve_leave();

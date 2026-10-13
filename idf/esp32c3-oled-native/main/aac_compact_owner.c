@@ -7,6 +7,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 #ifdef CONFIG_YORADIO_AAC_LATE_SBR
 #include "aac_analysis_core.h"
@@ -106,6 +107,19 @@ static void ps_pointer(aac_compact_owner_t *state) {
 }
 
 void *__real_media_lib_module_calloc(const char *,size_t,size_t);
+#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+void aac_compact_owner_prepare(aac_compact_owner_t *state) {
+    assert(state && !state->owner && !state->pending_owner && !context());
+    // Reserve the actual configured compact layout, before core/PCM split
+    // the heap. An unsuccessful reservation must not prohibit AAC-LC.
+    state->pending_owner = calloc(1, sizeof(owner_t));
+}
+void aac_compact_owner_discard_pending(aac_compact_owner_t *state) {
+    assert(state && !context());
+    free(state->pending_owner);
+    state->pending_owner = NULL;
+}
+#endif
 void *__wrap_media_lib_module_calloc(const char *module,size_t n,size_t size) {
     aac_compact_owner_t *state=context();
     bool owner_request=state && n==1 && size==sizeof(aac_sbr_owner_abi_t);
@@ -113,6 +127,11 @@ void *__wrap_media_lib_module_calloc(const char *module,size_t n,size_t size) {
 #ifdef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
     if(state && n==1 && size==fail_request) { fail_request=0;p=NULL; }
     else
+#endif
+#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+    if(owner_request && state->pending_owner) {
+        p=state->pending_owner;state->pending_owner=NULL;
+    } else
 #endif
     p=__real_media_lib_module_calloc(module,n,owner_request?sizeof(owner_t):size);
 #ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT

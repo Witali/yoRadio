@@ -1,0 +1,24 @@
+"""Sanitize the actual compact pending-owner allocation and free wrappers."""
+from pathlib import Path
+import hashlib
+import json
+import sys
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
+from run_output_dma_host import host,run
+source=ROOT/'idf/esp32c3-oled-native/main/aac_compact_owner.c'
+harness=ROOT/'tests/native/aac_compact_reserve_test.c'
+text=source.read_text()
+start=text.index('void *__real_media_lib_module_calloc(')
+end=text.index('int __real_PVMP4AudioDecodeFrame(',start)
+out=ROOT/'.build/aac-compact-reserve-host';out.mkdir(parents=True,exist_ok=True)
+unit=out/'test.c';unit.write_text(harness.read_text().replace('/* PRODUCTION_RESERVE_AND_WRAPPERS */',text[start:end]))
+binary=out/'test'
+(out/'build.log').write_bytes(run(['gcc','-std=c11','-O2','-Wall','-Wextra','-Werror',
+    '-fsanitize=address,undefined','-fno-pie','-no-pie',host(unit),'-o',host(binary)]))
+log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1',host(binary)])
+(out/'run.log').write_bytes(log)
+(out/'report.json').write_text(json.dumps(dict(passed=True,scope=__doc__,sources={
+    p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
+    for p in (source,harness,Path(__file__))}),indent=2)+'\n')
+print(log.decode(),end='')

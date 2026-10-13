@@ -1434,7 +1434,7 @@ static void decoder_task(void *argument) {
                     continue;
                 }
 #endif
-#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
+#if defined(CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE) || defined(CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER)
                 if (codec == NATIVE_CODEC_AAC) {
                     aac_decoder = native_aac_decoder_create();
                     if (!aac_decoder) {
@@ -1449,7 +1449,7 @@ static void decoder_task(void *argument) {
 #endif
                 if (!decoder_pcm_prepare(&output, &output_size,
                                          codec == NATIVE_CODEC_AAC)) {
-#ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
+#if defined(CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE) || defined(CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER)
                     native_aac_decoder_destroy(aac_decoder);
                     aac_decoder = NULL;
 #endif

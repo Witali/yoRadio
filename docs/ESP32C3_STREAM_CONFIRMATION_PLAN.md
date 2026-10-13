@@ -489,3 +489,26 @@ Next steps, keeping every AAC profile and unchanged PCM arithmetic:
    Check LC peak/steady heap as well as HE, so fixing HE does not regress LC/TLS.
 
 This is a pending placement experiment, not an implemented or qualified fix.
+
+### Compact early-owner prototype
+
+`CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER` is now an opt-in allocation-order
+experiment, dependent on compact SBR and disabled by default. It reserves the
+configured `sizeof(owner_t)` before the service allocates AAC PCM/core state,
+then transfers that zeroed block through the existing SDK owner-allocation
+wrapper. Normal owner initialization, pointer-audit registration and free
+handling remain in the common path. One extra pointer belongs to each native
+AAC adapter; no additional permanent/global arena is introduced.
+
+An unclaimed reservation is discarded on decoder destruction and after a
+successful PCM-producing LC frame. Profile reopen prepares a new reservation;
+an SDK open failure can release it and retry inside the same compact context.
+Late implicit SBR after LC still uses the normal allocation path. Preparation
+failure is not permission to emit LC instead of HE: the existing actual SBR
+allocation-failure handling continues to reject incomplete decoding.
+
+The actual prepare/claim/free functions pass ASan/UBSan ownership tests with
+injected failures, task-context isolation, zeroing, late retry and cleanup.
+These tests mock the ABI sizes and DSP; real-decoder PCM, complete adapter
+lifetime and physical repeated-HTTPS/LC-memory qualification remain required.
+The prototype is not a production default or a qualified fix.

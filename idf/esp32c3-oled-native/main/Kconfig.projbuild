@@ -767,6 +767,17 @@ config YORADIO_AAC_COMPACT_SBR
         SBR allocation failure is an error, never accepted as core-only PCM.
         Experimental until full-radio memory, CPU and OTA gates are met.
 
+config YORADIO_AAC_COMPACT_EARLY_OWNER
+    bool "Reserve compact SBR owner before AAC core and PCM"
+    depends on YORADIO_AAC_COMPACT_SBR
+    default n
+    help
+        Allocation-order experiment using the selected compact layout size.
+        Transfer the pending block to the SDK on its SBR request; release
+        unused storage after real LC output or decoder destruction. Adds one
+        pointer per native AAC decoder. Does not change DSP or format support.
+        Requires repeated HTTPS, LC/late-SBR, lifetime and PCM qualification.
+
 config YORADIO_AAC_HIGH_HISTORY
     bool "Pack retained high-QMF history"
     depends on YORADIO_AAC_COMPACT_SBR
