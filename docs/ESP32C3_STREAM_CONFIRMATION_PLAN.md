@@ -749,3 +749,30 @@ fault, and failure of the diagnostic request itself without reusing stale
 health. This instrumentation was added after the retained campaign and cannot
 fill its missing interval retrospectively. Correlated TCP evidence and repeat
 playback remain necessary; no production qualification yet.
+
+### Focused AAC-LC repeat after the TCP timeout (2026-10-13)
+
+Three preplanned 120-second observations of the same public 128-kbit AAC-LC
+source pass on one boot of the unchanged public-root image. All 18 checks
+(six per observation, including settled recovery and settings) pass. No
+transport request fails, no allocation/decoder/watchdog fault is recorded,
+and every post-warmup output-counter window has zero increments. Independent
+reference checks identify 44.1-kHz stereo AAC-LC in each observation.
+
+| Observation | Minimum sampled free heap | Minimum largest block | Settled free-heap median before / after Stop |
+| --- | ---: | ---: | ---: |
+| 1 | 59,160 B | 32,768 B | 139,476 / 139,472 B |
+| 2 | 58,796 B | 32,768 B | 139,484 / 139,468 B |
+| 3 | 59,680 B | 32,768 B | 139,340 / 139,344 B |
+
+The settled largest block remains 106,496 bytes in this boot. These values
+are diagnostics, not absolute acceptance floors. The endpoint counter windows
+cover approximately 105 seconds per observation after the 15-second warmup;
+they do not prove analog continuity. There was no failure to trigger the new
+pre-Stop diagnostic, so the original TCP timeout remains unattributed.
+Windows denied access to the PktMon driver; no packet capture is claimed.
+Original firmware and private settings are verified restored, stopped.
+
+[Retained reports, request phases and sources](../tests/results/esp32c3-stream-probe-20261013/early-owner-aac-repeat-01/summary.json).
+This closes a bounded AAC-LC repeat check, not the TCP cause investigation or
+the remaining all-format production qualification.

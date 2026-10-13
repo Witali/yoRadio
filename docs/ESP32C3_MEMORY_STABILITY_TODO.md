@@ -9,6 +9,32 @@ Keep total buffered bytes constant; audit the eight-slot ADTS startup window
 and every pointer owner before implementation. TLS/SBR remain separate
 contiguous-allocation problems. No new buffer size is enabled by this review.
 
+## Latest candidate checkpoint, 2026-10-13
+
+Candidate: `esp32c3-idf-6.1-r9a97-early-owner-public`, app SHA-256
+`219bfe1b4bd84e385825d5ee3b6e3468c7bf485a189c3765a11e511e1d459336`.
+It uses public roots and the experimental frame router, startup confirmation
+and early compact SBR reservation. Repository defaults are unchanged.
+The rows below refer only to this exact binary; older image results remain
+separate evidence. See the [current reports](ESP32C3_STREAM_CONFIRMATION_PLAN.md#public-root-early-owner-image-ten-minute-he-aac-test-2026-10-13).
+
+| Scope | Current evidence |
+| --- | --- |
+| Finite HTTP format/EOF and codec transitions | 20/20; MP3, FLAC, Vorbis, Opus, AAC-LC, HE-AAC and HE-AACv2; strict decoder-health audit |
+| Delayed header and held-candidate cancellation | 6/6; deadline, Stop, replacement and settled heap recovery |
+| Public HE-AAC HTTPS, 600 seconds | Passed; no new measured output faults, allocation or decoder faults; settled recovery |
+| Five public HTTPS variants, network failures, WebSocket | 19/20; one AAC-LC observation interrupted by TCP connect timeout; raw failure retained |
+| Focused AAC-LC HTTPS follow-up | Three preplanned 120-second observations pass on one boot; timeout does not recur, cause remains open |
+| Exact-image full production acceptance | Still open |
+
+Remaining evidence must address the interrupted AAC-LC observation, sustained
+heavy non-AAC playback, exact-image OTA regression and HTTPS coverage beyond
+the observed public AAC/MP3 sources. The public 16-kbit source was independently
+identified as mono HE-AAC without PS; it does not establish HTTPS HE-AACv2
+coverage. Routing/free-format and recovery requirements remain tracked in the
+stream-confirmation plan. Additional compression and one-KiB input experiments
+are optional research, not new release requirements.
+
 ## Current release checkpoint, 2026-10-12
 
 This section takes precedence over historical experiment checkboxes below.

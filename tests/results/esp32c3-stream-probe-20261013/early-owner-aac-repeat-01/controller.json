@@ -1,0 +1,83 @@
+{
+  "original": {
+    "version": "idf61-production-prefill1000",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "73da8e2146c5b3691bcfc7a8fb46b34109e74099eac221df2b66e05a62b95245"
+  },
+  "candidate": {
+    "app_elf_sha256": "b9e61a369486dc5b4404f218433dc00a01d4f348d9302467ae1e84c35a9d2118",
+    "sha256": "219bfe1b4bd84e385825d5ee3b6e3468c7bf485a189c3765a11e511e1d459336",
+    "bytes": 1470752
+  },
+  "installed": {
+    "version": "idf61-early-owner-public",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "b9e61a369486dc5b4404f218433dc00a01d4f348d9302467ae1e84c35a9d2118"
+  },
+  "command": [
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "tools/esp32c3_tests/quiet_acceptance.py",
+    "--board",
+    "http://192.168.100.4",
+    "--firmware",
+    "C:\\Work\\yoRadio\\.worktree\\esp32c3-idf-upgrade\\firmware\\development\\esp32c3-idf-6.1-r9a97-early-owner-public\\app.bin",
+    "--output",
+    "C:\\Work\\yoRadio\\.worktree\\esp32c3-idf-upgrade\\.build\\early-owner-public-aac-repeat-01\\physical",
+    "--host",
+    "192.168.100.253",
+    "--suite",
+    "public",
+    "--public-case",
+    "groovesalad-128-aac",
+    "--seconds",
+    "120",
+    "--aac-reference-command",
+    ".build/c3-prefill1000-public-20261010/faad-reference-command.json"
+  ],
+  "planned_repetitions": 3,
+  "runs": [
+    {
+      "attempt": 1,
+      "exit_code": 0
+    },
+    {
+      "attempt": 2,
+      "exit_code": 0
+    },
+    {
+      "attempt": 3,
+      "exit_code": 0
+    }
+  ],
+  "test_exit_code": 0,
+  "restoration": {
+    "image": {
+      "version": "idf61-production-prefill1000",
+      "partition": "app0",
+      "max_size": 1900544,
+      "app_elf_sha256": "73da8e2146c5b3691bcfc7a8fb46b34109e74099eac221df2b66e05a62b95245"
+    },
+    "status": {
+      "firmware": "esp32c3-oled-native",
+      "network": "client",
+      "audio": false,
+      "format": "stopped",
+      "sample_rate": 0,
+      "channels": 0,
+      "bits_per_sample": 0,
+      "pcm_sample_rate": 0,
+      "pcm_channels": 0,
+      "format_is_pcm": false,
+      "channels_are_core": false,
+      "rssi": -60
+    },
+    "wifi_unchanged": true,
+    "playlist_unchanged": true,
+    "settings_unchanged": true
+  }
+}
