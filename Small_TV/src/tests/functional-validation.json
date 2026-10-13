@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "started_utc": "2026-10-13T12:25:43.9017530Z",
-  "finished_utc": "2026-10-13T12:36:36.7798823Z",
+  "started_utc": "2026-10-13T13:44:20.1356394Z",
+  "finished_utc": "2026-10-13T13:55:13.5699112Z",
   "passed": true,
   "automatic_profile": "host_machine_qemu",
   "all_functionality_verified": false,
-  "source_sha256": "8f5e2c5edc2153e806aae00c8fa967c15942dc85b1c2f7d4311a2b2ef3eb1dce",
-  "app_sha256": "7bf1883663a5fab8f58316577c714824e06d3c7ffd63f98676f74bd51baf2700",
+  "source_sha256": "967831703a535a064cf4c6db0adec854eba821b1d13efb644de0a77eab68f538",
+  "app_sha256": "ecc8969486f335fcb42144965d73e9bdf0fdc1de28123b341daaeb0ba610b0eb",
   "test_inputs": [
     {
       "sha256": "c9187b43a2c83c8c8a433343c4a10026ee630c5a656773cd362e7b51a3a3e6dc",
@@ -17,7 +17,11 @@
       "file": "Small_TV/src/tests/control_oracle.py"
     },
     {
-      "sha256": "afc754b59b5ad03f5564446a5ec32a06b0923beb3c6a21751b95d768c3bdb7ec",
+      "sha256": "1ebb9bf3d85bcddc19234d656e795d582d136c5ed821d580250da36c19407772",
+      "file": "Small_TV/src/tests/frontend_test.py"
+    },
+    {
+      "sha256": "8f603ea446b4d755e78d20ae791ea38dc384542bb592982b232b83a4eacbd487",
       "file": "Small_TV/src/tests/http_contracts.inc"
     },
     {
@@ -37,7 +41,7 @@
       "file": "Small_TV/src/tests/platform_test.c"
     },
     {
-      "sha256": "cd6b59c987e3ce4c88af80f691edbde54e6f03b08e5498d37bcbaf0d67503591",
+      "sha256": "da0e51783b28921525d751b09e5a522cee0b29fe8f1d8ab96b222eb7c072df97",
       "file": "Small_TV/src/tests/publish-report.py"
     },
     {
@@ -45,7 +49,7 @@
       "file": "Small_TV/src/tests/qemu_suite.py"
     },
     {
-      "sha256": "f8e090c8e525c598d67c352b4f5547d8186513e93ff8c5c86840056f4dc9d65b",
+      "sha256": "a44268d22034e092d5de02300042d9e905fc520e6fa3a96acd9e9b9ee2505ab9",
       "file": "Small_TV/src/tests/run-all.ps1"
     },
     {
@@ -160,7 +164,7 @@
   ],
   "native": {
     "passed": true,
-    "checks": 3014,
+    "checks": 3021,
     "groups": [
       "settings",
       "factory_settings",
@@ -415,7 +419,6 @@
     ]
   },
   "platform": {
-    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation.",
     "passed": true,
     "cases": [
       {
@@ -493,15 +496,81 @@
         "passed": true,
         "checks": 8
       }
-    ]
+    ],
+    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation."
+  },
+  "frontend": {
+    "passed": true,
+    "scripts": 3,
+    "pages": [
+      {
+        "page": "setup",
+        "scripts": 1,
+        "sha256": "b0e13e311a2c2e34b557557f858bff40f6a77f76bd7ff5d662aa938e8d86213a"
+      },
+      {
+        "page": "settings",
+        "scripts": 1,
+        "sha256": "839e1c445080193d517fc6099d137523a24e9a91ccca8dd57a76e9e286693a40"
+      },
+      {
+        "page": "photo",
+        "scripts": 1,
+        "sha256": "53339fa44d5d6d8a8a3c2c1951abb688f5bb87923279ff5b555dc9fd57072445"
+      }
+    ],
+    "metadata_checks": 4,
+    "crop_checks": 156,
+    "cleaner_sha256": "82ceae4f0ea5d7aeec9808d924e29fe46136e7cdca40644b3cccd45c226a7710",
+    "crop_sha256": "20e5667451ee71b30b0103206f9a3b13c111573ce773fddcbe015ad222beb484",
+    "resize_checks": 23,
+    "inputs": [
+      {
+        "file": "Small_TV/local_site/check_scripts.mjs",
+        "sha256": "49b87b9caa7d650cfa8ae0b8fe585293fd0e2c28ca90d0bbe08abe0d2b3384d4"
+      },
+      {
+        "file": "Small_TV/local_site/jpeg_metadata.js",
+        "sha256": "82ceae4f0ea5d7aeec9808d924e29fe46136e7cdca40644b3cccd45c226a7710"
+      },
+      {
+        "file": "Small_TV/local_site/photo_crop.js",
+        "sha256": "20e5667451ee71b30b0103206f9a3b13c111573ce773fddcbe015ad222beb484"
+      },
+      {
+        "file": "Small_TV/local_site/photo_crop.html",
+        "sha256": "208062b9f19395049775f58ade19f648ee50fe2b8390c2d579e2519ed2313dcf"
+      },
+      {
+        "file": "Small_TV/local_site/extract_pages.py",
+        "sha256": "356b02b9c760e9dc7900438d3994d446474a3dfe8ef6a545a02a8e89b50a4759"
+      },
+      {
+        "file": "Small_TV/local_site/pages-manifest.json",
+        "sha256": "d39f4cd3b03548262f8be48bb1c20b841ef88eeb3f4adda1a8ed0a9c1b829f14"
+      },
+      {
+        "file": "Small_TV/local_site/pages/setup.html",
+        "sha256": "b0e13e311a2c2e34b557557f858bff40f6a77f76bd7ff5d662aa938e8d86213a"
+      },
+      {
+        "file": "Small_TV/local_site/pages/settings.html",
+        "sha256": "839e1c445080193d517fc6099d137523a24e9a91ccca8dd57a76e9e286693a40"
+      },
+      {
+        "file": "Small_TV/local_site/pages/photo.html",
+        "sha256": "53339fa44d5d6d8a8a3c2c1951abb688f5bb87923279ff5b555dc9fd57072445"
+      }
+    ],
+    "scope": "JavaScript syntax and DOM-independent crop/metadata checks; real browser Canvas and guest upload are recorded separately."
   },
   "integrity": {
     "passed": true,
     "cases": 6,
     "failures": 0,
     "errors": 0,
-    "source_sha256": "8f5e2c5edc2153e806aae00c8fa967c15942dc85b1c2f7d4311a2b2ef3eb1dce",
-    "app_sha256": "7bf1883663a5fab8f58316577c714824e06d3c7ffd63f98676f74bd51baf2700",
+    "source_sha256": "967831703a535a064cf4c6db0adec854eba821b1d13efb644de0a77eab68f538",
+    "app_sha256": "ecc8969486f335fcb42144965d73e9bdf0fdc1de28123b341daaeb0ba610b0eb",
     "factory_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
   },
   "machine": {
@@ -509,8 +578,8 @@
     "literal_factory_pixels_equal": false,
     "renderer_cases": 316,
     "geometry_checks": 4,
-    "source_sha256": "8f5e2c5edc2153e806aae00c8fa967c15942dc85b1c2f7d4311a2b2ef3eb1dce",
-    "native_elf_sha256": "810ab11c1278dada2ecb77e2f9004b0730e6c97c6c62a593d29c0d4e6eb8bbab",
+    "source_sha256": "967831703a535a064cf4c6db0adec854eba821b1d13efb644de0a77eab68f538",
+    "native_elf_sha256": "f24bc0a3afa8c00526a7a59797b3d762ee6e274bf1d212725d4b89de827e1ff2",
     "approved_fixes": {
       "simple-sunday-standard-tm-wday": "Display Sun for standard tm_wday 0; factory 0 repeats the date, while factory 7 draws Sun",
       "analog-perpendicular-stroke-offsets": "Use cos/sin for x/y after atan2+pi/2; the original sin/cos collapses axis-aligned thick strokes"
@@ -573,7 +642,7 @@
     },
     "http_initial_setup": {
       "passed": true,
-      "tested_at_utc": "2026-10-13T14:29:32.274408+02:00",
+      "tested_at_utc": "2026-10-13T15:47:49.279279+02:00",
       "flows": {
         "original": {
           "firmware": "original",
@@ -651,31 +720,31 @@
           "sources": {
             "images": [
               {
-                "file": "bootloader.bin",
                 "bytes": 19248,
                 "offset": "0x0",
-                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+                "file": "bootloader.bin"
               },
               {
-                "file": "partition-table.bin",
                 "bytes": 3072,
                 "offset": "0x8000",
-                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                "file": "partition-table.bin"
               },
               {
-                "file": "app.bin",
-                "bytes": 1009968,
+                "bytes": 1021392,
                 "offset": "0x10000",
-                "sha256": "7bf1883663a5fab8f58316577c714824e06d3c7ffd63f98676f74bd51baf2700"
+                "sha256": "ecc8969486f335fcb42144965d73e9bdf0fdc1de28123b341daaeb0ba610b0eb",
+                "file": "app.bin"
               },
               {
-                "file": "assets.bin",
                 "bytes": 1994752,
                 "offset": "0x200000",
-                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+                "file": "assets.bin"
               }
             ],
-            "source_sha256": "8f5e2c5edc2153e806aae00c8fa967c15942dc85b1c2f7d4311a2b2ef3eb1dce"
+            "source_sha256": "967831703a535a064cf4c6db0adec854eba821b1d13efb644de0a77eab68f538"
           },
           "web_endpoints": [
             {
@@ -730,7 +799,7 @@
     },
     "weather_http": {
       "passed": true,
-      "tested_at_utc": "2026-10-13T14:30:30.944701+02:00",
+      "tested_at_utc": "2026-10-13T15:48:52.429932+02:00",
       "scope": "Real guest DNS/TCP/HTTP via isolated loopback fixture; parsed synthetic weather and stable LCD regions. No Internet service, physical RF or full-program equivalence.",
       "native_layout": {
         "address": 1070266696,
@@ -752,7 +821,7 @@
           "generation": 224
         },
         "request_state_address": 1070282680,
-        "elf_sha256": "810ab11c1278dada2ecb77e2f9004b0730e6c97c6c62a593d29c0d4e6eb8bbab"
+        "elf_sha256": "f24bc0a3afa8c00526a7a59797b3d762ee6e274bf1d212725d4b89de827e1ff2"
       },
       "flows": {
         "original": {
@@ -906,31 +975,31 @@
           "sources": {
             "images": [
               {
-                "file": "bootloader.bin",
                 "bytes": 19248,
                 "offset": "0x0",
-                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+                "file": "bootloader.bin"
               },
               {
-                "file": "partition-table.bin",
                 "bytes": 3072,
                 "offset": "0x8000",
-                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                "file": "partition-table.bin"
               },
               {
-                "file": "app.bin",
-                "bytes": 1009968,
+                "bytes": 1021392,
                 "offset": "0x10000",
-                "sha256": "7bf1883663a5fab8f58316577c714824e06d3c7ffd63f98676f74bd51baf2700"
+                "sha256": "ecc8969486f335fcb42144965d73e9bdf0fdc1de28123b341daaeb0ba610b0eb",
+                "file": "app.bin"
               },
               {
-                "file": "assets.bin",
                 "bytes": 1994752,
                 "offset": "0x200000",
-                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+                "file": "assets.bin"
               }
             ],
-            "source_sha256": "8f5e2c5edc2153e806aae00c8fa967c15942dc85b1c2f7d4311a2b2ef3eb1dce"
+            "source_sha256": "967831703a535a064cf4c6db0adec854eba821b1d13efb644de0a77eab68f538"
           },
           "weather_services": true,
           "native_rejects_non_200_json": true,
@@ -1099,12 +1168,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.563613
+            "virtual_seconds": 46.451543
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.479479
+            "virtual_seconds": 46.350103
           }
         },
         "equal_pixels_min": 1.0,
@@ -1116,16 +1185,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.640424
+            "virtual_seconds": 46.884536
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.405485
+            "virtual_seconds": 46.501747
           }
         },
-        "equal_pixels_min": 0.9744618055555555,
-        "equal_pixels_max": 0.9967361111111112
+        "equal_pixels_min": 0.9761284722222222,
+        "equal_pixels_max": 0.9844270833333333
       },
       "simple": {
         "passed": true,
@@ -1133,16 +1202,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.650849
+            "virtual_seconds": 46.891797
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.699992
+            "virtual_seconds": 46.631077
           }
         },
-        "equal_pixels_min": 0.9973611111111111,
-        "equal_pixels_max": 1.0
+        "equal_pixels_min": 0.98953125,
+        "equal_pixels_max": 0.9921701388888889
       },
       "photo": {
         "passed": true,
@@ -1150,15 +1219,15 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.762159
+            "virtual_seconds": 46.70042
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.706279
+            "virtual_seconds": 46.952032
           }
         },
-        "equal_pixels_min": 1.0,
+        "equal_pixels_min": 0.0003298611111111111,
         "equal_pixels_max": 1.0
       },
       "dial": {
@@ -1167,24 +1236,24 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.419857
+            "virtual_seconds": 46.350046
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.20069
+            "virtual_seconds": 46.460379
           }
         },
-        "equal_pixels_min": 0.98390625,
-        "equal_pixels_max": 0.9932986111111111
+        "equal_pixels_min": 0.9859722222222222,
+        "equal_pixels_max": 0.9925868055555556
       }
     }
   },
   "not_run": [
     {
-      "reason": "Physical board, real browser/RF/weather service and long-run memory checks require the manual acceptance scenarios in README.md",
-      "status": "not_run",
-      "name": "hardware_browser_soak"
+      "reason": "Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately",
+      "name": "hardware_browser_soak",
+      "status": "not_run"
     }
   ]
 }

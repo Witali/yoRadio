@@ -159,6 +159,20 @@ Current launchers seed a sanitized raw settings sector without invoking an NVS
 generator. Localhost guest web access and synthetic weather have dedicated
 checks above; Internet weather and HTTPS remain outside those checks.
 
+## Browser photo and settings regression
+
+[browser-regression.json](browser-regression.json) binds an actual browser run
+to the current reconstructed application, frontend inputs and installed QEMU.
+Dragging a corner shrinks/enlarges the square; the selected part of a synthetic
+960×640 PNG is resampled to 240×240, cleaned by JavaScript and uploaded through
+the native start/chunk/finish API. Guest JPEG headers/pixels are checked, and
+Cancel/Escape leave its hash unchanged. Five previews decode after reload.
+Clock flags, 0%/100% brightness and RGB565 colours are also checked against
+guest HTTP replies. This is focused browser evidence, not complete UI or
+physical-device acceptance.
+
+![Resizable photo selection](browser-crop-selection.jpg)
+
 ## Earlier offline evidence
 
 [validation.json](validation.json), [factory report](original-report.json),
