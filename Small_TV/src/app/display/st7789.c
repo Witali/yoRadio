@@ -44,7 +44,9 @@ static void lcd_window(int x, int y, int width, int height)
 
 esp_err_t display_init(void)
 {
-    /* Initialize GPIO, SPI, reset sequence and the 240x240 RGB565 panel. */
+    /* Initialize GPIO, SPI, reset sequence and the 240x240 RGB565 panel.
+     * FIXED_FACTORY: 0x4200934a sends inclusive row/column end 240; the last
+     * pixel is 239. lcd_window computes width/height minus one for both axes. */
 
     gpio_config_t pins = {.pin_bit_mask = (1ULL << LCD_GPIO_DC) | (1ULL << LCD_GPIO_RESET),
                           .mode = GPIO_MODE_OUTPUT};
@@ -206,7 +208,10 @@ void display_line(int x0, int y0, int x1, int y1, uint16_t color)
 void display_bitmap(int x, int y, const tv_bitmap_t *bitmap, uint16_t color, uint16_t background,
                     bool transparent)
 {
-    /* Render the factory LSB-first bitmap without allocating a framebuffer. */
+    /* Render the factory LSB-first bitmap without allocating a framebuffer.
+     * FIXED_FACTORY: 0x4200950e drops an entire glyph when its right/bottom edge
+     * leaves the panel. Clip its visible columns/rows, preserving the source
+     * stride; the final 'r' in Thunderstorm at x=236 must remain visible. */
 
     if (x < 0 || y < 0 || x >= LCD_WIDTH || y >= LCD_HEIGHT)
         return;

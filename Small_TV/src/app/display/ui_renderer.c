@@ -203,7 +203,10 @@ void factory_draw_classic(const tv_settings_t *s, const struct tm *local,
 void factory_draw_simple(const tv_settings_t *s, const struct tm *local, const char *address,
                          bool reset, bool second_update, bool minute_update)
 {
-    /* Update the simple clock using the factory 0x4200bd26/0x4200bd8c split. */
+    /* Update the simple clock using the factory 0x4200bd26/0x4200bd8c split.
+     * FIXED_FACTORY: 0x4200bf9c repeats the date for standard Sunday (tm_wday=0);
+     * render Sun instead. Also update digits on real minute/hour/date changes,
+     * because 0x4200bd8c's 66-second flag leaves stale time on screen. */
 
     static struct tm previous_time;
     static uint8_t previous_hour12, previous_date;
@@ -254,7 +257,9 @@ static void circle(int x, int y, int radius, uint16_t color)
 
 static void thick_line(int x0, int y0, int x1, int y1, unsigned width, uint16_t color)
 {
-    /* Draw the parallel strokes used by the factory analog clock. */
+    /* Draw the parallel strokes used by the factory analog clock.
+     * FIXED_FACTORY: 0x42009644 swaps sin/cos after rotating by pi/2, collapsing
+     * axis-aligned thick strokes. Use the perpendicular cos/sin offset pair. */
 
     /* Retain the float narrowing and rounding at 0x42009644, but correct
      * its swapped sin/cos offsets: after adding pi/2, cos/sin moves strokes

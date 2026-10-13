@@ -96,7 +96,10 @@ static void url_escape(const char *source, char *target)
 
 static esp_err_t fetch_weather(const tv_settings_t *s, weather_snapshot_t *out)
 {
-    /* Fetch the factory HTTP/Kelvin endpoint and decode its bounded response. */
+    /* Fetch the factory HTTP/Kelvin endpoint and decode its bounded response.
+     * FIXED_FACTORY: 0x42010864 parses JSON even after an HTTP error such as 503.
+     * Require HTTP 200 and a complete bounded body; weather_task retains the
+     * last successful cache when a request for the same location fails. */
 
     char city[193], key[193], url[512];
     url_escape(s->city, city);

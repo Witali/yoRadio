@@ -36,7 +36,9 @@ static const struct
 
 esp_err_t web_settings_get(httpd_req_t *req)
 {
-    /* Return the requested setting using its original response shape. */
+    /* Return the requested setting using its original response shape.
+     * FIXED_RECONSTRUCTION: /get_display_time must return the displaytime JSON
+     * field, as in 0x4200e7b6, rather than a scalar that breaks the stock page. */
 
     tv_settings_t s;
     settings_snapshot(&s);
@@ -108,7 +110,9 @@ static bool copy_string(const cJSON *object, const char *key, char *out, size_t 
 
 static bool read_brightness(httpd_req_t *req, const char *key, unsigned *out)
 {
-    /* Parse the original form-encoded brightness percentage. */
+    /* Parse the original form-encoded brightness percentage.
+     * FIXED_RECONSTRUCTION: accept both 0 and 100 percent; rejecting the upper
+     * endpoint made the web slider unable to select full brightness. */
 
     char *body = web_body(req, 128);
     if (!body)
@@ -164,7 +168,11 @@ static bool update_city(tv_settings_t *s, const cJSON *object)
 
 esp_err_t web_settings_post(httpd_req_t *req)
 {
-    /* Validate and apply one original settings request and its follow-up action. */
+    /* Validate and apply one original settings request and its follow-up action.
+     * FIXED_FACTORY: /wifireset at 0x4200e84c overwrites the supplied credentials
+     * with unrelated scratch buffers. Persist the validated JSON SSID/password.
+     * Both credential routes accept normal JSON whitespace instead of relying
+     * on the factory handlers' literal substring parsing. */
 
     tv_settings_t s;
     settings_snapshot(&s);
@@ -301,7 +309,9 @@ esp_err_t web_settings_post(httpd_req_t *req)
 
 esp_err_t web_scan(httpd_req_t *req)
 {
-    /* Return real scan results or a retryable error when Wi-Fi cannot scan. */
+    /* Return real scan results or a retryable error when Wi-Fi cannot scan.
+     * FIXED_FACTORY: /scan at 0x4200f440 dereferences its null output buffer when
+     * there are no networks. Return a valid empty JSON array for zero results. */
 
     wifi_ap_record_t *records = calloc(20, sizeof(*records));
     if (!records)

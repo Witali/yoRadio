@@ -5,7 +5,10 @@
 /* Only one uncompressed IN question. Packet length is checked before each read. */
 size_t captive_dns_reply(uint8_t *packet, size_t length, size_t capacity)
 {
-    /* Validate one DNS question and construct a bounded captive IPv4 response. */
+    /* Validate one DNS question and construct a bounded captive IPv4 response.
+     * FIXED_FACTORY: 0x4200c74e appends 16 bytes to a copied request without
+     * checking response capacity or the complete question. Check every read/
+     * write; reject compressed questions rather than following unchecked offsets. */
 
     if (length > capacity || length < 12 || packet[2] & 0xf8 || packet[4] != 0 || packet[5] != 1)
         return 0;

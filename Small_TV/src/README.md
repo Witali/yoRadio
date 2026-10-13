@@ -46,7 +46,16 @@ meaning. The executable files in `app/` use real C types and descriptive
 functions, configuration fields, buffers and state variables. SDK code is
 provided by ESP-IDF rather than stubbed out or mapped to old machine addresses.
 
-All 129 production C functions have an entry comment explaining their purpose.
+All 130 production C functions have an entry comment explaining their purpose.
+Corrected functions also carry searchable entry-comment markers:
+`FIXED_FACTORY` identifies a deliberate correction of an original firmware bug;
+`FIXED_RECONSTRUCTION` identifies a repair of our C implementation to restore
+factory behavior. `REQUESTED_CHANGE` identifies an explicit user requirement,
+such as photo privacy, rather than evidence of a factory bug. Each marker states
+the reason and cites the original address when established. SDK replacement and
+unverified hypotheses are not classified as confirmed factory corrections.
+The [correction marker convention](CORRECTION_MARKERS.md) documents their usage,
+examples and the functions already marked.
 Comments also explain byte-padded/LSB-first fonts, fixed raw-sector offsets,
 timer thresholds, photo fades, MIME binary parsing and DNS packet bounds.
 Where machine instructions were checked directly, comments cite their original
@@ -253,6 +262,13 @@ Unicorn. They compare every framebuffer pixel for controlled simple/analog
 clock inputs and preserve framebuffer history across updates. The Sunday and
 analog-stroke fixes have explicit, separately tested reference paths; no region
 is masked.
+The [classic checks](../qemu/parity/classic-checks.md) add exact field pixels and
+media-call identities for 261 cases, plus 1,545 executed animation transitions.
+The GIF cursor now follows the factory terminator rule and survives selection
+and theme changes. Partially visible glyphs are clipped instead of dropped;
+the literal 17-pixel difference for the last letter of Thunderstorm is retained
+as a confirmed factory correction and checked against the original bitmap.
+These classic checks record media requests rather than decoding image pixels.
 These checks supplement the whole-board QEMU captures and do not establish
 network, service scheduling or hardware equivalence.
 

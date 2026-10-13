@@ -15,7 +15,9 @@ static struct
 
 bool photo_upload_active_unlocked(void)
 {
-    /* Expire an abandoned upload and report the current upload state. */
+    /* Expire an abandoned upload and report the current upload state.
+     * FIXED_FACTORY: abandoned factory uploads have no inactivity recovery.
+     * Release our upload state after 120 seconds so drawing/uploads can resume. */
 
     if (upload.active && esp_timer_get_time() - upload.last_activity > 120000000)
         upload.active = false;
@@ -24,7 +26,10 @@ bool photo_upload_active_unlocked(void)
 
 esp_err_t photo_upload_start(unsigned slot, uint32_t length, unsigned chunks)
 {
-    /* Validate a new upload, invalidate its slot and erase only that photo region. */
+    /* Validate a new upload, invalidate its slot and erase only that photo region.
+     * FIXED_FACTORY: 0x4200dda4 checks slot/maximum size but not minimum size
+     * or chunk-count consistency. Check both and mark the photo absent before erase so
+     * interrupted uploads cannot expose old lengths over partially written data. */
 
     if (slot >= PHOTO_COUNT || length < 4 || length > PHOTO_SLOT_BYTES ||
         chunks != (length + PHOTO_CHUNK_BYTES - 1) / PHOTO_CHUNK_BYTES)
@@ -54,7 +59,10 @@ esp_err_t photo_upload_start(unsigned slot, uint32_t length, unsigned chunks)
 esp_err_t photo_upload_chunk(unsigned slot, unsigned index, unsigned total, const uint8_t *data,
                              size_t length)
 {
-    /* Accept an ordered upload block or an exact retry of its last block. */
+    /* Accept an ordered upload block or an exact retry of its last block.
+     * FIXED_FACTORY: 0x4200dc58 receives a caller-sized body into a shared buffer
+     * and does not enforce chunk ordering. Bound writes to the declared slot,
+     * enforce the next index, and accept a last-block retry only if bytes match. */
 
     xSemaphoreTake(media_mutex, portMAX_DELAY);
     esp_err_t result = ESP_ERR_INVALID_ARG;
@@ -102,7 +110,9 @@ esp_err_t photo_upload_chunk(unsigned slot, unsigned index, unsigned total, cons
 
 static bool photo_headers_safe(uint32_t base, uint32_t length)
 {
-    /* Reject private metadata, unsupported JPEG headers and trailing data. */
+    /* Reject private metadata, unsupported JPEG headers and trailing data.
+     * REQUESTED_CHANGE: reject EXIF/APP/COM and embedded thumbnails as a second
+     * privacy check after the browser removes metadata and crops/resizes. */
 
     uint8_t bytes[16];
     bool dimensions = false;
@@ -179,7 +189,10 @@ static bool photo_headers_safe(uint32_t base, uint32_t length)
 
 esp_err_t photo_upload_finish(unsigned slot)
 {
-    /* Validate a complete photo, then publish its stored length. */
+    /* Validate a complete photo, then publish its stored length.
+     * FIXED_FACTORY: 0x4200d978 publishes a length without checking complete
+     * ordered data or JPEG validity. Publish only after all chunks and decode
+     * validation succeed. REQUESTED_CHANGE: enforce metadata-free 240x240 JPEG. */
 
     xSemaphoreTake(media_mutex, portMAX_DELAY);
     esp_err_t result = ESP_ERR_INVALID_STATE;
