@@ -1,0 +1,311 @@
+{
+  "scope": "Compare real C3 mixed-codec PCM against independently decoded segments in QEMU.\n\nUses the benchmark flash input and production decoder/PCM queue/output task.\nThe test-only output sink captures before resampling/gain/DMA, without timing claims.\n",
+  "cases": {
+    "mp3-320": {
+      "captured": true,
+      "bytes": 294912,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 294912,
+          "sha256": "0ab207da1a629a24d04550f81f05b973b7d4b3c865ebbc0d9cd53cdca69c7851"
+        }
+      ],
+      "reference_shape_verified": true
+    },
+    "lc-48000-stereo": {
+      "captured": true,
+      "bytes": 262144,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 262144,
+          "sha256": "ab4448bd90a5c435c1650829a2143dfd92560e0027923bf947085b0b461228c4"
+        }
+      ],
+      "reference_shape_verified": true
+    },
+    "he-48000-stereo": {
+      "captured": true,
+      "bytes": 524288,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 524288,
+          "sha256": "c239cc08f4d1f5be26a3a0c8ca410a0ef141550f3ddd596f6e901a72270f8e8e"
+        }
+      ],
+      "reference_shape_verified": true
+    },
+    "hev2-44100-stereo": {
+      "captured": true,
+      "bytes": 524288,
+      "layouts": [
+        {
+          "rate": 44100,
+          "channels": 2,
+          "bytes": 524288,
+          "sha256": "d73ff1017ef944182c3447a92fce46377f302a33b0a6929d54e88936eca31912"
+        }
+      ],
+      "reference_shape_verified": true
+    },
+    "false-mp3-before-he-aac": {
+      "exact": true,
+      "bytes": 524288,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 524288,
+          "sha256": "c239cc08f4d1f5be26a3a0c8ca410a0ef141550f3ddd596f6e901a72270f8e8e"
+        }
+      ]
+    },
+    "false-aac-before-mp3": {
+      "exact": true,
+      "bytes": 294912,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 294912,
+          "sha256": "0ab207da1a629a24d04550f81f05b973b7d4b3c865ebbc0d9cd53cdca69c7851"
+        }
+      ]
+    },
+    "false-large-adts-before-he-aac": {
+      "exact": true,
+      "bytes": 524288,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 524288,
+          "sha256": "c239cc08f4d1f5be26a3a0c8ca410a0ef141550f3ddd596f6e901a72270f8e8e"
+        }
+      ]
+    },
+    "false-large-adts-before-mp3": {
+      "exact": true,
+      "bytes": 294912,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 294912,
+          "sha256": "0ab207da1a629a24d04550f81f05b973b7d4b3c865ebbc0d9cd53cdca69c7851"
+        }
+      ]
+    },
+    "id3v1-mp3": {
+      "exact": true,
+      "bytes": 294912,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 294912,
+          "sha256": "0ab207da1a629a24d04550f81f05b973b7d4b3c865ebbc0d9cd53cdca69c7851"
+        }
+      ]
+    },
+    "mixed-mp3-320-he-48000-stereo-mp3-320": {
+      "exact": true,
+      "bytes": 1114112,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 1114112,
+          "sha256": "dd6b1e8adc88c64e9ac87cbea91512b4cfd0dc956b91036d919a9b0f98b8ae76"
+        }
+      ]
+    },
+    "tagged-mp3-320-he-48000-stereo-mp3-320": {
+      "exact": true,
+      "bytes": 1114112,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 1114112,
+          "sha256": "dd6b1e8adc88c64e9ac87cbea91512b4cfd0dc956b91036d919a9b0f98b8ae76"
+        }
+      ]
+    },
+    "id3v1-mp3-320-he-48000-stereo-mp3-320": {
+      "exact": true,
+      "bytes": 1114112,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 1114112,
+          "sha256": "dd6b1e8adc88c64e9ac87cbea91512b4cfd0dc956b91036d919a9b0f98b8ae76"
+        }
+      ]
+    },
+    "mixed-lc-48000-stereo-mp3-320-hev2-44100-stereo": {
+      "exact": true,
+      "bytes": 1081344,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 557056,
+          "sha256": "ae733b795d7fee94bba486eec4dd2fe415dab5748535cd66801815239fa53c1f"
+        },
+        {
+          "rate": 44100,
+          "channels": 2,
+          "bytes": 524288,
+          "sha256": "d73ff1017ef944182c3447a92fce46377f302a33b0a6929d54e88936eca31912"
+        }
+      ]
+    },
+    "tagged-lc-48000-stereo-mp3-320-hev2-44100-stereo": {
+      "exact": true,
+      "bytes": 1081344,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 557056,
+          "sha256": "ae733b795d7fee94bba486eec4dd2fe415dab5748535cd66801815239fa53c1f"
+        },
+        {
+          "rate": 44100,
+          "channels": 2,
+          "bytes": 524288,
+          "sha256": "d73ff1017ef944182c3447a92fce46377f302a33b0a6929d54e88936eca31912"
+        }
+      ]
+    },
+    "id3v1-lc-48000-stereo-mp3-320-hev2-44100-stereo": {
+      "exact": true,
+      "bytes": 1081344,
+      "layouts": [
+        {
+          "rate": 48000,
+          "channels": 2,
+          "bytes": 557056,
+          "sha256": "ae733b795d7fee94bba486eec4dd2fe415dab5748535cd66801815239fa53c1f"
+        },
+        {
+          "rate": 44100,
+          "channels": 2,
+          "bytes": 524288,
+          "sha256": "d73ff1017ef944182c3447a92fce46377f302a33b0a6929d54e88936eca31912"
+        }
+      ]
+    }
+  },
+  "fixtures": {
+    "mp3-320": {
+      "bytes": 61485,
+      "sha256": "fc8fc3daab65850150293324c44d74479c69bf4f9928ce6c4025913f820a9734"
+    },
+    "lc-48000-stereo": {
+      "bytes": 22121,
+      "sha256": "5d2be876142fe8c68b847111601da04a61d19b4553a9205ca83318ca728c8df7"
+    },
+    "he-48000-stereo": {
+      "bytes": 21850,
+      "sha256": "2051d30abe33a787630abfb8a15226788136598d9e4b15f82164eacf1e18b341"
+    },
+    "hev2-44100-stereo": {
+      "bytes": 11941,
+      "sha256": "264e073b7e54491d1cdd88734e4b1243c361126c292629b5cbbb5096be6c74c0"
+    },
+    "false-mp3-before-he-aac": {
+      "bytes": 21882,
+      "sha256": "1f29d6a0de11619b2c1e1863052019a4462011cb7c18c5c4540332c9f62088fd"
+    },
+    "false-aac-before-mp3": {
+      "bytes": 61517,
+      "sha256": "4b30bd7bcd24ad2857e4846e36410ee49338a31185be32333d5680a5292ee920"
+    },
+    "false-large-adts-before-he-aac": {
+      "bytes": 21882,
+      "sha256": "5467b4b9461e38b047fce19b13c19ef09adec25f98c4ac7ccd496b3037455b89"
+    },
+    "false-large-adts-before-mp3": {
+      "bytes": 61517,
+      "sha256": "0ae77cac7178bb4cd0b994f52fd5d55d9e05c71d73394a5a4d32c1ac5eb1fa0c"
+    },
+    "id3v1-mp3": {
+      "bytes": 61613,
+      "sha256": "416c174a08492a0cee248584e30b64fcfd68b3048d2399cee89d87d277bd4739"
+    },
+    "mixed-mp3-320-he-48000-stereo-mp3-320": {
+      "bytes": 144820,
+      "sha256": "8d6db02f57225bb1635a24b62f505942f084476d912920f220456ce5a47fe0c5"
+    },
+    "tagged-mp3-320-he-48000-stereo-mp3-320": {
+      "bytes": 144874,
+      "sha256": "2db3ec78c58d5b24ca44a02988f2a5bc08bbd915a3fda2b661fe3aa23446c724"
+    },
+    "id3v1-mp3-320-he-48000-stereo-mp3-320": {
+      "bytes": 145076,
+      "sha256": "c2bfe8429512cd9adc11fe4747c9b18fcaca6f25a5e61d73b24140463db29b52"
+    },
+    "mixed-lc-48000-stereo-mp3-320-hev2-44100-stereo": {
+      "bytes": 95547,
+      "sha256": "6a8a3d258cef7507c2cc036e3ec0ac06d5344afde8b7f03255478778787c5fdf"
+    },
+    "tagged-lc-48000-stereo-mp3-320-hev2-44100-stereo": {
+      "bytes": 95601,
+      "sha256": "2558c4a67c546b2a79c034e99f5ec40d2a48bf364ef6611b00732c659997e845"
+    },
+    "id3v1-lc-48000-stereo-mp3-320-hev2-44100-stereo": {
+      "bytes": 95675,
+      "sha256": "572d9fc8161c39e89296c0c049510b02b083009ba80198c94ad0b1fe0d8e360e"
+    }
+  },
+  "app_sha256": "a6690b6ad34562d65be010727aa9a1d43571701c9bdc5351f778ea10730b19bf",
+  "sdkconfig_sha256": "dbd9f258ad3bd7e8361c2c368c382e25b1bc19f7916a01c9bf3e08ff0438a42b",
+  "ffprobe": "ffprobe version 8.1.1-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+  "startup_confirmation": true,
+  "startup_only": false,
+  "source_sha256": {
+    "tools/codec_benchmark/run_pipeline_pcm.py": "0ca8946c58536163ec369bc6d764e649d509a57fefc3d07f44e1edf7efeb0b0b",
+    "tests/native/qemu_pipeline_pcm_capture.c": "95dacf0cc758b88bd8c1078c5f0634f84688d58ae0faaa22d7d227a5215d4e4e",
+    "idf/esp32c3-oled-native/main/CMakeLists.txt": "9e0b3cbbc092ae0f25bafb92b1bcf68a2e51f913bfffded885f13c864d9d1963",
+    "idf/esp32c3-oled-native/main/audio_service.c": "a897950065566df12dfb8174ec23a3d6427cbc4213c67cc839fe6e58bebd6412",
+    "idf/esp32c3-oled-native/main/stream_probe.h": "92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+    "idf/esp32c3-oled-native/main/stream_frames.h": "bc107612d9a78cb322cf577ee6bc0ee0a4b4801cb6a0b7a043f8c7b27de12330",
+    "idf/esp32c3-oled-native/main/stream_tags.h": "48e99297c7dc9667d67819d4b4e8e764cdaa1a822803d6e2e06da51aafc02bad",
+    "idf/esp32c3-oled-native/main/stream_encoded_router.h": "51562956e77ed05e04e578420fd5e2613889b7651b81fe3bf7ef76ffd1d53e77",
+    "idf/esp32c3-oled-native/main/native_aac_decoder.c": "5afe81bd644a92e37ac6c4f42c4cb2ea7ce50e6840d4a13146b39f31afebd376",
+    "idf/esp32c3-oled-native/main/audio_completion.h": "5f2da987401ce3a788caa341e437fee29cec5ef3aa52044b3cb43532a3b7c27c",
+    "idf/esp32c3-oled-native/main/stream_start.h": "608f0b68960803fb0aa81d054920afac34a26af27dd63b57fb76e30afbff741f",
+    "idf/esp32c3-oled-native/main/stream_staging.h": "d9228a08c3407d87a13e89822f2ed88916ef7ead4f012e7d88c7ad5767a18421",
+    "idf/esp32c3-oled-native/main/stream_confirm.h": "73e792e9d2ee076c25058a5a433b1ad95fbfb3044eaefbe4cbca69a595792dd7",
+    "idf/esp32c3-oled-native/main/adaptive_input.c": "e4cd319e241cf152ab7b5601dd32e90ad40649300baee2bb0e131be6840966fb",
+    "idf/esp32c3-oled-native/main/adaptive_input.h": "5096184f9f550cd5efe1ab38f6393c79d29bf200efc3ce6e7cc23e4d68c5db04"
+  },
+  "command": [
+    "wsl.exe",
+    "--exec",
+    "timeout",
+    "--kill-after=2",
+    "240",
+    "/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/qemu-flash-build/qemu-system-riscv32",
+    "-M",
+    "esp32c3",
+    "-nographic",
+    "-no-reboot",
+    "-snapshot",
+    "-icount",
+    "shift=0,align=off,sleep=off",
+    "-L",
+    "/mnt/c/Work/QEMU-ESP32/share/qemu",
+    "-drive",
+    "file=/mnt/c/Work/yoRadio/.worktree/esp32c3-idf-upgrade/.build/early-owner-pcm-01/flash.bin,if=mtd,format=raw"
+  ],
+  "passed": true
+}

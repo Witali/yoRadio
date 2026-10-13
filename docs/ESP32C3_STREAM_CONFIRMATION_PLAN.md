@@ -512,3 +512,48 @@ injected failures, task-context isolation, zeroing, late retry and cleanup.
 These tests mock the ABI sizes and DSP; real-decoder PCM, complete adapter
 lifetime and physical repeated-HTTPS/LC-memory qualification remain required.
 The prototype is not a production default or a qualified fix.
+
+### Early-owner comparison result (2026-10-13)
+
+The opt-in candidate now passes the identical five-cycle HTTPS workload and
+strict offline audit. Both runs used one boot across 20 connections and the
+same encoded fixtures, pacing and TLS setup. The candidate's only additional
+SDK configuration setting is `CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER=y`.
+
+| Measurement | Control | Early compact owner |
+| --- | ---: | ---: |
+| Successful cases / total | 17 / 20 | 20 / 20 |
+| MP3 -> HE-AAC -> MP3 passes | 2 / 5 | 5 / 5 |
+| Allocation failures | 3 | 0 |
+| Recorded decoder failures | 3 | 0 |
+| Watchdog events | 0 | 0 |
+| Lifetime minimum free heap, bytes | 18,732 | 17,896 |
+
+The lower observed free-heap minimum is recorded, not hidden: allocation order
+has changed, SBR storage has not shrunk. Differences between complete runs also
+include network scheduling; the minimum difference is not an isolated estimate
+of feature overhead. The native adapter adds one pointer. No permanent reserved
+SBR block remains after closing the decoder or successful LC-only first output.
+The experiment avoids the reproduced failure in this run; five successful
+transitions do not prove universal immunity to allocation failure.
+
+ASan/UBSan executes the actual native adapter as well as the allocation wrapper
+with SDK/ABI stubs: Stop before input, PCM buffer retry, LC release, implicit
+late SBR, profile reopen, injected SBR failure, and failed-open retry/cleanup.
+Real RV32 decoder validation in QEMU passes 15 captures: MP3, AAC-LC, HE-AAC,
+HE-AACv2, false startup prefixes, ID3v1 tails and mixed/tagged codec transitions.
+All eight captures with a previously retained control are byte-for-byte equal
+in PCM data and layout. Mixed-stream PCM also exactly equals the concatenation
+of its independently decoded segments. This is finite PCM validation, not an
+acoustic, CPU or hardware timing claim; the output sink is before gain/resampling.
+
+Original physical firmware and private settings are verified restored, playback
+stopped. Evidence, source snapshots and checksums:
+[early-owner-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-01/summary.json).
+Saved laboratory app:
+`firmware/development/esp32c3-idf-6.1-r9a97-early-owner-tls-lab/app.bin`.
+
+Before default enablement: repeat the full physical format matrix (including
+FLAC/Vorbis/Opus and profile/rate changes), cancellation/TLS controls, LC and
+late-SBR memory-pressure cases, and sustained-play/startup behavior. The general
+stream-confirmation gates above remain open. No production qualification yet.
