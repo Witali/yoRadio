@@ -46,6 +46,13 @@ across a transport gap without changing playback first. It is not an automatic
 retry of the test or proof of analog continuity. Host coverage:
 `python tests/test-production-health.py`.
 
+For a focused investigation, select a source with
+`quiet_acceptance.py --suite public --public-case groovesalad-128-aac`
+(plus the usual board, firmware, host, reference and output arguments).
+Repeat `--public-case` to select several distinct sources; omit it for the full
+manifest. Reports retain only the selected URLs and actual executed cases.
+A focused run does not replace full format qualification.
+
 ### Real AAC heap-pressure regression in QEMU
 
 Build the QEMU AAC fault profile with `CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER=y`,

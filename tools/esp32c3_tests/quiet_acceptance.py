@@ -22,6 +22,7 @@ from audio_test_server.fixtures import SEQUENCES
 
 
 def main():
+    public=json.loads(DEFAULT_MANIFEST.read_text())
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--board', required=True)
     p.add_argument('--host', required=True)
@@ -31,9 +32,14 @@ def main():
     p.add_argument('--suite', choices=('http','public','transitions','network','websocket'), action='append', required=True)
     p.add_argument('--aac-reference-command', type=Path)
     p.add_argument('--seconds', type=int, default=60)
+    p.add_argument('--public-case', choices=tuple(public['streams']), action='append',
+                   help='Select public sources for a focused investigation; default tests all')
     p.add_argument('--enforce-legacy-heap-floor', action='store_true',
                    help='Reproduce the historical 16/8 KiB gate; otherwise record it as diagnostic')
     a=p.parse_args()
+    public_names=a.public_case or list(public['streams'])
+    require(not a.public_case or 'public' in a.suite, '--public-case requires the public suite')
+    require(len(set(public_names))==len(public_names), 'Duplicate public source selection')
     require(45<=a.seconds<=600, 'Use a bounded 45..600 second public test')
     require(not a.output.exists(), 'Preserve previous evidence')
     config=a.firmware.with_name('sdkconfig').read_text()
@@ -107,10 +113,9 @@ def main():
                         if group=='public':
                             require(a.aac_reference_command is not None, 'Use independent AAC reference for public sources')
                             command=json.loads(a.aac_reference_command.read_text())
-                            public=json.loads(DEFAULT_MANIFEST.read_text())
                             report.data['public_manifest_sha256']=sha(DEFAULT_MANIFEST.read_bytes())
-                            report.data['public_urls']=public['streams']
-                            for name,url in public['streams'].items():
+                            report.data['public_urls']={n:public['streams'][n] for n in public_names}
+                            for name,url in report.data['public_urls'].items():
                                 case('https:'+name,lambda n=name,u=url:public_case(n,u,command))
                         elif group=='http':
                             for name,spec in specs.items():
