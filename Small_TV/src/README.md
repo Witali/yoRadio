@@ -35,7 +35,7 @@ virtual-time limitations; physical-board and Internet weather checks remain pend
 
 [`symbol-map.json`](symbol-map.json) preserves every exported function's
 original address and name, inferred logical name, category and corresponding
-native module. It also names 43 globals and 133 local/parameter aliases from observed settings/API/rendering
+native module. It also names 44 globals and 133 local/parameter aliases from observed settings/API/rendering
 uses. For example, `FUN_ram_4200c74e` becomes `captive_dns_task_at_4200c74e`,
 and `DAT_ram_3fcb7d1c` becomes `day_backlight_per_mille_at_3fcb7d1c`.
 

@@ -461,7 +461,7 @@ void draw_next_enabled_photo_at_4200bb4c(void)
   uint uVar3;
 
   for (uVar1 = 0; uVar1 < 5; uVar1 = uVar1 + 1) {
-    if ((1 << (DAT_ram_3fcc3a51 & 0x1f) & photo1_size_at_3fcb7d40) != 0) break;
+    if ((1 << (DAT_ram_3fcc3a51 & 0x1f) & slideshow_photo_mask_at_3fcb7d40) != 0) break;
     uVar3 = DAT_ram_3fcc3a51 + 1;
     DAT_ram_3fcc3a51 = (byte)uVar3;
     if (4 < (uVar3 & 0xff)) {

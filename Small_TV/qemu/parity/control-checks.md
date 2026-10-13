@@ -25,8 +25,10 @@ matches; startup requests exactly 181 redraws.
 five next-slot indices, blocked steps, repeated events and mid-sequence mask
 changes. Duty, JPEG/clear/footer requests, slot/fade state and completion match
 for valid factory photos. The mask is at offset `0x1a4`, runtime `0x3fcb7d40`;
-an earlier decompiler alias incorrectly names it `photo1_size`. Actual photo
-lengths start at `0x1a8`, runtime `0x3fcb7d44`. Native code also rejects absent/
+The former `photo1_size` alias is now corrected to `slideshow_photo_mask` in
+the reference export, symbol map and organizer. Actual photo lengths start
+at `0x1a8`, runtime `0x3fcb7d44`, and the five size aliases are corrected.
+Native code also rejects absent/
 corrupt slots instead of reading invalid JPEGs.
 
 ## Deliberate corrections

@@ -108,23 +108,23 @@ void load_settings_and_defaults_at_42008552(void)
   if (0x3c < photo_interval_seconds_at_3fcb7d3c) {
     photo_interval_seconds_at_3fcb7d3c = 5;
   }
-  if (0x1f < photo1_size_at_3fcb7d40) {
-    photo1_size_at_3fcb7d40 = 0x1f;
+  if (0x1f < slideshow_photo_mask_at_3fcb7d40) {
+    slideshow_photo_mask_at_3fcb7d40 = 0x1f;
   }
-  if (0x19000 < photo2_size_at_3fcb7d44) {
-    photo2_size_at_3fcb7d44 = 0x10fcf;
+  if (0x19000 < photo1_size_at_3fcb7d44) {
+    photo1_size_at_3fcb7d44 = 0x10fcf;
   }
-  if (0x19000 < photo3_size_at_3fcb7d48) {
-    photo3_size_at_3fcb7d48 = 0x188af;
+  if (0x19000 < photo2_size_at_3fcb7d48) {
+    photo2_size_at_3fcb7d48 = 0x188af;
   }
-  if (0x19000 < photo4_size_at_3fcb7d4c) {
-    photo4_size_at_3fcb7d4c = 0x156ce;
+  if (0x19000 < photo3_size_at_3fcb7d4c) {
+    photo3_size_at_3fcb7d4c = 0x156ce;
   }
-  if (0x19000 < photo5_size_at_3fcb7d50) {
-    photo5_size_at_3fcb7d50 = 0x10399;
+  if (0x19000 < photo4_size_at_3fcb7d50) {
+    photo4_size_at_3fcb7d50 = 0x10399;
   }
-  if (0x19000 < DAT_ram_3fcb7d54) {
-    DAT_ram_3fcb7d54 = 0x14ecd;
+  if (0x19000 < photo5_size_at_3fcb7d54) {
+    photo5_size_at_3fcb7d54 = 0x14ecd;
   }
   return;
 }
