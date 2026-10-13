@@ -197,7 +197,19 @@ Enabled sdkconfig values match the original non-laboratory probe image;
 the ephemeral TLS test CA is absent. Compiler-reported stack frames remain
 896 bytes for `stream_task` and 96 bytes for `send_stream_audio.part.0`;
 these are individual frames, not measured total stack high-water marks.
-The follow-up image has not been installed on the board or production-qualified.
+The follow-up subsequently passed **14/14 physical HTTP cases**: the seven
+codec files, two ID3 cases, three unknown/truncated cases and both AAC
+transition sequences. For `changing`, 78 active health samples had minimum
+free heap 37,136 bytes and largest block 22,528 bytes; `implicit-sbr` had 57
+samples, minima 31,308 and 21,504 bytes. All cases passed their restart,
+allocation/watchdog and active output-counter checks. The original image
+hash, stopped state and private settings were verified after restoration.
+[Physical evidence and executed runner](../tests/results/esp32c3-stream-probe-20261013/resync-physical-01/)
+are retained. This image still needs HTTPS/long-play qualification; no full
+production qualification or analog continuity claim is made.
+The frozen runner is the one executed. The reusable runner subsequently
+gained a nonzero exit status after restoration when any recorded case failed;
+these results were independently checked for all 14 explicit PASS entries.
 
 ## Frame boundary walker for the next integration stage
 
@@ -225,6 +237,8 @@ A mixed MP3/AAC sequence adds 1,457 frames, compared with concatenated
 per-file reference boundaries, using the same three read sizes. ASan/UBSan
 also covers every split of a synthetic mixed stream, every truncation,
 sync-shaped payload, callback failure and 100,000 random headers.
+[Exact sources, results, generation commands and checksums](../tests/results/esp32c3-stream-probe-20261013/frame-walker-01/)
+are retained. The reference executable versions are in `results.json`.
 
 Explicit limits: free-format MP3 returns a distinct unresolved-length result
 and retains its header; it is not rejected as invalid or assigned a guessed
