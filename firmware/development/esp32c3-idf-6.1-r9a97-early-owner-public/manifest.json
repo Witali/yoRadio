@@ -12,7 +12,7 @@
   "production_qualified": false,
   "hardware_tested": true,
   "experimental_startup_confirmation": true,
-  "qualification": "Passed one 600-second public HTTPS HE-AAC 44.1 kHz stereo trial, output/heap/recovery checks and app-only OTA restoration. Full production qualification remains open.",
+  "qualification": "Passed 600-second public HTTPS HE-AAC playback and 20-case finite HTTP format/transition matrix with strict decoder-health audit. Original firmware/settings restoration verified. Full production qualification remains open.",
   "config_changes_from_tls_lab": {
     "added": [],
     "removed": [
@@ -21,5 +21,8 @@
     ]
   },
   "evidence": "tests/results/esp32c3-stream-probe-20261013/early-owner-public-01/summary.json",
-  "qemu_test_symbols_absent": true
+  "qemu_test_symbols_absent": true,
+  "additional_evidence": [
+    "tests/results/esp32c3-stream-probe-20261013/early-owner-public-full-01/summary.json"
+  ]
 }

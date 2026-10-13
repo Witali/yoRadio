@@ -664,3 +664,31 @@ Evidence and source snapshots:
 [early-owner-public-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-public-01/summary.json).
 The earlier laboratory image's format/transition matrix is not transferred to
 this different binary. Full production qualification remains open.
+
+### Public-root image: full HTTP format matrix (2026-10-13)
+
+The exact public-root image above now passes all 20 HTTP AUTO-detection cases
+and the independent saved-evidence audit. Coverage includes MP3, FLAC, Vorbis,
+Opus, AAC-LC, HE-AAC, HE-AACv2, ID3-prefixed AAC, unknown/truncated input,
+four false startup prefixes, AAC parameter changes, implicit SBR, and
+MP3/HE-AAC/MP3 plus AAC/MP3/HE-AACv2 transitions within one connection.
+Valid finite streams reach `stream ended`; invalid input reaches its expected
+terminal status. The server's complete-body evidence is checked for each valid
+case. This campaign deliberately omits MIME hints to exercise detection.
+
+There are zero recorded allocation failures, decoder failures or watchdog
+events across 312 retained health samples, with one boot across the matrix.
+Sampled active output counters remain unchanged. The lifetime free-heap
+minimum is 21,664 bytes, recorded for diagnosis rather than as a pass threshold.
+The stricter audit now requires decoder-failure evidence in every retained
+health sample; stable format and EOF alone cannot hide a decoder fault.
+Mutation tests cover faults in each sample location and missing/malformed
+counters. Original firmware and private settings are verified restored,
+with playback stopped.
+
+Report, audit, controller sources and hashes:
+[early-owner-public-full-01](../tests/results/esp32c3-stream-probe-20261013/early-owner-public-full-01/summary.json).
+This closes the exact-image finite HTTP matrix gap. It does not replace
+HTTPS format coverage, cancellation/source-failure controls, sustained heavy
+codec playback or the remaining routing recovery work. Production qualification
+and default enablement remain open.
