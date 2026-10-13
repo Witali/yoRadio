@@ -175,6 +175,13 @@ def main():
                 except Exception as error:
                     row['result']='FAIL'; row['errors']=exception_details(error)
                     if isinstance(error,Failure): row['check']=str(error)
+                    # Preserve post-failure counters before Stop/restoration.
+                    # A last successful active sample cannot rule out an
+                    # allocation or watchdog failure at the codec boundary.
+                    try:
+                        row['failure_health']=read_health(board)
+                    except Exception as diagnostic_error:
+                        row['failure_health_errors']=exception_details(diagnostic_error)
                 finally:
                     row['seconds']=time.monotonic()-started
                     save(); print(name,row['result'],flush=True)

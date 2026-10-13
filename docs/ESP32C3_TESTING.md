@@ -1780,6 +1780,15 @@ of an incomplete maximum-length ADTS candidate. Repeat without this flag for
 a slowly arriving partial header. Server delivery is evidence of bytes sent,
 not direct instrumentation of the board's exact lease count.
 
+Both physical runners accept `--tls-cert SERVER.pem --tls-key SERVER.key
+--tls-ca CA.pem` together to serve the audio over HTTPS. Use a separate
+laboratory image whose manifest records `laboratory_only: true` and the
+supplied CA's SHA-256; retain full public roots, server verification and
+16384-byte TLS receive records. The control runner records negotiated TLS
+for both the incomplete input and replacement stream. Its WebUI control/OTA
+connection still uses the supplied `--board` URL. Keep private keys outside
+the saved results; archive only certificate identities and public certificates.
+
 After a matrix finishes, recheck its saved evidence without contacting the board:
 
 ```sh

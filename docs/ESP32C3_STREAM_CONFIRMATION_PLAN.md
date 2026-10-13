@@ -312,11 +312,82 @@ settings and leave playback stopped. Together with the format matrix, this
 qualifies 26 finite HTTP scenarios on the saved candidate, not HTTPS or
 continuous playback.
 
+## HTTPS qualification: unresolved transition failure (2026-10-13)
+
+The laboratory `idf61-start-confirm-tls` image uses the same firmware sources
+as the HTTP candidate. Its sdkconfig differs only by the added laboratory CA;
+full public roots, server certificate verification and 16384-byte TLS receive
+records remain enabled. The image is saved separately and is not a production
+release. Public certificate identities and the configuration comparison are in
+[startup-tls-01](../tests/results/esp32c3-stream-probe-20261013/startup-tls-01/).
+
+The first HTTPS matrix passes **19/20** cases. MP3, FLAC, Vorbis, Opus,
+AAC-LC, HE-AAC, HE-AACv2, false prefixes, metadata and rate/profile changes
+pass, as does AAC-LC -> MP3 -> HE-AACv2. **MP3 -> HE-AAC -> MP3 fails**:
+the second profile is never observed and the terminal status is `decode failed`.
+The offline audit rejects this run. The original app/settings were restored.
+
+The last 17 active health samples before the failed transition have zero
+allocation/watchdog failures and unchanged output counters. This does not
+exclude an allocation failure at the boundary: the original runner did not
+capture health after its transition assertion failed. It now attempts a
+post-failure health snapshot before Stop/restoration, without masking the
+original error if that diagnostic request also fails. Quiet firmware does
+not expose the decoder return code, so MP3 drain versus AAC initialization
+has not yet been distinguished. Do not classify this as a harmless UI race.
+
+The next case's baseline provides additional evidence on the same boot
+(`33dd1269d6827b79`): at uptime 304172 ms, `allocation_failures` is **1**,
+versus 0 at 302928 ms in the failed sequence's last active sample. Thus an
+allocation failure occurred by the time the failed case had been stopped.
+Its requested size/capabilities and exact phase are not recorded. The following
+AAC-LC -> MP3 -> HE-AACv2 case passed its local checks with the already-increased
+counter; that is not proof of zero allocation failures for the matrix.
+
+A standalone fresh-boot repeat of MP3 -> HE-AAC -> MP3 passes, including the
+strict offline audit with zero allocation failures and verified restoration.
+It does not erase the earlier failure or qualify the full sequence of tests.
+History-dependent fragmentation or allocation pressure is a hypothesis to
+investigate, not an established root cause.
+
+| Successful case | HTTP sampled free / largest | HTTPS sampled free / largest |
+|---|---:|---:|
+| MP3 320 kbit/s | 83,680 / 69,632 | 79,948 / 65,536 |
+| FLAC level 8 | 64,248 / 49,152 | 59,824 / 45,056 |
+| HE-AAC 48 kHz stereo | 38,040 / 28,672 | 35,248 / 21,504 |
+| HE-AACv2 44.1 kHz stereo | 40,560 / 31,744 | 36,596 / 21,504 |
+| Large false ADTS before HE-AAC | 29,964 / 20,480 | 29,856 / 17,408 |
+
+All figures are bytes and sampled system heap, not allocator peak guarantees
+or isolated TLS costs. Queue/network occupancy differs between runs.
+
+The held-candidate HTTPS control test passes 3/3: deadline 10.59 s, Stop
+0.140 s and replacement 2.78 s. It negotiates TLS 1.2 with
+ECDHE-RSA-AES256-GCM-SHA384. Settled median heap changes from 139,752 to
+139,756 bytes, largest block remains 110,592 bytes and task count remains 16.
+Firmware and private settings restoration passes. This control result does
+not resolve the failed in-connection codec transition.
+
+The partial-header HTTPS controller also passes 3/3: deadline 10.64 s, Stop
+0.135 s and replacement 2.74 s, using the same TLS version/cipher. Settled
+median free heap changes from 139,760 to 139,748 bytes (12 bytes lower),
+largest block stays 110,592 bytes and task count stays 16. This is within
+the existing recovery bounds (2048 free bytes, 4096 largest-block bytes);
+it is not an exact-byte heap-recovery claim. Both TLS control variants pass
+firmware/private-settings restoration and leave playback stopped.
+
+Next diagnosis: repeat the preceding workload, retain post-failure health,
+record the failed allocation size/capabilities, and capture the decoder's
+return code and whether it occurred on the MP3
+drain marker or an AAC data packet. Reproduce the encoded fragmentation with
+real-decoder PCM tests before changing error handling; never suppress a
+decoder error merely to turn the status green.
+
 ## Qualification status and remaining work
 
 1. HTTP format requalification of the metadata-order correction is complete;
    maximum-length startup replay also has host and real-decoder QEMU coverage.
-2. Complete HTTP/HTTPS control regressions and the HTTPS format matrix on C3, including Stop
+2. Resolve the HTTPS MP3/HE-AAC transition failure and complete control regressions on C3, including Stop
    during candidate collection, stalls and incomplete tags, TLS pressure,
    repeat connections, actual queue target below four, and heap recovery.
 3. HTTP FLAC/Vorbis/Opus playback passed. Add decoded free-format playback

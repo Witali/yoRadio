@@ -22,9 +22,27 @@ def main():
     p.add_argument('--candidate',type=Path,required=True)
     p.add_argument('--restore',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--tls-cert',type=Path)
+    p.add_argument('--tls-key',type=Path)
+    p.add_argument('--tls-ca',type=Path)
     p.add_argument('--hold-candidate',action='store_true',
                    help='Pause an 8191-byte ADTS candidate after 8180 bytes, holding four input leases')
     a=p.parse_args()
+    secure=a.tls_cert is not None
+    require(secure==(a.tls_key is not None)==(a.tls_ca is not None),
+            'Supply all TLS certificate/key/CA paths together')
+    scheme='https' if secure else 'http'
+    if secure:
+        manifest=json.loads(a.candidate.with_name('manifest.json').read_text())
+        cfg=a.candidate.with_name('sdkconfig').read_text()
+        require(manifest.get('laboratory_only') is True and
+                manifest.get('extra_trust_ca_sha256')==sha(a.tls_ca.read_bytes()),
+                'Use a labelled laboratory image trusting exactly the supplied CA')
+        require('CONFIG_MBEDTLS_CUSTOM_CERTIFICATE_BUNDLE=y' in cfg and
+                'CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=y' in cfg and
+                'CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=16384' in cfg and
+                'CONFIG_ESP_TLS_INSECURE=y' not in cfg,
+                'Preserve certificate verification, public roots and TLS record capacity')
     if a.hold_candidate:
         cfg=a.candidate.with_name('sdkconfig').read_text()
         require('CONFIG_YORADIO_STREAM_CONFIRM=y' in cfg,
@@ -36,7 +54,8 @@ def main():
             'Restore image does not match original')
     private=snapshot(b); watchdog=private['settings']['getsystem']['watchdog']
     report=dict(controller_sha256=sha(Path(__file__).read_bytes()),initial=original,
-                candidate=image_info(a.candidate.read_bytes()),hold_candidate=a.hold_candidate,cases=[])
+                candidate=image_info(a.candidate.read_bytes()),hold_candidate=a.hold_candidate,
+                transport=scheme,cases=[])
     def save():
         (a.output/'results.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     def install(path):
@@ -67,22 +86,27 @@ def main():
     save()
     try:
         install(a.candidate)
+        report['installed']=b.info()
         set_watchdog(b,False)
         require(b.settings()['getsystem']['watchdog']==0,'Watchdog is still enabled')
         report['watchdog_disabled_verified']=True
         report['idle_before']=idle()
         with Server(a.host,8774,{'prefix':fault_spec},delivery_stats=True,
-                    delivery_pauses=pauses,pacing_ratio=1.0) as slow, \
-             Server(a.host,8773,{'audio':spec},pacing_ratio=1.0) as normal:
+                    delivery_pauses=pauses,pacing_ratio=1.0,cert=a.tls_cert,key=a.tls_key) as slow, \
+             Server(a.host,8773,{'audio':spec},pacing_ratio=1.0,cert=a.tls_cert,key=a.tls_key) as normal:
             for name in ('deadline-without-watchdog','stop-during-prefix','replace-during-prefix'):
                 row=dict(name=name,before=read_health(b),observations=[])
                 report['cases'].append(row); previous=len(slow.events)
                 try:
-                    b.play(f'http://{a.host}:8774/file/prefix')
+                    b.play(f'{scheme}://{a.host}:8774/file/prefix')
                     limit=time.perf_counter()+5
                     while len(slow.events)==previous and time.perf_counter()<limit: time.sleep(.05)
                     require(len(slow.events)>previous,'Fault request did not reach server')
                     event=slow.events[previous]; start=event['delivery']['started_at']
+                    if secure:
+                        require(event.get('tls_version') and event.get('tls_cipher'),
+                                'Missing negotiated TLS for the fault stream')
+                        row['tls_version']=event['tls_version'];row['tls_cipher']=event['tls_cipher']
                     if a.hold_candidate:
                         limit=time.perf_counter()+8
                         while event['sent']<8180 and time.perf_counter()<limit:time.sleep(.05)
@@ -111,7 +135,7 @@ def main():
                             time.sleep(.25)
                         require(row['stop_seconds']<2,'Stop response was delayed')
                     else:
-                        action=time.perf_counter(); b.play(f'http://{a.host}:8773/file/audio')
+                        action=time.perf_counter(); b.play(f'{scheme}://{a.host}:8773/file/audio')
                         stable=0
                         while time.perf_counter()-action<12:
                             state=b.status(); row['observations'].append(state)
@@ -120,6 +144,9 @@ def main():
                             time.sleep(.25)
                         require(stable>=3,'Replacement stream did not start')
                         row['replacement_seconds']=time.perf_counter()-action
+                        if secure:
+                            require(any(e.get('tls_version') and e.get('tls_cipher') for e in normal.events),
+                                    'Missing negotiated TLS for the replacement stream')
                         active=read_health(b); time.sleep(3)
                         require(matches(b.status(),spec),'Old prefix changed replacement playback')
                         later=read_health(b)
