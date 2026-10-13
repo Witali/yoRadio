@@ -100,6 +100,33 @@ int main(int argc, char **argv) {
     replay(aac,sizeof(aac),0,NATIVE_CODEC_AAC);
     replay(flac,sizeof(flac),0,NATIVE_CODEC_FLAC);
     replay(ogg,sizeof(ogg),0,NATIVE_CODEC_OGG);
+    // A complete signature after junk must be recognized without waiting for
+    // payload or unrelated trailing bytes, even when the read ends here.
+    const uint8_t *headers[] = {mp3, aac, flac, ogg};
+    const size_t header_sizes[] = {4, 7, 8, 5};
+    const native_codec_t codecs[] = {NATIVE_CODEC_MP3, NATIVE_CODEC_AAC,
+                                    NATIVE_CODEC_FLAC, NATIVE_CODEC_OGG};
+    for (size_t kind=0; kind<4; ++kind) {
+        for (size_t junk=1; junk<=24; ++junk) {
+            uint8_t prefix_only[32]={0};
+            memcpy(prefix_only+junk,headers[kind],header_sizes[kind]);
+            replay(prefix_only,junk+header_sizes[kind],junk,codecs[kind]);
+            // The same input one byte short must still be unresolved.
+            stream_probe_t partial={0}; size_t count=0;
+            assert(stream_probe_feed(&partial,prefix_only,
+                   junk+header_sizes[kind]-1,&count)==STREAM_PROBE_MORE);
+        }
+        const uint8_t overlapping[][4]={{0,0xff,0xff,0xff},{'f','L','f','L'},
+                                      {'O','g','O','g'},{'I','D','I','D'}};
+        for (size_t prefix=0; prefix<4; ++prefix) {
+            uint8_t joined[12]; memcpy(joined,overlapping[prefix],4);
+            memcpy(joined+4,headers[kind],header_sizes[kind]);
+            replay(joined,4+header_sizes[kind],4,codecs[kind]);
+        }
+    }
+    uint8_t tagged_header[15]={0,'I','D','3',4,0,0,0,0,0,0};
+    memcpy(tagged_header+11,mp3,4);
+    replay(tagged_header,sizeof(tagged_header),11,NATIVE_CODEC_MP3);
     for (size_t junk=1; junk<=24; ++junk) {
         uint8_t prefixed[36]={0};
         memcpy(prefixed+junk,aac,sizeof(aac));
