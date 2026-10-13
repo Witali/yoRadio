@@ -3,6 +3,7 @@ from pathlib import Path
 import hashlib
 import json
 import sys
+import re
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
 from run_output_dma_host import host,run
@@ -21,4 +22,21 @@ log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt
 (out/'report.json').write_text(json.dumps(dict(passed=True,scope=__doc__,sources={
     p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
     for p in (source,harness,Path(__file__))}),indent=2)+'\n')
+print(log.decode(),end='')
+adapter_source=source.with_name('native_aac_decoder.c')
+adapter_harness=harness.with_name('aac_compact_reserve_adapter_test.c')
+prefix=unit.read_text().split('int main(void)',1)[0]
+adapter=re.sub(r'^#include[^\n]*\n','',adapter_source.read_text(),flags=re.M)
+unit=out/'adapter.c'
+unit.write_text(prefix+adapter_harness.read_text().replace('/* PRODUCTION_NATIVE_ADAPTER */',adapter))
+binary=out/'adapter'
+(out/'adapter-build.log').write_bytes(run(['gcc','-std=c11','-O2','-Wall','-Wextra','-Werror',
+    '-fsanitize=address,undefined','-fno-pie','-no-pie',host(unit),'-o',host(binary)]))
+log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1',host(binary)])
+(out/'adapter-run.log').write_bytes(log)
+report=json.loads((out/'report.json').read_text())
+report['adapter_passed']=True
+for p in (adapter_source,adapter_harness):
+    report['sources'][p.relative_to(ROOT).as_posix()]=hashlib.sha256(p.read_bytes()).hexdigest()
+(out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
 print(log.decode(),end='')
