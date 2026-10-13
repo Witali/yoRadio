@@ -1632,6 +1632,10 @@ not prove that a fixed arena can service reallocations across transitions.
 ## Initial stream signature detection
 
 Initial AUTO codec selection additionally has
+`tests/run-stream-confirm.py --output NEW_DIRECTORY`: sanitizer coverage of
+the experimental bounded two-header confirmation core. This does not yet test
+firmware queue integration; see the [confirmation plan and measured limits](ESP32C3_STREAM_CONFIRMATION_PLAN.md).
+
 `tests/run-esp32c3-stream-probe.py`: sanitizer coverage of the production
 prefix parser and audio submission function, fragmented signatures, ID3,
 unknown input and exact byte replay. See [scope and open hardware gates](ESP32C3_STREAM_PROBE_20261013.md).
