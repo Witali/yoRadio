@@ -368,6 +368,12 @@ by production audio_service; these results do not establish live codec changes
 or board playback qualification. The production initial probe only shares the
 same envelope-size calculation, preserving its previous behavior.
 
+ESP-IDF 6.1 revision `9a97f6c54ec638111ce55cd36581b3c192f15207` builds this
+change successfully. The development image `idf61-id3-boundaries` is saved at
+[`firmware/development/esp32c3-idf-6.1-r9a97-id3-boundaries/`](../firmware/development/esp32c3-idf-6.1-r9a97-id3-boundaries/)
+with the build log, source commit, image hashes and unchanged sdkconfig hash.
+It has not been installed on the board or qualified for production.
+
 ## Format references
 
 - [ID3v2.4 header, size and footer](https://id3.org/id3v2.4.0-structure)
