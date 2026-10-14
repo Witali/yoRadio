@@ -1,0 +1,269 @@
+{
+  "passed": true,
+  "app_sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826",
+  "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5",
+  "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
+  "compiled_qemu_commit": "5e136b6eab95345fa6889463dc5b0e3125d792ef",
+  "host_helper_commit": "1c7e4c0512",
+  "profile": {
+    "passed": true,
+    "tests": 4,
+    "inputs": [
+      {
+        "file": "Small_TV/qemu/profiles/small-tv-c2.json",
+        "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+      },
+      {
+        "file": "Small_TV/src/app/include/board.h",
+        "sha256": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0"
+      },
+      {
+        "file": "Small_TV/qemu/parity/compare.py",
+        "sha256": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84"
+      },
+      {
+        "file": "Small_TV/qemu/run.ps1",
+        "sha256": "1fb3683a4d2eb77416340cd08ca3a597c72ce8834150c440a44a8d2fb7d748e7"
+      }
+    ],
+    "compiler_sha256": {
+      "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+      "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+      "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2"
+    },
+    "scope": "Check the owned Small TV profile against firmware wiring and generic QEMU routing.",
+    "errors": [],
+    "failures": []
+  },
+  "packet_regression": {
+    "passed": true,
+    "tests": 6,
+    "failures": [],
+    "errors": [],
+    "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
+    "scope": "QOM validation/reset and real DNS/NTP packets through Wi-Fi DMA; qtest executes no guest instructions, no firmware or Internet."
+  },
+  "helper_regression": {
+    "passed": true,
+    "tests": 11,
+    "inputs": {
+      "tools/test_esp_legacy.py": "9d0c9e7b731d630d2186efd3396544a2b16ae7946d79f09c889e596305d9babb",
+      "tools/test_esp_modules.py": "ac6bf67b53508a84a930717103007f5112d784db6a989ff1fd57b14593f17657",
+      "tools/test_esp_services.py": "cb184decee40371c015da268e34508477246c38f3f8764f00f2ea0f2557621d9",
+      "tools/test_small_tv_http_client.py": "4c34ac4679bd0a83da75f034e55e28645ad1572fdbb1149b574c1e165dea9554",
+      "tools/test_small_tv_network.py": "7b70e42238a51c1bc281250f6cb57b12ad0683e9ae01240111a99e3bfc2faf0c",
+      "tools/small_tv_vm.py": "e70cf161c05f043f036e72d4694136679e199b8bca4afb06e26f738a5aa8bf23",
+      "tools/small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+      "tools/small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+      "tools/small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+      "tools/esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+      "tools/esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+    },
+    "errors": [],
+    "failures": []
+  },
+  "board_compatibility": {
+    "passed": true,
+    "qemu_source_commit": "1c7e4c0512c68efd6e6d11276bfe7a13c070b7bd",
+    "qemu_build_identity": {
+      "compiled_source_commit": "5e136b6eab95345fa6889463dc5b0e3125d792ef",
+      "host_helper_commit": "1c7e4c0512c68efd6e6d11276bfe7a13c070b7bd",
+      "compiled_changed_sources": {
+        "hw/net/esp32c2_clock.c": "22b3ed4efa833f545a4bc54e2d601f0c89ba7fde2cefe3a73eaf7bf92cd09921",
+        "hw/net/esp32c3_wifi.c": "20ff707a029819efc83defae7b3d11e1acd2c58c0e4d00a04c76a656c2ca9986",
+        "include/hw/net/esp32c3_wifi.h": "fe9b61e5880bde1890b52f444ef4e2faa1aed9c19c5d1523db54ba69f8e581ca"
+      },
+      "note": "RISC-V executable was built from the pinned source commit. A later host-only Python test fix does not change compiled emulator code; exact executable/helper SHA identifies each tested program."
+    },
+    "scope": "Fresh legacy boot and modular QTest compatibility only; no physical board or full-program parity claim.",
+    "modular": {
+      "passed": true,
+      "checks": {
+        "profile_validation": {
+          "unsupported_bus": true,
+          "flash_gpio": true,
+          "conflicting_pins": true,
+          "always_selected_shared_bus": true,
+          "duplicate_id": true
+        },
+        "c2_shared_spi": {
+          "lcd_sd_transfer": true,
+          "topology": "shared_bus",
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "cs_isolation": true,
+          "wrong_sck_blocked": true,
+          "wrong_miso_blocked": true,
+          "sd_snapshot_unchanged": true
+        },
+        "c3_shared_spi": {
+          "lcd_sd_transfer": true,
+          "topology": "shared_bus",
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "cs_isolation": true,
+          "wrong_sck_blocked": true,
+          "wrong_miso_blocked": true,
+          "sd_snapshot_unchanged": true
+        },
+        "esp32_dual_spi": {
+          "lcd_sd_transfer": true,
+          "topology": "two_hosts",
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "cs_isolation": true,
+          "wrong_sck_blocked": true,
+          "wrong_miso_blocked": true,
+          "sd_snapshot_unchanged": true
+        },
+        "c2_i2c": {
+          "alternate_gpio_oled": true,
+          "wrong_scl_nack": true
+        },
+        "c3_i2c": {
+          "alternate_gpio_oled": true,
+          "wrong_scl_nack": true
+        },
+        "legacy_cyd_mmio": {
+          "legacy_flags": true,
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "sd_idle_high": true,
+          "snapshot_unchanged": true
+        }
+      },
+      "qemu_sha256": {
+        "riscv32": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
+        "xtensa": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35"
+      }
+    },
+    "legacy": {
+      "cyd": {
+        "passed": true,
+        "checks": {
+          "running": true,
+          "console_has_content": true,
+          "display_dimensions": true,
+          "no_panic_or_watchdog": true,
+          "source_flash_unchanged": true,
+          "source_artifacts_unchanged": true
+        },
+        "hardware_profile": null,
+        "machine": "esp32,st7789=on,sdspi=on",
+        "duration_seconds": 25,
+        "qemu_sha256": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35",
+        "firmware_sources": {
+          "flash.bin": "1050294c50955df7a4b09e5a44950601b1da11a299b3aea6a30031353103b8a8"
+        },
+        "pixel_sha256": "4afa1d8c3cb4023eef448bc04e36e1ae6b4568da007c43777935b32a1ea995d7",
+        "nonzero_bytes": 42240,
+        "lcd_area_nonzero_bytes": 0,
+        "cyd_boot_scope": "Boot, console and panic checks; LCD transactions are verified separately by QTest"
+      },
+      "c3_oled": {
+        "passed": true,
+        "checks": {
+          "running": true,
+          "console_has_content": true,
+          "display_dimensions": true,
+          "no_panic_or_watchdog": true,
+          "source_flash_unchanged": true,
+          "source_artifacts_unchanged": true
+        },
+        "hardware_profile": null,
+        "machine": "esp32c3",
+        "duration_seconds": 25,
+        "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
+        "firmware_sources": {
+          "flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+        },
+        "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
+        "nonzero_bytes": 44160,
+        "lcd_area_nonzero_bytes": 44160,
+        "cyd_boot_scope": null
+      },
+      "c3_modular": {
+        "passed": true,
+        "checks": {
+          "running": true,
+          "console_has_content": true,
+          "display_dimensions": true,
+          "no_panic_or_watchdog": true,
+          "source_flash_unchanged": true,
+          "source_artifacts_unchanged": true
+        },
+        "hardware_profile": {
+          "schema": 1,
+          "name": "c3-oled",
+          "soc": "esp32c3",
+          "machine": "esp32c3,default-peripherals=off",
+          "arguments": [
+            "-device",
+            "{\"driver\":\"esp-i2c-module\",\"id\":\"oled\",\"bus\":\"/i2c0/i2c\",\"gpio\":\"/machine/gpio\",\"address\":60,\"model\":\"ssd1306\",\"scl\":6,\"sda\":5,\"properties\":\"{\\\"visible-width\\\":72,\\\"visible-height\\\":40,\\\"column-offset\\\":28,\\\"magnify\\\":4}\"}"
+          ],
+          "sd_images": [],
+          "profile": "C:\\Work\\QEMU-ESP32\\.worktree\\small-tv-service-profile\\configs\\boards\\c3-oled.json",
+          "network": {
+            "station_ssid": "yoRadio-QEMU",
+            "urls": [],
+            "ntp_hosts": []
+          },
+          "network_arguments": [],
+          "service_urls": []
+        },
+        "machine": "esp32c3",
+        "duration_seconds": 25,
+        "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
+        "firmware_sources": {
+          "flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+        },
+        "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
+        "nonzero_bytes": 44160,
+        "lcd_area_nonzero_bytes": 44160,
+        "cyd_boot_scope": null
+      },
+      "passed": true
+    }
+  },
+  "default_offline_launch": {
+    "passed": true,
+    "checks": {
+      "machine_still_running": true,
+      "rom_and_bootloader": true,
+      "lcd_240x240": true,
+      "lcd_has_content": true,
+      "no_panic_or_watchdog": true,
+      "app_main_completed": true,
+      "ap_started": true,
+      "no_panic_after_reset": true,
+      "reset_reboots": true,
+      "source_flash_unchanged": true,
+      "source_artifacts_unchanged": true
+    },
+    "network": "offline",
+    "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6"
+  },
+  "default_clock_launch": {
+    "passed": true,
+    "checks": {
+      "machine_still_running": true,
+      "rom_and_bootloader": true,
+      "lcd_240x240": true,
+      "lcd_has_content": true,
+      "no_panic_or_watchdog": true,
+      "app_main_completed": true,
+      "animation_updates": true,
+      "ntp_reply_sent": true,
+      "guest_clock_set_by_sntp": true,
+      "wifi_associated": true,
+      "station_dhcp": true,
+      "no_panic_after_reset": true,
+      "reset_reboots": true,
+      "source_flash_unchanged": true,
+      "source_artifacts_unchanged": true
+    },
+    "network": "clock",
+    "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6"
+  },
+  "scope": "Owned schema-1 profile, generic isolated services and exact application inputs. CYD boot/no-panic plus separate LCD MMIO; C3 OLED legacy/modular boot. No physical board/RF/Internet service claim."
+}

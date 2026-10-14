@@ -1,14 +1,15 @@
 {
   "passed": true,
-  "qemu_source_commit": "5520fbb7872642d6aca5d2a6b7bc6566baeadd79",
+  "qemu_source_commit": "1c7e4c0512c68efd6e6d11276bfe7a13c070b7bd",
   "qemu_build_identity": {
-    "base_commit_at_build": "320055a3c0cac0871929452b8be96518d7068a6e",
+    "compiled_source_commit": "5e136b6eab95345fa6889463dc5b0e3125d792ef",
+    "host_helper_commit": "1c7e4c0512c68efd6e6d11276bfe7a13c070b7bd",
     "compiled_changed_sources": {
-      "hw/net/esp32c2_clock.c": "5a2ad606e6fb19b1f15795ca22de12f2714cee8fb20b04107bdf29806af1f28d",
-      "hw/net/esp32c3_wifi.c": "0c4497d66541f0b06c449f5afbb89f7b1597e9f53fe16a456dbd781da6d1aa31",
-      "include/hw/net/esp32c3_wifi.h": "1f8be6c31bb2f4e0d74c22271a786887bd271808275bdddb94ca8a7933982550"
+      "hw/net/esp32c2_clock.c": "22b3ed4efa833f545a4bc54e2d601f0c89ba7fde2cefe3a73eaf7bf92cd09921",
+      "hw/net/esp32c3_wifi.c": "20ff707a029819efc83defae7b3d11e1acd2c58c0e4d00a04c76a656c2ca9986",
+      "include/hw/net/esp32c3_wifi.h": "fe9b61e5880bde1890b52f444ef4e2faa1aed9c19c5d1523db54ba69f8e581ca"
     },
-    "note": "Executables were built with these source changes before their b90e2131b8 commit. Version metadata may retain the base revision; executable SHA identifies the tested program."
+    "note": "RISC-V executable was built from the pinned source commit. A later host-only Python test fix does not change compiled emulator code; exact executable/helper SHA identifies each tested program."
   },
   "scope": "Fresh legacy boot and modular QTest compatibility only; no physical board or full-program parity claim.",
   "modular": {
@@ -68,7 +69,7 @@
       }
     },
     "qemu_sha256": {
-      "riscv32": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
+      "riscv32": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
       "xtensa": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35"
     }
   },
@@ -88,7 +89,7 @@
       "duration_seconds": 25,
       "qemu_sha256": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35",
       "firmware_sources": {
-        "C:\\Work\\QEMU-ESP32\\.cache\\esp-boards\\legacy-tests\\cyd\\flash.bin": "1050294c50955df7a4b09e5a44950601b1da11a299b3aea6a30031353103b8a8"
+        "flash.bin": "1050294c50955df7a4b09e5a44950601b1da11a299b3aea6a30031353103b8a8"
       },
       "pixel_sha256": "4afa1d8c3cb4023eef448bc04e36e1ae6b4568da007c43777935b32a1ea995d7",
       "nonzero_bytes": 42240,
@@ -108,9 +109,9 @@
       "hardware_profile": null,
       "machine": "esp32c3",
       "duration_seconds": 25,
-      "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
+      "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
       "firmware_sources": {
-        "C:\\Work\\QEMU-ESP32\\.cache\\esp-boards\\legacy-tests\\c3-oled\\flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+        "flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
       },
       "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
       "nonzero_bytes": 44160,
@@ -129,6 +130,7 @@
       },
       "hardware_profile": {
         "schema": 1,
+        "name": "c3-oled",
         "soc": "esp32c3",
         "machine": "esp32c3,default-peripherals=off",
         "arguments": [
@@ -136,13 +138,20 @@
           "{\"driver\":\"esp-i2c-module\",\"id\":\"oled\",\"bus\":\"/i2c0/i2c\",\"gpio\":\"/machine/gpio\",\"address\":60,\"model\":\"ssd1306\",\"scl\":6,\"sda\":5,\"properties\":\"{\\\"visible-width\\\":72,\\\"visible-height\\\":40,\\\"column-offset\\\":28,\\\"magnify\\\":4}\"}"
         ],
         "sd_images": [],
-        "profile": "C:\\Work\\QEMU-ESP32\\configs\\boards\\c3-oled.json"
+        "profile": "C:\\Work\\QEMU-ESP32\\.worktree\\small-tv-service-profile\\configs\\boards\\c3-oled.json",
+        "network": {
+          "station_ssid": "yoRadio-QEMU",
+          "urls": [],
+          "ntp_hosts": []
+        },
+        "network_arguments": [],
+        "service_urls": []
       },
       "machine": "esp32c3",
       "duration_seconds": 25,
-      "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
+      "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
       "firmware_sources": {
-        "C:\\Work\\QEMU-ESP32\\.cache\\esp-boards\\legacy-tests\\c3-oled\\flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+        "flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
       },
       "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
       "nonzero_bytes": 44160,

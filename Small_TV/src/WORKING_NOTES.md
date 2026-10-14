@@ -31,21 +31,49 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   Коммитить завершённые изменения отдельно, не включать посторонние правки,
   временные ВМ и журналы с пользовательскими данными.
 
-## Текущий запрос: профиль для новых сетевых сервисов QEMU
+## Последний завершённый запрос: новый сетевой профиль QEMU
 
-Пользователь попросил синхронизировать Small TV с новыми требованиями QEMU.
-Прочитаны `C:/Work/QEMU-ESP32/configs/boards/AGENTS.md` и README формата:
-network URLs/NTP hosts/SSID должны быть данными профиля, `ServicePort` заменяет
-provider-specific launcher setting, hardware-only schema 1/offline сохраняются.
-Main обновлён до `5e136b6eab`; прежний canonical Windows binary всё ещё BF98..
-и не поддерживает новые properties. Собран новый Windows RISC-V/SDL/SLIRP в
-собственном worktree `C:/Work/QEMU-ESP32/.worktree/small-tv-service-profile`,
-ветка `codex/small-tv-service-profile`, pinned 5e136b6eab. Его tests ещё не прошли.
-Следующий шаг: repo-owned `Small_TV/qemu/profiles/small-tv-c2.json`, shared compiler,
-обновить наши launch/test paths и generic service fixture. Проверить packet suite,
-legacy CYD/C3, обе Small TV firmware и default/offline/service routing.
-Не менять источники firmware ради сетевого профиля. UTF-8 checkpoint ниже уже
-проверен и должен оставаться самостоятельным завершённым коммитом.
+Repo-owned `Small_TV/qemu/profiles/small-tv-c2.json` хранит schema 1 hardware,
+factory SPI2/ST7789 wiring, network URLs/NTP hosts/SSID. `qemu/run.ps1` передаёт
+его shared QEMU launcher; default state — `.build/small-tv-vm/<network>-<variant>`.
+Standalone/full/comparator paths используют один профиль, weather/fields/text
+fixture использует generic `service_port`. NTP/URL names остались factory;
+profile не меняет compiled firmware endpoints и не содержит private keys.
+
+QEMU kernel built from `5e136b6eab95345fa6889463dc5b0e3125d792ef`, source/helper main
+`1c7e4c0512c68efd6e6d11276bfe7a13c070b7bd`, RISC-V executable
+`c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6`. Установлен в canonical QEMU bin; прежний BF98..
+и marker сохранены в `.cache/small-tv-profile-runtime-before`. Xtensa F6A.. прежний.
+Own frozen worktree `C:/Work/QEMU-ESP32/.worktree/small-tv-service-profile`
+(codex/small-tv-service-profile) оставить для следующих parity checks.
+
+`service-profile-verified-20261014` объединяет реальные passing stages третьего
+full attempt с fresh profile gate + пятью scene pairs после исправления seeder
+signature. Успешные stages сохраняют точные unchanged input bytes. Все automatic
+gates прошли на прежнем
+app/source/ELF: host/native/platform/JS/integrity/timezone-source; RV32 renderer,
+control/classic/weather/calendar/JPEG/timezones/time-state/text; profile 4;
+реальный QEMU boot/reset/AP→STA/persistence/weather/fields/UDP SNTP/UTF-8 и пять
+сцен. Source app не переписывалась. `qemu_profile` и publisher/verifier связывают
+profile/launcher/comparator/compiler bytes; runtime guard проверяет стабильность.
+Точные staged hashes проверяются перед коммитом. Source/app остаются ниже в
+UTF-8 checkpoint; full functionality / physical RF/browser/soak ещё не доказаны.
+
+Дополнительные evidence: packet DNS/NTP 6, shared helper 11, modular SPI/I2C/SD/CS
+и CYD MMIO; legacy CYD + C3 legacy/modular boots. CYD boot LCD blank baseline,
+LCD проверен отдельным MMIO; C3 OLED nonempty и legacy/modular hashes совпали.
+Штатный wrapper/main runtime offline и clock boot/reset/SNTP passed. Public summary:
+`../qemu/profile-compatibility-validation.json`; raw logs/flash не публиковались.
+
+Неуспешные service-profile full runs сохранены: test-only old
+weather-services property, затем service=weather trace. Generic service-hosts /
+service=http expectations исправлены; target weather preflight прошёл обе apps.
+Третий attempt дошёл до всех HTTP/time/UTF-8 passes, затем остановился на новом
+optional SSID argument seeder. Исправлен comparator; scenes и profile gate
+повторены отдельно и проверены точным unmodified validator из qemu_suite.py.
+QEMU helper 1c7e4c исправляет ложное animation ожидание для static offline/setup;
+clock animation остаётся обязательной. Main QEMU fix pushed; private user/source
+images и physical devices не менялись. Owned VM/listeners закрыты после тестов.
 
 ## Последний проверенный участок: UTF-8 и поля текста
 

@@ -395,3 +395,45 @@
   pinned 5e136b6eab. Скопированы уже закреплённые dtc/keycodemapdb dependencies;
   Windows RISC-V SDL/SLIRP успешно собран. Runtime/network/legacy проверки новой
   сборки ещё не выполнены; готовится отдельный repo-owned Small TV profile.
+
+- Добавлены repo-owned profile + launcher, все standalone/full/comparator paths
+  переведены на него, weather/fields/text fixtures используют generic service_port.
+  Compiler/profile source hashes включены в runner/publisher/verifier; LF rules
+  сохраняют проверяемые bytes. Actual profile checks 4, helper tests 11, packet
+  regressions 6 и modular SPI/I2C/SD/CS/CYD MMIO прошли на c970591d.. executable.
+- Legacy CYD/C3 source images заморожены из прежних checked copies; hashes
+  unchanged. CYD boot/no panic + separate MMIO passed, C3 OLED legacy/modular
+  boots passed, OLED nonempty/hashes match. Raw images/logs остаются ignored.
+- Первый full `service-profile-final-20261014` прошёл host/RV/profile/boot/AP→STA,
+  но qemu.weather ещё проверял deprecated weather-services=True. Assertion
+  обновлён на actual service-hosts vs profile endpoints; failed run сохранён.
+- Offline wrapper 5/30 sec загрузился/reset без panic, но QEMU test helper
+  требовал changing animation на static setup page. Own QEMU commit 1c7e4c0512
+  требует animation только при clock; real offline boot/reset passed. Emulated
+  hardware/firmware не менялись. Новый full service-profile-second запущен;
+  прежние опубликованные results не объявлены новым passing checkpoint.
+
+- `service-profile-second` завершился false по ещё одному old log label:
+  actual HTTP/cache scenarios прошли, DNS trace теперь service=http. Исправлено
+  ожидание, target weather preflight прошёл original+native. Failed reports
+  сохранены; новый `service-profile-third` не использует их как passing evidence.
+- Третий attempt прошёл все host/RV/HTTP/time/UTF-8 stages, но scene seeder ещё
+  принимал старые четыре args. Новый fifth argument — station SSID string;
+  comparator мигрирован. Только profile gate и все пять scene pairs повторены,
+  точный suite validator проверил PNG CRC/dimensions/pixels/panic/NTP. Остальные
+  stages сохраняют unchanged test/app/profile/emulator/helper bytes. Failed run
+  не переименован; combined verified report хранит rerun provenance. Packet 6, helper 11,
+  modular SPI/I2C/SD/CS, CYD boot/MMIO и C3 legacy/modular прошли отдельно.
+- QEMU source helper 1c7e4c merged FF и pushed main. Kernel compiled 5e136b6eab,
+  RISC-V SHA `c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6` установлен canonical bin; прежний BF98..
+  сохранён с marker. Штатный own launcher offline и clock boot/reset/SNTP прошёл на main.
+- Published profile/compiler/launcher fingerprints и compatibility summary;
+  publisher/artifact verifier отклоняют mixed/stale profile inputs. Production
+  app/source/ELF прежние 2acdf34f / 72ad106b / 570d62ad, физической прошивки нет.
+  Full functional correspondence ещё не объявляется: остаются regional settings,
+  transport/scene/JPEG/concurrency/browser/physical/soak пути из backlog.
+
+- Profile/launcher/test migration сохранена отдельным commit `b57996b6`.
+  Перед коммитом проверены exact staged bytes: 50 test inputs, 50 production
+  inputs, 106 TZif и font/LFS app/native ELF; profile/board/comparer/launcher
+  fingerprints проверяются отдельно тем же staged-byte checker.
