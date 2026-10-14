@@ -129,6 +129,15 @@ def check_health(samples):
                 allocation_failures=0, task_watchdog_events=0)
 
 
+def check_decoder_health(rows):
+    require(rows, 'Missing decoder health observations')
+    for row in rows:
+        fault = row.get('decoder_failure', {})
+        require(type(fault.get('sequence')) is int and fault['sequence'] == 0,
+                'Missing decoder diagnostics or recorded decoder failure')
+    return dict(samples=len(rows), decoder_failures=0)
+
+
 def capture_failure_snapshot(board):
     """One diagnostic status/health observation before the caller stops playback.
 

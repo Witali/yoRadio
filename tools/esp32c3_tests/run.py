@@ -12,7 +12,8 @@ import time
 from common import (Blocked, Board, Failure, Report, check_cpu, check_playback,
                     check_recovery_heap, check_transitions, fixtures, require,
                     filter_tls_line, check_certificate_rejection, exception_details,
-                    check_file_runtime)
+                    check_file_runtime, check_natural_eof)
+from production_health import capture_failure_snapshot, check_decoder_health
 from audio_test_server.server import Server
 from audio_test_server.fixtures import SEQUENCES
 from serial_lines import serial_lines
@@ -56,6 +57,7 @@ class Suite:
         self.capture, self.output = capture, Path(output)
         self.output.mkdir(parents=True, exist_ok=True)
         self.observations = []
+        self.file_failure_snapshots = []
         self.checkpoint = checkpoint
         self.cpu_budget = cpu_budget
 
@@ -96,16 +98,24 @@ class Suite:
     def file(self, name, hint='auto', origin=None, mode='file'):
         spec = self.specs[name]
         started = time.perf_counter()
-        self.start(name, mode, hint, origin)
+        health_start = len(getattr(self.board, 'health_samples', []))
         try:
+            self.start(name, mode, hint, origin)
             samples = self.observe(max(7, spec['seconds']-3), name)
             evidence = check_playback(samples, spec)
             tail = self.observe(8, name + ':eof')
-            require(any(not s['audio'] for s in tail), 'Finite stream never reached EOF')
+            evidence['eof'] = check_natural_eof(tail)
+            if hasattr(self.board, 'health_samples'):
+                evidence['decoder_health'] = check_decoder_health(self.board.health_samples[health_start:])
             check_file_runtime(self.capture.since(started))
             evidence['serial_capture_enabled'] = self.capture.port is not None
-            # No explicit stop: test that the next playback recovers from EOF.
+            # Natural EOF is verified before cleanup below.
             return evidence
+        except Exception:
+            if hasattr(self.board, 'health_samples'):
+                self.file_failure_snapshots.append(dict(name=name, hint=hint, mode=mode,
+                    snapshot=capture_failure_snapshot(self.board)))
+            raise
         finally:
             self.board.stop()
 

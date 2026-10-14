@@ -11,7 +11,8 @@ from urllib.parse import urlsplit
 
 from common import Report, check_playback, check_recovery_heap, fixtures, require, sha
 from ota import image_info, snapshot, verify_snapshot
-from production_health import HealthBoard, capture_failure_snapshot, check_health
+from production_health import (HealthBoard, capture_failure_snapshot, check_health,
+                              check_decoder_health as decoder_health)
 from sustained_output import sustained_window, check_memory, check_output
 from run import Capture, Suite
 from trace_transport import TransportTrace
@@ -128,15 +129,6 @@ def main():
                     report.data['server_events'] = server.events
                     save()
     return report.exit_code()
-
-
-def decoder_health(rows):
-    require(rows, 'Missing decoder health observations')
-    for row in rows:
-        fault = row.get('decoder_failure', {})
-        require(type(fault.get('sequence')) is int and fault['sequence'] == 0,
-                'Missing decoder diagnostics or recorded decoder failure')
-    return dict(samples=len(rows), decoder_failures=0)
 
 
 if __name__ == '__main__':

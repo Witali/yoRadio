@@ -171,6 +171,13 @@ def check_file_runtime(records):
             'Runtime failure during file playback')
 
 
+def check_natural_eof(samples):
+    require(len(samples) >= 3, 'Missing natural EOF observations')
+    require(all(s.get('audio') is False and s.get('format') == 'stream ended'
+                for s in samples[-3:]), 'Natural EOF was not observed')
+    return dict(samples=3, format='stream ended', explicit_stop=False)
+
+
 def check_playback(samples, spec, minimum=5, warmup=2):
     stable = [s for s in samples if s['seconds'] >= warmup and s.get('audio')]
     require(len(stable) >= minimum, 'Insufficient actual playback samples')

@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 
 from common import Report, check_playback, check_recovery_heap, fixtures, require, sha
 from ota import image_info, snapshot, verify_snapshot
-from production_health import HealthBoard, capture_failure_snapshot, check_health
+from production_health import HealthBoard, capture_failure_snapshot, check_health, check_decoder_health
 from public_streams import DEFAULT_MANIFEST, probe, public_url
 from run import Capture, Suite
 from trace_transport import TransportTrace
@@ -68,6 +68,7 @@ def main():
         try:report.case(name,fn)
         finally:
             report.data['actions'].append(dict(name=name,started_at=start,ended_at=time.perf_counter()))
+            report.data['file_failure_snapshots'] = suite.file_failure_snapshots
             save_health();report.save()
 
     def checkpoint(name):
@@ -138,6 +139,7 @@ def main():
             finally:
                 case('stop-and-settings',lambda:(b.stop(),verify_snapshot(b,before))[1])
                 case('lifetime-health',lambda:check_health(b.health_samples))
+                case('all-decoder-health',lambda:check_decoder_health(b.health_samples))
                 save_health();report.save()
     return report.exit_code()
 

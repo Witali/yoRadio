@@ -1920,6 +1920,15 @@ mutation and a synthetic inter-case reboot in an otherwise valid physical report
 
 ## Sustained local playback on a quiet production image
 
+Positive finite-file cases in `run.py` now require the final three EOF
+observations to have `audio=false` **and** `format="stream ended"`; an error or
+explicitly stopped status cannot pass. When used with `HealthBoard` (including
+`quiet_acceptance.py`), every file observation must also contain a zero
+decoder-failure sequence. Failures retain a bounded diagnostic snapshot before
+Stop in `file_failure_snapshots`. Quiet acceptance checks all decoder-health
+rows again at the end. Historical reports keep their original weaker coverage.
+Regression tests: `python tests/test-quiet-file-gates.py`.
+
 Use `tools/esp32c3_tests/local_sustained.py` to test a single long, finite
 fixture on an already installed image. The initially stopped board's ELF
 identity must match `--firmware`. No application or private settings are written
