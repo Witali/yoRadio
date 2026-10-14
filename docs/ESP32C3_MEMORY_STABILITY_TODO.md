@@ -20,8 +20,12 @@ to 114,688 bytes. See the [exact-image report](ESP32C3_PRODUCTION_QUALIFICATION_
 The pre-existing stopped `stream read failed` status is retained and remains
 unattributed. A subsequent **600-second Vorbis q10** run on the same boot also
 passes 9/9 gates, with zero recorded faults and exact settled free/largest
-recovery (139,492 / 114,688 bytes). Sustained Opus and the complete exact-image
-acceptance matrix remain open. This image does not enable the experimental router or
+recovery (139,492 / 114,688 bytes). **600-second Opus 510k** subsequently passes
+9/9 on the same boot with the same exact settled recovery and zero recorded
+faults. The three long local cases now pass; the complete exact-image
+format/EOF/network/HTTPS/OTA acceptance matrix remains open. Historical
+short-window memory fluctuations are retained, not reclassified as fixed.
+This image does not enable the experimental router or
 early compact owner described in the candidate checkpoint below.
 
 ## Latest experimental candidate checkpoint, 2026-10-13

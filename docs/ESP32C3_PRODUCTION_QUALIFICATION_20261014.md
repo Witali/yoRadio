@@ -1,4 +1,4 @@
-# Installed production image: sustained FLAC and Vorbis — 2026-10-14
+# Installed production image: sustained FLAC, Vorbis and Opus — 2026-10-14
 
 The installed `idf61-prod-20261013` application was tested without flashing or
 rebooting. App SHA-256:
@@ -56,12 +56,12 @@ acoustic continuity, all FLAC sample depths/LPC orders, HTTPS FLAC, or EOF:
 playback was deliberately stopped before the finite file ended. The full goal
 and `production_qualified=false` remain unchanged.
 
-Next: sustained Opus, exact-image format/EOF/network/OTA regressions,
+Next: exact-image format/EOF/network/OTA regressions,
 HTTPS coverage and attribution of intermittent transport failures. New
 610-second Vorbis/Opus fixtures have been generated in
 `.worktree/merge-c3-idf-20261013/.build/c3-production-qualification-20261014/ogg-fixtures/`
-for the next runs; the Vorbis result follows below, while Opus remains untested
-in this ten-minute campaign.
+for the runs documented below. Both Ogg fixtures have now completed their
+ten-minute physical observations.
 
 ## Sustained Vorbis on the same boot
 
@@ -97,3 +97,44 @@ rewriting their historical failures or proving their allocation ownership.
 The result applies to this local HTTP fixture; it does not establish Vorbis
 over HTTPS, chained Ogg, other channel layouts, EOF or acoustic continuity.
 Full production qualification remains open.
+
+## Sustained Opus on the same boot
+
+The same installed image then played the 610.0065-second continuous Ogg Opus
+fixture: 48 kHz stereo, encoder target 510 kbit/s (512.7 kbit/s including
+container overhead), 20 ms frames, fixed bitrate. The 600-second observation
+uses real-time HTTP pacing and the same source PCM as the FLAC/Vorbis files.
+No flashing or reset occurred between these three runs.
+
+[Opus evidence](../tests/results/esp32c3-production-qualification-20261014/opus-600-01/summary.json)
+records **9/9 PASS**. There were 518 playback observations, 505 after warmup,
+and a 584.118-second sustained output window with zero new queue drops or
+write errors. Every retained decoder-failure sequence, allocation-failure
+counter and watchdog counter was zero. Maximum paired status/health duration
+was 227.917 ms. Settings remained unchanged; the board is left stopped.
+
+FFmpeg 8.1.1 also decoded the entire exact Opus fixture with `-xerror` and
+exit code zero. The command, encoded hash and stderr are retained in
+`fixture-reference.json`. This is independent fixture validation, not a
+comparison with board PCM or a measurement of analog sound.
+
+### Three sequential long-playback cases
+
+All rows refer to this exact binary, the same boot, a 600-second local HTTP
+observation and the existing 15-second warmup. Values are bytes and sampled
+application-wide heap, including network buffers; they are not isolated
+codec allocation sizes.
+
+| Codec | Gates | Minimum active free / largest | Median settled free before → after | Settled largest before → after | New output / decoder / allocation / watchdog faults |
+| --- | --- | --- | --- | --- | --- |
+| FLAC level 8 | 9/9 | 62,700 / 45,056 | 139,496 → 139,484 | 114,688 → 114,688 | 0 / 0 / 0 / 0 |
+| Vorbis q10 | 9/9 | 69,716 / 55,296 | 139,492 → 139,492 | 114,688 → 114,688 | 0 / 0 / 0 / 0 |
+| Opus 510k | 9/9 | 80,644 / 65,536 | 139,492 → 139,492 | 114,688 → 114,688 | 0 / 0 / 0 / 0 |
+
+Task count remains 16. These runs show no failure of the active memory trend
+or settled recovery gates. They do not attribute historical short-window Opus
+heap fluctuations to a specific owner or erase those original observations.
+Radio signal varied during the campaign, so this is not a controlled RF or
+CPU-performance comparison. HTTPS, EOF, fault recovery and the remaining
+exact-image matrix still need separate evidence; `production_qualified` stays
+false.
