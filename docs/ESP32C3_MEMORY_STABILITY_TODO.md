@@ -22,8 +22,12 @@ unattributed. A subsequent **600-second Vorbis q10** run on the same boot also
 passes 9/9 gates, with zero recorded faults and exact settled free/largest
 recovery (139,492 / 114,688 bytes). **600-second Opus 510k** subsequently passes
 9/9 on the same boot with the same exact settled recovery and zero recorded
-faults. The three long local cases now pass; the complete exact-image
-format/EOF/network/HTTPS/OTA acceptance matrix remains open. Historical
+faults. The three long local cases now pass. The subsequent strict HTTP
+format/EOF matrix passes **28/28**, including 22 files/hints and independently
+replayed natural EOF recovery before Stop (worst free-heap loss 12 bytes,
+no largest-block loss). All 683 health observations have zero decoder,
+allocation and watchdog faults. Network/HTTPS/OTA regressions and codec
+transitions still require exact-image evidence. Historical
 short-window memory fluctuations are retained, not reclassified as fixed.
 This image does not enable the experimental router or
 early compact owner described in the candidate checkpoint below.

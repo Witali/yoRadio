@@ -1,4 +1,4 @@
-# Installed production image: sustained FLAC, Vorbis and Opus — 2026-10-14
+# Installed production image: playback and EOF qualification — 2026-10-14
 
 The installed `idf61-prod-20261013` application was tested without flashing or
 rebooting. App SHA-256:
@@ -56,7 +56,7 @@ acoustic continuity, all FLAC sample depths/LPC orders, HTTPS FLAC, or EOF:
 playback was deliberately stopped before the finite file ended. The full goal
 and `production_qualified=false` remain unchanged.
 
-Next: exact-image format/EOF/network/OTA regressions,
+Next: exact-image network/HTTPS/OTA regressions and codec transitions,
 HTTPS coverage and attribution of intermittent transport failures. New
 610-second Vorbis/Opus fixtures have been generated in
 `.worktree/merge-c3-idf-20261013/.build/c3-production-qualification-20261014/ogg-fixtures/`
@@ -135,6 +135,52 @@ Task count remains 16. These runs show no failure of the active memory trend
 or settled recovery gates. They do not attribute historical short-window Opus
 heap fluctuations to a specific owner or erase those original observations.
 Radio signal varied during the campaign, so this is not a controlled RF or
-CPU-performance comparison. HTTPS, EOF, fault recovery and the remaining
-exact-image matrix still need separate evidence; `production_qualified` stays
-false.
+CPU-performance comparison. The long runs do not cover EOF; the subsequent
+finite-file evidence is below. HTTPS, fault recovery and the remaining
+exact-image matrix still need evidence; `production_qualified` stays false.
+
+## Strict finite-file and natural EOF matrix
+
+After the three long runs, the same installed image and boot completed
+**28/28 acceptance cases**, including **22 positive file cases**: each of
+the following fixtures once with automatic codec detection and once with
+the explicit codec hint.
+
+| Fixture group | Layouts checked |
+| --- | --- |
+| MP3 | 320 kbit/s, 48 kHz stereo |
+| FLAC | level 8, 48 kHz stereo |
+| Vorbis | q10, 48 kHz stereo |
+| Opus | 510 kbit/s, 48 kHz stereo |
+| AAC-LC | 320-kbit calibration; 44.1/48 kHz stereo; 22.05 kHz mono |
+| HE-AAC | 44.1/48 kHz stereo, full SBR output rate |
+| HE-AACv2 | 44.1 kHz stereo, SBR/PS |
+
+The strengthened test requires the final three observations to have both
+`audio=false` and `format="stream ended"`. An error status, explicit Stop,
+decoder failure or missing decoder diagnostics cannot satisfy the gate.
+Failures retain a snapshot before cleanup. Five new host regression tests
+cover these distinctions; all 21 EOF/health/sustained validator tests pass.
+The first sandboxed host run failed in Windows temporary-directory cleanup;
+the normal-environment rerun passed without changing the test assertions.
+
+[Raw evidence and independent replay](../tests/results/esp32c3-production-qualification-20261014/http-eof-01/audit.json)
+verify all 22 playback/EOF sequences again, check all server payloads were
+completely delivered, and require zero decoder-failure sequences across all
+683 health observations. Allocation and watchdog counters were also zero,
+with no unexpected reboot. Minimum sampled free/largest heap was
+**29,332 / 14,848 bytes**.
+
+Natural-EOF resource recovery was checked from each case's last three health
+observations **before cleanup Stop**, against the initial idle baseline.
+All 22 pass: worst median free-heap loss was **12 bytes**, and the largest
+block never decreased. Final idle free/largest medians equal their initial
+values (**139,492 / 114,688 bytes**), with 16 tasks. Private settings were
+compared in memory and remain unchanged; the board is stopped.
+
+This closes the standard finite HTTP fixture matrix on this exact binary.
+It does not cover every bit depth/channel layout, midstream codec changes,
+HTTPS, network errors or repeated OTA. Finite-file status and health checks
+do not establish analog continuity; the separate long-playback cases above
+contain the sustained output-counter evidence. Full qualification remains
+open, and previous weaker EOF reports are not retroactively upgraded.
