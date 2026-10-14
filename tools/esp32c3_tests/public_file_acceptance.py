@@ -11,9 +11,10 @@ from pathlib import Path
 import time
 from urllib.parse import urlsplit
 
-from common import Report, check_recovery_heap, matches, require, sha
+from common import Report, matches, require, sha
 from ota import image_info, snapshot, verify_snapshot
-from production_health import HealthBoard, check_health
+from production_health import HealthBoard, check_health, check_decoder_health, capture_failure_snapshot
+from quiet_acceptance import idle_checkpoint, idle_recovery
 from public_streams import public_url
 from run import Capture, Suite
 from sustained_output import check_memory, check_output
@@ -58,6 +59,8 @@ def check_finite_playback(samples, spec):
     require(ended < len(samples), 'Finite file never reached EOF')
     require(len(samples) - ended >= 3 and times[-1] - times[ended] >= 2,
             'Insufficient stopped observations after EOF')
+    require(all(s.get('format') == 'stream ended' for s in samples[ended:]),
+            'File stopped with an error or explicit Stop instead of natural EOF')
     elapsed = times[ended] - times[first]
     require(duration - 2 <= elapsed <= duration + 5,
             'Playback duration differs from independently decoded file')
@@ -96,7 +99,8 @@ def load_references(path):
 def check_finite_health(steady):
     """Apply memory and output gates to the selected decoded-playback window."""
     require(len(steady) >= 10, 'Missing in-playback health evidence')
-    return dict(health=check_memory(steady), output=check_output(steady))
+    return dict(health=check_memory(steady), output=check_output(steady),
+                decoder_health=check_decoder_health(steady))
 
 
 def main():
@@ -136,18 +140,14 @@ def main():
             report.save()
 
     def idle(name):
-        board.stop()
-        suite.observe(12, 'idle:' + name, interval=1)
-        rows = board.health_samples[-3:]
-        report.data['idle'][name] = rows
-        return dict(samples=rows)
+        return idle_checkpoint(board, suite, report.data, name)
 
     def play(name, hint):
         reference = references['sources'][name]
         spec = reference['spec']
-        board.stop()
-        time.sleep(.8)
         try:
+            board.stop()
+            time.sleep(.8)
             board.play(reference['url'], hint)
             # Reserve startup and EOF confirmation time without exceeding ten minutes.
             states = suite.observe(spec['seconds'] + 22, 'https:' + name + ':' + hint)
@@ -157,6 +157,9 @@ def main():
                       if start + played['first_playback_seconds'] + 3 <= r['at'] <=
                       start + played['first_stopped_seconds'] - 1]
             return dict(playback=played, **check_finite_health(steady))
+        except Exception:
+            report.data.setdefault('failure_snapshots', {})[name + ':' + hint] = capture_failure_snapshot(board)
+            raise
         finally:
             board.stop()
 
@@ -169,10 +172,11 @@ def main():
                         case('https:' + name + ':' + hint, lambda n=name, h=hint: play(n, h))
                     case('idle:' + name, lambda n=name: idle(n))
                     case('recovery:' + name, lambda n=name:
-                         check_recovery_heap(report.data['idle']['initial'], report.data['idle'][n]))
+                         idle_recovery(report.data, n))
             finally:
                 case('stop-and-settings', lambda: (board.stop(), verify_snapshot(board, before))[1])
                 case('lifetime-health', lambda: check_health(board.health_samples))
+                case('all-decoder-health', lambda: check_decoder_health(board.health_samples))
     return report.exit_code()
 
 

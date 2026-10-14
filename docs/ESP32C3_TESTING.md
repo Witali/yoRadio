@@ -1938,6 +1938,16 @@ an explicit missing-checkpoint reason. A successful diagnostic request does
 not turn the original timeout into a pass. Regression tests:
 `python tests/test-quiet-idle-gates.py`.
 
+`public_file_acceptance.py` also requires every terminal observation after
+playback to report `stream ended`, even if an error occurs near the expected
+file duration. Decoder-health evidence is mandatory during playback and is
+checked again across the whole campaign. Failed files retain a diagnostic
+snapshot before Stop; idle/recovery uses the same complete-checkpoint rules.
+Absolute low heap is recorded without imposing the legacy floor; progressive
+loss, allocation faults and output faults still fail. Run
+`python tests/test-public-file-acceptance.py` (11 tests). Earlier archived
+public-file reports retain their original coverage.
+
 Use `tools/esp32c3_tests/local_sustained.py` to test a single long, finite
 fixture on an already installed image. The initially stopped board's ELF
 identity must match `--firmware`. No application or private settings are written
