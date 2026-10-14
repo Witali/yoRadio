@@ -207,6 +207,42 @@ playback, rerun OTA acceptance, and test mid-play framing recovery/cancellation
 and free-format decoding on the target. The earlier intermittent TCP connect
 failure remains unattributed; these passing HTTP requests do not resolve it.
 
+### Continuous-confirmation public HTTPS files, 2026-10-14
+
+The same `832ad10f...` candidate passes **15/16 checks** against public FFmpeg
+FLAC, Vorbis and Opus files, using normal certificate verification. The host
+independently downloads, hashes and decodes each reference before the campaign;
+audio files remain outside the evidence archive. Five completed playback cases
+match the independently decoded format/duration, reach natural EOF, and have
+zero sampled steady completion-queue drops or write errors:
+
+| Case | Reference duration | Observed decoded playback | Result |
+| --- | ---: | ---: | --- |
+| FLAC, AUTO | 60.480 s | Interrupted observation | FAIL: WebUI TCP-connect timeout |
+| FLAC, explicit | 60.480 s | 60.248 s | PASS |
+| Opus, AUTO / explicit | 29.480 s | 29.154 / 29.515 s | PASS / PASS |
+| Vorbis, AUTO / explicit | 76.488 s | 76.355 / 76.096 s | PASS / PASS |
+
+The failed request is connection 83 from local port 61179; it times out after
+5.002 seconds before an HTTP response. The last ordinary FLAC observation is
+at 15.433 seconds. A diagnostic snapshot obtained before cleanup Stop still
+reports FLAC 44.1-kHz stereo playback, 60,920 free bytes and a 45,056-byte
+largest block. The latest health sample before the timeout and this snapshot
+span 5.602 seconds with **zero** completion-queue-drop/write-error increments,
+on the same boot. This provides a measured output-counter bracket absent from
+some older failures; it neither proves uninterrupted analog sound nor
+attributes the missing TCP handshake. The incomplete case remains FAIL.
+
+All 750 health observations retain one boot and zero recorded allocation,
+decoder or watchdog faults. Sampled free/largest minima are 57,468 / 40,960 B.
+Every settled recovery check passes. Original firmware and settings are
+verified restored, stopped. The later radio group was not run by this controller
+after the failed file group; it requires separate evidence.
+
+[Raw results, reference metadata, transport phases and independent replay](../tests/results/esp32c3-stream-confirm-continuous-20261014/https-files-01/public-files/audit.json)
+preserve the failure and successful controls. No production qualification or
+TCP fix is claimed.
+
 ### Queue storage implemented and tested (2026-10-13)
 
 `stream_staging.h` now owns up to four unpublished leases from the actual

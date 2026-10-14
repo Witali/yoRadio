@@ -59,6 +59,15 @@ the demonstrated transition failure in these HTTP cases, while default
 enablement and final-image HTTPS, sustained output and OTA qualification remain
 open. See the [implementation and physical evidence](ESP32C3_STREAM_CONFIRMATION_PLAN.md#continuous-confirmation-physical-checkpoint-2026-10-14).
 
+The candidate's subsequent public HTTPS file campaign passes **15/16**:
+explicit FLAC and both AUTO/explicit Vorbis and Opus finish correctly with
+zero sampled steady output-counter increments. AUTO FLAC is interrupted by a
+five-second WebUI TCP-connect timeout. A pre-Stop diagnostic still shows FLAC
+playback; its 5.602-second before/after counter bracket has zero output faults.
+All 750 health samples show zero allocation/decoder/watchdog faults and settled
+recovery passes, but the TCP cause and interrupted observation remain open.
+[Retained failure and reference-based checks](ESP32C3_STREAM_CONFIRMATION_PLAN.md#continuous-confirmation-public-https-files-2026-10-14).
+
 ## Earlier experimental candidate checkpoint, 2026-10-13
 
 Candidate: `esp32c3-idf-6.1-r9a97-early-owner-public`, app SHA-256
