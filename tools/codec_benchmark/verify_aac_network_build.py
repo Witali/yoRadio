@@ -18,7 +18,7 @@ FEATURES = ('AAC_PLUS', 'AAC_COMPACT_SBR', 'AAC_HIGH_HISTORY',
             'AAC_HIGH_HISTORY_PC19', 'AAC_SMOOTHING_HISTORY',
             'AAC_LOW_WORKSPACE', 'AAC_ASYMMETRIC_OWNER', 'AAC_LATE_SBR')
 SIZES = {'native_aac_decoder': 204, 'aac_high_owner_t': 32744,
-         'aac_high_runtime_t': 160}
+         'aac_high_runtime_t': 160, 'aac_compact_owner_t': 176}
 CALLS = {
     'compact5_PVMP4AudioDecodeFrame': ('aac_late_sbr_select', '__wrap_get_sbr_bitstream', '__wrap_getfill'),
     '__wrap_get_sbr_bitstream': ('aac_fill_sbr', 'aac_late_sbr_after_fill'),
@@ -28,6 +28,24 @@ CALLS = {
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def verify_layout(config, found, owner_fields):
+    early = bool(re.search(r'^CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER=y$', config, re.M))
+    sizes = dict(SIZES)
+    # ESP32-C3: pending_owner is one 32-bit pointer immediately after owner.
+    # The DSP owner/runtime layouts do not change with this placement option.
+    if early:
+        sizes['native_aac_decoder'] += 4
+        sizes['aac_compact_owner_t'] += 4
+    expected_fields = {('owner', 0)}
+    if early:
+        expected_fields.add(('pending_owner', 4))
+    if found != {name: {size} for name, size in sizes.items()}:
+        raise ValueError('Missing or inconsistent compiled layout: '+repr(found))
+    if owner_fields != expected_fields:
+        raise ValueError('Incorrect early-owner pointer layout: '+repr(owner_fields))
+    return sizes
 
 
 def verify(build, objdump):
@@ -52,6 +70,7 @@ def verify(build, objdump):
             branch['output_sha256'] != sha(layout/'pvmp4audiodecoderframe.c.obj')):
         raise ValueError('Native patch provenance mismatch')
     found = {name: set() for name in SIZES}
+    owner_fields = set()
     with elf_path.open('rb') as file:
         elf = ELFFile(file)
         table = elf.get_section_by_name('.symtab')
@@ -72,8 +91,17 @@ def verify(build, objdump):
                 size = typ.attributes.get('DW_AT_byte_size')
                 if size:
                     found[name.value.decode()].add(size.value)
-    if found != {name: {size} for name, size in SIZES.items()}:
-        raise ValueError('Missing or inconsistent compiled layout: '+repr(found))
+                if name.value == b'aac_compact_owner_t':
+                    for member in typ.iter_children():
+                        field = member.attributes.get('DW_AT_name')
+                        if field and field.value in (b'owner', b'pending_owner'):
+                            offset = member.attributes.get('DW_AT_data_member_location')
+                            pointer = member.get_DIE_from_attribute('DW_AT_type')
+                            if (not offset or pointer.tag != 'DW_TAG_pointer_type' or
+                                    pointer.attributes['DW_AT_byte_size'].value != 4):
+                                raise ValueError('Owner member is not an ESP32-C3 pointer')
+                            owner_fields.add((field.value.decode(), offset.value))
+    sizes = verify_layout(config, found, owner_fields)
     linked = {}
     for caller, callees in CALLS.items():
         code = subprocess.run([str(objdump), '-d', '--disassemble='+caller, str(elf_path)],
@@ -89,7 +117,8 @@ def verify(build, objdump):
         raise ValueError('Owner aliasing or PC19 compile flags missing')
     return dict(app_sha256=sha(app), elf_sha256=sha(elf_path),
                 sdkconfig_sha256=sha(build/'sdkconfig'), app_bytes=app.stat().st_size,
-                types=SIZES, linked_calls=linked, features=list(FEATURES),
+                types=sizes, owner_pointer_offsets=dict(owner_fields),
+                linked_calls=linked, features=list(FEATURES),
                 codec_sha256=PIN, layout_sha256=sha(layout/'layout.o'),
                 branch_patch=branch, hardware_tested=False, production_qualified=False)
 
