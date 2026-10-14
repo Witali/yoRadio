@@ -44,6 +44,11 @@ Invoke-TestGroup "integrity" {
     & $PythonPath (Join-Path $PSScriptRoot "artifact_test.py") --output $integrityReport
     if($LASTEXITCODE){throw "Artifact integrity tests failed"}
 } $integrityReport
+$timezoneSourcesReport=Join-Path $OutputDirectory "timezone-sources.json"
+Invoke-TestGroup "timezone_sources" {
+    & $PythonPath (Join-Path $PSScriptRoot "timezone_update_test.py") --output $timezoneSourcesReport
+    if($LASTEXITCODE){throw "Offline timezone archive/update tests failed"}
+} $timezoneSourcesReport
 if ($SkipMachine) {$groups.Add(@{name="machine";status="not_run";reason="Explicit -SkipMachine"})}
 else {
     $machineFolder=Join-Path $OutputDirectory "machine"

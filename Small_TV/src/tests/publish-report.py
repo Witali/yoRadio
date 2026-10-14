@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -27,6 +27,9 @@ def main():
     for row in groups['frontend']['result']['inputs']:
         if hashlib.sha256((ROOT / row['file']).read_bytes()).hexdigest() != row['sha256']:
             raise ValueError('Frontend changed after the run: ' + row['file'])
+    for row in groups['timezone_sources']['result']['inputs']:
+        if hashlib.sha256((ROOT / row['file']).read_bytes()).hexdigest() != row['sha256']:
+            raise ValueError('Timezone source/updater changed after the run: ' + row['file'])
     app = ROOT / 'firmware/development/small-tv-esp32c2-reconstructed/app.bin'
     if hashlib.sha256(app.read_bytes()).hexdigest() != report['app_sha256']:
         raise ValueError('Firmware changed after the run')
@@ -67,6 +70,7 @@ def main():
     summary['platform'] = groups['platform']['result']
     summary['frontend'] = groups['frontend']['result']
     summary['integrity'] = groups['integrity']['result']
+    summary['timezone_sources'] = groups['timezone_sources']['result']
     summary['machine'] = {'passed': machine['passed'], 'literal_factory_pixels_equal': machine['equal'],
                           'renderer_cases': len(machine['cases']),
                           'geometry_checks': len(machine['stroke_geometry_checks']),

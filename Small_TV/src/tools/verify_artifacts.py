@@ -37,7 +37,7 @@ def main():
             'A full passing suite is required')
     groups = {row['name']: row['result'] for row in suite['groups'] if row['status'] == 'passed'} \
         if 'groups' in suite else suite
-    for name in ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'qemu'):
+    for name in ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'qemu'):
         require(name in groups and groups[name]['passed'], 'Missing passing group: ' + name)
     for item in suite['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
@@ -45,6 +45,9 @@ def main():
     for item in groups['frontend']['inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
                 'Frontend changed since execution: ' + item['file'])
+    for item in groups['timezone_sources']['inputs']:
+        require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
+                'Timezone source/updater changed since execution: ' + item['file'])
     app = (ARCHIVE / 'app.bin').read_bytes()
     app_sha = hashlib.sha256(app).hexdigest()
     require(suite['app_sha256'] == app_sha and suite['source_sha256'] == manifest['source_sha256'],

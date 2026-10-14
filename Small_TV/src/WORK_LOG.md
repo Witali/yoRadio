@@ -231,3 +231,34 @@
 - Код/сборка — `1e9fac91`. Перед коммитом проверены точные Git-байты всех 48
   production source files и 106 TZif; full suite содержит 44 test inputs.
   Отчёты/контекст фиксируются отдельным коммитом. Посторонние файлы не включаются.
+
+### 2026-10-14 — воспроизводимое обновление открытых часовых поясов
+
+- Пользователь предложил открытый источник правды. Официальный IANA
+  `https://data.iana.org/time-zones/tzdb/version` возвращает 2026e; сайт IANA
+  указывает выпуск 2026-09-29. Источник правил — IANA, wheel PSF tzdata 2026.5
+  используется только как готовый TZif транспорт для Windows.
+- Добавлен `tools/update_timezones.py`: discovery не меняет pins; загрузка
+  проверяет SHA-256, обе declared версии, все выбранные файлы и будущие правила.
+  Другой выпуск требует явных IANA/package/SHA аргументов вместе. Есть локальный
+  `--wheel` режим; build не получает сетевой зависимости. `--source` генератора
+  проверяет кандидата без изменения committed snapshot. README содержит команды.
+- Выполнены настоящий `--check-latest` и HTTPS-download в ignored
+  `.build/small-tv-parity/timezone-update/downloaded`. Дополнительный тест
+  настоящего закреплённого wheel воспроизвёл 106 файлов, 109 country keys и
+  точный generated C header. Девять офлайн-тестов прошли: corruption, pins,
+  declared версии, missing/duplicate, unsupported DST, сохранность output и
+  published metadata mismatch/yanking и неверный HTTPS origin. В full runner/publisher/verifier добавлен
+  обязательный `timezone_sources` с хешами инструментов, manifest и raw файлов.
+  Отдельное доказательство сохранено в `tests/timezone-update-validation.json`;
+  downloaded header SHA совпал с текущим build: `11e9f9f0...0947d01`.
+- Временный системный TEMP оказался недоступен sandbox для вложенных файлов;
+  регрессии перенесены в writable ignored `.build/.../temporary` и повторно
+  прошли. Никаких TZif правил, country default или готового firmware этим
+  изменением не заменено. Новый полный runtime gate пока не выполнялся: текущие
+  SNTP/QEMU изменения продолжаются отдельно, прежняя публикация — baseline.
+- Для продолжения SNTP: `0x42017ea0` подтверждён как restart wrapper (внутри
+  enabled query `0x4201bec6`, stop/init callback `0x42017d34`). QEMU experiment
+  `time-network-fourth` подтвердил stock preset после sync 2024, но затем не
+  завершился; это failed наблюдение, а не passing gate. Исправления ещё не
+  закоммичены и не объявлены готовыми. Физические платы не прошивались.

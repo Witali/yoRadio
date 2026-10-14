@@ -75,9 +75,9 @@ def parse_footer(text):
     return standard, daylight, 1, rule(match[6]), rule(match[7])
 
 
-def load_zones():
+def load_zones(folder=None):
     """Validate every retained factory country key and every pinned source hash."""
-    folder = ROOT/'resources/timezones'
+    folder = Path(folder) if folder is not None else ROOT/'resources/timezones'
     manifest = json.loads((folder/'manifest.json').read_text(encoding='utf-8'))
     legacy = re.findall(r'\{"([^"]+)","([^"]+)"\}',
                         (ROOT/'app/services/country_timezones.h').read_text(encoding='utf-8'))
@@ -97,9 +97,9 @@ def load_zones():
     return manifest, zones
 
 
-def generate_timezones(output):
+def generate_timezones(output, source=None):
     """Deduplicate identical clock rules and write a deterministic C header."""
-    manifest, zones = load_zones()
+    manifest, zones = load_zones(source)
     unique = list(dict.fromkeys(zones.values()))
     text = ('/* Generated from IANA '+manifest['iana_version']+'; public-domain timezone data. */\n'
             '#pragma once\n')
@@ -126,6 +126,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--source', type=Path, help='Validate a candidate snapshot without replacing committed data')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    generate_timezones(args.output)
+    generate_timezones(args.output, args.source)
