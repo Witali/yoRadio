@@ -327,7 +327,7 @@ def main():
     sys.path.insert(0,str(args.qemu_root/'tools'))
     options=SimpleNamespace(yoradio=str(ROOT),qemu=str(args.qemu_root/'bin/qemu-system-riscv32.exe'),
         rom_elf=str(ROOT/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),
-        hardware_profile=str(args.qemu_root/'configs/boards/small-tv-c2.json'),
+        hardware_profile=str(ROOT/'Small_TV/qemu/profiles/small-tv-c2.json'),
         display='none',paused=True,gdb_port=0,http_base_port=0)
     run_suite(options,args.output)
 

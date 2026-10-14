@@ -201,7 +201,7 @@ def region(pixels, rectangle):
 def exercise(options, folder, layout):
     """Run failure, retry, positive/negative weather and non-200 JSON in a real guest."""
     fixture = WeatherFixture()
-    options = SimpleNamespace(**{**vars(options),'network':'clock','weather_port':fixture.port,'persistent':False})
+    options = SimpleNamespace(**{**vars(options),'network':'clock','service_port':fixture.port,'persistent':False})
     session = None
     result = {'passed':False, 'snapshots':{}, 'captures':{}}
     try:
@@ -210,8 +210,10 @@ def exercise(options, folder, layout):
         url = session['web_urls']['station']
         wait_http(url, '/getclocktype', expected=b'0')
         with vm.QMP(session['qmp_port'],session['name']) as qmp:
-            result['weather_services'] = qmp.execute('qom-get',path='/machine/wifi',property='weather-services')
-            if not result['weather_services']: raise AssertionError('Weather DNS property not enabled')
+            result['service_hosts'] = qmp.execute('qom-get',path='/machine/wifi',property='service-hosts')
+            expected_hosts = {row['hostname'] for row in session['service_endpoints']}
+            if not expected_hosts or set(result['service_hosts'].split(';')) != expected_hosts:
+                raise AssertionError('Generic profile DNS services do not match the fixture endpoints')
             wait_for(lambda: bool(fixture.rows()), 'Guest never requested weather')
             result['snapshots']['initial_503'] = wait_snapshot(qmp,options.firmware,layout,lambda r:not r['valid'],'Failure incorrectly enabled weather')
             fixture.set_response(200)
@@ -267,7 +269,7 @@ def exercise(options, folder, layout):
             if not any(r['status']==200 and r['body_sha256']==expected for r in result['requests']):
                 raise AssertionError('Missing successful positive/negative weather response')
         if not clean_uart(folder): raise AssertionError('Guest panic/watchdog during weather')
-        if 'C2 DNS answer service=weather' not in (folder/'qemu.log').read_text(errors='replace'):
+        if 'C2 DNS answer service=http' not in (folder/'qemu.log').read_text(errors='replace'):
             raise AssertionError('No actual DNS reply for the weather hostname')
         result['passed'] = True
     except Exception as error:
@@ -333,7 +335,7 @@ def main():
     from small_tv_http_test import http,wait_http,wait_for,clean_uart
     options=SimpleNamespace(yoradio=str(ROOT),qemu=str(args.qemu_root/'bin/qemu-system-riscv32.exe'),
         rom_elf=str(ROOT/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),
-        hardware_profile=str(args.qemu_root/'configs/boards/small-tv-c2.json'),display='none',paused=False,gdb_port=0,http_base_port=0)
+        hardware_profile=str(ROOT/'Small_TV/qemu/profiles/small-tv-c2.json'),display='none',paused=False,gdb_port=0,http_base_port=0)
     run_suite(options,args.output)
 
 

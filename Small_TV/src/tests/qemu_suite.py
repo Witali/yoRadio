@@ -30,7 +30,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     sys.path.insert(0, str(args.qemu_root / 'tools'))
     import small_tv_vm as vm
-    profile = args.qemu_root / 'configs/boards/small-tv-c2.json'
+    profile = ROOT / 'Small_TV/qemu/profiles/small-tv-c2.json'
     options = SimpleNamespace(yoradio=str(ROOT), qemu=str(args.qemu_root / 'bin/qemu-system-riscv32.exe'),
                               rom_elf=str(ROOT / '.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),
                               hardware_profile=str(profile), network='clock', display='none',
@@ -39,7 +39,8 @@ def main():
     inputs = {'qemu_sha256': hashlib.sha256(Path(options.qemu).read_bytes()).hexdigest(),
               'profile_sha256': hashlib.sha256(profile.read_bytes()).hexdigest(),
               'helper_sha256': {name: hashlib.sha256((args.qemu_root / 'tools' / name).read_bytes()).hexdigest()
-                               for name in ('small_tv_vm.py', 'small_tv_network.py', 'small_tv_web.py', 'small_tv_http_test.py')}}
+                               for name in ('small_tv_vm.py', 'small_tv_network.py', 'small_tv_web.py', 'small_tv_http_test.py',
+                                            'esp_board.py', 'esp_services.py')}}
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
               **inputs,
               'boot_reset': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'scenes': {}, 'errors': [],

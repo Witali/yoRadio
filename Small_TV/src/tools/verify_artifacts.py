@@ -37,7 +37,7 @@ def main():
             'A full passing suite is required')
     groups = {row['name']: row['result'] for row in suite['groups'] if row['status'] == 'passed'} \
         if 'groups' in suite else suite
-    for name in ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'qemu'):
+    for name in ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'qemu_profile', 'qemu'):
         require(name in groups and groups[name]['passed'], 'Missing passing group: ' + name)
     for item in suite['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
@@ -48,6 +48,13 @@ def main():
     for item in groups['timezone_sources']['inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
                 'Timezone source/updater changed since execution: ' + item['file'])
+    for item in groups['qemu_profile']['inputs']:
+        require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
+                'Profile/firmware wiring changed since execution: ' + item['file'])
+    profile_input = next(row for row in groups['qemu_profile']['inputs'] if row['file'].endswith('/small-tv-c2.json'))
+    require(profile_input['sha256'] == groups['qemu']['profile_sha256'] and
+            all(groups['qemu']['helper_sha256'][key] == value for key, value in groups['qemu_profile']['compiler_sha256'].items()),
+            'Profile validation and firmware used different profile/compiler inputs')
     app = (ARCHIVE / 'app.bin').read_bytes()
     app_sha = hashlib.sha256(app).hexdigest()
     require(suite['app_sha256'] == app_sha and suite['source_sha256'] == manifest['source_sha256'],

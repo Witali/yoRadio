@@ -4,13 +4,20 @@ The [current factory-UI comparison checkpoint](parity/README.md) contains the
 restored fonts/layouts and five scene comparisons. Reconstruction is active;
 complete behavioral identity and the C-port assistant remain unfinished.
 
+The current [device profile](profiles/README.md) lives in this repository at
+`profiles/small-tv-c2.json`. It supplies hardware wiring, NTP/HTTP endpoints and
+SSID data to the generic QEMU service compiler. Rebuild QEMU for the service
+properties introduced in `f4322a8a8f`; our test launcher uses `ServicePort`.
+Use `Small_TV/qemu/run.ps1` to select this profile and keep VM state under the
+yoRadio `.build` directory.
+
 ## Localhost HTTP and initial Wi-Fi setup
 
 The launcher now exposes actual firmware HTTP through separate consecutive
 loopback ports. For an explicit setup range:
 
 ```powershell
-& C:\Work\QEMU-ESP32\run-small-tv-esp32c2.ps1 -Network setup `
+& .\Small_TV\qemu\run.ps1 -Network setup `
     -Firmware reconstructed -HttpBasePort 18080 -Persistent -Display none
 ```
 

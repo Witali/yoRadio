@@ -218,7 +218,7 @@ def exercise(options,folder,cache_layout,label_layout):
     """Run real location/title/icon transitions, distinguishing literal factory observations."""
     fixture=weather.WeatherFixture(['Shenzhen,CN',LONG_CITY+',CN','A,CN','B,CN'])
     fixture.set_response(200)
-    options=SimpleNamespace(**{**vars(options),'network':'clock','weather_port':fixture.port,'persistent':False})
+    options=SimpleNamespace(**{**vars(options),'network':'clock','service_port':fixture.port,'persistent':False})
     session=None
     native=options.firmware=='reconstructed'
     result={'passed':False,'sources':{},'stages':{},'checks':{}}
@@ -355,7 +355,7 @@ def main():
     args=parser.parse_args()
     options=SimpleNamespace(yoradio=str(ROOT),qemu=str(args.qemu_root/'bin/qemu-system-riscv32.exe'),
         rom_elf=str(ROOT/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),
-        hardware_profile=str(args.qemu_root/'configs/boards/small-tv-c2.json'),display='none',paused=False,gdb_port=0,http_base_port=0)
+        hardware_profile=str(ROOT/'Small_TV/qemu/profiles/small-tv-c2.json'),display='none',paused=False,gdb_port=0,http_base_port=0)
     run_suite(options,args.output)
 
 

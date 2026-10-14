@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'qemu_profile', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -49,6 +49,14 @@ def main():
     if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, jpeg, timezones, time_state, text, groups['integrity']['result'])):
         raise ValueError('Groups tested different applications')
     qemu = groups['qemu']['result']
+    profile = groups['qemu_profile']['result']
+    for row in profile['inputs']:
+        if hashlib.sha256((ROOT / row['file']).read_bytes()).hexdigest() != row['sha256']:
+            raise ValueError('Profile/firmware wiring changed after execution: ' + row['file'])
+    profile_input = next(row for row in profile['inputs'] if row['file'].endswith('/small-tv-c2.json'))
+    if (profile_input['sha256'] != qemu['profile_sha256'] or
+            any(qemu['helper_sha256'][key] != value for key, value in profile['compiler_sha256'].items())):
+        raise ValueError('Profile validation and firmware used different profile/compiler inputs')
     if not qemu['inputs_unchanged']:
         raise ValueError('Emulator or helpers changed during execution')
     if not qemu['http_initial_setup']['passed']:
@@ -112,6 +120,7 @@ def main():
     summary['frontend'] = groups['frontend']['result']
     summary['integrity'] = groups['integrity']['result']
     summary['timezone_sources'] = groups['timezone_sources']['result']
+    summary['qemu_profile'] = profile
     summary['machine'] = {'passed': machine['passed'], 'literal_factory_pixels_equal': machine['equal'],
                           'renderer_cases': len(machine['cases']),
                           'geometry_checks': len(machine['stroke_geometry_checks']),

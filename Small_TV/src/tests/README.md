@@ -123,6 +123,14 @@ HTTP 503 записана как ошибка; наша прошивка отк�
 сеансы обеих прошивок должны завершаться без panic. Подробности:
 [text-checks.md](../../qemu/parity/text-checks.md).
 
+Группа `qemu_profile` проверяет repo-owned `Small_TV/qemu/profiles/small-tv-c2.json`
+через shared QEMU compiler: реальные GPIO из `board.h`, unchanged hardware-only /
+offline defaults, NTP/SSID, generic ServicePort и URL overrides/metadata privacy.
+Full QEMU tests и comparator используют тот же профиль; publisher сверяет точные
+profile/launcher/comparison/compiler hashes. Нужен QEMU с новыми generic service
+properties (`f4322a8a8f`); изменение checkout без пересборки бинарника недостаточно.
+Тесты погоды/полей используют `service_port`, сохраняя оригинальный HTTP protocol.
+
 При параллельной работе над QEMU можно передать `-HttpHelperOverlay <каталог>`
 с точной копией закоммиченного `small_tv_http_test.py` и `manifest.json`, содержащим
 его SHA-256 и source commit. Только UTF-8 fixture использует эту копию; остальные

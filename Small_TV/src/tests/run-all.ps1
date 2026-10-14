@@ -120,6 +120,14 @@ else {
         if($LASTEXITCODE){throw "UTF-8 scalar/prefix/glyph machine comparison failed"}
     } $textReport
 }
+if ($SkipQemu) {$groups.Add(@{name="qemu_profile";status="not_run";reason="Explicit -SkipQemu"})}
+else {
+    $profileReport=Join-Path $OutputDirectory "qemu-profile.json"
+    Invoke-TestGroup "qemu_profile" {
+        & $PythonPath (Join-Path $PSScriptRoot "profile_test.py") --qemu-root $QemuRoot --output $profileReport
+        if($LASTEXITCODE){throw "Small TV profile/wiring/service routing checks failed"}
+    } $profileReport
+}
 if ($SkipQemu) {$groups.Add(@{name="qemu";status="not_run";reason="Explicit -SkipQemu"})}
 else {
     $qemuFolder=Join-Path $OutputDirectory "qemu"

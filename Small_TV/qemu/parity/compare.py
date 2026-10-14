@@ -16,12 +16,16 @@ import time
 from types import SimpleNamespace
 
 
-def seed_settings(data, variant, state, yoradio):
+def seed_settings(data, variant, state, yoradio, station_ssid=None):
     """Replace private state with the same explicit factory-format preferences."""
+    from esp_services import network_profile
+    if station_ssid is None:
+        network = network_profile(Path(yoradio)/'Small_TV/qemu/profiles/small-tv-c2.json')
+        station_ssid = network.get('station_ssid','QEMU')
     data = bytearray(data)
     data[0x9000:0xf000] = b'\xff' * 0x6000
     raw = bytearray(4096)
-    for offset, width, value in [(4,65,'yoRadio-QEMU'), (0x45,65,''),
+    for offset, width, value in [(4,65,station_ssid), (0x45,65,''),
             (0x86,65,'10.0.2.2'), (0xc7,20,'CN'), (0xdb,65,'Shenzhen'),
             (0x11c,65,'disabled')]:
         raw[offset:offset+width] = value.encode().ljust(width,b'\0')
@@ -55,7 +59,7 @@ def capture(variant, args, theme):
         qemu=str(args.qemu_root/'bin/qemu-system-riscv32.exe'),
         rom_elf=str(args.yoradio/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),
         persistent=False,network='clock',display='none',gdb_port=0,paused=False,
-        hardware_profile=str(args.qemu_root/'configs/boards/small-tv-c2.json'))
+        hardware_profile=str(args.yoradio/'Small_TV/qemu/profiles/small-tv-c2.json'))
     session, prepared = vm.launch(options,state)
     try:
         with vm.QMP(session['qmp_port'],session['name']) as qmp:

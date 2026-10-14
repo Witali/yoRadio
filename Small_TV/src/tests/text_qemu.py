@@ -127,7 +127,7 @@ def factory_city_fault(options,folder):
     fixture=weather.WeatherFixture()
     fixture.set_response(200)
     options=SimpleNamespace(**{**vars(options),'firmware':'original','network':'clock',
-                              'weather_port':fixture.port,'persistent':False})
+                              'service_port':fixture.port,'persistent':False})
     session=None
     report={'passed':False,'scope':'Expected immutable factory defect only; no corrected-program panic is permitted.'}
     try:
@@ -171,7 +171,7 @@ def exercise(options,folder,layout,label_layout):
         cases=[(name,'Fixture'+str(index),title,description) for index,(name,_,title,description) in enumerate(cases)]
     fixture.locations.update(city+',CN' for _,city,_,_ in cases)
     fixture.set_response(200)
-    options=SimpleNamespace(**{**vars(options),'network':'clock','weather_port':fixture.port,'persistent':False})
+    options=SimpleNamespace(**{**vars(options),'network':'clock','service_port':fixture.port,'persistent':False})
     session=None
     result={'passed':False,'sources':{},'cases':[],'checks':{}}
     try:
@@ -299,7 +299,7 @@ def main():
     args=parser.parse_args()
     options=SimpleNamespace(yoradio=str(ROOT),qemu=str(args.qemu_root/'bin/qemu-system-riscv32.exe'),
         rom_elf=str(ROOT/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),
-        hardware_profile=str(args.qemu_root/'configs/boards/small-tv-c2.json'),display='none',paused=False,gdb_port=0,http_base_port=0,
+        hardware_profile=str(ROOT/'Small_TV/qemu/profiles/small-tv-c2.json'),display='none',paused=False,gdb_port=0,http_base_port=0,
         http_helper_overlay=args.http_helper_overlay)
     run_suite(options,args.output)
 
