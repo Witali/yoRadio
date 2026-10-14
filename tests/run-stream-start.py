@@ -1,4 +1,4 @@
-"""Actual firmware send/finish path with startup confirmation and real adaptive queue."""
+"""Actual firmware send/finish path with continuous frame confirmation and real queue."""
 import argparse
 import hashlib
 import importlib.util
@@ -72,6 +72,25 @@ def main():
             (out/('large-prefix-'+name+'.log')).write_bytes(result)
             cases.append(dict(name='large-prefix-'+name,sha256=hashlib.sha256(data).hexdigest(),
                 source_sha256=original_case['sha256'],source_repeats=repeats,required_control=True,passed=True))
+        # Mid-play recovery must preserve real encoded bytes across both codec
+        # changes, including the false maximum-size ADTS candidate. These are
+        # transport/ownership checks; the harness does not decode PCM.
+        def clean_fixture(name):
+            entry=next(c for c in original['cases'] if c['name']==name)
+            data=(args.corpus/(name+'.input')).read_bytes()
+            assert hashlib.sha256(data).hexdigest()==entry['sha256']
+            return data
+        mp3=clean_fixture('mp3-320.mp3');aac=clean_fixture('he-48000-stereo.aac')
+        repeats=(8191+10+len(aac)-1)//len(aac);aac*=repeats
+        expected=mp3+aac+mp3
+        damaged=mp3+b'\xff\xf1\x4c\x83\xff\xff\xfc'+bytes(25)+aac+b'\xff\xfb\x90\0'+bytes(28)+mp3
+        input_path=out/'midstream-recovery.input';input_path.write_bytes(damaged)
+        expected_path=out/'midstream-recovery.expected';expected_path.write_bytes(expected)
+        result=run(['timeout','60',host(binary),host(input_path),'--expected',host(expected_path),'2'])
+        (out/'midstream-recovery.log').write_bytes(result)
+        cases.append(dict(name='midstream-recovery',passed=True,chunks=[1,7,2048],drains=2,
+            input_sha256=hashlib.sha256(damaged).hexdigest(),replayed_sha256=hashlib.sha256(expected).hexdigest(),
+            replayed_bytes=len(expected),aac_repeats=repeats))
     sources=[Path(__file__).resolve(),ROOT/'tests/run-adaptive-input.py',platform,test]+[source/name
         for name in ('audio_service.c','Kconfig.projbuild','adaptive_input.h','adaptive_input.c',
                      'stream_start.h','stream_staging.h','stream_encoded_router.h','stream_confirm.h',

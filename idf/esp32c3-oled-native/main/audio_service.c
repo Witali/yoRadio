@@ -475,6 +475,14 @@ static inline bool stream_initial_pending(native_codec_t codec, bool first) {
 #endif
 }
 
+static inline bool stream_confirmation_expired(void) {
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+    return s_stream_start.active && esp_timer_get_time()>=s_stream_start.deadline_us;
+#else
+    return false;
+#endif
+}
+
 static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
                               const uint8_t *data, size_t size,
                               bool *first_chunk, stream_probe_t *probe) {
@@ -482,18 +490,26 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
 #ifdef CONFIG_YORADIO_FRAME_ROUTER
     stream_route_context_t route = {.generation = generation, .codec = codec};
 #endif
-    if (*first_chunk) {
 #ifdef CONFIG_YORADIO_STREAM_CONFIRM
-        if (stream_start_eligible(*codec)) {
+        if (stream_start_eligible(*codec) && !s_frame_router.bypass) {
             size_t consumed;
-            stream_confirm_result_t result=stream_start_feed(generation,codec,data,size,&consumed,false);
+            stream_confirm_result_t result=stream_start_feed(&route,data,size,&consumed,false);
+            if (s_stream_start.published) *first_chunk=false;
+            // Already confirmed frames remain valid even if the following
+            // candidate exhausts its search budget. Never discard that prefix.
+            bool flushed=stream_route_flush(&route);
+            bool ok=result!=STREAM_CONFIRM_INVALID && flushed;
+            if (!ok) {
+                stream_route_cancel(&route);stream_start_abort();
+                probe->result=STREAM_PROBE_INVALID;return false;
+            }
             if (result==STREAM_CONFIRM_MORE) return true;
             stream_start_abort();
-            if (result!=STREAM_CONFIRM_READY) {probe->result=STREAM_PROBE_INVALID;return false;}
             data+=consumed;size-=consumed;
             *first_chunk = false; // stream_start_publish already set the provisional status.
-        } else
+        }
 #endif
+    if (*first_chunk) {
         if (*codec == NATIVE_CODEC_AUTO) {
             size_t consumed = 0;
             switch (stream_probe_feed(probe, data, size, &consumed)) {
@@ -529,15 +545,20 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
 static inline uint8_t finish_stream_audio(uint32_t generation, native_codec_t *codec,
         bool *first_chunk, uint8_t reason) {
 #ifdef CONFIG_YORADIO_STREAM_CONFIRM
-    if (*first_chunk && stream_start_eligible(*codec) && reason==AUDIO_END_EOF) {
+    if ((s_stream_start.active || (*first_chunk && stream_start_eligible(*codec))) &&
+        reason==AUDIO_END_EOF) {
         // EOF rescan can discard the incomplete candidate. Preserve its
         // presence before finalization so truncation is not reported as empty.
-        bool incomplete=s_stream_start.skip || stream_staging_size(&s_stream_start.window);
+        bool incomplete=s_stream_start.skip || s_stream_start.recovering ||
+            stream_staging_size(&s_stream_start.window);
         size_t consumed;
-        stream_confirm_result_t result=stream_start_feed(generation,codec,NULL,0,&consumed,true);
-        if (result==STREAM_CONFIRM_READY) {
+        stream_route_context_t route={.generation=generation,.codec=codec};
+        stream_confirm_result_t result=stream_start_feed(&route,NULL,0,&consumed,true);
+        bool flushed=stream_route_flush(&route);
+        if (result==STREAM_CONFIRM_READY && flushed) {
             *first_chunk=false;
         } else {
+            stream_route_cancel(&route);
             reason=incomplete || s_stream_start.skip || stream_staging_size(&s_stream_start.window)
                 ? AUDIO_END_FRAME_TRUNCATED : AUDIO_END_FORMAT_UNKNOWN;
         }
@@ -883,7 +904,8 @@ static void stream_task(void *argument) {
         bool input_growth_attempted = false;
 #endif
         while (atomic_load(&s_generation) == command.generation) {
-            if (stream_initial_pending(codec, first_chunk) && esp_timer_get_time() >= probe_deadline_us) {
+            if ((stream_initial_pending(codec, first_chunk) && esp_timer_get_time() >= probe_deadline_us) ||
+                stream_confirmation_expired()) {
                 format_unknown = true;
                 break;
             }

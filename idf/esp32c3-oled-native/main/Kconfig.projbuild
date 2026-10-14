@@ -107,22 +107,23 @@ config YORADIO_FRAME_ROUTER
     help
         Coalesce frame spans into existing input leases and drain the old
         decoder before changing codec family. Skip inter-frame ID3 tags.
-        No full-frame allocation. Strict boundary mode: recovery after lost
-        alignment is not yet implemented. Free-format MP3
+        No full-frame allocation. Without STREAM_CONFIRM this is a strict
+        boundary walker without alignment recovery. Free-format MP3
         falls back to the existing decoder for the rest of the connection.
         Keep disabled until live-transition and all-codec tests qualify it.
 
 config YORADIO_STREAM_CONFIRM
-    bool "Confirm startup audio with a second frame header (experimental)"
+    bool "Confirm MP3/AAC frames and recover alignment (experimental)"
     depends on YORADIO_FRAME_ROUTER
     default n
     help
-        Retain a candidate frame in four existing input packet leases and check
-        its next boundary before selecting MP3/AAC. Replay through a separate
-        128-byte control payload, avoiding a fifth full packet allocation.
-        Requires at least four guaranteed input slots. Bounded startup only;
-        recovery during established playback is not implemented here.
-        Keep disabled until network, cancellation and physical playback tests pass.
+        Retain each candidate in at most four existing input packet leases and
+        check its next boundary before publishing or changing decoder family.
+        Coalesce confirmed frames; use a separate 128-byte control payload only
+        when all guaranteed data slots are held. Scan at most 4096 junk bytes
+        per connection and wait at most ten seconds for a candidate. Requires
+        four guaranteed slots. Free-format MP3 returns to decoder-owned parsing.
+        Keep disabled until network, performance and physical playback tests pass.
 
 config YORADIO_INPUT_MIN_BLOCKS
     int "Minimum compressed-input capacity (1600-byte units)"

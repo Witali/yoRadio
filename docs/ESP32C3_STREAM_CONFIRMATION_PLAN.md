@@ -111,6 +111,50 @@ ordering; do not enable the current strict-boundary experimental path as the
 production default while its documented recovery gaps remain. The two failed
 physical sequences are fixed acceptance cases for the completed implementation.
 
+### Continuous confirmation implementation, 2026-10-14
+
+The opt-in STREAM_CONFIRM adapter now confirms frames throughout MP3/ADTS
+playback. It publishes only the first confirmed frame and retains its lookahead
+for the next decision. Rate/channel/profile changes remain allowed. Decoder
+family changes retain the old family until its ordered drain marker is sent.
+Only initial selection publishes a provisional UI label; later decoded
+metadata cannot be overwritten by that provisional label.
+
+Candidates reuse up to four protected input-queue leases plus ten lookahead
+bytes. No new full-frame heap buffer is allocated. Confirmed data is coalesced
+within each received read. If the pending output lease prevents candidate
+growth, it is flushed before waiting. The separate 128-byte control node is
+used only when all guaranteed slots are held and is flushed before changing
+capacity. Confirmed prefixes survive a later failed candidate in the same call.
+
+After a failed boundary, search is limited to 4,096 discarded bytes across the
+whole connection, without resetting the allowance at each recovery. A ten-second
+candidate deadline is also checked by the network loop when the station watchdog
+is disabled. Cancellation and terminal paths release held leases. FLAC/Ogg
+signatures are accepted at initial selection only. Free-format MP3 still returns
+to decoder-owned framing for the connection; decoded free-format coverage remains
+required before enabling defaults.
+
+The actual send/finish path and adaptive queue pass ASan/UBSan tests for two
+mid-play false headers, exact recovered bytes and ordered drain offsets/codecs,
+the shared search budget, valid-prefix retention on exhaustion, mid-play
+cancellation/read failure/deadline, and the existing startup/EOF/metadata cases.
+Five hundred tiny AAC frames use at most six output packets with 2,048-byte
+reads, preserving coalescing instead of consuming one queue lease per frame.
+
+The real encoded corpus passes **34 cases**, each with 1/7/2,048-byte fragments:
+31 existing cases, two large false-prefix cases, and a new MP3 → HE-AAC → MP3
+stream with two false headers. Replayed encoded bytes match exactly; the mixed
+recovery case emits exactly two drains. [Sources, logs and hashes](../tests/results/esp32c3-stream-confirm-continuous-20261014/host/report.json)
+are retained. Reproduce with `tests/run-stream-confirm.py --output NEW_CORPUS`
+then `tests/run-stream-start.py --output NEW_RESULT --corpus NEW_CORPUS`.
+
+This is transport/ownership evidence, not decoded PCM, timing, TLS pressure or
+physical playback qualification. Production defaults remain disabled. Next
+build the candidate with early compact SBR reservation, repeat the two failed
+production transition sequences and all-codec controls, and measure the queue,
+memory and performance effects before default enablement.
+
 ### Queue storage implemented and tested (2026-10-13)
 
 `stream_staging.h` now owns up to four unpublished leases from the actual
