@@ -43,7 +43,23 @@ short-window memory fluctuations are retained, not reclassified as fixed.
 This image does not enable the experimental router or
 early compact owner described in the candidate checkpoint below.
 
-## Latest experimental candidate checkpoint, 2026-10-13
+## Continuous-confirmation candidate checkpoint, 2026-10-14
+
+The new `idf61-confirm-20261014` candidate passes **11/11 physical transition
+checks**, including both MP3/AAC sequences that fail on the installed baseline.
+There are zero recorded allocation, decoder and watchdog faults in 311 health
+observations on one boot. Settled free/largest memory recovers without loss;
+the sampled active free/largest minima are 28,908 / 13,824 bytes. Its subsequent
+HTTP format/EOF matrix passes **28/28**, including 22 file/hint cases with
+independently replayed natural EOF and memory recovery. All 684 additional
+health samples have zero recorded faults; sampled free/largest minima are
+29,224 / 14,848 bytes. The original production image/settings are verified
+restored, stopped. This removes
+the demonstrated transition failure in these HTTP cases, while default
+enablement and final-image HTTPS, sustained output and OTA qualification remain
+open. See the [implementation and physical evidence](ESP32C3_STREAM_CONFIRMATION_PLAN.md#continuous-confirmation-physical-checkpoint-2026-10-14).
+
+## Earlier experimental candidate checkpoint, 2026-10-13
 
 Candidate: `esp32c3-idf-6.1-r9a97-early-owner-public`, app SHA-256
 `219bfe1b4bd84e385825d5ee3b6e3468c7bf485a189c3765a11e511e1d459336`.

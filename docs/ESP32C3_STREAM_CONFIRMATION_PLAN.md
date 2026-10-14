@@ -1,13 +1,15 @@
 # Bounded format confirmation: core and queue integration
 
-## Current state (2026-10-13)
+## Current state (2026-10-14)
 
 `stream_confirm.h` implements and tests a bounded confirmation core over a
 caller-owned byte window. `audio_service.c` now calls it through `stream_start.h`
 when **`CONFIG_YORADIO_STREAM_CONFIRM=y`** and the frame router is enabled.
 Both options remain experimental and off by default. Production therefore
-still uses the original single-header initial probe. Startup confirmation does
-not implement recovery after lost alignment during established playback.
+still uses the original single-header initial probe. The opt-in adapter now
+also confirms MP3/ADTS frames during established playback and performs bounded
+recovery after lost alignment; see the October 14 implementation and physical
+checkpoint below. Earlier checkpoints describe the startup-only implementation.
 
 The previous FFmpeg comparison identified false MP3 headers before AAC and false
 AAC headers before MP3 as unresolved failures. The new core rejects those
@@ -149,11 +151,61 @@ recovery case emits exactly two drains. [Sources, logs and hashes](../tests/resu
 are retained. Reproduce with `tests/run-stream-confirm.py --output NEW_CORPUS`
 then `tests/run-stream-start.py --output NEW_RESULT --corpus NEW_CORPUS`.
 
-This is transport/ownership evidence, not decoded PCM, timing, TLS pressure or
-physical playback qualification. Production defaults remain disabled. Next
-build the candidate with early compact SBR reservation, repeat the two failed
-production transition sequences and all-codec controls, and measure the queue,
-memory and performance effects before default enablement.
+This host evidence covers transport/ownership, not decoded PCM, timing or TLS
+pressure. Production defaults remain disabled. The physical checkpoint below
+covers the resulting candidate; remaining qualification must measure sustained
+output, TLS pressure and recovery before default enablement.
+
+### Continuous-confirmation physical checkpoint, 2026-10-14
+
+Candidate `idf61-confirm-20261014`, app SHA-256
+`832ad10f31dbfa2aebe1b9b01012a4b2c4fab3a7bad75bfce45e3c7cc84375bb`,
+is built from `47239b01` with the production radio profile plus FRAME_ROUTER,
+STREAM_CONFIRM and AAC_COMPACT_EARLY_OWNER. It retains QIO 80 MHz, the public
+CA bundle, exact nominal 48-kHz output, and no deep sleep. AAC library bytes
+are unchanged. The build/link audits pass for AAC layout, HTTP-buffer release
+and the adaptive input allocator. Both baseline and early-owner layout checks
+require exact compiled sizes and 32-bit owner pointers; early reservation adds
+one `pending_owner` pointer rather than changing the DSP layout.
+
+The physical transition campaign passes **11/11**, compared with **9/11** on
+the installed baseline. Both formerly missing middle segments now appear in
+order: MP3 → HE-AAC → MP3 and AAC-LC → MP3 → HE-AACv2. AAC profile/rate/channel
+changes, Stop/replacement, settled recovery and settings checks also pass.
+All 311 health observations retain one boot and zero recorded allocation,
+decoder or watchdog faults. Sampled free/largest minima are **28,908 / 13,824 B**.
+Settled free-heap median changes from 139,480 to 139,496 B; the largest block
+remains 106,496 B and the task count remains 16.
+
+[Raw observations and independently replayed transition assertions](../tests/results/esp32c3-stream-confirm-continuous-20261014/physical/transitions/audit.json)
+are retained. This proves ordered decoded-format observations and bounded
+memory recovery for these sequences; it does not establish PCM sample accuracy,
+gapless analog output, sustained performance or HTTPS qualification.
+
+On that same candidate and boot, the subsequent finite HTTP matrix passes
+**28/28 checks**: 22 file/hint cases plus idle, recovery, settings and health
+gates. It covers MP3, FLAC, Vorbis, Opus, AAC-LC at 22.05/44.1/48 kHz,
+HE-AAC at 44.1/48 kHz, and HE-AACv2 at 44.1 kHz. Independent replay confirms
+the decoded formats, natural `stream ended` status, complete server delivery
+and pre-cleanup EOF memory recovery in every file case. All 684 health samples
+retain zero recorded allocation, decoder and watchdog faults. Sampled
+free/largest minima are **29,224 / 14,848 B**. Settled free-heap median changes
+from 139,404 to 139,412 B, with the largest block unchanged at 106,496 B and
+16 tasks. No traced request fails in either campaign.
+
+[HTTP observations and replay](../tests/results/esp32c3-stream-confirm-continuous-20261014/physical/http/audit.json),
+[build/link evidence](../tests/results/esp32c3-stream-confirm-continuous-20261014/build/build-audit.json)
+and [OTA installation/restoration](../tests/results/esp32c3-stream-confirm-continuous-20261014/physical/controller.json)
+are retained. The original production image is restored and verified stopped;
+Wi-Fi, playlist and settings remain unchanged. These two app-only OTA transfers
+do not replace negative/interrupted/repeated OTA acceptance. Candidate artifacts
+are saved under `firmware/development/esp32c3-idf61-continuous-confirm/` with
+`hardware_tested=true` and `production_qualified=false`.
+
+Next: qualify this exact candidate under public HTTPS and sustained heavy
+playback, rerun OTA acceptance, and test mid-play framing recovery/cancellation
+and free-format decoding on the target. The earlier intermittent TCP connect
+failure remains unattributed; these passing HTTP requests do not resolve it.
 
 ### Queue storage implemented and tested (2026-10-13)
 

@@ -298,3 +298,11 @@ allocation, decoder and watchdog faults. Sampled free/largest minima are
 stopped. No firmware changes were made. The next implementation priority is
 safe confirmed decoder-family switching and bounded recovery, followed by
 re-running these exact failed sequences on the resulting candidate.
+
+Subsequent candidate evidence: `idf61-confirm-20261014` implements continuous
+confirmation and passes **11/11 physical transition checks**, including these
+two previously failing sequences. Its
+[separate checkpoint](ESP32C3_STREAM_CONFIRMATION_PLAN.md#continuous-confirmation-physical-checkpoint-2026-10-14)
+records exact image identity, memory and health observations. This does not
+change the baseline's retained 9/11 result or transfer its other qualification
+results to the new image.
