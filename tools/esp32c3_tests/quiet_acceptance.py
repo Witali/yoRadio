@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from common import Report, check_playback, check_recovery_heap, fixtures, require, sha
+from common import Blocked, Report, check_playback, check_recovery_heap, fixtures, require, sha
 from ota import image_info, snapshot, verify_snapshot
 from production_health import HealthBoard, capture_failure_snapshot, check_health, check_decoder_health
 from public_streams import DEFAULT_MANIFEST, probe, public_url
@@ -19,6 +19,35 @@ from trace_transport import TransportTrace
 from sustained_output import check_memory, check_output
 from audio_test_server.server import Server
 from audio_test_server.fixtures import SEQUENCES
+
+
+def idle_checkpoint(board, suite, data, name):
+    """Only a complete, stopped observation may become a recovery baseline."""
+    first = len(board.health_samples)
+    # A failed repeated checkpoint must not leave an older successful baseline.
+    data['idle'].pop(name, None)
+    try:
+        board.stop()
+        states = suite.observe(12, 'idle:' + name, interval=1)
+        samples = board.health_samples[first:]
+        require(len(states) >= 3 and all(s.get('audio') is False for s in states[-3:]),
+                'Missing confirmed idle state')
+        require(len(samples) >= 3, 'Missing fresh idle health samples')
+        data['idle'][name] = samples[-3:]
+        return dict(samples=samples[-3:])
+    except Exception:
+        partial = list(board.health_samples[first:])
+        data.setdefault('idle_failures', {})[name] = dict(
+            partial_health=partial, snapshot=capture_failure_snapshot(board))
+        raise
+
+
+def idle_recovery(data, name):
+    missing = [key for key in ('initial', name) if key not in data['idle']]
+    if missing:
+        raise Blocked('Incomplete idle checkpoint: ' + ', '.join(missing))
+    check_recovery_heap(data['idle']['initial'], data['idle'][name])
+    return dict(compared_with='initial', free_loss_tolerance=2048, largest_loss_tolerance=4096)
 
 
 def main():
@@ -72,14 +101,10 @@ def main():
             save_health();report.save()
 
     def checkpoint(name):
-        b.stop();suite.observe(12,'idle:'+name,interval=1)
-        samples=b.health_samples[-3:]
-        report.data['idle'][name]=samples
-        return dict(samples=samples)
+        return idle_checkpoint(b, suite, report.data, name)
 
     def recovery(name):
-        check_recovery_heap(report.data['idle']['initial'],report.data['idle'][name])
-        return dict(compared_with='initial',free_loss_tolerance=2048,largest_loss_tolerance=4096)
+        return idle_recovery(report.data, name)
 
     def public_case(name,url,command):
         b.stop()

@@ -1929,6 +1929,15 @@ Stop in `file_failure_snapshots`. Quiet acceptance checks all decoder-health
 rows again at the end. Historical reports keep their original weaker coverage.
 Regression tests: `python tests/test-quiet-file-gates.py`.
 
+Quiet acceptance idle checkpoints require a completed 12-second observation,
+three final stopped statuses and three fresh health samples. A failed Stop or
+observation retains partial health and a bounded diagnostic snapshot in
+`idle_failures`; neither partial samples nor an older checkpoint can pass
+recovery. The original case stays FAIL and dependent recovery is BLOCKED with
+an explicit missing-checkpoint reason. A successful diagnostic request does
+not turn the original timeout into a pass. Regression tests:
+`python tests/test-quiet-idle-gates.py`.
+
 Use `tools/esp32c3_tests/local_sustained.py` to test a single long, finite
 fixture on an already installed image. The initially stopped board's ELF
 identity must match `--firmware`. No application or private settings are written
