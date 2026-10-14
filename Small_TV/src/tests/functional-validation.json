@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "started_utc": "2026-10-14T09:41:06.4860095Z",
-  "finished_utc": "2026-10-14T09:57:02.5210942Z",
+  "started_utc": "2026-10-14T11:49:32.0308385Z",
+  "finished_utc": "2026-10-14T12:08:37.1325844Z",
   "passed": true,
   "automatic_profile": "host_machine_qemu",
   "all_functionality_verified": false,
-  "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
-  "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
+  "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
+  "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
   "test_inputs": [
     {
       "sha256": "c9187b43a2c83c8c8a433343c4a10026ee630c5a656773cd362e7b51a3a3e6dc",
@@ -57,19 +57,19 @@
       "file": "Small_TV/src/tests/oracle-requirements.txt"
     },
     {
-      "sha256": "02db0c592805ac36e0703297e45e348773ee01378f2f42fbf4119701502f04c4",
+      "sha256": "d8415ec90c189e23cc8726bdbf8025611bee5e8d3215d645ff57c1a42caf62d1",
       "file": "Small_TV/src/tests/platform_test.c"
     },
     {
-      "sha256": "0e1e1dbc3d5c77d4ff0027a8564b453404c4fcdf37122bb2f5308ab45342f55e",
+      "sha256": "4f810cf228e7b522cd30e47a199ba9b0923b2fede4adce718fc30dafcff5b966",
       "file": "Small_TV/src/tests/publish-report.py"
     },
     {
-      "sha256": "e08d575166ba9825141b8c39f8ca83f489c61df6d3701abd281f41f0eeb06082",
+      "sha256": "d6f42712ed6a6fe12d0b0367b4b4dcb04556c34d3fcae41a675cbc98e3908903",
       "file": "Small_TV/src/tests/qemu_suite.py"
     },
     {
-      "sha256": "1db4152412dcc03694c95f3c00de946ab943f9e6aca98d40845dc93de4dc12e4",
+      "sha256": "e5d5576175b888796c6907490ea23b2218a52639498fb68b3b7e474af411f93f",
       "file": "Small_TV/src/tests/run-all.ps1"
     },
     {
@@ -77,7 +77,7 @@
       "file": "Small_TV/src/tests/run-machine-oracle.ps1"
     },
     {
-      "sha256": "3cc131c574329467745c068b2486df8b6571840547560485fe4bdb9004b9cd4e",
+      "sha256": "28dff275cfa37683e066f21c14610f4d7adbc2fbbb0624c852ad19486b7b5b38",
       "file": "Small_TV/src/tests/run-platform.ps1"
     },
     {
@@ -129,7 +129,7 @@
       "file": "Small_TV/src/tests/stubs/esp_http_server.h"
     },
     {
-      "sha256": "87874208944e7c7785dcf7c984918200c780252ee86f4ac60e56302d73bc2879",
+      "sha256": "ffff057b6df9d5c1aa546c583141ad8bc8d773b45949e9fc74c5dd68d66f07a4",
       "file": "Small_TV/src/tests/stubs/esp_netif_sntp.h"
     },
     {
@@ -173,8 +173,20 @@
       "file": "Small_TV/src/tests/stubs/time_adapter.h"
     },
     {
+      "sha256": "b2b2a82ef841f96d1edfb866be321d312cdffc7323433d0586e32a06c468b0a0",
+      "file": "Small_TV/src/tests/time_qemu.py"
+    },
+    {
+      "sha256": "b291d5f8057e8d5ce28f15f2c0097d9900807221cbdeb6b187df16f551e626ba",
+      "file": "Small_TV/src/tests/time_state_oracle.py"
+    },
+    {
       "sha256": "d382200126c7d3e3594c279b1a2fb68c2261cdf2ab7122355b32c1999694970e",
       "file": "Small_TV/src/tests/timezone_oracle.py"
+    },
+    {
+      "sha256": "1a7314f1f76f28fd85962e5c870eff87f5657667c9bd60b4cf0f8f20d782c7c1",
+      "file": "Small_TV/src/tests/timezone_update_test.py"
     },
     {
       "sha256": "56a787ec26ddaa24cf3eae65c47aa119bbd8c9dfc2efbb9bde0699f963ca1d24",
@@ -447,7 +459,7 @@
     ]
   },
   "platform": {
-    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation.",
+    "passed": true,
     "cases": [
       {
         "case": "wifi_setup",
@@ -497,7 +509,7 @@
       {
         "case": "time_worker",
         "passed": true,
-        "checks": 12
+        "checks": 20
       },
       {
         "case": "time_zone_boundaries",
@@ -532,7 +544,7 @@
       {
         "case": "clock_coordinator",
         "passed": true,
-        "checks": 20320
+        "checks": 20323
       },
       {
         "case": "timer_driver_failures",
@@ -542,35 +554,45 @@
       {
         "case": "clock_animation_selection",
         "passed": true,
-        "checks": 227
+        "checks": 230
       },
       {
         "case": "clock_text_scroll",
         "passed": true,
-        "checks": 19
+        "checks": 22
       },
       {
         "case": "clock_calendar_classic",
         "passed": true,
-        "checks": 10
+        "checks": 13
       },
       {
         "case": "clock_calendar_simple",
         "passed": true,
-        "checks": 10
+        "checks": 13
       },
       {
         "case": "clock_timezone_classic",
         "passed": true,
-        "checks": 13
+        "checks": 16
       },
       {
         "case": "clock_timezone_simple",
         "passed": true,
-        "checks": 13
+        "checks": 16
+      },
+      {
+        "case": "clock_sync_classic",
+        "passed": true,
+        "checks": 201
+      },
+      {
+        "case": "clock_sync_simple",
+        "passed": true,
+        "checks": 201
       }
     ],
-    "passed": true
+    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation."
   },
   "frontend": {
     "passed": true,
@@ -642,17 +664,472 @@
     "cases": 6,
     "failures": 0,
     "errors": 0,
-    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
-    "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
+    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
+    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
     "factory_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+  },
+  "timezone_sources": {
+    "passed": true,
+    "tests": 9,
+    "iana_version": "2026e",
+    "wheel_reproduction": {
+      "status": "not_run",
+      "reason": "No --wheel supplied; controlled archive cases ran offline"
+    },
+    "inputs": [
+      {
+        "file": "Small_TV/src/tests/timezone_update_test.py",
+        "sha256": "1a7314f1f76f28fd85962e5c870eff87f5657667c9bd60b4cf0f8f20d782c7c1"
+      },
+      {
+        "file": "Small_TV/src/tools/update_timezones.py",
+        "sha256": "4cbdbdf4c1d5cf8df60bf8c6dc40616fbffd34c3f966f0ea40ba7471533bf3b9"
+      },
+      {
+        "file": "Small_TV/src/tools/prepare_timezones.py",
+        "sha256": "355a16a0c565c423a108f2094ffe36ec389b27bb88215135a34d61745368a148"
+      },
+      {
+        "file": "Small_TV/src/app/services/country_timezones.h",
+        "sha256": "d3098a16a798f3831d1321f1c8c7754c9528a38aa5523d9c2b92f65d30f11b8b"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/manifest.json",
+        "sha256": "81c0cf308eccf1b7a465ddbba7ba36b85376ad238b17232204f9efef0d9df2eb"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Accra.tzif",
+        "sha256": "f3e7fcaa0e9840ff4169d3567d8fb5926644848f4963d7acf92320843c5d486e"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Addis_Ababa.tzif",
+        "sha256": "0783854f52c33ada6b6d2a5d867662f0ae8e15238d2fce7b9ada4f4d319eb466"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Algiers.tzif",
+        "sha256": "2f69d2e202cd16fba8f3da7762d07e9520d8636dbce12aa4187f6941023cbb07"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Cairo.tzif",
+        "sha256": "89cb9a36212fb82e933dcd9faa10efdfa969a29ec80c32063bbb4518c033d1be"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Casablanca.tzif",
+        "sha256": "6b026cdcb00868a3dc1f24f7072a1ce3ac0c3ff83b3d847fee5f3cc01fa85f50"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Dakar.tzif",
+        "sha256": "f3e7fcaa0e9840ff4169d3567d8fb5926644848f4963d7acf92320843c5d486e"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Dar_es_Salaam.tzif",
+        "sha256": "0783854f52c33ada6b6d2a5d867662f0ae8e15238d2fce7b9ada4f4d319eb466"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Johannesburg.tzif",
+        "sha256": "d19aebe2435c4e84bf7ae65533d23a9d440f98162e5b4d69c73f783e02299ec8"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Kampala.tzif",
+        "sha256": "0783854f52c33ada6b6d2a5d867662f0ae8e15238d2fce7b9ada4f4d319eb466"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Lagos.tzif",
+        "sha256": "e5ef1288571cc56c5276ca966e1c8a675c6747726d758ecafe7effce6eca7be4"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Luanda.tzif",
+        "sha256": "e5ef1288571cc56c5276ca966e1c8a675c6747726d758ecafe7effce6eca7be4"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Maputo.tzif",
+        "sha256": "910c97c091cd34ae7427c83226234ce7b4f2f425c5822d6669c24be62010a792"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Nairobi.tzif",
+        "sha256": "0783854f52c33ada6b6d2a5d867662f0ae8e15238d2fce7b9ada4f4d319eb466"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Africa__Tunis.tzif",
+        "sha256": "ba8004111e3c449a8d786a1806e93921e62a8dcf2c1ef58bbcab2cb9509dd7c8"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Anchorage.tzif",
+        "sha256": "77ca0c22962f06998bce5e48d81cb865a14466c83ff5dc607eaa483344058bf6"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Argentina__Buenos_Aires.tzif",
+        "sha256": "20454ea527c8ea888926614d21bf556f46ce38c220c4ee5b821170eef9071469"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Asuncion.tzif",
+        "sha256": "dc938d02e787eca6bfc6ae4a3ab72d2a42806ae3dedc14e0d01393040f143542"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Barbados.tzif",
+        "sha256": "81d8897fd64a38cb3d401e1ec74f9caef76684d7c7a4dcd74d5db14da3430808"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Bogota.tzif",
+        "sha256": "268c2f06cb3237ba930d64a0bcf30c4266eee89ddc9dfabf250cc3900e411c34"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Caracas.tzif",
+        "sha256": "507994c1cd2614fa22751e140c259be13e30fe6a4206c49be01916dd238a2156"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Chicago.tzif",
+        "sha256": "c27b739ff46a7df0594e120d725b439217e11e44ea9a50cdc49130383b5482e7"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Costa_Rica.tzif",
+        "sha256": "8a1a2a03fb479989b46234d12d9bb7abc3eab2aa8e79bd4210b8d684f7ff1d71"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Denver.tzif",
+        "sha256": "9bb703920eca4b6119e81a105583a4f6ca220651f13b418479ab7cd56c413f3e"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Edmonton.tzif",
+        "sha256": "d52173b56a28205d8d6f792bcfa8bc07614ee0d269f7bf6e43ec91f68d410600"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Guayaquil.tzif",
+        "sha256": "f0e21a0b2f928ab28acf823bee5e8c4050e048b1ed8cdd13be494b54467fd34f"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Halifax.tzif",
+        "sha256": "90ee5a841336a132df592e0a5f5e456ca5dfa39c20f9ff6fc35fe130e2121a28"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Havana.tzif",
+        "sha256": "9ace6b0aeab6c81338f55993ca632d15037773968137596477c8e3cca767366f"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Jamaica.tzif",
+        "sha256": "a437b1700333aeff53a8b5868d5387c080dc14c2d3e95aa5ce36f901b3669284"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__La_Paz.tzif",
+        "sha256": "da2601c677341c8c00ce5c7e437008f4b6f4188f3b558dbbf6819cae8059495b"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Lima.tzif",
+        "sha256": "eef363461c732fe5f89326daf8d9335d8340384f9caaa717bf35d3a9c4d70616"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Los_Angeles.tzif",
+        "sha256": "200d05754f6d83a371cf408d7085125797657b3b0bebeba1e508cffe86a3e5c8"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Mexico_City.tzif",
+        "sha256": "37dd2bf08f13fce0f707c3b1f4cec4018efbd9c47c8367b0fb4debbd461bd72f"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Montevideo.tzif",
+        "sha256": "97b1635baaac706cddbdf8e56c8799e4243f005592dd97950d2e69a4c24234cd"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Nassau.tzif",
+        "sha256": "815ab4db7a1b1292867d2f924b718e1bba32455ce9f92205db2feb65029c6761"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__New_York.tzif",
+        "sha256": "d7f2206b3a45989fc9ad63d558922532fa7352280d5f87176bf1db79cb1d1fa9"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Nuuk.tzif",
+        "sha256": "2e5199e58fee77d270591be77079d41d102b41b6e735c9a6af3dddb8c851dc77"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Panama.tzif",
+        "sha256": "a78d73067ba3cbd94f8a23dfdd6aa8b68cb33b18484bc17b4e20ea1aec2f0a81"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Port-au-Prince.tzif",
+        "sha256": "c2c4ba55b43ffdb289d8850c3f2fcf6a8d022d12b9a57101aea91a62eaacdcdb"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Puerto_Rico.tzif",
+        "sha256": "abbe8628dd5487c889db816ce3a5077bbb47f6bafafeb9411d92d6ef2f70ce8d"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Santiago.tzif",
+        "sha256": "fd006953c2b442a2e1e66db2a967dd932a4824390f01cddd9c801ce63450c715"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Santo_Domingo.tzif",
+        "sha256": "c66268e7d9995cded69dffb7263977ee6082fbc19f37ac6693697fbe78327de2"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Sao_Paulo.tzif",
+        "sha256": "fa2ceb222f065c0289f3997ff0c54ba05a74a599b4522870fa86a96e24e18891"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Toronto.tzif",
+        "sha256": "815ab4db7a1b1292867d2f924b718e1bba32455ce9f92205db2feb65029c6761"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Vancouver.tzif",
+        "sha256": "7d23681b36849ac7f50537b9c02bd8d3aa000b98bd3d1825ce85e7ea3e5534c9"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/America__Winnipeg.tzif",
+        "sha256": "6072e5fb802900b193407239b4fb4de9fb2ce80b43ea0f4286a954665b565cbd"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Baghdad.tzif",
+        "sha256": "cc57ba2d749fba82631ac9984cc1a326d05c00c2e2285903ee3efe55aa8ac07f"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Bangkok.tzif",
+        "sha256": "cdc8e2c282d8bc9a5e9c3caf2fc45ff4e9e5cd18f5dec8cb873340ad7c584d64"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Colombo.tzif",
+        "sha256": "400ca32bb82d5d459f2ee8eed4cd07dff7b0ea24ccf9bc1fccee686e0bda1f2f"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Dhaka.tzif",
+        "sha256": "ac21a61306d6e2a91453641f4e3e732ebc9d542abc1d35a5d5db2a10340ebefa"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Dubai.tzif",
+        "sha256": "0d9ea5053e83188032a6fb4d301d5db688f43011e5b6b1f917a11b71a0da7b16"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Ho_Chi_Minh.tzif",
+        "sha256": "0d6e76fb941d0540214ee81f161f449c6a7dc3d515e5654618a7ae42d0acd1e1"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Hong_Kong.tzif",
+        "sha256": "f4068f73246db97417f73467453564c57d6646ce4909b9fa2536923efcd7eb4f"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Jakarta.tzif",
+        "sha256": "e2a099ea48b1f7166b88d219b326f7c44373d08909cd9723b44346946fd6a384"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Jerusalem.tzif",
+        "sha256": "9fcde8d584dea0585f5c8727aaf35f48a149e0dbd3a83bf6cef8bca9c14021e3"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Kabul.tzif",
+        "sha256": "a4d2304df8921bbd4118abeb84aaa8d71771724031f6f7dcc799c96a7acbf354"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Karachi.tzif",
+        "sha256": "ba3a38c2ffb7a1af6d7eb153e63b0b70461c8de19e051806d90c1d5e0fe28d4e"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Kathmandu.tzif",
+        "sha256": "76b8f1bfe072231a1d9e7f8501310e27c0d08048c48f7422860b6477c142c438"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Kolkata.tzif",
+        "sha256": "3a00bdbe1bc4959e727567c730ba51b03455ecd455f7c190c5ad14386eb79b0d"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Kuala_Lumpur.tzif",
+        "sha256": "0954b2d9a301d94f4348024606a71bbcb2fa24d3cd3709f5bc8bca605039785d"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Macau.tzif",
+        "sha256": "9abf3d8bfc293285a102da99ac5d9219ca082dc530eab62b0e42143400deb3b1"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Manila.tzif",
+        "sha256": "1681a62321489c79277c4d74dcf6e20fae46530b269d85b3179a06cacd3706a6"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Pyongyang.tzif",
+        "sha256": "3710b975af284d9e12b621509e5863969f454d1b8c33e5f0b2add8838cb4c640"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Riyadh.tzif",
+        "sha256": "46853e94276af2eea8e86c2f152a871c092df195dc51273b8fc7091faa4b461c"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Seoul.tzif",
+        "sha256": "64a70b6fbcc9b65e762dbd25eb89b6f40c137146edc8dbd4d081eafacdab78de"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Shanghai.tzif",
+        "sha256": "bf8b7ed82fe6e63e6d98f8cea934eeac901cd16aba85eb5755ce3f8b4289ea8a"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Singapore.tzif",
+        "sha256": "0954b2d9a301d94f4348024606a71bbcb2fa24d3cd3709f5bc8bca605039785d"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Taipei.tzif",
+        "sha256": "a04c2c72f4f76a83178d036dd97d157ee1f32e478e44dda7a5c10923687ee6cf"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Tehran.tzif",
+        "sha256": "452d5a097a6c260fccb4e7b229b4eddca5563f5cac30c515bc89cb73bc615b72"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Tokyo.tzif",
+        "sha256": "59a3871430f0d3b93e619fa30a43a41d1e88bdd49ff26f09d0f405a500706f96"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Asia__Ulaanbaatar.tzif",
+        "sha256": "fbe23c3fafdee01b5121edf009290fb701cebbf93dacfb30f8aa90287242f6f3"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Atlantic__Azores.tzif",
+        "sha256": "e97069fab820f211114ded9cf9b4ca6a160f9640e7dac44e06eaa8f7001db4f1"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Atlantic__Bermuda.tzif",
+        "sha256": "3eec6a0f6703f7d3f38dbf211fdf43c2cd39dddff35e76478de1f4919f0b48b2"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Atlantic__Faroe.tzif",
+        "sha256": "230d2a074981baf887e70dd0cbc8dac4239eb34ed91e1db0916f0c3d4589aa3d"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Atlantic__Reykjavik.tzif",
+        "sha256": "f3e7fcaa0e9840ff4169d3567d8fb5926644848f4963d7acf92320843c5d486e"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Australia__Adelaide.tzif",
+        "sha256": "1a4d52746455981db7dc8f961135c0302673ecbec7573a0de1a52821c80daf78"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Australia__Perth.tzif",
+        "sha256": "66cb9e95c042d587d6ba01f60ab94e5d07120c3e20194242a1b0755be6aea47a"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Australia__Sydney.tzif",
+        "sha256": "820d45a868a88f81c731d5b2c758b4ed000039b6260a80433f8e0f094a604b59"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Amsterdam.tzif",
+        "sha256": "b10f9542a8509f0a63ebca78e3d80432dd86b8ea296400280febd9cfa76e8288"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Athens.tzif",
+        "sha256": "f1fd678b0548e329b38934f6281255e698dfa761ad1ff841f6ccb79606c61345"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Berlin.tzif",
+        "sha256": "a7fd9932d785d4d690900b834c3563c1810c1cf2e01711bcc0926af6c0767cb7"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Bratislava.tzif",
+        "sha256": "a6e930e3375cdcb51f7d8a74885aff89fd14b861ebb75cb339d0f91c16c1469a"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Brussels.tzif",
+        "sha256": "b10f9542a8509f0a63ebca78e3d80432dd86b8ea296400280febd9cfa76e8288"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Bucharest.tzif",
+        "sha256": "898ef81fde9a693309be6a80873528488f128d952d3efbf83c61780a5c059ba5"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Budapest.tzif",
+        "sha256": "a8dafebda9680c8d667afb905ea38c90e848713d7de0473338a2228f1ac3315f"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Copenhagen.tzif",
+        "sha256": "a7fd9932d785d4d690900b834c3563c1810c1cf2e01711bcc0926af6c0767cb7"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Dublin.tzif",
+        "sha256": "db9497b0a9fcafc6630b0f06b41edb1827793b3b22d9f799d11419e0439f96ec"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Helsinki.tzif",
+        "sha256": "71ca4af5998f09990c5e875d350fc3c8e34f280bae6fe14f36d4692face7a563"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Istanbul.tzif",
+        "sha256": "2a7163b16b94806f69991348e7d0a60c46eb61b1f0305f5f4b83f613db10806f"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Kyiv.tzif",
+        "sha256": "0589e80ddecebf9d3077898c12975d2be7393df2856ee9926c534763e1e26bf2"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Lisbon.tzif",
+        "sha256": "44d2f6cf84737e6a1e0daf914109e94256beca40b40c9a11b7a04e8bddaee4ec"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__London.tzif",
+        "sha256": "676541f0b8ad457c744c093f807589adcad909e3fd03f901787d08786eedbd33"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Madrid.tzif",
+        "sha256": "ca5b321ddbfc88e07e0d03ed2fa0c832ce5d0dd8e7d90a25200a8e24898c3b21"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Moscow.tzif",
+        "sha256": "ed2e0a099fb446b2416683438d3f56f9fc5a62a16c7549a7f59cbc935b364c8a"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Oslo.tzif",
+        "sha256": "a7fd9932d785d4d690900b834c3563c1810c1cf2e01711bcc0926af6c0767cb7"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Paris.tzif",
+        "sha256": "cd588e779c5737d70e4e47158dafab7945b026b2bb34454cc47741815459b068"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Prague.tzif",
+        "sha256": "a6e930e3375cdcb51f7d8a74885aff89fd14b861ebb75cb339d0f91c16c1469a"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Rome.tzif",
+        "sha256": "86bd26a06fe3057b36cf29dd7a338f2524aff8116ef08d005aa2114ea6122869"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Sofia.tzif",
+        "sha256": "2d08c2f8e2642f84f365ca83f895287c3020d7ea89ba2ff6462e84a228b632e4"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Stockholm.tzif",
+        "sha256": "a7fd9932d785d4d690900b834c3563c1810c1cf2e01711bcc0926af6c0767cb7"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Vienna.tzif",
+        "sha256": "abcfd4176dfe287a9cd9acb88eed2a4f54ee052a514e7941ee2eaf125938789c"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Warsaw.tzif",
+        "sha256": "e88f5a51f168157a41ac2dd8a4ee0e9a879419c84c6122b4771b1a2a33d93a4c"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Europe__Zurich.tzif",
+        "sha256": "199062b1c30cfeb2375ec84c56df52be51891986a6293b7a124d3a62509f45e9"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Pacific__Auckland.tzif",
+        "sha256": "0e06e7e55aedbc92ef5b3d106e7c392ab1628cfd8a428b20e92e99028a0bfbb9"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Pacific__Fiji.tzif",
+        "sha256": "ba608d86d4ee0738935e77be580c73bd8bc62aa6714d8393c0afad261621e0c4"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Pacific__Honolulu.tzif",
+        "sha256": "1daa5729aa1e0f32cd44be112d01ad4cc567a9fe76d87dcbb9182be8d2c88ff0"
+      },
+      {
+        "file": "Small_TV/src/resources/timezones/Pacific__Port_Moresby.tzif",
+        "sha256": "683001055b6ef9dc9d88734e0eddd1782f1c3643b7c13a75e9cf8e9052006e19"
+      }
+    ]
   },
   "machine": {
     "passed": true,
     "literal_factory_pixels_equal": false,
     "renderer_cases": 316,
     "geometry_checks": 4,
-    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
-    "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
+    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
+    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
     "approved_fixes": {
       "simple-sunday-standard-tm-wday": "Display Sun for standard tm_wday 0; factory 0 repeats the date, while factory 7 draws Sun",
       "analog-perpendicular-stroke-offsets": "Use cos/sin for x/y after atan2+pi/2; the original sin/cos collapses axis-aligned thick strokes"
@@ -1170,7 +1647,7 @@
       ],
       "first_failures": [],
       "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-      "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
+      "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
       "approved_fix": "photo fade must restore configured duty even when the original schedule cache did not change",
       "scope": "Executed LEDC initialization, duty arithmetic and conditional schedule call traces; successful driver boundaries are captured. RF, electrical PWM and SDK locking are outside scope."
     }
@@ -1215,10 +1692,10 @@
   },
   "machine_weather": {
     "passed": true,
-    "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
-    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
+    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
+    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
+    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
     "approved_fixes": [
       "clear-city-full-height",
       "clear-weather-title",
@@ -1240,10 +1717,10 @@
   },
   "machine_calendar": {
     "passed": true,
-    "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
-    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
+    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
+    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
+    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
     "approved_fixes": [
       "calendar-change-with-unchanged-minute",
       "clear-shortened-simple-date",
@@ -1254,10 +1731,10 @@
   },
   "machine_jpeg": {
     "passed": true,
-    "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
-    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
+    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
+    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
+    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
     "complete_asset_set": true,
     "approved_fixes": [
       "erase-known-jpeg-rectangle-after-decode-error",
@@ -1271,10 +1748,10 @@
   },
   "machine_timezones": {
     "passed": true,
-    "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
-    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
+    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
+    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
+    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
     "complete_country_set": true,
     "iana_version": "2026e",
     "timezone_manifest_sha256": "81c0cf308eccf1b7a465ddbba7ba36b85376ad238b17232204f9efef0d9df2eb",
@@ -1287,9 +1764,241 @@
     "countries": 109,
     "invalid_inputs": 5
   },
+  "machine_time_state": {
+    "passed": true,
+    "factory_cases": [
+      {
+        "case": "initial-2025",
+        "epoch": 1735726447,
+        "calls": 1,
+        "cached_date": [
+          2025,
+          1,
+          1,
+          18,
+          14,
+          7,
+          3
+        ],
+        "retry_counter": 0,
+        "initialized": 1,
+        "sync_notification": 0,
+        "restart_attempts": 0,
+        "passed": true
+      },
+      {
+        "case": "same-second-year-jump",
+        "epoch": 1767262447,
+        "calls": 1,
+        "cached_date": [
+          2025,
+          1,
+          1,
+          18,
+          14,
+          7,
+          3
+        ],
+        "retry_counter": 0,
+        "initialized": 1,
+        "sync_notification": 0,
+        "restart_attempts": 0,
+        "passed": true
+      },
+      {
+        "case": "synced-2024-below-year-threshold",
+        "epoch": 1704104047,
+        "calls": 20,
+        "cached_date": [
+          2025,
+          1,
+          1,
+          18,
+          14,
+          7,
+          3
+        ],
+        "retry_counter": 20,
+        "initialized": 1,
+        "sync_notification": 1,
+        "restart_attempts": 0,
+        "passed": true
+      },
+      {
+        "case": "retry-after-21-updates",
+        "epoch": 1704104047,
+        "calls": 1,
+        "cached_date": [
+          2025,
+          1,
+          1,
+          18,
+          14,
+          7,
+          3
+        ],
+        "retry_counter": 0,
+        "initialized": 1,
+        "sync_notification": 1,
+        "restart_attempts": 1,
+        "passed": true
+      },
+      {
+        "case": "stopped-client-retry-clears-initialized",
+        "epoch": 1704104047,
+        "calls": 21,
+        "cached_date": [
+          2025,
+          1,
+          1,
+          18,
+          14,
+          7,
+          3
+        ],
+        "retry_counter": 0,
+        "initialized": 0,
+        "sync_notification": 1,
+        "restart_attempts": 2,
+        "passed": true
+      }
+    ],
+    "native_cases": [
+      {
+        "case": "before-notification",
+        "epoch": 1704104047,
+        "passed": true
+      },
+      {
+        "case": "before-notification",
+        "epoch": 1893456000,
+        "passed": true
+      },
+      {
+        "case": "after-notification",
+        "epoch": 1704104047,
+        "calendar": [
+          7,
+          14,
+          18,
+          1,
+          0,
+          124,
+          1,
+          0,
+          0
+        ],
+        "passed": true
+      },
+      {
+        "case": "after-notification",
+        "epoch": 1735726447,
+        "calendar": [
+          7,
+          14,
+          18,
+          1,
+          0,
+          125,
+          3,
+          0,
+          0
+        ],
+        "passed": true
+      },
+      {
+        "case": "after-notification",
+        "epoch": 1767262447,
+        "calendar": [
+          7,
+          14,
+          18,
+          1,
+          0,
+          126,
+          4,
+          0,
+          0
+        ],
+        "passed": true
+      },
+      {
+        "case": "after-notification",
+        "epoch": 1704104047,
+        "calendar": [
+          7,
+          14,
+          18,
+          1,
+          0,
+          124,
+          1,
+          0,
+          0
+        ],
+        "passed": true
+      },
+      {
+        "case": "after-notification",
+        "epoch": 0,
+        "calendar": [
+          0,
+          0,
+          8,
+          1,
+          0,
+          70,
+          4,
+          0,
+          0
+        ],
+        "passed": true
+      },
+      {
+        "case": "after-notification",
+        "epoch": 2147483648,
+        "calendar": [
+          8,
+          14,
+          11,
+          19,
+          0,
+          138,
+          2,
+          18,
+          0
+        ],
+        "passed": true
+      }
+    ],
+    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
+    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
+    "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
+    "adapters": {
+      "factory": {
+        "tz-lock": 46,
+        "libc-reent": 46,
+        "tz-getenv-r": 46,
+        "rom-libc-reent": 138,
+        "tz-unlock": 46,
+        "sdk-time": 45,
+        "sdk-log-timestamp": 2,
+        "sdk-log-write": 2,
+        "sdk-sntp-restart": 2
+      },
+      "native": {}
+    },
+    "approved_fixes": [
+      "validity-after-actual-sntp-notification",
+      "accept-pre-2025-synchronized-time",
+      "update-complete-calendar-at-unchanged-seconds"
+    ],
+    "scope": "Execute factory time/cache/retry instructions and compiled native sync validity.\n\nCalendar conversion and both notification handlers are actual RV32 code.\nOnly factory time(), SNTP restart and logging SDK boundaries are adapted.\nThis gate does not substitute for the separate real UDP/SNTP QEMU test.\n"
+  },
   "qemu": {
     "passed": true,
-    "qemu_sha256": "18f183bcffe9603f7c36966cafacb6c76e7bd8c42bdaadbcd75f8e380ee5cf00",
+    "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
     "profile_sha256": "ad88920762bd2199abb91ba0eed69d3ed62e7e381a10e228f49457b5ff84abb4",
     "scope": "Real firmware boot/reset/DHCP/SNTP, localhost HTTP setup and synthetic weather HTTP/value/LCD checks. Whole-frame scene similarity is measured, not a parity gate. No physical hardware or Internet weather service.",
     "helper_sha256": {
@@ -1300,7 +2009,7 @@
     },
     "http_initial_setup": {
       "passed": true,
-      "tested_at_utc": "2026-10-14T11:48:08.602109+02:00",
+      "tested_at_utc": "2026-10-14T13:56:02.347235+02:00",
       "flows": {
         "original": {
           "firmware": "original",
@@ -1378,31 +2087,31 @@
           "sources": {
             "images": [
               {
+                "offset": "0x0",
                 "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
-                "bytes": 19248,
                 "file": "bootloader.bin",
-                "offset": "0x0"
+                "bytes": 19248
               },
               {
+                "offset": "0x8000",
                 "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
-                "bytes": 3072,
                 "file": "partition-table.bin",
-                "offset": "0x8000"
+                "bytes": 3072
               },
               {
-                "sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
-                "bytes": 1115008,
+                "offset": "0x10000",
+                "sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
                 "file": "app.bin",
-                "offset": "0x10000"
+                "bytes": 1115104
               },
               {
+                "offset": "0x200000",
                 "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
-                "bytes": 1994752,
                 "file": "assets.bin",
-                "offset": "0x200000"
+                "bytes": 1994752
               }
             ],
-            "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c"
+            "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019"
           },
           "web_endpoints": [
             {
@@ -1453,11 +2162,11 @@
         ]
       },
       "scope": "Real HTTP/TCP, open synthetic Wi-Fi, DHCP, raw settings persistence, reboot and SNTP; no browser JS, real RF or WPA handshake.",
-      "qemu_sha256": "18f183bcffe9603f7c36966cafacb6c76e7bd8c42bdaadbcd75f8e380ee5cf00"
+      "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c"
     },
     "weather_http": {
       "passed": true,
-      "tested_at_utc": "2026-10-14T11:49:11.827337+02:00",
+      "tested_at_utc": "2026-10-14T13:57:09.457571+02:00",
       "scope": "Real guest DNS/TCP/HTTP via isolated loopback fixture; parsed synthetic weather and stable LCD regions. No Internet service, physical RF or full-program equivalence.",
       "native_layout": {
         "address": 1070267000,
@@ -1478,8 +2187,8 @@
           "wind_direction": 201,
           "generation": 224
         },
-        "request_state_address": 1070282984,
-        "elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff"
+        "request_state_address": 1070282988,
+        "elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394"
       },
       "flows": {
         "original": {
@@ -1633,31 +2342,31 @@
           "sources": {
             "images": [
               {
+                "offset": "0x0",
                 "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
-                "bytes": 19248,
                 "file": "bootloader.bin",
-                "offset": "0x0"
+                "bytes": 19248
               },
               {
+                "offset": "0x8000",
                 "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
-                "bytes": 3072,
                 "file": "partition-table.bin",
-                "offset": "0x8000"
+                "bytes": 3072
               },
               {
-                "sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
-                "bytes": 1115008,
+                "offset": "0x10000",
+                "sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
                 "file": "app.bin",
-                "offset": "0x10000"
+                "bytes": 1115104
               },
               {
+                "offset": "0x200000",
                 "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
-                "bytes": 1994752,
                 "file": "assets.bin",
-                "offset": "0x200000"
+                "bytes": 1994752
               }
             ],
-            "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c"
+            "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019"
           },
           "weather_services": true,
           "native_rejects_non_200_json": true,
@@ -1775,7 +2484,629 @@
           "pixels_equal": true
         }
       },
-      "qemu_sha256": "18f183bcffe9603f7c36966cafacb6c76e7bd8c42bdaadbcd75f8e380ee5cf00"
+      "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c"
+    },
+    "time_http": {
+      "passed": true,
+      "tested_at_utc": "2026-10-14T14:00:24.880285+02:00",
+      "flows": {
+        "original": {
+          "passed": true,
+          "sources": {
+            "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+          },
+          "stages": {
+            "before_first_reply": {
+              "state": {
+                "synced": false,
+                "year": 2025,
+                "month": 9,
+                "day": 19,
+                "hour": 17,
+                "minute": 4,
+                "second": 40,
+                "weekday": 5
+              },
+              "date": "2025/9/19",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 0.0
+            },
+            "factory_fallback_starvation": {
+              "requests": [
+                {
+                  "server": 1,
+                  "virtual_us": 8030087
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 22889964
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 25040279
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 28790863
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 35309965
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 39510280
+                }
+              ],
+              "drops": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+              ],
+              "responses": [],
+              "times": []
+            },
+            "synchronized_2024": {
+              "state": {
+                "synced": true,
+                "year": 2025,
+                "month": 9,
+                "day": 19,
+                "hour": 17,
+                "minute": 4,
+                "second": 40,
+                "weekday": 5
+              },
+              "date": "2025/9/19",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 1709179374.939348
+            },
+            "initial_trace": {
+              "requests": [
+                {
+                  "server": 1,
+                  "virtual_us": 8030087
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 22889964
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 25040279
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 28790863
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 35309965
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 39510280
+                },
+                {
+                  "server": 1,
+                  "virtual_us": 45029966
+                }
+              ],
+              "drops": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+              ],
+              "responses": [
+                1
+              ],
+              "times": [
+                {
+                  "epoch": 1709179420,
+                  "virtual_us": 45029966
+                }
+              ]
+            },
+            "factory_date_waits_for_minute": {
+              "state": {
+                "synced": true,
+                "year": 2025,
+                "month": 1,
+                "day": 1,
+                "hour": 18,
+                "minute": 14,
+                "second": 7,
+                "weekday": 3
+              },
+              "date": "2025/9/19",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 1735726393.946121
+            },
+            "server_2_2025": {
+              "state": {
+                "synced": true,
+                "year": 2025,
+                "month": 1,
+                "day": 1,
+                "hour": 18,
+                "minute": 14,
+                "second": 22,
+                "weekday": 3
+              },
+              "date": "2025/1/1",
+              "different_bytes": 0,
+              "clean_different_bytes": 165,
+              "boot_time_seconds": 1735726393.946121
+            }
+          },
+          "checks": {
+            "literal_factory_failure_or_corrected_three_server_fallback": true,
+            "actual_sntp_clock_update": true,
+            "first_notification_required": true,
+            "date_pixels_checked": true,
+            "no_panic": true,
+            "executable_media_unchanged": true
+          },
+          "clock_observations": {
+            "first_notification": {
+              "actual_utc_seconds": 1709179420.140337,
+              "expected_utc_seconds": 1709179420.171023,
+              "difference_seconds": -0.030685901641845703,
+              "boot_time_us": 1709179374939348,
+              "since_boot_us": 45200989,
+              "virtual_us": 45200989
+            },
+            "server_2_2025": {
+              "actual_utc_seconds": 1735726446.996446,
+              "expected_utc_seconds": 1735726447.020045,
+              "difference_seconds": -0.02359914779663086,
+              "boot_time_us": 1735726393946121,
+              "since_boot_us": 53050325,
+              "virtual_us": 53050325
+            }
+          },
+          "ntp_control_contract": {
+            "defaults_unchanged": true,
+            "invalid_inputs_rejected": 4
+          },
+          "trace": {
+            "requests": [
+              {
+                "server": 1,
+                "virtual_us": 8030087
+              },
+              {
+                "server": 1,
+                "virtual_us": 22889964
+              },
+              {
+                "server": 1,
+                "virtual_us": 25040279
+              },
+              {
+                "server": 1,
+                "virtual_us": 28790863
+              },
+              {
+                "server": 1,
+                "virtual_us": 35309965
+              },
+              {
+                "server": 1,
+                "virtual_us": 39510280
+              },
+              {
+                "server": 1,
+                "virtual_us": 45029966
+              },
+              {
+                "server": 1,
+                "virtual_us": 53030280
+              }
+            ],
+            "drops": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ],
+            "responses": [
+              1,
+              1
+            ],
+            "times": [
+              {
+                "epoch": 1709179420,
+                "virtual_us": 45029966
+              },
+              {
+                "epoch": 1735726447,
+                "virtual_us": 53030280
+              }
+            ]
+          }
+        },
+        "reconstructed": {
+          "passed": true,
+          "sources": {
+            "images": [
+              {
+                "offset": "0x0",
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+                "file": "bootloader.bin",
+                "bytes": 19248
+              },
+              {
+                "offset": "0x8000",
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                "file": "partition-table.bin",
+                "bytes": 3072
+              },
+              {
+                "offset": "0x10000",
+                "sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
+                "file": "app.bin",
+                "bytes": 1115104
+              },
+              {
+                "offset": "0x200000",
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+                "file": "assets.bin",
+                "bytes": 1994752
+              }
+            ],
+            "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019"
+          },
+          "stages": {
+            "before_first_reply": {
+              "state": {
+                "synced": false,
+                "year": 2025,
+                "month": 9,
+                "day": 19,
+                "hour": 17,
+                "minute": 4,
+                "second": 40,
+                "weekday": 5
+              },
+              "date": "2025/9/19",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 0.0
+            },
+            "synchronized_2024": {
+              "state": {
+                "synced": true,
+                "year": 2024,
+                "month": 2,
+                "day": 29,
+                "hour": 12,
+                "minute": 3,
+                "second": 40,
+                "weekday": 4
+              },
+              "date": "2024/2/29",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 1709179386.474783
+            },
+            "initial_trace": {
+              "requests": [
+                {
+                  "server": 1,
+                  "virtual_us": 3451365
+                },
+                {
+                  "server": 2,
+                  "virtual_us": 18465525
+                },
+                {
+                  "server": 3,
+                  "virtual_us": 33503507
+                }
+              ],
+              "drops": [
+                1,
+                2
+              ],
+              "responses": [
+                3
+              ],
+              "times": [
+                {
+                  "epoch": 1709179420,
+                  "virtual_us": 33503507
+                }
+              ]
+            },
+            "server_2_2025": {
+              "state": {
+                "synced": true,
+                "year": 2025,
+                "month": 1,
+                "day": 1,
+                "hour": 18,
+                "minute": 14,
+                "second": 7,
+                "weekday": 3
+              },
+              "date": "2025/1/1",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 1735726378.354182
+            },
+            "year-jump": {
+              "state": {
+                "synced": true,
+                "year": 2026,
+                "month": 1,
+                "day": 1,
+                "hour": 18,
+                "minute": 14,
+                "second": 7,
+                "weekday": 4
+              },
+              "date": "2026/1/1",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 1767262374.527906
+            },
+            "backward-leap-day": {
+              "state": {
+                "synced": true,
+                "year": 2024,
+                "month": 2,
+                "day": 29,
+                "hour": 12,
+                "minute": 3,
+                "second": 40,
+                "weekday": 4
+              },
+              "date": "2024/2/29",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 1709179341.594773
+            },
+            "post-2038": {
+              "state": {
+                "synced": true,
+                "year": 2038,
+                "month": 1,
+                "day": 19,
+                "hour": 11,
+                "minute": 14,
+                "second": 8,
+                "weekday": 2
+              },
+              "date": "2038/1/19",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 2147483566.18614
+            },
+            "reset_before_notification": {
+              "state": {
+                "synced": false,
+                "year": 2025,
+                "month": 9,
+                "day": 19,
+                "hour": 17,
+                "minute": 4,
+                "second": 40,
+                "weekday": 5
+              },
+              "date": "2025/9/19",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 2147483566.18614
+            },
+            "reset_recovered": {
+              "state": {
+                "synced": true,
+                "year": 2038,
+                "month": 1,
+                "day": 19,
+                "hour": 11,
+                "minute": 14,
+                "second": 8,
+                "weekday": 2
+              },
+              "date": "2038/1/19",
+              "different_bytes": 0,
+              "clean_different_bytes": 0,
+              "boot_time_seconds": 2147483538.081978
+            }
+          },
+          "checks": {
+            "literal_factory_failure_or_corrected_three_server_fallback": true,
+            "actual_sntp_clock_update": true,
+            "first_notification_required": true,
+            "date_pixels_checked": true,
+            "no_panic": true,
+            "executable_media_unchanged": true
+          },
+          "clock_observations": {
+            "first_notification": {
+              "actual_utc_seconds": 1709179420.056527,
+              "expected_utc_seconds": 1709179420.072658,
+              "difference_seconds": -0.016131162643432617,
+              "boot_time_us": 1709179386474783,
+              "since_boot_us": 33581744,
+              "virtual_us": 33576165,
+              "systimer_ticks": 349183114,
+              "rtc_hrt_offset_us": 68185,
+              "system_correction_us": -61740
+            },
+            "server_2_2025": {
+              "actual_utc_seconds": 1735726447.113686,
+              "expected_utc_seconds": 1735726447.135278,
+              "difference_seconds": -0.021591901779174805,
+              "boot_time_us": 1735726378354182,
+              "since_boot_us": 68759504,
+              "virtual_us": 68754453,
+              "systimer_ticks": 715031820,
+              "rtc_hrt_offset_us": 68185,
+              "system_correction_us": -61740
+            },
+            "year-jump": {
+              "actual_utc_seconds": 1767262447.107075,
+              "expected_utc_seconds": 1767262447.139963,
+              "difference_seconds": -0.032887935638427734,
+              "boot_time_us": 1767262374527906,
+              "since_boot_us": 72579169,
+              "virtual_us": 72583823,
+              "systimer_ticks": 754756333,
+              "rtc_hrt_offset_us": 68185,
+              "system_correction_us": -61740
+            },
+            "backward-leap-day": {
+              "actual_utc_seconds": 1709179420.154274,
+              "expected_utc_seconds": 1709179420.170808,
+              "difference_seconds": -0.016534090042114258,
+              "boot_time_us": 1709179341594773,
+              "since_boot_us": 78559501,
+              "virtual_us": 78554667,
+              "systimer_ticks": 816951787,
+              "rtc_hrt_offset_us": 68185,
+              "system_correction_us": -61740
+            },
+            "post-2038": {
+              "actual_utc_seconds": 2147483648.16463,
+              "expected_utc_seconds": 2147483648.189876,
+              "difference_seconds": -0.025246143341064453,
+              "boot_time_us": 2147483566186140,
+              "since_boot_us": 81978490,
+              "virtual_us": 81973735,
+              "systimer_ticks": 852509268,
+              "rtc_hrt_offset_us": 68185,
+              "system_correction_us": -61740
+            },
+            "reset_recovered": {
+              "actual_utc_seconds": 2147483648.068667,
+              "expected_utc_seconds": 2147483648.084412,
+              "difference_seconds": -0.015745162963867188,
+              "boot_time_us": 2147483538081978,
+              "since_boot_us": 109986689,
+              "virtual_us": 101541587,
+              "systimer_ticks": 1056010524,
+              "rtc_hrt_offset_us": 90490053,
+              "system_correction_us": -82042837
+            }
+          },
+          "ntp_control_contract": {
+            "defaults_unchanged": true,
+            "invalid_inputs_rejected": 4
+          },
+          "trace": {
+            "requests": [
+              {
+                "server": 1,
+                "virtual_us": 3451365
+              },
+              {
+                "server": 2,
+                "virtual_us": 18465525
+              },
+              {
+                "server": 3,
+                "virtual_us": 33503507
+              },
+              {
+                "server": 3,
+                "virtual_us": 38573859
+              },
+              {
+                "server": 1,
+                "virtual_us": 53584137
+              },
+              {
+                "server": 2,
+                "virtual_us": 68619175
+              },
+              {
+                "server": 2,
+                "virtual_us": 72443860
+              },
+              {
+                "server": 2,
+                "virtual_us": 78383859
+              },
+              {
+                "server": 2,
+                "virtual_us": 81783859
+              },
+              {
+                "server": 1,
+                "virtual_us": 86427712
+              },
+              {
+                "server": 2,
+                "virtual_us": 101457175
+              }
+            ],
+            "drops": [
+              1,
+              2,
+              3,
+              1,
+              1
+            ],
+            "responses": [
+              3,
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "times": [
+              {
+                "epoch": 1709179420,
+                "virtual_us": 33503507
+              },
+              {
+                "epoch": 1735726447,
+                "virtual_us": 68619175
+              },
+              {
+                "epoch": 1767262447,
+                "virtual_us": 72443860
+              },
+              {
+                "epoch": 1709179420,
+                "virtual_us": 78383859
+              },
+              {
+                "epoch": 2147483648,
+                "virtual_us": 81783859
+              },
+              {
+                "epoch": 2147483648,
+                "virtual_us": 101457175
+              }
+            ]
+          }
+        }
+      },
+      "layout": {
+        "sync_address": 1070282984,
+        "calendar_address": 1070266180,
+        "microseconds_offset_address": 1070282816,
+        "system_correction_address": 1070282832,
+        "elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394"
+      },
+      "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
+      "scope": "Exercise actual UDP SNTP fallback, clock updates and displayed dates in QEMU.\n\nQMP changes only the opt-in service's responses. Guest registers, RAM, clocks and\nexecutable bytes are never patched. Initial flash changes are synthetic settings\nin disposable copies; both production applications and source images stay intact.\n"
     },
     "boot_reset": {
       "original": {
@@ -1826,12 +3157,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.323626
+            "virtual_seconds": 46.540912
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.454184
+            "virtual_seconds": 46.424286
           }
         },
         "equal_pixels_min": 1.0,
@@ -1843,16 +3174,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.746687
+            "virtual_seconds": 46.601678
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.469208
+            "virtual_seconds": 46.66467
           }
         },
-        "equal_pixels_min": 0.9768576388888889,
-        "equal_pixels_max": 0.9866145833333333
+        "equal_pixels_min": 0.9757465277777778,
+        "equal_pixels_max": 0.9869444444444444
       },
       "simple": {
         "passed": true,
@@ -1860,16 +3191,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.527738
+            "virtual_seconds": 46.86101
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.647865
+            "virtual_seconds": 46.875316
           }
         },
-        "equal_pixels_min": 0.9825694444444445,
-        "equal_pixels_max": 0.9852083333333334
+        "equal_pixels_min": 0.9973611111111111,
+        "equal_pixels_max": 1.0
       },
       "photo": {
         "passed": true,
@@ -1877,12 +3208,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.708861
+            "virtual_seconds": 46.810843
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.887071
+            "virtual_seconds": 46.62392
           }
         },
         "equal_pixels_min": 0.0003298611111111111,
@@ -1894,22 +3225,22 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.362602
+            "virtual_seconds": 46.391187
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.686162
+            "virtual_seconds": 46.664508
           }
         },
-        "equal_pixels_min": 0.98140625,
-        "equal_pixels_max": 0.9893923611111111
+        "equal_pixels_min": 0.9838194444444445,
+        "equal_pixels_max": 0.9882986111111111
       }
     },
     "field_http": {
       "passed": true,
-      "tested_at_utc": "2026-10-14T11:50:25.151501+02:00",
-      "qemu_sha256": "18f183bcffe9603f7c36966cafacb6c76e7bd8c42bdaadbcd75f8e380ee5cf00",
+      "tested_at_utc": "2026-10-14T13:58:30.18742+02:00",
+      "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
       "cache_layout": {
         "address": 1070267000,
         "size": 232,
@@ -1929,8 +3260,8 @@
           "wind_direction": 201,
           "generation": 224
         },
-        "request_state_address": 1070282984,
-        "elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff"
+        "request_state_address": 1070282988,
+        "elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394"
       },
       "scroll_layout": {
         "address": 1070266664,
@@ -1989,7 +3320,7 @@
                 "icon_offset": 3878912
               },
               "frame": {
-                "virtual_seconds": 30.325095,
+                "virtual_seconds": 30.121138,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -2011,7 +3342,7 @@
                 "icon_offset": 3878912
               },
               "frame": {
-                "virtual_seconds": 32.851374,
+                "virtual_seconds": 32.581442,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -2033,7 +3364,7 @@
                 "icon_offset": 3802112
               },
               "frame": {
-                "virtual_seconds": 35.460455,
+                "virtual_seconds": 34.970543,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -2055,7 +3386,7 @@
                 "icon_offset": 0
               },
               "frame": {
-                "virtual_seconds": 38.019937,
+                "virtual_seconds": 37.457805,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -2078,31 +3409,31 @@
           "sources": {
             "images": [
               {
+                "offset": "0x0",
                 "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
-                "bytes": 19248,
                 "file": "bootloader.bin",
-                "offset": "0x0"
+                "bytes": 19248
               },
               {
+                "offset": "0x8000",
                 "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
-                "bytes": 3072,
                 "file": "partition-table.bin",
-                "offset": "0x8000"
+                "bytes": 3072
               },
               {
-                "sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
-                "bytes": 1115008,
+                "offset": "0x10000",
+                "sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
                 "file": "app.bin",
-                "offset": "0x10000"
+                "bytes": 1115104
               },
               {
+                "offset": "0x200000",
                 "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
-                "bytes": 1994752,
                 "file": "assets.bin",
-                "offset": "0x200000"
+                "bytes": 1994752
               }
             ],
-            "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c"
+            "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019"
           },
           "checks": {
             "actual_city_http": true,
@@ -2156,11 +3487,11 @@
                     "completed": false
                   },
                   {
-                    "text": "10.0.2.15",
+                    "text": "North-Northeast",
                     "x": 0,
                     "y": 40,
                     "width": 180,
-                    "length": 108,
+                    "length": 180,
                     "offset": 0,
                     "pause": 15,
                     "color": 65535,
@@ -2180,7 +3511,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 41.108387,
+                "virtual_seconds": 40.709416,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -2192,7 +3523,7 @@
                 },
                 "rendered_weather_generation": 5,
                 "passed": true,
-                "attempts": 1
+                "attempts": 3
               }
             },
             "unavailable": {
@@ -2247,7 +3578,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 41.401085,
+                "virtual_seconds": 40.976475,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -2314,7 +3645,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 41.822096,
+                "virtual_seconds": 41.32579,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -2357,11 +3688,11 @@
                     "completed": false
                   },
                   {
-                    "text": "North-Northeast",
+                    "text": "10.0.2.15",
                     "x": 0,
                     "y": 40,
                     "width": 180,
-                    "length": 180,
+                    "length": 108,
                     "offset": 0,
                     "pause": 15,
                     "color": 65535,
@@ -2381,7 +3712,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 42.20854,
+                "virtual_seconds": 41.691794,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -2415,7 +3746,7 @@
                 "pause": true
               }
             },
-            "observed_frames": 110
+            "observed_frames": 134
           },
           "refresh": {
             "passed": true,
@@ -2428,190 +3759,6 @@
                   "width": 180,
                   "length": 228,
                   "offset": 8,
-                  "pause": 0,
-                  "color": 2016,
-                  "returning": false,
-                  "completed": true
-                },
-                {
-                  "text": "10.0.2.15",
-                  "x": 0,
-                  "y": 40,
-                  "width": 180,
-                  "length": 108,
-                  "offset": 0,
-                  "pause": 15,
-                  "color": 65535,
-                  "returning": false,
-                  "completed": false
-                },
-                {
-                  "text": "Thunderstorm",
-                  "x": 160,
-                  "y": 83,
-                  "width": 80,
-                  "length": 144,
-                  "offset": 0,
-                  "pause": 12,
-                  "color": 65504,
-                  "returning": false,
-                  "completed": true
-                }
-              ],
-              "virtual_seconds": 38.245461,
-              "different_pixels": {
-                "field-0": 0,
-                "field-2": 0,
-                "icon": 0,
-                "guard-0": 0,
-                "guard-1": 0,
-                "guard-2": 0,
-                "guard-3": 0
-              },
-              "rendered_weather_generation": 4,
-              "passed": true,
-              "attempts": 75
-            },
-            "held": [
-              {
-                "labels": [
-                  {
-                    "text": "ABCDEFGHIJKLMNOPQRS",
-                    "x": 0,
-                    "y": 10,
-                    "width": 180,
-                    "length": 228,
-                    "offset": 8,
-                    "pause": 0,
-                    "color": 2016,
-                    "returning": false,
-                    "completed": true
-                  },
-                  {
-                    "text": "10.0.2.15",
-                    "x": 0,
-                    "y": 40,
-                    "width": 180,
-                    "length": 108,
-                    "offset": 0,
-                    "pause": 15,
-                    "color": 65535,
-                    "returning": false,
-                    "completed": false
-                  },
-                  {
-                    "text": "Thunderstorm",
-                    "x": 160,
-                    "y": 83,
-                    "width": 80,
-                    "length": 144,
-                    "offset": 0,
-                    "pause": 12,
-                    "color": 65504,
-                    "returning": false,
-                    "completed": true
-                  }
-                ],
-                "virtual_seconds": 38.431846,
-                "pixels_sha256": "fcce5b6caba8ba6ff5f75de55757c07000789bb6a371495c9e67e48b28898672",
-                "rendered_weather_generation": 4
-              },
-              {
-                "labels": [
-                  {
-                    "text": "ABCDEFGHIJKLMNOPQRS",
-                    "x": 0,
-                    "y": 10,
-                    "width": 180,
-                    "length": 228,
-                    "offset": 8,
-                    "pause": 0,
-                    "color": 2016,
-                    "returning": false,
-                    "completed": true
-                  },
-                  {
-                    "text": "10.0.2.15",
-                    "x": 0,
-                    "y": 40,
-                    "width": 180,
-                    "length": 108,
-                    "offset": 0,
-                    "pause": 15,
-                    "color": 65535,
-                    "returning": false,
-                    "completed": false
-                  },
-                  {
-                    "text": "Thunderstorm",
-                    "x": 160,
-                    "y": 83,
-                    "width": 80,
-                    "length": 144,
-                    "offset": 0,
-                    "pause": 12,
-                    "color": 65504,
-                    "returning": false,
-                    "completed": true
-                  }
-                ],
-                "virtual_seconds": 38.524808,
-                "pixels_sha256": "fcce5b6caba8ba6ff5f75de55757c07000789bb6a371495c9e67e48b28898672",
-                "rendered_weather_generation": 4
-              },
-              {
-                "labels": [
-                  {
-                    "text": "ABCDEFGHIJKLMNOPQRS",
-                    "x": 0,
-                    "y": 10,
-                    "width": 180,
-                    "length": 228,
-                    "offset": 8,
-                    "pause": 0,
-                    "color": 2016,
-                    "returning": false,
-                    "completed": true
-                  },
-                  {
-                    "text": "10.0.2.15",
-                    "x": 0,
-                    "y": 40,
-                    "width": 180,
-                    "length": 108,
-                    "offset": 0,
-                    "pause": 15,
-                    "color": 65535,
-                    "returning": false,
-                    "completed": false
-                  },
-                  {
-                    "text": "Thunderstorm",
-                    "x": 160,
-                    "y": 83,
-                    "width": 80,
-                    "length": 144,
-                    "offset": 0,
-                    "pause": 12,
-                    "color": 65504,
-                    "returning": false,
-                    "completed": true
-                  }
-                ],
-                "virtual_seconds": 38.625785,
-                "pixels_sha256": "fcce5b6caba8ba6ff5f75de55757c07000789bb6a371495c9e67e48b28898672",
-                "rendered_weather_generation": 4
-              }
-            ],
-            "resumed": {
-              "labels": [
-                {
-                  "text": "ABCDEFGHIJKLMNOPQRS",
-                  "x": 0,
-                  "y": 10,
-                  "width": 180,
-                  "length": 228,
-                  "offset": 10,
                   "pause": 0,
                   "color": 2016,
                   "returning": false,
@@ -2636,13 +3783,197 @@
                   "width": 80,
                   "length": 144,
                   "offset": 0,
-                  "pause": 11,
+                  "pause": 12,
                   "color": 65504,
                   "returning": false,
                   "completed": true
                 }
               ],
-              "virtual_seconds": 40.117972,
+              "virtual_seconds": 38.01365,
+              "different_pixels": {
+                "field-0": 0,
+                "field-2": 0,
+                "icon": 0,
+                "guard-0": 0,
+                "guard-1": 0,
+                "guard-2": 0,
+                "guard-3": 0
+              },
+              "rendered_weather_generation": 4,
+              "passed": true,
+              "attempts": 89
+            },
+            "held": [
+              {
+                "labels": [
+                  {
+                    "text": "ABCDEFGHIJKLMNOPQRS",
+                    "x": 0,
+                    "y": 10,
+                    "width": 180,
+                    "length": 228,
+                    "offset": 10,
+                    "pause": 0,
+                    "color": 2016,
+                    "returning": false,
+                    "completed": true
+                  },
+                  {
+                    "text": "clear",
+                    "x": 0,
+                    "y": 40,
+                    "width": 180,
+                    "length": 60,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65535,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "Thunderstorm",
+                    "x": 160,
+                    "y": 83,
+                    "width": 80,
+                    "length": 144,
+                    "offset": 0,
+                    "pause": 11,
+                    "color": 65504,
+                    "returning": false,
+                    "completed": true
+                  }
+                ],
+                "virtual_seconds": 38.354695,
+                "pixels_sha256": "428324132afbccfe22e9240bea7b568f26e620f7907b32c5e6bc32ac22efde6f",
+                "rendered_weather_generation": 4
+              },
+              {
+                "labels": [
+                  {
+                    "text": "ABCDEFGHIJKLMNOPQRS",
+                    "x": 0,
+                    "y": 10,
+                    "width": 180,
+                    "length": 228,
+                    "offset": 10,
+                    "pause": 0,
+                    "color": 2016,
+                    "returning": false,
+                    "completed": true
+                  },
+                  {
+                    "text": "clear",
+                    "x": 0,
+                    "y": 40,
+                    "width": 180,
+                    "length": 60,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65535,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "Thunderstorm",
+                    "x": 160,
+                    "y": 83,
+                    "width": 80,
+                    "length": 144,
+                    "offset": 0,
+                    "pause": 11,
+                    "color": 65504,
+                    "returning": false,
+                    "completed": true
+                  }
+                ],
+                "virtual_seconds": 38.4539,
+                "pixels_sha256": "428324132afbccfe22e9240bea7b568f26e620f7907b32c5e6bc32ac22efde6f",
+                "rendered_weather_generation": 4
+              },
+              {
+                "labels": [
+                  {
+                    "text": "ABCDEFGHIJKLMNOPQRS",
+                    "x": 0,
+                    "y": 10,
+                    "width": 180,
+                    "length": 228,
+                    "offset": 10,
+                    "pause": 0,
+                    "color": 2016,
+                    "returning": false,
+                    "completed": true
+                  },
+                  {
+                    "text": "clear",
+                    "x": 0,
+                    "y": 40,
+                    "width": 180,
+                    "length": 60,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65535,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "Thunderstorm",
+                    "x": 160,
+                    "y": 83,
+                    "width": 80,
+                    "length": 144,
+                    "offset": 0,
+                    "pause": 11,
+                    "color": 65504,
+                    "returning": false,
+                    "completed": true
+                  }
+                ],
+                "virtual_seconds": 38.553652,
+                "pixels_sha256": "428324132afbccfe22e9240bea7b568f26e620f7907b32c5e6bc32ac22efde6f",
+                "rendered_weather_generation": 4
+              }
+            ],
+            "resumed": {
+              "labels": [
+                {
+                  "text": "ABCDEFGHIJKLMNOPQRS",
+                  "x": 0,
+                  "y": 10,
+                  "width": 180,
+                  "length": 228,
+                  "offset": 12,
+                  "pause": 0,
+                  "color": 2016,
+                  "returning": false,
+                  "completed": true
+                },
+                {
+                  "text": "clear",
+                  "x": 0,
+                  "y": 40,
+                  "width": 180,
+                  "length": 60,
+                  "offset": 0,
+                  "pause": 15,
+                  "color": 65535,
+                  "returning": false,
+                  "completed": false
+                },
+                {
+                  "text": "Thunderstorm",
+                  "x": 160,
+                  "y": 83,
+                  "width": 80,
+                  "length": 144,
+                  "offset": 0,
+                  "pause": 10,
+                  "color": 65504,
+                  "returning": false,
+                  "completed": true
+                }
+              ],
+              "virtual_seconds": 39.784766,
               "different_pixels": {
                 "field-0": 0,
                 "field-2": 0,
@@ -2697,7 +4028,7 @@
                 "completed": false
               }
             ],
-            "virtual_seconds": 40.780295,
+            "virtual_seconds": 40.35409,
             "different_pixels": {
               "field-0": 0,
               "field-2": 0,
@@ -2717,9 +4048,9 @@
   },
   "not_run": [
     {
-      "status": "not_run",
+      "name": "hardware_browser_soak",
       "reason": "Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately",
-      "name": "hardware_browser_soak"
+      "status": "not_run"
     }
   ]
 }

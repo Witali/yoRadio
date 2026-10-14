@@ -262,3 +262,67 @@
   `time-network-fourth` подтвердил stock preset после sync 2024, но затем не
   завершился; это failed наблюдение, а не passing gate. Исправления ещё не
   закоммичены и не объявлены готовыми. Физические платы не прошивались.
+
+### 2026-10-14 — SNTP notification и настоящие UDP-переходы
+
+- Обновлён callback/валидность: atomic sync latch выставляет настоящий SDK
+  notification; будущий год/инициализация клиента не заменяют подтверждение.
+  Сохранён latch при disconnect/deinit; обе темы учитывают его изменение при
+  прежнем epoch. Подтверждённый 2024 теперь принимается. Time worker сохраняет
+  действующий retry/fallback вместо заводского преждевременного restart.
+- Экспортированы три полных helper excerpts: restart `0x42017ea0`, stop/init
+  callback `0x42017d34`, enabled query `0x4201bec6`. Manifest сохраняет прежние
+  записи; исторический time-cache report получил явную correction annotation.
+  Новый machine gate прошёл пять literal и восемь native случаев; теперь
+  проверяется точное количество SDK restart calls. Платформа — 26 сценариев,
+  включая callback при неизменном времени в simple/classic.
+- Failed `time-network-fifth` уточнил: SDK принял 2025, cache изменился, но LCD
+  ждёт minute event. `sixth` затем показал 165 отличающихся RGB bytes после
+  укороченной даты. Независимая retained-glyph модель совпала полностью;
+  native должен оставаться чистым. `seventh` выявил ошибочное предположение
+  теста о возврате server index на 0: SDK stop/init оставляет прежний индекс.
+  Маски отказа теперь действительно принуждают выбор требуемого сервера.
+- `eighth` прошёл 2024, retry/reconfigure, 2026, backward leap day, post-2038 и
+  preset/no-sync после reset, но RTC offset сравнивался с QEMU lifetime time.
+  Это ошибочный oracle: SDK использует guest SYSTIMER, RTC/HRT offset и system
+  correction. Восстановлена формула из pinned SDK/ELF; 26 MHz -> ticks*5/52.
+- Полный `time-network-ninth` прошёл обе прошивки, включая новую реальную
+  синхронизацию после reset. Последняя UTC разница native около -23 ms. QMP
+  только управляет внешним NTP fixture и кратко останавливает наблюдение; guest
+  RAM/код/время не подменяются. Все owned VM закрыты после проверок.
+- QEMU RISC-V SHA `bf98de89...33d44c`, Xtensa `f6a5f293...3abc35`: CYD boot/MMIO,
+  C3 OLED legacy/modular, C2/C3 shared SPI/I2C, ESP32 two-host SPI/SD isolation
+  и пять network unit cases прошли. QEMU source/docs — `b90e2131b8`, main push
+  проверен. Новые controls opt-in; defaults прежние.
+- Финальная LF-сборка сохранена: app 1,115,104 байт, свободно 420,896;
+  source SHA `9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019`.
+  Обязательные `machine_time_state`/`qemu.time_http` добавлены в runner/publisher/
+  verifier. Запущен полный `sntp-final-20261014`; пока это running, а не новая
+  опубликованная проверка. Исходный dump не менялся, физических прошивок не было.
+- Пока full suite исполняется, read-only RV32 probe рассмотрел следующий
+  non-ASCII участок. Шесть синтетических byte cases: ASCII и A1E6/A848 совпали;
+  UTF-8 «Тест»/«北京» совпали как 4/3 Celsius glyphs (248/186 lit pixels),
+  неизвестная пара попадает в Celsius fallback `0x4200aae0`. Native унаследовал
+  эту ошибку. Single trailing E6: stock Celsius 62 pixels, native blank.
+  `text-encoding-observation.json` хранит текущее app/ELF identity и scope;
+  production/test inputs не менялись. Исправление Unicode/byte truncation —
+  следующий отдельный участок после публикации SNTP; наблюдение не является
+  passing coverage gate.
+- Итог `sntp-final-20261014`: все включённые automatic gates прошли — native
+  3,021; platform 26 / 742,437; JS/integrity; timezone source 9; прежние RV32
+  renderer/control/classic/weather/calendar/JPEG и 36,404 timezone; time-state
+  5 factory + 8 native. Настоящий QEMU AP→STA/persistence/weather/field/SNTP и
+  пять сцен прошли. Шесть native UTC observations, max absolute около 33 ms.
+  Scene equality setup/simple/photo 100%, classic 98,69%, dial 98,83% — это
+  наблюдение, не критерий полной идентичности. Полное соответствие не доказано.
+- Публикация/повторная проверка архива прошла: app SHA `2a60eefc...35f672c`,
+  source `9402fd83...ace019`, ELF `ee74d566...93a394`; 47 test inputs. App
+  1,115,104, свободно 420,896; DIRAM 80,650, entry comments 151, markers 36.
+  Сохранены реальные native helper/worker instructions и bounded factory SDK
+  helpers; fences и guard проверены непосредственно по C ELF. Старые negative
+  JPEG/timezone/board records оставлены с историческими identities. Свежая
+  QEMU board compatibility опубликована отдельно в `ntp-board-validation.json`.
+- Код/сборка/инструменты — `6b7a52d3`. Перед коммитом точные staged Git bytes
+  сверены с passing report: 47 test inputs, 48 production inputs и 106 TZif.
+  Результаты и рабочий контекст сохраняются следующим отдельным коммитом;
+  посторонние `.karadio-*.patch`, `tmp/` и attachments не включаются.

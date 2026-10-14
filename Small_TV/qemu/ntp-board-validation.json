@@ -1,0 +1,154 @@
+{
+  "passed": true,
+  "qemu_source_commit": "b90e2131b8c54a6ecdb516b572bd6cbb43d104d8",
+  "qemu_build_identity": {
+    "base_commit_at_build": "320055a3c0cac0871929452b8be96518d7068a6e",
+    "compiled_changed_sources": {
+      "hw/net/esp32c2_clock.c": "1d18d3edbaa097c4bb824667f364a9044183150a6216b6d72bddd5379220655a",
+      "hw/net/esp32c3_wifi.c": "4d75ac5d31db357dae53699639876d044daa4ff3f378dbf95e53be6df8c0ff6c",
+      "include/hw/net/esp32c3_wifi.h": "f2b95419cd813fc7f25f545dbf7867cccba0e80dadcc88494755a000a6de5b25"
+    },
+    "note": "Executables were built with these source changes before their b90e2131b8 commit. Version metadata may retain the base revision; executable SHA identifies the tested program."
+  },
+  "scope": "Fresh legacy boot and modular QTest compatibility only; no physical board or full-program parity claim.",
+  "modular": {
+    "passed": true,
+    "checks": {
+      "profile_validation": {
+        "unsupported_bus": true,
+        "flash_gpio": true,
+        "conflicting_pins": true,
+        "always_selected_shared_bus": true,
+        "duplicate_id": true
+      },
+      "c2_shared_spi": {
+        "lcd_sd_transfer": true,
+        "topology": "shared_bus",
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "cs_isolation": true,
+        "wrong_sck_blocked": true,
+        "wrong_miso_blocked": true,
+        "sd_snapshot_unchanged": true
+      },
+      "c3_shared_spi": {
+        "lcd_sd_transfer": true,
+        "topology": "shared_bus",
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "cs_isolation": true,
+        "wrong_sck_blocked": true,
+        "wrong_miso_blocked": true,
+        "sd_snapshot_unchanged": true
+      },
+      "esp32_dual_spi": {
+        "lcd_sd_transfer": true,
+        "topology": "two_hosts",
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "cs_isolation": true,
+        "wrong_sck_blocked": true,
+        "wrong_miso_blocked": true,
+        "sd_snapshot_unchanged": true
+      },
+      "c2_i2c": {
+        "alternate_gpio_oled": true,
+        "wrong_scl_nack": true
+      },
+      "c3_i2c": {
+        "alternate_gpio_oled": true,
+        "wrong_scl_nack": true
+      },
+      "legacy_cyd_mmio": {
+        "legacy_flags": true,
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "sd_idle_high": true,
+        "snapshot_unchanged": true
+      }
+    },
+    "qemu_sha256": {
+      "riscv32": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
+      "xtensa": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35"
+    }
+  },
+  "legacy": {
+    "cyd": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "hardware_profile": null,
+      "machine": "esp32,st7789=on,sdspi=on",
+      "duration_seconds": 25,
+      "qemu_sha256": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35",
+      "firmware_sources": {
+        "C:\\Work\\QEMU-ESP32\\.cache\\esp-boards\\legacy-tests\\cyd\\flash.bin": "1050294c50955df7a4b09e5a44950601b1da11a299b3aea6a30031353103b8a8"
+      },
+      "pixel_sha256": "4afa1d8c3cb4023eef448bc04e36e1ae6b4568da007c43777935b32a1ea995d7",
+      "nonzero_bytes": 42240,
+      "lcd_area_nonzero_bytes": 0,
+      "cyd_boot_scope": "Boot, console and panic checks; LCD transactions are verified separately by QTest"
+    },
+    "c3_oled": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "hardware_profile": null,
+      "machine": "esp32c3",
+      "duration_seconds": 25,
+      "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
+      "firmware_sources": {
+        "C:\\Work\\QEMU-ESP32\\.cache\\esp-boards\\legacy-tests\\c3-oled\\flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+      },
+      "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
+      "nonzero_bytes": 44160,
+      "lcd_area_nonzero_bytes": 44160,
+      "cyd_boot_scope": null
+    },
+    "c3_modular": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "hardware_profile": {
+        "schema": 1,
+        "soc": "esp32c3",
+        "machine": "esp32c3,default-peripherals=off",
+        "arguments": [
+          "-device",
+          "{\"driver\":\"esp-i2c-module\",\"id\":\"oled\",\"bus\":\"/i2c0/i2c\",\"gpio\":\"/machine/gpio\",\"address\":60,\"model\":\"ssd1306\",\"scl\":6,\"sda\":5,\"properties\":\"{\\\"visible-width\\\":72,\\\"visible-height\\\":40,\\\"column-offset\\\":28,\\\"magnify\\\":4}\"}"
+        ],
+        "sd_images": [],
+        "profile": "C:\\Work\\QEMU-ESP32\\configs\\boards\\c3-oled.json"
+      },
+      "machine": "esp32c3",
+      "duration_seconds": 25,
+      "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
+      "firmware_sources": {
+        "C:\\Work\\QEMU-ESP32\\.cache\\esp-boards\\legacy-tests\\c3-oled\\flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+      },
+      "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
+      "nonzero_bytes": 44160,
+      "lcd_area_nonzero_bytes": 44160,
+      "cyd_boot_scope": null
+    },
+    "passed": true
+  }
+}
