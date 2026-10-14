@@ -11,6 +11,12 @@ also confirms MP3/ADTS frames during established playback and performs bounded
 recovery after lost alignment; see the October 14 implementation and physical
 checkpoint below. Earlier checkpoints describe the startup-only implementation.
 
+Latest diagnostic checkpoint: a [600-second AAC-LC HTTPS observation](ESP32C3_AAC_CONFIRM_PROBE_20261014.md)
+passes 7/7 checks with zero new steady output/decoder/allocation/watchdog faults.
+The recorder changes timing/layout, and the earlier quiet-candidate 27-drop
+failure was not reproduced. It and the FLAC/WebUI TCP timeout remain open;
+no production qualification or default change is inferred.
+
 The previous FFmpeg comparison identified false MP3 headers before AAC and false
 AAC headers before MP3 as unresolved failures. The new core rejects those
 candidates when their claimed next frame boundary is invalid, then searches for
