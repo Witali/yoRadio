@@ -26,8 +26,12 @@ faults. The three long local cases now pass. The subsequent strict HTTP
 format/EOF matrix passes **28/28**, including 22 files/hints and independently
 replayed natural EOF recovery before Stop (worst free-heap loss 12 bytes,
 no largest-block loss). All 683 health observations have zero decoder,
-allocation and watchdog faults. Network/HTTPS/OTA regressions and codec
-transitions still require exact-image evidence. Historical
+allocation and watchdog faults. The first network/WebSocket campaign passes
+12/14, retaining a TCP connect timeout and a dependent checkpoint error.
+After repairing checkpoint diagnostics, a full repeat passes 14/14 with exact
+settled heap recovery and zero decoder/allocation/watchdog faults. The TCP
+timeout's cause is still open. HTTPS/OTA regressions and codec transitions
+still require exact-image evidence. Historical
 short-window memory fluctuations are retained, not reclassified as fixed.
 This image does not enable the experimental router or
 early compact owner described in the candidate checkpoint below.

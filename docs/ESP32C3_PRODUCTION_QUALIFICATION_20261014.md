@@ -184,3 +184,43 @@ HTTPS, network errors or repeated OTA. Finite-file status and health checks
 do not establish analog continuity; the separate long-playback cases above
 contain the sustained output-counter evidence. Full qualification remains
 open, and previous weaker EOF reports are not retroactively upgraded.
+
+## Network faults and WebSocket follow-up
+
+The first network/WebSocket campaign on the same image and boot records
+**12/14 PASS**. Drop, stall, HTTP 503, redirect, jitter and two WebSocket
+reconnections pass their recorded gates. Independent inspection confirms
+that drop/stall actually played before their final three stopped samples:
+`stream read failed` after drop, `station unavailable` after stall. HTTP 503
+ends with `connection failed`. Recovery is a new explicit Stop/Play command
+to 22.05-kHz mono AAC; this does not prove automatic reconnect or an exact
+watchdog deadline.
+
+The subsequent idle observation fails on a TCP connect timeout: request 479,
+local port 62760, 5,003.6 ms. Four idle status samples were already collected;
+no HTTP response was received for the failing connection. The dependent
+heap-recovery check then raises `KeyError` because the checkpoint was never
+published. This second failure is a test dependency error, not evidence of
+a firmware leak. Final Stop/settings verification succeeds. All 226 health
+rows retain zero allocation, decoder and watchdog faults and the same boot.
+Minimum sampled heap/largest: **63,152 / 49,152 bytes**.
+
+The [original report and phase evidence](../tests/results/esp32c3-production-qualification-20261014/network-ws-01/audit.json)
+remain unchanged. A later live read finds the board stopped, with settled
+heap/largest **139,356 / 114,688 bytes**, 16 tasks and the same boot. This
+does not attribute or fix the intermittent connect timeout.
+
+The test now saves partial idle health plus one diagnostic snapshot, retains
+the original FAIL, and reports dependent recovery as BLOCKED when a complete
+checkpoint is missing. It requires fresh samples and a confirmed stopped
+state; old/partial samples cannot satisfy recovery. Six host regression tests
+pass. No firmware code, image or settings change was made.
+
+A complete repeat with the repaired checkpoint diagnostics passes **14/14**:
+[repeat evidence](../tests/results/esp32c3-production-qualification-20261014/network-ws-02/audit.json).
+All 233 health observations retain zero decoder/allocation/watchdog faults
+and the same boot. Minimum sampled heap/largest is **63,224 / 47,104 bytes**;
+settled median free/largest before and after both groups is exactly
+**139,356 / 114,688 bytes**, with 16 tasks. Settings remain unchanged and
+playback ends stopped. The timeout did not recur; this is a successful
+repeat, not a root-cause fix or grounds to remove the original failure.
