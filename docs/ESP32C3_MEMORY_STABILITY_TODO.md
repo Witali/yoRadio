@@ -30,8 +30,11 @@ allocation and watchdog faults. The first network/WebSocket campaign passes
 12/14, retaining a TCP connect timeout and a dependent checkpoint error.
 After repairing checkpoint diagnostics, a full repeat passes 14/14 with exact
 settled heap recovery and zero decoder/allocation/watchdog faults. The TCP
-timeout's cause is still open. HTTPS/OTA regressions and codec transitions
-still require exact-image evidence. Historical
+timeout's cause is still open. A subsequent **600-second public HE-AAC HTTPS**
+run passes 7/7: zero measured steady output/decoder/allocation/watchdog faults,
+24,232/9,216 B sampled free/largest minima, and settled recovery within 56 B
+with the largest block unchanged. Other HTTPS formats, OTA regressions and
+codec transitions still require exact-image evidence. Historical
 short-window memory fluctuations are retained, not reclassified as fixed.
 This image does not enable the experimental router or
 early compact owner described in the candidate checkpoint below.

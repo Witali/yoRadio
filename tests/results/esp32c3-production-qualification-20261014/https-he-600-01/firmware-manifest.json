@@ -1,0 +1,71 @@
+{
+  "source_commit": "7993c426bd54492fc906441b7c7c9b3d2d4570e7",
+  "embedded_version": "idf61-prod-20261013",
+  "image": {
+    "app_elf_sha256": "dc06c1a61da089e10f4d22855f05b7e0e4168e35b1810c40751472ccdad9cbe8",
+    "sha256": "f31ffba883053cf33d7f2e928bf529e5cbcac8f14a8aafd172e835a027684631",
+    "bytes": 1461376
+  },
+  "idf_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+  "profile": "build-production.ps1 -TestedRadioProfile",
+  "production_profile": true,
+  "production_qualified": false,
+  "hardware_tested": true,
+  "deep_sleep": false,
+  "flash_mode": "qio",
+  "flash_mhz": 80,
+  "nominal_pcm_output_hz": 48000,
+  "tls_rx_reserve_bytes": 17058,
+  "input_prefill_ms": 1000,
+  "laboratory_ca": false,
+  "console_and_logs": false,
+  "experimental_frame_router": false,
+  "experimental_early_sbr_owner": false,
+  "files": {
+    "app.bin": "f31ffba883053cf33d7f2e928bf529e5cbcac8f14a8aafd172e835a027684631",
+    "bootloader.bin": "a6c28b6052fe9ee9e051fd214084efd4befa00cde8a65ddacd832b1bf4783e2c",
+    "partition-table.bin": "f26d55c34a06f24ed917555cc4608a87f7c2300a6a71e20153d6dd43816e2f18",
+    "sdkconfig": "1c91a22c3959123c672b8f1247eee2c0e43914fb9fdd208d34c879ba0d70a056"
+  },
+  "sections": {
+    ".rtc.text": 0,
+    ".rtc.force_fast": 0,
+    ".rtc.data": 2688,
+    ".rtc.force_slow": 36,
+    ".iram0.text": 46344,
+    ".iram0.text_end": 248,
+    ".iram0.data": 0,
+    ".iram0.bss": 0,
+    ".iram0.end": 0,
+    ".dram0.dummy": 46592,
+    ".dram0.data": 11572,
+    ".dram0.bss": 44864,
+    ".flash.text": 1091514,
+    ".flash.rodata": 308596,
+    ".dram0.heap_start": 0
+  },
+  "qualification": "Build/link audits, OTA deployment, HE-AACv2 smoke, three 600-second FLAC/Vorbis/Opus runs and strict 28/28 HTTP format/EOF cases pass. Full network/HTTPS/OTA and codec-transition qualification remains open. Network/WebSocket: initial 12/14 with a TCP connect timeout and dependent checkpoint error retained; repeat 14/14 passes, timeout cause remains open.",
+  "installed_identity": {
+    "version": "idf61-prod-20261013",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "dc06c1a61da089e10f4d22855f05b7e0e4168e35b1810c40751472ccdad9cbe8"
+  },
+  "deployment_method": "WebUI app-only OTA",
+  "settings_preserved": {
+    "wifi_unchanged": true,
+    "playlist_unchanged": true,
+    "settings_unchanged": true
+  },
+  "evidence": "tests/results/esp32c3-production-deployment-20261013",
+  "report": "docs/ESP32C3_PRODUCTION_DEPLOYMENT_20261013.md",
+  "audio_codec_library_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+  "additional_evidence": [
+    "tests/results/esp32c3-production-qualification-20261014/flac-600-01/summary.json",
+    "tests/results/esp32c3-production-qualification-20261014/vorbis-600-01/summary.json",
+    "tests/results/esp32c3-production-qualification-20261014/opus-600-01/summary.json",
+    "tests/results/esp32c3-production-qualification-20261014/http-eof-01/audit.json",
+    "tests/results/esp32c3-production-qualification-20261014/network-ws-01/audit.json",
+    "tests/results/esp32c3-production-qualification-20261014/network-ws-02/audit.json"
+  ]
+}

@@ -224,3 +224,39 @@ settled median free/largest before and after both groups is exactly
 **139,356 / 114,688 bytes**, with 16 tasks. Settings remain unchanged and
 playback ends stopped. The timeout did not recur; this is a successful
 repeat, not a root-cause fix or grounds to remove the original failure.
+
+## Ten-minute public HE-AAC HTTPS playback
+
+The unchanged installed image next passes **7/7 checks** for 600 seconds of
+Groove Salad's 32-kbit AAC HTTPS stream, with the normal public CA bundle.
+FFprobe and the independent unquantized FAAD probe identify **HE-AAC,
+44.1 kHz stereo**, with SBR and no PS in the five-second reference capture.
+This is HE-AAC evidence, not HE-AACv2. Reference hashes and numeric decoder
+results are retained; broadcast audio and private settings are not archived.
+
+[Raw report and independent replay](../tests/results/esp32c3-production-qualification-20261014/https-he-600-01/audit.json)
+confirm the full observation and the following measurements:
+
+| Measurement | Result |
+| --- | --- |
+| First observed PCM | 2.288 s |
+| Health observations / steady playback samples | 1,107 / 1,058 |
+| Output observation after 15-second warmup | 584.318 s |
+| New steady completion-queue drops / write errors | 0 / 0 |
+| Decoder / allocation / watchdog faults | 0 / 0 / 0 |
+| Minimum sampled free heap / largest block | 24,232 / 9,216 B |
+| Firmware lifetime free-heap low-water after the run | 16,088 B |
+| Settled median free heap before / after | 139,356 / 139,300 B |
+| Settled largest block before / after | 114,688 / 114,688 B |
+| Tasks before / after | 16 / 16 |
+| Maximum paired status/health request duration | 221.382 ms |
+
+The boot identity remains `abb31264b4eb2085`; no traced HTTP request fails.
+Private settings remain equal and the board ends stopped. The 56-byte settled
+free-heap difference passes the existing recovery gate; it is not evidence
+of an accumulating leak. The firmware low-water is recorded separately from
+sampled active heap and is not an arbitrary release floor.
+
+This qualifies this source and observation on the exact image. Other HTTPS
+formats, codec transitions, repeated OTA and attribution of the earlier TCP
+timeout remain open. Output counters do not establish analog sound quality.
