@@ -79,6 +79,12 @@ pauses, measuring queued-input capacity and output counters; do not attribute
 the fault to the router or external network without that evidence.
 [Radio results and retained increments](ESP32C3_STREAM_CONFIRMATION_PLAN.md#continuous-confirmation-public-https-radio-2026-10-14).
 
+The [controlled HTTP A/B/A comparison](ESP32C3_AAC_DELIVERY_AB_20261014.md)
+passes 30/30 checks across production/candidate/production, including verified
+100/250/500-ms pauses in the same AAC-LC file. No output, decoder, allocation or
+watchdog faults occur; settled recovery passes. The public HTTPS output failure
+is not reproduced by this bounded local test and still requires investigation.
+
 ## Earlier experimental candidate checkpoint, 2026-10-13
 
 Candidate: `esp32c3-idf-6.1-r9a97-early-owner-public`, app SHA-256

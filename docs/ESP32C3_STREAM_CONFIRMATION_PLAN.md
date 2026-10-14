@@ -285,6 +285,12 @@ leases, so available queued audio is a concrete hypothesis to measure, not a
 confirmed diagnosis. Preserve both failures (TCP and output), keep production
 defaults unchanged, and do not relax the output acceptance gate to enable them.
 
+The subsequent [matched HTTP A/B/A comparison](ESP32C3_AAC_DELIVERY_AB_20261014.md)
+passes all three 80-second observations with identical synthetic AAC-LC bytes
+and verified 100/250/500-ms delivery pauses. Each run has zero new steady output
+faults and passes memory recovery. This bounds a successful local test; the
+public HTTPS failure remains unreproduced and unattributed.
+
 ### Queue storage implemented and tested (2026-10-13)
 
 `stream_staging.h` now owns up to four unpublished leases from the actual
