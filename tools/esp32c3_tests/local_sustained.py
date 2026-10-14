@@ -11,12 +11,30 @@ from urllib.parse import urlsplit
 
 from common import Report, check_playback, check_recovery_heap, fixtures, require, sha
 from ota import image_info, snapshot, verify_snapshot
-from production_health import (HealthBoard, capture_failure_snapshot, check_health,
+from production_health import (HealthBoard, capture_failure_snapshot, check_health, output_window,
                               check_decoder_health as decoder_health)
 from sustained_output import sustained_window, check_memory, check_output
 from run import Capture, Suite
 from trace_transport import TransportTrace
-from audio_test_server.server import Server
+from audio_test_server.server import Server, DeliveryPauses, pause_argument
+
+
+def check_delivery_pauses(events, fixture, schedule):
+    """A missed or materially stretched host pause cannot qualify a matched trial."""
+    require(len(events) == 1 and events[0].get('fixture') == fixture,
+            'Missing unique fixture delivery')
+    event = events[0]
+    expected = [dict(after_bytes=n, seconds=s) for n, s in schedule]
+    require(event.get('pacing_ratio') == 1.0 and event.get('pause_schedule') == expected,
+            'Delivery schedule differs from requested schedule')
+    rows = event.get('pauses', [])
+    require(len(rows) == len(schedule), 'Not all delivery pauses executed')
+    for row, (offset, seconds) in zip(rows, schedule):
+        require(row.get('after_bytes') == offset and row.get('requested_seconds') == seconds
+                and row.get('completed') is True, 'Missing or interrupted delivery pause')
+        elapsed = row.get('elapsed_seconds', float('nan'))
+        require(seconds - .005 <= elapsed <= seconds + .05, 'Host pause timing outside comparison tolerance')
+    return dict(pauses=rows, scope='Host write scheduling, not board receive timing')
 
 
 def main():
@@ -29,7 +47,12 @@ def main():
     p.add_argument('--fixture', required=True)
     p.add_argument('--seconds', type=int, default=600)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--delivery-pause', type=pause_argument, action='append', default=[],
+                   help='Pause before BYTE_OFFSET:SECONDS; repeat in increasing order')
+    p.add_argument('--send-buffer-bytes', type=int,
+                   help='Bound host socket buffering; actual size is recorded by the server')
     a = p.parse_args()
+    schedule = DeliveryPauses.validate(a.delivery_pause)
     require(45 <= a.seconds <= 600, 'Observation must be 45..600 seconds')
     require(not a.output.exists(), 'Preserve previous evidence')
     specs = fixtures(a.fixtures)
@@ -52,6 +75,8 @@ def main():
         fixture_manifest_sha256=sha(a.fixtures.read_bytes()),
         fixture={k: spec[k] for k in ('sha256', 'seconds', 'rate', 'channels', 'bits', 'codec')},
         fixture_name=a.fixture, observation_seconds=a.seconds, pacing_ratio=1.0,
+        delivery_pause_schedule=[dict(after_bytes=n, seconds=s) for n, s in schedule],
+        send_buffer_requested=a.send_buffer_bytes,
         scope='Finite paced HTTP playback, sampled format/output/faults and settled memory recovery; no acoustic or CPU measurement')
     last_checkpoint = 0
 
@@ -87,6 +112,8 @@ def main():
             states = suite.observe(a.seconds, a.fixture, interval=1)
             rows = b.health_samples[start:]
             steady, measured = sustained_window(states, rows, a.seconds)
+            # Retain the measured values even when the strict output gate fails.
+            report.data['measured_output_counters'] = output_window(measured)
             # Evaluate gates before Stop; every failure receives one last snapshot.
             gates = (
                 ('format', lambda: check_playback(states, spec,
@@ -111,13 +138,16 @@ def main():
 
     with (a.output/'request-phases.jsonl').open('x', encoding='utf-8') as trace:
         with TransportTrace(urlsplit(a.board).hostname, trace, capture_socket_ports=True):
-            with Server(a.host, a.port, specs, delivery_stats=True, pacing_ratio=1.0) as server:
+            with Server(a.host, a.port, specs, delivery_stats=True, pacing_ratio=1.0,
+                        delivery_pauses=schedule, send_buffer_bytes=a.send_buffer_bytes) as server:
                 try:
                     b.stop()
                     suite.observe(12, 'idle:initial', interval=1)
                     initial = b.health_samples[-3:]
                     report.data['idle'] = dict(initial=initial)
                     case('sustained-collection', observe)
+                    if schedule:
+                        case('delivery-pauses', lambda: check_delivery_pauses(server.events, a.fixture, schedule))
                     b.stop()
                     suite.observe(12, 'idle:final', interval=1)
                     report.data['idle']['final'] = b.health_samples[-3:]

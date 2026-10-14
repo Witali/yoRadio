@@ -1975,3 +1975,18 @@ loss and failure to recover remain errors. These checks do not measure analog
 continuity or CPU utilization and do not replace EOF or HTTPS tests.
 Run `python tests/test-sustained-output.py` and
 `python tests/test-production-health.py` for the shared evidence validators.
+
+For matched delivery-delay experiments, add repeated
+`--delivery-pause BYTE_OFFSET:SECONDS` arguments and optionally
+`--send-buffer-bytes 4096`. Offsets must increase and pauses are bounded to
+two seconds each. The server pauses before those exact encoded bytes, then
+returns to the original pacing schedule. The extra `delivery-pauses` gate
+requires every requested pause to complete within -5/+50 ms of its duration;
+missing, interrupted or materially stretched pauses invalidate the comparison.
+This records host socket writes, not the exact time bytes reach the device.
+Socket buffer sizes and measured output counters are retained even when the
+strict output gate fails. Use the same fixture bytes, schedule and observation
+length for both images; output failures must remain failures. A local HTTP
+comparison isolates delivery behavior but does not reproduce TLS memory use
+or prove the cause of an external station's outage. Host tests:
+`tests/test-local-sustained-pauses.py` and `tests/test-audio-server-pauses.py`.
