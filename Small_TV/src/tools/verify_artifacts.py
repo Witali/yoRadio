@@ -37,7 +37,7 @@ def main():
             'A full passing suite is required')
     groups = {row['name']: row['result'] for row in suite['groups'] if row['status'] == 'passed'} \
         if 'groups' in suite else suite
-    for name in ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'qemu'):
+    for name in ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'qemu'):
         require(name in groups and groups[name]['passed'], 'Missing passing group: ' + name)
     for item in suite['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
@@ -122,6 +122,14 @@ def main():
     report['machine_jpeg_report'] = '../qemu/parity/jpeg-validation.json'
     report['machine_jpeg_images'] = jpeg['decoded_images'] if 'decoded_images' in jpeg else len(jpeg['cases'])
     report['machine_jpeg_error_checks'] = jpeg['error_validation_checks'] if 'error_validation_checks' in jpeg else len(jpeg['errors'])
+    timezones = groups['machine_timezones']
+    require(timezones['complete_country_set'] and timezones['app_sha256']==app_sha and
+            timezones['source_sha256']==manifest['source_sha256'], 'Timezone gate tested different inputs')
+    require(timezones['timezone_manifest_sha256']==hashlib.sha256(
+        (ROOT/'resources/timezones/manifest.json').read_bytes()).hexdigest(), 'Timezone source data changed')
+    report['machine_timezone_report'] = '../qemu/parity/timezone-validation.json'
+    report['machine_timezone_countries'] = timezones['countries'] if isinstance(timezones['countries'],int) else len(timezones['countries'])
+    report['machine_timezone_comparisons'] = timezones['comparisons']
     report['qemu_field_report'] = '../qemu/field-http-validation.json'
     report['work_status'] = 'Reconstructed firmware; confirmed factory corrections are marked and tested'
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

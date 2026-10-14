@@ -195,8 +195,11 @@ min/max retain double precision. Text is limited to 15 bytes and wind bearings
 use the original sixteen sectors and literal hyphenated direction labels.
 The QEMU weather fixture verifies real DNS/TCP/HTTP, cache values and four LCD
 regions for positive/negative responses; HTTP 503 JSON is rejected despite the
-factory parser accepting it. The recovered 109-entry country/POSIX-TZ table
-sets local time; the weather UTC offset does not replace it. Requests retry
+factory parser accepting it. The recovered 109 country keys retain their generic
+timezone defaults; [pinned IANA rules](resources/timezones/README.md) correct the
+factory's implicit DST strings and outdated offsets. The weather UTC offset
+does not replace this selection. [Timezone checks](../qemu/parity/timezone-checks.md)
+execute actual RV32 code and Newlib against independent TZif conversion. Requests retry
 after about 3.1 seconds and successful updates repeat after 1801 timer seconds
 (about 1981.1 real seconds at the recovered 11-tick cadence).
 

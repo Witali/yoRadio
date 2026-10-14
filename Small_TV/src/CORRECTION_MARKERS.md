@@ -48,6 +48,7 @@
 | `captive_dns_reply` | Проверка границ DNS-пакета |
 | `web_settings_get`, `read_brightness`, `web_settings_post`, `web_scan` | Формат ответа, диапазон яркости, сохранение Wi-Fi и пустой результат сканирования |
 | `fetch_weather` | Отклонение ответа с ошибочным HTTP-статусом вместо публикации его JSON как погоды |
+| `timezone_utc_offset`, `time_sync_task`, `factory_local_time` | Явные переходы IANA вместо неявных американских DST-правил; обновление смещения при переходе и безопасная обработка ошибки календаря |
 | `jpeg_decode_unlocked` | Восстановление byte-clipped IDCT оригинала; очистка только области изображения после ошибки декодирования JPEG, без изменения экрана при проверке и ошибке подготовки |
 | `photo_upload_active_unlocked`, `photo_upload_start`, `photo_upload_chunk`, `photo_upload_finish`, `photo_headers_safe` | Завершённость, границы и порядок загрузки, тайм-аут и требования к приватности фотографии |
 

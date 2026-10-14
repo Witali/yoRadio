@@ -1,7 +1,7 @@
 #include "services.h"
 #include "network.h"
 #include "settings.h"
-#include "country_timezones.h"
+#include "timezones.h"
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,10 +13,13 @@
 
 static void time_sync_task(void *unused)
 {
-    /* Apply the factory country timezone and manage the three SNTP servers. */
+    /* Apply country time rules and manage the three factory SNTP servers.
+     * FIXED_FACTORY: derive the actual offset instead of implicit US DST rules
+     * in 0x42010a06. Revisit the offset each second, including while offline. */
 
     (void)unused;
     char configured_ntp[65] = "", configured_country[3] = "", configured_city[65] = "";
+    char configured_zone[32] = "";
     bool timezone_ready = false, sntp_started = false;
     for (;;)
     {
@@ -30,19 +33,23 @@ static void time_sync_task(void *unused)
             strcpy(configured_city, s.city);
             timezone_ready = false;
         }
-        if (!timezone_ready)
+        int32_t offset;
+        bool daylight;
+        if (timezone_utc_offset(s.country, time(NULL), &offset, &daylight))
         {
-            /* Factory selects its country/POSIX table, not the weather UTC offset. */
-            const char *zone = "GMT0BST";
-            for (unsigned i = 0; i < sizeof(country_timezones) / sizeof(country_timezones[0]); ++i)
-                if (!strcmp(s.country, country_timezones[i].country))
-                {
-                    zone = country_timezones[i].tz;
-                    break;
-                }
-            setenv("TZ", zone, 1);
-            tzset();
-            timezone_ready = true;
+            /* POSIX offsets have the opposite sign to UTC offsets. This fixed
+             * TZ keeps libc consumers consistent, including irregular transitions;
+             * the display computes its own calendar from the same immutable rules. */
+            unsigned magnitude = (unsigned)(offset < 0 ? -offset : offset);
+            char zone[32];
+            snprintf(zone, sizeof(zone), "UTC%c%u:%02u:%02u", offset < 0 ? '+' : '-',
+                     magnitude/3600, magnitude/60%60, magnitude%60);
+            if ((!timezone_ready || strcmp(zone, configured_zone)) && !setenv("TZ", zone, 1))
+            {
+                tzset();
+                strcpy(configured_zone, zone);
+                timezone_ready = true;
+            }
         }
         if (network_connected() && (!sntp_started || strcmp(configured_ntp, s.ntp)))
         {

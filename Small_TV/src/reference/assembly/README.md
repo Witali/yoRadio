@@ -62,6 +62,14 @@ unchanged-second year jumps and leap-year day-number collisions.
 images, errors and clipped placement. The bounded helper excerpt ends after
 the actual `jd_decomp` return at `0x42012090`; the next helper starts at `0x42012092`.
 
+[Timezone execution](../../../qemu/parity/timezone-checks.md) compares real Newlib
+and native country conversion against independent pinned IANA TZif data.
+`helper_at_420aa5ce.asm` includes the time/localtime/tzcalc/tzset code through its
+final parser branch at `0x420aaf5e`, ending before the next helper at `0x420aaf60`.
+The fallback at `0x420aaebe..0x420aaedc` installs M3.2.0/M11.1.0 US defaults when
+the recovered country string omits recurrence rules. The factory country table
+and `0x42010a06`/`0x42010b70` remain unchanged reference evidence.
+
 `../../tools/disassemble_factory.py` reproduces exports with an explicit local
 objdump path and a list of addresses or bounded IROM ranges.
 `../../tools/assist_c_port.py` is an unfinished library draft for the next stage:

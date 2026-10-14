@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import struct
 import zlib
+from prepare_timezones import generate_timezones
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT.parent / "assets"
@@ -176,11 +177,12 @@ def main():
     generate_font(args.output)
     generate_factory_bitmaps(args.output)
     generate_pages(args.output)
+    generate_timezones(args.output)
     compiled = sorted((ROOT / "app").rglob("*.c")) + sorted((ROOT / "app").rglob("*.h"))
     compiled += sorted((ROOT / "third_party").rglob("*.c")) + sorted((ROOT / "third_party").rglob("*.h"))
     compiled += [ROOT / "CMakeLists.txt", ROOT / "app/CMakeLists.txt", ROOT / "sdkconfig.defaults", ROOT / "partitions.csv"]
     records = [{"file":str(path.relative_to(ROOT)).replace("\\","/"), "sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for path in compiled]
-    for name in ("web_pages.c", "font6x12.h", "factory_bitmaps.c", "factory_bitmaps.h", "asset_defaults.h"):
+    for name in ("web_pages.c", "font6x12.h", "factory_bitmaps.c", "factory_bitmaps.h", "asset_defaults.h", "timezone_data.h"):
         records.append({"file":"generated/"+name,"sha256":hashlib.sha256((args.output/name).read_bytes()).hexdigest()})
     canonical = json.dumps(records, separators=(",",":"),sort_keys=True).encode("utf-8")
     (args.output/"source-manifest.json").write_text(json.dumps({"aggregate_sha256":hashlib.sha256(canonical).hexdigest(),"files":records},indent=2)+"\n",encoding="utf-8",newline="\n")

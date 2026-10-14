@@ -85,6 +85,11 @@ struct tm *test_localtime_r(const time_t *now, struct tm *local)
     *local = fake_local;
     return local;
 }
+struct tm *test_gmtime_r(const time_t *now, struct tm *local)
+{
+    /* Run the host CRT's real UTC calendar conversion; never substitute timezone logic. */
+    return _gmtime64_s(local, now) ? NULL : local;
+}
 esp_err_t settings_flush(void)
 {
     ++flushes;
@@ -622,7 +627,7 @@ static void time_scenario(void)
     ++time_step;
     if (time_step == 1)
     {
-        CHECK(!strcmp(timezone, "GMT0BST") && sntp_inits == 0);
+        CHECK(!strcmp(timezone, "UTC-1:00:00") && sntp_inits == 0);
         got_ip();
         preferences.ntp[0] = 0;
     }
@@ -635,7 +640,7 @@ static void time_scenario(void)
     }
     if (time_step == 3)
     {
-        CHECK(!strcmp(timezone, "CET-1CEST") && sntp_inits == 1 && timezone_updates == 2);
+        CHECK(!strcmp(timezone, "UTC-2:00:00") && sntp_inits == 1 && timezone_updates == 2);
         strcpy(preferences.ntp, "fixture.invalid");
         sntp_result = ESP_FAIL;
     }
@@ -657,7 +662,7 @@ static void time_scenario(void)
     }
     if (time_step == 7)
     {
-        CHECK(!strcmp(timezone, "GMT0BST") && timezone_updates == 3 && sntp_inits == 3);
+        CHECK(!strcmp(timezone, "UTC-1:00:00") && timezone_updates == 3 && sntp_inits == 3);
         longjmp(blocked, 1);
     }
 }
@@ -670,6 +675,37 @@ static void test_time_worker(void)
     services_start();
     CHECK(!strcmp(tasks[1].name, "weather_http") && !strcmp(tasks[2].name, "time_sync"));
     run_task("time_sync", time_scenario);
+}
+
+static const struct {time_t epoch; const char *tz;} time_boundaries[] = {
+    {1772931600, "UTC-0:00:00"}, /* GB must not use the US March 8 transition. */
+    {1774745999, "UTC-0:00:00"},
+    {1774746000, "UTC-1:00:00"},
+    {1792889999, "UTC-1:00:00"},
+    {1792890000, "UTC-0:00:00"},
+    {1774746000, "UTC-1:00:00"}, /* Backward epoch corrections revisit the rules. */
+    {1774745999, "UTC-0:00:00"},
+};
+static void time_boundary_scenario(void)
+{
+    /* Observe actual worker TZ changes while offline, without changing country/city. */
+    CHECK(!strcmp(timezone, time_boundaries[time_step].tz));
+    CHECK(sntp_inits == 0);
+    if (++time_step == sizeof(time_boundaries)/sizeof(time_boundaries[0]))
+    {
+        CHECK(timezone_updates == 5);
+        longjmp(blocked, 1);
+    }
+    fake_time = time_boundaries[time_step].epoch;
+}
+static void test_time_zone_boundaries(void)
+{
+    /* Verify civil-time transitions do not require a new location or network connection. */
+    station_start();
+    strcpy(preferences.country, "GB");
+    fake_time = time_boundaries[0].epoch;
+    services_start();
+    run_task("time_sync", time_boundary_scenario);
 }
 
 static esp_err_t driver_result = ESP_OK;
@@ -1403,6 +1439,7 @@ static void test_clock_calendar(unsigned theme)
     preferences.date_format=2;
     fake_local=(struct tm){.tm_year=125,.tm_mon=0,.tm_mday=1,.tm_yday=0,
                           .tm_wday=3,.tm_hour=18,.tm_min=14,.tm_sec=7};
+    fake_time=_mkgmtime64(&fake_local)-8*3600; /* CN fixture and epoch must describe the same date. */
     CHECK(clock_ui_timer_init()==ESP_OK);
     CHECK(network_init()==ESP_OK);
     got_ip();
@@ -1425,6 +1462,61 @@ static void test_clock_calendar_simple(void)
 {
     /* Run the simple date-jump task scenario in its own fresh process. */
     test_clock_calendar(1);
+}
+
+static void clock_timezone_scenario(void)
+{
+    /* Compare the real loop's incremental output with independently specified local dates. */
+    static const struct {int hour, minute, second, daylight;} expected[] = {
+        {0,59,59,0}, {2,0,59,1}, {3,0,59,1}, {1,59,59,0}};
+    struct tm local = {.tm_year=126,.tm_mon=2,.tm_mday=29,.tm_yday=87,.tm_wday=0,
+                       .tm_hour=expected[clock_step].hour,.tm_min=expected[clock_step].minute,
+                       .tm_sec=expected[clock_step].second,.tm_isdst=expected[clock_step].daylight};
+    static uint16_t incremental[240*240];
+    memcpy(incremental, panel, sizeof(panel));
+    weather_snapshot_t current;
+    weather_snapshot(&current);
+    char address[20];
+    network_address(address, sizeof(address));
+    display_fill(0,0,240,240,0);
+    if (preferences.theme==0)
+        factory_draw_classic(&preferences,&local,&current,0,0,true,true);
+    else
+        factory_draw_simple(&preferences,&local,address,true,true,true);
+    CHECK(!memcmp(incremental,panel,sizeof(panel)));
+    if (++clock_step == 4)
+        longjmp(blocked,1);
+    if (clock_step == 1) fake_time = 1774746059;
+    if (clock_step == 2) {strcpy(preferences.country,"HU"); ++preferences_generation;}
+    if (clock_step == 3) fake_time = 1774745999;
+}
+static void test_clock_timezone(unsigned theme)
+{
+    /* Observe DST, a same-epoch country change and backward correction with unchanged seconds.
+     * The colon retains the factory timer phase; these jumps do not raise its second event. */
+    preferences.theme=theme;
+    strcpy(preferences.country,"GB");
+    fake_time=1774745999;
+    CHECK(clock_ui_timer_init()==ESP_OK);
+    CHECK(network_init()==ESP_OK);
+    got_ip();
+    weather_start();
+    strcpy(preferences.weather_key,"fixture-key");
+    run_task("weather_http",seed_weather);
+    CHECK(display_init()==ESP_OK);
+    clock_ui_start();
+    run_task("clock_display",clock_timezone_scenario);
+    CHECK(clock_step==4);
+}
+static void test_clock_timezone_classic(void)
+{
+    /* Run the classic timezone-jump scenario in a fresh process. */
+    test_clock_timezone(0);
+}
+static void test_clock_timezone_simple(void)
+{
+    /* Run the simple timezone-jump scenario in a fresh process. */
+    test_clock_timezone(1);
 }
 
 int main(int argc, char **argv)
@@ -1452,6 +1544,7 @@ int main(int argc, char **argv)
                  {"wifi_task_failure", test_wifi_task_failure},
                  {"weather_worker", test_weather_worker},
                  {"time_worker", test_time_worker},
+                 {"time_zone_boundaries", test_time_zone_boundaries},
                  {"backlight_schedule", test_backlight},
                  {"display_protocol_clipping", test_display},
                  {"ui_transitions", test_ui_transitions},
@@ -1462,7 +1555,9 @@ int main(int argc, char **argv)
                  {"clock_animation_selection", test_clock_animation_selection},
                  {"clock_text_scroll", test_clock_text_scroll},
                  {"clock_calendar_classic", test_clock_calendar_classic},
-                 {"clock_calendar_simple", test_clock_calendar_simple}};
+                 {"clock_calendar_simple", test_clock_calendar_simple},
+                 {"clock_timezone_classic", test_clock_timezone_classic},
+                 {"clock_timezone_simple", test_clock_timezone_simple}};
     bool found = false;
     for (unsigned i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
         if (!strcmp(argv[1], cases[i].name))

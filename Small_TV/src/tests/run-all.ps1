@@ -90,6 +90,14 @@ else {
         if($LASTEXITCODE){throw "JPEG decoder/error machine comparison failed"}
     } $jpegReport
 }
+if ($SkipMachine) {$groups.Add(@{name="machine_timezones";status="not_run";reason="Explicit -SkipMachine"})}
+else {
+    $timezoneReport=Join-Path $OutputDirectory "timezones.json"
+    Invoke-TestGroup "machine_timezones" {
+        & $PythonPath (Join-Path $PSScriptRoot "timezone_oracle.py") --output $timezoneReport
+        if($LASTEXITCODE){throw "Country timezone/libc machine comparison failed"}
+    } $timezoneReport
+}
 if ($SkipQemu) {$groups.Add(@{name="qemu";status="not_run";reason="Explicit -SkipQemu"})}
 else {
     $qemuFolder=Join-Path $OutputDirectory "qemu"

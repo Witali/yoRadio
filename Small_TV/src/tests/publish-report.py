@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -36,9 +36,12 @@ def main():
     weather = groups['machine_weather']['result']
     calendar = groups['machine_calendar']['result']
     jpeg = groups['machine_jpeg']['result']
+    timezones = groups['machine_timezones']['result']
+    if not timezones['complete_country_set'] or timezones['legacy_only'] or len(timezones['countries']) != 109:
+        raise ValueError('Timezone gate did not execute every recovered country key')
     if not jpeg['complete_asset_set'] or len(jpeg['cases']) != 107:
         raise ValueError('JPEG gate did not execute every public image')
-    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, jpeg, groups['integrity']['result'])):
+    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, jpeg, timezones, groups['integrity']['result'])):
         raise ValueError('Groups tested different applications')
     qemu = groups['qemu']['result']
     if not qemu['http_initial_setup']['passed']:
@@ -96,6 +99,12 @@ def main():
     summary['machine_jpeg']['compared_pixels'] = sum(row['compared_pixels'] for row in jpeg['cases'])
     summary['machine_jpeg']['error_validation_checks'] = len(jpeg['errors'])
     summary['machine_jpeg']['placement_checks'] = len(jpeg['placements'])
+    summary['machine_timezones'] = {key:timezones[key] for key in
+        ('passed','app_sha256','source_sha256','factory_elf_sha256','native_elf_sha256',
+         'complete_country_set','iana_version','timezone_manifest_sha256','comparisons',
+         'factory_literal_differences','approved_fixes','scope')}
+    summary['machine_timezones']['countries'] = len(timezones['countries'])
+    summary['machine_timezones']['invalid_inputs'] = len(timezones['invalid_inputs'])
     summary['qemu'] = {'passed': qemu['passed'], 'qemu_sha256': qemu['qemu_sha256'],
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
                        'helper_sha256': qemu['helper_sha256'],

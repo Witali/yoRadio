@@ -6,6 +6,7 @@
 #include "media.h"
 #include "network.h"
 #include "services.h"
+#include "timezones.h"
 #include <time.h>
 #include "esp_attr.h"
 #include "driver/gptimer.h"
@@ -75,13 +76,14 @@ esp_err_t clock_ui_timer_init(void)
     return result;
 }
 
-static struct tm factory_local_time(time_t now, bool *valid)
+static struct tm factory_local_time(const char *country, time_t now, bool *valid)
 {
-    /* Return local time, retaining the original preset date until SNTP is valid. */
+    /* Return the selected country's calendar, retaining the original year gate.
+     * FIXED_FACTORY: use explicit IANA transitions instead of Newlib's implicit
+     * US rules, and safely retain the preset if calendar conversion fails. */
 
     struct tm local;
-    localtime_r(&now, &local);
-    *valid = local.tm_year >= 125;
+    *valid = timezone_local_time(country, now, &local) && local.tm_year >= 125;
     if (!*valid)
         local = (struct tm){.tm_year = 125,
                             .tm_mon = 8,
@@ -123,7 +125,7 @@ static void clock_task(void *unused)
         char address[20];
         network_address(address, sizeof(address));
         time_t now = time(NULL);
-        struct tm local = factory_local_time(now, &valid);
+        struct tm local = factory_local_time(settings.country, now, &valid);
         uint32_t current_generation = settings_generation();
         bool changed = current_generation != generation || weather.generation != weather_generation;
         /* 0x42008e56 retries unsuccessful weather after 30 completed main-loop
