@@ -68,6 +68,17 @@ All 750 health samples show zero allocation/decoder/watchdog faults and settled
 recovery passes, but the TCP cause and interrupted observation remain open.
 [Retained failure and reference-based checks](ESP32C3_STREAM_CONFIRMATION_PLAN.md#continuous-confirmation-public-https-files-2026-10-14).
 
+The subsequent five-source public HTTPS radio campaign passes **10/11**.
+HE-AAC 64/32/16-kbit sources and MP3 256-kbit pass; AAC-LC 128-kbit records
+**27 steady completion-queue drops** near observation second 41 while its
+format stays correct. All 575 health samples retain zero allocation, decoder
+and watchdog faults; settled memory recovers. This output failure is distinct
+from the TCP timeout and blocks default enablement. Next perform matched
+baseline/candidate tests with identical AAC bytes and controlled delivery
+pauses, measuring queued-input capacity and output counters; do not attribute
+the fault to the router or external network without that evidence.
+[Radio results and retained increments](ESP32C3_STREAM_CONFIRMATION_PLAN.md#continuous-confirmation-public-https-radio-2026-10-14).
+
 ## Earlier experimental candidate checkpoint, 2026-10-13
 
 Candidate: `esp32c3-idf-6.1-r9a97-early-owner-public`, app SHA-256

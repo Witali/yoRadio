@@ -243,6 +243,48 @@ after the failed file group; it requires separate evidence.
 preserve the failure and successful controls. No production qualification or
 TCP fix is claimed.
 
+### Continuous-confirmation public HTTPS radio, 2026-10-14
+
+A separate campaign on the unchanged candidate records **10/11 checks passed**.
+Each of five SomaFM sources is observed for 60 seconds with independent
+FFprobe/FAAD format references. All five retain the expected decoded format;
+four pass the complete playback/output/memory gate:
+
+| Source | Reference output | Steady completion drops / write errors | Result |
+| --- | --- | ---: | --- |
+| 128-kbit AAC | AAC-LC, 44.1 kHz stereo | **27 / 0** | FAIL |
+| 64-kbit AAC | HE-AAC, 44.1 kHz stereo | 0 / 0 | PASS |
+| 32-kbit AAC | HE-AAC, 44.1 kHz stereo | 0 / 0 | PASS |
+| 16-kbit AAC | HE-AAC, 32 kHz; mono source, stereo PCM | 0 / 0 | PASS |
+| 256-kbit MP3 | MP3, 44.1 kHz stereo | 0 / 0 | PASS |
+
+The 16-kbit source has SBR without PS; this is not HTTPS HE-AACv2 coverage.
+Independent replay requires a fully matching decoded-format sample within
+15 seconds, rather than treating the initial `audio=true` family label as PCM.
+All five first matching observations occur at 3.33–3.40 seconds.
+
+The AAC-LC output counter increases by 5 and then 22 in the two sampled
+intervals from **40.708 to 41.818 seconds** after observation starts. Free heap
+at those endpoints is 64,376 and 68,996 B; the largest block is 36,864 B.
+There are no allocation, decoder or watchdog faults. The format remains correct
+and `audio=true` throughout the minute. These are lost completion notifications,
+not a measured count or duration of audible gaps. Their cause is unproven;
+neither network jitter nor continuous confirmation can yet be blamed or cleared.
+
+All 575 health observations retain one boot. Sampled free/largest minima are
+24,400 / 9,216 B. Settled free-heap median changes from 139,360 to 139,352 B;
+the largest block remains 110,592 B and task count remains 16. No traced WebUI
+request fails in this campaign. Original production firmware and private
+settings are verified restored, stopped.
+
+[Raw observations, references, exact counter increments and independent replay](../tests/results/esp32c3-stream-confirm-continuous-20261014/https-radio-01/audit.json)
+retain the failed AAC-LC case. Next compare baseline and candidate using the
+same encoded AAC-LC bytes and deterministic delivery pauses, then investigate
+TLS-specific behavior as needed. Continuous staging retains unpublished input
+leases, so available queued audio is a concrete hypothesis to measure, not a
+confirmed diagnosis. Preserve both failures (TCP and output), keep production
+defaults unchanged, and do not relax the output acceptance gate to enable them.
+
 ### Queue storage implemented and tested (2026-10-13)
 
 `stream_staging.h` now owns up to four unpublished leases from the actual
