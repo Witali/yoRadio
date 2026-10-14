@@ -70,6 +70,15 @@ The fallback at `0x420aaebe..0x420aaedc` installs M3.2.0/M11.1.0 US defaults whe
 the recovered country string omits recurrence rules. The factory country table
 and `0x42010a06`/`0x42010b70` remain unchanged reference evidence.
 
+The bounded SNTP excerpts distinguish the SDK restart wrapper `0x42017ea0`
+from its enabled query `0x4201bec6`. The wrapper schedules callback `0x42017d34`,
+which stops and initializes the client. Each excerpt ends immediately after its
+actual return/tail jump. The application's `0x42010c3e` calls this restart every
+21 invalid-year updates; it is not a passive status query. Historical
+`time-cache-observation.json` keeps its old adapter labels with an explicit
+correction annotation. `tests/time_state_oracle.py` separately records actual
+restart-boundary calls; `tests/time_qemu.py` checks the real packet/fallback path.
+
 `../../tools/disassemble_factory.py` reproduces exports with an explicit local
 objdump path and a list of addresses or bounded IROM ranges.
 `../../tools/assist_c_port.py` is an unfinished library draft for the next stage:

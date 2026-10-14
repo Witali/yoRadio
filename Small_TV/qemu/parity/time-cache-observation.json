@@ -101,5 +101,12 @@
   "scope": "Exploratory actual factory RV32 observation, not a passing gate or SNTP transport test. Only time(), SNTP-enabled query and logging SDK boundaries are adapted; calendar conversion and update/cache/retry instructions execute literally. All epochs, cache and TZ are synthetic.",
   "utc_offset_fixture": "CST-8",
   "factory_update_entry": "0x42010b70",
-  "factory_notification_entry": "0x420109de"
+  "factory_notification_entry": "0x420109de",
+  "boundary_annotation_correction": {
+    "address": "0x42017ea0",
+    "original_adapter_label": "sdk-sntp-enabled",
+    "actual_function": "sntp_restart",
+    "reason": "It calls sntp_enabled at 0x4201bec6, then schedules the stop/init callback at 0x42017d34 and returns whether restart was possible.",
+    "scope": "Historical adapter names/cases are retained. Their bool result alone did not simulate asynchronous restarts or establish transport behavior. Superseded by the time-state and real-UDP gates."
+  }
 }

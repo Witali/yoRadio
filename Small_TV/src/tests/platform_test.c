@@ -599,6 +599,7 @@ static void test_weather_worker(void)
 static unsigned sntp_inits, sntp_deinits, timezone_updates, time_step;
 static esp_err_t sntp_result = ESP_OK;
 static char timezone[96], servers[3][65];
+static esp_sntp_time_cb_t sntp_callback;
 int test_setenv(const char *name, const char *value, int overwrite)
 {
     assert(!strcmp(name, "TZ") && overwrite == 1);
@@ -612,6 +613,8 @@ void test_tzset(void)
 esp_err_t esp_netif_sntp_init(const esp_sntp_config_t *config)
 {
     assert(config->num_servers == 3 && !config->wait_for_sync);
+    CHECK(config->sync_cb != NULL);
+    sntp_callback = config->sync_cb;
     for (unsigned i = 0; i < 3; ++i)
         strcpy(servers[i], config->servers[i]);
     ++sntp_inits;
@@ -627,12 +630,17 @@ static void time_scenario(void)
     ++time_step;
     if (time_step == 1)
     {
+        CHECK(!services_time_synced());
         CHECK(!strcmp(timezone, "UTC-1:00:00") && sntp_inits == 0);
         got_ip();
         preferences.ntp[0] = 0;
     }
     if (time_step == 2)
     {
+        CHECK(!services_time_synced()); /* Initializing SNTP alone is not synchronization. */
+        struct timeval event = {.tv_sec=fake_time};
+        sntp_callback(&event);
+        CHECK(services_time_synced());
         CHECK(sntp_inits == 1 && !strcmp(servers[0], "ntp1.aliyun.com") &&
               !strcmp(servers[1], "cn.pool.ntp.org") && !strcmp(servers[2], "pool.ntp.org"));
         strcpy(preferences.country, "HU");
@@ -646,6 +654,7 @@ static void time_scenario(void)
     }
     if (time_step == 4)
     {
+        CHECK(services_time_synced()); /* Failed client reconfiguration must retain valid time. */
         CHECK(sntp_inits == 2 && sntp_deinits == 1 && !strcmp(servers[1], "fixture.invalid"));
         sntp_result = ESP_OK;
     }
@@ -657,6 +666,7 @@ static void time_scenario(void)
     }
     if (time_step == 6)
     {
+        CHECK(services_time_synced()); /* Disconnect does not invalidate a running clock. */
         CHECK(sntp_inits == 3);
         strcpy(preferences.country, "ZZ");
     }
@@ -1204,6 +1214,21 @@ static void seed_weather(void)
         longjmp(blocked, 1);
     weather_request_update();
 }
+static void stop_time_worker_once(void)
+{
+    /* Stop only after the actual worker has configured its SDK callback. */
+    longjmp(blocked, 1);
+}
+static void start_synced_clock_services(void)
+{
+    /* Start production services and deliver the SDK notification after successful init. */
+    services_start();
+    run_task("time_sync", stop_time_worker_once);
+    CHECK(sntp_callback && sntp_result == ESP_OK && !services_time_synced());
+    struct timeval event = {.tv_sec=fake_time};
+    sntp_callback(&event);
+    CHECK(services_time_synced());
+}
 static void clock_scenario(void)
 {
     /* Advance the real clock task through startup, each theme, blocked upload and weather event. */
@@ -1288,7 +1313,7 @@ static void test_clock_coordinator(void)
           alarm_config.flags.auto_reload_on_alarm);
     CHECK(network_init() == ESP_OK);
     got_ip();
-    weather_start();
+    start_synced_clock_services();
     strcpy(preferences.weather_key, "fixture-key");
     run_task("weather_http", seed_weather);
     CHECK(display_init() == ESP_OK);
@@ -1347,7 +1372,7 @@ static void test_clock_animation_selection(void)
     CHECK(clock_ui_timer_init() == ESP_OK);
     CHECK(network_init() == ESP_OK);
     got_ip();
-    weather_start();
+    start_synced_clock_services();
     strcpy(preferences.weather_key, "fixture-key");
     run_task("weather_http", seed_weather);
     CHECK(display_init() == ESP_OK);
@@ -1395,7 +1420,7 @@ static void test_clock_text_scroll(void)
     CHECK(clock_ui_timer_init() == ESP_OK);
     CHECK(network_init() == ESP_OK);
     got_ip();
-    weather_start();
+    start_synced_clock_services();
     strcpy(preferences.weather_key,"fixture-key");
     run_task("weather_http",seed_weather);
     CHECK(display_init() == ESP_OK);
@@ -1443,7 +1468,7 @@ static void test_clock_calendar(unsigned theme)
     CHECK(clock_ui_timer_init()==ESP_OK);
     CHECK(network_init()==ESP_OK);
     got_ip();
-    weather_start();
+    start_synced_clock_services();
     strcpy(preferences.weather_key,"fixture-key");
     run_task("weather_http",seed_weather);
     CHECK(display_init()==ESP_OK);
@@ -1500,7 +1525,7 @@ static void test_clock_timezone(unsigned theme)
     CHECK(clock_ui_timer_init()==ESP_OK);
     CHECK(network_init()==ESP_OK);
     got_ip();
-    weather_start();
+    start_synced_clock_services();
     strcpy(preferences.weather_key,"fixture-key");
     run_task("weather_http",seed_weather);
     CHECK(display_init()==ESP_OK);
@@ -1517,6 +1542,90 @@ static void test_clock_timezone_simple(void)
 {
     /* Run the simple timezone-jump scenario in a fresh process. */
     test_clock_timezone(1);
+}
+
+static void clock_sync_scenario(void)
+{
+    /* Observe preset, notification and offline persistence through the actual display task. */
+    struct tm expected = clock_step < 2
+        ? (struct tm){.tm_year=125,.tm_mon=8,.tm_mday=19,.tm_hour=17,.tm_min=4,.tm_sec=40,.tm_wday=5}
+        : (struct tm){.tm_year=124,.tm_mon=1,.tm_mday=29,.tm_hour=12,.tm_min=3,.tm_sec=40,
+                      .tm_wday=4,.tm_yday=59};
+    static uint16_t last_online[240*240];
+    if (clock_step == 3)
+    {
+        /* The existing station reconnect policy holds the LCD until STA returns;
+         * preserve the successful-sync latch and advance the clock underneath it. */
+        CHECK(services_time_synced());
+        CHECK(!memcmp(last_online,panel,sizeof(panel)));
+        fake_time+=60;
+        ++clock_step;
+        got_ip();
+        return;
+    }
+    if (clock_step == 4) expected.tm_min=4;
+    static uint16_t incremental[240*240];
+    memcpy(incremental,panel,sizeof(panel));
+    weather_snapshot_t current;
+    weather_snapshot(&current);
+    display_fill(0,0,240,240,0);
+    if (preferences.theme==0)
+        factory_draw_classic(&preferences,&expected,&current,0,0,true,true);
+    else
+        factory_draw_simple(&preferences,&expected,"10.0.2.15",true,true,true);
+    if (memcmp(incremental,panel,sizeof(panel)))
+    {
+        unsigned differences=0;
+        for (unsigned i=0;i<240*240;++i) if(incremental[i]!=panel[i]) ++differences;
+        fprintf(stderr,"Sync frame step %u theme %u differences %u\n",clock_step,preferences.theme,differences);
+    }
+    CHECK(!memcmp(incremental,panel,sizeof(panel)));
+    memcpy(last_online,panel,sizeof(panel));
+    CHECK(services_time_synced() == (clock_step >= 2));
+    if (++clock_step == 5)
+        longjmp(blocked,1);
+    if (clock_step == 1)
+    {
+        struct tm utc={.tm_year=124,.tm_mon=1,.tm_mday=29,.tm_hour=4,.tm_min=3,.tm_sec=40};
+        fake_time=_mkgmtime64(&utc);
+    }
+    if (clock_step == 2)
+    {
+        struct timeval event={.tv_sec=fake_time};
+        sntp_callback(&event); /* Epoch is unchanged; only actual synchronization becomes valid. */
+    }
+    if (clock_step == 3) disconnected();
+}
+static void test_clock_sync(unsigned theme)
+{
+    /* A future year or initialized client must not authorize time before the first reply. */
+    preferences.theme=theme;
+    preferences.wifi_mode=1;
+    strcpy(preferences.ssid,"fixture");
+    struct tm future={.tm_year=130,.tm_mon=0,.tm_mday=1};
+    fake_time=_mkgmtime64(&future);
+    CHECK(clock_ui_timer_init()==ESP_OK);
+    tick_clock(181); /* Complete the actual station startup before comparing clock frames. */
+    CHECK(network_init()==ESP_OK);
+    got_ip();
+    services_start();
+    run_task("time_sync",stop_time_worker_once);
+    CHECK(sntp_inits==1 && !services_time_synced());
+    strcpy(preferences.weather_key,"fixture-key");
+    run_task("weather_http",seed_weather);
+    CHECK(display_init()==ESP_OK);
+    clock_ui_start();
+    run_task("clock_display",clock_sync_scenario);
+}
+static void test_clock_sync_classic(void)
+{
+    /* Run classic first-sync and offline validity in a fresh process. */
+    test_clock_sync(0);
+}
+static void test_clock_sync_simple(void)
+{
+    /* Run simple first-sync and offline validity in a fresh process. */
+    test_clock_sync(1);
 }
 
 int main(int argc, char **argv)
@@ -1557,7 +1666,9 @@ int main(int argc, char **argv)
                  {"clock_calendar_classic", test_clock_calendar_classic},
                  {"clock_calendar_simple", test_clock_calendar_simple},
                  {"clock_timezone_classic", test_clock_timezone_classic},
-                 {"clock_timezone_simple", test_clock_timezone_simple}};
+                 {"clock_timezone_simple", test_clock_timezone_simple},
+                 {"clock_sync_classic", test_clock_sync_classic},
+                 {"clock_sync_simple", test_clock_sync_simple}};
     bool found = false;
     for (unsigned i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
         if (!strcmp(argv[1], cases[i].name))

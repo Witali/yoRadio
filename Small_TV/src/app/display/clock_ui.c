@@ -6,7 +6,6 @@
 #include "media.h"
 #include "network.h"
 #include "services.h"
-#include "timezones.h"
 #include <time.h>
 #include "esp_attr.h"
 #include "driver/gptimer.h"
@@ -78,12 +77,14 @@ esp_err_t clock_ui_timer_init(void)
 
 static struct tm factory_local_time(const char *country, time_t now, bool *valid)
 {
-    /* Return the selected country's calendar, retaining the original year gate.
+    /* Return the selected country's calendar after a confirmed SNTP synchronization.
      * FIXED_FACTORY: use explicit IANA transitions instead of Newlib's implicit
-     * US rules, and safely retain the preset if calendar conversion fails. */
+     * US rules, and safely retain the preset if calendar conversion fails.
+     * FIXED_FACTORY: 0x42010b96 uses year >= 2025 instead of the successful-sync
+     * notification at 0x420109de. A started client or future year does not prove sync. */
 
     struct tm local;
-    *valid = timezone_local_time(country, now, &local) && local.tm_year >= 125;
+    *valid = services_local_time(country, now, &local);
     if (!*valid)
         local = (struct tm){.tm_year = 125,
                             .tm_mon = 8,
@@ -112,7 +113,7 @@ static void clock_task(void *unused)
     factory_photo_t slideshow = {0};
     time_t last_second = 0;
     unsigned phase = 0, progress = 0, previous_theme = 255;
-    bool was_online = false, previous_weather_valid = false;
+    bool was_online = false, previous_weather_valid = false, previous_time_valid = false;
     unsigned weather_retry = 0;
     for (;;)
     {
@@ -127,7 +128,8 @@ static void clock_task(void *unused)
         time_t now = time(NULL);
         struct tm local = factory_local_time(settings.country, now, &valid);
         uint32_t current_generation = settings_generation();
-        bool changed = current_generation != generation || weather.generation != weather_generation;
+        bool changed = current_generation != generation || weather.generation != weather_generation ||
+                       valid != previous_time_valid;
         /* 0x42008e56 retries unsuccessful weather after 30 completed main-loop
          * delays. A blocking HTTP request does not spend these retry steps. */
         if (online && !weather.valid && !weather_request_active())
@@ -245,7 +247,7 @@ static void clock_task(void *unused)
                     backlight_update(&settings, local.tm_hour, local.tm_min, valid);
                 }
             }
-            else if (timer_snapshot(TV_TIMER_SECOND, settings.photo_seconds).pending || reset_theme)
+            else if (timer_snapshot(TV_TIMER_SECOND, settings.photo_seconds).pending || reset_theme || changed)
             {
                 factory_draw_dial(&local, address, reset_theme);
             }
@@ -260,6 +262,7 @@ static void clock_task(void *unused)
         was_online = online;
         last_second = now;
         previous_weather_valid = weather.valid;
+        previous_time_valid = valid;
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }

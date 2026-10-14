@@ -103,6 +103,14 @@ else {
         if($LASTEXITCODE){throw "Country timezone/libc machine comparison failed"}
     } $timezoneReport
 }
+if ($SkipMachine) {$groups.Add(@{name="machine_time_state";status="not_run";reason="Explicit -SkipMachine"})}
+else {
+    $timeStateReport=Join-Path $OutputDirectory "time-state.json"
+    Invoke-TestGroup "machine_time_state" {
+        & $PythonPath (Join-Path $PSScriptRoot "time_state_oracle.py") --output $timeStateReport
+        if($LASTEXITCODE){throw "SNTP notification/cache/retry machine comparison failed"}
+    } $timeStateReport
+}
 if ($SkipQemu) {$groups.Add(@{name="qemu";status="not_run";reason="Explicit -SkipQemu"})}
 else {
     $qemuFolder=Join-Path $OutputDirectory "qemu"

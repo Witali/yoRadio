@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <time.h>
 #include "settings.h"
 #include "esp_err.h"
 typedef struct
@@ -14,6 +15,8 @@ typedef struct
     uint32_t generation;
 } weather_snapshot_t;
 void services_start(void);
+bool services_time_synced(void);
+bool services_local_time(const char *country, time_t utc, struct tm *local);
 void weather_start(void);
 void weather_request_update(void);
 void weather_snapshot(weather_snapshot_t *out);

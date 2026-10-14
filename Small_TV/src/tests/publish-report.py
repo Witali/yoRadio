@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -40,11 +40,12 @@ def main():
     calendar = groups['machine_calendar']['result']
     jpeg = groups['machine_jpeg']['result']
     timezones = groups['machine_timezones']['result']
+    time_state = groups['machine_time_state']['result']
     if not timezones['complete_country_set'] or timezones['legacy_only'] or len(timezones['countries']) != 109:
         raise ValueError('Timezone gate did not execute every recovered country key')
     if not jpeg['complete_asset_set'] or len(jpeg['cases']) != 107:
         raise ValueError('JPEG gate did not execute every public image')
-    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, jpeg, timezones, groups['integrity']['result'])):
+    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, jpeg, timezones, time_state, groups['integrity']['result'])):
         raise ValueError('Groups tested different applications')
     qemu = groups['qemu']['result']
     if not qemu['http_initial_setup']['passed']:
@@ -54,11 +55,23 @@ def main():
     fields = qemu['field_http']
     if not fields['passed'] or fields['qemu_sha256'] != qemu['qemu_sha256']:
         raise ValueError('Real field HTTP/scroll comparison did not pass on this emulator')
+    time_http = qemu['time_http']
+    if (not time_http['passed'] or time_http['qemu_sha256'] != qemu['qemu_sha256']
+            or time_http['layout']['elf_sha256'] != time_state['native_elf_sha256']):
+        raise ValueError('Real SNTP comparison used a different emulator or compiled time-state image')
+    required_time_stages = {'before_first_reply', 'synchronized_2024', 'server_2_2025',
+                            'year-jump', 'backward-leap-day', 'post-2038',
+                            'reset_before_notification', 'reset_recovered'}
+    if not required_time_stages <= set(time_http['flows']['reconstructed']['stages']):
+        raise ValueError('Real SNTP gate omitted a required calendar/reset stage')
+    if time_state['source_sha256'] != report['source_sha256']:
+        raise ValueError('Time-state gate used a different source archive')
     qemu_sources = [qemu['boot_reset']['reconstructed']['prepared']['sources']]
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
     qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
     qemu_sources.append(qemu['weather_http']['flows']['reconstructed']['sources'])
     qemu_sources.append(fields['flows']['reconstructed']['sources'])
+    qemu_sources.append(time_http['flows']['reconstructed']['sources'])
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -109,11 +122,13 @@ def main():
          'factory_literal_differences','approved_fixes','scope')}
     summary['machine_timezones']['countries'] = len(timezones['countries'])
     summary['machine_timezones']['invalid_inputs'] = len(timezones['invalid_inputs'])
+    summary['machine_time_state'] = time_state
     summary['qemu'] = {'passed': qemu['passed'], 'qemu_sha256': qemu['qemu_sha256'],
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
                        'helper_sha256': qemu['helper_sha256'],
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],
+                       'time_http': time_http,
                        'boot_reset': {name: {key: row[key] for key in ('passed', 'checks', 'duration_seconds', 'network')}
                                       for name, row in qemu['boot_reset'].items()},
                        'scenes': {name: {'passed': True,

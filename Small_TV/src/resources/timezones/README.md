@@ -13,8 +13,12 @@ TZif semantics follow [RFC 9636](https://www.rfc-editor.org/rfc/rfc9636.html).
 
 The firmware retains one representative timezone per factory country key and
 the unknown-country GB default. It does not infer a timezone from the weather
-city or add a regional selector. The longer recovered keys are retained for
-analysis; the existing two-character settings field cannot select them.
+city or add a regional selector. The longer recovered keys are available to the
+timezone helper. The current reconstructed settings field stores two characters
+and its HTTP parser rejects regional suffixes. The factory raw country slot is
+20 bytes and its recovered table contains keys such as `AU-W` and `US-H`;
+restoring those settings/HTTP paths remains part of the parity work. The current
+helper tests do not prove that all 109 keys can be selected through the web UI.
 
 `tools/prepare_timezones.py` validates the keys and hashes, reads complete 64-bit
 transitions, deduplicates identical offset/DST rules, and generates immutable C
