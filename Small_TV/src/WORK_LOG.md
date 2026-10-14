@@ -326,3 +326,72 @@
   сверены с passing report: 47 test inputs, 48 production inputs и 106 TZif.
   Результаты и рабочий контекст сохраняются следующим отдельным коммитом;
   посторонние `.karadio-*.patch`, `tmp/` и attachments не включаются.
+
+### 2026-10-14 — UTF-8 / glyph widths / safe prefix, в работе
+
+- Подтверждённая Celsius-on-high-byte ошибка заменяется общим scalar decoder.
+  Из bundled Spleen подготовлены 452 non-ASCII glyphs в размерах 16/24/32;
+  исходные ASCII и две unit bitmaps сохранены. Неизвестные символы используют
+  '?'; malformed bytes не поглощают последующий ASCII. Width, bounds и scrolling
+  разделяют token decode; Unicode ℃/℉ и °C/°F соответствуют старым unit codes.
+- Weather JSON сохраняет source budget 15 bytes с полной границей UTF-8;
+  added helper проверяет scalar range, overlong/surrogate/invalid/truncated bytes,
+  output guards и in-place prefix. Native 3,069 и platform 26 / 1,145,647 прошли.
+  Реальный RV32 text gate: 1,644 source glyph comparisons, 195 full retained
+  frames/windows/transparent/bounded cases, 219 scalar decode, 240 prefix cases
+  прошли против независимых raw BDF/factory source tables.
+- Первая production сборка сохранялась (app 1,175,584; free 360,416); после
+  URL comment/ASCII classification обновлена до app SHA `2acdf34f...80f826`,
+  ELF `570d62ad...a6d2c5`. Весь текущий runtime suite ещё не подтверждён.
+- `text-http-second` получил настоящий factory Load access fault при raw UTF-8
+  city URL: MEPC 4203e8f0 / RA 4201098c / address c. Original init result NULL
+  не проверяется перед perform. Native уже кодирует URL/проверяет handle;
+  Locale-dependent isalnum заменён явными URI ASCII ranges, причина помечена.
+  Fault теперь проверяется отдельным disposable factory-сеансом; Unicode JSON/
+  cache/renderer original проверяется с ASCII location. Source dump не изменён.
+- `text-http-third` остановился на старой HTTP-helper signature. Reflog доказал,
+  что параллельный cleanup сохранил helper/test в `5520fbb787`, вернул main на
+  b90e2131b8 и готовит собственное слияние. Не перезаписывались чужие ветки.
+  Exact helper blob/sha взят из commit в `.build/.../utf8-http-helper`; overlay
+  явно записывается в runtime provenance и имеет отдельный Python module name.
+  `text-http-fourth` запущен; metadata частичного запуска не превращается в pass.
+
+- `text-http-fourth` предварительно прошёл обе версии и отдельный factory fault;
+  после заморозки inputs выполнен `utf8-final-20261014`. Guard отклонил его QEMU
+  после изменения HTTP helper при параллельном merge. Failed report не исправлялся.
+  Создан собственный pinned 5520fbb787 worktree, весь QEMU повторён без overlay.
+  `utf8-verified-20261014` объединяет фактические passing results с unchanged
+  test/app/source bytes; сохраняет rerun provenance. Все включённые
+  автоматические группы прошли, включая 1,644 glyph comparisons,
+  195 render, 219 decode,
+  240 prefix, пять real Unicode HTTP cases + complete scroll.
+- Полный AP→STA/persistence/weather/fields/actual UDP SNTP + пять сцен также
+  прошёл в полном повторе. Fresh QEMU executable/profile/canonical helper hashes
+  сохранились; используется canonical client pinned 5520fbb787 без overlay.
+  Оригинальный NULL-client fault записан отдельно; native panic не допускается.
+- Publisher и повторный artifact verifier прошли: app 1,175,584,
+  free 360,416, DIRAM 80,650;
+  155 entry comments,
+  44 correction markers.
+  App `2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826`, source `72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5`,
+  ELF `570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5`. Позитивные отчёты обновлены на текущую сборку;
+  исторические text/JPEG/timezone/legacy-board negative records не переименованы.
+- Сохранены восемь compiled native text/weather helpers (Unicode/fetch inlined
+  в factory_glyph/weather_task) и четыре time-sync helpers. Factory temperature
+  helper 4200aae0..4200abee добавлен bounded excerpt без private DROM. Все owned
+  VM/listeners закрыты; физических прошивок/reset/OTA не выполнялось.
+
+- Код/сборка/новые gates сохранены в `5f608522`. Проверены точные staged bytes:
+  49 test files, 50 production inputs, 106 TZif, source font, LFS app и native ELF.
+
+### 2026-10-14 — синхронизация профиля с новыми сервисами QEMU, в работе
+
+- Новый запрос пользователя: синхронизировать Small TV profile под изменения
+  QEMU. Прочитаны новые configs/boards/AGENTS.md и README. Main 5e136b6eab
+  поддерживает network.urls/ntp_hosts/station+AP SSIDs и generic ServicePort;
+  defaults в самом emulator больше не выбирают provider/application.
+- Прежний Windows canonical binary BF98.. не пересобран. Создан собственный
+  worktree .worktree/small-tv-service-profile на codex/small-tv-service-profile,
+  pinned 5e136b6eab. Скопированы уже закреплённые dtc/keycodemapdb dependencies;
+  Windows RISC-V SDL/SLIRP успешно собран. Runtime/network/legacy проверки новой
+  сборки ещё не выполнены; готовится отдельный repo-owned Small TV profile.

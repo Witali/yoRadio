@@ -31,7 +31,77 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   Коммитить завершённые изменения отдельно, не включать посторонние правки,
   временные ВМ и журналы с пользовательскими данными.
 
-## Текущий участок: время и часовые пояса
+## Текущий запрос: профиль для новых сетевых сервисов QEMU
+
+Пользователь попросил синхронизировать Small TV с новыми требованиями QEMU.
+Прочитаны `C:/Work/QEMU-ESP32/configs/boards/AGENTS.md` и README формата:
+network URLs/NTP hosts/SSID должны быть данными профиля, `ServicePort` заменяет
+provider-specific launcher setting, hardware-only schema 1/offline сохраняются.
+Main обновлён до `5e136b6eab`; прежний canonical Windows binary всё ещё BF98..
+и не поддерживает новые properties. Собран новый Windows RISC-V/SDL/SLIRP в
+собственном worktree `C:/Work/QEMU-ESP32/.worktree/small-tv-service-profile`,
+ветка `codex/small-tv-service-profile`, pinned 5e136b6eab. Его tests ещё не прошли.
+Следующий шаг: repo-owned `Small_TV/qemu/profiles/small-tv-c2.json`, shared compiler,
+обновить наши launch/test paths и generic service fixture. Проверить packet suite,
+legacy CYD/C3, обе Small TV firmware и default/offline/service routing.
+Не менять источники firmware ради сетевого профиля. UTF-8 checkpoint ниже уже
+проверен и должен оставаться самостоятельным завершённым коммитом.
+
+## Последний проверенный участок: UTF-8 и поля текста
+
+Строгий `app/text/text.c` decoder принимает Unicode scalars, а не произвольные
+high-byte pairs. Известные A1E6/A848 и Unicode ℃/℉/°C/°F сохраняют factory
+bitmaps. Неизвестный scalar без глифа -> '?'; malformed byte не поглощает ASCII.
+452 bundled non-ASCII Spleen glyphs подготовлены в 16/24/32 cells, factory ASCII
+сохранён. UTF-8 copy сохраняет прежний 15-byte бюджет погоды и полную границу
+символа. Ширина/центрирование/прокрутка используют общий token decoder.
+Новый URL escape явно ASCII-only, не зависит от locale.
+
+`utf8-verified-20261014` объединяет прошедшие host/RV groups исходного full run
+и полный повтор QEMU на pinned dependencies с теми же test/app/source bytes:
+native 3,069, platform 26 /
+1,145,647; JS/integrity, timezone_sources 9,
+прежние renderer/control/classic/weather/calendar/JPEG/timezone/time-state.
+Новый text RV32: 1,644 glyph comparisons,
+195 full-panel cases, 219 scalar и
+240 prefix/guard checks. Новый real HTTP gate прошёл
+пять synthetic Unicode случаев, fragmented response, точные cache bytes,
+все native field/guard pixels и полный scroll cycle. QEMU AP→STA/persistence,
+weather/fields/actual SNTP и пять сцен тоже прошли. Сходство whole-frame остаётся
+наблюдением; полного соответствия, physical/RF/browser/soak результата нет.
+
+Factory UTF-8 `/updateCity` воспроизвёл NULL-client Load access fault в отдельной
+VM: MEPC 4203e8f0, RA 4201098c, address c. `42010864` вставляет raw city bytes,
+`42010988` вызывает perform без init guard. Native URL encoding/NULL-check
+защищают этот путь; normal original flows использовали ASCII locations, чтобы
+отдельно проверить Unicode JSON/cache. Source dump и физические платы не менялись.
+
+Сборка: app 1,175,584, free 360,416,
+DIRAM 80,650; app SHA
+`2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826`;
+source `72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5`;
+ELF `570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5`.
+Entry comments 155, markers
+44. Public evidence:
+`../qemu/parity/text-validation.json`, `../qemu/text-http-validation.json` и
+`tests/functional-validation.json`. Старый negative text observation сохраняет
+прежние app/ELF hashes. Native text/time-sync excerpts обновлены на точный ELF;
+bounded factory temperature helper добавлен в existing assembly manifest.
+
+Первый `utf8-final-20261014` дошёл до всех сцен, но runtime guard отклонил QEMU:
+параллельное слияние изменило canonical HTTP-helper. Этот failed report сохранён.
+Все QEMU checks повторены без overlay в собственном
+`C:/Work/QEMU-ESP32/.worktree/small-tv-utf8-validation` на ветке
+`codex/small-tv-utf8-validation`, pinned commit `5520fbb787` (parent b90e2131b8).
+Использованы те же BF98.. executable и production app; fresh executable/profile/
+helpers сохранились за повтор. Фактический client SHA
+`222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94` записан в report.
+Только реально прошедшая новая QEMU-группа заменяет rejected attempt; остальные
+группы сохраняют исходные результаты и точные unchanged test hashes.
+Чужие branches/worktrees не переключались. Worktree оставить для следующих
+parity checks, пока параллельный main продолжает меняться; binaries в нём ignored.
+
+## Завершённый участок: время и часовые пояса
 
 `timezones.c`, `time_sync.c`, `clock_ui.c`, `timezone_oracle.py`. Настоящий
 заводской `tzset`/`localtime_r` исполняется по адресам `0x420aa9c8`/`0x420aa5ce`;
@@ -206,31 +276,20 @@ runtime-память платы не измерялась. Entry comments у 142
 
 ## Следующие участки для исследования
 
-Здесь есть подтверждённая ошибка текста и ещё не проверенные пути:
+Остаются явно не проверенные или не восстановленные пути:
 
-1. Исправить исходное представление не-ASCII подписей и ограничения парсера.
-   Новый read-only RV32 `text-encoding-observation.json` исполнил factory
-   `0x4200abee`/`0x4200aae0` и native text: UTF-8 «Тест»/«北京» превращаются в
-   повторные Celsius glyphs в обеих версиях. Это подтверждённый stock fallback
-   и унаследованная ошибка; специальными legacy codes являются A1E6/A848.
-   Single trailing E6 даёт Celsius только в stock, native очищает пустой glyph.
-   Шесть случаев — exploratory наблюдение, не исправление/полный gate. Нужны
-   явно проверенные glyph/byte/width/truncation правила и новые регрессии.
-   Переходы длинного/короткого города, статуса и иконки уже проверены по HTTP
-   в QEMU для ASCII-фикстур; GBK/UTF-8 не считать проверенными этим результатом.
-2. SNTP/календарь: текущий gate опубликован; далее расширить
-   реальные UDP-проверки полуночи, Sunday, страны/DST и всех тем/форматов.
-   Порог `tm_year >= 125`, callback validity, преждевременные restart и
-   same-second cache уже подтверждены отдельными RV32/платформенными случаями;
-   QEMU gate проверяет отказ/восстановление и date jumps. Не считать его
-   проверкой всех других UTC/locale/transport путей. Сравнение строки TZ не
-   заменяет `tzset`/`localtime_r`; IANA machine gate проверяет преобразование.
-   Восстановить selectable regional country keys: factory country slot 20 bytes
-   и table содержит AU-W/US-H, native `country[3]`, raw encoder и HTTP parser
-   оставляют два символа. Pure timezone helper проверяет все 109, но этот факт
-   не доказывает доступность их через текущие settings/HTTP. Нужны отдельные
-   API/import/persistence и ABI migration проверки; не расширять UI выбором
-   города по догадке.
+1. Восстановить regional country keys: factory slot 20 bytes и table содержит
+   AU-W/US-H, native `country[3]`, raw encoder и HTTP parser оставляют два символа.
+   Pure timezone helper проверяет все 109, но это не доказывает доступность через
+   settings/HTTP. Нужны API/import/persistence и ABI/NVS migration проверки.
+   Country defaults нельзя выдавать за city timezone inference. Старый manifest
+   scope с «previously unreachable» надо исправить при следующем проверенном
+   обновлении: raw factory slot действительно вмещает эти строки.
+2. Расширить реальные UDP-проверки midnight/Sunday/country/DST/всех тем/форматов.
+   SNTP validity/retries/same-second cache/reset уже проходят обязательные gates,
+   IANA helper исполняет libc, но весь transport/locale путь ими не покрыт.
+   Unicode gate охватывает bundled 452 scalars и '?' для остальных; это не все
+   письменности, shaping/bidi/NFC или полный fuzz всех HTTP input strings.
 3. JPEG: новый gate охватывает все публичные ресурсы и ограниченные ошибки/обрезку.
    Произвольные пользовательские JPEG, разные subsampling и malformed Huffman/
    restart marker требуют дополнительных фикстур. Classic oracle сохраняет
@@ -238,6 +297,11 @@ runtime-память платы не измерялась. Entry comments у 142
 4. Проверить более длительные сетевые/загрузочные сценарии и расход памяти во
    время работы. Аппаратные и браузерные сценарии описаны в `tests/README.md`;
    их нельзя объявлять выполненными по результату других тестов.
+
+5. Классифицировать оставшиеся classic/dial whole-frame differences по
+   фиксированным времени/состоянию и независимому pixel oracle. Известные factory
+   corrections и разная фаза кадра не должны скрывать ещё не восстановленный
+   путь. Scene similarity percentage остаётся наблюдением, не критерием parity.
 
 ## Проверки и репозитории
 

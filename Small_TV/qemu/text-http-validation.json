@@ -1,0 +1,882 @@
+{
+  "passed": true,
+  "tested_at_utc": "2026-10-14T14:04:14.039005+00:00",
+  "flows": {
+    "original": {
+      "passed": true,
+      "sources": {
+        "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+      },
+      "cases": [
+        {
+          "case": "cyrillic",
+          "city": "Fixture0",
+          "source_main": "Облачно",
+          "source_description": "Небольшой дождь",
+          "cache": {
+            "valid": true,
+            "main_hex": "d09ed0b1d0bbd0b0d187d0bdd0be",
+            "description_hex": "d09dd0b5d0b1d0bed0bbd18cd188d0"
+          },
+          "server_multibyte_split": true,
+          "literal_city_vs_corrected_pixels": 0,
+          "literal_frame_sha256": "6606ae620c0073ead0cca9da5f73333dcf4e9d83519ba77841520000e2770615",
+          "passed": true
+        },
+        {
+          "case": "unicode-scroll",
+          "city": "Fixture1",
+          "source_main": "Облачно",
+          "source_description": "clear",
+          "cache": {
+            "valid": true,
+            "main_hex": "d09ed0b1d0bbd0b0d187d0bdd0be",
+            "description_hex": "636c656172"
+          },
+          "server_multibyte_split": true,
+          "literal_city_vs_corrected_pixels": 0,
+          "literal_frame_sha256": "aae96f6f4f4174a121cfeea03c17a1c251fe0956c6dc416c8befa822d3d4f3ce",
+          "passed": true
+        },
+        {
+          "case": "latin",
+          "city": "Fixture2",
+          "source_main": "Café",
+          "source_description": "déjà vu",
+          "cache": {
+            "valid": true,
+            "main_hex": "436166c3a9",
+            "description_hex": "64c3a96ac3a0207675"
+          },
+          "server_multibyte_split": true,
+          "literal_city_vs_corrected_pixels": 0,
+          "literal_frame_sha256": "ab98701614c9f4da1fd5ecfc1e794944dc5efa62c1dba58ffb946d355dde5837",
+          "passed": true
+        },
+        {
+          "case": "unsupported-cjk",
+          "city": "Fixture3",
+          "source_main": "😀",
+          "source_description": "clear",
+          "cache": {
+            "valid": true,
+            "main_hex": "f09f9880",
+            "description_hex": "636c656172"
+          },
+          "server_multibyte_split": true,
+          "literal_city_vs_corrected_pixels": 0,
+          "literal_frame_sha256": "d79401e5265d58c71ca7ff14df9387e4e969be0b4b4553393efe384a4bea76c6",
+          "passed": true
+        },
+        {
+          "case": "split-label-budget",
+          "city": "Fixture4",
+          "source_main": "12345678901234é",
+          "source_description": "1234567890123é",
+          "cache": {
+            "valid": true,
+            "main_hex": "3132333435363738393031323334c3",
+            "description_hex": "31323334353637383930313233c3a9"
+          },
+          "server_multibyte_split": true,
+          "literal_city_vs_corrected_pixels": 0,
+          "literal_frame_sha256": "68d5de80145811848a93649cbaf7c6410ad53c2c5203a648d03990d5c9964b70",
+          "passed": true
+        }
+      ],
+      "checks": {
+        "browser_style_utf8_post": true,
+        "actual_weather_prefixes": true,
+        "native_glyphs_width_scroll_guards": false,
+        "no_panic": true
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "36bb2c567dbc99042838799eabb0de11eafc52a7095252fe0c7059e6f2933f47",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "e4cea91383344080859aadf3fda260d7b22292fadfe626d488d8a76b71d1b402",
+          "fragments": 6
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "a62cdd4ea3ab37ea42bf5ac5d0b4d77704829612aff346b7c13bcf34853bd468",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "7edbbabeb72c2b6fa03ee824bdeddfe85f2506d60a1e7555eea1935779d6f5af",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "d4f20b408a190962875e7e830810d8c562926ed62d5401f81746170b0ba0f2a9",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "93cfbb049d13b7b320bf7fff8ff9139adb7221636dfe8646a5dfb661bf5ae0e3",
+          "fragments": 5
+        }
+      ]
+    },
+    "reconstructed": {
+      "passed": true,
+      "sources": {
+        "images": [
+          {
+            "file": "bootloader.bin",
+            "offset": "0x0",
+            "bytes": 19248,
+            "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
+          },
+          {
+            "file": "partition-table.bin",
+            "offset": "0x8000",
+            "bytes": 3072,
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+          },
+          {
+            "file": "app.bin",
+            "offset": "0x10000",
+            "bytes": 1175584,
+            "sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826"
+          },
+          {
+            "file": "assets.bin",
+            "offset": "0x200000",
+            "bytes": 1994752,
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+          }
+        ],
+        "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5"
+      },
+      "cases": [
+        {
+          "case": "cyrillic",
+          "city": "Тест",
+          "source_main": "Облачно",
+          "source_description": "Небольшой дождь",
+          "cache": {
+            "valid": true,
+            "main_hex": "d09ed0b1d0bbd0b0d187d0bdd0be",
+            "description_hex": "d09dd0b5d0b1d0bed0bbd18cd188"
+          },
+          "server_multibyte_split": true,
+          "frame": {
+            "labels": [
+              {
+                "text": "Тест",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 48,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Облачно",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 84,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 25.348863,
+            "rendered_weather_generation": 2,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "case": "unicode-scroll",
+          "city": "ДлинныйГородДлинныйГород",
+          "source_main": "Облачно",
+          "source_description": "clear",
+          "cache": {
+            "valid": true,
+            "main_hex": "d09ed0b1d0bbd0b0d187d0bdd0be",
+            "description_hex": "636c656172"
+          },
+          "server_multibyte_split": true,
+          "frame": {
+            "labels": [
+              {
+                "text": "ДлинныйГородДлинныйГород",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 288,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Облачно",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 84,
+                "offset": 0,
+                "pause": 14,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 25.611112,
+            "rendered_weather_generation": 4,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "passed": true
+          },
+          "scroll": {
+            "passed": true,
+            "first": {
+              "labels": [
+                {
+                  "text": "ДлинныйГородДлинныйГород",
+                  "x": 0,
+                  "y": 10,
+                  "width": 180,
+                  "length": 288,
+                  "offset": 0,
+                  "pause": 15,
+                  "color": 2016,
+                  "returning": false,
+                  "completed": false
+                },
+                {
+                  "text": "10.0.2.15",
+                  "x": 0,
+                  "y": 40,
+                  "width": 180,
+                  "length": 108,
+                  "offset": 0,
+                  "pause": 15,
+                  "color": 65535,
+                  "returning": false,
+                  "completed": false
+                },
+                {
+                  "text": "Облачно",
+                  "x": 160,
+                  "y": 83,
+                  "width": 80,
+                  "length": 84,
+                  "offset": 0,
+                  "pause": 14,
+                  "color": 65504,
+                  "returning": false,
+                  "completed": false
+                }
+              ],
+              "virtual_seconds": 25.61154,
+              "rendered_weather_generation": 4,
+              "different_pixels": {
+                "field-0": 0,
+                "field-2": 0,
+                "guard-0": 0,
+                "guard-1": 0,
+                "guard-2": 0,
+                "guard-3": 0
+              },
+              "passed": true
+            },
+            "outward": {
+              "labels": [
+                {
+                  "text": "ДлинныйГородДлинныйГород",
+                  "x": 0,
+                  "y": 10,
+                  "width": 180,
+                  "length": 288,
+                  "offset": 2,
+                  "pause": 0,
+                  "color": 2016,
+                  "returning": false,
+                  "completed": false
+                },
+                {
+                  "text": "Wind Speed",
+                  "x": 0,
+                  "y": 40,
+                  "width": 180,
+                  "length": 120,
+                  "offset": 0,
+                  "pause": 15,
+                  "color": 65535,
+                  "returning": false,
+                  "completed": false
+                },
+                {
+                  "text": "Облачно",
+                  "x": 160,
+                  "y": 83,
+                  "width": 80,
+                  "length": 84,
+                  "offset": 4,
+                  "pause": 15,
+                  "color": 65504,
+                  "returning": true,
+                  "completed": false
+                }
+              ],
+              "virtual_seconds": 27.677213,
+              "rendered_weather_generation": 6,
+              "different_pixels": {
+                "field-0": 0,
+                "field-2": 0,
+                "guard-0": 0,
+                "guard-1": 0,
+                "guard-2": 0,
+                "guard-3": 0
+              },
+              "passed": true
+            },
+            "end": {
+              "labels": [
+                {
+                  "text": "ДлинныйГородДлинныйГород",
+                  "x": 0,
+                  "y": 10,
+                  "width": 180,
+                  "length": 288,
+                  "offset": 108,
+                  "pause": 15,
+                  "color": 2016,
+                  "returning": true,
+                  "completed": false
+                },
+                {
+                  "text": "10.0.2.15",
+                  "x": 0,
+                  "y": 40,
+                  "width": 180,
+                  "length": 108,
+                  "offset": 0,
+                  "pause": 15,
+                  "color": 65535,
+                  "returning": false,
+                  "completed": false
+                },
+                {
+                  "text": "Облачно",
+                  "x": 160,
+                  "y": 83,
+                  "width": 80,
+                  "length": 84,
+                  "offset": 0,
+                  "pause": 13,
+                  "color": 65504,
+                  "returning": false,
+                  "completed": true
+                }
+              ],
+              "virtual_seconds": 34.557295,
+              "rendered_weather_generation": 6,
+              "different_pixels": {
+                "field-0": 0,
+                "field-2": 0,
+                "guard-0": 0,
+                "guard-1": 0,
+                "guard-2": 0,
+                "guard-3": 0
+              },
+              "passed": true
+            },
+            "back": {
+              "labels": [
+                {
+                  "text": "ДлинныйГородДлинныйГород",
+                  "x": 0,
+                  "y": 10,
+                  "width": 180,
+                  "length": 288,
+                  "offset": 108,
+                  "pause": 0,
+                  "color": 2016,
+                  "returning": true,
+                  "completed": false
+                },
+                {
+                  "text": "10.0.2.15",
+                  "x": 0,
+                  "y": 40,
+                  "width": 180,
+                  "length": 108,
+                  "offset": 0,
+                  "pause": 15,
+                  "color": 65535,
+                  "returning": false,
+                  "completed": false
+                },
+                {
+                  "text": "Облачно",
+                  "x": 160,
+                  "y": 83,
+                  "width": 80,
+                  "length": 84,
+                  "offset": 4,
+                  "pause": 15,
+                  "color": 65504,
+                  "returning": true,
+                  "completed": true
+                }
+              ],
+              "virtual_seconds": 36.556621,
+              "rendered_weather_generation": 6,
+              "different_pixels": {
+                "field-0": 0,
+                "field-2": 0,
+                "guard-0": 0,
+                "guard-1": 0,
+                "guard-2": 0,
+                "guard-3": 0
+              },
+              "passed": true
+            },
+            "complete": {
+              "labels": [
+                {
+                  "text": "ДлинныйГородДлинныйГород",
+                  "x": 0,
+                  "y": 10,
+                  "width": 180,
+                  "length": 288,
+                  "offset": 0,
+                  "pause": 15,
+                  "color": 2016,
+                  "returning": false,
+                  "completed": true
+                },
+                {
+                  "text": "Temp min 22¡æ",
+                  "x": 0,
+                  "y": 40,
+                  "width": 180,
+                  "length": 156,
+                  "offset": 0,
+                  "pause": 15,
+                  "color": 65535,
+                  "returning": false,
+                  "completed": false
+                },
+                {
+                  "text": "Облачно",
+                  "x": 160,
+                  "y": 83,
+                  "width": 80,
+                  "length": 84,
+                  "offset": 0,
+                  "pause": 12,
+                  "color": 65504,
+                  "returning": false,
+                  "completed": true
+                }
+              ],
+              "virtual_seconds": 43.518091,
+              "rendered_weather_generation": 6,
+              "different_pixels": {
+                "field-0": 0,
+                "field-2": 0,
+                "guard-0": 0,
+                "guard-1": 0,
+                "guard-2": 0,
+                "guard-3": 0
+              },
+              "passed": true
+            }
+          },
+          "passed": true
+        },
+        {
+          "case": "latin",
+          "city": "München",
+          "source_main": "Café",
+          "source_description": "déjà vu",
+          "cache": {
+            "valid": true,
+            "main_hex": "436166c3a9",
+            "description_hex": "64c3a96ac3a0207675"
+          },
+          "server_multibyte_split": true,
+          "frame": {
+            "labels": [
+              {
+                "text": "München",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 84,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Café",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 48,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 43.821438,
+            "rendered_weather_generation": 6,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "case": "unsupported-cjk",
+          "city": "北京",
+          "source_main": "😀",
+          "source_description": "clear",
+          "cache": {
+            "valid": true,
+            "main_hex": "f09f9880",
+            "description_hex": "636c656172"
+          },
+          "server_multibyte_split": true,
+          "frame": {
+            "labels": [
+              {
+                "text": "北京",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 24,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "😀",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 12,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 44.185395,
+            "rendered_weather_generation": 8,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "passed": true
+          },
+          "passed": true
+        },
+        {
+          "case": "split-label-budget",
+          "city": "A",
+          "source_main": "12345678901234é",
+          "source_description": "1234567890123é",
+          "cache": {
+            "valid": true,
+            "main_hex": "3132333435363738393031323334",
+            "description_hex": "31323334353637383930313233c3a9"
+          },
+          "server_multibyte_split": true,
+          "frame": {
+            "labels": [
+              {
+                "text": "A",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 12,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "12345678901234",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 168,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 44.558287,
+            "rendered_weather_generation": 10,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "passed": true
+          },
+          "passed": true
+        }
+      ],
+      "checks": {
+        "browser_style_utf8_post": true,
+        "actual_weather_prefixes": true,
+        "native_glyphs_width_scroll_guards": true,
+        "no_panic": true
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "36bb2c567dbc99042838799eabb0de11eafc52a7095252fe0c7059e6f2933f47",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "e4cea91383344080859aadf3fda260d7b22292fadfe626d488d8a76b71d1b402",
+          "fragments": 6
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "a62cdd4ea3ab37ea42bf5ac5d0b4d77704829612aff346b7c13bcf34853bd468",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "7edbbabeb72c2b6fa03ee824bdeddfe85f2506d60a1e7555eea1935779d6f5af",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "d4f20b408a190962875e7e830810d8c562926ed62d5401f81746170b0ba0f2a9",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "93cfbb049d13b7b320bf7fff8ff9139adb7221636dfe8646a5dfb661bf5ae0e3",
+          "fragments": 5
+        }
+      ]
+    }
+  },
+  "cache_layout": {
+    "address": 1070267000,
+    "size": 232,
+    "fields": {
+      "valid": 0,
+      "temperature_c": 8,
+      "wind_mps": 16,
+      "temperature_min_c": 24,
+      "temperature_max_c": 32,
+      "humidity": 40,
+      "timezone_seconds": 44,
+      "icon": 48,
+      "description": 52,
+      "city": 117,
+      "country": 182,
+      "main": 185,
+      "wind_direction": 201,
+      "generation": 224
+    },
+    "request_state_address": 1070282988,
+    "elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5"
+  },
+  "scroll_layout": {
+    "address": 1070266664,
+    "size": 300,
+    "stride": 100,
+    "fields": {
+      "text": 0,
+      "x": 68,
+      "y": 72,
+      "width": 76,
+      "color": 80,
+      "length": 84,
+      "offset": 88,
+      "pause": 92,
+      "returning": 96,
+      "completed": 97
+    },
+    "rendered_weather_address": 1070282952
+  },
+  "font_source_sha256": "fc0743d164690f99b7e2e1b9d503180e4c719a9831ae03fd8f6da18c857dee27",
+  "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
+  "scope": "Exercise actual UTF-8 settings/weather HTTP and bounded text pixels in both VMs.",
+  "http_helper_sha256": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+  "factory_utf8_city_fault": {
+    "passed": true,
+    "scope": "Expected immutable factory defect only; no corrected-program panic is permitted.",
+    "sources": {
+      "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+    },
+    "post_error": "TimeoutError",
+    "panic_pc": "0x4203e8f0",
+    "caller": "0x4201098c",
+    "fault_address": "0xc",
+    "expected_fault_detected": true
+  },
+  "test_sha256": "55b246fb530e8db6ae6603d79826b3d41d6b991d3d06648108d2cd0f10e490af"
+}

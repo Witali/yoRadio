@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "started_utc": "2026-10-14T11:49:32.0308385Z",
-  "finished_utc": "2026-10-14T12:08:37.1325844Z",
+  "started_utc": "2026-10-14T13:29:31.2561420Z",
+  "finished_utc": "2026-10-14T14:13:34.756839+00:00",
   "passed": true,
   "automatic_profile": "host_machine_qemu",
   "all_functionality_verified": false,
-  "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
-  "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
+  "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5",
+  "app_sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826",
   "test_inputs": [
     {
       "sha256": "c9187b43a2c83c8c8a433343c4a10026ee630c5a656773cd362e7b51a3a3e6dc",
@@ -49,7 +49,7 @@
       "file": "Small_TV/src/tests/machine_oracle.py"
     },
     {
-      "sha256": "193d00a83e0f04c91e6fb3d175a1e2c57681965e7c53dac129205c3ac94f7715",
+      "sha256": "600cd0225355cd2910d8ab8c8e9c822e1eee1594b5bff30ffcf92c13b7ecfcc1",
       "file": "Small_TV/src/tests/native_test.c"
     },
     {
@@ -57,19 +57,19 @@
       "file": "Small_TV/src/tests/oracle-requirements.txt"
     },
     {
-      "sha256": "d8415ec90c189e23cc8726bdbf8025611bee5e8d3215d645ff57c1a42caf62d1",
+      "sha256": "3e1cefd817d9cc3babffde6db785aec1ad96452eb5a0842865f03d0982d92d32",
       "file": "Small_TV/src/tests/platform_test.c"
     },
     {
-      "sha256": "4f810cf228e7b522cd30e47a199ba9b0923b2fede4adce718fc30dafcff5b966",
+      "sha256": "fbcfeec972dca25b345878a561d258fb38d010380563a48bd3e484abfdd5e89c",
       "file": "Small_TV/src/tests/publish-report.py"
     },
     {
-      "sha256": "d6f42712ed6a6fe12d0b0367b4b4dcb04556c34d3fcae41a675cbc98e3908903",
+      "sha256": "cd04123eb34b1fc4e74b93a717ce2a5a802700c5695b067019aa6ae5d03e039a",
       "file": "Small_TV/src/tests/qemu_suite.py"
     },
     {
-      "sha256": "e5d5576175b888796c6907490ea23b2218a52639498fb68b3b7e474af411f93f",
+      "sha256": "9315277dfd041a0abc4146b6a549ab78f48be2056d668ff7c1d8de9f9a21f781",
       "file": "Small_TV/src/tests/run-all.ps1"
     },
     {
@@ -77,11 +77,11 @@
       "file": "Small_TV/src/tests/run-machine-oracle.ps1"
     },
     {
-      "sha256": "28dff275cfa37683e066f21c14610f4d7adbc2fbbb0624c852ad19486b7b5b38",
+      "sha256": "2745b623da5f03b0a1e3a18fbb70a97b2d0ee16a6badcf2e0421b88121c8a0eb",
       "file": "Small_TV/src/tests/run-platform.ps1"
     },
     {
-      "sha256": "1c5968ba173480c82fd06eaa111cdb4b918c6fa21ee4837c5187095b4d005dec",
+      "sha256": "45780af5f47e983a7168b16be4502c814f8706e4a1443e954a1c723592b1296b",
       "file": "Small_TV/src/tests/run.ps1"
     },
     {
@@ -173,6 +173,14 @@
       "file": "Small_TV/src/tests/stubs/time_adapter.h"
     },
     {
+      "sha256": "8e436f4a2fbfe75e036fd3490812df87e5b3fbe26d7cb41d76b1c8fde312ba29",
+      "file": "Small_TV/src/tests/text_oracle.py"
+    },
+    {
+      "sha256": "55b246fb530e8db6ae6603d79826b3d41d6b991d3d06648108d2cd0f10e490af",
+      "file": "Small_TV/src/tests/text_qemu.py"
+    },
+    {
       "sha256": "b2b2a82ef841f96d1edfb866be321d312cdffc7323433d0586e32a06c468b0a0",
       "file": "Small_TV/src/tests/time_qemu.py"
     },
@@ -200,11 +208,12 @@
   "notes": [
     "Passing automated checks does not establish complete factory equivalence or physical operation.",
     "No board flashing or OTA; original dump and archived images remain read-only.",
-    "Host assertions include parameter sweeps; their count is not a code-coverage percentage."
+    "Host assertions include parameter sweeps; their count is not a code-coverage percentage.",
+    "Initial QEMU run was rejected after its HTTP helper changed during a parallel merge. All QEMU checks were repeated in a pinned 5520fbb787 worktree with unchanged executable. Earlier passing host/RV groups retain exact unchanged test/application inputs; the rejected run remains historical."
   ],
   "native": {
     "passed": true,
-    "checks": 3021,
+    "checks": 3069,
     "groups": [
       "settings",
       "factory_settings",
@@ -459,7 +468,7 @@
     ]
   },
   "platform": {
-    "passed": true,
+    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation.",
     "cases": [
       {
         "case": "wifi_setup",
@@ -534,7 +543,7 @@
       {
         "case": "text_field_windows",
         "passed": true,
-        "checks": 462630
+        "checks": 865840
       },
       {
         "case": "weather_field_cleanup",
@@ -592,7 +601,7 @@
         "checks": 201
       }
     ],
-    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation."
+    "passed": true
   },
   "frontend": {
     "passed": true,
@@ -664,8 +673,8 @@
     "cases": 6,
     "failures": 0,
     "errors": 0,
-    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
-    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
+    "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5",
+    "app_sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826",
     "factory_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
   },
   "timezone_sources": {
@@ -1128,8 +1137,8 @@
     "literal_factory_pixels_equal": false,
     "renderer_cases": 316,
     "geometry_checks": 4,
-    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
-    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
+    "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5",
+    "native_elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5",
     "approved_fixes": {
       "simple-sunday-standard-tm-wday": "Display Sun for standard tm_wday 0; factory 0 repeats the date, while factory 7 draws Sun",
       "analog-perpendicular-stroke-offsets": "Use cos/sin for x/y after atan2+pi/2; the original sin/cos collapses axis-aligned thick strokes"
@@ -1647,7 +1656,7 @@
       ],
       "first_failures": [],
       "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-      "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
+      "native_elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5",
       "approved_fix": "photo fade must restore configured duty even when the original schedule cache did not change",
       "scope": "Executed LEDC initialization, duty arithmetic and conditional schedule call traces; successful driver boundaries are captured. RF, electrical PWM and SDK locking are outside scope."
     }
@@ -1692,10 +1701,10 @@
   },
   "machine_weather": {
     "passed": true,
-    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
-    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
+    "app_sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826",
+    "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
+    "native_elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5",
     "approved_fixes": [
       "clear-city-full-height",
       "clear-weather-title",
@@ -1717,10 +1726,10 @@
   },
   "machine_calendar": {
     "passed": true,
-    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
-    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
+    "app_sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826",
+    "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
+    "native_elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5",
     "approved_fixes": [
       "calendar-change-with-unchanged-minute",
       "clear-shortened-simple-date",
@@ -1731,10 +1740,10 @@
   },
   "machine_jpeg": {
     "passed": true,
-    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
-    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
+    "app_sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826",
+    "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
+    "native_elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5",
     "complete_asset_set": true,
     "approved_fixes": [
       "erase-known-jpeg-rectangle-after-decode-error",
@@ -1748,10 +1757,10 @@
   },
   "machine_timezones": {
     "passed": true,
-    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
-    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
+    "app_sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826",
+    "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
+    "native_elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5",
     "complete_country_set": true,
     "iana_version": "2026e",
     "timezone_manifest_sha256": "81c0cf308eccf1b7a465ddbba7ba36b85376ad238b17232204f9efef0d9df2eb",
@@ -1971,10 +1980,10 @@
         "passed": true
       }
     ],
-    "app_sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
-    "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019",
+    "app_sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826",
+    "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394",
+    "native_elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5",
     "adapters": {
       "factory": {
         "tz-lock": 46,
@@ -1996,6 +2005,29 @@
     ],
     "scope": "Execute factory time/cache/retry instructions and compiled native sync validity.\n\nCalendar conversion and both notification handlers are actual RV32 code.\nOnly factory time(), SNTP restart and logging SDK boundaries are adapted.\nThis gate does not substitute for the separate real UDP/SNTP QEMU test.\n"
   },
+  "machine_text": {
+    "passed": true,
+    "app_sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826",
+    "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5",
+    "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+    "native_elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5",
+    "font_source_sha256": "fc0743d164690f99b7e2e1b9d503180e4c719a9831ae03fd8f6da18c857dee27",
+    "unicode_glyphs": 452,
+    "ascii_glyphs_per_height": 96,
+    "approved_fixes": [
+      "utf8-scalar-rendering",
+      "no-celsius-for-arbitrary-high-bytes",
+      "complete-utf8-prefix"
+    ],
+    "scope": "Execute real text/UTF-8 RV32 code against independent BDF and factory bitmap data.",
+    "case_counts": {
+      "glyph_checks": 1644,
+      "render_cases": 195,
+      "decode_checks": 219,
+      "prefix_checks": 240,
+      "literal_factory": 6
+    }
+  },
   "qemu": {
     "passed": true,
     "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
@@ -2005,11 +2037,12 @@
       "small_tv_vm.py": "919a9d03d8321d370e03ed844f1b99dcb5c57bf3fef5f6614e23c5702f9d0cb7",
       "small_tv_network.py": "a52db718c8131c06b4b41f1c3a1471862fae65798594ef21f62dcea649846ab9",
       "small_tv_web.py": "b4e57f78e2b8b46ed566497080690731cbb7501a92251ed11897fb692f3bc180",
-      "small_tv_http_test.py": "6432f640705184f3b725f4f33ed783b1e6dce4b955076363dfb580bc9b0ae58f"
+      "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94"
     },
+    "inputs_unchanged": true,
     "http_initial_setup": {
       "passed": true,
-      "tested_at_utc": "2026-10-14T13:56:02.347235+02:00",
+      "tested_at_utc": "2026-10-14T13:57:13.115142+00:00",
       "flows": {
         "original": {
           "firmware": "original",
@@ -2087,31 +2120,31 @@
           "sources": {
             "images": [
               {
-                "offset": "0x0",
-                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "file": "bootloader.bin",
-                "bytes": 19248
+                "offset": "0x0",
+                "bytes": 19248,
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
               },
               {
-                "offset": "0x8000",
-                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "file": "partition-table.bin",
-                "bytes": 3072
+                "offset": "0x8000",
+                "bytes": 3072,
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
               },
               {
-                "offset": "0x10000",
-                "sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
                 "file": "app.bin",
-                "bytes": 1115104
+                "offset": "0x10000",
+                "bytes": 1175584,
+                "sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826"
               },
               {
-                "offset": "0x200000",
-                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "file": "assets.bin",
-                "bytes": 1994752
+                "offset": "0x200000",
+                "bytes": 1994752,
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
               }
             ],
-            "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019"
+            "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5"
           },
           "web_endpoints": [
             {
@@ -2166,7 +2199,7 @@
     },
     "weather_http": {
       "passed": true,
-      "tested_at_utc": "2026-10-14T13:57:09.457571+02:00",
+      "tested_at_utc": "2026-10-14T13:58:11.349318+00:00",
       "scope": "Real guest DNS/TCP/HTTP via isolated loopback fixture; parsed synthetic weather and stable LCD regions. No Internet service, physical RF or full-program equivalence.",
       "native_layout": {
         "address": 1070267000,
@@ -2188,7 +2221,7 @@
           "generation": 224
         },
         "request_state_address": 1070282988,
-        "elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394"
+        "elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5"
       },
       "flows": {
         "original": {
@@ -2342,31 +2375,31 @@
           "sources": {
             "images": [
               {
-                "offset": "0x0",
-                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "file": "bootloader.bin",
-                "bytes": 19248
+                "offset": "0x0",
+                "bytes": 19248,
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
               },
               {
-                "offset": "0x8000",
-                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "file": "partition-table.bin",
-                "bytes": 3072
+                "offset": "0x8000",
+                "bytes": 3072,
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
               },
               {
-                "offset": "0x10000",
-                "sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
                 "file": "app.bin",
-                "bytes": 1115104
+                "offset": "0x10000",
+                "bytes": 1175584,
+                "sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826"
               },
               {
-                "offset": "0x200000",
-                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "file": "assets.bin",
-                "bytes": 1994752
+                "offset": "0x200000",
+                "bytes": 1994752,
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
               }
             ],
-            "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019"
+            "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5"
           },
           "weather_services": true,
           "native_rejects_non_200_json": true,
@@ -2488,7 +2521,7 @@
     },
     "time_http": {
       "passed": true,
-      "tested_at_utc": "2026-10-14T14:00:24.880285+02:00",
+      "tested_at_utc": "2026-10-14T14:01:07.136730+00:00",
       "flows": {
         "original": {
           "passed": true,
@@ -2516,36 +2549,31 @@
               "requests": [
                 {
                   "server": 1,
-                  "virtual_us": 8030087
+                  "virtual_us": 4953714
                 },
                 {
-                  "server": 1,
-                  "virtual_us": 22889964
+                  "server": 2,
+                  "virtual_us": 19988664
                 },
                 {
-                  "server": 1,
-                  "virtual_us": 25040279
+                  "server": 2,
+                  "virtual_us": 25879926
                 },
                 {
-                  "server": 1,
-                  "virtual_us": 28790863
+                  "server": 2,
+                  "virtual_us": 26640241
                 },
                 {
-                  "server": 1,
-                  "virtual_us": 35309965
-                },
-                {
-                  "server": 1,
-                  "virtual_us": 39510280
+                  "server": 2,
+                  "virtual_us": 38840805
                 }
               ],
               "drops": [
                 1,
-                1,
-                1,
-                1,
-                1,
-                1
+                2,
+                2,
+                2,
+                2
               ],
               "responses": [],
               "times": []
@@ -2564,54 +2592,49 @@
               "date": "2025/9/19",
               "different_bytes": 0,
               "clean_different_bytes": 0,
-              "boot_time_seconds": 1709179374.939348
+              "boot_time_seconds": 1709179374.075728
             },
             "initial_trace": {
               "requests": [
                 {
                   "server": 1,
-                  "virtual_us": 8030087
+                  "virtual_us": 4953714
                 },
                 {
-                  "server": 1,
-                  "virtual_us": 22889964
+                  "server": 2,
+                  "virtual_us": 19988664
                 },
                 {
-                  "server": 1,
-                  "virtual_us": 25040279
+                  "server": 2,
+                  "virtual_us": 25879926
                 },
                 {
-                  "server": 1,
-                  "virtual_us": 28790863
+                  "server": 2,
+                  "virtual_us": 26640241
                 },
                 {
-                  "server": 1,
-                  "virtual_us": 35309965
+                  "server": 2,
+                  "virtual_us": 38840805
                 },
                 {
-                  "server": 1,
-                  "virtual_us": 39510280
-                },
-                {
-                  "server": 1,
-                  "virtual_us": 45029966
+                  "server": 2,
+                  "virtual_us": 45900240
                 }
               ],
               "drops": [
                 1,
-                1,
-                1,
-                1,
-                1,
-                1
+                2,
+                2,
+                2,
+                2
               ],
               "responses": [
-                1
+                2
               ],
               "times": [
                 {
                   "epoch": 1709179420,
-                  "virtual_us": 45029966
+                  "virtual_us": 45900240
                 }
               ]
             },
@@ -2629,7 +2652,7 @@
               "date": "2025/9/19",
               "different_bytes": 0,
               "clean_different_bytes": 0,
-              "boot_time_seconds": 1735726393.946121
+              "boot_time_seconds": 1735726393.924623
             },
             "server_2_2025": {
               "state": {
@@ -2645,7 +2668,7 @@
               "date": "2025/1/1",
               "different_bytes": 0,
               "clean_different_bytes": 165,
-              "boot_time_seconds": 1735726393.946121
+              "boot_time_seconds": 1735726393.924623
             }
           },
           "checks": {
@@ -2658,20 +2681,20 @@
           },
           "clock_observations": {
             "first_notification": {
-              "actual_utc_seconds": 1709179420.140337,
-              "expected_utc_seconds": 1709179420.171023,
-              "difference_seconds": -0.030685901641845703,
-              "boot_time_us": 1709179374939348,
-              "since_boot_us": 45200989,
-              "virtual_us": 45200989
+              "actual_utc_seconds": 1709179420.066081,
+              "expected_utc_seconds": 1709179420.090113,
+              "difference_seconds": -0.024031877517700195,
+              "boot_time_us": 1709179374075728,
+              "since_boot_us": 45990353,
+              "virtual_us": 45990353
             },
             "server_2_2025": {
-              "actual_utc_seconds": 1735726446.996446,
-              "expected_utc_seconds": 1735726447.020045,
-              "difference_seconds": -0.02359914779663086,
-              "boot_time_us": 1735726393946121,
-              "since_boot_us": 53050325,
-              "virtual_us": 53050325
+              "actual_utc_seconds": 1735726447.015403,
+              "expected_utc_seconds": 1735726447.046439,
+              "difference_seconds": -0.031035900115966797,
+              "boot_time_us": 1735726393924623,
+              "since_boot_us": 53090780,
+              "virtual_us": 53090780
             }
           },
           "ntp_control_contract": {
@@ -2682,57 +2705,52 @@
             "requests": [
               {
                 "server": 1,
-                "virtual_us": 8030087
+                "virtual_us": 4953714
               },
               {
-                "server": 1,
-                "virtual_us": 22889964
+                "server": 2,
+                "virtual_us": 19988664
               },
               {
-                "server": 1,
-                "virtual_us": 25040279
+                "server": 2,
+                "virtual_us": 25879926
               },
               {
-                "server": 1,
-                "virtual_us": 28790863
+                "server": 2,
+                "virtual_us": 26640241
               },
               {
-                "server": 1,
-                "virtual_us": 35309965
+                "server": 2,
+                "virtual_us": 38840805
               },
               {
-                "server": 1,
-                "virtual_us": 39510280
+                "server": 2,
+                "virtual_us": 45900240
               },
               {
-                "server": 1,
-                "virtual_us": 45029966
-              },
-              {
-                "server": 1,
-                "virtual_us": 53030280
+                "server": 2,
+                "virtual_us": 53044341
               }
             ],
             "drops": [
               1,
-              1,
-              1,
-              1,
-              1,
-              1
+              2,
+              2,
+              2,
+              2
             ],
             "responses": [
-              1,
-              1
+              2,
+              2
             ],
             "times": [
               {
                 "epoch": 1709179420,
-                "virtual_us": 45029966
+                "virtual_us": 45900240
               },
               {
                 "epoch": 1735726447,
-                "virtual_us": 53030280
+                "virtual_us": 53044341
               }
             ]
           }
@@ -2742,31 +2760,31 @@
           "sources": {
             "images": [
               {
-                "offset": "0x0",
-                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "file": "bootloader.bin",
-                "bytes": 19248
+                "offset": "0x0",
+                "bytes": 19248,
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
               },
               {
-                "offset": "0x8000",
-                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "file": "partition-table.bin",
-                "bytes": 3072
+                "offset": "0x8000",
+                "bytes": 3072,
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
               },
               {
-                "offset": "0x10000",
-                "sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
                 "file": "app.bin",
-                "bytes": 1115104
+                "offset": "0x10000",
+                "bytes": 1175584,
+                "sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826"
               },
               {
-                "offset": "0x200000",
-                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "file": "assets.bin",
-                "bytes": 1994752
+                "offset": "0x200000",
+                "bytes": 1994752,
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
               }
             ],
-            "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019"
+            "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5"
           },
           "stages": {
             "before_first_reply": {
@@ -2799,21 +2817,21 @@
               "date": "2024/2/29",
               "different_bytes": 0,
               "clean_different_bytes": 0,
-              "boot_time_seconds": 1709179386.474783
+              "boot_time_seconds": 1709179385.757621
             },
             "initial_trace": {
               "requests": [
                 {
                   "server": 1,
-                  "virtual_us": 3451365
+                  "virtual_us": 4155660
                 },
                 {
                   "server": 2,
-                  "virtual_us": 18465525
+                  "virtual_us": 19179011
                 },
                 {
                   "server": 3,
-                  "virtual_us": 33503507
+                  "virtual_us": 34210015
                 }
               ],
               "drops": [
@@ -2826,7 +2844,7 @@
               "times": [
                 {
                   "epoch": 1709179420,
-                  "virtual_us": 33503507
+                  "virtual_us": 34210015
                 }
               ]
             },
@@ -2844,7 +2862,7 @@
               "date": "2025/1/1",
               "different_bytes": 0,
               "clean_different_bytes": 0,
-              "boot_time_seconds": 1735726378.354182
+              "boot_time_seconds": 1735726381.642401
             },
             "year-jump": {
               "state": {
@@ -2860,7 +2878,7 @@
               "date": "2026/1/1",
               "different_bytes": 0,
               "clean_different_bytes": 0,
-              "boot_time_seconds": 1767262374.527906
+              "boot_time_seconds": 1767262376.551865
             },
             "backward-leap-day": {
               "state": {
@@ -2876,7 +2894,7 @@
               "date": "2024/2/29",
               "different_bytes": 0,
               "clean_different_bytes": 0,
-              "boot_time_seconds": 1709179341.594773
+              "boot_time_seconds": 1709179344.119569
             },
             "post-2038": {
               "state": {
@@ -2892,7 +2910,7 @@
               "date": "2038/1/19",
               "different_bytes": 0,
               "clean_different_bytes": 0,
-              "boot_time_seconds": 2147483566.18614
+              "boot_time_seconds": 2147483569.792467
             },
             "reset_before_notification": {
               "state": {
@@ -2908,7 +2926,7 @@
               "date": "2025/9/19",
               "different_bytes": 0,
               "clean_different_bytes": 0,
-              "boot_time_seconds": 2147483566.18614
+              "boot_time_seconds": 2147483569.792467
             },
             "reset_recovered": {
               "state": {
@@ -2924,7 +2942,7 @@
               "date": "2038/1/19",
               "different_bytes": 0,
               "clean_different_bytes": 0,
-              "boot_time_seconds": 2147483538.081978
+              "boot_time_seconds": 2147483541.781749
             }
           },
           "checks": {
@@ -2937,70 +2955,70 @@
           },
           "clock_observations": {
             "first_notification": {
-              "actual_utc_seconds": 1709179420.056527,
-              "expected_utc_seconds": 1709179420.072658,
-              "difference_seconds": -0.016131162643432617,
-              "boot_time_us": 1709179386474783,
-              "since_boot_us": 33581744,
-              "virtual_us": 33576165,
-              "systimer_ticks": 349183114,
-              "rtc_hrt_offset_us": 68185,
-              "system_correction_us": -61740
+              "actual_utc_seconds": 1709179420.020478,
+              "expected_utc_seconds": 1709179420.046807,
+              "difference_seconds": -0.02632904052734375,
+              "boot_time_us": 1709179385757621,
+              "since_boot_us": 34262857,
+              "virtual_us": 34256822,
+              "systimer_ticks": 356263778,
+              "rtc_hrt_offset_us": 71207,
+              "system_correction_us": -64482
             },
             "server_2_2025": {
-              "actual_utc_seconds": 1735726447.113686,
-              "expected_utc_seconds": 1735726447.135278,
-              "difference_seconds": -0.021591901779174805,
-              "boot_time_us": 1735726378354182,
-              "since_boot_us": 68759504,
-              "virtual_us": 68754453,
-              "systimer_ticks": 715031820,
-              "rtc_hrt_offset_us": 68185,
-              "system_correction_us": -61740
+              "actual_utc_seconds": 1735726447.174276,
+              "expected_utc_seconds": 1735726447.194134,
+              "difference_seconds": -0.01985788345336914,
+              "boot_time_us": 1735726381642401,
+              "since_boot_us": 65531875,
+              "virtual_us": 65526484,
+              "systimer_ticks": 681461569,
+              "rtc_hrt_offset_us": 71207,
+              "system_correction_us": -64482
             },
             "year-jump": {
-              "actual_utc_seconds": 1767262447.107075,
-              "expected_utc_seconds": 1767262447.139963,
-              "difference_seconds": -0.032887935638427734,
-              "boot_time_us": 1767262374527906,
-              "since_boot_us": 72579169,
-              "virtual_us": 72583823,
-              "systimer_ticks": 754756333,
-              "rtc_hrt_offset_us": 68185,
-              "system_correction_us": -61740
+              "actual_utc_seconds": 1767262447.005528,
+              "expected_utc_seconds": 1767262447.022096,
+              "difference_seconds": -0.01656794548034668,
+              "boot_time_us": 1767262376551865,
+              "since_boot_us": 70453663,
+              "virtual_us": 70448381,
+              "systimer_ticks": 732648159,
+              "rtc_hrt_offset_us": 71207,
+              "system_correction_us": -64482
             },
             "backward-leap-day": {
-              "actual_utc_seconds": 1709179420.154274,
-              "expected_utc_seconds": 1709179420.170808,
-              "difference_seconds": -0.016534090042114258,
-              "boot_time_us": 1709179341594773,
-              "since_boot_us": 78559501,
-              "virtual_us": 78554667,
-              "systimer_ticks": 816951787,
-              "rtc_hrt_offset_us": 68185,
-              "system_correction_us": -61740
+              "actual_utc_seconds": 1709179420.171346,
+              "expected_utc_seconds": 1709179420.190021,
+              "difference_seconds": -0.01867508888244629,
+              "boot_time_us": 1709179344119569,
+              "since_boot_us": 76051777,
+              "virtual_us": 76046615,
+              "systimer_ticks": 790868542,
+              "rtc_hrt_offset_us": 71207,
+              "system_correction_us": -64482
             },
             "post-2038": {
-              "actual_utc_seconds": 2147483648.16463,
-              "expected_utc_seconds": 2147483648.189876,
-              "difference_seconds": -0.025246143341064453,
-              "boot_time_us": 2147483566186140,
-              "since_boot_us": 81978490,
-              "virtual_us": 81973735,
-              "systimer_ticks": 852509268,
-              "rtc_hrt_offset_us": 68185,
-              "system_correction_us": -61740
+              "actual_utc_seconds": 2147483648.075288,
+              "expected_utc_seconds": 2147483648.110237,
+              "difference_seconds": -0.034949302673339844,
+              "boot_time_us": 2147483569792467,
+              "since_boot_us": 78282821,
+              "virtual_us": 78286832,
+              "systimer_ticks": 814071403,
+              "rtc_hrt_offset_us": 71207,
+              "system_correction_us": -64482
             },
             "reset_recovered": {
-              "actual_utc_seconds": 2147483648.068667,
-              "expected_utc_seconds": 2147483648.084412,
-              "difference_seconds": -0.015745162963867188,
-              "boot_time_us": 2147483538081978,
-              "since_boot_us": 109986689,
-              "virtual_us": 101541587,
-              "systimer_ticks": 1056010524,
-              "rtc_hrt_offset_us": 90490053,
-              "system_correction_us": -82042837
+              "actual_utc_seconds": 2147483648.08912,
+              "expected_utc_seconds": 2147483648.114856,
+              "difference_seconds": -0.025735855102539062,
+              "boot_time_us": 2147483541781749,
+              "since_boot_us": 106307371,
+              "virtual_us": 98241604,
+              "systimer_ticks": 1021691290,
+              "rtc_hrt_offset_us": 86425758,
+              "system_correction_us": -78357934
             }
           },
           "ntp_control_contract": {
@@ -3011,47 +3029,47 @@
             "requests": [
               {
                 "server": 1,
-                "virtual_us": 3451365
+                "virtual_us": 4155660
               },
               {
                 "server": 2,
-                "virtual_us": 18465525
+                "virtual_us": 19179011
               },
               {
                 "server": 3,
-                "virtual_us": 33503507
+                "virtual_us": 34210015
               },
               {
                 "server": 3,
-                "virtual_us": 38573859
+                "virtual_us": 35286595
               },
               {
                 "server": 1,
-                "virtual_us": 53584137
+                "virtual_us": 50297246
               },
               {
                 "server": 2,
-                "virtual_us": 68619175
+                "virtual_us": 65332350
               },
               {
                 "server": 2,
-                "virtual_us": 72443860
+                "virtual_us": 70426285
               },
               {
                 "server": 2,
-                "virtual_us": 78383859
+                "virtual_us": 75856594
               },
               {
                 "server": 2,
-                "virtual_us": 81783859
+                "virtual_us": 78176595
               },
               {
                 "server": 1,
-                "virtual_us": 86427712
+                "virtual_us": 83097911
               },
               {
                 "server": 2,
-                "virtual_us": 101457175
+                "virtual_us": 98126748
               }
             ],
             "drops": [
@@ -3072,27 +3090,27 @@
             "times": [
               {
                 "epoch": 1709179420,
-                "virtual_us": 33503507
+                "virtual_us": 34210015
               },
               {
                 "epoch": 1735726447,
-                "virtual_us": 68619175
+                "virtual_us": 65332350
               },
               {
                 "epoch": 1767262447,
-                "virtual_us": 72443860
+                "virtual_us": 70426285
               },
               {
                 "epoch": 1709179420,
-                "virtual_us": 78383859
+                "virtual_us": 75856594
               },
               {
                 "epoch": 2147483648,
-                "virtual_us": 81783859
+                "virtual_us": 78176595
               },
               {
                 "epoch": 2147483648,
-                "virtual_us": 101457175
+                "virtual_us": 98126748
               }
             ]
           }
@@ -3103,10 +3121,891 @@
         "calendar_address": 1070266180,
         "microseconds_offset_address": 1070282816,
         "system_correction_address": 1070282832,
-        "elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394"
+        "elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5"
       },
       "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
       "scope": "Exercise actual UDP SNTP fallback, clock updates and displayed dates in QEMU.\n\nQMP changes only the opt-in service's responses. Guest registers, RAM, clocks and\nexecutable bytes are never patched. Initial flash changes are synthetic settings\nin disposable copies; both production applications and source images stay intact.\n"
+    },
+    "text_http": {
+      "passed": true,
+      "tested_at_utc": "2026-10-14T14:04:14.039005+00:00",
+      "flows": {
+        "original": {
+          "passed": true,
+          "sources": {
+            "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+          },
+          "cases": [
+            {
+              "case": "cyrillic",
+              "city": "Fixture0",
+              "source_main": "Облачно",
+              "source_description": "Небольшой дождь",
+              "cache": {
+                "valid": true,
+                "main_hex": "d09ed0b1d0bbd0b0d187d0bdd0be",
+                "description_hex": "d09dd0b5d0b1d0bed0bbd18cd188d0"
+              },
+              "server_multibyte_split": true,
+              "literal_city_vs_corrected_pixels": 0,
+              "literal_frame_sha256": "6606ae620c0073ead0cca9da5f73333dcf4e9d83519ba77841520000e2770615",
+              "passed": true
+            },
+            {
+              "case": "unicode-scroll",
+              "city": "Fixture1",
+              "source_main": "Облачно",
+              "source_description": "clear",
+              "cache": {
+                "valid": true,
+                "main_hex": "d09ed0b1d0bbd0b0d187d0bdd0be",
+                "description_hex": "636c656172"
+              },
+              "server_multibyte_split": true,
+              "literal_city_vs_corrected_pixels": 0,
+              "literal_frame_sha256": "aae96f6f4f4174a121cfeea03c17a1c251fe0956c6dc416c8befa822d3d4f3ce",
+              "passed": true
+            },
+            {
+              "case": "latin",
+              "city": "Fixture2",
+              "source_main": "Café",
+              "source_description": "déjà vu",
+              "cache": {
+                "valid": true,
+                "main_hex": "436166c3a9",
+                "description_hex": "64c3a96ac3a0207675"
+              },
+              "server_multibyte_split": true,
+              "literal_city_vs_corrected_pixels": 0,
+              "literal_frame_sha256": "ab98701614c9f4da1fd5ecfc1e794944dc5efa62c1dba58ffb946d355dde5837",
+              "passed": true
+            },
+            {
+              "case": "unsupported-cjk",
+              "city": "Fixture3",
+              "source_main": "😀",
+              "source_description": "clear",
+              "cache": {
+                "valid": true,
+                "main_hex": "f09f9880",
+                "description_hex": "636c656172"
+              },
+              "server_multibyte_split": true,
+              "literal_city_vs_corrected_pixels": 0,
+              "literal_frame_sha256": "d79401e5265d58c71ca7ff14df9387e4e969be0b4b4553393efe384a4bea76c6",
+              "passed": true
+            },
+            {
+              "case": "split-label-budget",
+              "city": "Fixture4",
+              "source_main": "12345678901234é",
+              "source_description": "1234567890123é",
+              "cache": {
+                "valid": true,
+                "main_hex": "3132333435363738393031323334c3",
+                "description_hex": "31323334353637383930313233c3a9"
+              },
+              "server_multibyte_split": true,
+              "literal_city_vs_corrected_pixels": 0,
+              "literal_frame_sha256": "68d5de80145811848a93649cbaf7c6410ad53c2c5203a648d03990d5c9964b70",
+              "passed": true
+            }
+          ],
+          "checks": {
+            "browser_style_utf8_post": true,
+            "actual_weather_prefixes": true,
+            "native_glyphs_width_scroll_guards": false,
+            "no_panic": true
+          },
+          "requests": [
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "36bb2c567dbc99042838799eabb0de11eafc52a7095252fe0c7059e6f2933f47",
+              "fragments": 5
+            },
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "e4cea91383344080859aadf3fda260d7b22292fadfe626d488d8a76b71d1b402",
+              "fragments": 6
+            },
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "a62cdd4ea3ab37ea42bf5ac5d0b4d77704829612aff346b7c13bcf34853bd468",
+              "fragments": 5
+            },
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "7edbbabeb72c2b6fa03ee824bdeddfe85f2506d60a1e7555eea1935779d6f5af",
+              "fragments": 5
+            },
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "d4f20b408a190962875e7e830810d8c562926ed62d5401f81746170b0ba0f2a9",
+              "fragments": 5
+            },
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "93cfbb049d13b7b320bf7fff8ff9139adb7221636dfe8646a5dfb661bf5ae0e3",
+              "fragments": 5
+            }
+          ]
+        },
+        "reconstructed": {
+          "passed": true,
+          "sources": {
+            "images": [
+              {
+                "file": "bootloader.bin",
+                "offset": "0x0",
+                "bytes": 19248,
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
+              },
+              {
+                "file": "partition-table.bin",
+                "offset": "0x8000",
+                "bytes": 3072,
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+              },
+              {
+                "file": "app.bin",
+                "offset": "0x10000",
+                "bytes": 1175584,
+                "sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826"
+              },
+              {
+                "file": "assets.bin",
+                "offset": "0x200000",
+                "bytes": 1994752,
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+              }
+            ],
+            "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5"
+          },
+          "cases": [
+            {
+              "case": "cyrillic",
+              "city": "Тест",
+              "source_main": "Облачно",
+              "source_description": "Небольшой дождь",
+              "cache": {
+                "valid": true,
+                "main_hex": "d09ed0b1d0bbd0b0d187d0bdd0be",
+                "description_hex": "d09dd0b5d0b1d0bed0bbd18cd188"
+              },
+              "server_multibyte_split": true,
+              "frame": {
+                "labels": [
+                  {
+                    "text": "Тест",
+                    "x": 0,
+                    "y": 10,
+                    "width": 180,
+                    "length": 48,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 2016,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "10.0.2.15",
+                    "x": 0,
+                    "y": 40,
+                    "width": 180,
+                    "length": 108,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65535,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "Облачно",
+                    "x": 160,
+                    "y": 83,
+                    "width": 80,
+                    "length": 84,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65504,
+                    "returning": false,
+                    "completed": false
+                  }
+                ],
+                "virtual_seconds": 25.348863,
+                "rendered_weather_generation": 2,
+                "different_pixels": {
+                  "field-0": 0,
+                  "field-2": 0,
+                  "guard-0": 0,
+                  "guard-1": 0,
+                  "guard-2": 0,
+                  "guard-3": 0
+                },
+                "passed": true
+              },
+              "passed": true
+            },
+            {
+              "case": "unicode-scroll",
+              "city": "ДлинныйГородДлинныйГород",
+              "source_main": "Облачно",
+              "source_description": "clear",
+              "cache": {
+                "valid": true,
+                "main_hex": "d09ed0b1d0bbd0b0d187d0bdd0be",
+                "description_hex": "636c656172"
+              },
+              "server_multibyte_split": true,
+              "frame": {
+                "labels": [
+                  {
+                    "text": "ДлинныйГородДлинныйГород",
+                    "x": 0,
+                    "y": 10,
+                    "width": 180,
+                    "length": 288,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 2016,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "10.0.2.15",
+                    "x": 0,
+                    "y": 40,
+                    "width": 180,
+                    "length": 108,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65535,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "Облачно",
+                    "x": 160,
+                    "y": 83,
+                    "width": 80,
+                    "length": 84,
+                    "offset": 0,
+                    "pause": 14,
+                    "color": 65504,
+                    "returning": false,
+                    "completed": false
+                  }
+                ],
+                "virtual_seconds": 25.611112,
+                "rendered_weather_generation": 4,
+                "different_pixels": {
+                  "field-0": 0,
+                  "field-2": 0,
+                  "guard-0": 0,
+                  "guard-1": 0,
+                  "guard-2": 0,
+                  "guard-3": 0
+                },
+                "passed": true
+              },
+              "scroll": {
+                "passed": true,
+                "first": {
+                  "labels": [
+                    {
+                      "text": "ДлинныйГородДлинныйГород",
+                      "x": 0,
+                      "y": 10,
+                      "width": 180,
+                      "length": 288,
+                      "offset": 0,
+                      "pause": 15,
+                      "color": 2016,
+                      "returning": false,
+                      "completed": false
+                    },
+                    {
+                      "text": "10.0.2.15",
+                      "x": 0,
+                      "y": 40,
+                      "width": 180,
+                      "length": 108,
+                      "offset": 0,
+                      "pause": 15,
+                      "color": 65535,
+                      "returning": false,
+                      "completed": false
+                    },
+                    {
+                      "text": "Облачно",
+                      "x": 160,
+                      "y": 83,
+                      "width": 80,
+                      "length": 84,
+                      "offset": 0,
+                      "pause": 14,
+                      "color": 65504,
+                      "returning": false,
+                      "completed": false
+                    }
+                  ],
+                  "virtual_seconds": 25.61154,
+                  "rendered_weather_generation": 4,
+                  "different_pixels": {
+                    "field-0": 0,
+                    "field-2": 0,
+                    "guard-0": 0,
+                    "guard-1": 0,
+                    "guard-2": 0,
+                    "guard-3": 0
+                  },
+                  "passed": true
+                },
+                "outward": {
+                  "labels": [
+                    {
+                      "text": "ДлинныйГородДлинныйГород",
+                      "x": 0,
+                      "y": 10,
+                      "width": 180,
+                      "length": 288,
+                      "offset": 2,
+                      "pause": 0,
+                      "color": 2016,
+                      "returning": false,
+                      "completed": false
+                    },
+                    {
+                      "text": "Wind Speed",
+                      "x": 0,
+                      "y": 40,
+                      "width": 180,
+                      "length": 120,
+                      "offset": 0,
+                      "pause": 15,
+                      "color": 65535,
+                      "returning": false,
+                      "completed": false
+                    },
+                    {
+                      "text": "Облачно",
+                      "x": 160,
+                      "y": 83,
+                      "width": 80,
+                      "length": 84,
+                      "offset": 4,
+                      "pause": 15,
+                      "color": 65504,
+                      "returning": true,
+                      "completed": false
+                    }
+                  ],
+                  "virtual_seconds": 27.677213,
+                  "rendered_weather_generation": 6,
+                  "different_pixels": {
+                    "field-0": 0,
+                    "field-2": 0,
+                    "guard-0": 0,
+                    "guard-1": 0,
+                    "guard-2": 0,
+                    "guard-3": 0
+                  },
+                  "passed": true
+                },
+                "end": {
+                  "labels": [
+                    {
+                      "text": "ДлинныйГородДлинныйГород",
+                      "x": 0,
+                      "y": 10,
+                      "width": 180,
+                      "length": 288,
+                      "offset": 108,
+                      "pause": 15,
+                      "color": 2016,
+                      "returning": true,
+                      "completed": false
+                    },
+                    {
+                      "text": "10.0.2.15",
+                      "x": 0,
+                      "y": 40,
+                      "width": 180,
+                      "length": 108,
+                      "offset": 0,
+                      "pause": 15,
+                      "color": 65535,
+                      "returning": false,
+                      "completed": false
+                    },
+                    {
+                      "text": "Облачно",
+                      "x": 160,
+                      "y": 83,
+                      "width": 80,
+                      "length": 84,
+                      "offset": 0,
+                      "pause": 13,
+                      "color": 65504,
+                      "returning": false,
+                      "completed": true
+                    }
+                  ],
+                  "virtual_seconds": 34.557295,
+                  "rendered_weather_generation": 6,
+                  "different_pixels": {
+                    "field-0": 0,
+                    "field-2": 0,
+                    "guard-0": 0,
+                    "guard-1": 0,
+                    "guard-2": 0,
+                    "guard-3": 0
+                  },
+                  "passed": true
+                },
+                "back": {
+                  "labels": [
+                    {
+                      "text": "ДлинныйГородДлинныйГород",
+                      "x": 0,
+                      "y": 10,
+                      "width": 180,
+                      "length": 288,
+                      "offset": 108,
+                      "pause": 0,
+                      "color": 2016,
+                      "returning": true,
+                      "completed": false
+                    },
+                    {
+                      "text": "10.0.2.15",
+                      "x": 0,
+                      "y": 40,
+                      "width": 180,
+                      "length": 108,
+                      "offset": 0,
+                      "pause": 15,
+                      "color": 65535,
+                      "returning": false,
+                      "completed": false
+                    },
+                    {
+                      "text": "Облачно",
+                      "x": 160,
+                      "y": 83,
+                      "width": 80,
+                      "length": 84,
+                      "offset": 4,
+                      "pause": 15,
+                      "color": 65504,
+                      "returning": true,
+                      "completed": true
+                    }
+                  ],
+                  "virtual_seconds": 36.556621,
+                  "rendered_weather_generation": 6,
+                  "different_pixels": {
+                    "field-0": 0,
+                    "field-2": 0,
+                    "guard-0": 0,
+                    "guard-1": 0,
+                    "guard-2": 0,
+                    "guard-3": 0
+                  },
+                  "passed": true
+                },
+                "complete": {
+                  "labels": [
+                    {
+                      "text": "ДлинныйГородДлинныйГород",
+                      "x": 0,
+                      "y": 10,
+                      "width": 180,
+                      "length": 288,
+                      "offset": 0,
+                      "pause": 15,
+                      "color": 2016,
+                      "returning": false,
+                      "completed": true
+                    },
+                    {
+                      "text": "Temp min 22¡æ",
+                      "x": 0,
+                      "y": 40,
+                      "width": 180,
+                      "length": 156,
+                      "offset": 0,
+                      "pause": 15,
+                      "color": 65535,
+                      "returning": false,
+                      "completed": false
+                    },
+                    {
+                      "text": "Облачно",
+                      "x": 160,
+                      "y": 83,
+                      "width": 80,
+                      "length": 84,
+                      "offset": 0,
+                      "pause": 12,
+                      "color": 65504,
+                      "returning": false,
+                      "completed": true
+                    }
+                  ],
+                  "virtual_seconds": 43.518091,
+                  "rendered_weather_generation": 6,
+                  "different_pixels": {
+                    "field-0": 0,
+                    "field-2": 0,
+                    "guard-0": 0,
+                    "guard-1": 0,
+                    "guard-2": 0,
+                    "guard-3": 0
+                  },
+                  "passed": true
+                }
+              },
+              "passed": true
+            },
+            {
+              "case": "latin",
+              "city": "München",
+              "source_main": "Café",
+              "source_description": "déjà vu",
+              "cache": {
+                "valid": true,
+                "main_hex": "436166c3a9",
+                "description_hex": "64c3a96ac3a0207675"
+              },
+              "server_multibyte_split": true,
+              "frame": {
+                "labels": [
+                  {
+                    "text": "München",
+                    "x": 0,
+                    "y": 10,
+                    "width": 180,
+                    "length": 84,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 2016,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "10.0.2.15",
+                    "x": 0,
+                    "y": 40,
+                    "width": 180,
+                    "length": 108,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65535,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "Café",
+                    "x": 160,
+                    "y": 83,
+                    "width": 80,
+                    "length": 48,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65504,
+                    "returning": false,
+                    "completed": false
+                  }
+                ],
+                "virtual_seconds": 43.821438,
+                "rendered_weather_generation": 6,
+                "different_pixels": {
+                  "field-0": 0,
+                  "field-2": 0,
+                  "guard-0": 0,
+                  "guard-1": 0,
+                  "guard-2": 0,
+                  "guard-3": 0
+                },
+                "passed": true
+              },
+              "passed": true
+            },
+            {
+              "case": "unsupported-cjk",
+              "city": "北京",
+              "source_main": "😀",
+              "source_description": "clear",
+              "cache": {
+                "valid": true,
+                "main_hex": "f09f9880",
+                "description_hex": "636c656172"
+              },
+              "server_multibyte_split": true,
+              "frame": {
+                "labels": [
+                  {
+                    "text": "北京",
+                    "x": 0,
+                    "y": 10,
+                    "width": 180,
+                    "length": 24,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 2016,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "10.0.2.15",
+                    "x": 0,
+                    "y": 40,
+                    "width": 180,
+                    "length": 108,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65535,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "😀",
+                    "x": 160,
+                    "y": 83,
+                    "width": 80,
+                    "length": 12,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65504,
+                    "returning": false,
+                    "completed": false
+                  }
+                ],
+                "virtual_seconds": 44.185395,
+                "rendered_weather_generation": 8,
+                "different_pixels": {
+                  "field-0": 0,
+                  "field-2": 0,
+                  "guard-0": 0,
+                  "guard-1": 0,
+                  "guard-2": 0,
+                  "guard-3": 0
+                },
+                "passed": true
+              },
+              "passed": true
+            },
+            {
+              "case": "split-label-budget",
+              "city": "A",
+              "source_main": "12345678901234é",
+              "source_description": "1234567890123é",
+              "cache": {
+                "valid": true,
+                "main_hex": "3132333435363738393031323334",
+                "description_hex": "31323334353637383930313233c3a9"
+              },
+              "server_multibyte_split": true,
+              "frame": {
+                "labels": [
+                  {
+                    "text": "A",
+                    "x": 0,
+                    "y": 10,
+                    "width": 180,
+                    "length": 12,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 2016,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "10.0.2.15",
+                    "x": 0,
+                    "y": 40,
+                    "width": 180,
+                    "length": 108,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65535,
+                    "returning": false,
+                    "completed": false
+                  },
+                  {
+                    "text": "12345678901234",
+                    "x": 160,
+                    "y": 83,
+                    "width": 80,
+                    "length": 168,
+                    "offset": 0,
+                    "pause": 15,
+                    "color": 65504,
+                    "returning": false,
+                    "completed": false
+                  }
+                ],
+                "virtual_seconds": 44.558287,
+                "rendered_weather_generation": 10,
+                "different_pixels": {
+                  "field-0": 0,
+                  "field-2": 0,
+                  "guard-0": 0,
+                  "guard-1": 0,
+                  "guard-2": 0,
+                  "guard-3": 0
+                },
+                "passed": true
+              },
+              "passed": true
+            }
+          ],
+          "checks": {
+            "browser_style_utf8_post": true,
+            "actual_weather_prefixes": true,
+            "native_glyphs_width_scroll_guards": true,
+            "no_panic": true
+          },
+          "requests": [
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "36bb2c567dbc99042838799eabb0de11eafc52a7095252fe0c7059e6f2933f47",
+              "fragments": 5
+            },
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "e4cea91383344080859aadf3fda260d7b22292fadfe626d488d8a76b71d1b402",
+              "fragments": 6
+            },
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "a62cdd4ea3ab37ea42bf5ac5d0b4d77704829612aff346b7c13bcf34853bd468",
+              "fragments": 5
+            },
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "7edbbabeb72c2b6fa03ee824bdeddfe85f2506d60a1e7555eea1935779d6f5af",
+              "fragments": 5
+            },
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "d4f20b408a190962875e7e830810d8c562926ed62d5401f81746170b0ba0f2a9",
+              "fragments": 5
+            },
+            {
+              "method": "GET",
+              "resource": "/data/2.5/weather",
+              "synthetic_location": true,
+              "synthetic_key": true,
+              "status": 200,
+              "body_sha256": "93cfbb049d13b7b320bf7fff8ff9139adb7221636dfe8646a5dfb661bf5ae0e3",
+              "fragments": 5
+            }
+          ]
+        }
+      },
+      "cache_layout": {
+        "address": 1070267000,
+        "size": 232,
+        "fields": {
+          "valid": 0,
+          "temperature_c": 8,
+          "wind_mps": 16,
+          "temperature_min_c": 24,
+          "temperature_max_c": 32,
+          "humidity": 40,
+          "timezone_seconds": 44,
+          "icon": 48,
+          "description": 52,
+          "city": 117,
+          "country": 182,
+          "main": 185,
+          "wind_direction": 201,
+          "generation": 224
+        },
+        "request_state_address": 1070282988,
+        "elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5"
+      },
+      "scroll_layout": {
+        "address": 1070266664,
+        "size": 300,
+        "stride": 100,
+        "fields": {
+          "text": 0,
+          "x": 68,
+          "y": 72,
+          "width": 76,
+          "color": 80,
+          "length": 84,
+          "offset": 88,
+          "pause": 92,
+          "returning": 96,
+          "completed": 97
+        },
+        "rendered_weather_address": 1070282952
+      },
+      "font_source_sha256": "fc0743d164690f99b7e2e1b9d503180e4c719a9831ae03fd8f6da18c857dee27",
+      "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
+      "scope": "Exercise actual UTF-8 settings/weather HTTP and bounded text pixels in both VMs.",
+      "http_helper_sha256": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+      "factory_utf8_city_fault": {
+        "passed": true,
+        "scope": "Expected immutable factory defect only; no corrected-program panic is permitted.",
+        "sources": {
+          "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+        },
+        "post_error": "TimeoutError",
+        "panic_pc": "0x4203e8f0",
+        "caller": "0x4201098c",
+        "fault_address": "0xc",
+        "expected_fault_detected": true
+      }
     },
     "boot_reset": {
       "original": {
@@ -3157,12 +4056,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.540912
+            "virtual_seconds": 46.337162
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.424286
+            "virtual_seconds": 46.556809
           }
         },
         "equal_pixels_min": 1.0,
@@ -3174,16 +4073,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.601678
+            "virtual_seconds": 46.50148
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.66467
+            "virtual_seconds": 46.506717
           }
         },
-        "equal_pixels_min": 0.9757465277777778,
-        "equal_pixels_max": 0.9869444444444444
+        "equal_pixels_min": 0.9751909722222222,
+        "equal_pixels_max": 0.9880729166666666
       },
       "simple": {
         "passed": true,
@@ -3191,12 +4090,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.86101
+            "virtual_seconds": 46.64009
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.875316
+            "virtual_seconds": 46.93676
           }
         },
         "equal_pixels_min": 0.9973611111111111,
@@ -3208,12 +4107,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.810843
+            "virtual_seconds": 46.69056
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.62392
+            "virtual_seconds": 46.777409
           }
         },
         "equal_pixels_min": 0.0003298611111111111,
@@ -3225,21 +4124,21 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.391187
+            "virtual_seconds": 46.193523
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.664508
+            "virtual_seconds": 46.29934
           }
         },
-        "equal_pixels_min": 0.9838194444444445,
-        "equal_pixels_max": 0.9882986111111111
+        "equal_pixels_min": 0.9861979166666667,
+        "equal_pixels_max": 0.9908333333333333
       }
     },
     "field_http": {
       "passed": true,
-      "tested_at_utc": "2026-10-14T13:58:30.18742+02:00",
+      "tested_at_utc": "2026-10-14T13:59:25.789582+00:00",
       "qemu_sha256": "bf98de89b4d77fb73c9f9d594e9de3e65ec3057d53e36443f67abf871533d44c",
       "cache_layout": {
         "address": 1070267000,
@@ -3261,7 +4160,7 @@
           "generation": 224
         },
         "request_state_address": 1070282988,
-        "elf_sha256": "ee74d566d3d13a33c5d2ce767d8b7570efc853b6446d390b9d6646dc7793a394"
+        "elf_sha256": "570d62ad0547ae49a4bbe42b7deee586d319553f5565599d35635eaf5da6d2c5"
       },
       "scroll_layout": {
         "address": 1070266664,
@@ -3320,7 +4219,7 @@
                 "icon_offset": 3878912
               },
               "frame": {
-                "virtual_seconds": 30.121138,
+                "virtual_seconds": 29.880537,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -3342,7 +4241,7 @@
                 "icon_offset": 3878912
               },
               "frame": {
-                "virtual_seconds": 32.581442,
+                "virtual_seconds": 32.291103,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -3364,7 +4263,7 @@
                 "icon_offset": 3802112
               },
               "frame": {
-                "virtual_seconds": 34.970543,
+                "virtual_seconds": 34.681199,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -3386,7 +4285,7 @@
                 "icon_offset": 0
               },
               "frame": {
-                "virtual_seconds": 37.457805,
+                "virtual_seconds": 37.241361,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -3409,31 +4308,31 @@
           "sources": {
             "images": [
               {
-                "offset": "0x0",
-                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "file": "bootloader.bin",
-                "bytes": 19248
+                "offset": "0x0",
+                "bytes": 19248,
+                "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
               },
               {
-                "offset": "0x8000",
-                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "file": "partition-table.bin",
-                "bytes": 3072
+                "offset": "0x8000",
+                "bytes": 3072,
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
               },
               {
-                "offset": "0x10000",
-                "sha256": "2a60eefcc480f96eced3e6318f91995f89b38475f93ce3551da1847c135f672c",
                 "file": "app.bin",
-                "bytes": 1115104
+                "offset": "0x10000",
+                "bytes": 1175584,
+                "sha256": "2acdf34f68edccdfa9fd4753a22909598391ee23a6bc2e40e91737061a80f826"
               },
               {
-                "offset": "0x200000",
-                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "file": "assets.bin",
-                "bytes": 1994752
+                "offset": "0x200000",
+                "bytes": 1994752,
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
               }
             ],
-            "source_sha256": "9402fd83c7cef65222685deff3fbe6a98ad9cb197413da3d6af2b90536ace019"
+            "source_sha256": "72ad106b1276f430f7f26b5e1a7fc6660f0174919f009d3591a70d660b64e1b5"
           },
           "checks": {
             "actual_city_http": true,
@@ -3511,7 +4410,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 40.709416,
+                "virtual_seconds": 40.711728,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -3523,7 +4422,7 @@
                 },
                 "rendered_weather_generation": 5,
                 "passed": true,
-                "attempts": 3
+                "attempts": 2
               }
             },
             "unavailable": {
@@ -3578,7 +4477,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 40.976475,
+                "virtual_seconds": 40.988352,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -3645,7 +4544,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 41.32579,
+                "virtual_seconds": 41.334159,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -3712,7 +4611,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 41.691794,
+                "virtual_seconds": 41.687615,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -3746,7 +4645,7 @@
                 "pause": true
               }
             },
-            "observed_frames": 134
+            "observed_frames": 110
           },
           "refresh": {
             "passed": true,
@@ -3789,7 +4688,7 @@
                   "completed": true
                 }
               ],
-              "virtual_seconds": 38.01365,
+              "virtual_seconds": 37.966905,
               "different_pixels": {
                 "field-0": 0,
                 "field-2": 0,
@@ -3801,7 +4700,7 @@
               },
               "rendered_weather_generation": 4,
               "passed": true,
-              "attempts": 89
+              "attempts": 74
             },
             "held": [
               {
@@ -3843,8 +4742,8 @@
                     "completed": true
                   }
                 ],
-                "virtual_seconds": 38.354695,
-                "pixels_sha256": "428324132afbccfe22e9240bea7b568f26e620f7907b32c5e6bc32ac22efde6f",
+                "virtual_seconds": 38.29767,
+                "pixels_sha256": "508f1d1b9e927cd33a47a90d80504abae9c86157cbfe09e45cb31e681b671693",
                 "rendered_weather_generation": 4
               },
               {
@@ -3886,8 +4785,8 @@
                     "completed": true
                   }
                 ],
-                "virtual_seconds": 38.4539,
-                "pixels_sha256": "428324132afbccfe22e9240bea7b568f26e620f7907b32c5e6bc32ac22efde6f",
+                "virtual_seconds": 38.39708,
+                "pixels_sha256": "508f1d1b9e927cd33a47a90d80504abae9c86157cbfe09e45cb31e681b671693",
                 "rendered_weather_generation": 4
               },
               {
@@ -3929,8 +4828,8 @@
                     "completed": true
                   }
                 ],
-                "virtual_seconds": 38.553652,
-                "pixels_sha256": "428324132afbccfe22e9240bea7b568f26e620f7907b32c5e6bc32ac22efde6f",
+                "virtual_seconds": 38.496962,
+                "pixels_sha256": "508f1d1b9e927cd33a47a90d80504abae9c86157cbfe09e45cb31e681b671693",
                 "rendered_weather_generation": 4
               }
             ],
@@ -3973,7 +4872,7 @@
                   "completed": true
                 }
               ],
-              "virtual_seconds": 39.784766,
+              "virtual_seconds": 39.726996,
               "different_pixels": {
                 "field-0": 0,
                 "field-2": 0,
@@ -4028,7 +4927,7 @@
                 "completed": false
               }
             ],
-            "virtual_seconds": 40.35409,
+            "virtual_seconds": 40.369908,
             "different_pixels": {
               "field-0": 0,
               "field-2": 0,
@@ -4040,7 +4939,7 @@
             },
             "rendered_weather_generation": 5,
             "passed": true,
-            "attempts": 1
+            "attempts": 3
           }
         }
       }
