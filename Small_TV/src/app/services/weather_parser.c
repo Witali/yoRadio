@@ -1,5 +1,6 @@
 #include "services.h"
 #include "cJSON.h"
+#include "text.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,7 +20,9 @@ static bool number(const cJSON *object, const char *name, double minimum, double
 bool weather_parse_response(const char *body, size_t length, const tv_settings_t *s,
                             weather_snapshot_t *out)
 {
-    /* Decode the original Kelvin payload and preserve its display conversions. */
+    /* Decode the original Kelvin payload and preserve its display conversions.
+     * FIXED_FACTORY: retain the 15-byte label budget from 0x4200fccc without
+     * splitting UTF-8 scalars or passing malformed bytes to the renderer. */
     cJSON *root = cJSON_ParseWithLength(body, length);
     if (!root)
         return false;
@@ -54,9 +57,9 @@ bool weather_parse_response(const char *body, size_t length, const tv_settings_t
         const cJSON *description = cJSON_GetObjectItemCaseSensitive(weather, "description");
         const cJSON *summary = cJSON_GetObjectItemCaseSensitive(weather, "main");
         if (cJSON_IsString(description))
-            snprintf(out->description, sizeof(out->description), "%.15s", description->valuestring);
+            text_utf8_copy(out->description, sizeof(out->description), description->valuestring, 15);
         if (cJSON_IsString(summary))
-            snprintf(out->main, sizeof(out->main), "%.15s", summary->valuestring);
+            text_utf8_copy(out->main, sizeof(out->main), summary->valuestring, 15);
         double bearing;
         if (number(wind, "deg", 0, 360, &bearing))
         {

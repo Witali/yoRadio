@@ -1,6 +1,38 @@
 #include "factory_ui.h"
 #include "factory_bitmaps.h"
+#include "unicode_bitmaps.h"
+#include "text.h"
 #include <string.h>
+
+static bool unicode_glyph(unsigned character, unsigned height, tv_bitmap_t *out)
+{
+    /* Find a bundled Spleen Unicode glyph with the factory text-cell dimensions.
+     * FIXED_FACTORY: non-ASCII text must render its scalar instead of triggering
+     * the unrelated Celsius fallback in 0x4200aae0. ASCII uses the original data. */
+    unsigned first = 0, end = UNICODE_GLYPH_COUNT;
+    while (first < end)
+    {
+        unsigned middle = first + (end - first) / 2;
+        if (unicode_codepoints[middle] < character)
+            first = middle + 1;
+        else
+            end = middle;
+    }
+    if (first == UNICODE_GLYPH_COUNT || unicode_codepoints[first] != character)
+        return false;
+    const uint8_t *pixels;
+    if (height == 16)
+        pixels = unicode_font16[first];
+    else if (height == 24)
+        pixels = unicode_font24[first];
+    else if (height == 32)
+        pixels = unicode_font32[first];
+    else
+        return false;
+    unsigned width = height / 2;
+    *out = (tv_bitmap_t){pixels, width, height, (width + 7) / 8};
+    return true;
+}
 
 bool factory_glyph(unsigned character, unsigned height, tv_bitmap_t *out)
 {
@@ -16,7 +48,7 @@ bool factory_glyph(unsigned character, unsigned height, tv_bitmap_t *out)
         }
     }
     if (!table || character < table->first || character >= table->first + table->count)
-        return false;
+        return character >= 128 && unicode_glyph(character, height, out);
     *out = (tv_bitmap_t){table->data + (character - table->first) * table->stride * height,
                          table->width, height, table->stride};
     return true;
@@ -33,31 +65,62 @@ bool factory_symbol(unsigned symbol, tv_bitmap_t *out)
     return true;
 }
 
+static unsigned text_token(const char *text, size_t available, size_t *consumed)
+{
+    /* Decode one UTF-8 scalar or one of the two explicit factory unit tokens.
+     * FIXED_FACTORY: an arbitrary high-byte pair is not a Celsius symbol.
+     * Recognize Unicode Celsius/Fahrenheit and degree+C/F spellings consistently. */
+    const unsigned char *bytes = (const unsigned char *)text;
+    if (available >= 2 && ((bytes[0] == 0xa1 && bytes[1] == 0xe6) ||
+                          (bytes[0] == 0xa8 && bytes[1] == 0x48)))
+    {
+        *consumed = 2;
+        return bytes[0] == 0xa1 ? 0x2103 : 0x2109;
+    }
+    unsigned scalar = text_utf8_decode(text, available, consumed);
+    if (scalar == 0xb0 && available > *consumed &&
+        (bytes[*consumed] == 'C' || bytes[*consumed] == 'F'))
+    {
+        scalar = bytes[*consumed] == 'C' ? 0x2103 : 0x2109;
+        ++*consumed;
+    }
+    return scalar;
+}
+
 static void draw_text(int x, int y, int left, int right, bool complete_glyphs, const char *text,
                       unsigned height, uint16_t color, uint16_t background, bool transparent)
 {
-    /* Share factory decoding/spacing between panel-clipped and bounded labels. */
+    /* Share scalar decoding/spacing between panel-clipped and bounded labels.
+     * FIXED_FACTORY: preserve the two unit bitmaps, decode complete UTF-8 and
+     * render unsupported scalars as '?' rather than inventing Celsius symbols. */
 
-    const unsigned char *cursor = (const unsigned char *)text;
-    while (*cursor && x < right)
+    if (!text)
+        return;
+    const char *cursor = text;
+    size_t remaining = strlen(text);
+    while (remaining && x < right)
     {
         unsigned advance = height / 2;
         tv_bitmap_t glyph;
         bool found;
-        if (cursor[0] >= 0x81 && cursor[1])
+        size_t consumed;
+        unsigned scalar = text_token(cursor, remaining, &consumed);
+        if (scalar == 0x2103 || scalar == 0x2109)
         {
-            /* These are the original two-byte Celsius/Fahrenheit codes,
-             * not UTF-8 degree signs. Their bitmap advances a full 24 pixels. */
-            unsigned symbol =
-                cursor[0] == 0xa8 && cursor[1] == 0x48 ? TV_SYMBOL_FAHRENHEIT : TV_SYMBOL_CELSIUS;
+            /* Keep the original 24x24 Celsius/Fahrenheit bitmaps and their
+             * height-based advance, independent of the source spelling. */
+            unsigned symbol = scalar == 0x2109 ? TV_SYMBOL_FAHRENHEIT : TV_SYMBOL_CELSIUS;
             found = factory_symbol(symbol, &glyph);
-            cursor += 2;
             advance = height;
         }
         else
         {
-            found = factory_glyph(*cursor++, height, &glyph);
+            found = factory_glyph(scalar, height, &glyph);
+            if (!found && scalar >= 128)
+                found = factory_glyph('?', height, &glyph);
         }
+        cursor += consumed;
+        remaining -= consumed;
         unsigned spacing = transparent && height == 16 && advance == 8 ? 5 : advance;
         /* A transparent glyph can be wider than its advance. Require both to
          * fit, and never draw half of a legacy two-byte temperature symbol. */
@@ -110,15 +173,21 @@ void display_factory_text_bounded(int x, int y, int width, const char *text, uns
 
 unsigned display_factory_text_width(const char *text, unsigned height)
 {
-    /* Measure opaque factory text, including full-width two-byte unit symbols. */
+    /* Measure exactly the scalar/unit cells used by the opaque text renderer.
+     * FIXED_FACTORY: UTF-8 byte length is not glyph width; share decoding with draw_text. */
 
     unsigned width = 0;
-    const unsigned char *cursor = (const unsigned char *)text;
-    while (*cursor)
+    if (!text)
+        return 0;
+    const char *cursor = text;
+    size_t remaining = strlen(text);
+    while (remaining)
     {
-        bool pair = cursor[0] >= 0x81 && cursor[1];
-        width += pair ? height : height / 2;
-        cursor += pair ? 2 : 1;
+        size_t consumed;
+        unsigned scalar = text_token(cursor, remaining, &consumed);
+        width += scalar == 0x2103 || scalar == 0x2109 ? height : height / 2;
+        cursor += consumed;
+        remaining -= consumed;
     }
     return width;
 }

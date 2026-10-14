@@ -106,20 +106,57 @@ def pack_assets(output: Path):
     (output / "asset_defaults.h").write_text("#pragma once\n#define DEFAULT_PHOTO_SIZES {"+",".join(map(str,sizes))+"}\n",encoding="utf-8",newline="\n")
 
 
-def generate_font(output: Path):
+def spleen_glyphs():
+    """Read the bundled monospace BDF once with explicit size and scalar checks."""
     bdf = (ROOT / "third_party/spleen/spleen-6x12.bdf").read_text(encoding="utf-8")
     glyphs = {}
     for block in bdf.split("STARTCHAR ")[1:]:
         lines = block.splitlines()
         code = int(next(line.split()[1] for line in lines if line.startswith("ENCODING ")))
-        if 32 <= code < 127:
-            bitmap = lines[lines.index("BITMAP")+1:lines.index("ENDCHAR")]
-            if len(bitmap) != 12: raise ValueError("Font height")
-            glyphs[code] = [int(row,16) for row in bitmap]
+        if code in glyphs or not 0 <= code <= 0x10ffff or 0xd800 <= code <= 0xdfff:
+            raise ValueError("Invalid or duplicate Spleen scalar")
+        if 'BBX 6 12 0 -3' not in lines or 'DWIDTH 6 0' not in lines:
+            raise ValueError("Unexpected Spleen glyph geometry")
+        bitmap = lines[lines.index("BITMAP")+1:lines.index("ENDCHAR")]
+        if len(bitmap) != 12: raise ValueError("Font height")
+        rows = [int(row,16) for row in bitmap]
+        if any(row < 0 or row > 255 or row & 3 for row in rows):
+            raise ValueError("Invalid Spleen row")
+        glyphs[code] = rows
+    return glyphs
+
+
+def generate_font(output: Path):
+    """Keep the existing ASCII Spleen header byte-compatible with prior builds."""
+    glyphs = {code:rows for code,rows in spleen_glyphs().items() if 32 <= code < 127}
     assert len(glyphs) == 95
     text = "/* Spleen 6x12, Copyright Frederic Cambus, BSD-2-Clause. */\n#pragma once\n#include <stdint.h>\nstatic const uint8_t font6x12[95][12] = {\n"
     text += "\n".join("{"+",".join(hex(v) for v in glyphs[code])+"}," for code in range(32,127))
     (output / "font6x12.h").write_text(text+"\n};\n",encoding="utf-8",newline="\n")
+
+
+def generate_unicode_font(output: Path):
+    """Scale bundled non-ASCII glyphs to factory text cells, storing LSB-first rows."""
+    glyphs = {code:rows for code,rows in spleen_glyphs().items() if code >= 128}
+    codes = sorted(glyphs)
+    text = ("/* Spleen 6x12, Copyright Frederic Cambus, BSD-2-Clause.\n"
+            " * Non-ASCII only: nearest-neighbor scaling; factory ASCII stays unchanged. */\n"
+            "#pragma once\n#include <stdint.h>\n"
+            f"#define UNICODE_GLYPH_COUNT {len(codes)}\n"
+            "static const uint32_t unicode_codepoints[] = {\n"+
+            ','.join(str(code) for code in codes)+"\n};\n")
+    for height in (16,24,32):
+        width, stride = height//2, (height//2+7)//8
+        text += f'static const uint8_t unicode_font{height}[UNICODE_GLYPH_COUNT][{height*stride}] = {{\n'
+        for code in codes:
+            data = bytearray(height*stride)
+            for y in range(height):
+                for x in range(width):
+                    if glyphs[code][y*12//height] & (1 << (7-x*6//width)):
+                        data[y*stride+x//8] |= 1 << (x%8)
+            text += '{'+','.join(hex(v) for v in data)+'},\n'
+        text += '};\n'
+    (output/'unicode_bitmaps.h').write_text(text, encoding='utf-8', newline='\n')
 
 
 def generate_factory_bitmaps(output: Path):
@@ -175,6 +212,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     pack_assets(args.output)
     generate_font(args.output)
+    generate_unicode_font(args.output)
     generate_factory_bitmaps(args.output)
     generate_pages(args.output)
     generate_timezones(args.output)
@@ -182,7 +220,7 @@ def main():
     compiled += sorted((ROOT / "third_party").rglob("*.c")) + sorted((ROOT / "third_party").rglob("*.h"))
     compiled += [ROOT / "CMakeLists.txt", ROOT / "app/CMakeLists.txt", ROOT / "sdkconfig.defaults", ROOT / "partitions.csv"]
     records = [{"file":str(path.relative_to(ROOT)).replace("\\","/"), "sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for path in compiled]
-    for name in ("web_pages.c", "font6x12.h", "factory_bitmaps.c", "factory_bitmaps.h", "asset_defaults.h", "timezone_data.h"):
+    for name in ("web_pages.c", "font6x12.h", "unicode_bitmaps.h", "factory_bitmaps.c", "factory_bitmaps.h", "asset_defaults.h", "timezone_data.h"):
         records.append({"file":"generated/"+name,"sha256":hashlib.sha256((args.output/name).read_bytes()).hexdigest()})
     canonical = json.dumps(records, separators=(",",":"),sort_keys=True).encode("utf-8")
     (args.output/"source-manifest.json").write_text(json.dumps({"aggregate_sha256":hashlib.sha256(canonical).hexdigest(),"files":records},indent=2)+"\n",encoding="utf-8",newline="\n")

@@ -1087,6 +1087,44 @@ static void test_text_fields(void)
     for (unsigned y = 5; y < 29; ++y)
         for (unsigned x = 200; x < 240; ++x)
             CHECK(panel[y * 240 + x] == raster[(y - 5) * 240 + x - 200 + 188]);
+    /* UTF-8 byte counts differ from rendered cells; every spelling of a unit
+     * must preserve the literal factory unit raster, including edge clipping. */
+    const char *cyrillic="\xd0\xa2\xd0\xb5\xd1\x81\xd1\x82";
+    CHECK(display_factory_text_width(cyrillic,24)==48);
+    CHECK(display_factory_text_width("\xe5\x8c\x97\xe4\xba\xac",24)==24);
+    CHECK(display_factory_text_width("\xe2\x84\x83",24)==24);
+    CHECK(display_factory_text_width("\xc2\xb0" "C",24)==24);
+    CHECK(display_factory_text_width("\xc2\xb0",24)==12);
+    CHECK(display_factory_text_width(NULL,24)==0);
+    const char *units[]={"\xa1\xe6","\xe2\x84\x83","\xc2\xb0" "C"};
+    static uint16_t unit_raster[240*24];
+    for(unsigned i=0;i<3;++i){
+        display_fill(0,0,240,240,0);
+        display_factory_text(10,0,units[i],24,0xffff,0,false);
+        if (!i) memcpy(unit_raster,panel,sizeof(unit_raster));
+        else CHECK(!memcmp(unit_raster,panel,sizeof(unit_raster)));
+    }
+    display_fill(0,0,240,240,0);
+    display_factory_text(0,0,"?A",24,0xffff,0,false);
+    memcpy(unit_raster,panel,sizeof(unit_raster));
+    display_fill(0,0,240,240,0);
+    display_factory_text(0,0,"\x81" "A",24,0xffff,0,false);
+    CHECK(!memcmp(unit_raster,panel,sizeof(unit_raster)));
+    const char *mixed="A\xd0\xa2\xd0\xb5\xd1\x81\xd1\x82" "BCDEFG";
+    CHECK(display_factory_text_width(mixed,24)==132);
+    display_fill(0,0,240,240,0);
+    display_factory_text(0,0,mixed,24,0xffff,0,false);
+    memcpy(raster,panel,sizeof(raster));
+    const unsigned unicode_offsets[]={0,1,7,12,51,52,0xffffffff};
+    for(unsigned i=0;i<sizeof(unicode_offsets)/sizeof(unicode_offsets[0]);++i){
+        unsigned offset=unicode_offsets[i]<52?unicode_offsets[i]:52;
+        display_fill(0,0,240,240,0x4567);
+        display_factory_text_window(20,5,80,unicode_offsets[i],mixed,24,0xffff,0);
+        for(unsigned y=0;y<240;++y)
+            for(unsigned x=0;x<240;++x)
+                CHECK(panel[y*240+x]==(x>=20&&x<100&&y>=5&&y<29
+                    ?raster[(y-5)*240+x-20+offset]:0x4567));
+    }
 }
 
 static void test_weather_field_cleanup(void)

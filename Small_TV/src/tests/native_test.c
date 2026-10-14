@@ -11,6 +11,7 @@
 #include "media.h"
 #include "network.h"
 #include "services.h"
+#include "text.h"
 #include "web.h"
 #include "dns_packet.h"
 #include "factory_settings.h"
@@ -189,6 +190,45 @@ static void test_factory_settings(void)
     CHECK(settings_init()==ESP_OK); settings_snapshot(&s); CHECK(s.wifi_mode==1);
 }
 
+static void test_utf8(void)
+{
+    /* Check scalar boundaries, malformed sequences and complete-prefix byte budgets. */
+    static const struct { const char *text; size_t bytes; uint32_t scalar; size_t consumed; } cases[] = {
+        {"A",1,0x41,1}, {"\xc2\x80",2,0x80,2}, {"\xdf\xbf",2,0x7ff,2},
+        {"\xe0\xa0\x80",3,0x800,3}, {"\xe2\x82\xac",3,0x20ac,3},
+        {"\xf0\x90\x80\x80",4,0x10000,4}, {"\xf4\x8f\xbf\xbf",4,0x10ffff,4},
+        {"\xc0\x80",2,0xfffd,1}, {"\xe0\x80\x80",3,0xfffd,1},
+        {"\xed\xa0\x80",3,0xfffd,1}, {"\xf4\x90\x80\x80",4,0xfffd,1},
+        {"\xe2" "A",2,0xfffd,1}, {"\xc2\xa2",1,0xfffd,1}, {"\x80",1,0xfffd,1}
+    };
+    for (unsigned i=0;i<sizeof(cases)/sizeof(cases[0]);++i) {
+        size_t consumed=99;
+        CHECK(text_utf8_decode(cases[i].text,cases[i].bytes,&consumed)==cases[i].scalar);
+        CHECK(consumed==cases[i].consumed);
+    }
+    size_t consumed=99;
+    CHECK(text_utf8_decode(NULL,4,&consumed)==0 && consumed==0);
+    CHECK(text_utf8_decode("A",0,&consumed)==0 && consumed==0);
+    CHECK(text_utf8_decode("A",1,NULL)==0);
+    CHECK(text_utf8_decode("",1,&consumed)==0 && consumed==0);
+    char output[20];
+    CHECK(text_utf8_copy(output,sizeof(output),"1234567890123\xc3\xa9",15)==15);
+    CHECK(!strcmp(output,"1234567890123\xc3\xa9"));
+    CHECK(text_utf8_copy(output,sizeof(output),"12345678901234\xc3\xa9",15)==14);
+    CHECK(!strcmp(output,"12345678901234"));
+    CHECK(text_utf8_copy(output,sizeof(output),"\xe2" "A",15)==2 && !strcmp(output,"?A"));
+    CHECK(text_utf8_copy(output,3,"\xe2\x82\xac",15)==0 && !output[0]);
+    CHECK(text_utf8_copy(output,4,"\xe2\x82\xac",15)==3 && !strcmp(output,"\xe2\x82\xac"));
+    strcpy(output,"\xc0\x80" "A");
+    CHECK(text_utf8_copy(output,sizeof(output),output,15)==3 && !strcmp(output,"??A"));
+    unsigned char guards[6]; memset(guards,0xa5,sizeof(guards));
+    CHECK(text_utf8_copy((char *)guards+1,4,"\xe2\x82\xac",15)==3);
+    CHECK(guards[0]==0xa5 && guards[4]==0 && guards[5]==0xa5);
+    CHECK(text_utf8_copy(output,1,"A",15)==0 && !output[0]);
+    output[0]='X'; CHECK(text_utf8_copy(output,0,"A",15)==0 && output[0]=='X');
+    CHECK(text_utf8_copy(output,sizeof(output),NULL,15)==0 && !output[0]);
+}
+
 static void test_weather(void)
 {
     /* Values come from a synthetic OpenWeather Kelvin payload, not live data. */
@@ -204,6 +244,12 @@ static void test_weather(void)
     CHECK(!strcmp(weather.main,"Clouds") && !strcmp(weather.description,"scattered cloud"));
     CHECK(!strcmp(weather.wind_direction,"North") && !strcmp(weather.icon,"02d"));
     CHECK(!strcmp(weather.city,"London") && !strcmp(weather.country,"GB"));
+    const char unicode[]={"{\"main\":{\"temp\":293,\"humidity\":50},\"wind\":{\"speed\":1},"
+        "\"weather\":[{\"icon\":\"02d\",\"main\":\"12345678901234\xc3\xa9\","
+        "\"description\":\"1234567890123\xc3\xa9\"}]}"};
+    CHECK(weather_parse_response(unicode,strlen(unicode),&s,&weather));
+    CHECK(!strcmp(weather.main,"12345678901234"));
+    CHECK(!strcmp(weather.description,"1234567890123\xc3\xa9"));
     CHECK(!weather_parse_response("{}",2,&s,&weather));
     CHECK(!weather_parse_response(body,10,&s,&weather));
     const char invalid[]={"{\"main\":{\"temp\":293,\"humidity\":101},\"wind\":{\"speed\":1},\"weather\":[{\"icon\":\"02d\"}]}"};
@@ -310,7 +356,7 @@ int main(int argc,char **argv)
     CHECK(argc==2 || argc==3);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
     CHECK(web_start()==ESP_OK);CHECK(registered_routes==40);
     for(unsigned i=0;i<registered_routes;++i)for(unsigned j=i+1;j<registered_routes;++j)CHECK(route_table[i]->method!=route_table[j]->method || strcmp(route_table[i]->uri,route_table[j]->uri));
-    test_settings();test_factory_settings();test_weather();test_assets();test_http_contracts();test_uploads();test_multipart();test_dns();
+    test_settings();test_factory_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_uploads();test_multipart();test_dns();
     for(unsigned i=0;i<registered_routes;++i)CHECK(route_success[i]>0);
     if(argc==3)write_native_report(argv[2]);
     printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers\n",checks);

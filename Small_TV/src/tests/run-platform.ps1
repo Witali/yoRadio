@@ -9,7 +9,7 @@ New-Item -ItemType Directory -Force -Path $output | Out-Null
 if (!(Test-Path -LiteralPath $VsDevCmd)) {throw "Pass -VsDevCmd pointing to an installed MSVC development environment."}
 & (Join-Path $repo ".idf\python-3.12.10\tools\python.exe") (Join-Path $project "tools\prepare_resources.py") --output $resources
 if ($LASTEXITCODE) {throw "Resource generation failed"}
-$sources=@("tests/platform_test.c","app/network/wifi.c","app/services/weather.c","app/services/weather_parser.c","app/services/time_sync.c","app/services/timezones.c","app/display/backlight.c","app/display/st7789.c","app/display/factory_fonts.c","app/display/ui_renderer.c","app/display/clock_ui.c","app/display/factory_timer.c","app/display/factory_photo.c","app/display/factory_animation.c","third_party/cjson/cJSON.c")
+$sources=@("tests/platform_test.c","app/network/wifi.c","app/services/weather.c","app/services/weather_parser.c","app/services/time_sync.c","app/services/timezones.c","app/text/text.c","app/display/backlight.c","app/display/st7789.c","app/display/factory_fonts.c","app/display/ui_renderer.c","app/display/clock_ui.c","app/display/factory_timer.c","app/display/factory_photo.c","app/display/factory_animation.c","third_party/cjson/cJSON.c")
 $arguments=@("/nologo","/std:c11","/experimental:c11atomics","/W3","/D_CRT_SECURE_NO_WARNINGS","/Dsetenv=test_setenv","/Dtzset=test_tzset")
 $arguments+='/FI"'+(Join-Path $project "tests/stubs/time_adapter.h")+'"'
 foreach($include in @("tests/stubs","app/include","third_party/cjson")) {$arguments+='/I"'+(Join-Path $project $include)+'"'}

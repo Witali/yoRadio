@@ -4,6 +4,7 @@ param(
     [switch]$SkipQemu,
     [switch]$InstallOracleDependencies,
     [string]$QemuRoot="C:\Work\QEMU-ESP32",
+    [string]$HttpHelperOverlay,
     [string]$PythonPath,
     [string]$VsDevCmd="C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat",
     [string]$OutputDirectory
@@ -111,11 +112,21 @@ else {
         if($LASTEXITCODE){throw "SNTP notification/cache/retry machine comparison failed"}
     } $timeStateReport
 }
+if ($SkipMachine) {$groups.Add(@{name="machine_text";status="not_run";reason="Explicit -SkipMachine"})}
+else {
+    $textReport=Join-Path $OutputDirectory "text.json"
+    Invoke-TestGroup "machine_text" {
+        & $PythonPath (Join-Path $PSScriptRoot "text_oracle.py") --output $textReport
+        if($LASTEXITCODE){throw "UTF-8 scalar/prefix/glyph machine comparison failed"}
+    } $textReport
+}
 if ($SkipQemu) {$groups.Add(@{name="qemu";status="not_run";reason="Explicit -SkipQemu"})}
 else {
     $qemuFolder=Join-Path $OutputDirectory "qemu"
     Invoke-TestGroup "qemu" {
-        & $PythonPath (Join-Path $PSScriptRoot "qemu_suite.py") --qemu-root $QemuRoot --output $qemuFolder
+        $qemuArguments=@("--qemu-root",$QemuRoot,"--output",$qemuFolder)
+        if($HttpHelperOverlay){$qemuArguments+=@("--http-helper-overlay",$HttpHelperOverlay)}
+        & $PythonPath (Join-Path $PSScriptRoot "qemu_suite.py") @qemuArguments
         if($LASTEXITCODE){throw "Full-firmware QEMU tests failed"}
     } (Join-Path $qemuFolder "report.json")
 }

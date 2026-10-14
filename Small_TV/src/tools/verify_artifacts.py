@@ -37,7 +37,7 @@ def main():
             'A full passing suite is required')
     groups = {row['name']: row['result'] for row in suite['groups'] if row['status'] == 'passed'} \
         if 'groups' in suite else suite
-    for name in ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'qemu'):
+    for name in ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'qemu'):
         require(name in groups and groups[name]['passed'], 'Missing passing group: ' + name)
     for item in suite['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
@@ -58,6 +58,17 @@ def main():
     require(network['passed'] and network['qemu_sha256'] == groups['qemu']['qemu_sha256'] and
             network['layout']['elf_sha256'] == state['native_elf_sha256'],
             'Real SNTP gate tested different machine/emulator inputs')
+    text_gate, text_network = groups['machine_text'], groups['qemu']['text_http']
+    require(text_gate['app_sha256'] == app_sha and text_gate['source_sha256'] == manifest['source_sha256']
+            and text_gate['native_elf_sha256'] == state['native_elf_sha256']
+            and text_gate['native_elf_sha256'] == hashlib.sha256((BUILD/'small_tv_reconstructed.elf').read_bytes()).hexdigest(),
+            'Text machine gate tested a different application/source/ELF')
+    require(groups['qemu']['inputs_unchanged'] and text_network['passed']
+            and text_network['qemu_sha256'] == groups['qemu']['qemu_sha256']
+            and text_network['cache_layout']['elf_sha256'] == text_gate['native_elf_sha256'],
+            'Real UTF-8 gate tested different machine/emulator inputs')
+    require(text_gate['font_source_sha256'] == text_network['font_source_sha256'] == hashlib.sha256(
+        (ROOT/'third_party/spleen/spleen-6x12.bdf').read_bytes()).hexdigest(), 'Unicode font source changed')
     require(app == (BUILD / 'small_tv_reconstructed.bin').read_bytes(), 'Build and archive differ')
     generated = BUILD / 'verification-resources'
     subprocess.run([sys.executable, str(ROOT / 'tools/prepare_resources.py'), '--output', str(generated)], check=True)
@@ -145,6 +156,12 @@ def main():
     report['machine_time_state_native_checks'] = len(state['native_cases'])
     report['qemu_time_report'] = '../qemu/time-http-validation.json'
     report['qemu_time_native_stages'] = len(network['flows']['reconstructed']['stages'])
+    report['machine_text_report'] = '../qemu/parity/text-validation.json'
+    report['machine_text_case_counts'] = text_gate['case_counts'] if 'case_counts' in text_gate else {
+        key: len(text_gate[key]) for key in ('glyph_checks','render_cases','decode_checks','prefix_checks','literal_factory')}
+    report['unicode_glyphs'] = text_gate['unicode_glyphs']
+    report['qemu_text_report'] = '../qemu/text-http-validation.json'
+    report['qemu_text_native_cases'] = len(text_network['flows']['reconstructed']['cases'])
     report['work_status'] = 'Reconstructed firmware; confirmed factory corrections are marked and tested'
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(f'Verified application {app_sha}: {len(app)} bytes, {partitions["factory"] - len(app)} bytes free')

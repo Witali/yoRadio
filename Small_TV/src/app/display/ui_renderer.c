@@ -144,10 +144,10 @@ static void centered_at(int x, int width, int y, const char *text, uint16_t colo
      * FIXED_FACTORY: capping the centering length alone still draws the whole
      * string; also avoid the original city's eight-bit width wraparound. */
 
-    unsigned length = strlen(text);
-    if (length > (unsigned)width / 12)
-        length = width / 12;
-    int offset = (width - length * 12) / 2;
+    unsigned length = display_factory_text_width(text, 24);
+    if (length > (unsigned)width)
+        length = width / 12 * 12;
+    int offset = (width - length) / 2;
     display_factory_text_bounded(x + offset, y, width - offset, text, 24, color, 0, false);
 }
 

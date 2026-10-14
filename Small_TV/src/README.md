@@ -29,6 +29,7 @@ virtual-time limitations; physical-board and Internet weather checks remain pend
 | `app/media/` | Flash assets, streaming JPEG/BMP, validated photo uploads |
 | `app/network/` | Station/AP mode, real Wi-Fi scan, bounded captive DNS |
 | `app/services/` | SNTP, factory timezone selection, HTTP/Kelvin weather and cached results |
+| `app/text/` | Strict UTF-8 scalar decoding and complete label prefixes |
 | `app/web/` | Recovered HTTP contracts, pages, settings and photo APIs |
 | `third_party/` | Pinned cJSON, TJpgDec and licensed Spleen font |
 | `reference/` | 176 exported functions split into 16 logical pseudocode modules |
@@ -222,8 +223,17 @@ the vendor's swapped pair that makes axis-aligned thick strokes collapse.
 The simple theme follows real hour/minute changes, correcting the factory's
 stale digits caused by its 66-second update flag. Colon events remain independent.
 Setup text and the `Ver:0.0.2` progress screen are restored. The earlier extra
-seconds/IP overlay and clock-on-photo strip are removed. Spleen remains only
-for the diagnostic `display_text` helper, not the normal factory UI.
+seconds/IP overlay and clock-on-photo strip are removed. Factory ASCII and
+temperature-unit bitmaps are retained. UTF-8 text uses 452 non-ASCII glyphs from
+the bundled Spleen font, scaled to the original 16/24/32-pixel cells. Unsupported
+Unicode scalars render one `?`; malformed bytes cannot consume the following
+ASCII character. This is a limited bitmap font, without shaping or bidirectional
+layout. Weather labels retain their original 15-byte source budget but stop at
+a complete UTF-8 boundary. Width, centering and scrolling count glyphs rather
+than bytes. UTF-8 city bytes are percent-encoded in weather URLs, and a failed
+HTTP-client initialization is checked before use. The factory's unguarded
+client call can crash on such a city. [Text checks](../qemu/parity/text-checks.md)
+record the literal errors separately from corrected behavior.
 
 The `timeSync` compatibility flag is stored as in the recovered handler:
 the original page supplies no browser timestamp. Time is synchronized by

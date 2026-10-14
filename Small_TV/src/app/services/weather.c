@@ -2,7 +2,6 @@
 #include "settings.h"
 #include "network.h"
 #include "cJSON.h"
-#include <ctype.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,13 +75,16 @@ static esp_err_t weather_http_event(esp_http_client_event_t *event)
 
 static void url_escape(const char *source, char *target)
 {
-    /* Encode unsafe URL bytes while preserving ordinary city/key characters. */
+    /* Encode every non-ASCII URI byte, independent of the current C locale.
+     * FIXED_FACTORY: 0x42010864 puts raw UTF-8 city bytes into the URL; its
+     * client initialization can fail and the unguarded perform call then faults. */
 
     static const char hex[] = "0123456789ABCDEF";
     for (; *source; ++source)
     {
         unsigned char c = *source;
-        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
+        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
+            (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.' || c == '~')
             *target++ = c;
         else
         {
@@ -99,7 +101,9 @@ static esp_err_t fetch_weather(const tv_settings_t *s, weather_snapshot_t *out)
     /* Fetch the factory HTTP/Kelvin endpoint and decode its bounded response.
      * FIXED_FACTORY: 0x42010864 parses JSON even after an HTTP error such as 503.
      * Require HTTP 200 and a complete bounded body; weather_task retains the
-     * last successful cache when a request for the same location fails. */
+     * last successful cache when a request for the same location fails.
+     * FIXED_FACTORY: 0x42010988 passes a possibly NULL client into perform;
+     * retain the initialization check so invalid URLs/allocation cannot crash. */
 
     char city[193], key[193], url[512];
     url_escape(s->city, city);

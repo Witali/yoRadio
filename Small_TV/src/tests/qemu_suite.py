@@ -23,6 +23,8 @@ def main():
     parser.add_argument('--qemu-root', type=Path, default=Path('C:/Work/QEMU-ESP32'))
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--seconds', type=int, default=30)
+    parser.add_argument('--http-helper-overlay', type=Path,
+                        help='Pinned committed HTTP-client snapshot for UTF-8 tests only')
     args = parser.parse_args()
     check(5 <= args.seconds <= 3600, 'Invalid boot-test duration')
     args.output.mkdir(parents=True, exist_ok=True)
@@ -32,9 +34,15 @@ def main():
     options = SimpleNamespace(yoradio=str(ROOT), qemu=str(args.qemu_root / 'bin/qemu-system-riscv32.exe'),
                               rom_elf=str(ROOT / '.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),
                               hardware_profile=str(profile), network='clock', display='none',
-                              persistent=False, paused=False, gdb_port=0, seconds=args.seconds)
+                              persistent=False, paused=False, gdb_port=0, seconds=args.seconds,
+                              http_helper_overlay=args.http_helper_overlay)
+    inputs = {'qemu_sha256': hashlib.sha256(Path(options.qemu).read_bytes()).hexdigest(),
+              'profile_sha256': hashlib.sha256(profile.read_bytes()).hexdigest(),
+              'helper_sha256': {name: hashlib.sha256((args.qemu_root / 'tools' / name).read_bytes()).hexdigest()
+                               for name in ('small_tv_vm.py', 'small_tv_network.py', 'small_tv_web.py', 'small_tv_http_test.py')}}
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
-              'boot_reset': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'scenes': {}, 'errors': [],
+              **inputs,
+              'boot_reset': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'scenes': {}, 'errors': [],
               'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP setup and synthetic weather HTTP/value/LCD checks. Whole-frame scene similarity is measured, not a parity gate. No physical hardware or Internet weather service.'}
     try:
         for variant in ('original', 'reconstructed'):
@@ -55,6 +63,9 @@ def main():
         from time_qemu import run_suite as run_time
         report['time_http'] = run_time(options, args.output / 'time-http')
         check(report['time_http']['passed'], 'Real UDP/SNTP fallback/calendar/reset checks failed')
+        from text_qemu import run_suite as run_text
+        report['text_http'] = run_text(options, args.output / 'text-http')
+        check(report['text_http']['passed'], 'Real UTF-8 HTTP/cache/glyph/scroll checks failed')
         scene_output = args.output / 'scenes'
         subprocess.run([sys.executable, str(ROOT / 'Small_TV/qemu/parity/compare.py'),
                         '--qemu-root', str(args.qemu_root), '--yoradio', str(ROOT),
@@ -94,11 +105,16 @@ def main():
         report['errors'].append(str(error))
         raise
     finally:
-        report['qemu_sha256'] = hashlib.sha256(Path(options.qemu).read_bytes()).hexdigest()
-        report['profile_sha256'] = hashlib.sha256(profile.read_bytes()).hexdigest()
-        report['helper_sha256'] = {name: hashlib.sha256((args.qemu_root / 'tools' / name).read_bytes()).hexdigest()
-                                  for name in ('small_tv_vm.py', 'small_tv_network.py', 'small_tv_web.py', 'small_tv_http_test.py')}
+        unchanged = (inputs['qemu_sha256'] == hashlib.sha256(Path(options.qemu).read_bytes()).hexdigest()
+                     and inputs['profile_sha256'] == hashlib.sha256(profile.read_bytes()).hexdigest()
+                     and all(value == hashlib.sha256((args.qemu_root / 'tools' / name).read_bytes()).hexdigest()
+                             for name, value in inputs['helper_sha256'].items()))
+        report['inputs_unchanged'] = unchanged
+        if not unchanged:
+            report['passed'] = False
+            report['errors'].append('Emulator/profile/helpers changed during execution')
         (args.output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
+        check(unchanged, 'Emulator/profile/helpers changed during execution')
 
 
 if __name__ == '__main__':

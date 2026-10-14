@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -41,13 +41,16 @@ def main():
     jpeg = groups['machine_jpeg']['result']
     timezones = groups['machine_timezones']['result']
     time_state = groups['machine_time_state']['result']
+    text = groups['machine_text']['result']
     if not timezones['complete_country_set'] or timezones['legacy_only'] or len(timezones['countries']) != 109:
         raise ValueError('Timezone gate did not execute every recovered country key')
     if not jpeg['complete_asset_set'] or len(jpeg['cases']) != 107:
         raise ValueError('JPEG gate did not execute every public image')
-    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, jpeg, timezones, time_state, groups['integrity']['result'])):
+    if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, jpeg, timezones, time_state, text, groups['integrity']['result'])):
         raise ValueError('Groups tested different applications')
     qemu = groups['qemu']['result']
+    if not qemu['inputs_unchanged']:
+        raise ValueError('Emulator or helpers changed during execution')
     if not qemu['http_initial_setup']['passed']:
         raise ValueError('Real HTTP initial setup did not pass')
     if not qemu['weather_http']['passed']:
@@ -66,12 +69,37 @@ def main():
         raise ValueError('Real SNTP gate omitted a required calendar/reset stage')
     if time_state['source_sha256'] != report['source_sha256']:
         raise ValueError('Time-state gate used a different source archive')
+    text_http = qemu['text_http']
+    if (not text_http['passed'] or text_http['qemu_sha256'] != qemu['qemu_sha256']
+            or text_http['cache_layout']['elf_sha256'] != text['native_elf_sha256']
+            or text['native_elf_sha256'] != time_state['native_elf_sha256']
+            or text['source_sha256'] != report['source_sha256']
+            or text_http['font_source_sha256'] != text['font_source_sha256']):
+        raise ValueError('UTF-8 machine/HTTP gates used different inputs')
+    font = ROOT / 'Small_TV/src/third_party/spleen/spleen-6x12.bdf'
+    if hashlib.sha256(font.read_bytes()).hexdigest() != text['font_source_sha256']:
+        raise ValueError('UTF-8 font source changed after execution')
+    if (len(text['glyph_checks']) != (text['unicode_glyphs'] + text['ascii_glyphs_per_height']) * 3
+            or any(not row['passed'] for key in ('glyph_checks', 'render_cases', 'decode_checks', 'prefix_checks', 'literal_factory') for row in text[key])):
+        raise ValueError('UTF-8 gate omitted glyphs or failed a scalar/prefix/render case')
+    required_text_cases = {'cyrillic', 'unicode-scroll', 'latin', 'unsupported-cjk', 'split-label-budget'}
+    for variant in ('original', 'reconstructed'):
+        flow = text_http['flows'][variant]
+        if not flow['passed'] or not flow['checks']['no_panic'] or {row['case'] for row in flow['cases']} != required_text_cases:
+            raise ValueError('UTF-8 HTTP gate omitted required healthy-flow cases')
+    native_text = text_http['flows']['reconstructed']
+    if (not native_text['checks']['native_glyphs_width_scroll_guards']
+            or any(not row['frame']['passed'] for row in native_text['cases'])
+            or not next(row for row in native_text['cases'] if row['case'] == 'unicode-scroll')['scroll']['passed']
+            or not text_http['factory_utf8_city_fault']['passed']):
+        raise ValueError('UTF-8 HTTP gate omitted native field/scroll guards or literal factory fault')
     qemu_sources = [qemu['boot_reset']['reconstructed']['prepared']['sources']]
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
     qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
     qemu_sources.append(qemu['weather_http']['flows']['reconstructed']['sources'])
     qemu_sources.append(fields['flows']['reconstructed']['sources'])
     qemu_sources.append(time_http['flows']['reconstructed']['sources'])
+    qemu_sources.append(native_text['sources'])
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -123,12 +151,19 @@ def main():
     summary['machine_timezones']['countries'] = len(timezones['countries'])
     summary['machine_timezones']['invalid_inputs'] = len(timezones['invalid_inputs'])
     summary['machine_time_state'] = time_state
+    summary['machine_text'] = {key: text[key] for key in
+        ('passed', 'app_sha256', 'source_sha256', 'factory_elf_sha256', 'native_elf_sha256',
+         'font_source_sha256', 'unicode_glyphs', 'ascii_glyphs_per_height', 'approved_fixes', 'scope')}
+    summary['machine_text']['case_counts'] = {key: len(text[key]) for key in
+        ('glyph_checks', 'render_cases', 'decode_checks', 'prefix_checks', 'literal_factory')}
     summary['qemu'] = {'passed': qemu['passed'], 'qemu_sha256': qemu['qemu_sha256'],
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
                        'helper_sha256': qemu['helper_sha256'],
+                       'inputs_unchanged': qemu['inputs_unchanged'],
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],
                        'time_http': time_http,
+                       'text_http': text_http,
                        'boot_reset': {name: {key: row[key] for key in ('passed', 'checks', 'duration_seconds', 'network')}
                                       for name, row in qemu['boot_reset'].items()},
                        'scenes': {name: {'passed': True,
