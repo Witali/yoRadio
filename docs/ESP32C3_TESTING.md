@@ -1917,3 +1917,33 @@ runs once after the complete sequence. The offline auditor needs
 request names, and boot/uptime continuity between cases as well as within cases.
 Older single-pass reports remain readable. Six host tests cover schedule
 mutation and a synthetic inter-case reboot in an otherwise valid physical report.
+
+## Sustained local playback on a quiet production image
+
+Use `tools/esp32c3_tests/local_sustained.py` to test a single long, finite
+fixture on an already installed image. The initially stopped board's ELF
+identity must match `--firmware`. No application or private settings are written
+to disk by this controller. It stops playback and verifies settings on exit.
+
+```powershell
+python tools/esp32c3_tests/local_sustained.py --board http://BOARD_IP `
+  --host HOST_IP --firmware firmware/development/VARIANT/app.bin `
+  --fixtures PATH_TO_GENERATED_MANIFEST --fixture FIXTURE_NAME `
+  --seconds 600 --output NEW_RESULT_DIRECTORY
+```
+
+The fixture manifest must provide at least 605 seconds of verified encoded
+audio for a 600-second observation. `/file/` sends the actual continuous
+container at real-time pacing (`1.0`), without concatenating FLAC/Ogg streams.
+Each status observation is paired with health counters. Output deltas exclude
+the first 15 seconds and preserve pre-existing idle/startup counters.
+Decoder diagnostics are mandatory on every retained row. Collection failures
+and failed playback gates retain one bounded snapshot before Stop.
+
+Independent gates cover format, output errors, faults and active memory trend,
+then settled recovery after Stop. A passing collection does not override a
+failed gate. Low free RAM alone is diagnostic; allocation failures, progressive
+loss and failure to recover remain errors. These checks do not measure analog
+continuity or CPU utilization and do not replace EOF or HTTPS tests.
+Run `python tests/test-sustained-output.py` and
+`python tests/test-production-health.py` for the shared evidence validators.
