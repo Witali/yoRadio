@@ -9,7 +9,20 @@ Keep total buffered bytes constant; audit the eight-slot ADTS startup window
 and every pointer owner before implementation. TLS/SBR remain separate
 contiguous-allocation problems. No new buffer size is enabled by this review.
 
-## Latest candidate checkpoint, 2026-10-13
+## Installed production checkpoint, 2026-10-14
+
+The installed `idf61-prod-20261013` image has app SHA-256
+`f31ffba883053cf33d7f2e928bf529e5cbcac8f14a8aafd172e835a027684631`.
+Its deployment/HE-AACv2 smoke is followed by a **600-second local FLAC test**:
+9/9 gates pass, zero new sustained output faults, decoder/allocation/watchdog
+faults or reboots. Settled heap recovers within 12 bytes; largest block returns
+to 114,688 bytes. See the [exact-image report](ESP32C3_PRODUCTION_QUALIFICATION_20261014.md).
+The pre-existing stopped `stream read failed` status is retained and remains
+unattributed. Sustained Vorbis/Opus and the complete exact-image acceptance
+matrix remain open. This image does not enable the experimental router or
+early compact owner described in the candidate checkpoint below.
+
+## Latest experimental candidate checkpoint, 2026-10-13
 
 Candidate: `esp32c3-idf-6.1-r9a97-early-owner-public`, app SHA-256
 `219bfe1b4bd84e385825d5ee3b6e3468c7bf485a189c3765a11e511e1d459336`.

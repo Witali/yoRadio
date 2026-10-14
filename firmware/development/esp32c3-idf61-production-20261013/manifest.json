@@ -44,7 +44,7 @@
     ".flash.rodata": 308596,
     ".dram0.heap_start": 0
   },
-  "qualification": "Build/link audits, OTA identity/settings checks and 60-second local HE-AACv2 smoke passed. Full codec/network/OTA qualification was not rerun.",
+  "qualification": "Build/link audits, OTA identity/settings checks, 60-second local HE-AACv2 smoke and 600-second paced local FLAC pass. Full codec/network/OTA qualification remains open.",
   "installed_identity": {
     "version": "idf61-prod-20261013",
     "partition": "app1",
@@ -59,5 +59,8 @@
   },
   "evidence": "tests/results/esp32c3-production-deployment-20261013",
   "report": "docs/ESP32C3_PRODUCTION_DEPLOYMENT_20261013.md",
-  "audio_codec_library_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909"
+  "audio_codec_library_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+  "additional_evidence": [
+    "tests/results/esp32c3-production-qualification-20261014/flac-600-01/summary.json"
+  ]
 }
