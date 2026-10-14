@@ -84,6 +84,10 @@ passes 30/30 checks across production/candidate/production, including verified
 100/250/500-ms pauses in the same AAC-LC file. No output, decoder, allocation or
 watchdog faults occur; settled recovery passes. The public HTTPS output failure
 is not reproduced by this bounded local test and still requires investigation.
+A subsequent 120-second public AAC-LC control on the original image passes
+7/7, including 104.378 seconds of steady output with zero counter increments.
+This is additional control evidence, not attribution or a fix. Next correlate
+the candidate's output drops with pipeline phase/age telemetry under TLS.
 
 ## Earlier experimental candidate checkpoint, 2026-10-13
 

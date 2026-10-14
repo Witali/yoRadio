@@ -72,3 +72,23 @@ Next compare the public AAC-LC source on the original image, then use matched
 TLS delivery and existing pipeline phase/age telemetry if needed. The prior
 27-drop event and independent WebUI TCP timeout remain open. Do not enable
 continuous confirmation by default on the strength of this passing HTTP test.
+
+## Public HTTPS control on the original image
+
+After the A/B/A sequence, the unchanged original image observes the same
+public 128-kbit AAC-LC station for **120 seconds**, passing **7/7 checks**.
+FFprobe confirms 44.1-kHz stereo AAC-LC. The independent replay finds the
+first fully matching decoded format at 3.389 seconds. The 192 post-warmup
+samples span 104.378 seconds with zero new completion drops or write errors.
+All 241 health samples retain the preceding production boot and zero recorded
+allocation, decoder and watchdog faults. Sampled free/largest minima are
+59,044 / 47,104 B; recovery and settings checks pass. No traced WebUI request
+fails. Playback ends stopped, without another firmware change.
+
+[Public control evidence](../tests/results/esp32c3-aac-pause-public-control-20261014/audit.json)
+is separate from the deterministic file comparison: live broadcast bytes and
+network conditions differ from the earlier candidate observation. A passing
+control cannot attribute a single intermittent candidate failure. The next
+useful evidence is a matched TLS experiment and pipeline phase/age telemetry
+at a reproduced drop, separating encoded-input starvation, PCM starvation and
+output scheduling delay. The original 27-drop case remains FAIL.
