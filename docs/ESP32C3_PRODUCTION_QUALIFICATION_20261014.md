@@ -260,3 +260,41 @@ sampled active heap and is not an arbitrary release floor.
 This qualifies this source and observation on the exact image. Other HTTPS
 formats, codec transitions, repeated OTA and attribution of the earlier TCP
 timeout remain open. Output counters do not establish analog sound quality.
+
+## In-connection format changes: production gap confirmed
+
+The unchanged production image completes the transition campaign with
+**9/11 PASS and two retained failures**. This is a functional failure even
+though memory and lifetime-health gates pass:
+
+| Encoded sequence in one HTTP connection | Result |
+| --- | --- |
+| AAC-LC 44.1 stereo → LC 48 stereo → HE 48 stereo → HEv2 44.1 stereo | PASS |
+| AAC-LC 22.05 mono → HEv2 44.1 stereo → LC 48 stereo | PASS |
+| MP3 48 stereo → HE-AAC 48 stereo → MP3 48 stereo | FAIL: HE-AAC phase missing |
+| AAC-LC 48 stereo → MP3 48 stereo → HEv2 44.1 stereo | FAIL: MP3 phase missing |
+| Stop during stalled input, then replacement AAC playback | PASS |
+
+[Reports and independently replayed format assertions](../tests/results/esp32c3-production-qualification-20261014/transitions-01/audit.json)
+retain all samples. In the MP3-first case one sample incorrectly reports
+`MP3 11.025 kHz mono`; no HE-AAC format appears. In the AAC-first case the
+later HE-AACv2 appears, but the intervening MP3 segment never does. Terminal
+`stream ended` and zero decoder-failure counters therefore do not prove that
+all segments were decoded. These observations are not a PCM comparison.
+
+The source/configuration explanation is concrete: this binary has
+`CONFIG_YORADIO_FRAME_ROUTER` disabled. `send_stream_audio()` selects the
+codec at startup, then forwards subsequent bytes with that original family.
+The AAC decoder can update its own profile/rate/channels, but the transport
+does not change decoder families. The experimental route adapter has explicit
+ordered codec-drain markers; it remains disabled pending its confirmation and
+alignment-recovery requirements in the
+[stream-confirmation plan](ESP32C3_STREAM_CONFIRMATION_PLAN.md).
+
+All 306 retained health observations stay on the same boot, with zero recorded
+allocation, decoder and watchdog faults. Sampled free/largest minima are
+**28,764 / 13,312 B**; settled median free/largest return exactly to
+**139,308 / 114,688 B**, with 16 tasks. Settings are unchanged and the board is
+stopped. No firmware changes were made. The next implementation priority is
+safe confirmed decoder-family switching and bounded recovery, followed by
+re-running these exact failed sequences on the resulting candidate.

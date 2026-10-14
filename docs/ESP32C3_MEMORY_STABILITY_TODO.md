@@ -33,8 +33,12 @@ settled heap recovery and zero decoder/allocation/watchdog faults. The TCP
 timeout's cause is still open. A subsequent **600-second public HE-AAC HTTPS**
 run passes 7/7: zero measured steady output/decoder/allocation/watchdog faults,
 24,232/9,216 B sampled free/largest minima, and settled recovery within 56 B
-with the largest block unchanged. Other HTTPS formats, OTA regressions and
-codec transitions still require exact-image evidence. Historical
+with the largest block unchanged. The transition matrix then passes 9/11:
+AAC profile/rate/channel changes and Stop/replacement pass, but both cross-family
+MP3/AAC sequences fail while FRAME_ROUTER is off. Health stays fault-free and
+settled heap recovers exactly. Safe decoder-family switching/confirmation and
+bounded recovery are now a demonstrated production gap, not merely missing
+test coverage. Other HTTPS formats and OTA regressions remain open. Historical
 short-window memory fluctuations are retained, not reclassified as fixed.
 This image does not enable the experimental router or
 early compact owner described in the candidate checkpoint below.

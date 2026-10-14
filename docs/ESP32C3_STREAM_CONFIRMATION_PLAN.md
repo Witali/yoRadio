@@ -93,6 +93,24 @@ one codec.
 
 ## Ordered remaining work
 
+### Installed production evidence, 2026-10-14
+
+The `idf61-prod-20261013` image (app SHA-256
+`f31ffba883053cf33d7f2e928bf529e5cbcac8f14a8aafd172e835a027684631`)
+has FRAME_ROUTER/STREAM_CONFIRM disabled. On the physical board, both AAC-only
+profile/rate/channel sequences pass, but MP3 → HE-AAC → MP3 and AAC → MP3 →
+HE-AACv2 fail at their middle segment. One false MP3 11.025-kHz mono status is
+observed inside the former sequence. Zero recorded decoder/allocation/watchdog
+faults and exact settled heap recovery do not excuse missing audio formats.
+See the [production transition report](ESP32C3_PRODUCTION_QUALIFICATION_20261014.md#in-connection-format-changes-production-gap-confirmed).
+
+Prioritize confirmation at decoder-family changes and bounded recovery after
+lost alignment, reusing the existing staging/confirmation ownership rules.
+Preserve partial headers, exact payload order, cancellation and codec drain
+ordering; do not enable the current strict-boundary experimental path as the
+production default while its documented recovery gaps remain. The two failed
+physical sequences are fixed acceptance cases for the completed implementation.
+
 ### Queue storage implemented and tested (2026-10-13)
 
 `stream_staging.h` now owns up to four unpublished leases from the actual
