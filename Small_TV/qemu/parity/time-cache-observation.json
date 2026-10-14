@@ -1,0 +1,105 @@
+{
+  "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+  "cases": [
+    {
+      "case": "initial-2025",
+      "epoch": 1735726447,
+      "calls": 1,
+      "cached_date": [
+        2025,
+        1,
+        1,
+        18,
+        14,
+        7,
+        3
+      ],
+      "retry_counter": 0,
+      "initialized": 1,
+      "sync_notification": 0
+    },
+    {
+      "case": "same-second-year-jump",
+      "epoch": 1767262447,
+      "calls": 1,
+      "cached_date": [
+        2025,
+        1,
+        1,
+        18,
+        14,
+        7,
+        3
+      ],
+      "retry_counter": 0,
+      "initialized": 1,
+      "sync_notification": 0
+    },
+    {
+      "case": "synced-2024-below-year-threshold",
+      "epoch": 1704104047,
+      "calls": 20,
+      "cached_date": [
+        2025,
+        1,
+        1,
+        18,
+        14,
+        7,
+        3
+      ],
+      "retry_counter": 20,
+      "initialized": 1,
+      "sync_notification": 1
+    },
+    {
+      "case": "retry-after-21-updates",
+      "epoch": 1704104047,
+      "calls": 1,
+      "cached_date": [
+        2025,
+        1,
+        1,
+        18,
+        14,
+        7,
+        3
+      ],
+      "retry_counter": 0,
+      "initialized": 1,
+      "sync_notification": 1
+    },
+    {
+      "case": "stopped-client-retry-clears-initialized",
+      "epoch": 1704104047,
+      "calls": 21,
+      "cached_date": [
+        2025,
+        1,
+        1,
+        18,
+        14,
+        7,
+        3
+      ],
+      "retry_counter": 0,
+      "initialized": 0,
+      "sync_notification": 1
+    }
+  ],
+  "adapters": {
+    "tz-lock": 46,
+    "libc-reent": 46,
+    "tz-getenv-r": 46,
+    "rom-libc-reent": 138,
+    "tz-unlock": 46,
+    "sdk-time": 45,
+    "sdk-log-timestamp": 2,
+    "sdk-log-write": 2,
+    "sdk-sntp-enabled": 2
+  },
+  "scope": "Exploratory actual factory RV32 observation, not a passing gate or SNTP transport test. Only time(), SNTP-enabled query and logging SDK boundaries are adapted; calendar conversion and update/cache/retry instructions execute literally. All epochs, cache and TZ are synthetic.",
+  "utc_offset_fixture": "CST-8",
+  "factory_update_entry": "0x42010b70",
+  "factory_notification_entry": "0x420109de"
+}

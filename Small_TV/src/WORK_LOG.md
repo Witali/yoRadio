@@ -190,3 +190,44 @@
   Полный отчёт, `jpeg-validation.json`, scoped negative `jpeg-before.json` и
   две картинки до исправления сохранены. SNTP/DST, произвольные JPEG и
   длительные/аппаратные/полные браузерные сценарии остаются дальнейшей работой.
+
+- Время: выполнены настоящий заводской `tzset`/`localtime_r` и прежняя native
+  libc для 109 ключей × 12 месячных выборок 2026. Буквальные результаты библиотек
+  равны; 116 календарных отличий от независимого IANA TZif. Причина: неявные US
+  DST-правила и устаревшие country offsets. Исходный дамп не менялся.
+- Вынесены чистые country/timezone helpers. Закреплённые TZif IANA 2026e проверяются
+  по SHA, преобразуются в дедуплицированные static C tables с полной историей и
+  явными будущими recurrence. Не вводится выбор региона по городу; сохранены
+  исходные keys/default GB. Worker revisits offset offline; UI использует
+  текущий settings snapshot и не ждёт глобального TZ setter.
+- Настоящий RV32 gate прошёл 36,404 сравнения всех 109 ключей с Python ZoneInfo:
+  recorded/future edges, leap/century dates, fractional/negative DST, unknown key,
+  пять invalid pointer/epoch inputs. Проверка обратного преобразования защищает
+  от календарного переполнения libc. Named RV32 time_t ABI подтверждён objdump.
+- Платформа: 24 случая прошли, включая offline DST-переходы и обе реальные темы
+  при DST/стране/обратном epoch jump с прежними секундами. Раннее ожидание нового
+  colon без timer event исправлено в тесте: исходная фаза должна сохраняться.
+- Сборка сохранена: app 1,115,008, SHA
+  `4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c`;
+  source `b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c`.
+  Полный `timezone-final` выполняется. Порог 2025, SNTP callback и transport
+  retry/fallback остаются отдельной работой; полного соответствия ещё нет.
+- Дополнительное exploratory наблюдение настоящего `0x42010b70`: после 2025
+  годовой epoch jump с теми же секундами оставляет cached year/weekday; callback
+  `0x420109de` выставляет sync flag, но 2024 отвергается year gate. 21-й шаг
+  обнуляет retry counter и сбрасывает initialized только при stopped SNTP.
+  Синтетический `time-cache-observation.json` сохранён отдельно от passing gates.
+- Итог `timezone-final`: все включённые группы прошли — native 3,021;
+  платформа 24 / 742,006; JS/целостность; renderer/control/classic/weather/calendar/
+  JPEG и 36,404 timezone comparisons. QEMU boot/reset/SNTP, настоящий AP→STA HTTP,
+  persistence, weather/field и пять сцен обеих прошивок прошли; 110 native scroll
+  frames. Сходство setup 100%, classic 98,66%, simple 98,52%, photo 100%, dial
+  98,94% — наблюдение, не критерий идентичности. Снимки/отчёты связаны с новой
+  app/source, старые negative JPEG и board reports не переписаны.
+- Повторная проверка публикации подтвердила app/source/test hashes; app 1,115,008,
+  свободно 420,992, DIRAM 80,650, 148 entry comments и 34 функции с метками.
+  Полное соответствие остаётся неустановленным. QEMU-репозиторий и физические платы
+  не изменены; созданные ВМ закрыты. SNTP-validity/transport остаются следующим шагом.
+- Код/сборка — `1e9fac91`. Перед коммитом проверены точные Git-байты всех 48
+  production source files и 106 TZif; full suite содержит 44 test inputs.
+  Отчёты/контекст фиксируются отдельным коммитом. Посторонние файлы не включаются.

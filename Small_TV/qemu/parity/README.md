@@ -5,6 +5,13 @@ Functional reconstruction has since resumed. The reconstruction now uses
 the factory fonts, layouts, settings sector, timer thresholds, photo fades and
 rounded analog strokes. Complete function/behavior identity is **not established**.
 
+[Country timezone checks](timezone-checks.md) now execute the native conversion
+and real Newlib against independent pinned IANA TZif data for all 109 recovered
+keys. The implicit factory DST-rule defect is a declared correction; literal
+monthly differences remain in [the before observation](timezone-before.json).
+The [current result](timezone-validation.json) retains its own app/source hashes.
+SNTP validity and retry/fallback transport remain separate work.
+
 Newer [machine-level renderer checks](machine-checks.md) use identical explicit
 inputs and execute both RV32 programs. They restore tick-angle narrowing while
 deliberately correcting the vendor's Sunday-label and stroke-geometry bugs at

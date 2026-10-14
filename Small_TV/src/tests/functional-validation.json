@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "started_utc": "2026-10-13T19:40:12.8429575Z",
-  "finished_utc": "2026-10-13T19:55:15.2476560Z",
+  "started_utc": "2026-10-14T09:41:06.4860095Z",
+  "finished_utc": "2026-10-14T09:57:02.5210942Z",
   "passed": true,
   "automatic_profile": "host_machine_qemu",
   "all_functionality_verified": false,
-  "source_sha256": "a754f79707a9f140c381c171101d5837ac9a7a62f9e6c8813c9a65491868434d",
-  "app_sha256": "997769839e8a016cb1c86845410297cea4097b47580b820fe0a77492267e2ded",
+  "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
+  "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
   "test_inputs": [
     {
       "sha256": "c9187b43a2c83c8c8a433343c4a10026ee630c5a656773cd362e7b51a3a3e6dc",
@@ -57,11 +57,11 @@
       "file": "Small_TV/src/tests/oracle-requirements.txt"
     },
     {
-      "sha256": "762670a90248c92d5b1b9905641f20d2574fc6ed7e1bc6b4c85904c4c42dee83",
+      "sha256": "02db0c592805ac36e0703297e45e348773ee01378f2f42fbf4119701502f04c4",
       "file": "Small_TV/src/tests/platform_test.c"
     },
     {
-      "sha256": "aaf0bbd4c75b779f354f3891e553d2af4b753927d739071ffceb46ab4695ddff",
+      "sha256": "0e1e1dbc3d5c77d4ff0027a8564b453404c4fcdf37122bb2f5308ab45342f55e",
       "file": "Small_TV/src/tests/publish-report.py"
     },
     {
@@ -69,7 +69,7 @@
       "file": "Small_TV/src/tests/qemu_suite.py"
     },
     {
-      "sha256": "e287186082aa61f74cc8f3ad95c83f5a36f3d8b125937692f332a79fec1f99ea",
+      "sha256": "1db4152412dcc03694c95f3c00de946ab943f9e6aca98d40845dc93de4dc12e4",
       "file": "Small_TV/src/tests/run-all.ps1"
     },
     {
@@ -77,7 +77,7 @@
       "file": "Small_TV/src/tests/run-machine-oracle.ps1"
     },
     {
-      "sha256": "01320fc00564fce78237cdf77bf8b11c7f5d2beba02a04d37e3806cb4514e059",
+      "sha256": "3cc131c574329467745c068b2486df8b6571840547560485fe4bdb9004b9cd4e",
       "file": "Small_TV/src/tests/run-platform.ps1"
     },
     {
@@ -169,8 +169,12 @@
       "file": "Small_TV/src/tests/stubs/nvs.h"
     },
     {
-      "sha256": "32e631e313bdd9eab2ff6a5b83cfdf0c282ac57f95b9a91e18eaade3ed2210ae",
+      "sha256": "14aa359e1ce977a8bc520a67c0d3d6ed6bb8fd5c61960fedb2fbc7f5f79b8559",
       "file": "Small_TV/src/tests/stubs/time_adapter.h"
+    },
+    {
+      "sha256": "d382200126c7d3e3594c279b1a2fb68c2261cdf2ab7122355b32c1999694970e",
+      "file": "Small_TV/src/tests/timezone_oracle.py"
     },
     {
       "sha256": "56a787ec26ddaa24cf3eae65c47aa119bbd8c9dfc2efbb9bde0699f963ca1d24",
@@ -443,7 +447,7 @@
     ]
   },
   "platform": {
-    "passed": true,
+    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation.",
     "cases": [
       {
         "case": "wifi_setup",
@@ -494,6 +498,11 @@
         "case": "time_worker",
         "passed": true,
         "checks": 12
+      },
+      {
+        "case": "time_zone_boundaries",
+        "passed": true,
+        "checks": 19
       },
       {
         "case": "backlight_schedule",
@@ -549,9 +558,19 @@
         "case": "clock_calendar_simple",
         "passed": true,
         "checks": 10
+      },
+      {
+        "case": "clock_timezone_classic",
+        "passed": true,
+        "checks": 13
+      },
+      {
+        "case": "clock_timezone_simple",
+        "passed": true,
+        "checks": 13
       }
     ],
-    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation."
+    "passed": true
   },
   "frontend": {
     "passed": true,
@@ -623,8 +642,8 @@
     "cases": 6,
     "failures": 0,
     "errors": 0,
-    "source_sha256": "a754f79707a9f140c381c171101d5837ac9a7a62f9e6c8813c9a65491868434d",
-    "app_sha256": "997769839e8a016cb1c86845410297cea4097b47580b820fe0a77492267e2ded",
+    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
+    "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
     "factory_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
   },
   "machine": {
@@ -632,8 +651,8 @@
     "literal_factory_pixels_equal": false,
     "renderer_cases": 316,
     "geometry_checks": 4,
-    "source_sha256": "a754f79707a9f140c381c171101d5837ac9a7a62f9e6c8813c9a65491868434d",
-    "native_elf_sha256": "be42f70db48ce47715dea6d4ef45fa86216dabdbec32103000951aa66951bfd5",
+    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
+    "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
     "approved_fixes": {
       "simple-sunday-standard-tm-wday": "Display Sun for standard tm_wday 0; factory 0 repeats the date, while factory 7 draws Sun",
       "analog-perpendicular-stroke-offsets": "Use cos/sin for x/y after atan2+pi/2; the original sin/cos collapses axis-aligned thick strokes"
@@ -1151,7 +1170,7 @@
       ],
       "first_failures": [],
       "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-      "native_elf_sha256": "be42f70db48ce47715dea6d4ef45fa86216dabdbec32103000951aa66951bfd5",
+      "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
       "approved_fix": "photo fade must restore configured duty even when the original schedule cache did not change",
       "scope": "Executed LEDC initialization, duty arithmetic and conditional schedule call traces; successful driver boundaries are captured. RF, electrical PWM and SDK locking are outside scope."
     }
@@ -1196,10 +1215,10 @@
   },
   "machine_weather": {
     "passed": true,
-    "app_sha256": "997769839e8a016cb1c86845410297cea4097b47580b820fe0a77492267e2ded",
-    "source_sha256": "a754f79707a9f140c381c171101d5837ac9a7a62f9e6c8813c9a65491868434d",
+    "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
+    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "be42f70db48ce47715dea6d4ef45fa86216dabdbec32103000951aa66951bfd5",
+    "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
     "approved_fixes": [
       "clear-city-full-height",
       "clear-weather-title",
@@ -1221,10 +1240,10 @@
   },
   "machine_calendar": {
     "passed": true,
-    "app_sha256": "997769839e8a016cb1c86845410297cea4097b47580b820fe0a77492267e2ded",
-    "source_sha256": "a754f79707a9f140c381c171101d5837ac9a7a62f9e6c8813c9a65491868434d",
+    "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
+    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "be42f70db48ce47715dea6d4ef45fa86216dabdbec32103000951aa66951bfd5",
+    "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
     "approved_fixes": [
       "calendar-change-with-unchanged-minute",
       "clear-shortened-simple-date",
@@ -1235,10 +1254,10 @@
   },
   "machine_jpeg": {
     "passed": true,
-    "app_sha256": "997769839e8a016cb1c86845410297cea4097b47580b820fe0a77492267e2ded",
-    "source_sha256": "a754f79707a9f140c381c171101d5837ac9a7a62f9e6c8813c9a65491868434d",
+    "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
+    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
     "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-    "native_elf_sha256": "be42f70db48ce47715dea6d4ef45fa86216dabdbec32103000951aa66951bfd5",
+    "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
     "complete_asset_set": true,
     "approved_fixes": [
       "erase-known-jpeg-rectangle-after-decode-error",
@@ -1249,6 +1268,24 @@
     "compared_pixels": 6163200,
     "error_validation_checks": 35,
     "placement_checks": 7
+  },
+  "machine_timezones": {
+    "passed": true,
+    "app_sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
+    "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c",
+    "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+    "native_elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff",
+    "complete_country_set": true,
+    "iana_version": "2026e",
+    "timezone_manifest_sha256": "81c0cf308eccf1b7a465ddbba7ba36b85376ad238b17232204f9efef0d9df2eb",
+    "comparisons": 36404,
+    "factory_literal_differences": 116,
+    "approved_fixes": [
+      "explicit-iana-country-offset-and-dst-rules"
+    ],
+    "scope": "Execute real RV32 timezone code and libc against independently loaded IANA TZif.\n\nFactory libc receives its literal recovered strings; discrepancies are retained.\nOnly environment, libc reentrancy/locking and existing LCD adapters are replaced.\nDate conversion, TZ parsing, transition search and calendar arithmetic execute\nfrom immutable ELF bytes. No SNTP transport or physical-board claim is made.\n",
+    "countries": 109,
+    "invalid_inputs": 5
   },
   "qemu": {
     "passed": true,
@@ -1263,7 +1300,7 @@
     },
     "http_initial_setup": {
       "passed": true,
-      "tested_at_utc": "2026-10-13T21:46:20.631329+02:00",
+      "tested_at_utc": "2026-10-14T11:48:08.602109+02:00",
       "flows": {
         "original": {
           "firmware": "original",
@@ -1341,31 +1378,31 @@
           "sources": {
             "images": [
               {
-                "offset": "0x0",
                 "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "bytes": 19248,
-                "file": "bootloader.bin"
+                "file": "bootloader.bin",
+                "offset": "0x0"
               },
               {
-                "offset": "0x8000",
                 "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "bytes": 3072,
-                "file": "partition-table.bin"
+                "file": "partition-table.bin",
+                "offset": "0x8000"
               },
               {
-                "offset": "0x10000",
-                "sha256": "997769839e8a016cb1c86845410297cea4097b47580b820fe0a77492267e2ded",
-                "bytes": 1022496,
-                "file": "app.bin"
+                "sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
+                "bytes": 1115008,
+                "file": "app.bin",
+                "offset": "0x10000"
               },
               {
-                "offset": "0x200000",
                 "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "bytes": 1994752,
-                "file": "assets.bin"
+                "file": "assets.bin",
+                "offset": "0x200000"
               }
             ],
-            "source_sha256": "a754f79707a9f140c381c171101d5837ac9a7a62f9e6c8813c9a65491868434d"
+            "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c"
           },
           "web_endpoints": [
             {
@@ -1420,7 +1457,7 @@
     },
     "weather_http": {
       "passed": true,
-      "tested_at_utc": "2026-10-13T21:47:25.965582+02:00",
+      "tested_at_utc": "2026-10-14T11:49:11.827337+02:00",
       "scope": "Real guest DNS/TCP/HTTP via isolated loopback fixture; parsed synthetic weather and stable LCD regions. No Internet service, physical RF or full-program equivalence.",
       "native_layout": {
         "address": 1070267000,
@@ -1442,7 +1479,7 @@
           "generation": 224
         },
         "request_state_address": 1070282984,
-        "elf_sha256": "be42f70db48ce47715dea6d4ef45fa86216dabdbec32103000951aa66951bfd5"
+        "elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff"
       },
       "flows": {
         "original": {
@@ -1596,31 +1633,31 @@
           "sources": {
             "images": [
               {
-                "offset": "0x0",
                 "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "bytes": 19248,
-                "file": "bootloader.bin"
+                "file": "bootloader.bin",
+                "offset": "0x0"
               },
               {
-                "offset": "0x8000",
                 "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "bytes": 3072,
-                "file": "partition-table.bin"
+                "file": "partition-table.bin",
+                "offset": "0x8000"
               },
               {
-                "offset": "0x10000",
-                "sha256": "997769839e8a016cb1c86845410297cea4097b47580b820fe0a77492267e2ded",
-                "bytes": 1022496,
-                "file": "app.bin"
+                "sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
+                "bytes": 1115008,
+                "file": "app.bin",
+                "offset": "0x10000"
               },
               {
-                "offset": "0x200000",
                 "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "bytes": 1994752,
-                "file": "assets.bin"
+                "file": "assets.bin",
+                "offset": "0x200000"
               }
             ],
-            "source_sha256": "a754f79707a9f140c381c171101d5837ac9a7a62f9e6c8813c9a65491868434d"
+            "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c"
           },
           "weather_services": true,
           "native_rejects_non_200_json": true,
@@ -1789,12 +1826,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.353768
+            "virtual_seconds": 46.323626
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": false,
-            "virtual_seconds": 46.609774
+            "virtual_seconds": 46.454184
           }
         },
         "equal_pixels_min": 1.0,
@@ -1806,16 +1843,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.770218
+            "virtual_seconds": 46.746687
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.665016
+            "virtual_seconds": 46.469208
           }
         },
-        "equal_pixels_min": 0.9754340277777778,
-        "equal_pixels_max": 0.9957291666666667
+        "equal_pixels_min": 0.9768576388888889,
+        "equal_pixels_max": 0.9866145833333333
       },
       "simple": {
         "passed": true,
@@ -1823,16 +1860,16 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.64035
+            "virtual_seconds": 46.527738
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.721049
+            "virtual_seconds": 46.647865
           }
         },
-        "equal_pixels_min": 0.98953125,
-        "equal_pixels_max": 0.9921701388888889
+        "equal_pixels_min": 0.9825694444444445,
+        "equal_pixels_max": 0.9852083333333334
       },
       "photo": {
         "passed": true,
@@ -1840,12 +1877,12 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.860827
+            "virtual_seconds": 46.708861
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.59998
+            "virtual_seconds": 46.887071
           }
         },
         "equal_pixels_min": 0.0003298611111111111,
@@ -1857,21 +1894,21 @@
           "original": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.240229
+            "virtual_seconds": 46.362602
           },
           "reconstructed": {
             "no_panic": true,
             "ntp_reply": true,
-            "virtual_seconds": 46.38988
+            "virtual_seconds": 46.686162
           }
         },
-        "equal_pixels_min": 0.9848263888888888,
-        "equal_pixels_max": 0.99078125
+        "equal_pixels_min": 0.98140625,
+        "equal_pixels_max": 0.9893923611111111
       }
     },
     "field_http": {
       "passed": true,
-      "tested_at_utc": "2026-10-13T21:48:40.648131+02:00",
+      "tested_at_utc": "2026-10-14T11:50:25.151501+02:00",
       "qemu_sha256": "18f183bcffe9603f7c36966cafacb6c76e7bd8c42bdaadbcd75f8e380ee5cf00",
       "cache_layout": {
         "address": 1070267000,
@@ -1893,7 +1930,7 @@
           "generation": 224
         },
         "request_state_address": 1070282984,
-        "elf_sha256": "be42f70db48ce47715dea6d4ef45fa86216dabdbec32103000951aa66951bfd5"
+        "elf_sha256": "c4bf2cec73e495ffab2b52bc9447d81599feeb56cc81861257b444e16437bbff"
       },
       "scroll_layout": {
         "address": 1070266664,
@@ -1952,7 +1989,7 @@
                 "icon_offset": 3878912
               },
               "frame": {
-                "virtual_seconds": 30.070565,
+                "virtual_seconds": 30.325095,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -1974,7 +2011,7 @@
                 "icon_offset": 3878912
               },
               "frame": {
-                "virtual_seconds": 32.420626,
+                "virtual_seconds": 32.851374,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -1996,7 +2033,7 @@
                 "icon_offset": 3802112
               },
               "frame": {
-                "virtual_seconds": 34.760476,
+                "virtual_seconds": 35.460455,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -2018,7 +2055,7 @@
                 "icon_offset": 0
               },
               "frame": {
-                "virtual_seconds": 37.281106,
+                "virtual_seconds": 38.019937,
                 "literal_ideal_differences": {
                   "city": 0,
                   "title": 0,
@@ -2041,31 +2078,31 @@
           "sources": {
             "images": [
               {
-                "offset": "0x0",
                 "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
                 "bytes": 19248,
-                "file": "bootloader.bin"
+                "file": "bootloader.bin",
+                "offset": "0x0"
               },
               {
-                "offset": "0x8000",
                 "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
                 "bytes": 3072,
-                "file": "partition-table.bin"
+                "file": "partition-table.bin",
+                "offset": "0x8000"
               },
               {
-                "offset": "0x10000",
-                "sha256": "997769839e8a016cb1c86845410297cea4097b47580b820fe0a77492267e2ded",
-                "bytes": 1022496,
-                "file": "app.bin"
+                "sha256": "4778377602bd3c596aba9640202fd40fb9420fb7a10b3da29c949a936a72585c",
+                "bytes": 1115008,
+                "file": "app.bin",
+                "offset": "0x10000"
               },
               {
-                "offset": "0x200000",
                 "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
                 "bytes": 1994752,
-                "file": "assets.bin"
+                "file": "assets.bin",
+                "offset": "0x200000"
               }
             ],
-            "source_sha256": "a754f79707a9f140c381c171101d5837ac9a7a62f9e6c8813c9a65491868434d"
+            "source_sha256": "b1acb29646c238edda0018deac4e07042d5ff1187106bd4e9836fcdb4ffc875c"
           },
           "checks": {
             "actual_city_http": true,
@@ -2119,11 +2156,11 @@
                     "completed": false
                   },
                   {
-                    "text": "North-Northeast",
+                    "text": "10.0.2.15",
                     "x": 0,
                     "y": 40,
                     "width": 180,
-                    "length": 180,
+                    "length": 108,
                     "offset": 0,
                     "pause": 15,
                     "color": 65535,
@@ -2143,7 +2180,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 40.508921,
+                "virtual_seconds": 41.108387,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -2155,7 +2192,7 @@
                 },
                 "rendered_weather_generation": 5,
                 "passed": true,
-                "attempts": 2
+                "attempts": 1
               }
             },
             "unavailable": {
@@ -2210,7 +2247,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 40.795375,
+                "virtual_seconds": 41.401085,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -2277,7 +2314,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 41.152566,
+                "virtual_seconds": 41.822096,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -2320,11 +2357,11 @@
                     "completed": false
                   },
                   {
-                    "text": "10.0.2.15",
+                    "text": "North-Northeast",
                     "x": 0,
                     "y": 40,
                     "width": 180,
-                    "length": 108,
+                    "length": 180,
                     "offset": 0,
                     "pause": 15,
                     "color": 65535,
@@ -2344,7 +2381,7 @@
                     "completed": false
                   }
                 ],
-                "virtual_seconds": 41.502114,
+                "virtual_seconds": 42.20854,
                 "different_pixels": {
                   "field-0": 0,
                   "field-2": 0,
@@ -2378,7 +2415,7 @@
                 "pause": true
               }
             },
-            "observed_frames": 106
+            "observed_frames": 110
           },
           "refresh": {
             "passed": true,
@@ -2397,11 +2434,11 @@
                   "completed": true
                 },
                 {
-                  "text": "clear",
+                  "text": "10.0.2.15",
                   "x": 0,
                   "y": 40,
                   "width": 180,
-                  "length": 60,
+                  "length": 108,
                   "offset": 0,
                   "pause": 15,
                   "color": 65535,
@@ -2421,7 +2458,7 @@
                   "completed": true
                 }
               ],
-              "virtual_seconds": 37.830785,
+              "virtual_seconds": 38.245461,
               "different_pixels": {
                 "field-0": 0,
                 "field-2": 0,
@@ -2433,7 +2470,7 @@
               },
               "rendered_weather_generation": 4,
               "passed": true,
-              "attempts": 74
+              "attempts": 75
             },
             "held": [
               {
@@ -2444,18 +2481,18 @@
                     "y": 10,
                     "width": 180,
                     "length": 228,
-                    "offset": 10,
+                    "offset": 8,
                     "pause": 0,
                     "color": 2016,
                     "returning": false,
                     "completed": true
                   },
                   {
-                    "text": "clear",
+                    "text": "10.0.2.15",
                     "x": 0,
                     "y": 40,
                     "width": 180,
-                    "length": 60,
+                    "length": 108,
                     "offset": 0,
                     "pause": 15,
                     "color": 65535,
@@ -2469,14 +2506,14 @@
                     "width": 80,
                     "length": 144,
                     "offset": 0,
-                    "pause": 11,
+                    "pause": 12,
                     "color": 65504,
                     "returning": false,
                     "completed": true
                   }
                 ],
-                "virtual_seconds": 37.994577,
-                "pixels_sha256": "1385f85c8dc8fed3f3e8edc4c56487651ed33eca37e83fffec0c421db26dec9e",
+                "virtual_seconds": 38.431846,
+                "pixels_sha256": "fcce5b6caba8ba6ff5f75de55757c07000789bb6a371495c9e67e48b28898672",
                 "rendered_weather_generation": 4
               },
               {
@@ -2487,18 +2524,18 @@
                     "y": 10,
                     "width": 180,
                     "length": 228,
-                    "offset": 10,
+                    "offset": 8,
                     "pause": 0,
                     "color": 2016,
                     "returning": false,
                     "completed": true
                   },
                   {
-                    "text": "clear",
+                    "text": "10.0.2.15",
                     "x": 0,
                     "y": 40,
                     "width": 180,
-                    "length": 60,
+                    "length": 108,
                     "offset": 0,
                     "pause": 15,
                     "color": 65535,
@@ -2512,14 +2549,14 @@
                     "width": 80,
                     "length": 144,
                     "offset": 0,
-                    "pause": 11,
+                    "pause": 12,
                     "color": 65504,
                     "returning": false,
                     "completed": true
                   }
                 ],
-                "virtual_seconds": 38.09033,
-                "pixels_sha256": "1385f85c8dc8fed3f3e8edc4c56487651ed33eca37e83fffec0c421db26dec9e",
+                "virtual_seconds": 38.524808,
+                "pixels_sha256": "fcce5b6caba8ba6ff5f75de55757c07000789bb6a371495c9e67e48b28898672",
                 "rendered_weather_generation": 4
               },
               {
@@ -2530,18 +2567,18 @@
                     "y": 10,
                     "width": 180,
                     "length": 228,
-                    "offset": 10,
+                    "offset": 8,
                     "pause": 0,
                     "color": 2016,
                     "returning": false,
                     "completed": true
                   },
                   {
-                    "text": "clear",
+                    "text": "10.0.2.15",
                     "x": 0,
                     "y": 40,
                     "width": 180,
-                    "length": 60,
+                    "length": 108,
                     "offset": 0,
                     "pause": 15,
                     "color": 65535,
@@ -2555,14 +2592,14 @@
                     "width": 80,
                     "length": 144,
                     "offset": 0,
-                    "pause": 11,
+                    "pause": 12,
                     "color": 65504,
                     "returning": false,
                     "completed": true
                   }
                 ],
-                "virtual_seconds": 38.189805,
-                "pixels_sha256": "1385f85c8dc8fed3f3e8edc4c56487651ed33eca37e83fffec0c421db26dec9e",
+                "virtual_seconds": 38.625785,
+                "pixels_sha256": "fcce5b6caba8ba6ff5f75de55757c07000789bb6a371495c9e67e48b28898672",
                 "rendered_weather_generation": 4
               }
             ],
@@ -2574,7 +2611,7 @@
                   "y": 10,
                   "width": 180,
                   "length": 228,
-                  "offset": 12,
+                  "offset": 10,
                   "pause": 0,
                   "color": 2016,
                   "returning": false,
@@ -2599,13 +2636,13 @@
                   "width": 80,
                   "length": 144,
                   "offset": 0,
-                  "pause": 10,
+                  "pause": 11,
                   "color": 65504,
                   "returning": false,
                   "completed": true
                 }
               ],
-              "virtual_seconds": 39.600356,
+              "virtual_seconds": 40.117972,
               "different_pixels": {
                 "field-0": 0,
                 "field-2": 0,
@@ -2617,7 +2654,7 @@
               },
               "rendered_weather_generation": 5,
               "passed": true,
-              "attempts": 2
+              "attempts": 3
             },
             "published_generation": 5
           },
@@ -2660,7 +2697,7 @@
                 "completed": false
               }
             ],
-            "virtual_seconds": 40.16925,
+            "virtual_seconds": 40.780295,
             "different_pixels": {
               "field-0": 0,
               "field-2": 0,
@@ -2680,8 +2717,8 @@
   },
   "not_run": [
     {
-      "reason": "Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately",
       "status": "not_run",
+      "reason": "Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately",
       "name": "hardware_browser_soak"
     }
   ]
