@@ -1,0 +1,75 @@
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c: In function ‘stream_task’:
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:604:9: error: unknown type name ‘stream_probe_t’
+  604 |         stream_probe_t probe = {0};
+      |         ^~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:605:9: error: implicit declaration of function ‘stream_transport_reset’ [-Werror=implicit-function-declaration]
+  605 |         stream_transport_reset();
+      |         ^~~~~~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:607:22: error: ‘STREAM_PROBE_TIMEOUT_MS’ undeclared (first use in this function); did you mean ‘STREAM_READ_TIMEOUT_MS’?
+  607 |             (int64_t)STREAM_PROBE_TIMEOUT_MS * 1000;
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~
+      |                      STREAM_READ_TIMEOUT_MS
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:607:22: note: each undeclared identifier is reported only once for each function it appears in
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:621:18: error: implicit declaration of function ‘stream_initial_pending’ [-Werror=implicit-function-declaration]
+  621 |             if ((stream_initial_pending(codec, first_chunk) && esp_timer_get_time() >= probe_deadline_us) ||
+      |                  ^~~~~~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:622:17: error: implicit declaration of function ‘stream_confirmation_expired’ [-Werror=implicit-function-declaration]
+  622 |                 stream_confirmation_expired()) {
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:627:18: error: ‘input_growth_attempted’ undeclared (first use in this function)
+  627 |             if (!input_growth_attempted && codec == NATIVE_CODEC_FLAC &&
+      |                  ^~~~~~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:640:13: error: implicit declaration of function ‘AUDIO_PROBE_FLAG’ [-Werror=implicit-function-declaration]
+  640 |             AUDIO_PROBE_FLAG(stream_read, 1U);
+      |             ^~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:640:30: error: ‘stream_read’ undeclared (first use in this function)
+  640 |             AUDIO_PROBE_FLAG(stream_read, 1U);
+      |                              ^~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:644:31: error: implicit declaration of function ‘AUDIO_PROBE_STAMP’ [-Werror=implicit-function-declaration]
+  644 |             if (received > 0) AUDIO_PROBE_STAMP(network_us);
+      |                               ^~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:644:49: error: ‘network_us’ undeclared (first use in this function)
+  644 |             if (received > 0) AUDIO_PROBE_STAMP(network_us);
+      |                                                 ^~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:679:26: error: too many arguments to function ‘send_stream_audio’
+  679 |                     if (!send_stream_audio(command.generation, &codec,
+      |                          ^~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:176:13: note: declared here
+  176 | static bool send_stream_audio(uint32_t gen, native_codec_t *codec, const void *data,
+      |             ^~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:694:26: error: too many arguments to function ‘send_stream_audio’
+  694 |                     if (!send_stream_audio(command.generation, &codec,
+      |                          ^~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:176:13: note: declared here
+  176 | static bool send_stream_audio(uint32_t gen, native_codec_t *codec, const void *data,
+      |             ^~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:726:42: error: request for member ‘result’ in something not a structure or union
+  726 |                 ESP_LOGW(TAG, "%s", probe.result == STREAM_PROBE_INVALID
+      |                                          ^
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:72:47: note: in definition of macro ‘ESP_LOGE’
+   72 | #define ESP_LOGE(tag, ...) do { if (0) printf(__VA_ARGS__); } while (0)
+      |                                               ^~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:726:17: note: in expansion of macro ‘ESP_LOGW’
+  726 |                 ESP_LOGW(TAG, "%s", probe.result == STREAM_PROBE_INVALID
+      |                 ^~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:726:53: error: ‘STREAM_PROBE_INVALID’ undeclared (first use in this function)
+  726 |                 ESP_LOGW(TAG, "%s", probe.result == STREAM_PROBE_INVALID
+      |                                                     ^~~~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:72:47: note: in definition of macro ‘ESP_LOGE’
+   72 | #define ESP_LOGE(tag, ...) do { if (0) printf(__VA_ARGS__); } while (0)
+      |                                               ^~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:726:17: note: in expansion of macro ‘ESP_LOGW’
+  726 |                 ESP_LOGW(TAG, "%s", probe.result == STREAM_PROBE_INVALID
+      |                 ^~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:734:49: error: ‘AUDIO_END_FORMAT_UNKNOWN’ undeclared (first use in this function)
+  734 |                              : format_unknown ? AUDIO_END_FORMAT_UNKNOWN
+      |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:737:22: error: implicit declaration of function ‘finish_stream_audio’; did you mean ‘send_stream_audio’? [-Werror=implicit-function-declaration]
+  737 |         end_reason = finish_stream_audio(command.generation, &codec, &first_chunk, end_reason);
+      |                      ^~~~~~~~~~~~~~~~~~~
+      |                      send_stream_audio
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c: At top level:
+/mnt/c/Work/yoRadio/.worktree/merge-c3-idf-20261013/.build/c3-read25-20261015/host-25-fixed/test.c:127:13: error: ‘tls_input_reserve_finish_connection’ defined but not used [-Werror=unused-function]
+  127 | static void tls_input_reserve_finish_connection(void) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors

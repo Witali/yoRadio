@@ -265,3 +265,87 @@ the connection timeout or discard authenticated partial bytes.
 
 [Reports, host tests, socket policies, frame sizes and pinned reader source](../tests/results/esp32c3-flac-tcp-20261015/)
 preserve the failed comparisons and restoration evidence.
+
+## HTTP body read timeout experiment
+
+`CONFIG_YORADIO_STREAM_READ_TIMEOUT_MS` now controls the existing post-header
+read timeout. Its default remains **250 ms**. The experimental image selects
+25 ms; it keeps 2,048-byte read requests, eight FLAC packet slots, the TLS RX
+reserve, connection/handshake and station-unavailable deadlines, decoder/DSP,
+output priority and clock settings unchanged. Main firmware source differs
+from the earlier diagnostic only in replacing the timeout literal with this
+configuration value. The configuration audit finds only the added 25-ms key.
+
+| Diagnostic image | Value |
+| --- | --- |
+| Version | `idf61-read25-20261015` |
+| Source commit recorded at packaging | `2f75d1c8` |
+| App SHA-256 | `0aa2ed3d4e45183d99077421fd2105f4a6155d87abee806cb3fb18ef2600bc96` |
+| ELF SHA-256 | `7a07b0d7335d0a0945168837393023f34a6abc36d6ed7decf8f4f2ad48458b12` |
+| App bytes | 1,476,544 |
+| Static RAM change | 0 B |
+
+The connection/retry harness was stale against the current stream-task
+interfaces. It now imports the actual reset/pending/finalization helpers,
+accepts the current probe argument and enables the matching expansion guard.
+Every body-read stub asserts that the configured post-header timeout was
+applied. Both 25 and 250 ms pass **42 cases** under ASan/UBSan, including
+cancellation, retries, availability deadlines, partial fatal errors and EOF.
+Frame recognition and decoder arithmetic are outside this harness's scope.
+
+The separate harness compiles the pinned SDK's HTTP read function, parser,
+body/completion callbacks and TLS adapter with scripted transport. All **89
+cases** pass with diagnostics enabled. New fixed-length and chunked cases
+return the first three body bytes after a scripted 25 or 250-ms transport
+timeout, then resume with the remaining bytes and correct EOF. Body bytes
+are unchanged and the reader remains retryable. This proves the reader's
+control flow, not real network latency, CPU cost or audio continuity.
+
+The archived build/test evidence retains the initial harness compilation
+failures (missing current interfaces and a WSL include-path issue) and the
+legacy-PowerShell launch failure. Include paths now use separate `-I` arguments;
+the build uses the required PowerShell 7. These setup failures are not firmware
+runtime failures. Build/link, AAC and TLS allocator audits pass.
+
+[Saved diagnostic firmware](../firmware/development/esp32c3-idf61-read25-diagnostic/)
+and [build/host-test evidence](../tests/results/esp32c3-read25-20261015/build/)
+are retained. The production default has not changed.
+
+### Physical timeout comparison
+
+| Body timeout | Delivery | Passed checks | Completion drops | Write errors |
+| ---: | --- | ---: | ---: | ---: |
+| 250 ms | No imposed pauses | 8/9 | 22 | 0 |
+| 250 ms | 100/250/500-ms pauses | 8/9 | 29 (0/3/26 around pauses) | 0 |
+| 25 ms | No imposed pauses | 9/9 | 0 | 0 |
+| 25 ms | 100/250/500-ms pauses | 8/9 | 32 (0/4/28 around pauses) | 0 |
+
+Each image uses one boot for its two cases; all fixed steady windows show
+eight resident input slots. TCP_NODELAY is explicitly off for every transfer.
+All four files reach confirmed natural EOF and pass settled-memory recovery.
+All 595 health samples show zero allocation, decoder and watchdog faults;
+minimum sampled heap/largest block is 63,744/47,104 B. Original production
+image and settings are restored with playback stopped.
+
+The baseline's unplanned control failure is now captured with ISR diagnostics:
+20 drops occur between playback seconds 42.615 and 43.375, followed by two
+between 43.375 and 44.417. Eighteen of 22 event details are retained; four are
+overwritten. Retained output checkpoints are 0.321–4.671 ms old, while the
+last PCM packet is 53.031–170.465 ms old. Of all 22 phase counts, 13 include
+output wait, decoder wait and HTTP read, eight include only output wait, and
+one includes decoder wait and HTTP read. These are call phases, not a task
+scheduler trace. The evidence supports insufficient prepared PCM during the
+event, rather than an output task that simply stopped servicing its loop.
+It does not isolate host/network delivery from decoder processing and refill.
+Nor does this local HTTP event prove the cause of the original quiet HTTPS
+three-drop event.
+
+**Do not promote the 25-ms timeout.** The imposed-pause comparison shows no
+improvement, and the single clean 25-ms control cannot establish that it fixes
+an intermittent fault. Keep the configurable option for future tests and the
+250-ms production default. Next correlate PCM production gaps with decoder
+processing and input availability before changing another buffer or task
+priority; the timing evidence does not justify a decoder arithmetic change.
+
+[Physical reports, fixed-window replay and spontaneous-failure inspection](../tests/results/esp32c3-read25-20261015/physical/)
+preserve all three failed output gates and restoration.
