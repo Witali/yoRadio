@@ -718,3 +718,22 @@ Keep the previous failures and independently evaluate output, health and
 stopped memory recovery; do not infer a fix from successful HE-AAC alone.
 
 [Proposed defaults, generated configuration, comparison script and reconfigure log](../tests/results/esp32c3-raw-tail-quiet-20261015/profile-preflight/).
+
+### Sustained quiet-image qualification
+
+The corrected quiet application passes **27/27 checks** across continuous
+600-second FLAC, Vorbis and Opus observations. All three steady output windows
+(584.049 / 584.854 / 584.166 seconds after warmup) have zero completion drops
+and write errors. The 1,621 health samples share one boot and contain no
+recorded allocation, decoder or watchdog faults. No traced HTTP request fails.
+Each stopped recovery check passes and the largest free block returns to
+114,688 bytes. The controller verifies the original application/settings are
+restored and playback stopped.
+
+These are continuous 610-second synthetic files paced at 1.0. They do not test
+injected network pauses or analog output, and do not supersede the failed
+paused diagnostic experiment. The same corrected application still needs the
+600-second public AAC-LC repeat before profile promotion and final deployment.
+
+[Sustained evidence and exact test sources](../tests/results/esp32c3-raw-tail-quiet-20261015/sustained/).
+[Current acceptance audit](ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md).

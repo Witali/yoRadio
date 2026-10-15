@@ -3,8 +3,9 @@
 ## Decision
 
 **Pending.** The corrected quiet image has passed its short codec, public
-HTTPS, network, WebUI and OTA campaigns. Final sustained checks, production
-wrapper verification and final installation are still in progress. This
+HTTPS, network, WebUI, OTA and sustained FLAC/Vorbis/Opus campaigns. A sustained
+AAC-LC repeat, production wrapper verification and final installation are
+still in progress. This
 document does not mark the playback goal complete.
 
 ## Exact application under review
@@ -28,7 +29,7 @@ the saved application above; a new build must have its own recorded identity.
 | Requirement | Evidence | Assessment |
 | --- | --- | --- |
 | AAC-LC, HE-AAC and HE-AAC v2; preserve SBR/PS and full decoded rate | HTTP matrix includes LC 22.05/44.1/48 kHz, mono/stereo, HE 44.1/48 kHz and HEv2 44.1 kHz; implicit/late SBR and mixed-family transitions | Passed tested cases; no 22-kHz cap or core-only substitution |
-| Other implemented native codecs | MP3, FLAC, Vorbis and Opus, AUTO and explicit hints; natural EOF; public HTTPS FLAC/Vorbis/Opus | Passed short matrix; exact-image sustained campaign pending completion |
+| Other implemented native codecs | MP3, FLAC, Vorbis and Opus, AUTO and explicit hints; natural EOF; public HTTPS FLAC/Vorbis/Opus; 600-s FLAC/Vorbis/Opus | Passed tested cases |
 | Safe parameter/decoder changes | 11/11 transition checks: rate/profile changes, implicit SBR, MP3/AAC changes and Stop/Play generations | Passed |
 | No crashes or allocation failures; recover memory | Lifetime health, settled recovery and active memory-trend gates in each campaign | Passed completed campaigns; numerical free-heap floors are diagnostic |
 | HTTPS and network recovery | Normal certificate verification; five public AAC/MP3 profiles; drop/stall/error/redirect/jitter recovery | Passed completed campaigns; long AAC-LC repeat pending |
@@ -53,12 +54,25 @@ claimed as tested by this report.
 | WebSocket | 7/7 | [Reports](../tests/results/esp32c3-raw-tail-quiet-20261015/qualification/websocket/report.json) |
 | OTA | 15/15 | [Reports](../tests/results/esp32c3-raw-tail-quiet-20261015/qualification/ota/report.json) |
 | Public HTTPS radio: 600-s HE-AAC plus four 60-s AAC/MP3 cases | 17/17 | [Audit](../tests/results/esp32c3-raw-tail-quiet-20261015/public-radio/audit.json) |
+| Sustained FLAC/Vorbis/Opus: 600 s each | 27/27 | [Audit](../tests/results/esp32c3-raw-tail-quiet-20261015/sustained/audit.json) |
 
 The first five playback suites contain 2,096 health samples; the public-radio
 campaign adds 1,572. Each campaign has a consistent boot identity and no
 reported allocation, decoder-failure or watchdog events. OTA intentionally
 reboots the application. Controllers verify application identity and unchanged
 Wi-Fi, playlist and settings without saving their private contents.
+
+The three sustained cases add 1,621 health samples on one boot, with zero
+reported allocation, decoder or watchdog faults and no failed traced request.
+All playback windows have zero completion drops and write errors. After each
+Stop, the largest free block returns to 114,688 bytes. These are continuously
+encoded 610-second synthetic fixtures, paced at 1.0, not looped short files.
+
+| Sustained codec | Measured steady output | Minimum free heap / largest block |
+| --- | ---: | ---: |
+| FLAC, 48 kHz stereo | 584.049 s | 62,440 / 45,056 B |
+| Vorbis, 48 kHz stereo | 584.854 s | 69,612 / 53,248 B |
+| Opus, 48 kHz stereo | 584.166 s | 80,384 / 65,536 B |
 
 The 16-kbit/s public source is **HE-AAC mono**, duplicated to two output
 channels; it is not PS evidence. HE-AAC v2 has separate fixture and PCM coverage.
@@ -93,8 +107,9 @@ owner changes are explicitly recorded rather than assumed identical.
 
 ## Remaining acceptance actions
 
-1. Finish and archive the exact-image 600-second FLAC/Vorbis/Opus campaign,
-   including recovery and verified controller cleanup.
+1. **Done:** exact-image 600-second FLAC/Vorbis/Opus campaign archived,
+   including recovery and verified restoration of the original application,
+   private settings and stopped playback.
 2. Repeat 600-second public AAC-LC on this image; preserve any failure.
 3. Apply the reviewed tested-radio defaults and check fresh and reused
    directories through the normal production wrapper. The
