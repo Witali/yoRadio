@@ -36,7 +36,7 @@ def main():
     report['source_sha256'] = {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
                               for p in (source,harness,Path(__file__).resolve())}
     variants = ((mode,maximum,minimum) for mode in ('ring','adaptive')
-                for maximum in (500,1000) for minimum in dict.fromkeys((0,1,250,500,maximum)))
+                for maximum in (500,1000,2000) for minimum in dict.fromkeys((0,1,250,500,maximum)))
     for mode,maximum,minimum in variants:
         name = mode+'-max'+str(maximum)+'-min'+str(minimum)
         binary = args.output/name
