@@ -17,6 +17,17 @@ from sustained_output import sustained_window, check_memory, check_output
 from run import Capture, Suite
 from trace_transport import TransportTrace
 from audio_test_server.server import Server, DeliveryPauses, pause_argument
+from aac_growth import transport_config
+
+
+def check_tls_delivery(events, fixture):
+    require(len(events) == 1 and events[0].get('fixture') == fixture,
+            'Missing unique TLS fixture transfer')
+    event = events[0]
+    require(event.get('tls_version') in ('TLSv1.2','TLSv1.3') and
+            isinstance(event.get('tls_cipher'), str) and event['tls_cipher'] and event.get('sent',0)>0,
+            'Missing negotiated TLS delivery evidence')
+    return dict(version=event['tls_version'],cipher=event['tls_cipher'],sent=event['sent'])
 
 
 def check_delivery_pauses(events, fixture, schedule):
@@ -47,6 +58,9 @@ def main():
     p.add_argument('--fixture', required=True)
     p.add_argument('--seconds', type=int, default=600)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--ca', type=Path, help='Additional laboratory CA trusted by the test image')
+    p.add_argument('--cert', type=Path)
+    p.add_argument('--key', type=Path, help='Local test server key; never included in reports')
     p.add_argument('--delivery-pause', type=pause_argument, action='append', default=[],
                    help='Pause before BYTE_OFFSET:SECONDS; repeat in increasing order')
     p.add_argument('--send-buffer-bytes', type=int,
@@ -60,6 +74,8 @@ def main():
     spec = specs[a.fixture]
     require(spec['seconds'] >= a.seconds + 5, 'Fixture must outlast the observation')
     config = a.firmware.with_name('sdkconfig').read_text()
+    manifest = json.loads(a.firmware.with_name('manifest.json').read_text()) if any((a.ca,a.cert,a.key)) else {}
+    scheme = transport_config(config,manifest,a.ca,a.cert,a.key)
     require('CONFIG_ESP_CONSOLE_NONE=y' in config and 'CONFIG_LOG_MAXIMUM_LEVEL=0' in config,
             'Expected quiet firmware')
     require('CONFIG_YORADIO_DEEP_SLEEP_CLOCK=y' not in config, 'Disable deep sleep')
@@ -77,7 +93,10 @@ def main():
         fixture_name=a.fixture, observation_seconds=a.seconds, pacing_ratio=1.0,
         delivery_pause_schedule=[dict(after_bytes=n, seconds=s) for n, s in schedule],
         send_buffer_requested=a.send_buffer_bytes,
-        scope='Finite paced HTTP playback, sampled format/output/faults and settled memory recovery; no acoustic or CPU measurement')
+        transport=scheme,
+        scope='Finite paced HTTP(S) playback, sampled format/output/faults and settled memory recovery; no acoustic or CPU measurement')
+    if scheme == 'https':
+        report.data.update(test_ca_sha256=sha(a.ca.read_bytes()),leaf_certificate_sha256=sha(a.cert.read_bytes()))
     last_checkpoint = 0
 
     def save():
@@ -96,7 +115,7 @@ def main():
         save()
         print('OBSERVE', batch['case'], round(row['seconds']), flush=True)
 
-    origin = f'http://{a.host}:{a.port}'
+    origin = f'{scheme}://{a.host}:{a.port}'
     suite = Suite(b, origin, specs, Capture(None), a.output, checkpoint=checkpoint)
 
     def case(name, action):
@@ -139,13 +158,16 @@ def main():
     with (a.output/'request-phases.jsonl').open('x', encoding='utf-8') as trace:
         with TransportTrace(urlsplit(a.board).hostname, trace, capture_socket_ports=True):
             with Server(a.host, a.port, specs, delivery_stats=True, pacing_ratio=1.0,
-                        delivery_pauses=schedule, send_buffer_bytes=a.send_buffer_bytes) as server:
+                        delivery_pauses=schedule, send_buffer_bytes=a.send_buffer_bytes,
+                        cert=a.cert,key=a.key) as server:
                 try:
                     b.stop()
                     suite.observe(12, 'idle:initial', interval=1)
                     initial = b.health_samples[-3:]
                     report.data['idle'] = dict(initial=initial)
                     case('sustained-collection', observe)
+                    if scheme == 'https':
+                        case('tls-delivery',lambda:check_tls_delivery(server.events,a.fixture))
                     if schedule:
                         case('delivery-pauses', lambda: check_delivery_pauses(server.events, a.fixture, schedule))
                     b.stop()

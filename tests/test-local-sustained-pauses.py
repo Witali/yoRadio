@@ -3,11 +3,22 @@ import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools/esp32c3_tests'))
-from local_sustained import check_delivery_pauses
+from local_sustained import check_delivery_pauses,check_tls_delivery,transport_config
 from common import Failure
 
 
 class PauseEvidenceTests(unittest.TestCase):
+    def test_tls_evidence_requires_negotiated_unique_transfer(self):
+        event=dict(fixture='aac',sent=1234,tls_version='TLSv1.2',tls_cipher='cipher')
+        self.assertEqual(check_tls_delivery([event],'aac')['sent'],1234)
+        for events in ([],[event,event],[dict(event,tls_version=None)],
+                       [dict(event,tls_cipher='')],[dict(event,sent=0)],[dict(event,fixture='other')]):
+            with self.subTest(events=events),self.assertRaises(Failure):check_tls_delivery(events,'aac')
+
+    def test_http_default_and_partial_tls_config(self):
+        self.assertEqual(transport_config('',{},None,None,None),'http')
+        with self.assertRaises(Failure):transport_config('',{},Path('ca'),None,None)
+
     def setUp(self):
         self.schedule=((100,.25),(200,.5))
         self.events=[dict(fixture='aac',pacing_ratio=1.,

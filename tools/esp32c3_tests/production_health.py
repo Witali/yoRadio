@@ -52,6 +52,21 @@ def validate_output(output):
     return {key: output[key] for key in ('available', *OUTPUT_COUNTERS)}
 
 
+def validate_input_queue(value):
+    fields = ('resident', 'occupied', 'minimum', 'limit', 'packet_capacity')
+    require(type(value) is dict, 'Invalid input queue snapshot')
+    require(all(type(value.get(k)) is int and 0 <= value[k] <= COUNTER_MASK for k in fields),
+            'Missing or invalid input queue field')
+    if value['packet_capacity'] == 0:
+        require(all(value[k] == 0 for k in fields), 'Inconsistent absent input queue')
+    else:
+        require(0 < value['minimum'] <= value['resident'] and
+                value['minimum'] <= value['limit'] and value['occupied'] <= value['resident'],
+                'Inconsistent input queue capacity')
+    # A reduced limit can temporarily be below resident while busy leases drain.
+    return {key: value[key] for key in fields}
+
+
 def read_health(board):
     raw = board.json('/api/native/health')
     require(type(raw) is dict and type(raw.get('schema')) is int and
@@ -70,6 +85,8 @@ def read_health(board):
         result['output'] = validate_output(raw['output'])
     if 'pipeline' in raw:
         result['pipeline'] = validate_pipeline(raw['pipeline'], validate_output(raw.get('output')))
+    if 'input_queue' in raw:
+        result['input_queue'] = validate_input_queue(raw['input_queue'])
     for key, fields in (
         ('last_allocation_failure', ('size', 'caps')),
         ('decoder_failure', ('sequence', 'codec', 'stage', 'result', 'completion',
