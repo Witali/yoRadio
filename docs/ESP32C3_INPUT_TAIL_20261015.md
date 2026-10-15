@@ -118,10 +118,47 @@ retains original reports, fixture hashes, source references and independent audi
 These are format/transport/output-counter checks, not PCM capture or an analog
 continuity measurement.
 
+## Quiet finite-file qualification
+
+The public-root-only, non-ISR-diagnostic candidate `idf61-tailq-20261015` is
+saved under `firmware/development/esp32c3-idf61-input-tail-quiet/`.
+App SHA-256: `0edeb859478dc22894e0f369bd62756b7b15a0c5dbf62d78a2d9594789444547`.
+Firmware source is `595a4dc3`; the strengthened file runner is `0a35e7c0`.
+Configuration differs from the previous quiet confirmation image only by the
+tail-coalescing flag, normalizing the previously absent extra-AAC option to
+zero. The local CA and pipeline recorder are absent; public certificate
+verification, all AAC profiles and existing TLS reserve are retained.
+
+The finite HTTP matrix passes **28/28 checks**: 22 file/hint cases plus idle,
+recovery, settings and lifetime-health checks. MP3, FLAC, Vorbis, Opus, AAC-LC
+at 22.05/44.1/48 kHz, HE-AAC at 44.1/48 kHz and HE-AAC v2 at 44.1 kHz pass
+both AUTO and explicit codec selection (including the separate high-bitrate
+AAC-LC fixture).
+
+The runner now rejects new completion-queue drops/write errors in paired
+steady file observations. Independent replay verifies all 22 windows, each
+5.462–6.741 seconds, with zero increments. Startup and the separate EOF idle
+window are excluded. This additional gate was not part of the earlier 28/28
+file result; it does not convert that older report into equivalent coverage.
+Seven file-gate regressions, 13 health tests and five sustained-output tests
+pass. Complete fixture delivery, expected decoded formats, natural EOF and
+pre-cleanup EOF memory recovery pass for all 22 files.
+
+All 680 health observations retain one boot, zero allocation/decoder/watchdog
+faults, minimum sampled heap 28,708 B and largest block 13,312 B. Settled heap
+changes from 139,472 to 139,520 B; largest block stays 110,592 B and task count
+stays 16. No traced HTTP request fails. The controller restores the original
+production image and verifies unchanged settings and stopped playback.
+
+[Quiet build and file evidence](../tests/results/esp32c3-input-tail-quiet-20261015/)
+contains raw reports, independent replay, request timings, source references
+and hashes. The finite windows do not establish ten-minute public HTTPS
+stability or full PCM/acoustic continuity.
+
 ## Further hardware qualification
 
-Keep the feature off by default. Check the complete finite-file matrix and
-quiet public HTTPS playback before considering it for production. More densely
+Keep the feature off by default. Check quiet public HTTPS playback before
+considering it for production. More densely
 filled slots do not eliminate the measured long-gap starvation or explain the
 earlier public-station and WebUI TCP failures. Preserve those open findings;
 do not widen output acceptance merely because memory and transition gates pass.
