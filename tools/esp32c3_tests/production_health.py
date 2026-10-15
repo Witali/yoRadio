@@ -63,8 +63,19 @@ def validate_input_queue(value):
         require(0 < value['minimum'] <= value['resident'] and
                 value['minimum'] <= value['limit'] and value['occupied'] <= value['resident'],
                 'Inconsistent input queue capacity')
+    result = {key: value[key] for key in fields}
+    usage = ('ready', 'reading', 'writing', 'ready_bytes', 'reading_bytes')
+    if any(key in value for key in usage):
+        require(all(type(value.get(k)) is int and 0 <= value[k] <= COUNTER_MASK for k in usage),
+                'Missing or invalid input queue usage')
+        require(value['ready'] + value['reading'] + value['writing'] == value['occupied'],
+                'Inconsistent input queue ownership counts')
+        for state in ('ready', 'reading'):
+            require(value[state] <= value[state+'_bytes'] <= value[state] * value['packet_capacity'],
+                    'Inconsistent input queue byte count')
+        result.update({key:value[key] for key in usage})
     # A reduced limit can temporarily be below resident while busy leases drain.
-    return {key: value[key] for key in fields}
+    return result
 
 
 def read_health(board):

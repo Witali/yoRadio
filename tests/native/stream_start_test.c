@@ -17,7 +17,8 @@ static unsigned committed_data_packets, provisional_updates;
 static atomic_bool decoder_metadata_published;
 static BaseType_t encoded_commit(adaptive_input_t *input, void *packet) {
     bool data=((encoded_packet_t *)packet)->data_size != 0;
-    BaseType_t result=adaptive_input_commit(input,packet);
+    BaseType_t result=adaptive_input_commit_size(input,packet,
+        sizeof(encoded_packet_t)+((encoded_packet_t *)packet)->data_size);
     if (result==pdTRUE && data) {
         unsigned expected=++committed_data_packets;
         // Force the valid scheduling order that exposed the hardware race,

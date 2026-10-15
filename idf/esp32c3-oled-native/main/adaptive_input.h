@@ -9,6 +9,11 @@ typedef struct {
     size_t packet_capacity;
     unsigned resident, minimum, target, occupied, limit;
     unsigned released;
+    // Data slots only; unpublished WRITING/control storage is not ready audio.
+    // Byte counts include the caller's packet header. READING counts the whole
+    // retained packet, not the decoder's unconsumed suffix.
+    unsigned ready, reading, writing;
+    size_t ready_bytes, reading_bytes;
 } adaptive_input_stats_t;
 
 // One producer, one consumer. Each acquired pointer is a lease: reclaim never
@@ -19,6 +24,10 @@ void adaptive_input_destroy(adaptive_input_t *input); // Quiescent callers only.
 BaseType_t adaptive_input_acquire(adaptive_input_t *input, void **packet,
                                   size_t size, TickType_t timeout);
 BaseType_t adaptive_input_commit(adaptive_input_t *input, void *packet);
+// Publish a nonempty prefix of the acquired lease. Never extend its requested
+// size. Failure preserves the WRITING lease for correction or cancellation.
+BaseType_t adaptive_input_commit_size(adaptive_input_t *input, void *packet,
+                                      size_t used);
 // Optional caller-owned small control storage, attached once before use.
 // It joins the same FIFO, independently of the data slots. Never reclaimed,
 // counted as audio prefill, or freed by this queue. Storage must outlive input.

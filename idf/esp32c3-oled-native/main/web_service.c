@@ -198,8 +198,11 @@ static esp_err_t health_handler(httpd_req_t *request) {
         --length;
         int added = snprintf(body + length, sizeof(body) - length,
             ",\"input_queue\":{\"resident\":%u,\"occupied\":%u,\"minimum\":%u,"
-            "\"limit\":%u,\"packet_capacity\":%u}}", input.resident, input.occupied,
-            input.minimum, input.limit, (unsigned)input.packet_capacity);
+            "\"limit\":%u,\"packet_capacity\":%u,\"ready\":%u,\"reading\":%u,"
+            "\"writing\":%u,\"ready_bytes\":%u,\"reading_bytes\":%u}}",
+            input.resident, input.occupied, input.minimum, input.limit,
+            (unsigned)input.packet_capacity, input.ready, input.reading, input.writing,
+            (unsigned)input.ready_bytes, (unsigned)input.reading_bytes);
         length = added < 0 ? -1 : length + added;
     }
 #endif

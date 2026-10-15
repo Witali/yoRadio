@@ -166,7 +166,9 @@ static QueueHandle_t s_commands;
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
 static adaptive_input_t *s_encoded;
 #define encoded_acquire adaptive_input_acquire
-#define encoded_commit adaptive_input_commit
+static BaseType_t encoded_commit(adaptive_input_t *input, encoded_packet_t *packet) {
+    return adaptive_input_commit_size(input, packet, sizeof(*packet) + packet->data_size);
+}
 #define encoded_return adaptive_input_return
 #else
 static RingbufHandle_t s_encoded;
