@@ -266,3 +266,9 @@ production image and unchanged settings with playback stopped.
 [Raw reports, source hashes and independent counter replay](../tests/results/esp32c3-input-tail-quiet-20261015/network/)
 are retained. Fresh public-file execution under the revised memory check and
 OTA regression are the remaining checks for this candidate.
+
+The fresh public-file run subsequently reports **15/16**: explicit FLAC has
+three steady completion drops, while memory and fault/recovery checks pass.
+OTA was not run after this failure. See the
+[FLAC output investigation](ESP32C3_FLAC_OUTPUT_20261015.md); qualification
+and production defaults remain unchanged.

@@ -1,0 +1,1301 @@
+{
+  "image": {
+    "app_elf_sha256": "cdb049f5366747813967955e404e957ec8ba3c7869eefc025e4612283dbbec2c",
+    "sha256": "0edeb859478dc22894e0f369bd62756b7b15a0c5dbf62d78a2d9594789444547",
+    "bytes": 1474448
+  },
+  "input_sha256": {
+    "report.json": "4af33161f6c57ba569987b1fa2999350cb688d6a56ba90740e0a284f372b0e36",
+    "status.json": "7a8099599f7d09dd6d0f0cd5fc8a5869cafec24f8f8670c1efb09ce66c29e529",
+    "health.json": "dc47ca77d6bbb92d24a6f49a2bd0d7165bb48ca834f07ebc2949b82fff7a5330"
+  },
+  "original_cases": [
+    {
+      "name": "initial-idle",
+      "result": "PASS"
+    },
+    {
+      "name": "https:flac:auto",
+      "result": "PASS"
+    },
+    {
+      "name": "https:flac:flac",
+      "result": "FAIL",
+      "reason": "I2S completion queue overflow during sustained play"
+    },
+    {
+      "name": "idle:flac",
+      "result": "PASS"
+    },
+    {
+      "name": "recovery:flac",
+      "result": "PASS"
+    },
+    {
+      "name": "https:opus:auto",
+      "result": "PASS"
+    },
+    {
+      "name": "https:opus:opus",
+      "result": "PASS"
+    },
+    {
+      "name": "idle:opus",
+      "result": "PASS"
+    },
+    {
+      "name": "recovery:opus",
+      "result": "PASS"
+    },
+    {
+      "name": "https:vorbis:auto",
+      "result": "PASS"
+    },
+    {
+      "name": "https:vorbis:vorbis",
+      "result": "PASS"
+    },
+    {
+      "name": "idle:vorbis",
+      "result": "PASS"
+    },
+    {
+      "name": "recovery:vorbis",
+      "result": "PASS"
+    },
+    {
+      "name": "stop-and-settings",
+      "result": "PASS"
+    },
+    {
+      "name": "lifetime-health",
+      "result": "PASS"
+    },
+    {
+      "name": "all-decoder-health",
+      "result": "PASS"
+    }
+  ],
+  "scope": "Retrospective checks on original playback boundaries; original report remains unchanged. Finite observations do not prove absence of slower leaks or acoustic continuity.",
+  "files": [
+    {
+      "case": "https:flac:auto",
+      "checks": {
+        "playback": {
+          "result": "PASS",
+          "evidence": {
+            "first_playback_seconds": 5.588675100007094,
+            "first_stopped_seconds": 66.1281988999981,
+            "observed_playback_seconds": 60.539523799991,
+            "reference_seconds": 60.48,
+            "format_samples": 109,
+            "pending_format_samples": 2,
+            "maximum_status_and_health_ms": 296.36849999951664
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 102,
+            "boot_id": "c8d85220a4cd989f",
+            "minimum_heap": 61016,
+            "minimum_largest": 43008,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "legacy_floor_pass": true,
+            "legacy_floor_enforced": false,
+            "trend": {
+              "samples": 102,
+              "endpoint_samples": 34,
+              "fields": {
+                "heap": {
+                  "tolerance": 2048,
+                  "first_median": 69436.0,
+                  "last_median": 69540.0,
+                  "median_loss": -104.0,
+                  "first_range": [
+                    61020,
+                    70912
+                  ],
+                  "last_range": [
+                    61024,
+                    70920
+                  ],
+                  "endpoint_loss": -440,
+                  "final_below_initial_range": -8740,
+                  "loss_detected": false
+                },
+                "largest": {
+                  "tolerance": 4096,
+                  "first_median": 49152.0,
+                  "last_median": 49152.0,
+                  "median_loss": 0.0,
+                  "first_range": [
+                    43008,
+                    49152
+                  ],
+                  "last_range": [
+                    43008,
+                    49152
+                  ],
+                  "endpoint_loss": 0,
+                  "final_below_initial_range": -6144,
+                  "loss_detected": false
+                }
+              }
+            }
+          }
+        },
+        "decoder": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 102,
+            "decoder_failures": 0
+          }
+        },
+        "output_measurement": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 102,
+            "elapsed_ms": 56049,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 102,
+            "elapsed_ms": 56049,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "natural_eof_recovery": {
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "at": 96436.4780091,
+                "request_ms": 63.156899996101856,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 104784,
+                "reset_reason": 3,
+                "heap": 139496,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 3695,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96437.0743026,
+                "request_ms": 63.76560000353493,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 105379,
+                "reset_reason": 3,
+                "heap": 139496,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 3751,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96437.7070705,
+                "request_ms": 80.90709999669343,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 106010,
+                "reset_reason": 3,
+                "heap": 139484,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 3810,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              }
+            ],
+            "before_explicit_stop": true
+          }
+        }
+      },
+      "window": {
+        "first_at": 96364.3782614,
+        "last_at": 96420.433501,
+        "samples": 102
+      }
+    },
+    {
+      "case": "https:flac:flac",
+      "checks": {
+        "playback": {
+          "result": "PASS",
+          "evidence": {
+            "first_playback_seconds": 5.571172900003148,
+            "first_stopped_seconds": 66.13873690000037,
+            "observed_playback_seconds": 60.56756399999722,
+            "reference_seconds": 60.48,
+            "format_samples": 108,
+            "pending_format_samples": 2,
+            "maximum_status_and_health_ms": 542.6949999964563
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 102,
+            "boot_id": "c8d85220a4cd989f",
+            "minimum_heap": 60312,
+            "minimum_largest": 43008,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "legacy_floor_pass": true,
+            "legacy_floor_enforced": false,
+            "trend": {
+              "samples": 102,
+              "endpoint_samples": 34,
+              "fields": {
+                "heap": {
+                  "tolerance": 2048,
+                  "first_median": 69588.0,
+                  "last_median": 69300.0,
+                  "median_loss": 288.0,
+                  "first_range": [
+                    60924,
+                    70772
+                  ],
+                  "last_range": [
+                    60948,
+                    70772
+                  ],
+                  "endpoint_loss": -28,
+                  "final_below_initial_range": -8692,
+                  "loss_detected": false
+                },
+                "largest": {
+                  "tolerance": 4096,
+                  "first_median": 51200.0,
+                  "last_median": 51200.0,
+                  "median_loss": 0.0,
+                  "first_range": [
+                    43008,
+                    51200
+                  ],
+                  "last_range": [
+                    43008,
+                    51200
+                  ],
+                  "endpoint_loss": 0,
+                  "final_below_initial_range": -8192,
+                  "loss_detected": false
+                }
+              }
+            }
+          }
+        },
+        "decoder": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 102,
+            "decoder_failures": 0
+          }
+        },
+        "output_measurement": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 102,
+            "elapsed_ms": 56148,
+            "completion_queue_drops": 3,
+            "write_errors": 0
+          }
+        },
+        "output": {
+          "result": "FAIL",
+          "reason": "I2S completion queue overflow during sustained play"
+        },
+        "natural_eof_recovery": {
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "at": 96520.2410353,
+                "request_ms": 169.44840000360273,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 188442,
+                "reset_reason": 3,
+                "heap": 139512,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 5868,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96521.1838476,
+                "request_ms": 252.5037000013981,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 189312,
+                "reset_reason": 3,
+                "heap": 139524,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 5949,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96521.8192447,
+                "request_ms": 62.11650000477675,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 190128,
+                "reset_reason": 3,
+                "heap": 139512,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 6026,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              }
+            ],
+            "before_explicit_stop": true
+          }
+        }
+      },
+      "window": {
+        "first_at": 96448.0001406,
+        "last_at": 96504.1110923,
+        "samples": 102
+      }
+    },
+    {
+      "case": "https:opus:auto",
+      "checks": {
+        "playback": {
+          "result": "PASS",
+          "evidence": {
+            "first_playback_seconds": 5.619340200006263,
+            "first_stopped_seconds": 34.67446170000767,
+            "observed_playback_seconds": 29.055121500001405,
+            "reference_seconds": 29.48,
+            "format_samples": 50,
+            "pending_format_samples": 2,
+            "maximum_status_and_health_ms": 322.92360000428744
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 43,
+            "boot_id": "c8d85220a4cd989f",
+            "minimum_heap": 71284,
+            "minimum_largest": 43008,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "legacy_floor_pass": true,
+            "legacy_floor_enforced": false,
+            "trend": {
+              "samples": 43,
+              "endpoint_samples": 14,
+              "fields": {
+                "heap": {
+                  "tolerance": 2048,
+                  "first_median": 71788.0,
+                  "last_median": 71786.0,
+                  "median_loss": 2.0,
+                  "first_range": [
+                    71720,
+                    72060
+                  ],
+                  "last_range": [
+                    71284,
+                    80444
+                  ],
+                  "endpoint_loss": 180,
+                  "final_below_initial_range": -124,
+                  "loss_detected": false
+                },
+                "largest": {
+                  "tolerance": 4096,
+                  "first_median": 43008.0,
+                  "last_median": 43008.0,
+                  "median_loss": 0.0,
+                  "first_range": [
+                    43008,
+                    43008
+                  ],
+                  "last_range": [
+                    43008,
+                    43008
+                  ],
+                  "endpoint_loss": 0,
+                  "final_below_initial_range": 0,
+                  "loss_detected": false
+                }
+              }
+            }
+          }
+        },
+        "decoder": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 43,
+            "decoder_failures": 0
+          }
+        },
+        "output_measurement": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 43,
+            "elapsed_ms": 24501,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 43,
+            "elapsed_ms": 24501,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "natural_eof_recovery": {
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "at": 96586.0586799,
+                "request_ms": 126.45599999814294,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 254297,
+                "reset_reason": 3,
+                "heap": 139512,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 9278,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96586.7735881,
+                "request_ms": 157.03770000254735,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 254981,
+                "reset_reason": 3,
+                "heap": 139524,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 9342,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96587.3103344,
+                "request_ms": 78.46809999318793,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 255621,
+                "reset_reason": 3,
+                "heap": 139524,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 9402,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              }
+            ],
+            "before_explicit_stop": true
+          }
+        }
+      },
+      "window": {
+        "first_at": 96544.8530563,
+        "last_at": 96569.3559397,
+        "samples": 43
+      }
+    },
+    {
+      "case": "https:opus:opus",
+      "checks": {
+        "playback": {
+          "result": "PASS",
+          "evidence": {
+            "first_playback_seconds": 5.568666600011056,
+            "first_stopped_seconds": 34.79509240000334,
+            "observed_playback_seconds": 29.226425799992285,
+            "reference_seconds": 29.48,
+            "format_samples": 50,
+            "pending_format_samples": 2,
+            "maximum_status_and_health_ms": 379.1217000107281
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 43,
+            "boot_id": "c8d85220a4cd989f",
+            "minimum_heap": 71680,
+            "minimum_largest": 47104,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "legacy_floor_pass": true,
+            "legacy_floor_enforced": false,
+            "trend": {
+              "samples": 43,
+              "endpoint_samples": 14,
+              "fields": {
+                "heap": {
+                  "tolerance": 2048,
+                  "first_median": 71752.0,
+                  "last_median": 71752.0,
+                  "median_loss": 0.0,
+                  "first_range": [
+                    71740,
+                    80588
+                  ],
+                  "last_range": [
+                    71680,
+                    80416
+                  ],
+                  "endpoint_loss": 168,
+                  "final_below_initial_range": -12,
+                  "loss_detected": false
+                },
+                "largest": {
+                  "tolerance": 4096,
+                  "first_median": 47104.0,
+                  "last_median": 47104.0,
+                  "median_loss": 0.0,
+                  "first_range": [
+                    47104,
+                    47104
+                  ],
+                  "last_range": [
+                    47104,
+                    47104
+                  ],
+                  "endpoint_loss": 0,
+                  "final_below_initial_range": 0,
+                  "loss_detected": false
+                }
+              }
+            }
+          }
+        },
+        "decoder": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 43,
+            "decoder_failures": 0
+          }
+        },
+        "output_measurement": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 43,
+            "elapsed_ms": 24601,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 43,
+            "elapsed_ms": 24601,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "natural_eof_recovery": {
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "at": 96639.1253068,
+                "request_ms": 63.522399999783374,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 307436,
+                "reset_reason": 3,
+                "heap": 139524,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 11495,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96639.7407393,
+                "request_ms": 64.9491000076523,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 308050,
+                "reset_reason": 3,
+                "heap": 139512,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 11553,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96640.3941942,
+                "request_ms": 66.88719999510795,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 308705,
+                "reset_reason": 3,
+                "heap": 139524,
+                "largest": 110592,
+                "minimum_heap": 51380,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 11614,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              }
+            ],
+            "before_explicit_stop": true
+          }
+        }
+      },
+      "window": {
+        "first_at": 96597.8322215,
+        "last_at": 96622.4374152,
+        "samples": 43
+      }
+    },
+    {
+      "case": "https:vorbis:auto",
+      "checks": {
+        "playback": {
+          "result": "PASS",
+          "evidence": {
+            "first_playback_seconds": 5.613807100002305,
+            "first_stopped_seconds": 81.75495840000804,
+            "observed_playback_seconds": 76.14115130000573,
+            "reference_seconds": 76.488,
+            "format_samples": 138,
+            "pending_format_samples": 2,
+            "maximum_status_and_health_ms": 362.2819000011077
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 131,
+            "boot_id": "c8d85220a4cd989f",
+            "minimum_heap": 57520,
+            "minimum_largest": 40960,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "legacy_floor_pass": true,
+            "legacy_floor_enforced": false,
+            "trend": {
+              "samples": 131,
+              "endpoint_samples": 43,
+              "fields": {
+                "heap": {
+                  "tolerance": 2048,
+                  "first_median": 57816,
+                  "last_median": 57820,
+                  "median_loss": -4,
+                  "first_range": [
+                    57808,
+                    66484
+                  ],
+                  "last_range": [
+                    57724,
+                    66536
+                  ],
+                  "endpoint_loss": -8664,
+                  "final_below_initial_range": -8672,
+                  "loss_detected": false
+                },
+                "largest": {
+                  "tolerance": 4096,
+                  "first_median": 47104,
+                  "last_median": 47104,
+                  "median_loss": 0,
+                  "first_range": [
+                    43008,
+                    47104
+                  ],
+                  "last_range": [
+                    40960,
+                    47104
+                  ],
+                  "endpoint_loss": 0,
+                  "final_below_initial_range": -4096,
+                  "loss_detected": false
+                }
+              }
+            }
+          }
+        },
+        "decoder": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 131,
+            "decoder_failures": 0
+          }
+        },
+        "output_measurement": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 131,
+            "elapsed_ms": 71824,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 131,
+            "elapsed_ms": 71824,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "natural_eof_recovery": {
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "at": 96752.5223057,
+                "request_ms": 68.33130000450183,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 420835,
+                "reset_reason": 3,
+                "heap": 139524,
+                "largest": 110592,
+                "minimum_heap": 49044,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 14954,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96753.1275697,
+                "request_ms": 57.695700001204386,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 421440,
+                "reset_reason": 3,
+                "heap": 139524,
+                "largest": 110592,
+                "minimum_heap": 49044,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 15010,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96753.7849677,
+                "request_ms": 137.6454000128433,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 422016,
+                "reset_reason": 3,
+                "heap": 139524,
+                "largest": 110592,
+                "minimum_heap": 49044,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 15064,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              }
+            ],
+            "before_explicit_stop": true
+          }
+        }
+      },
+      "window": {
+        "first_at": 96664.1068475,
+        "last_at": 96735.9266791,
+        "samples": 131
+      }
+    },
+    {
+      "case": "https:vorbis:vorbis",
+      "checks": {
+        "playback": {
+          "result": "PASS",
+          "evidence": {
+            "first_playback_seconds": 5.652393800002756,
+            "first_stopped_seconds": 81.80254100001184,
+            "observed_playback_seconds": 76.15014720000909,
+            "reference_seconds": 76.488,
+            "format_samples": 139,
+            "pending_format_samples": 2,
+            "maximum_status_and_health_ms": 304.76590000034776
+          }
+        },
+        "memory": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 132,
+            "boot_id": "c8d85220a4cd989f",
+            "minimum_heap": 57204,
+            "minimum_largest": 40960,
+            "allocation_failures": 0,
+            "task_watchdog_events": 0,
+            "legacy_floor_pass": true,
+            "legacy_floor_enforced": false,
+            "trend": {
+              "samples": 132,
+              "endpoint_samples": 44,
+              "fields": {
+                "heap": {
+                  "tolerance": 2048,
+                  "first_median": 57788.0,
+                  "last_median": 57812.0,
+                  "median_loss": -24.0,
+                  "first_range": [
+                    57204,
+                    66520
+                  ],
+                  "last_range": [
+                    57368,
+                    66592
+                  ],
+                  "endpoint_loss": -76,
+                  "final_below_initial_range": -660,
+                  "loss_detected": false
+                },
+                "largest": {
+                  "tolerance": 4096,
+                  "first_median": 40960.0,
+                  "last_median": 40960.0,
+                  "median_loss": 0.0,
+                  "first_range": [
+                    40960,
+                    40960
+                  ],
+                  "last_range": [
+                    40960,
+                    40960
+                  ],
+                  "endpoint_loss": 0,
+                  "final_below_initial_range": 0,
+                  "loss_detected": false
+                }
+              }
+            }
+          }
+        },
+        "decoder": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 132,
+            "decoder_failures": 0
+          }
+        },
+        "output_measurement": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 132,
+            "elapsed_ms": 71739,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "output": {
+          "result": "PASS",
+          "evidence": {
+            "samples": 132,
+            "elapsed_ms": 71739,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          }
+        },
+        "natural_eof_recovery": {
+          "result": "PASS",
+          "evidence": {
+            "samples": [
+              {
+                "at": 96852.4025799,
+                "request_ms": 109.40269999264274,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 520665,
+                "reset_reason": 3,
+                "heap": 139536,
+                "largest": 110592,
+                "minimum_heap": 49044,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 17140,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96853.0209891,
+                "request_ms": 62.45579999813344,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 521330,
+                "reset_reason": 3,
+                "heap": 139536,
+                "largest": 110592,
+                "minimum_heap": 49044,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 17202,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              },
+              {
+                "at": 96853.6658542,
+                "request_ms": 80.073099990841,
+                "schema": 1,
+                "boot_id": "c8d85220a4cd989f",
+                "uptime_ms": 521979,
+                "reset_reason": 3,
+                "heap": 139536,
+                "largest": 110592,
+                "minimum_heap": 49044,
+                "tasks": 16,
+                "allocation_failures": 0,
+                "task_watchdog_events": 0,
+                "output": {
+                  "available": true,
+                  "completion_queue_drops": 17263,
+                  "write_errors": 0
+                },
+                "last_allocation_failure": {
+                  "size": 0,
+                  "caps": 0
+                },
+                "decoder_failure": {
+                  "sequence": 0,
+                  "codec": 0,
+                  "stage": 0,
+                  "result": 0,
+                  "completion": 0,
+                  "input_bytes": 0,
+                  "allocation_sequence": 0
+                }
+              }
+            ],
+            "before_explicit_stop": true
+          }
+        }
+      },
+      "window": {
+        "first_at": 96764.3495607,
+        "last_at": 96836.0833971,
+        "samples": 132
+      }
+    }
+  ]
+}
