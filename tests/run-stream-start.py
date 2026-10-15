@@ -17,6 +17,9 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--corpus',type=Path)
+    parser.add_argument('--tail-coalesce',action='store_true')
+    parser.add_argument('--queued-consumer',action='store_true',
+                        help='Allow queue backpressure instead of forcing immediate consumption after commit')
     args=parser.parse_args();out=args.output.resolve();out.mkdir(parents=True,exist_ok=False)
     source=ROOT/'idf/esp32c3-oled-native/main'
     platform=ROOT/'tests/native/adaptive_input_test.c';test=ROOT/'tests/native/stream_start_test.c'
@@ -33,6 +36,8 @@ def main():
     unit=out/'test.c';binary=out/'test'
     unit.write_text(prelude+test.read_text().replace('/* PRODUCTION_SEND */',send))
     (out/'build.log').write_bytes(run(['gcc','-std=c11','-O2','-g','-Wall','-Wextra','-Werror',
+        *(['-DCONFIG_YORADIO_INPUT_TAIL_COALESCE=1'] if args.tail_coalesce else []),
+        *(['-DTEST_QUEUED_CONSUMER=1'] if args.queued_consumer else []),
         '-pthread','-fsanitize=address,undefined','-fno-pie','-no-pie','-I',host(shim),
         '-I',host(source),host(unit),'-o',host(binary)]))
     try:
@@ -101,7 +106,8 @@ def main():
         target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(path.read_bytes())
         hashes[relative.as_posix()]=hashlib.sha256(path.read_bytes()).hexdigest()
     (out/'report.json').write_text(json.dumps(dict(passed=True,sources=hashes,scope=__doc__,
-        corpus=cases,http_socket=False,physical_playback=False),indent=2)+'\n')
+        corpus=cases,tail_coalesce=args.tail_coalesce,queued_consumer=args.queued_consumer,
+        http_socket=False,physical_playback=False),indent=2)+'\n')
     print(log.decode(),end='');print('PASS startup corpus:',len(cases))
 
 

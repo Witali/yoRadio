@@ -112,6 +112,17 @@ config YORADIO_FRAME_ROUTER
         falls back to the existing decoder for the rest of the connection.
         Keep disabled until live-transition and all-codec tests qualify it.
 
+config YORADIO_INPUT_TAIL_COALESCE
+    bool "Fill partial queued input tails (experimental)"
+    depends on YORADIO_FRAME_ROUTER
+    default n
+    help
+        Reopen a partial READY data tail only when an older queued node remains.
+        Append matching generation/codec data outside the queue lock, then
+        republish before the current read returns. Never modify READING or
+        control storage. No new packet allocation or cross-read waiting.
+        Keep disabled until ownership, format changes and hardware tests pass.
+
 config YORADIO_STREAM_CONFIRM
     bool "Confirm MP3/AAC frames and recover alignment (experimental)"
     depends on YORADIO_FRAME_ROUTER

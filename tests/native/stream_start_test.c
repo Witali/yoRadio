@@ -20,10 +20,12 @@ static BaseType_t encoded_commit(adaptive_input_t *input, void *packet) {
     BaseType_t result=adaptive_input_commit_size(input,packet,
         sizeof(encoded_packet_t)+((encoded_packet_t *)packet)->data_size);
     if (result==pdTRUE && data) {
-        unsigned expected=++committed_data_packets;
+        ++committed_data_packets;
+#ifndef TEST_QUEUED_CONSUMER
         // Force the valid scheduling order that exposed the hardware race,
         // including a one-frame file published only at EOF.
-        while (atomic_load(&consumed_data_packets)<expected) sched_yield();
+        while (atomic_load(&consumed_data_packets)<committed_data_packets) sched_yield();
+#endif
     }
     return result;
 }

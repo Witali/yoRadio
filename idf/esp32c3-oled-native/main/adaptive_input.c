@@ -231,6 +231,35 @@ BaseType_t adaptive_input_commit_size(adaptive_input_t *input, void *packet,
     return commit_packet(input, packet, used, true);
 }
 
+BaseType_t adaptive_input_reopen_tail(adaptive_input_t *input, void **packet,
+                                      size_t *used) {
+    if (packet) *packet = NULL;
+    if (used) *used = 0;
+    if (!input || !packet || !used) return pdFALSE;
+    portENTER_CRITICAL(&input->lock);
+    unsigned tail = input->tail;
+    if (tail >= input->target || input->head == tail ||
+        input->slots[tail].state != READY ||
+        input->slots[tail].size == input->packet_capacity) {
+        portEXIT_CRITICAL(&input->lock);
+        return pdFALSE;
+    }
+    unsigned previous = input->head;
+    // At most target data nodes and one control node; no heap work or copying
+    // under the lock. The single producer will reinsert this same FIFO tail.
+    while (input_slot(input, previous)->next != tail)
+        previous = input_slot(input, previous)->next;
+    input_slot(input, previous)->next = NO_SLOT;
+    input->tail = previous;
+    input_slot_t *slot = &input->slots[tail];
+    *packet = slot->data;
+    *used = slot->size;
+    slot->size = input->packet_capacity;
+    slot->state = WRITING;
+    portEXIT_CRITICAL(&input->lock);
+    return pdTRUE;
+}
+
 bool adaptive_input_attach_control(adaptive_input_t *input, void *storage,
                                     size_t capacity) {
     if (!input || !storage || !capacity) return false;

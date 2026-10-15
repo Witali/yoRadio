@@ -28,6 +28,13 @@ BaseType_t adaptive_input_commit(adaptive_input_t *input, void *packet);
 // size. Failure preserves the WRITING lease for correction or cancellation.
 BaseType_t adaptive_input_commit_size(adaptive_input_t *input, void *packet,
                                       size_t used);
+// Single producer only: temporarily take the partial READY data tail back as
+// a full-capacity WRITING lease. Never take the sole queued node, a control
+// tail, a full packet or a READING lease. Returns its previous committed size.
+// Copy outside the lock, then republish before any other producer commit or
+// blocking operation. Preserve the original prefix on rejection/cancellation.
+BaseType_t adaptive_input_reopen_tail(adaptive_input_t *input, void **packet,
+                                      size_t *used);
 // Optional caller-owned small control storage, attached once before use.
 // It joins the same FIFO, independently of the data slots. Never reclaimed,
 // counted as audio prefill, or freed by this queue. Storage must outlive input.
