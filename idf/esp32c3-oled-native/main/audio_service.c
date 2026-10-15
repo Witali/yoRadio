@@ -1061,8 +1061,12 @@ static bool send_pcm(decode_stats_t *stats, uint32_t generation,
         chunk -= chunk % frame_bytes;
         size_t packet_size = sizeof(pcm_packet_t) + chunk;
         pcm_packet_t *packet = NULL;
-        while (pipeline_acquire(s_pcm, (void **)&packet, packet_size,
-                                 pdMS_TO_TICKS(250), &stats->pcm_full) != pdTRUE) {
+        for (;;) {
+            AUDIO_PROBE_PCM_BEGIN();
+            BaseType_t acquired = pipeline_acquire(s_pcm, (void **)&packet, packet_size,
+                                                   pdMS_TO_TICKS(250), &stats->pcm_full);
+            AUDIO_PROBE_PCM_END();
+            if (acquired == pdTRUE) break;
             if (atomic_load(&s_generation) != generation) return false;
         }
         packet->generation = generation;
@@ -1083,8 +1087,11 @@ static bool send_pcm_end(uint32_t generation, uint8_t reason) {
     pcm_packet_t *packet = NULL;
     for (;;) {
         if (generation != atomic_load(&s_generation)) return false;
-        if (xRingbufferSendAcquire(s_pcm, (void **)&packet, sizeof(*packet),
-                                  pdMS_TO_TICKS(250)) == pdTRUE) break;
+        AUDIO_PROBE_PCM_BEGIN();
+        BaseType_t acquired = xRingbufferSendAcquire(s_pcm, (void **)&packet, sizeof(*packet),
+                                                    pdMS_TO_TICKS(250));
+        AUDIO_PROBE_PCM_END();
+        if (acquired == pdTRUE) break;
     }
     memset(packet, 0, sizeof(*packet));
     packet->generation = generation;
@@ -1540,10 +1547,12 @@ static void decoder_task(void *argument) {
                     .stream_info = &stream_info,
                     .stream_info_ready = &stream_info_ready,
                 };
+                AUDIO_PROBE_DECODE_BEGIN(esp_timer_get_time());
                 int result = custom_flac_decoder_feed(
                     flac_decoder, packet->data, packet->data_size,
                     packet->end_of_stream, custom_flac_output, &context,
                     &feed_stats);
+                AUDIO_PROBE_DECODE_END(feed_stats.max_call_us);
                 stats.decode_us += feed_stats.decode_us;
                 stats.calls += feed_stats.decode_calls;
                 if (feed_stats.max_call_us > stats.max_call_us) {
@@ -1603,10 +1612,12 @@ static void decoder_task(void *argument) {
                     .stream_info = &stream_info,
                     .stream_info_ready = &stream_info_ready,
                 };
+                AUDIO_PROBE_DECODE_BEGIN(esp_timer_get_time());
                 int result = custom_legacy_decoder_feed(
                     legacy_decoder, packet->data, packet->data_size,
                     packet->end_of_stream, custom_legacy_output, &context,
                     &feed_stats);
+                AUDIO_PROBE_DECODE_END(feed_stats.max_call_us);
                 stats.decode_us += feed_stats.decode_us;
                 stats.calls += feed_stats.decode_calls;
                 if (feed_stats.max_call_us > stats.max_call_us) {
@@ -1666,11 +1677,13 @@ static void decoder_task(void *argument) {
             };
             raw.consumed = 0;
             int64_t decode_started_us = esp_timer_get_time();
+            AUDIO_PROBE_DECODE_BEGIN(decode_started_us);
             esp_audio_err_t result = aac_decoder
                 ? native_aac_decoder_process(aac_decoder, &raw, &frame)
                 : esp_audio_simple_dec_process(decoder, &raw, &frame);
             uint32_t decode_call_us =
                 (uint32_t)(esp_timer_get_time() - decode_started_us);
+            AUDIO_PROBE_DECODE_END(decode_call_us);
             stats.decode_us += decode_call_us;
             ++stats.calls;
             if (decode_call_us > stats.max_call_us) {

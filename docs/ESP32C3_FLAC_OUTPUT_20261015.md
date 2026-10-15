@@ -349,3 +349,30 @@ priority; the timing evidence does not justify a decoder arithmetic change.
 
 [Physical reports, fixed-window replay and spontaneous-failure inspection](../tests/results/esp32c3-read25-20261015/physical/)
 preserve all three failed output gates and restoration.
+
+## Separate decoder work from PCM waiting
+
+Diagnostic event version 2 adds the active decoder-feed span, the active PCM
+buffer-acquisition span and the maximum process-call time in the last completed
+feed batch. Custom FLAC/legacy adapters already measure process calls before
+their PCM callbacks; native AAC/SDK calls use their existing measurements.
+The feed span includes callbacks, while process-call wall time excludes those
+callbacks but still includes preemption. Neither is CPU utilization. A separate
+maximum is cumulative since boot, not specific to the selected test interval.
+
+The retained history remains 16 events; overwritten events are still counted.
+Probe storage grows from 540 to 820 B only with diagnostic mode enabled. Disabled
+macros discard their arguments, including the added timer reads. Codec arithmetic,
+queue sizes, priorities and production defaults are unchanged. The diagnostic
+health response buffer grows to 3,584 B on the existing 8,192-B HTTP task stack;
+physical stack headroom must still be checked before qualifying this image.
+
+The host parser accepts legacy seven-word events and version-2 eleven-word
+events, rejects mixed/unknown versions, and preserves wait/process distinctions.
+Six native health-handler configurations pass ASan/UBSan, including maximal
+event fields and optional input/arena counters. Decoder completion/drain,
+output boundaries and HTTP/TLS tests also pass. This is instrumentation
+verification, not a fix or production qualification.
+
+[Host evidence and exact tested sources](../tests/results/esp32c3-decode-probe-20261015/host/)
+are retained. Physical reproduction with this diagnostic is the next step.

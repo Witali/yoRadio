@@ -1,10 +1,12 @@
 """Sanitize actual quiet counter and HTTP handler C with SDK call doubles."""
-import hashlib,json,re,sys
+import argparse,hashlib,json,re,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
 from run_output_dma_host import host,run
-folder=ROOT/'.build/production-health-native';folder.mkdir(parents=True,exist_ok=True)
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output',type=Path,default=ROOT/'.build/production-health-native')
+folder=parser.parse_args().output;folder.mkdir(parents=True,exist_ok=True)
 main=ROOT/'idf/esp32c3-oled-native/main'
 profiler=main/'cpu_profiler.c';web=main/'web_service.c'
 profiler_header=main/'cpu_profiler.h'
@@ -18,13 +20,16 @@ source=source.replace('/* PROFILER_TYPES */',re.sub(r'^#(?:include|pragma)[^\n]*
 output_type=header.read_text().split('typedef struct {',1)[1].split('} native_audio_output_health_t;',1)[0]
 source=source.replace('/* OUTPUT_HEALTH_TYPE */','typedef struct {'+output_type+'} native_audio_output_health_t;')
 variants={}
-for enabled,probe in ((0,0),(1,0),(0,1),(1,1)):
-    name=f'{enabled}-probe{probe}'
+for enabled,probe,arena in ((0,0,0),(1,0,0),(0,1,0),(1,1,0),(1,1,1),(1,0,1)):
+    name=f'{enabled}-probe{probe}-arena{arena}'
     diagnostic=''
     if probe:
         diagnostic='#define CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC 1\n#define CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ 160\n'
         diagnostic+=re.sub(r'^#(?:include|pragma)[^\n]*\n','',probe_header.read_text(),flags=re.M)
         diagnostic+='\nvolatile audio_pipeline_probe_t s_audio_pipeline_probe;\n'
+        diagnostic+='#define CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER 1\n'
+    if arena:
+        diagnostic+='#define CONFIG_YORADIO_SHARED_DECODER_ARENA 1\n'
     unit=folder/f'health-{name}.c';unit.write_text(source.replace('/* PIPELINE_PROBE_SOURCE */',diagnostic))
     binary=folder/f'health-{name}'
     (folder/f'build-{name}.log').write_bytes(run(['gcc','-std=c11','-O2','-Wall','-Wextra','-Werror',
@@ -44,10 +49,17 @@ for enabled,probe in ((0,0),(1,0),(0,1),(1,1)):
         from production_health import validate_pipeline
         validate_pipeline(value['pipeline'],value['output'])
         assert len(value['pipeline']['events'])==16
+        assert value['pipeline']['event_version']==2
+        assert value['pipeline']['process_max_us']==2**32-1
+        assert value['input_queue']['ready_bytes']==2**32-1
+    if arena:
+        assert value['decoder_arena']['capacity']==2**32-1
+    if arena and probe:
+        assert value['arena_timing']['malloc']==[2**32-1]*2
     unavailable=json.loads(output.splitlines()[1])
     assert unavailable['output']==dict(value['output'],available=bool(probe))
     assert b'PASS:' in output
-    variants[name]={'passed':True,'json':value}
+    variants[name]={'passed':True,'json_bytes':len(output.splitlines()[0]),'json':value}
 sources={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in (profiler,profiler_header,web,header,probe_header,harness,Path(__file__))}
 (folder/'report.json').write_text(json.dumps(dict(variants=variants,sources=sources,scope='Actual C with SDK doubles; no hardware timing claim'),indent=2)+'\n')
 print('PASS: quiet C counters and bounded JSON, watchdog and pipeline probe enabled/disabled; ASan/UBSan')

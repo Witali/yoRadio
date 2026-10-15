@@ -24,14 +24,24 @@ def validate_pipeline(probe, output):
     require(type(histogram) is list and len(histogram) == 8 and all(map(word, histogram)) and
             (sum(histogram) & COUNTER_MASK) == sequence, 'Invalid pipeline phase counts')
     require(type(events) is list and len(events) <= 16, 'Invalid pipeline event capacity')
+    version = probe.get('event_version', 1)
+    require(type(version) is int and version in (1, 2), 'Unknown pipeline event version')
+    if version == 2:
+        require(word(probe.get('process_max_us')), 'Invalid decoder process maximum')
     for index, event in enumerate(events):
-        require(type(event) is list and len(event) == 7 and all(map(word, event)),
+        require(type(event) is list and len(event) == (7 if version == 1 else 11) and all(map(word, event)),
                 'Invalid pipeline event')
         require(event[0] == ((sequence - len(events) + 1 + index) & COUNTER_MASK) and
                 event[2] < 8, 'Invalid pipeline event order or phase')
+        if version == 2:
+            require(event[7] <= 3 and (event[7] & 1 or event[8] == 0) and
+                    (event[7] & 2 or event[9] == 0), 'Invalid decoder work flags or ages')
+            require(event[10] <= probe['process_max_us'], 'Inconsistent decoder process maximum')
     require(events or sequence == 0, 'Missing pipeline event history')
     result = dict(timer_hz=probe['timer_hz'], sequence=sequence,
                   phase_drops=list(histogram), events=[list(e) for e in events])
+    if version == 2:
+        result.update(event_version=version, process_max_us=probe['process_max_us'])
     if 'stream_failure' in probe:
         failure = probe['stream_failure']
         require(type(failure) is dict and all(word(failure.get(k))

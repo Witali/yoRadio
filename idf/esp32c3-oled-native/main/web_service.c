@@ -127,7 +127,7 @@ static esp_err_t health_handler(httpd_req_t *request) {
     portCLEAR_INTERRUPT_MASK_FROM_ISR(previous_mask);
     // Bound the full 16-event history, input and optional arena counters at
     // uint32 maxima. Both diagnostic variants use the same stack workspace.
-    char body[2816];
+    char body[3584];
 #else
     native_audio_output_health_t output = native_audio_output_health();
 #ifdef CONFIG_YORADIO_SHARED_DECODER_ARENA
