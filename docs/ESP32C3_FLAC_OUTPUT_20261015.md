@@ -457,3 +457,60 @@ timeouts, cancellation, EOF, HTTP ownership and FLAC input growth.
 [Host evidence and exact sources](../tests/results/esp32c3-read512-20261015/host/)
 cover control flow, not physical TCP/TLS latency, CPU cost or PCM continuity.
 Compare the two request sizes on hardware before changing the production default.
+
+### Physical request-size comparison
+
+Both images retain eight slots, a 250-ms timeout and identical static RAM.
+The 512-B diagnostic image is 1,477,184 B, SHA-256
+`7e3b0d833e0d98633fb6b42e5e650d75ca05c6def3719e794d875658f8033e99`.
+
+| Requested bytes | Delivery | Checks passed | Completion drops | Write errors |
+| ---: | --- | ---: | ---: | ---: |
+| 2,048 | Control | 9/9 | 0 | 0 |
+| 2,048 | 100/250/500-ms pauses | 8/9 | 32 (0/4/28) | 0 |
+| 512 | Control | 9/9 | 0 | 0 |
+| 512 | 100/250/500-ms pauses | 8/9 | 48 (0/13/35) | 0 |
+
+All four files finish naturally and pass memory recovery; 594 health samples
+have zero allocation, decoder and watchdog faults. Heap/largest minima are
+63,568/45,056 B. Original production/settings and stopped playback are restored.
+Both paused output gates remain failed. Keep the default at 2,048 B.
+
+The queue measurements expose a concrete packing difference. In the 2,048-B
+control, sampled READY/READING payload is median/max 16,384/16,384 B and every
+nonempty packet has 2,048 payload bytes. In the 512-B control, the corresponding
+median/max is 1,536/4,096 B, and every observed nonempty packet contains only
+512 payload bytes. These are sampled lease sizes (READING can be partially
+consumed), not measurements of remaining undecoded audio or network throughput.
+
+Source inspection confirms that `stream_route_feed()` sends FLAC/Ogg directly
+through `send_encoded()` unless using startup control storage. Only MP3/AAC
+reach `stream_route_emit()` and its existing safe tail-reopening logic. Thus
+the enabled tail-coalescing option does not currently pack short FLAC/Ogg reads.
+The next change should route these bytes through the same coalescing path,
+with tests for byte identity, FIFO order, generation/codec/EOF barriers and
+consumer ownership. Compare again before promoting shorter HTTP reads.
+
+[Build evidence](../tests/results/esp32c3-read512-20261015/build/) and
+[physical evidence, queue occupancy and frame-size analysis](../tests/results/esp32c3-read512-20261015/physical/)
+retain the failed comparisons and restoration.
+
+### Separate FLAC frame-availability gate
+
+Source inspection finds another wait before decoding: at a new frame, the
+adapter waits until its accumulated input reaches STREAMINFO's maximum encoded
+frame size, except at EOF. For this reference that threshold is 13,965 B.
+FFprobe's 579 frame sizes range from 7,119 to 13,965 B, with median 11,683 B;
+578 frames are smaller than the maximum. The static difference between the
+threshold and each complete frame is median 2,282 B, maximum 6,846 B. This
+comparison does not model the EOF bypass or establish actual waiting time.
+
+Shorter HTTP reads cannot bypass this separate gate. A follow-up experiment
+should investigate detecting a complete frame earlier while preserving exact
+PCM, supported depths/channels, malformed/truncated-input handling and decoder
+state ownership. Simply lowering the threshold is unsafe: the decoder consumes
+the header before processing subframes, latches truncation as an error, and the
+adapter's error path discards bytes and resets it. Any retry design must preserve
+the original frame and measure repeated decoding cost before it can be enabled.
+The size comparison is a hypothesis for investigation, not an explanation of
+the earlier spontaneous DMA fault.

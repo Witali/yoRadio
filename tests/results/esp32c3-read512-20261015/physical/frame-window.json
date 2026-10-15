@@ -1,0 +1,21 @@
+{
+  "reference_sha256": "920a6baa4f19ada7c8ed59383b22fa452612b555c9636c4f125ab798bebe2566",
+  "packets_source": "tests/results/esp32c3-flac-tcp-20261015/flac-packets.json",
+  "packets_source_sha256": "84d4c6d175446474a3aac2c07b462bb2425076f9b22d13fe5ae1e884a51df27e",
+  "adapter_source": "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.cpp",
+  "adapter_source_sha256": "920069ad2fe6d92de9b778ca6752fec67f29ec24d2a90f193efe32b4ebc81459",
+  "packets": 579,
+  "streaminfo_max_frame_bytes": 13965,
+  "actual_frame_bytes": {
+    "min": 7119,
+    "median": 11683,
+    "max": 13965
+  },
+  "additional_bytes_before_size_gate": {
+    "min": 0,
+    "median": 2282,
+    "max": 6846,
+    "frames_below_max": 578
+  },
+  "scope": "Static complete-frame size comparison, excluding EOF gate bypass. No inference of actual stall duration or cause; the adapter cannot safely feed an incomplete frame to its stateful decoder and then treat truncation as retryable without further design."
+}

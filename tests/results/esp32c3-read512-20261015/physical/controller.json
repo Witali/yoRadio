@@ -1,0 +1,86 @@
+{
+  "initial": {
+    "version": "idf61-prod-20261013",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "dc06c1a61da089e10f4d22855f05b7e0e4168e35b1810c40751472ccdad9cbe8"
+  },
+  "candidate": {
+    "app_elf_sha256": "13adfc498e6f97aa941fae987853e3bfff25bb27a2b81c5c48d7cd5756ea7aa1",
+    "sha256": "7e3b0d833e0d98633fb6b42e5e650d75ca05c6def3719e794d875658f8033e99",
+    "bytes": 1477184
+  },
+  "original": {
+    "app_elf_sha256": "dc06c1a61da089e10f4d22855f05b7e0e4168e35b1810c40751472ccdad9cbe8",
+    "sha256": "f31ffba883053cf33d7f2e928bf529e5cbcac8f14a8aafd172e835a027684631",
+    "bytes": 1461376
+  },
+  "baseline_diagnostic": {
+    "app_elf_sha256": "711a242bca33558219344c701f301cdaa43b8ffa73ced6836a75ee7ac61ebed4",
+    "sha256": "cb92d03aaa9f26e0adb370dda38d3c3267f421fb9fa527dd06fe35d9a5e67c2e",
+    "bytes": 1477216
+  },
+  "tests": [
+    {
+      "policy": "read2048",
+      "suite": "control",
+      "exit_code": 0
+    },
+    {
+      "policy": "read2048",
+      "suite": "pauses",
+      "exit_code": 1
+    },
+    {
+      "policy": "read512",
+      "suite": "control",
+      "exit_code": 0
+    },
+    {
+      "policy": "read512",
+      "suite": "pauses",
+      "exit_code": 1
+    }
+  ],
+  "controller_sha256": "f972f2377fe8ae94861627486dbbd44eb8f8915e27a17f637352cc29f82075fb",
+  "installed_read2048": {
+    "identity": {
+      "version": "idf61-decdiag-20261015",
+      "partition": "app0",
+      "max_size": 1900544,
+      "app_elf_sha256": "711a242bca33558219344c701f301cdaa43b8ffa73ced6836a75ee7ac61ebed4"
+    },
+    "settings": {
+      "wifi_unchanged": true,
+      "playlist_unchanged": true,
+      "settings_unchanged": true
+    }
+  },
+  "installed_read512": {
+    "identity": {
+      "version": "idf61-read512-20261015",
+      "partition": "app1",
+      "max_size": 1900544,
+      "app_elf_sha256": "13adfc498e6f97aa941fae987853e3bfff25bb27a2b81c5c48d7cd5756ea7aa1"
+    },
+    "settings": {
+      "wifi_unchanged": true,
+      "playlist_unchanged": true,
+      "settings_unchanged": true
+    }
+  },
+  "restored": {
+    "identity": {
+      "version": "idf61-prod-20261013",
+      "partition": "app0",
+      "max_size": 1900544,
+      "app_elf_sha256": "dc06c1a61da089e10f4d22855f05b7e0e4168e35b1810c40751472ccdad9cbe8"
+    },
+    "settings": {
+      "wifi_unchanged": true,
+      "playlist_unchanged": true,
+      "settings_unchanged": true
+    },
+    "stopped": true
+  }
+}
