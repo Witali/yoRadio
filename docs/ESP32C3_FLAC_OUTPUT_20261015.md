@@ -514,3 +514,21 @@ adapter's error path discards bytes and resets it. Any retry design must preserv
 the original frame and measure repeated decoding cost before it can be enabled.
 The size comparison is a hypothesis for investigation, not an explanation of
 the earlier spontaneous DMA fault.
+
+### Coalescing opaque FLAC/Ogg input
+
+With `YORADIO_INPUT_TAIL_COALESCE` enabled, the opaque FLAC/Ogg route now uses
+the same packet emitter as MP3/AAC. No codec frame parsing is added to that
+route. The emitter can extend only a READY tail that is not the FIFO head,
+matches generation and codec, and contains ordinary data rather than an EOF
+or drain marker. A changed generation cancels any unpublished suffix and
+restores the previously committed prefix. Disabled-option behavior is unchanged.
+
+The new regression fails on the old implementation and passes after the fix:
+eight 512-B reads fit into three slots with all 4,096 bytes intact, instead of
+requiring eight slots. Tests cover FLAC/Ogg barriers and cancellation between
+feed calls, 600,000 exact concurrent bytes, startup with four held slots and
+the actual send/finish path under queue pressure. ASan/UBSan pass.
+[Failing regression and final passing host evidence](../tests/results/esp32c3-raw-tail-20261015/host/)
+are retained. Hardware comparison is required before promoting the change or
+the separate 512-B read option.

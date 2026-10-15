@@ -39,14 +39,18 @@ static void expect_packet(unsigned gen,native_codec_t codec,unsigned reason,cons
 static void publish(unsigned gen,native_codec_t codec,unsigned reason,const char *data) {
     assert(send_encoded(gen,codec,(const uint8_t *)data,strlen(data),reason));
 }
-static void router_cases(void) {
+static bool route_payload(stream_route_context_t *route,const uint8_t *data,size_t size) {
+    return *route->codec==NATIVE_CODEC_AAC ? stream_route_emit(route,data,size)
+                                         : stream_route_feed(route,data,size);
+}
+static void router_cases(native_codec_t codec) {
     // A lone ready packet is never withheld from the consumer.
-    create();native_codec_t codec=NATIVE_CODEC_AAC;
+    create();
     stream_route_context_t r={.generation=42,.codec=&codec};
     publish(42,codec,AUDIO_CONTINUE,"first");
-    assert(stream_route_emit(&r,(const uint8_t *)"second",6));assert(stream_route_flush(&r));
+    assert(route_payload(&r,(const uint8_t *)"second",6));assert(stream_route_flush(&r));
     assert(adaptive_input_stats(s_encoded).ready==2);
-    assert(stream_route_emit(&r,(const uint8_t *)"+tail",5));assert(stream_route_flush(&r));
+    assert(route_payload(&r,(const uint8_t *)"+tail",5));assert(stream_route_flush(&r));
     assert(adaptive_input_stats(s_encoded).ready==2);
     expect_packet(42,codec,AUDIO_CONTINUE,"first");expect_packet(42,codec,AUDIO_CONTINUE,"second+tail");destroy();
 
@@ -55,7 +59,7 @@ static void router_cases(void) {
     for(unsigned stop=0;stop<2;++stop) {
         create();r=(stream_route_context_t){.generation=42,.codec=&codec};
         publish(42,codec,AUDIO_CONTINUE,"first");publish(42,codec,AUDIO_CONTINUE,"old");
-        assert(stream_route_emit(&r,(const uint8_t *)"new",3));
+        assert(route_payload(&r,(const uint8_t *)"new",3));
         if(stop) {atomic_store(&s_generation,43);assert(!stream_route_flush(&r));}
         else stream_route_cancel(&r);
         assert(!r.packet && !r.reopened_bytes);
@@ -69,11 +73,44 @@ static void router_cases(void) {
         unsigned end=mode==2?AUDIO_DRAIN_CODEC:mode==3?AUDIO_END_EOF:AUDIO_CONTINUE;
         const char *payload=mode>=2?"":"old";
         publish(42,codec,AUDIO_CONTINUE,"first");publish(gen,old,end,payload);
-        assert(stream_route_emit(&r,(const uint8_t *)"new",3));assert(stream_route_flush(&r));
+        assert(route_payload(&r,(const uint8_t *)"new",3));assert(stream_route_flush(&r));
         assert(adaptive_input_stats(s_encoded).ready==3);
         expect_packet(42,codec,AUDIO_CONTINUE,"first");expect_packet(gen,old,end,payload);
         expect_packet(42,codec,AUDIO_CONTINUE,"new");destroy();
     }
+}
+
+static void short_passthrough_reads(native_codec_t codec) {
+    create();
+    uint8_t input[4096];for(size_t i=0;i<sizeof(input);++i)input[i]=(uint8_t)(i%251);
+    for(size_t offset=0;offset<sizeof(input);offset+=512) {
+        // The production caller creates a new context and flushes each read.
+        stream_route_context_t route={.generation=42,.codec=&codec};
+        assert(stream_route_feed(&route,input+offset,512));assert(stream_route_flush(&route));
+        if(offset==1024)assert(adaptive_input_stats(s_encoded).ready==2);
+    }
+    assert(adaptive_input_stats(s_encoded).ready==3);
+    size_t offset=0,packets=0;
+    for(;;) {
+        size_t size;encoded_packet_t *packet=adaptive_input_receive(s_encoded,&size,0);
+        if(!packet)break;
+        assert(packet->generation==42 && packet->codec==codec && packet->end_of_stream==AUDIO_CONTINUE);
+        assert(size==sizeof(*packet)+packet->data_size && offset+packet->data_size<=sizeof(input));
+        assert(!memcmp(packet->data,input+offset,packet->data_size));
+        offset+=packet->data_size;++packets;assert(adaptive_input_return(s_encoded,packet));
+    }
+    assert(offset==sizeof(input) && packets==3);destroy();
+
+    // Cancellation between prefix and remaining bytes must not leave a lease
+    // behind when the caller drops its per-read routing context.
+    create();publish(42,codec,AUDIO_CONTINUE,"head");publish(42,codec,AUDIO_CONTINUE,"old");
+    stream_route_context_t route={.generation=42,.codec=&codec};
+    assert(stream_route_feed(&route,(const uint8_t *)"unpublished",11));
+    assert(route.packet && route.reopened_bytes);
+    atomic_store(&s_generation,43);
+    assert(!stream_route_feed(&route,(const uint8_t *)"more",4));
+    assert(!route.packet && !route.reopened_bytes);
+    expect_packet(42,codec,AUDIO_CONTINUE,"head");expect_packet(42,codec,AUDIO_CONTINUE,"old");destroy();
 }
 
 static void queue_cases(void) {
@@ -138,4 +175,11 @@ static void stress(void) {
     assert(!pthread_join(thread,NULL));destroy();
     printf("PASS input tail: FIFO, barriers, original-prefix restoration, control exclusion, consumer ownership; %u concurrent reopens, %u exact bytes\n",atomic_load(&reopen_count),STRESS_BYTES);
 }
-int main(void) {queue_cases();router_cases();stress();}
+int main(void) {
+    queue_cases();
+    router_cases(NATIVE_CODEC_AAC);
+    router_cases(NATIVE_CODEC_FLAC);router_cases(NATIVE_CODEC_OGG);
+    short_passthrough_reads(NATIVE_CODEC_FLAC);short_passthrough_reads(NATIVE_CODEC_OGG);
+    stress();
+    puts("PASS FLAC/Ogg passthrough: 8 short reads pack into 3 slots; exact bytes and all barriers preserved");
+}

@@ -135,9 +135,19 @@ static bool stream_route_begin(void *opaque, const stream_frame_info_t *info) {
 }
 
 static bool stream_route_feed(stream_route_context_t *ctx, const uint8_t *data, size_t size) {
-    if (*ctx->codec != NATIVE_CODEC_MP3 && *ctx->codec != NATIVE_CODEC_AAC)
+    if (*ctx->codec != NATIVE_CODEC_MP3 && *ctx->codec != NATIVE_CODEC_AAC) {
+#ifdef CONFIG_YORADIO_INPUT_TAIL_COALESCE
+        // Opaque FLAC/Ogg bytes share the same packet storage and ownership
+        // barriers. Direct send_encoded would strand every short HTTP read
+        // in its own slot, reducing an eight-slot queue to 4 KiB at 512 B/read.
+        if (stream_route_emit(ctx, data, size)) return true;
+        stream_route_cancel(ctx);
+        return false;
+#else
         return !size || (ctx->control_payload_bytes ? stream_route_emit(ctx, data, size)
             : send_encoded(ctx->generation, *ctx->codec, data, size, AUDIO_CONTINUE));
+#endif
+    }
     if (s_frame_router.bypass) {
         if (stream_route_emit(ctx, data, size)) return true;
     } else {
