@@ -29,6 +29,12 @@ growth and alternating records). Overall 29/30: the 16-KiB endpoint memory gate
 fails, with no allocation fault and successful stopped-state recovery. Delivery
 pauses and input-queue occupancy are the next diagnostic controls.
 
+The [controlled TLS pause experiment](ESP32C3_AAC_TLS_PAUSES_20261015.md) then
+reproduces 48 output completion drops during a 1.51-second pause, while shorter
+0.51/1.00-second pauses pass. Recent output-task checkpoints and old input/PCM
+ages support buffered-data exhaustion in that test. Next compare bounded AAC
+input expansion, preserving TLS reserve and late SBR/PS transition coverage.
+
 The previous FFmpeg comparison identified false MP3 headers before AAC and false
 AAC headers before MP3 as unresolved failures. The new core rejects those
 candidates when their claimed next frame boundary is invalid, then searches for

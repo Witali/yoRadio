@@ -1,0 +1,2815 @@
+{
+  "board": {
+    "version": "idf61-ctls-20261015",
+    "partition": "app0",
+    "max_size": 1900544,
+    "app_elf_sha256": "75a91acdca3c9c1ce4a13375f2487795a5581a2baaba4b3c5183b4dba38e2da8"
+  },
+  "cases": [
+    {
+      "name": "format",
+      "result": "PASS",
+      "evidence": {
+        "samples": 68,
+        "rate": 44100,
+        "channels": 2
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "output",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "I2S completion queue overflow during sustained play",
+      "seconds": 0.098
+    },
+    {
+      "name": "memory",
+      "result": "PASS",
+      "evidence": {
+        "samples": 68,
+        "boot_id": "ef1aea2883a635d0",
+        "minimum_heap": 59152,
+        "minimum_largest": 32768,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "legacy_floor_pass": true,
+        "legacy_floor_enforced": false
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "decoder-health",
+      "result": "PASS",
+      "evidence": {
+        "samples": 82,
+        "decoder_failures": 0
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "sustained-collection",
+      "result": "PASS",
+      "evidence": {
+        "samples": 82,
+        "steady_samples": 68,
+        "maximum_status_health_ms": 139.93800000753254
+      },
+      "seconds": 90.794
+    },
+    {
+      "name": "tls-delivery",
+      "result": "PASS",
+      "evidence": {
+        "version": "TLSv1.2",
+        "cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "sent": 1485702
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "delivery-pauses",
+      "result": "PASS",
+      "evidence": {
+        "pauses": [
+          {
+            "after_bytes": 414279,
+            "requested_seconds": 0.5,
+            "started_at": 88332.6432933,
+            "completed": true,
+            "ended_at": 88333.1553648,
+            "elapsed_seconds": 0.5120701999985613
+          },
+          {
+            "after_bytes": 745703,
+            "requested_seconds": 1.0,
+            "started_at": 88352.6430435,
+            "completed": true,
+            "ended_at": 88353.6462357,
+            "elapsed_seconds": 1.0031905000068946
+          },
+          {
+            "after_bytes": 1077126,
+            "requested_seconds": 1.5,
+            "started_at": 88372.6891403,
+            "completed": true,
+            "ended_at": 88374.199458,
+            "elapsed_seconds": 1.5103159999998752
+          }
+        ],
+        "scope": "Host write scheduling, not board receive timing"
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "recovery",
+      "result": "PASS",
+      "evidence": null,
+      "seconds": 0.0
+    },
+    {
+      "name": "stop-and-settings",
+      "result": "PASS",
+      "evidence": {
+        "wifi_unchanged": true,
+        "playlist_unchanged": true,
+        "settings_unchanged": true
+      },
+      "seconds": 0.538
+    },
+    {
+      "name": "lifetime-health",
+      "result": "PASS",
+      "evidence": {
+        "samples": 106,
+        "boot_id": "ef1aea2883a635d0",
+        "minimum_heap": 59152,
+        "minimum_largest": 32768,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      },
+      "seconds": 0.0
+    },
+    {
+      "name": "all-decoder-health",
+      "result": "PASS",
+      "evidence": {
+        "samples": 106,
+        "decoder_failures": 0
+      },
+      "seconds": 0.0
+    }
+  ],
+  "note": "PASS covers recorded checks only; no acoustic/IRQ inference",
+  "cpu_budget_percent": null,
+  "created_utc": "2026-10-15T11:32:16.713551+00:00",
+  "host_clock": {
+    "api": "time.perf_counter",
+    "implementation": "QueryPerformanceCounter()",
+    "monotonic": true,
+    "adjustable": false,
+    "resolution": 1e-07
+  },
+  "test_sources_sha256": {
+    "tools/esp32c3_tests/aac_growth.py": "cfcf743179d5c205ed2fe1ec01767954cd1d23299d78367de711efce42e05f2f",
+    "tools/esp32c3_tests/aac_reference.py": "a6e43f029101120be5b0fb3e20c9cf76fd5cbd83c158c5e2b0e1d9dfa47610f8",
+    "tools/esp32c3_tests/allocations.py": "b2478abdad5627c08a9af520c4ab776e0232b51edfd70006905dec96a1095ea7",
+    "tools/esp32c3_tests/audit_stream_probe.py": "f0cd69c6838a2a9a8da2f917c1d644ac32c272d15d639e40cea0cdd339be53b5",
+    "tools/esp32c3_tests/common.py": "af23633067b779367338cd6c231201524f74077db0ad71d3d3638882b04eb4ce",
+    "tools/esp32c3_tests/compare_latency.py": "4530ec501fb350e9b7bf1c6b4c63724754296fe835c346e6ebc18354db25c394",
+    "tools/esp32c3_tests/compare_output_dma.py": "04de602acaed8846b3dc0c37a8ca11b061a436be1730cfadd4c2b408591e56b0",
+    "tools/esp32c3_tests/compare_output_priority.py": "073979d7a6ddd40ab324b6d06c80c35131cc180a26a1a8bc5f11780e3a1153cc",
+    "tools/esp32c3_tests/compare_output_priority_matrix.py": "680840fb1beb2d4c6a9708e460803411820f82107e1679c4d39eb8023f8962fb",
+    "tools/esp32c3_tests/connection_retry.py": "1f09f000f72d605bc70e89754783c8dabe885dee7ff224f331578ba44791947e",
+    "tools/esp32c3_tests/decoder_arena_experiment.py": "7b83c1fffb0ffefa2d6eed41a47e537545c02ab055aa1acd0556e18880351586",
+    "tools/esp32c3_tests/decoder_arena_flac_review.py": "ad810b1e58f2f9458d4fb7804ceedf8e603bbc8fb688acadd9777ad12b2f8dd7",
+    "tools/esp32c3_tests/diagnostic.py": "bb9e7477ab73d6d323befd6f0f50180b319abeee8f50d70fc20d58beadeb546b",
+    "tools/esp32c3_tests/flac_truncation.py": "b24a3ae36165f63ac1dd0d988a98752083b35946dd8bc16b37c3fce1fc8400ce",
+    "tools/esp32c3_tests/flash_constants.py": "7bf7955d7c1d1cf2fa6806baa4ef4413c151610c0bd40eace96e3972b4350ae5",
+    "tools/esp32c3_tests/flash_mode.py": "9fd930378e0260b88930af74ff12d4422748e6b57628005ad18c652c7812ee9d",
+    "tools/esp32c3_tests/frame_router_control.py": "e29ba4898988db4a35106e6337c44e08dd91f5c20571fc9cb6557568b54fb516",
+    "tools/esp32c3_tests/heap_fragment.py": "998c454faad743f4fa14bd3be960ede6944a4a5e522e45d749b42120f07fd803",
+    "tools/esp32c3_tests/heap_idle.py": "eb36a08b01bfc973398477c8e2eee4dbe5a9706cc464424bb68496ff56fc4a21",
+    "tools/esp32c3_tests/heap_receive_correlation.py": "9a80b0cfb9230e996c663566322613734f4fdce804d4004a62c0e033b3c91368",
+    "tools/esp32c3_tests/http_headers.py": "6bc8ebb1b18e17bce737ea5f79e5a7c73549350f4cb20004c6dd28bf2586e30b",
+    "tools/esp32c3_tests/icy_metadata.py": "ab78d6f5f8a31ac8695309553dd9bcec89c850eff15e4c43406bb7c978c93fa2",
+    "tools/esp32c3_tests/iram_inventory.py": "3651d276db2bc876af7e2a017cbd8f07ed3a204de0242e7d71da18843631e81f",
+    "tools/esp32c3_tests/load_windows.py": "eee95396e81156bb4ae8b74a1e165d0fa4f3912ff1d0a1dbb1d86584d28b9df2",
+    "tools/esp32c3_tests/local_sustained.py": "48dc584815ef6cbf1b3571fee4d48f94ee17c0ffc474b10dc629105e37a874dc",
+    "tools/esp32c3_tests/memory.py": "94bed682722b011f0d3f039d3ee656225c99b76cbee419473a29245b86e77922",
+    "tools/esp32c3_tests/network_memory.py": "c77cef3021fb54c9b08f07c1ee25f3938cefc97e176724689ef2b005957d2aca",
+    "tools/esp32c3_tests/ota.py": "851f46490b6e53ca412b1e37bee23de0ee072d2292840613bd146712efe1aabe",
+    "tools/esp32c3_tests/ota_diagnostic.py": "1ef7902be1cd8b686a8952a41d9aa80941b0e1301ac29b9a6670a7b28e568af8",
+    "tools/esp32c3_tests/ota_transition.py": "53c57eefae9400104980023a1edf2ca6e6ca6e527f7f86ad2b167cd01db5681f",
+    "tools/esp32c3_tests/output_priority_matrix.py": "d5ed53dfcd71d757576cb5e6649e14aef4b476622460d5e3bab63baa7b14c475",
+    "tools/esp32c3_tests/pcm_tail.py": "967939a89c84ec2e8ef8129cb8370357e1dba022a8cc1bb6ab5465ec602b9848",
+    "tools/esp32c3_tests/pdm_clock.py": "ae93e8a9236ff3d67aaaed844ce18e059d098dc3aacf5928863e051c12ddd5f4",
+    "tools/esp32c3_tests/pipeline_flow.py": "211e5a8f834e490047086c7fbd6c8869c235d50b57856d8e8555fc1d3d2a6c50",
+    "tools/esp32c3_tests/pipeline_flow_study.py": "bf464bbdbb6b3d67d019e68b8ea1861cc34df89f4e2f2df7c272266a210d1e82",
+    "tools/esp32c3_tests/pipeline_probe.py": "5e161087af105264ab4fa1407267a16719273131ca98499d261be4dfdef02135",
+    "tools/esp32c3_tests/pool_settle.py": "fb98ed089b6121a198a21fc90750fe763e60a95f6a3bd569b04fc46597fe4818",
+    "tools/esp32c3_tests/prefix_control.py": "e9de45976861f3fdededa1531b7bdb3e4bd3bce2377e37256dd88b4841a4f700",
+    "tools/esp32c3_tests/production_health.py": "1132db94eb4c5427f1e8452d85fa7a71cc52d8d0166f5dd87c6c78c4bc9b2d5a",
+    "tools/esp32c3_tests/public_file_acceptance.py": "84645fb6ec3d90875d166dc48c0ea91408d0d632e08e97896ab51a1639d36a11",
+    "tools/esp32c3_tests/public_file_probe.py": "aba570cc8baa4fd6e797806be94b3f0073ab856290dfe48cd0edb0a017caff87",
+    "tools/esp32c3_tests/public_streams.py": "1ebe4680459eaf051bdf3a8cb383f41982b28c6f0df00b4c926da70421de35c7",
+    "tools/esp32c3_tests/quiet_acceptance.py": "97bc1f748d13b00a278d4631896556eaffab4f67b88a91add05cbcfdbca2e52d",
+    "tools/esp32c3_tests/quiet_tls_records.py": "d2886b8dc45c1c440dccd55b13aa0c7c54dea747fec9a7dcaef14280c05f062a",
+    "tools/esp32c3_tests/radio_flac_study.py": "25c55f49cf95a2117c499a90da6b53f3a0212b76a82b36ac1fb9f3dd7ea07a76",
+    "tools/esp32c3_tests/reboot_tls.py": "5accc6d9d2576c203ec6981fe77443296c2583bb555906515bd152c69b940f81",
+    "tools/esp32c3_tests/reference_eof.py": "7828d8746c12f98d174d32ce1e5c2251e71b331e35d7b2dffd69c6a66e23974f",
+    "tools/esp32c3_tests/run.py": "f6e220c72e6643c19d7366428c3d43e738cc4b222e1ad1956d0c6398687c058b",
+    "tools/esp32c3_tests/rx_ownership.py": "05ad01b7bb3e7a7b511dc5d1f271b54be4d84b1cc40b686fd186c343c9380a37",
+    "tools/esp32c3_tests/serial_lines.py": "6d20a50063e4680e851d99026ed62352085756f959e2ae308d3890ad1c51dc7a",
+    "tools/esp32c3_tests/staged_dma.py": "d2cc918f2071ef58afc1923fcb4d39e4e4e4f5e3a79af6becdac4fe0061b433e",
+    "tools/esp32c3_tests/stream_memory_study.py": "11cb8f9db1ab21c12b32b608e3502b502574e735b0ac3b8d9b9003fe15554fe4",
+    "tools/esp32c3_tests/stream_probe.py": "800f87f65490a8f67b1a150641e3c8383e19005d5cb8a09ea8096aef8b8d4cc2",
+    "tools/esp32c3_tests/stream_probe_cases.py": "93f5d282dd7083ee0042226611f07b81a84971d3af9285e6c0c28f66b445f419",
+    "tools/esp32c3_tests/summarize_codec_sequence.py": "90f94232cbdd247be4ac21f73a9aebcc726f3d49186c2233109b1454f63a2166",
+    "tools/esp32c3_tests/summarize_load.py": "f4fa51d2a7949ab2f067726c40a17d10c61da8c64ec106bedf0830ffaffe5133",
+    "tools/esp32c3_tests/summarize_memory.py": "b0d6e631b9ce1d059d3cf61388ae7e191d55d00dc1a7e6b725b7c271ca204bae",
+    "tools/esp32c3_tests/summarize_public.py": "6d8ef40047e08728dd944f27a961332f3a1def3f94ce1f34dc07e8e09901c8de",
+    "tools/esp32c3_tests/summarize_public_windows.py": "95682dc551d34ba9df534530b0ae0ab0ef7ee15e3a2332041d3f699cbc54e709",
+    "tools/esp32c3_tests/summarize_radio_flac.py": "72d66f872f1b511d9964e16cb72e7885791dd7bb8a9499ac0244678bf7135c47",
+    "tools/esp32c3_tests/summarize_rx_ownership.py": "0e62d6da908502efbfd4111aa7491b9f8a195219ac325a10862c93ab9e116685",
+    "tools/esp32c3_tests/summarize_stream_memory.py": "d32c496ce429750a5565b4396bcc1030b5319ebe33eee9940e390cb62d788697",
+    "tools/esp32c3_tests/summarize_sustained.py": "6f3a7786ec5c36935a2fd7714c8add9a9ccbf686b887eaa074e55e325e814245",
+    "tools/esp32c3_tests/summarize_terminal_cpu.py": "db99ad6e55f2b3e671106cdb2c3902225704d9167a2e65ef662fe23c726c69bd",
+    "tools/esp32c3_tests/summarize_terminal_memory.py": "f351cf6f73e9d256a406e8a7da5b65ab46e354b0cefca7543536f3ebac077bda",
+    "tools/esp32c3_tests/sustained_output.py": "6a858cb5c841b66116087bd6e7cccbcc26aaf76291d37f24400eda0c525d8fb0",
+    "tools/esp32c3_tests/terminal_memory.py": "e920df2d0150a1e93e982c1fa06578444879e35c2158fee270ebd2f041bbe478",
+    "tools/esp32c3_tests/tls_error_codes.py": "9041fbd512fd1b1dec315c76144d2b2cdbd84ecaf9071f614097e483843ebe35",
+    "tools/esp32c3_tests/tls_framing.py": "7e72b87e79648b33ffad60e6f56f7db8afbe23c81f492fb8050e111b2f1eedb1",
+    "tools/esp32c3_tests/tls_path.py": "cf2b8da05804a4b2434b49b090f15deb83d4e915b0a8fbb7a76cc721a8dc8e72",
+    "tools/esp32c3_tests/tls_records.py": "4f68987a3ec789e8c6a4a088cc4e0a308ebf26422882fbd1c50b9bf9a9c81e2a",
+    "tools/esp32c3_tests/trace_transport.py": "7d60e7ccb7cf475a4627e33d3ebcb6a72b5797b068a60bc94cfff1b8ec8ddbe1",
+    "tools/esp32c3_tests/transport.py": "124917ee9999594b628eb9d4f1b7fd045001e97d54faee19e5f07342a230142c",
+    "tools/esp32c3_tests/verify_adaptive_input_link.py": "0b79554b414518b88203ca7b6c09932a47370d7e96b9a2d62e5c706becf271bb",
+    "tools/esp32c3_tests/verify_gcm_byte_link.py": "c9c1a2ebeb28f670fcaea9e41c1e2c94f600c376fc32c5275302d6da512d512f",
+    "tools/esp32c3_tests/verify_http_link.py": "48474518625fbfd2b0178e7e2f4869c6fcc6c519debec5e34f2253e18214bca6",
+    "tools/esp32c3_tests/verify_tls_path_link.py": "ccf48acaed47b40605bf4dd5155f4c0ec7e34fc37b5ce111f37d67befcb01127",
+    "tools/esp32c3_tests/web_memory.py": "12bd0829a64bf967b906ff2adee24454100808dc9f0319de81f1d3a5632f8e77",
+    "tools/esp32c3_tests/web_tcp.py": "819239140503fbacc78ade0920d8cc75cd764b26cbae02803e0775a9fac6cc2a",
+    "tools/audio_test_server/fixtures.py": "cc605a2043820d05a44f77d1b4e3115defc82c723fc581464c048f3c79680aff",
+    "tools/audio_test_server/generate.py": "21f37cb2f4a8d5c3881227199d8ee3fae8e373bd7c13373ec75baf44d339b0c8",
+    "tools/audio_test_server/generate_aac_growth.py": "c49bc9f9c15446c777759b7bd8034ab622761e18ec88716dec25cf4d1897c8d4",
+    "tools/audio_test_server/generate_flac_depths.py": "6f15589438a6fd31fb937e95e7f840a3288ff083c5e3771b6e9b486cede9f4c1",
+    "tools/audio_test_server/generate_flac_high_depth.py": "55417b00036c9256c5229fe51447be47b238dafa45b9f14e124771c09d515068",
+    "tools/audio_test_server/generate_mp3_fixtures.py": "e773f655ad4127ed8b8a7fa6607a826aed0c827984e045707b84d93a925f14d3",
+    "tools/audio_test_server/generate_pcm_tails.py": "ba3eec2f14229844c3dd4c75ec1f594c8185a3b88d388c8dab3c117b04a0b663",
+    "tools/audio_test_server/generate_stress.py": "a492c0aeba37abe35616ae7ab6aeda5f79f12d93662da5141a3528cafff30c6e",
+    "tools/audio_test_server/icy.py": "75d10f9a725f53c30b26e126a0b05e37c5a55ce8749803a90ee322f18433a182",
+    "tools/audio_test_server/make_test_certificate.py": "6771a7840b4c704c0e7f5ea50c14beeee110edfca63f171bbe8ca9beecd3330a",
+    "tools/audio_test_server/record_test_ca.py": "a815919f37be4b73f6452abe2b538e3b81ca595e45410a2b127345a0daef1a67",
+    "tools/audio_test_server/relay.py": "b0a781ba86777865e096dd64a2e39f85395f9f69279ce41bc4ee85243240e2cd",
+    "tools/audio_test_server/server.py": "d1685d3dc5dc9ff5817204dc26efaa38c80e87410a4782adc604e519bd89ddf4",
+    "tools/audio_test_server/tls_framing.py": "fbf7eb4bf06c74a32484b794aa42460ac73fd158466c41cafac01610daef5011",
+    "tools/audio_test_server/tls_records.py": "e71cb9e74662febfe8e513080b0df90ad15a1593d2c1e2a38b400703890082de",
+    "tools/audio_test_server/tls_renegotiation.py": "19a8309b358e991cb12fe85dc08014138ba9b0671d65f703a8a7b64f9fdf8b7e"
+  },
+  "image": {
+    "app_elf_sha256": "75a91acdca3c9c1ce4a13375f2487795a5581a2baaba4b3c5183b4dba38e2da8",
+    "sha256": "cd9d9461cedafcab26ddcf05ec4ce8780b8a570f6d49b21f1e6e4d00dba39e85",
+    "bytes": 1476768
+  },
+  "initial_status": {
+    "firmware": "esp32c3-oled-native",
+    "network": "client",
+    "audio": false,
+    "format": "stopped",
+    "sample_rate": 0,
+    "channels": 0,
+    "bits_per_sample": 0,
+    "pcm_sample_rate": 0,
+    "pcm_channels": 0,
+    "format_is_pcm": false,
+    "channels_are_core": false,
+    "rssi": -66
+  },
+  "initial_health": {
+    "at": 88293.5417634,
+    "request_ms": 25.86360000714194,
+    "schema": 1,
+    "boot_id": "ef1aea2883a635d0",
+    "uptime_ms": 9063,
+    "reset_reason": 3,
+    "heap": 138932,
+    "largest": 114688,
+    "minimum_heap": 107712,
+    "tasks": 16,
+    "allocation_failures": 0,
+    "task_watchdog_events": 0,
+    "output": {
+      "available": true,
+      "completion_queue_drops": 390,
+      "write_errors": 0
+    },
+    "pipeline": {
+      "timer_hz": 1000000,
+      "sequence": 390,
+      "phase_drops": [
+        0,
+        2,
+        0,
+        388,
+        0,
+        0,
+        0,
+        0
+      ],
+      "events": [
+        [
+          375,
+          8895242,
+          3,
+          694,
+          8895242,
+          8895242,
+          8895242
+        ],
+        [
+          376,
+          8905914,
+          3,
+          1366,
+          8905914,
+          8905914,
+          8905914
+        ],
+        [
+          377,
+          8916580,
+          3,
+          3363,
+          8916580,
+          8916580,
+          8916580
+        ],
+        [
+          378,
+          8927247,
+          3,
+          4698,
+          8927247,
+          8927247,
+          8927247
+        ],
+        [
+          379,
+          8937913,
+          3,
+          346,
+          8937913,
+          8937913,
+          8937913
+        ],
+        [
+          380,
+          8948580,
+          3,
+          1032,
+          8948580,
+          8948580,
+          8948580
+        ],
+        [
+          381,
+          8959242,
+          3,
+          1694,
+          8959242,
+          8959242,
+          8959242
+        ],
+        [
+          382,
+          8969908,
+          3,
+          2360,
+          8969908,
+          8969908,
+          8969908
+        ],
+        [
+          383,
+          8980577,
+          3,
+          3029,
+          8980577,
+          8980577,
+          8980577
+        ],
+        [
+          384,
+          8991248,
+          3,
+          3378,
+          8991248,
+          8991248,
+          8991248
+        ],
+        [
+          385,
+          9001913,
+          3,
+          4365,
+          9001913,
+          9001913,
+          9001913
+        ],
+        [
+          386,
+          9012581,
+          1,
+          33,
+          9012581,
+          9012581,
+          9012581
+        ],
+        [
+          387,
+          9023242,
+          3,
+          694,
+          9023242,
+          9023242,
+          9023242
+        ],
+        [
+          388,
+          9033910,
+          3,
+          1360,
+          9033910,
+          9033910,
+          9033910
+        ],
+        [
+          389,
+          9044575,
+          3,
+          2027,
+          9044575,
+          9044575,
+          9044575
+        ],
+        [
+          390,
+          9055247,
+          3,
+          2504,
+          9055247,
+          9055247,
+          9055247
+        ]
+      ],
+      "stream_failure": {
+        "sequence": 0,
+        "timestamp_us": 0,
+        "http_result": 0,
+        "esp_tls_error": 0,
+        "tls_code": 0,
+        "system_errno": 0
+      }
+    },
+    "input_queue": {
+      "resident": 4,
+      "occupied": 0,
+      "minimum": 4,
+      "limit": 4,
+      "packet_capacity": 2060
+    },
+    "last_allocation_failure": {
+      "size": 0,
+      "caps": 0
+    },
+    "decoder_failure": {
+      "sequence": 0,
+      "codec": 0,
+      "stage": 0,
+      "result": 0,
+      "completion": 0,
+      "input_bytes": 0,
+      "allocation_sequence": 0
+    }
+  },
+  "sdkconfig_sha256": "b6eb4381f80d7fc9de459499063eebbc8ee1aa6e71c06be494c28e3d5f2eed1b",
+  "fixture_manifest_sha256": "44677c9cf3dd6930949f9b56145f9541bc6a69f01338ce209a731eb66930b613",
+  "fixture": {
+    "sha256": "65feca3e7d6f0a87fb411488aa146a736da097b685772b00438d300268e0f9e7",
+    "seconds": 100.03156462585034,
+    "rate": 44100,
+    "channels": 2,
+    "bits": 16,
+    "codec": "aac"
+  },
+  "fixture_name": "aac-lc-44100-128k",
+  "observation_seconds": 90,
+  "pacing_ratio": 1.0,
+  "delivery_pause_schedule": [
+    {
+      "after_bytes": 414279,
+      "seconds": 0.5
+    },
+    {
+      "after_bytes": 745703,
+      "seconds": 1.0
+    },
+    {
+      "after_bytes": 1077126,
+      "seconds": 1.5
+    }
+  ],
+  "send_buffer_requested": 4096,
+  "transport": "https",
+  "scope": "Finite paced HTTP(S) playback, sampled format/output/faults and settled memory recovery; no acoustic or CPU measurement",
+  "test_ca_sha256": "130ebc00c3cba4cc1a73857bd2e3f6af09722110d4b5ed5c91d482b47b7aee5a",
+  "leaf_certificate_sha256": "ada11c8f7953f07dfc3e4a604f1a9912eb56b0e282a0b6fe10b71c1512a5c1a2",
+  "idle": {
+    "initial": [
+      {
+        "at": 88303.8362463,
+        "request_ms": 15.450699997018091,
+        "schema": 1,
+        "boot_id": "ef1aea2883a635d0",
+        "uptime_ms": 19361,
+        "reset_reason": 3,
+        "heap": 138928,
+        "largest": 114688,
+        "minimum_heap": 107712,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1356,
+          "write_errors": 0
+        },
+        "pipeline": {
+          "timer_hz": 1000000,
+          "sequence": 1356,
+          "phase_drops": [
+            0,
+            3,
+            0,
+            1353,
+            0,
+            0,
+            0,
+            0
+          ],
+          "events": [
+            [
+              1341,
+              19199242,
+              3,
+              4694,
+              19199242,
+              19199242,
+              19199242
+            ],
+            [
+              1342,
+              19209912,
+              3,
+              361,
+              19209912,
+              19209912,
+              19209912
+            ],
+            [
+              1343,
+              19220575,
+              3,
+              1027,
+              19220575,
+              19220575,
+              19220575
+            ],
+            [
+              1344,
+              19231243,
+              3,
+              1683,
+              19231243,
+              19231243,
+              19231243
+            ],
+            [
+              1345,
+              19241932,
+              3,
+              2384,
+              19241932,
+              19241932,
+              19241932
+            ],
+            [
+              1346,
+              19252580,
+              3,
+              3011,
+              19252580,
+              19252580,
+              19252580
+            ],
+            [
+              1347,
+              19263243,
+              3,
+              3693,
+              19263243,
+              19263243,
+              19263243
+            ],
+            [
+              1348,
+              19273908,
+              3,
+              4360,
+              19273908,
+              19273908,
+              19273908
+            ],
+            [
+              1349,
+              19284575,
+              3,
+              27,
+              19284575,
+              19284575,
+              19284575
+            ],
+            [
+              1350,
+              19295242,
+              3,
+              694,
+              19295242,
+              19295242,
+              19295242
+            ],
+            [
+              1351,
+              19305910,
+              3,
+              1362,
+              19305910,
+              19305910,
+              19305910
+            ],
+            [
+              1352,
+              19316575,
+              3,
+              2027,
+              19316575,
+              19316575,
+              19316575
+            ],
+            [
+              1353,
+              19327242,
+              3,
+              2694,
+              19327242,
+              19327242,
+              19327242
+            ],
+            [
+              1354,
+              19337910,
+              3,
+              3362,
+              19337910,
+              19337910,
+              19337910
+            ],
+            [
+              1355,
+              19348579,
+              3,
+              4010,
+              19348579,
+              19348579,
+              19348579
+            ],
+            [
+              1356,
+              19359248,
+              3,
+              2447,
+              19359248,
+              19359248,
+              19359248
+            ]
+          ],
+          "stream_failure": {
+            "sequence": 0,
+            "timestamp_us": 0,
+            "http_result": 0,
+            "esp_tls_error": 0,
+            "tls_code": 0,
+            "system_errno": 0
+          }
+        },
+        "input_queue": {
+          "resident": 4,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 4,
+          "packet_capacity": 2060
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 88304.9274298,
+        "request_ms": 20.48639999702573,
+        "schema": 1,
+        "boot_id": "ef1aea2883a635d0",
+        "uptime_ms": 20448,
+        "reset_reason": 3,
+        "heap": 138824,
+        "largest": 114688,
+        "minimum_heap": 107712,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1458,
+          "write_errors": 0
+        },
+        "pipeline": {
+          "timer_hz": 1000000,
+          "sequence": 1458,
+          "phase_drops": [
+            0,
+            3,
+            0,
+            1455,
+            0,
+            0,
+            0,
+            0
+          ],
+          "events": [
+            [
+              1443,
+              20287245,
+              3,
+              697,
+              20287245,
+              20287245,
+              20287245
+            ],
+            [
+              1444,
+              20297908,
+              3,
+              1360,
+              20297908,
+              20297908,
+              20297908
+            ],
+            [
+              1445,
+              20308575,
+              3,
+              2027,
+              20308575,
+              20308575,
+              20308575
+            ],
+            [
+              1446,
+              20319243,
+              3,
+              2695,
+              20319243,
+              20319243,
+              20319243
+            ],
+            [
+              1447,
+              20329908,
+              3,
+              3360,
+              20329908,
+              20329908,
+              20329908
+            ],
+            [
+              1448,
+              20340575,
+              3,
+              4027,
+              20340575,
+              20340575,
+              20340575
+            ],
+            [
+              1449,
+              20351242,
+              3,
+              4694,
+              20351242,
+              20351242,
+              20351242
+            ],
+            [
+              1450,
+              20361910,
+              3,
+              362,
+              20361910,
+              20361910,
+              20361910
+            ],
+            [
+              1451,
+              20372577,
+              3,
+              1022,
+              20372577,
+              20372577,
+              20372577
+            ],
+            [
+              1452,
+              20383247,
+              3,
+              1673,
+              20383247,
+              20383247,
+              20383247
+            ],
+            [
+              1453,
+              20393914,
+              3,
+              1676,
+              20393914,
+              20393914,
+              20393914
+            ],
+            [
+              1454,
+              20404580,
+              3,
+              3029,
+              20404580,
+              20404580,
+              20404580
+            ],
+            [
+              1455,
+              20415242,
+              3,
+              3694,
+              20415242,
+              20415242,
+              20415242
+            ],
+            [
+              1456,
+              20425912,
+              3,
+              4356,
+              20425912,
+              20425912,
+              20425912
+            ],
+            [
+              1457,
+              20436575,
+              3,
+              27,
+              20436575,
+              20436575,
+              20436575
+            ],
+            [
+              1458,
+              20447247,
+              3,
+              4482,
+              20447247,
+              20447247,
+              20447247
+            ]
+          ],
+          "stream_failure": {
+            "sequence": 0,
+            "timestamp_us": 0,
+            "http_result": 0,
+            "esp_tls_error": 0,
+            "tls_code": 0,
+            "system_errno": 0
+          }
+        },
+        "input_queue": {
+          "resident": 4,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 4,
+          "packet_capacity": 2060
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 88306.0399037,
+        "request_ms": 19.087300010141917,
+        "schema": 1,
+        "boot_id": "ef1aea2883a635d0",
+        "uptime_ms": 21561,
+        "reset_reason": 3,
+        "heap": 138928,
+        "largest": 114688,
+        "minimum_heap": 107712,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 1562,
+          "write_errors": 0
+        },
+        "pipeline": {
+          "timer_hz": 1000000,
+          "sequence": 1562,
+          "phase_drops": [
+            0,
+            3,
+            0,
+            1559,
+            0,
+            0,
+            0,
+            0
+          ],
+          "events": [
+            [
+              1547,
+              21396579,
+              3,
+              3020,
+              21396579,
+              21396579,
+              21396579
+            ],
+            [
+              1548,
+              21407243,
+              3,
+              3694,
+              21407243,
+              21407243,
+              21407243
+            ],
+            [
+              1549,
+              21417908,
+              3,
+              4360,
+              21417908,
+              21417908,
+              21417908
+            ],
+            [
+              1550,
+              21428577,
+              3,
+              29,
+              21428577,
+              21428577,
+              21428577
+            ],
+            [
+              1551,
+              21439243,
+              3,
+              695,
+              21439243,
+              21439243,
+              21439243
+            ],
+            [
+              1552,
+              21449908,
+              3,
+              1360,
+              21449908,
+              21449908,
+              21449908
+            ],
+            [
+              1553,
+              21460575,
+              3,
+              2027,
+              21460575,
+              21460575,
+              21460575
+            ],
+            [
+              1554,
+              21471242,
+              3,
+              2694,
+              21471242,
+              21471242,
+              21471242
+            ],
+            [
+              1555,
+              21481908,
+              3,
+              3360,
+              21481908,
+              21481908,
+              21481908
+            ],
+            [
+              1556,
+              21492575,
+              3,
+              4027,
+              21492575,
+              21492575,
+              21492575
+            ],
+            [
+              1557,
+              21503247,
+              3,
+              4696,
+              21503247,
+              21503247,
+              21503247
+            ],
+            [
+              1558,
+              21513913,
+              3,
+              364,
+              21513913,
+              21513913,
+              21513913
+            ],
+            [
+              1559,
+              21524575,
+              3,
+              1027,
+              21524575,
+              21524575,
+              21524575
+            ],
+            [
+              1560,
+              21535242,
+              3,
+              1694,
+              21535242,
+              21535242,
+              21535242
+            ],
+            [
+              1561,
+              21545908,
+              3,
+              2354,
+              21545908,
+              21545908,
+              21545908
+            ],
+            [
+              1562,
+              21556581,
+              3,
+              3012,
+              21556581,
+              21556581,
+              21556581
+            ]
+          ],
+          "stream_failure": {
+            "sequence": 0,
+            "timestamp_us": 0,
+            "http_result": 0,
+            "esp_tls_error": 0,
+            "tls_code": 0,
+            "system_errno": 0
+          }
+        },
+        "input_queue": {
+          "resident": 4,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 4,
+          "packet_capacity": 2060
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      }
+    ],
+    "final": [
+      {
+        "at": 88407.1505429,
+        "request_ms": 44.81829999713227,
+        "schema": 1,
+        "boot_id": "ef1aea2883a635d0",
+        "uptime_ms": 122675,
+        "reset_reason": 3,
+        "heap": 138936,
+        "largest": 114688,
+        "minimum_heap": 26432,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 2713,
+          "write_errors": 0
+        },
+        "pipeline": {
+          "timer_hz": 1000000,
+          "sequence": 2713,
+          "phase_drops": [
+            0,
+            63,
+            1,
+            2555,
+            0,
+            41,
+            0,
+            53
+          ],
+          "events": [
+            [
+              2698,
+              122505908,
+              3,
+              3360,
+              9076904,
+              9055461,
+              9143763
+            ],
+            [
+              2699,
+              122516575,
+              3,
+              4027,
+              9087571,
+              9066128,
+              9154430
+            ],
+            [
+              2700,
+              122527242,
+              3,
+              4694,
+              9098238,
+              9076795,
+              9165097
+            ],
+            [
+              2701,
+              122537908,
+              3,
+              360,
+              9108904,
+              9087461,
+              9175763
+            ],
+            [
+              2702,
+              122548575,
+              3,
+              1027,
+              9119571,
+              9098128,
+              9186430
+            ],
+            [
+              2703,
+              122559242,
+              3,
+              1693,
+              9130238,
+              9108795,
+              9197097
+            ],
+            [
+              2704,
+              122569910,
+              3,
+              2354,
+              9140906,
+              9119463,
+              9207765
+            ],
+            [
+              2705,
+              122580580,
+              3,
+              3013,
+              9151576,
+              9130133,
+              9218435
+            ],
+            [
+              2706,
+              122591242,
+              3,
+              3694,
+              9162238,
+              9140795,
+              9229097
+            ],
+            [
+              2707,
+              122601913,
+              3,
+              4346,
+              9172909,
+              9151466,
+              9239768
+            ],
+            [
+              2708,
+              122612575,
+              3,
+              27,
+              9183571,
+              9162128,
+              9250430
+            ],
+            [
+              2709,
+              122623242,
+              3,
+              694,
+              9194238,
+              9172795,
+              9261097
+            ],
+            [
+              2710,
+              122633908,
+              3,
+              1360,
+              9204904,
+              9183461,
+              9271763
+            ],
+            [
+              2711,
+              122644580,
+              3,
+              682,
+              9215576,
+              9194133,
+              9282435
+            ],
+            [
+              2712,
+              122655247,
+              3,
+              1698,
+              9226243,
+              9204800,
+              9293102
+            ],
+            [
+              2713,
+              122665908,
+              3,
+              2360,
+              9236904,
+              9215461,
+              9303763
+            ]
+          ],
+          "stream_failure": {
+            "sequence": 0,
+            "timestamp_us": 0,
+            "http_result": 0,
+            "esp_tls_error": 0,
+            "tls_code": 0,
+            "system_errno": 0
+          }
+        },
+        "input_queue": {
+          "resident": 4,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 4,
+          "packet_capacity": 2060
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 88408.258762,
+        "request_ms": 22.170600001118146,
+        "schema": 1,
+        "boot_id": "ef1aea2883a635d0",
+        "uptime_ms": 123786,
+        "reset_reason": 3,
+        "heap": 138932,
+        "largest": 114688,
+        "minimum_heap": 26432,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 2818,
+          "write_errors": 0
+        },
+        "pipeline": {
+          "timer_hz": 1000000,
+          "sequence": 2818,
+          "phase_drops": [
+            0,
+            63,
+            1,
+            2660,
+            0,
+            41,
+            0,
+            53
+          ],
+          "events": [
+            [
+              2803,
+              123625908,
+              3,
+              2358,
+              10196904,
+              10175461,
+              10263763
+            ],
+            [
+              2804,
+              123636575,
+              3,
+              3026,
+              10207571,
+              10186128,
+              10274430
+            ],
+            [
+              2805,
+              123647242,
+              3,
+              3694,
+              10218238,
+              10196795,
+              10285097
+            ],
+            [
+              2806,
+              123657908,
+              3,
+              4358,
+              10228904,
+              10207461,
+              10295763
+            ],
+            [
+              2807,
+              123668575,
+              3,
+              27,
+              10239571,
+              10218128,
+              10306430
+            ],
+            [
+              2808,
+              123679242,
+              3,
+              694,
+              10250238,
+              10228795,
+              10317097
+            ],
+            [
+              2809,
+              123689909,
+              3,
+              1358,
+              10260905,
+              10239462,
+              10327764
+            ],
+            [
+              2810,
+              123700581,
+              3,
+              1150,
+              10271577,
+              10250134,
+              10338436
+            ],
+            [
+              2811,
+              123711247,
+              3,
+              2696,
+              10282243,
+              10260800,
+              10349102
+            ],
+            [
+              2812,
+              123721909,
+              3,
+              3361,
+              10292905,
+              10271462,
+              10359764
+            ],
+            [
+              2813,
+              123732580,
+              3,
+              4013,
+              10303576,
+              10282133,
+              10370435
+            ],
+            [
+              2814,
+              123743242,
+              3,
+              4694,
+              10314238,
+              10292795,
+              10381097
+            ],
+            [
+              2815,
+              123753908,
+              3,
+              360,
+              10324904,
+              10303461,
+              10391763
+            ],
+            [
+              2816,
+              123764575,
+              3,
+              1027,
+              10335571,
+              10314128,
+              10402430
+            ],
+            [
+              2817,
+              123775247,
+              3,
+              342,
+              10346243,
+              10324800,
+              10413102
+            ],
+            [
+              2818,
+              123785914,
+              3,
+              1366,
+              10356910,
+              10335467,
+              10423769
+            ]
+          ],
+          "stream_failure": {
+            "sequence": 0,
+            "timestamp_us": 0,
+            "http_result": 0,
+            "esp_tls_error": 0,
+            "tls_code": 0,
+            "system_errno": 0
+          }
+        },
+        "input_queue": {
+          "resident": 4,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 4,
+          "packet_capacity": 2060
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      },
+      {
+        "at": 88409.3763508,
+        "request_ms": 35.3359000000637,
+        "schema": 1,
+        "boot_id": "ef1aea2883a635d0",
+        "uptime_ms": 124904,
+        "reset_reason": 3,
+        "heap": 138932,
+        "largest": 114688,
+        "minimum_heap": 26432,
+        "tasks": 16,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "output": {
+          "available": true,
+          "completion_queue_drops": 2922,
+          "write_errors": 0
+        },
+        "pipeline": {
+          "timer_hz": 1000000,
+          "sequence": 2922,
+          "phase_drops": [
+            0,
+            63,
+            1,
+            2764,
+            0,
+            41,
+            0,
+            53
+          ],
+          "events": [
+            [
+              2907,
+              124735242,
+              3,
+              4694,
+              11306238,
+              11284795,
+              11373097
+            ],
+            [
+              2908,
+              124745908,
+              3,
+              360,
+              11316904,
+              11295461,
+              11383763
+            ],
+            [
+              2909,
+              124756575,
+              3,
+              1026,
+              11327571,
+              11306128,
+              11394430
+            ],
+            [
+              2910,
+              124767242,
+              3,
+              1694,
+              11338238,
+              11316795,
+              11405097
+            ],
+            [
+              2911,
+              124777908,
+              3,
+              2359,
+              11348904,
+              11327461,
+              11415763
+            ],
+            [
+              2912,
+              124788575,
+              3,
+              3027,
+              11359571,
+              11338128,
+              11426430
+            ],
+            [
+              2913,
+              124799242,
+              3,
+              3694,
+              11370238,
+              11348795,
+              11437097
+            ],
+            [
+              2914,
+              124809908,
+              3,
+              4360,
+              11380904,
+              11359461,
+              11447763
+            ],
+            [
+              2915,
+              124820577,
+              3,
+              21,
+              11391573,
+              11370130,
+              11458432
+            ],
+            [
+              2916,
+              124831247,
+              3,
+              651,
+              11402243,
+              11380800,
+              11469102
+            ],
+            [
+              2917,
+              124841908,
+              3,
+              1360,
+              11412904,
+              11391461,
+              11479763
+            ],
+            [
+              2918,
+              124852575,
+              3,
+              2027,
+              11423571,
+              11402128,
+              11490430
+            ],
+            [
+              2919,
+              124863242,
+              3,
+              2692,
+              11434238,
+              11412795,
+              11501097
+            ],
+            [
+              2920,
+              124873913,
+              3,
+              3365,
+              11444909,
+              11423466,
+              11511768
+            ],
+            [
+              2921,
+              124884580,
+              3,
+              3230,
+              11455576,
+              11434133,
+              11522435
+            ],
+            [
+              2922,
+              124895242,
+              3,
+              4694,
+              11466238,
+              11444795,
+              11533097
+            ]
+          ],
+          "stream_failure": {
+            "sequence": 0,
+            "timestamp_us": 0,
+            "http_result": 0,
+            "esp_tls_error": 0,
+            "tls_code": 0,
+            "system_errno": 0
+          }
+        },
+        "input_queue": {
+          "resident": 4,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 4,
+          "packet_capacity": 2060
+        },
+        "last_allocation_failure": {
+          "size": 0,
+          "caps": 0
+        },
+        "decoder_failure": {
+          "sequence": 0,
+          "codec": 0,
+          "stage": 0,
+          "result": 0,
+          "completion": 0,
+          "input_bytes": 0,
+          "allocation_sequence": 0
+        }
+      }
+    ]
+  },
+  "measured_output_counters": {
+    "samples": 68,
+    "elapsed_ms": 73926,
+    "completion_queue_drops": 48,
+    "write_errors": 0
+  },
+  "failure_snapshots": {
+    "output": {
+      "started_at": 88397.7026866,
+      "status": {
+        "firmware": "esp32c3-oled-native",
+        "network": "client",
+        "audio": true,
+        "format": "AAC PCM 44.1 kHz stereo",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 16,
+        "pcm_sample_rate": 44100,
+        "pcm_channels": 2,
+        "format_is_pcm": true,
+        "channels_are_core": false,
+        "rssi": -63
+      },
+      "health": [
+        {
+          "at": 88397.8007437,
+          "request_ms": 26.45410000695847,
+          "schema": 1,
+          "boot_id": "ef1aea2883a635d0",
+          "uptime_ms": 113325,
+          "reset_reason": 3,
+          "heap": 60052,
+          "largest": 32768,
+          "minimum_heap": 26432,
+          "tasks": 16,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "output": {
+            "available": true,
+            "completion_queue_drops": 1852,
+            "write_errors": 0
+          },
+          "pipeline": {
+            "timer_hz": 1000000,
+            "sequence": 1852,
+            "phase_drops": [
+              0,
+              58,
+              0,
+              1700,
+              0,
+              41,
+              0,
+              53
+            ],
+            "events": [
+              [
+                1837,
+                89588575,
+                7,
+                4027,
+                383677,
+                498560,
+                498958
+              ],
+              [
+                1838,
+                89599245,
+                7,
+                4697,
+                394347,
+                509230,
+                509628
+              ],
+              [
+                1839,
+                89609909,
+                7,
+                361,
+                405011,
+                519894,
+                520292
+              ],
+              [
+                1840,
+                89620575,
+                7,
+                1027,
+                415677,
+                530560,
+                530958
+              ],
+              [
+                1841,
+                89631247,
+                7,
+                1693,
+                426349,
+                541232,
+                541630
+              ],
+              [
+                1842,
+                89641908,
+                7,
+                2360,
+                437010,
+                551893,
+                552291
+              ],
+              [
+                1843,
+                89652575,
+                7,
+                3027,
+                447677,
+                562560,
+                562958
+              ],
+              [
+                1844,
+                89663242,
+                7,
+                3694,
+                458344,
+                573227,
+                573625
+              ],
+              [
+                1845,
+                89673911,
+                7,
+                4360,
+                469013,
+                583896,
+                584294
+              ],
+              [
+                1846,
+                89684577,
+                7,
+                29,
+                479679,
+                594562,
+                594960
+              ],
+              [
+                1847,
+                89695242,
+                7,
+                692,
+                490344,
+                605227,
+                605625
+              ],
+              [
+                1848,
+                89705913,
+                7,
+                1363,
+                501015,
+                615898,
+                616296
+              ],
+              [
+                1849,
+                89716575,
+                7,
+                2008,
+                511677,
+                626560,
+                626958
+              ],
+              [
+                1850,
+                89727242,
+                7,
+                2694,
+                522344,
+                637227,
+                637625
+              ],
+              [
+                1851,
+                89737915,
+                7,
+                3367,
+                533017,
+                647900,
+                648298
+              ],
+              [
+                1852,
+                89748580,
+                1,
+                4010,
+                543682,
+                2533,
+                3016
+              ]
+            ],
+            "stream_failure": {
+              "sequence": 0,
+              "timestamp_us": 0,
+              "http_result": 0,
+              "esp_tls_error": 0,
+              "tls_code": 0,
+              "system_errno": 0
+            }
+          },
+          "input_queue": {
+            "resident": 4,
+            "occupied": 4,
+            "minimum": 4,
+            "limit": 4,
+            "packet_capacity": 2060
+          },
+          "last_allocation_failure": {
+            "size": 0,
+            "caps": 0
+          },
+          "decoder_failure": {
+            "sequence": 0,
+            "codec": 0,
+            "stage": 0,
+            "result": 0,
+            "completion": 0,
+            "input_bytes": 0,
+            "allocation_sequence": 0
+          }
+        }
+      ],
+      "ended_at": 88397.8007542
+    }
+  },
+  "server_events": [
+    {
+      "mode": "file",
+      "fixture": "aac-lc-44100-128k",
+      "sent": 1488774,
+      "complete": false,
+      "pacing_ratio": 1.0,
+      "clock": "time.perf_counter",
+      "send_buffer_requested": 4096,
+      "send_buffer_actual": 4096,
+      "pauses": [
+        {
+          "after_bytes": 414279,
+          "requested_seconds": 0.5,
+          "started_at": 88332.6432933,
+          "completed": true,
+          "ended_at": 88333.1553648,
+          "elapsed_seconds": 0.5120701999985613
+        },
+        {
+          "after_bytes": 745703,
+          "requested_seconds": 1.0,
+          "started_at": 88352.6430435,
+          "completed": true,
+          "ended_at": 88353.6462357,
+          "elapsed_seconds": 1.0031905000068946
+        },
+        {
+          "after_bytes": 1077126,
+          "requested_seconds": 1.5,
+          "started_at": 88372.6891403,
+          "completed": true,
+          "ended_at": 88374.199458,
+          "elapsed_seconds": 1.5103159999998752
+        }
+      ],
+      "pause_schedule": [
+        {
+          "after_bytes": 414279,
+          "seconds": 0.5
+        },
+        {
+          "after_bytes": 745703,
+          "seconds": 1.0
+        },
+        {
+          "after_bytes": 1077126,
+          "seconds": 1.5
+        }
+      ],
+      "tls_version": "TLSv1.2",
+      "tls_cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+      "delivery": {
+        "clock": "time.perf_counter",
+        "started_at": 88307.5259556,
+        "finished": true,
+        "windows": [
+          {
+            "started_at": 88307.5259556,
+            "ended_at": 88308.5279248,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 0.0008115999953588471,
+            "max_write_seconds": 7.899999036453664e-05,
+            "max_late_seconds": 0.013230176700744778
+          },
+          {
+            "started_at": 88308.5279248,
+            "ended_at": 88309.5734543,
+            "bytes": 14336,
+            "writes": 14,
+            "write_seconds": 0.8178870000265306,
+            "max_write_seconds": 0.18689250000170432,
+            "max_late_seconds": 0.1312805842171656
+          },
+          {
+            "started_at": 88309.5734543,
+            "ended_at": 88310.6375988,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.0638335999974515,
+            "max_write_seconds": 0.19478700000036042,
+            "max_late_seconds": 0.14288316092279274
+          },
+          {
+            "started_at": 88310.6375988,
+            "ended_at": 88311.6376778,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.9996768999990309,
+            "max_write_seconds": 0.28340600000228733,
+            "max_late_seconds": 0.24919280114409048
+          },
+          {
+            "started_at": 88311.6376778,
+            "ended_at": 88312.6381366,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.000099400014733,
+            "max_write_seconds": 0.2014532000030158,
+            "max_late_seconds": 0.17478561619645916
+          },
+          {
+            "started_at": 88312.6381366,
+            "ended_at": 88313.6821883,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.043686399993021,
+            "max_write_seconds": 0.19720029999734834,
+            "max_late_seconds": 0.18089255453378428
+          },
+          {
+            "started_at": 88313.6821883,
+            "ended_at": 88314.6850484,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.002555899991421,
+            "max_write_seconds": 0.20528870000271127,
+            "max_late_seconds": 0.18791236770630348
+          },
+          {
+            "started_at": 88314.6850484,
+            "ended_at": 88315.8891334,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.2037708000279963,
+            "max_write_seconds": 0.21225120000599418,
+            "max_late_seconds": 0.20071604438999202
+          },
+          {
+            "started_at": 88315.8891334,
+            "ended_at": 88316.9156342,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 0.9315305000345688,
+            "max_write_seconds": 0.23851950000971556,
+            "max_late_seconds": 0.20640148274833336
+          },
+          {
+            "started_at": 88316.9156342,
+            "ended_at": 88318.1384541,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.2225101999938488,
+            "max_write_seconds": 0.23268220000318252,
+            "max_late_seconds": 0.22591236696462147
+          },
+          {
+            "started_at": 88318.1384541,
+            "ended_at": 88319.1424059,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 0.9863597999938065,
+            "max_write_seconds": 0.23666350000712555,
+            "max_late_seconds": 0.280759207191295
+          },
+          {
+            "started_at": 88319.1424059,
+            "ended_at": 88320.3890813,
+            "bytes": 20480,
+            "writes": 20,
+            "write_seconds": 1.2462391999870306,
+            "max_write_seconds": 0.24759220000123605,
+            "max_late_seconds": 0.20133018388878554
+          },
+          {
+            "started_at": 88320.3890813,
+            "ended_at": 88321.3922456,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.0026740000321297,
+            "max_write_seconds": 0.23224470000423025,
+            "max_late_seconds": 0.19539759516192134
+          },
+          {
+            "started_at": 88321.3922456,
+            "ended_at": 88322.5979376,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.0924166000477271,
+            "max_write_seconds": 0.22668390000762884,
+            "max_late_seconds": 0.1904474485636456
+          },
+          {
+            "started_at": 88322.5979376,
+            "ended_at": 88323.6006632,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.002417499985313,
+            "max_write_seconds": 0.20834360001026653,
+            "max_late_seconds": 0.17966591773438267
+          },
+          {
+            "started_at": 88323.6006632,
+            "ended_at": 88324.6403429,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.03919650001626,
+            "max_write_seconds": 0.19957139999314677,
+            "max_late_seconds": 0.1964313711214345
+          },
+          {
+            "started_at": 88324.6403429,
+            "ended_at": 88325.7139011,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0732344999996712,
+            "max_write_seconds": 0.19047970000247005,
+            "max_late_seconds": 0.19283940947207157
+          },
+          {
+            "started_at": 88325.7139011,
+            "ended_at": 88326.8903318,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.175988199946005,
+            "max_write_seconds": 0.19693040000856854,
+            "max_late_seconds": 0.20614898616622668
+          },
+          {
+            "started_at": 88326.8903318,
+            "ended_at": 88327.9214203,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.030712499996298,
+            "max_write_seconds": 0.18504700000630692,
+            "max_late_seconds": 0.21631327038630843
+          },
+          {
+            "started_at": 88327.9214203,
+            "ended_at": 88329.1470832,
+            "bytes": 19456,
+            "writes": 19,
+            "write_seconds": 1.1461645000235876,
+            "max_write_seconds": 0.23980790001223795,
+            "max_late_seconds": 0.2279902451991802
+          },
+          {
+            "started_at": 88329.1470832,
+            "ended_at": 88330.1509543,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0034574999735923,
+            "max_write_seconds": 0.2501468999980716,
+            "max_late_seconds": 0.24202679106383584
+          },
+          {
+            "started_at": 88330.1509543,
+            "ended_at": 88331.3764046,
+            "bytes": 19456,
+            "writes": 19,
+            "write_seconds": 1.2251580000447575,
+            "max_write_seconds": 0.24541930000123102,
+            "max_late_seconds": 0.24755822941369843
+          },
+          {
+            "started_at": 88331.3764046,
+            "ended_at": 88332.3789714,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.002327400012291,
+            "max_write_seconds": 0.24448470000061207,
+            "max_late_seconds": 0.2004563117516227
+          },
+          {
+            "started_at": 88332.3789714,
+            "ended_at": 88333.3910742,
+            "bytes": 17991,
+            "writes": 18,
+            "write_seconds": 0.49974550002662,
+            "max_write_seconds": 0.18606690000160597,
+            "max_late_seconds": 0.6294534230110003
+          },
+          {
+            "started_at": 88333.3910742,
+            "ended_at": 88334.3911475,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.999744999979157,
+            "max_write_seconds": 0.2242643999925349,
+            "max_late_seconds": 0.2219535726471804
+          },
+          {
+            "started_at": 88334.3911475,
+            "ended_at": 88335.6019479,
+            "bytes": 20480,
+            "writes": 20,
+            "write_seconds": 1.13842299998214,
+            "max_write_seconds": 0.21582620000117458,
+            "max_late_seconds": 0.17320464746444486
+          },
+          {
+            "started_at": 88335.6019479,
+            "ended_at": 88336.6410226,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0387714999378659,
+            "max_write_seconds": 0.32444609999947716,
+            "max_late_seconds": 0.2960141933290288
+          },
+          {
+            "started_at": 88336.6410226,
+            "ended_at": 88337.6413556,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.999941599991871,
+            "max_write_seconds": 0.19477719999849796,
+            "max_late_seconds": 0.17792047002876643
+          },
+          {
+            "started_at": 88337.6413556,
+            "ended_at": 88338.6933973,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 0.9304576000140514,
+            "max_write_seconds": 0.22896310000214726,
+            "max_late_seconds": 0.17717524484032765
+          },
+          {
+            "started_at": 88338.6933973,
+            "ended_at": 88339.8910368,
+            "bytes": 19456,
+            "writes": 19,
+            "write_seconds": 1.197168300001067,
+            "max_write_seconds": 0.21023609999974724,
+            "max_late_seconds": 0.19132689070829656
+          },
+          {
+            "started_at": 88339.8910368,
+            "ended_at": 88341.0279456,
+            "bytes": 19456,
+            "writes": 19,
+            "write_seconds": 0.9703667999856407,
+            "max_write_seconds": 0.21850719999929424,
+            "max_late_seconds": 0.19703372905496508
+          },
+          {
+            "started_at": 88341.0279456,
+            "ended_at": 88342.1408545,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.0350501999782864,
+            "max_write_seconds": 0.2312376000045333,
+            "max_late_seconds": 0.21080601327412296
+          },
+          {
+            "started_at": 88342.1408545,
+            "ended_at": 88343.1408685,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 0.9734878999734065,
+            "max_write_seconds": 0.23033099999884143,
+            "max_late_seconds": 0.21593332079646643
+          },
+          {
+            "started_at": 88343.1408685,
+            "ended_at": 88344.1412523,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.9638846999878297,
+            "max_write_seconds": 0.21290139999473467,
+            "max_late_seconds": 0.15900476479146164
+          },
+          {
+            "started_at": 88344.1412523,
+            "ended_at": 88345.1430087,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0013938999618404,
+            "max_write_seconds": 0.22347900000750087,
+            "max_late_seconds": 0.16967397983535193
+          },
+          {
+            "started_at": 88345.1430087,
+            "ended_at": 88346.1431566,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.999890500024776,
+            "max_write_seconds": 0.2068416999973124,
+            "max_late_seconds": 0.15623291817610152
+          },
+          {
+            "started_at": 88346.1431566,
+            "ended_at": 88347.3221939,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.1786940000311006,
+            "max_write_seconds": 0.20855930000834633,
+            "max_late_seconds": 0.16939909486973193
+          },
+          {
+            "started_at": 88347.3221939,
+            "ended_at": 88348.3254947,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.003007199979038,
+            "max_write_seconds": 0.1894616999925347,
+            "max_late_seconds": 0.16856530991208274
+          },
+          {
+            "started_at": 88348.3254947,
+            "ended_at": 88349.3274369,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0016813999973238,
+            "max_write_seconds": 0.19667499999923166,
+            "max_late_seconds": 0.1776340230862843
+          },
+          {
+            "started_at": 88349.3274369,
+            "ended_at": 88350.3906506,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.0628549000248313,
+            "max_write_seconds": 0.21435480000218377,
+            "max_late_seconds": 0.18929439978091978
+          },
+          {
+            "started_at": 88350.3906506,
+            "ended_at": 88351.4414012,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0503616000205511,
+            "max_write_seconds": 0.21159000000625383,
+            "max_late_seconds": 0.20051907647575717
+          },
+          {
+            "started_at": 88351.4414012,
+            "ended_at": 88352.6407342,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.1988664000818972,
+            "max_write_seconds": 0.22800410000490956,
+            "max_late_seconds": 0.2117444531613728
+          },
+          {
+            "started_at": 88352.6407342,
+            "ended_at": 88353.6463395,
+            "bytes": 2720,
+            "writes": 3,
+            "write_seconds": 0.002335900004254654,
+            "max_write_seconds": 0.0022185999987414107,
+            "max_late_seconds": 1.1202952248277143
+          },
+          {
+            "started_at": 88353.6463395,
+            "ended_at": 88354.7568968,
+            "bytes": 32768,
+            "writes": 32,
+            "write_seconds": 1.11002490001556,
+            "max_write_seconds": 0.2302501999947708,
+            "max_late_seconds": 1.0586234921211144
+          },
+          {
+            "started_at": 88354.7568968,
+            "ended_at": 88355.8906055,
+            "bytes": 19456,
+            "writes": 19,
+            "write_seconds": 1.1333409000071697,
+            "max_write_seconds": 0.22945360001176596,
+            "max_late_seconds": 0.2539639819879085
+          },
+          {
+            "started_at": 88355.8906055,
+            "ended_at": 88356.892569,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0016209999885177,
+            "max_write_seconds": 0.21970049999072216,
+            "max_late_seconds": 0.19365816432400607
+          },
+          {
+            "started_at": 88356.892569,
+            "ended_at": 88357.9610161,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 0.959999799990328,
+            "max_write_seconds": 0.23566089999803808,
+            "max_late_seconds": 0.19079930266889278
+          },
+          {
+            "started_at": 88357.9610161,
+            "ended_at": 88358.9626442,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0012713999458356,
+            "max_write_seconds": 0.19746730000770185,
+            "max_late_seconds": 0.19845848689146806
+          },
+          {
+            "started_at": 88358.9626442,
+            "ended_at": 88360.1884695,
+            "bytes": 19456,
+            "writes": 19,
+            "write_seconds": 1.1395978000073228,
+            "max_write_seconds": 0.24586249999993015,
+            "max_late_seconds": 0.19501052523264661
+          },
+          {
+            "started_at": 88360.1884695,
+            "ended_at": 88361.4241518,
+            "bytes": 20480,
+            "writes": 20,
+            "write_seconds": 1.1351921999885235,
+            "max_write_seconds": 0.23578550000092946,
+            "max_late_seconds": 0.20885560757596977
+          },
+          {
+            "started_at": 88361.4241518,
+            "ended_at": 88362.5512633,
+            "bytes": 19456,
+            "writes": 19,
+            "write_seconds": 1.1267650999652687,
+            "max_write_seconds": 0.20477419999951962,
+            "max_late_seconds": 0.2228527534462046
+          },
+          {
+            "started_at": 88362.5512633,
+            "ended_at": 88363.6416464,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.09005049992993,
+            "max_write_seconds": 0.2279809000028763,
+            "max_late_seconds": 0.2369359993172111
+          },
+          {
+            "started_at": 88363.6416464,
+            "ended_at": 88364.6426569,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 0.987981599959312,
+            "max_write_seconds": 0.2362215000030119,
+            "max_late_seconds": 0.24257033766480163
+          },
+          {
+            "started_at": 88364.6426569,
+            "ended_at": 88365.74488,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.1019214000407374,
+            "max_write_seconds": 0.2427635000058217,
+            "max_late_seconds": 0.2818265470559709
+          },
+          {
+            "started_at": 88365.74488,
+            "ended_at": 88366.891264,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.1460411000152817,
+            "max_write_seconds": 0.24435949999315199,
+            "max_late_seconds": 0.20272932751686312
+          },
+          {
+            "started_at": 88366.891264,
+            "ended_at": 88367.9727758,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 0.9671690999530256,
+            "max_write_seconds": 0.23618729998997878,
+            "max_late_seconds": 0.18652650421427097
+          },
+          {
+            "started_at": 88367.9727758,
+            "ended_at": 88368.9761899,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0031216999923345,
+            "max_write_seconds": 0.20644030001130886,
+            "max_late_seconds": 0.19587298843543977
+          },
+          {
+            "started_at": 88368.9761899,
+            "ended_at": 88370.2024759,
+            "bytes": 19456,
+            "writes": 19,
+            "write_seconds": 1.1244175999745494,
+            "max_write_seconds": 0.24851530000159983,
+            "max_late_seconds": 0.1894447267841315
+          },
+          {
+            "started_at": 88370.2024759,
+            "ended_at": 88371.3932196,
+            "bytes": 19456,
+            "writes": 19,
+            "write_seconds": 1.1902371000178391,
+            "max_write_seconds": 0.19476610000128858,
+            "max_late_seconds": 0.20293860911624506
+          },
+          {
+            "started_at": 88371.3932196,
+            "ended_at": 88372.3981035,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0044596000225283,
+            "max_write_seconds": 0.20653809999930672,
+            "max_late_seconds": 0.2531618895736756
+          },
+          {
+            "started_at": 88372.3981035,
+            "ended_at": 88374.1995713,
+            "bytes": 6815,
+            "writes": 7,
+            "write_seconds": 0.2909003999957349,
+            "max_write_seconds": 0.1739534999942407,
+            "max_late_seconds": 1.6735536724008853
+          },
+          {
+            "started_at": 88374.1995713,
+            "ended_at": 88375.2590135,
+            "bytes": 33792,
+            "writes": 33,
+            "write_seconds": 1.0589080000208924,
+            "max_write_seconds": 0.24398440000368282,
+            "max_late_seconds": 1.611895939684473
+          },
+          {
+            "started_at": 88375.2590135,
+            "ended_at": 88376.379872,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.1206050000037067,
+            "max_write_seconds": 0.24489069999253843,
+            "max_late_seconds": 0.7129567351948936
+          },
+          {
+            "started_at": 88376.379872,
+            "ended_at": 88377.3966574,
+            "bytes": 20480,
+            "writes": 20,
+            "write_seconds": 1.0163747999758925,
+            "max_write_seconds": 0.3369980999996187,
+            "max_late_seconds": 0.7643079370755004
+          },
+          {
+            "started_at": 88377.3966574,
+            "ended_at": 88378.6084951,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.2114444999897387,
+            "max_write_seconds": 0.32369229999312665,
+            "max_late_seconds": 0.695593857759377
+          },
+          {
+            "started_at": 88378.6084951,
+            "ended_at": 88379.6461387,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0373206000222126,
+            "max_write_seconds": 0.20571189999463968,
+            "max_late_seconds": 0.7065417269332102
+          },
+          {
+            "started_at": 88379.6461387,
+            "ended_at": 88380.6483111,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.001848499989137,
+            "max_write_seconds": 0.2120637999905739,
+            "max_late_seconds": 0.7048688476206735
+          },
+          {
+            "started_at": 88380.6483111,
+            "ended_at": 88381.6695997,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0209643000271171,
+            "max_write_seconds": 0.2609616000117967,
+            "max_late_seconds": 0.663986557017779
+          },
+          {
+            "started_at": 88381.6695997,
+            "ended_at": 88382.8946589,
+            "bytes": 19456,
+            "writes": 19,
+            "write_seconds": 1.2246843000175431,
+            "max_write_seconds": 0.24664620000112336,
+            "max_late_seconds": 0.7199568934884155
+          },
+          {
+            "started_at": 88382.8946589,
+            "ended_at": 88383.8993432,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.0042690000263974,
+            "max_write_seconds": 0.22483950000605546,
+            "max_late_seconds": 0.6671270374790765
+          },
+          {
+            "started_at": 88383.8993432,
+            "ended_at": 88384.9865961,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0868461999925785,
+            "max_write_seconds": 0.22605290000501554,
+            "max_late_seconds": 0.6738670908671338
+          },
+          {
+            "started_at": 88384.9865961,
+            "ended_at": 88385.9896038,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0027112000243505,
+            "max_write_seconds": 0.22384120000060648,
+            "max_late_seconds": 0.6813049675547518
+          },
+          {
+            "started_at": 88385.9896038,
+            "ended_at": 88387.1083845,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.118475999988732,
+            "max_write_seconds": 0.21218249999219552,
+            "max_late_seconds": 0.6611405750736594
+          },
+          {
+            "started_at": 88387.1083845,
+            "ended_at": 88388.15,
+            "bytes": 21504,
+            "writes": 21,
+            "write_seconds": 1.041226099972846,
+            "max_write_seconds": 0.2831794999947306,
+            "max_late_seconds": 0.7615748517710017
+          },
+          {
+            "started_at": 88388.15,
+            "ended_at": 88389.152211,
+            "bytes": 13312,
+            "writes": 13,
+            "write_seconds": 1.0018978000152856,
+            "max_write_seconds": 0.3022664000018267,
+            "max_late_seconds": 0.6811836341075832
+          },
+          {
+            "started_at": 88389.152211,
+            "ended_at": 88390.3081627,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.1556796000077156,
+            "max_write_seconds": 0.21008470001106616,
+            "max_late_seconds": 0.6922594108036719
+          },
+          {
+            "started_at": 88390.3081627,
+            "ended_at": 88391.3101066,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.0015204999799607,
+            "max_write_seconds": 0.23177600000053644,
+            "max_late_seconds": 0.703548387507908
+          },
+          {
+            "started_at": 88391.3101066,
+            "ended_at": 88392.3992701,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0888290000002598,
+            "max_write_seconds": 0.2524406000011368,
+            "max_late_seconds": 0.6634704277385026
+          },
+          {
+            "started_at": 88392.3992701,
+            "ended_at": 88393.4007128,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.001063100018655,
+            "max_write_seconds": 0.2360616000078153,
+            "max_late_seconds": 0.6742522025451763
+          },
+          {
+            "started_at": 88393.4007128,
+            "ended_at": 88394.6067393,
+            "bytes": 18432,
+            "writes": 18,
+            "write_seconds": 1.2057818000030238,
+            "max_write_seconds": 0.33540609999909066,
+            "max_late_seconds": 0.65322185405239
+          },
+          {
+            "started_at": 88394.6067393,
+            "ended_at": 88395.6172094,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0101148999965517,
+            "max_write_seconds": 0.21433750000142027,
+            "max_late_seconds": 0.6621955269947648
+          },
+          {
+            "started_at": 88395.6172094,
+            "ended_at": 88396.650775,
+            "bytes": 17408,
+            "writes": 17,
+            "write_seconds": 1.0331637999770464,
+            "max_write_seconds": 0.20553389999258798,
+            "max_late_seconds": 0.655577776618884
+          },
+          {
+            "started_at": 88396.650775,
+            "ended_at": 88397.6515544,
+            "bytes": 16384,
+            "writes": 16,
+            "write_seconds": 1.0005319999618223,
+            "max_write_seconds": 0.2091491000028327,
+            "max_late_seconds": 0.6727659149764804
+          },
+          {
+            "started_at": 88397.6515544,
+            "ended_at": 88397.917157,
+            "bytes": 5120,
+            "writes": 5,
+            "write_seconds": 0.2534472000115784,
+            "max_write_seconds": 0.2113458000094397,
+            "max_late_seconds": 0.6588497897901107
+          }
+        ],
+        "dropped_windows": 0,
+        "ended_at": 88397.917157
+      },
+      "seconds": 90.39119890000438
+    }
+  ]
+}
