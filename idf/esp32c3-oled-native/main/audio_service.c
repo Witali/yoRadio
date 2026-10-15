@@ -59,7 +59,7 @@
 #include "tls_input_reserve.h"
 #endif
 #define STREAM_CHUNK_SIZE 2048
-#define STREAM_READ_TIMEOUT_MS 250
+#define STREAM_READ_TIMEOUT_MS CONFIG_YORADIO_STREAM_READ_TIMEOUT_MS
 #define PCM_RING_SIZE (8 * 1024)
 #ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
 // Three 512-frame stereo packets, including lease/ring headers, fit in the

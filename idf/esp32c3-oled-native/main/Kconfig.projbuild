@@ -44,6 +44,18 @@ config YORADIO_HTTP_RELEASE_REQUEST_BUFFER
         copy is restricted to an audited revision. Keep disabled until reuse,
         redirects, allocation failures, all codecs and OTA are qualified.
 
+config YORADIO_STREAM_READ_TIMEOUT_MS
+    int "HTTP body read timeout in milliseconds"
+    range 10 1000
+    default 250
+    help
+        Applied after final response headers, leaving connection, TLS handshake
+        and station-unavailable deadlines unchanged. A shorter timeout may
+        return authenticated partial body data sooner but increases polling
+        during network gaps. It does not change packet capacity or codec data.
+        Keep the established 250 ms default until HTTP/HTTPS, all codecs,
+        framing, Stop/EOF and memory recovery have been compared on hardware.
+
 config YORADIO_TLS_LARGE_BLOCK_RESERVE
     bool "Reserve one large TLS allocation in static RAM (experimental)"
     depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_INTERNAL_MEM_ALLOC && MBEDTLS_DYNAMIC_BUFFER
