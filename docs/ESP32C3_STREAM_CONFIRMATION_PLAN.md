@@ -998,3 +998,23 @@ Original firmware and private settings are verified restored, stopped.
 [Retained reports, request phases and sources](../tests/results/esp32c3-stream-probe-20261013/early-owner-aac-repeat-01/summary.json).
 This closes a bounded AAC-LC repeat check, not the TCP cause investigation or
 the remaining all-format production qualification.
+
+### Input capacity and retained-owner experiments (2026-10-15)
+
+The [first guarded AAC growth trial](ESP32C3_AAC_INPUT_GROWTH_20261015.md)
+never expanded pure LC because its pending SBR owner was released before the
+readiness check. A [two-second prefill trial](ESP32C3_AAC_PREFILL2_20261015.md)
+did not improve the controlled TLS pause (50 completion drops versus 48).
+
+[Retaining the SBR owner](ESP32C3_AAC_RETAIN_INPUT_20261015.md) allows actual
+growth from four to eight slots and reduces that pause's drops to 33. However,
+the TLS changing-format case records a failed 1,630-byte DMA-capable allocation;
+the same case passes on the four-slot control image. Other tested transitions
+complete, but do not waive this failure. All original firmware/settings are
+restored. Extra AAC slots remain disabled in production.
+
+Next measure actual queued payload utilization and investigate bounded packing
+of validated bytes into existing slots, including EOF, cancellation, ordered
+drains and four-lease confirmation deadlocks. Keep the public AAC output and
+FLAC/WebUI timeout failures open; these experiments do not qualify a final
+production image or replace full-format verification.
