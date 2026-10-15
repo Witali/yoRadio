@@ -57,3 +57,32 @@ failed pair. Each pair completes its observations and recovery checks before
 restoration. Preserve every failure and report overwritten events explicitly.
 Use the ISR evidence to choose a targeted fix; do not increase input capacity
 or change task priority without evidence of the bottleneck.
+
+## Diagnostic public repeats
+
+All three planned pairs complete: **24/24 checks pass**, covering six public
+HTTPS FLAC observations on one boot. The six fixed steady windows total
+338.530 seconds and have zero new completion drops or write errors. There are
+no overwritten overrun events within those windows because no overrun occurs.
+All 1,016 health samples have zero allocation, decoder and watchdog faults.
+Minimum sampled free heap / largest block is 59,648 / 40,960 B. Natural EOF,
+memory recovery, settings and final restoration pass.
+
+The input pool has eight resident slots during every measured FLAC interval;
+sampled occupancy ranges from two to eight. In the first pair, all 232 sampled
+nonempty READY queues use their packet capacity fully (weighted and median
+fill both 100%). Packing partial slots cannot improve those observations.
+These samples do not identify the cause of the earlier quiet-image failure.
+
+[Raw public repeats and ISR analysis](../tests/results/esp32c3-flac-output-diagnostic-20261015/physical/)
+preserve the source/configuration references, each verdict and restoration.
+The diagnostic timing/layout and live network differ from the failed quiet run;
+do not treat these passes as a fix or as production qualification.
+
+Next compare the same reference FLAC bytes over local HTTP, first without
+intentional delay and then with 100/250/500-ms host pauses at fixed byte offsets.
+Use unpaced file delivery and a requested 4-KiB socket send buffer, so average
+bitrate pacing does not itself starve variable-bitrate frames. This isolates
+controlled delivery gaps from TLS and the public server, but cannot by itself
+attribute the original HTTPS fault. Keep failed output gates and actual host
+pause durations, including any overwritten ISR events.
