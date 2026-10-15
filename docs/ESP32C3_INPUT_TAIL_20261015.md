@@ -155,10 +155,45 @@ contains raw reports, independent replay, request timings, source references
 and hashes. The finite windows do not establish ten-minute public HTTPS
 stability or full PCM/acoustic continuity.
 
+## Quiet public AAC HTTPS, ten minutes
+
+The **same quiet image** then passes **7/7** checks on `groovesalad-128-aac`
+over HTTPS with normal certificate verification. The independent source probe
+confirms AAC-LC 44.1-kHz stereo. The final playback sample is at 599.819 s;
+the exact saved steady window contains 1,074 paired observations over 584.579 s,
+with **zero new completion-queue drops and zero write errors**. Independent
+replay reproduces every saved format/response/memory/decoder/output verdict
+using the original start/end boundaries, rather than shifting the window.
+
+| Measurement | Result |
+| --- | ---: |
+| All health observations / boots | 1,123 / 1 |
+| Allocation / decoder / watchdog faults | 0 / 0 / 0 |
+| First matching decoded format | 3.348 s |
+| Maximum combined status/health request | 471.98 ms |
+| Failed traced HTTP request phases | 0 |
+| Minimum sampled free heap / largest block | 58,384 / 32,768 B |
+| Settled heap before / after Stop | 139,476 / 139,392 B |
+| Settled largest block / task count, both endpoints | 106,496 B / 16 |
+| RSSI min / median / max | -73 / -65 / -53 dBm |
+
+Stopped-state recovery passes. The controller restores the original production
+image, verifies unchanged Wi-Fi/playlist/settings and leaves playback stopped.
+[Saved public evidence](../tests/results/esp32c3-input-tail-quiet-20261015/public-radio/)
+includes raw reports, transport timings, exact-window replay and source hashes.
+No broadcast audio is archived.
+
+The earlier quiet image recorded 36 completion drops on this station, whereas
+this run records none. Live content and network conditions differ between
+runs: this is a successful observation, not a controlled causal demonstration
+that tail packing alone eliminated the original fault. The imposed 1.5-second
+TLS-pause failure remains recorded separately, and this does not resolve the
+earlier FLAC/WebUI TCP timeout or prove acoustic continuity outside the window.
+
 ## Further hardware qualification
 
-Keep the feature off by default. Check quiet public HTTPS playback before
-considering it for production. More densely
+Keep the feature off by default until public HTTPS files, quiet transitions,
+network recovery and OTA regression are checked on this image. More densely
 filled slots do not eliminate the measured long-gap starvation or explain the
-earlier public-station and WebUI TCP failures. Preserve those open findings;
-do not widen output acceptance merely because memory and transition gates pass.
+earlier WebUI TCP failures. Preserve those open findings; do not widen output
+acceptance merely because memory and transition gates pass.
