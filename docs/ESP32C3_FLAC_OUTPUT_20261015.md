@@ -667,3 +667,35 @@ not a new emulator run, physical PCM capture or a bound over every possible
 AAC input. Physical radio and sustained-codec qualification remain separate.
 
 [Audit scripts, logs, source comparison and retained dependency failure](../tests/results/esp32c3-raw-tail-quiet-20261015/evidence-audit/).
+
+### Real-radio HTTPS results on the corrected quiet image
+
+The same exact candidate passes **17/17 public-radio checks**: seven for a
+600-second Groove Salad 16-kbit/s AAC observation, then ten for four 60-second
+AAC/MP3 observations and their recovery/settings/health checks. TLS uses normal
+public certificate verification. Source formats are independently probed.
+
+| Source | Decoded format | Measured steady window | Completion drops / write errors | Minimum free heap / largest block |
+| --- | --- | ---: | ---: | ---: |
+| Groove Salad AAC 16 | HE-AAC, 32 kHz; mono source, two output channels | 584.692 s | 0 / 0 | 24,600 / 8,704 B |
+| Groove Salad AAC 128 | AAC-LC, 44.1 kHz stereo | 44.940 s | 0 / 0 | 58,572 / 34,816 B |
+| Groove Salad AAC 64 | HE-AAC, 44.1 kHz stereo | 44.811 s | 0 / 0 | 24,448 / 11,264 B |
+| Groove Salad AAC 32 | HE-AAC, 44.1 kHz stereo | 44.796 s | 0 / 0 | 24,532 / 9,728 B |
+| Groove Salad MP3 256 | MP3, 44.1 kHz stereo | 44.731 s | 0 / 0 | 84,228 / 65,536 B |
+
+The 16-kbit/s source is HE-AAC mono, not proof of PS/HE-AAC v2; duplicated
+output channels must not be used to infer its encoded profile. HE-AAC v2 is
+covered separately by the local matrix, transitions and retained PCM tests.
+The reported output windows exclude the fixed startup warmup. All 1,572 health
+samples share one boot with zero reported allocation, decoder and watchdog
+events. Memory trend and stopped recovery checks pass; no traced HTTP request
+fails. The largest paired status/health latency is 209.930 ms.
+
+The controller restores the original production image, verifies unchanged
+Wi-Fi/playlist/settings and leaves playback stopped. These successful windows
+do not rewrite earlier failures or establish an all-network/acoustic guarantee.
+The corrected image now has 105 passing short/public/OTA campaign checks;
+exact-image ten-minute FLAC/Vorbis/Opus stress runs remain pending before
+production promotion and final completion review.
+
+[Public-radio reports, probes, test sources and restoration](../tests/results/esp32c3-raw-tail-quiet-20261015/public-radio/).
