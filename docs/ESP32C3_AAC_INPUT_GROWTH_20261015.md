@@ -6,8 +6,10 @@ The [controlled TLS pause](ESP32C3_AAC_TLS_PAUSES_20261015.md) exhausted buffere
 audio at 1.51 seconds with four resident input slots. Output-task checkpoints
 remained recent. This experiment adds capacity after native AAC initialization,
 without changing DSP, sampling rates, DMA scheduling or the TLS RX reservation.
-It is implemented and host-tested; physical benefit and all-codec safety are
-not yet established. Production defaults remain unchanged.
+It is implemented and host-tested. The first physical trial did **not** activate
+growth for AAC-LC: the queue remained at four slots and repeated the output
+failure. Physical benefit and all-codec safety are not established. Production
+defaults remain unchanged.
 
 `CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS` accepts 0–8, default **0**. The planned
 first trial requests four extra slots, capped by the user's saved target.
@@ -63,3 +65,67 @@ use pthread/heap stubs. They do not qualify target scheduling or actual TLS/PCM.
 4. Check other codecs, Stop/replacement/EOF, TLS pressure and OTA on the final
    quiet candidate. Retain failed controls and do not infer public-stream
    causality merely from a passing local pause experiment.
+
+## First physical trial: expansion did not activate
+
+The audited `idf61-aacin4-20261015` image has application SHA-256
+`edbadada673b8509e1aae11a3a55e89f2168cd6a3b19a0bf609aebd21144f37a`.
+Its configuration differs from the preceding local-CA diagnostic only by the
+new extra-slot option, set to four (absent in the baseline, equivalent to zero).
+Linked AAC/HTTP/allocator checks and the ISR/timer IRAM audit pass.
+
+| Measurement | Baseline | Requested four extra AAC slots |
+| --- | ---: | ---: |
+| Actual resident / minimum / limit | 4 / 4 / 4 | 4 / 4 / 4 |
+| Actual longest host pause | 1.510316 s | 1.513596 s |
+| New DMA completion-queue drops | 48 | 48 |
+| Output write errors | 0 | 0 |
+| Allocation / decoder / watchdog faults | 0 / 0 / 0 | 0 / 0 / 0 |
+| Minimum sampled free heap / largest block | 59,152 / 32,768 B | 59,308 / 32,768 B |
+| Passed campaign checks | 10 / 11 | 10 / 11 |
+
+Both use the same owned AAC-LC fixture, TLS cipher, pacing, 4-KiB host send
+buffer and pause offsets. The new run has 106 health observations on one boot.
+The shorter pauses introduce no new completion drops. The final pause produces
+all 48 increments; the retained events have all three pipeline wait flags.
+After Stop, median free heap returns from 138,924 to 138,928 B; the largest
+block remains 110,592 B and task count stays at 16. Original production firmware
+and private settings are verified restored, with playback stopped.
+
+### Why the feature did not activate
+
+`native_aac_decoder_process()` deliberately discards an unused pending SBR
+owner after the first successful PCM output. For pure LC, no active SBR owner
+exists. The caller then asks `native_aac_decoder_input_growth_ready()`, whose
+owner requirement is false. The stream task never receives the readiness
+generation. This is a lifecycle mismatch in the proposed LC experiment, not
+evidence that a larger queue provides no benefit. No additional resident queue
+storage was observed.
+
+The actual adapter ASan/UBSan test now enables the extra-slot option and checks
+eligibility after LC, output retry, late SBR, reopen and allocation failure.
+It confirms false after LC and true once SBR owns its storage. The caller only
+signals inside its first-frame block, so later eligibility alone does not
+activate growth in an already-running LC stream. DSP is mocked in this host
+test; the physical evidence supplies the real LC lifecycle observation.
+
+Do not remove the owner guard merely to force this test to pass: extra occupied
+input leases cannot be reclaimed on demand when a later SBR allocation needs
+memory. Retaining the full pending owner would also have a separate RAM cost
+and must be measured with late-profile transitions.
+
+### Next experiment
+
+First compare the existing bounded startup-prefill setting at two seconds
+against the one-second baseline, with extra AAC slots disabled and the same
+TLS schedule. This isolates startup lead without inventing additional reserved
+RAM. Check start latency, Stop/replacement responsiveness and output counters;
+a longer prefill does not guarantee that a live server can supply that lead.
+Then revisit safe queue growth with explicit owner lifetime and late-SBR tests.
+Neither experiment qualifies public-source failures or the final production
+image by itself.
+
+[Build evidence](../tests/results/esp32c3-aac-input-growth-20261015/build/),
+[physical run and restoration](../tests/results/esp32c3-aac-input-growth-20261015/physical/),
+and [adapter eligibility regression](../tests/results/esp32c3-aac-input-growth-20261015/adapter-eligibility/)
+are retained, including the failed output check.
