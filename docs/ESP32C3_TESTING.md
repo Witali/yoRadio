@@ -2002,3 +2002,26 @@ length for both images; output failures must remain failures. A local HTTP
 comparison isolates delivery behavior but does not reproduce TLS memory use
 or prove the cause of an external station's outage. Host tests:
 `tests/test-local-sustained-pauses.py` and `tests/test-audio-server-pauses.py`.
+
+### Distinguishing heap cycles from persistent losses
+
+The shared quiet-playback memory check now compares median free heap and largest
+block over the first and last contiguous thirds of the selected observations
+(at least three samples each). The tolerances remain 2,048 and 4,096 bytes.
+It also rejects a final three-sample median below the initial third's minimum
+by more than the same tolerance, so an abrupt late fall is not diluted.
+The former first/last-three medians remain in `trend.fields.*.endpoint_loss`.
+
+This avoids treating different phases of recurring temporary allocations as
+proof of a progressive leak. It does not establish which allocator owns those
+allocations, exclude slower leaks, or replace settled recovery and allocation,
+decoder, watchdog, reboot and output checks. Long irregular cycles can still
+affect the statistic. Observation boundaries and thresholds must not be shifted
+after seeing a failure. Tests include artificial loss on top of periodic data,
+late losses, fragmentation and loss injected into real FLAC observations:
+`python tests/test-heap-trend.py`.
+
+`review_finite_memory.py SAVED_PUBLIC_FILE_DIRECTORY --output NEW_JSON` retains
+original case verdicts and input hashes while independently checking format,
+memory, decoder, DMA output and natural-EOF recovery. It neither overwrites the
+original report nor substitutes a retrospective review for a new hardware run.

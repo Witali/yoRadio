@@ -6,7 +6,6 @@ heap budgets from actual faults, progressive loss and response-time failures.
 """
 import argparse
 import json
-import statistics
 import time
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -17,6 +16,7 @@ from production_health import HealthBoard, check_health, output_window
 from public_streams import DEFAULT_MANIFEST, probe, public_url
 from run import Capture, Suite
 from trace_transport import TransportTrace
+from heap_trend import heap_trend
 
 WARMUP_SECONDS = 15
 
@@ -49,10 +49,9 @@ def check_memory(health, *, enforce_legacy_floor=False):
     for row in health:
         if 'decoder_failure' in row:
             require(row['decoder_failure']['sequence'] == 0, 'Firmware reported a decoder failure')
-    for key,tolerance in (('heap',2048),('largest',4096)):
-        require(statistics.median(r[key] for r in health[:3])-
-                statistics.median(r[key] for r in health[-3:]) <= tolerance,
-                'Progressive '+key+' loss')
+    result['trend'] = heap_trend(health)
+    for key, trend in result['trend']['fields'].items():
+        require(not trend['loss_detected'], 'Progressive '+key+' loss')
     return result
 
 

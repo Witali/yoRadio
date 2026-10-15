@@ -223,3 +223,22 @@ at 110,592 B. No failed TCP connect was recorded in this campaign. The controlle
 restored the original production application, verified settings and stopped
 playback. The earlier TCP timeout remains historical evidence; its cause has
 not been identified by this successful transport observation.
+
+### Memory-check correction and independent replay
+
+The shared check now compares the first/last contiguous thirds, retaining the
+same 2,048/4,096-byte tolerances and a separate late-fall check below the initial
+range. The old three-sample endpoint loss remains visible. Seven trend tests
+cover phase aliasing, slopes, loss superimposed on recurring allocations, abrupt
+late loss and fragmentation, including losses injected into both real FLAC
+recordings. The existing sustained-output, public-file, health and quiet gate
+tests also pass; no firmware or decoder code changed.
+
+The [separate retrospective review](../tests/results/esp32c3-input-tail-quiet-20261015/memory-review/review.json)
+keeps hashes and original case results. All six files pass independent format,
+memory, decoder, output and natural-EOF recovery checks on the original time
+boundaries. FLAC median heap loss over thirds is +324 / -236 B and largest-block
+loss is zero in both cases. Each original FLAC failure remains in the original
+14/16 report. This resolves the observed endpoint-comparison false alarm; it
+does not prove allocation ownership or exclude slower leaks. A fresh hardware
+run with the revised runner, quiet network/transition and OTA checks remain due.
