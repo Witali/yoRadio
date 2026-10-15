@@ -13,7 +13,7 @@ from common import (Blocked, Board, Failure, Report, check_cpu, check_playback,
                     check_recovery_heap, check_transitions, fixtures, require,
                     filter_tls_line, check_certificate_rejection, exception_details,
                     check_file_runtime, check_natural_eof)
-from production_health import capture_failure_snapshot, check_decoder_health
+from production_health import capture_failure_snapshot, check_decoder_health, output_window
 from audio_test_server.server import Server
 from audio_test_server.fixtures import SEQUENCES
 from serial_lines import serial_lines
@@ -49,6 +49,25 @@ class Capture:
         if self.port:
             self.thread.join(timeout=2)
             self.port.close()
+
+
+def check_file_output(states, health):
+    """Paired steady-play evidence only; startup and EOF idle DMA are excluded."""
+    require(len(states) == len(health), 'Unpaired file status/health evidence')
+    require(all(b['seconds'] > a['seconds'] for a,b in zip(states,states[1:])),
+            'Nonmonotonic file observation')
+    # Match check_playback's existing two-second startup allowance. Do not
+    # filter stopped or invalid PCM rows out of the interior of this window.
+    pairs = [(s,h) for s,h in zip(states,health) if s['seconds'] >= 2]
+    require(len(pairs) >= 5, 'Missing steady file output evidence')
+    require(all(s.get('audio') is True and s.get('pcm_sample_rate',0) > 0 and
+                s.get('pcm_channels',0) > 0 for s,h in pairs),
+            'Missing decoded playback inside file output window')
+    result = output_window([h for s,h in pairs])
+    result.update(first_seconds=pairs[0][0]['seconds'],last_seconds=pairs[-1][0]['seconds'])
+    require(result['completion_queue_drops'] == 0, 'I2S completion queue overflow during file playback')
+    require(result['write_errors'] == 0, 'I2S write error during file playback')
+    return result
 
 
 class Suite:
@@ -101,12 +120,15 @@ class Suite:
         health_start = len(getattr(self.board, 'health_samples', []))
         try:
             self.start(name, mode, hint, origin)
+            play_health_start = len(getattr(self.board, 'health_samples', []))
             samples = self.observe(max(7, spec['seconds']-3), name)
             evidence = check_playback(samples, spec)
+            play_health = list(getattr(self.board, 'health_samples', [])[play_health_start:])
             tail = self.observe(8, name + ':eof')
             evidence['eof'] = check_natural_eof(tail)
             if hasattr(self.board, 'health_samples'):
                 evidence['decoder_health'] = check_decoder_health(self.board.health_samples[health_start:])
+                evidence['output'] = check_file_output(samples, play_health)
             check_file_runtime(self.capture.since(started))
             evidence['serial_capture_enabled'] = self.capture.port is not None
             # Natural EOF is verified before cleanup below.

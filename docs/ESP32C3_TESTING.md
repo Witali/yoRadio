@@ -24,6 +24,18 @@ The current stream-confirmation matrix has no absolute free-RAM floor. Its
 allocation, restart, watchdog and active-output checks remain strict. Prefix
 control tests check settled heap recovery, not an absolute minimum RAM value.
 
+Finite-file cases through `Suite.file()` now also require zero new DMA
+completion-queue drops and write errors when a `HealthBoard` supplies telemetry.
+Status and health observations must be paired. The output window uses the same
+two-second startup allowance as the existing format check and ends before the
+separate EOF observation; idle DMA events after EOF are excluded. At least five
+steady observations with decoded PCM are required; stopped/interrupted rows
+inside that window cannot be filtered away. Natural EOF does not override an
+output failure. Raw health and a pre-cleanup failure snapshot remain available.
+Older 28/28 file reports predate this output gate and must not be presented as
+evidence that it passed. This is a sampled digital window, not complete PCM or
+acoustic capture. Regression: `python tests/test-quiet-file-gates.py` (7 tests).
+
 `sustained_output.py` now uses this policy by default: the historical 16/8 KiB
 free/largest floor is reported as `legacy_floor_pass`, while actual faults,
 progressive heap loss and settled recovery remain gates. Use

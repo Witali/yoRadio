@@ -117,7 +117,7 @@ def main():
     report=Report(a.output/'report.json',identity)
     report.data.update(image=image, sdkconfig_sha256=sha(a.firmware.with_name('sdkconfig').read_bytes()),
         fixture_hashes={k:v['sha256'] for k,v in specs.items()}, suites=a.suite,
-        scope='Quiet format/EOF, heap, allocation/watchdog and reboot detection; public cases also check decoder faults and sampled output counters. No PCM/acoustic claim',
+        scope='Quiet format/EOF, heap, allocation/watchdog and reboot detection; file/public cases also check decoder faults and sampled steady output counters. No PCM/acoustic claim',
         public_memory_policy='legacy-absolute-floor' if a.enforce_legacy_heap_floor else 'faults-and-recovery',
         health_http_requests_per_status=1, serial_capture_enabled=False,
         public_seconds=a.seconds, idle={}, actions=[])
