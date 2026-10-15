@@ -1,6 +1,6 @@
 # Bounded format confirmation: core and queue integration
 
-## Current state (2026-10-14)
+## Current state (2026-10-15)
 
 `stream_confirm.h` implements and tests a bounded confirmation core over a
 caller-owned byte window. `audio_service.c` now calls it through `stream_start.h`
@@ -34,6 +34,17 @@ reproduces 48 output completion drops during a 1.51-second pause, while shorter
 0.51/1.00-second pauses pass. Recent output-task checkpoints and old input/PCM
 ages support buffered-data exhaustion in that test. Next compare bounded AAC
 input expansion, preserving TLS reserve and late SBR/PS transition coverage.
+
+The [retained-owner expansion](ESP32C3_AAC_RETAIN_INPUT_20261015.md) reduces
+some pause events but fails a real allocation during TLS profile changes;
+production growth remains off. [Input utilization](ESP32C3_INPUT_USAGE_20261015.md)
+then finds partially filled READY slots. The opt-in
+[tail-coalescing experiment](ESP32C3_INPUT_TAIL_20261015.md) raises median READY
+fill from 56.87% to 100% with the original four slots and unchanged static RAM.
+The long imposed pause still fails output acceptance (45 events versus 47 in
+the utilization control), so fuller packets do not close the playback goal.
+Host ownership/framing tests pass; hardware qualification is tracked in that
+experiment's report. All original quiet-image and TCP failures remain open.
 
 The previous FFmpeg comparison identified false MP3 headers before AAC and false
 AAC headers before MP3 as unresolved failures. The new core rejects those
