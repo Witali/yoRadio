@@ -1,0 +1,62 @@
+{
+  "generator": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "source_sha256": "47ecdd824d426393728e03e12267fab9602b800dcbcb641737cf997174bac81a",
+  "source_filter": [
+    "anoisesrc=color=white:amplitude=0.34:sample_rate=48000:duration=610:seed=12345[nl]",
+    "anoisesrc=color=pink:amplitude=0.34:sample_rate=48000:duration=610:seed=67890[nr]",
+    "sine=frequency=997:sample_rate=48000:duration=610:beep_factor=2[tl]",
+    "sine=frequency=1601:sample_rate=48000:duration=610:beep_factor=2[tr]",
+    "[nl][tl]amix=inputs=2:weights='0.72 0.28':normalize=0[left]",
+    "[nr][tr]amix=inputs=2:weights='0.72 0.28':normalize=0[right]",
+    "[left][right]amerge=inputs=2,alimiter=limit=0.95[out]"
+  ],
+  "source_bits": 16,
+  "fixtures": [
+    {
+      "name": "stress-vorbis-48000-2ch-16bit-610s",
+      "file": "stress-vorbis-48000-2ch-16bit-610s.ogg",
+      "seconds": 610.0,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "vorbis",
+      "mime": "audio/ogg",
+      "profile": "vorbis",
+      "sha256": "e5b134198b71f55cec564be78250f6554e29e365061f40faafb3e5c8c12e84b8",
+      "bytes": 38663491,
+      "average_kbps": 507.0621770491803,
+      "encoder_options": [
+        "-c:a",
+        "libvorbis",
+        "-q:a",
+        "10"
+      ]
+    },
+    {
+      "name": "stress-opus-48000-2ch-16bit-610s",
+      "file": "stress-opus-48000-2ch-16bit-610s.ogg",
+      "seconds": 610.0065,
+      "rate": 48000,
+      "channels": 2,
+      "bits": 16,
+      "codec": "opus",
+      "mime": "audio/ogg",
+      "profile": "opus",
+      "sha256": "86404ec7e17cdff37bfd853987f649f47d80c7a00f8026de4e0b61c9183b3dbb",
+      "bytes": 39091304,
+      "average_kbps": 512.6673764951686,
+      "encoder_options": [
+        "-c:a",
+        "libopus",
+        "-b:a",
+        "510k",
+        "-vbr",
+        "off",
+        "-application",
+        "audio",
+        "-frame_duration",
+        "20"
+      ]
+    }
+  ]
+}

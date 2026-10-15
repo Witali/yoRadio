@@ -24,6 +24,18 @@ The current stream-confirmation matrix has no absolute free-RAM floor. Its
 allocation, restart, watchdog and active-output checks remain strict. Prefix
 control tests check settled heap recovery, not an absolute minimum RAM value.
 
+Finite-file cases through `Suite.file()` now also require zero new DMA
+completion-queue drops and write errors when a `HealthBoard` supplies telemetry.
+Status and health observations must be paired. The output window uses the same
+two-second startup allowance as the existing format check and ends before the
+separate EOF observation; idle DMA events after EOF are excluded. At least five
+steady observations with decoded PCM are required; stopped/interrupted rows
+inside that window cannot be filtered away. Natural EOF does not override an
+output failure. Raw health and a pre-cleanup failure snapshot remain available.
+Older 28/28 file reports predate this output gate and must not be presented as
+evidence that it passed. This is a sampled digital window, not complete PCM or
+acoustic capture. Regression: `python tests/test-quiet-file-gates.py` (7 tests).
+
 `sustained_output.py` now uses this policy by default: the historical 16/8 KiB
 free/largest floor is reported as `legacy_floor_pass`, while actual faults,
 progressive heap loss and settled recovery remain gates. Use
@@ -1917,3 +1929,99 @@ runs once after the complete sequence. The offline auditor needs
 request names, and boot/uptime continuity between cases as well as within cases.
 Older single-pass reports remain readable. Six host tests cover schedule
 mutation and a synthetic inter-case reboot in an otherwise valid physical report.
+
+## Sustained local playback on a quiet production image
+
+Positive finite-file cases in `run.py` now require the final three EOF
+observations to have `audio=false` **and** `format="stream ended"`; an error or
+explicitly stopped status cannot pass. When used with `HealthBoard` (including
+`quiet_acceptance.py`), every file observation must also contain a zero
+decoder-failure sequence. Failures retain a bounded diagnostic snapshot before
+Stop in `file_failure_snapshots`. Quiet acceptance checks all decoder-health
+rows again at the end. Historical reports keep their original weaker coverage.
+Regression tests: `python tests/test-quiet-file-gates.py`.
+
+Quiet acceptance idle checkpoints require a completed 12-second observation,
+three final stopped statuses and three fresh health samples. A failed Stop or
+observation retains partial health and a bounded diagnostic snapshot in
+`idle_failures`; neither partial samples nor an older checkpoint can pass
+recovery. The original case stays FAIL and dependent recovery is BLOCKED with
+an explicit missing-checkpoint reason. A successful diagnostic request does
+not turn the original timeout into a pass. Regression tests:
+`python tests/test-quiet-idle-gates.py`.
+
+`public_file_acceptance.py` also requires every terminal observation after
+playback to report `stream ended`, even if an error occurs near the expected
+file duration. Decoder-health evidence is mandatory during playback and is
+checked again across the whole campaign. Failed files retain a diagnostic
+snapshot before Stop; idle/recovery uses the same complete-checkpoint rules.
+Absolute low heap is recorded without imposing the legacy floor; progressive
+loss, allocation faults and output faults still fail. Run
+`python tests/test-public-file-acceptance.py` (11 tests). Earlier archived
+public-file reports retain their original coverage.
+
+Use `tools/esp32c3_tests/local_sustained.py` to test a single long, finite
+fixture on an already installed image. The initially stopped board's ELF
+identity must match `--firmware`. No application or private settings are written
+to disk by this controller. It stops playback and verifies settings on exit.
+
+```powershell
+python tools/esp32c3_tests/local_sustained.py --board http://BOARD_IP `
+  --host HOST_IP --firmware firmware/development/VARIANT/app.bin `
+  --fixtures PATH_TO_GENERATED_MANIFEST --fixture FIXTURE_NAME `
+  --seconds 600 --output NEW_RESULT_DIRECTORY
+```
+
+The fixture manifest must provide at least 605 seconds of verified encoded
+audio for a 600-second observation. `/file/` sends the actual continuous
+container at real-time pacing (`1.0`), without concatenating FLAC/Ogg streams.
+Each status observation is paired with health counters. Output deltas exclude
+the first 15 seconds and preserve pre-existing idle/startup counters.
+Decoder diagnostics are mandatory on every retained row. Collection failures
+and failed playback gates retain one bounded snapshot before Stop.
+
+Independent gates cover format, output errors, faults and active memory trend,
+then settled recovery after Stop. A passing collection does not override a
+failed gate. Low free RAM alone is diagnostic; allocation failures, progressive
+loss and failure to recover remain errors. These checks do not measure analog
+continuity or CPU utilization and do not replace EOF or HTTPS tests.
+Run `python tests/test-sustained-output.py` and
+`python tests/test-production-health.py` for the shared evidence validators.
+
+For matched delivery-delay experiments, add repeated
+`--delivery-pause BYTE_OFFSET:SECONDS` arguments and optionally
+`--send-buffer-bytes 4096`. Offsets must increase and pauses are bounded to
+two seconds each. The server pauses before those exact encoded bytes, then
+returns to the original pacing schedule. The extra `delivery-pauses` gate
+requires every requested pause to complete within -5/+50 ms of its duration;
+missing, interrupted or materially stretched pauses invalidate the comparison.
+This records host socket writes, not the exact time bytes reach the device.
+Socket buffer sizes and measured output counters are retained even when the
+strict output gate fails. Use the same fixture bytes, schedule and observation
+length for both images; output failures must remain failures. A local HTTP
+comparison isolates delivery behavior but does not reproduce TLS memory use
+or prove the cause of an external station's outage. Host tests:
+`tests/test-local-sustained-pauses.py` and `tests/test-audio-server-pauses.py`.
+
+### Distinguishing heap cycles from persistent losses
+
+The shared quiet-playback memory check now compares median free heap and largest
+block over the first and last contiguous thirds of the selected observations
+(at least three samples each). The tolerances remain 2,048 and 4,096 bytes.
+It also rejects a final three-sample median below the initial third's minimum
+by more than the same tolerance, so an abrupt late fall is not diluted.
+The former first/last-three medians remain in `trend.fields.*.endpoint_loss`.
+
+This avoids treating different phases of recurring temporary allocations as
+proof of a progressive leak. It does not establish which allocator owns those
+allocations, exclude slower leaks, or replace settled recovery and allocation,
+decoder, watchdog, reboot and output checks. Long irregular cycles can still
+affect the statistic. Observation boundaries and thresholds must not be shifted
+after seeing a failure. Tests include artificial loss on top of periodic data,
+late losses, fragmentation and loss injected into real FLAC observations:
+`python tests/test-heap-trend.py`.
+
+`review_finite_memory.py SAVED_PUBLIC_FILE_DIRECTORY --output NEW_JSON` retains
+original case verdicts and input hashes while independently checking format,
+memory, decoder, DMA output and natural-EOF recovery. It neither overwrites the
+original report nor substitutes a retrospective review for a new hardware run.

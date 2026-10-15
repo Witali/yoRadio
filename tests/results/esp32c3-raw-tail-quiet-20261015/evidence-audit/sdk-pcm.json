@@ -1,0 +1,44 @@
+{
+  "scope": "Recompute retained pinned-SDK PCM; not a new emulator run or an all-input bound.",
+  "inputs": {
+    "tests/results/esp32c3-idf61-revision-20261008/qemu/pcm-comparison.json": "4ecbf870da93086af514c78b185364b312924b5cbbb32e8d472344055763577f",
+    "tests/results/esp32c3-idf61-revision-20261008/qemu/report.json": "d32f94178f99458a8d2b9a28f5187aae0fd1fe836792908923e277378a0500f3",
+    "tests/results/esp32c3-idf61-revision-20261008/qemu/late.pcm.gz": "f602bc00f2d8a7ef861af9b1a1e6fcf9506c5bdf06756b5de40ca97e2c1b2437",
+    "tests/results/esp32c3-idf61-revision-20261008/qemu/gaps.pcm.gz": "e64b19558b08aed3f76d3c4cd9be9a9f582729c102077f55e7feaf9471c3a7e3",
+    "tests/results/esp32c3-aac-metadata-20261004/reference/late.pcm.gz": "c6a8286ebe9fee7dde8325ef9bdd134a8c447757ecc4dc45144e94ff0afff260",
+    "tests/results/esp32c3-aac-metadata-20261004/pc19/late.pcm.gz": "f602bc00f2d8a7ef861af9b1a1e6fcf9506c5bdf06756b5de40ca97e2c1b2437",
+    "tests/results/esp32c3-aac-metadata-20261004/reference/gaps.pcm.gz": "f37685794b88d0340405f19a9489cd963f933c58764a58ae8a1d1eb6d9792ea7",
+    "tests/results/esp32c3-aac-metadata-20261004/pc19/gaps.pcm.gz": "e64b19558b08aed3f76d3c4cd9be9a9f582729c102077f55e7feaf9471c3a7e3"
+  },
+  "comparisons": [
+    {
+      "case": "late",
+      "reference": "tests\\results\\esp32c3-aac-metadata-20261004\\reference\\late.pcm.gz",
+      "samples": 189440,
+      "peak_lsb": 2,
+      "limit_lsb": 3
+    },
+    {
+      "case": "late",
+      "reference": "tests\\results\\esp32c3-aac-metadata-20261004\\pc19\\late.pcm.gz",
+      "samples": 189440,
+      "peak_lsb": 0,
+      "limit_lsb": 0
+    },
+    {
+      "case": "gaps",
+      "reference": "tests\\results\\esp32c3-aac-metadata-20261004\\reference\\gaps.pcm.gz",
+      "samples": 675840,
+      "peak_lsb": 2,
+      "limit_lsb": 3
+    },
+    {
+      "case": "gaps",
+      "reference": "tests\\results\\esp32c3-aac-metadata-20261004\\pc19\\gaps.pcm.gz",
+      "samples": 675840,
+      "peak_lsb": 0,
+      "limit_lsb": 0
+    }
+  ],
+  "passed": true
+}

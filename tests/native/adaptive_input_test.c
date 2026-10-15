@@ -141,13 +141,16 @@ static void *producer(void *unused) {
     (void)unused;
     for (uint32_t n = 0; n < STRESS_PACKETS; ++n) {
         size_t size = stress_size(n);
+        bool trim = n % 2;
+        size_t acquired_size = trim ? (stress_control && n % CONTROL_INTERVAL == 0
+            ? CONTROL_BYTES : PACKET_CAPACITY) : size;
         void *p;
         assert(stress_control && n % CONTROL_INTERVAL == 0
-            ? adaptive_input_acquire_control(queue, &p, size, 5000)
-            : adaptive_input_acquire(queue, &p, size, 5000));
+            ? adaptive_input_acquire_control(queue, &p, acquired_size, 5000)
+            : adaptive_input_acquire(queue, &p, acquired_size, 5000));
         memcpy(p, &n, sizeof(n));
         memset((uint8_t *)p + 4, (uint8_t)n, size - 4);
-        assert(adaptive_input_commit(queue, p));
+        assert(trim ? adaptive_input_commit_size(queue, p, size) : adaptive_input_commit(queue, p));
         if (n % 97 == 0) {
             adaptive_input_set_limit(queue, (n / 97) % 2 ? 4 : 8);
             adaptive_input_restore(queue);
@@ -176,6 +179,9 @@ static void *reclaimer(void *unused) {
         adaptive_input_release_one(queue);
         adaptive_input_stats_t s = adaptive_input_stats(queue);
         assert(s.resident >= s.minimum && s.occupied <= s.resident);
+        assert(s.ready + s.reading + s.writing == s.occupied);
+        assert(s.ready_bytes <= s.ready * s.packet_capacity);
+        assert(s.reading_bytes <= s.reading * s.packet_capacity);
         struct timespec delay = {0, 100000};
         nanosleep(&delay, NULL);
     } while (!atomic_load(&done));
@@ -352,7 +358,41 @@ static void test_deferred_limit(void) {
     assert(!adaptive_input_restore_one(NULL));
 }
 
+static void test_committed_sizes(void) {
+    adaptive_input_t *q=adaptive_input_create(8000,8000,PACKET_CAPACITY);
+    void *p,*other;size_t size;
+    assert(q && !adaptive_input_commit_size(NULL,NULL,1));
+    assert(adaptive_input_acquire(q,&p,100,0));
+    assert(adaptive_input_acquire(q,&other,200,0));
+    assert(!adaptive_input_commit_size(q,p,0));
+    assert(!adaptive_input_commit_size(q,p,101)); // Requested extent, not slot capacity.
+    assert(!adaptive_input_commit_size(q,(uint8_t *)p+1,20));
+    adaptive_input_stats_t s=adaptive_input_stats(q);
+    assert(s.writing==2 && !s.ready && !s.reading && !s.ready_bytes);
+    memset(p,0x57,37);
+    assert(adaptive_input_commit_size(q,p,37));
+    assert(!adaptive_input_commit_size(q,p,1)); // Cannot trim published data.
+    s=adaptive_input_stats(q);
+    assert(s.ready==1 && s.ready_bytes==37 && s.writing==1);
+    assert(adaptive_input_receive(q,&size,0)==p && size==37);
+    assert(!adaptive_input_commit_size(q,p,1));
+    s=adaptive_input_stats(q);
+    assert(s.reading==1 && s.reading_bytes==37 && !s.ready_bytes);
+    for(size_t i=0;i<size;++i)assert(((uint8_t *)p)[i]==0x57);
+    assert(adaptive_input_return(q,p));assert(adaptive_input_cancel(q,other));
+    alignas(max_align_t) uint8_t control[CONTROL_BYTES];
+    assert(adaptive_input_attach_control(q,control,sizeof(control)));
+    assert(adaptive_input_acquire_control(q,&p,CONTROL_BYTES,0));
+    assert(adaptive_input_commit_size(q,p,12));
+    s=adaptive_input_stats(q);assert(!s.occupied && !s.ready && !s.ready_bytes);
+    assert(adaptive_input_receive(q,&size,0)==p && size==12);
+    assert(adaptive_input_return(q,p));
+    s=adaptive_input_stats(q);assert(!s.occupied && !s.reading_bytes);
+    cleanup(q);
+}
+
 int main(void) {
+    test_committed_sizes();
     {
         adaptive_input_t *cancel_queue=adaptive_input_create(16000,8000,PACKET_CAPACITY);
         assert(cancel_queue);void *leases[8];size_t received_size;

@@ -1,0 +1,32 @@
+#pragma once
+
+#define AUDIO_STATUS_STATION_UNAVAILABLE "station unavailable"
+
+// Terminal markers travel after encoded data and then after PCM. The internal
+// codec-drain marker ends a decoder segment only and must never stop output.
+// Zero is reserved for ordinary data packets.
+enum {
+    AUDIO_CONTINUE = 0,
+    AUDIO_END_EOF,
+    AUDIO_END_READ_FAILED,
+    AUDIO_END_BUFFER_STALLED,
+    AUDIO_END_UNAVAILABLE,
+    AUDIO_END_FORMAT_UNKNOWN,
+    AUDIO_END_FRAME_TRUNCATED,
+    AUDIO_DRAIN_CODEC,
+};
+
+static inline int audio_completion_is_terminal(unsigned reason) {
+    return reason != AUDIO_CONTINUE && reason != AUDIO_DRAIN_CODEC;
+}
+
+static inline const char *audio_completion_status(unsigned reason) {
+    switch (reason) {
+        case AUDIO_END_FRAME_TRUNCATED: return "truncated audio frame";
+        case AUDIO_END_FORMAT_UNKNOWN: return "unknown audio format";
+        case AUDIO_END_READ_FAILED: return "stream read failed";
+        case AUDIO_END_BUFFER_STALLED: return "buffer stalled";
+        case AUDIO_END_UNAVAILABLE: return AUDIO_STATUS_STATION_UNAVAILABLE;
+        default: return "stream ended";
+    }
+}

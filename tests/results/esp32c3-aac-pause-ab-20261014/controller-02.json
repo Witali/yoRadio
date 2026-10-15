@@ -1,0 +1,94 @@
+{
+  "initial": {
+    "version": "idf61-prod-20261013",
+    "partition": "app1",
+    "max_size": 1900544,
+    "app_elf_sha256": "dc06c1a61da089e10f4d22855f05b7e0e4168e35b1810c40751472ccdad9cbe8"
+  },
+  "images": {
+    "baseline": {
+      "app_elf_sha256": "dc06c1a61da089e10f4d22855f05b7e0e4168e35b1810c40751472ccdad9cbe8",
+      "sha256": "f31ffba883053cf33d7f2e928bf529e5cbcac8f14a8aafd172e835a027684631",
+      "bytes": 1461376
+    },
+    "candidate": {
+      "app_elf_sha256": "30a89eacd0564a3264ff78da5578077778bf50d92bff51fed66787829f21eb43",
+      "sha256": "832ad10f31dbfa2aebe1b9b01012a4b2c4fab3a7bad75bfce45e3c7cc84375bb",
+      "bytes": 1474352
+    }
+  },
+  "sequence": [
+    "baseline-before",
+    "candidate",
+    "baseline-after"
+  ],
+  "runs": [
+    {
+      "name": "baseline-before",
+      "installation": {
+        "identity": {
+          "version": "idf61-prod-20261013",
+          "partition": "app1",
+          "max_size": 1900544,
+          "app_elf_sha256": "dc06c1a61da089e10f4d22855f05b7e0e4168e35b1810c40751472ccdad9cbe8"
+        },
+        "settings": {
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        }
+      },
+      "exit_code": 0
+    },
+    {
+      "name": "candidate",
+      "installation": {
+        "identity": {
+          "version": "idf61-confirm-20261014",
+          "partition": "app0",
+          "max_size": 1900544,
+          "app_elf_sha256": "30a89eacd0564a3264ff78da5578077778bf50d92bff51fed66787829f21eb43"
+        },
+        "settings": {
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        }
+      },
+      "exit_code": 0
+    },
+    {
+      "name": "baseline-after",
+      "installation": {
+        "identity": {
+          "version": "idf61-prod-20261013",
+          "partition": "app1",
+          "max_size": 1900544,
+          "app_elf_sha256": "dc06c1a61da089e10f4d22855f05b7e0e4168e35b1810c40751472ccdad9cbe8"
+        },
+        "settings": {
+          "wifi_unchanged": true,
+          "playlist_unchanged": true,
+          "settings_unchanged": true
+        }
+      },
+      "exit_code": 0
+    }
+  ],
+  "controller_sha256": "cbba5d312ad2767c299b9523e9274b2c9a41b6eb904d77bdc5d0b25ad91b3595",
+  "scope": "Matched finite HTTP pause experiment; not TLS or proof of the public-station failure cause",
+  "restored": {
+    "identity": {
+      "version": "idf61-prod-20261013",
+      "partition": "app1",
+      "max_size": 1900544,
+      "app_elf_sha256": "dc06c1a61da089e10f4d22855f05b7e0e4168e35b1810c40751472ccdad9cbe8"
+    },
+    "settings": {
+      "wifi_unchanged": true,
+      "playlist_unchanged": true,
+      "settings_unchanged": true
+    },
+    "stopped": true
+  }
+}

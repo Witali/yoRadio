@@ -65,39 +65,41 @@ static void *concurrent_client(void *argument) {
     return NULL;
 }
 
-#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+#ifdef YORADIO_INPUT_EXPANSION_ENABLED
+static size_t tested_headroom;
 static void consume_headroom(void) {
-    fake_free = FLAC_INPUT_HEAP_HEADROOM + 2060 - 1;
+    fake_free = tested_headroom + 2060 - 1;
 }
-static void test_flac_growth(void) {
-    tls_input_reserve_expand_flac(); // Unbound lifetime is safe.
+static void test_input_growth(void (*expand)(void), size_t headroom) {
+    tested_headroom = headroom;
+    expand(); // Unbound lifetime is safe.
     tls_input_reserve_finish_connection();
     adaptive_input_t *q = adaptive_input_create(16000, 8000, 2060);
     assert(q);
     tls_input_reserve_bind(q);
     for (unsigned boundary = 0; boundary < 3; ++boundary) {
-        const size_t low[] = {0, FLAC_INPUT_HEAP_HEADROOM - 1,
-                             FLAC_INPUT_HEAP_HEADROOM + 2060 - 1};
+        const size_t low[] = {0, headroom - 1,
+                             headroom + 2060 - 1};
         fake_free = low[boundary];
-        tls_input_reserve_expand_flac();
+        expand();
         assert(adaptive_input_stats(q).resident == 4);
     }
     fake_free = 100000;
     atomic_store(&fail_after, 2);
-    tls_input_reserve_expand_flac();
+    expand();
     assert(adaptive_input_stats(q).resident == 6); // Partial OOM preserves data.
     atomic_store(&fail_after, -1);
     tls_input_reserve_finish_connection();
     assert(adaptive_input_stats(q).resident == 4);
     after_allocation = consume_headroom;
-    tls_input_reserve_expand_flac();
+    expand();
     assert(adaptive_input_stats(q).resident == 5); // Recheck before each slot.
     tls_input_reserve_finish_connection();
     fake_free = 100000;
     unsigned char *tls = test_tls_calloc(1, 16749);
     assert(tls == s_tls_large_storage);
     memset(tls, 0x72, 16749);
-    tls_input_reserve_expand_flac();
+    expand();
     assert(adaptive_input_stats(q).resident == 8);
     // End a fully queued stream with one consumer lease and one producer lease.
     void *packets[8];
@@ -124,7 +126,7 @@ static void test_flac_growth(void) {
     // Its ordinary preparation must leave the idle floor buffers in place.
     void *baseline[4];
     for (unsigned i = 0; i < 4; ++i) baseline[i] = q->slots[i].data;
-    tls_input_reserve_expand_flac();
+    expand();
     for (unsigned i = 0; i < 8; ++i) {
         assert(adaptive_input_acquire(q, &packets[i], sizeof(i), 0));
         memcpy(packets[i], &i, sizeof(i));
@@ -156,7 +158,7 @@ static void test_flac_growth(void) {
     // The saved user target is an independent upper bound on expansion.
     q = adaptive_input_create(12000, 8000, 2060);
     tls_input_reserve_bind(q);
-    tls_input_reserve_expand_flac();
+    expand();
     assert(adaptive_input_stats(q).resident == 6);
     assert(adaptive_input_stats(q).limit == 6);
     tls_input_reserve_bind(NULL);
@@ -267,7 +269,10 @@ int main(void) {
 #endif
     fake_largest = 200000;
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
-    test_flac_growth();
+    test_input_growth(tls_input_reserve_expand_flac, INPUT_EXPANSION_HEAP_HEADROOM);
+#endif
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+    test_input_growth(tls_input_reserve_expand_aac, CONFIG_YORADIO_AAC_INPUT_HEADROOM_BYTES);
 #endif
     pthread_t clients[4];
     for (uintptr_t i = 0; i < 4; ++i)

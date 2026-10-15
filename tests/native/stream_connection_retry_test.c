@@ -7,7 +7,10 @@
 #include <stdatomic.h>
 #include <setjmp.h>
 #include "icy_title.h"
+#include "stream_probe.h"
 /* PRODUCTION_PROFILE_HEADER */
+#define AUDIO_PROBE_FLAG(field, value) ((void)0)
+#define AUDIO_PROBE_STAMP(field) ((void)0)
 #define AUDIO_STATUS_STATION_UNAVAILABLE "station unavailable"
 
 typedef int esp_err_t;
@@ -16,11 +19,12 @@ enum { ESP_OK=0, ESP_FAIL=-1, ESP_ERR_HTTP_CONNECT=0x7001, ESP_ERR_HTTP_WRITE_DA
        ESP_ERR_HTTP_EAGAIN, ESP_ERR_TIMEOUT, ESP_ERR_HTTP_FETCH_HEADER,
        ESP_ERR_HTTP_MAX_REDIRECT, ESP_ERR_HTTP_INVALID_TRANSPORT };
 enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_AAC, NATIVE_CODEC_FLAC, AUDIO_END_EOF,
-       AUDIO_END_BUFFER_STALLED, AUDIO_END_READ_FAILED, AUDIO_END_UNAVAILABLE };
+       AUDIO_END_BUFFER_STALLED, AUDIO_END_READ_FAILED, AUDIO_END_UNAVAILABLE,
+       AUDIO_END_FORMAT_UNKNOWN };
 enum { ESP_ERR_MBEDTLS_SSL_READ_FAILED=0x801d,
        ESP_TLS_ERR_SSL_TIMEOUT=-0x6800, ESP_TLS_ERR_SSL_WANT_READ=-0x6900,
        ESP_TLS_ERR_SSL_WANT_WRITE=-0x6880, TEST_TLS_ALLOCATION_ERROR=141 };
-enum { STREAM_CHUNK_SIZE = 2048, STREAM_READ_TIMEOUT_MS = 250,
+enum { STREAM_CHUNK_SIZE = 2048,
        MAX_HTTP_REDIRECTS = 5, ICY_METADATA_MAX = 4080 };
 typedef uint32_t TickType_t;
 #define portMAX_DELAY UINT32_MAX
@@ -46,12 +50,13 @@ typedef struct {
 } esp_http_client_config_t;
 enum { HTTP_TLS_DYN_BUF_RX_STATIC=1 };
 #define esp_crt_bundle_attach NULL
-typedef struct { bool live; } fake_client_t;
+typedef struct { bool live; int timeout_ms; } fake_client_t;
 typedef fake_client_t *esp_http_client_handle_t;
 /* PRODUCTION_HTTP_READER_TYPE */
 typedef struct { int result, status; bool bad_headers; } attempt_t;
 static fake_client_t client;
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+#define YORADIO_INPUT_EXPANSION_ENABLED 1
 static atomic_uint s_flac_input_ready_generation;
 static unsigned growth_calls, finish_calls, finite_reads, read_calls, ready_on_read;
 static void tls_input_reserve_expand_flac(void) {
@@ -109,10 +114,11 @@ static void stream_bitrate_add(uint32_t gen, stream_bitrate_meter_t *meter, size
     (void)gen; (void)meter; (void)size;
 }
 static bool send_stream_audio(uint32_t gen, native_codec_t *codec, const void *data,
-                              size_t size, bool *first) {
-    (void)gen; (void)codec; (void)data; (void)size; (void)first;
+                              size_t size, bool *first, stream_probe_t *probe) {
+    (void)gen; (void)codec; (void)data; (void)size; (void)first; (void)probe;
     return send_ok;
 }
+/* PRODUCTION_STREAM_HELPERS */
 static bool send_encoded(uint32_t gen, native_codec_t codec, const void *data, size_t size, uint8_t eos) {
     (void)gen; (void)codec; (void)data; (void)size;
     ++eos_count; eof_reason = eos; return true;
@@ -183,11 +189,13 @@ static int esp_http_client_set_redirection(esp_http_client_handle_t c) { (void)c
 static void esp_http_client_close(esp_http_client_handle_t c) { assert(c->live); ++close_count; }
 static void esp_http_client_cleanup(esp_http_client_handle_t c) { assert(c->live); c->live = false; }
 /* PRODUCTION_DISPOSE_CLIENT */
-static void esp_http_client_set_timeout_ms(esp_http_client_handle_t c, int timeout) { (void)c; (void)timeout; }
+static void esp_http_client_set_timeout_ms(esp_http_client_handle_t c, int timeout) { c->timeout_ms = timeout; }
 static int esp_http_client_get_response_header(esp_http_client_handle_t c, const char *key, char **value) {
     (void)c; (void)key; (void)value; return ESP_FAIL;
 }
 static int esp_http_client_read(esp_http_client_handle_t c, char *data, size_t size) {
+    assert(c->timeout_ms == CONFIG_YORADIO_STREAM_READ_TIMEOUT_MS);
+    assert(size == CONFIG_YORADIO_STREAM_READ_BYTES);
     now_us += read_step_us;
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
     ++read_calls;

@@ -1,0 +1,3249 @@
+[
+  {
+    "case": "slots11/control",
+    "results": {
+      "PASS": 9,
+      "FAIL": 0,
+      "BLOCKED": 0
+    },
+    "failures": [],
+    "health": {
+      "samples": 145,
+      "boot_id": "5097a4c612f3dd33",
+      "minimum_heap": 57208,
+      "minimum_largest": 40960,
+      "allocation_failures": 0,
+      "task_watchdog_events": 0
+    },
+    "decoder": {
+      "samples": 145,
+      "decoder_failures": 0
+    },
+    "pipeline": {
+      "output": {
+        "samples": 104,
+        "elapsed_ms": 55383,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      },
+      "timer_hz": 1000000,
+      "phase_drops": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "retained_events": 0,
+      "overwritten_events": 0,
+      "events": [],
+      "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+    },
+    "resident_slots": [
+      11
+    ],
+    "input_queue_first": {
+      "resident": 11,
+      "occupied": 11,
+      "minimum": 4,
+      "limit": 11,
+      "packet_capacity": 2060,
+      "ready": 10,
+      "reading": 1,
+      "writing": 0,
+      "ready_bytes": 20600,
+      "reading_bytes": 2060
+    },
+    "requested_pauses": [],
+    "measured_pauses": [],
+    "drop_intervals": []
+  },
+  {
+    "case": "slots11/pauses",
+    "results": {
+      "PASS": 8,
+      "FAIL": 1,
+      "BLOCKED": 0
+    },
+    "failures": [
+      {
+        "name": "flac:pauses",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "Natural EOF was not observed",
+        "seconds": 67.365
+      }
+    ],
+    "health": {
+      "samples": 139,
+      "boot_id": "5097a4c612f3dd33",
+      "minimum_heap": 57432,
+      "minimum_largest": 40960,
+      "allocation_failures": 0,
+      "task_watchdog_events": 0
+    },
+    "decoder": {
+      "samples": 139,
+      "decoder_failures": 0
+    },
+    "pipeline": {
+      "output": {
+        "samples": 99,
+        "elapsed_ms": 54945,
+        "completion_queue_drops": 303,
+        "write_errors": 0
+      },
+      "timer_hz": 1000000,
+      "phase_drops": [
+        2,
+        59,
+        0,
+        1,
+        0,
+        3,
+        0,
+        238
+      ],
+      "retained_events": 119,
+      "overwritten_events": 184,
+      "events": [
+        {
+          "sequence": 4997,
+          "timestamp_us": 137801222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137031,
+            137946
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.687,
+            "pcm_packet": 52.989,
+            "encoded_packet": 57.561,
+            "http_read": 57.597
+          }
+        },
+        {
+          "sequence": 4998,
+          "timestamp_us": 137811893,
+          "phases": 1,
+          "observed_uptime_ms": [
+            137031,
+            137946
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.312,
+            "pcm_packet": 63.66,
+            "encoded_packet": 3.031,
+            "http_read": 3.101
+          }
+        },
+        {
+          "sequence": 4999,
+          "timestamp_us": 137822560,
+          "phases": 1,
+          "observed_uptime_ms": [
+            137031,
+            137946
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.989,
+            "pcm_packet": 74.327,
+            "encoded_packet": 13.698,
+            "http_read": 13.768
+          }
+        },
+        {
+          "sequence": 5000,
+          "timestamp_us": 137939891,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137031,
+            137946
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.359,
+            "pcm_packet": 53.088,
+            "encoded_packet": 131.029,
+            "http_read": 131.099
+          }
+        },
+        {
+          "sequence": 5031,
+          "timestamp_us": 138686555,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.021,
+            "pcm_packet": 138.306,
+            "encoded_packet": 146.542,
+            "http_read": 146.612
+          }
+        },
+        {
+          "sequence": 5032,
+          "timestamp_us": 138697227,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.686,
+            "pcm_packet": 148.978,
+            "encoded_packet": 157.214,
+            "http_read": 157.284
+          }
+        },
+        {
+          "sequence": 5033,
+          "timestamp_us": 138707893,
+          "phases": 1,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.342,
+            "pcm_packet": 159.644,
+            "encoded_packet": 8.728,
+            "http_read": 8.799
+          }
+        },
+        {
+          "sequence": 5034,
+          "timestamp_us": 138718555,
+          "phases": 1,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.023,
+            "pcm_packet": 170.306,
+            "encoded_packet": 19.39,
+            "http_read": 19.461
+          }
+        },
+        {
+          "sequence": 5035,
+          "timestamp_us": 138835891,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.359,
+            "pcm_packet": 53.093,
+            "encoded_packet": 73.689,
+            "http_read": 81.338
+          }
+        },
+        {
+          "sequence": 5036,
+          "timestamp_us": 138846556,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.021,
+            "pcm_packet": 63.758,
+            "encoded_packet": 84.354,
+            "http_read": 92.003
+          }
+        },
+        {
+          "sequence": 5037,
+          "timestamp_us": 138857222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.671,
+            "pcm_packet": 74.424,
+            "encoded_packet": 95.02,
+            "http_read": 102.669
+          }
+        },
+        {
+          "sequence": 5038,
+          "timestamp_us": 138867891,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.358,
+            "pcm_packet": 85.093,
+            "encoded_packet": 105.689,
+            "http_read": 113.338
+          }
+        },
+        {
+          "sequence": 5039,
+          "timestamp_us": 138878556,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.017,
+            "pcm_packet": 95.758,
+            "encoded_packet": 116.354,
+            "http_read": 124.003
+          }
+        },
+        {
+          "sequence": 5040,
+          "timestamp_us": 138889222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.686,
+            "pcm_packet": 106.424,
+            "encoded_packet": 127.02,
+            "http_read": 134.669
+          }
+        },
+        {
+          "sequence": 5041,
+          "timestamp_us": 138899893,
+          "phases": 1,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.341,
+            "pcm_packet": 117.095,
+            "encoded_packet": 3.707,
+            "http_read": 3.738
+          }
+        },
+        {
+          "sequence": 5042,
+          "timestamp_us": 138910555,
+          "phases": 1,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.022,
+            "pcm_packet": 127.757,
+            "encoded_packet": 14.369,
+            "http_read": 14.4
+          }
+        },
+        {
+          "sequence": 5043,
+          "timestamp_us": 139027892,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.343,
+            "pcm_packet": 53.188,
+            "encoded_packet": 11.72,
+            "http_read": 11.788
+          }
+        },
+        {
+          "sequence": 5044,
+          "timestamp_us": 139038556,
+          "phases": 7,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.023,
+            "pcm_packet": 63.852,
+            "encoded_packet": 22.384,
+            "http_read": 22.452
+          }
+        },
+        {
+          "sequence": 5045,
+          "timestamp_us": 139049227,
+          "phases": 1,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.554,
+            "pcm_packet": 74.523,
+            "encoded_packet": 2.341,
+            "http_read": 2.383
+          }
+        },
+        {
+          "sequence": 5046,
+          "timestamp_us": 139059888,
+          "phases": 1,
+          "observed_uptime_ms": [
+            137946,
+            139143
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.354,
+            "pcm_packet": 85.184,
+            "encoded_packet": 13.002,
+            "http_read": 13.044
+          }
+        },
+        {
+          "sequence": 5082,
+          "timestamp_us": 139753222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.671,
+            "pcm_packet": 74.401,
+            "encoded_packet": 95.168,
+            "http_read": 129.815
+          }
+        },
+        {
+          "sequence": 5083,
+          "timestamp_us": 139763888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.356,
+            "pcm_packet": 85.067,
+            "encoded_packet": 105.834,
+            "http_read": 140.481
+          }
+        },
+        {
+          "sequence": 5084,
+          "timestamp_us": 139774555,
+          "phases": 7,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.015,
+            "pcm_packet": 95.734,
+            "encoded_packet": 116.501,
+            "http_read": 151.148
+          }
+        },
+        {
+          "sequence": 5085,
+          "timestamp_us": 139785228,
+          "phases": 7,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 6.688,
+            "pcm_packet": 106.407,
+            "encoded_packet": 127.174,
+            "http_read": 161.821
+          }
+        },
+        {
+          "sequence": 5086,
+          "timestamp_us": 139795893,
+          "phases": 7,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.361,
+            "pcm_packet": 117.072,
+            "encoded_packet": 8.785,
+            "http_read": 8.854
+          }
+        },
+        {
+          "sequence": 5087,
+          "timestamp_us": 139806556,
+          "phases": 5,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.012,
+            "pcm_packet": 127.735,
+            "encoded_packet": 19.448,
+            "http_read": 19.517
+          }
+        },
+        {
+          "sequence": 5088,
+          "timestamp_us": 139817227,
+          "phases": 7,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.685,
+            "pcm_packet": 138.406,
+            "encoded_packet": 30.119,
+            "http_read": 30.188
+          }
+        },
+        {
+          "sequence": 5089,
+          "timestamp_us": 139827894,
+          "phases": 7,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.362,
+            "pcm_packet": 149.073,
+            "encoded_packet": 9.18,
+            "http_read": 9.255
+          }
+        },
+        {
+          "sequence": 5090,
+          "timestamp_us": 139838560,
+          "phases": 1,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.02,
+            "pcm_packet": 159.739,
+            "encoded_packet": 8.064,
+            "http_read": 8.138
+          }
+        },
+        {
+          "sequence": 5091,
+          "timestamp_us": 139849224,
+          "phases": 1,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.688,
+            "pcm_packet": 170.403,
+            "encoded_packet": 18.728,
+            "http_read": 18.802
+          }
+        },
+        {
+          "sequence": 5092,
+          "timestamp_us": 139966559,
+          "phases": 7,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.01,
+            "pcm_packet": 53.153,
+            "encoded_packet": 26.966,
+            "http_read": 27.042
+          }
+        },
+        {
+          "sequence": 5093,
+          "timestamp_us": 139977227,
+          "phases": 1,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.807,
+            "pcm_packet": 63.821,
+            "encoded_packet": 2.026,
+            "http_read": 2.1
+          }
+        },
+        {
+          "sequence": 5094,
+          "timestamp_us": 139987888,
+          "phases": 1,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.354,
+            "pcm_packet": 74.482,
+            "encoded_packet": 12.687,
+            "http_read": 12.761
+          }
+        },
+        {
+          "sequence": 5095,
+          "timestamp_us": 140105235,
+          "phases": 7,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 7.703,
+            "pcm_packet": 53.196,
+            "encoded_packet": 60.167,
+            "http_read": 60.201
+          }
+        },
+        {
+          "sequence": 5096,
+          "timestamp_us": 140115893,
+          "phases": 1,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.337,
+            "pcm_packet": 63.854,
+            "encoded_packet": 7.301,
+            "http_read": 7.378
+          }
+        },
+        {
+          "sequence": 5097,
+          "timestamp_us": 140126555,
+          "phases": 1,
+          "observed_uptime_ms": [
+            139143,
+            140225
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.022,
+            "pcm_packet": 74.516,
+            "encoded_packet": 17.963,
+            "http_read": 18.04
+          }
+        },
+        {
+          "sequence": 5126,
+          "timestamp_us": 140958557,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.007,
+            "pcm_packet": 181.261,
+            "encoded_packet": 24.953,
+            "http_read": 25.069
+          }
+        },
+        {
+          "sequence": 5127,
+          "timestamp_us": 140969228,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.695,
+            "pcm_packet": 191.932,
+            "encoded_packet": 35.624,
+            "http_read": 35.74
+          }
+        },
+        {
+          "sequence": 5128,
+          "timestamp_us": 140979888,
+          "phases": 1,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.356,
+            "pcm_packet": 202.592,
+            "encoded_packet": 10.529,
+            "http_read": 10.602
+          }
+        },
+        {
+          "sequence": 5129,
+          "timestamp_us": 141086556,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.019,
+            "pcm_packet": 52.875,
+            "encoded_packet": 36.383,
+            "http_read": 36.453
+          }
+        },
+        {
+          "sequence": 5130,
+          "timestamp_us": 141097222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.683,
+            "pcm_packet": 63.541,
+            "encoded_packet": 47.049,
+            "http_read": 47.119
+          }
+        },
+        {
+          "sequence": 5131,
+          "timestamp_us": 141107893,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.352,
+            "pcm_packet": 74.212,
+            "encoded_packet": 57.72,
+            "http_read": 57.79
+          }
+        },
+        {
+          "sequence": 5132,
+          "timestamp_us": 141118555,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.023,
+            "pcm_packet": 84.874,
+            "encoded_packet": 68.382,
+            "http_read": 68.452
+          }
+        },
+        {
+          "sequence": 5133,
+          "timestamp_us": 141129222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.68,
+            "pcm_packet": 95.541,
+            "encoded_packet": 79.049,
+            "http_read": 79.119
+          }
+        },
+        {
+          "sequence": 5134,
+          "timestamp_us": 141139894,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.16,
+            "pcm_packet": 106.213,
+            "encoded_packet": 89.721,
+            "http_read": 89.791
+          }
+        },
+        {
+          "sequence": 5135,
+          "timestamp_us": 141150560,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.028,
+            "pcm_packet": 116.879,
+            "encoded_packet": 10.397,
+            "http_read": 10.468
+          }
+        },
+        {
+          "sequence": 5136,
+          "timestamp_us": 141161222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.689,
+            "pcm_packet": 127.541,
+            "encoded_packet": 21.059,
+            "http_read": 21.13
+          }
+        },
+        {
+          "sequence": 5137,
+          "timestamp_us": 141171888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.356,
+            "pcm_packet": 138.207,
+            "encoded_packet": 31.725,
+            "http_read": 31.796
+          }
+        },
+        {
+          "sequence": 5138,
+          "timestamp_us": 141182560,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.027,
+            "pcm_packet": 148.879,
+            "encoded_packet": 42.397,
+            "http_read": 42.468
+          }
+        },
+        {
+          "sequence": 5139,
+          "timestamp_us": 141193222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.69,
+            "pcm_packet": 159.541,
+            "encoded_packet": 53.059,
+            "http_read": 53.13
+          }
+        },
+        {
+          "sequence": 5140,
+          "timestamp_us": 141203894,
+          "phases": 1,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.32,
+            "pcm_packet": 170.213,
+            "encoded_packet": 0.036,
+            "http_read": 0.105
+          }
+        },
+        {
+          "sequence": 5141,
+          "timestamp_us": 141214560,
+          "phases": 1,
+          "observed_uptime_ms": [
+            140225,
+            141231
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.01,
+            "pcm_packet": 180.879,
+            "encoded_packet": 10.702,
+            "http_read": 10.771
+          }
+        },
+        {
+          "sequence": 5158,
+          "timestamp_us": 141609226,
+          "phases": 7,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.677,
+            "pcm_packet": 50.516,
+            "encoded_packet": 47.788,
+            "http_read": 47.824
+          }
+        },
+        {
+          "sequence": 5159,
+          "timestamp_us": 141619889,
+          "phases": 7,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.356,
+            "pcm_packet": 61.179,
+            "encoded_packet": 58.451,
+            "http_read": 58.487
+          }
+        },
+        {
+          "sequence": 5160,
+          "timestamp_us": 141630555,
+          "phases": 7,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.022,
+            "pcm_packet": 71.845,
+            "encoded_packet": 69.117,
+            "http_read": 69.153
+          }
+        },
+        {
+          "sequence": 5161,
+          "timestamp_us": 141641227,
+          "phases": 1,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.551,
+            "pcm_packet": 82.517,
+            "encoded_packet": 0.886,
+            "http_read": 0.956
+          }
+        },
+        {
+          "sequence": 5162,
+          "timestamp_us": 141651888,
+          "phases": 1,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.356,
+            "pcm_packet": 93.178,
+            "encoded_packet": 11.547,
+            "http_read": 11.617
+          }
+        },
+        {
+          "sequence": 5163,
+          "timestamp_us": 141662560,
+          "phases": 0,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.48,
+            "pcm_packet": 0.477,
+            "encoded_packet": 22.219,
+            "http_read": 22.289
+          }
+        },
+        {
+          "sequence": 5164,
+          "timestamp_us": 141779893,
+          "phases": 1,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.306,
+            "pcm_packet": 53.185,
+            "encoded_packet": 3.019,
+            "http_read": 3.092
+          }
+        },
+        {
+          "sequence": 5165,
+          "timestamp_us": 141790555,
+          "phases": 1,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.019,
+            "pcm_packet": 63.847,
+            "encoded_packet": 13.681,
+            "http_read": 13.754
+          }
+        },
+        {
+          "sequence": 5166,
+          "timestamp_us": 142003893,
+          "phases": 7,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.342,
+            "pcm_packet": 52.87,
+            "encoded_packet": 73.7,
+            "http_read": 102.729
+          }
+        },
+        {
+          "sequence": 5167,
+          "timestamp_us": 142014555,
+          "phases": 7,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.003,
+            "pcm_packet": 63.532,
+            "encoded_packet": 84.362,
+            "http_read": 113.391
+          }
+        },
+        {
+          "sequence": 5168,
+          "timestamp_us": 142025227,
+          "phases": 7,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.686,
+            "pcm_packet": 74.204,
+            "encoded_packet": 95.034,
+            "http_read": 124.063
+          }
+        },
+        {
+          "sequence": 5169,
+          "timestamp_us": 142035893,
+          "phases": 7,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.343,
+            "pcm_packet": 84.87,
+            "encoded_packet": 8.628,
+            "http_read": 8.698
+          }
+        },
+        {
+          "sequence": 5170,
+          "timestamp_us": 142046562,
+          "phases": 7,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.014,
+            "pcm_packet": 95.539,
+            "encoded_packet": 19.297,
+            "http_read": 19.367
+          }
+        },
+        {
+          "sequence": 5171,
+          "timestamp_us": 142057225,
+          "phases": 7,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.691,
+            "pcm_packet": 106.202,
+            "encoded_packet": 29.96,
+            "http_read": 30.03
+          }
+        },
+        {
+          "sequence": 5172,
+          "timestamp_us": 142067894,
+          "phases": 1,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.358,
+            "pcm_packet": 116.871,
+            "encoded_packet": 5.997,
+            "http_read": 6.069
+          }
+        },
+        {
+          "sequence": 5173,
+          "timestamp_us": 142078555,
+          "phases": 1,
+          "observed_uptime_ms": [
+            141231,
+            142229
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.022,
+            "pcm_packet": 127.532,
+            "encoded_packet": 16.658,
+            "http_read": 16.73
+          }
+        },
+        {
+          "sequence": 5184,
+          "timestamp_us": 142622555,
+          "phases": 7,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.023,
+            "pcm_packet": 63.897,
+            "encoded_packet": 92.995,
+            "http_read": 93.061
+          }
+        },
+        {
+          "sequence": 5185,
+          "timestamp_us": 142633227,
+          "phases": 7,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.692,
+            "pcm_packet": 74.569,
+            "encoded_packet": 103.667,
+            "http_read": 103.733
+          }
+        },
+        {
+          "sequence": 5186,
+          "timestamp_us": 142643888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.356,
+            "pcm_packet": 85.23,
+            "encoded_packet": 114.328,
+            "http_read": 114.394
+          }
+        },
+        {
+          "sequence": 5187,
+          "timestamp_us": 142654560,
+          "phases": 1,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.007,
+            "pcm_packet": 95.902,
+            "encoded_packet": 4.392,
+            "http_read": 4.463
+          }
+        },
+        {
+          "sequence": 5188,
+          "timestamp_us": 142665222,
+          "phases": 1,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.682,
+            "pcm_packet": 106.564,
+            "encoded_packet": 15.054,
+            "http_read": 15.125
+          }
+        },
+        {
+          "sequence": 5189,
+          "timestamp_us": 142771889,
+          "phases": 7,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.346,
+            "pcm_packet": 52.867,
+            "encoded_packet": 57.79,
+            "http_read": 57.862
+          }
+        },
+        {
+          "sequence": 5190,
+          "timestamp_us": 142782555,
+          "phases": 7,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.022,
+            "pcm_packet": 63.533,
+            "encoded_packet": 68.456,
+            "http_read": 68.528
+          }
+        },
+        {
+          "sequence": 5191,
+          "timestamp_us": 142793227,
+          "phases": 7,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.676,
+            "pcm_packet": 74.205,
+            "encoded_packet": 5.248,
+            "http_read": 5.318
+          }
+        },
+        {
+          "sequence": 5192,
+          "timestamp_us": 142803890,
+          "phases": 7,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.333,
+            "pcm_packet": 84.868,
+            "encoded_packet": 15.911,
+            "http_read": 15.981
+          }
+        },
+        {
+          "sequence": 5193,
+          "timestamp_us": 142814559,
+          "phases": 7,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.023,
+            "pcm_packet": 95.537,
+            "encoded_packet": 26.58,
+            "http_read": 26.65
+          }
+        },
+        {
+          "sequence": 5194,
+          "timestamp_us": 142825223,
+          "phases": 7,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.681,
+            "pcm_packet": 106.201,
+            "encoded_packet": 37.244,
+            "http_read": 37.314
+          }
+        },
+        {
+          "sequence": 5195,
+          "timestamp_us": 142835893,
+          "phases": 1,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.249,
+            "pcm_packet": 116.871,
+            "encoded_packet": 2.743,
+            "http_read": 2.814
+          }
+        },
+        {
+          "sequence": 5196,
+          "timestamp_us": 142846555,
+          "phases": 1,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.014,
+            "pcm_packet": 127.533,
+            "encoded_packet": 13.405,
+            "http_read": 13.476
+          }
+        },
+        {
+          "sequence": 5197,
+          "timestamp_us": 142963892,
+          "phases": 7,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.328,
+            "pcm_packet": 52.329,
+            "encoded_packet": 70.53,
+            "http_read": 70.602
+          }
+        },
+        {
+          "sequence": 5198,
+          "timestamp_us": 142974560,
+          "phases": 1,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.014,
+            "pcm_packet": 62.997,
+            "encoded_packet": 5.854,
+            "http_read": 5.927
+          }
+        },
+        {
+          "sequence": 5199,
+          "timestamp_us": 142985222,
+          "phases": 1,
+          "observed_uptime_ms": [
+            142229,
+            143134
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.514,
+            "pcm_packet": 73.659,
+            "encoded_packet": 16.516,
+            "http_read": 16.589
+          }
+        },
+        {
+          "sequence": 5264,
+          "timestamp_us": 144307888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.355,
+            "pcm_packet": 149.096,
+            "encoded_packet": 51.517,
+            "http_read": 51.589
+          }
+        },
+        {
+          "sequence": 5265,
+          "timestamp_us": 144318565,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.018,
+            "pcm_packet": 159.773,
+            "encoded_packet": 3.935,
+            "http_read": 4.007
+          }
+        },
+        {
+          "sequence": 5266,
+          "timestamp_us": 144329222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.69,
+            "pcm_packet": 170.43,
+            "encoded_packet": 14.592,
+            "http_read": 14.664
+          }
+        },
+        {
+          "sequence": 5267,
+          "timestamp_us": 144339888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.355,
+            "pcm_packet": 181.096,
+            "encoded_packet": 25.258,
+            "http_read": 25.33
+          }
+        },
+        {
+          "sequence": 5268,
+          "timestamp_us": 144350560,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.028,
+            "pcm_packet": 191.768,
+            "encoded_packet": 35.93,
+            "http_read": 36.002
+          }
+        },
+        {
+          "sequence": 5269,
+          "timestamp_us": 144361222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.665,
+            "pcm_packet": 202.43,
+            "encoded_packet": 46.592,
+            "http_read": 46.664
+          }
+        },
+        {
+          "sequence": 5270,
+          "timestamp_us": 144371893,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.342,
+            "pcm_packet": 213.101,
+            "encoded_packet": 57.263,
+            "http_read": 57.335
+          }
+        },
+        {
+          "sequence": 5271,
+          "timestamp_us": 144382555,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.016,
+            "pcm_packet": 223.763,
+            "encoded_packet": 67.925,
+            "http_read": 67.997
+          }
+        },
+        {
+          "sequence": 5272,
+          "timestamp_us": 144393227,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.676,
+            "pcm_packet": 234.435,
+            "encoded_packet": 78.597,
+            "http_read": 78.669
+          }
+        },
+        {
+          "sequence": 5273,
+          "timestamp_us": 144403888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.347,
+            "pcm_packet": 245.096,
+            "encoded_packet": 89.258,
+            "http_read": 89.33
+          }
+        },
+        {
+          "sequence": 5274,
+          "timestamp_us": 144414561,
+          "phases": 1,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.569,
+            "pcm_packet": 255.769,
+            "encoded_packet": 0.028,
+            "http_read": 0.107
+          }
+        },
+        {
+          "sequence": 5275,
+          "timestamp_us": 144425227,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.694,
+            "pcm_packet": 266.435,
+            "encoded_packet": 10.694,
+            "http_read": 10.773
+          }
+        },
+        {
+          "sequence": 5276,
+          "timestamp_us": 144435888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.355,
+            "pcm_packet": 277.096,
+            "encoded_packet": 21.355,
+            "http_read": 21.434
+          }
+        },
+        {
+          "sequence": 5277,
+          "timestamp_us": 144446560,
+          "phases": 7,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.011,
+            "pcm_packet": 287.768,
+            "encoded_packet": 32.027,
+            "http_read": 32.106
+          }
+        },
+        {
+          "sequence": 5278,
+          "timestamp_us": 144457227,
+          "phases": 1,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.143,
+            "pcm_packet": 298.435,
+            "encoded_packet": 1.448,
+            "http_read": 1.515
+          }
+        },
+        {
+          "sequence": 5279,
+          "timestamp_us": 144467888,
+          "phases": 1,
+          "observed_uptime_ms": [
+            143134,
+            144540
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.355,
+            "pcm_packet": 309.096,
+            "encoded_packet": 12.109,
+            "http_read": 12.176
+          }
+        },
+        {
+          "sequence": 5280,
+          "timestamp_us": 155347894,
+          "phases": 7,
+          "observed_uptime_ms": [
+            154992,
+            155502
+          ],
+          "ages_ms": {
+            "output_checkpoint": 8.362,
+            "pcm_packet": 53.099,
+            "encoded_packet": 73.733,
+            "http_read": 254.803
+          }
+        },
+        {
+          "sequence": 5281,
+          "timestamp_us": 155358560,
+          "phases": 1,
+          "observed_uptime_ms": [
+            154992,
+            155502
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.009,
+            "pcm_packet": 63.765,
+            "encoded_packet": 5.124,
+            "http_read": 5.197
+          }
+        },
+        {
+          "sequence": 5282,
+          "timestamp_us": 155369222,
+          "phases": 1,
+          "observed_uptime_ms": [
+            154992,
+            155502
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.69,
+            "pcm_packet": 74.427,
+            "encoded_packet": 15.786,
+            "http_read": 15.859
+          }
+        },
+        {
+          "sequence": 5284,
+          "timestamp_us": 169289222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.69,
+            "pcm_packet": 63.92,
+            "encoded_packet": 18.547,
+            "http_read": 18.607
+          }
+        },
+        {
+          "sequence": 5285,
+          "timestamp_us": 169299888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.356,
+            "pcm_packet": 74.586,
+            "encoded_packet": 29.213,
+            "http_read": 29.273
+          }
+        },
+        {
+          "sequence": 5286,
+          "timestamp_us": 169310557,
+          "phases": 5,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.021,
+            "pcm_packet": 85.255,
+            "encoded_packet": 39.882,
+            "http_read": 39.942
+          }
+        },
+        {
+          "sequence": 5287,
+          "timestamp_us": 169321222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.688,
+            "pcm_packet": 95.92,
+            "encoded_packet": 50.547,
+            "http_read": 50.607
+          }
+        },
+        {
+          "sequence": 5288,
+          "timestamp_us": 169331888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.354,
+            "pcm_packet": 106.586,
+            "encoded_packet": 61.213,
+            "http_read": 61.273
+          }
+        },
+        {
+          "sequence": 5289,
+          "timestamp_us": 169342557,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.021,
+            "pcm_packet": 117.255,
+            "encoded_packet": 71.882,
+            "http_read": 71.942
+          }
+        },
+        {
+          "sequence": 5290,
+          "timestamp_us": 169353222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.69,
+            "pcm_packet": 127.92,
+            "encoded_packet": 82.547,
+            "http_read": 82.607
+          }
+        },
+        {
+          "sequence": 5291,
+          "timestamp_us": 169363888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.355,
+            "pcm_packet": 138.586,
+            "encoded_packet": 93.213,
+            "http_read": 93.273
+          }
+        },
+        {
+          "sequence": 5292,
+          "timestamp_us": 169374555,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.022,
+            "pcm_packet": 149.253,
+            "encoded_packet": 103.88,
+            "http_read": 103.94
+          }
+        },
+        {
+          "sequence": 5293,
+          "timestamp_us": 169385223,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.688,
+            "pcm_packet": 159.921,
+            "encoded_packet": 114.548,
+            "http_read": 114.608
+          }
+        },
+        {
+          "sequence": 5294,
+          "timestamp_us": 169395888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.356,
+            "pcm_packet": 170.586,
+            "encoded_packet": 125.213,
+            "http_read": 125.273
+          }
+        },
+        {
+          "sequence": 5295,
+          "timestamp_us": 169406555,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.016,
+            "pcm_packet": 181.253,
+            "encoded_packet": 135.88,
+            "http_read": 135.94
+          }
+        },
+        {
+          "sequence": 5296,
+          "timestamp_us": 169417222,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.69,
+            "pcm_packet": 191.92,
+            "encoded_packet": 146.547,
+            "http_read": 146.607
+          }
+        },
+        {
+          "sequence": 5297,
+          "timestamp_us": 169427888,
+          "phases": 7,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.356,
+            "pcm_packet": 202.586,
+            "encoded_packet": 157.213,
+            "http_read": 157.273
+          }
+        },
+        {
+          "sequence": 5298,
+          "timestamp_us": 169438560,
+          "phases": 1,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.009,
+            "pcm_packet": 213.258,
+            "encoded_packet": 3.441,
+            "http_read": 3.513
+          }
+        },
+        {
+          "sequence": 5299,
+          "timestamp_us": 169449222,
+          "phases": 1,
+          "observed_uptime_ms": [
+            169127,
+            169629
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.69,
+            "pcm_packet": 223.92,
+            "encoded_packet": 14.103,
+            "http_read": 14.175
+          }
+        }
+      ],
+      "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+    },
+    "resident_slots": [
+      11
+    ],
+    "input_queue_first": {
+      "resident": 11,
+      "occupied": 11,
+      "minimum": 4,
+      "limit": 11,
+      "packet_capacity": 2060,
+      "ready": 10,
+      "reading": 1,
+      "writing": 0,
+      "ready_bytes": 20600,
+      "reading_bytes": 2060
+    },
+    "requested_pauses": [
+      {
+        "after_bytes": 2097152,
+        "seconds": 0.1
+      },
+      {
+        "after_bytes": 3670016,
+        "seconds": 0.25
+      },
+      {
+        "after_bytes": 5242880,
+        "seconds": 0.5
+      }
+    ],
+    "measured_pauses": [
+      {
+        "after_bytes": 2097152,
+        "requested_seconds": 0.1,
+        "started_at": 98923.1644019,
+        "completed": true,
+        "ended_at": 98923.274935,
+        "elapsed_seconds": 0.11053029999311548
+      },
+      {
+        "after_bytes": 3670016,
+        "requested_seconds": 0.25,
+        "started_at": 98941.1224593,
+        "completed": true,
+        "ended_at": 98941.3805776,
+        "elapsed_seconds": 0.25811480000265874
+      },
+      {
+        "after_bytes": 5242880,
+        "requested_seconds": 0.5,
+        "started_at": 98954.9551431,
+        "completed": true,
+        "ended_at": 98955.4641146,
+        "elapsed_seconds": 0.5089699999953154
+      }
+    ],
+    "drop_intervals": [
+      {
+        "seconds": [
+          19.365165299997898,
+          20.54407619999256
+        ],
+        "drops": 4,
+        "input_before": {
+          "resident": 11,
+          "occupied": 11,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 10,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 20600,
+          "reading_bytes": 2060
+        },
+        "input_after": {
+          "resident": 11,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        }
+      },
+      {
+        "seconds": [
+          20.54407619999256,
+          21.777337599996827
+        ],
+        "drops": 46,
+        "input_before": {
+          "resident": 11,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        },
+        "input_after": {
+          "resident": 11,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        }
+      },
+      {
+        "seconds": [
+          21.777337599996827,
+          22.602856199999223
+        ],
+        "drops": 51,
+        "input_before": {
+          "resident": 11,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        },
+        "input_after": {
+          "resident": 11,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        }
+      },
+      {
+        "seconds": [
+          22.602856199999223,
+          23.780057900003158
+        ],
+        "drops": 44,
+        "input_before": {
+          "resident": 11,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        },
+        "input_after": {
+          "resident": 11,
+          "occupied": 2,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 1,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 2060,
+          "reading_bytes": 2060
+        }
+      },
+      {
+        "seconds": [
+          23.780057900003158,
+          24.759732000005897
+        ],
+        "drops": 32,
+        "input_before": {
+          "resident": 11,
+          "occupied": 2,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 1,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 2060,
+          "reading_bytes": 2060
+        },
+        "input_after": {
+          "resident": 11,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        }
+      },
+      {
+        "seconds": [
+          24.759732000005897,
+          25.902224100005697
+        ],
+        "drops": 26,
+        "input_before": {
+          "resident": 11,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        },
+        "input_after": {
+          "resident": 11,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        }
+      },
+      {
+        "seconds": [
+          25.902224100005697,
+          26.88226030000078
+        ],
+        "drops": 80,
+        "input_before": {
+          "resident": 11,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        },
+        "input_after": {
+          "resident": 11,
+          "occupied": 9,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 8,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 16480,
+          "reading_bytes": 2060
+        }
+      },
+      {
+        "seconds": [
+          37.33046509999258,
+          37.83558179999818
+        ],
+        "drops": 3,
+        "input_before": {
+          "resident": 11,
+          "occupied": 11,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 10,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 20600,
+          "reading_bytes": 2060
+        },
+        "input_after": {
+          "resident": 11,
+          "occupied": 11,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 10,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 20600,
+          "reading_bytes": 2060
+        }
+      },
+      {
+        "seconds": [
+          51.45982170000207,
+          51.97081820000312
+        ],
+        "drops": 17,
+        "input_before": {
+          "resident": 11,
+          "occupied": 5,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 4,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 8240,
+          "reading_bytes": 2060
+        },
+        "input_after": {
+          "resident": 11,
+          "occupied": 11,
+          "minimum": 4,
+          "limit": 11,
+          "packet_capacity": 2060,
+          "ready": 10,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 20600,
+          "reading_bytes": 2060
+        }
+      }
+    ]
+  },
+  {
+    "case": "slots8/control",
+    "results": {
+      "PASS": 9,
+      "FAIL": 0,
+      "BLOCKED": 0
+    },
+    "failures": [],
+    "health": {
+      "samples": 148,
+      "boot_id": "5ceff6f7ce5e09d3",
+      "minimum_heap": 64260,
+      "minimum_largest": 49152,
+      "allocation_failures": 0,
+      "task_watchdog_events": 0
+    },
+    "decoder": {
+      "samples": 148,
+      "decoder_failures": 0
+    },
+    "pipeline": {
+      "output": {
+        "samples": 106,
+        "elapsed_ms": 55277,
+        "completion_queue_drops": 0,
+        "write_errors": 0
+      },
+      "timer_hz": 1000000,
+      "phase_drops": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "retained_events": 0,
+      "overwritten_events": 0,
+      "events": [],
+      "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+    },
+    "resident_slots": [
+      8
+    ],
+    "input_queue_first": {
+      "resident": 8,
+      "occupied": 8,
+      "minimum": 4,
+      "limit": 8,
+      "packet_capacity": 2060,
+      "ready": 7,
+      "reading": 1,
+      "writing": 0,
+      "ready_bytes": 14420,
+      "reading_bytes": 2060
+    },
+    "requested_pauses": [],
+    "measured_pauses": [],
+    "drop_intervals": []
+  },
+  {
+    "case": "slots8/pauses",
+    "results": {
+      "PASS": 8,
+      "FAIL": 1,
+      "BLOCKED": 0
+    },
+    "failures": [
+      {
+        "name": "flac:pauses",
+        "result": "FAIL",
+        "exception_chain": [
+          {
+            "type": "Failure"
+          }
+        ],
+        "reason": "I2S completion queue overflow during file playback",
+        "seconds": 66.975
+      }
+    ],
+    "health": {
+      "samples": 146,
+      "boot_id": "5ceff6f7ce5e09d3",
+      "minimum_heap": 63972,
+      "minimum_largest": 45056,
+      "allocation_failures": 0,
+      "task_watchdog_events": 0
+    },
+    "decoder": {
+      "samples": 146,
+      "decoder_failures": 0
+    },
+    "pipeline": {
+      "output": {
+        "samples": 105,
+        "elapsed_ms": 55084,
+        "completion_queue_drops": 51,
+        "write_errors": 0
+      },
+      "timer_hz": 1000000,
+      "phase_drops": [
+        0,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        41
+      ],
+      "retained_events": 43,
+      "overwritten_events": 8,
+      "events": [
+        {
+          "sequence": 5073,
+          "timestamp_us": 133932233,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.698,
+            "pcm_packet": 74.504,
+            "encoded_packet": 0.204,
+            "http_read": 0.277
+          }
+        },
+        {
+          "sequence": 5074,
+          "timestamp_us": 133942899,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.364,
+            "pcm_packet": 85.17,
+            "encoded_packet": 8.957,
+            "http_read": 9.004
+          }
+        },
+        {
+          "sequence": 5075,
+          "timestamp_us": 133953561,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.025,
+            "pcm_packet": 95.832,
+            "encoded_packet": 19.619,
+            "http_read": 19.666
+          }
+        },
+        {
+          "sequence": 5076,
+          "timestamp_us": 133964231,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.68,
+            "pcm_packet": 106.502,
+            "encoded_packet": 30.289,
+            "http_read": 30.336
+          }
+        },
+        {
+          "sequence": 5077,
+          "timestamp_us": 133974896,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.343,
+            "pcm_packet": 117.167,
+            "encoded_packet": 40.954,
+            "http_read": 41.001
+          }
+        },
+        {
+          "sequence": 5078,
+          "timestamp_us": 133985566,
+          "phases": 1,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.962,
+            "pcm_packet": 127.837,
+            "encoded_packet": 0.682,
+            "http_read": 0.752
+          }
+        },
+        {
+          "sequence": 5079,
+          "timestamp_us": 133996233,
+          "phases": 1,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.68,
+            "pcm_packet": 138.504,
+            "encoded_packet": 11.349,
+            "http_read": 11.419
+          }
+        },
+        {
+          "sequence": 5080,
+          "timestamp_us": 134113564,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.03,
+            "pcm_packet": 63.514,
+            "encoded_packet": 17.445,
+            "http_read": 17.517
+          }
+        },
+        {
+          "sequence": 5081,
+          "timestamp_us": 134124228,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.572,
+            "pcm_packet": 74.178,
+            "encoded_packet": 28.109,
+            "http_read": 28.181
+          }
+        },
+        {
+          "sequence": 5082,
+          "timestamp_us": 134134899,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.341,
+            "pcm_packet": 84.849,
+            "encoded_packet": 38.78,
+            "http_read": 38.852
+          }
+        },
+        {
+          "sequence": 5083,
+          "timestamp_us": 134145561,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.027,
+            "pcm_packet": 95.511,
+            "encoded_packet": 49.442,
+            "http_read": 49.514
+          }
+        },
+        {
+          "sequence": 5084,
+          "timestamp_us": 134156228,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.691,
+            "pcm_packet": 106.178,
+            "encoded_packet": 60.109,
+            "http_read": 60.181
+          }
+        },
+        {
+          "sequence": 5085,
+          "timestamp_us": 134166894,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.36,
+            "pcm_packet": 116.844,
+            "encoded_packet": 70.775,
+            "http_read": 70.847
+          }
+        },
+        {
+          "sequence": 5086,
+          "timestamp_us": 134177561,
+          "phases": 7,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.027,
+            "pcm_packet": 127.511,
+            "encoded_packet": 81.442,
+            "http_read": 81.514
+          }
+        },
+        {
+          "sequence": 5087,
+          "timestamp_us": 134188233,
+          "phases": 1,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.68,
+            "pcm_packet": 138.183,
+            "encoded_packet": 3.887,
+            "http_read": 3.958
+          }
+        },
+        {
+          "sequence": 5088,
+          "timestamp_us": 134198901,
+          "phases": 1,
+          "observed_uptime_ms": [
+            133448,
+            134226
+          ],
+          "ages_ms": {
+            "output_checkpoint": 6.363,
+            "pcm_packet": 148.851,
+            "encoded_packet": 14.555,
+            "http_read": 14.626
+          }
+        },
+        {
+          "sequence": 5089,
+          "timestamp_us": 134305562,
+          "phases": 1,
+          "observed_uptime_ms": [
+            134226,
+            134756
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.028,
+            "pcm_packet": 52.914,
+            "encoded_packet": 27.141,
+            "http_read": 27.212
+          }
+        },
+        {
+          "sequence": 5090,
+          "timestamp_us": 153548234,
+          "phases": 7,
+          "observed_uptime_ms": [
+            153091,
+            153626
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.901,
+            "pcm_packet": 53.213,
+            "encoded_packet": 1.934,
+            "http_read": 2.006
+          }
+        },
+        {
+          "sequence": 5091,
+          "timestamp_us": 153558899,
+          "phases": 1,
+          "observed_uptime_ms": [
+            153091,
+            153626
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.346,
+            "pcm_packet": 63.878,
+            "encoded_packet": 10.396,
+            "http_read": 10.468
+          }
+        },
+        {
+          "sequence": 5092,
+          "timestamp_us": 153569561,
+          "phases": 1,
+          "observed_uptime_ms": [
+            153091,
+            153626
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.027,
+            "pcm_packet": 74.54,
+            "encoded_packet": 21.058,
+            "http_read": 21.13
+          }
+        },
+        {
+          "sequence": 5093,
+          "timestamp_us": 159222895,
+          "phases": 1,
+          "observed_uptime_ms": [
+            159167,
+            159741
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.348,
+            "pcm_packet": 53.158,
+            "encoded_packet": 13.171,
+            "http_read": 13.244
+          }
+        },
+        {
+          "sequence": 5094,
+          "timestamp_us": 167489562,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167029,
+            167544
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.028,
+            "pcm_packet": 53.283,
+            "encoded_packet": 84.446,
+            "http_read": 158.487
+          }
+        },
+        {
+          "sequence": 5095,
+          "timestamp_us": 167500228,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167029,
+            167544
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.694,
+            "pcm_packet": 63.949,
+            "encoded_packet": 95.112,
+            "http_read": 169.153
+          }
+        },
+        {
+          "sequence": 5096,
+          "timestamp_us": 167510894,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167029,
+            167544
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.36,
+            "pcm_packet": 74.615,
+            "encoded_packet": 105.778,
+            "http_read": 179.819
+          }
+        },
+        {
+          "sequence": 5097,
+          "timestamp_us": 167521575,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167029,
+            167544
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.022,
+            "pcm_packet": 85.296,
+            "encoded_packet": 116.459,
+            "http_read": 190.5
+          }
+        },
+        {
+          "sequence": 5098,
+          "timestamp_us": 167532228,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167029,
+            167544
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.693,
+            "pcm_packet": 95.949,
+            "encoded_packet": 127.112,
+            "http_read": 201.153
+          }
+        },
+        {
+          "sequence": 5099,
+          "timestamp_us": 167542901,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167029,
+            167544
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.366,
+            "pcm_packet": 106.622,
+            "encoded_packet": 137.785,
+            "http_read": 211.826
+          }
+        },
+        {
+          "sequence": 5106,
+          "timestamp_us": 167617561,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.027,
+            "pcm_packet": 181.282,
+            "encoded_packet": 212.445,
+            "http_read": 286.486
+          }
+        },
+        {
+          "sequence": 5107,
+          "timestamp_us": 167628228,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.694,
+            "pcm_packet": 191.949,
+            "encoded_packet": 223.112,
+            "http_read": 297.153
+          }
+        },
+        {
+          "sequence": 5108,
+          "timestamp_us": 167638894,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.36,
+            "pcm_packet": 202.615,
+            "encoded_packet": 233.778,
+            "http_read": 307.819
+          }
+        },
+        {
+          "sequence": 5109,
+          "timestamp_us": 167649561,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.027,
+            "pcm_packet": 213.282,
+            "encoded_packet": 244.445,
+            "http_read": 318.486
+          }
+        },
+        {
+          "sequence": 5110,
+          "timestamp_us": 167660228,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.69,
+            "pcm_packet": 223.949,
+            "encoded_packet": 255.112,
+            "http_read": 329.153
+          }
+        },
+        {
+          "sequence": 5111,
+          "timestamp_us": 167670894,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.359,
+            "pcm_packet": 234.615,
+            "encoded_packet": 265.778,
+            "http_read": 339.819
+          }
+        },
+        {
+          "sequence": 5112,
+          "timestamp_us": 167681562,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.027,
+            "pcm_packet": 245.283,
+            "encoded_packet": 276.446,
+            "http_read": 350.487
+          }
+        },
+        {
+          "sequence": 5113,
+          "timestamp_us": 167692228,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 0.693,
+            "pcm_packet": 255.949,
+            "encoded_packet": 287.112,
+            "http_read": 361.153
+          }
+        },
+        {
+          "sequence": 5114,
+          "timestamp_us": 167702894,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 1.359,
+            "pcm_packet": 266.615,
+            "encoded_packet": 297.778,
+            "http_read": 371.819
+          }
+        },
+        {
+          "sequence": 5115,
+          "timestamp_us": 167713563,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.028,
+            "pcm_packet": 277.284,
+            "encoded_packet": 308.447,
+            "http_read": 382.488
+          }
+        },
+        {
+          "sequence": 5116,
+          "timestamp_us": 167724229,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.687,
+            "pcm_packet": 287.95,
+            "encoded_packet": 319.113,
+            "http_read": 393.154
+          }
+        },
+        {
+          "sequence": 5117,
+          "timestamp_us": 167734894,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.359,
+            "pcm_packet": 298.615,
+            "encoded_packet": 329.778,
+            "http_read": 403.819
+          }
+        },
+        {
+          "sequence": 5118,
+          "timestamp_us": 167745561,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.026,
+            "pcm_packet": 309.282,
+            "encoded_packet": 340.445,
+            "http_read": 414.486
+          }
+        },
+        {
+          "sequence": 5119,
+          "timestamp_us": 167756232,
+          "phases": 7,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 4.697,
+            "pcm_packet": 319.953,
+            "encoded_packet": 351.116,
+            "http_read": 425.157
+          }
+        },
+        {
+          "sequence": 5120,
+          "timestamp_us": 167766899,
+          "phases": 1,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 2.316,
+            "pcm_packet": 330.62,
+            "encoded_packet": 6.22,
+            "http_read": 6.295
+          }
+        },
+        {
+          "sequence": 5121,
+          "timestamp_us": 167777566,
+          "phases": 1,
+          "observed_uptime_ms": [
+            167544,
+            168067
+          ],
+          "ages_ms": {
+            "output_checkpoint": 3.01,
+            "pcm_packet": 341.287,
+            "encoded_packet": 16.887,
+            "http_read": 16.962
+          }
+        }
+      ],
+      "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+    },
+    "resident_slots": [
+      8
+    ],
+    "input_queue_first": {
+      "resident": 8,
+      "occupied": 8,
+      "minimum": 4,
+      "limit": 8,
+      "packet_capacity": 2060,
+      "ready": 7,
+      "reading": 1,
+      "writing": 0,
+      "ready_bytes": 14420,
+      "reading_bytes": 2060
+    },
+    "requested_pauses": [
+      {
+        "after_bytes": 2097152,
+        "seconds": 0.1
+      },
+      {
+        "after_bytes": 3670016,
+        "seconds": 0.25
+      },
+      {
+        "after_bytes": 5242880,
+        "seconds": 0.5
+      }
+    ],
+    "measured_pauses": [
+      {
+        "after_bytes": 2097152,
+        "requested_seconds": 0.1,
+        "started_at": 98711.9218853,
+        "completed": true,
+        "ended_at": 98712.0322629,
+        "elapsed_seconds": 0.11037579999538139
+      },
+      {
+        "after_bytes": 3670016,
+        "requested_seconds": 0.25,
+        "started_at": 98726.7698093,
+        "completed": true,
+        "ended_at": 98727.0198314,
+        "elapsed_seconds": 0.25002030000905506
+      },
+      {
+        "after_bytes": 5242880,
+        "requested_seconds": 0.5,
+        "started_at": 98740.710253,
+        "completed": true,
+        "ended_at": 98741.2327557,
+        "elapsed_seconds": 0.5225004999956582
+      }
+    ],
+    "drop_intervals": [
+      {
+        "seconds": [
+          14.84671040000103,
+          15.611384800009546
+        ],
+        "drops": 18,
+        "input_before": {
+          "resident": 8,
+          "occupied": 7,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 6,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 12360,
+          "reading_bytes": 2060
+        },
+        "input_after": {
+          "resident": 8,
+          "occupied": 4,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 3,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 6180,
+          "reading_bytes": 2060
+        }
+      },
+      {
+        "seconds": [
+          15.611384800009546,
+          16.09171900000365
+        ],
+        "drops": 1,
+        "input_before": {
+          "resident": 8,
+          "occupied": 4,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 3,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 6180,
+          "reading_bytes": 2060
+        },
+        "input_after": {
+          "resident": 8,
+          "occupied": 8,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 7,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 14420,
+          "reading_bytes": 2060
+        }
+      },
+      {
+        "seconds": [
+          34.42541009999695,
+          34.97672790000797
+        ],
+        "drops": 3,
+        "input_before": {
+          "resident": 8,
+          "occupied": 8,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 7,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 14420,
+          "reading_bytes": 2060
+        },
+        "input_after": {
+          "resident": 8,
+          "occupied": 5,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 3,
+          "reading": 1,
+          "writing": 1,
+          "ready_bytes": 6180,
+          "reading_bytes": 2060
+        }
+      },
+      {
+        "seconds": [
+          40.566528000010294,
+          41.07748960000754
+        ],
+        "drops": 1,
+        "input_before": {
+          "resident": 8,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        },
+        "input_after": {
+          "resident": 8,
+          "occupied": 8,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 7,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 14420,
+          "reading_bytes": 2060
+        }
+      },
+      {
+        "seconds": [
+          48.36422190000303,
+          48.8800035000022
+        ],
+        "drops": 6,
+        "input_before": {
+          "resident": 8,
+          "occupied": 8,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 7,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 14420,
+          "reading_bytes": 2060
+        },
+        "input_after": {
+          "resident": 8,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        }
+      },
+      {
+        "seconds": [
+          48.8800035000022,
+          49.4037229000096
+        ],
+        "drops": 22,
+        "input_before": {
+          "resident": 8,
+          "occupied": 0,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 0,
+          "reading": 0,
+          "writing": 0,
+          "ready_bytes": 0,
+          "reading_bytes": 0
+        },
+        "input_after": {
+          "resident": 8,
+          "occupied": 7,
+          "minimum": 4,
+          "limit": 8,
+          "packet_capacity": 2060,
+          "ready": 6,
+          "reading": 1,
+          "writing": 0,
+          "ready_bytes": 12360,
+          "reading_bytes": 2060
+        }
+      }
+    ]
+  }
+]

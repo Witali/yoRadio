@@ -35,6 +35,29 @@ static esp_err_t heap_caps_register_failed_alloc_callback(void (*fn)(size_t,uint
 /* PIPELINE_PROBE_SOURCE */
 
 /* OUTPUT_HEALTH_TYPE */
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+typedef struct {
+    unsigned resident,occupied,minimum,limit,packet_capacity;
+    unsigned ready,reading,writing,ready_bytes,reading_bytes;
+} adaptive_input_stats_t;
+static adaptive_input_stats_t tls_input_reserve_input_stats(void) {
+    // Deliberately maximal fields test serialization bounds, not queue consistency.
+    return (adaptive_input_stats_t){UINT32_MAX,UINT32_MAX,UINT32_MAX,UINT32_MAX,UINT32_MAX,
+        UINT32_MAX,UINT32_MAX,UINT32_MAX,UINT32_MAX,UINT32_MAX};
+}
+#endif
+#ifdef CONFIG_YORADIO_SHARED_DECODER_ARENA
+enum { ARENA_MALLOC,ARENA_FREE,ARENA_REALLOC,ARENA_SNAPSHOT };
+typedef struct {
+    unsigned capacity,live,peak,blocks,free_bytes,largest,failures;
+    struct { uint32_t calls,max_us; } timing[4];
+} decoder_arena_stats_t;
+static decoder_arena_stats_t decoder_arena_stats(void) {
+    decoder_arena_stats_t stats;
+    memset(&stats,0xff,sizeof(stats));
+    return stats;
+}
+#endif
 static native_audio_output_health_t output_sample;
 static native_audio_output_health_t native_audio_output_health(void) { return output_sample; }
 
@@ -99,6 +122,28 @@ int main(void) {
     heap_sample=(multi_heap_info_t){UINT32_MAX,UINT32_MAX,UINT32_MAX};
     output_sample=(native_audio_output_health_t){true,UINT32_MAX,UINT32_MAX};
 #ifdef CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC
+    // Feed time includes callbacks, but the separately measured process does not.
+    AUDIO_PROBE_DECODE_BEGIN(UINT32_MAX-9);
+    uptime_us=UINT32_MAX-4;
+    AUDIO_PROBE_PCM_BEGIN();
+    audio_pipeline_probe_overrun(5);
+    assert(s_audio_pipeline_probe.events[1].work_flags==3);
+    assert(s_audio_pipeline_probe.events[1].feed_age==15);
+    assert(s_audio_pipeline_probe.events[1].pcm_wait_age==10);
+    AUDIO_PROBE_PCM_END();
+    audio_pipeline_probe_overrun(6);
+    assert(s_audio_pipeline_probe.events[2].work_flags==1);
+    assert(s_audio_pipeline_probe.events[2].pcm_wait_age==0);
+    AUDIO_PROBE_DECODE_END(1234);
+    AUDIO_PROBE_DECODE_BEGIN(8);
+    AUDIO_PROBE_DECODE_END(100);
+    audio_pipeline_probe_overrun(10);
+    assert(s_audio_pipeline_probe.events[3].work_flags==0);
+    assert(s_audio_pipeline_probe.events[3].feed_age==0);
+    assert(s_audio_pipeline_probe.events[3].last_process_max_us==100);
+    assert(s_audio_pipeline_probe.process_max_us==1234);
+    memset((void *)&s_audio_pipeline_probe,0,sizeof(s_audio_pipeline_probe));
+    uptime_us=INT64_MAX;
     // Check every phase, ring overwrite and unsigned sequence/timer wrap.
     for (unsigned n=0;n<40;++n) {
         s_audio_pipeline_probe.output_wait=n & 1;
@@ -116,6 +161,15 @@ int main(void) {
     s_audio_pipeline_probe.phase_drops[7]=UINT32_MAX-8;
     for (unsigned n=0;n<17;++n) audio_pipeline_probe_overrun(UINT32_MAX);
     assert(s_audio_pipeline_probe.sequence==8);
+    // Longest event fields, including inactive/active combinations above.
+    s_audio_pipeline_probe.process_max_us=UINT32_MAX;
+    for (unsigned n=0;n<AUDIO_PROBE_EVENTS;++n) {
+        volatile audio_pipeline_probe_event_t *event=&s_audio_pipeline_probe.events[n];
+        event->timestamp_us=UINT32_MAX;
+        event->output_age=event->pcm_age=event->input_age=event->network_age=UINT32_MAX;
+        event->work_flags=AUDIO_PROBE_FEED_ACTIVE|AUDIO_PROBE_PCM_WAIT_ACTIVE;
+        event->feed_age=event->pcm_wait_age=event->last_process_max_us=UINT32_MAX;
+    }
     audio_pipeline_probe_t snapshot=s_audio_pipeline_probe;
     // Exercise the longest signed and unsigned failure fields in bounded JSON.
     s_audio_pipeline_probe.stream_failure=(audio_stream_failure_t){

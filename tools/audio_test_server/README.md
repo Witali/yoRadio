@@ -189,6 +189,19 @@ when comparing full-stream totals. Timing is disabled by default.
 
 ## Reproducible delivery pauses
 
+To isolate sender-side packet coalescing, compare `--tcp-nodelay` and
+`--no-tcp-nodelay` with the same fixture, send buffer and pause schedule.
+Omitting both preserves the socket's OS default. The Python `Server` accepts
+`tcp_nodelay=True`, `False` or `None` respectively. This changes only audio
+connections handled by that server, not system-wide TCP settings or the radio.
+When delivery statistics are enabled or a policy is explicitly selected,
+events record `tcp_nodelay_requested` and the actual socket value read back
+with `getsockopt`. It does not force TCP packet boundaries or acknowledgements.
+[Microsoft's TCP socket documentation](https://learn.microsoft.com/en-us/windows/win32/winsock/ipproto-tcp-socket-options)
+describes the option; it is a diagnostic variable, not a guarantee of faster
+delivery. `tests/test-audio-server-nodelay.py` verifies HTTP/HTTPS body identity,
+unaligned pause positions and the actual option for both policies.
+
 `--delivery-pause BYTE_OFFSET:SECONDS` pauses before sending the byte at an
 exact position in the response body. Repeat it in increasing byte order;
 at most 64 pauses of more than zero and at most two seconds are allowed.

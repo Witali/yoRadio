@@ -6,7 +6,8 @@
 // Startup/recovery candidate inspection over caller-owned, potentially split
 // storage. This is NOT the aligned frame walker: it may scan candidate payload
 // only after a claimed next boundary has failed. No pointer is retained.
-// Not yet wired into audio_service; queue lease/EOF integration is a separate gate.
+// Caller selects whether initial container signatures are allowed. Once an
+// elementary stream is established, recovery searches only MP3/ADTS frames.
 typedef bool (*stream_confirm_read_fn)(void *context, size_t offset,
                                       uint8_t *destination, size_t count);
 typedef enum {
@@ -32,9 +33,10 @@ typedef struct {
     uint32_t tag_bytes;
 } stream_confirm_info_t;
 
-static inline stream_confirm_result_t stream_confirm_window(
+static inline stream_confirm_result_t stream_confirm_window_mode(
         stream_confirm_read_fn read, void *context, size_t bytes, bool eof,
-        size_t search_left, uint32_t tag_budget, stream_confirm_info_t *out) {
+        size_t search_left, uint32_t tag_budget, bool containers,
+        stream_confirm_info_t *out) {
     *out = (stream_confirm_info_t){0};
     size_t start = 0;
     while (true) {
@@ -59,7 +61,7 @@ static inline stream_confirm_result_t stream_confirm_window(
             }
         }
         stream_probe_result_t probe = stream_probe_header(header,count);
-        if (probe==STREAM_PROBE_FLAC || probe==STREAM_PROBE_OGG) {
+        if (containers && (probe==STREAM_PROBE_FLAC || probe==STREAM_PROBE_OGG)) {
             out->codec=probe;
             return STREAM_CONFIRM_READY; // Container parser owns further validation.
         }
@@ -120,4 +122,11 @@ static inline stream_confirm_result_t stream_confirm_window(
         if (start>=search_left) return STREAM_CONFIRM_INVALID;
         ++start;
     }
+}
+
+static inline stream_confirm_result_t stream_confirm_window(
+        stream_confirm_read_fn read, void *context, size_t bytes, bool eof,
+        size_t search_left, uint32_t tag_budget, stream_confirm_info_t *out) {
+    return stream_confirm_window_mode(read, context, bytes, eof, search_left,
+                                     tag_budget, true, out);
 }

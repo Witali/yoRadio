@@ -15,6 +15,9 @@ typedef struct {
     uint32_t generation;
     native_codec_t *codec;
     encoded_packet_t *packet;
+#ifdef CONFIG_YORADIO_INPUT_TAIL_COALESCE
+    size_t reopened_bytes; // Original committed extent; preserve on rejection.
+#endif
     // Nonzero only when replaying unpublished candidate storage. The caller
     // attaches control storage of at least header + this payload capacity.
     // Small copies into that separate FIFO node avoid waiting for a fifth
@@ -28,6 +31,13 @@ static void stream_route_reset(void) {
 
 static void stream_route_cancel(stream_route_context_t *ctx) {
     if (ctx->packet) {
+#ifdef CONFIG_YORADIO_INPUT_TAIL_COALESCE
+        if (ctx->reopened_bytes) {
+            ctx->packet->data_size = ctx->reopened_bytes - sizeof(encoded_packet_t);
+            adaptive_input_commit_size(s_encoded, ctx->packet, ctx->reopened_bytes);
+            ctx->reopened_bytes = 0;
+        } else
+#endif
         adaptive_input_cancel(s_encoded, ctx->packet);
         ctx->packet = NULL;
     }
@@ -41,11 +51,32 @@ static bool stream_route_flush(stream_route_context_t *ctx) {
         return false;
     }
     ctx->packet = NULL;
+#ifdef CONFIG_YORADIO_INPUT_TAIL_COALESCE
+    ctx->reopened_bytes = 0;
+#endif
     return true;
 }
 
 static bool stream_route_acquire(stream_route_context_t *ctx) {
     if (ctx->packet) return true;
+#ifdef CONFIG_YORADIO_INPUT_TAIL_COALESCE
+    if (!ctx->control_payload_bytes && atomic_load(&s_generation) == ctx->generation) {
+        encoded_packet_t *tail = NULL;
+        size_t used = 0;
+        if (adaptive_input_reopen_tail(s_encoded, (void **)&tail, &used) == pdTRUE) {
+            if (used >= sizeof(*tail) && used == sizeof(*tail) + tail->data_size &&
+                tail->data_size && tail->data_size < STREAM_CHUNK_SIZE &&
+                tail->generation == ctx->generation && tail->codec == *ctx->codec &&
+                tail->end_of_stream == AUDIO_CONTINUE) {
+                ctx->packet = tail;
+                ctx->reopened_bytes = used;
+                return true;
+            }
+            // A drain, EOF or another generation/family is an ordering barrier.
+            if (adaptive_input_commit_size(s_encoded, tail, used) != pdTRUE) return false;
+        }
+    }
+#endif
     size_t capacity = ctx->control_payload_bytes ? ctx->control_payload_bytes : STREAM_CHUNK_SIZE;
     while (atomic_load(&s_generation) == ctx->generation) {
         BaseType_t acquired = ctx->control_payload_bytes
@@ -104,9 +135,19 @@ static bool stream_route_begin(void *opaque, const stream_frame_info_t *info) {
 }
 
 static bool stream_route_feed(stream_route_context_t *ctx, const uint8_t *data, size_t size) {
-    if (*ctx->codec != NATIVE_CODEC_MP3 && *ctx->codec != NATIVE_CODEC_AAC)
+    if (*ctx->codec != NATIVE_CODEC_MP3 && *ctx->codec != NATIVE_CODEC_AAC) {
+#ifdef CONFIG_YORADIO_INPUT_TAIL_COALESCE
+        // Opaque FLAC/Ogg bytes share the same packet storage and ownership
+        // barriers. Direct send_encoded would strand every short HTTP read
+        // in its own slot, reducing an eight-slot queue to 4 KiB at 512 B/read.
+        if (stream_route_emit(ctx, data, size)) return true;
+        stream_route_cancel(ctx);
+        return false;
+#else
         return !size || (ctx->control_payload_bytes ? stream_route_emit(ctx, data, size)
             : send_encoded(ctx->generation, *ctx->codec, data, size, AUDIO_CONTINUE));
+#endif
+    }
     if (s_frame_router.bypass) {
         if (stream_route_emit(ctx, data, size)) return true;
     } else {

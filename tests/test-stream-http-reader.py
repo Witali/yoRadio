@@ -87,7 +87,7 @@ main=ROOT/'idf/esp32c3-oled-native/main'
 binary=args.output/'test'
 command=['wsl.exe','--exec','gcc','-std=c11','-Wall','-Wextra','-Werror','-g','-O1',
     '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
-    '-I'+linux(args.output),'-I'+linux(main),'-I'+linux(parser),linux(args.output/'test.c'),
+    '-I',linux(args.output),'-I',linux(main),'-I',linux(parser),linux(args.output/'test.c'),
     linux(main/'stream_http_reader.c'),linux(main/'tls_stream_eof.c'),linux(parser/'http_parser.c'),
     '-o',linux(binary)]
 build=subprocess.run(command,capture_output=True,text=True,timeout=120)

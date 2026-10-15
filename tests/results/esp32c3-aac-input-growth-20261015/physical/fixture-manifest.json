@@ -1,0 +1,84 @@
+{
+  "fixtures": [
+    {
+      "name": "aac-lc-44100-128k",
+      "file": "aac-lc-44100-128k.aac",
+      "sha256": "65feca3e7d6f0a87fb411488aa146a736da097b685772b00438d300268e0f9e7",
+      "seconds": 100.03156462585034,
+      "codec": "aac",
+      "profile": "AAC-LC",
+      "mime": "audio/aac",
+      "label": "AAC PCM",
+      "rate": 44100,
+      "channels": 2,
+      "bits": 16
+    }
+  ],
+  "generation_command": [
+    "ffmpeg",
+    "-nostdin",
+    "-v",
+    "error",
+    "-f",
+    "lavfi",
+    "-i",
+    "aevalsrc=0.25*sin(2*PI*997*t)+0.1*sin(2*PI*113*t)|0.25*sin(2*PI*1201*t)+0.1*sin(2*PI*179*t):s=44100:d=100",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "128k",
+    "-f",
+    "adts",
+    ".build\\c3-aac-pause-ab-20261014\\fixtures\\aac-lc-44100-128k.aac"
+  ],
+  "ffprobe": {
+    "streams": [
+      {
+        "index": 0,
+        "codec_name": "aac",
+        "codec_long_name": "AAC (Advanced Audio Coding)",
+        "profile": "LC",
+        "codec_type": "audio",
+        "codec_tag_string": "[0][0][0][0]",
+        "codec_tag": "0x0000",
+        "mime_codec_string": "mp4a.40.2",
+        "sample_fmt": "fltp",
+        "sample_rate": "44100",
+        "channels": 2,
+        "channel_layout": "stereo",
+        "bits_per_sample": 0,
+        "initial_padding": 0,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "time_base": "1/28224000",
+        "duration_ts": 2937480981,
+        "duration": "104.077416",
+        "bit_rate": "127416",
+        "disposition": {
+          "default": 0,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        }
+      }
+    ]
+  },
+  "pcm_sha256": "850720051a2917a8a28ab0f2f3783c40d7589c3d9928481baf473f9e97f9676b",
+  "decoded_frames": 4411392,
+  "encoded_bytes": 1657641
+}

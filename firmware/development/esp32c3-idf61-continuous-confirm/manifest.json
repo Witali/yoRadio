@@ -1,0 +1,51 @@
+{
+  "source_commit": "47239b017df85b3bf2c1d57e93a6488091670262",
+  "embedded_version": "idf61-confirm-20261014",
+  "image": {
+    "app_elf_sha256": "30a89eacd0564a3264ff78da5578077778bf50d92bff51fed66787829f21eb43",
+    "sha256": "832ad10f31dbfa2aebe1b9b01012a4b2c4fab3a7bad75bfce45e3c7cc84375bb",
+    "bytes": 1474352
+  },
+  "idf_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+  "profile": "TestedRadioProfile + FRAME_ROUTER + STREAM_CONFIRM + AAC_COMPACT_EARLY_OWNER",
+  "production_profile": true,
+  "production_qualified": false,
+  "hardware_tested": true,
+  "deep_sleep": false,
+  "flash_mode": "qio",
+  "flash_mhz": 80,
+  "nominal_pcm_output_hz": 48000,
+  "tls_rx_reserve_bytes": 17058,
+  "input_prefill_ms": 1000,
+  "laboratory_ca": false,
+  "console_and_logs": false,
+  "experimental_frame_router": true,
+  "experimental_early_sbr_owner": true,
+  "continuous_confirmation": true,
+  "files": {
+    "app.bin": "832ad10f31dbfa2aebe1b9b01012a4b2c4fab3a7bad75bfce45e3c7cc84375bb",
+    "bootloader.bin": "16de714fd680211974483836973e9e43e5a5bc696aa314a8ce26c137fbd4e7c1",
+    "partition-table.bin": "f26d55c34a06f24ed917555cc4608a87f7c2300a6a71e20153d6dd43816e2f18",
+    "sdkconfig": "81ad3ad6a28e6bdf45e030a62ca4fafbba4c11cca94e3f8a24f0f743f7f8db54"
+  },
+  "sections": {
+    ".rtc.text": 0,
+    ".rtc.force_fast": 0,
+    ".rtc.data": 2688,
+    ".rtc.force_slow": 36,
+    ".iram0.text": 46344,
+    ".iram0.text_end": 248,
+    ".iram0.data": 0,
+    ".iram0.bss": 0,
+    ".iram0.end": 0,
+    ".dram0.dummy": 46592,
+    ".dram0.data": 11572,
+    ".dram0.bss": 45136,
+    ".flash.text": 1104218,
+    ".flash.rodata": 308868,
+    ".dram0.heap_start": 0
+  },
+  "qualification": "HTTP transitions 11/11 and file/EOF 28/28 pass. Public HTTPS files 15/16 (TCP connect timeout); public radio 10/11 (27 AAC-LC steady completion-queue drops). Ten-minute AAC-LC repeat 6/7: original memory gate failed; independent replay also finds 36 steady completion drops. Failures retained; full production qualification remains open.",
+  "physical_evidence": "tests/results/esp32c3-stream-confirm-continuous-20261014/physical",
+  "original_production_restored": true
+}

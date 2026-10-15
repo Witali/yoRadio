@@ -59,7 +59,10 @@
 #include "tls_input_reserve.h"
 #endif
 #define STREAM_CHUNK_SIZE 2048
-#define STREAM_READ_TIMEOUT_MS 250
+#define STREAM_READ_TIMEOUT_MS CONFIG_YORADIO_STREAM_READ_TIMEOUT_MS
+#define STREAM_READ_SIZE CONFIG_YORADIO_STREAM_READ_BYTES
+_Static_assert(STREAM_READ_SIZE > 0 && STREAM_READ_SIZE <= STREAM_CHUNK_SIZE,
+               "HTTP read must fit the receive buffer");
 #define PCM_RING_SIZE (8 * 1024)
 #ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
 // Three 512-frame stereo packets, including lease/ring headers, fit in the
@@ -166,7 +169,9 @@ static QueueHandle_t s_commands;
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
 static adaptive_input_t *s_encoded;
 #define encoded_acquire adaptive_input_acquire
-#define encoded_commit adaptive_input_commit
+static BaseType_t encoded_commit(adaptive_input_t *input, encoded_packet_t *packet) {
+    return adaptive_input_commit_size(input, packet, sizeof(*packet) + packet->data_size);
+}
 #define encoded_return adaptive_input_return
 #else
 static RingbufHandle_t s_encoded;
@@ -184,6 +189,9 @@ static atomic_uint s_decoder_released_generation;
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
 static atomic_uint s_flac_input_ready_generation;
 #endif
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+static atomic_uint s_aac_input_ready_generation;
+#endif
 static portMUX_TYPE s_generation_lock = portMUX_INITIALIZER_UNLOCKED;
 static char s_last_url[sizeof(((play_command_t *)0)->url)];
 static native_codec_t s_last_codec;
@@ -200,7 +208,7 @@ static void log_runtime_memory(const char *stage);
 
 static void dispose_http_client(esp_http_client_handle_t client) {
     if (!client) return;
-#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+#ifdef YORADIO_INPUT_EXPANSION_ENABLED
     tls_input_reserve_finish_connection();
 #endif
     esp_http_client_close(client);
@@ -475,6 +483,14 @@ static inline bool stream_initial_pending(native_codec_t codec, bool first) {
 #endif
 }
 
+static inline bool stream_confirmation_expired(void) {
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+    return s_stream_start.active && esp_timer_get_time()>=s_stream_start.deadline_us;
+#else
+    return false;
+#endif
+}
+
 static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
                               const uint8_t *data, size_t size,
                               bool *first_chunk, stream_probe_t *probe) {
@@ -482,18 +498,26 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
 #ifdef CONFIG_YORADIO_FRAME_ROUTER
     stream_route_context_t route = {.generation = generation, .codec = codec};
 #endif
-    if (*first_chunk) {
 #ifdef CONFIG_YORADIO_STREAM_CONFIRM
-        if (stream_start_eligible(*codec)) {
+        if (stream_start_eligible(*codec) && !s_frame_router.bypass) {
             size_t consumed;
-            stream_confirm_result_t result=stream_start_feed(generation,codec,data,size,&consumed,false);
+            stream_confirm_result_t result=stream_start_feed(&route,data,size,&consumed,false);
+            if (s_stream_start.published) *first_chunk=false;
+            // Already confirmed frames remain valid even if the following
+            // candidate exhausts its search budget. Never discard that prefix.
+            bool flushed=stream_route_flush(&route);
+            bool ok=result!=STREAM_CONFIRM_INVALID && flushed;
+            if (!ok) {
+                stream_route_cancel(&route);stream_start_abort();
+                probe->result=STREAM_PROBE_INVALID;return false;
+            }
             if (result==STREAM_CONFIRM_MORE) return true;
             stream_start_abort();
-            if (result!=STREAM_CONFIRM_READY) {probe->result=STREAM_PROBE_INVALID;return false;}
             data+=consumed;size-=consumed;
             *first_chunk = false; // stream_start_publish already set the provisional status.
-        } else
+        }
 #endif
+    if (*first_chunk) {
         if (*codec == NATIVE_CODEC_AUTO) {
             size_t consumed = 0;
             switch (stream_probe_feed(probe, data, size, &consumed)) {
@@ -529,15 +553,20 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
 static inline uint8_t finish_stream_audio(uint32_t generation, native_codec_t *codec,
         bool *first_chunk, uint8_t reason) {
 #ifdef CONFIG_YORADIO_STREAM_CONFIRM
-    if (*first_chunk && stream_start_eligible(*codec) && reason==AUDIO_END_EOF) {
+    if ((s_stream_start.active || (*first_chunk && stream_start_eligible(*codec))) &&
+        reason==AUDIO_END_EOF) {
         // EOF rescan can discard the incomplete candidate. Preserve its
         // presence before finalization so truncation is not reported as empty.
-        bool incomplete=s_stream_start.skip || stream_staging_size(&s_stream_start.window);
+        bool incomplete=s_stream_start.skip || s_stream_start.recovering ||
+            stream_staging_size(&s_stream_start.window);
         size_t consumed;
-        stream_confirm_result_t result=stream_start_feed(generation,codec,NULL,0,&consumed,true);
-        if (result==STREAM_CONFIRM_READY) {
+        stream_route_context_t route={.generation=generation,.codec=codec};
+        stream_confirm_result_t result=stream_start_feed(&route,NULL,0,&consumed,true);
+        bool flushed=stream_route_flush(&route);
+        if (result==STREAM_CONFIRM_READY && flushed) {
             *first_chunk=false;
         } else {
+            stream_route_cancel(&route);
             reason=incomplete || s_stream_start.skip || stream_staging_size(&s_stream_start.window)
                 ? AUDIO_END_FRAME_TRUNCATED : AUDIO_END_FORMAT_UNKNOWN;
         }
@@ -879,11 +908,12 @@ static void stream_task(void *argument) {
             .started_us = esp_timer_get_time(),
         };
         stream_http_reader_t reader = {0};
-#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+#ifdef YORADIO_INPUT_EXPANSION_ENABLED
         bool input_growth_attempted = false;
 #endif
         while (atomic_load(&s_generation) == command.generation) {
-            if (stream_initial_pending(codec, first_chunk) && esp_timer_get_time() >= probe_deadline_us) {
+            if ((stream_initial_pending(codec, first_chunk) && esp_timer_get_time() >= probe_deadline_us) ||
+                stream_confirmation_expired()) {
                 format_unknown = true;
                 break;
             }
@@ -894,9 +924,16 @@ static void stream_task(void *argument) {
                 tls_input_reserve_expand_flac();
             }
 #endif
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+            if (!input_growth_attempted && codec == NATIVE_CODEC_AAC &&
+                atomic_load(&s_aac_input_ready_generation) == command.generation) {
+                input_growth_attempted = true;
+                tls_input_reserve_expand_aac();
+            }
+#endif
             AUDIO_PROBE_FLAG(stream_read, 1U);
             int received = stream_http_read(&reader, client, (char *)buffer,
-                                            STREAM_CHUNK_SIZE);
+                                            STREAM_READ_SIZE);
             AUDIO_PROBE_FLAG(stream_read, 0U);
             if (received > 0) AUDIO_PROBE_STAMP(network_us);
             // Stop/station change may happen while the socket read is blocked.
@@ -1027,8 +1064,12 @@ static bool send_pcm(decode_stats_t *stats, uint32_t generation,
         chunk -= chunk % frame_bytes;
         size_t packet_size = sizeof(pcm_packet_t) + chunk;
         pcm_packet_t *packet = NULL;
-        while (pipeline_acquire(s_pcm, (void **)&packet, packet_size,
-                                 pdMS_TO_TICKS(250), &stats->pcm_full) != pdTRUE) {
+        for (;;) {
+            AUDIO_PROBE_PCM_BEGIN();
+            BaseType_t acquired = pipeline_acquire(s_pcm, (void **)&packet, packet_size,
+                                                   pdMS_TO_TICKS(250), &stats->pcm_full);
+            AUDIO_PROBE_PCM_END();
+            if (acquired == pdTRUE) break;
             if (atomic_load(&s_generation) != generation) return false;
         }
         packet->generation = generation;
@@ -1049,8 +1090,11 @@ static bool send_pcm_end(uint32_t generation, uint8_t reason) {
     pcm_packet_t *packet = NULL;
     for (;;) {
         if (generation != atomic_load(&s_generation)) return false;
-        if (xRingbufferSendAcquire(s_pcm, (void **)&packet, sizeof(*packet),
-                                  pdMS_TO_TICKS(250)) == pdTRUE) break;
+        AUDIO_PROBE_PCM_BEGIN();
+        BaseType_t acquired = xRingbufferSendAcquire(s_pcm, (void **)&packet, sizeof(*packet),
+                                                    pdMS_TO_TICKS(250));
+        AUDIO_PROBE_PCM_END();
+        if (acquired == pdTRUE) break;
     }
     memset(packet, 0, sizeof(*packet));
     packet->generation = generation;
@@ -1506,10 +1550,12 @@ static void decoder_task(void *argument) {
                     .stream_info = &stream_info,
                     .stream_info_ready = &stream_info_ready,
                 };
+                AUDIO_PROBE_DECODE_BEGIN(esp_timer_get_time());
                 int result = custom_flac_decoder_feed(
                     flac_decoder, packet->data, packet->data_size,
                     packet->end_of_stream, custom_flac_output, &context,
                     &feed_stats);
+                AUDIO_PROBE_DECODE_END(feed_stats.max_call_us);
                 stats.decode_us += feed_stats.decode_us;
                 stats.calls += feed_stats.decode_calls;
                 if (feed_stats.max_call_us > stats.max_call_us) {
@@ -1569,10 +1615,12 @@ static void decoder_task(void *argument) {
                     .stream_info = &stream_info,
                     .stream_info_ready = &stream_info_ready,
                 };
+                AUDIO_PROBE_DECODE_BEGIN(esp_timer_get_time());
                 int result = custom_legacy_decoder_feed(
                     legacy_decoder, packet->data, packet->data_size,
                     packet->end_of_stream, custom_legacy_output, &context,
                     &feed_stats);
+                AUDIO_PROBE_DECODE_END(feed_stats.max_call_us);
                 stats.decode_us += feed_stats.decode_us;
                 stats.calls += feed_stats.decode_calls;
                 if (feed_stats.max_call_us > stats.max_call_us) {
@@ -1632,11 +1680,13 @@ static void decoder_task(void *argument) {
             };
             raw.consumed = 0;
             int64_t decode_started_us = esp_timer_get_time();
+            AUDIO_PROBE_DECODE_BEGIN(decode_started_us);
             esp_audio_err_t result = aac_decoder
                 ? native_aac_decoder_process(aac_decoder, &raw, &frame)
                 : esp_audio_simple_dec_process(decoder, &raw, &frame);
             uint32_t decode_call_us =
                 (uint32_t)(esp_timer_get_time() - decode_started_us);
+            AUDIO_PROBE_DECODE_END(decode_call_us);
             stats.decode_us += decode_call_us;
             ++stats.calls;
             if (decode_call_us > stats.max_call_us) {
@@ -1713,6 +1763,15 @@ static void decoder_task(void *argument) {
                                              decoder_heap_before, 0);
                         first_frame_memory_reported = true;
                     }
+#endif
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+                    // An LC low-memory open can discard the reservation; a
+                    // later SBR frame can acquire a real owner. Recheck until
+                    // eligible, while the producer still grows only once.
+                    if (aac_decoder && !packet->end_of_stream &&
+                        atomic_load(&s_aac_input_ready_generation) != generation &&
+                        native_aac_decoder_input_growth_ready(aac_decoder))
+                        atomic_store(&s_aac_input_ready_generation, generation);
 #endif
                     if (!first_frame_memory_logged) {
                         log_runtime_memory("after first decoded frame");
@@ -1959,6 +2018,9 @@ esp_err_t audio_service_start(native_state_t *state) {
     atomic_init(&s_decoder_released_generation, 0);
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
     atomic_init(&s_flac_input_ready_generation, 0);
+#endif
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+    atomic_init(&s_aac_input_ready_generation, 0);
 #endif
     atomic_init(&s_measured_bitrate_ready, false);
     s_last_url[0] = '\0';

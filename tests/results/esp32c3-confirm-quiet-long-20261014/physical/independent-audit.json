@@ -1,0 +1,232 @@
+{
+  "image": {
+    "app_elf_sha256": "30a89eacd0564a3264ff78da5578077778bf50d92bff51fed66787829f21eb43",
+    "sha256": "832ad10f31dbfa2aebe1b9b01012a4b2c4fab3a7bad75bfce45e3c7cc84375bb",
+    "bytes": 1474352
+  },
+  "samples": 1065,
+  "last_seconds": 599.6633136,
+  "output": {
+    "samples": 1065,
+    "elapsed_ms": 584180,
+    "completion_queue_drops": 36,
+    "write_errors": 0
+  },
+  "checks": {
+    "health": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 1065,
+        "boot_id": "4ba7a8dcdb4f770a",
+        "minimum_heap": 58696,
+        "minimum_largest": 32768,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0
+      }
+    },
+    "decoder": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 1065,
+        "decoder_failures": 0
+      }
+    },
+    "memory": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 1065,
+        "boot_id": "4ba7a8dcdb4f770a",
+        "minimum_heap": 58696,
+        "minimum_largest": 32768,
+        "allocation_failures": 0,
+        "task_watchdog_events": 0,
+        "legacy_floor_pass": true,
+        "legacy_floor_enforced": false
+      }
+    },
+    "output": {
+      "result": "FAIL",
+      "reason": "I2S completion queue overflow during sustained play"
+    },
+    "format": {
+      "result": "PASS",
+      "evidence": {
+        "samples": 1065,
+        "rate": 44100,
+        "channels": 2
+      }
+    }
+  },
+  "minutes": [
+    {
+      "minute": 0,
+      "samples": 82,
+      "heap": {
+        "min": 59592,
+        "median": 63664.0,
+        "max": 66832
+      },
+      "largest": {
+        "min": 32768,
+        "median": 32768.0,
+        "max": 32768
+      }
+    },
+    {
+      "minute": 1,
+      "samples": 109,
+      "heap": {
+        "min": 58696,
+        "median": 63548,
+        "max": 67672
+      },
+      "largest": {
+        "min": 32768,
+        "median": 32768,
+        "max": 32768
+      }
+    },
+    {
+      "minute": 2,
+      "samples": 109,
+      "heap": {
+        "min": 59660,
+        "median": 63344,
+        "max": 67432
+      },
+      "largest": {
+        "min": 32768,
+        "median": 32768,
+        "max": 32768
+      }
+    },
+    {
+      "minute": 3,
+      "samples": 110,
+      "heap": {
+        "min": 60264,
+        "median": 63556.0,
+        "max": 67924
+      },
+      "largest": {
+        "min": 32768,
+        "median": 32768.0,
+        "max": 32768
+      }
+    },
+    {
+      "minute": 4,
+      "samples": 109,
+      "heap": {
+        "min": 59512,
+        "median": 63496,
+        "max": 68252
+      },
+      "largest": {
+        "min": 32768,
+        "median": 32768,
+        "max": 32768
+      }
+    },
+    {
+      "minute": 5,
+      "samples": 109,
+      "heap": {
+        "min": 60868,
+        "median": 63284,
+        "max": 66904
+      },
+      "largest": {
+        "min": 32768,
+        "median": 32768,
+        "max": 32768
+      }
+    },
+    {
+      "minute": 6,
+      "samples": 109,
+      "heap": {
+        "min": 59964,
+        "median": 63500,
+        "max": 69248
+      },
+      "largest": {
+        "min": 32768,
+        "median": 32768,
+        "max": 32768
+      }
+    },
+    {
+      "minute": 7,
+      "samples": 110,
+      "heap": {
+        "min": 59064,
+        "median": 63270.0,
+        "max": 67032
+      },
+      "largest": {
+        "min": 32768,
+        "median": 32768.0,
+        "max": 32768
+      }
+    },
+    {
+      "minute": 8,
+      "samples": 109,
+      "heap": {
+        "min": 58964,
+        "median": 63384,
+        "max": 69248
+      },
+      "largest": {
+        "min": 32768,
+        "median": 32768,
+        "max": 32768
+      }
+    },
+    {
+      "minute": 9,
+      "samples": 109,
+      "heap": {
+        "min": 59668,
+        "median": 63280,
+        "max": 69248
+      },
+      "largest": {
+        "min": 32768,
+        "median": 32768,
+        "max": 32768
+      }
+    }
+  ],
+  "first_decoded_format_seconds": 2.9194446000001335,
+  "maximum_status_health_ms": 201.78630000009434,
+  "heap_endpoint_medians": {
+    "heap": [
+      63920,
+      62440
+    ],
+    "largest": [
+      32768,
+      32768
+    ]
+  },
+  "idle": {
+    "initial": {
+      "heap": 139460,
+      "largest": 110592,
+      "tasks": 16
+    },
+    "public": {
+      "heap": 139468,
+      "largest": 110592,
+      "tasks": 16
+    }
+  },
+  "rssi": {
+    "minimum": -75,
+    "maximum": -55,
+    "median": -60
+  },
+  "scope": "Independent gates; original memory failure retained. Endpoint decline alone does not identify a leak."
+}

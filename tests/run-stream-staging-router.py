@@ -16,7 +16,8 @@ queue_runner=importlib.util.module_from_spec(spec);spec.loader.exec_module(queue
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
-    out=parser.parse_args().output.resolve();out.mkdir(parents=True,exist_ok=False)
+    parser.add_argument('--tail-coalesce',action='store_true')
+    args=parser.parse_args();out=args.output.resolve();out.mkdir(parents=True,exist_ok=False)
     source=ROOT/'idf/esp32c3-oled-native/main'
     platform=ROOT/'tests/native/adaptive_input_test.c'
     test=ROOT/'tests/native/stream_staging_router_test.c'
@@ -27,6 +28,7 @@ def main():
     unit.write_text(prelude+test.read_text().replace('/* STAGING_HEADER */',queue_runner.body(source/'stream_staging.h')))
     (out/'build.log').write_bytes(run(['gcc','-std=c11','-O2','-g','-Wall','-Wextra','-Werror',
         '-Wno-unused-function','-pthread','-fsanitize=address,undefined','-fno-pie','-no-pie',
+        *(['-DCONFIG_YORADIO_INPUT_TAIL_COALESCE=1'] if args.tail_coalesce else []),
         '-I',host(source),host(unit),'-o',host(binary)]))
     try:
         log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
@@ -44,7 +46,7 @@ def main():
         target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(path.read_bytes())
         hashes[relative.as_posix()]=hashlib.sha256(path.read_bytes()).hexdigest()
     (out/'report.json').write_text(json.dumps(dict(passed=True,sources=hashes,scope=__doc__,
-        chunks=[1,7,2048],cancellation=True,http_integration=False,physical_playback=False),indent=2)+'\n')
+        chunks=[1,7,2048],tail_coalesce=args.tail_coalesce,cancellation=True,http_integration=False,physical_playback=False),indent=2)+'\n')
     print(log.decode(),end='')
 
 

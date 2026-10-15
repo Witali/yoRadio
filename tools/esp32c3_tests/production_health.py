@@ -24,14 +24,24 @@ def validate_pipeline(probe, output):
     require(type(histogram) is list and len(histogram) == 8 and all(map(word, histogram)) and
             (sum(histogram) & COUNTER_MASK) == sequence, 'Invalid pipeline phase counts')
     require(type(events) is list and len(events) <= 16, 'Invalid pipeline event capacity')
+    version = probe.get('event_version', 1)
+    require(type(version) is int and version in (1, 2), 'Unknown pipeline event version')
+    if version == 2:
+        require(word(probe.get('process_max_us')), 'Invalid decoder process maximum')
     for index, event in enumerate(events):
-        require(type(event) is list and len(event) == 7 and all(map(word, event)),
+        require(type(event) is list and len(event) == (7 if version == 1 else 11) and all(map(word, event)),
                 'Invalid pipeline event')
         require(event[0] == ((sequence - len(events) + 1 + index) & COUNTER_MASK) and
                 event[2] < 8, 'Invalid pipeline event order or phase')
+        if version == 2:
+            require(event[7] <= 3 and (event[7] & 1 or event[8] == 0) and
+                    (event[7] & 2 or event[9] == 0), 'Invalid decoder work flags or ages')
+            require(event[10] <= probe['process_max_us'], 'Inconsistent decoder process maximum')
     require(events or sequence == 0, 'Missing pipeline event history')
     result = dict(timer_hz=probe['timer_hz'], sequence=sequence,
                   phase_drops=list(histogram), events=[list(e) for e in events])
+    if version == 2:
+        result.update(event_version=version, process_max_us=probe['process_max_us'])
     if 'stream_failure' in probe:
         failure = probe['stream_failure']
         require(type(failure) is dict and all(word(failure.get(k))
@@ -52,6 +62,32 @@ def validate_output(output):
     return {key: output[key] for key in ('available', *OUTPUT_COUNTERS)}
 
 
+def validate_input_queue(value):
+    fields = ('resident', 'occupied', 'minimum', 'limit', 'packet_capacity')
+    require(type(value) is dict, 'Invalid input queue snapshot')
+    require(all(type(value.get(k)) is int and 0 <= value[k] <= COUNTER_MASK for k in fields),
+            'Missing or invalid input queue field')
+    if value['packet_capacity'] == 0:
+        require(all(value[k] == 0 for k in fields), 'Inconsistent absent input queue')
+    else:
+        require(0 < value['minimum'] <= value['resident'] and
+                value['minimum'] <= value['limit'] and value['occupied'] <= value['resident'],
+                'Inconsistent input queue capacity')
+    result = {key: value[key] for key in fields}
+    usage = ('ready', 'reading', 'writing', 'ready_bytes', 'reading_bytes')
+    if any(key in value for key in usage):
+        require(all(type(value.get(k)) is int and 0 <= value[k] <= COUNTER_MASK for k in usage),
+                'Missing or invalid input queue usage')
+        require(value['ready'] + value['reading'] + value['writing'] == value['occupied'],
+                'Inconsistent input queue ownership counts')
+        for state in ('ready', 'reading'):
+            require(value[state] <= value[state+'_bytes'] <= value[state] * value['packet_capacity'],
+                    'Inconsistent input queue byte count')
+        result.update({key:value[key] for key in usage})
+    # A reduced limit can temporarily be below resident while busy leases drain.
+    return result
+
+
 def read_health(board):
     raw = board.json('/api/native/health')
     require(type(raw) is dict and type(raw.get('schema')) is int and
@@ -70,6 +106,8 @@ def read_health(board):
         result['output'] = validate_output(raw['output'])
     if 'pipeline' in raw:
         result['pipeline'] = validate_pipeline(raw['pipeline'], validate_output(raw.get('output')))
+    if 'input_queue' in raw:
+        result['input_queue'] = validate_input_queue(raw['input_queue'])
     for key, fields in (
         ('last_allocation_failure', ('size', 'caps')),
         ('decoder_failure', ('sequence', 'codec', 'stage', 'result', 'completion',
@@ -127,6 +165,15 @@ def check_health(samples):
                 minimum_heap=min(r['heap'] for r in samples),
                 minimum_largest=min(r['largest'] for r in samples),
                 allocation_failures=0, task_watchdog_events=0)
+
+
+def check_decoder_health(rows):
+    require(rows, 'Missing decoder health observations')
+    for row in rows:
+        fault = row.get('decoder_failure', {})
+        require(type(fault.get('sequence')) is int and fault['sequence'] == 0,
+                'Missing decoder diagnostics or recorded decoder failure')
+    return dict(samples=len(rows), decoder_failures=0)
 
 
 def capture_failure_snapshot(board):

@@ -1,13 +1,60 @@
 # Bounded format confirmation: core and queue integration
 
-## Current state (2026-10-13)
+## Current state (2026-10-15)
+
+The [accepted quiet production checkpoint](ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md)
+now enables frame routing, continuous confirmation, input-tail coalescing and
+early compact AAC ownership in `-TestedRadioProfile`. It passes the exact-image
+codec, HTTPS, sustained, transition, network, WebUI and OTA campaigns and is
+installed on the C3. Generic Kconfig defaults remain opt-in. The following
+earlier checkpoints retain their original failures and experimental status;
+their pending-promotion wording describes those earlier images.
+
+### Earlier implementation and diagnostic checkpoints
 
 `stream_confirm.h` implements and tests a bounded confirmation core over a
 caller-owned byte window. `audio_service.c` now calls it through `stream_start.h`
 when **`CONFIG_YORADIO_STREAM_CONFIRM=y`** and the frame router is enabled.
 Both options remain experimental and off by default. Production therefore
-still uses the original single-header initial probe. Startup confirmation does
-not implement recovery after lost alignment during established playback.
+still uses the original single-header initial probe. The opt-in adapter now
+also confirms MP3/ADTS frames during established playback and performs bounded
+recovery after lost alignment; see the October 14 implementation and physical
+checkpoint below. Earlier checkpoints describe the startup-only implementation.
+
+Latest diagnostic checkpoint: a [600-second AAC-LC HTTPS observation](ESP32C3_AAC_CONFIRM_PROBE_20261014.md)
+passes 7/7 checks with zero new steady output/decoder/allocation/watchdog faults.
+The recorder changes timing/layout, and the earlier quiet-candidate 27-drop
+failure was not reproduced. It and the FLAC/WebUI TCP timeout remain open;
+no production qualification or default change is inferred.
+
+The subsequent [600-second quiet-image repeat](ESP32C3_AAC_QUIET_REPEAT_20261015.md)
+records 36 steady completion drops, with no allocation/decoder/watchdog faults
+and successful stopped-state memory recovery. The original report's memory
+failure is retained; independent replay exposes the output failure that it
+previously hid. Public tests now retain independent gates and exact window bounds.
+
+Controlled [TLS record-size tests](ESP32C3_AAC_TLS_RECORD_CONTROL_20261015.md)
+on a local-CA diagnostic image pass all four output checks (1 KiB, 16 KiB,
+growth and alternating records). Overall 29/30: the 16-KiB endpoint memory gate
+fails, with no allocation fault and successful stopped-state recovery. Delivery
+pauses and input-queue occupancy are the next diagnostic controls.
+
+The [controlled TLS pause experiment](ESP32C3_AAC_TLS_PAUSES_20261015.md) then
+reproduces 48 output completion drops during a 1.51-second pause, while shorter
+0.51/1.00-second pauses pass. Recent output-task checkpoints and old input/PCM
+ages support buffered-data exhaustion in that test. Next compare bounded AAC
+input expansion, preserving TLS reserve and late SBR/PS transition coverage.
+
+The [retained-owner expansion](ESP32C3_AAC_RETAIN_INPUT_20261015.md) reduces
+some pause events but fails a real allocation during TLS profile changes;
+production growth remains off. [Input utilization](ESP32C3_INPUT_USAGE_20261015.md)
+then finds partially filled READY slots. The opt-in
+[tail-coalescing experiment](ESP32C3_INPUT_TAIL_20261015.md) raises median READY
+fill from 56.87% to 100% with the original four slots and unchanged static RAM.
+The long imposed pause still fails output acceptance (45 events versus 47 in
+the utilization control), so fuller packets do not close the playback goal.
+Host ownership/framing tests pass; hardware qualification is tracked in that
+experiment's report. All original quiet-image and TCP failures remain open.
 
 The previous FFmpeg comparison identified false MP3 headers before AAC and false
 AAC headers before MP3 as unresolved failures. The new core rejects those
@@ -92,6 +139,202 @@ published to make room, and a whole held packet is never blindly labelled as
 one codec.
 
 ## Ordered remaining work
+
+### Installed production evidence, 2026-10-14
+
+The `idf61-prod-20261013` image (app SHA-256
+`f31ffba883053cf33d7f2e928bf529e5cbcac8f14a8aafd172e835a027684631`)
+has FRAME_ROUTER/STREAM_CONFIRM disabled. On the physical board, both AAC-only
+profile/rate/channel sequences pass, but MP3 → HE-AAC → MP3 and AAC → MP3 →
+HE-AACv2 fail at their middle segment. One false MP3 11.025-kHz mono status is
+observed inside the former sequence. Zero recorded decoder/allocation/watchdog
+faults and exact settled heap recovery do not excuse missing audio formats.
+See the [production transition report](ESP32C3_PRODUCTION_QUALIFICATION_20261014.md#in-connection-format-changes-production-gap-confirmed).
+
+Prioritize confirmation at decoder-family changes and bounded recovery after
+lost alignment, reusing the existing staging/confirmation ownership rules.
+Preserve partial headers, exact payload order, cancellation and codec drain
+ordering; do not enable the current strict-boundary experimental path as the
+production default while its documented recovery gaps remain. The two failed
+physical sequences are fixed acceptance cases for the completed implementation.
+
+### Continuous confirmation implementation, 2026-10-14
+
+The opt-in STREAM_CONFIRM adapter now confirms frames throughout MP3/ADTS
+playback. It publishes only the first confirmed frame and retains its lookahead
+for the next decision. Rate/channel/profile changes remain allowed. Decoder
+family changes retain the old family until its ordered drain marker is sent.
+Only initial selection publishes a provisional UI label; later decoded
+metadata cannot be overwritten by that provisional label.
+
+Candidates reuse up to four protected input-queue leases plus ten lookahead
+bytes. No new full-frame heap buffer is allocated. Confirmed data is coalesced
+within each received read. If the pending output lease prevents candidate
+growth, it is flushed before waiting. The separate 128-byte control node is
+used only when all guaranteed slots are held and is flushed before changing
+capacity. Confirmed prefixes survive a later failed candidate in the same call.
+
+After a failed boundary, search is limited to 4,096 discarded bytes across the
+whole connection, without resetting the allowance at each recovery. A ten-second
+candidate deadline is also checked by the network loop when the station watchdog
+is disabled. Cancellation and terminal paths release held leases. FLAC/Ogg
+signatures are accepted at initial selection only. Free-format MP3 still returns
+to decoder-owned framing for the connection; decoded free-format coverage remains
+required before enabling defaults.
+
+The actual send/finish path and adaptive queue pass ASan/UBSan tests for two
+mid-play false headers, exact recovered bytes and ordered drain offsets/codecs,
+the shared search budget, valid-prefix retention on exhaustion, mid-play
+cancellation/read failure/deadline, and the existing startup/EOF/metadata cases.
+Five hundred tiny AAC frames use at most six output packets with 2,048-byte
+reads, preserving coalescing instead of consuming one queue lease per frame.
+
+The real encoded corpus passes **34 cases**, each with 1/7/2,048-byte fragments:
+31 existing cases, two large false-prefix cases, and a new MP3 → HE-AAC → MP3
+stream with two false headers. Replayed encoded bytes match exactly; the mixed
+recovery case emits exactly two drains. [Sources, logs and hashes](../tests/results/esp32c3-stream-confirm-continuous-20261014/host/report.json)
+are retained. Reproduce with `tests/run-stream-confirm.py --output NEW_CORPUS`
+then `tests/run-stream-start.py --output NEW_RESULT --corpus NEW_CORPUS`.
+
+This host evidence covers transport/ownership, not decoded PCM, timing or TLS
+pressure. Production defaults remain disabled. The physical checkpoint below
+covers the resulting candidate; remaining qualification must measure sustained
+output, TLS pressure and recovery before default enablement.
+
+### Continuous-confirmation physical checkpoint, 2026-10-14
+
+Candidate `idf61-confirm-20261014`, app SHA-256
+`832ad10f31dbfa2aebe1b9b01012a4b2c4fab3a7bad75bfce45e3c7cc84375bb`,
+is built from `47239b01` with the production radio profile plus FRAME_ROUTER,
+STREAM_CONFIRM and AAC_COMPACT_EARLY_OWNER. It retains QIO 80 MHz, the public
+CA bundle, exact nominal 48-kHz output, and no deep sleep. AAC library bytes
+are unchanged. The build/link audits pass for AAC layout, HTTP-buffer release
+and the adaptive input allocator. Both baseline and early-owner layout checks
+require exact compiled sizes and 32-bit owner pointers; early reservation adds
+one `pending_owner` pointer rather than changing the DSP layout.
+
+The physical transition campaign passes **11/11**, compared with **9/11** on
+the installed baseline. Both formerly missing middle segments now appear in
+order: MP3 → HE-AAC → MP3 and AAC-LC → MP3 → HE-AACv2. AAC profile/rate/channel
+changes, Stop/replacement, settled recovery and settings checks also pass.
+All 311 health observations retain one boot and zero recorded allocation,
+decoder or watchdog faults. Sampled free/largest minima are **28,908 / 13,824 B**.
+Settled free-heap median changes from 139,480 to 139,496 B; the largest block
+remains 106,496 B and the task count remains 16.
+
+[Raw observations and independently replayed transition assertions](../tests/results/esp32c3-stream-confirm-continuous-20261014/physical/transitions/audit.json)
+are retained. This proves ordered decoded-format observations and bounded
+memory recovery for these sequences; it does not establish PCM sample accuracy,
+gapless analog output, sustained performance or HTTPS qualification.
+
+On that same candidate and boot, the subsequent finite HTTP matrix passes
+**28/28 checks**: 22 file/hint cases plus idle, recovery, settings and health
+gates. It covers MP3, FLAC, Vorbis, Opus, AAC-LC at 22.05/44.1/48 kHz,
+HE-AAC at 44.1/48 kHz, and HE-AACv2 at 44.1 kHz. Independent replay confirms
+the decoded formats, natural `stream ended` status, complete server delivery
+and pre-cleanup EOF memory recovery in every file case. All 684 health samples
+retain zero recorded allocation, decoder and watchdog faults. Sampled
+free/largest minima are **29,224 / 14,848 B**. Settled free-heap median changes
+from 139,404 to 139,412 B, with the largest block unchanged at 106,496 B and
+16 tasks. No traced request fails in either campaign.
+
+[HTTP observations and replay](../tests/results/esp32c3-stream-confirm-continuous-20261014/physical/http/audit.json),
+[build/link evidence](../tests/results/esp32c3-stream-confirm-continuous-20261014/build/build-audit.json)
+and [OTA installation/restoration](../tests/results/esp32c3-stream-confirm-continuous-20261014/physical/controller.json)
+are retained. The original production image is restored and verified stopped;
+Wi-Fi, playlist and settings remain unchanged. These two app-only OTA transfers
+do not replace negative/interrupted/repeated OTA acceptance. Candidate artifacts
+are saved under `firmware/development/esp32c3-idf61-continuous-confirm/` with
+`hardware_tested=true` and `production_qualified=false`.
+
+Next: qualify this exact candidate under public HTTPS and sustained heavy
+playback, rerun OTA acceptance, and test mid-play framing recovery/cancellation
+and free-format decoding on the target. The earlier intermittent TCP connect
+failure remains unattributed; these passing HTTP requests do not resolve it.
+
+### Continuous-confirmation public HTTPS files, 2026-10-14
+
+The same `832ad10f...` candidate passes **15/16 checks** against public FFmpeg
+FLAC, Vorbis and Opus files, using normal certificate verification. The host
+independently downloads, hashes and decodes each reference before the campaign;
+audio files remain outside the evidence archive. Five completed playback cases
+match the independently decoded format/duration, reach natural EOF, and have
+zero sampled steady completion-queue drops or write errors:
+
+| Case | Reference duration | Observed decoded playback | Result |
+| --- | ---: | ---: | --- |
+| FLAC, AUTO | 60.480 s | Interrupted observation | FAIL: WebUI TCP-connect timeout |
+| FLAC, explicit | 60.480 s | 60.248 s | PASS |
+| Opus, AUTO / explicit | 29.480 s | 29.154 / 29.515 s | PASS / PASS |
+| Vorbis, AUTO / explicit | 76.488 s | 76.355 / 76.096 s | PASS / PASS |
+
+The failed request is connection 83 from local port 61179; it times out after
+5.002 seconds before an HTTP response. The last ordinary FLAC observation is
+at 15.433 seconds. A diagnostic snapshot obtained before cleanup Stop still
+reports FLAC 44.1-kHz stereo playback, 60,920 free bytes and a 45,056-byte
+largest block. The latest health sample before the timeout and this snapshot
+span 5.602 seconds with **zero** completion-queue-drop/write-error increments,
+on the same boot. This provides a measured output-counter bracket absent from
+some older failures; it neither proves uninterrupted analog sound nor
+attributes the missing TCP handshake. The incomplete case remains FAIL.
+
+All 750 health observations retain one boot and zero recorded allocation,
+decoder or watchdog faults. Sampled free/largest minima are 57,468 / 40,960 B.
+Every settled recovery check passes. Original firmware and settings are
+verified restored, stopped. The later radio group was not run by this controller
+after the failed file group; it requires separate evidence.
+
+[Raw results, reference metadata, transport phases and independent replay](../tests/results/esp32c3-stream-confirm-continuous-20261014/https-files-01/public-files/audit.json)
+preserve the failure and successful controls. No production qualification or
+TCP fix is claimed.
+
+### Continuous-confirmation public HTTPS radio, 2026-10-14
+
+A separate campaign on the unchanged candidate records **10/11 checks passed**.
+Each of five SomaFM sources is observed for 60 seconds with independent
+FFprobe/FAAD format references. All five retain the expected decoded format;
+four pass the complete playback/output/memory gate:
+
+| Source | Reference output | Steady completion drops / write errors | Result |
+| --- | --- | ---: | --- |
+| 128-kbit AAC | AAC-LC, 44.1 kHz stereo | **27 / 0** | FAIL |
+| 64-kbit AAC | HE-AAC, 44.1 kHz stereo | 0 / 0 | PASS |
+| 32-kbit AAC | HE-AAC, 44.1 kHz stereo | 0 / 0 | PASS |
+| 16-kbit AAC | HE-AAC, 32 kHz; mono source, stereo PCM | 0 / 0 | PASS |
+| 256-kbit MP3 | MP3, 44.1 kHz stereo | 0 / 0 | PASS |
+
+The 16-kbit source has SBR without PS; this is not HTTPS HE-AACv2 coverage.
+Independent replay requires a fully matching decoded-format sample within
+15 seconds, rather than treating the initial `audio=true` family label as PCM.
+All five first matching observations occur at 3.33–3.40 seconds.
+
+The AAC-LC output counter increases by 5 and then 22 in the two sampled
+intervals from **40.708 to 41.818 seconds** after observation starts. Free heap
+at those endpoints is 64,376 and 68,996 B; the largest block is 36,864 B.
+There are no allocation, decoder or watchdog faults. The format remains correct
+and `audio=true` throughout the minute. These are lost completion notifications,
+not a measured count or duration of audible gaps. Their cause is unproven;
+neither network jitter nor continuous confirmation can yet be blamed or cleared.
+
+All 575 health observations retain one boot. Sampled free/largest minima are
+24,400 / 9,216 B. Settled free-heap median changes from 139,360 to 139,352 B;
+the largest block remains 110,592 B and task count remains 16. No traced WebUI
+request fails in this campaign. Original production firmware and private
+settings are verified restored, stopped.
+
+[Raw observations, references, exact counter increments and independent replay](../tests/results/esp32c3-stream-confirm-continuous-20261014/https-radio-01/audit.json)
+retain the failed AAC-LC case. Next compare baseline and candidate using the
+same encoded AAC-LC bytes and deterministic delivery pauses, then investigate
+TLS-specific behavior as needed. Continuous staging retains unpublished input
+leases, so available queued audio is a concrete hypothesis to measure, not a
+confirmed diagnosis. Preserve both failures (TCP and output), keep production
+defaults unchanged, and do not relax the output acceptance gate to enable them.
+
+The subsequent [matched HTTP A/B/A comparison](ESP32C3_AAC_DELIVERY_AB_20261014.md)
+passes all three 80-second observations with identical synthetic AAC-LC bytes
+and verified 100/250/500-ms delivery pauses. Each run has zero new steady output
+faults and passes memory recovery. This bounds a successful local test; the
+public HTTPS failure remains unreproduced and unattributed.
 
 ### Queue storage implemented and tested (2026-10-13)
 
@@ -776,3 +1019,23 @@ Original firmware and private settings are verified restored, stopped.
 [Retained reports, request phases and sources](../tests/results/esp32c3-stream-probe-20261013/early-owner-aac-repeat-01/summary.json).
 This closes a bounded AAC-LC repeat check, not the TCP cause investigation or
 the remaining all-format production qualification.
+
+### Input capacity and retained-owner experiments (2026-10-15)
+
+The [first guarded AAC growth trial](ESP32C3_AAC_INPUT_GROWTH_20261015.md)
+never expanded pure LC because its pending SBR owner was released before the
+readiness check. A [two-second prefill trial](ESP32C3_AAC_PREFILL2_20261015.md)
+did not improve the controlled TLS pause (50 completion drops versus 48).
+
+[Retaining the SBR owner](ESP32C3_AAC_RETAIN_INPUT_20261015.md) allows actual
+growth from four to eight slots and reduces that pause's drops to 33. However,
+the TLS changing-format case records a failed 1,630-byte DMA-capable allocation;
+the same case passes on the four-slot control image. Other tested transitions
+complete, but do not waive this failure. All original firmware/settings are
+restored. Extra AAC slots remain disabled in production.
+
+Next measure actual queued payload utilization and investigate bounded packing
+of validated bytes into existing slots, including EOF, cancellation, ordered
+drains and four-lease confirmation deadlocks. Keep the public AAC output and
+FLAC/WebUI timeout failures open; these experiments do not qualify a final
+production image or replace full-format verification.

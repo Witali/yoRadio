@@ -3,7 +3,7 @@
 #include "stream_confirm.h"
 #include "stream_staging.h"
 
-// Private stream_task startup adapter. No decoder pointer refers to the held
+// Private stream_task confirmation adapter. No decoder pointer refers to the held
 // window: replay copies short spans into independent control FIFO storage.
 enum { STREAM_START_CONTROL_PAYLOAD = 128 };
 static _Alignas(encoded_packet_t) uint8_t s_start_control[
@@ -14,7 +14,7 @@ static struct {
     int64_t deadline_us;
     size_t search_left, tag_anchor;
     uint32_t skip, tag_bytes;
-    bool active, tail_seen;
+    bool active, tail_seen, published, recovering;
 } s_stream_start;
 
 static bool stream_start_eligible(native_codec_t codec) {
@@ -26,43 +26,53 @@ static void stream_start_abort(void) {
     memset(&s_stream_start, 0, sizeof(s_stream_start));
 }
 
-static bool stream_start_publish(uint32_t generation, native_codec_t *codec,
-                                 stream_probe_result_t selected) {
+static bool stream_start_publish(stream_route_context_t *route,
+                                 stream_probe_result_t selected, size_t bytes) {
+    native_codec_t next;
     switch (selected) {
-        case STREAM_PROBE_MP3: *codec=NATIVE_CODEC_MP3; break;
-        case STREAM_PROBE_AAC: *codec=NATIVE_CODEC_AAC; break;
-        case STREAM_PROBE_FLAC: *codec=NATIVE_CODEC_FLAC; break;
-        case STREAM_PROBE_OGG: *codec=NATIVE_CODEC_OGG; break;
+        case STREAM_PROBE_MP3: next=NATIVE_CODEC_MP3; break;
+        case STREAM_PROBE_AAC: next=NATIVE_CODEC_AAC; break;
+        case STREAM_PROBE_FLAC: next=NATIVE_CODEC_FLAC; break;
+        case STREAM_PROBE_OGG: next=NATIVE_CODEC_OGG; break;
         default: return false;
     }
     // Publish the provisional family before handing any bytes to the decoder.
     // Replay can block long enough for it to publish a more precise profile.
-    state_set_audio(generation, true, codec_name(*codec));
+    if (!s_stream_start.published) {
+        *route->codec=next;
+        state_set_audio(route->generation, true, codec_name(next));
+        s_stream_start.published=true;
+    }
+    // Keep the old family until stream_route_begin emits its ordered drain.
+    // Never overwrite decoder-published metadata for later frames.
     // Prefer normal coalescing when at least one data slot is guaranteed to
     // remain outside our unpublished window. Tiny fragments can make a codec
     // allocate its own frame accumulator. Use the small independent node only
     // when all guaranteed data slots are held; TLS cannot lower this floor.
     adaptive_input_stats_t stats=adaptive_input_stats(s_encoded);
-    stream_route_context_t route = {.generation=generation, .codec=codec,
-        .control_payload_bytes=s_stream_start.window.count < stats.minimum
-            ? 0 : STREAM_START_CONTROL_PAYLOAD};
-    size_t bytes=stream_staging_size(&s_stream_start.window);
+    size_t capacity=s_stream_start.window.count < stats.minimum
+        ? 0 : STREAM_START_CONTROL_PAYLOAD;
+    if (capacity!=route->control_payload_bytes) {
+        if (!stream_route_flush(route)) return false;
+        route->control_payload_bytes=capacity;
+    }
     bool ok=true;
     for (size_t offset=0; offset<bytes && ok;) {
         size_t count;
         const uint8_t *span=stream_staging_span(&s_stream_start.window,offset,&count);
-        ok=stream_route_feed(&route,span,count);
+        if (count>bytes-offset) count=bytes-offset;
+        ok=stream_route_feed(route,span,count);
         offset+=count;
     }
-    if (ok) ok=stream_route_flush(&route);
-    if (!ok) stream_route_cancel(&route);
     return ok;
 }
 
-// MORE retains only owned queue leases; READY replayed every retained byte.
+// MORE retains an unconfirmed candidate; READY is EOF or decoder-owned bypass.
+// Only the confirmed first frame is published. Its lookahead stays unpublished
+// until it in turn is confirmed. The caller flushes/cancels route on every exit.
 // consumed identifies the unhandled suffix of the caller's current read.
-static stream_confirm_result_t stream_start_feed(uint32_t generation,
-        native_codec_t *codec, const uint8_t *data, size_t size, size_t *consumed,
+static stream_confirm_result_t stream_start_feed(stream_route_context_t *route,
+        const uint8_t *data, size_t size, size_t *consumed,
         bool eof) {
     *consumed=0;
     if (!s_stream_start.active) {
@@ -77,7 +87,7 @@ static stream_confirm_result_t stream_start_feed(uint32_t generation,
         s_stream_start.search_left=STREAM_PROBE_SEARCH_BYTES;
         s_stream_start.deadline_us=esp_timer_get_time()+(int64_t)STREAM_PROBE_TIMEOUT_MS*1000;
     }
-    while (atomic_load(&s_generation)==generation &&
+    while (atomic_load(&s_generation)==route->generation &&
            esp_timer_get_time()<s_stream_start.deadline_us) {
         if (s_stream_start.skip) {
             size_t skip=size-*consumed;
@@ -86,19 +96,30 @@ static stream_confirm_result_t stream_start_feed(uint32_t generation,
             if (s_stream_start.skip) return eof ? STREAM_CONFIRM_INVALID : STREAM_CONFIRM_MORE;
         }
         size_t bytes=stream_staging_size(&s_stream_start.window);
+        if (eof && *consumed==size && !bytes && s_stream_start.published &&
+            !s_stream_start.recovering) return STREAM_CONFIRM_READY;
         stream_confirm_info_t info;
-        stream_confirm_result_t result=stream_confirm_window(stream_staging_read,
+        stream_confirm_result_t result=stream_confirm_window_mode(stream_staging_read,
             &s_stream_start.window,bytes,eof && *consumed==size,
-            s_stream_start.search_left,STREAM_ID3_RUN_BYTES,&info);
+            s_stream_start.search_left,STREAM_ID3_RUN_BYTES,
+            !s_stream_start.published,&info);
         if (info.discard) {
             if (!stream_staging_erase(&s_stream_start.window,0,info.discard)) break;
             s_stream_start.search_left-=info.discard;
+            s_stream_start.recovering=true;
             s_stream_start.tag_bytes=0; s_stream_start.tag_anchor=0; s_stream_start.tail_seen=false;
             bytes-=info.discard;
         }
         if (result==STREAM_CONFIRM_READY || result==STREAM_CONFIRM_FREE_FORMAT) {
-            return stream_start_publish(generation,codec,info.codec)
-                ? STREAM_CONFIRM_READY : STREAM_CONFIRM_INVALID;
+            bool bypass=result==STREAM_CONFIRM_FREE_FORMAT || !info.first_frame_bytes;
+            size_t publish=bypass ? bytes : info.first_frame_bytes;
+            if (!stream_start_publish(route,info.codec,publish)) return STREAM_CONFIRM_INVALID;
+            if (bypass) return STREAM_CONFIRM_READY;
+            if (!stream_staging_erase(&s_stream_start.window,0,publish)) break;
+            s_stream_start.recovering=false;
+            s_stream_start.tag_bytes=0;s_stream_start.tag_anchor=0;s_stream_start.tail_seen=false;
+            s_stream_start.deadline_us=esp_timer_get_time()+(int64_t)STREAM_PROBE_TIMEOUT_MS*1000;
+            continue;
         }
         if (result==STREAM_CONFIRM_REMOVE_TAG) {
             if (info.tag_offset!=s_stream_start.tag_anchor) {
@@ -125,7 +146,12 @@ static stream_confirm_result_t stream_start_feed(uint32_t generation,
         if (count>size-*consumed) count=size-*consumed;
         size_t accepted=stream_staging_append(&s_stream_start.window,data+*consumed,count);
         *consumed+=accepted;
-        if (!accepted) vTaskDelay(pdMS_TO_TICKS(1)); // Bounded by generation and deadline above.
+        if (!accepted) {
+            // A coalesced output lease must not prevent the candidate from
+            // acquiring its fourth data slot. The consumer can now release it.
+            if (!stream_route_flush(route)) break;
+            vTaskDelay(pdMS_TO_TICKS(1)); // Generation and deadline bounded.
+        }
     }
     return STREAM_CONFIRM_INVALID;
 }

@@ -3,13 +3,105 @@
 Goal: keep HTTPS radio playback reliable on the ESP32-C3 OLED board by
 avoiding repeated allocation and release of large heap blocks.
 
+## Accepted production checkpoint, 2026-10-15
+
+The [current acceptance report](ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md)
+qualifies and installs `idf61-rawq-20261015`: 139 campaign checks plus six
+post-install checks pass. The tested radio profile enables TLS reservation,
+bounded input-tail coalescing, frame confirmation and early compact AAC ownership.
+Full-rate HE-AAC/PS remains enabled. The accepted campaigns have no recorded
+allocation/watchdog failures or unexpected reboots; recovery checks pass.
+Historical failures below retain their original image identity. Remaining
+reservation/segmentation investigations are future optimization work, not a
+claim that their individual research questions have all been resolved.
+
 Research update, 2026-10-13: [fragmentation methods, 1 KiB segmented input and
 span iterators](ESP32C3_MEMORY_RESERVATION_PLAN_20261013.md#fragmentation-review-segmented-buffers-and-iterators-2026-10-13).
 Keep total buffered bytes constant; audit the eight-slot ADTS startup window
 and every pointer owner before implementation. TLS/SBR remain separate
 contiguous-allocation problems. No new buffer size is enabled by this review.
 
-## Latest candidate checkpoint, 2026-10-13
+## Installed production checkpoint, 2026-10-14
+
+The installed `idf61-prod-20261013` image has app SHA-256
+`f31ffba883053cf33d7f2e928bf529e5cbcac8f14a8aafd172e835a027684631`.
+Its deployment/HE-AACv2 smoke is followed by a **600-second local FLAC test**:
+9/9 gates pass, zero new sustained output faults, decoder/allocation/watchdog
+faults or reboots. Settled heap recovers within 12 bytes; largest block returns
+to 114,688 bytes. See the [exact-image report](ESP32C3_PRODUCTION_QUALIFICATION_20261014.md).
+The pre-existing stopped `stream read failed` status is retained and remains
+unattributed. A subsequent **600-second Vorbis q10** run on the same boot also
+passes 9/9 gates, with zero recorded faults and exact settled free/largest
+recovery (139,492 / 114,688 bytes). **600-second Opus 510k** subsequently passes
+9/9 on the same boot with the same exact settled recovery and zero recorded
+faults. The three long local cases now pass. The subsequent strict HTTP
+format/EOF matrix passes **28/28**, including 22 files/hints and independently
+replayed natural EOF recovery before Stop (worst free-heap loss 12 bytes,
+no largest-block loss). All 683 health observations have zero decoder,
+allocation and watchdog faults. The first network/WebSocket campaign passes
+12/14, retaining a TCP connect timeout and a dependent checkpoint error.
+After repairing checkpoint diagnostics, a full repeat passes 14/14 with exact
+settled heap recovery and zero decoder/allocation/watchdog faults. The TCP
+timeout's cause is still open. A subsequent **600-second public HE-AAC HTTPS**
+run passes 7/7: zero measured steady output/decoder/allocation/watchdog faults,
+24,232/9,216 B sampled free/largest minima, and settled recovery within 56 B
+with the largest block unchanged. The transition matrix then passes 9/11:
+AAC profile/rate/channel changes and Stop/replacement pass, but both cross-family
+MP3/AAC sequences fail while FRAME_ROUTER is off. Health stays fault-free and
+settled heap recovers exactly. Safe decoder-family switching/confirmation and
+bounded recovery are now a demonstrated production gap, not merely missing
+test coverage. Other HTTPS formats and OTA regressions remain open. Historical
+short-window memory fluctuations are retained, not reclassified as fixed.
+This image does not enable the experimental router or
+early compact owner described in the candidate checkpoint below.
+
+## Continuous-confirmation candidate checkpoint, 2026-10-14
+
+The new `idf61-confirm-20261014` candidate passes **11/11 physical transition
+checks**, including both MP3/AAC sequences that fail on the installed baseline.
+There are zero recorded allocation, decoder and watchdog faults in 311 health
+observations on one boot. Settled free/largest memory recovers without loss;
+the sampled active free/largest minima are 28,908 / 13,824 bytes. Its subsequent
+HTTP format/EOF matrix passes **28/28**, including 22 file/hint cases with
+independently replayed natural EOF and memory recovery. All 684 additional
+health samples have zero recorded faults; sampled free/largest minima are
+29,224 / 14,848 bytes. The original production image/settings are verified
+restored, stopped. This removes
+the demonstrated transition failure in these HTTP cases, while default
+enablement and final-image HTTPS, sustained output and OTA qualification remain
+open. See the [implementation and physical evidence](ESP32C3_STREAM_CONFIRMATION_PLAN.md#continuous-confirmation-physical-checkpoint-2026-10-14).
+
+The candidate's subsequent public HTTPS file campaign passes **15/16**:
+explicit FLAC and both AUTO/explicit Vorbis and Opus finish correctly with
+zero sampled steady output-counter increments. AUTO FLAC is interrupted by a
+five-second WebUI TCP-connect timeout. A pre-Stop diagnostic still shows FLAC
+playback; its 5.602-second before/after counter bracket has zero output faults.
+All 750 health samples show zero allocation/decoder/watchdog faults and settled
+recovery passes, but the TCP cause and interrupted observation remain open.
+[Retained failure and reference-based checks](ESP32C3_STREAM_CONFIRMATION_PLAN.md#continuous-confirmation-public-https-files-2026-10-14).
+
+The subsequent five-source public HTTPS radio campaign passes **10/11**.
+HE-AAC 64/32/16-kbit sources and MP3 256-kbit pass; AAC-LC 128-kbit records
+**27 steady completion-queue drops** near observation second 41 while its
+format stays correct. All 575 health samples retain zero allocation, decoder
+and watchdog faults; settled memory recovers. This output failure is distinct
+from the TCP timeout and blocks default enablement. Next perform matched
+baseline/candidate tests with identical AAC bytes and controlled delivery
+pauses, measuring queued-input capacity and output counters; do not attribute
+the fault to the router or external network without that evidence.
+[Radio results and retained increments](ESP32C3_STREAM_CONFIRMATION_PLAN.md#continuous-confirmation-public-https-radio-2026-10-14).
+
+The [controlled HTTP A/B/A comparison](ESP32C3_AAC_DELIVERY_AB_20261014.md)
+passes 30/30 checks across production/candidate/production, including verified
+100/250/500-ms pauses in the same AAC-LC file. No output, decoder, allocation or
+watchdog faults occur; settled recovery passes. The public HTTPS output failure
+is not reproduced by this bounded local test and still requires investigation.
+A subsequent 120-second public AAC-LC control on the original image passes
+7/7, including 104.378 seconds of steady output with zero counter increments.
+This is additional control evidence, not attribution or a fix. Next correlate
+the candidate's output drops with pipeline phase/age telemetry under TLS.
+
+## Earlier experimental candidate checkpoint, 2026-10-13
 
 Candidate: `esp32c3-idf-6.1-r9a97-early-owner-public`, app SHA-256
 `219bfe1b4bd84e385825d5ee3b6e3468c7bf485a189c3765a11e511e1d459336`.

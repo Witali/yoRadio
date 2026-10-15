@@ -1,14 +1,18 @@
 """Execute the actual C3 custom-decoder branches with guarded ownership stubs."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
 import sys
+import re
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
 from run_output_dma_host import host,run
 
-folder=ROOT/'.build/codec-recovery/host'
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output',type=Path,default=ROOT/'.build/codec-recovery/host')
+folder=parser.parse_args().output
 folder.mkdir(parents=True,exist_ok=True)
 audio=ROOT/'idf/esp32c3-oled-native/main/audio_service.c'
 harness=ROOT/'tests/native/custom_decoder_terminal_test.c'
@@ -16,7 +20,9 @@ text=audio.read_text()
 start=text.index('#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM\n        if (codec == NATIVE_CODEC_FLAC)')
 end=text.index('        if (!decoder && !aac_decoder)',start)
 unit=folder/'test.c'
-unit.write_text(harness.read_text().replace('/* PRODUCTION_CUSTOM_BRANCHES */',text[start:end]))
+probe_header=audio.with_name('audio_pipeline_probe.h')
+probe=re.sub(r'^#(?:include|pragma)[^\n]*\n','',probe_header.read_text(),flags=re.M)
+unit.write_text(probe+'\n'+harness.read_text().replace('/* PRODUCTION_CUSTOM_BRANCHES */',text[start:end]))
 binary=folder/'test'
 (folder/'build.log').write_bytes(run(['gcc','-std=c11','-O2','-Wall','-Wextra','-Werror',
     '-fsanitize=address,undefined','-fno-pie','-no-pie',
@@ -24,7 +30,7 @@ binary=folder/'test'
 log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1',host(binary)])
 (folder/'run.log').write_bytes(log)
 assert b'PASS custom terminal ownership cases=20 queued PCM unchanged' in log
-paths=[audio,audio.parent/'audio_completion.h',harness,Path(__file__)]
+paths=[audio,audio.parent/'audio_completion.h',probe_header,harness,Path(__file__)]
 for p in paths:
     target=folder/'sources'/p.relative_to(ROOT);target.parent.mkdir(parents=True,exist_ok=True)
     target.write_bytes(p.read_bytes())

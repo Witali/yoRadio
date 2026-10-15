@@ -121,7 +121,9 @@ class Server:
     def __init__(self, host, port, fixtures, cert=None, key=None, *, unpaced_files=False,
                  delivery_stats=False, initial_failures=0, pacing_ratio=1.02,
                  delivery_pauses=(), send_buffer_bytes=None, icy_interval=0,
-                 icy_metadata=DEFAULT_METADATA):
+                 icy_metadata=DEFAULT_METADATA, tcp_nodelay=None):
+        if tcp_nodelay is not None and type(tcp_nodelay) is not bool:
+            raise ValueError('tcp_nodelay must be None or a boolean')
         if type(icy_interval) is not int or icy_interval < 0:
             raise ValueError('ICY interval must be a nonnegative integer')
         if icy_interval:
@@ -200,6 +202,10 @@ class Server:
                     self.send_error(400)
                     return
                 actual_send_buffer = None
+                if tcp_nodelay is not None:
+                    self.connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, int(tcp_nodelay))
+                actual_nodelay = (bool(self.connection.getsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY))
+                                  if delivery_stats or tcp_nodelay is not None else None)
                 if send_buffer_bytes is not None:
                     self.connection.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, send_buffer_bytes)
                     actual_send_buffer = self.connection.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
@@ -226,6 +232,9 @@ class Server:
                 if send_buffer_bytes is not None:
                     event.update(send_buffer_requested=send_buffer_bytes,
                                  send_buffer_actual=actual_send_buffer)
+                if actual_nodelay is not None:
+                    event.update(tcp_nodelay_requested=tcp_nodelay,
+                                 tcp_nodelay_actual=actual_nodelay)
                 pauses = DeliveryPauses(delivery_pauses, outer.closed, event) if delivery_pauses else None
                 if isinstance(self.connection, ssl.SSLSocket):
                     # Record negotiated algorithms, never certificates/keys.
@@ -333,6 +342,8 @@ def main():
                         help='Pause before BYTE_OFFSET:SECONDS; repeat in increasing byte order, up to 64 times')
     parser.add_argument('--send-buffer-bytes', type=int,
                         help='Optional SO_SNDBUF request (1024..1048576); actual OS value is recorded')
+    parser.add_argument('--tcp-nodelay', action=argparse.BooleanOptionalAction, default=None,
+                        help='Enable/disable TCP_NODELAY on audio sockets; omitted leaves the OS default')
     parser.add_argument('--icy-interval', type=int, default=0,
                         help='Insert synthetic ICY metadata every N audio bytes when requested; 0 disables')
     parser.add_argument('--events-output', type=Path,
@@ -344,7 +355,8 @@ def main():
     with Server(args.host,args.port,specs,args.cert,args.key, unpaced_files=args.unpaced_files,
                 delivery_stats=args.delivery_stats, initial_failures=args.initial_failures,
                 pacing_ratio=args.pacing_ratio, delivery_pauses=args.delivery_pause,
-                send_buffer_bytes=args.send_buffer_bytes, icy_interval=args.icy_interval) as server:
+                send_buffer_bytes=args.send_buffer_bytes, icy_interval=args.icy_interval,
+                tcp_nodelay=args.tcp_nodelay) as server:
         print(f"Serving {len(specs)} fixtures on port {args.port}; /manifest.json lists them", flush=True)
         try:
             threading.Event().wait()

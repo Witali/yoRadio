@@ -44,7 +44,7 @@
     ".flash.rodata": 308596,
     ".dram0.heap_start": 0
   },
-  "qualification": "Build/link audits, OTA identity/settings checks and 60-second local HE-AACv2 smoke passed. Full codec/network/OTA qualification was not rerun.",
+  "qualification": "Build/link audits, OTA deployment, HE-AACv2 smoke, three 600-second FLAC/Vorbis/Opus runs and strict 28/28 HTTP format/EOF cases pass. Full network/HTTPS/OTA and codec-transition qualification remains open. Network/WebSocket: initial 12/14 with a TCP connect timeout and dependent checkpoint error retained; repeat 14/14 passes, timeout cause remains open. Public 600-second HE-AAC HTTPS passes 7/7 with zero measured steady output/decoder/allocation/watchdog faults and settled heap recovery. Production transitions: 9/11; AAC-only changes pass but both MP3/AAC cross-family sequences fail with FRAME_ROUTER disabled. Health and settled recovery pass; family-switching implementation remains required.",
   "installed_identity": {
     "version": "idf61-prod-20261013",
     "partition": "app1",
@@ -59,5 +59,15 @@
   },
   "evidence": "tests/results/esp32c3-production-deployment-20261013",
   "report": "docs/ESP32C3_PRODUCTION_DEPLOYMENT_20261013.md",
-  "audio_codec_library_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909"
+  "audio_codec_library_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+  "additional_evidence": [
+    "tests/results/esp32c3-production-qualification-20261014/flac-600-01/summary.json",
+    "tests/results/esp32c3-production-qualification-20261014/vorbis-600-01/summary.json",
+    "tests/results/esp32c3-production-qualification-20261014/opus-600-01/summary.json",
+    "tests/results/esp32c3-production-qualification-20261014/http-eof-01/audit.json",
+    "tests/results/esp32c3-production-qualification-20261014/network-ws-01/audit.json",
+    "tests/results/esp32c3-production-qualification-20261014/network-ws-02/audit.json",
+    "tests/results/esp32c3-production-qualification-20261014/https-he-600-01/audit.json",
+    "tests/results/esp32c3-production-qualification-20261014/transitions-01/audit.json"
+  ]
 }

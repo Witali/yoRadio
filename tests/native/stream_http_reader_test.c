@@ -42,13 +42,17 @@ struct fake_client {
     bool cache_data_in_fetch_hdr;
     int state;
     unsigned next, calls, events, error_queries, closes;
+    unsigned scripted_wait_ms;
     int tls_error, tls_code;
 };
 static void esp_http_client_cached_buf_cleanup(esp_http_buffer_t *b) { b->raw_data=NULL; }
 /* SDK_HTTP_COMPLETE */
 static int esp_transport_read(struct fake_client *c,char *buffer,int size,int timeout) {
-    (void)timeout;++c->calls;assert(!c->closes && c->next<256);
+    ++c->calls;assert(!c->closes && c->next<256);
     step_t step=c->steps[c->next++];assert(step.bytes<=size);
+    if(step.bytes==ERR_TCP_TRANSPORT_CONNECTION_TIMEOUT) {
+        assert(timeout>=0);c->scripted_wait_ms+=(unsigned)timeout;
+    }
     if(step.bytes<0) errno=ECONNRESET;
     if(step.bytes>0) {
         if(step.data)memcpy(buffer,step.data,(size_t)step.bytes);
@@ -264,7 +268,73 @@ static void test_protocol(void) {
     puts("UNMODIFIED_SDK_LIMITATION close_notify_and_bare_TLS_EOF_are_indistinguishable_at_HTTP_API");
 }
 
+static void test_partial_read_timeout_latency(void) {
+    const int timeouts[]={25,250};
+    for(unsigned t=0;t<2;++t)for(unsigned chunked=0;chunked<2;++chunked) {
+        struct fake_client c;response_t r;esp_http_buffer_t b;
+        setup_headers(&c,&r,&b,chunked
+            ? "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n"
+            : "HTTP/1.1 200 OK\r\nContent-Length: 6\r\n\r\n");
+        c.timeout_ms=timeouts[t];
+        const char *first=chunked ? "3\r\nabc\r\n" : "abc";
+        const char *last=chunked ? "3\r\ndef\r\n0\r\n\r\n" : "def";
+        c.steps[0]=(step_t){.bytes=(int)strlen(first),.data=first};
+        c.steps[1]=(step_t){.bytes=ERR_TCP_TRANSPORT_CONNECTION_TIMEOUT};
+        c.steps[2]=(step_t){.bytes=(int)strlen(last),.data=last};
+        stream_http_reader_t reader={0};char output[64]={0};
+        assert(stream_http_read(&reader,&c,output,sizeof(output))==3);
+        assert(!memcmp(output,"abc",3) && c.scripted_wait_ms==(unsigned)timeouts[t]);
+        assert(!reader.failed && !c.closes && !esp_http_client_is_complete_data_received(&c));
+        assert(stream_http_read(&reader,&c,output+3,sizeof(output)-3)==3);
+        assert(!memcmp(output,"abcdef",6) && esp_http_client_is_complete_data_received(&c));
+        assert(stream_http_read(&reader,&c,output,sizeof(output))==0);
+        assert(c.scripted_wait_ms==(unsigned)timeouts[t] && c.calls==3 && !reader.failed);
+        ++cases;
+    }
+    puts("PARTIAL_TIMEOUT_PASS fixed_and_chunked; scripted_wait_ms=25/250; exact_body_and_EOF=true");
+}
+
+static void test_request_size_prefix_latency(void) {
+    // Same transport bytes and gap; only the caller's requested length changes.
+    // This models wait placement, not real TCP/TLS timing or decoder progress.
+    const int requests[]={512,2048};
+    char payload[1024];
+    for(unsigned n=0;n<sizeof(payload);++n)payload[n]=(char)(n%251);
+    for(unsigned q=0;q<2;++q)for(unsigned chunked=0;chunked<2;++chunked) {
+        struct fake_client c;response_t r;esp_http_buffer_t b;
+        setup_headers(&c,&r,&b,chunked
+            ? "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n"
+            : "HTTP/1.1 200 OK\r\nContent-Length: 1024\r\n\r\n");
+        c.timeout_ms=250;
+        unsigned step=0;
+        if(chunked)c.steps[step++]=(step_t){.bytes=5,.data="200\r\n"};
+        c.steps[step++]=(step_t){.bytes=256,.data=payload};
+        c.steps[step++]=(step_t){.bytes=256,.data=payload+256};
+        if(chunked)c.steps[step++]=(step_t){.bytes=2,.data="\r\n"};
+        c.steps[step++]=(step_t){.bytes=ERR_TCP_TRANSPORT_CONNECTION_TIMEOUT};
+        if(chunked)c.steps[step++]=(step_t){.bytes=5,.data="200\r\n"};
+        c.steps[step++]=(step_t){.bytes=256,.data=payload+512};
+        c.steps[step++]=(step_t){.bytes=256,.data=payload+768};
+        if(chunked)c.steps[step++]=(step_t){.bytes=7,.data="\r\n0\r\n\r\n"};
+        stream_http_reader_t reader={0};char output[2560]={0};
+        assert(stream_http_read(&reader,&c,output,requests[q])==512);
+        assert(!memcmp(output,payload,512));
+        assert(c.scripted_wait_ms==(q==0 ? 0U : 250U));
+        assert(!reader.failed && !c.closes && !esp_http_client_is_complete_data_received(&c));
+        if(q==0)assert(stream_http_read(&reader,&c,output+512,requests[q])==-ESP_ERR_HTTP_EAGAIN);
+        assert(stream_http_read(&reader,&c,output+512,requests[q])==512);
+        assert(!memcmp(output,payload,sizeof(payload)));
+        assert(stream_http_read(&reader,&c,output,requests[q])==0);
+        assert(c.scripted_wait_ms==250 && c.next==step && !reader.failed && !c.closes);
+        assert(esp_http_client_is_complete_data_received(&c));
+        ++cases;
+    }
+    puts("READ_SIZE_PASS fixed_and_chunked; prefix_512_wait_ms=0; prefix_2048_wait_ms=250; total_wait_equal; exact_body_and_EOF=true");
+}
+
 int main(void) {
+    test_request_size_prefix_latency();
+    test_partial_read_timeout_latency();
     // TLS allocation failure and invalid authenticated record: valid preceding
     // bytes survive, but the damaged connection is never read a second time.
     for(unsigned initial=0;initial<=64;initial+=32)

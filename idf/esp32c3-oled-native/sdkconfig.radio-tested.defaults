@@ -1,5 +1,5 @@
 # Reproduce the measured radio candidate on the pinned ESP-IDF 6.1 revision.
-# Qualification and remaining failures: docs/ESP32C3_HTTP_REQUEST_BUFFER.md.
+# Qualification and remaining failures: docs/ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md.
 # Quad flash and the fractional divider previously checked on this OLED board.
 # CONFIG_ESPTOOLPY_FLASHMODE_DIO is not set
 CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
@@ -27,3 +27,13 @@ CONFIG_YORADIO_INPUT_MIN_BLOCKS=5
 CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS=4
 CONFIG_YORADIO_INPUT_PREFILL_MS=1000
 CONFIG_YORADIO_INPUT_PREFILL_MIN_MS=1000
+
+# Qualified frame changes, compact AAC allocation order and packed input tails.
+CONFIG_YORADIO_FRAME_ROUTER=y
+CONFIG_YORADIO_STREAM_CONFIRM=y
+CONFIG_YORADIO_INPUT_TAIL_COALESCE=y
+CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER=y
+# Keep the measured bounded capacity and HTTP read policy.
+CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS=0
+CONFIG_YORADIO_STREAM_READ_BYTES=2048
+CONFIG_YORADIO_STREAM_READ_TIMEOUT_MS=250

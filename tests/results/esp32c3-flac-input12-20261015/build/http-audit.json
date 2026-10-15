@@ -1,0 +1,59 @@
+{
+  "result": "PASS",
+  "dynamic_buffers": true,
+  "retained_rx": false,
+  "sdkconfig_sha256": "6949ad8a13f90ebce1f3d32d61ecea3c6b069720e83f421139c1df5135bbd6ee",
+  "elf_sha256": "0e8dfa915ea06ee47af7ccabda5620cc2c5b9b35752cd544cf73d64f5e6650de",
+  "calls": [
+    {
+      "caller": "stream_task",
+      "target": "stream_http_read",
+      "calls": [
+        "42013e10:\t5ed000ef          \tjal\t42014bfc <stream_http_read>",
+        "42014416:\t7e6000ef          \tjal\t42014bfc <stream_http_read>"
+      ],
+      "disassembly_sha256": "a62cd43e381ff179eb4f993c42246067fcfdd22269609484ab789c769c764f57"
+    },
+    {
+      "caller": "esp_mbedtls_read",
+      "target": "yoradio_mbedtls_ssl_read",
+      "calls": [
+        "420f8e64:\t8682e0ef          \tjal\t42026ecc <yoradio_mbedtls_ssl_read>"
+      ],
+      "disassembly_sha256": "d3853db2dabb7d74117616dc5fbc3464d5e42b80d0bfff1b8362234982edb581"
+    },
+    {
+      "caller": "yoradio_mbedtls_ssl_read",
+      "target": "__wrap_mbedtls_ssl_read",
+      "calls": [
+        "42026ed4:\t51c6c0ef          \tjal\t420933f0 <__wrap_mbedtls_ssl_read>"
+      ],
+      "disassembly_sha256": "6a1bf957d8036f31cd09742cafd98b5020012a7d281e9d59bcb14209b81da673"
+    },
+    {
+      "caller": "__wrap_mbedtls_ssl_read",
+      "target": "esp_mbedtls_add_rx_buffer",
+      "calls": [
+        "420933fe:\t2e8d                \tjal\t42093770 <esp_mbedtls_add_rx_buffer>"
+      ],
+      "disassembly_sha256": "18379039389c041948f48a6a7c8595de31d02f0e6993c68d7468d40ef1bceb1c"
+    },
+    {
+      "caller": "__wrap_mbedtls_ssl_read",
+      "target": "mbedtls_ssl_read",
+      "calls": [
+        "42093414:\t67d010ef          \tjal\t42095290 <mbedtls_ssl_read>"
+      ],
+      "disassembly_sha256": "18379039389c041948f48a6a7c8595de31d02f0e6993c68d7468d40ef1bceb1c"
+    },
+    {
+      "caller": "__wrap_mbedtls_ssl_read",
+      "target": "esp_mbedtls_free_rx_buffer",
+      "calls": [
+        "4209342e:\t2135                \tjal\t4209385a <esp_mbedtls_free_rx_buffer>"
+      ],
+      "disassembly_sha256": "18379039389c041948f48a6a7c8595de31d02f0e6993c68d7468d40ef1bceb1c"
+    }
+  ],
+  "scope": "Linked RISC-V call paths only; no hardware or TLS cryptography qualification"
+}

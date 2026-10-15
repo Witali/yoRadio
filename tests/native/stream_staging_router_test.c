@@ -11,7 +11,9 @@ typedef struct {uint32_t generation; native_codec_t codec; uint16_t data_size;
 static adaptive_input_t *s_encoded;
 static atomic_uint s_generation;
 #define encoded_acquire adaptive_input_acquire
-#define encoded_commit adaptive_input_commit
+static BaseType_t encoded_commit(adaptive_input_t *input, encoded_packet_t *packet) {
+    return adaptive_input_commit_size(input,packet,sizeof(*packet)+packet->data_size);
+}
 static bool send_encoded(uint32_t gen,native_codec_t codec,const uint8_t *data,size_t size,uint8_t eos) {
     encoded_packet_t *packet=NULL;
     // Any attempt to route around the dedicated control node while the

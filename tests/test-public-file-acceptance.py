@@ -13,7 +13,8 @@ SPEC = dict(codec='flac', rate=44100, channels=2, bits=16, label='FLAC', seconds
 def samples():
     return [dict(seconds=i / 2, request_ms=80, audio=2 <= i / 2 < 32,
                  pcm_sample_rate=44100, pcm_channels=2, bits_per_sample=16,
-                 format='FLAC', channels_are_core=False) for i in range(80)]
+                 format='stream ended' if i / 2 >= 32 else 'FLAC',
+                 channels_are_core=False) for i in range(80)]
 
 
 def pending_format(row, label='FLAC'):
@@ -30,6 +31,7 @@ class FileTests(unittest.TestCase):
         def health():
             return [dict(boot_id='0123456789abcdef', uptime_ms=10000+i*500,
                 heap=64000, largest=32768, allocation_failures=0, task_watchdog_events=0,
+                decoder_failure=dict(sequence=0),
                 output=dict(available=True, completion_queue_drops=100, write_errors=0))
                 for i in range(12)]
         self.assertEqual(check_finite_health(health())['output']['completion_queue_drops'], 0)
@@ -45,12 +47,12 @@ class FileTests(unittest.TestCase):
                 check_finite_health(rows)
 
     def test_finite_memory_gates_remain_required(self):
-        for kind in ('heap','largest','allocation_failures','task_watchdog_events','trend','sparse'):
+        for kind in ('allocation_failures','task_watchdog_events','trend','sparse'):
             rows=[dict(boot_id='0123456789abcdef',uptime_ms=10000+i*500,
                 heap=64000,largest=32768,allocation_failures=0,task_watchdog_events=0,
+                decoder_failure=dict(sequence=0),
                 output=dict(available=True,completion_queue_drops=0,write_errors=0)) for i in range(12)]
-            if kind in ('heap','largest'): rows[6][kind]=1000
-            elif kind in ('allocation_failures','task_watchdog_events'): rows[6][kind]=1
+            if kind in ('allocation_failures','task_watchdog_events'): rows[6][kind]=1
             elif kind == 'trend':
                 for row in rows[-3:]: row['heap']-=2049
             else: rows=rows[:9]
@@ -58,6 +60,29 @@ class FileTests(unittest.TestCase):
 
     def test_complete_file(self):
         self.assertEqual(check_finite_playback(samples(), SPEC)['observed_playback_seconds'], 30)
+
+    def test_error_or_explicit_stop_near_expected_duration_is_not_eof(self):
+        for terminal in ('stream read failed', 'stopped', 'station unavailable', None):
+            rows = samples()
+            rows[64]['format'] = terminal
+            with self.subTest(terminal=terminal), self.assertRaises(Failure):
+                check_finite_playback(rows, SPEC)
+
+    def test_decoder_diagnostics_are_mandatory_even_when_output_is_healthy(self):
+        def health():
+            return [dict(boot_id='0123456789abcdef', uptime_ms=10000+i*500,
+                heap=10000, largest=4608, allocation_failures=0, task_watchdog_events=0,
+                decoder_failure=dict(sequence=0),
+                output=dict(available=True, completion_queue_drops=0, write_errors=0))
+                for i in range(12)]
+        # Low absolute headroom alone is diagnostic under the current policy.
+        self.assertFalse(check_finite_health(health())['health']['legacy_floor_pass'])
+        for kind in ('missing', 'fault'):
+            rows = health()
+            if kind == 'missing': del rows[6]['decoder_failure']
+            else: rows[6]['decoder_failure']['sequence'] = 1
+            with self.subTest(kind=kind), self.assertRaises(Failure):
+                check_finite_health(rows)
 
     def test_connection_and_container_prefix_before_pcm(self):
         rows = samples()

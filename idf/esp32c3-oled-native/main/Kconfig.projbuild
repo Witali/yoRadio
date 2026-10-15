@@ -44,6 +44,30 @@ config YORADIO_HTTP_RELEASE_REQUEST_BUFFER
         copy is restricted to an audited revision. Keep disabled until reuse,
         redirects, allocation failures, all codecs and OTA are qualified.
 
+config YORADIO_STREAM_READ_TIMEOUT_MS
+    int "HTTP body read timeout in milliseconds"
+    range 10 1000
+    default 250
+    help
+        Applied after final response headers, leaving connection, TLS handshake
+        and station-unavailable deadlines unchanged. A shorter timeout may
+        return authenticated partial body data sooner but increases polling
+        during network gaps. It does not change packet capacity or codec data.
+        Keep the established 250 ms default until HTTP/HTTPS, all codecs,
+        framing, Stop/EOF and memory recovery have been compared on hardware.
+
+config YORADIO_STREAM_READ_BYTES
+    int "HTTP body bytes requested per read (experimental)"
+    range 128 2048
+    default 2048
+    help
+        Limit each HTTP body read without changing the 2048-byte receive
+        scratch buffer, HTTP parser buffer or encoded-packet capacity.
+        Smaller requests can deliver an available prefix before a later
+        network gap, but increase call frequency and may reduce queue packing.
+        Compare continuity, throughput, ICY/framing, all codecs, Stop/EOF and
+        memory recovery before changing the established 2048-byte default.
+
 config YORADIO_TLS_LARGE_BLOCK_RESERVE
     bool "Reserve one large TLS allocation in static RAM (experimental)"
     depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_INTERNAL_MEM_ALLOC && MBEDTLS_DYNAMIC_BUFFER
@@ -101,28 +125,40 @@ config YORADIO_ADAPTIVE_INPUT_BUFFER
         tolerance. Keep disabled until all-codec and long-playback tests pass.
 
 config YORADIO_FRAME_ROUTER
-    bool "Route MP3/AAC frame boundaries (experimental)"
+    bool "Route MP3/AAC frame boundaries"
     depends on YORADIO_ADAPTIVE_INPUT_BUFFER
     default n
     help
         Coalesce frame spans into existing input leases and drain the old
         decoder before changing codec family. Skip inter-frame ID3 tags.
-        No full-frame allocation. Strict boundary mode: recovery after lost
-        alignment is not yet implemented. Free-format MP3
+        No full-frame allocation. Without STREAM_CONFIRM this is a strict
+        boundary walker without alignment recovery. Free-format MP3
         falls back to the existing decoder for the rest of the connection.
-        Keep disabled until live-transition and all-codec tests qualify it.
+        Enabled by the tested radio profile; validate custom input-pool settings.
 
-config YORADIO_STREAM_CONFIRM
-    bool "Confirm startup audio with a second frame header (experimental)"
+config YORADIO_INPUT_TAIL_COALESCE
+    bool "Fill partial queued input tails"
     depends on YORADIO_FRAME_ROUTER
     default n
     help
-        Retain a candidate frame in four existing input packet leases and check
-        its next boundary before selecting MP3/AAC. Replay through a separate
-        128-byte control payload, avoiding a fifth full packet allocation.
-        Requires at least four guaranteed input slots. Bounded startup only;
-        recovery during established playback is not implemented here.
-        Keep disabled until network, cancellation and physical playback tests pass.
+        Reopen a partial READY data tail only when an older queued node remains.
+        Append matching generation/codec data outside the queue lock, then
+        republish before the current read returns. Never modify READING or
+        control storage. No new packet allocation or cross-read waiting.
+        Enabled by the tested radio profile after ownership and playback checks.
+
+config YORADIO_STREAM_CONFIRM
+    bool "Confirm MP3/AAC frames and recover alignment"
+    depends on YORADIO_FRAME_ROUTER
+    default n
+    help
+        Retain each candidate in at most four existing input packet leases and
+        check its next boundary before publishing or changing decoder family.
+        Coalesce confirmed frames; use a separate 128-byte control payload only
+        when all guaranteed data slots are held. Scan at most 4096 junk bytes
+        per connection and wait at most ten seconds for a candidate. Requires
+        four guaranteed slots. Free-format MP3 returns to decoder-owned parsing.
+        Enabled by the tested radio profile after network and playback checks.
 
 config YORADIO_INPUT_MIN_BLOCKS
     int "Minimum compressed-input capacity (1600-byte units)"
@@ -137,7 +173,7 @@ config YORADIO_INPUT_MIN_BLOCKS
 
 config YORADIO_INPUT_PREFILL_MS
     int "Maximum initial compressed-input prefill time (experimental, ms)"
-    range 0 1000
+    range 0 2000
     default 0
     help
         Before opening a decoder for a new stream, allow its existing input
@@ -163,6 +199,36 @@ config YORADIO_FLAC_INPUT_EXTRA_SLOTS
         reclaiming queued or leased slots only when the decoder returns them.
         Zero preserves the existing policy. Keep disabled until heavy FLAC,
         AAC switching, memory recovery, TLS and OTA checks pass.
+
+config YORADIO_AAC_INPUT_EXTRA_SLOTS
+    int "Extra input slots after the first AAC frame (experimental)"
+    depends on YORADIO_ADAPTIVE_INPUT_BUFFER && YORADIO_TLS_LARGE_BLOCK_RESERVE && YORADIO_AAC_COMPACT_EARLY_OWNER
+    range 0 8
+    default 0
+    help
+        After successful native AAC output, allow bounded input expansion only
+        while the configured compact SBR/PS owner is allocated or reserved.
+        Retain the unused compact owner after LC PCM for late SBR/PS; this
+        costs its full configured size even during LC playback. Reuse idle
+        packet slots up to the saved target, with advisory internal-heap
+        headroom configured below. Never reclaim live leases.
+        The permanent TLS RX reserve is unchanged. AAC-LC fallback without a
+        reserved SBR owner keeps the minimum queue. Stop/EOF/new connections
+        retire extra slots through their ordinary lease lifecycle.
+        Keep zero until late SBR/PS, codec transitions, TLS, recovery and OTA
+        qualify the experiment. This is not a memory-availability guarantee.
+
+config YORADIO_AAC_INPUT_HEADROOM_BYTES
+    int "Internal heap headroom after AAC input expansion (experimental, bytes)"
+    depends on YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+    range 16384 65536
+    default 32768
+    help
+        Check this remaining free-heap allowance before restoring each slot,
+        after the compact SBR/PS owner is already allocated or reserved.
+        This is not a contiguous reservation or a guarantee for concurrent
+        allocations. Lower values require physical late-SBR/PS, large-frame,
+        TLS, WebUI, OTA and recovery tests. FLAC keeps its separate 32-KiB policy.
 
 config YORADIO_INPUT_PREFILL_MIN_MS
     int "Minimum initial compressed-input prefill time (experimental, ms)"
@@ -772,11 +838,11 @@ config YORADIO_AAC_COMPACT_EARLY_OWNER
     depends on YORADIO_AAC_COMPACT_SBR
     default n
     help
-        Allocation-order experiment using the selected compact layout size.
+        Reserve the selected compact layout before allocating core and PCM storage.
         Transfer the pending block to the SDK on its SBR request; release
         unused storage after real LC output or decoder destruction. Adds one
         pointer per native AAC decoder. Does not change DSP or format support.
-        Requires repeated HTTPS, LC/late-SBR, lifetime and PCM qualification.
+        The tested radio profile enables this with HTTPS and LC/late-SBR coverage.
 
 config YORADIO_AAC_HIGH_HISTORY
     bool "Pack retained high-QMF history"

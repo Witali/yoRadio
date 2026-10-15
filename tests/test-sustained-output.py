@@ -4,6 +4,7 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools/esp32c3_tests'))
 from common import Failure
 from sustained_output import sustained_window, check_output, check_memory
+from local_sustained import decoder_health
 
 
 def health(ms=0,drops=9,errors=2):
@@ -13,6 +14,14 @@ def health(ms=0,drops=9,errors=2):
 
 
 class SustainedTests(unittest.TestCase):
+    def test_local_sustained_requires_decoder_evidence_on_every_row(self):
+        valid = dict(decoder_failure=dict(sequence=0))
+        self.assertEqual(decoder_health([valid, valid])['samples'], 2)
+        for rows in ([], [{}], [valid, {}], [dict(decoder_failure=dict(sequence=1))],
+                     [dict(decoder_failure=dict(sequence=False))]):
+            with self.assertRaises(Failure):
+                decoder_health(rows)
+
     def test_window_excludes_startup_and_checks_complete_collection(self):
         states=[dict(seconds=s) for s in range(60)]
         rows=[health(s*1000) for s in range(60)]

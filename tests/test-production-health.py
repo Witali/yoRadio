@@ -16,6 +16,33 @@ def sample(**updates):
 
 
 class HealthTests(unittest.TestCase):
+    def test_input_queue_usage_is_complete_bounded_and_separate_from_occupancy(self):
+        queue=dict(resident=4,occupied=4,minimum=4,limit=4,packet_capacity=2060,
+                   ready=2,reading=1,writing=1,ready_bytes=1500,reading_bytes=600)
+        self.assertEqual(read_health(Mock(json=Mock(return_value=sample(input_queue=queue))))['input_queue'],queue)
+        for update in ({'writing':2},{'ready_bytes':4121},{'reading':0},
+                       {'ready_bytes':1},{'ready':True},{'reading_bytes':-1}):
+            with self.subTest(update=update),self.assertRaises(Failure):
+                read_health(Mock(json=Mock(return_value=sample(input_queue=dict(queue,**update)))))
+        for key in ('ready','reading','writing','ready_bytes','reading_bytes'):
+            missing=dict(queue);del missing[key]
+            with self.subTest(missing=key),self.assertRaises(Failure):
+                read_health(Mock(json=Mock(return_value=sample(input_queue=missing))))
+        empty={key:0 for key in queue}
+        self.assertEqual(read_health(Mock(json=Mock(return_value=sample(input_queue=empty))))['input_queue'],empty)
+
+    def test_optional_input_queue_filters_and_checks_capacity(self):
+        queue = dict(resident=8, occupied=6, minimum=4, limit=4, packet_capacity=2068)
+        result = read_health(Mock(json=Mock(return_value=sample(input_queue=dict(queue, private='ignored')))))
+        self.assertEqual(result['input_queue'], queue)
+        # Busy slots above a newly lowered limit are valid until their leases end.
+        for change in (dict(occupied=9), dict(minimum=9), dict(limit=3), dict(resident=True),
+                       dict(packet_capacity=0), dict(occupied=-1), dict(limit=2**32)):
+            with self.subTest(change=change), self.assertRaises(Failure):
+                read_health(Mock(json=Mock(return_value=sample(input_queue=dict(queue, **change)))))
+        absent = {key:0 for key in queue}
+        self.assertEqual(read_health(Mock(json=Mock(return_value=sample(input_queue=absent))))['input_queue'],absent)
+
     def test_failure_snapshot_reads_once_and_does_not_change_playback(self):
         board = HealthBoard('http://unused.invalid')
         board.health_samples.append(sample())

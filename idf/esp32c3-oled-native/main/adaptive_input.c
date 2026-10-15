@@ -43,6 +43,13 @@ adaptive_input_stats_t adaptive_input_stats(adaptive_input_t *input) {
         slot_state_t state = input->slots[i].state;
         if (state == WRITING || state == READY || state == READING)
             ++result.occupied;
+        if (state == READY) {
+            ++result.ready;
+            result.ready_bytes += input->slots[i].size;
+        } else if (state == READING) {
+            ++result.reading;
+            result.reading_bytes += input->slots[i].size;
+        } else if (state == WRITING) ++result.writing;
     }
     portEXIT_CRITICAL(&input->lock);
     return result;
@@ -187,13 +194,21 @@ BaseType_t adaptive_input_acquire(adaptive_input_t *input, void **packet,
     return pdFALSE;
 }
 
-BaseType_t adaptive_input_commit(adaptive_input_t *input, void *packet) {
+static BaseType_t commit_packet(adaptive_input_t *input, void *packet,
+                                size_t used, bool trim) {
     if (!input || !packet) return pdFALSE;
     portENTER_CRITICAL(&input->lock);
     for (unsigned scan = 0; scan <= input->target; ++scan) {
         unsigned i = scan == input->target ? CONTROL_SLOT : scan;
         input_slot_t *slot = input_slot(input, i);
         if (slot->data != packet || slot->state != WRITING) continue;
+        if (trim) {
+            if (!used || used > slot->size) {
+                portEXIT_CRITICAL(&input->lock);
+                return pdFALSE;
+            }
+            slot->size = used;
+        }
         slot->state = READY;
         slot->next = NO_SLOT;
         if (input->tail != NO_SLOT) input_slot(input, input->tail)->next = i;
@@ -205,6 +220,44 @@ BaseType_t adaptive_input_commit(adaptive_input_t *input, void *packet) {
     }
     portEXIT_CRITICAL(&input->lock);
     return pdFALSE;
+}
+
+BaseType_t adaptive_input_commit(adaptive_input_t *input, void *packet) {
+    return commit_packet(input, packet, 0, false);
+}
+
+BaseType_t adaptive_input_commit_size(adaptive_input_t *input, void *packet,
+                                      size_t used) {
+    return commit_packet(input, packet, used, true);
+}
+
+BaseType_t adaptive_input_reopen_tail(adaptive_input_t *input, void **packet,
+                                      size_t *used) {
+    if (packet) *packet = NULL;
+    if (used) *used = 0;
+    if (!input || !packet || !used) return pdFALSE;
+    portENTER_CRITICAL(&input->lock);
+    unsigned tail = input->tail;
+    if (tail >= input->target || input->head == tail ||
+        input->slots[tail].state != READY ||
+        input->slots[tail].size == input->packet_capacity) {
+        portEXIT_CRITICAL(&input->lock);
+        return pdFALSE;
+    }
+    unsigned previous = input->head;
+    // At most target data nodes and one control node; no heap work or copying
+    // under the lock. The single producer will reinsert this same FIFO tail.
+    while (input_slot(input, previous)->next != tail)
+        previous = input_slot(input, previous)->next;
+    input_slot(input, previous)->next = NO_SLOT;
+    input->tail = previous;
+    input_slot_t *slot = &input->slots[tail];
+    *packet = slot->data;
+    *used = slot->size;
+    slot->size = input->packet_capacity;
+    slot->state = WRITING;
+    portEXIT_CRITICAL(&input->lock);
+    return pdTRUE;
 }
 
 bool adaptive_input_attach_control(adaptive_input_t *input, void *storage,
