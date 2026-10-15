@@ -10,9 +10,9 @@ import time
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from common import Blocked, Report, check_playback, check_recovery_heap, fixtures, require, sha
+from common import Blocked, Report, check_playback, check_recovery_heap, fixtures, matches, require, sha
 from ota import image_info, snapshot, verify_snapshot
-from production_health import HealthBoard, capture_failure_snapshot, check_health, check_decoder_health
+from production_health import HealthBoard, capture_failure_snapshot, check_health, check_decoder_health, output_window
 from public_streams import DEFAULT_MANIFEST, probe, public_url
 from run import Capture, Suite
 from trace_transport import TransportTrace
@@ -48,6 +48,40 @@ def idle_recovery(data, name):
         raise Blocked('Incomplete idle checkpoint: ' + ', '.join(missing))
     check_recovery_heap(data['idle']['initial'], data['idle'][name])
     return dict(compared_with='initial', free_loss_tolerance=2048, largest_loss_tolerance=4096)
+
+
+def public_window_checks(states, steady, spec, seconds, *, enforce_legacy_floor=False):
+    """Retain independent failures; memory rejection must not hide output faults."""
+    checks = {}
+
+    def format_check():
+        require(states and states[-1]['seconds'] >= seconds-1,
+                'Incomplete playback observation')
+        first = next((s['seconds'] for s in states if matches(s, spec)), None)
+        require(first is not None and first <= 15, 'No matching decoded format within 15 seconds')
+        return dict(first_decoded_format_seconds=first,
+                    **check_playback(states, spec, minimum=int((seconds-15)*.6), warmup=15))
+
+    def response_check():
+        require(states, 'Missing status evidence')
+        maximum = max(s['request_ms'] for s in states)
+        require(maximum < 2000, 'WebUI response exceeded 2 seconds')
+        return dict(max_status_and_health_ms=maximum)
+
+    def memory_check():
+        require(len(steady) >= 10, 'Missing steady-state health evidence')
+        return check_memory(steady, enforce_legacy_floor=enforce_legacy_floor)
+
+    # Measurement is separate from acceptance, so nonzero counters remain visible.
+    for name, fn in (('format', format_check), ('response', response_check),
+                     ('memory', memory_check), ('decoder', lambda: check_decoder_health(steady)),
+                     ('output_measurement', lambda: output_window(steady)),
+                     ('output', lambda: check_output(steady))):
+        try:
+            checks[name] = dict(result='PASS', evidence=fn())
+        except Exception as error:
+            checks[name] = dict(result='FAIL', reason=str(error), exception_type=type(error).__name__)
+    return checks
 
 
 def main():
@@ -114,16 +148,20 @@ def main():
         try:
             b.play(url)
             states=suite.observe(a.seconds,'https:'+name)
-            first=next((s['seconds'] for s in states if s['audio']),None)
-            require(first is not None and first<=15, 'No full PCM playback within 15 seconds')
-            playback=check_playback(states,reference['spec'],minimum=int((a.seconds-15)*.6),warmup=15)
-            require(max(s['request_ms'] for s in states)<2000, 'WebUI response exceeded 2 seconds')
-            steady=[r for r in b.health_samples if r['at']>=started+15]
-            require(len(steady)>=10, 'Missing steady-state health evidence')
-            memory=check_memory(steady,enforce_legacy_floor=a.enforce_legacy_heap_floor)
-            output=check_output(steady)
-            return dict(reference=reference,playback=playback,health=memory,output_window=output,
-                first_pcm_seconds=first,max_status_and_health_ms=max(s['request_ms'] for s in states))
+            ended=time.perf_counter()
+            steady=[r for r in b.health_samples if started+15<=r['at']<=ended]
+            checks=public_window_checks(states,steady,reference['spec'],a.seconds,
+                enforce_legacy_floor=a.enforce_legacy_heap_floor)
+            report.data.setdefault('public_checks',{})[name]=dict(
+                started_at=started,ended_at=ended,warmup_seconds=15,
+                health_samples=len(steady),checks=checks)
+            report.save()
+            failures=[key+': '+row['reason'] for key,row in checks.items() if row['result']!='PASS']
+            require(not failures, '; '.join(failures))
+            return dict(reference=reference,playback=checks['format']['evidence'],
+                health=checks['memory']['evidence'],output_window=checks['output']['evidence'],
+                first_decoded_format_seconds=checks['format']['evidence']['first_decoded_format_seconds'],
+                **checks['response']['evidence'])
         except Exception:
             report.data.setdefault('failure_snapshots',{})[name]=capture_failure_snapshot(b)
             report.save()
