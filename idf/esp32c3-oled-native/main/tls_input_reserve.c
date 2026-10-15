@@ -39,9 +39,9 @@ void tls_input_reserve_prepare_connection(void) {
     // The static TLS slot consumes RAM even for HTTP and small TLS records.
     // Fund it before input slots fill; later allocation hooks cannot reclaim
     // producer/decoder leases or queued bytes. request=0 denotes this policy,
-    // rather than an allocation failure. Only the explicit post-FLAC policy
+    // rather than an allocation failure. Only explicit post-decoder policies
     // may later restore slots; the next connection always starts at the floor.
-#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+#ifdef YORADIO_INPUT_EXPANSION_ENABLED
     adaptive_input_stats_t stats = adaptive_input_stats(input);
     adaptive_input_set_limit(input, stats.minimum);
     // The limit retires busy extras when their leases end. Preserve the
@@ -54,31 +54,41 @@ void tls_input_reserve_prepare_connection(void) {
     adaptive_input_restore(input);
 #endif
 }
-#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
-enum { FLAC_INPUT_HEAP_HEADROOM = 32 * 1024 };
+#ifdef YORADIO_INPUT_EXPANSION_ENABLED
+enum { INPUT_EXPANSION_HEAP_HEADROOM = 32 * 1024 };
 
-void tls_input_reserve_expand_flac(void) {
+static void expand_input(unsigned extra_slots, const char *codec) {
+    (void)codec; // Logging may be compiled out in production and host tests.
     adaptive_input_t *input = atomic_load(&s_input);
     adaptive_input_stats_t stats = adaptive_input_stats(input);
     if (!input) return;
-    adaptive_input_set_limit(input, stats.minimum +
-                                    CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS);
+    adaptive_input_set_limit(input, stats.minimum + extra_slots);
     // Single producer; each attempt is bounded. The decoder has already
-    // allocated its FLAC frame storage. Another task can still allocate after
+    // allocated its working storage. Another task can still allocate after
     // this snapshot, so the threshold is advisory, never a heap guarantee.
-    for (unsigned attempt = 0; attempt < CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS;
+    for (unsigned attempt = 0; attempt < extra_slots;
          ++attempt) {
         size_t available = heap_caps_get_free_size(MALLOC_CAP_INTERNAL |
                                                     MALLOC_CAP_8BIT);
-        if (available < FLAC_INPUT_HEAP_HEADROOM ||
-            stats.packet_capacity > available - FLAC_INPUT_HEAP_HEADROOM ||
+        if (available < INPUT_EXPANSION_HEAP_HEADROOM ||
+            stats.packet_capacity > available - INPUT_EXPANSION_HEAP_HEADROOM ||
             !adaptive_input_restore_one(input)) break;
     }
     stats = adaptive_input_stats(input);
-    ESP_LOGI("tls_input", "PERF FLAC_INPUT: resident=%u minimum=%u limit=%u "
-             "target=%u capacity=%u", stats.resident, stats.minimum, stats.limit,
+    ESP_LOGI("tls_input", "PERF %s_INPUT: resident=%u minimum=%u limit=%u "
+             "target=%u capacity=%u", codec, stats.resident, stats.minimum, stats.limit,
              stats.target, (unsigned)(stats.resident * stats.packet_capacity));
 }
+#if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
+void tls_input_reserve_expand_flac(void) {
+    expand_input(CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS, "FLAC");
+}
+#endif
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+void tls_input_reserve_expand_aac(void) {
+    expand_input(CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS, "AAC");
+}
+#endif
 
 void tls_input_reserve_finish_connection(void) {
     adaptive_input_t *input = atomic_load(&s_input);

@@ -165,6 +165,22 @@ config YORADIO_FLAC_INPUT_EXTRA_SLOTS
         Zero preserves the existing policy. Keep disabled until heavy FLAC,
         AAC switching, memory recovery, TLS and OTA checks pass.
 
+config YORADIO_AAC_INPUT_EXTRA_SLOTS
+    int "Extra input slots after the first AAC frame (experimental)"
+    depends on YORADIO_ADAPTIVE_INPUT_BUFFER && YORADIO_TLS_LARGE_BLOCK_RESERVE && YORADIO_AAC_COMPACT_EARLY_OWNER
+    range 0 8
+    default 0
+    help
+        After successful native AAC output, allow bounded input expansion only
+        while the configured compact SBR/PS owner is allocated or reserved.
+        Reuse idle packet slots up to the saved target and leave at least
+        32 KiB of advisory internal-heap headroom. Never reclaim live leases.
+        The permanent TLS RX reserve is unchanged. AAC-LC fallback without a
+        reserved SBR owner keeps the minimum queue. Stop/EOF/new connections
+        retire extra slots through their ordinary lease lifecycle.
+        Keep zero until late SBR/PS, codec transitions, TLS, recovery and OTA
+        qualify the experiment. This is not a memory-availability guarantee.
+
 config YORADIO_INPUT_PREFILL_MIN_MS
     int "Minimum initial compressed-input prefill time (experimental, ms)"
     depends on YORADIO_INPUT_PREFILL_MS > 0

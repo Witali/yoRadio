@@ -132,6 +132,13 @@ void native_aac_decoder_destroy(native_aac_decoder_t *decoder) {
     free(decoder);
 }
 
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+bool native_aac_decoder_input_growth_ready(const native_aac_decoder_t *decoder) {
+    return decoder && decoder->codec && !decoder->compact.allocation_failed &&
+           (decoder->compact.owner || decoder->compact.pending_owner);
+}
+#endif
+
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
 void native_aac_decoder_test_disable_late_sbr(native_aac_decoder_t *decoder) {
     assert(decoder && !decoder->codec);

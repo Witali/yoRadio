@@ -1,11 +1,17 @@
 #pragma once
 
 #include "esp_audio_simple_dec.h"
+#include "sdkconfig.h"
 
 typedef struct native_aac_decoder native_aac_decoder_t;
 
 native_aac_decoder_t *native_aac_decoder_create(void);
 void native_aac_decoder_destroy(native_aac_decoder_t *decoder);
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+// Decoder task only, after successful PCM. No pointers escape this query.
+// LC fallback without the worst-profile owner must not fund extra input slots.
+bool native_aac_decoder_input_growth_ready(const native_aac_decoder_t *decoder);
+#endif
 #ifdef CONFIG_YORADIO_QEMU_AAC_LATE_SBR_TEST
 // Select the unmodified native controller before opening a QEMU test decoder.
 void native_aac_decoder_test_disable_late_sbr(native_aac_decoder_t *decoder);
