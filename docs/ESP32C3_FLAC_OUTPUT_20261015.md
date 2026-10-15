@@ -579,3 +579,24 @@ including public HTTPS files and OTA; do not promote on diagnostic results alone
 [Build evidence](../tests/results/esp32c3-raw-tail-20261015/build/) and
 [physical reports, queue measurements and exact test sources](../tests/results/esp32c3-raw-tail-20261015/physical/)
 retain the failed paused output gate as well as the successful runs.
+
+### Corrected quiet candidate
+
+`firmware/development/esp32c3-idf61-raw-tail-quiet/` contains the corrected
+production-profile candidate `idf61-rawq-20261015`, application SHA-256
+`90334aabe2d62cbec10b0686433eba43d8c79bd62c5c191db337dace5e571aeb`
+(1,474,288 B). It disables the expanded pipeline recorder, retains full public
+TLS roots and AAC SBR/PS support, and uses QIO 80 MHz without deep sleep.
+The earlier quiet configuration is preserved: newly exposed read settings are
+explicitly set to their existing defaults, 2,048 B and 250 ms. The build and
+AAC/HTTP/allocator link audits pass; this is not yet a qualified release.
+
+The bounded physical qualification campaign checks public HTTPS FLAC/Vorbis/Opus
+with AUTO and explicit hints, the local HTTP codec matrix, format transitions,
+network fault recovery, WebSocket metadata and OTA negative/round-trip/playing/
+slow-upload cases. It stops between suites on a failed gate and restores the
+original application, settings and stopped state in its final cleanup. Results
+must be reviewed before promoting this image; the diagnostic success above
+does not substitute for testing this exact quiet binary.
+
+[Quiet build and audit evidence](../tests/results/esp32c3-raw-tail-quiet-20261015/build/).
