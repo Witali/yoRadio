@@ -600,3 +600,44 @@ must be reviewed before promoting this image; the diagnostic success above
 does not substitute for testing this exact quiet binary.
 
 [Quiet build and audit evidence](../tests/results/esp32c3-raw-tail-quiet-20261015/build/).
+
+### Quiet-candidate qualification results
+
+The exact `90334aab…571aeb` application above passes **88/88 checks** on the C3:
+
+| Suite | Passed / total | Scope |
+| --- | ---: | --- |
+| Public HTTPS files | 16/16 | FLAC, Opus and Vorbis; AUTO/explicit hints, format, duration, EOF, memory recovery and steady output counters |
+| Local HTTP files | 28/28 | MP3, FLAC, Vorbis, Opus, AAC-LC, HE-AAC and HE-AAC v2; 22 codec/hint cases plus health/recovery checks |
+| Format transitions | 11/11 | Rate/profile changes, implicit SBR, MP3/AAC switches and Stop/Play generations |
+| Network recovery | 11/11 | Drop, stall, HTTP error, redirect and jitter, followed by recovery/settings checks |
+| WebSocket | 7/7 | Decoded metadata, reconnect and recovery/settings checks |
+| OTA | 15/15 | Rejected invalid/interrupted uploads, two round trips, upload while playing, slow upload and saved-station restoration |
+
+The five playback suites retain 2,096 health samples, with zero reported
+allocation failures, decoder-failure events and task-watchdog events. Minimum
+free heap is 28,652 B; minimum largest block is 11,264 B during transitions.
+All completed idle recovery checks pass. OTA deliberately reboots the board;
+the controller then verifies restoration of the original production image,
+unchanged Wi-Fi/playlist/settings and stopped playback.
+
+Both quiet HTTPS FLAC runs have zero completion drops and write errors.
+Observed durations are 60.556/60.648 s against the independently decoded
+60.480-s reference. Their minimum heap/largest block are 60,384/43,008 B.
+The other four public-file runs also have zero measured output faults.
+This is evidence for the corrected quiet binary; the earlier spontaneous
+FLAC failure and the diagnostic pause-induced failures remain archived.
+
+These are bounded runtime tests, not an analog-output or bit-exact PCM capture.
+The decoder-failure counter alone is not a complete FLAC error oracle: the
+custom FLAC adapter can log and resynchronize some frame errors internally.
+Public-file duration/EOF and output checks, host byte-identity tests and the
+existing independent decoder PCM tests provide separate evidence. Do not infer
+all internal FLAC errors are impossible merely from a zero telemetry counter.
+
+A separate real-radio HTTPS campaign is still required for this image: a
+ten-minute low-bitrate AAC stream plus the other configured public AAC/MP3
+profiles, with independent format probes. Production promotion remains pending
+that campaign and the final evidence review.
+
+[Complete quiet qualification reports, exact test sources and restoration](../tests/results/esp32c3-raw-tail-quiet-20261015/qualification/).
