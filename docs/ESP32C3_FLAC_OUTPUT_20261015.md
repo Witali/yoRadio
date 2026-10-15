@@ -699,3 +699,22 @@ exact-image ten-minute FLAC/Vorbis/Opus stress runs remain pending before
 production promotion and final completion review.
 
 [Public-radio reports, probes, test sources and restoration](../tests/results/esp32c3-raw-tail-quiet-20261015/public-radio/).
+
+### Production-profile reproducibility preflight
+
+A fresh ESP-IDF reconfigure using the proposed tested-radio defaults reproduces
+all **1,603 normalized configuration values** of the exact quiet candidate.
+Both enabled values and disabled options are compared. The textual hashes
+differ; configuration equality does not imply binary identity. This operation
+does not build or install another application, and the proposed profile is not
+yet applied to the production build wrapper. Fresh and reused directory checks
+through `build-production.ps1 -TestedRadioProfile` remain pending promotion.
+
+The final review also requires a **600-second public AAC-LC repeat** on this
+exact image. The previous candidate had a sustained AAC-LC output failure;
+the current image's successful 60-second LC observation is insufficient to
+cover that duration. This repeat follows the active FLAC/Vorbis/Opus campaign.
+Keep the previous failures and independently evaluate output, health and
+stopped memory recovery; do not infer a fix from successful HE-AAC alone.
+
+[Proposed defaults, generated configuration, comparison script and reconfigure log](../tests/results/esp32c3-raw-tail-quiet-20261015/profile-preflight/).
