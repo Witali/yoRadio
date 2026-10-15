@@ -29,13 +29,18 @@ prefix=unit.read_text().split('int main(void)',1)[0]
 adapter=re.sub(r'^#include[^\n]*\n','',adapter_source.read_text(),flags=re.M)
 unit=out/'adapter.c'
 unit.write_text(prefix+adapter_harness.read_text().replace('/* PRODUCTION_NATIVE_ADAPTER */',adapter))
-binary=out/'adapter'
-(out/'adapter-build.log').write_bytes(run(['gcc','-std=c11','-O2','-Wall','-Wextra','-Werror',
-    '-fsanitize=address,undefined','-fno-pie','-no-pie',host(unit),'-o',host(binary)]))
-log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1',host(binary)])
-(out/'adapter-run.log').write_bytes(log)
+for slots in (0,4):
+    name='adapter' if not slots else 'adapter-input4'
+    binary=out/name
+    (out/(name+'-build.log')).write_bytes(run(['gcc','-std=c11','-O2','-Wall','-Wextra','-Werror',
+        '-DCONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS='+str(slots),
+        '-fsanitize=address,undefined','-fno-pie','-no-pie',host(unit),'-o',host(binary)]))
+    log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1',host(binary)])
+    (out/(name+'-run.log')).write_bytes(log)
+    print(log.decode(),end='')
 report=json.loads((out/'report.json').read_text())
 report['adapter_passed']=True
+report['adapter_extra_slot_variants']=[0,4]
 for p in (adapter_source,adapter_harness):
     report['sources'][p.relative_to(ROOT).as_posix()]=hashlib.sha256(p.read_bytes()).hexdigest()
 (out/'report.json').write_text(json.dumps(report,indent=2)+'\n')

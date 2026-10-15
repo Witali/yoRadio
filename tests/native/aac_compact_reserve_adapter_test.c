@@ -2,7 +2,9 @@
 #undef CONFIG_YORADIO_QEMU_AAC_COMPACT_ADAPTER_TEST
 #undef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
 #define CONFIG_YORADIO_AAC_COMPACT_SBR 1
-#define CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS 4
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS == 0
+#define native_aac_decoder_input_growth_ready(decoder) false
+#endif
 #define NATIVE_AAC_PCM_FRAME_BYTES 8192
 typedef int esp_audio_err_t;
 typedef void *esp_audio_simple_dec_handle_t;
@@ -66,15 +68,35 @@ int main(void) {
     d=native_aac_decoder_create();
     assert(feed(d,0x50,1024,&pcm)==ESP_AUDIO_ERR_BUFF_NOT_ENOUGH && !pcm && d->compact.pending_owner);
     assert(!native_aac_decoder_input_growth_ready(d));
-    mode=0;assert(feed(d,0x50,8192,&pcm)==0 && pcm==4096 && !d->compact.pending_owner);
-    // LC releases its unused SBR reservation before the caller sees PCM.
-    // The guarded expansion therefore cannot enlarge a pure LC stream.
+    mode=0;assert(feed(d,0x50,8192,&pcm)==0 && pcm==4096);
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+    void *pending=d->compact.pending_owner;
+    assert(pending && native_aac_decoder_input_growth_ready(d));
+    unsigned before=calls;
+    assert(feed(d,0x4c,8192,&pcm)==0 && pcm==4096);
+    assert(d->compact.pending_owner==pending && calls==before); // Reuse on LC reopen.
+#else
+    assert(!d->compact.pending_owner);
     assert(!native_aac_decoder_input_growth_ready(d));
+#endif
+    // Return to the initial signature before late SBR; pending stays owned.
+    assert(feed(d,0x50,8192,&pcm)==0 && pcm==4096);
     mode=1;assert(feed(d,0x50,8192,&pcm)==0 && pcm==8192 && d->compact.owner); // Late SBR.
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+    assert(d->compact.owner==pending); // Transfer, no second owner allocation.
     assert(native_aac_decoder_input_growth_ready(d));
+#endif
     assert(feed(d,0x4c,8192,&pcm)==0 && pcm==8192 && d->compact.owner && !d->compact.pending_owner); // Reopen.
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
     assert(native_aac_decoder_input_growth_ready(d));
+#endif
     destroy(d);
+    mode=0;d=native_aac_decoder_create();
+    assert(feed(d,0x50,8192,&pcm)==0 && pcm==4096);destroy(d); // Stop with LC reservation.
+    fail_alloc=1;d=native_aac_decoder_create();assert(!d->compact.pending_owner);
+    assert(feed(d,0x50,8192,&pcm)==0 && pcm==4096);
+    assert(!native_aac_decoder_input_growth_ready(d));destroy(d); // LC still works.
+    mode=1;
     d=native_aac_decoder_create();fail_request=sizeof(aac_sbr_owner_abi_t);
     assert(feed(d,0x50,8192,&pcm)==ESP_AUDIO_ERR_MEM_LACK && !pcm && d->compact.pending_owner);
     assert(!native_aac_decoder_input_growth_ready(d));

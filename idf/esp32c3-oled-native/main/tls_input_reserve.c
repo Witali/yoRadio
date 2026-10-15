@@ -57,7 +57,7 @@ void tls_input_reserve_prepare_connection(void) {
 #ifdef YORADIO_INPUT_EXPANSION_ENABLED
 enum { INPUT_EXPANSION_HEAP_HEADROOM = 32 * 1024 };
 
-static void expand_input(unsigned extra_slots, const char *codec) {
+static void expand_input(unsigned extra_slots, size_t headroom, const char *codec) {
     (void)codec; // Logging may be compiled out in production and host tests.
     adaptive_input_t *input = atomic_load(&s_input);
     adaptive_input_stats_t stats = adaptive_input_stats(input);
@@ -70,8 +70,8 @@ static void expand_input(unsigned extra_slots, const char *codec) {
          ++attempt) {
         size_t available = heap_caps_get_free_size(MALLOC_CAP_INTERNAL |
                                                     MALLOC_CAP_8BIT);
-        if (available < INPUT_EXPANSION_HEAP_HEADROOM ||
-            stats.packet_capacity > available - INPUT_EXPANSION_HEAP_HEADROOM ||
+        if (available < headroom ||
+            stats.packet_capacity > available - headroom ||
             !adaptive_input_restore_one(input)) break;
     }
     stats = adaptive_input_stats(input);
@@ -81,12 +81,12 @@ static void expand_input(unsigned extra_slots, const char *codec) {
 }
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
 void tls_input_reserve_expand_flac(void) {
-    expand_input(CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS, "FLAC");
+    expand_input(CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS, INPUT_EXPANSION_HEAP_HEADROOM, "FLAC");
 }
 #endif
 #if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
 void tls_input_reserve_expand_aac(void) {
-    expand_input(CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS, "AAC");
+    expand_input(CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS, CONFIG_YORADIO_AAC_INPUT_HEADROOM_BYTES, "AAC");
 }
 #endif
 

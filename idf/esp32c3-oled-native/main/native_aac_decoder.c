@@ -205,8 +205,16 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                     if (decoder->codec) {
                         close_codec(decoder);
 #ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+#if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+                        // An unused reservation has no codec pointers yet.
+                        // Keep it across LC header changes; active owners were
+                        // released by close_codec and must be prepared again.
+                        if (!decoder->compact.pending_owner)
+                            aac_compact_owner_prepare(&decoder->compact);
+#else
                         aac_compact_owner_discard_pending(&decoder->compact);
                         aac_compact_owner_prepare(&decoder->compact);
+#endif
 #endif
 #ifdef CONFIG_YORADIO_AAC_EARLY_SBR_RESERVE
                         aac_sbr_reserve_discard(&decoder->reserve);
@@ -312,9 +320,11 @@ esp_audio_err_t native_aac_decoder_process(native_aac_decoder_t *decoder,
                     output->decoded_size=0;
                     result=ESP_AUDIO_ERR_MEM_LACK;
                 }
-#ifdef CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER
+#if defined(CONFIG_YORADIO_AAC_COMPACT_EARLY_OWNER) && CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS == 0
                 // LC returns unused storage after real PCM, not a parser-only
                 // call or buffer retry. Later implicit SBR still allocates normally.
+                // The optional input-growth policy instead retains this block
+                // so occupied extra packets cannot consume the late SBR owner.
                 if (result == ESP_AUDIO_ERR_OK && output->decoded_size)
                     aac_compact_owner_discard_pending(&decoder->compact);
 #endif

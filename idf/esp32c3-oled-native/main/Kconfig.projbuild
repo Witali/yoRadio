@@ -173,13 +173,27 @@ config YORADIO_AAC_INPUT_EXTRA_SLOTS
     help
         After successful native AAC output, allow bounded input expansion only
         while the configured compact SBR/PS owner is allocated or reserved.
-        Reuse idle packet slots up to the saved target and leave at least
-        32 KiB of advisory internal-heap headroom. Never reclaim live leases.
+        Retain the unused compact owner after LC PCM for late SBR/PS; this
+        costs its full configured size even during LC playback. Reuse idle
+        packet slots up to the saved target, with advisory internal-heap
+        headroom configured below. Never reclaim live leases.
         The permanent TLS RX reserve is unchanged. AAC-LC fallback without a
         reserved SBR owner keeps the minimum queue. Stop/EOF/new connections
         retire extra slots through their ordinary lease lifecycle.
         Keep zero until late SBR/PS, codec transitions, TLS, recovery and OTA
         qualify the experiment. This is not a memory-availability guarantee.
+
+config YORADIO_AAC_INPUT_HEADROOM_BYTES
+    int "Internal heap headroom after AAC input expansion (experimental, bytes)"
+    depends on YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
+    range 16384 65536
+    default 32768
+    help
+        Check this remaining free-heap allowance before restoring each slot,
+        after the compact SBR/PS owner is already allocated or reserved.
+        This is not a contiguous reservation or a guarantee for concurrent
+        allocations. Lower values require physical late-SBR/PS, large-frame,
+        TLS, WebUI, OTA and recovery tests. FLAC keeps its separate 32-KiB policy.
 
 config YORADIO_INPUT_PREFILL_MIN_MS
     int "Minimum initial compressed-input prefill time (experimental, ms)"

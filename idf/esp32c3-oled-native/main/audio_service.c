@@ -1746,12 +1746,16 @@ static void decoder_task(void *argument) {
                         first_frame_memory_reported = true;
                     }
 #endif
-                    if (!first_frame_memory_logged) {
 #if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
-                        if (aac_decoder && !packet->end_of_stream &&
-                            native_aac_decoder_input_growth_ready(aac_decoder))
-                            atomic_store(&s_aac_input_ready_generation, generation);
+                    // An LC low-memory open can discard the reservation; a
+                    // later SBR frame can acquire a real owner. Recheck until
+                    // eligible, while the producer still grows only once.
+                    if (aac_decoder && !packet->end_of_stream &&
+                        atomic_load(&s_aac_input_ready_generation) != generation &&
+                        native_aac_decoder_input_growth_ready(aac_decoder))
+                        atomic_store(&s_aac_input_ready_generation, generation);
 #endif
+                    if (!first_frame_memory_logged) {
                         log_runtime_memory("after first decoded frame");
                         first_frame_memory_logged = true;
                     }

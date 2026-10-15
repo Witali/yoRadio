@@ -66,18 +66,20 @@ static void *concurrent_client(void *argument) {
 }
 
 #ifdef YORADIO_INPUT_EXPANSION_ENABLED
+static size_t tested_headroom;
 static void consume_headroom(void) {
-    fake_free = INPUT_EXPANSION_HEAP_HEADROOM + 2060 - 1;
+    fake_free = tested_headroom + 2060 - 1;
 }
-static void test_input_growth(void (*expand)(void)) {
+static void test_input_growth(void (*expand)(void), size_t headroom) {
+    tested_headroom = headroom;
     expand(); // Unbound lifetime is safe.
     tls_input_reserve_finish_connection();
     adaptive_input_t *q = adaptive_input_create(16000, 8000, 2060);
     assert(q);
     tls_input_reserve_bind(q);
     for (unsigned boundary = 0; boundary < 3; ++boundary) {
-        const size_t low[] = {0, INPUT_EXPANSION_HEAP_HEADROOM - 1,
-                             INPUT_EXPANSION_HEAP_HEADROOM + 2060 - 1};
+        const size_t low[] = {0, headroom - 1,
+                             headroom + 2060 - 1};
         fake_free = low[boundary];
         expand();
         assert(adaptive_input_stats(q).resident == 4);
@@ -267,10 +269,10 @@ int main(void) {
 #endif
     fake_largest = 200000;
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
-    test_input_growth(tls_input_reserve_expand_flac);
+    test_input_growth(tls_input_reserve_expand_flac, INPUT_EXPANSION_HEAP_HEADROOM);
 #endif
 #if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
-    test_input_growth(tls_input_reserve_expand_aac);
+    test_input_growth(tls_input_reserve_expand_aac, CONFIG_YORADIO_AAC_INPUT_HEADROOM_BYTES);
 #endif
     pthread_t clients[4];
     for (uintptr_t i = 0; i < 4; ++i)

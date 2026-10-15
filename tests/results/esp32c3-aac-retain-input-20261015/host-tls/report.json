@@ -1,0 +1,101 @@
+{
+  "variants": [
+    {
+      "adaptive_input": false,
+      "rx_only": false,
+      "flac_extra_slots": 0,
+      "aac_extra_slots": 0,
+      "aac_headroom_bytes": 32768,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": true,
+      "rx_only": false,
+      "flac_extra_slots": 0,
+      "aac_extra_slots": 0,
+      "aac_headroom_bytes": 32768,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": false,
+      "rx_only": true,
+      "flac_extra_slots": 0,
+      "aac_extra_slots": 0,
+      "aac_headroom_bytes": 32768,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": true,
+      "rx_only": true,
+      "flac_extra_slots": 0,
+      "aac_extra_slots": 0,
+      "aac_headroom_bytes": 32768,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": true,
+      "rx_only": true,
+      "flac_extra_slots": 4,
+      "aac_extra_slots": 0,
+      "aac_headroom_bytes": 32768,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": true,
+      "rx_only": true,
+      "flac_extra_slots": 0,
+      "aac_extra_slots": 4,
+      "aac_headroom_bytes": 32768,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": true,
+      "rx_only": true,
+      "flac_extra_slots": 4,
+      "aac_extra_slots": 4,
+      "aac_headroom_bytes": 32768,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": true,
+      "rx_only": true,
+      "flac_extra_slots": 4,
+      "aac_extra_slots": 4,
+      "aac_headroom_bytes": 16384,
+      "passed": true,
+      "concurrent_allocations": 8000
+    },
+    {
+      "adaptive_input": true,
+      "rx_only": true,
+      "flac_extra_slots": 4,
+      "aac_extra_slots": 4,
+      "aac_headroom_bytes": 65536,
+      "passed": true,
+      "concurrent_allocations": 8000
+    }
+  ],
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "scope": "Actual C allocators; pthread platform and simulated heap. SDK sizing separately verified in ELF; no physical qualification.",
+  "sources": {
+    "idf/esp32c3-oled-native/main/adaptive_input.h": "ce13c66c95c2bd4bd801d6721d479b22fdeeea6e9c837c23e82a0b0f96d700b5",
+    "idf/esp32c3-oled-native/main/adaptive_input.c": "e4350dd5643ccf3bb79f161feaf8d0bd429610bbd4a30a91e57cc4da990d94e7",
+    "idf/esp32c3-oled-native/main/tls_input_reserve.c": "5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e",
+    "idf/esp32c3-oled-native/main/tls_large_reserve.h": "f8e4cd3fdaa8ff70a0dc2360092808c60666be61cc6379732c1d52caefafce9c",
+    "idf/esp32c3-oled-native/main/tls_large_reserve.c": "3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e",
+    "idf/esp32c3-oled-native/main/tls_input_reserve.h": "69360e52662a5c926eb6eabcdcdbe34cf569483f64baee53e9cdad201d007b72",
+    "tests/native/adaptive_input_test.c": "c2f0b9d0e31f6380b9b147bd0d3d675cb79377af18b4879d76be9061e025ec40",
+    "tests/native/tls_large_reserve_test.c": "21cca5d967218d3290b7d04e8c68394515c11c866fe2b901aee975763b3dd528",
+    "tests/run-tls-large-reserve.py": "32fe2a7493a7aa0a7e769ca0dec7d475c244191afb06f8d2b28f180f1f73d84d"
+  }
+}
