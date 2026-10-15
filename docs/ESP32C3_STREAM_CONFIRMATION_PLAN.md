@@ -23,6 +23,12 @@ and successful stopped-state memory recovery. The original report's memory
 failure is retained; independent replay exposes the output failure that it
 previously hid. Public tests now retain independent gates and exact window bounds.
 
+Controlled [TLS record-size tests](ESP32C3_AAC_TLS_RECORD_CONTROL_20261015.md)
+on a local-CA diagnostic image pass all four output checks (1 KiB, 16 KiB,
+growth and alternating records). Overall 29/30: the 16-KiB endpoint memory gate
+fails, with no allocation fault and successful stopped-state recovery. Delivery
+pauses and input-queue occupancy are the next diagnostic controls.
+
 The previous FFmpeg comparison identified false MP3 headers before AAC and false
 AAC headers before MP3 as unresolved failures. The new core rejects those
 candidates when their claimed next frame boundary is invalid, then searches for

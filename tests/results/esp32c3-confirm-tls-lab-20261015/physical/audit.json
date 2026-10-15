@@ -1,0 +1,366 @@
+{
+  "image": {
+    "app_elf_sha256": "75a91acdca3c9c1ce4a13375f2487795a5581a2baaba4b3c5183b4dba38e2da8",
+    "sha256": "cd9d9461cedafcab26ddcf05ec4ce8780b8a570f6d49b21f1e6e4d00dba39e85",
+    "bytes": 1476768
+  },
+  "diagnostic_only": true,
+  "counts": {
+    "PASS": 29,
+    "FAIL": 1,
+    "BLOCKED": 0
+  },
+  "failures": [
+    {
+      "name": "lc-44100-stereo:large:memory",
+      "result": "FAIL",
+      "exception_chain": [
+        {
+          "type": "Failure"
+        }
+      ],
+      "reason": "Progressive heap loss",
+      "seconds": 0.0
+    }
+  ],
+  "windows": {
+    "lc-44100-stereo:small": {
+      "last_seconds": 75.02806579999742,
+      "format": {
+        "result": "PASS",
+        "evidence": {
+          "first_full_pcm_seconds": 2.359354100000928,
+          "samples": 55,
+          "rate": 44100,
+          "channels": 2
+        }
+      },
+      "records": {
+        "result": "PASS",
+        "evidence": {
+          "record_counts": {
+            "1048": 1186
+          },
+          "first_large_at": null,
+          "audio_bytes": 1214464,
+          "last_write_age_seconds": 0.033791699999710545
+        }
+      },
+      "output": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 55,
+          "elapsed_ms": 59444,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        }
+      },
+      "memory": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 55,
+          "boot_id": "2463697a88b1d92c",
+          "minimum_heap": 59480,
+          "minimum_largest": 32768,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "legacy_floor_pass": true,
+          "legacy_floor_enforced": false
+        }
+      },
+      "response": {
+        "result": "PASS",
+        "evidence": {
+          "maximum_ms": 143.82350000960287
+        }
+      },
+      "pipeline": {
+        "result": "PASS",
+        "evidence": {
+          "output": {
+            "samples": 55,
+            "elapsed_ms": 59444,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          },
+          "timer_hz": 1000000,
+          "phase_drops": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "retained_events": 0,
+          "overwritten_events": 0,
+          "events": [],
+          "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+        }
+      }
+    },
+    "lc-44100-stereo:large": {
+      "last_seconds": 74.04122579999967,
+      "format": {
+        "result": "PASS",
+        "evidence": {
+          "first_full_pcm_seconds": 2.2964617000106955,
+          "samples": 54,
+          "rate": 44100,
+          "channels": 2
+        }
+      },
+      "records": {
+        "result": "PASS",
+        "evidence": {
+          "record_counts": {
+            "16408": 74
+          },
+          "first_large_at": 87758.5684713,
+          "audio_bytes": 1212416,
+          "last_write_age_seconds": 0.13148959999671206
+        }
+      },
+      "output": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 54,
+          "elapsed_ms": 58526,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        }
+      },
+      "memory": {
+        "result": "FAIL",
+        "reason": "Progressive heap loss"
+      },
+      "response": {
+        "result": "PASS",
+        "evidence": {
+          "maximum_ms": 135.21680000121705
+        }
+      },
+      "pipeline": {
+        "result": "PASS",
+        "evidence": {
+          "output": {
+            "samples": 54,
+            "elapsed_ms": 58526,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          },
+          "timer_hz": 1000000,
+          "phase_drops": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "retained_events": 0,
+          "overwritten_events": 0,
+          "events": [],
+          "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+        }
+      }
+    },
+    "lc-44100-stereo:grow": {
+      "last_seconds": 74.98392649999005,
+      "format": {
+        "result": "PASS",
+        "evidence": {
+          "first_full_pcm_seconds": 2.3218296999984886,
+          "samples": 55,
+          "rate": 44100,
+          "channels": 2
+        }
+      },
+      "records": {
+        "result": "PASS",
+        "evidence": {
+          "record_counts": {
+            "1048": 471,
+            "16408": 45
+          },
+          "first_large_at": 87876.6852722,
+          "audio_bytes": 1219584,
+          "last_write_age_seconds": 0.6288970000023255
+        }
+      },
+      "output": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 55,
+          "elapsed_ms": 59475,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        }
+      },
+      "memory": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 55,
+          "boot_id": "2463697a88b1d92c",
+          "minimum_heap": 60304,
+          "minimum_largest": 32768,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "legacy_floor_pass": true,
+          "legacy_floor_enforced": false
+        }
+      },
+      "response": {
+        "result": "PASS",
+        "evidence": {
+          "maximum_ms": 137.22260000940878
+        }
+      },
+      "pipeline": {
+        "result": "PASS",
+        "evidence": {
+          "output": {
+            "samples": 55,
+            "elapsed_ms": 59475,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          },
+          "timer_hz": 1000000,
+          "phase_drops": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "retained_events": 0,
+          "overwritten_events": 0,
+          "events": [],
+          "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+        }
+      }
+    },
+    "lc-44100-stereo:alternate": {
+      "last_seconds": 75.04119220000575,
+      "format": {
+        "result": "PASS",
+        "evidence": {
+          "first_full_pcm_seconds": 2.3219040999974823,
+          "samples": 55,
+          "rate": 44100,
+          "channels": 2
+        }
+      },
+      "records": {
+        "result": "PASS",
+        "evidence": {
+          "record_counts": {
+            "1048": 70,
+            "16408": 70
+          },
+          "first_large_at": 87935.7782177,
+          "audio_bytes": 1218560,
+          "last_write_age_seconds": 0.7828396000113571
+        }
+      },
+      "output": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 55,
+          "elapsed_ms": 59426,
+          "completion_queue_drops": 0,
+          "write_errors": 0
+        }
+      },
+      "memory": {
+        "result": "PASS",
+        "evidence": {
+          "samples": 55,
+          "boot_id": "2463697a88b1d92c",
+          "minimum_heap": 60856,
+          "minimum_largest": 32768,
+          "allocation_failures": 0,
+          "task_watchdog_events": 0,
+          "legacy_floor_pass": true,
+          "legacy_floor_enforced": false
+        }
+      },
+      "response": {
+        "result": "PASS",
+        "evidence": {
+          "maximum_ms": 137.44549998955335
+        }
+      },
+      "pipeline": {
+        "result": "PASS",
+        "evidence": {
+          "output": {
+            "samples": 55,
+            "elapsed_ms": 59426,
+            "completion_queue_drops": 0,
+            "write_errors": 0
+          },
+          "timer_hz": 1000000,
+          "phase_drops": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "retained_events": 0,
+          "overwritten_events": 0,
+          "events": [],
+          "scope": "ISR checkpoints; call phases are not scheduler states or analog samples"
+        }
+      }
+    }
+  },
+  "recovery": {
+    "lc-44100-stereo:small": {
+      "result": "PASS",
+      "evidence": null
+    },
+    "lc-44100-stereo:large": {
+      "result": "PASS",
+      "evidence": null
+    },
+    "lc-44100-stereo:grow": {
+      "result": "PASS",
+      "evidence": null
+    },
+    "lc-44100-stereo:alternate": {
+      "result": "PASS",
+      "evidence": null
+    }
+  },
+  "health": {
+    "result": "PASS",
+    "evidence": {
+      "samples": 330,
+      "boot_id": "2463697a88b1d92c",
+      "minimum_heap": 59480,
+      "minimum_largest": 32768,
+      "allocation_failures": 0,
+      "task_watchdog_events": 0
+    }
+  },
+  "decoder": {
+    "result": "PASS",
+    "evidence": {
+      "samples": 330,
+      "decoder_failures": 0
+    }
+  },
+  "failed_request_phases": []
+}
