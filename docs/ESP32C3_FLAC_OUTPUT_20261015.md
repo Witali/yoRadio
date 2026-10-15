@@ -532,3 +532,50 @@ the actual send/finish path under queue pressure. ASan/UBSan pass.
 [Failing regression and final passing host evidence](../tests/results/esp32c3-raw-tail-20261015/host/)
 are retained. Hardware comparison is required before promoting the change or
 the separate 512-B read option.
+
+### Physical FLAC/Ogg tail-coalescing results
+
+The corrected diagnostic image `idf61-rawtail-20261015` is built from
+`dd288c48`; application SHA-256 is
+`4db56e98f297e4966738fae64fc77372d4ff38f60d4e36765ee7c6be85f68868`.
+Its configuration is identical to the preceding 512-B-read image. Static RAM
+is unchanged: 46,592 B IRAM text/end, 12,396 B DRAM data and 45,136 B DRAM BSS.
+The application is 1,477,040 B. No extra input slots or PCM storage were added.
+
+| Local public reference | Checks passed | DMA completion drops | Write errors | Steady input slots |
+| --- | ---: | ---: | ---: | ---: |
+| FLAC, normal delivery | 9/9 | 0 | 0 | 8 |
+| FLAC, 100/250/500-ms pauses | 8/9 | 32 (0/4/28) | 0 | 8 |
+| Vorbis, normal delivery | 9/9 | 0 | 0 | 4 |
+| Opus, normal delivery | 9/9 | 0 | 0 | 4 |
+
+All four files reach natural EOF, recover memory and preserve settings.
+Across 566 health samples there are no allocation, decoder or watchdog faults;
+minimum free heap/largest block are 61,508/45,056 B. The original production
+image and settings were restored and playback was stopped. The paused FLAC
+output gate remains failed; it has not been waived.
+
+With the same 512-B request size and eight slots, sampled FLAC input payload
+median/max rises from **1,536/4,096 B to 8,192/16,384 B** in normal delivery.
+For paused delivery it rises from 2,560/4,096 B to 7,680/16,384 B. Vorbis and
+Opus both reach 8,192 B with four slots. These measurements exclude packet
+headers and writing leases; reading leases may already be partly consumed.
+They establish the packing correction, not remaining audio duration.
+
+The corrected paused run has 32 drops versus 48 in the earlier 512-B run;
+the preceding 2,048-B comparison also had 32. Twenty-four of the new 32 events
+were retained, with eight overwritten. Twenty retained events occur outside
+a decoder feed call, four during one, and none during a PCM-buffer acquisition.
+At those events, the latest PCM packet is 53.221–341.262 ms old while the output
+task checkpoint is only 0.039–4.701 ms old. This supports PCM starvation during
+the injected delivery pauses, not a blocked output task. It does not establish
+the cause of the earlier spontaneous quiet-build failure.
+
+The correction is supported by host ownership/byte-identity tests and these
+physical measurements. The 512-B read option is still experimental. Next test
+the corrected quiet production profile with its existing 2,048-B read size,
+including public HTTPS files and OTA; do not promote on diagnostic results alone.
+
+[Build evidence](../tests/results/esp32c3-raw-tail-20261015/build/) and
+[physical reports, queue measurements and exact test sources](../tests/results/esp32c3-raw-tail-20261015/physical/)
+retain the failed paused output gate as well as the successful runs.
