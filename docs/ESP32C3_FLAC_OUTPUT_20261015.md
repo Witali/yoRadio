@@ -755,3 +755,14 @@ pause-induced diagnostic failures. Profile-wrapper validation and final
 installation are recorded in the acceptance audit.
 
 [AAC-LC repeat and source references](../tests/results/esp32c3-raw-tail-quiet-20261015/public-lc-repeat/).
+
+### Final disposition
+
+The tested production profile now reproduces the exact candidate configuration
+through both fresh and reused build directories. App-only OTA installs the
+saved `idf61-rawq-20261015` image; six post-install HE-AAC/PS, output, EOF,
+recovery/settings/health checks pass. The first smoke runner's import failure
+and successful rollback are archived separately. No firmware change was needed
+for that harness correction. The board retains the tested image and unchanged
+settings, with playback stopped. See the [acceptance decision](ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md)
+for final identity, evidence and remaining measurement/network limits.

@@ -2,10 +2,14 @@
 
 ## Decision
 
-**Pending.** The corrected quiet image has passed its short codec, public
-HTTPS, network, WebUI, OTA and sustained FLAC/Vorbis/Opus/AAC-LC campaigns.
-Production wrapper verification has also passed. Final installation evidence
-is being reconciled below before the decision is closed.
+**Accepted for the normal-playback objective on this ESP32-C3 OLED board.**
+The saved quiet image passes 139 campaign checks plus six post-install checks
+and is installed on the board. AAC-LC, HE-AAC, HE-AAC v2, MP3, FLAC, Vorbis and
+Opus have the playback, recovery and numerical evidence summarized below.
+No allocation failure, watchdog event or unexpected reboot was observed in
+the accepted campaigns. The explicit network-starvation and measurement limits
+below remain; this decision does not turn separate research plans into completed
+work or guarantee playback through every possible interruption of the source.
 
 ## Exact application under review
 
@@ -33,7 +37,7 @@ the saved application above; a new build must have its own recorded identity.
 | No crashes or allocation failures; recover memory | Lifetime health, settled recovery and active memory-trend gates in each campaign | Passed completed campaigns; numerical free-heap floors are diagnostic |
 | HTTPS and network recovery | Normal certificate verification; five public AAC/MP3 profiles; 600-s HE-AAC and AAC-LC; drop/stall/error/redirect/jitter recovery | Passed tested cases |
 | Correct terminal and browser state | Natural EOF in file matrix, WebSocket metadata/reconnect, stopped-state checks | Passed |
-| Safe OTA and preserved settings | 15/15 invalid/interrupted/round-trip/playing/slow-upload/restoration checks | Passed; final installation pending |
+| Safe OTA and preserved settings | 15/15 invalid/interrupted/round-trip/playing/slow-upload/restoration checks; final install and six post-install checks | Passed; exact saved image installed, settings unchanged |
 | Production numerical tolerance of 3 PCM LSB | Revalidated recording statistics and retained pinned-SDK PCM comparisons | Peak 2 LSB on the measured corpus; not a universal input bound |
 | Reproducible production options | Fresh and reused directories through `build-production.ps1 -TestedRadioProfile` both match all 1,603 normalized candidate values | Passed |
 
@@ -55,6 +59,7 @@ claimed as tested by this report.
 | Public HTTPS radio: 600-s HE-AAC plus four 60-s AAC/MP3 cases | 17/17 | [Audit](../tests/results/esp32c3-raw-tail-quiet-20261015/public-radio/audit.json) |
 | Sustained FLAC/Vorbis/Opus: 600 s each | 27/27 | [Audit](../tests/results/esp32c3-raw-tail-quiet-20261015/sustained/audit.json) |
 | Public AAC-LC HTTPS repeat: 600 s | 7/7 | [Audit](../tests/results/esp32c3-raw-tail-quiet-20261015/public-lc-repeat/audit.json) |
+| Final OTA installation: HE-AAC 48 kHz, HEv2 44.1 kHz, recovery/settings/health | 6/6 | [Audit](../tests/results/esp32c3-raw-tail-quiet-20261015/final-deployment/audit.json) |
 
 The first five playback suites contain 2,096 health samples; the public-radio
 campaign adds 1,572. Each campaign has a consistent boot identity and no
@@ -94,6 +99,11 @@ owner changes are explicitly recorded rather than assumed identical.
 
 ## Failures and limits that remain visible
 
+- The first final-install smoke runner failed to import its local test-server
+  module before playing audio. Its controller restored the original image and
+  verified settings. The [failed harness and rollback](../tests/results/esp32c3-raw-tail-quiet-20261015/final-deployment-import-failure/)
+  are retained. Correcting the import order, with no firmware change, gives
+  the separate six-check passing final installation above.
 - Earlier quiet candidates had spontaneous AAC-LC/FLAC output failures and
   WebUI TCP timeouts. They remain in the [investigation](ESP32C3_FLAC_OUTPUT_20261015.md).
   Current successful windows do not establish the cause of every historical
@@ -113,7 +123,7 @@ owner changes are explicitly recorded rather than assumed identical.
   threshold was introduced to obtain a pass. CPU utilization is not a release
   gate in these quiet tests; actual playback faults and recovery are checked.
 
-## Remaining acceptance actions
+## Completed acceptance actions
 
 1. **Done:** exact-image 600-second FLAC/Vorbis/Opus campaign archived,
    including recovery and verified restoration of the original application,
@@ -127,6 +137,20 @@ owner changes are explicitly recorded rather than assumed identical.
    fixes boot-file selection and two text-encoding errors; those edits do not
    change the configuration or application. All 24 PowerShell blocks parse,
    and the current variant's application/boot-file hashes pass the guide's checks.
-4. Review all results, install the exact saved image through app-only OTA,
-   verify HE-AAC/PS playback and settings, and record the final board identity.
-5. Update this decision and artifact qualification only from those results.
+4. **Done:** exact saved image installed through app-only OTA, with HE-AAC/PS
+   playback, natural EOF, output, memory recovery and unchanged settings verified.
+   Final identity is `idf61-rawq-20261015`, partition `app1`, ELF SHA-256
+   `8d63aee7c134d8c994d254bb8bdea3a66ad33d552ad3ef4ba2426d99b4cbc2e5`.
+   Playback is stopped; Wi-Fi, playlist and settings are preserved.
+5. **Done:** artifact qualification records this decision and the exact-image
+   evidence. Prior candidate failures and diagnostic starvation tests remain
+   unchanged. The first-install USB procedure is checked offline; its separate
+   fresh-board hardware validation is not claimed by the OTA campaign.
+
+The [final read-only audit](../tests/results/esp32c3-raw-tail-quiet-20261015/completion/)
+checks all 145 report cases against the installed ELF identity, artifact hashes,
+both complete configuration comparisons and current profile sources. A fresh
+board read confirms the same boot, stopped playback and no allocation/watchdog
+event after deployment. Source comparison from the application build commit
+shows only profile/Kconfig documentation and README changes under `idf`,
+`yoRadio` and `tools`; executable audio/network code is unchanged.

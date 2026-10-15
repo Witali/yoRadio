@@ -7,12 +7,12 @@
     "bytes": 1474288
   },
   "idf_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
-  "profile": "TestedRadioProfile + FRAME_ROUTER + STREAM_CONFIRM + AAC_COMPACT_EARLY_OWNER + INPUT_TAIL_COALESCE",
+  "profile": "TestedRadioProfile",
   "production_profile": true,
   "stream_read_bytes": 2048,
   "stream_read_timeout_ms": 250,
   "flac_input_extra_slots": 4,
-  "production_qualified": false,
+  "production_qualified": true,
   "hardware_tested": true,
   "deep_sleep": false,
   "flash_mode": "qio",
@@ -51,9 +51,16 @@
     ".flash.rodata": 308860,
     ".dram0.heap_start": 0
   },
-  "qualification": "See retained physical qualification reports. Full goal completion remains subject to all playback, continuity and OTA evidence; previous failures remain recorded.",
+  "qualification": "Accepted for normal playback on the tested ESP32-C3 OLED board: 139 campaign checks and 6 post-install checks pass. Prior failures and injected-network-starvation limits remain documented.",
   "physical_evidence": "tests/results/esp32c3-raw-tail-quiet-20261015/qualification",
   "public_radio_evidence": "tests/results/esp32c3-raw-tail-quiet-20261015/public-radio",
   "sustained_evidence": "tests/results/esp32c3-raw-tail-quiet-20261015/sustained",
-  "public_lc_repeat_evidence": "tests/results/esp32c3-raw-tail-quiet-20261015/public-lc-repeat"
+  "public_lc_repeat_evidence": "tests/results/esp32c3-raw-tail-quiet-20261015/public-lc-repeat",
+  "qualification_source_commit": "7d7c290a",
+  "acceptance_report": "docs/ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md",
+  "profile_evidence": "tests/results/esp32c3-raw-tail-quiet-20261015/profile-wrapper",
+  "deployment_evidence": "tests/results/esp32c3-raw-tail-quiet-20261015/final-deployment",
+  "frame_router": true,
+  "early_sbr_owner": true,
+  "legacy_experimental_field_names": true
 }

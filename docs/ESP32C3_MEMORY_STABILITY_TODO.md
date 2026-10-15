@@ -3,6 +3,18 @@
 Goal: keep HTTPS radio playback reliable on the ESP32-C3 OLED board by
 avoiding repeated allocation and release of large heap blocks.
 
+## Accepted production checkpoint, 2026-10-15
+
+The [current acceptance report](ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md)
+qualifies and installs `idf61-rawq-20261015`: 139 campaign checks plus six
+post-install checks pass. The tested radio profile enables TLS reservation,
+bounded input-tail coalescing, frame confirmation and early compact AAC ownership.
+Full-rate HE-AAC/PS remains enabled. The accepted campaigns have no recorded
+allocation/watchdog failures or unexpected reboots; recovery checks pass.
+Historical failures below retain their original image identity. Remaining
+reservation/segmentation investigations are future optimization work, not a
+claim that their individual research questions have all been resolved.
+
 Research update, 2026-10-13: [fragmentation methods, 1 KiB segmented input and
 span iterators](ESP32C3_MEMORY_RESERVATION_PLAN_20261013.md#fragmentation-review-segmented-buffers-and-iterators-2026-10-13).
 Keep total buffered bytes constant; audit the eight-slot ADTS startup window

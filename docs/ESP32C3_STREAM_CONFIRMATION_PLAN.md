@@ -2,6 +2,16 @@
 
 ## Current state (2026-10-15)
 
+The [accepted quiet production checkpoint](ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md)
+now enables frame routing, continuous confirmation, input-tail coalescing and
+early compact AAC ownership in `-TestedRadioProfile`. It passes the exact-image
+codec, HTTPS, sustained, transition, network, WebUI and OTA campaigns and is
+installed on the C3. Generic Kconfig defaults remain opt-in. The following
+earlier checkpoints retain their original failures and experimental status;
+their pending-promotion wording describes those earlier images.
+
+### Earlier implementation and diagnostic checkpoints
+
 `stream_confirm.h` implements and tests a bounded confirmation core over a
 caller-owned byte window. `audio_service.c` now calls it through `stream_start.h`
 when **`CONFIG_YORADIO_STREAM_CONFIRM=y`** and the frame router is enabled.
