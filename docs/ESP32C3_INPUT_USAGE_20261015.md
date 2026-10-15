@@ -53,9 +53,71 @@ zero. Unknown fields are still filtered.
   optional arena counters and all 16 maximum-width ISR events.
 
 [Saved host evidence](../tests/results/esp32c3-input-usage-20261015/)
-contains sources, reports and hashes. Physical measurement is pending.
+contains sources, reports and hashes.
 
-## Physical measurement plan
+## Physical result
+
+The diagnostic image `idf61-inuse-20261015`, built from `5f1efbc1`, passed
+build/link/IRAM audits and ran the same 90-second AAC-LC TLS pause schedule.
+Normalized configuration comparison against the four-slot local-CA control
+found no differences. AAC extra slots stay disabled, prefill stays one second,
+and the TLS receive reserve stays 17,058 bytes. No PCM algorithm changed.
+
+App SHA-256: `9a3f23ec215b4a8e477cc923f4afec940d44a347795f8bb739c4ba4d4d551eea`.
+
+| Measurement | Result |
+| --- | ---: |
+| Campaign checks | 10 PASS / 1 FAIL |
+| Sustained usage samples / observed interval | 68 / 73.975 s |
+| Resident / minimum / limit | 4 / 4 / 4 |
+| READY=2, READING=1, WRITING=1 | 67 samples |
+| READY=0, READING=1, WRITING=1 | 1 sample |
+| Nonempty READY slot fill, min / median / max | 50.0% / 56.87% / 99.13% |
+| Sample-weighted READY slot fill | 70.61% |
+| Unused capacity in nonempty READY slots, median / max | 1,777 / 2,060 B |
+| Committed READY bytes, median including empty sample | 2,337 B |
+| Completion drops / write errors | 47 / 0 |
+| Allocation / decoder / watchdog faults | 0 / 0 / 0 |
+| Minimum sampled heap / largest block | 59,028 / 32,768 B |
+| Settled free heap before / after Stop | 138,924 / 138,956 B |
+| Settled largest block / tasks, before and after | 110,592 B / 16 |
+
+Fill is calculated as `ready_bytes / (ready * packet_capacity)`, only when
+READY is nonzero. Packet capacity is 2,060 bytes. Committed extents include the
+12-byte packet header (confirmed from target ELF DWARF). These are sampled
+occupancies, not a count-weighted distribution of every packet or a precise
+measurement of audio duration. READING includes its consumed prefix; WRITING
+is unpublished and is excluded from playable bytes. The unused READY capacity
+is already allocated RAM, not a free-heap gain.
+
+Actual host pauses were 0.5005, 1.0119 and 1.5014 seconds. Only the longest
+pause overlaps new completion drops. READY is empty at 66.430 s; 47 drops
+appear between that sample and 67.536 s. The retained all-wait ISR events show
+output checkpoints only 0.009–7.678 ms old, but PCM, encoded and HTTP progress
+hundreds of milliseconds old. This supports starvation in this imposed-gap
+experiment; it does not prove the cause of the earlier public-station failure
+or establish analog continuity. The difference from the control's 48 drops
+is not evidence of an improvement from telemetry.
+
+The controller restored the original `idf61-prod-20261013` image, verified
+Wi-Fi/playlist/settings equality, and left playback stopped. Raw failures,
+queue observations, replay scripts and hashes are in the
+[physical archive](../tests/results/esp32c3-input-usage-20261015/physical/).
+This laboratory image is not production-qualified.
+
+## Next experiment
+
+Partial READY packets are now demonstrated. Test bounded coalescing of validated
+bytes across reads, using the existing slots. Retaining a partial producer
+lease can itself reduce READY capacity, so success must be measured as usable
+queued data and output continuity, not merely fuller individual packets.
+Flush before the staging window needs its fourth slot, before ordered codec
+drains, at EOF and at a bounded latency; cancel leases on Stop and failures.
+Verify maximum ADTS frames, low bitrates, fragmented reads, metadata, format
+changes and cancellation before replaying this hardware schedule. Do not
+enable a new memory policy on the basis of the fill measurement alone.
+
+### Original measurement plan
 
 Build the local-CA diagnostic with the original four-slot policy, one-second
 prefill and AAC extra slots disabled. Repeat the same owned AAC-LC TLS pause
