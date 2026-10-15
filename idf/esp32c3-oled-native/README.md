@@ -11,6 +11,25 @@ layouts. Keeping independent `sdkconfig`, board code and images avoids making
 the proven `esp32-cyd2usb-native` build depend on C3 conditionals. The native
 network, WebUI and audio pipeline sources were carried over from that target.
 
+## Tested production profile
+
+From the repository root, use PowerShell 7:
+
+```powershell
+./idf/esp32c3-oled-native/build-production.ps1 -TestedRadioProfile -DependencyRoot C:/Work/yoRadio/.idf
+```
+
+Change `DependencyRoot` to your installed dependency directory. This profile
+selects the measured QIO 80 MHz, fractional 48-kHz output, TLS reservation,
+bounded input buffering, compact full-rate AAC, frame confirmation and input
+tail coalescing. It updates its options in existing configurations too. The
+ordinary-clock profile is the one covered by the
+[current acceptance report](../../docs/ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md).
+Optional deep sleep or external RTC settings need separate qualification.
+The generic board defaults and older experiments described below are distinct
+from this explicitly selected profile. See the
+[beginner guide](../../docs/ESP32C3_BEGINNERS_GUIDE.md) for setup and flashing.
+
 ## Hardware profile
 
 Agents optimizing this target should start with the

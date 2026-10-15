@@ -4,8 +4,8 @@
 
 **Pending.** The corrected quiet image has passed its short codec, public
 HTTPS, network, WebUI, OTA and sustained FLAC/Vorbis/Opus/AAC-LC campaigns.
-Production wrapper verification and final installation are still in progress. This
-document does not mark the playback goal complete.
+Production wrapper verification has also passed. Final installation evidence
+is being reconciled below before the decision is closed.
 
 ## Exact application under review
 
@@ -35,7 +35,7 @@ the saved application above; a new build must have its own recorded identity.
 | Correct terminal and browser state | Natural EOF in file matrix, WebSocket metadata/reconnect, stopped-state checks | Passed |
 | Safe OTA and preserved settings | 15/15 invalid/interrupted/round-trip/playing/slow-upload/restoration checks | Passed; final installation pending |
 | Production numerical tolerance of 3 PCM LSB | Revalidated recording statistics and retained pinned-SDK PCM comparisons | Peak 2 LSB on the measured corpus; not a universal input bound |
-| Reproducible production options | Fresh reconfigure matches all 1,603 normalized candidate values | Passed preflight; actual wrapper fresh/reused-directory checks pending |
+| Reproducible production options | Fresh and reused directories through `build-production.ps1 -TestedRadioProfile` both match all 1,603 normalized candidate values | Passed |
 
 Implemented native codec support here means the AAC/MP3/FLAC/Vorbis/Opus
 set compiled into this application. xHE-AAC, additional containers, optional
@@ -119,10 +119,14 @@ owner changes are explicitly recorded rather than assumed identical.
    including recovery and verified restoration of the original application,
    private settings and stopped playback.
 2. **Done:** 600-second public AAC-LC repeat passes and is archived separately.
-3. Apply the reviewed tested-radio defaults and check fresh and reused
-   directories through the normal production wrapper. The
-   [preflight](../tests/results/esp32c3-raw-tail-quiet-20261015/profile-preflight/)
-   alone does not exercise that wrapper.
+3. **Done:** tested-radio defaults applied; fresh and reused directories through
+   the normal wrapper match every candidate configuration value. The reused
+   case starts from the older production configuration with the new features
+   disabled. [Wrapper evidence](../tests/results/esp32c3-raw-tail-quiet-20261015/profile-wrapper/)
+   supplements the earlier standalone preflight. Documentation subsequently
+   fixes boot-file selection and two text-encoding errors; those edits do not
+   change the configuration or application. All 24 PowerShell blocks parse,
+   and the current variant's application/boot-file hashes pass the guide's checks.
 4. Review all results, install the exact saved image through app-only OTA,
    verify HE-AAC/PS playback and settings, and record the final board identity.
 5. Update this decision and artifact qualification only from those results.

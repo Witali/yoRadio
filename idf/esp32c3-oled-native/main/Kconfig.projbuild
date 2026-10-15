@@ -125,7 +125,7 @@ config YORADIO_ADAPTIVE_INPUT_BUFFER
         tolerance. Keep disabled until all-codec and long-playback tests pass.
 
 config YORADIO_FRAME_ROUTER
-    bool "Route MP3/AAC frame boundaries (experimental)"
+    bool "Route MP3/AAC frame boundaries"
     depends on YORADIO_ADAPTIVE_INPUT_BUFFER
     default n
     help
@@ -134,10 +134,10 @@ config YORADIO_FRAME_ROUTER
         No full-frame allocation. Without STREAM_CONFIRM this is a strict
         boundary walker without alignment recovery. Free-format MP3
         falls back to the existing decoder for the rest of the connection.
-        Keep disabled until live-transition and all-codec tests qualify it.
+        Enabled by the tested radio profile; validate custom input-pool settings.
 
 config YORADIO_INPUT_TAIL_COALESCE
-    bool "Fill partial queued input tails (experimental)"
+    bool "Fill partial queued input tails"
     depends on YORADIO_FRAME_ROUTER
     default n
     help
@@ -145,10 +145,10 @@ config YORADIO_INPUT_TAIL_COALESCE
         Append matching generation/codec data outside the queue lock, then
         republish before the current read returns. Never modify READING or
         control storage. No new packet allocation or cross-read waiting.
-        Keep disabled until ownership, format changes and hardware tests pass.
+        Enabled by the tested radio profile after ownership and playback checks.
 
 config YORADIO_STREAM_CONFIRM
-    bool "Confirm MP3/AAC frames and recover alignment (experimental)"
+    bool "Confirm MP3/AAC frames and recover alignment"
     depends on YORADIO_FRAME_ROUTER
     default n
     help
@@ -158,7 +158,7 @@ config YORADIO_STREAM_CONFIRM
         when all guaranteed data slots are held. Scan at most 4096 junk bytes
         per connection and wait at most ten seconds for a candidate. Requires
         four guaranteed slots. Free-format MP3 returns to decoder-owned parsing.
-        Keep disabled until network, performance and physical playback tests pass.
+        Enabled by the tested radio profile after network and playback checks.
 
 config YORADIO_INPUT_MIN_BLOCKS
     int "Minimum compressed-input capacity (1600-byte units)"
@@ -838,11 +838,11 @@ config YORADIO_AAC_COMPACT_EARLY_OWNER
     depends on YORADIO_AAC_COMPACT_SBR
     default n
     help
-        Allocation-order experiment using the selected compact layout size.
+        Reserve the selected compact layout before allocating core and PCM storage.
         Transfer the pending block to the SDK on its SBR request; release
         unused storage after real LC output or decoder destruction. Adds one
         pointer per native AAC decoder. Does not change DSP or format support.
-        Requires repeated HTTPS, LC/late-SBR, lifetime and PCM qualification.
+        The tested radio profile enables this with HTTPS and LC/late-SBR coverage.
 
 config YORADIO_AAC_HIGH_HISTORY
     bool "Pack retained high-QMF history"

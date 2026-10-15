@@ -6,7 +6,7 @@ yourself, program a board for the first time, and update it later.
 
 **Already running a native firmware with WebUI OTA support?** You only need a
 browser and the matching `app.bin`: follow [WebUI OTA](#webui-ota-no-tools-required).
-Skip installation steps 1–10, USB drivers, programming mode and all esptool
+Skip installation steps 1-10, USB drivers, programming mode and all esptool
 commands. A blank board, an Arduino installation or an older native firmware
 without OTA support needs the USB installation route once.
 
@@ -51,9 +51,10 @@ a firmware that already implements OTA; it cannot migrate an Arduino installatio
    the repository's firmware directory (use **Download raw file** on GitHub),
    or use the `app.bin` produced by your own build. A Git LFS pointer text file
    or a saved GitHub HTML page is not a firmware binary.
-   The OTA builds are `esp32c3-oled-native-webui-ota` (ordinary clock) and
-   `esp32c3-oled-native-webui-ota-deep-sleep` (sleeping clock), under
-   `firmware/development/`. Both use the internal RTC oscillator.
+   The tested ordinary-clock build is `esp32c3-idf61-raw-tail-quiet`, under
+   `firmware/development/`. The older `esp32c3-oled-native-webui-ota` and
+   `esp32c3-oled-native-webui-ota-deep-sleep` builds remain archived options.
+   These images use the internal RTC oscillator.
    Choose the same features you want to keep; OTA does not add build options.
 2. Connect the computer to the radio's local network and open its IP address
    in a browser. With deep sleep enabled, hold **BOOT for over 500 ms** and
@@ -193,6 +194,7 @@ The directory name is the value to use for `$variant` in the commands below.
 
 | Directory under `firmware/development/` | Features | Saved source | Files and details |
 | --- | --- | --- | --- |
+| `esp32c3-idf61-raw-tail-quiet` | Tested ESP-IDF 6.1 radio: full-rate compact AAC/SBR/PS, all native codecs, QIO 80 MHz, exact nominal 48 kHz output and WebUI OTA; deep sleep/logs off. | `453cd451`, 2026-10-15 | `app.bin` and matching boot files. [Manifest](../firmware/development/esp32c3-idf61-raw-tail-quiet/manifest.json), [acceptance](ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md). |
 | `esp32c3-oled-native-webui-ota` | WebUI application OTA, approved clock font, ordinary clock; internal RTC; logs off. | `ab56a923` | Application only. [Manifest](../firmware/development/esp32c3-oled-native-webui-ota/manifest.json). |
 | `esp32c3-oled-native-webui-ota-deep-sleep` | WebUI application OTA and sleeping clock; internal RTC; logs off. | `ab56a923` | Application only. [Manifest](../firmware/development/esp32c3-oled-native-webui-ota-deep-sleep/manifest.json). |
 | `esp32c3-oled-native-production` | Ordinary radio; internal RTC oscillator; deep sleep off; logs off. | `eef49d1`, 2026-08-29 | `app.bin`, recovery `full.bin` and boot files. [Manifest](../firmware/development/esp32c3-oled-native-production/manifest.md). |
@@ -211,7 +213,7 @@ while this defect is being investigated. External-crystal variants have not been
 tested on hardware. See the [hardware validation report](ESP32C3_HARDWARE_VALIDATION_20260930.md).
 Compile from source if you need the newest code with your own combination of options.
 
-Choose `esp32c3-oled-native-webui-ota` for the ordinary radio with application
+Choose `esp32c3-idf61-raw-tail-quiet` for the tested ordinary radio with application
 OTA, `esp32c3-oled-native-production` for the older archived build, or choose
 one of the other rows for its listed features. A prebuilt binary's features are
 fixed: passing build switches to esptool cannot enable or disable them.
@@ -262,20 +264,21 @@ terminal. Keep this terminal open so `$flashPython` remains available.
 
 ### P3. Download the actual binary files and check them
 
-Change the first line to one of the five native directory names in the table:
+Change the first line to a native directory name in the table:
 
 ```powershell
-$variant = "esp32c3-oled-native-production"
+$variant = "esp32c3-idf61-raw-tail-quiet"
 $firmware = Join-Path "C:\yoRadio\firmware\development" $variant
 $installFiles = "C:\yoRadio\firmware\development\esp32c3-oled-native-installation"
 
 Set-Location C:\yoRadio
-git lfs pull --include="firmware/development/$variant/app.bin,firmware/development/esp32c3-oled-native-installation/*.bin" --exclude=""
+git lfs pull --include="firmware/development/$variant/app.bin,firmware/development/$variant/bootloader.bin,firmware/development/$variant/partition-table.bin,firmware/development/esp32c3-oled-native-installation/*.bin" --exclude=""
 if ($LASTEXITCODE -ne 0) { throw "Firmware download failed; do not flash." }
 ```
 
 This works even though step 2 enabled `--skip-smudge`. It downloads only the
-chosen application and the shared installation files. Do not save GitHub's HTML
+chosen application, its matching boot files when available, and the shared
+installation files. Do not save GitHub's HTML
 file page as `.bin`, and do not flash a Git LFS pointer file.
 
 Check the installation-file hashes automatically:
@@ -290,6 +293,20 @@ foreach ($file in $installManifest.files) {
     }
 }
 
+$bootloader = Join-Path $installFiles "bootloader.bin"
+$partitionTable = Join-Path $installFiles "partitions.bin"
+if ($variant -eq "esp32c3-idf61-raw-tail-quiet") {
+    $variantManifest = Get-Content "$firmware\manifest.json" -Raw | ConvertFrom-Json
+    foreach ($name in @("app.bin", "bootloader.bin", "partition-table.bin")) {
+        $actualHash = (Get-FileHash -LiteralPath (Join-Path $firmware $name) -Algorithm SHA256).Hash
+        if ($actualHash -ne $variantManifest.files.$name) {
+            throw "Wrong or incomplete variant download: $name"
+        }
+    }
+    $bootloader = Join-Path $firmware "bootloader.bin"
+    $partitionTable = Join-Path $firmware "partition-table.bin"
+}
+
 & $flashPython -m esptool --chip esp32c3 image-info "$firmware\app.bin"
 if ($LASTEXITCODE -ne 0) { throw "Invalid application image; do not flash." }
 Get-FileHash -LiteralPath "$firmware\app.bin" -Algorithm SHA256
@@ -302,9 +319,11 @@ check the download. These checks do not connect to the board.
 The [shared installation package](../firmware/development/esp32c3-oled-native-installation/manifest.md)
 contains a production bootloader, the native partition table, an initial OTA
 selector, and a ready-made SPIFFS image with WebUI and the repository playlist.
-It contains no Wi-Fi credentials. Use your selected variant's `app.bin` with it.
-The shared bootloader is quiet; the development application still provides its
-own application logs.
+It contains no Wi-Fi credentials. For the current tested QIO build, the commands
+select the bootloader and partition table shipped with that application;
+the shared package supplies the initial OTA selector and WebUI filesystem.
+Older listed variants use the shared boot files. The shared bootloader is quiet;
+the development application still provides its own application logs.
 
 Wi-Fi credentials entered during setup are saved on the board in
 `/data/wifi.csv`. P6 deliberately preserves that file: a radio remembering your
@@ -336,8 +355,8 @@ before using this installation procedure.
 ```powershell
 & $flashPython -m esptool --chip esp32c3 --port $port --baud 460800 --before usb-reset --after no-reset write-flash `
     --flash-mode dio --flash-freq 80m --flash-size 4MB `
-    0x0 "$installFiles\bootloader.bin" `
-    0x8000 "$installFiles\partitions.bin" `
+    0x0 "$bootloader" `
+    0x8000 "$partitionTable" `
     0xe000 "$installFiles\boot_app0.bin" `
     0x10000 "$firmware\app.bin" `
     0x3b0000 "$installFiles\spiffs.bin"
@@ -347,6 +366,11 @@ Wait until all writes and verification finish successfully. Release BOOT, then
 press RESET, or unplug and reconnect USB without holding BOOT. The command uses
 `--after no-reset` so the final restart is explicit. Continue with step 9 to
 configure Wi-Fi. For a sleeping-clock image, also follow step 10.
+
+The `dio` argument matches ESP-IDF's generated flash command for this QIO build:
+the ROM loads the bootloader in DIO, then the matching bootloader configures
+QIO operation. The acceptance campaign covers application OTA on the configured
+board; it does not claim a fresh-board installation test of this package.
 
 The older production/development `full.bin` files are recovery images with an
 empty SPIFFS region: they do not install the WebUI. The command above uses the
@@ -440,11 +464,19 @@ an external RTC crystal, which is a simple starting point for a new board:
 ```powershell
 $buildOptions = @{
     DependencyRoot = "C:\yoRadio\.idf"
+    TestedRadioProfile = $true
     FirmwareOutputDirectory = "firmware/development/local-esp32c3"
     DeepSleepClock = $false
     Rtc32kCrystal = $false
 }
 ```
+
+`TestedRadioProfile` selects the tested ESP-IDF 6.1 radio settings, including
+full-rate compact HE-AAC, the TLS reserve, QIO 80 MHz, frame-format changes and
+bounded input buffers. It also updates these settings in a reused build directory.
+See the [acceptance report](ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md). The reported
+qualification applies to the ordinary-clock build; enabling an optional clock
+feature changes the tested configuration.
 
 The last two lines are optional features:
 
@@ -635,6 +667,7 @@ force the update. Set your build options again, using the same desired values:
 ```powershell
 $buildOptions = @{
     DependencyRoot = "C:\yoRadio\.idf"
+    TestedRadioProfile = $true
     FirmwareOutputDirectory = "firmware/development/local-esp32c3"
     DeepSleepClock = $false
     Rtc32kCrystal = $false
@@ -652,7 +685,7 @@ curl.exe --fail-with-body -F "updatetarget=firmware" -F "update=@firmware/develo
 
 If the installed firmware lacks OTA support, use the application-only USB update
 in **P6**, setting `$firmware` to `firmware/development/local-esp32c3` for this
-build. Complete P2–P4 first if their tools and boot files are not available.
+build. Complete P2-P4 first if their tools and boot files are not available.
 P6 resets the boot selector as well as writing `app0`: `app-flash` alone can
 leave the old `app1` selected after an OTA update.
 
