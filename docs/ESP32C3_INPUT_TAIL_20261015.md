@@ -197,3 +197,29 @@ network recovery and OTA regression are checked on this image. More densely
 filled slots do not eliminate the measured long-gap starvation or explain the
 earlier WebUI TCP failures. Preserve those open findings; do not widen output
 acceptance merely because memory and transition gates pass.
+
+## Quiet public HTTPS files
+
+The exact quiet image completed both AUTO and explicit FLAC, Opus and Vorbis
+files from independently decoded public HTTPS references. The original runner
+reports **14/16**, with both FLAC cases rejected by `Progressive heap loss`.
+These failures are retained in the
+[original HTTPS evidence](../tests/results/esp32c3-input-tail-quiet-20261015/public-files/).
+
+Independent inspection of the two FLAC cases finds expected format, natural EOF
+at 60.793 / 60.797 seconds versus a 60.480-second reference, and zero new output
+completion drops/write errors over 56.289 / 56.099 seconds. WebUI responses stay
+below 412 ms. The original three-sample endpoint medians fall by 8,592 / 8,508 B,
+but five-second buckets repeatedly revisit approximately the same 61–71 KB
+heap range throughout playback. This is evidence of endpoint phase sensitivity,
+not proof of a continuing leak or of its allocator source. Largest-block
+endpoint medians are 49,152→49,152 and 53,248→49,152 B.
+
+All 865 health samples retain one boot and zero allocation, decoder and watchdog
+faults. Opus/Vorbis pass their existing format/duration/EOF, memory and output
+checks. All three codec recovery checkpoints pass. After FLAC, settled free
+heap is 139,520 B versus 139,484 B initially, with the largest block unchanged
+at 110,592 B. No failed TCP connect was recorded in this campaign. The controller
+restored the original production application, verified settings and stopped
+playback. The earlier TCP timeout remains historical evidence; its cause has
+not been identified by this successful transport observation.
