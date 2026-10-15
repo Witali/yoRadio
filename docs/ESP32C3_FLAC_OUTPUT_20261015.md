@@ -641,3 +641,29 @@ profiles, with independent format probes. Production promotion remains pending
 that campaign and the final evidence review.
 
 [Complete quiet qualification reports, exact test sources and restoration](../tests/results/esp32c3-raw-tail-quiet-20261015/qualification/).
+
+### AAC evidence cross-check during final review
+
+Four existing evidence/policy test entrypoints pass **24 checks**: complete
+recording statistics, asymmetric-owner evidence, the production 3-LSB policy
+and both early-owner ABI layouts. The asymmetric-owner check initially found
+a Git LFS pointer instead of its old application binary. Hydrating that exact
+tracked image from local LFS storage fixes the dependency; all ten checks then
+pass without changing source or assertions. The original failure is retained.
+
+The current build audit and the historical physical/QEMU audits identify the
+same native codec archive, SHA-256
+`311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909`.
+This does not mean all wrappers are unchanged: the saved source comparison
+explicitly lists later PC19 and owner/lifecycle changes. The five-recording
+statistics retain their measured 2-LSB peak over 12,505,088 channel samples.
+
+The pinned ESP-IDF `6.1-9a97f6c54ec6` synthetic PCM files were independently
+decompressed and compared again, with their indexed hashes and complete error
+histograms checked. Late-SBR (189,440 samples) and absent/resumed-SBR (675,840)
+are byte-identical to the retained PC19 PCM and differ from full-precision
+storage by at most 2 LSB. These checks revalidate existing captures; they are
+not a new emulator run, physical PCM capture or a bound over every possible
+AAC input. Physical radio and sustained-codec qualification remain separate.
+
+[Audit scripts, logs, source comparison and retained dependency failure](../tests/results/esp32c3-raw-tail-quiet-20261015/evidence-audit/).

@@ -1,0 +1,18 @@
+......F...
+======================================================================
+FAIL: test_physical_artifact_and_only_one_configuration_change (__main__.AsymmetricProductionTests.test_physical_artifact_and_only_one_configuration_change)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\merge-c3-idf-20261013\tests\test-aac-asymmetric-production.py", line 36, in test_physical_artifact_and_only_one_configuration_change
+    self.assertEqual(image_info((FIRMWARE/'app.bin').read_bytes()), manifest['image'])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\merge-c3-idf-20261013\tools\esp32c3_tests\ota.py", line 24, in image_info
+    require(len(data) > 288 and data[0] == 0xe9, 'Not an ESP application image')
+  File "C:\Work\yoRadio\.worktree\merge-c3-idf-20261013\tools\esp32c3_tests\common.py", line 44, in require
+    raise Failure(message)
+common.Failure: Not an ESP application image
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.956s
+
+FAILED (failures=1)

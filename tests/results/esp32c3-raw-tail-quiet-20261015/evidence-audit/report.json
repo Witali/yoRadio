@@ -1,0 +1,33 @@
+{
+  "inputs": {
+    "tests/results/esp32c3-raw-tail-quiet-20261015/build/aac-audit.json": "0e62f259f0a8b4966f99a5e498f28621b9858040cade2cf26f81690c940ffe5b",
+    "tests/results/esp32c3-aac-asymmetric-production-20261004/physical-patch-audit.json": "fb8c887f9b8bbbbc88f8c43d50a03dd937165bf9eabd4d17e9ff75b15dc88488",
+    "tests/results/esp32c3-aac-asymmetric-production-20261004/qemu/audit.json": "fb8c887f9b8bbbbc88f8c43d50a03dd937165bf9eabd4d17e9ff75b15dc88488"
+  },
+  "tests": [
+    {
+      "path": "tests/test-aac-recording-evidence.py",
+      "sha256": "946dd7bdd61080aa5b652c70429a77a03d30a14b847b2863cbef084581f82304",
+      "exit_code": 0
+    },
+    {
+      "path": "tests/test-aac-asymmetric-production.py",
+      "sha256": "30f2ebf6502f93442b5dc15df23dc0e4eefd5bd87a4162e4652ccfde2bdbe1d6",
+      "exit_code": 1
+    },
+    {
+      "path": "tests/test-aac-precision-policy.py",
+      "sha256": "43b879f1a5d4a9a6844f77ee9837f565783674522d904530117f80161a7fc099",
+      "exit_code": 0
+    },
+    {
+      "path": "tests/test-aac-network-build-layout.py",
+      "sha256": "6c1f9c834989ea31380b8a9d9e3c91595187daea733b0904fcfe4265f9d90745",
+      "exit_code": 0
+    }
+  ],
+  "codec_sha256": "311caa814095b098e476b28e46d55623ef70c26b0d73d69ba5832e154ec8d909",
+  "scope": "Revalidates archived PCM statistics, pointer/lifetime evidence and precision policy. Does not re-decode music PCM or replace physical qualification.",
+  "same_codec_archive": true,
+  "passed": false
+}
