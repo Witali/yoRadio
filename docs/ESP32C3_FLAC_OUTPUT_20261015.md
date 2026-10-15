@@ -365,7 +365,7 @@ Probe storage grows from 540 to 820 B only with diagnostic mode enabled. Disable
 macros discard their arguments, including the added timer reads. Codec arithmetic,
 queue sizes, priorities and production defaults are unchanged. The diagnostic
 health response buffer grows to 3,584 B on the existing 8,192-B HTTP task stack;
-physical stack headroom must still be checked before qualifying this image.
+the physical stack measurements below cover the tested workload.
 
 The host parser accepts legacy seven-word events and version-2 eleven-word
 events, rejects mixed/unknown versions, and preserves wait/process distinctions.
@@ -375,4 +375,63 @@ output boundaries and HTTP/TLS tests also pass. This is instrumentation
 verification, not a fix or production qualification.
 
 [Host evidence and exact tested sources](../tests/results/esp32c3-decode-probe-20261015/host/)
-are retained. Physical reproduction with this diagnostic is the next step.
+are retained. Physical trials with this diagnostic are described below.
+
+### Version-2 diagnostic on the board
+
+The saved image `idf61-decdiag-20261015` uses the same eight-slot FLAC input
+policy and 250-ms read timeout as the baseline. Build/link, AAC and TLS allocator
+audits pass. App size is 1,477,216 B; app SHA-256 is
+`cb92d03aaa9f26e0adb370dda38d3c3267f421fb9fa527dd06fe35d9a5e67c2e`.
+Probe storage is confirmed at 820 B in the ELF; static DRAM grows by 280 B.
+
+| Local HTTP trial | Checks passed | Completion drops | Write errors |
+| --- | ---: | ---: | ---: |
+| Control 1 | 9/9 | 0 | 0 |
+| Control 2 | 9/9 | 0 | 0 |
+| 100/250/500-ms delivery pauses | 8/9 | 29 (0/3/26 around pauses) | 0 |
+| Control 3 | 9/9 | 0 | 0 |
+
+All four trials share one boot and finish naturally. All 592 health observations
+have zero allocation, decoder and watchdog faults. Sampled heap/largest minima
+are 63,800/47,104 B. HTTP task stack low-water mark is 2,264 B; static-file worker
+stack low-water mark is 424 B. These measurements cover this experiment, not
+all HTTP handlers or OTA stack use. The maximum measured decoder process-call
+wall time since boot reaches 29.458 ms. Original production, private settings
+and stopped playback are verified restored after the campaign.
+
+Nineteen of the 29 paused-trial event details survive; ten are overwritten.
+Fifteen retained events have no decoder feed active; four have a feed active
+for 1.376–19.143 ms. None has an active PCM-buffer acquisition. The full legacy
+phase histogram has 25 events in output-wait/encoded-input-wait/HTTP-read and
+four in output-wait alone. Last PCM age reaches 319.883 ms. This is consistent
+with input starvation and subsequent decoding while refilling after the imposed
+pauses. It does not indicate a decoder blocked by a full PCM buffer in the
+retained events. A zero last-completed-batch process maximum means that the
+previous feed contained no process call; it says nothing about the current call.
+
+The paused-trial output gate remains failed. Three clean controls do not explain
+the earlier spontaneous fault or qualify the quiet production candidate.
+[Build evidence](../tests/results/esp32c3-decode-probe-20261015/build/),
+[physical evidence](../tests/results/esp32c3-decode-probe-20261015/physical/)
+and [saved diagnostic firmware](../firmware/development/esp32c3-idf61-decode-probe-diagnostic/)
+are retained.
+
+### Public HTTPS replay with version-2 diagnostics
+
+Three pairs of the same public FLAC file (AUTO and explicit FLAC) pass **24/24
+checks** on one boot. Six fixed steady windows total 337.262 seconds, with zero
+completion-queue drops and zero write errors. All 1,008 health observations have
+zero allocation, decoder and watchdog faults; sampled heap/largest minima are
+59,508/43,008 B. The cumulative maximum process-call wall time reaches 33.811 ms.
+All files reach natural EOF and pass settled-memory recovery. Original production
+firmware/settings and stopped playback are verified restored afterward.
+
+[Public HTTPS reports and fixed-window pipeline replay](../tests/results/esp32c3-decode-probe-20261015/public/)
+retain the measured results. The earlier spontaneous failures remain unresolved:
+this instrumented image changes timing and memory layout, and no spontaneous
+dropout was captured in this campaign. Production defaults remain unchanged.
+The next useful evidence is a spontaneous event with the new feed/PCM-wait
+fields, correlated with encoded-input availability and HTTP delivery. These
+clean runs alone do not justify changing decoder arithmetic, priority or buffer
+capacity, or declaring the quiet candidate qualified.
