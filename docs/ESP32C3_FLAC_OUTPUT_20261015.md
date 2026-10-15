@@ -737,3 +737,21 @@ paused diagnostic experiment. The same corrected application still needs the
 
 [Sustained evidence and exact test sources](../tests/results/esp32c3-raw-tail-quiet-20261015/sustained/).
 [Current acceptance audit](ESP32C3_PRODUCTION_ACCEPTANCE_20261015.md).
+
+### Sustained AAC-LC repeat
+
+The same quiet application passes **7/7** in a separate 600-second public
+Groove Salad 128-kbit/s AAC-LC HTTPS run. The independently identified format
+is 44.1 kHz stereo. Its 584.694-second measured steady window has zero
+completion drops and write errors; 1,119 health samples have no reported
+allocation, decoder or watchdog events. No traced HTTP request fails.
+Minimum free heap/largest block are 58,440/32,768 bytes, and the largest paired
+status/health latency is 583.672 ms. Memory trend and settled recovery pass.
+The original application, settings and stopped state are verified restored.
+
+This closes the missing same-duration repeat on the corrected image. It does
+not attribute every historical public-network failure or change the retained
+pause-induced diagnostic failures. Profile-wrapper validation and final
+installation are recorded in the acceptance audit.
+
+[AAC-LC repeat and source references](../tests/results/esp32c3-raw-tail-quiet-20261015/public-lc-repeat/).

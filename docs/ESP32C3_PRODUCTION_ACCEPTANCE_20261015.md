@@ -3,9 +3,8 @@
 ## Decision
 
 **Pending.** The corrected quiet image has passed its short codec, public
-HTTPS, network, WebUI, OTA and sustained FLAC/Vorbis/Opus campaigns. A sustained
-AAC-LC repeat, production wrapper verification and final installation are
-still in progress. This
+HTTPS, network, WebUI, OTA and sustained FLAC/Vorbis/Opus/AAC-LC campaigns.
+Production wrapper verification and final installation are still in progress. This
 document does not mark the playback goal complete.
 
 ## Exact application under review
@@ -32,7 +31,7 @@ the saved application above; a new build must have its own recorded identity.
 | Other implemented native codecs | MP3, FLAC, Vorbis and Opus, AUTO and explicit hints; natural EOF; public HTTPS FLAC/Vorbis/Opus; 600-s FLAC/Vorbis/Opus | Passed tested cases |
 | Safe parameter/decoder changes | 11/11 transition checks: rate/profile changes, implicit SBR, MP3/AAC changes and Stop/Play generations | Passed |
 | No crashes or allocation failures; recover memory | Lifetime health, settled recovery and active memory-trend gates in each campaign | Passed completed campaigns; numerical free-heap floors are diagnostic |
-| HTTPS and network recovery | Normal certificate verification; five public AAC/MP3 profiles; drop/stall/error/redirect/jitter recovery | Passed completed campaigns; long AAC-LC repeat pending |
+| HTTPS and network recovery | Normal certificate verification; five public AAC/MP3 profiles; 600-s HE-AAC and AAC-LC; drop/stall/error/redirect/jitter recovery | Passed tested cases |
 | Correct terminal and browser state | Natural EOF in file matrix, WebSocket metadata/reconnect, stopped-state checks | Passed |
 | Safe OTA and preserved settings | 15/15 invalid/interrupted/round-trip/playing/slow-upload/restoration checks | Passed; final installation pending |
 | Production numerical tolerance of 3 PCM LSB | Revalidated recording statistics and retained pinned-SDK PCM comparisons | Peak 2 LSB on the measured corpus; not a universal input bound |
@@ -55,6 +54,7 @@ claimed as tested by this report.
 | OTA | 15/15 | [Reports](../tests/results/esp32c3-raw-tail-quiet-20261015/qualification/ota/report.json) |
 | Public HTTPS radio: 600-s HE-AAC plus four 60-s AAC/MP3 cases | 17/17 | [Audit](../tests/results/esp32c3-raw-tail-quiet-20261015/public-radio/audit.json) |
 | Sustained FLAC/Vorbis/Opus: 600 s each | 27/27 | [Audit](../tests/results/esp32c3-raw-tail-quiet-20261015/sustained/audit.json) |
+| Public AAC-LC HTTPS repeat: 600 s | 7/7 | [Audit](../tests/results/esp32c3-raw-tail-quiet-20261015/public-lc-repeat/audit.json) |
 
 The first five playback suites contain 2,096 health samples; the public-radio
 campaign adds 1,572. Each campaign has a consistent boot identity and no
@@ -77,6 +77,13 @@ encoded 610-second synthetic fixtures, paced at 1.0, not looped short files.
 The 16-kbit/s public source is **HE-AAC mono**, duplicated to two output
 channels; it is not PS evidence. HE-AAC v2 has separate fixture and PCM coverage.
 
+The separate AAC-LC repeat has 1,119 health samples, zero recorded allocation,
+decoder and watchdog events, and no traced HTTP failure. Its 584.694-second
+steady output window has zero completion drops/write errors. Minimum free
+heap/largest block are 58,440/32,768 bytes; maximum paired status/health response
+is 583.672 ms. Settled recovery and original application/settings restoration
+pass. The completed physical campaigns now contain **139 passing checks**.
+
 The [numerical audit](../tests/results/esp32c3-raw-tail-quiet-20261015/evidence-audit/)
 rechecks five recording statistics (12,505,088 channel samples, peak 2 LSB)
 and directly compares 865,280 retained pinned-SDK late/resumed-SBR PCM samples
@@ -90,7 +97,8 @@ owner changes are explicitly recorded rather than assumed identical.
 - Earlier quiet candidates had spontaneous AAC-LC/FLAC output failures and
   WebUI TCP timeouts. They remain in the [investigation](ESP32C3_FLAC_OUTPUT_20261015.md).
   Current successful windows do not establish the cause of every historical
-  fault. A ten-minute AAC-LC repeat is mandatory before the current decision.
+  fault. The exact-image ten-minute AAC-LC repeat now passes; the earlier failed
+  reports remain unchanged.
 - Diagnostic FLAC with injected 100/250/500-ms delivery pauses still has a
   failed output gate: 32 completion drops. It recovers without an allocation
   failure or crash. No claim of uninterrupted audio under arbitrary network
@@ -110,7 +118,7 @@ owner changes are explicitly recorded rather than assumed identical.
 1. **Done:** exact-image 600-second FLAC/Vorbis/Opus campaign archived,
    including recovery and verified restoration of the original application,
    private settings and stopped playback.
-2. Repeat 600-second public AAC-LC on this image; preserve any failure.
+2. **Done:** 600-second public AAC-LC repeat passes and is archived separately.
 3. Apply the reviewed tested-radio defaults and check fresh and reused
    directories through the normal production wrapper. The
    [preflight](../tests/results/esp32c3-raw-tail-quiet-20261015/profile-preflight/)
