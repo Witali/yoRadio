@@ -125,6 +125,11 @@ Then revisit safe queue growth with explicit owner lifetime and late-SBR tests.
 Neither experiment qualifies public-source failures or the final production
 image by itself.
 
+The [two-second prefill trial](ESP32C3_AAC_PREFILL2_20261015.md) is now complete:
+50 completion drops versus 48 in the control, without allocation/decoder faults.
+It does not justify a production delay increase; guarded real-capacity growth
+remains the next memory-lifetime experiment.
+
 [Build evidence](../tests/results/esp32c3-aac-input-growth-20261015/build/),
 [physical run and restoration](../tests/results/esp32c3-aac-input-growth-20261015/physical/),
 and [adapter eligibility regression](../tests/results/esp32c3-aac-input-growth-20261015/adapter-eligibility/)
