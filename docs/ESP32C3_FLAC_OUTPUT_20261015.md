@@ -126,3 +126,84 @@ TLS reserve is unchanged. Compare this exact file and pause schedule before
 considering a default change, then verify HTTP/HTTPS, FLAC→AAC replacement,
 EOF/Stop memory recovery and the quiet image. A finite queue cannot cover
 arbitrarily long delivery outages.
+
+## Capacity experiment: compiled limit is not the allocated capacity
+
+The first `FLAC_INPUT_EXTRA_SLOTS=8` image passes its build/link checks and
+changes no other configuration option from the diagnostic baseline. However,
+both physical runs still have **eight resident slots** throughout their fixed
+steady windows. The no-pause control passes 8/8 with zero drops; the paused run
+passes 7/8 with 29 drops (3 around the 250-ms pause and 26 around the 500-ms
+pause). There are no allocation, decoder or watchdog faults. Original firmware,
+settings and stopped playback are restored. This is **not** an 8-versus-12-slot
+comparison and does not demonstrate the effect of increasing input capacity.
+
+[Original capped run and exact test sources](../tests/results/esp32c3-flac-input12-20261015/controlled/)
+retain the failed output gate. The artifact directory uses the original
+`input12` experiment name; that name is not a measured allocation count.
+
+The saved WebUI setting `abuff` determines the queue's target at boot:
+`ceil(abuff * 1600 / 2060)` slots. `adaptive_input_set_limit()` clamps the
+FLAC limit to that target. The supported setting is 5..14 blocks, so the
+largest user-configurable target is **11 slots**, not 12. Raising only the
+build option cannot bypass this cap. The running queue is created once;
+changing `abuff` requires rebooting before measuring its capacity.
+
+The matched experiment temporarily uses `abuff=14` for both images: the
+baseline permits 4 minimum + 4 extra = 8 slots, while the candidate permits
+up to 12 but is capped at 11. Three additional slots contain **6,180 bytes**
+including packet headers (6,144 audio-data bytes), plus allocator overhead.
+AAC growth, TLS reserve and DSP remain unchanged. Each run explicitly checks
+that the expected resident capacity was actually reached. Private settings
+stay in memory; the controller restores the original setting and application
+even if an output test fails. The temporary setting is an experiment, not a
+new production default.
+
+### Matched target results
+
+Both images use the same temporary 14-block setting, reference bytes, host,
+unpaced delivery and pause byte offsets. The measured resident count stays at
+8 or 11, respectively, throughout each fixed steady observation window.
+
+| Resident slots | Delivery | Passed checks | Completion drops | Write errors | Minimum sampled heap / largest block |
+| ---: | --- | ---: | ---: | ---: | ---: |
+| 8 | No imposed pauses | 9/9 | 0 | 0 | 64,260 / 49,152 B |
+| 8 | 100/250/500-ms pauses | 8/9 | 51 | 0 | 63,972 / 45,056 B |
+| 11 | No imposed pauses | 9/9 | 0 | 0 | 57,208 / 40,960 B |
+| 11 | 100/250/500-ms pauses | 8/9 | 303 | 0 | 57,432 / 40,960 B |
+
+All 578 health samples have zero allocation, decoder and watchdog faults.
+Each image remains on one boot for its two cases. EOF/Stop recovery checks,
+settings equality and final restoration pass. These are sequential physical
+trials, not identical network delivery traces.
+
+The 11-slot paused case fails the original three-sample natural-EOF check:
+its last two samples show `stream ended` at 7.471 and 7.976 seconds into the
+eight-second EOF observation, while the preceding sample still shows playback.
+This is late confirmation, **not evidence of a permanently stuck EOF status**.
+Because that assertion precedes the output assertion, the raw case reports EOF
+failure first. Independent replay of the unchanged steady window also finds
+303 completion drops; the earlier assertion must not hide them. Neither the
+deadline nor the required confirmation count was relaxed.
+
+The paused trials also have unexpected input starvation outside the deliberate
+250/500-ms delays. With eight slots, 19 drops occur around playback seconds
+14.847–16.092, before the first imposed pause at 19.768 seconds. With eleven
+slots, 283 drops span 19.365–26.882 seconds; the imposed 100-ms pause near the
+start of that interval actually lasts 110.530 ms. Input occupancy repeatedly
+reaches zero. Most phase counts include output wait, decoder wait and HTTP
+read; these phases are not scheduler states and do not identify a Wi-Fi,
+host, TCP or firmware root cause. Retained event details cover 43/51 and
+119/303 drops respectively; **8 and 184 event details were overwritten**.
+RSSI ranges from -71 to -59 dBm in both paused trials, which alone cannot
+explain the difference.
+
+Consequently, 51 versus 303 is an observed result, **not a measured causal
+regression from adding three slots**. The extra capacity costs approximately
+6 KiB of packet memory but has not demonstrated reliable improvement here.
+Keep production defaults unchanged. Next isolate the unplanned delivery
+stalls and reproduce the original quiet HTTPS fault before choosing a buffer
+policy; do not use successful control runs to qualify this candidate.
+
+[Matched reports, ISR replay, delivery timing, exact sources and restoration](../tests/results/esp32c3-flac-input12-20261015/matched/)
+retain both failures. The saved diagnostic image remains unqualified.
