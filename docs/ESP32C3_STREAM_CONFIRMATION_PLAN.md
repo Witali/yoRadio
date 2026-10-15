@@ -17,6 +17,12 @@ The recorder changes timing/layout, and the earlier quiet-candidate 27-drop
 failure was not reproduced. It and the FLAC/WebUI TCP timeout remain open;
 no production qualification or default change is inferred.
 
+The subsequent [600-second quiet-image repeat](ESP32C3_AAC_QUIET_REPEAT_20261015.md)
+records 36 steady completion drops, with no allocation/decoder/watchdog faults
+and successful stopped-state memory recovery. The original report's memory
+failure is retained; independent replay exposes the output failure that it
+previously hid. Public tests now retain independent gates and exact window bounds.
+
 The previous FFmpeg comparison identified false MP3 headers before AAC and false
 AAC headers before MP3 as unresolved failures. The new core rejects those
 candidates when their claimed next frame boundary is invalid, then searches for
