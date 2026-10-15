@@ -207,3 +207,61 @@ policy; do not use successful control runs to qualify this candidate.
 
 [Matched reports, ISR replay, delivery timing, exact sources and restoration](../tests/results/esp32c3-flac-input12-20261015/matched/)
 retain both failures. The saved diagnostic image remains unqualified.
+
+## Sender TCP_NODELAY comparison
+
+The previous long starvation interval coincides with host writes accepted at
+roughly 43–79 KB/s instead of the usual 110–120 KB/s. Almost all wall time is
+inside socket writes; the measured outside-write time is approximately
+0–1 ms per window, except for the deliberately inserted pauses. This argues
+against long pauses in the Python loop between writes. It does **not** separate
+receiver backpressure, network delay, TCP behaviour or host scheduling during
+the blocking calls.
+
+The fixture server writes 1-KiB pieces. To test sender coalescing, it now has
+an optional `tcp_nodelay` policy and records the actual socket option. Its
+default behaviour is unchanged. The option affects only that server socket;
+see [Microsoft's description](https://learn.microsoft.com/en-us/windows/win32/winsock/ipproto-tcp-socket-options).
+Fourteen host tests pass, including HTTP/HTTPS byte identity and exact pause
+positions. An initial restricted-sandbox attempt could not access local sockets
+or temporary certificate directories; the saved successful run used the normal
+host environment. No OS TCP settings or trust stores were modified.
+
+All four physical cases use the **same eight-slot diagnostic image on one
+boot**, original saved settings, reference bytes, send buffer and pause offsets.
+The socket option is read back in every case; the maximum and steady resident
+capacity remain eight.
+
+| TCP_NODELAY | Delivery | Passed checks | Completion drops | Write errors |
+| --- | --- | ---: | ---: | ---: |
+| Off | No imposed pauses | 9/9 | 0 | 0 |
+| Off | 100/250/500-ms pauses | 8/9 | 30 (0/4/26 around the pauses) | 0 |
+| On | No imposed pauses | 9/9 | 0 | 0 |
+| On | 100/250/500-ms pauses | 8/9 | 30 (0/3/27 around the pauses) | 0 |
+
+All 596 health observations have zero allocation, decoder and watchdog faults.
+Minimum sampled heap/largest block is 63,996/47,104 B. Every file reaches
+confirmed natural EOF and passes memory recovery; original firmware/settings
+are restored, stopped. The two failed output gates remain failed. Detailed ISR
+history retains 20/30 and 19/30 events, with 10 and 11 overwritten respectively.
+No earlier unexpected multi-second starvation recurs in these four trials.
+
+**No benefit from disabling Nagle was demonstrated.** This comparison does not
+explain the original quiet HTTPS fault or qualify the candidate. Ordinary
+approximately 100-ms blocked writes cannot alone be called a network defect:
+FFprobe finds 578 FLAC packets of 104.490 ms and one final packet of 84.898 ms
+in this reference (encoded frame sizes 7,119–13,965 bytes), so frame decoding
+and output backpressure can also produce bursty input demand.
+
+The pinned ESP-IDF `esp_http_client_read()` source exposes another testable
+latency mechanism: it tries to fill the requested length, returning partial
+bytes on timeout, EOF or error. Our caller requests 2,048 bytes with a 250-ms
+read timeout. A partial body can therefore wait inside that call before being
+offered to the decoder. This is source-based reasoning, **not proof that it
+caused the observed fault**. Next compare returning smaller reads or a shorter
+read timeout, one change at a time, retaining fatal-TLS handling, HTTP framing,
+EOF, Stop responsiveness, full codec support and memory checks. Do not change
+the connection timeout or discard authenticated partial bytes.
+
+[Reports, host tests, socket policies, frame sizes and pinned reader source](../tests/results/esp32c3-flac-tcp-20261015/)
+preserve the failed comparisons and restoration evidence.
