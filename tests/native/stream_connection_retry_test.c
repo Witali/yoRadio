@@ -195,6 +195,7 @@ static int esp_http_client_get_response_header(esp_http_client_handle_t c, const
 }
 static int esp_http_client_read(esp_http_client_handle_t c, char *data, size_t size) {
     assert(c->timeout_ms == CONFIG_YORADIO_STREAM_READ_TIMEOUT_MS);
+    assert(size == CONFIG_YORADIO_STREAM_READ_BYTES);
     now_us += read_step_us;
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
     ++read_calls;

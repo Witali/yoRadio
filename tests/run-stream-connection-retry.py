@@ -22,9 +22,13 @@ def main():
                         help='Verify FLAC-only growth after the current decoder is ready')
     parser.add_argument('--read-timeout-ms', type=int, default=250,
                         help='HTTP body timeout to validate independently of connection deadlines (10..1000)')
+    parser.add_argument('--read-size', type=int, default=2048,
+                        help='HTTP body request size, independent of packet capacity (128..2048)')
     args = parser.parse_args()
     if not 10 <= args.read_timeout_ms <= 1000:
         parser.error('--read-timeout-ms must be within 10..1000')
+    if not 128 <= args.read_size <= 2048:
+        parser.error('--read-size must be within 128..2048')
     if args.flac_input_growth:
         args.adaptive_input = True
     args.output.mkdir(parents=True, exist_ok=False)
@@ -40,7 +44,7 @@ def main():
     text = source.read_text()
     start = text.index('static void dispose_http_client(')
     dispose_code = text[start:text.index('\n}', start)+2]
-    constants = '\n'.join(re.findall(r'^#define STREAM_(?:RETRY_.*|READ_TIMEOUT_MS.*)$', text, re.M))
+    constants = '\n'.join(re.findall(r'^#define STREAM_(?:RETRY_.*|READ_TIMEOUT_MS.*|READ_SIZE.*)$', text, re.M))
     types = text[text.index('typedef struct {\n    uint32_t generation;'):
                  text.index('} stream_retry_t;')+len('} stream_retry_t;')]
     start = text.index('static bool http_status_is_redirect(')
@@ -74,6 +78,7 @@ def main():
     (args.output/'build.log').write_bytes(run(['gcc', '-std=c11', '-O2', '-g', '-Wall', '-Wextra',
         '-Werror', '-fsanitize=address,undefined', '-fno-pie', '-no-pie',
         f'-DCONFIG_YORADIO_STREAM_READ_TIMEOUT_MS={args.read_timeout_ms}',
+        f'-DCONFIG_YORADIO_STREAM_READ_BYTES={args.read_size}',
         *(['-DCONFIG_YORADIO_TLS_RETAIN_RX_BUFFER=1'] if args.tls_retain_rx else []),
         *(['-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1'] if args.adaptive_input else []),
         *(['-DCONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS=4'] if args.flac_input_growth else []),
@@ -88,6 +93,7 @@ def main():
         tls_retain_rx=args.tls_retain_rx,
         adaptive_input=args.adaptive_input,
         read_timeout_ms=args.read_timeout_ms,
+        read_size=args.read_size,
         source_sha256={p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                        for p in inputs},
         scope='Actual open_stream, retry scheduling and stream_task with deterministic platform stubs; '

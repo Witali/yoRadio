@@ -60,6 +60,9 @@
 #endif
 #define STREAM_CHUNK_SIZE 2048
 #define STREAM_READ_TIMEOUT_MS CONFIG_YORADIO_STREAM_READ_TIMEOUT_MS
+#define STREAM_READ_SIZE CONFIG_YORADIO_STREAM_READ_BYTES
+_Static_assert(STREAM_READ_SIZE > 0 && STREAM_READ_SIZE <= STREAM_CHUNK_SIZE,
+               "HTTP read must fit the receive buffer");
 #define PCM_RING_SIZE (8 * 1024)
 #ifdef CONFIG_YORADIO_DIRECT_DMA_PCM
 // Three 512-frame stereo packets, including lease/ring headers, fit in the
@@ -930,7 +933,7 @@ static void stream_task(void *argument) {
 #endif
             AUDIO_PROBE_FLAG(stream_read, 1U);
             int received = stream_http_read(&reader, client, (char *)buffer,
-                                            STREAM_CHUNK_SIZE);
+                                            STREAM_READ_SIZE);
             AUDIO_PROBE_FLAG(stream_read, 0U);
             if (received > 0) AUDIO_PROBE_STAMP(network_us);
             // Stop/station change may happen while the socket read is blocked.

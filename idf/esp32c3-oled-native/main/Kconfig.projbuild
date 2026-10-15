@@ -56,6 +56,18 @@ config YORADIO_STREAM_READ_TIMEOUT_MS
         Keep the established 250 ms default until HTTP/HTTPS, all codecs,
         framing, Stop/EOF and memory recovery have been compared on hardware.
 
+config YORADIO_STREAM_READ_BYTES
+    int "HTTP body bytes requested per read (experimental)"
+    range 128 2048
+    default 2048
+    help
+        Limit each HTTP body read without changing the 2048-byte receive
+        scratch buffer, HTTP parser buffer or encoded-packet capacity.
+        Smaller requests can deliver an available prefix before a later
+        network gap, but increase call frequency and may reduce queue packing.
+        Compare continuity, throughput, ICY/framing, all codecs, Stop/EOF and
+        memory recovery before changing the established 2048-byte default.
+
 config YORADIO_TLS_LARGE_BLOCK_RESERVE
     bool "Reserve one large TLS allocation in static RAM (experimental)"
     depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_INTERNAL_MEM_ALLOC && MBEDTLS_DYNAMIC_BUFFER

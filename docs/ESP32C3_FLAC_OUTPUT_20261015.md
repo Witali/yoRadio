@@ -435,3 +435,25 @@ The next useful evidence is a spontaneous event with the new feed/PCM-wait
 fields, correlated with encoded-input availability and HTTP delivery. These
 clean runs alone do not justify changing decoder arithmetic, priority or buffer
 capacity, or declaring the quiet candidate qualified.
+
+## HTTP read-size experiment
+
+`CONFIG_YORADIO_STREAM_READ_BYTES` controls only the requested HTTP body length
+(128–2,048 B, default 2,048 B). The receive scratch buffer, HTTP parser buffer,
+encoded-packet capacity, input-slot policy and 250-ms timeout are unchanged.
+The experiment requests 512 B. Shorter reads may expose an available prefix
+sooner, but increase call frequency and can reduce effective queue packing;
+they do not supply missing network data or increase storage capacity.
+
+Four new cases compile the pinned ESP-IDF HTTP read function and parser with
+the same scripted 1,024-byte body, delivered as 512 B, a timeout, then 512 B.
+For both Content-Length and chunked framing, a 512-B request returns the first
+512 body bytes before the scripted wait; a 2,048-B request returns them after
+250 ms. The total scripted wait is identical, and both paths preserve the exact
+body and EOF. All **93 reader cases** pass ASan/UBSan. The actual stream-task
+harness passes **42 cases at each request size**, checking the configured length,
+timeouts, cancellation, EOF, HTTP ownership and FLAC input growth.
+
+[Host evidence and exact sources](../tests/results/esp32c3-read512-20261015/host/)
+cover control flow, not physical TCP/TLS latency, CPU cost or PCM continuity.
+Compare the two request sizes on hardware before changing the production default.
