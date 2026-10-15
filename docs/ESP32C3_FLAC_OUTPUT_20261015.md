@@ -86,3 +86,43 @@ bitrate pacing does not itself starve variable-bitrate frames. This isolates
 controlled delivery gaps from TLS and the public server, but cannot by itself
 attribute the original HTTPS fault. Keep failed output gates and actual host
 pause durations, including any overwritten ISR events.
+
+## Controlled delivery: input starvation reproduced
+
+Both runs use the same independently decoded 6,663,512-byte FLAC reference,
+unpaced local HTTP and requested/actual 4,096-byte host send buffers. Both
+deliver the complete file, reach natural EOF, recover memory and preserve
+settings. The unchanged diagnostic firmware stays on one boot. The no-pause
+control passes **8/8**, with zero output increments over 55.281 seconds.
+
+| Requested host pause | Measured host pause | Byte offset | New completion drops |
+| --- | ---: | ---: | ---: |
+| 100 ms | 106.340 ms | 2,097,152 | 0 |
+| 250 ms | 261.781 ms | 3,670,016 | 4 |
+| 500 ms | 504.150 ms | 5,242,880 | 26 |
+
+The paused run is **7/8**, retaining its output failure. All three pauses pass
+the original timing tolerance (-5/+50 ms), and their observation intervals
+are separate. The phase histogram records 25 overruns with OUTPUT_WAIT +
+DECODER_WAIT + STREAM_READ and five OUTPUT_WAIT-only events during refill.
+Of 30 events, 26 retain detailed timestamps; **four details were overwritten**.
+Output checkpoints are only 0.314–4.999 ms old. A sampled input queue is empty
+during the longest pause, and retained HTTP-read ages reach 404.270 ms. Together
+these observations support exhausted input/PCM buffering in this experiment,
+rather than an output task that is not being serviced. They do not identify
+the cause of the earlier public HTTPS fault.
+
+All 298 health samples have zero decoder, allocation and watchdog faults.
+Minimum sampled heap / largest block is 63,984 / 47,104 B. Original application
+and private settings are restored, stopped. The
+[controlled evidence](../tests/results/esp32c3-flac-output-diagnostic-20261015/controlled/)
+includes raw pauses, full transfer statistics, source hashes and ISR analysis.
+
+Next test `CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS=8` versus the current value 4:
+up to 12 resident slots after FLAC initialization, subject to the saved target
+and the existing allocation guard. Four additional slots provide 8,240 bytes
+of packet storage, plus allocator overhead. AAC expansion stays zero and the
+TLS reserve is unchanged. Compare this exact file and pause schedule before
+considering a default change, then verify HTTP/HTTPS, FLAC→AAC replacement,
+EOF/Stop memory recovery and the quiet image. A finite queue cannot cover
+arbitrarily long delivery outages.
