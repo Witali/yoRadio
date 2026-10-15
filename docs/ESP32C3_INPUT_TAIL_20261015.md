@@ -242,3 +242,27 @@ loss is zero in both cases. Each original FLAC failure remains in the original
 14/16 report. This resolves the observed endpoint-comparison false alarm; it
 does not prove allocation ownership or exclude slower leaks. A fresh hardware
 run with the revised runner, quiet network/transition and OTA checks remain due.
+
+## Quiet transitions, network recovery and WebSocket
+
+The same quiet application then passes **29/29** checks: 11 transition-suite,
+11 network-suite and seven WebSocket-suite checks. Coverage includes four AAC/
+MP3/HE/HEv2 parameter and codec sequences, Stop→Play generation replacement,
+truncated delivery, a stalled stream, HTTP error, redirect, jitter and two
+WebSocket reconnects with matching stream status.
+
+All 563 health observations share one boot, with zero allocation, decoder or
+watchdog errors. Independently replayed output counters show zero new completion
+drops/write errors in all nine retained transition/recovery/warmup windows;
+the redirect/jitter finite-file output gates also pass. This does not assert
+continuous sound while the test intentionally removes network data.
+
+Settled heap changes from 139,488 to 139,408 B across the campaign; the largest
+block remains 114,688 B and the task count remains 16. The lifetime heap minimum
+is 18,460 B; the smallest sampled largest block is 8,192 B. No traced HTTP
+request fails. Each suite recovers, and the controller restores the original
+production image and unchanged settings with playback stopped.
+
+[Raw reports, source hashes and independent counter replay](../tests/results/esp32c3-input-tail-quiet-20261015/network/)
+are retained. Fresh public-file execution under the revised memory check and
+OTA regression are the remaining checks for this candidate.
