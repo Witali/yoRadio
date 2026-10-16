@@ -553,3 +553,28 @@
   QEMU/full suite кандидата ещё не проходили; прежние опубликованные общие
   отчёты сохраняют старую app identity. Нужны natural virtual Wi-Fi loss/recovery,
   новый полный прогон и затем включение исправления в main. Физических действий нет.
+
+### 2026-10-16 — удалено программное ожидание погоды
+
+- Пользователь уточнил, что лишние программные delay/vTaskDelay и ожидания
+  следует убирать. Из clock_task удалено ожидание weather_request_active:
+  weather worker уже асинхронный, snapshot публикуется под отдельным mutex.
+  REQUESTED_CHANGE объясняет намеренное отличие от блокирующего factory main.
+- Новый platform negative воспроизводит устаревший classic frame. После
+  изменения все 37 cases / 1,182,490 checks проходят: три clock themes и
+  photo-fade продолжаются при queued weather. Обычный task yield и upload guard
+  сохраняются. Неисследованные startup/display/restart задержки не менялись.
+- App a2b6129b / source 246397dd / ELF 00ef2763 собран и сохранён в firmware:
+  1,176,144 bytes, free 359,856. Exact coordinator/weather instructions
+  архивированы. Старые offline app 072135ee reports сохранены отдельно.
+- Portable weather_wait_qemu.py выполнен before/after. Внешний HTTP удерживается
+  во время natural minute boundary. Старый app допускает кадр после weather
+  timeout, наблюдаемый остаток 6.735 guest s / state=0. Candidate обновляет его
+  через .932 guest s при RUNNING=1, до ответа сервера; input/code hashes прежние.
+  Ранние prototypes ошибались в RUNNING bit; итоговый test читает actual DWARF
+  enum. Собственные ВМ закрыты, физического flashing нет.
+- Scoped code/test/build/evidence готовятся отдельным коммитом. Whole-suite
+  candidate ещё не проходил; новый weather wait test надо включить в общий gate,
+  а field_qemu frozen-scroll ожидание заменить проверкой отзывчивости. Natural
+  station disconnect/reconnect, дальнейший software-delay audit и полный набор
+  остаются обязательной последующей работой.

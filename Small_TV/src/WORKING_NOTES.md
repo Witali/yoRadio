@@ -22,6 +22,15 @@ app; candidate не объявлять прошедшим QEMU/full suite. Сл�
 Wi-Fi disconnect/reconnect в QEMU, затем полный набор с обязательным
 machine_network. Подробности/ограничения — `../qemu/parity/offline-clock-checks.md`.
 
+Следующий child change удаляет software wait по weather_request_active в UI
+по уточнению пользователя. App a2b6129b / source 246397dd / ELF 00ef2763 собран,
+37 platform cases / 1,182,490 checks прошли. Actual external-HTTP QEMU test
+before/after воспроизводит 6.735 guest s old wait и .932 guest s candidate
+second-event frame при RUNNING=1. Результаты/точные compiled instructions —
+`../qemu/parity/software-weather-wait-checks.md`. Старые reports 072135ee не
+переименовывать. Нужны integration нового test в full gate, обновление прежнего
+frozen-scroll ожидания field_qemu, full regression и natural station link loss.
+
 - Сопоставлять оригинальные инструкции с реально скомпилированным C ELF, а не
   только с псевдокодом Ghidra. Не менять исходный `Small_TV/full-flash.bin`.
 - Если обнаружен интересный случай или пограничное состояние, добавлять тест:

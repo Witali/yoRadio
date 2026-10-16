@@ -1839,6 +1839,82 @@ static void test_offline_photo(void)
     run_task("clock_display",offline_photo_scenario);
 }
 
+static void weather_pending_clock_scenario(void)
+{
+    /* Advance a synchronized minute while the actual weather request remains pending. */
+    struct tm expected={.tm_year=126,.tm_mon=0,.tm_mday=1,.tm_hour=12,
+                        .tm_min=3+(int)clock_step,.tm_sec=40,.tm_wday=4};
+    uint16_t observed[240*240];
+    memcpy(observed,panel,sizeof(panel));
+    weather_snapshot_t weather;weather_snapshot(&weather);
+    CHECK(weather.valid && http_calls==1 && network_connected());
+    if(clock_step) CHECK(weather_request_active());
+    display_fill(0,0,240,240,0);
+    if(preferences.theme==0)
+        factory_draw_classic(&preferences,&expected,&weather,clock_step==2?1:0,0,true,true);
+    else if(preferences.theme==1)
+        factory_draw_simple(&preferences,&expected,"10.0.2.15",true,true,true);
+    else {
+        factory_draw_dial(&expected,"10.0.2.15",true);
+        if(clock_step) factory_draw_dial(&expected,"10.0.2.15",false);
+    }
+    CHECK(!memcmp(observed,panel,sizeof(panel)));
+    if(++clock_step==3) longjmp(blocked,1);
+    weather_request_update();
+    fake_time+=60;
+    tick_clock(11);
+}
+
+static void test_weather_pending_clock(unsigned theme)
+{
+    /* A queued worker request must not suspend clock rendering or cache snapshots. */
+    preferences.theme=theme;preferences.date_format=2;preferences.wifi_mode=1;
+    strcpy(preferences.ssid,"fixture");
+    struct tm utc={.tm_year=126,.tm_mon=0,.tm_mday=1,.tm_hour=4,.tm_min=3,.tm_sec=40};
+    fake_time=_mkgmtime64(&utc);
+    CHECK(clock_ui_timer_init()==ESP_OK);tick_clock(181);
+    CHECK(network_init()==ESP_OK);got_ip();start_synced_clock_services();
+    strcpy(preferences.weather_key,"fixture-key");run_task("weather_http",seed_weather);
+    CHECK(display_init()==ESP_OK);clock_ui_start();
+    run_task("clock_display",weather_pending_clock_scenario);
+}
+static void test_weather_pending_classic(void)
+{
+    /* Require full classic clock frames while weather work is queued. */
+    test_weather_pending_clock(0);
+}
+static void test_weather_pending_simple(void)
+{
+    /* Require full simple clock frames while weather work is queued. */
+    test_weather_pending_clock(1);
+}
+static void test_weather_pending_dial(void)
+{
+    /* Require advancing analog hands while weather work is queued. */
+    test_weather_pending_clock(3);
+}
+static void weather_pending_photo_scenario(void)
+{
+    /* Finish all six photo-fade actions without waiting for the weather worker. */
+    static const unsigned expected[]={2457,4914,8191,4914,2457,4095};
+    CHECK(duty==expected[clock_step] && network_connected());
+    CHECK(photo_draws==(clock_step>=2));
+    if(clock_step) CHECK(weather_request_active());
+    if(++clock_step==6) longjmp(blocked,1);
+    weather_request_update();tick_clock(1);
+}
+static void test_weather_pending_photo(void)
+{
+    /* Verify weather waiting cannot hold the backlight in an unfinished fade. */
+    preferences.theme=2;preferences.photo_mask=1;preferences.photo_size[0]=100;
+    preferences.day_level=500;preferences.wifi_mode=1;strcpy(preferences.ssid,"fixture");
+    CHECK(clock_ui_timer_init()==ESP_OK);tick_clock(181);
+    CHECK(network_init()==ESP_OK);got_ip();start_synced_clock_services();
+    strcpy(preferences.weather_key,"fixture-key");run_task("weather_http",seed_weather);
+    CHECK(display_init()==ESP_OK && backlight_init()==ESP_OK);clock_ui_start();
+    run_task("clock_display",weather_pending_photo_scenario);
+}
+
 int main(int argc, char **argv)
 {
     /* Select a fresh-process scenario and save a machine-readable result only after success. */
@@ -1878,6 +1954,10 @@ int main(int argc, char **argv)
                  {"clock_offline_dst_simple", test_offline_dst_simple},
                  {"clock_offline_dst_dial", test_offline_dst_dial},
                  {"clock_offline_photo", test_offline_photo},
+                 {"clock_weather_pending_classic", test_weather_pending_classic},
+                 {"clock_weather_pending_simple", test_weather_pending_simple},
+                 {"clock_weather_pending_dial", test_weather_pending_dial},
+                 {"clock_weather_pending_photo", test_weather_pending_photo},
                  {"timer_driver_failures", test_timer_driver_failures},
                  {"clock_animation_selection", test_clock_animation_selection},
                  {"clock_text_scroll", test_clock_text_scroll},

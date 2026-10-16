@@ -110,7 +110,9 @@ static void clock_task(void *unused)
      * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
      * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
      * after the photo fade rather than 0x4200bc36's full-brightness ending.
-     * REQUESTED_CHANGE: advance clipped text fields in the active display loop. */
+     * REQUESTED_CHANGE: advance clipped text fields in the active display loop.
+     * REQUESTED_CHANGE: do not suspend the active clock/fade for asynchronous
+     * weather work; its mutex-protected snapshot is safe to render meanwhile. */
 
     (void)unused;
     uint32_t generation = 0, weather_generation = 0;
@@ -148,7 +150,10 @@ static void clock_task(void *unused)
             else
                 --weather_retry;
         }
-        if (media_upload_active() || (!ticks.startup_active && weather_request_active()))
+        /* A photo slot can be partially overwritten during upload. Weather has
+         * a separate worker and publishes a complete snapshot under its mutex,
+         * so waiting for its network timeout would needlessly freeze the UI. */
+        if (media_upload_active())
         {
             vTaskDelay(pdMS_TO_TICKS(100));
             continue;

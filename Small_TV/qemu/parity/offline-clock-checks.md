@@ -39,6 +39,12 @@ DISCONNECTED сохраняет строку адреса. Полные ориг
 `offline-platform-candidate.json` сохраняет отдельный платформенный результат.
 App сохранён в `firmware/development/small-tv-esp32c2-reconstructed/` этой ветки.
 
+Это исторический offline checkpoint commit `6f10bc46`. Последующее удаление
+software weather wait создаёт app `a2b6129b`; его отдельные результаты описаны
+в [software-weather-wait-checks.md](software-weather-wait-checks.md). Старые
+offline reports сохраняют идентификатор 072135ee, их нельзя считать полной
+проверкой нового app.
+
 Для worktree с общими установленными SDK/dependencies:
 
 ```powershell
