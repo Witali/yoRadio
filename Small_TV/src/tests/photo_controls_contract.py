@@ -11,7 +11,7 @@ def validate_photo_brightness(data):
     require(set(data['flows']) == {'original', 'reconstructed'}, 'missing firmware variant')
     checks = {'first_photo_complete', 'settings_changed', 'idle_brightness_bounded',
               'complete_photo_frame', 'no_new_fade', 'hardware_breakpoints_only',
-              'no_guest_state_writes', 'executable_media_unchanged', 'no_panic'}
+              'no_guest_state_writes', 'direct_flash_backing', 'executable_media_unchanged', 'no_panic'}
     for flow in data['flows'].values():
         require(flow['passed'] and set(flow['checks']) == checks and all(flow['checks'].values()),
                 'missing HTTP/frame/state/integrity check')
@@ -34,7 +34,7 @@ def validate_photo_controls(data):
     require(data['passed'] and data['inputs_unchanged'], 'failed or changing inputs')
     require(set(data['flows']) == {'original', 'reconstructed'}, 'missing firmware variant')
     common = {'first_photo_complete', 'three_same_theme_commands', 'hardware_breakpoints_only',
-              'no_guest_state_writes', 'executable_media_unchanged', 'no_panic'}
+              'no_guest_state_writes', 'direct_flash_backing', 'executable_media_unchanged', 'no_panic'}
     for variant, flow in data['flows'].items():
         required = common | ({'no_redundant_configuration_revision', 'explicit_theme_requests'}
                              if variant == 'reconstructed' else set())
@@ -64,7 +64,8 @@ def validate_photo_reinit(data):
     require(data['passed'] and data['inputs_unchanged'], 'failed or changing inputs')
     require(set(data['flows']) == {'original', 'reconstructed'}, 'missing firmware variant')
     common = {'active_fade_command', 'first_photo_complete', 'http_command_accepted',
-              'hardware_breakpoints_only', 'no_guest_state_writes', 'executable_media_unchanged', 'no_panic'}
+              'hardware_breakpoints_only', 'no_guest_state_writes', 'direct_flash_backing',
+              'executable_media_unchanged', 'no_panic'}
     for variant, flow in data['flows'].items():
         required = common | ({'known_factory_blank_screen'} if variant == 'original' else
                              {'complete_next_photo', 'bounded_response', 'full_backlight'})

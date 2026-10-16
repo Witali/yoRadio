@@ -34,13 +34,19 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   исходника, но не весь гостевой носитель. Новые advanced_qemu/qemu_storage
   уже используют raw backing и проверяют его через query-block. Snapshot
   negative и final raw image checks сохранены в .build/small-tv-browser.
-- Следующий обязательный шаг ПЕРЕД новым full: перевести photo_frames,
-  photo_brightness, photo_controls и photo_reinit с persistent=False на True
-  для их собственных новых state dirs; подтвердить direct_flash_backing в
-  каждом flow, добавить utility в fingerprints и усилить contracts. Повторить
-  scoped photo gates на текущем DAF, не переписывать historical before/after.
-  Затем commit/push, freeze input pins и один новый full run со всеми child
-  gates, включая advanced_http. До terminal не менять его source/tests/helpers.
+- Усиление четырёх photo storage gates завершено: новые собственные raw-копии,
+  live query-block proof, обязательный direct_flash_backing в contracts и
+  utility fingerprint. Batch26076 terminal exit0 на DAF/C839/B06: brightness,
+  три theme commands, active reinit,84 frames/9 scenes pass. Все ВМ закрыты.
+  Actual paused snapshot/raw probe pass;12 frame guards/12 backing guards и
+  четыре historical rejections pass. Исторические отчёты не изменены;
+  см. photo-storage-checks.md. Production source/BIN прежние.
+- NTP044e488f отправлен main; audit программных задержек ac187b10 завершён.
+  Следующий шаг: commit/push storage tests/evidence, freeze initial inputs
+  (также7 firmware files,6 QEMU helpers/profile/marker), один новый full run
+  со всеми child gates, включая advanced_http. До terminal не менять его
+  source/tests/helpers. Collector archive_immutable_run.py адаптирован к новым
+  gates и extra initial pins; сначала strict publisher/verifier, потом canonical.
 - Browser controls на6BF6 сохранены отдельно в browser-controls-partial-20261016:
   flags,4 themes,5 GIFs,3 date formats,3 colors,brightness0,London/GB,mask0/10/31,
   intervals60/3/4 и5 previews. Это частичное наблюдение старого образа. Остались

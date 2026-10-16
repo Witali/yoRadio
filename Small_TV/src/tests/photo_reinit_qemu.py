@@ -15,6 +15,7 @@ from gdb_observer import Observer
 from machine_oracle import ROOT
 from photo_frame_replay import PhotoMachine
 from photo_frames_qemu import native_entries
+from qemu_storage import direct_flash_backing
 import scene_qemu as scene
 import weather_qemu as weather
 
@@ -59,7 +60,7 @@ def exercise(options, folder, variant, symbols, loop_end):
     with socket.socket() as reservation:
         reservation.bind(('127.0.0.1', 0)); port = reservation.getsockname()[1]
     options = SimpleNamespace(**{**vars(options), 'firmware': variant, 'network': 'clock',
-                                'persistent': False, 'paused': True, 'gdb_port': port})
+                                'persistent': True, 'paused': True, 'gdb_port': port})
     folder.mkdir(parents=True, exist_ok=False)
     result = {'passed': False, 'checks': {}, 'photo_interval': 60}
     session = observer = None
@@ -72,6 +73,9 @@ def exercise(options, folder, variant, symbols, loop_end):
         immutable = [vm.digest(flash[a:b]) for a, b in ranges]
         observer = Observer(port)
         with vm.QMP(session['qmp_port'], session['name']) as qmp:
+            result['checks']['direct_flash_backing'] = direct_flash_backing(qmp, folder)
+            if not result['checks']['direct_flash_backing']:
+                raise AssertionError('Flash integrity cannot be checked behind a snapshot overlay')
             pointer = first_photo_before_fade_finishes(observer, variant, symbols, loop_end)
             result['state_before_request'] = list(observer.memory(pointer, 2))
             address = (scene.cstring(observer, 0x3fcb7b84, 20) if variant == 'original' else
@@ -169,7 +173,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=False)
     symbols, loop_end = native_entries()
     paths = [Path(__file__), *[Path(__file__).with_name(name) for name in
-        ('photo_frames_qemu.py', 'photo_frame_replay.py', 'photo_frame_contract.py', 'jpeg_oracle.py',
+        ('photo_frames_qemu.py', 'photo_frame_replay.py', 'photo_frame_contract.py', 'photo_controls_contract.py', 'qemu_storage.py', 'jpeg_oracle.py',
          'scene_qemu.py', 'frame_replay.py', 'machine_oracle.py', 'classic_oracle.py', 'control_oracle.py',
          'weather_render_oracle.py', 'weather_qemu.py', 'gdb_observer.py')],
          ROOT/'Small_TV/qemu/parity/compare.py', Path(options.hardware_profile)]

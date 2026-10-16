@@ -1286,3 +1286,27 @@
 - Усиление четырёх photo storage gates выполняется отдельно. Идёт scoped
   raw-backed прогон26076 на DAF; исходники прошивки неизменны. Результат не
   объявлен полным suite. Старые snapshot reports сохраняют прежнюю область.
+
+### 2026-10-16 — проверка настоящего гостевого флеша
+
+- Четыре photo producers теперь создают новые собственные state dirs с
+  persistent=True. Перед наблюдением общий qemu_storage подтверждает через
+  query-block единственный writable raw backend именно для этой копии.
+  После stop проверяются реальные защищённые диапазоны. Fingerprints включают
+  helper, contracts требуют его положительный результат. Frame checks update
+  сохраняет ранее записанный backing flag; publisher/verifier требуют12 guards.
+- Batch26076 terminal exit0 на неизменных appDAF/sourceC839/ELFB06/QEMUFDE3:
+  brightness, три повторных theme commands, active reinit,84 frames и9 scenes
+  проходят. Все ВМ закрыты. Все pixels совпали; factory known blank-screen
+  correction остаётся явно отделена. Не заявлен полный suite новой сборки.
+- Два paused QEMU дополнительно подтверждают direct_flash_backing=false для
+  настоящего qcow2 с -snapshot и true для raw. Первый probe с профилем none завершился
+  до запуска ВМ; исправлен только тестовый launcher на поддерживаемый offline,
+  повтор успешен. Обе ВМ закрыты, базовые копии unchanged.
+- Сохранены scoped photo-direct-storage reports и отдельный backend probe;
+ 12 frame mutations,12 control-backing mutations и4 historical rejections pass.
+  Старые reports не дополнены вымышленными raw-checks. Точный scope описан
+  в photo-storage-checks.md. Source/BIN/QEMU/физическая плата не менялись.
+- Freeze helper расширен initial pins семи firmware artifacts,6 QEMU helpers,
+  профиля/marker/source commit, factory ELF/dump и verifier. Collector готов к
+  advanced_http и четырём photo gates; далее один новый полный run после commit.

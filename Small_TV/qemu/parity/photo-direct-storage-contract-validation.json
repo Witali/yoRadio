@@ -1,0 +1,185 @@
+{
+  "passed": true,
+  "app_sha256": "daf5595dd615be24636ae0dcc506dc67ad2b31225931c20d4d2918a2232846ea",
+  "source_sha256": "c83941ff9c078ae5fcd53a084dee236288046ecee6e4e22794626c5968eb9047",
+  "native_elf_sha256": "b06ce81048b556cb83ea3cb738af48b6c38c7d5dc154811b6715211c506fa1a3",
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "profile_sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+  "helper_sha256": {
+    "small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+  },
+  "consumers": [
+    {
+      "file": "Small_TV/src/tests/photo_frame_contract.py",
+      "sha256": "672e5986605d63dee1c7490a6a20d9a1ff0624247fa2515c30a5431624716afe"
+    },
+    {
+      "file": "Small_TV/src/tests/photo_controls_contract.py",
+      "sha256": "94dffad27715cbdaf0072797a1d9748f6ce58c8163c2ace9be9652208ccaa3b6"
+    },
+    {
+      "file": "Small_TV/src/tests/publish-report.py",
+      "sha256": "98947dee20e31266592e49c0075db86fe5d233f2b50fd3057f33546632bfb98a"
+    },
+    {
+      "file": "Small_TV/src/tools/verify_artifacts.py",
+      "sha256": "6304aa45725e1c3bb1c753264a0497326395381d0ede58ba45d6071e32a6194f"
+    }
+  ],
+  "frame_checks": [
+    {
+      "case": "missing-variant",
+      "passed": true
+    },
+    {
+      "case": "missing-profile",
+      "passed": true
+    },
+    {
+      "case": "missing-phase",
+      "passed": true
+    },
+    {
+      "case": "wrong-photo-order",
+      "passed": true
+    },
+    {
+      "case": "missing-no-panic",
+      "passed": true
+    },
+    {
+      "case": "missing-direct-backing",
+      "passed": true
+    },
+    {
+      "case": "snapshot-backing",
+      "passed": true
+    },
+    {
+      "case": "code-changed",
+      "passed": true
+    },
+    {
+      "case": "wrong-duty",
+      "passed": true
+    },
+    {
+      "case": "wrong-schedule-window",
+      "passed": true
+    },
+    {
+      "case": "missing-normalized-photo",
+      "passed": true
+    },
+    {
+      "case": "mixed-executable",
+      "passed": true
+    }
+  ],
+  "control_backing_checks": [
+    {
+      "gate": "brightness",
+      "variant": "original",
+      "case": "missing-backing",
+      "passed": true
+    },
+    {
+      "gate": "brightness",
+      "variant": "original",
+      "case": "snapshot-backing",
+      "passed": true
+    },
+    {
+      "gate": "brightness",
+      "variant": "reconstructed",
+      "case": "missing-backing",
+      "passed": true
+    },
+    {
+      "gate": "brightness",
+      "variant": "reconstructed",
+      "case": "snapshot-backing",
+      "passed": true
+    },
+    {
+      "gate": "controls",
+      "variant": "original",
+      "case": "missing-backing",
+      "passed": true
+    },
+    {
+      "gate": "controls",
+      "variant": "original",
+      "case": "snapshot-backing",
+      "passed": true
+    },
+    {
+      "gate": "controls",
+      "variant": "reconstructed",
+      "case": "missing-backing",
+      "passed": true
+    },
+    {
+      "gate": "controls",
+      "variant": "reconstructed",
+      "case": "snapshot-backing",
+      "passed": true
+    },
+    {
+      "gate": "reinit",
+      "variant": "original",
+      "case": "missing-backing",
+      "passed": true
+    },
+    {
+      "gate": "reinit",
+      "variant": "original",
+      "case": "snapshot-backing",
+      "passed": true
+    },
+    {
+      "gate": "reinit",
+      "variant": "reconstructed",
+      "case": "missing-backing",
+      "passed": true
+    },
+    {
+      "gate": "reinit",
+      "variant": "reconstructed",
+      "case": "snapshot-backing",
+      "passed": true
+    }
+  ],
+  "historical_reports_rejected": [
+    {
+      "gate": "brightness",
+      "file": "photo-reinit-brightness-candidate.json",
+      "sha256": "d7cbbe10715093a9b0a4e71a841644fb0437ddefe61c942a2f7fe234c7cd9ff7",
+      "passed": true
+    },
+    {
+      "gate": "controls",
+      "file": "photo-reinit-controls-candidate.json",
+      "sha256": "11d106d8125a3829e7887b37e8b90afe2946e619118a12c294b75b68a26bf697",
+      "passed": true
+    },
+    {
+      "gate": "reinit",
+      "file": "photo-reinit-candidate.json",
+      "sha256": "2f4804c3420161bb40eab37e91ea30c3de1595905408775f77b2850dd3168b9e",
+      "passed": true
+    },
+    {
+      "gate": "frames",
+      "file": "photo-reinit-frames-candidate.json",
+      "sha256": "81120d74ec64a2a1b8112cc98b71a8954e649132c925c392e0390a23c2eae9a8",
+      "passed": true
+    }
+  ],
+  "scope": "Mutated report rejection and preserved historical report identities; these are consumer checks, not extra firmware runs."
+}

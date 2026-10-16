@@ -23,7 +23,8 @@ def validate_photo_frames(data):
             require(flow['case'] == expected_case and flow['passed'] and all(flow['checks'].values()),
                     'profile or integrity checks failed')
             required_checks = {'all_pixels_checked', 'expected_fade_steps', 'hardware_breakpoints_only',
-                               'no_guest_state_writes', 'photo_order', 'executable_media_unchanged', 'no_panic'}
+                               'no_guest_state_writes', 'photo_order', 'direct_flash_backing',
+                               'executable_media_unchanged', 'no_panic'}
             if variant == 'reconstructed' and night_mode:
                 required_checks.add('synchronized_night_restore')
             require(required_checks <= set(flow['checks']), 'missing integrity/panic/state-write check')
@@ -90,6 +91,8 @@ def contract_rejection_checks(data):
         ('missing-phase', lambda item: native(item)['samples'].pop()),
         ('wrong-photo-order', lambda item: native(item)['samples'][0].update(selected=[4])),
         ('missing-no-panic', lambda item: native(item)['checks'].pop('no_panic')),
+        ('missing-direct-backing', lambda item: native(item)['checks'].pop('direct_flash_backing')),
+        ('snapshot-backing', lambda item: native(item)['checks'].update(direct_flash_backing=False)),
         ('code-changed', lambda item: native(item)['samples'][0].update(code_unchanged=False)),
         ('wrong-duty', lambda item: native(item)['samples'][0]['backlight'].update(high_duty=0)),
         ('wrong-schedule-window', lambda item: item['flows']['reconstructed']['masked-night']['samples'][-1]['restore_calendar'].update(night_selected=False)),

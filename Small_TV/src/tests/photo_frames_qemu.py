@@ -13,6 +13,7 @@ from gdb_observer import Observer
 from machine_oracle import ROOT, ELFFile, Panel
 from photo_frame_replay import PhotoMachine, normalized_checks
 from photo_frame_contract import validate_photo_frames, contract_rejection_checks
+from qemu_storage import direct_flash_backing
 from frame_replay import panel_rgb, write_rgb_png
 import scene_qemu as scene
 import weather_qemu as weather
@@ -73,7 +74,7 @@ def exercise(options, output, variant, case, symbols, loop_end):
         reservation.bind(('127.0.0.1', 0))
         port = reservation.getsockname()[1]
     options = SimpleNamespace(**{**vars(options), 'firmware': variant, 'network': 'clock',
-                                'persistent': False, 'paused': True, 'gdb_port': port})
+                                'persistent': True, 'paused': True, 'gdb_port': port})
     output.mkdir(parents=True, exist_ok=False)
     report = {'passed': False, 'samples': [], 'checks': {}, 'case': case}
     session = observer = None
@@ -93,6 +94,9 @@ def exercise(options, output, variant, case, symbols, loop_end):
         expected_state = None
         remaining = 4+(case['cycles']-1)*6
         with vm.QMP(session['qmp_port'], session['name']) as qmp:
+            report['checks']['direct_flash_backing'] = direct_flash_backing(qmp, output)
+            if not report['checks']['direct_flash_backing']:
+                raise AssertionError('Flash integrity cannot be checked behind a snapshot overlay')
             qmp.execute('qom-set', path='/machine/wifi', property='ntp-unix-seconds',
                         value=int(dt.datetime(2026, 10, 13, 16, 34, 30, tzinfo=dt.timezone.utc).timestamp()))
             while remaining:
@@ -186,9 +190,9 @@ def exercise(options, output, variant, case, symbols, loop_end):
                     write_rgb_png(output/(str(len(report['samples']))+'-expected.png'), expected)
                     raise AssertionError('Real photo/fade frame or brightness differs')
                 remaining -= 1
-        report['checks'] = {'all_pixels_checked': True, 'expected_fade_steps': set(row['fade_before'] for row in report['samples']) ==
+        report['checks'].update({'all_pixels_checked': True, 'expected_fade_steps': set(row['fade_before'] for row in report['samples']) ==
                             ({2, 3, 4, 5} if case['cycles'] == 1 else set(range(6))),
-                            'hardware_breakpoints_only': True, 'no_guest_state_writes': True}
+                            'hardware_breakpoints_only': True, 'no_guest_state_writes': True})
         selected = [slot for row in report['samples'] for slot in row['selected']]
         report['checks']['photo_order'] = selected == [slot for slot in range(5) if case['mask'] & (1 << slot)]
         if case['night_mode'] and variant == 'reconstructed':
@@ -246,7 +250,7 @@ def main():
     symbols, loop_end = native_entries()
     cases = [row for row in CASES if not args.cases or row['name'] in args.cases]
     paths = [ROOT/'Small_TV/src/tests'/name for name in ('photo_frames_qemu.py', 'photo_frame_replay.py', 'photo_frame_contract.py',
-        'jpeg_oracle.py', 'machine_oracle.py', 'classic_oracle.py', 'control_oracle.py', 'scene_qemu.py',
+        'qemu_storage.py', 'jpeg_oracle.py', 'machine_oracle.py', 'classic_oracle.py', 'control_oracle.py', 'scene_qemu.py',
         'frame_replay.py', 'weather_qemu.py', 'weather_render_oracle.py', 'gdb_observer.py')]
     paths += [ROOT/'Small_TV/qemu/parity/compare.py', Path(options.hardware_profile)]
     archive = ROOT/'firmware/development/small-tv-esp32c2-reconstructed'

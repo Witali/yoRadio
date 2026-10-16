@@ -107,7 +107,7 @@ def main():
                 'Advanced editor artifact changed: '+item['file'])
     frames = groups['qemu']['photo_frames']
     validate_photo_frames(frames)
-    require(len(frames['contract_checks']) == 10 and all(row['passed'] for row in frames['contract_checks']),
+    require(len(frames['contract_checks']) == 12 and all(row['passed'] for row in frames['contract_checks']),
             'Photo frame contract rejection checks did not pass')
     idle_brightness = groups['qemu']['photo_brightness']
     validate_photo_brightness(idle_brightness)

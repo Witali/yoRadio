@@ -120,7 +120,7 @@ def main():
             raise ValueError('Advanced editor artifact changed: '+item['file'])
     frames = qemu['photo_frames']
     validate_photo_frames(frames)
-    if len(frames['contract_checks']) != 10 or any(not row['passed'] for row in frames['contract_checks']):
+    if len(frames['contract_checks']) != 12 or any(not row['passed'] for row in frames['contract_checks']):
         raise ValueError('Photo frame contract rejection checks did not pass')
     idle_brightness = qemu['photo_brightness']
     validate_photo_brightness(idle_brightness)
