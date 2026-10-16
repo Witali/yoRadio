@@ -11,17 +11,26 @@
 
 static esp_netif_t *station_netif, *ap_netif;
 static atomic_bool connected, ap_active, scanning, restarting, station_failed;
+static atomic_uint_least32_t last_station_address;
 static bool station_configured;
 static unsigned station_retries;
 
 static void wifi_event(void *context, esp_event_base_t base, int32_t id, void *data)
 {
-    /* Track station connectivity and handle the configured reconnect policy. */
+    /* Track station connectivity and handle the configured reconnect policy.
+     * FIXED_RECONSTRUCTION: 0x4200c602 retains its last GOT_IP address across
+     * station retries. Cache it atomically instead of inventing the AP address
+     * whenever connectivity temporarily drops. */
 
     (void)context;
-    (void)data;
     if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP)
     {
+        const ip_event_got_ip_t *event = data;
+        if (!event)
+            return;
+        /* The event owns the assigned lease; a later netif query may already
+         * reflect a following disconnect or address change. */
+        atomic_store(&last_station_address, event->ip_info.ip.addr);
         atomic_store(&connected, true);
         station_retries = 0;
     }
@@ -148,10 +157,14 @@ bool network_ap_active(void)
 
 void network_address(char *out, size_t size)
 {
-    /* Format the station address or the fixed setup address for display. */
+    /* Format the last station address or the explicitly active setup address.
+     * FIXED_RECONSTRUCTION: the original 0x3fcb7b84 display string is updated
+     * by GOT_IP, not cleared by DISCONNECTED in 0x4200c602. Retain it while
+     * clocks keep running offline; only a setup AP selects its fixed address. */
 
-    esp_netif_ip_info_t ip;
-    if (network_connected() && esp_netif_get_ip_info(station_netif, &ip) == ESP_OK)
+    esp_netif_ip_info_t ip = {0};
+    ip.ip.addr = (uint32_t)atomic_load(&last_station_address);
+    if (!network_ap_active() && ip.ip.addr)
         snprintf(out, size, IPSTR, IP2STR(&ip.ip));
     else
         snprintf(out, size, "192.168.43.1");

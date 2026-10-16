@@ -1,5 +1,6 @@
 [CmdletBinding()]
-param([string]$VsDevCmd="C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat")
+param([string]$VsDevCmd="C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat",
+      [string]$PythonPath)
 $ErrorActionPreference="Stop"
 $project=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $repo=[IO.Path]::GetFullPath((Join-Path $project "..\.."))
@@ -7,7 +8,8 @@ $output=Join-Path $repo ".build\small-tv-esp32c2\platform-tests"
 $resources=Join-Path $repo ".build\small-tv-esp32c2\resources"
 New-Item -ItemType Directory -Force -Path $output | Out-Null
 if (!(Test-Path -LiteralPath $VsDevCmd)) {throw "Pass -VsDevCmd pointing to an installed MSVC development environment."}
-& (Join-Path $repo ".idf\python-3.12.10\tools\python.exe") (Join-Path $project "tools\prepare_resources.py") --output $resources
+if (!$PythonPath) {$PythonPath=Join-Path $repo ".idf\python-3.12.10\tools\python.exe"}
+& $PythonPath (Join-Path $project "tools\prepare_resources.py") --output $resources
 if ($LASTEXITCODE) {throw "Resource generation failed"}
 $sources=@("tests/platform_test.c","app/network/wifi.c","app/services/weather.c","app/services/weather_parser.c","app/services/time_sync.c","app/services/timezones.c","app/text/text.c","app/display/backlight.c","app/display/st7789.c","app/display/factory_fonts.c","app/display/ui_renderer.c","app/display/clock_ui.c","app/display/factory_timer.c","app/display/factory_photo.c","app/display/factory_animation.c","third_party/cjson/cJSON.c")
 $arguments=@("/nologo","/std:c11","/experimental:c11atomics","/W3","/D_CRT_SECURE_NO_WARNINGS","/Dsetenv=test_setenv","/Dtzset=test_tzset")
@@ -25,6 +27,9 @@ $cases=@("wifi_setup","wifi_reconnect_scan","wifi_open_station","wifi_fallback_t
 $cases+=@("clock_sync_classic","clock_sync_simple")
 $cases+=@("regional_time_worker","regional_weather_worker")
 $cases+=@("clock_first_digital_brightness")
+$cases+=@("clock_offline_dst_classic","clock_offline_dst_simple","clock_offline_dst_dial","clock_offline_photo")
+$cases+=@("clock_weather_pending_classic","clock_weather_pending_simple","clock_weather_pending_dial","clock_weather_pending_photo")
+$cases+=@("clock_startup_ready_classic","clock_startup_ready_simple","clock_startup_ready_photo","clock_startup_ready_dial","clock_startup_wait_sync","clock_startup_wait_address")
 $results=@()
 foreach($case in $cases) {
     $path=Join-Path $output "$case.json"

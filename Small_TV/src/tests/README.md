@@ -263,6 +263,17 @@ SPI-байты в RGB565. При тестировании классическо
 отдельно: настоящий JPEG/BMP decoder проверяется в первом наборе.
 
 Детерминированная подача событий не проверяет гонки настоящего FreeRTOS.
+Отдельный `startup_qemu.py` измеряет первый actual classic frame после настоящего
+UDP SNTP notification через read-only аппаратные GDB breakpoints. Критерий —
+не более 0,5 guest s после callback; отсутствие SNTP/IP и photo theme покрыты
+платформенными сценариями. Тест пока запускается отдельно от полного suite:
+
+```powershell
+python Small_TV/src/tests/startup_qemu.py --dependency-root C:/Work/yoRadio `
+  --qemu-root C:/Work/QEMU-ESP32/.worktree/small-tv-wifi-link `
+  --output .build/startup-check
+```
+
 Число `checks` включает обходы диапазонов и пикселей и не является процентом
 покрытия кода. Никакой результат успешного host HTTP не выдаётся за успешный
 запрос погоды из QEMU или физической платы. Сравнение QEMU-снимков измеряет
@@ -271,6 +282,23 @@ SPI-байты в RGB565. При тестировании классическо
 ошибок (воскресенье, геометрия стрелок, устаревающая минута).
 
 ## Приёмочные сценарии для платы и браузера
+
+В отдельном [кандидате offline clock](../../qemu/parity/offline-clock-checks.md)
+исправлены остановка активной темы и подмена IP при потере Wi-Fi. Новые
+`clock_offline_dst_*` и `clock_offline_photo` проходят с production C и SDK
+адаптерами; `network_oracle.py` сравнивает реальные RV32 event/cache instructions
+и bounded original dispatch. `machine_network` обязателен для следующей полной
+публикации. Текущие общие отчёты относятся к предыдущей сборке; естественный
+QEMU link loss и полный прогон кандидата ещё требуются.
+
+По уточнению о программных задержках удалён guard, который приостанавливал UI
+до завершения асинхронного HTTP погоды. Новые `clock_weather_pending_*` дают
+37 passing platform scenarios. Отдельный `weather_wait_qemu.py` удерживает
+реальный внешний ответ и проверяет смену минуты при RUNNING=1; старый app
+воспроизводит ожидание тайм-аута. См.
+[software-weather-wait-checks.md](../../qemu/parity/software-weather-wait-checks.md).
+Этот новый test ещё нужно включить в общий gate и пересмотреть старое ожидание
+frozen scroll в `field_qemu.py`. Прежние published reports не подтверждают новый app.
 
 Эти сценарии пока **не выполнены**. Для каждого нужно записать версию/SHA
 приложения, дату, шаги, результат и свидетельства. Используйте отдельную

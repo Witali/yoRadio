@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "scope": "Observe real clock frames while an external weather server withholds its reply.",
+  "native_elf_sha256": "7bda9d7de341a5a415bcf53d8b80d128a1dfca33b0fe44bca9085253adaf4631",
+  "app_sha256": "743fa69f107cac7939b63e71b0d555351a6aaee4ef9686111eacb64387af79a8",
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "test_inputs": [
+    {
+      "file": "Small_TV/src/tests/weather_wait_qemu.py",
+      "sha256": "ffef795c7478cc2fa099abb30dbb4af2902e592fdd728af2cf5efceb1e8b6be6"
+    },
+    {
+      "file": "Small_TV/src/tests/gdb_observer.py",
+      "sha256": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83"
+    },
+    {
+      "file": "Small_TV/src/tests/weather_qemu.py",
+      "sha256": "4b47d08490fe513159bd8478ac58b4a341742aaee236ee18edce46a71e87a5e5"
+    },
+    {
+      "file": "Small_TV/src/tests/scene_qemu.py",
+      "sha256": "a2b365f05d14b34c6ce24c2e78c75d619e51189091eb55d26d6ff68be2fbb7d9"
+    }
+  ],
+  "helper_sha256": {
+    "small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+  },
+  "compiled_running_mask": 1,
+  "sources": {
+    "images": [
+      {
+        "sha256": "f51bd6b270fa726d4a2265a9e6d15b919f3e4ea0671b3e66a7f44ef55a5157cb",
+        "bytes": 19248,
+        "offset": "0x0",
+        "file": "bootloader.bin"
+      },
+      {
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "bytes": 3072,
+        "offset": "0x8000",
+        "file": "partition-table.bin"
+      },
+      {
+        "sha256": "743fa69f107cac7939b63e71b0d555351a6aaee4ef9686111eacb64387af79a8",
+        "bytes": 1176224,
+        "offset": "0x10000",
+        "file": "app.bin"
+      },
+      {
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "bytes": 1994752,
+        "offset": "0x200000",
+        "file": "assets.bin"
+      }
+    ],
+    "source_sha256": "2583ac4cc4658a97f992572d4fbcc85330f0890755815ff4e36a56d09212c216"
+  },
+  "before": {
+    "local_tm": [
+      57,
+      35,
+      1,
+      17,
+      9,
+      126,
+      6,
+      289,
+      0
+    ],
+    "request_state": 0,
+    "guest_seconds": 56.086523,
+    "wait_guest_seconds": 1.0986180000000019,
+    "rgb_sha256": "f8c0c6f370ef065173d02985d9a4d604448f01a7beff2c90175747389833b58b"
+  },
+  "during": {
+    "local_tm": [
+      2,
+      36,
+      1,
+      17,
+      9,
+      126,
+      6,
+      289,
+      0
+    ],
+    "request_state": 1,
+    "guest_seconds": 60.487973,
+    "wait_guest_seconds": 0.9714449999999957,
+    "rgb_sha256": "e9d62e68ca809ee1c0da0cbe676df0105c82c7ffeac9d38afd3773580e880c82"
+  },
+  "inputs_unchanged": true
+}

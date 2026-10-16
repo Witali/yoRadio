@@ -93,3 +93,12 @@ objdump path and a list of addresses or bounded IROM ranges.
 `../../tools/assist_c_port.py` is an unfinished library draft for the next stage:
 instruction parsing, basic blocks, dominators/natural loops, ABI stack hints and
 C branch conditions exist; a complete C-draft emitter, CLI and tests are pending.
+
+`application_main_at_42008e56.asm` preserves the actual active-clock dispatch:
+`0x42009054..0x420090c0` gates weather retry by station state, while all four
+theme calls and `0x42010b70` remain reachable offline. The station event handler
+at `0x4200c602` copies GOT_IP's address at event-data offset 4 into `0x3fcb7b84`
+and does not clear it on disconnect. `tests/network_oracle.py` executes the
+event/cache code and a bounded active-loop slice; source-based clock tests
+separately exercise offline time, DST and photo fade. See
+`../../../qemu/parity/offline-clock-checks.md` for the candidate's scope.

@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "scope": "Measure the first native clock frame after an actual UDP SNTP notification.",
+  "app_sha256": "743fa69f107cac7939b63e71b0d555351a6aaee4ef9686111eacb64387af79a8",
+  "native_elf_sha256": "7bda9d7de341a5a415bcf53d8b80d128a1dfca33b0fe44bca9085253adaf4631",
+  "test_inputs": {
+    "Small_TV/src/tests/startup_qemu.py": "6b12018b710960df2cd046870afc0d2fbd4bdfb3f908067d54b7134bd87220bc",
+    "Small_TV/src/tests/gdb_observer.py": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83",
+    "Small_TV/src/tests/weather_qemu.py": "4b47d08490fe513159bd8478ac58b4a341742aaee236ee18edce46a71e87a5e5",
+    "Small_TV/src/tests/scene_qemu.py": "a2b365f05d14b34c6ce24c2e78c75d619e51189091eb55d26d6ff68be2fbb7d9"
+  },
+  "helper_sha256": {
+    "small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+  },
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "sources": {
+    "images": [
+      {
+        "sha256": "f51bd6b270fa726d4a2265a9e6d15b919f3e4ea0671b3e66a7f44ef55a5157cb",
+        "bytes": 19248,
+        "offset": "0x0",
+        "file": "bootloader.bin"
+      },
+      {
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "bytes": 3072,
+        "offset": "0x8000",
+        "file": "partition-table.bin"
+      },
+      {
+        "sha256": "743fa69f107cac7939b63e71b0d555351a6aaee4ef9686111eacb64387af79a8",
+        "bytes": 1176224,
+        "offset": "0x10000",
+        "file": "app.bin"
+      },
+      {
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "bytes": 1994752,
+        "offset": "0x200000",
+        "file": "assets.bin"
+      }
+    ],
+    "source_sha256": "2583ac4cc4658a97f992572d4fbcc85330f0890755815ff4e36a56d09212c216"
+  },
+  "sync": {
+    "entry_guest_seconds": 6.148827,
+    "return_guest_seconds": 6.148868
+  },
+  "first_clock": {
+    "entry_guest_seconds": 6.18907,
+    "return_guest_seconds": 6.250724
+  },
+  "rgb_sha256": "8f637b61926f126ca37bbc21086b0f503f3d4529765ff0e4f0266e2b671cba64",
+  "different_colors": 602,
+  "ready_wait_guest_seconds": 0.04020199999999985,
+  "inputs_unchanged": true
+}

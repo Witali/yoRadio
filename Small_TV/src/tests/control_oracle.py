@@ -18,9 +18,10 @@ FLAGS = [(0x3fcc39f6, 1), (0x3fcc39f7, 2), (0x3fcc39f8, 4),
 PHOTO_OFFSETS = [0x200000, 0x219000, 0x232000, 0x24b000, 0x264000]
 
 
-def verify_inputs():
+def verify_inputs(root=ROOT,dependency_root=None):
     """Check factory payload identity and the archived native ELF/binary pair."""
-    dump = (ROOT / 'Small_TV/full-flash.bin').read_bytes()
+    dependencies=Path(dependency_root) if dependency_root is not None else root
+    dump = (root / 'Small_TV/full-flash.bin').read_bytes()
     if hashlib.sha256(dump).hexdigest() != DUMP_SHA:
         raise ValueError('Factory dump hash mismatch')
     position = 0x10000 + 24
@@ -30,16 +31,16 @@ def verify_inputs():
         position += 8
         expected[address] = dump[position:position + size]
         position += size
-    with (ROOT / '.build/small-tv-reverse/factory-analysis.elf').open('rb') as stream:
+    with (dependencies / '.build/small-tv-reverse/factory-analysis.elf').open('rb') as stream:
         actual = {segment['p_vaddr']:segment.data() for segment in ELFFile(stream).iter_segments()
                   if segment['p_type'] == 'PT_LOAD' and segment['p_filesz']}
     if actual != expected:
         raise ValueError('Prepared factory ELF differs from the immutable image')
-    archive = ROOT / 'firmware/development/small-tv-esp32c2-reconstructed'
+    archive = root / 'firmware/development/small-tv-esp32c2-reconstructed'
     binary = (archive / 'app.bin').read_bytes()
-    if binary != (ROOT / '.build/small-tv-esp32c2/small_tv_reconstructed.bin').read_bytes():
+    if binary != (root / '.build/small-tv-esp32c2/small_tv_reconstructed.bin').read_bytes():
         raise ValueError('Archived firmware is stale')
-    native_sha = hashlib.sha256((ROOT / '.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()).digest()
+    native_sha = hashlib.sha256((root / '.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()).digest()
     if binary[176:208] != native_sha:
         raise ValueError('Native ELF digest differs from the firmware descriptor')
     return hashlib.sha256(binary).hexdigest()

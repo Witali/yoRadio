@@ -50,7 +50,7 @@ void weather_request_update(void)
 }
 bool weather_request_active(void)
 {
-    /* Report a blocking request so the LCD follows the factory pause behavior. */
+    /* Report pending/running worker work for request coalescing and retry pacing. */
     return atomic_load(&request_state) != 0;
 }
 

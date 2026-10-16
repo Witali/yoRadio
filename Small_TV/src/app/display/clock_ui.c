@@ -50,6 +50,15 @@ static void timer_raise(uint32_t events)
     portEXIT_CRITICAL(&timer_lock);
 }
 
+static void timer_finish_startup(void)
+{
+    /* Retire the startup latch without resetting the running animation/time counters. */
+    portENTER_CRITICAL(&timer_lock);
+    timer_state.startup_active = false;
+    timer_state.pending &= ~TV_TIMER_STARTUP_DRAW;
+    portEXIT_CRITICAL(&timer_lock);
+}
+
 esp_err_t clock_ui_timer_init(void)
 {
     /* Start the hardware timebase before network/services, as at 0x420083b6. */
@@ -104,10 +113,18 @@ static void clock_task(void *unused)
      * FIXED_RECONSTRUCTION: the factory's 0x42008e08 applies backlight before
      * the next digital render. Our combined init/render must not paint its
      * first complete digital frame at the previous startup/photo brightness.
+     * FIXED_RECONSTRUCTION: 0x42008e56 keeps rendering its active clock while
+     * station retries run. A lost link must not freeze the time, hands or fade;
+     * an explicit setup AP still selects the setup screen above this branch.
      * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
      * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
      * after the photo fade rather than 0x4200bc36's full-brightness ending.
-     * REQUESTED_CHANGE: advance clipped text fields in the active display loop. */
+     * REQUESTED_CHANGE: advance clipped text fields in the active display loop.
+     * REQUESTED_CHANGE: do not suspend the active clock/fade for asynchronous
+     * weather work; its mutex-protected snapshot is safe to render meanwhile.
+     * REQUESTED_CHANGE: skip the remaining 18.1-second startup wait when the
+     * station and time are ready; the photo theme does not require SNTP. Keep
+     * the original timeout for missing prerequisites and the normal task yield. */
 
     (void)unused;
     uint32_t generation = 0, weather_generation = 0;
@@ -145,13 +162,24 @@ static void clock_task(void *unused)
             else
                 --weather_retry;
         }
-        if (media_upload_active() || (!ticks.startup_active && weather_request_active()))
+        /* A photo slot can be partially overwritten during upload. Weather has
+         * a separate worker and publishes a complete snapshot under its mutex,
+         * so waiting for its network timeout would needlessly freeze the UI. */
+        if (media_upload_active())
         {
             vTaskDelay(pdMS_TO_TICKS(100));
             continue;
         }
-        /* The original 100-ms timer ends startup after 181 ticks. Its "second"
-         * flags fire after eleven ticks: labels rotate every 3.3 seconds. */
+        /* A confirmed clock needs no further progress animation. Cancel only
+         * startup: resetting all counters would shift GIF, colon and photo phases.
+         * Weather is optional and must not keep a usable clock on this screen. */
+        if (ticks.startup_active && online && (valid || settings.theme == 2))
+        {
+            timer_finish_startup();
+            ticks.startup_active = false;
+        }
+        /* The original 100-ms timer still bounds an unsuccessful startup at
+         * 181 ticks. Its "second" flags fire after eleven ticks. */
         if (ticks.startup_active)
         {
             unsigned current_progress = ticks.startup_progress;
@@ -167,7 +195,7 @@ static void clock_task(void *unused)
                 factory_draw_setup();
             phase = 2;
         }
-        else if (online)
+        else if (online || phase == 3)
         {
             bool reset_theme = phase != 3 || previous_theme != settings.theme;
             if (reset_theme)

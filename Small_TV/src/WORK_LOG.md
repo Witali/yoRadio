@@ -716,3 +716,89 @@
 - QEMU canonical/main не заменялся, физические платы не затрагивались,
   собственные ВМ закрыты. Далее integration веток/обязательных gates, обновление
   frozen-scroll expectation и полный стабильный набор. Общий parity не заявлен.
+
+### Дополнительный журнал из ветки исправлений
+
+### 2026-10-16 — автономный ход часов при потере Wi-Fi, отдельный кандидат
+
+- Создан собственный worktree `.worktree/small-tv-offline-clock`, ветка
+  `codex/small-tv-offline-clock`, от e4195bb9. Основной календарный прогон не
+  менялся. SDK используется через явный DependencyRoot, без junction/copy.
+- Заводской main 0x42008e56 продолжает theme dispatch и update_local_time при
+  offline/retry, ограничивая только weather retry. В C прежний else-if online
+  замораживал экран. После восстановления active-phase dispatch платформенные
+  тесты показывают ход минут/DST в classic/simple/dial и завершение фото-fade.
+- Второй сбой — station IP заменялся AP адресом. 0x4200c602 сохраняет GOT_IP
+  event snapshot при отключении. Добавлен atomic IPv4 cache. Тест с новым lease
+  .21 при позднем SDK snapshot .15 проверяет выбор event payload, а не netif.
+- До исправления реальные platform frames расходились на 713/815 пикселей;
+  после исправления все 33 platform scenarios прошли. Новый network_oracle
+  исполняет event/getter RV32 и 16 original active-loop states: старый app
+  9e4f856a даёт ожидаемый fail, кандидат 072135ee проходит четыре event traces
+  и весь dispatch. Подменяются только явно перечисленные SDK/output boundaries.
+- Кандидат app 1,176,176 bytes, free 359,824; source e10dd9f6 / ELF eec972f2.
+  BIN и manifest сохранены в firmware этой ветки. Exact original/main и native
+  clock_task/wifi_event/network_address instructions архивированы. Результаты
+  before/candidate разделены, исходный factory dump не менялся.
+- machine_network добавлен в полный набор и следующий publisher/verifier.
+  QEMU/full suite кандидата ещё не проходили; прежние опубликованные общие
+  отчёты сохраняют старую app identity. Нужны natural virtual Wi-Fi loss/recovery,
+  новый полный прогон и затем включение исправления в main. Физических действий нет.
+
+### 2026-10-16 — удалено программное ожидание погоды
+
+- Пользователь уточнил, что лишние программные delay/vTaskDelay и ожидания
+  следует убирать. Из clock_task удалено ожидание weather_request_active:
+  weather worker уже асинхронный, snapshot публикуется под отдельным mutex.
+  REQUESTED_CHANGE объясняет намеренное отличие от блокирующего factory main.
+- Новый platform negative воспроизводит устаревший classic frame. После
+  изменения все 37 cases / 1,182,490 checks проходят: три clock themes и
+  photo-fade продолжаются при queued weather. Обычный task yield и upload guard
+  сохраняются. Неисследованные startup/display/restart задержки не менялись.
+- App a2b6129b / source 246397dd / ELF 00ef2763 собран и сохранён в firmware:
+  1,176,144 bytes, free 359,856. Exact coordinator/weather instructions
+  архивированы. Старые offline app 072135ee reports сохранены отдельно.
+- Portable weather_wait_qemu.py выполнен before/after. Внешний HTTP удерживается
+  во время natural minute boundary. Старый app допускает кадр после weather
+  timeout, наблюдаемый остаток 6.735 guest s / state=0. Candidate обновляет его
+  через .932 guest s при RUNNING=1, до ответа сервера; input/code hashes прежние.
+  Ранние prototypes ошибались в RUNNING bit; итоговый test читает actual DWARF
+  enum. Собственные ВМ закрыты, физического flashing нет.
+- Scoped code/test/build/evidence готовятся отдельным коммитом. Whole-suite
+  candidate ещё не проходил; новый weather wait test надо включить в общий gate,
+  а field_qemu frozen-scroll ожидание заменить проверкой отзывчивости. Natural
+  station disconnect/reconnect, дальнейший software-delay audit и полный набор
+  остаются обязательной последующей работой.
+
+### 2026-10-16 — startup по готовности вместо лишнего программного ожидания
+
+- Пользователь уточнил software delays. Исследованы factory timer
+  0x42008278..0x42008296 и actual compiled clock_task. Подтверждённое ожидание
+  181 тика сохранялось даже при готовом clock. REQUESTED_CHANGE завершает его
+  по station lease + confirmed SNTP; photo theme не нуждается в SNTP.
+- Startup latch и его event сбрасываются под ISR critical section без сброса
+  остальных timer counters. При отсутствии условий остаётся старый тайм-аут.
+  Yield 100 ms, дисплейные init delays и фоновые timers не удалялись.
+- Новые platform cases classic/simple/dial воспроизвели старый startup. Ошибка
+  mutex раннего photo prototype исправлена в самом test; этот сбой не выдан за
+  дефект production. После исправления все 43 cases / 1,182,204 checks прошли,
+  включая четыре темы, ожидание IP/SNTP и отсутствие возврата startup при потере
+  Wi-Fi. Старый timeout и требование яркости первого кадра проверены отдельно.
+- Portable startup_qemu.py наблюдает actual callback/renderer hardware GDB
+  breakpoints: прежний app 9e4f856a — ожидаемый fail, 13.353327 guest s; новый
+  743fa69f — pass, .040202 до renderer / .101856 до полного кадра. Guest RAM,
+  инструкции, PC и время не меняются, test/helper hashes одинаковы до/после.
+- Сборка app 1,176,224 / free 359,776, source 2583ac4c / ELF 7bda9d7d сохранена
+  в firmware. Отдельно сохранены точные compiled instructions и отчёты.
+  Actual RV32 network (4 traces / 16 dispatch states) прошёл; real external
+  weather-wait regression тоже pass: RUNNING=1, frame через .971445 guest s.
+- QEMU graceful AP control завершён отдельным коммитом 962cda7a6f и отправлен
+  в codex/small-tv-wifi-link. Восемь packet tests, 11 helper tests, modular
+  SPI/I2C/SD, CYD/C3 boots и actual HTTP setup/AP->STA/persistence обеих app
+  прошли на executable fde38d53. Native a2b6129b также продолжает simple clock
+  во время live SDK disconnect, сохраняет station IP и восстанавливает HTTP;
+  три полных кадра имеют 0 отличий от declared corrected reference.
+- Canonical QEMU не заменялся, физической платы не касались, собственные ВМ
+  закрыты. Whole-suite нового app ещё не проходил: observers следует включить
+  в полный gate и обновить старое frozen-scroll ожидание. Общие старые positive
+  reports не переименовываются в результаты кандидата; parity остаётся неполной.

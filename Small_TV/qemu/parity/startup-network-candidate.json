@@ -1,0 +1,306 @@
+{
+  "passed": true,
+  "app_sha256": "743fa69f107cac7939b63e71b0d555351a6aaee4ef9686111eacb64387af79a8",
+  "source_sha256": "2583ac4cc4658a97f992572d4fbcc85330f0890755815ff4e36a56d09212c216",
+  "native_elf_sha256": "7bda9d7de341a5a415bcf53d8b80d128a1dfca33b0fe44bca9085253adaf4631",
+  "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+  "input_hashes": {
+    "native_elf": "7bda9d7de341a5a415bcf53d8b80d128a1dfca33b0fe44bca9085253adaf4631",
+    "factory_elf": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+    "rom_elf": "289ce00e79c024d9efeb29a7fbc2d21853a1cbc383a2b9c2ece85c54fa829dd9",
+    "test": "0a766cedb9b6aaf07c92d8e97b6fdd88d2ff2097f7a78ba557ca0c55ee241488",
+    "machine_adapter": "009af0436897d63044f692baac40b45ade60e69a511a9f36befd3aed09705ff2",
+    "input_verifier": "f7df352f24bdad4e978dad327cd66c1f88383bfa46a07fa4399a274594335d8a"
+  },
+  "event_cases": {
+    "factory": [
+      {
+        "case": "new-dhcp-lease",
+        "first_lease": "10.0.2.15",
+        "new_lease": "10.0.2.21",
+        "disconnections": [
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 1
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 2
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 3
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 4
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 4
+          }
+        ],
+        "passed": true,
+        "elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+        "adapters": {
+          "sdk-ip4-to-string": 2,
+          "sdk-http-start": 2,
+          "sdk-task-notification": 3,
+          "sdk-wifi-connect": 4,
+          "sdk-http-stop": 1
+        }
+      },
+      {
+        "case": "reconnect-resets-retries",
+        "first_lease": "10.0.2.15",
+        "new_lease": "10.0.2.21",
+        "disconnections": [
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 4
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 5
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 6
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 7
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 7
+          }
+        ],
+        "passed": true,
+        "elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+        "adapters": {
+          "sdk-ip4-to-string": 2,
+          "sdk-http-start": 2,
+          "sdk-task-notification": 3,
+          "sdk-wifi-connect": 7,
+          "sdk-http-stop": 1
+        }
+      }
+    ],
+    "native": [
+      {
+        "case": "new-dhcp-lease",
+        "first_lease": "10.0.2.15",
+        "new_lease": "10.0.2.21",
+        "disconnections": [
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 1
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 2
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 3
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 4
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 4
+          }
+        ],
+        "passed": true,
+        "elf_sha256": "7bda9d7de341a5a415bcf53d8b80d128a1dfca33b0fe44bca9085253adaf4631",
+        "adapters": {
+          "snprintf": 7,
+          "sdk-wifi-connect": 4
+        }
+      },
+      {
+        "case": "reconnect-resets-retries",
+        "first_lease": "10.0.2.15",
+        "new_lease": "10.0.2.21",
+        "disconnections": [
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 4
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 5
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 6
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 7
+          },
+          {
+            "address": "10.0.2.21",
+            "connect_calls": 7
+          }
+        ],
+        "passed": true,
+        "elf_sha256": "7bda9d7de341a5a415bcf53d8b80d128a1dfca33b0fe44bca9085253adaf4631",
+        "adapters": {
+          "snprintf": 7,
+          "sdk-wifi-connect": 7
+        }
+      }
+    ]
+  },
+  "factory_dispatch": [
+    {
+      "theme": 0,
+      "station_state": 0,
+      "calls": [
+        "classic",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 0,
+      "station_state": 1,
+      "calls": [
+        "classic",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 0,
+      "station_state": 2,
+      "calls": [
+        "classic",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 0,
+      "station_state": 5,
+      "calls": [
+        "classic",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 1,
+      "station_state": 0,
+      "calls": [
+        "simple",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 1,
+      "station_state": 1,
+      "calls": [
+        "simple",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 1,
+      "station_state": 2,
+      "calls": [
+        "simple",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 1,
+      "station_state": 5,
+      "calls": [
+        "simple",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 2,
+      "station_state": 0,
+      "calls": [
+        "photo",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 2,
+      "station_state": 1,
+      "calls": [
+        "photo",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 2,
+      "station_state": 2,
+      "calls": [
+        "photo",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 2,
+      "station_state": 5,
+      "calls": [
+        "photo",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 3,
+      "station_state": 0,
+      "calls": [
+        "dial",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 3,
+      "station_state": 1,
+      "calls": [
+        "dial",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 3,
+      "station_state": 2,
+      "calls": [
+        "dial",
+        "local-time"
+      ],
+      "passed": true
+    },
+    {
+      "theme": 3,
+      "station_state": 5,
+      "calls": [
+        "dial",
+        "local-time"
+      ],
+      "passed": true
+    }
+  ],
+  "scope": "Execute original and rebuilt RV32 station events and the original active loop.\n\nSynthetic DHCP leases and Wi-Fi events enter the actual compiled handlers. SDK\nconnect/notification/HTTP lifecycle and IPv4 formatting are boundaries; field\nselection, cache, counters and native address formatting remain machine code.\nThe bounded original main-loop slice records dispatch, without substituting its\nbranches. This is not a radio, whole FreeRTOS scheduler or live QEMU link test.\n"
+}
