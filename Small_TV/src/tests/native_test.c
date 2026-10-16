@@ -28,6 +28,7 @@ static uint8_t factory_sector[4096];
 static size_t saved_nvs_length;
 static int64_t clock_us;
 static unsigned rendered_pixels,registered_routes,restart_requests,weather_requests;
+static unsigned nvs_commits;
 static unsigned route_success[48],route_errors[48];
 static bool connected;
 static uint16_t scan_count=1;
@@ -50,7 +51,7 @@ esp_err_t nvs_get_blob(nvs_handle_t handle,const char *key,void *data,size_t *le
 {(void)handle;(void)key;if (!saved_nvs_length) return ESP_ERR_NOT_FOUND;if (*length<saved_nvs_length)return ESP_ERR_INVALID_SIZE;memcpy(data,saved_nvs,saved_nvs_length);*length=saved_nvs_length;return ESP_OK;}
 esp_err_t nvs_set_blob(nvs_handle_t handle,const char *key,const void *data,size_t length)
 {(void)handle;(void)key;assert(length<=sizeof(saved_nvs));memcpy(saved_nvs,data,length);saved_nvs_length=length;return ESP_OK;}
-esp_err_t nvs_commit(nvs_handle_t handle) {(void)handle;return ESP_OK;}
+esp_err_t nvs_commit(nvs_handle_t handle) {(void)handle;++nvs_commits;return ESP_OK;}
 esp_err_t esp_flash_read(esp_flash_t *chip,void *data,uint32_t offset,uint32_t length)
 {(void)chip;if(offset!=FACTORY_SETTINGS_OFFSET || length>sizeof(factory_sector))return ESP_ERR_INVALID_SIZE;memcpy(data,factory_sector,length);return ESP_OK;}
 esp_err_t esp_flash_write(esp_flash_t *chip,const void *data,uint32_t offset,uint32_t length)
@@ -151,6 +152,43 @@ static void test_settings(void)
     CHECK(settings_flush()==ESP_OK);CHECK(settings_init()==ESP_OK);settings_snapshot(&s);CHECK(!strcmp(s.ssid,"Home") && s.wifi_mode==1);
     CHECK(rgb888_from_rgb565(rgb565_from_rgb888(0xffffff))==0xffffff);
     CHECK(rgb888_from_rgb565(rgb565_from_rgb888(0xff0000))==0xff0000);
+}
+
+static void test_theme_requests(void)
+{
+    /* Same-value commands advance only the transient UI revision, never flash data. */
+    tv_settings_t original,current;
+    uint32_t configuration,selection,next_configuration,next_selection;
+    settings_snapshot_with_revisions(&original,&configuration,&selection);
+    CHECK(settings_flush()==ESP_OK);
+    unsigned committed=nvs_commits;
+    char body[32];snprintf(body,sizeof(body),"{\"clocktype\":\"%u\"}",original.theme);
+    for(unsigned repeat=0;repeat<3;++repeat) {
+        post("/setclocktype",body,200);
+        settings_snapshot_with_revisions(&current,&next_configuration,&next_selection);
+        CHECK(!memcmp(&current,&original,sizeof(current)));
+        CHECK(next_configuration==configuration && next_selection==selection+repeat+1);
+        CHECK(settings_flush()==ESP_OK && nvs_commits==committed);
+    }
+    selection=next_selection;
+    post("/setclocktype","{\"clocktype\":4}",400);
+    CHECK(settings_select_theme(256)==ESP_ERR_INVALID_ARG);
+    CHECK(settings_select_theme((unsigned)-1)==ESP_ERR_INVALID_ARG);
+    settings_snapshot_with_revisions(&current,&next_configuration,&next_selection);
+    CHECK(next_configuration==configuration && next_selection==selection);
+    unsigned theme=(original.theme+1)%4;
+    CHECK(settings_select_theme(theme)==ESP_OK);
+    settings_snapshot_with_revisions(&current,&next_configuration,&next_selection);
+    CHECK(current.theme==theme && next_configuration==configuration+1 && next_selection==selection+1);
+    current.day_level=current.day_level==500?400:500;
+    CHECK(settings_replace(&current)==ESP_OK);
+    settings_snapshot_with_revisions(&current,&configuration,&selection);
+    CHECK(configuration==next_configuration+1 && selection==next_selection);
+    CHECK(settings_replace(&original)==ESP_OK && settings_flush()==ESP_OK);
+    CHECK(settings_init()==ESP_OK);
+    settings_snapshot_with_revisions(&current,&configuration,&selection);
+    CHECK(!memcmp(&current,&original,sizeof(current)) && configuration==1 && selection==0);
+    CHECK(sizeof(tv_settings_t)==364 && current.version==2);
 }
 
 static uint32_t le32(const uint8_t *data) {return data[0]|((uint32_t)data[1]<<8)|((uint32_t)data[2]<<16)|((uint32_t)data[3]<<24);}
@@ -460,7 +498,7 @@ int main(int argc,char **argv)
     CHECK(argc==2 || argc==3);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
     CHECK(web_start()==ESP_OK);CHECK(registered_routes==40);
     for(unsigned i=0;i<registered_routes;++i)for(unsigned j=i+1;j<registered_routes;++j)CHECK(route_table[i]->method!=route_table[j]->method || strcmp(route_table[i]->uri,route_table[j]->uri));
-    test_settings();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_uploads();test_multipart();test_dns();
+    test_settings();test_theme_requests();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_uploads();test_multipart();test_dns();
     for(unsigned i=0;i<registered_routes;++i)CHECK(route_success[i]>0);
     if(argc==3)write_native_report(argv[2]);
     printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers\n",checks);

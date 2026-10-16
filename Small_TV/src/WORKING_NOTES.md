@@ -7,6 +7,22 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Актуально после terminal handle47090 exit0: исправлен повторный выбор той же
+темы. Factory0x4200d854 безусловно сбрасывает theme-init latch; старый C терял
+команду при одинаковых bytes. Новый transient revision и единый mutex snapshot
+восстанавливают reinit без дополнительных NVS writes. Candidate app2eb7bb69 /
+sourceefc9fc36 / ELF4dc4e444,1,176,480 bytes/free359,520 сохранён в firmware.
+Тот же actual HTTP observer до/после: старый E390 fail, новый три раза запускает
+photo1/0/1, все pixels совпали, каждый переход1.04…1.12 guest s. Host3909,
+platform45/1,182,288, idle-brightness HTTP,84 frames/9 scenes,10 frame guards
+и9 control guards pass. Все ВМ этой серии закрыты; actual assembly и отдельные
+scoped reports в photo-reselect-checks.md. Исторические E390/AD7A не заменены.
+Root full92411 по-прежнему жив на frozenAD7A: native classic natural calendar
+через us-spring, до terminal не менять root source/tests/helpers. После terminal
+сначала19-group publisher, затем интеграция всей этой ветки и новый full suite.
+Новая photo_controls проверка обязательна в branch suite/publisher/verifier;
+photo_controls_contract объединяет прежний brightness и новый command contract.
+
 Candidate проверки завершены: handle86675 exit0. E3902939/B9787790/D73C9146
 прошёл actual HTTP idle brightness обеих app, повтор84 full photo/fade frames,
 9 canonical scenes и10 negative contract checks. Все input/image/helper hashes

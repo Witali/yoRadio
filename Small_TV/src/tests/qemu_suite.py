@@ -43,7 +43,7 @@ def main():
                                             'esp_board.py', 'esp_services.py')}}
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
               **inputs,
-              'boot_reset': {}, 'startup_wait': {}, 'weather_wait': {}, 'photo_http': {}, 'photo_frames': {}, 'photo_brightness': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
+              'boot_reset': {}, 'startup_wait': {}, 'weather_wait': {}, 'photo_http': {}, 'photo_frames': {}, 'photo_brightness': {}, 'photo_controls': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
               'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP, synthetic weather, natural calendar/DST transitions and complete instruction-replayed frames. The separate unsynchronized scene similarity remains diagnostic. No physical hardware or Internet weather service.'}
     try:
         for variant in ('original', 'reconstructed'):
@@ -54,9 +54,10 @@ def main():
             print('PASS QEMU boot/reset/SNTP:', variant, flush=True)
         for name, key in (('startup', 'startup_wait'), ('weather_wait', 'weather_wait'),
                           ('photo', 'photo_http'), ('photo_frames', 'photo_frames'),
-                          ('photo_brightness', 'photo_brightness')):
+                          ('photo_brightness', 'photo_brightness'), ('photo_controls', 'photo_controls')):
             folder = args.output / ({'photo': 'photo-http', 'photo_frames': 'photo-frames',
-                                     'photo_brightness': 'photo-brightness'}.get(name, name+'-observer'))
+                                     'photo_brightness': 'photo-brightness',
+                                     'photo_controls': 'photo-controls'}.get(name, name+'-observer'))
             process = subprocess.run([sys.executable, str(Path(__file__).with_name(name + '_qemu.py')),
                                       '--qemu-root', str(args.qemu_root), '--output', str(folder)])
             result = json.loads((folder / 'report.json').read_text(encoding='utf-8-sig'))

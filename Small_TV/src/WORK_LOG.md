@@ -1084,3 +1084,29 @@
   не менялся. Первоначальные 11-check reports/prototype исторические; архивные
   photo-http-before/candidate содержат окончательный одинаковый 21-check observer.
   Не моделировался power cut посреди операции записи flash.
+
+### 2026-10-16 — повторный выбор той же темы
+
+- Factory handler0x4200d7f0 записывает тему и всегда сбрасывает39e9. Наш
+  settings_replace игнорировал одинаковые bytes, coordinator не видел команды.
+  Permanent same-observer negative: factory трижды меняет фото; oldE390 даёт200,
+  но остаётся[0,1],57,492 different pixels через2.283872 guest s. Code/media и
+  helpers неизменны, panic отсутствует; bounded result не выдаётся за60s wait.
+- settings_select_theme публикует transient command revision. Единый snapshot
+  preferences/configuration/theme revisions под mutex исключает рассогласование
+  с HTTP. Активный coordinator подтверждает reinit, photo cursor сохраняется;
+  повторные запросы до одного pass coalesce. ABI364/version2 не менялся.
+- Candidate2eb7bb69/sourceefc9fc36/ELF4dc4e444 собран и сохранён в firmware,
+  1,176,480 bytes/free359,520. Три actual HTTP перехода photo1/0/1 совпали по
+  всем pixels/footer и duty, каждый1.04…1.12 guest s. Host3909 и platform45 /
+  1,182,288 pass, включая отсутствие новых NVS commits и coalescing команд.
+- Batch47090 terminal exit0: новый HTTP, прежний idle brightness и84 frames /
+  9 scenes проходят на одной exact сборке;10 frame guards и9 control mutations
+  отклоняют неполное evidence. Все owned VMs закрыты. Scoped before/candidate,
+  host/platform reports и actual factory/native assembly сохранены отдельно;
+  старые positive results не переименованы. Подробности photo-reselect-checks.md.
+- Root92411 по-прежнему жив на AD7A, native classic calendar через us-spring.
+  Root production/tests не менялись. Сначала дождаться terminal, сверить63 pins
+  и опубликовать его19-group result, затем merge/build/full с тремя photo gates.
+  QEMU/физическая плата не менялись. User clarification про software delays
+  сохраняется: убирать лишние UI waits, оставлять task yield и аппаратный timing.

@@ -18,7 +18,10 @@ typedef struct
 } tv_settings_t;
 esp_err_t settings_init(void);
 void settings_snapshot(tv_settings_t *out);
+void settings_snapshot_with_revisions(tv_settings_t *out, uint32_t *configuration_revision,
+                                      uint32_t *theme_selection_revision);
 esp_err_t settings_replace(const tv_settings_t *settings);
+esp_err_t settings_select_theme(unsigned theme);
 esp_err_t settings_photo_size(unsigned slot, uint32_t bytes);
 esp_err_t settings_flush(void);
 uint32_t settings_generation(void);

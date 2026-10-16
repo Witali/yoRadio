@@ -15,7 +15,7 @@ ARCHIVE = REPO / 'firmware/development/small-tv-esp32c2-reconstructed'
 BUILD = REPO / '.build/small-tv-esp32c2'
 sys.path.insert(0, str(ROOT/'tests'))
 from photo_frame_contract import validate_photo_frames
-from photo_brightness_contract import validate_photo_brightness
+from photo_controls_contract import validate_photo_brightness, validate_photo_controls
 
 
 def read(path):
@@ -83,9 +83,9 @@ def main():
     for item in jpeg_inputs['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
                 'Additional JPEG fixture/adapter changed: ' + item['file'])
-    for name in ('startup_wait', 'weather_wait', 'photo_http', 'photo_frames', 'photo_brightness'):
+    for name in ('startup_wait', 'weather_wait', 'photo_http', 'photo_frames', 'photo_brightness', 'photo_controls'):
         gate = groups['qemu'][name]
-        gate_source = gate['source_sha256'] if name in ('photo_frames', 'photo_brightness') else gate['sources']['source_sha256']
+        gate_source = gate['source_sha256'] if name in ('photo_frames', 'photo_brightness', 'photo_controls') else gate['sources']['source_sha256']
         require(gate['passed'] and gate['inputs_unchanged'] and gate['app_sha256'] == app_sha and
                 gate['native_elf_sha256'] == state['native_elf_sha256'] and
                 gate['qemu_sha256'] == groups['qemu']['qemu_sha256'] and
@@ -100,6 +100,13 @@ def main():
             'Photo frame contract rejection checks did not pass')
     idle_brightness = groups['qemu']['photo_brightness']
     validate_photo_brightness(idle_brightness)
+    controls_http = groups['qemu']['photo_controls']
+    validate_photo_controls(controls_http)
+    require(controls_http['profile_sha256'] == groups['qemu']['profile_sha256'],
+            'Photo theme commands used a different hardware profile')
+    for item in controls_http['test_inputs']:
+        require(hashlib.sha256((REPO/item['file']).read_bytes()).hexdigest() == item['sha256'],
+                'Photo theme command input changed since execution: '+item['file'])
     require(idle_brightness['profile_sha256'] == groups['qemu']['profile_sha256'],
             'Photo brightness used a different hardware profile')
     for item in idle_brightness['test_inputs']:

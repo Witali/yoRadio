@@ -97,6 +97,14 @@ Factory и исправленный C должны применить измен
 day/night/calendar изменения и отсутствие лишних SPI/LEDC операций.
 См. [photo-idle-brightness-checks.md](../../qemu/parity/photo-idle-brightness-checks.md).
 
+`photo_controls_qemu.py` трижды отправляет `/setclocktype` с прежним номером
+фототемы. Каждый запрос запускает следующий fade за ограниченное время,
+сохраняя photo round-robin; проверяются весь кадр, LEDC и transient command
+revision. Host tests дополнительно исключают лишние NVS commits, platform case
+проверяет объединение команд до прохода UI. Общий `photo_controls_contract.py`
+используется publisher/verifier для brightness и theme command evidence.
+См. [photo-reselect-checks.md](../../qemu/parity/photo-reselect-checks.md).
+
 `report_aggregation` проверяет реальный общий JSON reader и serializer: даты
 сохраняются строками с исходным country offset, включая midnight, DST overlap и
 дробный offset. PowerShell `ConvertFrom-Json -DateKind String` предотвращает

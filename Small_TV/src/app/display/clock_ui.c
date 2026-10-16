@@ -118,6 +118,9 @@ static void clock_task(void *unused)
      * an explicit setup AP still selects the setup screen above this branch.
      * FIXED_RECONSTRUCTION: photo idle must apply settings/calendar brightness
      * changes as 0x4200913c does, without waiting for another photo timer event.
+     * FIXED_RECONSTRUCTION: consume explicit theme selections, including a
+     * same-value /setclocktype request. A configuration-byte comparison alone
+     * loses 0x4200d7f0's reinitialization command. Snapshot both revisions once.
      * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
      * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
      * after the photo fade rather than 0x4200bc36's full-brightness ending.
@@ -129,7 +132,7 @@ static void clock_task(void *unused)
      * the original timeout for missing prerequisites and the normal task yield. */
 
     (void)unused;
-    uint32_t generation = 0, weather_generation = 0;
+    uint32_t generation = 0, weather_generation = 0, last_theme_selection = 0;
     factory_animation_t animation = {0};
     unsigned description = 0;
     factory_photo_t slideshow = {0};
@@ -140,8 +143,9 @@ static void clock_task(void *unused)
     for (;;)
     {
         tv_settings_t settings;
+        uint32_t current_generation, theme_selection;
         weather_snapshot_t weather;
-        settings_snapshot(&settings);
+        settings_snapshot_with_revisions(&settings, &current_generation, &theme_selection);
         weather_snapshot(&weather);
         factory_timer_t ticks = timer_snapshot(0, settings.photo_seconds);
         bool online = network_connected(), valid;
@@ -149,7 +153,6 @@ static void clock_task(void *unused)
         network_address(address, sizeof(address));
         time_t now = time(NULL);
         struct tm local = factory_local_time(settings.country, now, &valid);
-        uint32_t current_generation = settings_generation();
         bool changed = current_generation != generation || weather.generation != weather_generation ||
                        valid != previous_time_valid;
         /* 0x42008e56 retries unsuccessful weather after 30 completed main-loop
@@ -199,7 +202,8 @@ static void clock_task(void *unused)
         }
         else if (online || phase == 3)
         {
-            bool reset_theme = phase != 3 || previous_theme != settings.theme;
+            bool reset_theme = phase != 3 || previous_theme != settings.theme ||
+                               theme_selection != last_theme_selection;
             if (reset_theme)
             {
                 display_fill(0, 0, 240, 240, 0);
@@ -291,6 +295,7 @@ static void clock_task(void *unused)
             if (settings.theme != 2)
                 backlight_update(&settings, local.tm_hour, local.tm_min, valid);
             previous_theme = settings.theme;
+            last_theme_selection = theme_selection;
             if (timer_snapshot(TV_TIMER_WEATHER, settings.photo_seconds).pending)
                 weather_request_update();
         }
