@@ -25,7 +25,7 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   prefill/save/reload/empty/HTML isolation pass; нет console errors.
   Источники/assembly/SDK/C/browser evidence — advanced-editor-checks.md.
 - Все собственные ВМ30908/14684/12152 и CUA tab1 закрыты после сохранения
-  scoped evidence. Активного полного прогона сейчас нет. Browser2 binding
+  scoped evidence. Новый full96792 описан ниже. Browser2 binding
   smallTvBrowser остаётся выбранным, но smallTvTab закрыт. Для продолжения
   использовать новую временную вкладку в том же IAB. computer-use skill,
   guidance/confirmations, browser docs и local-web-development прочитаны.
@@ -46,7 +46,10 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   .build/small-tv-functional/controls-integrated-full-20261016, initialHEAD65d7be99.
   Frozen72 test files, appDAF/ELFB06/QEMUFDE3, также7 firmware files,6 QEMU
   helpers/profile/marker/source commit и verifier. Native3924/platform46,
-  frontend/integrity/timezone_sources уже pass; machine/QEMU ещё выполняются.
+  frontend/integrity/timezone_sources и все machine groups уже pass. QEMU:
+  boot/reset/SNTP, startup/weather UI wait,advanced,upload,84 photo frames/9 scenes,
+  brightness/theme commands/reinit,setup,weather,fields и SNTP transport pass
+  на обеих firmware. Идёт UTF8 (original pass), далее regional/calendar/scenes.
   Опросить тот же handle, не перезапускать. До terminal не менять production,
   tests, generated media, BIN/ELF и QEMU/helpers; разрешены контекстные Markdown.
   Затем сверить initial pins и использовать archive_immutable_run.py: он уже
@@ -58,6 +61,25 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   intervals60/3/4 и5 previews. Это частичное наблюдение старого образа. Остались
   night/setup/crop/upload/responsive,mask/interval during fade,soak/heap/stack
   и physical acceptance. NTP scoped checks не превращать в полный H03 pass.
+- Независимо от frozen main создана .worktree/small-tv-photo-settings на ветке
+  codex/small-tv-photo-settings от cc65d379. Ветка завершена и отправлена:
+  6ae7373f tests/evidence,459b93bd exact assembly EOL. Production C/BIN прежние
+  DAF/C839/B06. Final2990 terminal exit0, output photo-settings-all-20261016-03:
+  12 actual mask/interval scenarios,24 completed frames/0 pixel differences,
+  14 consumer mutations pass.74 initial test files/57 production inputs/BIN/
+  ELF/ROM/helpers/staged proof pass; ВМ набора закрыты.8 factory/native instruction
+  ranges сохранены. Actual counter17 при60->3 корректен; формула учитывает >=.
+  Preliminary30669 пропустил первый native frame после API wait; hardware capture
+  двух кадров теперь идёт до response wait. Smoke4374 и final2990 подтверждают
+  правильную работу неизменённого C. Main не сливать до terminal/publish96792.
+  Branch suite/publisher/verifier уже требуют новый gate. Не подменять старый full
+  новым scoped report; после интеграции обновить collector для photo_settings.
+- Для H10 получен только layout audit ELF/SDK: root .build/small-tv-parity/
+  native-memory-layout-20261016.json содержит heap/TCB/list offsets и source IDs;
+  StackType_t здесь byte. Guest RAM не читалась, heap/stack/soak ещё не проверены.
+  Browser skill/guidance/confirmations перечитаны; в этом этапе UI не открывался.
+  Для H03 сначала cua.rewriteDocumentation, новый raw guest/tab; старые tab1 и
+  ВМ закрыты, не переиспользовать прежний state dir без явной проверки источников.
 - Подтверждённые factory bugs исправлять, метки/комментарии сохранять. Лишние
   software waits убирать; normal task yield, периоды эффектов и необходимый
   ST7789 timing сохранять. OTA/SD/audio не добавлять. Physical boards/QEMU

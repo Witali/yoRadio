@@ -1324,3 +1324,33 @@
   Продолжать опрос того же handle; не запускать второй full. После terminal
   проверить initial/final pins и strict publisher/verifier через адаптированный
   archive_immutable_run.py. Контекстные Markdown не входят в frozen test bytes.
+
+### 2026-10-16 — закрыта проверка фотонастроек при active fade
+
+- Отдельная .worktree/small-tv-photo-settings от maincc65d379 не меняла frozen
+  root. Новые real HTTP mask/interval tests, contract и child gate отправлены
+  веткой codex/small-tv-photo-settings:6ae7373f. Production DAF/C839/B06 прежние.
+  Commit459b93bd сохраняет LF двух новых assembly files; реальный Git checkout
+  filter с core.autocrlf=true сохраняет оба manifest hashes.
+- Final2990 terminal exit0:12 scenarios на обеих firmware/24 full frames с0
+  отличиями/14 consumer rejections pass. Все ВМ набора закрыты,74 initial test
+  files и BIN/ELF/ROM/QEMU/helpers совпали. Staged proof57 production inputs,
+  образов,74 test pins и8 instruction ranges прошёл. Scoped candidate/guards/
+  input audit/assembly сохранены только в этой ветке; root full не переименован.
+- Предварительные ошибки касались harness: missing replay ROM/Path digest,
+  неверное counter<new_period предположение и запоздалое наблюдение первого
+  native frame после HTTP wait. Factory сохраняет counter17 при60->3; >=
+  сбрасывает его на ближайшей секундной границе. Код C это уже делает правильно.
+  Hardware captures обоих кадров теперь предшествуют response wait; отдельный
+  smoke4374 и final12-case2990 проходят без изменения прошивки.
+- Root96792 повторно подтверждён live; все72 initial test pins и firmware/ELF/
+  QEMU/helper/profile identities неизменны. Все machine groups и QEMU startup/
+  weather wait/advanced/upload/photo84/brightness/commands/reinit/setup/weather/
+  fields/SNTP прошли на обеих; original UTF8 тоже pass. Далее native UTF8,
+  regional/calendar/completed scenes. Не сливать branch и не менять root frozen
+  inputs до terminal и strict публикации root. Опросить тот же handle96792.
+- Для следующей проверки памяти изучены только DWARF/SDK layouts: heap_t36,
+  multi_heap_info20, TCB96, list20; StackType_t=uint8_t. Layout-only metadata
+  сохранён в root .build. Guest RAM/heap/stack/soak этим не проверены. Browser
+  skill/docs перечитаны, новых browser tabs/VM не открывалось. H03/H09/H10 и
+  физическая приёмка остаются; это не основание объявлять цель завершённой.
