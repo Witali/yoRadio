@@ -114,8 +114,11 @@ class PhotoMachine(JpegMachine):
             pending = bool(event and not finished)
         if self.allocations:
             raise AssertionError('Photo renderer leaked its decoder workspace')
+        if self.decompression_started != bool(self.selected) or self.selected and not self.reads:
+            raise AssertionError('A selected photo did not execute its real JPEG decoder')
         return {'fade': state[0], 'next_slot': state[1], 'pending': pending,
-                'selected': self.selected[:], 'events': self.events[:], 'duty': self.duty}
+                'selected': self.selected[:], 'events': self.events[:], 'duty': self.duty,
+                'decoder_started': self.decompression_started}
 
 
 def normalized_checks():

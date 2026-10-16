@@ -979,6 +979,18 @@
   factory handlers0x4200d5ac/0x4200d66a выставляют flag3fcc39f2, main4200913c
   применяет его; C пока обновляет schedule только на finished. Проверить before.
 
+### 2026-10-16 — защита полноты photo evidence
+
+- Shared contract теперь требует явных panic/immutable/state-write checks и
+  совпадающих normalized executable identities. Десять отрицательных mutations
+  (missing variant/profile/phase/panic, wrong order/duty/window, changed code,
+  missing normalized case/mixed ELF) отклонены на committed baseline57ef94ae.
+- Photo replay требует настоящий decoder entry и flash reads для выбранного
+  фото; все9 raw scenes повторно прошли на старом ad7a9009 ELF. Scoped hashes
+  и результаты сохранены в photo-frame-guard-validation.json. Это postprocessor/
+  isolated replay проверки, новый full QEMU run здесь не заявлен. Baseline84
+  сохраняет прежние observer hashes и не перепривязан к новому helper.
+
 ### 2026-10-16 — постоянные JPEG inputs и baseline headers
 
 - Создан sparse worktree .worktree/small-tv-jpeg-inputs / branch

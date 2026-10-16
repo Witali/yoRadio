@@ -1,4 +1,5 @@
 """Require complete photo/fade evidence before publishing a full validation report."""
+from copy import deepcopy
 
 
 def validate_photo_frames(data):
@@ -21,6 +22,11 @@ def validate_photo_frames(data):
                                  night_mode=night_mode, night=night_level)
             require(flow['case'] == expected_case and flow['passed'] and all(flow['checks'].values()),
                     'profile or integrity checks failed')
+            required_checks = {'all_pixels_checked', 'expected_fade_steps', 'hardware_breakpoints_only',
+                               'no_guest_state_writes', 'photo_order', 'executable_media_unchanged', 'no_panic'}
+            if variant == 'reconstructed' and night_mode:
+                required_checks.add('synchronized_night_restore')
+            require(required_checks <= set(flow['checks']), 'missing integrity/panic/state-write check')
             phases = [2, 3, 4, 5]+list(range(6))*(cycles-1)
             require([row['fade_before'] for row in flow['samples']] == phases, 'missing/reordered fade phase')
             selected = [slot for row in flow['samples'] for slot in row['selected']]
@@ -61,6 +67,8 @@ def validate_photo_frames(data):
             if night_mode and variant == 'reconstructed':
                 require(night_verified, 'no synchronized night-brightness restoration')
     normalized = data['normalized']
+    require(all(normalized[key] == data[key] for key in
+                ('app_sha256', 'native_elf_sha256', 'factory_elf_sha256')), 'normalized executable differs')
     require(normalized['passed'] and len(normalized['cases']) == 9, 'missing independent complete-photo scenes')
     expected = {(1 << slot, (slot+1) % 5, '10.0.2.15') for slot in range(5)} | {
         (31, 4, '192.168.43.1'), (10, 4, '255.255.255.255'),
@@ -70,3 +78,32 @@ def validate_photo_frames(data):
     require(all(row['passed'] and row['compared_pixels'] == 57600 and row['different_pixels'] == 0 and
                 row['factory'] == row['native'] for row in normalized['cases']),
             'normalized decoder/footer/state outputs differ')
+
+
+def contract_rejection_checks(data):
+    """Prove that incomplete, reordered and differently identified evidence cannot pass."""
+    validate_photo_frames(data)
+    native = lambda item: item['flows']['reconstructed']['all-photos']
+    mutations = [
+        ('missing-variant', lambda item: item['flows'].pop('original')),
+        ('missing-profile', lambda item: item['flows']['original'].pop('none-dark')),
+        ('missing-phase', lambda item: native(item)['samples'].pop()),
+        ('wrong-photo-order', lambda item: native(item)['samples'][0].update(selected=[4])),
+        ('missing-no-panic', lambda item: native(item)['checks'].pop('no_panic')),
+        ('code-changed', lambda item: native(item)['samples'][0].update(code_unchanged=False)),
+        ('wrong-duty', lambda item: native(item)['samples'][0]['backlight'].update(high_duty=0)),
+        ('wrong-schedule-window', lambda item: item['flows']['reconstructed']['masked-night']['samples'][-1]['restore_calendar'].update(night_selected=False)),
+        ('missing-normalized-photo', lambda item: item['normalized']['cases'].pop()),
+        ('mixed-executable', lambda item: item['normalized'].update(native_elf_sha256='0'*64)),
+    ]
+    checks = []
+    for name, mutate in mutations:
+        changed = deepcopy(data)
+        mutate(changed)
+        try:
+            validate_photo_frames(changed)
+        except ValueError:
+            checks.append({'case': name, 'passed': True})
+        else:
+            raise ValueError('Photo frame contract accepted '+name)
+    return checks

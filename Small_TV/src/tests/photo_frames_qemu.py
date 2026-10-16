@@ -12,7 +12,7 @@ from control_oracle import verify_inputs
 from gdb_observer import Observer
 from machine_oracle import ROOT, ELFFile, Panel
 from photo_frame_replay import PhotoMachine, normalized_checks
-from photo_frame_contract import validate_photo_frames
+from photo_frame_contract import validate_photo_frames, contract_rejection_checks
 from frame_replay import panel_rgb, write_rgb_png
 import scene_qemu as scene
 import weather_qemu as weather
@@ -286,6 +286,7 @@ def main():
         if report['passed'] and set(args.variants) == {'original', 'reconstructed'} and len(cases) == len(CASES):
             try:
                 validate_photo_frames(report)
+                report['contract_checks'] = contract_rejection_checks(report)
             except ValueError as error:
                 report['passed'] = False
                 report['error'] = str(error)
