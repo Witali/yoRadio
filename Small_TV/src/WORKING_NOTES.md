@@ -87,6 +87,52 @@ startup/weather waits, AP->STA setup, weather, field scroll, SNTP и UTF-8 об�
 прошивок. Идут региональные HTTP/NVS/cold-boot сценарии, затем natural calendar
 matrix и complete scenes. Не выдавать эти промежуточные passes за весь suite.
 
+Подробные исторические заметки JPEG-ветки (до объединения):
+
+Новый permanent photo_qemu прошёл actual SDK HTTP/flash pipeline на app131ce792:
+21 checks, valid gray/RGB, ten chunks, busy/premature/out-of-order/conflicting
+requests, exact retries, download и четыре cold processes без debounce-пауз. Old app0d8b7585
+в том же тесте публикует malformed Huffman JPEG363 (200/exists), candidate
+rejects400/absent. Exact reports — `../qemu/parity/photo-http-checks.md`.
+Общий byte producer вынесен в jpeg_test_fixtures; все 41 machine cases после
+рефакторинга тоже pass. Production image не менялся, branch full suite ещё нужен.
+
+Гипотеза о фоновом сохранении размера не подтвердилась: settings_photo_size()
+уже вызывает settings_flush() синхронно. Firmware менять не нужно. Новый тест
+останавливает VM сразу после finish и после start незавершённой замены: новая
+длина/bytes сохраняются, незавершённый slot после cold boot скрыт, новая загрузка
+доступна. Это границы HTTP-ответов, не произвольный power cut посреди flash write.
+Фото-загрузка через браузер и actual completed photo/fade frames остаются gaps.
+
+Huffman gap исправлен следующим child change: actual before принимал все 17
+impossible prefix trees (DC1, AC1…16) в factory/native draw и native validation.
+Новый uint32 prefix-space check отклоняет их до jd_decomp; 4 valid 1/16-bit
+boundaries и прежние 8/12 cases проходят, всего 41. Public 107/35/7 и host
+3,884 также pass. App 131ce792 / source f411bf0e / ELF 9184b08b сохранён в
+firmware ветки, 1,176,272 bytes / free 359,728. Actual snippets/scoped evidence:
+`../qemu/parity/huffman-checks.md`. Root full run 22926 не менялся, candidate
+full suite ещё нужен. Следующий функциональный пробел — real HTTP photo
+start/chunks/finish/download/reboot с valid/invalid JPEG, кроме уже проверенных
+host adapters; затем интеграция ветки и общий повтор после terminal 22926.
+
+Текущая отдельная ветка `codex/small-tv-jpeg-inputs`, worktree
+`.worktree/small-tv-jpeg-inputs`, основана на main 41b972aa. Root full run 22926
+продолжает проверять app 0d8b7585 неизменёнными source/test/helper bytes.
+Здесь закреплены 8 synthetic JPEG / 12 invalid cases; исправлены factory/C
+header bugs: DQT ID alias, ignored precision, SOF component length.
+App a33788db / source 731815d5 / ELF c2c6ae3b, 1,176,256 bytes / free 359,744
+сохранён в firmware. Новые 20 cases, 107 public JPEG / 35 errors / 7 placements
+и 3,884 host checks pass. Exact instructions и scoped reports —
+`../qemu/parity/jpeg-header-checks.md`. Branch gate обязателен; full suite ещё нужен.
+
+Следующий подтверждённый дефект: synthetic 363-byte grayscale с тремя 1-bit
+DC Huffman codes успешно проходит factory/native draw и native validation.
+Первый random-entropy malformed case падал лишь позже; он не проверяет все
+невозможные prefix trees. Probe/fixture/report в root
+`.build/small-tv-parity/jpeg-extra-fixtures/oversubscribed-gray*` и
+`.build/small-tv-parity/probe_oversubscribed_gray.py`. Добавить regression и
+исправить построитель таблиц с сохранением literal factory observation.
+
 Активный полный прогон: `.build/small-tv-functional/responsiveness-full-20261016`,
 shell session `22926`. Запущен после commit `ad5b8c5d` на app `0d8b7585`,
 ELF `97adeb91`, QEMU `fde38d53`. `inputs-before.json` фиксирует все test bytes

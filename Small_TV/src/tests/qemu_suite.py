@@ -43,7 +43,7 @@ def main():
                                             'esp_board.py', 'esp_services.py')}}
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
               **inputs,
-              'boot_reset': {}, 'startup_wait': {}, 'weather_wait': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
+              'boot_reset': {}, 'startup_wait': {}, 'weather_wait': {}, 'photo_http': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
               'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP, synthetic weather, natural calendar/DST transitions and complete instruction-replayed frames. The separate unsynchronized scene similarity remains diagnostic. No physical hardware or Internet weather service.'}
     try:
         for variant in ('original', 'reconstructed'):
@@ -52,16 +52,15 @@ def main():
             report['boot_reset'][variant] = result
             check(result['passed'], f'{variant}: boot/reset/SNTP checks failed')
             print('PASS QEMU boot/reset/SNTP:', variant, flush=True)
-        for name in ('startup', 'weather_wait'):
-            folder = args.output / (name + '-observer')
+        for name, key in (('startup', 'startup_wait'), ('weather_wait', 'weather_wait'), ('photo', 'photo_http')):
+            folder = args.output / ('photo-http' if name == 'photo' else name + '-observer')
             process = subprocess.run([sys.executable, str(Path(__file__).with_name(name + '_qemu.py')),
                                       '--qemu-root', str(args.qemu_root), '--output', str(folder)])
             result = json.loads((folder / 'report.json').read_text(encoding='utf-8-sig'))
-            key = 'startup_wait' if name == 'startup' else name
             report[key] = result
             check(process.returncode == 0 and result['passed'] and result['inputs_unchanged'],
-                  name + ': actual software-wait regression failed')
-            print('PASS QEMU software wait:', name, flush=True)
+                  name + ': actual guest regression failed')
+            print('PASS QEMU guest regression:', name, flush=True)
         from small_tv_http_test import run_suite
         report['http_initial_setup'] = run_suite(options, args.output / 'http-initial-setup')
         check(report['http_initial_setup']['passed'], 'Real guest HTTP/AP->STA setup failed')

@@ -37,7 +37,7 @@ def main():
             'A full passing suite is required')
     groups = {row['name']: row['result'] for row in suite['groups'] if row['status'] == 'passed'} \
         if 'groups' in suite else suite
-    for name in ('report_aggregation', 'native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu'):
+    for name in ('report_aggregation', 'native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_jpeg_inputs', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu'):
         require(name in groups and groups[name]['passed'], 'Missing passing group: ' + name)
     for item in suite['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
@@ -60,15 +60,49 @@ def main():
     require(suite['app_sha256'] == app_sha and suite['source_sha256'] == manifest['source_sha256'],
             'Suite tested a different application/source archive')
     state, network = groups['machine_time_state'], groups['qemu']['time_http']
-    for name in ('startup_wait', 'weather_wait'):
+    jpeg_inputs = groups['machine_jpeg_inputs']
+    require(jpeg_inputs['passed'] and jpeg_inputs['inputs_unchanged'] and
+            jpeg_inputs['app_sha256'] == app_sha and
+            jpeg_inputs['source_sha256'] == manifest['source_sha256'] and
+            jpeg_inputs['native_elf_sha256'] == state['native_elf_sha256'] and
+            len(jpeg_inputs['valid']) == 8 and len(jpeg_inputs['invalid']) == 12 and
+            all(row['passed'] for row in jpeg_inputs['valid'] + jpeg_inputs['invalid']),
+            'Additional JPEG gate omitted cases or used different inputs')
+    huffman = jpeg_inputs['huffman']
+    require(huffman['passed'] and len(huffman['valid']) == 4 and len(huffman['invalid']) == 17 and
+            {row['name'] for row in huffman['valid']} ==
+                {'one-bit', 'long-dc', 'long-ac', 'long-dc-and-ac'} and
+            {row['name'] for row in huffman['invalid']} ==
+                {'dc-depth-1'} | {'ac-depth-' + str(depth) for depth in range(1, 17)} and
+            all(row['passed'] for row in huffman['valid'] + huffman['invalid']) and
+            not any(row['decoder_started'] for row in huffman['invalid']),
+            'Huffman gate omitted depth/boundary cases or accepted an impossible tree')
+    for item in jpeg_inputs['test_inputs']:
+        require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
+                'Additional JPEG fixture/adapter changed: ' + item['file'])
+    for name in ('startup_wait', 'weather_wait', 'photo_http'):
         gate = groups['qemu'][name]
         require(gate['passed'] and gate['inputs_unchanged'] and gate['app_sha256'] == app_sha and
                 gate['native_elf_sha256'] == state['native_elf_sha256'] and
                 gate['qemu_sha256'] == groups['qemu']['qemu_sha256'] and
                 gate['helper_sha256'] == groups['qemu']['helper_sha256'] and
                 gate['sources']['source_sha256'] == manifest['source_sha256'],
-                'Software-wait gate tested different inputs: ' + name)
+                'Guest observer tested different inputs: ' + name)
     startup, held_weather = groups['qemu']['startup_wait'], groups['qemu']['weather_wait']
+    photo = groups['qemu']['photo_http']
+    photo_checks = {'valid_gray_published', 'malformed_huffman_rejected', 'busy_and_retry_policy',
+                    'valid_published', 'download_exact', 'first_boot_no_panic', 'owned_flash_changed',
+                    'cold_boot_new_vm', 'cold_boot_metadata', 'cold_boot_download_exact', 'cold_boot_no_panic',
+                    'immediate_finish_cut_bounded', 'immediate_finish_new_vm', 'immediate_finish_persisted',
+                    'interrupted_slot_unpublished', 'interrupted_start_cut_bounded', 'immediate_finish_no_panic',
+                    'interrupted_boot_new_vm', 'interrupted_photo_hidden', 'new_upload_after_interruption',
+                    'interrupted_boot_no_panic'}
+    require(photo['profile_sha256'] == groups['qemu']['profile_sha256'] and
+            set(photo['checks']) == photo_checks and all(photo['checks'].values()) and
+            photo['invalid']['finish_status'] == 400 and photo['invalid']['metadata'] == {'exists': False, 'size': 0} and
+            all(0 <= photo[key] < .5 for key in
+                ('finish_response_to_stop_guest_seconds', 'start_response_to_stop_guest_seconds')),
+            'Real photo upload/download/cold-boot checks omitted stages or accepted invalid data')
     require(0 <= startup['ready_wait_guest_seconds'] <= .5 and startup['different_colors'] >= 2,
             'Ready startup clock was delayed or blank')
     require(held_weather['during']['request_state'] & held_weather['compiled_running_mask'] and

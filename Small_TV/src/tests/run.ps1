@@ -1,5 +1,6 @@
 [CmdletBinding()]
-param([string]$VsDevCmd="C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat")
+param([string]$VsDevCmd="C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat",
+      [string]$PythonPath)
 $ErrorActionPreference="Stop"
 $project=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $repo=[IO.Path]::GetFullPath((Join-Path $project "..\.."))
@@ -7,7 +8,8 @@ $output=Join-Path $repo ".build\small-tv-esp32c2\native-tests"
 New-Item -ItemType Directory -Force -Path $output | Out-Null
 if (!(Test-Path -LiteralPath $VsDevCmd)) {throw "Pass -VsDevCmd pointing to an installed MSVC development environment."}
 $resources=Join-Path $repo ".build\small-tv-esp32c2\resources"
-& (Join-Path $repo ".idf\python-3.12.10\tools\python.exe") (Join-Path $project "tools\prepare_resources.py") --output $resources
+if (!$PythonPath) {$PythonPath=Join-Path $repo ".idf\python-3.12.10\tools\python.exe"}
+& $PythonPath (Join-Path $project "tools\prepare_resources.py") --output $resources
 if ($LASTEXITCODE) {throw "Resource generation failed"}
 $sources=@("tests/native_test.c","app/settings/settings.c","app/settings/factory_settings.c","app/services/weather_parser.c","app/text/text.c","app/media/assets.c","app/media/photo_upload.c","app/network/dns_packet.c","app/web/server.c","app/web/settings_api.c","app/web/photo_api.c","third_party/tjpgd/tjpgd.c","third_party/cjson/cJSON.c")
 $arguments=@("/nologo","/std:c11","/W3","/D_CRT_SECURE_NO_WARNINGS","/DCJSON_NESTING_LIMIT=16")

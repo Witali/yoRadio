@@ -1,0 +1,503 @@
+{
+  "passed": false,
+  "scope": "Exercise actual native photo HTTP writes, safe publication, download and cold boot.",
+  "checks": {
+    "valid_gray_published": true,
+    "malformed_huffman_rejected": false,
+    "busy_and_retry_policy": true,
+    "valid_published": true,
+    "download_exact": true,
+    "first_boot_no_panic": true,
+    "owned_flash_changed": true,
+    "cold_boot_new_vm": true,
+    "cold_boot_metadata": true,
+    "cold_boot_download_exact": true,
+    "immediate_finish_cut_bounded": true,
+    "cold_boot_no_panic": true,
+    "immediate_finish_new_vm": true,
+    "immediate_finish_persisted": true,
+    "interrupted_slot_unpublished": true,
+    "interrupted_start_cut_bounded": true,
+    "immediate_finish_no_panic": true,
+    "interrupted_boot_new_vm": true,
+    "interrupted_photo_hidden": true,
+    "new_upload_after_interruption": true,
+    "interrupted_boot_no_panic": true
+  },
+  "requests": [
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.12974799999999975,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.14758799999999983,
+      "response_bytes": 25
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.11847200000000013,
+      "response_bytes": 2
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.18760900000000014,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.1401159999999999,
+      "response_bytes": 26
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14441000000000015,
+      "response_bytes": 361
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.15185199999999988,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.13597500000000018,
+      "response_bytes": 25
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.13469599999999993,
+      "response_bytes": 2
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.15749599999999964,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.14071200000000017,
+      "response_bytes": 26
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.16010400000000047,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.13768899999999995,
+      "response_bytes": 25
+    },
+    {
+      "path": "/start_upload",
+      "status": 400,
+      "guest_seconds": 0.1484399999999999,
+      "response_bytes": 97
+    },
+    {
+      "path": "/finish_upload",
+      "status": 400,
+      "guest_seconds": 0.1504139999999996,
+      "response_bytes": 97
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 400,
+      "guest_seconds": 0.24845499999999987,
+      "response_bytes": 36
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.23759700000000006,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.2418560000000003,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 400,
+      "guest_seconds": 0.2352559999999997,
+      "response_bytes": 36
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.21534399999999998,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.24495600000000017,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.2352369999999997,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.23082000000000047,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.2474350000000003,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.2496419999999997,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.2269079999999999,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.23681800000000042,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.18765199999999993,
+      "response_bytes": 2
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.30797399999999975,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.13911400000000018,
+      "response_bytes": 28
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15147599999999972,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=1&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1711930000000006,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=2&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1459039999999998,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=3&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1422030000000003,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=4&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15167600000000014,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=5&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14190900000000006,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=6&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14380599999999966,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=7&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13983600000000074,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=8&size=4096",
+      "status": 200,
+      "guest_seconds": 0.16745399999999933,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=9&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13606099999999977,
+      "response_bytes": 1624
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.1327499999999997,
+      "response_bytes": 28
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14907200000000032,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=1&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14588199999999985,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=2&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1485470000000002,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=3&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13697399999999993,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=4&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14775800000000006,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=5&size=4096",
+      "status": 200,
+      "guest_seconds": 0.16711199999999993,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=6&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14465100000000009,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=7&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1456299999999997,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=8&size=4096",
+      "status": 200,
+      "guest_seconds": 0.134922,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=9&size=4096",
+      "status": 200,
+      "guest_seconds": 0.134903,
+      "response_bytes": 1624
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.1422939999999997,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.14193600000000028,
+      "response_bytes": 25
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.13275900000000007,
+      "response_bytes": 2
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.18413500000000038,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.14415099999999992,
+      "response_bytes": 26
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13297599999999976,
+      "response_bytes": 361
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.14424500000000018,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.14307399999999992,
+      "response_bytes": 25
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.12948799999999983,
+      "response_bytes": 25
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 400,
+      "guest_seconds": 0.1370560000000003,
+      "response_bytes": 25
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.15381,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.14024100000000006,
+      "response_bytes": 25
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.15054100000000004,
+      "response_bytes": 2
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.16969400000000023,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.13997899999999985,
+      "response_bytes": 26
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1320269999999999,
+      "response_bytes": 361
+    }
+  ],
+  "test_inputs": [
+    {
+      "file": "Small_TV/src/tests/photo_qemu.py",
+      "sha256": "44fe0fe608debadc52bc88a812cef181a85ba50d76b0ed026c96d39baba48c7c"
+    },
+    {
+      "file": "Small_TV/src/tests/jpeg_test_fixtures.py",
+      "sha256": "980004c204a67c2664caa2fcde647bc40ef4635dae91770ff612436fe097a92d"
+    },
+    {
+      "file": "Small_TV/src/tests/weather_qemu.py",
+      "sha256": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/rgb-420.jpg",
+      "sha256": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8"
+    }
+  ],
+  "app_sha256": "0d8b758502ac2dcda93695f422c0f94b7e743d735f29b00356c9f3ae59f21e3e",
+  "native_elf_sha256": "97adeb91a4c8515330c39dc971c36b8cea449d48ab5d13d11356bfe3e4da5924",
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "profile_sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+  "helper_sha256": {
+    "small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+  },
+  "valid_jpeg_sha256": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8",
+  "invalid_jpeg_sha256": "a6a9cfe4649e41144ca3f6dfb2bd1f3ed97327028851bbcea61559971b936739",
+  "sources": {
+    "images": [
+      {
+        "bytes": 19248,
+        "file": "bootloader.bin",
+        "offset": "0x0",
+        "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
+      },
+      {
+        "bytes": 3072,
+        "file": "partition-table.bin",
+        "offset": "0x8000",
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+      },
+      {
+        "bytes": 1176224,
+        "file": "app.bin",
+        "offset": "0x10000",
+        "sha256": "0d8b758502ac2dcda93695f422c0f94b7e743d735f29b00356c9f3ae59f21e3e"
+      },
+      {
+        "bytes": 1994752,
+        "file": "assets.bin",
+        "offset": "0x200000",
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+      }
+    ],
+    "source_sha256": "9d9c5c8c08db0848d05257a44304a94e562f0de0b7562c911200f5b10fb2abfe"
+  },
+  "invalid": {
+    "finish_status": 200,
+    "metadata": {
+      "exists": true,
+      "size": 363
+    }
+  },
+  "finish_response_to_stop_guest_seconds": 0.0005169999999994346,
+  "start_response_to_stop_guest_seconds": 0.14319399999999982,
+  "inputs_unchanged": true,
+  "expected_negative": true
+}

@@ -937,3 +937,70 @@
   сохранились. Scoped source hashes/result сохранены в report-aggregation-checks.
   Production app0d8b7585 не менялся; полный machine/QEMU здесь не повторялся.
   Checkpoint73687652 сохраняет точный прежний 17-group набор и даты его запуска.
+
+### 2026-10-16 — постоянные JPEG inputs и baseline headers
+
+- Создан sparse worktree .worktree/small-tv-jpeg-inputs / branch
+  codex/small-tv-jpeg-inputs от main 41b972aa. Existing ignore rule подтверждён;
+  root frozen full run 22926 не затронут. SDK/oracle shared; before ELF/bin/ROM
+  скопированы точно, factory dump на диске не менялся.
+- Закреплены 8 synthetic fixtures с manifest/generator и 12 malformed cases.
+  Actual factory/native before принимает quantizer ID 4 как 0, SOF precision 12
+  и extra component data. Инструкции 0x420110c4 и 0x42011d5a..8a сохранены;
+  FIXED_FACTORY checks устраняют эти ошибки, IDCT/color/output прежние.
+- App a33788db / source 731815d5 / ELF c2c6ae3b сохранён в firmware, 1,176,256
+  bytes / free 359,744. Все 8 valid / 12 invalid, 107 public JPEG / 35 errors /
+  7 placements и host 3,884 checks проходят. Exact before/candidate/native/public
+  reports и factory/native snippets сохранены отдельно. Full suite ещё нужен.
+- machine_jpeg_inputs включён в branch run-all/publisher/verifier, native runner
+  получил PythonPath для shared SDK. UPSTREAM/README уточняют header validation.
+  Старый main full run продолжает проверять свой app/test set; physical действий нет.
+- Отдельный минимальный 363-byte grayscale JPEG доказывает acceptance impossible
+  Huffman tree: три 1-bit DC codes, entropy использует только первый. Factory draw,
+  native draw и validation возвращают 0. Это следующий bug; random entropy case
+  не доказывал проверку таблицы. Probe/result сохранены в root .build для следующего
+  регрессионного case и отдельного исправления.
+
+### 2026-10-16 — Huffman prefix-space validation
+
+- Добавлены 4 valid 1/16-bit boundary cases и 17 impossible trees (DC1, AC1…16),
+  entropy намеренно не использует невозможные ветви. Actual before app a33788db
+  принимает все 17 в factory/native draw и native validation; 4 valid pass.
+- Factory builder 0x42011100..0x42011244 архивирован; 0x42011194..0x420111c8
+  строит 16-bit codewords без prefix-space check. FIXED_FACTORY в C считает
+  доступные префиксы uint32_t (включая 65536 при length16) до codeword allocation.
+- Candidate 131ce792 / source f411bf0e / ELF 9184b08b собран и сохранён в firmware:
+  1,176,272 bytes / free 359,728. Все 41 additional JPEG cases проходят;
+  invalid trees не достигают jd_decomp и не рисуют. Public 107/35/7 и host
+  3,884 pass. Before/after observer bytes одинаковы; отдельные reports/snippets
+  сохранены, header-only evidence a33788db не переименовывается.
+- Branch mandatory publisher/verifier проверяют все глубины. Main full run
+  22926 продолжает свой неизменённый app 0d8b7585. Candidate QEMU/full suite
+  пока не проходил; следующий шаг — фактический HTTP upload/download/reboot,
+  затем интеграция после terminal main run. Физических действий нет.
+
+### 2026-10-16 — реальные photo HTTP writes/download/cold boot
+
+- Permanent photo_qemu.py исполняет actual SDK HTTP/flash без app server mock.
+  Одинаковый before/after test: old0d8b7585 принимает invalid Huffman JPEG363
+  (finish200, exists=true), candidate131ce792 даёт400/absent. Valid grayscale и
+  RGB38488, ten4096-byte chunks, busy/early/out-of-order/conflicting requests,
+  exact retry, полное скачивание и cold process проходят.
+- Финальный тест усилен до 21 checks и четырёх процессов без debounce-паузы.
+  Замена RGB на gray другой длины переживает остановку сразу после finish;
+  незавершённая замена после start остаётся скрытой при cold boot, новая загрузка
+  доступна. Candidate finish→stop 0 guest s, start→stop .143098 guest s;
+  maximum observed request .298990 guest s. Все 21 candidate checks pass.
+  Все четыре UART-фазы
+  checked before log reuse, owned flash действительно менялся, source archive
+  unchanged; ВМ закрыты. Ранний prototype проверял panic только после cold boot;
+  постоянный тест усилен и before/after повторён, prototype не подменяет его.
+- Общий minimal JPEG producer вынесен в jpeg_test_fixtures; повтор 41-case
+  machine gate проходит. Старые scoped reports/их source hashes не переписаны.
+  Photo stage добавлен в branch suite/publisher/verifier. Root full run22926
+  продолжает frozen app0d8b7585 и не содержит эту новую проверку задним числом.
+- Гипотеза о недолговечном RAM-only размере не подтвердилась: фактический
+  settings_photo_size() уже вызывает settings_flush() синхронно. Production code
+  не менялся. Первоначальные 11-check reports/prototype исторические; архивные
+  photo-http-before/candidate содержат окончательный одинаковый 21-check observer.
+  Не моделировался power cut посреди операции записи flash.

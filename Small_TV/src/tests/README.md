@@ -88,6 +88,23 @@ HTTP 503 записана как ошибка; наша прошивка отк�
 дробный offset. PowerShell `ConvertFrom-Json -DateKind String` предотвращает
 неявное преобразование независимой календарной reference в host timezone.
 
+Обязательный gate `photo_qemu.py` проводит настоящий multipart upload,
+download и cold boot через SDK/flash. Valid/invalid JPEG, занятая сессия,
+порядок и retries проверяются без подмены application server. Четыре процесса
+проверяют cold boot сразу после finish и start незавершённой замены без debounce
+паузы. Power cut посреди flash write не моделируется; подробности —
+[photo-http-checks.md](../../qemu/parity/photo-http-checks.md).
+
+`machine_jpeg_inputs` дополняет public assets восемью synthetic JPEG variations
+и двенадцатью header/entropy/restart errors. Сравниваются все пиксели с actual
+factory decoder, отсутствие рисования при discard validation и native cleanup.
+Pillow нужен только для воспроизведения закреплённых файлов. Описание:
+[jpeg-header-checks.md](../../qemu/parity/jpeg-header-checks.md).
+Эта же группа проверяет ещё 4 корректных 1/16-bit Huffman boundaries и 17
+невозможных таблиц с рабочим entropy: DC depth 1 и AC depths 1…16. Ошибки
+должны отклоняться до начала декомпрессии; буквальный factory acceptance
+записывается отдельно. [Huffman-проверки](../../qemu/parity/huffman-checks.md).
+
 Группа `machine_timezones` исполняет настоящий код преобразования времени и libc:
 36,404 сравнения для 109 исходных ключей стран, все записанные переходы ±1 секунду,
 будущие правила до выборок 2400 года, неизвестная страна и ошибки epoch/указателя.

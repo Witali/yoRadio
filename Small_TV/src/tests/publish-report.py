@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('report_aggregation', 'native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu')
+    required = ('report_aggregation', 'native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_jpeg_inputs', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -39,10 +39,31 @@ def main():
     weather = groups['machine_weather']['result']
     calendar = groups['machine_calendar']['result']
     jpeg = groups['machine_jpeg']['result']
+    jpeg_inputs = groups['machine_jpeg_inputs']['result']
     timezones = groups['machine_timezones']['result']
     time_state = groups['machine_time_state']['result']
     text = groups['machine_text']['result']
     network = groups['machine_network']['result']
+    if (not jpeg_inputs['passed'] or not jpeg_inputs['inputs_unchanged'] or
+            jpeg_inputs['app_sha256'] != report['app_sha256'] or
+            jpeg_inputs['source_sha256'] != report['source_sha256'] or
+            jpeg_inputs['native_elf_sha256'] != text['native_elf_sha256'] or
+            jpeg_inputs['factory_elf_sha256'] != text['factory_elf_sha256'] or
+            len(jpeg_inputs['valid']) != 8 or len(jpeg_inputs['invalid']) != 12 or
+            any(not row['passed'] for row in jpeg_inputs['valid'] + jpeg_inputs['invalid'])):
+        raise ValueError('Additional JPEG gate omitted cases or used different executables')
+    huffman = jpeg_inputs['huffman']
+    if (not huffman['passed'] or len(huffman['valid']) != 4 or len(huffman['invalid']) != 17 or
+            {row['name'] for row in huffman['valid']} !=
+                {'one-bit', 'long-dc', 'long-ac', 'long-dc-and-ac'} or
+            {row['name'] for row in huffman['invalid']} !=
+                {'dc-depth-1'} | {'ac-depth-' + str(depth) for depth in range(1, 17)} or
+            any(not row['passed'] for row in huffman['valid'] + huffman['invalid']) or
+            any(row['decoder_started'] for row in huffman['invalid'])):
+        raise ValueError('Huffman gate omitted depth/boundary cases or accepted an impossible tree')
+    for item in jpeg_inputs['test_inputs']:
+        if hashlib.sha256((ROOT / item['file']).read_bytes()).hexdigest() != item['sha256']:
+            raise ValueError('Additional JPEG fixture/adapter changed: ' + item['file'])
     if (network['app_sha256'] != report['app_sha256'] or
             network['source_sha256'] != report['source_sha256'] or
             network['native_elf_sha256'] != text['native_elf_sha256'] or
@@ -73,19 +94,33 @@ def main():
         raise ValueError('Profile validation and firmware used different profile/compiler inputs')
     if not qemu['inputs_unchanged']:
         raise ValueError('Emulator or helpers changed during execution')
-    for name in ('startup_wait', 'weather_wait'):
+    for name in ('startup_wait', 'weather_wait', 'photo_http'):
         gate = qemu[name]
         if (not gate['passed'] or not gate['inputs_unchanged'] or
                 gate['app_sha256'] != report['app_sha256'] or
                 gate['native_elf_sha256'] != text['native_elf_sha256'] or
                 gate['qemu_sha256'] != qemu['qemu_sha256'] or gate['helper_sha256'] != qemu['helper_sha256']):
-            raise ValueError('Software-wait gate failed or used different inputs: ' + name)
+            raise ValueError('Guest observer failed or used different inputs: ' + name)
         items = gate['test_inputs']
         items = items.items() if isinstance(items, dict) else ((item['file'], item['sha256']) for item in items)
         for path, sha in items:
             if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != sha:
-                raise ValueError('Software-wait observer changed: ' + path)
+                raise ValueError('Guest observer changed: ' + path)
     startup, held_weather = qemu['startup_wait'], qemu['weather_wait']
+    photo = qemu['photo_http']
+    photo_checks = {'valid_gray_published', 'malformed_huffman_rejected', 'busy_and_retry_policy',
+                    'valid_published', 'download_exact', 'first_boot_no_panic', 'owned_flash_changed',
+                    'cold_boot_new_vm', 'cold_boot_metadata', 'cold_boot_download_exact', 'cold_boot_no_panic',
+                    'immediate_finish_cut_bounded', 'immediate_finish_new_vm', 'immediate_finish_persisted',
+                    'interrupted_slot_unpublished', 'interrupted_start_cut_bounded', 'immediate_finish_no_panic',
+                    'interrupted_boot_new_vm', 'interrupted_photo_hidden', 'new_upload_after_interruption',
+                    'interrupted_boot_no_panic'}
+    if (photo['profile_sha256'] != qemu['profile_sha256'] or set(photo['checks']) != photo_checks or
+            not all(photo['checks'].values()) or photo['invalid']['finish_status'] != 400 or
+            photo['invalid']['metadata'] != {'exists': False, 'size': 0} or
+            any(not 0 <= photo[key] < .5 for key in
+                ('finish_response_to_stop_guest_seconds', 'start_response_to_stop_guest_seconds'))):
+        raise ValueError('Real photo upload/download/cold-boot checks omitted a stage or accepted invalid data')
     if not 0 <= startup['ready_wait_guest_seconds'] <= .5 or startup['different_colors'] < 2:
         raise ValueError('Ready clock still waits on startup or its first frame is blank')
     if (not held_weather['during']['request_state'] & held_weather['compiled_running_mask'] or
@@ -209,7 +244,7 @@ def main():
                         not row['digital_requested_brightness_applied'] for row in flow['samples'])):
                 raise ValueError('Completed scene comparison omitted full frames or brightness checks')
     qemu_sources = [qemu['boot_reset']['reconstructed']['prepared']['sources']]
-    qemu_sources.extend(qemu[name]['sources'] for name in ('startup_wait', 'weather_wait'))
+    qemu_sources.extend(qemu[name]['sources'] for name in ('startup_wait', 'weather_wait', 'photo_http'))
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
     qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
     qemu_sources.append(qemu['weather_http']['flows']['reconstructed']['sources'])
@@ -265,6 +300,7 @@ def main():
     summary['machine_jpeg']['compared_pixels'] = sum(row['compared_pixels'] for row in jpeg['cases'])
     summary['machine_jpeg']['error_validation_checks'] = len(jpeg['errors'])
     summary['machine_jpeg']['placement_checks'] = len(jpeg['placements'])
+    summary['machine_jpeg_inputs'] = jpeg_inputs
     summary['machine_timezones'] = {key:timezones[key] for key in
         ('passed','app_sha256','source_sha256','factory_elf_sha256','native_elf_sha256',
          'complete_country_set','iana_version','timezone_manifest_sha256','comparisons',
@@ -284,6 +320,7 @@ def main():
                        'inputs_unchanged': qemu['inputs_unchanged'],
                        'startup_wait': startup,
                        'weather_wait': held_weather,
+                       'photo_http': photo,
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],
                        'time_http': time_http,

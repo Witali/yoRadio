@@ -1,0 +1,760 @@
+{
+  "passed": true,
+  "app_sha256": "131ce792670349e81cba3d3c16288ad6472502bcf1fe16908d885d406b5e2701",
+  "source_sha256": "f411bf0e7af2230294e25f1bf9da5a15eecb85e7d1961f375bdc305f3e5edebc",
+  "native_elf_sha256": "9184b08b4cd29b855d962209baaa70bff56c98863c6d06c1fd4f55fec7274575",
+  "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+  "test_inputs": [
+    {
+      "file": "Small_TV/src/tests/jpeg_inputs_oracle.py",
+      "sha256": "1bb212bc3e5ae7fe8127ca2f36cdd35a5dcf021b11eef740307b30752c130189"
+    },
+    {
+      "file": "Small_TV/src/tests/jpeg_oracle.py",
+      "sha256": "354048940b1d6bd065428a83a03133f333a5334154eee7472806e25d1a893e89"
+    },
+    {
+      "file": "Small_TV/src/tests/machine_oracle.py",
+      "sha256": "009af0436897d63044f692baac40b45ade60e69a511a9f36befd3aed09705ff2"
+    },
+    {
+      "file": "Small_TV/src/tests/control_oracle.py",
+      "sha256": "f7df352f24bdad4e978dad327cd66c1f88383bfa46a07fa4399a274594335d8a"
+    },
+    {
+      "file": "Small_TV/src/tests/classic_oracle.py",
+      "sha256": "92401ddcf595125ae6108dbcd65f54cc276e16f531f2b5952dfcc9e082dd5667"
+    },
+    {
+      "file": "Small_TV/src/tests/jpeg_test_fixtures.py",
+      "sha256": "980004c204a67c2664caa2fcde647bc40ef4635dae91770ff612436fe097a92d"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/manifest.json",
+      "sha256": "fd5f0bfa098462c590f4737b3759e705060438c1fd0df3769d29cdf0a447a857"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/rgb-444.jpg",
+      "sha256": "68ebb2b96a446262ea2e9d65980146c07776c23b8d54dd9517ba6c2a6c5ea7df"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/rgb-422.jpg",
+      "sha256": "646fcde983c483fe47c36875fea061855310cb10da3d12f3a6d51c30965a965d"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/rgb-420.jpg",
+      "sha256": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/rgb-444-restart.jpg",
+      "sha256": "2b8f08c8398e7450cf475e574838e5ca1e3cdb87f7a469de58641e7afda403a1"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/rgb-420-restart.jpg",
+      "sha256": "c8ce32fed8ea72404e89590e7185ce5546e51f85e15a61b3f6bf1172c390d919"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/grayscale.jpg",
+      "sha256": "1b80ccdb6063226b0c22e7ef83bf4728a5df5146ca33635316a7ff69459b134b"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/odd-rgb.jpg",
+      "sha256": "afd3bfb9a5f902b4d6ea53ba97285bcd4016900eccf6b8a8e08b3c740b8063ba"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/odd-grayscale.jpg",
+      "sha256": "9e22eed5ef8095c9a2a4e59f1a7638d08b19589976401359c345e3420e1cd098"
+    }
+  ],
+  "inputs_unchanged": true,
+  "valid": [
+    {
+      "name": "rgb-444",
+      "file": "rgb-444.jpg",
+      "width": 240,
+      "height": 240,
+      "sha256": "68ebb2b96a446262ea2e9d65980146c07776c23b8d54dd9517ba6c2a6c5ea7df",
+      "bytes": 74509,
+      "mode": "RGB",
+      "options": {
+        "subsampling": 0
+      },
+      "passed": true,
+      "factory_result": 0,
+      "factory_decoder_started": true,
+      "native_result": 0,
+      "native_decoder_started": true,
+      "different_pixels": 0,
+      "validation_result": 0,
+      "validation_pixel_changes": 0
+    },
+    {
+      "name": "rgb-422",
+      "file": "rgb-422.jpg",
+      "width": 240,
+      "height": 240,
+      "sha256": "646fcde983c483fe47c36875fea061855310cb10da3d12f3a6d51c30965a965d",
+      "bytes": 50234,
+      "mode": "RGB",
+      "options": {
+        "subsampling": 1
+      },
+      "passed": true,
+      "factory_result": 0,
+      "factory_decoder_started": true,
+      "native_result": 0,
+      "native_decoder_started": true,
+      "different_pixels": 0,
+      "validation_result": 0,
+      "validation_pixel_changes": 0
+    },
+    {
+      "name": "rgb-420",
+      "file": "rgb-420.jpg",
+      "width": 240,
+      "height": 240,
+      "sha256": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8",
+      "bytes": 38488,
+      "mode": "RGB",
+      "options": {
+        "subsampling": 2
+      },
+      "passed": true,
+      "factory_result": 0,
+      "factory_decoder_started": true,
+      "native_result": 0,
+      "native_decoder_started": true,
+      "different_pixels": 0,
+      "validation_result": 0,
+      "validation_pixel_changes": 0
+    },
+    {
+      "name": "rgb-444-restart",
+      "file": "rgb-444-restart.jpg",
+      "width": 240,
+      "height": 240,
+      "sha256": "2b8f08c8398e7450cf475e574838e5ca1e3cdb87f7a469de58641e7afda403a1",
+      "bytes": 75198,
+      "mode": "RGB",
+      "options": {
+        "subsampling": 0,
+        "restart_marker_blocks": 3
+      },
+      "passed": true,
+      "factory_result": 0,
+      "factory_decoder_started": true,
+      "native_result": 0,
+      "native_decoder_started": true,
+      "different_pixels": 0,
+      "validation_result": 0,
+      "validation_pixel_changes": 0
+    },
+    {
+      "name": "rgb-420-restart",
+      "file": "rgb-420-restart.jpg",
+      "width": 240,
+      "height": 240,
+      "sha256": "c8ce32fed8ea72404e89590e7185ce5546e51f85e15a61b3f6bf1172c390d919",
+      "bytes": 38972,
+      "mode": "RGB",
+      "options": {
+        "subsampling": 2,
+        "restart_marker_blocks": 1
+      },
+      "passed": true,
+      "factory_result": 0,
+      "factory_decoder_started": true,
+      "native_result": 0,
+      "native_decoder_started": true,
+      "different_pixels": 0,
+      "validation_result": 0,
+      "validation_pixel_changes": 0
+    },
+    {
+      "name": "grayscale",
+      "file": "grayscale.jpg",
+      "width": 240,
+      "height": 240,
+      "sha256": "1b80ccdb6063226b0c22e7ef83bf4728a5df5146ca33635316a7ff69459b134b",
+      "bytes": 31385,
+      "mode": "L",
+      "options": {},
+      "passed": true,
+      "factory_result": 0,
+      "factory_decoder_started": true,
+      "native_result": 0,
+      "native_decoder_started": true,
+      "different_pixels": 0,
+      "validation_result": 0,
+      "validation_pixel_changes": 0
+    },
+    {
+      "name": "odd-rgb",
+      "file": "odd-rgb.jpg",
+      "width": 123,
+      "height": 117,
+      "sha256": "afd3bfb9a5f902b4d6ea53ba97285bcd4016900eccf6b8a8e08b3c740b8063ba",
+      "bytes": 10598,
+      "mode": "RGB",
+      "options": {
+        "subsampling": 2
+      },
+      "passed": true,
+      "factory_result": 0,
+      "factory_decoder_started": true,
+      "native_result": 0,
+      "native_decoder_started": true,
+      "different_pixels": 0,
+      "validation_result": 0,
+      "validation_pixel_changes": 0
+    },
+    {
+      "name": "odd-grayscale",
+      "file": "odd-grayscale.jpg",
+      "width": 23,
+      "height": 29,
+      "sha256": "9e22eed5ef8095c9a2a4e59f1a7638d08b19589976401359c345e3420e1cd098",
+      "bytes": 603,
+      "mode": "L",
+      "options": {},
+      "passed": true,
+      "factory_result": 0,
+      "factory_decoder_started": true,
+      "native_result": 0,
+      "native_decoder_started": true,
+      "different_pixels": 0,
+      "validation_result": 0,
+      "validation_pixel_changes": 0
+    }
+  ],
+  "invalid": [
+    {
+      "name": "bad-huffman-table-id",
+      "width": 240,
+      "height": 240,
+      "bytes": 74509,
+      "sha256": "7236dc8e21e513849577dc5280e4861da34933b499689f776acfb1f097137e00",
+      "result": 258,
+      "decoder_started": false,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true
+    },
+    {
+      "name": "bad-quantization-table-id",
+      "width": 240,
+      "height": 240,
+      "bytes": 74509,
+      "sha256": "66e993aeafe22230b5325b648c1641387922c54c518785ef767b4a27e12a4387",
+      "result": 258,
+      "decoder_started": false,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true,
+      "literal_factory": {
+        "result": 0,
+        "decoder_started": true,
+        "changed_pixels": 57600
+      }
+    },
+    {
+      "name": "unsupported-sample-precision",
+      "width": 240,
+      "height": 240,
+      "bytes": 74509,
+      "sha256": "40dc2c1c93a6a408402a555c5fd81966f2b24e547219f51651896f9eb09c3e6d",
+      "result": 258,
+      "decoder_started": false,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true,
+      "literal_factory": {
+        "result": 0,
+        "decoder_started": true,
+        "changed_pixels": 57600
+      }
+    },
+    {
+      "name": "invalid-sampling-factor",
+      "width": 240,
+      "height": 240,
+      "bytes": 74509,
+      "sha256": "e31538d889225391be23fee9c814a228bf1cdc9a780730515bc5582567479d9b",
+      "result": 258,
+      "decoder_started": false,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true
+    },
+    {
+      "name": "oversubscribed-huffman-tree",
+      "width": 240,
+      "height": 240,
+      "bytes": 74509,
+      "sha256": "3e526a9e98ac390488475e799a6d8d95116eb1550882b9e61cc67f4c93e2c24f",
+      "result": 258,
+      "decoder_started": false,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true
+    },
+    {
+      "name": "oversized-scan-header",
+      "width": 240,
+      "height": 240,
+      "bytes": 74509,
+      "sha256": "87604ea714dfaa711a603a354dd59405bdf2ea6028b6806fa53f2c6a0bc090f1",
+      "result": 258,
+      "decoder_started": false,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true
+    },
+    {
+      "name": "short-frame-header",
+      "width": 240,
+      "height": 240,
+      "bytes": 74499,
+      "sha256": "e2eab69d9f5e67b6c1f768c994e59128948bff20c96c6156a705e1f0e5d94406",
+      "result": 258,
+      "decoder_started": false,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true
+    },
+    {
+      "name": "missing-frame-components",
+      "width": 240,
+      "height": 240,
+      "bytes": 74500,
+      "sha256": "89d2344f44731c4820395eee9d30a3dd35f94ebe2f3e36988e845d7ed2b842ae",
+      "result": 258,
+      "decoder_started": false,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true
+    },
+    {
+      "name": "extra-frame-component-data",
+      "width": 240,
+      "height": 240,
+      "bytes": 74510,
+      "sha256": "6fbf5b339812298160546f495017c5b4d3b947ce566882b01678c30778d707aa",
+      "result": 258,
+      "decoder_started": false,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true,
+      "literal_factory": {
+        "result": 0,
+        "decoder_started": true,
+        "changed_pixels": 57600
+      }
+    },
+    {
+      "name": "wrong-restart-sequence",
+      "width": 240,
+      "height": 240,
+      "bytes": 75198,
+      "sha256": "92bd7c81b47475c9a403654613a11e21d20a623b5f9f5fa1efdb2a19611124bc",
+      "result": 258,
+      "decoder_started": true,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true
+    },
+    {
+      "name": "missing-restart-marker",
+      "width": 240,
+      "height": 240,
+      "bytes": 75198,
+      "sha256": "03f229b5bbb7acfc06849c75ea61cfbba57afb8919d615bf897bf7f396789f5a",
+      "result": 258,
+      "decoder_started": true,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true
+    },
+    {
+      "name": "truncated-entropy",
+      "width": 240,
+      "height": 240,
+      "bytes": 441,
+      "sha256": "fb644812bd67c4d562d770785d20c4ac3e56029c78d313cdaecc587e97d4c27c",
+      "result": 258,
+      "decoder_started": true,
+      "erase_pixel_differences": 0,
+      "validation_result": 258,
+      "validation_pixel_changes": 0,
+      "passed": true
+    }
+  ],
+  "huffman": {
+    "passed": true,
+    "valid": [
+      {
+        "name": "one-bit",
+        "width": 240,
+        "height": 240,
+        "bytes": 361,
+        "sha256": "44340caead281ffc19c68176ac23566915cef1e06906d5de7fd02d513112d80a",
+        "passed": true,
+        "factory_result": 0,
+        "factory_decoder_started": true,
+        "native_result": 0,
+        "native_decoder_started": true,
+        "different_pixels": 0,
+        "validation_result": 0,
+        "validation_pixel_changes": 0
+      },
+      {
+        "name": "long-dc",
+        "width": 240,
+        "height": 240,
+        "bytes": 2049,
+        "sha256": "fcd976229f8752df0cff1d14e969b08877b5d8ee4e5aa793f6474feb48f02aa6",
+        "passed": true,
+        "factory_result": 0,
+        "factory_decoder_started": true,
+        "native_result": 0,
+        "native_decoder_started": true,
+        "different_pixels": 0,
+        "validation_result": 0,
+        "validation_pixel_changes": 0
+      },
+      {
+        "name": "long-ac",
+        "width": 240,
+        "height": 240,
+        "bytes": 2049,
+        "sha256": "ebd3d778200e0d308ff688a7f117734ec762517a7b15e9ae1eefcf4884ca827d",
+        "passed": true,
+        "factory_result": 0,
+        "factory_decoder_started": true,
+        "native_result": 0,
+        "native_decoder_started": true,
+        "different_pixels": 0,
+        "validation_result": 0,
+        "validation_pixel_changes": 0
+      },
+      {
+        "name": "long-dc-and-ac",
+        "width": 240,
+        "height": 240,
+        "bytes": 3736,
+        "sha256": "e28b820677d65d468ab97d2c51243ef28d908b348b1112647b8f2284727bfa23",
+        "passed": true,
+        "factory_result": 0,
+        "factory_decoder_started": true,
+        "native_result": 0,
+        "native_decoder_started": true,
+        "different_pixels": 0,
+        "validation_result": 0,
+        "validation_pixel_changes": 0
+      }
+    ],
+    "invalid": [
+      {
+        "name": "dc-depth-1",
+        "width": 240,
+        "height": 240,
+        "bytes": 363,
+        "sha256": "a6a9cfe4649e41144ca3f6dfb2bd1f3ed97327028851bbcea61559971b936739",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-1",
+        "width": 240,
+        "height": 240,
+        "bytes": 363,
+        "sha256": "3c6a17860af261763723df4e2fd7856b5d01b347f92ecfb4a8f57ced0e4df992",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-2",
+        "width": 240,
+        "height": 240,
+        "bytes": 364,
+        "sha256": "aaa923fa3c8e0fbb222316f2a0e1a64912ceaf94762a014a25c0974a4dfd9e57",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-3",
+        "width": 240,
+        "height": 240,
+        "bytes": 365,
+        "sha256": "25354c3312058a189a6047dc6fad3fd503bde51ab76b0bf4b103b6e910d96eb8",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-4",
+        "width": 240,
+        "height": 240,
+        "bytes": 366,
+        "sha256": "26142a018659ba7eb90480e9c1547bb04b8b454c94e2661012878f632385ba68",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-5",
+        "width": 240,
+        "height": 240,
+        "bytes": 367,
+        "sha256": "0eb7483dfc9b19d60f65d9a223bbe6c00ef84b8902a01fd59576e9cbd45c9b9c",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-6",
+        "width": 240,
+        "height": 240,
+        "bytes": 368,
+        "sha256": "b581c3df74b136970c04c4b7e19cd0bebf886112391a4b393a8a0e2e067f2592",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-7",
+        "width": 240,
+        "height": 240,
+        "bytes": 369,
+        "sha256": "ac5d7576f6740736035709123530e9c11e19b293ee73a26be8a4b10fb4ece3e4",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-8",
+        "width": 240,
+        "height": 240,
+        "bytes": 370,
+        "sha256": "d671f4f70f9822f5c197d1500b2341cf572d6c9b596a95f8215ac499d106134c",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-9",
+        "width": 240,
+        "height": 240,
+        "bytes": 371,
+        "sha256": "3f2cf5d80e390e6574e05f9e9b89cae239580ebadffeac68b2ccb7acc1697e79",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-10",
+        "width": 240,
+        "height": 240,
+        "bytes": 372,
+        "sha256": "4f27ce03605a6a8cf70ca3d5e847d809b5334d0d061b9bb45536cb588407645f",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-11",
+        "width": 240,
+        "height": 240,
+        "bytes": 373,
+        "sha256": "6ccf8f5c93927a5349379b4cef2601f93aca90f912c7f1127995e2669b0daa43",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-12",
+        "width": 240,
+        "height": 240,
+        "bytes": 374,
+        "sha256": "26beb4d720f289bd4ff06aff71c1a777283244bf0d5b7cf921ffb1faaa6f244f",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-13",
+        "width": 240,
+        "height": 240,
+        "bytes": 375,
+        "sha256": "754ea6a3b9717fe4036bfcfe45e671f6044d64ae75f56bac5d8c8ab337ff72c4",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-14",
+        "width": 240,
+        "height": 240,
+        "bytes": 376,
+        "sha256": "ff39ed4da81faf58666b6aaeab24427d04695b6fc3f0631fab4a3f6b3bdab513",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-15",
+        "width": 240,
+        "height": 240,
+        "bytes": 377,
+        "sha256": "4068b61609f1f5ffbfa0a1af3d76dc7ecb44cfccf8be2c961d8f4858df53b8c7",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      },
+      {
+        "name": "ac-depth-16",
+        "width": 240,
+        "height": 240,
+        "bytes": 378,
+        "sha256": "0c6e517c8eb3a2fcd2c1b27119983d49698e1b595bdf2fa3dfd0d3c47b79203f",
+        "result": 258,
+        "decoder_started": false,
+        "erase_pixel_differences": 0,
+        "validation_result": 258,
+        "validation_pixel_changes": 0,
+        "passed": true,
+        "literal_factory": {
+          "result": 0,
+          "decoder_started": true
+        }
+      }
+    ]
+  },
+  "scope": "Compare additional JPEG inputs using actual factory/native RV32 decoder instructions. Only the SDK flash-read boundary supplies generated test bytes. Full panel guards, discard validation and native error cleanup are checked. This is not an image-upload HTTP or physical/concurrency test."
+}

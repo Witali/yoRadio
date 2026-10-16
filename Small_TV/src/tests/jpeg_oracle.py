@@ -13,8 +13,8 @@ from machine_oracle import Machine, Panel, ROOT, SCRATCH, UC_HOOK_CODE
 
 class JpegMachine(Machine):
     """Keep JPEG input, IDCT, output callbacks and LCD blitters as machine code."""
-    def __init__(self, variant, dump):
-        super().__init__(variant)
+    def __init__(self, variant, dump, *, dependency_root=None):
+        super().__init__(variant, dependency_root=dependency_root)
         self.dump = dump
         self.native_assets = (ROOT/'firmware/development/small-tv-esp32c2-reconstructed/assets.bin').read_bytes()
         self.reads = []
@@ -106,13 +106,13 @@ class JpegMachine(Machine):
             raise AssertionError('JPEG decoder leaked its workspace')
         return result
 
-    def validate(self, asset, width, height):
+    def validate(self, asset, width, height, length=None):
         """Execute the real discard-only decoder, with no drawing or fake validation."""
         self.active_asset = asset
         self.reads = []
         self.decompression_started = False
         self.prepare_reads = 0
-        self.native_length = len((ROOT/'Small_TV/assets'/asset['file']).read_bytes())
+        self.native_length = length if length is not None else len((ROOT/'Small_TV/assets'/asset['file']).read_bytes())
         result = self.call(self.symbols['media_validate_jpeg_unlocked'], asset['native_offset'],
                            self.native_length, width, height, instruction_limit=100000000)
         if self.allocations:

@@ -245,8 +245,8 @@ static JRESULT create_qt_tbl (  /* 0:OK, !0:Failed */
         }
         ndata -= 65;
         d = *data++;                            /* Get table property */
-        if (d & 0xF0) {
-            return JDR_FMT1;    /* Err: not 8-bit resolution */
+        if (d & 0xFC) {
+            return JDR_FMT1;    /* Err: unsupported precision or table ID */
         }
         i = d & 3;                              /* Get table ID */
         pb = alloc_pool(jd, 64 * sizeof (int32_t));/* Allocate a memory block for the table */
@@ -276,10 +276,15 @@ static JRESULT create_huffman_tbl ( /* 0:OK, !0:Failed */
     size_t ndata                /* Size of input data */
 )
 {
+    /* Build canonical DC/AC tables from code-length counts and symbols.
+     * FIXED_FACTORY: 0x42011100 accepts oversubscribed prefix trees. Count
+     * available prefixes before constructing codewords, so unused impossible
+     * branches cannot pass validation merely because entropy avoids them. */
     unsigned int i, j, b, cls, num;
     size_t np;
     uint8_t d, *pb, *pd;
     uint16_t hc, *ph;
+    uint32_t available_codes;
 
 
     while (ndata) { /* Process all tables in the segment */
@@ -297,8 +302,17 @@ static JRESULT create_huffman_tbl ( /* 0:OK, !0:Failed */
             return JDR_MEM1;    /* Err: not enough memory */
         }
         jd->huffbits[num][cls] = pb;
+        available_codes = 1;
         for (np = i = 0; i < 16; i++) {     /* Load number of patterns for 1 to 16-bit code */
-            np += (pb[i] = *data++);        /* Get sum of code words for each code */
+            /* Use 32 bits: a sparse valid table can have 65536 available
+             * prefixes at length 16. Incomplete trees remain supported. */
+            available_codes <<= 1;
+            b = pb[i] = *data++;
+            if (b > available_codes) {
+                return JDR_FMT1;
+            }
+            available_codes -= b;
+            np += b;
         }
         ph = alloc_pool(jd, np * sizeof (uint16_t));/* Allocate a memory block for the code word table */
         if (!ph) {
@@ -629,6 +643,9 @@ static JRESULT restart (
     uint16_t rstn   /* Expected restert sequence number */
 )
 {
+    /* Build the four supported 8-bit dequantizer tables.
+     * FIXED_FACTORY: 0x420110c4 masks an invalid ID to two bits, silently
+     * turning table 4 into table 0. Reject reserved ID/precision bits first. */
     unsigned int i;
     uint8_t *dp = jd->dptr;
     size_t dc = jd->dctr;
@@ -1121,6 +1138,10 @@ JRESULT jd_prepare (
     void *dev               /* I/O device identifier for the session */
 )
 {
+    /* Read baseline headers and construct the decoder's tables and MCU state.
+     * FIXED_FACTORY: 0x42011d5a..0x42011d8a ignores SOF sample precision and
+     * component payload length. Require the supported 8-bit frame and its
+     * complete component list before reading or accepting those fields. */
     uint8_t *seg, b;
     uint16_t marker;
     unsigned int n, i, ofs;
@@ -1189,11 +1210,21 @@ JRESULT jd_prepare (
                 return JDR_INP;    /* Load segment data */
             }
 
+            if (len < 6) {
+                return JDR_FMT1;    /* Err: truncated frame header */
+            }
+            if (seg[0] != 8) {
+                return JDR_FMT3;    /* Err: unsupported sample precision */
+            }
+
             jd->width = LDB_WORD(&seg[3]);      /* Image width in unit of pixel */
             jd->height = LDB_WORD(&seg[1]);     /* Image height in unit of pixel */
             jd->ncomp = seg[5];                 /* Number of color components */
             if (jd->ncomp != 3 && jd->ncomp != 1) {
                 return JDR_FMT3;    /* Err: Supports only Grayscale and Y/Cb/Cr */
+            }
+            if (len != 6 + 3 * jd->ncomp) {
+                return JDR_FMT1;    /* Err: incomplete or extra component data */
             }
 
             /* Check each image component */
