@@ -1,57 +1,5 @@
 {
   "passed": true,
-  "app_sha256": "9e4f856a45fb3526eb2032f08f948c1354e8ba80065d1b4b32242f2d0c94f03c",
-  "source_sha256": "6ab9c80f0d245a4fdd977b6028a453d95a6156de6172ee959ced5284159db51b",
-  "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
-  "native_elf_sha256": "7e34a29babbb85c1d9f8f5eac8f01ce48e7748952ed6d5c4dcb0e31bc91a7170",
-  "adapters": {
-    "factory": {
-      "lcd-command": 8994,
-      "lcd-data": 39694,
-      "sprintf": 74,
-      "asset-header-read": 1764,
-      "bmp-malloc": 56,
-      "bmp-free": 56,
-      "jpeg-output-recorded": 140
-    },
-    "native": {
-      "asset-partition": 1,
-      "media-mutex-create": 1,
-      "synthetic-address": 28,
-      "snprintf": 243,
-      "lcd-transfer": 19237,
-      "media-mutex-take": 27,
-      "bmp-partition-read": 1647,
-      "media-mutex-give": 27,
-      "jpeg-output-recorded": 112,
-      "asset-frame-count": 28,
-      "animation-output-recorded": 28
-    },
-    "factory-weather-corrected": {
-      "lcd-command": 2721,
-      "lcd-data": 11569,
-      "sprintf": 20,
-      "correct-weather-bands": 10,
-      "asset-header-read": 568,
-      "bmp-malloc": 18,
-      "bmp-free": 18,
-      "jpeg-output-recorded": 50,
-      "correct-city-height": 10,
-      "correct-field-centering": 5,
-      "correct-field-glyph-blit": 75,
-      "correct-stale-icon": 1
-    }
-  },
-  "approved_fixes": [
-    "clear-city-full-height",
-    "clear-weather-title",
-    "clear-unavailable-weather-icon",
-    "bound-text-to-field"
-  ],
-  "requested_changes": [
-    "bidirectional-field-scroll"
-  ],
-  "scope": "Both real BMP decoders and LCD pixels; flash/allocation/mutex boundaries adapted. JPEG output remains recorded. Incremental native pixels compared with fresh rendering and a separately declared corrected factory reference. Scroll frames checked against factory bitmaps and independent phase expectations; injected real-decoder read failures. Only explicit status-update events and active 100-ms scroll steps are modeled here.",
   "cases": [
     {"kind":"bmp","icon":"01d","different_pixels":0,"compared_icon_pixels":3600,"nonblack_icon_pixels":2030,"media_equal":true,"passed":true},
     {"kind":"bmp","icon":"01n","different_pixels":0,"compared_icon_pixels":3600,"nonblack_icon_pixels":2030,"media_equal":true,"passed":true},
@@ -278,5 +226,57 @@
     {"kind":"decoder-read-error","read_number":2,"error_observed":true,"failed_frame_pixels":0,"restored_frame_pixels":0,"passed":true},
     {"kind":"decoder-read-error","read_number":8,"error_observed":true,"failed_frame_pixels":0,"restored_frame_pixels":0,"passed":true},
     {"kind":"decoder-read-error","read_number":61,"error_observed":true,"failed_frame_pixels":0,"restored_frame_pixels":0,"passed":true}
-  ]
+  ],
+  "app_sha256": "0d8b758502ac2dcda93695f422c0f94b7e743d735f29b00356c9f3ae59f21e3e",
+  "source_sha256": "9d9c5c8c08db0848d05257a44304a94e562f0de0b7562c911200f5b10fb2abfe",
+  "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+  "native_elf_sha256": "97adeb91a4c8515330c39dc971c36b8cea449d48ab5d13d11356bfe3e4da5924",
+  "adapters": {
+    "factory": {
+      "lcd-command": 8994,
+      "lcd-data": 39694,
+      "sprintf": 74,
+      "asset-header-read": 1764,
+      "bmp-malloc": 56,
+      "bmp-free": 56,
+      "jpeg-output-recorded": 140
+    },
+    "native": {
+      "asset-partition": 1,
+      "media-mutex-create": 1,
+      "synthetic-address": 28,
+      "snprintf": 243,
+      "lcd-transfer": 19237,
+      "media-mutex-take": 27,
+      "bmp-partition-read": 1647,
+      "media-mutex-give": 27,
+      "jpeg-output-recorded": 112,
+      "asset-frame-count": 28,
+      "animation-output-recorded": 28
+    },
+    "factory-weather-corrected": {
+      "lcd-command": 2721,
+      "lcd-data": 11569,
+      "sprintf": 20,
+      "correct-weather-bands": 10,
+      "asset-header-read": 568,
+      "bmp-malloc": 18,
+      "bmp-free": 18,
+      "jpeg-output-recorded": 50,
+      "correct-city-height": 10,
+      "correct-field-centering": 5,
+      "correct-field-glyph-blit": 75,
+      "correct-stale-icon": 1
+    }
+  },
+  "approved_fixes": [
+    "clear-city-full-height",
+    "clear-weather-title",
+    "clear-unavailable-weather-icon",
+    "bound-text-to-field"
+  ],
+  "requested_changes": [
+    "bidirectional-field-scroll"
+  ],
+  "scope": "Both real BMP decoders and LCD pixels; flash/allocation/mutex boundaries adapted. JPEG output remains recorded. Incremental native pixels compared with fresh rendering and a separately declared corrected factory reference. Scroll frames checked against factory bitmaps and independent phase expectations; injected real-decoder read failures. Only explicit status-update events and active 100-ms scroll steps are modeled here."
 }

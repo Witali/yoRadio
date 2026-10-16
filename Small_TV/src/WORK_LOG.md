@@ -903,3 +903,23 @@
   pass, native classic/simple pass, dial продолжается; затем complete scenes.
   Terminal full result пока отсутствует. После него сверить frozen inputs,
   объединить JPEG branch, собрать main и проверить актуальный полный набор.
+
+### 2026-10-16 — полный responsiveness run завершён
+
+- Исходный session22926 завершился exit0. Все 17 automatic groups pass на
+  app0d8b7585/source9d9c5c8c/ELF97adeb91/QEMUfde38d53. Сверены все 58 initial
+  test hashes, BIN/ELF/QEMU и helpers; unchanged. Calendar: 42 transitions /
+  84 frames для каждой app. Complete scenes: 24 frames с 0 differing pixels,
+  40 normalized cases; five unsynchronized diagnostic scene pairs тоже прошли.
+- Current startup wait .061207 guest s, held-weather next frame .879886 guest s.
+  Сохранён task yield, hardware init, upload guard и debounce; hardware/браузер/
+  long soak не объявлены выполненными. Полная equivalence всех путей не доказана.
+- Strict publisher поймал изменение ISO date strings при PowerShell JSON
+  aggregation. QEMU raw JSON и все реальные наблюдения корректны. Проверены все
+  17 raw group files: единственные различия — 207 строк представления тех же
+  timezone-aware instants. Производный aggregate сохраняет исходные строки;
+  первоначальные файлы не переписаны. Аудит и hashes сохранены отдельно.
+  После этого штатные publisher/verifier прошли, обновлены 23 positive artifacts
+  из одного запуска; исторические negatives/board reports не переименованы.
+- Далее исправить date aggregation, объединить завершённую JPEG branch,
+  пересобрать root и прогнать новый полный gate с JPEG inputs/photo HTTP.

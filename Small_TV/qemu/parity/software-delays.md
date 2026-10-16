@@ -11,6 +11,14 @@
 состояния гостя. Старые результаты ниже сохраняют исходные build/test identities;
 они не заменяют новый полный прогон объединённой сборки.
 
+Полный интегрированный прогон завершён 2026-10-16: все 17 автоматических групп
+прошли на app `0d8b7585` / source `9d9c5c8c` / ELF `97adeb91` / QEMU `fde38d53`.
+Startup renderer начат через .061207 guest s после SNTP; во время held weather
+следующий кадр получен через .879886 guest s. Это отдельные измерения новой
+сборки; таблица before/after ниже сохраняет прежние identities. Итог —
+`../../src/tests/functional-validation.json`, точные observer reports —
+`startup-integrated-candidate.json` и `weather-wait-integrated-candidate.json`.
+
 ## Удалённое ожидание стартового экрана
 
 Заводской обработчик `0x4200826a` увеличивает startup counter и сбрасывает

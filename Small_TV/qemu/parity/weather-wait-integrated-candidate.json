@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "scope": "Observe real clock frames while an external weather server withholds its reply.",
+  "native_elf_sha256": "97adeb91a4c8515330c39dc971c36b8cea449d48ab5d13d11356bfe3e4da5924",
+  "app_sha256": "0d8b758502ac2dcda93695f422c0f94b7e743d735f29b00356c9f3ae59f21e3e",
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "test_inputs": [
+    {
+      "file": "Small_TV/src/tests/weather_wait_qemu.py",
+      "sha256": "6b6f8dc0c38309109050a55cc1dd915004d4e32c691ee9a930d7f7695a56b3da"
+    },
+    {
+      "file": "Small_TV/src/tests/gdb_observer.py",
+      "sha256": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83"
+    },
+    {
+      "file": "Small_TV/src/tests/weather_qemu.py",
+      "sha256": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9"
+    },
+    {
+      "file": "Small_TV/src/tests/scene_qemu.py",
+      "sha256": "797304412870bee54e2af631833d84cbd9e7c114f643fd60a6e60ce64e09098c"
+    }
+  ],
+  "helper_sha256": {
+    "small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+  },
+  "compiled_running_mask": 1,
+  "sources": {
+    "images": [
+      {
+        "bytes": 19248,
+        "file": "bootloader.bin",
+        "offset": "0x0",
+        "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
+      },
+      {
+        "bytes": 3072,
+        "file": "partition-table.bin",
+        "offset": "0x8000",
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+      },
+      {
+        "bytes": 1176224,
+        "file": "app.bin",
+        "offset": "0x10000",
+        "sha256": "0d8b758502ac2dcda93695f422c0f94b7e743d735f29b00356c9f3ae59f21e3e"
+      },
+      {
+        "bytes": 1994752,
+        "file": "assets.bin",
+        "offset": "0x200000",
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+      }
+    ],
+    "source_sha256": "9d9c5c8c08db0848d05257a44304a94e562f0de0b7562c911200f5b10fb2abfe"
+  },
+  "before": {
+    "local_tm": [
+      57,
+      52,
+      1,
+      17,
+      9,
+      126,
+      6,
+      289,
+      0
+    ],
+    "request_state": 0,
+    "guest_seconds": 39.346895,
+    "wait_guest_seconds": 1.0998610000000042,
+    "rgb_sha256": "185c731c16d878631ead0dc40b743a479637e7bd27c5021da734fc9882acecbb"
+  },
+  "during": {
+    "local_tm": [
+      1,
+      53,
+      1,
+      17,
+      9,
+      126,
+      6,
+      289,
+      0
+    ],
+    "request_state": 1,
+    "guest_seconds": 43.846775,
+    "wait_guest_seconds": 0.8798859999999991,
+    "rgb_sha256": "7b034f8c9b19207454a0750711ce92a52d035e83cc1ab276a2fa3e51087f26c5"
+  },
+  "inputs_unchanged": true
+}

@@ -9,6 +9,23 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 Актуально 2026-10-16, после предыдущих промежуточных записей:
 
+Полный root run `22926` завершён с exit0. Все 17 automatic groups pass;
+84 natural calendar transitions / 168 complete frames, 24 completed scene frames
+с 0 differences и 40 normalized scenes прошли. Все 58 initial test files,
+app `0d8b7585` / source `9d9c5c8c` / ELF `97adeb91` / QEMU `fde38d53`
+неизменны. Published functional-validation/validation и 21 scoped artifacts
+обновлены из этого одного запуска. Для startup измерено .061207 guest s,
+при held weather следующий кадр через .879886 guest s.
+
+Первый publisher выявил автоматическое преобразование 207 ISO date strings
+PowerShell ConvertFrom-Json в host timezone. Исходные child JSON корректны.
+Агрегат восстановлен из всех 17 child files с проверкой, что изменилось только
+представление тех же aware instants; raw results и исходный aggregate сохранены.
+Audit: `../qemu/parity/responsiveness-report-aggregation.json`. После восстановления
+строгие publisher/verifier прошли. Следующий шаг — DateKind String в сборщике,
+затем merge JPEG branch, build и новый полный набор. Старые live записи ниже
+теперь исторические; никакой terminal run не продолжать и не перезапускать.
+
 - JPEG branch `codex/small-tv-jpeg-inputs` отправлена до `28bfa63881bb`.
   `9a59cb07` исправляет три header ошибки, `49a50986` — oversubscribed Huffman
   trees, `28bfa638` добавляет настоящий HTTP/flash upload/download и cold boot.
