@@ -1,5 +1,6 @@
 #include "web.h"
 #include "network.h"
+#include "settings.h"
 #include <errno.h>
 #include <limits.h>
 #include <math.h>
@@ -155,17 +156,54 @@ static esp_err_t page(httpd_req_t *req)
     return httpd_resp_send(req, (const char *)data, (int)length);
 }
 
+static bool html_attribute(char *out, size_t capacity, const char *value)
+{
+    /* Encode a settings string for a double-quoted HTML attribute within a fixed buffer. */
+
+    if (!capacity)
+        return false;
+    size_t used = 0;
+    for (; *value; ++value)
+    {
+        const char *escaped = NULL;
+        switch (*value)
+        {
+        case '&': escaped = "&amp;"; break;
+        case '<': escaped = "&lt;"; break;
+        case '>': escaped = "&gt;"; break;
+        case '\"': escaped = "&quot;"; break;
+        case '\'': escaped = "&#39;"; break;
+        }
+        size_t length = escaped ? strlen(escaped) : 1;
+        if (length >= capacity - used)
+            return false;
+        if (escaped)
+            memcpy(out + used, escaped, length);
+        else
+            out[used] = *value;
+        used += length;
+    }
+    out[used] = 0;
+    return true;
+}
+
 static esp_err_t advanced_page(httpd_req_t *req)
 {
-    /* Serve the retained optional editor for weather, NTP and night settings. */
+    /* Serve the retained optional editor for weather, NTP and night settings.
+     * FIXED_RECONSTRUCTION: prefill the saved NTP server rather than a fixed
+     * pool.ntp.org value that silently replaces it when the form is submitted.
+     * Escape its attribute and stream the page without allocating another full
+     * HTML document on the HTTP task's stack or heap. */
 
-    static const char html[] =
+    static const char prefix[] =
         "<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport "
         "content='width=device-width,initial-scale=1'><title>Small TV advanced settings</title>"
         "<body style='font:18px sans-serif;max-width:600px;margin:2rem auto;padding:1rem'><a "
         "href=/settings>Clock settings</a> | <a href=/photo>Photos</a>"
         "<h1>Advanced settings</h1><form id=f><p><label>NTP server <input id=ntp "
-        "value=pool.ntp.org maxlength=64 required></label></p>"
+        "value=\"";
+    static const char suffix[] =
+        "\" maxlength=64 placeholder=cn.pool.ntp.org></label></p>"
         "<p><label>OpenWeatherMap API key <input id=key type=password maxlength=64 "
         "autocomplete=off></label></p>"
         "<p>The key is stored on this device and sent to OpenWeatherMap using the factory HTTP API. Saving an "
@@ -199,8 +237,21 @@ static esp_err_t advanced_page(httpd_req_t *req)
         "GetNightStopTime','/"
         "SetNightStopTime','StopTime']]){fetch(get).then(r=>r.text()).then(v=>$(id).value=v);$(id)."
         "onchange=()=>post(set,{[key]:$(id).value})}</script></body></html>";
+    tv_settings_t settings;
+    settings_snapshot(&settings);
+    char ntp[6 * sizeof(settings.ntp)];
+    if (!html_attribute(ntp, sizeof(ntp), settings.ntp))
+        return httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Invalid saved NTP server");
     httpd_resp_set_type(req, "text/html; charset=utf-8");
-    return httpd_resp_send(req, html, sizeof(html) - 1);
+    esp_err_t result = httpd_resp_send_chunk(req, prefix, sizeof(prefix) - 1);
+    /* Empty NTP selects the built-in fallback; a zero-length SDK chunk would end the page. */
+    if (result == ESP_OK && ntp[0])
+        result = httpd_resp_send_chunk(req, ntp, (int)strlen(ntp));
+    if (result == ESP_OK)
+        result = httpd_resp_send_chunk(req, suffix, sizeof(suffix) - 1);
+    if (result == ESP_OK)
+        result = httpd_resp_send_chunk(req, NULL, 0);
+    return result;
 }
 
 static esp_err_t captive_redirect(httpd_req_t *req, httpd_err_code_t error)

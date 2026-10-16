@@ -1,0 +1,131 @@
+{
+  "browser": "Codex In-app Browser",
+  "url": "http://127.0.0.1:18080/advanced",
+  "sources": {
+    "images": [
+      {
+        "file": "bootloader.bin",
+        "bytes": 19248,
+        "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+        "offset": "0x0"
+      },
+      {
+        "file": "partition-table.bin",
+        "bytes": 3072,
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "offset": "0x8000"
+      },
+      {
+        "file": "app.bin",
+        "bytes": 1177568,
+        "sha256": "daf5595dd615be24636ae0dcc506dc67ad2b31225931c20d4d2918a2232846ea",
+        "offset": "0x10000"
+      },
+      {
+        "file": "assets.bin",
+        "bytes": 1994752,
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "offset": "0x200000"
+      }
+    ],
+    "source_sha256": "c83941ff9c078ae5fcd53a084dee236288046ecee6e4e22794626c5968eb9047"
+  },
+  "native_elf_sha256": "b06ce81048b556cb83ea3cb738af48b6c38c7d5dc154811b6715211c506fa1a3",
+  "frontend_inputs": [
+    {
+      "file": "Small_TV/local_site/photo_crop.html",
+      "sha256": "208062b9f19395049775f58ade19f648ee50fe2b8390c2d579e2519ed2313dcf"
+    },
+    {
+      "file": "Small_TV/local_site/photo_crop.js",
+      "sha256": "20e5667451ee71b30b0103206f9a3b13c111573ce773fddcbe015ad222beb484"
+    },
+    {
+      "file": "Small_TV/local_site/jpeg_metadata.js",
+      "sha256": "82ceae4f0ea5d7aeec9808d924e29fe46136e7cdca40644b3cccd45c226a7710"
+    },
+    {
+      "file": "Small_TV/local_site/pages-manifest.json",
+      "sha256": "d39f4cd3b03548262f8be48bb1c20b841ef88eeb3f4adda1a8ed0a9c1b829f14"
+    },
+    {
+      "file": "Small_TV/local_site/pages/photo.html",
+      "sha256": "53339fa44d5d6d8a8a3c2c1951abb688f5bb87923279ff5b555dc9fd57072445"
+    },
+    {
+      "file": "Small_TV/local_site/pages/settings.html",
+      "sha256": "839e1c445080193d517fc6099d137523a24e9a91ccca8dd57a76e9e286693a40"
+    },
+    {
+      "file": "Small_TV/local_site/pages/setup.html",
+      "sha256": "b0e13e311a2c2e34b557557f858bff40f6a77f76bd7ff5d662aa938e8d86213a"
+    }
+  ],
+  "empty": {
+    "nightControl": true,
+    "placeholder": "cn.pool.ntp.org",
+    "saveButton": true,
+    "value": ""
+  },
+  "escaped": {
+    "injectedNode": false,
+    "keyBlank": true,
+    "value": "time\"><img id=ntp-injected>.invalid"
+  },
+  "restored": {
+    "brightness": "50",
+    "keyBlank": true,
+    "ntp": "10.0.2.2",
+    "start": "22",
+    "stop": "9"
+  },
+  "console": [],
+  "checks": {
+    "saved_ntp_visible": true,
+    "empty_keeps_complete_editor": true,
+    "attribute_isolated": true,
+    "no_console_errors": true
+  },
+  "all_browser_acceptance_complete": false,
+  "scope": "Actual browser NTP editor submission, reload, attribute isolation and empty fallback on the final firmware; other acceptance scenarios remain separate",
+  "passed": true,
+  "storage_integrity": {
+    "passed": true,
+    "direct_flash_backing": true,
+    "owned_vm_stopped": true,
+    "images": [
+      {
+        "file": "bootloader.bin",
+        "bytes": 19248,
+        "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+        "offset": "0x0",
+        "guest_sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
+      },
+      {
+        "file": "partition-table.bin",
+        "bytes": 3072,
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "offset": "0x8000",
+        "guest_sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+      },
+      {
+        "file": "app.bin",
+        "bytes": 1177568,
+        "sha256": "daf5595dd615be24636ae0dcc506dc67ad2b31225931c20d4d2918a2232846ea",
+        "offset": "0x10000",
+        "guest_sha256": "daf5595dd615be24636ae0dcc506dc67ad2b31225931c20d4d2918a2232846ea"
+      },
+      {
+        "file": "assets.bin",
+        "bytes": 1994752,
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "offset": "0x200000",
+        "guest_sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+      }
+    ]
+  },
+  "screenshot": {
+    "file": "advanced-settings-after.jpg",
+    "sha256": "a78588d64759ba3a98fa995423d13f1bf4ebd31f4b4035069d23a2ad520221aa"
+  }
+}

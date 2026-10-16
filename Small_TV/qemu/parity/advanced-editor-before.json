@@ -1,0 +1,106 @@
+{
+  "passed": false,
+  "checks": {
+    "direct_flash_backing": true,
+    "initial_saved_ntp": false,
+    "executable_media_unchanged": true,
+    "no_panic": true,
+    "source_inputs_unchanged": true
+  },
+  "cases": [],
+  "app_sha256": "d978aab6372d09e55b2e9ff44428a70dc8d5a5222ff6c85e3998519d2c513be7",
+  "native_elf_sha256": "8ac006e09d930d41baf6e37b267e256ec4a34e6a0b69deed17bd66737e4eda1e",
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "profile_sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+  "test_inputs": [
+    {
+      "file": "Small_TV/src/tests/advanced_qemu.py",
+      "sha256": "a27d41f076b530f18f931f4f14450c9df6f7eda0bb54ee09ebca2cd8ed100ae0"
+    },
+    {
+      "file": "Small_TV/src/tests/qemu_storage.py",
+      "sha256": "3fa00b82379b90c76939ad61d1756f1fcefe03ded492bd16c7df1b532578dc3d"
+    },
+    {
+      "file": "Small_TV/qemu/parity/compare.py",
+      "sha256": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84"
+    },
+    {
+      "file": "Small_TV/qemu/profiles/small-tv-c2.json",
+      "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+    }
+  ],
+  "helper_sha256": {
+    "small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+  },
+  "artifact_inputs": [
+    {
+      "file": "app.bin",
+      "sha256": "d978aab6372d09e55b2e9ff44428a70dc8d5a5222ff6c85e3998519d2c513be7"
+    },
+    {
+      "file": "bootloader.bin",
+      "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
+    },
+    {
+      "file": "partition-table.bin",
+      "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+    },
+    {
+      "file": "assets.bin",
+      "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+    },
+    {
+      "file": "manifest.json",
+      "sha256": "41cadffcfc645bc8db6140a41bd939338c9b0a59fd2ba4639b1c009775fb9182"
+    },
+    {
+      "file": "source-manifest.json",
+      "sha256": "3e8021b76d556be74b68851b336073f115f88b32d4ddf21404b6cc3849e9adb7"
+    },
+    {
+      "file": "assets-manifest.json",
+      "sha256": "9f034fa7d5793c24da9a5399c68d93f921d6716b923fb6193a7a54a1ec7a6e0b"
+    }
+  ],
+  "scope": "Verify saved NTP attributes through the real SDK HTTP server, including chunked HTML.",
+  "sources": {
+    "images": [
+      {
+        "bytes": 19248,
+        "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+        "offset": "0x0",
+        "file": "bootloader.bin"
+      },
+      {
+        "bytes": 3072,
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "offset": "0x8000",
+        "file": "partition-table.bin"
+      },
+      {
+        "bytes": 1176480,
+        "sha256": "d978aab6372d09e55b2e9ff44428a70dc8d5a5222ff6c85e3998519d2c513be7",
+        "offset": "0x10000",
+        "file": "app.bin"
+      },
+      {
+        "bytes": 1994752,
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "offset": "0x200000",
+        "file": "assets.bin"
+      }
+    ],
+    "source_sha256": "0baa7e03fd94cd0c54177f6d3e2c661f25109d55876e63abe6ca100e5a8c8342"
+  },
+  "source_sha256": "0baa7e03fd94cd0c54177f6d3e2c661f25109d55876e63abe6ca100e5a8c8342",
+  "initial_value": "pool.ntp.org",
+  "error": "Editor shows a fixed default instead of the seeded saved NTP server",
+  "inputs_unchanged": true,
+  "expected_negative": true
+}

@@ -1234,3 +1234,38 @@
   Partial browser controls и before screenshot сохранены в ignored state;
   неправильный порядок JSON keys в одном test assertion исправлен сравнением
   значений, не изменением приложения. Snapshot imagefile read тоже не был багом.
+
+### 2026-10-16 — сохранённый NTP и корректное HTML-экранирование
+
+- Браузер6BF6/source0BAA показал pool.ntp.org при QMP/DWARF actual10.0.2.2,
+  dirty=false. Старый optional advanced_page действительно hardcodes value.
+  Точечный C negative воспроизведён; final test/adapter отдельно компилируется
+  с сохранённым server.c без изменения production checkout.
+- advanced_page получает settings snapshot, bounded html_attribute сохраняет
+  quoted attribute. Static page передаётся chunks, временный buffer390 bytes.
+  Код помечен FIXED_RECONSTRUCTION. Допустимый empty NTP с fallback сохранён;
+  нулевой промежуточный chunk пропускается, поскольку SDK трактует его как EOF.
+- Первый nonempty prototype1E33/source0357 работал для обычного/escaped NTP,
+  но новый empty case поймал premature EOF. Native adapter усилен реальным
+  состоянием completion; prototype сохранён и его expected negative повторён
+  с тем же final adapter. Отсутствовавший settings.h include исправлен до SDK
+  сборки. Эти промежуточные проблемы не объявлены factory defects.
+- Build5179 terminal exit0, native3924 pass. AppDAF5595D/sourceC83941FF /
+  ELFB06CE810,1,177,568 bytes/free358,432 сохранён в firmware. SDK advanced_qemu
+  beforeD978/source0BAA expected fail, afterDAF4 cases pass, observers identical.
+  Ordinary/metachar/64quotes/empty, complete HTML, no key echo, raw backing,
+  app/media integrity и no panic подтверждены. Обе SDK VM закрыты.
+- На final browser12152/DAF direct raw body NTP10, Save/reload, harmless markup
+  string без injected DOM node и empty complete page проверены. Errors нет.
+  QMP подтвердил raw backend, после stop все4 source images совпали по SHA.
+  CUA tab закрыт. Screenshot и scoped browser/C/SDK/assembly reports сохранены;
+  final browser report не заявляет complete H03. Старый controls snapshot6BF6
+  сохранён отдельным partial report, source IDs не переименованы.
+- При инспекции storage выявлено: -snapshot скрывает guest writes в overlay,
+  так что старый basefile unchanged check не доказывал весь guest media.
+  Это ограничение теста, не установленный firmware bug. qemu_storage подтверждает
+  actual raw backing и отвергает живой snapshot guest. Advanced HTTP уже использует
+  его; далее усилить4 photo gates/contracts до нового full run. Pixel/PWM и
+  instruction observations исторических тестов сохраняют свою область проверки.
+- QEMU/physical boards не менялись, непрофильные файлы не затронуты. Общий
+  успешный checkpointdbbef80d остаётся на AD7A; новый полный DAF ещё не запускался.

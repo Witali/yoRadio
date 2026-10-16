@@ -7,50 +7,49 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
-Актуально после завершения root-прогона 92411 и объединения photo branch.
+Актуально после исправления расширенного NTP-редактора.
 
-- Root92411 terminal exit0: все19 автоматических групп прошли на appAD7A9009 /
-  sourceF411BF0E / ELF6D7B586F / QEMUFDE38D53. Совпали63 initial/final inputs;
-  publisher/verifier прошли,25 scoped artifacts и отдельный initial/final audit
-  опубликованы commit dbbef80d. Все84 calendar transitions /24 full frames /
-  40 normalized scenes pass; unsynchronized scene similarity — только диагностика.
-- В main объединяется ветка codex/small-tv-photo-frames до aded56bf: полный
-  photo/fade pipeline, idle brightness, повторный выбор темы и исправление
-  заводского чёрного экрана при повторной инициализации во время fade.
-  Последний branch candidate6BF6A61C/source0BAA7E03/ELF7DE6FEC2 прошёл host3909,
-  platform46/1,182,310, четыре real HTTP/frame сценария,84 frames/9 scenes
-  и20 rejection checks. Подробности photo-{frames,idle-brightness,reselect,reinit}-checks.md.
-- После merge обязательно пересобрать root и сохранить его actual BIN/ELF/hash;
-  branch source0BAA ожидается тем же, но root app/ELF будут отдельной сборкой.
-  Затем новый full suite с обязательными photo_frames/photo_brightness/
-  photo_controls/photo_reinit. Результат AD7A не считать проверкой нового образа.
-  До начала нового full сохранить initial test/app/ELF/QEMU pins, далее не менять
-  его source/tests/helpers, опрашивать один живой handle.
-- Root build80930 завершён exit0: appD978AAB6/source0BAA7E03/ELF8AC006E0,
-  1 176 480 байт/free359 520 сохранён в firmware, actual assembly отдельно
-  native-photo-root-integrated. Новый full пока не запущен: браузер выявил
-  hardcoded NTP value pool.ntp.org в advanced_page при actual10.0.2.2. Исправить
-  prefill с HTML-escaping и проверить C+браузером перед новым full.
-- Собственная браузерная VM6BF6, PID30908, state
-  .build/small-tv-browser/controls-20261016, URL http://127.0.0.1:18081.
-  QMP подтвердил running и имя SmallTV-cbd9d8d529ec. В CUA Browser2 tab1,
-  binding smallTvTab; сейчас страница /photo. Все настройки синтетические.
-  Проверены flags,4 themes,5 GIFs,3 dates,3 colors,brightness0 и cityLondon/GB;
-  reload действительно читает сохранённые API values. QMP/DWARF видит countryGB,
-  cityLondon,dirty=false. Маски0/10/31 и интервалы60/3/4 наблюдались в браузере;
-  пять превью240×240 декодируются. Браузерная приёмка ещё продолжается.
-- Использован computer-use skill (SKILL.md и guidance/confirmations прочитаны),
-  browser plugin выбран по его рекомендации. CUA browser docs и local-web-
-  development прочитаны. Native app APIs disabled. Tab временный, закрыть по
-  окончании; если нужен в следующем turn — markHandoff. VM не закрывать до
-  сохранения результата; затем stop именно этого state. Base flash.bin остаётся
-  исходным из-за -snapshot: для текущих настроек читать typed QMP или reset guest,
-  не приписывать неизменность basefile потере сохранения.
-- Дальше в H03: night/advanced/setup controls, повтор JPEG crop/upload и viewport,
-  нормальный guest reset с проверкой сохранения. Маска/интервал во время active
-  fade, длительная нагрузка и физическая панель остаются отдельными gaps.
-  Не воспроизводить подтверждённые factory bugs. Лишние software waits убирать,
-  task yield/периоды эффектов/необходимый ST7789 timing сохранять.
+- Main объединён с photo branch aded56bf merge95eddf55. Root photo buildD978 /
+  source0BAA / ELF8AC сохранён и отправлен в ba349b5a. Исправлены idle brightness,
+  повторный выбор темы и заводской чёрный экран после отменённого fade;84 full
+  photo frames/9 scenes и46 platform cases проверялись на branch6BF6.
+- Последний завершённый общий checkpoint — dbbef80d: все19 automatic groups
+  на AD7A/F411/6D7B,63 initial/final files,84 calendar transitions,24 complete
+  frames и40 normalized scenes. Он исторический и не проверяет новую сборку.
+- Текущий production candidate: appDAF5595D/sourceC83941FF/ELFB06CE810,
+  1 177 568 байт/free358 432, сохранён в firmware. advanced_page показывает
+  сохранённый NTP с bounded HTML escaping; empty setting не обрывает chunked
+  страницу. Host3924 pass, включая15 новых проверок; оба negative server-source
+  controls с теми же final test/adapter воспроизведены. Реальный SDK HTTP:
+  D978 before expected fail, DAF after4 cases pass. Actual final browser:
+  prefill/save/reload/empty/HTML isolation pass; нет console errors.
+  Источники/assembly/SDK/C/browser evidence — advanced-editor-checks.md.
+- Все собственные ВМ30908/14684/12152 и CUA tab1 закрыты после сохранения
+  scoped evidence. Активного полного прогона сейчас нет. Browser2 binding
+  smallTvBrowser остаётся выбранным, но smallTvTab закрыт. Для продолжения
+  использовать новую временную вкладку в том же IAB. computer-use skill,
+  guidance/confirmations, browser docs и local-web-development прочитаны.
+- Важная обнаруженная граница старых тестов: при -snapshot базовый flash.bin
+  не содержит guest writes. Старые проверки basefile гарантировали сохранность
+  исходника, но не весь гостевой носитель. Новые advanced_qemu/qemu_storage
+  уже используют raw backing и проверяют его через query-block. Snapshot
+  negative и final raw image checks сохранены в .build/small-tv-browser.
+- Следующий обязательный шаг ПЕРЕД новым full: перевести photo_frames,
+  photo_brightness, photo_controls и photo_reinit с persistent=False на True
+  для их собственных новых state dirs; подтвердить direct_flash_backing в
+  каждом flow, добавить utility в fingerprints и усилить contracts. Повторить
+  scoped photo gates на текущем DAF, не переписывать historical before/after.
+  Затем commit/push, freeze input pins и один новый full run со всеми child
+  gates, включая advanced_http. До terminal не менять его source/tests/helpers.
+- Browser controls на6BF6 сохранены отдельно в browser-controls-partial-20261016:
+  flags,4 themes,5 GIFs,3 date formats,3 colors,brightness0,London/GB,mask0/10/31,
+  intervals60/3/4 и5 previews. Это частичное наблюдение старого образа. Остались
+  night/setup/crop/upload/responsive,mask/interval during fade,soak/heap/stack
+  и physical acceptance. NTP scoped checks не превращать в полный H03 pass.
+- Подтверждённые factory bugs исправлять, метки/комментарии сохранять. Лишние
+  software waits убирать; normal task yield, периоды эффектов и необходимый
+  ST7789 timing сохранять. OTA/SD/audio не добавлять. Physical boards/QEMU
+  не менялись; посторонние .karadio patches/tmp/.tmp_async_pdm не трогать.
 
 ## Исторические записи
 

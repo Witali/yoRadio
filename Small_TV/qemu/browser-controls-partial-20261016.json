@@ -1,0 +1,197 @@
+{
+  "scope": "Partial real-browser control acceptance on a dedicated synthetic QEMU guest",
+  "completed": false,
+  "url": "http://127.0.0.1:18081/advanced",
+  "savedUnits": {
+    "date": "1",
+    "fahrenheit": true,
+    "gif": "4",
+    "hour12": true,
+    "kmh": true,
+    "theme": "2"
+  },
+  "savedColors": {
+    "brightness": "0",
+    "colors": [
+      "#103452",
+      "#adcfef",
+      "#102031"
+    ]
+  },
+  "roundTrips": [
+    {
+      "expected": {
+        "theme": "1",
+        "gif": "1",
+        "date": "0"
+      },
+      "actual": {
+        "date": "0",
+        "gif": "1",
+        "theme": "1"
+      }
+    },
+    {
+      "expected": {
+        "theme": "3",
+        "gif": "2",
+        "date": "2"
+      },
+      "actual": {
+        "date": "2",
+        "gif": "2",
+        "theme": "3"
+      }
+    },
+    {
+      "expected": {
+        "theme": "0",
+        "gif": "3",
+        "date": "1"
+      },
+      "actual": {
+        "date": "1",
+        "gif": "3",
+        "theme": "0"
+      }
+    }
+  ],
+  "photoZero": {
+    "enabled": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    "seconds": "60"
+  },
+  "photoTen": {
+    "enabled": [
+      false,
+      true,
+      false,
+      true,
+      false
+    ],
+    "seconds": "3"
+  },
+  "photoAll": {
+    "enabled": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "previews": [
+      {
+        "complete": true,
+        "height": 240,
+        "id": "thumbnail1",
+        "width": 240
+      },
+      {
+        "complete": true,
+        "height": 240,
+        "id": "thumbnail2",
+        "width": 240
+      },
+      {
+        "complete": true,
+        "height": 240,
+        "id": "thumbnail3",
+        "width": 240
+      },
+      {
+        "complete": true,
+        "height": 240,
+        "id": "thumbnail4",
+        "width": 240
+      },
+      {
+        "complete": true,
+        "height": 240,
+        "id": "thumbnail5",
+        "width": 240
+      }
+    ],
+    "seconds": "4"
+  },
+  "advancedBefore": {
+    "brightness": "50",
+    "keyBlank": true,
+    "night": false,
+    "ntp": "pool.ntp.org",
+    "start": "22",
+    "stop": "9"
+  },
+  "pending": [
+    "Advanced saved NTP prefill differs from actual guest configuration",
+    "Night and advanced save controls",
+    "Guest reset persistence",
+    "Crop and upload",
+    "Responsive viewport"
+  ],
+  "sources": {
+    "images": [
+      {
+        "sha256": "ed5975aeed937743f5e00de098c4f735b2e780eed2f8181a9f11810fd23f84c6",
+        "offset": "0x0",
+        "bytes": 19248,
+        "file": "bootloader.bin"
+      },
+      {
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "offset": "0x8000",
+        "bytes": 3072,
+        "file": "partition-table.bin"
+      },
+      {
+        "sha256": "6bf6a61c6fcddd388ea3c963b5abd5eddf10bc62611fb6e0df259db4c7a56256",
+        "offset": "0x10000",
+        "bytes": 1176480,
+        "file": "app.bin"
+      },
+      {
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "offset": "0x200000",
+        "bytes": 1994752,
+        "file": "assets.bin"
+      }
+    ],
+    "source_sha256": "0baa7e03fd94cd0c54177f6d3e2c661f25109d55876e63abe6ca100e5a8c8342"
+  },
+  "native_elf_sha256": "7de6fec28d1161bc9873967c424e9d47e4834f1bda80ac7f0192a34a144c81aa",
+  "frontend_inputs": [
+    {
+      "file": "Small_TV/local_site/photo_crop.html",
+      "sha256": "208062b9f19395049775f58ade19f648ee50fe2b8390c2d579e2519ed2313dcf"
+    },
+    {
+      "file": "Small_TV/local_site/photo_crop.js",
+      "sha256": "20e5667451ee71b30b0103206f9a3b13c111573ce773fddcbe015ad222beb484"
+    },
+    {
+      "file": "Small_TV/local_site/jpeg_metadata.js",
+      "sha256": "82ceae4f0ea5d7aeec9808d924e29fe46136e7cdca40644b3cccd45c226a7710"
+    },
+    {
+      "file": "Small_TV/local_site/pages-manifest.json",
+      "sha256": "d39f4cd3b03548262f8be48bb1c20b841ef88eeb3f4adda1a8ed0a9c1b829f14"
+    },
+    {
+      "file": "Small_TV/local_site/pages/photo.html",
+      "sha256": "53339fa44d5d6d8a8a3c2c1951abb688f5bb87923279ff5b555dc9fd57072445"
+    },
+    {
+      "file": "Small_TV/local_site/pages/settings.html",
+      "sha256": "839e1c445080193d517fc6099d137523a24e9a91ccca8dd57a76e9e286693a40"
+    },
+    {
+      "file": "Small_TV/local_site/pages/setup.html",
+      "sha256": "b0e13e311a2c2e34b557557f858bff40f6a77f76bd7ff5d662aa938e8d86213a"
+    }
+  ],
+  "test_data_is_synthetic": true
+}

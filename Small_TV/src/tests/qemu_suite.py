@@ -43,7 +43,7 @@ def main():
                                             'esp_board.py', 'esp_services.py')}}
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
               **inputs,
-              'boot_reset': {}, 'startup_wait': {}, 'weather_wait': {}, 'photo_http': {}, 'photo_frames': {}, 'photo_brightness': {}, 'photo_controls': {}, 'photo_reinit': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
+              'boot_reset': {}, 'startup_wait': {}, 'weather_wait': {}, 'advanced_http': {}, 'photo_http': {}, 'photo_frames': {}, 'photo_brightness': {}, 'photo_controls': {}, 'photo_reinit': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
               'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP, synthetic weather, natural calendar/DST transitions and complete instruction-replayed frames. The separate unsynchronized scene similarity remains diagnostic. No physical hardware or Internet weather service.'}
     try:
         for variant in ('original', 'reconstructed'):
@@ -53,10 +53,10 @@ def main():
             check(result['passed'], f'{variant}: boot/reset/SNTP checks failed')
             print('PASS QEMU boot/reset/SNTP:', variant, flush=True)
         for name, key in (('startup', 'startup_wait'), ('weather_wait', 'weather_wait'),
-                          ('photo', 'photo_http'), ('photo_frames', 'photo_frames'),
+                          ('advanced', 'advanced_http'), ('photo', 'photo_http'), ('photo_frames', 'photo_frames'),
                           ('photo_brightness', 'photo_brightness'), ('photo_controls', 'photo_controls'),
                           ('photo_reinit', 'photo_reinit')):
-            folder = args.output / ({'photo': 'photo-http', 'photo_frames': 'photo-frames',
+            folder = args.output / ({'advanced': 'advanced-http', 'photo': 'photo-http', 'photo_frames': 'photo-frames',
                                      'photo_brightness': 'photo-brightness',
                                      'photo_controls': 'photo-controls',
                                      'photo_reinit': 'photo-reinit'}.get(name, name+'-observer'))

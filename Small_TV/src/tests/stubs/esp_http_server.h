@@ -22,7 +22,7 @@ typedef struct
     size_t content_len, position, response_length;
     unsigned status;
     unsigned recv_timeouts;
-    bool recv_disconnect;
+    bool recv_disconnect, response_complete;
     char response_type[64], location[128], cache_control[64];
     char response[98305];
 } httpd_req_t;
@@ -42,6 +42,7 @@ esp_err_t httpd_resp_set_status(httpd_req_t *req, const char *status);
 esp_err_t httpd_resp_set_type(httpd_req_t *req, const char *type);
 esp_err_t httpd_resp_set_hdr(httpd_req_t *req, const char *name, const char *value);
 esp_err_t httpd_resp_send(httpd_req_t *req, const char *data, int length);
+esp_err_t httpd_resp_send_chunk(httpd_req_t *req, const char *data, int length);
 esp_err_t httpd_resp_send_err(httpd_req_t *req, httpd_err_code_t code, const char *message);
 size_t httpd_req_get_hdr_value_len(httpd_req_t *req, const char *name);
 esp_err_t httpd_req_get_hdr_value_str(httpd_req_t *req, const char *name, char *out,

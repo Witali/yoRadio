@@ -116,6 +116,12 @@ revision. Host tests дополнительно исключают лишние 
 дробный offset. PowerShell `ConvertFrom-Json -DateKind String` предотвращает
 неявное преобразование независимой календарной reference в host timezone.
 
+`advanced_qemu.py` проверяет сохранённый NTP в настоящем chunked HTML: обычное
+имя, спецсимволы, 64 кавычки и пустое значение; ключ не попадает в страницу.
+Гость работает на собственной raw-копии, прямой backend подтверждён `query-block`.
+Gate `advanced_http` обязателен в QEMU suite/publisher/verifier.
+См. [advanced-editor-checks.md](../../qemu/parity/advanced-editor-checks.md).
+
 Обязательный gate `photo_qemu.py` проводит настоящий multipart upload,
 download и cold boot через SDK/flash. Valid/invalid JPEG, занятая сессия,
 порядок и retries проверяются без подмены application server. Четыре процесса

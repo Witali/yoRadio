@@ -16,6 +16,7 @@ BUILD = REPO / '.build/small-tv-esp32c2'
 sys.path.insert(0, str(ROOT/'tests'))
 from photo_frame_contract import validate_photo_frames
 from photo_controls_contract import validate_photo_brightness, validate_photo_controls, validate_photo_reinit
+from advanced_qemu import validate_advanced
 
 
 def read(path):
@@ -83,7 +84,7 @@ def main():
     for item in jpeg_inputs['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
                 'Additional JPEG fixture/adapter changed: ' + item['file'])
-    for name in ('startup_wait', 'weather_wait', 'photo_http', 'photo_frames', 'photo_brightness', 'photo_controls', 'photo_reinit'):
+    for name in ('startup_wait', 'weather_wait', 'advanced_http', 'photo_http', 'photo_frames', 'photo_brightness', 'photo_controls', 'photo_reinit'):
         gate = groups['qemu'][name]
         gate_source = gate['source_sha256'] if name in ('photo_frames', 'photo_brightness', 'photo_controls', 'photo_reinit') else gate['sources']['source_sha256']
         require(gate['passed'] and gate['inputs_unchanged'] and gate['app_sha256'] == app_sha and
@@ -94,6 +95,16 @@ def main():
                 'Guest observer tested different inputs: ' + name)
     startup, held_weather = groups['qemu']['startup_wait'], groups['qemu']['weather_wait']
     photo = groups['qemu']['photo_http']
+    advanced = groups['qemu']['advanced_http']
+    validate_advanced(advanced)
+    require(advanced['profile_sha256'] == groups['qemu']['profile_sha256'],
+            'Advanced editor used a different hardware profile')
+    for item in advanced['test_inputs']:
+        require(hashlib.sha256((REPO/item['file']).read_bytes()).hexdigest() == item['sha256'],
+                'Advanced editor test changed: '+item['file'])
+    for item in advanced['artifact_inputs']:
+        require(hashlib.sha256((ARCHIVE/item['file']).read_bytes()).hexdigest() == item['sha256'],
+                'Advanced editor artifact changed: '+item['file'])
     frames = groups['qemu']['photo_frames']
     validate_photo_frames(frames)
     require(len(frames['contract_checks']) == 10 and all(row['passed'] for row in frames['contract_checks']),

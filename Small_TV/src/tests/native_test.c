@@ -85,7 +85,17 @@ esp_err_t httpd_resp_set_type(httpd_req_t *req,const char *type) {strcpy(req->re
 esp_err_t httpd_resp_set_hdr(httpd_req_t *req,const char *name,const char *value)
 {if(!strcmp(name,"Location"))strcpy(req->location,value);if(!strcmp(name,"Cache-Control"))strcpy(req->cache_control,value);return ESP_OK;}
 esp_err_t httpd_resp_send(httpd_req_t *req,const char *data,int length)
-{if(length<0)length=(int)strlen(data);assert((size_t)length<sizeof(req->response));memcpy(req->response,data,length);req->response[length]=0;req->response_length=length;return ESP_OK;}
+{if(length<0)length=(int)strlen(data);assert((size_t)length<sizeof(req->response));memcpy(req->response,data,length);req->response[length]=0;req->response_length=length;req->response_complete=true;return ESP_OK;}
+esp_err_t httpd_resp_send_chunk(httpd_req_t *req,const char *data,int length)
+{
+    /* Model the SDK's concatenated response body, including its empty final chunk. */
+    if(req->response_complete)return ESP_FAIL;
+    if(length<0)length=(int)strlen(data);
+    if(!length){req->response_complete=true;return ESP_OK;}
+    assert((size_t)length<sizeof(req->response)-req->response_length);
+    if(length)memcpy(req->response+req->response_length,data,length);
+    req->response_length+=length;req->response[req->response_length]=0;return ESP_OK;
+}
 esp_err_t httpd_resp_send_err(httpd_req_t *req,httpd_err_code_t code,const char *message) {req->status=code;return httpd_resp_send(req,message,-1);}
 static const char *header(httpd_req_t *req,const char *name)
 {if(!strcmp(name,"Content-Type"))return req->content_type;if(!strcmp(name,"Origin"))return req->origin;if(!strcmp(name,"Host"))return req->host;return NULL;}
@@ -490,6 +500,35 @@ static void test_dns(void)
     CHECK(captive_dns_reply(packet,513,512)==0);
 }
 
+static void test_advanced_page(void)
+{
+    /* The editor must show the saved NTP hostname without exposing markup or the key. */
+    tv_settings_t original,s;
+    settings_snapshot(&original);s=original;
+    strcpy(s.ntp,"clock-test.invalid");
+    strcpy(s.weather_key,"never-render-this-fixture-key");
+    CHECK(settings_replace(&s)==ESP_OK);
+    const char *html=get("/advanced");
+    CHECK(strstr(html,"value=\"clock-test.invalid\"")!=NULL);
+    CHECK(strstr(html,s.weather_key)==NULL);
+    strcpy(s.ntp,"time\"><&'host");
+    CHECK(settings_replace(&s)==ESP_OK);
+    html=get("/advanced");
+    CHECK(strstr(html,"value=\"time&quot;&gt;&lt;&amp;&#39;host\"")!=NULL);
+    CHECK(strstr(html,s.ntp)==NULL && strstr(html,s.weather_key)==NULL);
+    memset(s.ntp,'\"',sizeof(s.ntp)-1);s.ntp[sizeof(s.ntp)-1]=0;
+    CHECK(settings_replace(&s)==ESP_OK);
+    html=get("/advanced");
+    char escaped[6*(sizeof(s.ntp)-1)+1];
+    for(unsigned i=0;i<sizeof(s.ntp)-1;++i)memcpy(escaped+6*i,"&quot;",6);
+    escaped[sizeof(escaped)-1]=0;
+    CHECK(strstr(html,escaped)!=NULL && strstr(html,s.weather_key)==NULL);
+    s.ntp[0]=0;CHECK(settings_replace(&s)==ESP_OK);
+    html=get("/advanced");
+    CHECK(strstr(html,"value=\"\"")!=NULL && strstr(html,"</body></html>")!=NULL);
+    CHECK(settings_replace(&original)==ESP_OK);
+}
+
 #include "http_contracts.inc"
 
 int main(int argc,char **argv)
@@ -498,7 +537,7 @@ int main(int argc,char **argv)
     CHECK(argc==2 || argc==3);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
     CHECK(web_start()==ESP_OK);CHECK(registered_routes==40);
     for(unsigned i=0;i<registered_routes;++i)for(unsigned j=i+1;j<registered_routes;++j)CHECK(route_table[i]->method!=route_table[j]->method || strcmp(route_table[i]->uri,route_table[j]->uri));
-    test_settings();test_theme_requests();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_uploads();test_multipart();test_dns();
+    test_settings();test_theme_requests();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_advanced_page();test_uploads();test_multipart();test_dns();
     for(unsigned i=0;i<registered_routes;++i)CHECK(route_success[i]>0);
     if(argc==3)write_native_report(argv[2]);
     printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers\n",checks);
