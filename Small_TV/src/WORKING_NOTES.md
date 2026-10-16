@@ -26,6 +26,11 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   photo_controls/photo_reinit. Результат AD7A не считать проверкой нового образа.
   До начала нового full сохранить initial test/app/ELF/QEMU pins, далее не менять
   его source/tests/helpers, опрашивать один живой handle.
+- Root build80930 завершён exit0: appD978AAB6/source0BAA7E03/ELF8AC006E0,
+  1 176 480 байт/free359 520 сохранён в firmware, actual assembly отдельно
+  native-photo-root-integrated. Новый full пока не запущен: браузер выявил
+  hardcoded NTP value pool.ntp.org в advanced_page при actual10.0.2.2. Исправить
+  prefill с HTML-escaping и проверить C+браузером перед новым full.
 - Собственная браузерная VM6BF6, PID30908, state
   .build/small-tv-browser/controls-20261016, URL http://127.0.0.1:18081.
   QMP подтвердил running и имя SmallTV-cbd9d8d529ec. В CUA Browser2 tab1,

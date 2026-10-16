@@ -1221,3 +1221,16 @@
   mask0/10/31,interval60/3/4 и пять decoded previews наблюдались. Full H03 не
   завершён, dedicated state не закрыт. Снимок baseline flash в -snapshot не
   отражает guest writes; это объясняет ошибочную первую проверку файла.
+
+### 2026-10-16 — root build после фото-слияния
+
+- Merge95eddf55 завершён; build80930 terminal exit0. AppD978AAB6 /
+  source0BAA7E03 / ELF8AC006E0,1,176,480 bytes/free359,520 сохранён в firmware;
+  root source identity совпадает с branch6BF6, BIN/ELF сохраняют свои новые IDs.
+  Actual instructions шести функций сохранены в native-photo-root-integrated.
+- Новый full ещё не начат. На отдельном браузерном6BF6 обнаружен hardcoded
+  NTP prefill pool.ntp.org при QMP-confirmed actual10.0.2.2. Для optional editor
+  требуется подставлять сохранённый hostname с безопасным HTML attribute encoding.
+  Partial browser controls и before screenshot сохранены в ignored state;
+  неправильный порядок JSON keys в одном test assertion исправлен сравнением
+  значений, не изменением приложения. Snapshot imagefile read тоже не был багом.
