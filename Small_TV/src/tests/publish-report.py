@@ -52,6 +52,15 @@ def main():
             len(jpeg_inputs['valid']) != 8 or len(jpeg_inputs['invalid']) != 12 or
             any(not row['passed'] for row in jpeg_inputs['valid'] + jpeg_inputs['invalid'])):
         raise ValueError('Additional JPEG gate omitted cases or used different executables')
+    huffman = jpeg_inputs['huffman']
+    if (not huffman['passed'] or len(huffman['valid']) != 4 or len(huffman['invalid']) != 17 or
+            {row['name'] for row in huffman['valid']} !=
+                {'one-bit', 'long-dc', 'long-ac', 'long-dc-and-ac'} or
+            {row['name'] for row in huffman['invalid']} !=
+                {'dc-depth-1'} | {'ac-depth-' + str(depth) for depth in range(1, 17)} or
+            any(not row['passed'] for row in huffman['valid'] + huffman['invalid']) or
+            any(row['decoder_started'] for row in huffman['invalid'])):
+        raise ValueError('Huffman gate omitted depth/boundary cases or accepted an impossible tree')
     for item in jpeg_inputs['test_inputs']:
         if hashlib.sha256((ROOT / item['file']).read_bytes()).hexdigest() != item['sha256']:
             raise ValueError('Additional JPEG fixture/adapter changed: ' + item['file'])

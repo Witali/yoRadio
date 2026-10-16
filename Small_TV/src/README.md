@@ -349,5 +349,6 @@ ESP32-C2 uses the software decoder. ChaN's copyright/redistribution terms,
 cJSON's MIT license and Spleen's BSD-2-Clause license are retained in
 `third_party/`. TJpgDec's configuration and Windows fixed-width-type includes
 are adapted for this project. Baseline header checks reject invalid quantization
-table IDs, unsupported sample precision and inconsistent frame component lengths;
+table IDs, unsupported sample precision, inconsistent frame component lengths
+and oversubscribed Huffman trees;
 the IDCT, color conversion and output algorithms are unchanged.

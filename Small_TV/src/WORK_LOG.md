@@ -872,3 +872,21 @@
   native draw и validation возвращают 0. Это следующий bug; random entropy case
   не доказывал проверку таблицы. Probe/result сохранены в root .build для следующего
   регрессионного case и отдельного исправления.
+
+### 2026-10-16 — Huffman prefix-space validation
+
+- Добавлены 4 valid 1/16-bit boundary cases и 17 impossible trees (DC1, AC1…16),
+  entropy намеренно не использует невозможные ветви. Actual before app a33788db
+  принимает все 17 в factory/native draw и native validation; 4 valid pass.
+- Factory builder 0x42011100..0x42011244 архивирован; 0x42011194..0x420111c8
+  строит 16-bit codewords без prefix-space check. FIXED_FACTORY в C считает
+  доступные префиксы uint32_t (включая 65536 при length16) до codeword allocation.
+- Candidate 131ce792 / source f411bf0e / ELF 9184b08b собран и сохранён в firmware:
+  1,176,272 bytes / free 359,728. Все 41 additional JPEG cases проходят;
+  invalid trees не достигают jd_decomp и не рисуют. Public 107/35/7 и host
+  3,884 pass. Before/after observer bytes одинаковы; отдельные reports/snippets
+  сохранены, header-only evidence a33788db не переименовывается.
+- Branch mandatory publisher/verifier проверяют все глубины. Main full run
+  22926 продолжает свой неизменённый app 0d8b7585. Candidate QEMU/full suite
+  пока не проходил; следующий шаг — фактический HTTP upload/download/reboot,
+  затем интеграция после terminal main run. Физических действий нет.

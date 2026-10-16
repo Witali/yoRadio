@@ -88,6 +88,10 @@ HTTP 503 записана как ошибка; наша прошивка отк�
 factory decoder, отсутствие рисования при discard validation и native cleanup.
 Pillow нужен только для воспроизведения закреплённых файлов. Описание:
 [jpeg-header-checks.md](../../qemu/parity/jpeg-header-checks.md).
+Эта же группа проверяет ещё 4 корректных 1/16-bit Huffman boundaries и 17
+невозможных таблиц с рабочим entropy: DC depth 1 и AC depths 1…16. Ошибки
+должны отклоняться до начала декомпрессии; буквальный factory acceptance
+записывается отдельно. [Huffman-проверки](../../qemu/parity/huffman-checks.md).
 
 Группа `machine_timezones` исполняет настоящий код преобразования времени и libc:
 36,404 сравнения для 109 исходных ключей стран, все записанные переходы ±1 секунду,

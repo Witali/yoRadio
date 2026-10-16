@@ -41,3 +41,5 @@ DC Huffman codes принимается обоими decoder и native validatio
 tree невозможно; entropy использует лишь первый код. Первый malformed mutation
 падал позже на entropy и не доказывал проверку самой таблицы. Нужны отдельные
 case и исправление; этот scoped результат не закрывает arbitrary JPEG fuzz.
+Последующее исправление и точные boundary/depth tests описаны в
+[huffman-checks.md](huffman-checks.md); header-only results выше остаются историческими.

@@ -68,6 +68,15 @@ def main():
             len(jpeg_inputs['valid']) == 8 and len(jpeg_inputs['invalid']) == 12 and
             all(row['passed'] for row in jpeg_inputs['valid'] + jpeg_inputs['invalid']),
             'Additional JPEG gate omitted cases or used different inputs')
+    huffman = jpeg_inputs['huffman']
+    require(huffman['passed'] and len(huffman['valid']) == 4 and len(huffman['invalid']) == 17 and
+            {row['name'] for row in huffman['valid']} ==
+                {'one-bit', 'long-dc', 'long-ac', 'long-dc-and-ac'} and
+            {row['name'] for row in huffman['invalid']} ==
+                {'dc-depth-1'} | {'ac-depth-' + str(depth) for depth in range(1, 17)} and
+            all(row['passed'] for row in huffman['valid'] + huffman['invalid']) and
+            not any(row['decoder_started'] for row in huffman['invalid']),
+            'Huffman gate omitted depth/boundary cases or accepted an impossible tree')
     for item in jpeg_inputs['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
                 'Additional JPEG fixture/adapter changed: ' + item['file'])

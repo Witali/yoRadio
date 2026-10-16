@@ -15,3 +15,5 @@ python Small_TV/src/tools/generate_jpeg_test_fixtures.py
 at the SDK flash-read boundary. Every pixel, including outside-image guards,
 is compared. Header/entropy/restart mutations check rejection and error cleanup.
 Upload policy, HTTP and FreeRTOS concurrency remain separate tests.
+The same runner builds additional minimal gray JPEGs in Python to test valid
+1/16-bit codes and impossible unused Huffman branches at every depth 1..16.

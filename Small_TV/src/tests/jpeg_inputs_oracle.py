@@ -95,6 +95,56 @@ def mutations(baseline, restarted):
     return cases
 
 
+def gray_huffman_fixture(dc_counts, dc_values, ac_counts, ac_values):
+    """Encode a gray 240x240 image using only zero DC and EOB, without an image library."""
+    def segment(marker, payload):
+        """Frame one JPEG segment with its exact big-endian length."""
+        return b'\xff' + bytes([marker]) + (len(payload) + 2).to_bytes(2, 'big') + payload
+    dc_bits = next(index + 1 for index, count in enumerate(dc_counts) if count)
+    ac_bits = next(index + 1 for index, count in enumerate(ac_counts) if count)
+    bits = 900 * (dc_bits + ac_bits)  # 30x30 grayscale MCUs; both first codewords are zero.
+    entropy = bytearray((bits + 7) // 8)
+    if bits % 8:
+        entropy[-1] = (1 << (8 - bits % 8)) - 1
+    return (b'\xff\xd8' + segment(0xdb, b'\0' + bytes([1]) * 64) +
+            segment(0xc0, b'\x08\x00\xf0\x00\xf0\x01\x01\x11\x00') +
+            segment(0xc4, b'\0' + bytes(dc_counts) + bytes(dc_values) +
+                    b'\x10' + bytes(ac_counts) + bytes(ac_values)) +
+            segment(0xda, b'\x01\x01\x00\x00\x3f\0') + entropy + b'\xff\xd9')
+
+
+def huffman_cases(factory, native, original):
+    """Exercise unused invalid branches at every depth and valid 1/16-bit boundaries."""
+    one, long = [1] + [0] * 15, [0] * 15 + [1]
+    valid, invalid = [], []
+    for name, dc, ac in (('one-bit', one, one), ('long-dc', long, one),
+                         ('long-ac', one, long), ('long-dc-and-ac', long, long)):
+        data = gray_huffman_fixture(dc, [0], ac, [0])
+        row = {'name': name, 'width': 240, 'height': 240, 'bytes': len(data),
+               'sha256': hashlib.sha256(data).hexdigest()}
+        result = valid_case(factory, native, original, row, data)
+        valid.append(result)
+        print('Huffman valid', name, 'passed:', result['passed'], flush=True)
+    ac_symbols = [0] + [value for value in range(1, 256) if 1 <= value % 16 <= 10]
+    inputs = [('dc-depth-1', gray_huffman_fixture([3] + [0] * 15, [0, 1, 2], one, [0]))]
+    for depth in range(1, 17):
+        counts = [1] * (depth - 1) + [3] + [0] * (16 - depth)
+        # Each earlier level leaves one unused prefix; the next level has two
+        # slots, so three codes oversubscribe it. Entropy uses only the first EOB.
+        data = gray_huffman_fixture(one, [0], counts, ac_symbols[:sum(counts)])
+        inputs.append(('ac-depth-' + str(depth), data))
+    for name, data in inputs:
+        result = invalid_case(native, original, name, data)
+        result['passed'] = result['passed'] and not result['decoder_started']
+        asset = supply(factory, original, {'width': 240, 'height': 240}, data)
+        factory.panel = patterned_panel()
+        literal = factory.draw(asset, length=len(data))
+        result['literal_factory'] = {'result': literal, 'decoder_started': factory.decompression_started}
+        invalid.append(result)
+        print('Huffman invalid', name, 'passed:', result['passed'], flush=True)
+    return {'passed': all(row['passed'] for row in valid + invalid), 'valid': valid, 'invalid': invalid}
+
+
 def supply(machine, original, row, data):
     """Supply only synthetic JPEG bytes and erased padding at the SDK flash-read boundary."""
     if machine.is_factory:
@@ -181,13 +231,15 @@ def main():
             errors.append(str(error))
         invalid.append(result)
         print(name, 'passed:', result['passed'], flush=True)
+    huffman = huffman_cases(factory, native, original)
     unchanged = app_sha == verify_inputs(ROOT, dependencies) and all(
         digest(ROOT / row['file']) == row['sha256'] for row in inputs)
     archive = json.loads((ROOT / 'firmware/development/small-tv-esp32c2-reconstructed/manifest.json').read_text(encoding='utf-8-sig'))
-    report = {'passed': all(row['passed'] for row in valid + invalid) and unchanged and not errors,
+    report = {'passed': all(row['passed'] for row in valid + invalid) and huffman['passed'] and unchanged and not errors,
               'app_sha256': app_sha, 'source_sha256': archive['source_sha256'],
               'native_elf_sha256': native.source_sha, 'factory_elf_sha256': factory.source_sha,
               'test_inputs': inputs, 'inputs_unchanged': unchanged, 'valid': valid, 'invalid': invalid,
+              'huffman': huffman,
               'scope': __doc__ + ' Only the SDK flash-read boundary supplies generated test bytes. Full panel guards, discard validation and native error cleanup are checked. This is not an image-upload HTTP or physical/concurrency test.'}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8', newline='\n')

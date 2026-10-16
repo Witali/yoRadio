@@ -7,6 +7,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Huffman gap исправлен следующим child change: actual before принимал все 17
+impossible prefix trees (DC1, AC1…16) в factory/native draw и native validation.
+Новый uint32 prefix-space check отклоняет их до jd_decomp; 4 valid 1/16-bit
+boundaries и прежние 8/12 cases проходят, всего 41. Public 107/35/7 и host
+3,884 также pass. App 131ce792 / source f411bf0e / ELF 9184b08b сохранён в
+firmware ветки, 1,176,272 bytes / free 359,728. Actual snippets/scoped evidence:
+`../qemu/parity/huffman-checks.md`. Root full run 22926 не менялся, candidate
+full suite ещё нужен. Следующий функциональный пробел — real HTTP photo
+start/chunks/finish/download/reboot с valid/invalid JPEG, кроме уже проверенных
+host adapters; затем интеграция ветки и общий повтор после terminal 22926.
+
 Текущая отдельная ветка `codex/small-tv-jpeg-inputs`, worktree
 `.worktree/small-tv-jpeg-inputs`, основана на main 41b972aa. Root full run 22926
 продолжает проверять app 0d8b7585 неизменёнными source/test/helper bytes.

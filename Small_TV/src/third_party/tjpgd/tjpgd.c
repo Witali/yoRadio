@@ -276,10 +276,15 @@ static JRESULT create_huffman_tbl ( /* 0:OK, !0:Failed */
     size_t ndata                /* Size of input data */
 )
 {
+    /* Build canonical DC/AC tables from code-length counts and symbols.
+     * FIXED_FACTORY: 0x42011100 accepts oversubscribed prefix trees. Count
+     * available prefixes before constructing codewords, so unused impossible
+     * branches cannot pass validation merely because entropy avoids them. */
     unsigned int i, j, b, cls, num;
     size_t np;
     uint8_t d, *pb, *pd;
     uint16_t hc, *ph;
+    uint32_t available_codes;
 
 
     while (ndata) { /* Process all tables in the segment */
@@ -297,8 +302,17 @@ static JRESULT create_huffman_tbl ( /* 0:OK, !0:Failed */
             return JDR_MEM1;    /* Err: not enough memory */
         }
         jd->huffbits[num][cls] = pb;
+        available_codes = 1;
         for (np = i = 0; i < 16; i++) {     /* Load number of patterns for 1 to 16-bit code */
-            np += (pb[i] = *data++);        /* Get sum of code words for each code */
+            /* Use 32 bits: a sparse valid table can have 65536 available
+             * prefixes at length 16. Incomplete trees remain supported. */
+            available_codes <<= 1;
+            b = pb[i] = *data++;
+            if (b > available_codes) {
+                return JDR_FMT1;
+            }
+            available_codes -= b;
+            np += b;
         }
         ph = alloc_pool(jd, np * sizeof (uint16_t));/* Allocate a memory block for the code word table */
         if (!ph) {
