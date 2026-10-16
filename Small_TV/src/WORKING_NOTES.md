@@ -7,6 +7,28 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Последний завершённый этап: photo branch отправлена до `a8b119e3`.
+Повторный `/setclocktype` с прежним номером теперь остаётся командой
+переинициализации, как безусловный сброс флага `0x4200d854` у factory.
+Отдельная временная ревизия и единый mutex snapshot восстанавливают команду
+без новых NVS commits при неизменённых настройках; persisted ABI прежний.
+Candidate app `2eb7bb69` / source `efc9fc36` / ELF `4dc4e444`, 1 176 480 байт,
+свободно 359 520. Host3909 и platform45/1,182,288 pass. Batch47090 exit0:
+тот же HTTP observer до/после, три перехода фото1/0/1, idle brightness,
+84 полных кадра/9 сцен,10 frame guards и9 command guards проходят. Все ВМ
+этой серии закрыты. Source/image/ELF/staged proof прошёл; assembly и scoped
+reports сохранены в photo-reselect-checks.md ветки. Main ими не подменять.
+
+Root92411 остаётся жив на AD7A: native classic calendar через
+fractional-midnight. Все63 initial tests и BIN/ELF/QEMU hashes повторно совпали.
+До terminal менять только контекстные Markdown. Затем сначала опубликовать
+его19-group result, после этого merge всей photo ветки, root build/full suite
+с новыми photo_frames/photo_brightness/photo_controls gates. Между переходами
+проверки завершены; команды во время fade, browser/physical/soak остаются gaps.
+Уточнение пользователя про программные задержки сохранено в software-delays.md:
+убирать лишние ожидания после готовности данных, сохранять необходимый timing
+и task yield. Дополнительных обоснованных удалений текущий просмотр не выявил.
+
 Новая завершённая ветка `codex/small-tv-photo-frames`, worktree
 `.worktree/small-tv-photo-frames`, отправлена до `2a949010de70`.
 `57ef94ae` добавляет84 full photo/fade frames и9 canonical scenes на AD7A,

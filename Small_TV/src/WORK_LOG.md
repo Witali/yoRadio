@@ -1048,3 +1048,24 @@
   не менялся. Первоначальные 11-check reports/prototype исторические; архивные
   photo-http-before/candidate содержат окончательный одинаковый 21-check observer.
   Не моделировался power cut посреди операции записи flash.
+
+### 2026-10-16 — программные задержки и повторная команда темы
+
+- Пользователь уточнил, что имеет в виду программные задержки. Явные паузы
+  и циклы ожидания просмотрены в app. Ранее удалённые startup/HTTP-weather waits
+  остаются в обязательном suite. Остальные vTaskDelay имеют отдельное назначение;
+  новых обоснований для их удаления нет. Уточнение записано в software-delays.md.
+- Photo branch отправлена до a8b119e3. Factory0x4200d854 всегда сбрасывает latch
+  при выборе темы; oldE390 терял same-value command. Восстановлены transient
+  command revision и согласованный snapshot под mutex, без лишних NVS commits.
+  Native3909/platform45/1,182,288 pass. Candidate2eb7bb69/sourceefc9fc36 /
+  ELF4dc4e444,1,176,480 bytes/free359,520 сохранён в firmware ветки.
+- Terminal47090 exit0: actual same-observer negative/positive HTTP, три полных
+  перехода фото1/0/1, idle brightness,84 frames/9 scenes,10 frame guards и9
+  command guards проходят. Actual assembly и scoped reports сохранены отдельно,
+  staged source/images/generated resources/ELF proof прошёл. Все ВМ серии закрыты.
+- Root92411 жив, native classic natural calendar через fractional-midnight.
+  Все63 initial test files, appAD7A/ELF6D7B/QEMU неизменны. Не интегрировать новую
+  ветку до terminal и публикации root19-group result; после merge/build нужен
+  полный набор с тремя новыми photo gates. Main production/tests не менялись.
+  Физических действий или изменений QEMU не было; посторонние файлы сохранены.
