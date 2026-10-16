@@ -527,3 +527,29 @@
   реальные UDP packets и все time-bearing themes/formats; затем adversarial JPEG,
   concurrency/long-run, browser и physical acceptance. Полное соответствие
   не заявлено; all_functionality_verified остаётся false.
+
+### 2026-10-16 — автономный ход часов при потере Wi-Fi, отдельный кандидат
+
+- Создан собственный worktree `.worktree/small-tv-offline-clock`, ветка
+  `codex/small-tv-offline-clock`, от e4195bb9. Основной календарный прогон не
+  менялся. SDK используется через явный DependencyRoot, без junction/copy.
+- Заводской main 0x42008e56 продолжает theme dispatch и update_local_time при
+  offline/retry, ограничивая только weather retry. В C прежний else-if online
+  замораживал экран. После восстановления active-phase dispatch платформенные
+  тесты показывают ход минут/DST в classic/simple/dial и завершение фото-fade.
+- Второй сбой — station IP заменялся AP адресом. 0x4200c602 сохраняет GOT_IP
+  event snapshot при отключении. Добавлен atomic IPv4 cache. Тест с новым lease
+  .21 при позднем SDK snapshot .15 проверяет выбор event payload, а не netif.
+- До исправления реальные platform frames расходились на 713/815 пикселей;
+  после исправления все 33 platform scenarios прошли. Новый network_oracle
+  исполняет event/getter RV32 и 16 original active-loop states: старый app
+  9e4f856a даёт ожидаемый fail, кандидат 072135ee проходит четыре event traces
+  и весь dispatch. Подменяются только явно перечисленные SDK/output boundaries.
+- Кандидат app 1,176,176 bytes, free 359,824; source e10dd9f6 / ELF eec972f2.
+  BIN и manifest сохранены в firmware этой ветки. Exact original/main и native
+  clock_task/wifi_event/network_address instructions архивированы. Результаты
+  before/candidate разделены, исходный factory dump не менялся.
+- machine_network добавлен в полный набор и следующий publisher/verifier.
+  QEMU/full suite кандидата ещё не проходили; прежние опубликованные общие
+  отчёты сохраняют старую app identity. Нужны natural virtual Wi-Fi loss/recovery,
+  новый полный прогон и затем включение исправления в main. Физических действий нет.

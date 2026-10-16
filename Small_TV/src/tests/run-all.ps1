@@ -34,7 +34,7 @@ function Invoke-TestGroup([string]$Name,[scriptblock]$Action,[string]$ResultPath
 $nativeReport=Join-Path $repo ".build\small-tv-esp32c2\native-tests\report.json"
 Invoke-TestGroup "native" {& (Join-Path $PSScriptRoot "run.ps1") -VsDevCmd $VsDevCmd} $nativeReport
 $platformReport=Join-Path $repo ".build\small-tv-esp32c2\platform-tests\report.json"
-Invoke-TestGroup "platform" {& (Join-Path $PSScriptRoot "run-platform.ps1") -VsDevCmd $VsDevCmd} $platformReport
+Invoke-TestGroup "platform" {& (Join-Path $PSScriptRoot "run-platform.ps1") -VsDevCmd $VsDevCmd -PythonPath $PythonPath} $platformReport
 $frontendReport=Join-Path $OutputDirectory "frontend.json"
 Invoke-TestGroup "frontend" {
     & $PythonPath (Join-Path $PSScriptRoot "frontend_test.py") --output $frontendReport
@@ -119,6 +119,14 @@ else {
         & $PythonPath (Join-Path $PSScriptRoot "text_oracle.py") --output $textReport
         if($LASTEXITCODE){throw "UTF-8 scalar/prefix/glyph machine comparison failed"}
     } $textReport
+}
+if ($SkipMachine) {$groups.Add(@{name="machine_network";status="not_run";reason="Explicit -SkipMachine"})}
+else {
+    $networkReport=Join-Path $OutputDirectory "network.json"
+    Invoke-TestGroup "machine_network" {
+        & $PythonPath (Join-Path $PSScriptRoot "network_oracle.py") --output $networkReport
+        if($LASTEXITCODE){throw "Station event/address machine comparison failed"}
+    } $networkReport
 }
 if ($SkipQemu) {$groups.Add(@{name="qemu_profile";status="not_run";reason="Explicit -SkipQemu"})}
 else {

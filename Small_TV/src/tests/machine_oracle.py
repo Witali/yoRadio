@@ -110,7 +110,7 @@ class Panel:
 
 class Machine:
     """Load immutable RV32 programs and call them with explicit ABI inputs."""
-    def __init__(self,variant):
+    def __init__(self,variant,*,dependency_root=None,native_elf=None):
         self.variant=variant
         self.is_factory=variant.startswith('factory')
         self.cpu=Uc(UC_ARCH_RISCV,UC_MODE_RISCV32)
@@ -123,9 +123,11 @@ class Machine:
         self.adapters={}
         self.executed_adapters={}
         self.fault=None
-        rom=ROOT/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'
+        dependencies=Path(dependency_root) if dependency_root is not None else ROOT
+        rom=dependencies/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'
         self.load(rom)
-        path=(ROOT/'.build/small-tv-reverse/factory-analysis.elf' if self.is_factory
+        path=(dependencies/'.build/small-tv-reverse/factory-analysis.elf' if self.is_factory
+              else Path(native_elf) if native_elf is not None
               else ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf')
         self.load(path)
         self.source_sha=hashlib.sha256(path.read_bytes()).hexdigest()

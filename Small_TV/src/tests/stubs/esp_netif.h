@@ -1,5 +1,6 @@
 #pragma once
 #include <stddef.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include "esp_err.h"
 typedef struct
@@ -14,6 +15,12 @@ typedef struct
 {
     int identity;
 } esp_netif_t;
+typedef struct
+{
+    esp_netif_t *esp_netif;
+    esp_netif_ip_info_t ip_info;
+    bool ip_changed;
+} ip_event_got_ip_t;
 typedef struct
 {
     struct

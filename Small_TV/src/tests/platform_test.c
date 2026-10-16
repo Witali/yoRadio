@@ -308,10 +308,18 @@ void dns_start(void)
 {
     ++dns_started;
 }
+static void got_ip_at(unsigned last_octet)
+{
+    /* Deliver the SDK event snapshot, independently of a later netif query. */
+    assert(event_callback);
+    ip_event_got_ip_t event={.esp_netif=&sta,.ip_changed=true};
+    esp_netif_set_ip4_addr(&event.ip_info.ip,10,0,2,last_octet);
+    event_callback(NULL, IP_EVENT, IP_EVENT_STA_GOT_IP, &event);
+}
 static void got_ip(void)
 {
-    assert(event_callback);
-    event_callback(NULL, IP_EVENT, IP_EVENT_STA_GOT_IP, NULL);
+    /* Use the ordinary synthetic station lease for other scenarios. */
+    got_ip_at(15);
 }
 static void disconnected(void)
 {
@@ -370,6 +378,8 @@ static void test_wifi_reconnect(void)
     {
         disconnected();
         CHECK(!network_connected() && connects == i + 2);
+        network_address(address,sizeof(address));
+        CHECK(!strcmp(address,"10.0.2.15"));
     }
     disconnected();
     CHECK(connects == 5);
@@ -388,6 +398,8 @@ static void test_wifi_reconnect(void)
     before = connects;
     CHECK(network_scan(records, &count) == ESP_FAIL);
     CHECK(scan_clears == 1 && connects == before + 1);
+    got_ip_at(21);disconnected();network_address(address,sizeof(address));
+    CHECK(!strcmp(address,"10.0.2.21"));
 }
 static void test_wifi_open(void)
 {
@@ -1368,7 +1380,7 @@ static void clock_scenario(void)
         blocked_transfers = transfers;
     }
     if (clock_step > 280 && clock_step <= 285)
-        CHECK(transfers == blocked_transfers);
+        CHECK(!network_connected() && services_time_synced());
     if (clock_step == 285)
         got_ip();
     if (clock_step == 300)
@@ -1669,24 +1681,12 @@ static void test_clock_timezone_simple(void)
 
 static void clock_sync_scenario(void)
 {
-    /* Observe preset, notification and offline persistence through the actual display task. */
+    /* Keep time and the last station address visible during disconnect/reconnect. */
     struct tm expected = clock_step < 2
         ? (struct tm){.tm_year=125,.tm_mon=8,.tm_mday=19,.tm_hour=17,.tm_min=4,.tm_sec=40,.tm_wday=5}
         : (struct tm){.tm_year=124,.tm_mon=1,.tm_mday=29,.tm_hour=12,.tm_min=3,.tm_sec=40,
                       .tm_wday=4,.tm_yday=59};
-    static uint16_t last_online[240*240];
-    if (clock_step == 3)
-    {
-        /* The existing station reconnect policy holds the LCD until STA returns;
-         * preserve the successful-sync latch and advance the clock underneath it. */
-        CHECK(services_time_synced());
-        CHECK(!memcmp(last_online,panel,sizeof(panel)));
-        fake_time+=60;
-        ++clock_step;
-        got_ip();
-        return;
-    }
-    if (clock_step == 4) expected.tm_min=4;
+    if (clock_step >= 3) expected.tm_min=clock_step+1;
     static uint16_t incremental[240*240];
     memcpy(incremental,panel,sizeof(panel));
     weather_snapshot_t current;
@@ -1703,7 +1703,13 @@ static void clock_sync_scenario(void)
         fprintf(stderr,"Sync frame step %u theme %u differences %u\n",clock_step,preferences.theme,differences);
     }
     CHECK(!memcmp(incremental,panel,sizeof(panel)));
-    memcpy(last_online,panel,sizeof(panel));
+    if (clock_step == 3)
+    {
+        char address[20];
+        CHECK(services_time_synced() && !network_connected() && !network_ap_active());
+        network_address(address,sizeof(address));
+        CHECK(!strcmp(address,"10.0.2.15"));
+    }
     CHECK(services_time_synced() == (clock_step >= 2));
     if (++clock_step == 5)
         longjmp(blocked,1);
@@ -1717,7 +1723,8 @@ static void clock_sync_scenario(void)
         struct timeval event={.tv_sec=fake_time};
         sntp_callback(&event); /* Epoch is unchanged; only actual synchronization becomes valid. */
     }
-    if (clock_step == 3) disconnected();
+    if (clock_step == 3) {fake_time+=60; disconnected();}
+    if (clock_step == 4) {fake_time+=60; got_ip();}
 }
 static void test_clock_sync(unsigned theme)
 {
@@ -1749,6 +1756,87 @@ static void test_clock_sync_simple(void)
 {
     /* Run simple first-sync and offline validity in a fresh process. */
     test_clock_sync(1);
+}
+
+static void offline_dst_scenario(void)
+{
+    /* Cross the GB spring gap while STA is down, then recover without losing time. */
+    struct tm expected={.tm_year=126,.tm_mon=2,.tm_mday=29,.tm_hour=clock_step?2:0,
+                        .tm_min=clock_step==0?59:clock_step==2?1:0,
+                        .tm_sec=clock_step?2:58,.tm_wday=0,.tm_yday=87,.tm_isdst=clock_step!=0};
+    uint16_t observed[240*240];
+    memcpy(observed,panel,sizeof(panel));
+    weather_snapshot_t weather;weather_snapshot(&weather);
+    display_fill(0,0,240,240,0);
+    if (preferences.theme==0)
+        /* 181 startup + 22 timer ticks crosses the next 3-second label event. */
+        factory_draw_classic(&preferences,&expected,&weather,clock_step==2?1:0,0,true,true);
+    else if (preferences.theme==1)
+        factory_draw_simple(&preferences,&expected,"10.0.2.15",true,true,true);
+    else {
+        factory_draw_dial(&expected,"10.0.2.15",true);
+        if (clock_step) factory_draw_dial(&expected,"10.0.2.15",false);
+    }
+    if (memcmp(observed,panel,sizeof(panel)))
+        fprintf(stderr,"Offline DST frame step %u theme %u did not match\n",clock_step,preferences.theme);
+    CHECK(!memcmp(observed,panel,sizeof(panel)));
+    char address[20];network_address(address,sizeof(address));
+    CHECK(!strcmp(address,"10.0.2.15") && services_time_synced());
+    if (clock_step==1) CHECK(!network_connected() && !network_ap_active());
+    if (++clock_step==3) longjmp(blocked,1);
+    fake_time+=clock_step==1?4:60;
+    tick_clock(11); /* A real pending second event is required by the dial. */
+    if (clock_step==1) disconnected();else got_ip();
+}
+static void test_offline_dst(unsigned theme)
+{
+    /* Compose the actual time conversion, reconnect state and renderer during an offline DST edge. */
+    preferences.theme=theme;preferences.wifi_mode=1;
+    strcpy(preferences.ssid,"fixture");strcpy(preferences.country,"GB");
+    struct tm utc={.tm_year=126,.tm_mon=2,.tm_mday=29,.tm_hour=0,.tm_min=59,.tm_sec=58};
+    fake_time=_mkgmtime64(&utc);
+    CHECK(clock_ui_timer_init()==ESP_OK);tick_clock(181);
+    CHECK(network_init()==ESP_OK);got_ip();start_synced_clock_services();
+    strcpy(preferences.weather_key,"fixture-key");run_task("weather_http",seed_weather);
+    CHECK(display_init()==ESP_OK);clock_ui_start();
+    run_task("clock_display",offline_dst_scenario);
+}
+static void test_offline_dst_classic(void)
+{
+    /* Keep the classic time/date current while disconnected. */
+    test_offline_dst(0);
+}
+static void test_offline_dst_simple(void)
+{
+    /* Keep simple digits/Sunday current while disconnected. */
+    test_offline_dst(1);
+}
+static void test_offline_dst_dial(void)
+{
+    /* Keep analog hands current on timer events while disconnected. */
+    test_offline_dst(3);
+}
+static void offline_photo_scenario(void)
+{
+    /* Finish every fade step after a lost link, including photo selection and configured duty. */
+    static const unsigned expected[]={2457,4914,8191,4914,2457,4095};
+    CHECK(duty==expected[clock_step]);
+    CHECK(photo_draws==(clock_step>=2));
+    if (clock_step) CHECK(!network_connected() && services_time_synced());
+    if (++clock_step==6) longjmp(blocked,1);
+    if (clock_step==1) disconnected();
+    tick_clock(1);
+}
+static void test_offline_photo(void)
+{
+    /* Exercise the real coordinator and fade algorithm, with only the photo blit stubbed. */
+    preferences.theme=2;preferences.photo_mask=1;preferences.photo_size[0]=100;
+    preferences.day_level=500;preferences.wifi_mode=1;strcpy(preferences.ssid,"fixture");
+    CHECK(clock_ui_timer_init()==ESP_OK);tick_clock(181);
+    CHECK(network_init()==ESP_OK);got_ip();start_synced_clock_services();
+    strcpy(preferences.weather_key,"fixture-key");run_task("weather_http",seed_weather);
+    CHECK(display_init()==ESP_OK && backlight_init()==ESP_OK);clock_ui_start();
+    run_task("clock_display",offline_photo_scenario);
 }
 
 int main(int argc, char **argv)
@@ -1786,6 +1874,10 @@ int main(int argc, char **argv)
                  {"weather_field_cleanup", test_weather_field_cleanup},
                  {"clock_coordinator", test_clock_coordinator},
                  {"clock_first_digital_brightness", test_first_digital_brightness},
+                 {"clock_offline_dst_classic", test_offline_dst_classic},
+                 {"clock_offline_dst_simple", test_offline_dst_simple},
+                 {"clock_offline_dst_dial", test_offline_dst_dial},
+                 {"clock_offline_photo", test_offline_photo},
                  {"timer_driver_failures", test_timer_driver_failures},
                  {"clock_animation_selection", test_clock_animation_selection},
                  {"clock_text_scroll", test_clock_text_scroll},

@@ -104,6 +104,9 @@ static void clock_task(void *unused)
      * FIXED_RECONSTRUCTION: the factory's 0x42008e08 applies backlight before
      * the next digital render. Our combined init/render must not paint its
      * first complete digital frame at the previous startup/photo brightness.
+     * FIXED_RECONSTRUCTION: 0x42008e56 keeps rendering its active clock while
+     * station retries run. A lost link must not freeze the time, hands or fade;
+     * an explicit setup AP still selects the setup screen above this branch.
      * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
      * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
      * after the photo fade rather than 0x4200bc36's full-brightness ending.
@@ -167,7 +170,7 @@ static void clock_task(void *unused)
                 factory_draw_setup();
             phase = 2;
         }
-        else if (online)
+        else if (online || phase == 3)
         {
             bool reset_theme = phase != 3 || previous_theme != settings.theme;
             if (reset_theme)

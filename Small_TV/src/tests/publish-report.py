@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'qemu_profile', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -42,6 +42,20 @@ def main():
     timezones = groups['machine_timezones']['result']
     time_state = groups['machine_time_state']['result']
     text = groups['machine_text']['result']
+    network = groups['machine_network']['result']
+    if (network['app_sha256'] != report['app_sha256'] or
+            network['source_sha256'] != report['source_sha256'] or
+            network['native_elf_sha256'] != text['native_elf_sha256'] or
+            network['factory_elf_sha256'] != text['factory_elf_sha256'] or
+            set(network['event_cases']) != {'factory','native'} or
+            any({row['case'] for row in cases} != {'new-dhcp-lease','reconnect-resets-retries'}
+                or len(cases) != 2 or any(not row['passed'] for row in cases)
+                for cases in network['event_cases'].values()) or
+            len(network['factory_dispatch']) != 16 or
+            {(row['theme'],row['station_state']) for row in network['factory_dispatch']} !=
+                {(theme,state) for theme in range(4) for state in (0,1,2,5)} or
+            any(not row['passed'] for row in network['factory_dispatch'])):
+        raise ValueError('Station event/dispatch gate omitted states or used different executables')
     if not timezones['complete_country_set'] or timezones['legacy_only'] or len(timezones['countries']) != 109:
         raise ValueError('Timezone gate did not execute every recovered country key')
     if not jpeg['complete_asset_set'] or len(jpeg['cases']) != 107:
@@ -201,6 +215,7 @@ def main():
     summary['machine_timezones']['countries'] = len(timezones['countries'])
     summary['machine_timezones']['invalid_inputs'] = len(timezones['invalid_inputs'])
     summary['machine_time_state'] = time_state
+    summary['machine_network'] = network
     summary['machine_text'] = {key: text[key] for key in
         ('passed', 'app_sha256', 'source_sha256', 'factory_elf_sha256', 'native_elf_sha256',
          'font_source_sha256', 'unicode_glyphs', 'ascii_glyphs_per_height', 'approved_fixes', 'scope')}

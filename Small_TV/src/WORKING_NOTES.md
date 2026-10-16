@@ -11,6 +11,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 оригинала исправлять, как попросил пользователь. Намеренные исправления учитывать
 отдельно от ошибок нашего переноса; полное совпадение пока не установлено.
 
+Ветка `codex/small-tv-offline-clock` в `.worktree/small-tv-offline-clock`
+восстанавливает активные часы/фото-fade и последний station IP при потере Wi-Fi.
+Factory main `0x42008e56` и обработчик `0x4200c602` сравнены с настоящим compiled
+C. Кандидат app `072135ee` / source `e10dd9f6` / ELF `eec972f2` собран и сохранён
+в firmware этой ветки. Все 33 platform cases прошли; новый RV32 network gate
+показывает fail старого app 9e4f856a и pass кандидата (четыре event traces,
+16 factory dispatch states). Общие published reports ещё относятся к старому
+app; candidate не объявлять прошедшим QEMU/full suite. Следующее: естественный
+Wi-Fi disconnect/reconnect в QEMU, затем полный набор с обязательным
+machine_network. Подробности/ограничения — `../qemu/parity/offline-clock-checks.md`.
+
 - Сопоставлять оригинальные инструкции с реально скомпилированным C ELF, а не
   только с псевдокодом Ghidra. Не менять исходный `Small_TV/full-flash.bin`.
 - Если обнаружен интересный случай или пограничное состояние, добавлять тест:

@@ -37,7 +37,7 @@ def main():
             'A full passing suite is required')
     groups = {row['name']: row['result'] for row in suite['groups'] if row['status'] == 'passed'} \
         if 'groups' in suite else suite
-    for name in ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'qemu_profile', 'qemu'):
+    for name in ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu'):
         require(name in groups and groups[name]['passed'], 'Missing passing group: ' + name)
     for item in suite['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
@@ -66,6 +66,15 @@ def main():
             network['layout']['elf_sha256'] == state['native_elf_sha256'],
             'Real SNTP gate tested different machine/emulator inputs')
     text_gate, text_network = groups['machine_text'], groups['qemu']['text_http']
+    station = groups['machine_network']
+    require(station['app_sha256'] == app_sha and station['source_sha256'] == manifest['source_sha256']
+            and station['native_elf_sha256'] == state['native_elf_sha256'],
+            'Station event gate tested a different application/source/ELF')
+    require(set(station['event_cases']) == {'factory','native'} and
+            all(len(cases) == 2 and all(row['passed'] for row in cases)
+                for cases in station['event_cases'].values()) and
+            len(station['factory_dispatch']) == 16 and all(row['passed'] for row in station['factory_dispatch']),
+            'Station event/dispatch gate omitted required cases')
     require(text_gate['app_sha256'] == app_sha and text_gate['source_sha256'] == manifest['source_sha256']
             and text_gate['native_elf_sha256'] == state['native_elf_sha256']
             and text_gate['native_elf_sha256'] == hashlib.sha256((BUILD/'small_tv_reconstructed.elf').read_bytes()).hexdigest(),
@@ -168,6 +177,8 @@ def main():
     report['machine_timezone_comparisons'] = timezones['comparisons']
     report['qemu_field_report'] = '../qemu/field-http-validation.json'
     report['machine_time_state_report'] = '../qemu/parity/time-state-validation.json'
+    report['machine_network_event_traces'] = sum(len(cases) for cases in station['event_cases'].values())
+    report['machine_network_factory_dispatch_states'] = len(station['factory_dispatch'])
     report['machine_time_state_factory_cases'] = len(state['factory_cases'])
     report['machine_time_state_native_checks'] = len(state['native_cases'])
     report['qemu_time_report'] = '../qemu/time-http-validation.json'
