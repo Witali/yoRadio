@@ -61,7 +61,7 @@ void factory_scroll_tick(void)
 {
     /* Advance overflowing fields by two pixels per active 100-ms display loop.
      * REQUESTED_CHANGE: pause for 15 steps at each end, then reverse direction.
-     * Blocking uploads/weather requests suspend drawing and therefore motion. */
+     * An active photo upload suspends motion; asynchronous weather work does not. */
 
     for (unsigned i = 0; i < 3; ++i)
     {

@@ -60,6 +60,23 @@ def main():
     require(suite['app_sha256'] == app_sha and suite['source_sha256'] == manifest['source_sha256'],
             'Suite tested a different application/source archive')
     state, network = groups['machine_time_state'], groups['qemu']['time_http']
+    for name in ('startup_wait', 'weather_wait'):
+        gate = groups['qemu'][name]
+        require(gate['passed'] and gate['inputs_unchanged'] and gate['app_sha256'] == app_sha and
+                gate['native_elf_sha256'] == state['native_elf_sha256'] and
+                gate['qemu_sha256'] == groups['qemu']['qemu_sha256'] and
+                gate['helper_sha256'] == groups['qemu']['helper_sha256'] and
+                gate['sources']['source_sha256'] == manifest['source_sha256'],
+                'Software-wait gate tested different inputs: ' + name)
+    startup, held_weather = groups['qemu']['startup_wait'], groups['qemu']['weather_wait']
+    require(0 <= startup['ready_wait_guest_seconds'] <= .5 and startup['different_colors'] >= 2,
+            'Ready startup clock was delayed or blank')
+    require(held_weather['during']['request_state'] & held_weather['compiled_running_mask'] and
+            held_weather['during']['wait_guest_seconds'] <= 1.5 and
+            held_weather['during']['rgb_sha256'] != held_weather['before']['rgb_sha256'],
+            'Clock did not advance during the held weather request')
+    require(groups['qemu']['field_http']['flows']['reconstructed']['checks']['responsive_refresh_phase'],
+            'Live field scroll was not checked during the held reply')
     require(state['app_sha256'] == app_sha and state['source_sha256'] == manifest['source_sha256'],
             'Time-state gate tested a different archive')
     require(network['passed'] and network['qemu_sha256'] == groups['qemu']['qemu_sha256'] and

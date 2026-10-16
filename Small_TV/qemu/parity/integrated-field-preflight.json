@@ -1,0 +1,1245 @@
+{
+  "passed": true,
+  "tested_at_utc": "2026-10-16T17:43:29.261003+00:00",
+  "flows": {
+    "original": {
+      "passed": true,
+      "sources": {
+        "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+      },
+      "stages": {
+        "long_cache": {
+          "valid": true,
+          "temperature_c": 26,
+          "humidity": 67,
+          "temperature_min_c": 21.5,
+          "temperature_max_c": 29.5,
+          "wind_mps": 3.75,
+          "main": "Thunderstorm",
+          "description": "clear",
+          "wind_direction": "North-Northeast",
+          "icon_offset": 3817472
+        },
+        "short": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26,
+            "humidity": 67,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "main": "Fog",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon_offset": 3878912
+          },
+          "frame": {
+            "virtual_seconds": 30.161084,
+            "literal_ideal_differences": {
+              "city": 0,
+              "title": 0,
+              "icon": 0
+            }
+          }
+        },
+        "unavailable": {
+          "state": {
+            "valid": false,
+            "temperature_c": 26,
+            "humidity": 67,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "main": "Fog",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon_offset": 3878912
+          },
+          "frame": {
+            "virtual_seconds": 32.4817,
+            "literal_ideal_differences": {
+              "city": 0,
+              "title": 0,
+              "icon": 382
+            }
+          }
+        },
+        "recovery": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26,
+            "humidity": 67,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "main": "Rain",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon_offset": 3802112
+          },
+          "frame": {
+            "virtual_seconds": 35.020399,
+            "literal_ideal_differences": {
+              "city": 0,
+              "title": 0,
+              "icon": 0
+            }
+          }
+        },
+        "unknown_icon": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26,
+            "humidity": 67,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "main": "Clear",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon_offset": 0
+          },
+          "frame": {
+            "virtual_seconds": 37.57107,
+            "literal_ideal_differences": {
+              "city": 0,
+              "title": 0,
+              "icon": 0
+            }
+          }
+        }
+      },
+      "checks": {
+        "actual_city_http": true,
+        "known_response_cache": true,
+        "no_panic": true
+      },
+      "literal_long": {
+        "city_ideal_differences": 970,
+        "title_ideal_differences": 570
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "36bb2c567dbc99042838799eabb0de11eafc52a7095252fe0c7059e6f2933f47",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "837775d522d4883e8ffb9feb932c4cb6f7cf8e2eb678ca3a578ca0e701f1a5da",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "6e9c935f834d75350dce095f8178b6ff95bcaa36851d8cb606d454d0db79a3d8",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 503,
+          "body_sha256": "708ab39a79e958322d7199829d447d3438d38524657c99242f242855e273cda3",
+          "fragments": 1
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "c26a3940f11064fa88b8a80866ad07ea75a10ce76dad661bc2de15d1e34cd8c1",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "e475fd7a363b87afd751994f86039b301952ee1a6f9aba2efa192d26b7d8cb30",
+          "fragments": 5
+        }
+      ],
+      "not_applicable_factory": [
+        "requested scroll/phase/reset extension",
+        "corrected cleanup expectations; literal pixels recorded"
+      ]
+    },
+    "reconstructed": {
+      "passed": true,
+      "sources": {
+        "images": [
+          {
+            "bytes": 19248,
+            "file": "bootloader.bin",
+            "offset": "0x0",
+            "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
+          },
+          {
+            "bytes": 3072,
+            "file": "partition-table.bin",
+            "offset": "0x8000",
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+          },
+          {
+            "bytes": 1176224,
+            "file": "app.bin",
+            "offset": "0x10000",
+            "sha256": "0d8b758502ac2dcda93695f422c0f94b7e743d735f29b00356c9f3ae59f21e3e"
+          },
+          {
+            "bytes": 1994752,
+            "file": "assets.bin",
+            "offset": "0x200000",
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+          }
+        ],
+        "source_sha256": "9d9c5c8c08db0848d05257a44304a94e562f0de0b7562c911200f5b10fb2abfe"
+      },
+      "stages": {
+        "long_cache": {
+          "valid": true,
+          "temperature_c": 26.0,
+          "temperature_min_c": 21.5,
+          "temperature_max_c": 29.5,
+          "wind_mps": 3.75,
+          "humidity": 67,
+          "main": "Thunderstorm",
+          "description": "clear",
+          "wind_direction": "North-Northeast",
+          "icon": "11d"
+        },
+        "short": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26.0,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "humidity": 67,
+            "main": "Fog",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon": "50d"
+          },
+          "frame": {
+            "labels": [
+              {
+                "text": "A",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 12,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Fog",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 36,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 39.42987,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 6,
+            "passed": true,
+            "attempts": 2
+          }
+        },
+        "unavailable": {
+          "state": {
+            "valid": false,
+            "temperature_c": 26.0,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "humidity": 67,
+            "main": "Fog",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon": "50d"
+          },
+          "frame": {
+            "labels": [
+              {
+                "text": "B",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 12,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Getting Weather",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 180,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 0,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 39.697104,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 8,
+            "passed": true,
+            "attempts": 1
+          }
+        },
+        "recovery": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26.0,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "humidity": 67,
+            "main": "Rain",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon": "10n"
+          },
+          "frame": {
+            "labels": [
+              {
+                "text": "B",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 12,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Rain",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 48,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 40.004511,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 8,
+            "passed": true,
+            "attempts": 2
+          }
+        },
+        "unknown_icon": {
+          "state": {
+            "valid": true,
+            "temperature_c": 26.0,
+            "temperature_min_c": 21.5,
+            "temperature_max_c": 29.5,
+            "wind_mps": 3.75,
+            "humidity": 67,
+            "main": "Clear",
+            "description": "clear",
+            "wind_direction": "North-Northeast",
+            "icon": "99x"
+          },
+          "frame": {
+            "labels": [
+              {
+                "text": "B",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 12,
+                "offset": 0,
+                "pause": 15,
+                "color": 2016,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "10.0.2.15",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Clear",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 60,
+                "offset": 0,
+                "pause": 15,
+                "color": 65504,
+                "returning": false,
+                "completed": false
+              }
+            ],
+            "virtual_seconds": 40.291249,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 9,
+            "passed": true,
+            "attempts": 1
+          }
+        }
+      },
+      "checks": {
+        "actual_city_http": true,
+        "known_response_cache": true,
+        "no_panic": true,
+        "clipped_live_scroll": true,
+        "responsive_refresh_phase": true,
+        "theme_reset": true,
+        "short_and_missing_fields": true,
+        "unknown_icon_cleanup": true,
+        "recovery": true
+      },
+      "scroll": {
+        "passed": true,
+        "evidence": {
+          "0": {
+            "left": true,
+            "right": true,
+            "start": true,
+            "end": true,
+            "pause": true
+          },
+          "2": {
+            "left": true,
+            "right": true,
+            "start": true,
+            "end": true,
+            "pause": true
+          }
+        },
+        "observed_frames": 110
+      },
+      "refresh": {
+        "passed": true,
+        "before": {
+          "labels": [
+            {
+              "text": "ABCDEFGHIJKLMNOPQRS",
+              "x": 0,
+              "y": 10,
+              "width": 180,
+              "length": 228,
+              "offset": 4,
+              "pause": 0,
+              "color": 2016,
+              "returning": false,
+              "completed": true
+            },
+            {
+              "text": "8.4mile/h",
+              "x": 0,
+              "y": 40,
+              "width": 180,
+              "length": 108,
+              "offset": 0,
+              "pause": 15,
+              "color": 65535,
+              "returning": false,
+              "completed": false
+            },
+            {
+              "text": "Thunderstorm",
+              "x": 160,
+              "y": 83,
+              "width": 80,
+              "length": 144,
+              "offset": 2,
+              "pause": 0,
+              "color": 65504,
+              "returning": true,
+              "completed": false
+            }
+          ],
+          "virtual_seconds": 37.497184,
+          "different_pixels": {
+            "field-0": 0,
+            "field-2": 0,
+            "icon": 0,
+            "guard-0": 0,
+            "guard-1": 0,
+            "guard-2": 0,
+            "guard-3": 0
+          },
+          "rendered_weather_generation": 4,
+          "passed": true,
+          "attempts": 67
+        },
+        "held": [
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 8,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "8.4mile/h",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 14,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 37.776945,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 4,
+            "passed": true,
+            "attempts": 1,
+            "request_state": 1
+          },
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 8,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "8.4mile/h",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 14,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 37.841954,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 4,
+            "passed": true,
+            "attempts": 1,
+            "request_state": 1
+          },
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 10,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "8.4mile/h",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 13,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 37.896884,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 4,
+            "passed": true,
+            "attempts": 1,
+            "request_state": 1
+          },
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 10,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "8.4mile/h",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 13,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 37.962305,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 4,
+            "passed": true,
+            "attempts": 1,
+            "request_state": 1
+          },
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 12,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "8.4mile/h",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 12,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 37.991445,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 4,
+            "passed": true,
+            "attempts": 1,
+            "request_state": 1
+          },
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 12,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "8.4mile/h",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 12,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 38.077524,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 4,
+            "passed": true,
+            "attempts": 1,
+            "request_state": 1
+          },
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 12,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "8.4mile/h",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 12,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 38.118467,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 4,
+            "passed": true,
+            "attempts": 1,
+            "request_state": 1
+          },
+          {
+            "labels": [
+              {
+                "text": "ABCDEFGHIJKLMNOPQRS",
+                "x": 0,
+                "y": 10,
+                "width": 180,
+                "length": 228,
+                "offset": 14,
+                "pause": 0,
+                "color": 2016,
+                "returning": false,
+                "completed": true
+              },
+              {
+                "text": "8.4mile/h",
+                "x": 0,
+                "y": 40,
+                "width": 180,
+                "length": 108,
+                "offset": 0,
+                "pause": 15,
+                "color": 65535,
+                "returning": false,
+                "completed": false
+              },
+              {
+                "text": "Thunderstorm",
+                "x": 160,
+                "y": 83,
+                "width": 80,
+                "length": 144,
+                "offset": 0,
+                "pause": 11,
+                "color": 65504,
+                "returning": false,
+                "completed": true
+              }
+            ],
+            "virtual_seconds": 38.196546,
+            "different_pixels": {
+              "field-0": 0,
+              "field-2": 0,
+              "icon": 0,
+              "guard-0": 0,
+              "guard-1": 0,
+              "guard-2": 0,
+              "guard-3": 0
+            },
+            "rendered_weather_generation": 4,
+            "passed": true,
+            "attempts": 1,
+            "request_state": 1
+          }
+        ],
+        "resumed": {
+          "labels": [
+            {
+              "text": "ABCDEFGHIJKLMNOPQRS",
+              "x": 0,
+              "y": 10,
+              "width": 180,
+              "length": 228,
+              "offset": 18,
+              "pause": 0,
+              "color": 2016,
+              "returning": false,
+              "completed": true
+            },
+            {
+              "text": "8.4mile/h",
+              "x": 0,
+              "y": 40,
+              "width": 180,
+              "length": 108,
+              "offset": 0,
+              "pause": 15,
+              "color": 65535,
+              "returning": false,
+              "completed": false
+            },
+            {
+              "text": "Thunderstorm",
+              "x": 160,
+              "y": 83,
+              "width": 80,
+              "length": 144,
+              "offset": 0,
+              "pause": 9,
+              "color": 65504,
+              "returning": false,
+              "completed": true
+            }
+          ],
+          "virtual_seconds": 38.446356,
+          "different_pixels": {
+            "field-0": 0,
+            "field-2": 0,
+            "icon": 0,
+            "guard-0": 0,
+            "guard-1": 0,
+            "guard-2": 0,
+            "guard-3": 0
+          },
+          "rendered_weather_generation": 5,
+          "passed": true,
+          "attempts": 4
+        },
+        "published_generation": 5
+      },
+      "theme_reset": {
+        "labels": [
+          {
+            "text": "ABCDEFGHIJKLMNOPQRS",
+            "x": 0,
+            "y": 10,
+            "width": 180,
+            "length": 228,
+            "offset": 0,
+            "pause": 15,
+            "color": 2016,
+            "returning": false,
+            "completed": false
+          },
+          {
+            "text": "10.0.2.15",
+            "x": 0,
+            "y": 40,
+            "width": 180,
+            "length": 108,
+            "offset": 0,
+            "pause": 15,
+            "color": 65535,
+            "returning": false,
+            "completed": false
+          },
+          {
+            "text": "Thunderstorm",
+            "x": 160,
+            "y": 83,
+            "width": 80,
+            "length": 144,
+            "offset": 0,
+            "pause": 15,
+            "color": 65504,
+            "returning": false,
+            "completed": false
+          }
+        ],
+        "virtual_seconds": 39.00521,
+        "different_pixels": {
+          "field-0": 0,
+          "field-2": 0,
+          "icon": 0,
+          "guard-0": 0,
+          "guard-1": 0,
+          "guard-2": 0,
+          "guard-3": 0
+        },
+        "rendered_weather_generation": 5,
+        "passed": true,
+        "attempts": 1
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "36bb2c567dbc99042838799eabb0de11eafc52a7095252fe0c7059e6f2933f47",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "837775d522d4883e8ffb9feb932c4cb6f7cf8e2eb678ca3a578ca0e701f1a5da",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "837775d522d4883e8ffb9feb932c4cb6f7cf8e2eb678ca3a578ca0e701f1a5da",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "6e9c935f834d75350dce095f8178b6ff95bcaa36851d8cb606d454d0db79a3d8",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 503,
+          "body_sha256": "708ab39a79e958322d7199829d447d3438d38524657c99242f242855e273cda3",
+          "fragments": 1
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "c26a3940f11064fa88b8a80866ad07ea75a10ce76dad661bc2de15d1e34cd8c1",
+          "fragments": 5
+        },
+        {
+          "method": "GET",
+          "resource": "/data/2.5/weather",
+          "synthetic_location": true,
+          "synthetic_key": true,
+          "status": 200,
+          "body_sha256": "e475fd7a363b87afd751994f86039b301952ee1a6f9aba2efa192d26b7d8cb30",
+          "fragments": 5
+        }
+      ]
+    }
+  },
+  "cache_layout": {
+    "address": 1070267040,
+    "size": 248,
+    "fields": {
+      "valid": 0,
+      "temperature_c": 8,
+      "wind_mps": 16,
+      "temperature_min_c": 24,
+      "temperature_max_c": 32,
+      "humidity": 40,
+      "timezone_seconds": 44,
+      "icon": 48,
+      "description": 52,
+      "city": 117,
+      "country": 182,
+      "main": 202,
+      "wind_direction": 218,
+      "generation": 240
+    },
+    "request_state_address": 1070283052,
+    "elf_sha256": "97adeb91a4c8515330c39dc971c36b8cea449d48ab5d13d11356bfe3e4da5924"
+  },
+  "scroll_layout": {
+    "address": 1070266704,
+    "size": 300,
+    "stride": 100,
+    "fields": {
+      "text": 0,
+      "x": 68,
+      "y": 72,
+      "width": 76,
+      "color": 80,
+      "length": 84,
+      "offset": 88,
+      "pause": 92,
+      "returning": 96,
+      "completed": 97
+    },
+    "rendered_weather_address": 1070283008
+  },
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "scope": "Scoped real factory/native HTTP fields and scroll preflight, including continued exact field pixels while the external weather reply is held; not a full suite or physical acceptance.",
+  "test_inputs": [
+    {
+      "file": "Small_TV/src/tests/field_qemu.py",
+      "sha256": "5d935d1f2523d51a378c5c15d28f30d52e950011e9f333c95662af90f3e60e06"
+    },
+    {
+      "file": "Small_TV/src/tests/weather_qemu.py",
+      "sha256": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9"
+    }
+  ],
+  "app_sha256": "0d8b758502ac2dcda93695f422c0f94b7e743d735f29b00356c9f3ae59f21e3e",
+  "source_sha256": "9d9c5c8c08db0848d05257a44304a94e562f0de0b7562c911200f5b10fb2abfe",
+  "native_elf_sha256": "97adeb91a4c8515330c39dc971c36b8cea449d48ab5d13d11356bfe3e4da5924"
+}

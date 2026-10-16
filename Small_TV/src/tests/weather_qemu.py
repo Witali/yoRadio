@@ -39,6 +39,8 @@ class WeatherFixture:
         self.locations = set(locations or ['Shenzhen,CN'])
         self.status, self.body = 503, b'Synthetic service temporarily unavailable'
         self.response_delay = 0
+        self.response_release = None
+        self.response_held = threading.Event()
         self.requests, self.connections = [], []
         owner = self
         class Handler(BaseHTTPRequestHandler):
@@ -56,11 +58,16 @@ class WeatherFixture:
                 fields = parse_qs(target.query)
                 with owner.lock:
                     status, body, delay = owner.status, owner.body, owner.response_delay
+                    release = owner.response_release
                     # Never retain a raw request URL, key, cookie or header.
                     owner.requests.append({'method':'GET', 'resource':target.path,
                         'synthetic_location':len(fields.get('q',[]))==1 and fields['q'][0] in owner.locations,
                         'synthetic_key':fields.get('appid') == ['disabled'],
                         'status':status, 'body_sha256':vm.digest(body), 'fragments':(len(body)+63)//64})
+                if release is not None:
+                    owner.response_held.set()
+                    if not release.wait(30):
+                        return
                 if delay: time.sleep(delay)
                 self.send_response(status)
                 self.send_header('Content-Type', 'application/json' if body.startswith(b'{') else 'text/plain')
@@ -89,8 +96,25 @@ class WeatherFixture:
         """Copy completed request observations without exposing sensitive inputs."""
         with self.lock: return list(self.requests)
 
+    def hold_response(self):
+        """Withhold the external reply until explicitly released; guest execution remains normal."""
+        with self.lock:
+            if self.response_release is not None:
+                raise RuntimeError('A weather response is already held')
+            self.response_held.clear()
+            self.response_release = threading.Event()
+
+    def release_response(self):
+        """Release an armed response, including when a test fails before its request arrives."""
+        with self.lock:
+            release = self.response_release
+            self.response_release = None
+            if release is not None:
+                release.set()
+
     def close(self):
         """Stop listeners and active chardev sockets after the VM has exited."""
+        self.release_response()
         self.server.shutdown()
         with self.lock:
             for connection in self.connections:

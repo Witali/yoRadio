@@ -1,5 +1,5 @@
 """Observe real clock frames while an external weather server withholds its reply."""
-import argparse,hashlib,json,socket,struct,sys,threading,time
+import argparse,hashlib,json,socket,struct,sys,time
 from pathlib import Path
 from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[3]
@@ -33,16 +33,6 @@ with elf_path.open('rb') as stream:
     if len(running)!=1:raise ValueError('Missing compiled REQUEST_RUNNING enum')
     running=running[0]
 fixture=weather.WeatherFixture(['Shenzhen,CN','Fixture,CN']);fixture.set_response(200)
-held=threading.Event();release=threading.Event();hold=False
-handler=fixture.server.RequestHandlerClass
-original_get=handler.do_GET
-def controlled_get(self):
-    """Hold only the external service response; never modify a guest task or cache."""
-    if hold:
-        held.set()
-        release.wait(30)
-    original_get(self)
-handler.do_GET=controlled_get
 with socket.socket() as reservation:
     reservation.bind(('127.0.0.1',0));port=reservation.getsockname()[1]
 options=SimpleNamespace(yoradio=str(args.yoradio),
@@ -99,10 +89,10 @@ try:
             result['before']=sample(qmp,'before')
             if result['before']['local_tm'][0] in (57,58):break
         else:raise ValueError('No imminent natural minute boundary')
-        hold=True
+        fixture.hold_response()
         status,_=http(url,'/updateCity',{'city':'Fixture,CN'},origin=url,timeout=20)
         if status!=200:raise ValueError('City update failed')
-        wait_for(held.is_set,'External weather request did not arrive')
+        wait_for(fixture.response_held.is_set,'External weather request did not arrive')
         state=int.from_bytes(weather.read_bytes(qmp,symbols['request_state'],4),'little')
         if not state&running:raise ValueError('Weather task is not running: '+str(state))
         start=weather.virtual_seconds(qmp)
@@ -113,7 +103,7 @@ try:
             raise AssertionError('Clock waited for the weather task: '+str(row))
         if row['rgb_sha256']==result['before']['rgb_sha256']:
             raise AssertionError('Clock pixels did not advance while response was held')
-        release.set()
+        fixture.release_response()
         wait_for(lambda:int.from_bytes(weather.read_bytes(qmp,symbols['request_state'],4),'little')==0,
                  'Weather request did not complete after release')
         result['passed']=clean_uart(args.output)
@@ -122,7 +112,7 @@ except Exception as error:
     result['error']=str(error)
     raise
 finally:
-    release.set()
+    fixture.release_response()
     if observer:observer.close()
     if session:
         try:vm.control(args.output,'stop')

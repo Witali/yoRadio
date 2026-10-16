@@ -73,6 +73,25 @@ def main():
         raise ValueError('Profile validation and firmware used different profile/compiler inputs')
     if not qemu['inputs_unchanged']:
         raise ValueError('Emulator or helpers changed during execution')
+    for name in ('startup_wait', 'weather_wait'):
+        gate = qemu[name]
+        if (not gate['passed'] or not gate['inputs_unchanged'] or
+                gate['app_sha256'] != report['app_sha256'] or
+                gate['native_elf_sha256'] != text['native_elf_sha256'] or
+                gate['qemu_sha256'] != qemu['qemu_sha256'] or gate['helper_sha256'] != qemu['helper_sha256']):
+            raise ValueError('Software-wait gate failed or used different inputs: ' + name)
+        items = gate['test_inputs']
+        items = items.items() if isinstance(items, dict) else ((item['file'], item['sha256']) for item in items)
+        for path, sha in items:
+            if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != sha:
+                raise ValueError('Software-wait observer changed: ' + path)
+    startup, held_weather = qemu['startup_wait'], qemu['weather_wait']
+    if not 0 <= startup['ready_wait_guest_seconds'] <= .5 or startup['different_colors'] < 2:
+        raise ValueError('Ready clock still waits on startup or its first frame is blank')
+    if (not held_weather['during']['request_state'] & held_weather['compiled_running_mask'] or
+            held_weather['during']['wait_guest_seconds'] > 1.5 or
+            held_weather['during']['rgb_sha256'] == held_weather['before']['rgb_sha256']):
+        raise ValueError('Clock did not advance while the weather reply was withheld')
     if not qemu['http_initial_setup']['passed']:
         raise ValueError('Real HTTP initial setup did not pass')
     if not qemu['weather_http']['passed']:
@@ -80,6 +99,8 @@ def main():
     fields = qemu['field_http']
     if not fields['passed'] or fields['qemu_sha256'] != qemu['qemu_sha256']:
         raise ValueError('Real field HTTP/scroll comparison did not pass on this emulator')
+    if not fields['flows']['reconstructed']['checks']['responsive_refresh_phase']:
+        raise ValueError('Field scroll was not checked during a held weather reply')
     time_http = qemu['time_http']
     if (not time_http['passed'] or time_http['qemu_sha256'] != qemu['qemu_sha256']
             or time_http['layout']['elf_sha256'] != time_state['native_elf_sha256']):
@@ -188,6 +209,7 @@ def main():
                         not row['digital_requested_brightness_applied'] for row in flow['samples'])):
                 raise ValueError('Completed scene comparison omitted full frames or brightness checks')
     qemu_sources = [qemu['boot_reset']['reconstructed']['prepared']['sources']]
+    qemu_sources.extend(qemu[name]['sources'] for name in ('startup_wait', 'weather_wait'))
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
     qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
     qemu_sources.append(qemu['weather_http']['flows']['reconstructed']['sources'])
@@ -259,6 +281,8 @@ def main():
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
                        'helper_sha256': qemu['helper_sha256'],
                        'inputs_unchanged': qemu['inputs_unchanged'],
+                       'startup_wait': startup,
+                       'weather_wait': held_weather,
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],
                        'time_http': time_http,

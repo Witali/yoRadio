@@ -214,6 +214,52 @@ def scroll_trace(qmp,folder,layout):
     raise AssertionError(f'Scroll did not show both complete directions/endpoints: {evidence}')
 
 
+def refresh_during_motion(qmp,folder,url,fixture,cache_layout,label_layout):
+    """Keep a real reply withheld while exact field pixels advance, then preserve their phase."""
+    before=wait_frame(qmp,folder,label_layout,LONG_CITY,'Thunderstorm','11d',
+        predicate=lambda row:4<=row['labels'][0]['offset']<=8 and
+            not row['labels'][0]['pause'] and not row['labels'][0]['returning'])
+    fixture.set_response(200,data=response('Thunderstorm','11d'))
+    fixture.hold_response()
+    held=[]
+    try:
+        post_city(url,LONG_CITY)
+        wait_for(fixture.response_held.is_set,'Held refresh never reached the service')
+        deadline=time.monotonic()+12
+        while time.monotonic()<deadline:
+            frame=wait_frame(qmp,folder,label_layout,LONG_CITY,'Thunderstorm','11d',seconds=10)
+            frame['request_state']=int.from_bytes(read_bytes(qmp,cache_layout['request_state_address'],4),'little')
+            city=frame['labels'][0]
+            if (not frame['request_state'] or city['returning'] or city['pause'] or
+                    frame['rendered_weather_generation']!=before['rendered_weather_generation']):
+                raise AssertionError('Refresh changed the cached text or its outward scroll phase')
+            if held and city['offset']<held[-1]['labels'][0]['offset']:
+                raise AssertionError('Held refresh restarted the city scroll')
+            held.append(frame)
+            if len(held)>=2 and city['offset']>=held[0]['labels'][0]['offset']+6:
+                break
+            time.sleep(.08)
+        else:
+            raise AssertionError('City scroll froze while the real HTTP response was held')
+    finally:
+        fixture.release_response()
+    await_response(qmp,'reconstructed',cache_layout,'Thunderstorm','11d')
+    published=int.from_bytes(read_bytes(qmp,cache_layout['address']+cache_layout['fields']['generation'],4),'little')
+    if published<=held[-1]['rendered_weather_generation']:
+        raise AssertionError('Refresh did not publish a new generation')
+    resumed=wait_frame(qmp,folder,label_layout,LONG_CITY,'Thunderstorm','11d',
+        predicate=lambda row:row['rendered_weather_generation']==published)
+    old,after=held[-1]['labels'][0],resumed['labels'][0]
+    # The normal loop can advance at most 20 pixels per virtual second, plus
+    # one partially observed loop at either boundary. Publishing identical text
+    # must not jump to zero or create a new endpoint pause.
+    advance=int(20*(resumed['virtual_seconds']-held[-1]['virtual_seconds']))+6
+    if not(old['offset']<=after['offset']<=old['offset']+advance and
+           not after['returning'] and not after['pause']):
+        raise AssertionError('Applied refresh restarted or jumped the scroll phase')
+    return {'passed':True,'before':before,'held':held,'resumed':resumed,'published_generation':published}
+
+
 def exercise(options,folder,cache_layout,label_layout):
     """Run real location/title/icon transitions, distinguishing literal factory observations."""
     fixture=weather.WeatherFixture(['Shenzhen,CN',LONG_CITY+',CN','A,CN','B,CN'])
@@ -235,31 +281,7 @@ def exercise(options,folder,cache_layout,label_layout):
             result['stages']['long_cache']=await_response(qmp,options.firmware,cache_layout,'Thunderstorm','11d')
             if native:
                 result['scroll']=scroll_trace(qmp,folder,label_layout)
-                # Refresh the same text during motion; a held real response must pause UI.
-                before=wait_frame(qmp,folder,label_layout,LONG_CITY,'Thunderstorm','11d',
-                    predicate=lambda row:8<=row['labels'][0]['offset']<=40 and not row['labels'][0]['pause'] and not row['labels'][0]['returning'])
-                fixture.set_response(200,data=response('Thunderstorm','11d'),delay=1.5)
-                count=len(fixture.rows())
-                post_city(url,LONG_CITY)
-                wait_for(lambda:len(fixture.rows())>count,'Held refresh never reached the service')
-                held=[]
-                for _ in range(3):
-                    labels,pixels,seconds,generation=capture(qmp,folder,label_layout)
-                    held.append({'labels':labels,'virtual_seconds':seconds,'pixels_sha256':vm.digest(pixels),
-                                 'rendered_weather_generation':generation})
-                    time.sleep(.1)
-                unchanged=all(row['labels']==held[0]['labels'] and row['pixels_sha256']==held[0]['pixels_sha256'] for row in held)
-                if not unchanged or held[0]['labels'][0]['offset']<8:raise AssertionError('HTTP refresh reset or moved blocked labels')
-                await_response(qmp,options.firmware,cache_layout,'Thunderstorm','11d')
-                published=int.from_bytes(read_bytes(qmp,cache_layout['address']+cache_layout['fields']['generation'],4),'little')
-                if published<=held[0]['rendered_weather_generation']:raise AssertionError('Refresh did not publish a new generation')
-                resumed=wait_frame(qmp,folder,label_layout,LONG_CITY,'Thunderstorm','11d',
-                    predicate=lambda row:row['rendered_weather_generation']==published)
-                after=resumed['labels'][0]
-                old=held[0]['labels'][0]
-                if not(old['offset']<=after['offset']<=old['offset']+6 and not after['returning'] and not after['pause']):
-                    raise AssertionError('Applied refresh restarted or jumped the scroll phase')
-                result['refresh']={'passed':True,'before':before,'held':held,'resumed':resumed,'published_generation':published}
+                result['refresh']=refresh_during_motion(qmp,folder,url,fixture,cache_layout,label_layout)
                 fixture.set_response(200,data=response('Thunderstorm','11d'))
                 status,_=http(url,'/setclocktype',{'clocktype':'1'},origin=url)
                 if status!=200:raise AssertionError('Simple theme POST failed')
@@ -303,7 +325,7 @@ def exercise(options,folder,cache_layout,label_layout):
         if not clean_uart(folder):raise AssertionError('Panic during field transition')
         result['checks']={'actual_city_http':True,'known_response_cache':True,'no_panic':True}
         if native:
-            result['checks'].update(clipped_live_scroll=True,blocked_refresh_phase=True,theme_reset=True,
+            result['checks'].update(clipped_live_scroll=True,responsive_refresh_phase=True,theme_reset=True,
                                     short_and_missing_fields=True,unknown_icon_cleanup=True,recovery=True)
         else:
             result['not_applicable_factory']=['requested scroll/phase/reset extension','corrected cleanup expectations; literal pixels recorded']

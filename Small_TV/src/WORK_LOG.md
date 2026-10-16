@@ -802,3 +802,26 @@
   закрыты. Whole-suite нового app ещё не проходил: observers следует включить
   в полный gate и обновить старое frozen-scroll ожидание. Общие старые positive
   reports не переименовываются в результаты кандидата; parity остаётся неполной.
+
+### 2026-10-16 — объединение и обязательная проверка отзывчивости
+
+- Merge 12172b4d включил offline/weather/startup branch в main с сохранением
+  календарной матрицы и обоих рабочих журналов. Посторонние untracked файлы
+  не затронуты. QEMU main обновлён до 962cda7a6f и отправлен; canonical executable
+  теперь fde38d53, установлен штатным SkipBuild installer из проверенной сборки.
+  Старый c970591d/marker сохранён отдельно, Xtensa binary не изменён.
+- startup_qemu/weather_wait_qemu включены в обязательный suite. Publisher и
+  artifact verifier проверяют app/ELF/QEMU/helper identities и реальные пределы
+  задержки. Последний общий positive report пока остаётся историческим 9e4f856a.
+- WeatherFixture получил общий явный HTTP hold/release. Field test требует
+  продолжения exact-pixel scroll до ответа и сохранения фазы после публикации
+  тех же данных. Обе реальные прошивки прошли preflight; native 110 кадров,
+  held offsets 8,8,10,10,12,12,12,14 при request state 1; resumed 18, generation 5.
+  Никакие guest RAM/PC/clock значения не подменяются; тестовые ВМ закрыты.
+- Исправлен устаревший production comment о погодной блокировке. Root build
+  app 0d8b7585 / source 9d9c5c8c / ELF 97adeb91, 1,176,224 bytes, сохранён в
+  firmware. Exact compiled code девяти функций сохранён отдельным manifest.
+  Branch 743fa69f reports остаются привязанными к своей сборке.
+- Следующий шаг — полный запуск из одного замороженного набора input bytes,
+  включая все natural calendar transitions. Этот preflight не объявляет
+  full parity; physical/browser/soak и прочие неохваченные пути остаются открыты.

@@ -7,6 +7,23 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Текущая интеграция main (2026-10-16): merge `12172b4d` принял все три
+исправления offline/weather/startup и сохранил main calendar matrix. Установлен
+QEMU main `962cda7a6f`, executable `fde38d53`; прежний c970591d и marker
+сохранены в `.build/small-tv-parity/qemu-canonical-before-962cda7a/`.
+Основная новая сборка: app `0d8b7585`, source `9d9c5c8c`, ELF `97adeb91`,
+1,176,224 bytes / free 359,776. Различия с branch image identities не скрывать:
+это root build и уточнённый комментарий factory_scroll_tick. Бинарники в firmware.
+Exact compiled snippets девяти функций — `native-responsiveness-integrated.asm`.
+
+Startup/weather observers включены в обязательный QEMU suite и publisher/verifier.
+Общий WeatherFixture поддерживает явный hold/release внешнего ответа. Старое
+требование frozen scroll в field_qemu заменено точными движущимися полями и
+сохранением фазы. Preflight обеих прошивок прошёл: 110 native scroll frames,
+offset 8..14 при RUNNING=1, после ответа 18 без reset. Scoped report —
+`../qemu/parity/integrated-field-preflight.json`. Общий полный прогон ещё нужен;
+ниже описаны исторические branch results, их не переименовывать в результаты main.
+
 2026-10-16, software-delay audit: после app a2b6129b удалено также безусловное
 ожидание startup при уже готовых Wi-Fi/SNTP. Кандидат app `743fa69f`, source
 `2583ac4c`, ELF `7bda9d7d` сохранён в firmware; 43 platform cases / 1,182,204
