@@ -825,3 +825,27 @@
 - Следующий шаг — полный запуск из одного замороженного набора input bytes,
   включая все natural calendar transitions. Этот preflight не объявляет
   full parity; physical/browser/soak и прочие неохваченные пути остаются открыты.
+
+### 2026-10-16 — полный интегрированный прогон и новые JPEG-наблюдения
+
+- Commit ad5b8c5d сохранён и отправлен в main вместе с merge 12172b4d.
+  Запущен один полный `responsiveness-full-20261016`, shell 22926. Before input
+  manifest фиксирует тесты/app/ELF/QEMU. Test/source/helper bytes заморожены.
+- На записи native 3,884, все 43 platform cases, JS, integrity, TZ archive
+  checks, basic machine/control, classic (261 field/media + 1,545 animation)
+  и weather (225) прошли. Handle жив, идёт machine_calendar. Это ещё не итог
+  всего запуска; настоящий конечный результат следует получить тем же handle.
+- Не меняя frozen tree, generated synthetic JPEG probe исполнил actual factory
+  и native RV32 decoders на восьми новых inputs: RGB 444/422/420, 444 и 420 с
+  DRI/restart markers, grayscale 240x240, odd RGB 123x117 и grayscale 23x29.
+  Во всех случаях native result=0, оба decoder started, all 57,600 panel pixels
+  совпали (0 differences), включая неперерисованные guards. Результат относится
+  к ELF 97adeb91, не заменяет image-upload policy или полный fuzz.
+- Fixtures детерминированные, без личных данных; Pillow 12.3.0, quality 83,
+  optimize=True, увеличенный локальный encoder buffer MAXBLOCK 1MiB. Первый
+  encoder attempt завершился ошибкой рабочего буфера; это не firmware defect.
+  Повторный отдельный probe завершён. Имена/хеши/размеры и options сохранены
+  в `.build/small-tv-parity/jpeg-extra-fixtures/manifest.json`, report рядом.
+- После terminal full run следует включить новые JPEG cases в постоянный
+  regression; текущий mandatory JPEG gate по-прежнему покрывает прежние 107
+  public assets/ошибки/placements. Publication/full parity пока не заявлены.
