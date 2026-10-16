@@ -82,6 +82,12 @@ actual return/tail jump. The application's `0x42010c3e` calls this restart every
 correction annotation. `tests/time_state_oracle.py` separately records actual
 restart-boundary calls; `tests/time_qemu.py` checks the real packet/fallback path.
 
+`http_advancedset_at_4200e9ea.asm` preserves the full advanced-settings handler.
+Its NTP-copy branch sets only the dirty/save deadline at `0x4200eb88..0x4200eb94`;
+it does not clear the SNTP init byte. The city handler explicitly clears init
+and sync at `0x4200f3d4`/`0x4200f3dc`. The natural calendar transport test uses
+that real endpoint for factory re-entry and records the advanced-only observation.
+
 `../../tools/disassemble_factory.py` reproduces exports with an explicit local
 objdump path and a list of addresses or bounded IROM ranges.
 `../../tools/assist_c_port.py` is an unfinished library draft for the next stage:
