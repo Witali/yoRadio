@@ -83,6 +83,13 @@ HTTP 503 записана как ошибка; наша прошивка отк�
 
 ## Что проверяется автоматически
 
+Обязательный branch gate `photo_qemu.py` проводит настоящий multipart upload,
+download и cold boot через SDK/flash. Valid/invalid JPEG, занятая сессия,
+порядок и retries проверяются без подмены application server. Четыре процесса
+проверяют cold boot сразу после finish и start незавершённой замены без debounce
+паузы. Power cut посреди flash write не моделируется; подробности —
+[photo-http-checks.md](../../qemu/parity/photo-http-checks.md).
+
 `machine_jpeg_inputs` дополняет public assets восемью synthetic JPEG variations
 и двенадцатью header/entropy/restart errors. Сравниваются все пиксели с actual
 factory decoder, отсутствие рисования при discard validation и native cleanup.

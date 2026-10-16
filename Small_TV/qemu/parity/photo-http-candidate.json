@@ -1,0 +1,502 @@
+{
+  "passed": true,
+  "scope": "Exercise actual native photo HTTP writes, safe publication, download and cold boot.",
+  "checks": {
+    "valid_gray_published": true,
+    "malformed_huffman_rejected": true,
+    "busy_and_retry_policy": true,
+    "valid_published": true,
+    "download_exact": true,
+    "first_boot_no_panic": true,
+    "owned_flash_changed": true,
+    "cold_boot_new_vm": true,
+    "cold_boot_metadata": true,
+    "cold_boot_download_exact": true,
+    "immediate_finish_cut_bounded": true,
+    "cold_boot_no_panic": true,
+    "immediate_finish_new_vm": true,
+    "immediate_finish_persisted": true,
+    "interrupted_slot_unpublished": true,
+    "interrupted_start_cut_bounded": true,
+    "immediate_finish_no_panic": true,
+    "interrupted_boot_new_vm": true,
+    "interrupted_photo_hidden": true,
+    "new_upload_after_interruption": true,
+    "interrupted_boot_no_panic": true
+  },
+  "requests": [
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.15188699999999988,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.14171200000000006,
+      "response_bytes": 25
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.14547199999999982,
+      "response_bytes": 2
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.17581300000000022,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.1466479999999999,
+      "response_bytes": 26
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1322359999999998,
+      "response_bytes": 361
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.13591599999999993,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.13462300000000038,
+      "response_bytes": 25
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.14114300000000002,
+      "response_bytes": 2
+    },
+    {
+      "path": "/finish_upload",
+      "status": 400,
+      "guest_seconds": 0.13965399999999972,
+      "response_bytes": 97
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.133127,
+      "response_bytes": 25
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.17182399999999953,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.15185800000000071,
+      "response_bytes": 25
+    },
+    {
+      "path": "/start_upload",
+      "status": 400,
+      "guest_seconds": 0.1379709999999994,
+      "response_bytes": 97
+    },
+    {
+      "path": "/finish_upload",
+      "status": 400,
+      "guest_seconds": 0.1315710000000001,
+      "response_bytes": 97
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 400,
+      "guest_seconds": 0.21864300000000014,
+      "response_bytes": 36
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.21880599999999983,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.21966200000000047,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 400,
+      "guest_seconds": 0.2297349999999998,
+      "response_bytes": 36
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.2252030000000005,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.22894400000000026,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.21398899999999976,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.21544899999999956,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.23662600000000023,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.23325499999999977,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.2236280000000006,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.2651139999999996,
+      "response_bytes": 2
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.1895730000000002,
+      "response_bytes": 2
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.29898999999999987,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.1452990000000005,
+      "response_bytes": 28
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14420199999999994,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=1&size=4096",
+      "status": 200,
+      "guest_seconds": 0.16144300000000023,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=2&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14070099999999996,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=3&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14145800000000008,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=4&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1446430000000003,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=5&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14780899999999875,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=6&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13567700000000116,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=7&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14579900000000023,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=8&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1492559999999994,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=9&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13843100000000064,
+      "response_bytes": 1624
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.12788999999999984,
+      "response_bytes": 28
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15342400000000023,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=1&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15422499999999983,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=2&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14950099999999988,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=3&size=4096",
+      "status": 200,
+      "guest_seconds": 0.16228700000000007,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=4&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15218500000000024,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=5&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14648700000000003,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=6&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1435299999999997,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=7&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13900000000000023,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=8&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14376800000000012,
+      "response_bytes": 4096
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=9&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14911699999999994,
+      "response_bytes": 1624
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.1409360000000004,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.13499199999999956,
+      "response_bytes": 25
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.14009699999999992,
+      "response_bytes": 2
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.165095,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.14669299999999996,
+      "response_bytes": 26
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13917000000000002,
+      "response_bytes": 361
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.14709299999999992,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.14309800000000017,
+      "response_bytes": 25
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.13798399999999988,
+      "response_bytes": 25
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 400,
+      "guest_seconds": 0.13106099999999987,
+      "response_bytes": 25
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.140501,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.1440560000000004,
+      "response_bytes": 25
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.14212099999999994,
+      "response_bytes": 2
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.1702919999999999,
+      "response_bytes": 2
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.133019,
+      "response_bytes": 26
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14035499999999956,
+      "response_bytes": 361
+    }
+  ],
+  "test_inputs": [
+    {
+      "file": "Small_TV/src/tests/photo_qemu.py",
+      "sha256": "44fe0fe608debadc52bc88a812cef181a85ba50d76b0ed026c96d39baba48c7c"
+    },
+    {
+      "file": "Small_TV/src/tests/jpeg_test_fixtures.py",
+      "sha256": "980004c204a67c2664caa2fcde647bc40ef4635dae91770ff612436fe097a92d"
+    },
+    {
+      "file": "Small_TV/src/tests/weather_qemu.py",
+      "sha256": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9"
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/jpeg/rgb-420.jpg",
+      "sha256": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8"
+    }
+  ],
+  "app_sha256": "131ce792670349e81cba3d3c16288ad6472502bcf1fe16908d885d406b5e2701",
+  "native_elf_sha256": "9184b08b4cd29b855d962209baaa70bff56c98863c6d06c1fd4f55fec7274575",
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "profile_sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+  "helper_sha256": {
+    "small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+  },
+  "valid_jpeg_sha256": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8",
+  "invalid_jpeg_sha256": "a6a9cfe4649e41144ca3f6dfb2bd1f3ed97327028851bbcea61559971b936739",
+  "sources": {
+    "images": [
+      {
+        "offset": "0x0",
+        "file": "bootloader.bin",
+        "sha256": "87240d0333b32d8d1415ad6bf2f6083bd33bae301a4fc4e9e00e158c79a0ec96",
+        "bytes": 19248
+      },
+      {
+        "offset": "0x8000",
+        "file": "partition-table.bin",
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "bytes": 3072
+      },
+      {
+        "offset": "0x10000",
+        "file": "app.bin",
+        "sha256": "131ce792670349e81cba3d3c16288ad6472502bcf1fe16908d885d406b5e2701",
+        "bytes": 1176272
+      },
+      {
+        "offset": "0x200000",
+        "file": "assets.bin",
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "bytes": 1994752
+      }
+    ],
+    "source_sha256": "f411bf0e7af2230294e25f1bf9da5a15eecb85e7d1961f375bdc305f3e5edebc"
+  },
+  "invalid": {
+    "finish_status": 400,
+    "metadata": {
+      "exists": false,
+      "size": 0
+    }
+  },
+  "finish_response_to_stop_guest_seconds": 0.0,
+  "start_response_to_stop_guest_seconds": 0.14309800000000017,
+  "inputs_unchanged": true
+}

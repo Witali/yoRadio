@@ -890,3 +890,29 @@
   22926 продолжает свой неизменённый app 0d8b7585. Candidate QEMU/full suite
   пока не проходил; следующий шаг — фактический HTTP upload/download/reboot,
   затем интеграция после terminal main run. Физических действий нет.
+
+### 2026-10-16 — реальные photo HTTP writes/download/cold boot
+
+- Permanent photo_qemu.py исполняет actual SDK HTTP/flash без app server mock.
+  Одинаковый before/after test: old0d8b7585 принимает invalid Huffman JPEG363
+  (finish200, exists=true), candidate131ce792 даёт400/absent. Valid grayscale и
+  RGB38488, ten4096-byte chunks, busy/early/out-of-order/conflicting requests,
+  exact retry, полное скачивание и cold process проходят.
+- Финальный тест усилен до 21 checks и четырёх процессов без debounce-паузы.
+  Замена RGB на gray другой длины переживает остановку сразу после finish;
+  незавершённая замена после start остаётся скрытой при cold boot, новая загрузка
+  доступна. Candidate finish→stop 0 guest s, start→stop .143098 guest s;
+  maximum observed request .298990 guest s. Все 21 candidate checks pass.
+  Все четыре UART-фазы
+  checked before log reuse, owned flash действительно менялся, source archive
+  unchanged; ВМ закрыты. Ранний prototype проверял panic только после cold boot;
+  постоянный тест усилен и before/after повторён, prototype не подменяет его.
+- Общий minimal JPEG producer вынесен в jpeg_test_fixtures; повтор 41-case
+  machine gate проходит. Старые scoped reports/их source hashes не переписаны.
+  Photo stage добавлен в branch suite/publisher/verifier. Root full run22926
+  продолжает frozen app0d8b7585 и не содержит эту новую проверку задним числом.
+- Гипотеза о недолговечном RAM-only размере не подтвердилась: фактический
+  settings_photo_size() уже вызывает settings_flush() синхронно. Production code
+  не менялся. Первоначальные 11-check reports/prototype исторические; архивные
+  photo-http-before/candidate содержат окончательный одинаковый 21-check observer.
+  Не моделировался power cut посреди операции записи flash.

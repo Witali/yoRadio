@@ -94,19 +94,33 @@ def main():
         raise ValueError('Profile validation and firmware used different profile/compiler inputs')
     if not qemu['inputs_unchanged']:
         raise ValueError('Emulator or helpers changed during execution')
-    for name in ('startup_wait', 'weather_wait'):
+    for name in ('startup_wait', 'weather_wait', 'photo_http'):
         gate = qemu[name]
         if (not gate['passed'] or not gate['inputs_unchanged'] or
                 gate['app_sha256'] != report['app_sha256'] or
                 gate['native_elf_sha256'] != text['native_elf_sha256'] or
                 gate['qemu_sha256'] != qemu['qemu_sha256'] or gate['helper_sha256'] != qemu['helper_sha256']):
-            raise ValueError('Software-wait gate failed or used different inputs: ' + name)
+            raise ValueError('Guest observer failed or used different inputs: ' + name)
         items = gate['test_inputs']
         items = items.items() if isinstance(items, dict) else ((item['file'], item['sha256']) for item in items)
         for path, sha in items:
             if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != sha:
-                raise ValueError('Software-wait observer changed: ' + path)
+                raise ValueError('Guest observer changed: ' + path)
     startup, held_weather = qemu['startup_wait'], qemu['weather_wait']
+    photo = qemu['photo_http']
+    photo_checks = {'valid_gray_published', 'malformed_huffman_rejected', 'busy_and_retry_policy',
+                    'valid_published', 'download_exact', 'first_boot_no_panic', 'owned_flash_changed',
+                    'cold_boot_new_vm', 'cold_boot_metadata', 'cold_boot_download_exact', 'cold_boot_no_panic',
+                    'immediate_finish_cut_bounded', 'immediate_finish_new_vm', 'immediate_finish_persisted',
+                    'interrupted_slot_unpublished', 'interrupted_start_cut_bounded', 'immediate_finish_no_panic',
+                    'interrupted_boot_new_vm', 'interrupted_photo_hidden', 'new_upload_after_interruption',
+                    'interrupted_boot_no_panic'}
+    if (photo['profile_sha256'] != qemu['profile_sha256'] or set(photo['checks']) != photo_checks or
+            not all(photo['checks'].values()) or photo['invalid']['finish_status'] != 400 or
+            photo['invalid']['metadata'] != {'exists': False, 'size': 0} or
+            any(not 0 <= photo[key] < .5 for key in
+                ('finish_response_to_stop_guest_seconds', 'start_response_to_stop_guest_seconds'))):
+        raise ValueError('Real photo upload/download/cold-boot checks omitted a stage or accepted invalid data')
     if not 0 <= startup['ready_wait_guest_seconds'] <= .5 or startup['different_colors'] < 2:
         raise ValueError('Ready clock still waits on startup or its first frame is blank')
     if (not held_weather['during']['request_state'] & held_weather['compiled_running_mask'] or
@@ -230,7 +244,7 @@ def main():
                         not row['digital_requested_brightness_applied'] for row in flow['samples'])):
                 raise ValueError('Completed scene comparison omitted full frames or brightness checks')
     qemu_sources = [qemu['boot_reset']['reconstructed']['prepared']['sources']]
-    qemu_sources.extend(qemu[name]['sources'] for name in ('startup_wait', 'weather_wait'))
+    qemu_sources.extend(qemu[name]['sources'] for name in ('startup_wait', 'weather_wait', 'photo_http'))
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
     qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
     qemu_sources.append(qemu['weather_http']['flows']['reconstructed']['sources'])
@@ -305,6 +319,7 @@ def main():
                        'inputs_unchanged': qemu['inputs_unchanged'],
                        'startup_wait': startup,
                        'weather_wait': held_weather,
+                       'photo_http': photo,
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],
                        'time_http': time_http,

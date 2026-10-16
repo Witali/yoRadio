@@ -80,15 +80,29 @@ def main():
     for item in jpeg_inputs['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
                 'Additional JPEG fixture/adapter changed: ' + item['file'])
-    for name in ('startup_wait', 'weather_wait'):
+    for name in ('startup_wait', 'weather_wait', 'photo_http'):
         gate = groups['qemu'][name]
         require(gate['passed'] and gate['inputs_unchanged'] and gate['app_sha256'] == app_sha and
                 gate['native_elf_sha256'] == state['native_elf_sha256'] and
                 gate['qemu_sha256'] == groups['qemu']['qemu_sha256'] and
                 gate['helper_sha256'] == groups['qemu']['helper_sha256'] and
                 gate['sources']['source_sha256'] == manifest['source_sha256'],
-                'Software-wait gate tested different inputs: ' + name)
+                'Guest observer tested different inputs: ' + name)
     startup, held_weather = groups['qemu']['startup_wait'], groups['qemu']['weather_wait']
+    photo = groups['qemu']['photo_http']
+    photo_checks = {'valid_gray_published', 'malformed_huffman_rejected', 'busy_and_retry_policy',
+                    'valid_published', 'download_exact', 'first_boot_no_panic', 'owned_flash_changed',
+                    'cold_boot_new_vm', 'cold_boot_metadata', 'cold_boot_download_exact', 'cold_boot_no_panic',
+                    'immediate_finish_cut_bounded', 'immediate_finish_new_vm', 'immediate_finish_persisted',
+                    'interrupted_slot_unpublished', 'interrupted_start_cut_bounded', 'immediate_finish_no_panic',
+                    'interrupted_boot_new_vm', 'interrupted_photo_hidden', 'new_upload_after_interruption',
+                    'interrupted_boot_no_panic'}
+    require(photo['profile_sha256'] == groups['qemu']['profile_sha256'] and
+            set(photo['checks']) == photo_checks and all(photo['checks'].values()) and
+            photo['invalid']['finish_status'] == 400 and photo['invalid']['metadata'] == {'exists': False, 'size': 0} and
+            all(0 <= photo[key] < .5 for key in
+                ('finish_response_to_stop_guest_seconds', 'start_response_to_stop_guest_seconds')),
+            'Real photo upload/download/cold-boot checks omitted stages or accepted invalid data')
     require(0 <= startup['ready_wait_guest_seconds'] <= .5 and startup['different_colors'] >= 2,
             'Ready startup clock was delayed or blank')
     require(held_weather['during']['request_state'] & held_weather['compiled_running_mask'] and

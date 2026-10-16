@@ -7,6 +7,21 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Новый permanent photo_qemu прошёл actual SDK HTTP/flash pipeline на app131ce792:
+21 checks, valid gray/RGB, ten chunks, busy/premature/out-of-order/conflicting
+requests, exact retries, download и четыре cold processes без debounce-пауз. Old app0d8b7585
+в том же тесте публикует malformed Huffman JPEG363 (200/exists), candidate
+rejects400/absent. Exact reports — `../qemu/parity/photo-http-checks.md`.
+Общий byte producer вынесен в jpeg_test_fixtures; все 41 machine cases после
+рефакторинга тоже pass. Production image не менялся, branch full suite ещё нужен.
+
+Гипотеза о фоновом сохранении размера не подтвердилась: settings_photo_size()
+уже вызывает settings_flush() синхронно. Firmware менять не нужно. Новый тест
+останавливает VM сразу после finish и после start незавершённой замены: новая
+длина/bytes сохраняются, незавершённый slot после cold boot скрыт, новая загрузка
+доступна. Это границы HTTP-ответов, не произвольный power cut посреди flash write.
+Фото-загрузка через браузер и actual completed photo/fade frames остаются gaps.
+
 Huffman gap исправлен следующим child change: actual before принимал все 17
 impossible prefix trees (DC1, AC1…16) в factory/native draw и native validation.
 Новый uint32 prefix-space check отклоняет их до jd_decomp; 4 valid 1/16-bit
