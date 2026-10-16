@@ -81,6 +81,11 @@ def main():
     require(regional['passed'] and regional['qemu_sha256'] == groups['qemu']['qemu_sha256'] and
             regional['settings_layout']['elf_sha256'] == state['native_elf_sha256'],
             'Regional settings gate tested a different executable/emulator')
+    completed = groups['qemu']['completed_scenes']
+    require(completed['passed'] and completed['app_sha256'] == app_sha and
+            completed['native_elf_sha256'] == state['native_elf_sha256'] and
+            completed['qemu_sha256'] == groups['qemu']['qemu_sha256'],
+            'Completed-frame gate tested a different executable/emulator')
     generated = BUILD / 'verification-resources'
     subprocess.run([sys.executable, str(ROOT / 'tools/prepare_resources.py'), '--output', str(generated)], check=True)
     source = read(generated / 'source-manifest.json')
@@ -178,6 +183,9 @@ def main():
     report['settings_version'] = 2
     report['settings_nvs_bytes'] = regional['settings_layout']['size']
     report['settings_nvs_v1_migration_verified'] = regional['nvs_migration']['passed']
+    report['qemu_completed_scene_report'] = '../qemu/completed-scenes-validation.json'
+    report['qemu_completed_frames'] = sum(len(flow['samples']) for scene in completed['scenes'].values() for flow in scene.values())
+    report['normalized_complete_scene_cases'] = len(completed['normalized']['cases'])
     report['work_status'] = 'Reconstructed firmware; confirmed factory corrections are marked and tested'
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(f'Verified application {app_sha}: {len(app)} bytes, {partitions["factory"] - len(app)} bytes free')

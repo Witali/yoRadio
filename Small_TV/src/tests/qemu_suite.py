@@ -43,7 +43,7 @@ def main():
                                             'esp_board.py', 'esp_services.py')}}
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
               **inputs,
-              'boot_reset': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'scenes': {}, 'errors': [],
+              'boot_reset': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
               'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP setup and synthetic weather HTTP/value/LCD checks. Whole-frame scene similarity is measured, not a parity gate. No physical hardware or Internet weather service.'}
     try:
         for variant in ('original', 'reconstructed'):
@@ -70,6 +70,9 @@ def main():
         from regional_qemu import run_suite as run_regional
         report['regional_http'] = run_regional(options, args.output / 'regional-http')
         check(report['regional_http']['passed'], 'Regional HTTP/raw/calendar/cold boot checks failed')
+        from scene_qemu import run_suite as run_completed_scenes
+        report['completed_scenes'] = run_completed_scenes(options, args.output / 'completed-scenes')
+        check(report['completed_scenes']['passed'], 'Completed whole-frame instruction replay failed')
         scene_output = args.output / 'scenes'
         subprocess.run([sys.executable, str(ROOT / 'Small_TV/qemu/parity/compare.py'),
                         '--qemu-root', str(args.qemu_root), '--yoradio', str(ROOT),

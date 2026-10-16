@@ -888,6 +888,8 @@ esp_err_t spi_bus_add_device(int host, const spi_device_interface_config_t *conf
     *device = (void *)1;
     return ESP_OK;
 }
+static bool digital_brightness_probe;
+static unsigned expected_digital_duty, digital_ink;
 esp_err_t spi_device_polling_transmit(spi_device_handle_t device, spi_transaction_t *transaction)
 {
     /* Decode actual ST7789 command/data bytes at the peripheral boundary into a test panel. */
@@ -898,6 +900,12 @@ esp_err_t spi_device_polling_transmit(spi_device_handle_t device, spi_transactio
     ++transfers;
     if (bytes > max_transfer)
         max_transfer = (unsigned)bytes;
+    if (digital_brightness_probe && dc && command == 0x2c)
+        for (size_t i=0;i+1<bytes;i+=2)
+            if (data[i] || data[i+1]) {
+                CHECK(duty==expected_digital_duty);
+                ++digital_ink;
+            }
     if (!dc)
     {
         assert(bytes == 1);
@@ -1406,6 +1414,36 @@ static void test_clock_coordinator(void)
     run_task("clock_display", clock_scenario);
     CHECK(clock_step == 302 && photo_draws >= 1);
 }
+
+static void digital_entry_scenario(void)
+{
+    /* Observe colored SPI pixels, rather than merely checking duty after a frame. */
+    ++clock_step;
+    if (clock_step==181)digital_brightness_probe=true;
+    if (clock_step==182) {
+        CHECK(digital_ink>0); digital_ink=0;
+        preferences.theme=1; ++preferences_generation;
+        backlight_set_level(800); /* Simulate entering from a different visible duty. */
+    }
+    if (clock_step==183) {
+        CHECK(digital_ink>0 && duty==expected_digital_duty);
+        longjmp(blocked,1);
+    }
+    tick_clock(1);
+}
+static void test_first_digital_brightness(void)
+{
+    /* Both first classic and simple frames must use the configured brightness. */
+    preferences.wifi_mode=1; strcpy(preferences.ssid,"fixture");
+    preferences.day_level=500; expected_digital_duty=4095;
+    CHECK(clock_ui_timer_init()==ESP_OK);
+    CHECK(network_init()==ESP_OK); got_ip(); start_synced_clock_services();
+    strcpy(preferences.weather_key,"fixture-key");
+    run_task("weather_http",seed_weather);
+    CHECK(display_init()==ESP_OK && backlight_init()==ESP_OK);
+    CHECK(duty==819);
+    clock_ui_start(); run_task("clock_display",digital_entry_scenario);
+}
 static void test_timer_driver_failures(void)
 {
     /* Every failed GPTimer initialization stage must propagate without later API calls. */
@@ -1718,7 +1756,7 @@ int main(int argc, char **argv)
     /* Select a fresh-process scenario and save a machine-readable result only after success. */
     CHECK(argc == 3);
     memset(&preferences, 0, sizeof(preferences));
-    preferences.version = 1;
+    preferences.version = TV_SETTINGS_VERSION;
     preferences.wifi_mode = 2;
     preferences.photo_seconds = 5;
     strcpy(preferences.city, "Shenzhen");
@@ -1747,6 +1785,7 @@ int main(int argc, char **argv)
                  {"text_field_windows", test_text_fields},
                  {"weather_field_cleanup", test_weather_field_cleanup},
                  {"clock_coordinator", test_clock_coordinator},
+                 {"clock_first_digital_brightness", test_first_digital_brightness},
                  {"timer_driver_failures", test_timer_driver_failures},
                  {"clock_animation_selection", test_clock_animation_selection},
                  {"clock_text_scroll", test_clock_text_scroll},

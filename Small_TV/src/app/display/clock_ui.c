@@ -101,6 +101,9 @@ static void clock_task(void *unused)
     /* Run the startup/setup/theme state machine and factory animation/fade timers.
      * FIXED_RECONSTRUCTION: retain the GIF cursor across selection/theme changes
      * as in 0x4200b5cc and 0x42008e08; resetting it changes the next frame.
+     * FIXED_RECONSTRUCTION: the factory's 0x42008e08 applies backlight before
+     * the next digital render. Our combined init/render must not paint its
+     * first complete digital frame at the previous startup/photo brightness.
      * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
      * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
      * after the photo fade rather than 0x4200bc36's full-brightness ending.
@@ -178,6 +181,8 @@ static void clock_task(void *unused)
                             (settings.theme == 2 ? TV_TIMER_PHOTO : 0));
             }
             phase = 3;
+            if (reset_theme && (settings.theme == 0 || settings.theme == 1))
+                backlight_update(&settings, local.tm_hour, local.tm_min, valid);
             if (!weather.valid || !previous_weather_valid)
                 description = 0;
             if (settings.theme == 0 && (reset_theme || factory_scroll_description_ready()) &&

@@ -188,7 +188,7 @@ Disassembly of section .flash.text:
 4200c232:	33312e23          	sw	s3,828(sp)
 4200c236:	33412c23          	sw	s4,824(sp)
 4200c23a:	33512a23          	sw	s5,820(sp)
-4200c23e:	088a00ef          	jal	420ac2c6 <xQueueCreateMutex>
+4200c23e:	0a6a00ef          	jal	420ac2e4 <xQueueCreateMutex>
 4200c242:	3fcb47b7          	lui	a5,0x3fcb4
 4200c246:	8ea7a623          	sw	a0,-1812(a5) # 3fcb38ec <settings_mutex>
 4200c24a:	e50d                	bnez	a0,4200c274 <settings_init+0x58>
@@ -284,7 +284,7 @@ Disassembly of section .flash.text:
 4200c36a:	80060613          	addi	a2,a2,-2048 # 800 <ALIGN_VECTOR_TABLE+0x700>
 4200c36e:	76458593          	addi	a1,a1,1892 # 3c0b4764 <_esp_libc_clock_array_end+0x4614>
 4200c372:	1a250513          	addi	a0,a0,418 # 4200c1a2 <persistence_task>
-4200c376:	480a10ef          	jal	420ad7f6 <xTaskCreatePinnedToCore>
+4200c376:	49ea10ef          	jal	420ad814 <xTaskCreatePinnedToCore>
 4200c37a:	ec8519e3          	bne	a0,s0,4200c24c <settings_init+0x30>
 4200c37e:	bdc9                	j	4200c250 <settings_init+0x34>
 4200c380:	15800793          	li	a5,344
@@ -753,473 +753,473 @@ Disassembly of section .iram0.text:
 
 Disassembly of section .flash.text:
 
-42011e4a <web_settings_post>:
-42011e4a:	7101                	addi	sp,sp,-512
-42011e4c:	1e912a23          	sw	s1,500(sp)
-42011e50:	84aa                	mv	s1,a0
-42011e52:	18c8                	addi	a0,sp,116
-42011e54:	1e112e23          	sw	ra,508(sp)
-42011e58:	1e812c23          	sw	s0,504(sp)
-42011e5c:	1f212823          	sw	s2,496(sp)
-42011e60:	1f312623          	sw	s3,492(sp)
-42011e64:	1f412423          	sw	s4,488(sp)
-42011e68:	1f512223          	sw	s5,484(sp)
-42011e6c:	e24fa0ef          	jal	4200c490 <settings_snapshot>
-42011e70:	3c0b45b7          	lui	a1,0x3c0b4
-42011e74:	65058593          	addi	a1,a1,1616 # 3c0b4650 <_esp_libc_clock_array_end+0x4500>
-42011e78:	00848513          	addi	a0,s1,8
-42011e7c:	fe375097          	auipc	ra,0xfe375
-42011e80:	7d6080e7          	jalr	2006(ra) # 40387652 <strcmp>
-42011e84:	ed21                	bnez	a0,42011edc <web_settings_post+0x92>
-42011e86:	20c4a783          	lw	a5,524(s1)
-42011e8a:	c3b9                	beqz	a5,42011ed0 <web_settings_post+0x86>
-42011e8c:	08000593          	li	a1,128
-42011e90:	8526                	mv	a0,s1
-42011e92:	9b7ff0ef          	jal	42011848 <web_body>
-42011e96:	e90d                	bnez	a0,42011ec8 <web_settings_post+0x7e>
-42011e98:	3c0b55b7          	lui	a1,0x3c0b5
-42011e9c:	88858593          	addi	a1,a1,-1912 # 3c0b4888 <_esp_libc_clock_array_end+0x4738>
-42011ea0:	8526                	mv	a0,s1
-42011ea2:	8d9ff0ef          	jal	4201177a <web_error>
-42011ea6:	1fc12083          	lw	ra,508(sp)
-42011eaa:	1f812403          	lw	s0,504(sp)
-42011eae:	1f412483          	lw	s1,500(sp)
-42011eb2:	1f012903          	lw	s2,496(sp)
-42011eb6:	1ec12983          	lw	s3,492(sp)
-42011eba:	1e812a03          	lw	s4,488(sp)
-42011ebe:	1e412a83          	lw	s5,484(sp)
-42011ec2:	20010113          	addi	sp,sp,512
-42011ec6:	8082                	ret
-42011ec8:	fe375097          	auipc	ra,0xfe375
-42011ecc:	2fa080e7          	jalr	762(ra) # 403871c2 <cfree>
-42011ed0:	c14fe0ef          	jal	420102e4 <network_restart_later>
-42011ed4:	8526                	mv	a0,s1
-42011ed6:	8ddff0ef          	jal	420117b2 <web_ok>
-42011eda:	b7f1                	j	42011ea6 <web_settings_post+0x5c>
-42011edc:	3c0b45b7          	lui	a1,0x3c0b4
-42011ee0:	70458593          	addi	a1,a1,1796 # 3c0b4704 <_esp_libc_clock_array_end+0x45b4>
-42011ee4:	00848513          	addi	a0,s1,8
-42011ee8:	fe375097          	auipc	ra,0xfe375
-42011eec:	76a080e7          	jalr	1898(ra) # 40387652 <strcmp>
-42011ef0:	89aa                	mv	s3,a0
-42011ef2:	c55d                	beqz	a0,42011fa0 <web_settings_post+0x156>
-42011ef4:	3c0b45b7          	lui	a1,0x3c0b4
-42011ef8:	6ac58593          	addi	a1,a1,1708 # 3c0b46ac <_esp_libc_clock_array_end+0x455c>
-42011efc:	00848513          	addi	a0,s1,8
-42011f00:	fe375097          	auipc	ra,0xfe375
-42011f04:	752080e7          	jalr	1874(ra) # 40387652 <strcmp>
-42011f08:	0e051663          	bnez	a0,42011ff4 <web_settings_post+0x1aa>
-42011f0c:	3c0b5937          	lui	s2,0x3c0b5
-42011f10:	87890913          	addi	s2,s2,-1928 # 3c0b4878 <_esp_libc_clock_array_end+0x4728>
-42011f14:	08000593          	li	a1,128
-42011f18:	8526                	mv	a0,s1
-42011f1a:	92fff0ef          	jal	42011848 <web_body>
-42011f1e:	8a2a                	mv	s4,a0
-42011f20:	20050f63          	beqz	a0,4201213e <web_settings_post+0x2f4>
-42011f24:	20c4a603          	lw	a2,524(s1)
-42011f28:	4581                	li	a1,0
-42011f2a:	fdfee097          	auipc	ra,0xfdfee
-42011f2e:	5d2080e7          	jalr	1490(ra) # 400004fc <memchr>
-42011f32:	cd25                	beqz	a0,42011faa <web_settings_post+0x160>
-42011f34:	4901                	li	s2,0
-42011f36:	8552                	mv	a0,s4
-42011f38:	fe375097          	auipc	ra,0xfe375
-42011f3c:	28a080e7          	jalr	650(ra) # 403871c2 <cfree>
-42011f40:	1e090f63          	beqz	s2,4201213e <web_settings_post+0x2f4>
-42011f44:	47a9                	li	a5,10
-42011f46:	02f40433          	mul	s0,s0,a5
-42011f4a:	3e800793          	li	a5,1000
-42011f4e:	40878433          	sub	s0,a5,s0
-42011f52:	08099e63          	bnez	s3,42011fee <web_settings_post+0x1a4>
-42011f56:	1a811923          	sh	s0,434(sp)
-42011f5a:	4981                	li	s3,0
-42011f5c:	4901                	li	s2,0
-42011f5e:	18c8                	addi	a0,sp,116
-42011f60:	d74fa0ef          	jal	4200c4d4 <settings_replace>
-42011f64:	1c051d63          	bnez	a0,4201213e <web_settings_post+0x2f4>
-42011f68:	00098463          	beqz	s3,42011f70 <web_settings_post+0x126>
-42011f6c:	9e0ff0ef          	jal	4201114c <weather_request_update>
-42011f70:	00090463          	beqz	s2,42011f78 <web_settings_post+0x12e>
-42011f74:	b70fe0ef          	jal	420102e4 <network_restart_later>
-42011f78:	3c0b45b7          	lui	a1,0x3c0b4
-42011f7c:	64058593          	addi	a1,a1,1600 # 3c0b4640 <_esp_libc_clock_array_end+0x44f0>
-42011f80:	00848513          	addi	a0,s1,8
-42011f84:	fe375097          	auipc	ra,0xfe375
-42011f88:	6ce080e7          	jalr	1742(ra) # 40387652 <strcmp>
-42011f8c:	f521                	bnez	a0,42011ed4 <web_settings_post+0x8a>
-42011f8e:	3c0b55b7          	lui	a1,0x3c0b5
-42011f92:	567d                	li	a2,-1
-42011f94:	93c58593          	addi	a1,a1,-1732 # 3c0b493c <_esp_libc_clock_array_end+0x47ec>
-42011f98:	8526                	mv	a0,s1
-42011f9a:	040270ef          	jal	42038fda <httpd_resp_send>
-42011f9e:	b721                	j	42011ea6 <web_settings_post+0x5c>
-42011fa0:	3c0b5937          	lui	s2,0x3c0b5
-42011fa4:	86890913          	addi	s2,s2,-1944 # 3c0b4868 <_esp_libc_clock_array_end+0x4718>
-42011fa8:	b7b5                	j	42011f14 <web_settings_post+0xca>
-42011faa:	46a1                	li	a3,8
-42011fac:	0870                	addi	a2,sp,28
-42011fae:	85ca                	mv	a1,s2
-42011fb0:	8552                	mv	a0,s4
-42011fb2:	520260ef          	jal	420384d2 <httpd_query_key_value>
-42011fb6:	fd3d                	bnez	a0,42011f34 <web_settings_post+0xea>
-42011fb8:	01c14783          	lbu	a5,28(sp)
-42011fbc:	dfa5                	beqz	a5,42011f34 <web_settings_post+0xea>
-42011fbe:	0878                	addi	a4,sp,28
-42011fc0:	4905                	li	s2,1
-42011fc2:	a801                	j	42011fd2 <web_settings_post+0x188>
-42011fc4:	fd078793          	addi	a5,a5,-48
-42011fc8:	00a7b793          	sltiu	a5,a5,10
-42011fcc:	00f97933          	and	s2,s2,a5
-42011fd0:	0705                	addi	a4,a4,1
-42011fd2:	00074783          	lbu	a5,0(a4)
-42011fd6:	f7fd                	bnez	a5,42011fc4 <web_settings_post+0x17a>
-42011fd8:	4629                	li	a2,10
-42011fda:	4581                	li	a1,0
-42011fdc:	0868                	addi	a0,sp,28
-42011fde:	46c8c0ef          	jal	4209e44a <strtoul>
-42011fe2:	06553793          	sltiu	a5,a0,101
-42011fe6:	842a                	mv	s0,a0
-42011fe8:	00f97933          	and	s2,s2,a5
-42011fec:	b7a9                	j	42011f36 <web_settings_post+0xec>
-42011fee:	1a811a23          	sh	s0,436(sp)
-42011ff2:	b7a5                	j	42011f5a <web_settings_post+0x110>
-42011ff4:	8526                	mv	a0,s1
-42011ff6:	953ff0ef          	jal	42011948 <web_parse_json>
-42011ffa:	8a2a                	mv	s4,a0
-42011ffc:	e511                	bnez	a0,42012008 <web_settings_post+0x1be>
-42011ffe:	3c0b55b7          	lui	a1,0x3c0b5
-42012002:	89858593          	addi	a1,a1,-1896 # 3c0b4898 <_esp_libc_clock_array_end+0x4748>
-42012006:	bd69                	j	42011ea0 <web_settings_post+0x56>
-42012008:	3c0eb937          	lui	s2,0x3c0eb
-4201200c:	54490913          	addi	s2,s2,1348 # 3c0eb544 <integers>
-42012010:	09090993          	addi	s3,s2,144
-42012014:	4401                	li	s0,0
-42012016:	00492583          	lw	a1,4(s2)
-4201201a:	00848513          	addi	a0,s1,8
-4201201e:	fe375097          	auipc	ra,0xfe375
-42012022:	634080e7          	jalr	1588(ra) # 40387652 <strcmp>
-42012026:	e515                	bnez	a0,42012052 <web_settings_post+0x208>
-42012028:	01492683          	lw	a3,20(s2)
-4201202c:	01092603          	lw	a2,16(s2)
-42012030:	00892583          	lw	a1,8(s2)
-42012034:	0878                	addi	a4,sp,28
-42012036:	8552                	mv	a0,s4
-42012038:	95dff0ef          	jal	42011994 <web_integer>
-4201203c:	842a                	mv	s0,a0
-4201203e:	c911                	beqz	a0,42012052 <web_settings_post+0x208>
-42012040:	00c92783          	lw	a5,12(s2)
-42012044:	0818                	addi	a4,sp,16
-42012046:	1d078793          	addi	a5,a5,464
-4201204a:	97ba                	add	a5,a5,a4
-4201204c:	4772                	lw	a4,28(sp)
-4201204e:	e8e78a23          	sb	a4,-364(a5)
-42012052:	0961                	addi	s2,s2,24
-42012054:	fd3911e3          	bne	s2,s3,42012016 <web_settings_post+0x1cc>
-42012058:	3c0b45b7          	lui	a1,0x3c0b4
-4201205c:	77058593          	addi	a1,a1,1904 # 3c0b4770 <_esp_libc_clock_array_end+0x4620>
-42012060:	00848513          	addi	a0,s1,8
-42012064:	fe375097          	auipc	ra,0xfe375
-42012068:	5ee080e7          	jalr	1518(ra) # 40387652 <strcmp>
-4201206c:	e531                	bnez	a0,420120b8 <web_settings_post+0x26e>
-4201206e:	3c0eb937          	lui	s2,0x3c0eb
-42012072:	51c90913          	addi	s2,s2,1308 # 3c0eb51c <switches>
-42012076:	02890993          	addi	s3,s2,40
-4201207a:	4401                	li	s0,0
-4201207c:	00092583          	lw	a1,0(s2)
-42012080:	8552                	mv	a0,s4
-42012082:	c62e                	sw	a1,12(sp)
-42012084:	43b020ef          	jal	42014cbe <cJSON_HasObjectItem>
-42012088:	45b2                	lw	a1,12(sp)
-4201208a:	c115                	beqz	a0,420120ae <web_settings_post+0x264>
-4201208c:	0878                	addi	a4,sp,28
-4201208e:	4685                	li	a3,1
-42012090:	4601                	li	a2,0
-42012092:	8552                	mv	a0,s4
-42012094:	901ff0ef          	jal	42011994 <web_integer>
-42012098:	842a                	mv	s0,a0
-4201209a:	cd09                	beqz	a0,420120b4 <web_settings_post+0x26a>
-4201209c:	00492783          	lw	a5,4(s2)
-420120a0:	0818                	addi	a4,sp,16
-420120a2:	1d078793          	addi	a5,a5,464
-420120a6:	97ba                	add	a5,a5,a4
-420120a8:	4772                	lw	a4,28(sp)
-420120aa:	e8e78a23          	sb	a4,-364(a5)
-420120ae:	0921                	addi	s2,s2,8
-420120b0:	fd2996e3          	bne	s3,s2,4201207c <web_settings_post+0x232>
-420120b4:	4981                	li	s3,0
-420120b6:	a219                	j	420121bc <web_settings_post+0x372>
-420120b8:	3c0b45b7          	lui	a1,0x3c0b4
-420120bc:	7c458593          	addi	a1,a1,1988 # 3c0b47c4 <_esp_libc_clock_array_end+0x4674>
-420120c0:	00848513          	addi	a0,s1,8
-420120c4:	fe375097          	auipc	ra,0xfe375
-420120c8:	58e080e7          	jalr	1422(ra) # 40387652 <strcmp>
-420120cc:	cd01                	beqz	a0,420120e4 <web_settings_post+0x29a>
-420120ce:	3c0b45b7          	lui	a1,0x3c0b4
-420120d2:	63458593          	addi	a1,a1,1588 # 3c0b4634 <_esp_libc_clock_array_end+0x44e4>
-420120d6:	00848513          	addi	a0,s1,8
-420120da:	fe375097          	auipc	ra,0xfe375
-420120de:	578080e7          	jalr	1400(ra) # 40387652 <strcmp>
-420120e2:	e92d                	bnez	a0,42012154 <web_settings_post+0x30a>
-420120e4:	3c0bf5b7          	lui	a1,0x3c0bf
-420120e8:	02100693          	li	a3,33
-420120ec:	18b0                	addi	a2,sp,120
-420120ee:	1e058593          	addi	a1,a1,480 # 3c0bf1e0 <_esp_libc_clock_array_end+0xf090>
-420120f2:	8552                	mv	a0,s4
-420120f4:	ab3ff0ef          	jal	42011ba6 <copy_string>
-420120f8:	c91d                	beqz	a0,4201212e <web_settings_post+0x2e4>
-420120fa:	07814783          	lbu	a5,120(sp)
-420120fe:	cb85                	beqz	a5,4201212e <web_settings_post+0x2e4>
-42012100:	3c0b55b7          	lui	a1,0x3c0b5
-42012104:	04100693          	li	a3,65
-42012108:	09910613          	addi	a2,sp,153
-4201210c:	8b858593          	addi	a1,a1,-1864 # 3c0b48b8 <_esp_libc_clock_array_end+0x4768>
+42011e68 <web_settings_post>:
+42011e68:	7101                	addi	sp,sp,-512
+42011e6a:	1e912a23          	sw	s1,500(sp)
+42011e6e:	84aa                	mv	s1,a0
+42011e70:	18c8                	addi	a0,sp,116
+42011e72:	1e112e23          	sw	ra,508(sp)
+42011e76:	1e812c23          	sw	s0,504(sp)
+42011e7a:	1f212823          	sw	s2,496(sp)
+42011e7e:	1f312623          	sw	s3,492(sp)
+42011e82:	1f412423          	sw	s4,488(sp)
+42011e86:	1f512223          	sw	s5,484(sp)
+42011e8a:	e06fa0ef          	jal	4200c490 <settings_snapshot>
+42011e8e:	3c0b45b7          	lui	a1,0x3c0b4
+42011e92:	65058593          	addi	a1,a1,1616 # 3c0b4650 <_esp_libc_clock_array_end+0x4500>
+42011e96:	00848513          	addi	a0,s1,8
+42011e9a:	fe375097          	auipc	ra,0xfe375
+42011e9e:	7b8080e7          	jalr	1976(ra) # 40387652 <strcmp>
+42011ea2:	ed21                	bnez	a0,42011efa <web_settings_post+0x92>
+42011ea4:	20c4a783          	lw	a5,524(s1)
+42011ea8:	c3b9                	beqz	a5,42011eee <web_settings_post+0x86>
+42011eaa:	08000593          	li	a1,128
+42011eae:	8526                	mv	a0,s1
+42011eb0:	9b7ff0ef          	jal	42011866 <web_body>
+42011eb4:	e90d                	bnez	a0,42011ee6 <web_settings_post+0x7e>
+42011eb6:	3c0b55b7          	lui	a1,0x3c0b5
+42011eba:	88858593          	addi	a1,a1,-1912 # 3c0b4888 <_esp_libc_clock_array_end+0x4738>
+42011ebe:	8526                	mv	a0,s1
+42011ec0:	8d9ff0ef          	jal	42011798 <web_error>
+42011ec4:	1fc12083          	lw	ra,508(sp)
+42011ec8:	1f812403          	lw	s0,504(sp)
+42011ecc:	1f412483          	lw	s1,500(sp)
+42011ed0:	1f012903          	lw	s2,496(sp)
+42011ed4:	1ec12983          	lw	s3,492(sp)
+42011ed8:	1e812a03          	lw	s4,488(sp)
+42011edc:	1e412a83          	lw	s5,484(sp)
+42011ee0:	20010113          	addi	sp,sp,512
+42011ee4:	8082                	ret
+42011ee6:	fe375097          	auipc	ra,0xfe375
+42011eea:	2dc080e7          	jalr	732(ra) # 403871c2 <cfree>
+42011eee:	c14fe0ef          	jal	42010302 <network_restart_later>
+42011ef2:	8526                	mv	a0,s1
+42011ef4:	8ddff0ef          	jal	420117d0 <web_ok>
+42011ef8:	b7f1                	j	42011ec4 <web_settings_post+0x5c>
+42011efa:	3c0b45b7          	lui	a1,0x3c0b4
+42011efe:	70458593          	addi	a1,a1,1796 # 3c0b4704 <_esp_libc_clock_array_end+0x45b4>
+42011f02:	00848513          	addi	a0,s1,8
+42011f06:	fe375097          	auipc	ra,0xfe375
+42011f0a:	74c080e7          	jalr	1868(ra) # 40387652 <strcmp>
+42011f0e:	89aa                	mv	s3,a0
+42011f10:	c55d                	beqz	a0,42011fbe <web_settings_post+0x156>
+42011f12:	3c0b45b7          	lui	a1,0x3c0b4
+42011f16:	6ac58593          	addi	a1,a1,1708 # 3c0b46ac <_esp_libc_clock_array_end+0x455c>
+42011f1a:	00848513          	addi	a0,s1,8
+42011f1e:	fe375097          	auipc	ra,0xfe375
+42011f22:	734080e7          	jalr	1844(ra) # 40387652 <strcmp>
+42011f26:	0e051663          	bnez	a0,42012012 <web_settings_post+0x1aa>
+42011f2a:	3c0b5937          	lui	s2,0x3c0b5
+42011f2e:	87890913          	addi	s2,s2,-1928 # 3c0b4878 <_esp_libc_clock_array_end+0x4728>
+42011f32:	08000593          	li	a1,128
+42011f36:	8526                	mv	a0,s1
+42011f38:	92fff0ef          	jal	42011866 <web_body>
+42011f3c:	8a2a                	mv	s4,a0
+42011f3e:	20050f63          	beqz	a0,4201215c <web_settings_post+0x2f4>
+42011f42:	20c4a603          	lw	a2,524(s1)
+42011f46:	4581                	li	a1,0
+42011f48:	fdfee097          	auipc	ra,0xfdfee
+42011f4c:	5b4080e7          	jalr	1460(ra) # 400004fc <memchr>
+42011f50:	cd25                	beqz	a0,42011fc8 <web_settings_post+0x160>
+42011f52:	4901                	li	s2,0
+42011f54:	8552                	mv	a0,s4
+42011f56:	fe375097          	auipc	ra,0xfe375
+42011f5a:	26c080e7          	jalr	620(ra) # 403871c2 <cfree>
+42011f5e:	1e090f63          	beqz	s2,4201215c <web_settings_post+0x2f4>
+42011f62:	47a9                	li	a5,10
+42011f64:	02f40433          	mul	s0,s0,a5
+42011f68:	3e800793          	li	a5,1000
+42011f6c:	40878433          	sub	s0,a5,s0
+42011f70:	08099e63          	bnez	s3,4201200c <web_settings_post+0x1a4>
+42011f74:	1a811923          	sh	s0,434(sp)
+42011f78:	4981                	li	s3,0
+42011f7a:	4901                	li	s2,0
+42011f7c:	18c8                	addi	a0,sp,116
+42011f7e:	d56fa0ef          	jal	4200c4d4 <settings_replace>
+42011f82:	1c051d63          	bnez	a0,4201215c <web_settings_post+0x2f4>
+42011f86:	00098463          	beqz	s3,42011f8e <web_settings_post+0x126>
+42011f8a:	9e0ff0ef          	jal	4201116a <weather_request_update>
+42011f8e:	00090463          	beqz	s2,42011f96 <web_settings_post+0x12e>
+42011f92:	b70fe0ef          	jal	42010302 <network_restart_later>
+42011f96:	3c0b45b7          	lui	a1,0x3c0b4
+42011f9a:	64058593          	addi	a1,a1,1600 # 3c0b4640 <_esp_libc_clock_array_end+0x44f0>
+42011f9e:	00848513          	addi	a0,s1,8
+42011fa2:	fe375097          	auipc	ra,0xfe375
+42011fa6:	6b0080e7          	jalr	1712(ra) # 40387652 <strcmp>
+42011faa:	f521                	bnez	a0,42011ef2 <web_settings_post+0x8a>
+42011fac:	3c0b55b7          	lui	a1,0x3c0b5
+42011fb0:	567d                	li	a2,-1
+42011fb2:	93c58593          	addi	a1,a1,-1732 # 3c0b493c <_esp_libc_clock_array_end+0x47ec>
+42011fb6:	8526                	mv	a0,s1
+42011fb8:	040270ef          	jal	42038ff8 <httpd_resp_send>
+42011fbc:	b721                	j	42011ec4 <web_settings_post+0x5c>
+42011fbe:	3c0b5937          	lui	s2,0x3c0b5
+42011fc2:	86890913          	addi	s2,s2,-1944 # 3c0b4868 <_esp_libc_clock_array_end+0x4718>
+42011fc6:	b7b5                	j	42011f32 <web_settings_post+0xca>
+42011fc8:	46a1                	li	a3,8
+42011fca:	0870                	addi	a2,sp,28
+42011fcc:	85ca                	mv	a1,s2
+42011fce:	8552                	mv	a0,s4
+42011fd0:	520260ef          	jal	420384f0 <httpd_query_key_value>
+42011fd4:	fd3d                	bnez	a0,42011f52 <web_settings_post+0xea>
+42011fd6:	01c14783          	lbu	a5,28(sp)
+42011fda:	dfa5                	beqz	a5,42011f52 <web_settings_post+0xea>
+42011fdc:	0878                	addi	a4,sp,28
+42011fde:	4905                	li	s2,1
+42011fe0:	a801                	j	42011ff0 <web_settings_post+0x188>
+42011fe2:	fd078793          	addi	a5,a5,-48
+42011fe6:	00a7b793          	sltiu	a5,a5,10
+42011fea:	00f97933          	and	s2,s2,a5
+42011fee:	0705                	addi	a4,a4,1
+42011ff0:	00074783          	lbu	a5,0(a4)
+42011ff4:	f7fd                	bnez	a5,42011fe2 <web_settings_post+0x17a>
+42011ff6:	4629                	li	a2,10
+42011ff8:	4581                	li	a1,0
+42011ffa:	0868                	addi	a0,sp,28
+42011ffc:	46c8c0ef          	jal	4209e468 <strtoul>
+42012000:	06553793          	sltiu	a5,a0,101
+42012004:	842a                	mv	s0,a0
+42012006:	00f97933          	and	s2,s2,a5
+4201200a:	b7a9                	j	42011f54 <web_settings_post+0xec>
+4201200c:	1a811a23          	sh	s0,436(sp)
+42012010:	b7a5                	j	42011f78 <web_settings_post+0x110>
+42012012:	8526                	mv	a0,s1
+42012014:	953ff0ef          	jal	42011966 <web_parse_json>
+42012018:	8a2a                	mv	s4,a0
+4201201a:	e511                	bnez	a0,42012026 <web_settings_post+0x1be>
+4201201c:	3c0b55b7          	lui	a1,0x3c0b5
+42012020:	89858593          	addi	a1,a1,-1896 # 3c0b4898 <_esp_libc_clock_array_end+0x4748>
+42012024:	bd69                	j	42011ebe <web_settings_post+0x56>
+42012026:	3c0eb937          	lui	s2,0x3c0eb
+4201202a:	54490913          	addi	s2,s2,1348 # 3c0eb544 <integers>
+4201202e:	09090993          	addi	s3,s2,144
+42012032:	4401                	li	s0,0
+42012034:	00492583          	lw	a1,4(s2)
+42012038:	00848513          	addi	a0,s1,8
+4201203c:	fe375097          	auipc	ra,0xfe375
+42012040:	616080e7          	jalr	1558(ra) # 40387652 <strcmp>
+42012044:	e515                	bnez	a0,42012070 <web_settings_post+0x208>
+42012046:	01492683          	lw	a3,20(s2)
+4201204a:	01092603          	lw	a2,16(s2)
+4201204e:	00892583          	lw	a1,8(s2)
+42012052:	0878                	addi	a4,sp,28
+42012054:	8552                	mv	a0,s4
+42012056:	95dff0ef          	jal	420119b2 <web_integer>
+4201205a:	842a                	mv	s0,a0
+4201205c:	c911                	beqz	a0,42012070 <web_settings_post+0x208>
+4201205e:	00c92783          	lw	a5,12(s2)
+42012062:	0818                	addi	a4,sp,16
+42012064:	1d078793          	addi	a5,a5,464
+42012068:	97ba                	add	a5,a5,a4
+4201206a:	4772                	lw	a4,28(sp)
+4201206c:	e8e78a23          	sb	a4,-364(a5)
+42012070:	0961                	addi	s2,s2,24
+42012072:	fd3911e3          	bne	s2,s3,42012034 <web_settings_post+0x1cc>
+42012076:	3c0b45b7          	lui	a1,0x3c0b4
+4201207a:	77058593          	addi	a1,a1,1904 # 3c0b4770 <_esp_libc_clock_array_end+0x4620>
+4201207e:	00848513          	addi	a0,s1,8
+42012082:	fe375097          	auipc	ra,0xfe375
+42012086:	5d0080e7          	jalr	1488(ra) # 40387652 <strcmp>
+4201208a:	e531                	bnez	a0,420120d6 <web_settings_post+0x26e>
+4201208c:	3c0eb937          	lui	s2,0x3c0eb
+42012090:	51c90913          	addi	s2,s2,1308 # 3c0eb51c <switches>
+42012094:	02890993          	addi	s3,s2,40
+42012098:	4401                	li	s0,0
+4201209a:	00092583          	lw	a1,0(s2)
+4201209e:	8552                	mv	a0,s4
+420120a0:	c62e                	sw	a1,12(sp)
+420120a2:	43b020ef          	jal	42014cdc <cJSON_HasObjectItem>
+420120a6:	45b2                	lw	a1,12(sp)
+420120a8:	c115                	beqz	a0,420120cc <web_settings_post+0x264>
+420120aa:	0878                	addi	a4,sp,28
+420120ac:	4685                	li	a3,1
+420120ae:	4601                	li	a2,0
+420120b0:	8552                	mv	a0,s4
+420120b2:	901ff0ef          	jal	420119b2 <web_integer>
+420120b6:	842a                	mv	s0,a0
+420120b8:	cd09                	beqz	a0,420120d2 <web_settings_post+0x26a>
+420120ba:	00492783          	lw	a5,4(s2)
+420120be:	0818                	addi	a4,sp,16
+420120c0:	1d078793          	addi	a5,a5,464
+420120c4:	97ba                	add	a5,a5,a4
+420120c6:	4772                	lw	a4,28(sp)
+420120c8:	e8e78a23          	sb	a4,-364(a5)
+420120cc:	0921                	addi	s2,s2,8
+420120ce:	fd2996e3          	bne	s3,s2,4201209a <web_settings_post+0x232>
+420120d2:	4981                	li	s3,0
+420120d4:	a219                	j	420121da <web_settings_post+0x372>
+420120d6:	3c0b45b7          	lui	a1,0x3c0b4
+420120da:	7c458593          	addi	a1,a1,1988 # 3c0b47c4 <_esp_libc_clock_array_end+0x4674>
+420120de:	00848513          	addi	a0,s1,8
+420120e2:	fe375097          	auipc	ra,0xfe375
+420120e6:	570080e7          	jalr	1392(ra) # 40387652 <strcmp>
+420120ea:	cd01                	beqz	a0,42012102 <web_settings_post+0x29a>
+420120ec:	3c0b45b7          	lui	a1,0x3c0b4
+420120f0:	63458593          	addi	a1,a1,1588 # 3c0b4634 <_esp_libc_clock_array_end+0x44e4>
+420120f4:	00848513          	addi	a0,s1,8
+420120f8:	fe375097          	auipc	ra,0xfe375
+420120fc:	55a080e7          	jalr	1370(ra) # 40387652 <strcmp>
+42012100:	e92d                	bnez	a0,42012172 <web_settings_post+0x30a>
+42012102:	3c0bf5b7          	lui	a1,0x3c0bf
+42012106:	02100693          	li	a3,33
+4201210a:	18b0                	addi	a2,sp,120
+4201210c:	1e058593          	addi	a1,a1,480 # 3c0bf1e0 <_esp_libc_clock_array_end+0xf090>
 42012110:	8552                	mv	a0,s4
-42012112:	a95ff0ef          	jal	42011ba6 <copy_string>
-42012116:	842a                	mv	s0,a0
-42012118:	c919                	beqz	a0,4201212e <web_settings_post+0x2e4>
-4201211a:	09910513          	addi	a0,sp,153
-4201211e:	fdfee097          	auipc	ra,0xfdfee
-42012122:	38a080e7          	jalr	906(ra) # 400004a8 <strlen>
-42012126:	157d                	addi	a0,a0,-1
-42012128:	4799                	li	a5,6
-4201212a:	00a7ef63          	bltu	a5,a0,42012148 <web_settings_post+0x2fe>
-4201212e:	4981                	li	s3,0
-42012130:	4901                	li	s2,0
-42012132:	4401                	li	s0,0
-42012134:	8552                	mv	a0,s4
-42012136:	63a020ef          	jal	42014770 <cJSON_Delete>
-4201213a:	e20412e3          	bnez	s0,42011f5e <web_settings_post+0x114>
-4201213e:	3c0b55b7          	lui	a1,0x3c0b5
-42012142:	92058593          	addi	a1,a1,-1760 # 3c0b4920 <_esp_libc_clock_array_end+0x47d0>
-42012146:	bba9                	j	42011ea0 <web_settings_post+0x56>
-42012148:	4785                	li	a5,1
-4201214a:	1cf104a3          	sb	a5,457(sp)
-4201214e:	8922                	mv	s2,s0
-42012150:	4981                	li	s3,0
-42012152:	b7cd                	j	42012134 <web_settings_post+0x2ea>
-42012154:	3c0b45b7          	lui	a1,0x3c0b4
-42012158:	64058593          	addi	a1,a1,1600 # 3c0b4640 <_esp_libc_clock_array_end+0x44f0>
-4201215c:	00848513          	addi	a0,s1,8
-42012160:	fe375097          	auipc	ra,0xfe375
-42012164:	4f2080e7          	jalr	1266(ra) # 40387652 <strcmp>
-42012168:	ed21                	bnez	a0,420121c0 <web_settings_post+0x376>
-4201216a:	3c0b55b7          	lui	a1,0x3c0b5
-4201216e:	04100693          	li	a3,65
-42012172:	12f10613          	addi	a2,sp,303
-42012176:	8c458593          	addi	a1,a1,-1852 # 3c0b48c4 <_esp_libc_clock_array_end+0x4774>
-4201217a:	8552                	mv	a0,s4
-4201217c:	a2bff0ef          	jal	42011ba6 <copy_string>
-42012180:	e119                	bnez	a0,42012186 <web_settings_post+0x33c>
-42012182:	4401                	li	s0,0
-42012184:	a81d                	j	420121ba <web_settings_post+0x370>
-42012186:	3c0b55b7          	lui	a1,0x3c0b5
-4201218a:	04100693          	li	a3,65
-4201218e:	1a90                	addi	a2,sp,368
-42012190:	8c858593          	addi	a1,a1,-1848 # 3c0b48c8 <_esp_libc_clock_array_end+0x4778>
-42012194:	8552                	mv	a0,s4
-42012196:	a11ff0ef          	jal	42011ba6 <copy_string>
-4201219a:	d565                	beqz	a0,42012182 <web_settings_post+0x338>
-4201219c:	3c0b55b7          	lui	a1,0x3c0b5
-420121a0:	0878                	addi	a4,sp,28
-420121a2:	46a9                	li	a3,10
-420121a4:	4601                	li	a2,0
-420121a6:	8dc58593          	addi	a1,a1,-1828 # 3c0b48dc <_esp_libc_clock_array_end+0x478c>
-420121aa:	8552                	mv	a0,s4
-420121ac:	fe8ff0ef          	jal	42011994 <web_integer>
-420121b0:	842a                	mv	s0,a0
-420121b2:	d961                	beqz	a0,42012182 <web_settings_post+0x338>
-420121b4:	47f2                	lw	a5,28(sp)
-420121b6:	1cf103a3          	sb	a5,455(sp)
-420121ba:	89a2                	mv	s3,s0
-420121bc:	4901                	li	s2,0
-420121be:	bf9d                	j	42012134 <web_settings_post+0x2ea>
-420121c0:	3c0b45b7          	lui	a1,0x3c0b4
-420121c4:	72c58593          	addi	a1,a1,1836 # 3c0b472c <_esp_libc_clock_array_end+0x45dc>
-420121c8:	00848513          	addi	a0,s1,8
-420121cc:	fe375097          	auipc	ra,0xfe375
-420121d0:	486080e7          	jalr	1158(ra) # 40387652 <strcmp>
-420121d4:	e95d                	bnez	a0,4201228a <web_settings_post+0x440>
-420121d6:	3c0b55b7          	lui	a1,0x3c0b5
-420121da:	05700693          	li	a3,87
-420121de:	0870                	addi	a2,sp,28
-420121e0:	8e858593          	addi	a1,a1,-1816 # 3c0b48e8 <_esp_libc_clock_array_end+0x4798>
-420121e4:	8552                	mv	a0,s4
-420121e6:	9c1ff0ef          	jal	42011ba6 <copy_string>
-420121ea:	dd41                	beqz	a0,42012182 <web_settings_post+0x338>
-420121ec:	02c00593          	li	a1,44
-420121f0:	0868                	addi	a0,sp,28
-420121f2:	fdfee097          	auipc	ra,0xfdfee
-420121f6:	34a080e7          	jalr	842(ra) # 4000053c <strrchr>
-420121fa:	892a                	mv	s2,a0
-420121fc:	4985                	li	s3,1
-420121fe:	ed09                	bnez	a0,42012218 <web_settings_post+0x3ce>
-42012200:	3c0b55b7          	lui	a1,0x3c0b5
-42012204:	8f058593          	addi	a1,a1,-1808 # 3c0b48f0 <_esp_libc_clock_array_end+0x47a0>
-42012208:	0868                	addi	a0,sp,28
-4201220a:	fdfee097          	auipc	ra,0xfdfee
-4201220e:	2a2080e7          	jalr	674(ra) # 400004ac <strstr>
-42012212:	892a                	mv	s2,a0
-42012214:	d53d                	beqz	a0,42012182 <web_settings_post+0x338>
-42012216:	498d                	li	s3,3
-42012218:	99ca                	add	s3,s3,s2
-4201221a:	854e                	mv	a0,s3
-4201221c:	fdfee097          	auipc	ra,0xfdfee
-42012220:	28c080e7          	jalr	652(ra) # 400004a8 <strlen>
-42012224:	47cd                	li	a5,19
-42012226:	f4a7eee3          	bltu	a5,a0,42012182 <web_settings_post+0x338>
-4201222a:	854e                	mv	a0,s3
-4201222c:	cddf90ef          	jal	4200bf08 <settings_country_valid>
-42012230:	842a                	mv	s0,a0
-42012232:	d921                	beqz	a0,42012182 <web_settings_post+0x338>
-42012234:	00090023          	sb	zero,0(s2)
-42012238:	0868                	addi	a0,sp,28
+42012112:	ab3ff0ef          	jal	42011bc4 <copy_string>
+42012116:	c91d                	beqz	a0,4201214c <web_settings_post+0x2e4>
+42012118:	07814783          	lbu	a5,120(sp)
+4201211c:	cb85                	beqz	a5,4201214c <web_settings_post+0x2e4>
+4201211e:	3c0b55b7          	lui	a1,0x3c0b5
+42012122:	04100693          	li	a3,65
+42012126:	09910613          	addi	a2,sp,153
+4201212a:	8b858593          	addi	a1,a1,-1864 # 3c0b48b8 <_esp_libc_clock_array_end+0x4768>
+4201212e:	8552                	mv	a0,s4
+42012130:	a95ff0ef          	jal	42011bc4 <copy_string>
+42012134:	842a                	mv	s0,a0
+42012136:	c919                	beqz	a0,4201214c <web_settings_post+0x2e4>
+42012138:	09910513          	addi	a0,sp,153
+4201213c:	fdfee097          	auipc	ra,0xfdfee
+42012140:	36c080e7          	jalr	876(ra) # 400004a8 <strlen>
+42012144:	157d                	addi	a0,a0,-1
+42012146:	4799                	li	a5,6
+42012148:	00a7ef63          	bltu	a5,a0,42012166 <web_settings_post+0x2fe>
+4201214c:	4981                	li	s3,0
+4201214e:	4901                	li	s2,0
+42012150:	4401                	li	s0,0
+42012152:	8552                	mv	a0,s4
+42012154:	63a020ef          	jal	4201478e <cJSON_Delete>
+42012158:	e20412e3          	bnez	s0,42011f7c <web_settings_post+0x114>
+4201215c:	3c0b55b7          	lui	a1,0x3c0b5
+42012160:	92058593          	addi	a1,a1,-1760 # 3c0b4920 <_esp_libc_clock_array_end+0x47d0>
+42012164:	bba9                	j	42011ebe <web_settings_post+0x56>
+42012166:	4785                	li	a5,1
+42012168:	1cf104a3          	sb	a5,457(sp)
+4201216c:	8922                	mv	s2,s0
+4201216e:	4981                	li	s3,0
+42012170:	b7cd                	j	42012152 <web_settings_post+0x2ea>
+42012172:	3c0b45b7          	lui	a1,0x3c0b4
+42012176:	64058593          	addi	a1,a1,1600 # 3c0b4640 <_esp_libc_clock_array_end+0x44f0>
+4201217a:	00848513          	addi	a0,s1,8
+4201217e:	fe375097          	auipc	ra,0xfe375
+42012182:	4d4080e7          	jalr	1236(ra) # 40387652 <strcmp>
+42012186:	ed21                	bnez	a0,420121de <web_settings_post+0x376>
+42012188:	3c0b55b7          	lui	a1,0x3c0b5
+4201218c:	04100693          	li	a3,65
+42012190:	12f10613          	addi	a2,sp,303
+42012194:	8c458593          	addi	a1,a1,-1852 # 3c0b48c4 <_esp_libc_clock_array_end+0x4774>
+42012198:	8552                	mv	a0,s4
+4201219a:	a2bff0ef          	jal	42011bc4 <copy_string>
+4201219e:	e119                	bnez	a0,420121a4 <web_settings_post+0x33c>
+420121a0:	4401                	li	s0,0
+420121a2:	a81d                	j	420121d8 <web_settings_post+0x370>
+420121a4:	3c0b55b7          	lui	a1,0x3c0b5
+420121a8:	04100693          	li	a3,65
+420121ac:	1a90                	addi	a2,sp,368
+420121ae:	8c858593          	addi	a1,a1,-1848 # 3c0b48c8 <_esp_libc_clock_array_end+0x4778>
+420121b2:	8552                	mv	a0,s4
+420121b4:	a11ff0ef          	jal	42011bc4 <copy_string>
+420121b8:	d565                	beqz	a0,420121a0 <web_settings_post+0x338>
+420121ba:	3c0b55b7          	lui	a1,0x3c0b5
+420121be:	0878                	addi	a4,sp,28
+420121c0:	46a9                	li	a3,10
+420121c2:	4601                	li	a2,0
+420121c4:	8dc58593          	addi	a1,a1,-1828 # 3c0b48dc <_esp_libc_clock_array_end+0x478c>
+420121c8:	8552                	mv	a0,s4
+420121ca:	fe8ff0ef          	jal	420119b2 <web_integer>
+420121ce:	842a                	mv	s0,a0
+420121d0:	d961                	beqz	a0,420121a0 <web_settings_post+0x338>
+420121d2:	47f2                	lw	a5,28(sp)
+420121d4:	1cf103a3          	sb	a5,455(sp)
+420121d8:	89a2                	mv	s3,s0
+420121da:	4901                	li	s2,0
+420121dc:	bf9d                	j	42012152 <web_settings_post+0x2ea>
+420121de:	3c0b45b7          	lui	a1,0x3c0b4
+420121e2:	72c58593          	addi	a1,a1,1836 # 3c0b472c <_esp_libc_clock_array_end+0x45dc>
+420121e6:	00848513          	addi	a0,s1,8
+420121ea:	fe375097          	auipc	ra,0xfe375
+420121ee:	468080e7          	jalr	1128(ra) # 40387652 <strcmp>
+420121f2:	e95d                	bnez	a0,420122a8 <web_settings_post+0x440>
+420121f4:	3c0b55b7          	lui	a1,0x3c0b5
+420121f8:	05700693          	li	a3,87
+420121fc:	0870                	addi	a2,sp,28
+420121fe:	8e858593          	addi	a1,a1,-1816 # 3c0b48e8 <_esp_libc_clock_array_end+0x4798>
+42012202:	8552                	mv	a0,s4
+42012204:	9c1ff0ef          	jal	42011bc4 <copy_string>
+42012208:	dd41                	beqz	a0,420121a0 <web_settings_post+0x338>
+4201220a:	02c00593          	li	a1,44
+4201220e:	0868                	addi	a0,sp,28
+42012210:	fdfee097          	auipc	ra,0xfdfee
+42012214:	32c080e7          	jalr	812(ra) # 4000053c <strrchr>
+42012218:	892a                	mv	s2,a0
+4201221a:	4985                	li	s3,1
+4201221c:	ed09                	bnez	a0,42012236 <web_settings_post+0x3ce>
+4201221e:	3c0b55b7          	lui	a1,0x3c0b5
+42012222:	8f058593          	addi	a1,a1,-1808 # 3c0b48f0 <_esp_libc_clock_array_end+0x47a0>
+42012226:	0868                	addi	a0,sp,28
+42012228:	fdfee097          	auipc	ra,0xfdfee
+4201222c:	284080e7          	jalr	644(ra) # 400004ac <strstr>
+42012230:	892a                	mv	s2,a0
+42012232:	d53d                	beqz	a0,420121a0 <web_settings_post+0x338>
+42012234:	498d                	li	s3,3
+42012236:	99ca                	add	s3,s3,s2
+42012238:	854e                	mv	a0,s3
 4201223a:	fdfee097          	auipc	ra,0xfdfee
 4201223e:	26e080e7          	jalr	622(ra) # 400004a8 <strlen>
-42012242:	157d                	addi	a0,a0,-1
-42012244:	03f00793          	li	a5,63
-42012248:	f2a7ede3          	bltu	a5,a0,42012182 <web_settings_post+0x338>
-4201224c:	086c                	addi	a1,sp,28
-4201224e:	0da10513          	addi	a0,sp,218
-42012252:	fe375097          	auipc	ra,0xfe375
-42012256:	516080e7          	jalr	1302(ra) # 40387768 <strcpy>
-4201225a:	854e                	mv	a0,s3
-4201225c:	fdfee097          	auipc	ra,0xfdfee
-42012260:	24c080e7          	jalr	588(ra) # 400004a8 <strlen>
-42012264:	18d4                	addi	a3,sp,116
-42012266:	4781                	li	a5,0
-42012268:	4665                	li	a2,25
-4201226a:	00f98733          	add	a4,s3,a5
-4201226e:	00074703          	lbu	a4,0(a4)
-42012272:	f9f70593          	addi	a1,a4,-97
-42012276:	00b66363          	bltu	a2,a1,4201227c <web_settings_post+0x432>
-4201227a:	1701                	addi	a4,a4,-32
-4201227c:	0ae683a3          	sb	a4,167(a3)
-42012280:	0785                	addi	a5,a5,1
-42012282:	0685                	addi	a3,a3,1
-42012284:	fef573e3          	bgeu	a0,a5,4201226a <web_settings_post+0x420>
-42012288:	bf0d                	j	420121ba <web_settings_post+0x370>
-4201228a:	3c0b45b7          	lui	a1,0x3c0b4
-4201228e:	6dc58593          	addi	a1,a1,1756 # 3c0b46dc <_esp_libc_clock_array_end+0x458c>
-42012292:	00848513          	addi	a0,s1,8
-42012296:	fe375097          	auipc	ra,0xfe375
-4201229a:	3bc080e7          	jalr	956(ra) # 40387652 <strcmp>
-4201229e:	e945                	bnez	a0,4201234e <web_settings_post+0x504>
-420122a0:	3c0b55b7          	lui	a1,0x3c0b5
-420122a4:	8f458593          	addi	a1,a1,-1804 # 3c0b48f4 <_esp_libc_clock_array_end+0x47a4>
-420122a8:	8552                	mv	a0,s4
-420122aa:	20f020ef          	jal	42014cb8 <cJSON_GetObjectItemCaseSensitive>
-420122ae:	3c0ba5b7          	lui	a1,0x3c0ba
-420122b2:	892a                	mv	s2,a0
-420122b4:	0878                	addi	a4,sp,28
-420122b6:	4689                	li	a3,2
-420122b8:	4601                	li	a2,0
-420122ba:	86458593          	addi	a1,a1,-1948 # 3c0b9864 <_esp_libc_clock_array_end+0x9714>
-420122be:	8552                	mv	a0,s4
-420122c0:	ed4ff0ef          	jal	42011994 <web_integer>
-420122c4:	842a                	mv	s0,a0
-420122c6:	e119                	bnez	a0,420122cc <web_settings_post+0x482>
-420122c8:	4401                	li	s0,0
-420122ca:	b3ed                	j	420120b4 <web_settings_post+0x26a>
-420122cc:	854a                	mv	a0,s2
-420122ce:	3e9020ef          	jal	42014eb6 <cJSON_IsString>
-420122d2:	d97d                	beqz	a0,420122c8 <web_settings_post+0x47e>
-420122d4:	01092903          	lw	s2,16(s2)
-420122d8:	854a                	mv	a0,s2
-420122da:	fdfee097          	auipc	ra,0xfdfee
-420122de:	1ce080e7          	jalr	462(ra) # 400004a8 <strlen>
-420122e2:	479d                	li	a5,7
-420122e4:	fef512e3          	bne	a0,a5,420122c8 <web_settings_post+0x47e>
-420122e8:	00094703          	lbu	a4,0(s2)
-420122ec:	02300793          	li	a5,35
-420122f0:	fcf71ce3          	bne	a4,a5,420122c8 <web_settings_post+0x47e>
-420122f4:	4705                	li	a4,1
-420122f6:	4625                	li	a2,9
-420122f8:	4595                	li	a1,5
-420122fa:	86aa                	mv	a3,a0
-420122fc:	00e907b3          	add	a5,s2,a4
-42012300:	0007c783          	lbu	a5,0(a5)
-42012304:	fd078513          	addi	a0,a5,-48
-42012308:	00a67b63          	bgeu	a2,a0,4201231e <web_settings_post+0x4d4>
-4201230c:	fbf78513          	addi	a0,a5,-65
-42012310:	00a5f763          	bgeu	a1,a0,4201231e <web_settings_post+0x4d4>
-42012314:	f9f78793          	addi	a5,a5,-97
-42012318:	0067b793          	sltiu	a5,a5,6
-4201231c:	8c7d                	and	s0,s0,a5
-4201231e:	0705                	addi	a4,a4,1
-42012320:	fcd71ee3          	bne	a4,a3,420122fc <web_settings_post+0x4b2>
-42012324:	d055                	beqz	s0,420122c8 <web_settings_post+0x47e>
-42012326:	4641                	li	a2,16
-42012328:	4581                	li	a1,0
-4201232a:	00190513          	addi	a0,s2,1
-4201232e:	11c8c0ef          	jal	4209e44a <strtoul>
-42012332:	4972                	lw	s2,28(sp)
-42012334:	b87f90ef          	jal	4200beba <rgb565_from_rgb888>
-42012338:	0818                	addi	a4,sp,16
-4201233a:	0a090913          	addi	s2,s2,160
-4201233e:	0906                	slli	s2,s2,0x1
-42012340:	1d090793          	addi	a5,s2,464
-42012344:	00e78933          	add	s2,a5,a4
-42012348:	e8a91b23          	sh	a0,-362(s2)
-4201234c:	b3a5                	j	420120b4 <web_settings_post+0x26a>
-4201234e:	3c0b45b7          	lui	a1,0x3c0b4
-42012352:	5e458593          	addi	a1,a1,1508 # 3c0b45e4 <_esp_libc_clock_array_end+0x4494>
-42012356:	00848513          	addi	a0,s1,8
-4201235a:	fe375097          	auipc	ra,0xfe375
-4201235e:	2f8080e7          	jalr	760(ra) # 40387652 <strcmp>
-42012362:	d40519e3          	bnez	a0,420120b4 <web_settings_post+0x26a>
-42012366:	3c0b55b7          	lui	a1,0x3c0b5
-4201236a:	8fc58593          	addi	a1,a1,-1796 # 3c0b48fc <_esp_libc_clock_array_end+0x47ac>
-4201236e:	8552                	mv	a0,s4
-42012370:	149020ef          	jal	42014cb8 <cJSON_GetObjectItemCaseSensitive>
-42012374:	3c0b55b7          	lui	a1,0x3c0b5
-42012378:	842a                	mv	s0,a0
-4201237a:	90858593          	addi	a1,a1,-1784 # 3c0b4908 <_esp_libc_clock_array_end+0x47b8>
-4201237e:	8552                	mv	a0,s4
-42012380:	139020ef          	jal	42014cb8 <cJSON_GetObjectItemCaseSensitive>
-42012384:	892a                	mv	s2,a0
-42012386:	8522                	mv	a0,s0
-42012388:	32f020ef          	jal	42014eb6 <cJSON_IsString>
-4201238c:	da0501e3          	beqz	a0,4201212e <web_settings_post+0x2e4>
-42012390:	854a                	mv	a0,s2
-42012392:	30b020ef          	jal	42014e9c <cJSON_IsBool>
-42012396:	d8050ce3          	beqz	a0,4201212e <web_settings_post+0x2e4>
-4201239a:	4800                	lw	s0,16(s0)
-4201239c:	8522                	mv	a0,s0
-4201239e:	fdfee097          	auipc	ra,0xfdfee
-420123a2:	10a080e7          	jalr	266(ra) # 400004a8 <strlen>
-420123a6:	47b1                	li	a5,12
-420123a8:	d8f513e3          	bne	a0,a5,4201212e <web_settings_post+0x2e4>
-420123ac:	3c0b55b7          	lui	a1,0x3c0b5
-420123b0:	4611                	li	a2,4
-420123b2:	91058593          	addi	a1,a1,-1776 # 3c0b4910 <_esp_libc_clock_array_end+0x47c0>
-420123b6:	8522                	mv	a0,s0
-420123b8:	fe375097          	auipc	ra,0xfe375
-420123bc:	e44080e7          	jalr	-444(ra) # 403871fc <memcmp>
-420123c0:	d60517e3          	bnez	a0,4201212e <web_settings_post+0x2e4>
-420123c4:	3c0b55b7          	lui	a1,0x3c0b5
-420123c8:	91858593          	addi	a1,a1,-1768 # 3c0b4918 <_esp_libc_clock_array_end+0x47c8>
-420123cc:	00540513          	addi	a0,s0,5
-420123d0:	fe375097          	auipc	ra,0xfe375
-420123d4:	282080e7          	jalr	642(ra) # 40387652 <strcmp>
-420123d8:	d4051be3          	bnez	a0,4201212e <web_settings_post+0x2e4>
-420123dc:	00444403          	lbu	s0,4(s0)
-420123e0:	4791                	li	a5,4
-420123e2:	fcf40413          	addi	s0,s0,-49
-420123e6:	0ff47713          	zext.b	a4,s0
-420123ea:	d4e7e2e3          	bltu	a5,a4,4201212e <web_settings_post+0x2e4>
-420123ee:	854a                	mv	a0,s2
-420123f0:	29f020ef          	jal	42014e8e <cJSON_IsTrue>
-420123f4:	4785                	li	a5,1
-420123f6:	008797b3          	sll	a5,a5,s0
-420123fa:	1c814703          	lbu	a4,456(sp)
-420123fe:	0ff7f793          	zext.b	a5,a5
-42012402:	c901                	beqz	a0,42012412 <web_settings_post+0x5c8>
-42012404:	8f5d                	or	a4,a4,a5
-42012406:	1ce10423          	sb	a4,456(sp)
-4201240a:	4981                	li	s3,0
-4201240c:	4901                	li	s2,0
-4201240e:	4405                	li	s0,1
-42012410:	b315                	j	42012134 <web_settings_post+0x2ea>
-42012412:	fff7c793          	not	a5,a5
-42012416:	8f7d                	and	a4,a4,a5
-42012418:	b7fd                	j	42012406 <web_settings_post+0x5bc>
+42012242:	47cd                	li	a5,19
+42012244:	f4a7eee3          	bltu	a5,a0,420121a0 <web_settings_post+0x338>
+42012248:	854e                	mv	a0,s3
+4201224a:	cbff90ef          	jal	4200bf08 <settings_country_valid>
+4201224e:	842a                	mv	s0,a0
+42012250:	d921                	beqz	a0,420121a0 <web_settings_post+0x338>
+42012252:	00090023          	sb	zero,0(s2)
+42012256:	0868                	addi	a0,sp,28
+42012258:	fdfee097          	auipc	ra,0xfdfee
+4201225c:	250080e7          	jalr	592(ra) # 400004a8 <strlen>
+42012260:	157d                	addi	a0,a0,-1
+42012262:	03f00793          	li	a5,63
+42012266:	f2a7ede3          	bltu	a5,a0,420121a0 <web_settings_post+0x338>
+4201226a:	086c                	addi	a1,sp,28
+4201226c:	0da10513          	addi	a0,sp,218
+42012270:	fe375097          	auipc	ra,0xfe375
+42012274:	4f8080e7          	jalr	1272(ra) # 40387768 <strcpy>
+42012278:	854e                	mv	a0,s3
+4201227a:	fdfee097          	auipc	ra,0xfdfee
+4201227e:	22e080e7          	jalr	558(ra) # 400004a8 <strlen>
+42012282:	18d4                	addi	a3,sp,116
+42012284:	4781                	li	a5,0
+42012286:	4665                	li	a2,25
+42012288:	00f98733          	add	a4,s3,a5
+4201228c:	00074703          	lbu	a4,0(a4)
+42012290:	f9f70593          	addi	a1,a4,-97
+42012294:	00b66363          	bltu	a2,a1,4201229a <web_settings_post+0x432>
+42012298:	1701                	addi	a4,a4,-32
+4201229a:	0ae683a3          	sb	a4,167(a3)
+4201229e:	0785                	addi	a5,a5,1
+420122a0:	0685                	addi	a3,a3,1
+420122a2:	fef573e3          	bgeu	a0,a5,42012288 <web_settings_post+0x420>
+420122a6:	bf0d                	j	420121d8 <web_settings_post+0x370>
+420122a8:	3c0b45b7          	lui	a1,0x3c0b4
+420122ac:	6dc58593          	addi	a1,a1,1756 # 3c0b46dc <_esp_libc_clock_array_end+0x458c>
+420122b0:	00848513          	addi	a0,s1,8
+420122b4:	fe375097          	auipc	ra,0xfe375
+420122b8:	39e080e7          	jalr	926(ra) # 40387652 <strcmp>
+420122bc:	e945                	bnez	a0,4201236c <web_settings_post+0x504>
+420122be:	3c0b55b7          	lui	a1,0x3c0b5
+420122c2:	8f458593          	addi	a1,a1,-1804 # 3c0b48f4 <_esp_libc_clock_array_end+0x47a4>
+420122c6:	8552                	mv	a0,s4
+420122c8:	20f020ef          	jal	42014cd6 <cJSON_GetObjectItemCaseSensitive>
+420122cc:	3c0ba5b7          	lui	a1,0x3c0ba
+420122d0:	892a                	mv	s2,a0
+420122d2:	0878                	addi	a4,sp,28
+420122d4:	4689                	li	a3,2
+420122d6:	4601                	li	a2,0
+420122d8:	86458593          	addi	a1,a1,-1948 # 3c0b9864 <_esp_libc_clock_array_end+0x9714>
+420122dc:	8552                	mv	a0,s4
+420122de:	ed4ff0ef          	jal	420119b2 <web_integer>
+420122e2:	842a                	mv	s0,a0
+420122e4:	e119                	bnez	a0,420122ea <web_settings_post+0x482>
+420122e6:	4401                	li	s0,0
+420122e8:	b3ed                	j	420120d2 <web_settings_post+0x26a>
+420122ea:	854a                	mv	a0,s2
+420122ec:	3e9020ef          	jal	42014ed4 <cJSON_IsString>
+420122f0:	d97d                	beqz	a0,420122e6 <web_settings_post+0x47e>
+420122f2:	01092903          	lw	s2,16(s2)
+420122f6:	854a                	mv	a0,s2
+420122f8:	fdfee097          	auipc	ra,0xfdfee
+420122fc:	1b0080e7          	jalr	432(ra) # 400004a8 <strlen>
+42012300:	479d                	li	a5,7
+42012302:	fef512e3          	bne	a0,a5,420122e6 <web_settings_post+0x47e>
+42012306:	00094703          	lbu	a4,0(s2)
+4201230a:	02300793          	li	a5,35
+4201230e:	fcf71ce3          	bne	a4,a5,420122e6 <web_settings_post+0x47e>
+42012312:	4705                	li	a4,1
+42012314:	4625                	li	a2,9
+42012316:	4595                	li	a1,5
+42012318:	86aa                	mv	a3,a0
+4201231a:	00e907b3          	add	a5,s2,a4
+4201231e:	0007c783          	lbu	a5,0(a5)
+42012322:	fd078513          	addi	a0,a5,-48
+42012326:	00a67b63          	bgeu	a2,a0,4201233c <web_settings_post+0x4d4>
+4201232a:	fbf78513          	addi	a0,a5,-65
+4201232e:	00a5f763          	bgeu	a1,a0,4201233c <web_settings_post+0x4d4>
+42012332:	f9f78793          	addi	a5,a5,-97
+42012336:	0067b793          	sltiu	a5,a5,6
+4201233a:	8c7d                	and	s0,s0,a5
+4201233c:	0705                	addi	a4,a4,1
+4201233e:	fcd71ee3          	bne	a4,a3,4201231a <web_settings_post+0x4b2>
+42012342:	d055                	beqz	s0,420122e6 <web_settings_post+0x47e>
+42012344:	4641                	li	a2,16
+42012346:	4581                	li	a1,0
+42012348:	00190513          	addi	a0,s2,1
+4201234c:	11c8c0ef          	jal	4209e468 <strtoul>
+42012350:	4972                	lw	s2,28(sp)
+42012352:	b69f90ef          	jal	4200beba <rgb565_from_rgb888>
+42012356:	0818                	addi	a4,sp,16
+42012358:	0a090913          	addi	s2,s2,160
+4201235c:	0906                	slli	s2,s2,0x1
+4201235e:	1d090793          	addi	a5,s2,464
+42012362:	00e78933          	add	s2,a5,a4
+42012366:	e8a91b23          	sh	a0,-362(s2)
+4201236a:	b3a5                	j	420120d2 <web_settings_post+0x26a>
+4201236c:	3c0b45b7          	lui	a1,0x3c0b4
+42012370:	5e458593          	addi	a1,a1,1508 # 3c0b45e4 <_esp_libc_clock_array_end+0x4494>
+42012374:	00848513          	addi	a0,s1,8
+42012378:	fe375097          	auipc	ra,0xfe375
+4201237c:	2da080e7          	jalr	730(ra) # 40387652 <strcmp>
+42012380:	d40519e3          	bnez	a0,420120d2 <web_settings_post+0x26a>
+42012384:	3c0b55b7          	lui	a1,0x3c0b5
+42012388:	8fc58593          	addi	a1,a1,-1796 # 3c0b48fc <_esp_libc_clock_array_end+0x47ac>
+4201238c:	8552                	mv	a0,s4
+4201238e:	149020ef          	jal	42014cd6 <cJSON_GetObjectItemCaseSensitive>
+42012392:	3c0b55b7          	lui	a1,0x3c0b5
+42012396:	842a                	mv	s0,a0
+42012398:	90858593          	addi	a1,a1,-1784 # 3c0b4908 <_esp_libc_clock_array_end+0x47b8>
+4201239c:	8552                	mv	a0,s4
+4201239e:	139020ef          	jal	42014cd6 <cJSON_GetObjectItemCaseSensitive>
+420123a2:	892a                	mv	s2,a0
+420123a4:	8522                	mv	a0,s0
+420123a6:	32f020ef          	jal	42014ed4 <cJSON_IsString>
+420123aa:	da0501e3          	beqz	a0,4201214c <web_settings_post+0x2e4>
+420123ae:	854a                	mv	a0,s2
+420123b0:	30b020ef          	jal	42014eba <cJSON_IsBool>
+420123b4:	d8050ce3          	beqz	a0,4201214c <web_settings_post+0x2e4>
+420123b8:	4800                	lw	s0,16(s0)
+420123ba:	8522                	mv	a0,s0
+420123bc:	fdfee097          	auipc	ra,0xfdfee
+420123c0:	0ec080e7          	jalr	236(ra) # 400004a8 <strlen>
+420123c4:	47b1                	li	a5,12
+420123c6:	d8f513e3          	bne	a0,a5,4201214c <web_settings_post+0x2e4>
+420123ca:	3c0b55b7          	lui	a1,0x3c0b5
+420123ce:	4611                	li	a2,4
+420123d0:	91058593          	addi	a1,a1,-1776 # 3c0b4910 <_esp_libc_clock_array_end+0x47c0>
+420123d4:	8522                	mv	a0,s0
+420123d6:	fe375097          	auipc	ra,0xfe375
+420123da:	e26080e7          	jalr	-474(ra) # 403871fc <memcmp>
+420123de:	d60517e3          	bnez	a0,4201214c <web_settings_post+0x2e4>
+420123e2:	3c0b55b7          	lui	a1,0x3c0b5
+420123e6:	91858593          	addi	a1,a1,-1768 # 3c0b4918 <_esp_libc_clock_array_end+0x47c8>
+420123ea:	00540513          	addi	a0,s0,5
+420123ee:	fe375097          	auipc	ra,0xfe375
+420123f2:	264080e7          	jalr	612(ra) # 40387652 <strcmp>
+420123f6:	d4051be3          	bnez	a0,4201214c <web_settings_post+0x2e4>
+420123fa:	00444403          	lbu	s0,4(s0)
+420123fe:	4791                	li	a5,4
+42012400:	fcf40413          	addi	s0,s0,-49
+42012404:	0ff47713          	zext.b	a4,s0
+42012408:	d4e7e2e3          	bltu	a5,a4,4201214c <web_settings_post+0x2e4>
+4201240c:	854a                	mv	a0,s2
+4201240e:	29f020ef          	jal	42014eac <cJSON_IsTrue>
+42012412:	4785                	li	a5,1
+42012414:	008797b3          	sll	a5,a5,s0
+42012418:	1c814703          	lbu	a4,456(sp)
+4201241c:	0ff7f793          	zext.b	a5,a5
+42012420:	c901                	beqz	a0,42012430 <web_settings_post+0x5c8>
+42012422:	8f5d                	or	a4,a4,a5
+42012424:	1ce10423          	sb	a4,456(sp)
+42012428:	4981                	li	s3,0
+4201242a:	4901                	li	s2,0
+4201242c:	4405                	li	s0,1
+4201242e:	b315                	j	42012152 <web_settings_post+0x2ea>
+42012430:	fff7c793          	not	a5,a5
+42012434:	8f7d                	and	a4,a4,a5
+42012436:	b7fd                	j	42012424 <web_settings_post+0x5bc>

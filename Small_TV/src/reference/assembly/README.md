@@ -19,6 +19,8 @@ Direct instruction checks during the current work confirmed:
 | `0x4200afcc`, `0x4200b738`, `0x4200bd8c` | Conditional field updates instead of full-screen repainting |
 | `0x4200b850`, `0x4200b0b2`, `0x4200bd8c` | Calendar changes ignored when time/event gates do not change; omitted simple date-band erase deliberately corrected |
 | `0x4200f2c0`, especially `0x4200f380..0x4200f39e` | The complete country/region suffix is copied into a 20-byte slot; the native two-letter restriction is corrected with NVS v1 migration |
+| `0x42008e08`, `0x42008e32..0x42008e34` | Theme initialization is followed by duty 0; the next complete digital frame must not retain startup brightness |
+| `0x42009ccc`, `0x42009cf4`, `0x4200a156` | Initial and active incremental dial entry points used by read-only completed-frame observations |
 | `0x4200b5cc`, `0x42008e08`, `0x4200aebe` | Byte GIF cursor, terminator restart and persistence across selection/theme changes |
 | `0x4200950e` | Whole-glyph rejection at the panel edge; visible-column/row clipping deliberately corrected |
 | `0x4200aefc`, `0x4200abee`, `0x4200b340` | Incomplete city clear, panel-only text bounds and uncleared weather-title margins deliberately corrected |

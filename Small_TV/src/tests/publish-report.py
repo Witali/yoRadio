@@ -121,6 +121,25 @@ def main():
             any(not row['matches_iana'] for row in regional['flows']['reconstructed']['cases']) or
             any(not row['weather_key_preserved'] for row in regional['flows']['reconstructed']['cases'])):
         raise ValueError('Regional settings gate omitted maximum inputs/cache/rejection checks')
+    completed = qemu['completed_scenes']
+    if (not completed['passed'] or completed['app_sha256'] != report['app_sha256'] or
+            completed['native_elf_sha256'] != text['native_elf_sha256'] or
+            completed['qemu_sha256'] != qemu['qemu_sha256'] or not completed['normalized']['passed']):
+        raise ValueError('Completed scene comparison used different inputs or did not pass')
+    if set(completed['scenes']) != {'classic','classic-weather','dial'} or len(completed['normalized']['cases']) != 40:
+        raise ValueError('Completed scene comparison omitted a required theme/control case')
+    for item in completed['test_inputs']:
+        if hashlib.sha256((ROOT/item['file']).read_bytes()).hexdigest() != item['sha256']:
+            raise ValueError('Completed scene test changed since execution')
+    for theme, flows in completed['scenes'].items():
+        if set(flows) != {'original','reconstructed'}:
+            raise ValueError('Completed scene comparison omitted an application')
+        for flow in flows.values():
+            if (not flow['passed'] or len(flow['samples']) != 4 or
+                    not flow['samples'][-1]['mature'] or flow['samples'][-1]['virtual_seconds'] < 40 or
+                    any(not row['passed'] or row['different_pixels'] or not row['code_unchanged'] or
+                        not row['digital_requested_brightness_applied'] for row in flow['samples'])):
+                raise ValueError('Completed scene comparison omitted full frames or brightness checks')
     qemu_sources = [qemu['boot_reset']['reconstructed']['prepared']['sources']]
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
     qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
@@ -129,6 +148,7 @@ def main():
     qemu_sources.append(time_http['flows']['reconstructed']['sources'])
     qemu_sources.append(native_text['sources'])
     qemu_sources.append(regional['flows']['reconstructed']['sources'])
+    qemu_sources.extend(flows['reconstructed']['sources'] for flows in completed['scenes'].values())
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -195,6 +215,7 @@ def main():
                        'time_http': time_http,
                        'text_http': text_http,
                        'regional_http': regional,
+                       'completed_scenes': completed,
                        'boot_reset': {name: {key: row[key] for key in ('passed', 'checks', 'duration_seconds', 'network')}
                                       for name, row in qemu['boot_reset'].items()},
                        'scenes': {name: {'passed': True,
