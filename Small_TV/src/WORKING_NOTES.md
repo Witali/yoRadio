@@ -41,12 +41,18 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   Actual paused snapshot/raw probe pass;12 frame guards/12 backing guards и
   четыре historical rejections pass. Исторические отчёты не изменены;
   см. photo-storage-checks.md. Production source/BIN прежние.
-- NTP044e488f отправлен main; audit программных задержек ac187b10 завершён.
-  Следующий шаг: commit/push storage tests/evidence, freeze initial inputs
-  (также7 firmware files,6 QEMU helpers/profile/marker), один новый full run
-  со всеми child gates, включая advanced_http. До terminal не менять его
-  source/tests/helpers. Collector archive_immutable_run.py адаптирован к новым
-  gates и extra initial pins; сначала strict publisher/verifier, потом canonical.
+- NTP044e488f, software-wait auditac187b10 и storage65d7be99 отправлены main.
+  Новый единственный full run уже идёт: handle96792,
+  .build/small-tv-functional/controls-integrated-full-20261016, initialHEAD65d7be99.
+  Frozen72 test files, appDAF/ELFB06/QEMUFDE3, также7 firmware files,6 QEMU
+  helpers/profile/marker/source commit и verifier. Native3924/platform46,
+  frontend/integrity/timezone_sources уже pass; machine/QEMU ещё выполняются.
+  Опросить тот же handle, не перезапускать. До terminal не менять production,
+  tests, generated media, BIN/ELF и QEMU/helpers; разрешены контекстные Markdown.
+  Затем сверить initial pins и использовать archive_immutable_run.py: он уже
+  адаптирован к advanced_http/4photo/extra pins, сначала strict publisher/verifier,
+  потом canonical artifacts и integrated-controls-run-inputs.json. Не выдавать
+  scoped passes за полный результат и не переименовывать прежние identities.
 - Browser controls на6BF6 сохранены отдельно в browser-controls-partial-20261016:
   flags,4 themes,5 GIFs,3 date formats,3 colors,brightness0,London/GB,mask0/10/31,
   intervals60/3/4 и5 previews. Это частичное наблюдение старого образа. Остались

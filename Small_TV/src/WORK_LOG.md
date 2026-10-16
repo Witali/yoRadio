@@ -1310,3 +1310,17 @@
 - Freeze helper расширен initial pins семи firmware artifacts,6 QEMU helpers,
   профиля/marker/source commit, factory ELF/dump и verifier. Collector готов к
   advanced_http и четырём photo gates; далее один новый полный run после commit.
+
+### 2026-10-16 — новый объединённый прогон DAF
+
+- Storage65d7be99 и auditac187b10 отправлены main. После фиксации72 test files
+  и дополнительных firmware/QEMU/helper/profile identities запущен единственный
+  полный run controls-integrated-full-20261016, handle96792, initialHEAD65d7be99.
+  AppDAF5595D/sourceC83941FF/ELFB06CE810/QEMUFDE38D53 прежние. Загрузчик3FB735A3
+  соответствует manifest и реально использованному новому DAF-комплекту.
+- Native3924, все46 platform scenarios, frontend, artifact integrity,
+  report aggregation14 и timezone-source tests уже pass. Machine/QEMU остаются
+  активными; общего результата ещё нет. Source/tests/helpers/BIN/ELF заморожены.
+  Продолжать опрос того же handle; не запускать второй full. После terminal
+  проверить initial/final pins и strict publisher/verifier через адаптированный
+  archive_immutable_run.py. Контекстные Markdown не входят в frozen test bytes.
