@@ -485,3 +485,45 @@
 - Regional settings item закрыт; следующие задачи: actual calendar/DST matrix,
   exact fixed-state scene differences, adversarial JPEG, concurrency/long-run,
   browser/physical acceptance. all_functionality_verified остаётся false.
+
+### 2026-10-16 — завершённые кадры и порядок применения яркости, проверка в работе
+
+- Вместо процента сходства несинхронных снимков введено наблюдение реального
+  входа/возврата renderer через аппаратные GDB точки. Гостевые инструкции,
+  регистры и RAM не меняются. Read-only аргументы/состояние передаются отдельному
+  исполнению того же RV32-кода; JPEG/BMP действительно декодируются.
+- Первая проверка показала 6,034 разных пикселя native classic. Реальное чтение
+  LEDC duty/timer и GPIO18 показало причину: стартовые duty 819/8192 и яркость
+  901/1000. С учётом наблюдаемой аппаратной яркости геометрия/цвета совпали
+  полностью, но требуемая яркость 1000 не была применена к первому кадру.
+- Сопоставлены factory 0x42008e08/0x42008e32..34 и текущий compiled clock_task.
+  Перед первым classic/simple render теперь применяется выбранная яркость.
+  Порядок dial/photo сохранён; добавлен тест SPI-пикселей при входе в обе
+  цифровые темы. Новый case прошёл 35,048 checks; все 29 platform cases прошли.
+- Сборка app 9e4f856a / source 6ab9c80f / ELF 7e34a29b сохранена в firmware.
+  Архивированы точные factory init/dial инструкции и native scene snippets.
+  Подготовлены 24 завершённых QEMU кадра, включая real-weather HTTP и поздние
+  кадры после 40 секунд, и 40 нормализованных полных сцен с реальными медиа.
+- Пробные classic/dial и weather кадры совпали. Один weather preflight отклонён
+  по изменившимся во время запуска test bytes; он не объявляется passing gate.
+  Full scene-final-20261016 выполняется из одного неизменяемого набора тестов.
+  На этой записи новый итоговый успешный результат ещё не заявлен.
+
+- Full `scene-final-20261016` завершился успешно одним запуском: все host/RV32/
+  QEMU groups и пять ordinary scenes. Native 3,884; platform 29 / 1,180,724.
+  Все 24 завершённых кадра дали 0 отличающихся пикселей. В 33 canonical classic
+  cases factory/native full frames идентичны; семь dial cases дают 0 относительно
+  объявленной коррекции stroke geometry, literal differences сохранены.
+- Publisher, evidence collector и artifact verifier подтвердили app 9e4f856a,
+  source 6ab9c80f, ELF 7e34a29b. Опубликованы complete-scene results и отдельный
+  negative first-frame brightness с прежним app 446a5c3c. Historical negatives
+  и board compatibility не выданы за результаты новой сборки.
+- Commit `caad5d3c` сохраняет исправление/тесты/сборку/ассемблер. Exact staged
+  byte check проверил 54 test inputs, 50 production inputs, 106 TZif, font,
+  LFS app и ELF. App 1,176,112, free 359,888, DIRAM 80,706, comments 157,
+  marked functions 50. QEMU main 1c7e4c0512 чист, executable прежний c970591d;
+  собственных работающих scene VMs не осталось, физического flashing не было.
+- Следующий приоритет — natural midnight/Sunday/year/leap/DST transitions через
+  реальные UDP packets и все time-bearing themes/formats; затем adversarial JPEG,
+  concurrency/long-run, browser и physical acceptance. Полное соответствие
+  не заявлено; all_functionality_verified остаётся false.

@@ -31,7 +31,44 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   Коммитить завершённые изменения отдельно, не включать посторонние правки,
   временные ВМ и журналы с пользовательскими данными.
 
-## Последний проверенный участок: региональные ключи и NVS v2
+## Последний проверенный участок: завершённые кадры и яркость цифровой темы
+
+2026-10-16: добавлен строгий gate полного кадра: реальные QEMU renderer entry/return
+наблюдаются аппаратными GDB breakpoints без записи guest RAM/регистров/кода.
+В отдельном Unicorn исполняются реальные RV32 renderers и JPEG/BMP. Все 57 600
+пикселей сравниваются; поздний кадр после 40 virtual seconds строится с чистого
+фона. Пройдены classic без/с погодой и dial, обе прошивки, по четыре кадра (24),
+плюс 40 полных сцен с одинаковыми входами. См.
+`../qemu/parity/completed-scene-checks.md`.
+
+На прежнем app 446a5c3c первый цифровой кадр имел стартовую яркость 901/1000
+при выбранной 1000. Read-only LEDC/GPIO observation отделил эту ошибку от
+отрисовки: при фактической яркости отличалось 0 пикселей. Factory 0x42008e08
+применяет backlight перед последующим digital render; наш объединённый init/render
+передавал первый кадр раньше. В `clock_task` восстановлен этот порядок для
+classic/simple. Новый платформенный тест проверяет duty во время передачи
+цветных пикселей обеих тем, а не только после завершения кадра.
+
+Новая сборка: app `9e4f856a45fb3526eb2032f08f948c1354e8ba80065d1b4b32242f2d0c94f03c`,
+source `6ab9c80f0d245a4fdd977b6028a453d95a6156de6172ee959ced5284159db51b`,
+ELF `7e34a29babbb85c1d9f8f5eac8f01ce48e7748952ed6d5c4dcb0e31bc91a7170`.
+App 1,176,112 bytes, свободно 359,888; DIRAM 80,706. Full `scene-final-20261016`
+прошёл из одного неизменяемого набора тестов: native 3,884, platform 29 /
+1,180,724 checks, все RV32/QEMU groups и пять обычных scene pairs. Все 24
+завершённых кадра совпали с replay. В 33 canonical classic scenes literal
+factory/native difference равен 0; семь dial scenes совпали с явно исправленной
+геометрией, буквальные отличия сохранены. Все 54 test inputs, 50 production
+inputs, 106 TZif, font, LFS app и ELF проверены по staged bytes.
+
+Код/тесты/сборка — `caad5d3c`. Current positive reports опубликованы для этого
+app, включая `../qemu/completed-scenes-validation.json`; scoped negative
+`../qemu/parity/first-digital-brightness-before.json` сохраняет старые app/ELF
+и фактический duty 819. Запуск preflight с изменившимися test bytes не принят.
+QEMU executable/source и физическая плата не изменены, созданные ВМ закрыты.
+Полное соответствие всех путей не установлено: calendar/DST transport matrix,
+дополнительные JPEG и concurrency/browser/physical/long-run остаются ниже.
+
+## Предыдущий проверенный участок: региональные ключи и NVS v2
 
 2026-10-16: восстановлены все 20 байт country slot, HTTP, raw import/export,
 time/weather buffers и cache. NVS v2 = 364 bytes; v1 = 344 bytes мигрируется
@@ -67,9 +104,8 @@ AU-W обрезался до AU и показывал на три часа бо�
 наша — без него. AU-C/AU-E сохраняют объявленную factory implicit-DST разницу;
 native обязан совпадать с IANA. Отрицательные результаты не переименованы в green.
 
-Полное функциональное соответствие ещё не установлено: остались integration
-calendar/DST, классификация whole-frame различий, дополнительные JPEG,
-concurrency/browser/physical/long-run сценарии ниже.
+Это предыдущий checkpoint; его app/source/ELF не переименовываются в новую
+сборку. Перечень остающихся проверок расположен ниже.
 
 ## Предыдущий проверенный участок: новый сетевой профиль QEMU
 
@@ -353,14 +389,16 @@ runtime-память платы не измерялась. Entry comments у 142
    письменности, shaping/bidi/NFC или полный fuzz всех HTTP input strings.
 2. JPEG: новый gate охватывает все публичные ресурсы и ограниченные ошибки/обрезку.
    Произвольные пользовательские JPEG, разные subsampling и malformed Huffman/
-   restart marker требуют дополнительных фикстур. Classic oracle сохраняет
-   media-вызовы как границу; JPEG/BMP исполняются отдельными gates.
+   restart marker требуют дополнительных фикстур. Старый classic oracle сохраняет
+   media-вызовы как границу; новый complete-scene gate исполняет renderers и
+   JPEG/BMP вместе, дополняя отдельные decoder gates.
 3. Проверить более длительные сетевые/загрузочные сценарии и расход памяти во
    время работы. Аппаратные и браузерные сценарии описаны в `tests/README.md`;
    их нельзя объявлять выполненными по результату других тестов.
 
-4. Классифицировать оставшиеся classic/dial whole-frame differences по
-   фиксированным времени/состоянию и независимому pixel oracle. Известные factory
+4. Расширить полные кадры на другие настройки, цвета/яркости, длинные поля и
+   переходы тем. Canonical classic/dial и 24 actual completed frames уже проходят
+   строгий gate без масок, но не исчерпывают все состояния. Известные factory
    corrections и разная фаза кадра не должны скрывать ещё не восстановленный
    путь. Scene similarity percentage остаётся наблюдением, не критерием parity.
 

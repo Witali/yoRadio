@@ -1,4 +1,16 @@
-# Small TV comparison checkpoint
+# Small TV comparison checkpoints
+
+The latest completed-frame checkpoint (2026-10-16) is documented in
+[completed-scene checks](completed-scene-checks.md), with exact identities in
+[the current results](../completed-scenes-validation.json). All 24 real QEMU
+frames match instruction replay. At identical canonical inputs, 33 complete
+classic scenes match the unchanged factory renderer; seven dial scenes match
+the explicitly corrected factory geometry. Real JPEG/BMP decoders execute in
+these checks. [The previous first-frame brightness failure](first-digital-brightness-before.json)
+retains its old application hash. Complete program equivalence remains unproven.
+
+The captures and percentage table below are historical; they retain their own
+earlier application identities and do not measure the latest completed-frame gate.
 
 This historical QEMU checkpoint was paused at the user's request on 2026-10-13.
 Functional reconstruction has since resumed. The reconstruction now uses
@@ -10,7 +22,8 @@ and real Newlib against independent pinned IANA TZif data for all 109 recovered
 keys. The implicit factory DST-rule defect is a declared correction; literal
 monthly differences remain in [the before observation](timezone-before.json).
 The [current result](timezone-validation.json) retains its own app/source hashes.
-SNTP validity and retry/fallback transport remain separate work.
+Later [SNTP checks](time-sync-checks.md) cover validity and retry/fallback transport
+separately; the broader calendar/DST transport matrix remains incomplete.
 
 Newer [machine-level renderer checks](machine-checks.md) use identical explicit
 inputs and execute both RV32 programs. They restore tick-angle narrowing while
