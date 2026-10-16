@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu')
+    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_jpeg_inputs', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -39,10 +39,22 @@ def main():
     weather = groups['machine_weather']['result']
     calendar = groups['machine_calendar']['result']
     jpeg = groups['machine_jpeg']['result']
+    jpeg_inputs = groups['machine_jpeg_inputs']['result']
     timezones = groups['machine_timezones']['result']
     time_state = groups['machine_time_state']['result']
     text = groups['machine_text']['result']
     network = groups['machine_network']['result']
+    if (not jpeg_inputs['passed'] or not jpeg_inputs['inputs_unchanged'] or
+            jpeg_inputs['app_sha256'] != report['app_sha256'] or
+            jpeg_inputs['source_sha256'] != report['source_sha256'] or
+            jpeg_inputs['native_elf_sha256'] != text['native_elf_sha256'] or
+            jpeg_inputs['factory_elf_sha256'] != text['factory_elf_sha256'] or
+            len(jpeg_inputs['valid']) != 8 or len(jpeg_inputs['invalid']) != 12 or
+            any(not row['passed'] for row in jpeg_inputs['valid'] + jpeg_inputs['invalid'])):
+        raise ValueError('Additional JPEG gate omitted cases or used different executables')
+    for item in jpeg_inputs['test_inputs']:
+        if hashlib.sha256((ROOT / item['file']).read_bytes()).hexdigest() != item['sha256']:
+            raise ValueError('Additional JPEG fixture/adapter changed: ' + item['file'])
     if (network['app_sha256'] != report['app_sha256'] or
             network['source_sha256'] != report['source_sha256'] or
             network['native_elf_sha256'] != text['native_elf_sha256'] or
@@ -264,6 +276,7 @@ def main():
     summary['machine_jpeg']['compared_pixels'] = sum(row['compared_pixels'] for row in jpeg['cases'])
     summary['machine_jpeg']['error_validation_checks'] = len(jpeg['errors'])
     summary['machine_jpeg']['placement_checks'] = len(jpeg['placements'])
+    summary['machine_jpeg_inputs'] = jpeg_inputs
     summary['machine_timezones'] = {key:timezones[key] for key in
         ('passed','app_sha256','source_sha256','factory_elf_sha256','native_elf_sha256',
          'complete_country_set','iana_version','timezone_manifest_sha256','comparisons',

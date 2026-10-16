@@ -7,6 +7,24 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Текущая отдельная ветка `codex/small-tv-jpeg-inputs`, worktree
+`.worktree/small-tv-jpeg-inputs`, основана на main 41b972aa. Root full run 22926
+продолжает проверять app 0d8b7585 неизменёнными source/test/helper bytes.
+Здесь закреплены 8 synthetic JPEG / 12 invalid cases; исправлены factory/C
+header bugs: DQT ID alias, ignored precision, SOF component length.
+App a33788db / source 731815d5 / ELF c2c6ae3b, 1,176,256 bytes / free 359,744
+сохранён в firmware. Новые 20 cases, 107 public JPEG / 35 errors / 7 placements
+и 3,884 host checks pass. Exact instructions и scoped reports —
+`../qemu/parity/jpeg-header-checks.md`. Branch gate обязателен; full suite ещё нужен.
+
+Следующий подтверждённый дефект: synthetic 363-byte grayscale с тремя 1-bit
+DC Huffman codes успешно проходит factory/native draw и native validation.
+Первый random-entropy malformed case падал лишь позже; он не проверяет все
+невозможные prefix trees. Probe/fixture/report в root
+`.build/small-tv-parity/jpeg-extra-fixtures/oversubscribed-gray*` и
+`.build/small-tv-parity/probe_oversubscribed_gray.py`. Добавить regression и
+исправить построитель таблиц с сохранением literal factory observation.
+
 Активный полный прогон: `.build/small-tv-functional/responsiveness-full-20261016`,
 shell session `22926`. Запущен после commit `ad5b8c5d` на app `0d8b7585`,
 ELF `97adeb91`, QEMU `fde38d53`. `inputs-before.json` фиксирует все test bytes

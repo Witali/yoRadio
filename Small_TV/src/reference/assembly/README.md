@@ -102,3 +102,9 @@ and does not clear it on disconnect. `tests/network_oracle.py` executes the
 event/cache code and a bounded active-loop slice; source-based clock tests
 separately exercise offline time, DST and photo fade. See
 `../../../qemu/parity/offline-clock-checks.md` for the candidate's scope.
+
+`jpeg_quantization_tables_at_4201105c.asm` records the ID alias at 0x420110c4.
+`jpeg_header_prepare_at_42011c48.asm` records SOF fields read without checking
+precision/component payload length. Actual RV32 tests reproduce literal factory
+acceptance; native rejects these malformed headers. Exact before/after evidence
+is in `../../../qemu/parity/jpeg-header-checks.md`.

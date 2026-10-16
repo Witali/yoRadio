@@ -849,3 +849,26 @@
 - После terminal full run следует включить новые JPEG cases в постоянный
   regression; текущий mandatory JPEG gate по-прежнему покрывает прежние 107
   public assets/ошибки/placements. Publication/full parity пока не заявлены.
+
+### 2026-10-16 — постоянные JPEG inputs и baseline headers
+
+- Создан sparse worktree .worktree/small-tv-jpeg-inputs / branch
+  codex/small-tv-jpeg-inputs от main 41b972aa. Existing ignore rule подтверждён;
+  root frozen full run 22926 не затронут. SDK/oracle shared; before ELF/bin/ROM
+  скопированы точно, factory dump на диске не менялся.
+- Закреплены 8 synthetic fixtures с manifest/generator и 12 malformed cases.
+  Actual factory/native before принимает quantizer ID 4 как 0, SOF precision 12
+  и extra component data. Инструкции 0x420110c4 и 0x42011d5a..8a сохранены;
+  FIXED_FACTORY checks устраняют эти ошибки, IDCT/color/output прежние.
+- App a33788db / source 731815d5 / ELF c2c6ae3b сохранён в firmware, 1,176,256
+  bytes / free 359,744. Все 8 valid / 12 invalid, 107 public JPEG / 35 errors /
+  7 placements и host 3,884 checks проходят. Exact before/candidate/native/public
+  reports и factory/native snippets сохранены отдельно. Full suite ещё нужен.
+- machine_jpeg_inputs включён в branch run-all/publisher/verifier, native runner
+  получил PythonPath для shared SDK. UPSTREAM/README уточняют header validation.
+  Старый main full run продолжает проверять свой app/test set; physical действий нет.
+- Отдельный минимальный 363-byte grayscale JPEG доказывает acceptance impossible
+  Huffman tree: три 1-bit DC codes, entropy использует только первый. Factory draw,
+  native draw и validation возвращают 0. Это следующий bug; random entropy case
+  не доказывал проверку таблицы. Probe/result сохранены в root .build для следующего
+  регрессионного case и отдельного исправления.

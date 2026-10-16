@@ -37,7 +37,7 @@ def main():
             'A full passing suite is required')
     groups = {row['name']: row['result'] for row in suite['groups'] if row['status'] == 'passed'} \
         if 'groups' in suite else suite
-    for name in ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu'):
+    for name in ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_jpeg_inputs', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu'):
         require(name in groups and groups[name]['passed'], 'Missing passing group: ' + name)
     for item in suite['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
@@ -60,6 +60,17 @@ def main():
     require(suite['app_sha256'] == app_sha and suite['source_sha256'] == manifest['source_sha256'],
             'Suite tested a different application/source archive')
     state, network = groups['machine_time_state'], groups['qemu']['time_http']
+    jpeg_inputs = groups['machine_jpeg_inputs']
+    require(jpeg_inputs['passed'] and jpeg_inputs['inputs_unchanged'] and
+            jpeg_inputs['app_sha256'] == app_sha and
+            jpeg_inputs['source_sha256'] == manifest['source_sha256'] and
+            jpeg_inputs['native_elf_sha256'] == state['native_elf_sha256'] and
+            len(jpeg_inputs['valid']) == 8 and len(jpeg_inputs['invalid']) == 12 and
+            all(row['passed'] for row in jpeg_inputs['valid'] + jpeg_inputs['invalid']),
+            'Additional JPEG gate omitted cases or used different inputs')
+    for item in jpeg_inputs['test_inputs']:
+        require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
+                'Additional JPEG fixture/adapter changed: ' + item['file'])
     for name in ('startup_wait', 'weather_wait'):
         gate = groups['qemu'][name]
         require(gate['passed'] and gate['inputs_unchanged'] and gate['app_sha256'] == app_sha and

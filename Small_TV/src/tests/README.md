@@ -83,6 +83,12 @@ HTTP 503 записана как ошибка; наша прошивка отк�
 
 ## Что проверяется автоматически
 
+`machine_jpeg_inputs` дополняет public assets восемью synthetic JPEG variations
+и двенадцатью header/entropy/restart errors. Сравниваются все пиксели с actual
+factory decoder, отсутствие рисования при discard validation и native cleanup.
+Pillow нужен только для воспроизведения закреплённых файлов. Описание:
+[jpeg-header-checks.md](../../qemu/parity/jpeg-header-checks.md).
+
 Группа `machine_timezones` исполняет настоящий код преобразования времени и libc:
 36,404 сравнения для 109 исходных ключей стран, все записанные переходы ±1 секунду,
 будущие правила до выборок 2400 года, неизвестная страна и ошибки epoch/указателя.

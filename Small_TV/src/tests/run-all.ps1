@@ -32,7 +32,7 @@ function Invoke-TestGroup([string]$Name,[scriptblock]$Action,[string]$ResultPath
     }
 }
 $nativeReport=Join-Path $repo ".build\small-tv-esp32c2\native-tests\report.json"
-Invoke-TestGroup "native" {& (Join-Path $PSScriptRoot "run.ps1") -VsDevCmd $VsDevCmd} $nativeReport
+Invoke-TestGroup "native" {& (Join-Path $PSScriptRoot "run.ps1") -VsDevCmd $VsDevCmd -PythonPath $PythonPath} $nativeReport
 $platformReport=Join-Path $repo ".build\small-tv-esp32c2\platform-tests\report.json"
 Invoke-TestGroup "platform" {& (Join-Path $PSScriptRoot "run-platform.ps1") -VsDevCmd $VsDevCmd -PythonPath $PythonPath} $platformReport
 $frontendReport=Join-Path $OutputDirectory "frontend.json"
@@ -95,6 +95,14 @@ else {
         & $PythonPath (Join-Path $PSScriptRoot "jpeg_oracle.py") --output $jpegReport
         if($LASTEXITCODE){throw "JPEG decoder/error machine comparison failed"}
     } $jpegReport
+}
+if ($SkipMachine) {$groups.Add(@{name="machine_jpeg_inputs";status="not_run";reason="Explicit -SkipMachine"})}
+else {
+    $jpegInputsReport=Join-Path $OutputDirectory "jpeg-inputs.json"
+    Invoke-TestGroup "machine_jpeg_inputs" {
+        & $PythonPath (Join-Path $PSScriptRoot "jpeg_inputs_oracle.py") --output $jpegInputsReport
+        if($LASTEXITCODE){throw "Additional JPEG format/header/error comparisons failed"}
+    } $jpegInputsReport
 }
 if ($SkipMachine) {$groups.Add(@{name="machine_timezones";status="not_run";reason="Explicit -SkipMachine"})}
 else {

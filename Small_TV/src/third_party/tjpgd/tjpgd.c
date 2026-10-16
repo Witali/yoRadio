@@ -245,8 +245,8 @@ static JRESULT create_qt_tbl (  /* 0:OK, !0:Failed */
         }
         ndata -= 65;
         d = *data++;                            /* Get table property */
-        if (d & 0xF0) {
-            return JDR_FMT1;    /* Err: not 8-bit resolution */
+        if (d & 0xFC) {
+            return JDR_FMT1;    /* Err: unsupported precision or table ID */
         }
         i = d & 3;                              /* Get table ID */
         pb = alloc_pool(jd, 64 * sizeof (int32_t));/* Allocate a memory block for the table */
@@ -629,6 +629,9 @@ static JRESULT restart (
     uint16_t rstn   /* Expected restert sequence number */
 )
 {
+    /* Build the four supported 8-bit dequantizer tables.
+     * FIXED_FACTORY: 0x420110c4 masks an invalid ID to two bits, silently
+     * turning table 4 into table 0. Reject reserved ID/precision bits first. */
     unsigned int i;
     uint8_t *dp = jd->dptr;
     size_t dc = jd->dctr;
@@ -1121,6 +1124,10 @@ JRESULT jd_prepare (
     void *dev               /* I/O device identifier for the session */
 )
 {
+    /* Read baseline headers and construct the decoder's tables and MCU state.
+     * FIXED_FACTORY: 0x42011d5a..0x42011d8a ignores SOF sample precision and
+     * component payload length. Require the supported 8-bit frame and its
+     * complete component list before reading or accepting those fields. */
     uint8_t *seg, b;
     uint16_t marker;
     unsigned int n, i, ofs;
@@ -1189,11 +1196,21 @@ JRESULT jd_prepare (
                 return JDR_INP;    /* Load segment data */
             }
 
+            if (len < 6) {
+                return JDR_FMT1;    /* Err: truncated frame header */
+            }
+            if (seg[0] != 8) {
+                return JDR_FMT3;    /* Err: unsupported sample precision */
+            }
+
             jd->width = LDB_WORD(&seg[3]);      /* Image width in unit of pixel */
             jd->height = LDB_WORD(&seg[1]);     /* Image height in unit of pixel */
             jd->ncomp = seg[5];                 /* Number of color components */
             if (jd->ncomp != 3 && jd->ncomp != 1) {
                 return JDR_FMT3;    /* Err: Supports only Grayscale and Y/Cb/Cr */
+            }
+            if (len != 6 + 3 * jd->ncomp) {
+                return JDR_FMT1;    /* Err: incomplete or extra component data */
             }
 
             /* Check each image component */
