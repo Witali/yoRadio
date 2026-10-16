@@ -7,6 +7,32 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Новый независимый результат: branch `codex/small-tv-jpeg-inputs`, worktree
+`.worktree/small-tv-jpeg-inputs`, commit `9a59cb07`, отправлен в origin.
+В нём закреплены восемь JPEG variations и 12 malformed cases. Найдены и исправлены
+три подтверждённые factory/C ошибки: DQT ID 4 превращался в 0, игнорировалась
+SOF precision 12 и лишняя component payload. Candidate app a33788db / source
+731815d5 / ELF c2c6ae3b, 1,176,256 bytes / free 359,744 сохранён в firmware ветки.
+Все 8 valid / 12 invalid, 107 public JPEG / 35 errors / 7 placements и 3,884
+host checks pass; actual factory/native инструкции и before/after в branch
+`Small_TV/qemu/parity/jpeg-header-checks.md`. Gate обязателен в branch full set,
+но полный suite кандидата ещё не проходил. Main run 22926 НЕ заменён этой сборкой.
+
+Далее исправить отдельный выявленный Huffman bug: 363-byte synthetic grayscale
+с тремя 1-bit DC codes проходит draw в обеих прошивках и native validation.
+Entropy использует первый код, поэтому прежний random-entropy mutation не ловил
+отсутствие проверки дерева. Probe/fixture/report в
+`.build/small-tv-parity/probe_oversubscribed_gray.py` и
+`.build/small-tv-parity/jpeg-extra-fixtures/oversubscribed-gray*`.
+Для before следующего исправления сохранён точный header candidate BIN/ELF
+в `.build/small-tv-parity/jpeg-header-before-huffman/` (app a33788db, ELF c2c6ae3b).
+Продолжать в JPEG worktree; root source/tests/helper bytes заморожены до конца 22926.
+
+Последний live опрос 22926: пройдены все RV32 группы и QEMU boot/reset,
+startup/weather waits, AP->STA setup, weather, field scroll, SNTP и UTF-8 обеих
+прошивок. Идут региональные HTTP/NVS/cold-boot сценарии, затем natural calendar
+matrix и complete scenes. Не выдавать эти промежуточные passes за весь suite.
+
 Активный полный прогон: `.build/small-tv-functional/responsiveness-full-20261016`,
 shell session `22926`. Запущен после commit `ad5b8c5d` на app `0d8b7585`,
 ELF `97adeb91`, QEMU `fde38d53`. `inputs-before.json` фиксирует все test bytes

@@ -849,3 +849,29 @@
 - После terminal full run следует включить новые JPEG cases в постоянный
   regression; текущий mandatory JPEG gate по-прежнему покрывает прежние 107
   public assets/ошибки/placements. Publication/full parity пока не заявлены.
+
+### 2026-10-16 — отдельная JPEG-ветка: заголовки и следующий Huffman bug
+
+- Root full run 22926 жив; все RV32 gates прошли, QEMU boot/reset, новые software
+  waits, initial AP->STA setup, weather, field scroll, SNTP и UTF-8 прошли обе app.
+  Региональный этап ещё выполняется; main frozen source/test/helper bytes не менялись.
+- Создан sparse worktree .worktree/small-tv-jpeg-inputs, branch от main 41b972aa.
+  Закреплены 8 deterministic RGB/grayscale/subsampling/restart/odd-size fixtures
+  с encoder manifest и 12 header/entropy/restart mutations. Literal factory и
+  прежний C принимают DQT ID 4 как 0, SOF precision 12 и extra component payload.
+- Три ошибки исправлены с FIXED_FACTORY в create_qt_tbl/jd_prepare. Native actual
+  ELF c2c6ae3b / app a33788db / source 731815d5 сохранён в firmware ветки:
+  1,176,256 bytes / free 359,744. Все 8/12 новых cases и прежние 107/35/7 RV32
+  JPEG checks проходят; host production C 3,884 тоже pass. IDCT/color/output прежние.
+- Exact factory/native assembly, before/candidate/public/native reports и новый
+  обязательный branch gate сохранены commit 9a59cb07 и отправлены. First staging
+  check поймал текстовое правило Small_TV/src/** для JPEG: добавлен scoped -text
+  override, повторный staged byte check подтвердил все source/image/fixture hashes.
+  Ни corrupted binary, ни временные файлы не попали в коммит. Candidate full suite
+  ещё не выполнялся; main run продолжает свой app 0d8b7585, без изменения байтов.
+- Отдельный минимальный synthetic 363-byte grayscale доказал ещё один bug:
+  невозможное дерево с тремя 1-bit DC codes принимается factory/native draw и
+  native validation (все возвращают 0). Предыдущая random-entropy mutation падала
+  позже и не доказывала проверку таблицы. Следующий приоритет — постоянный case и
+  исправление Huffman builder в JPEG worktree. Before header candidate BIN/ELF
+  сохранён в .build/small-tv-parity/jpeg-header-before-huffman/.
