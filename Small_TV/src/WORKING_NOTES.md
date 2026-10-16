@@ -18,6 +18,11 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   сохранение состояния между шагами. По возможности показать сбой до исправления.
 - Рефакторинг допустим в текущем участке работы: выделять повторяющийся алгоритм
   в общую функцию и проверять, что состояние и последовательность вызовов сохранены.
+- По уточнению пользователя ненужные программные паузы (`delay`, `vTaskDelay`,
+  циклы ожидания) убирать, включая заводские:
+  устанавливать их причину и влияние, устранять лишнее блокирование и отмечать
+  намеренное исправление отдельно от parity. Проверять отзывчивость и работу
+  таймеров после изменения; периоды часов и debounce не считать лишними без анализа.
 - Выбирать осмысленные имена; объяснять назначение каждой функции и сложные места.
   Комментарии в C писать на английском. Исправленные функции маркировать по
   [CORRECTION_MARKERS.md](CORRECTION_MARKERS.md).
@@ -91,12 +96,31 @@ PCAP diagnostic `.build/small-tv-parity/http-latency-pcap-20261016-03` восп�
 Failed calendar summary — `calendar-transport-observation.json`.
 Тестовая diagnostic VM закрыта. Создан отдельный QEMU worktree
 `C:/Work/QEMU-ESP32/.worktree/small-tv-wifi-link`, ветка `codex/small-tv-wifi-link`,
-от 1c7e4c0512. Там добавлена только opt-in RX drop logging; отдельная сборка
-shell 43346, log `.build/small-tv-qemu-rx-build.log`. Main QEMU source/bin прежние.
+от 1c7e4c0512. Diagnostics завершены: dedicated RX trace подтвердил no-descriptor
+loss. Commits `6f3fa56a48` (trace), `9d4da15732` (C2 queue) отправлены в отдельную
+ветку; remote SHA сверён. Candidate QEMU SHA e8122fe2, canonical по-прежнему
+c970591d. C2 теперь удерживает head frame в существующей bounded queue до записи
+RX_BASE_DESC, без poll/retry delay; C3 legacy path сохранён. Новый packet test
+показывает fail только C2 на старом canonical и pass всех семи на candidate;
+проверяет starvation 5 s, FIFO, queue limit и no duplicates. SPI/I2C/SD и
+CYD/C3 legacy/modular boot прошли. 120 реальных HTTP POST: max .165376 guest s,
+раньше trace-only QEMU давал 5.74/5.76 s. Scoped evidence
+`../qemu/parity/rx-queue-candidate.json`. Это не полный firmware suite.
+
+Сейчас жив native-only calendar process shell 32961, output
+`.build/small-tv-functional/calendar-native-complete-20261016`, log
+`.build/small-tv-calendar-native-complete.log`. ROOT production/test inputs и
+canonical QEMU c970591d заморожены до terminal result. Не заменять binary и не
+перезапускать только из-за observer timeout. После завершения: обновить QEMU
+canonical только из проверенной ветки с regressions, затем новый полный suite.
+Для offline app 072135ee ещё нужна natural station disconnect/reconnect проверка.
 
 Новый участок для последующего анализа: `settings.c` сохраняет через 1 s покоя;
 factory dirty countdown начинает с 50 и сохраняет на 51-м eligible loop pass;
-в loop передаётся delay 10 ticks, но factory tick frequency ещё не измерена.
+в loop передаётся delay 10 ticks. Реальный factory QEMU/GDB sample теперь
+подтвердил около 100 ms для десяти ticks (98.5–109.5 ms, десять samples);
+`../qemu/parity/factory-loop-delay-observation.json`. Эта задержка измерена,
+а время body/render/weather в расчёт 51-pass модели отдельно не включено.
 Игнорируемый persistence_probe использует явную модель 100 ms/eligible pass;
 получает single 5.1 s против native 1 s, burst один save против трёх. Это
 model timestamps, не измеренные RF/RTOS задержки. Счётчик

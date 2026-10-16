@@ -608,3 +608,45 @@
   отчёт не заменён; six-guest-second gate не ослаблен. Для дальнейшей диагностики
   отдельный QEMU worktree `.worktree/small-tv-wifi-link` от main 1c7e4c0512
   собирает opt-in RX logging; canonical QEMU source/executable не меняются.
+
+- Пользователь уточнил: ненужные задержки следует удалять. Это сохраняется как
+  правило дальнейшей работы; deliberate fixes документировать и проверять их
+  влияние на события/таймеры/отзывчивость. TCP SYN retransmission уже локализован,
+  но его конкретная причина ещё не доказана.
+- Новый native-only calendar matrix запущен, shell 32961. Шестисекундный предел
+  сохранён; превышения теперь агрегируются в отрицательном flow check в конце,
+  позволяя собрать остальные календарные случаи. Этот запуск не полный suite.
+- Factory delay напрямую измерен read-only GDB/QMP: десять vTaskDelay(10)
+  составили 98.5–109.5 ms. Это проверка реального SDK delay, отдельно от времени
+  body/render/weather. Источник дампа и canonical QEMU SHA прежние.
+- Первый diagnostic QEMU B05E с общим guest_errors log слишком шумный: display
+  startup не достиг 25 guest s за wall timeout. Его VM закрыта, это failed
+  diagnostic attempt. Диагностика заменена dedicated RX trace event, не меняющим
+  доставку пакетов. Повторный build завершился, installer сначала получил sharing
+  violation от ещё закрывавшейся собственной VM; после её выхода устанавливается
+  уже собранный бинарник. Canonical QEMU не затрагивается.
+
+- Dedicated RX trace QEMU 8cc11913 показал no-descriptor losses в момент
+  медленных соединений. Новая C2 queue не выбрасывает head frame до появления
+  DMA буфера и возобновляется по RX_BASE_DESC write без polling/retry pause.
+  Commit 6f3fa56a48 сохраняет trace; 9d4da15732 — queue fix и C2 packet test.
+  Оба pushed в codex/small-tv-wifi-link, remote 9d4da15732 проверен.
+- Candidate QEMU e8122fe2: новый C2 starvation/FIFO/limit/no-duplicate packet
+  test прошёл; вместе с шестью прежними — 7 passed. На canonical c970591d новый
+  тест воспроизводит потерю двух ответов, прежние шесть проходят. Первая версия
+  нового harness использовала C3 MMIO base для C2: ошибочный negative сохранён,
+  итоговый before/after использует реальный C2 0x60047000 из модели платы.
+- 120 real HTTP POST после queue fix: все 200, max .165376 guest s. Ранний
+  trace-only вариант на том же app давал 5.74/5.76 s. Actual app не менялась.
+  Модульные SPI/I2C/SD/GPIO tests и unchanged CYD/C3 OLED legacy+modular boot
+  прошли, собственные диагностические ВМ закрыты. Scoped candidate evidence
+  сохранён отдельно; canonical binary и root native-only calendar не изменены.
+- Native-only calendar shell 32961 жив, тестовые байты заморожены до результата.
+  На этой записи прошли classic/simple все 14, dial Sunday/year. Это ещё не
+  общий passing suite. Далее: закончить этот attempt, принять проверенный QEMU,
+  прогнать полный набор; offline branch и программные паузы — отдельные участки.
+- Для программных пауз начат read-only аудит: startup timer держит заставку
+  181 × 100 ms даже при готовой сети; clock_task также ждёт weather_request_active,
+  хотя worker имеет независимый cache mutex. Эти кандидаты на удаление лишнего
+  ожидания требуют отдельных тестов и меток REQUESTED_CHANGE. ST7789 reset/sleep,
+  debounce, периодический task yield и restart grace не удаляются без основания.

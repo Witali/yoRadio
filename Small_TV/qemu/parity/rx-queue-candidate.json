@@ -1,0 +1,209 @@
+{
+  "passed": true,
+  "scope": "Scoped candidate QEMU C2 RX backpressure: firmware-independent DMA/FIFO/bounds packets, modular peripherals, historical board boot and a synthetic real-firmware HTTP latency run. Not a full Small TV acceptance result.",
+  "canonical_emulator_replaced": false,
+  "qemu_source_commit": "9d4da15732c44581aadced96fb71b9310bbee8b9",
+  "qemu_sha256": "e8122fe24e3f005ac2d7e16bf8a55ae788d8678937071aa05062212be4a32fdc",
+  "qemu_source_inputs": [
+    {
+      "file": "hw/net/esp32c3_wifi.c",
+      "sha256": "d8af7ffd8ee82af5ab07ce815b66a103600e77b34d02315407930eb4d0be6286"
+    },
+    {
+      "file": "hw/net/esp32c3_wifi_ap.c",
+      "sha256": "bc093b994a2779eb5074f73dfb122e22285f399314d1f60f945943d698acb345"
+    },
+    {
+      "file": "hw/net/trace-events",
+      "sha256": "33d6c264d51d6e827394234dcf99d9f648d8ac96a89cdfcc77bed489bce295a9"
+    },
+    {
+      "file": "include/hw/net/esp32c3_wifi.h",
+      "sha256": "93cf5201f15f255b28eda7f13761384e03803a2d3d0d080376288641ca568168"
+    },
+    {
+      "file": "tests/esp32_wifi_services_test.py",
+      "sha256": "ee854dffd015feb3df962c49760db742021101b0912511013c1c1fb3ba7dfa53"
+    }
+  ],
+  "packet_before": {
+    "passed": false,
+    "tests": 7,
+    "failures": [
+      "test_c2_receive_waits_for_dma_and_keeps_bounded_fifo (__main__.WifiServicesTests.test_c2_receive_waits_for_dma_and_keeps_bounded_fifo)"
+    ],
+    "errors": [],
+    "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
+    "scope": "QOM validation/reset and real DNS/NTP packets through Wi-Fi DMA; qtest executes no guest instructions, no firmware or Internet."
+  },
+  "packet_after": {
+    "passed": true,
+    "tests": 7,
+    "failures": [],
+    "errors": [],
+    "qemu_sha256": "e8122fe24e3f005ac2d7e16bf8a55ae788d8678937071aa05062212be4a32fdc",
+    "scope": "QOM validation/reset and real DNS/NTP packets through Wi-Fi DMA; qtest executes no guest instructions, no firmware or Internet."
+  },
+  "modules": {
+    "passed": true,
+    "checks": {
+      "profile_validation": {
+        "unsupported_bus": true,
+        "flash_gpio": true,
+        "conflicting_pins": true,
+        "always_selected_shared_bus": true,
+        "duplicate_id": true
+      },
+      "c2_shared_spi": {
+        "lcd_sd_transfer": true,
+        "topology": "shared_bus",
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "cs_isolation": true,
+        "wrong_sck_blocked": true,
+        "wrong_miso_blocked": true,
+        "sd_snapshot_unchanged": true
+      },
+      "c3_shared_spi": {
+        "lcd_sd_transfer": true,
+        "topology": "shared_bus",
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "cs_isolation": true,
+        "wrong_sck_blocked": true,
+        "wrong_miso_blocked": true,
+        "sd_snapshot_unchanged": true
+      },
+      "esp32_dual_spi": {
+        "lcd_sd_transfer": true,
+        "topology": "two_hosts",
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "cs_isolation": true,
+        "wrong_sck_blocked": true,
+        "wrong_miso_blocked": true,
+        "sd_snapshot_unchanged": true
+      },
+      "c2_i2c": {
+        "alternate_gpio_oled": true,
+        "wrong_scl_nack": true
+      },
+      "c3_i2c": {
+        "alternate_gpio_oled": true,
+        "wrong_scl_nack": true
+      },
+      "legacy_cyd_mmio": {
+        "legacy_flags": true,
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "sd_idle_high": true,
+        "snapshot_unchanged": true
+      }
+    },
+    "qemu_sha256": {
+      "riscv32": "e8122fe24e3f005ac2d7e16bf8a55ae788d8678937071aa05062212be4a32fdc",
+      "xtensa": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35"
+    }
+  },
+  "legacy": {
+    "cyd": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "hardware_profile": null,
+      "machine": "esp32,st7789=on,sdspi=on",
+      "duration_seconds": 25,
+      "qemu_sha256": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35",
+      "firmware_sources": {
+        "flash.bin": "1050294c50955df7a4b09e5a44950601b1da11a299b3aea6a30031353103b8a8"
+      },
+      "pixel_sha256": "4afa1d8c3cb4023eef448bc04e36e1ae6b4568da007c43777935b32a1ea995d7",
+      "nonzero_bytes": 42240,
+      "lcd_area_nonzero_bytes": 0,
+      "cyd_boot_scope": "Boot, console and panic checks; LCD transactions are verified separately by QTest"
+    },
+    "c3_oled": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "hardware_profile": null,
+      "machine": "esp32c3",
+      "duration_seconds": 25,
+      "qemu_sha256": "e8122fe24e3f005ac2d7e16bf8a55ae788d8678937071aa05062212be4a32fdc",
+      "firmware_sources": {
+        "flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+      },
+      "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
+      "nonzero_bytes": 44160,
+      "lcd_area_nonzero_bytes": 44160,
+      "cyd_boot_scope": null
+    },
+    "c3_modular": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "hardware_profile": {
+        "schema": 1,
+        "name": "c3-oled",
+        "soc": "esp32c3",
+        "machine": "esp32c3,default-peripherals=off",
+        "arguments": [
+          "-device",
+          "{\"driver\":\"esp-i2c-module\",\"id\":\"oled\",\"bus\":\"/i2c0/i2c\",\"gpio\":\"/machine/gpio\",\"address\":60,\"model\":\"ssd1306\",\"scl\":6,\"sda\":5,\"properties\":\"{\\\"visible-width\\\":72,\\\"visible-height\\\":40,\\\"column-offset\\\":28,\\\"magnify\\\":4}\"}"
+        ],
+        "sd_images": [],
+        "profile": "C:\\Work\\QEMU-ESP32\\configs\\boards\\c3-oled.json",
+        "network": {
+          "station_ssid": "yoRadio-QEMU",
+          "urls": [],
+          "ntp_hosts": []
+        },
+        "network_arguments": [],
+        "service_urls": []
+      },
+      "machine": "esp32c3",
+      "duration_seconds": 25,
+      "qemu_sha256": "e8122fe24e3f005ac2d7e16bf8a55ae788d8678937071aa05062212be4a32fdc",
+      "firmware_sources": {
+        "flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+      },
+      "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
+      "nonzero_bytes": 44160,
+      "lcd_area_nonzero_bytes": 44160,
+      "cyd_boot_scope": null
+    },
+    "passed": true
+  },
+  "http": {
+    "app_sha256": "9e4f856a45fb3526eb2032f08f948c1354e8ba80065d1b4b32242f2d0c94f03c",
+    "source_sha256": "6ab9c80f0d245a4fdd977b6028a453d95a6156de6172ee959ced5284159db51b",
+    "requests": 120,
+    "all_status_200": true,
+    "maximum_guest_seconds": 0.1653759999999984,
+    "pcap_sha256": "3febca6fb279299e0c61cbcf34f7023bf86c1701a56874d89834070d7ff2857f",
+    "earlier_trace_qemu_sha256": "8cc11913135a5ebb556b4e51bff17e4c5b4f565398fdda5b8dedaa9c2722e579",
+    "earlier_trace_maximum_guest_seconds": 5.762506000000002
+  },
+  "limitations": [
+    "Canonical RISC-V QEMU and main firmware are still the previous versions.",
+    "The complete calendar suite, natural station disconnect and physical/soak acceptance remain separate work."
+  ]
+}
