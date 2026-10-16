@@ -938,6 +938,19 @@
   Production app0d8b7585 не менялся; полный machine/QEMU здесь не повторялся.
   Checkpoint73687652 сохраняет точный прежний 17-group набор и даты его запуска.
 
+### 2026-10-16 — JPEG integration в main и новая архивная сборка
+
+- Merge3aede06f включил branch28bfa638 после terminal root run. Конфликты
+  обязательных списков разрешены с сохранением report_aggregation и
+  machine_jpeg_inputs, всего19 groups; документы/оба журнала сохранены.
+  Новые photo21-check gate и Huffman/header tests не приписываются старому run.
+- Root build успешен, production sourcef411bf0e совпадает с JPEG branch;
+  root appad7a9009/ELF6d7b586f,1,176,272 bytes/free359,728 архивирован в firmware.
+  Actual decoder/coordinator/network code девяти функций сохранён отдельным
+  native-jpeg-integrated assembly/manifest. Старые branch/root evidence не
+  перепривязаны. Следом один новый полный run jpeg-integrated-full-20261016,
+  с initial input pins; полный positive report пока остаётся для0d8b7585.
+
 ### 2026-10-16 — постоянные JPEG inputs и baseline headers
 
 - Создан sparse worktree .worktree/small-tv-jpeg-inputs / branch

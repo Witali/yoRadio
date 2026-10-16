@@ -7,6 +7,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Текущая интеграция: merge `3aede06f` включил JPEG branch28bfa638 в main и
+сохранил JSON DateKind fix39e666e1, оба журнала и все 19 mandatory groups.
+Root rebuild успешен: app `ad7a9009` / source `f411bf0e` / ELF `6d7b586f`,
+1,176,272 bytes / free359,728. Архив firmware обновлён; source identity совпадает
+с проверенным JPEG candidate131ce792, ELF/app root отличаются и не переименованы.
+Actual instructions девяти функций — `../qemu/parity/native-jpeg-integrated.asm`
+и manifest. Следующий full output: `.build/small-tv-functional/jpeg-integrated-full-20261016`.
+Сохранить initial input pins, один живой handle, не менять source/test/helper
+байты до terminal result. Полный positive checkpoint73687652 пока относится к
+старому app0d8b7585 и 17-group набору; текущий root ещё не объявлен прошедшим full.
+
 Актуально 2026-10-16, после предыдущих промежуточных записей:
 
 JSON reader исправлен: общий Read-SmallTvTestResult использует DateKind String,
