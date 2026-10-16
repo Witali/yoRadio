@@ -43,6 +43,19 @@ app/ELF/test hashes; опубликованный общий passing checkpoint 
 42–49 ms. Сводка `http-latency-observation.json` отделяет это наблюдение от
 приёмочного теста; конкретная причина потери первого SYN ещё не установлена.
 
+Последующие запуски продолжают остальные календарные случаи после успешного
+HTTP 200 с превышенной задержкой. В конце `settings_http_latency_bounded=false`
+всё равно делает весь flow неуспешным. Это позволяет получить недостающие
+календарные свидетельства, сохраняя предел шесть секунд и отрицательный общий
+результат при его нарушении; неуспешный HTTP-статус по-прежнему останавливает flow.
+
+Native-only `calendar-native-complete-20261016` выполнил все 42 перехода и 84
+полных кадра: IANA/calendar и corrected pixel checks прошли. Итог остаётся
+отрицательным из-за HTTP latency (max 6,195 guest s) на прежнем QEMU.
+`calendar-native-observation.json` сохраняет scoped результат; factory в этом
+запуске не проверялась. Эти разные attempts не заменяют одного полного passing
+набора на актуальных firmware/emulator/test inputs.
+
 ## Независимые эталоны
 
 Календарь native сравнивается с Python ZoneInfo и закреплёнными IANA TZif,

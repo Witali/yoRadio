@@ -650,3 +650,27 @@
   хотя worker имеет независимый cache mutex. Эти кандидаты на удаление лишнего
   ожидания требуют отдельных тестов и меток REQUESTED_CHANGE. ST7789 reset/sleep,
   debounce, периодический task yield и restart grace не удаляются без основания.
+
+- Native-only calendar attempt 32961 завершился: все 42 transitions и 84
+  complete frames совпали с corrected factory reference; все native calendars
+  совпали с IANA. Flow failed только по settings_http_latency_bounded=false,
+  max 6.195069 guest s. Scoped observation сохранён; different attempts не
+  склеиваются в passing full suite. Canonical emulator ещё c970591d.
+- По прямому уточнению о программных паузах в offline branch удалён weather
+  wait в clock_task: worker асинхронный, published cache защищён mutex, поэтому
+  UI/fade может работать до ответа. Новый host negative ловит прежнюю заморозку;
+  после изменения все 37 platform cases прошли. REQUESTED_CHANGE добавлен в
+  entry comment. Startup и аппаратные задержки пока отдельно от этого изменения.
+- Новая branch production сборка a2b6129b / source 246397dd / ELF 00ef2763,
+  1,176,144 bytes / free 359,856, сохранена в firmware/development. Before/after
+  QEMU probes удерживают настоящий внешний HTTP-ответ, не меняя guest state.
+  Первый harness ошибся в RUNNING mask, обе ранние попытки failed до проверки
+  UI; второй читает enum из actual DWARF и ждёт natural minute boundary.
+
+- Corrected prototype QEMU observation подтвердил программное ожидание:
+  old app 9e4f856a допустил следующий кадр только после завершения/тайм-аута
+  weather worker (6.535 guest s наблюдаемого ожидания); a2b6129b отрисовал новую
+  минуту через .740 guest s при реально выполняющемся HTTP и удержанном ответе.
+  Обе VM закрыты, app/ELF inputs не менялись. Постоянный portable regression
+  создан в branch tests/weather_wait_qemu.py с DWARF enum и source/helper/code
+  fingerprints; отдельный before/after repeat shell 14536 / 87620 в работе.

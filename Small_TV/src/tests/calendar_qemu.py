@@ -240,8 +240,8 @@ def exercise(options,folder,variant,themes,cases):
                 elapsed=weather.virtual_seconds(qmp)-started
                 result['http_observations'].append({'path':path,'status':status,'guest_seconds':elapsed,
                                                     'host_seconds':time.monotonic()-host})
-                if status!=200 or elapsed>6:
-                    raise AssertionError('Settings response failed its six-guest-second bound: '+str(result['http_observations'][-1]))
+                if status!=200:
+                    raise AssertionError('Settings response failed: '+str(result['http_observations'][-1]))
             wait_http(url,'/getclocktype')
             weather.wait_display(qmp)
             sequence=0
@@ -302,8 +302,10 @@ def exercise(options,folder,variant,themes,cases):
                     row['natural_transition_without_resync']=True
                     print('PASS natural calendar:',variant,theme,case['name'],flush=True)
             result['checks']={'all_pixels_checked':True,'natural_transitions':True,'hardware_breakpoints_only':True,
-                              'real_ntp_packets':True,'no_guest_state_writes':True}
-        result['passed']=all(row['passed'] for row in result['cases'])
+                              'real_ntp_packets':True,'no_guest_state_writes':True,
+                              'settings_http_latency_bounded':all(row['guest_seconds']<=6
+                                                                  for row in result['http_observations'])}
+        result['passed']=all(row['passed'] for row in result['cases']) and all(result['checks'].values())
     except Exception as error:
         result['error']=str(error)
         raise
@@ -320,7 +322,7 @@ def exercise(options,folder,variant,themes,cases):
                 result['checks']['no_panic']=clean_uart(folder)
                 result['passed'] &= all(result['checks'].values())
             vm.save_json(folder/'calendar-report.json',result)
-    if not result['passed']:raise AssertionError('Calendar fixture integrity checks failed')
+    if not result['passed']:raise AssertionError('Calendar fixture checks failed: '+str(result['checks']))
     return result
 
 

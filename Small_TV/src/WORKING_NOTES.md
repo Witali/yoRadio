@@ -107,13 +107,32 @@ CYD/C3 legacy/modular boot прошли. 120 реальных HTTP POST: max .16
 раньше trace-only QEMU давал 5.74/5.76 s. Scoped evidence
 `../qemu/parity/rx-queue-candidate.json`. Это не полный firmware suite.
 
-Сейчас жив native-only calendar process shell 32961, output
-`.build/small-tv-functional/calendar-native-complete-20261016`, log
-`.build/small-tv-calendar-native-complete.log`. ROOT production/test inputs и
-canonical QEMU c970591d заморожены до terminal result. Не заменять binary и не
-перезапускать только из-за observer timeout. После завершения: обновить QEMU
-canonical только из проверенной ветки с regressions, затем новый полный suite.
-Для offline app 072135ee ещё нужна natural station disconnect/reconnect проверка.
+Native-only calendar shell 32961 завершился exit 1: все 42 transitions / 84
+complete frames прошли, native везде совпал с IANA и corrected pixel reference.
+Единственный отрицательный check — HTTP latency (max 6.195069 guest s), предел
+не ослаблен. Scoped `../qemu/parity/calendar-native-observation.json` сохраняет
+все samples и test hashes. Factory в этом attempt не запускалась; результаты
+разных attempts не объединять в passing full suite. Freeze этого процесса снят.
+Следующее: принять проверенный QEMU candidate и новый полный suite.
+Для offline branch ещё нужна natural station disconnect/reconnect проверка.
+
+По уточнению о программных паузах в offline branch убран отдельный software wait:
+clock_task не пропускает active UI/fade пока weather worker pending/running;
+cache защищён своим mutex. Media upload guard сохранён из-за частичного overwrite
+photo slots. Новый negative platform case воспроизводит старую заморозку; после
+изменения проходят все 37 cases, включая три clock themes и полный fade с pending
+weather. Сборка app a2b6129b / source 246397dd / ELF 00ef2763 сохранена в firmware
+ветки (1,176,144 bytes). Это новый candidate, старые offline scoped reports
+072135ee не переименовывать. Actual-QEMU prototype before/after завершён:
+прежний app ждал 6.535 guest s до следующего кадра и выходил только после weather
+timeout; candidate дал кадр через .740 guest s при реальном REQUEST_RUNNING=1
+и удержанном внешнем ответе. Prototype runs:
+`.build/small-tv-parity/weather-wait-*-20261016-02`.
+Переносимый постоянный тест добавлен в branch tests/weather_wait_qemu.py;
+повтор с input/code fingerprints сейчас идёт: shell 14536 / 87620, output
+`.build/small-tv-parity/weather-wait-permanent-*-20261016`.
+Первый probe неверно считал RUNNING bit=2; исправленный читает реальный DWARF enum
+REQUEST_RUNNING=1. Early failed harness attempts не являются доказательством bug.
 
 Новый участок для последующего анализа: `settings.c` сохраняет через 1 s покоя;
 factory dirty countdown начинает с 50 и сохраняет на 51-м eligible loop pass;
