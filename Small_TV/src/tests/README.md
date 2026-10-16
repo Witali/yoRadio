@@ -123,6 +123,13 @@ HTTP 503 записана как ошибка; наша прошивка отк�
 используется штатная смена темы, для нашей прошивки — прямое обновление.
 Подробнее: [regional-settings-checks.md](../../qemu/parity/regional-settings-checks.md).
 
+Новый обязательный `qemu.calendar_http` проверяет 14 natural calendar/DST
+boundaries в classic/simple/dial обеих прошивок: 84 перехода и 168 полных кадров.
+IANA календарь и factory instructions используются как разные эталоны; между
+before/after не допускается новая синхронизация. Все шесть date/hour styles
+чередуются по случаям в каждой теме. Полный результат этой новой матрицы пока
+не опубликован. Подробнее: [calendar-transport-checks.md](../../qemu/parity/calendar-transport-checks.md).
+
 `qemu.completed_scenes` сравнивает все пиксели завершённых classic, weather и dial
 кадров с реальными инструкциями того же ELF/оригинала. Аппаратные точки наблюдения
 не изменяют гостевой код/RAM/PC. Проверяются 24 кадра, включая чистый полный

@@ -121,6 +121,39 @@ def main():
             any(not row['matches_iana'] for row in regional['flows']['reconstructed']['cases']) or
             any(not row['weather_key_preserved'] for row in regional['flows']['reconstructed']['cases'])):
         raise ValueError('Regional settings gate omitted maximum inputs/cache/rejection checks')
+    calendar_http = qemu['calendar_http']
+    from calendar_qemu import requirements
+    calendar_requirements = requirements()
+    if (not calendar_http['passed'] or calendar_http['app_sha256'] != report['app_sha256'] or
+            calendar_http['source_sha256'] != report['source_sha256'] or
+            calendar_http['native_elf_sha256'] != text['native_elf_sha256'] or
+            calendar_http['qemu_sha256'] != qemu['qemu_sha256'] or
+            calendar_http['profile_sha256'] != qemu['profile_sha256'] or
+            calendar_http['helper_sha256'] != qemu['helper_sha256'] or
+            calendar_http['requirements'] != calendar_requirements or
+            set(calendar_http['flows']) != {'original','reconstructed'}):
+        raise ValueError('Calendar transport matrix used different inputs or omitted requirements')
+    for item in calendar_http['test_inputs']:
+        if hashlib.sha256((ROOT/item['file']).read_bytes()).hexdigest() != item['sha256']:
+            raise ValueError('Calendar test/reference changed since execution')
+    expected_cases = {(theme, case['name']) for theme in ('classic','simple','dial') for case in calendar_requirements}
+    for variant, flow in calendar_http['flows'].items():
+        if (not flow['passed'] or not all(flow['checks'].values()) or len(flow['cases']) != len(expected_cases) or
+                {(row['theme'],row['name']) for row in flow['cases']} != expected_cases):
+            raise ValueError('Calendar transport matrix omitted a theme or transition')
+        for row in flow['cases']:
+            required_case = next(case for case in calendar_requirements if case['name'] == row['name'])
+            if (any(row[key] != value for key,value in required_case.items()) or not row['passed'] or
+                    not row['natural_transition_without_resync'] or len(row['samples']) != 2 or
+                    not row['boundary_utc']-10 <= row['samples'][0]['packet_utc'] < row['boundary_utc'] or
+                    not row['boundary_utc']+2 <= row['samples'][1]['packet_utc'] <= row['boundary_utc']+6):
+                raise ValueError('Calendar transition lacked natural before/after samples')
+            for sample in row['samples']:
+                if (not sample['passed'] or not sample['code_unchanged'] or sample['compared_pixels'] != 57600 or
+                        sample['literal_replay_different_bytes'] or
+                        (variant == 'original' and not sample['matches_literal_factory_calendar']) or
+                        (variant == 'reconstructed' and (not sample['matches_iana'] or sample['corrected_different_pixels']))):
+                    raise ValueError('Calendar sample failed actual time or complete-frame checks')
     completed = qemu['completed_scenes']
     if (not completed['passed'] or completed['app_sha256'] != report['app_sha256'] or
             completed['native_elf_sha256'] != text['native_elf_sha256'] or
@@ -148,6 +181,7 @@ def main():
     qemu_sources.append(time_http['flows']['reconstructed']['sources'])
     qemu_sources.append(native_text['sources'])
     qemu_sources.append(regional['flows']['reconstructed']['sources'])
+    qemu_sources.append(calendar_http['flows']['reconstructed']['sources'])
     qemu_sources.extend(flows['reconstructed']['sources'] for flows in completed['scenes'].values())
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
@@ -215,6 +249,13 @@ def main():
                        'time_http': time_http,
                        'text_http': text_http,
                        'regional_http': regional,
+                       'calendar_http': {**{key:calendar_http[key] for key in
+                           ('passed','tested_at_utc','app_sha256','source_sha256','native_elf_sha256','qemu_sha256','profile_sha256','helper_sha256','test_inputs','requirements','scope')},
+                           'flows': {variant:{'passed':flow['passed'],'sources':flow['sources'],'checks':flow['checks'],
+                               'transitions':len(flow['cases']),
+                               'completed_frames':sum(len(row['samples']) for row in flow['cases']),
+                               'literal_iana_differences':sum(not sample['matches_iana'] for row in flow['cases'] for sample in row['samples'])}
+                               for variant,flow in calendar_http['flows'].items()}},
                        'completed_scenes': completed,
                        'boot_reset': {name: {key: row[key] for key in ('passed', 'checks', 'duration_seconds', 'network')}
                                       for name, row in qemu['boot_reset'].items()},

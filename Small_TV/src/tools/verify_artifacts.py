@@ -86,6 +86,24 @@ def main():
             completed['native_elf_sha256'] == state['native_elf_sha256'] and
             completed['qemu_sha256'] == groups['qemu']['qemu_sha256'],
             'Completed-frame gate tested a different executable/emulator')
+    calendar_network = groups['qemu']['calendar_http']
+    require(calendar_network['passed'] and calendar_network['app_sha256'] == app_sha and
+            calendar_network['source_sha256'] == manifest['source_sha256'] and
+            calendar_network['native_elf_sha256'] == state['native_elf_sha256'] and
+            calendar_network['qemu_sha256'] == groups['qemu']['qemu_sha256'] and
+            calendar_network['profile_sha256'] == groups['qemu']['profile_sha256'] and
+            calendar_network['helper_sha256'] == groups['qemu']['helper_sha256'],
+            'Natural calendar gate tested a different application/source/executable/emulator')
+    require(len(calendar_network['requirements']) == 14 and
+            set(calendar_network['flows']) == {'original','reconstructed'} and
+            all(flow['passed'] and all(flow['checks'].values()) and
+                flow.get('transitions',len(flow.get('cases',[]))) == 42 and
+                flow.get('completed_frames',sum(len(row['samples']) for row in flow.get('cases',[]))) == 84
+                for flow in calendar_network['flows'].values()),
+            'Natural calendar gate omitted a required theme/transition/frame')
+    for item in calendar_network['test_inputs']:
+        require(hashlib.sha256((REPO/item['file']).read_bytes()).hexdigest() == item['sha256'],
+                'Calendar input changed since execution: '+item['file'])
     generated = BUILD / 'verification-resources'
     subprocess.run([sys.executable, str(ROOT / 'tools/prepare_resources.py'), '--output', str(generated)], check=True)
     source = read(generated / 'source-manifest.json')
@@ -186,6 +204,11 @@ def main():
     report['qemu_completed_scene_report'] = '../qemu/completed-scenes-validation.json'
     report['qemu_completed_frames'] = sum(len(flow['samples']) for scene in completed['scenes'].values() for flow in scene.values())
     report['normalized_complete_scene_cases'] = len(completed['normalized']['cases'])
+    report['qemu_calendar_transport_report'] = '../qemu/calendar-transport-validation.json'
+    report['qemu_calendar_transitions'] = sum(flow.get('transitions',len(flow.get('cases',[])))
+                                            for flow in calendar_network['flows'].values())
+    report['qemu_calendar_completed_frames'] = sum(flow.get('completed_frames',sum(len(row['samples']) for row in flow.get('cases',[])))
+                                                 for flow in calendar_network['flows'].values())
     report['work_status'] = 'Reconstructed firmware; confirmed factory corrections are marked and tested'
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(f'Verified application {app_sha}: {len(app)} bytes, {partitions["factory"] - len(app)} bytes free')

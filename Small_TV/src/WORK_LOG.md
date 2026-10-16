@@ -527,3 +527,84 @@
   реальные UDP packets и все time-bearing themes/formats; затем adversarial JPEG,
   concurrency/long-run, browser и physical acceptance. Полное соответствие
   не заявлено; all_functionality_verified остаётся false.
+
+### 2026-10-16 — natural calendar transport matrix, работа над тестом
+
+- Проверены Git/main 09ff077b и незатронутые посторонние untracked patches.
+  Приложение/ELF/QEMU остаются прежними; физических действий нет.
+- Добавляется calendar_qemu.py: реальные HTTP settings/NTP packets, before/after
+  natural boundary без повторной синхронизации, read-only hardware breakpoints,
+  independent IANA и literal Newlib, full-frame factory instruction reference.
+  14 входных границ проверены по pinned TZif; используются все шесть сочетаний
+  date/hour modes в каждой теме. Это scoped matrix, не exhaustiveness claim.
+- Первый native simple/Sunday preflight остановился на ошибочном пути к NTP log
+  внутри case folder. Путь к VM log теперь передаётся явно. Второй preflight
+  остановился на HTTP timeout до отрисовки; причина ещё исследуется. Failed runs
+  сохранены и не объявляются проверкой прошивки. Добавлены HTTP/QEMU diagnostics.
+- После пропуска неподходящего entry harness теперь доходит до реального
+  return, затем ищет следующий entry: повторная установка breakpoint на том же
+  PC могла бы остановить ту же инструкцию вместо продвижения гостя.
+
+- Factory ADV handler 0x4200e9ea не сбрасывает SNTP init; city handler сбрасывает
+  его в 0x4200f3d4 и sync в 0x4200f3dc. Архивирован полный advanced handler.
+  Первый повтор смешал запоздалый city reply с ADV; после ожидания initialized/
+  actual-sync наблюдение подтвердило отсутствие нового reply за 3.01 guest s.
+  Для следующего epoch factory использует реальный city re-entry. Native
+  перенастраивает клиент по изменившемуся NTP host самостоятельно.
+- Все три factory Sunday themes прошли literal full-frame replay. Native
+  reference сначала выявил различие представлений int/double текущей температуры
+  в самом harness; проверено truncation-to-int в production weather_parser,
+  canonical observer теперь требует exact integral value. App не менялась.
+- `calendar-transport-latency-20261016` прошёл native classic/simple/dial Sunday,
+  обе полные картинки в каждой теме совпали с factory corrected reference.
+  Один POST: 5.75 guest / 8.14 host seconds, остальные короче. Новый календарный
+  HTTP helper измеряет обе длительности и имеет guest bound 6 s / host guard
+  20 s. Причина задержки остаётся H09/network вопросом, не объявлена решённой.
+- Full calendar-final-20261016 запущен (shell 97647), producer/test inputs
+  заморожены, app/source/ELF по-прежнему 9e4f856a / 6ab9c80f / 7e34a29b.
+  Host 3,884, platform 29, JS/integrity/timezone-source уже прошли; RV32/QEMU
+  продолжаются. Старые опубликованные результаты пока не заменены.
+- При read-only анализе найден следующий алгоритмический участок: native
+  persistence debounce = 1 s, factory = 50 main-loop steps (100 ms delay плюс
+  body/blocking weather), save branch только в active-clock path. Машинные
+  адреса 0x420090e2..f8/0x4200916a и loop delay 0x42008fd2 проверены в bounded
+  export .build/small-tv-save-delay-assembly. Требует отдельного coalescing test;
+  связь с HTTP latency не установлена. Текущий application image не меняется.
+
+- Завершённый ассемблерный аудит ADV сохранён отдельным commit `e4195bb9` и
+  отправлен в main; origin/main подтверждён как e4195bb9aa86636c5b64b8bc5bcebc491b5b45a0.
+  Календарный test module и новые обязательные gates остаются незакоммиченными
+  до полного результата. Full process 97647 подтверждён live; прошли также
+  boot/reset/SNTP и первоначальная AP→STA/persistence настройка обеих прошивок.
+
+- Полный calendar-final завершился exit 1: factory 42/42 перехода прошли;
+  reconstructed classic прошёл Sunday/year/month/leap-start/leap-end. Затем
+  HTTP /SetTimeModeValue вернул 200 за 6.127902 guest / 8.718 host s, нарушив
+  новый предел 6 guest s. Новый общий passing report не публикуется, оставшиеся
+  native transitions и subsequent completed-scenes не объявляются выполненными.
+  Сессия 97647 терминальная, повторять poll или запускать её заново не нужно.
+- В собственной отдельной ветке offline-clock восстановлены active dispatch и
+  retained station IP, новые 33 platform cases проходят; реальные RV32 network
+  traces показывают negative старого app и pass кандидата 072135ee. Полные
+  оригинальные/compiled instructions и scoped candidate reports сохранены в
+  worktree. Full QEMU/natural RF loss ещё требуются; main app не заменён.
+- Уточнён persistence probe: factory save на 51-м eligible pass при initial 50.
+  Модель 100-ms pass даёт single 5.1 s / native 1 s; burst один / три save.
+  Factory tick rate не измерялся; inactive/weather phases — explicit model
+  inputs, не выполнение целого FreeRTOS main. Связь с HTTP задержкой не доказана.
+
+- Offline candidate сохранён отдельным commit `6f10bc46` и pushed в
+  `origin/codex/small-tv-offline-clock`, remote SHA сверён. Перед commit:
+  50 production inputs, actual network adapters/test bytes, 24 platform/stub
+  files и LFS app/ELF identity совпали с tested bytes. 33 / 1,181,610 platform
+  checks. Общий main app и его published evidence остаются 9e4f856a.
+- Независимый real-TCP probe с пассивным filter-dump дал 60 POST и три задержки
+  около 6 guest s. В них первый SYN не дал SYN-ACK, повтор SYN через 5.82–5.94 s,
+  после actual HTTP arrival headers вернулись за 42–49 ms. Это свидетельство
+  транспортной фазы, не доказательство конкретного RX/SDK дефекта. Две ранние
+  попытки probe завершились на имени backend и неинициализированных harness
+  globals; они сохранены как failed diagnostics. Третья VM закрыта.
+- Failed calendar и обезличенная TCP-сводка сохраняются отдельно. Полный passing
+  отчёт не заменён; six-guest-second gate не ослаблен. Для дальнейшей диагностики
+  отдельный QEMU worktree `.worktree/small-tv-wifi-link` от main 1c7e4c0512
+  собирает opt-in RX logging; canonical QEMU source/executable не меняются.

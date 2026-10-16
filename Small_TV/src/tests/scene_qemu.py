@@ -81,6 +81,9 @@ def inputs(observer,variant,theme,registers):
     if variant=='original':
         year,month,day,hour,minute,second,weekday=struct.unpack('<I6B',observer.memory(0x3fcbffc8,10))
         data=Inputs(year=year,month=month,day=day,hour=hour,minute=minute,second=second,weekday=weekday)
+        if theme=='simple':
+            data=replace(data,hour12=int.from_bytes(observer.memory(0x3fcb7b9c+0x170,4),'little'),
+                         date_format=int.from_bytes(observer.memory(0x3fcb7b9c+0x17c,4),'little'))
         if theme=='classic':
             raw=0x3fcb7b9c
             integer=lambda offset:int.from_bytes(observer.memory(raw+offset,4),'little')
@@ -104,9 +107,12 @@ def inputs(observer,variant,theme,registers):
                 code=next(row['code'] for row in manifest['weather'] if int(row['flash_offset'],16)==pointer)
                 data=replace(data,icon=code,retained_icon=not data.valid)
     else:
-        tm_address=registers['a1'] if theme=='classic' else registers['a0']
+        tm_address=registers['a0'] if theme=='dial' else registers['a1']
         second,minute,hour,day,month,year,weekday,_,_=struct.unpack('<9i',observer.memory(tm_address,36))
         data=Inputs(year=year+1900,month=month+1,day=day,hour=hour,minute=minute,second=second,weekday=weekday)
+        if theme=='simple':
+            size,fields=layout('tv_settings_t'); raw=observer.memory(registers['a0'],size)
+            data=replace(data,hour12=raw[fields['hour12']],date_format=raw[fields['date_format']])
         if theme=='classic':
             size,fields=layout('tv_settings_t'); raw=observer.memory(registers['a0'],size)
             text=lambda name:raw[fields[name]:].split(b'\0')[0].decode('ascii')
@@ -114,11 +120,14 @@ def inputs(observer,variant,theme,registers):
             cache=observer.memory(registers['a2'],weather_size)
             weather_text=lambda name:cache[weather_fields[name]:].split(b'\0')[0].decode('ascii')
             number=lambda name:struct.unpack_from('<d',cache,weather_fields[name])[0]
+            temperature=number('temperature_c')
+            if temperature!=int(temperature):
+                raise AssertionError('Observed temperature violates the factory integer-Celsius contract')
             data=replace(data,city=text('city'),animation=raw[fields['animation']],
                          fahrenheit=raw[fields['fahrenheit']],hour12=raw[fields['hour12']],miles=raw[fields['miles']],
                          date_format=raw[fields['date_format']],valid=bool(cache[weather_fields['valid']]),
                          minimum=number('temperature_min_c'),maximum=number('temperature_max_c'),wind=number('wind_mps'),
-                         temperature=number('temperature_c'),humidity=struct.unpack_from('<i',cache,weather_fields['humidity'])[0],
+                         temperature=int(temperature),humidity=struct.unpack_from('<i',cache,weather_fields['humidity'])[0],
                          main=weather_text('main'),description=weather_text('description'),direction=weather_text('wind_direction'),
                          generation=struct.unpack_from('<I',cache,weather_fields['generation'])[0],step=registers['a3'])
             data=replace(data,icon=weather_text('icon') or '01d')

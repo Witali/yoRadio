@@ -1,0 +1,36 @@
+{
+  "scope": "Passive QEMU Ethernet PCAP in an isolated synthetic station; relative timestamps only. No live firmware writes or retries by the probe client.",
+  "is_passing_gate": false,
+  "app_sha256": "9e4f856a45fb3526eb2032f08f948c1354e8ba80065d1b4b32242f2d0c94f03c",
+  "source_sha256": "6ab9c80f0d245a4fdd977b6028a453d95a6156de6172ee959ced5284159db51b",
+  "native_elf_sha256": "7e34a29babbb85c1d9f8f5eac8f01ce48e7748952ed6d5c4dcb0e31bc91a7170",
+  "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
+  "pcap_sha256": "c99d15bf9a72b53e569a02ec6f1c0a28a4efbbc60ef72f9790dc10ae14b30142",
+  "diagnostic_requests": 60,
+  "maximum_guest_seconds": 6.078634000000001,
+  "delayed_posts": [
+    {
+      "path": "/SetTimeModeValue",
+      "repeated_syn_seconds": 5.892604,
+      "request_arrival_seconds": 5.94118,
+      "response_header_seconds": 5.990411,
+      "request_to_response_header_seconds": 0.049231
+    },
+    {
+      "path": "/SetTimeModeValue",
+      "repeated_syn_seconds": 5.824089,
+      "request_arrival_seconds": 5.86888,
+      "response_header_seconds": 5.910454,
+      "request_to_response_header_seconds": 0.041574
+    },
+    {
+      "path": "/SetTimeModeValue",
+      "repeated_syn_seconds": 5.936945,
+      "request_arrival_seconds": 5.986995,
+      "response_header_seconds": 6.033045,
+      "request_to_response_header_seconds": 0.04605
+    }
+  ],
+  "conclusion": "Three delayed POST flows spend most of their time awaiting SYN retransmission; HTTP response headers follow request arrival within 50 ms. This does not identify which QEMU DMA, network or SDK layer lost the first SYN.",
+  "limitations": "A diagnostic observation, not a full H09 concurrency/performance or physical result. Original PCAP and uncommitted probe/parser are retained in the local ignored diagnostic directory; raw addresses, ports and absolute timestamps are not published."
+}

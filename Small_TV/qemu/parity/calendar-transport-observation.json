@@ -1,0 +1,3636 @@
+{
+  "passed": false,
+  "tested_at_utc": "2026-10-16T16:23:55.925570+00:00",
+  "app_sha256": "9e4f856a45fb3526eb2032f08f948c1354e8ba80065d1b4b32242f2d0c94f03c",
+  "source_sha256": "6ab9c80f0d245a4fdd977b6028a453d95a6156de6172ee959ced5284159db51b",
+  "native_elf_sha256": "7e34a29babbb85c1d9f8f5eac8f01ce48e7748952ed6d5c4dcb0e31bc91a7170",
+  "requirements": [
+    {
+      "name": "sunday",
+      "country": "CN",
+      "kind": "weekday",
+      "boundary_utc": 1792252800,
+      "date_format": 0,
+      "hour12": 0,
+      "iana_before": "2026-10-17T23:59:59+08:00",
+      "iana_after": "2026-10-18T00:00:00+08:00"
+    },
+    {
+      "name": "new-year",
+      "country": "CN",
+      "kind": "year",
+      "boundary_utc": 1767196800,
+      "date_format": 1,
+      "hour12": 0,
+      "iana_before": "2025-12-31T23:59:59+08:00",
+      "iana_after": "2026-01-01T00:00:00+08:00"
+    },
+    {
+      "name": "month-end",
+      "country": "CN",
+      "kind": "month",
+      "boundary_utc": 1777564800,
+      "date_format": 2,
+      "hour12": 0,
+      "iana_before": "2026-04-30T23:59:59+08:00",
+      "iana_after": "2026-05-01T00:00:00+08:00"
+    },
+    {
+      "name": "leap-day-start",
+      "country": "CN",
+      "kind": "leap",
+      "boundary_utc": 1835366400,
+      "date_format": 0,
+      "hour12": 1,
+      "iana_before": "2028-02-28T23:59:59+08:00",
+      "iana_after": "2028-02-29T00:00:00+08:00"
+    },
+    {
+      "name": "leap-day-end",
+      "country": "CN",
+      "kind": "leap",
+      "boundary_utc": 1835452800,
+      "date_format": 1,
+      "hour12": 1,
+      "iana_before": "2028-02-29T23:59:59+08:00",
+      "iana_after": "2028-03-01T00:00:00+08:00"
+    },
+    {
+      "name": "noon",
+      "country": "CN",
+      "kind": "noon",
+      "boundary_utc": 1767240000,
+      "date_format": 2,
+      "hour12": 1,
+      "iana_before": "2026-01-01T11:59:59+08:00",
+      "iana_after": "2026-01-01T12:00:00+08:00"
+    },
+    {
+      "name": "gb-spring",
+      "country": "GB",
+      "kind": "dst-forward",
+      "boundary_utc": 1774746000,
+      "date_format": 0,
+      "hour12": 0,
+      "iana_before": "2026-03-29T00:59:59+00:00",
+      "iana_after": "2026-03-29T02:00:00+01:00"
+    },
+    {
+      "name": "gb-autumn",
+      "country": "GB",
+      "kind": "dst-backward",
+      "boundary_utc": 1792890000,
+      "date_format": 1,
+      "hour12": 0,
+      "iana_before": "2026-10-25T01:59:59+01:00",
+      "iana_after": "2026-10-25T01:00:00+00:00"
+    },
+    {
+      "name": "us-spring",
+      "country": "US-E",
+      "kind": "dst-forward",
+      "boundary_utc": 1772953200,
+      "date_format": 2,
+      "hour12": 0,
+      "iana_before": "2026-03-08T01:59:59-05:00",
+      "iana_after": "2026-03-08T03:00:00-04:00"
+    },
+    {
+      "name": "us-autumn",
+      "country": "US-E",
+      "kind": "dst-backward",
+      "boundary_utc": 1793512800,
+      "date_format": 0,
+      "hour12": 1,
+      "iana_before": "2026-11-01T01:59:59-04:00",
+      "iana_after": "2026-11-01T01:00:00-05:00"
+    },
+    {
+      "name": "au-spring",
+      "country": "AU-E",
+      "kind": "dst-forward",
+      "boundary_utc": 1791043200,
+      "date_format": 1,
+      "hour12": 1,
+      "iana_before": "2026-10-04T01:59:59+10:00",
+      "iana_after": "2026-10-04T03:00:00+11:00"
+    },
+    {
+      "name": "au-autumn",
+      "country": "AU-E",
+      "kind": "dst-backward",
+      "boundary_utc": 1775318400,
+      "date_format": 2,
+      "hour12": 1,
+      "iana_before": "2026-04-05T02:59:59+11:00",
+      "iana_after": "2026-04-05T02:00:00+10:00"
+    },
+    {
+      "name": "fractional-midnight",
+      "country": "NP",
+      "kind": "fractional",
+      "boundary_utc": 1767291300,
+      "date_format": 0,
+      "hour12": 0,
+      "iana_before": "2026-01-01T23:59:59+05:45",
+      "iana_after": "2026-01-02T00:00:00+05:45"
+    },
+    {
+      "name": "post-2038-midnight",
+      "country": "IN",
+      "kind": "post-2038",
+      "boundary_utc": 2147538600,
+      "date_format": 1,
+      "hour12": 0,
+      "iana_before": "2038-01-19T23:59:59+05:30",
+      "iana_after": "2038-01-20T00:00:00+05:30"
+    }
+  ],
+  "qemu_sha256": "c970591d626c7500cccd00121ba52667998ebeb091388acd2af46c22cc10bea6",
+  "helper_sha256": {
+    "small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+  },
+  "profile_sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+  "test_inputs": [
+    {
+      "file": "Small_TV/src/tests/calendar_qemu.py",
+      "sha256": "cb0f6459979d1bf084a421e324709a6a9e84003a76c575bdaff7d85a387b8fec"
+    },
+    {
+      "file": "Small_TV/src/tests/scene_qemu.py",
+      "sha256": "797304412870bee54e2af631833d84cbd9e7c114f643fd60a6e60ce64e09098c"
+    },
+    {
+      "file": "Small_TV/src/tests/gdb_observer.py",
+      "sha256": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83"
+    },
+    {
+      "file": "Small_TV/src/tests/frame_replay.py",
+      "sha256": "5a7ed3dbb6738fa2002e6aaecacdf3b0bab769fa4e2e9a12f52cee7ecb253251"
+    },
+    {
+      "file": "Small_TV/src/tests/calendar_oracle.py",
+      "sha256": "e0b4fa1a9a32658f3f809e149e44c622068202a890020fd3a79abb1295f09b06"
+    },
+    {
+      "file": "Small_TV/src/tests/machine_oracle.py",
+      "sha256": "d3089746358af8775a72e46d4081764ad30a74f749006599d9e08aed28d4d4ed"
+    },
+    {
+      "file": "Small_TV/src/tests/classic_oracle.py",
+      "sha256": "92401ddcf595125ae6108dbcd65f54cc276e16f531f2b5952dfcc9e082dd5667"
+    },
+    {
+      "file": "Small_TV/src/tests/weather_render_oracle.py",
+      "sha256": "ccc566ba5ab138340c269c34b5e12cefbf16e881d3c08b1c1da7b286af76f724"
+    },
+    {
+      "file": "Small_TV/src/tests/jpeg_oracle.py",
+      "sha256": "d4156b0796c6b9a0d30d343107c748d98334eaf81bba955a680855f2a1711ca1"
+    },
+    {
+      "file": "Small_TV/src/tests/timezone_oracle.py",
+      "sha256": "d382200126c7d3e3594c279b1a2fb68c2261cdf2ab7122355b32c1999694970e"
+    },
+    {
+      "file": "Small_TV/src/tests/regional_qemu.py",
+      "sha256": "99432c612416fde7eb7f826262bd9607ab611cedf5e4816253032c6c2c808b37"
+    },
+    {
+      "file": "Small_TV/src/tests/time_qemu.py",
+      "sha256": "ef7e8ea96884e0ed87c16bdf2648465f32700dd047903231f3fc608811d534c0"
+    },
+    {
+      "file": "Small_TV/src/tests/weather_qemu.py",
+      "sha256": "4b47d08490fe513159bd8478ac58b4a341742aaee236ee18edce46a71e87a5e5"
+    },
+    {
+      "file": "Small_TV/src/tests/control_oracle.py",
+      "sha256": "d58c6efd78e7a7d19ed8574cd2da7bed831072741ab28f67cd2c7a2111f6cc0a"
+    },
+    {
+      "file": "Small_TV/src/tests/oracle-requirements.txt",
+      "sha256": "3ac351c1e919f4b505b9e5f9951783babeffd0a599ecd9a69ae4644bc2757967"
+    },
+    {
+      "file": "Small_TV/qemu/parity/compare.py",
+      "sha256": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84"
+    },
+    {
+      "file": "Small_TV/src/resources/timezones/manifest.json",
+      "sha256": "1005340de075284d9e46b61a3bb5fbc6632799ac7ee808636b811bf0bb209745"
+    },
+    {
+      "file": "Small_TV/src/tools/prepare_timezones.py",
+      "sha256": "355a16a0c565c423a108f2094ffe36ec389b27bb88215135a34d61745368a148"
+    },
+    {
+      "file": "Small_TV/qemu/profiles/small-tv-c2.json",
+      "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+    },
+    {
+      "file": "Small_TV/src/resources/timezones/America__New_York.tzif",
+      "sha256": "d7f2206b3a45989fc9ad63d558922532fa7352280d5f87176bf1db79cb1d1fa9"
+    },
+    {
+      "file": "Small_TV/src/resources/timezones/Asia__Kathmandu.tzif",
+      "sha256": "76b8f1bfe072231a1d9e7f8501310e27c0d08048c48f7422860b6477c142c438"
+    },
+    {
+      "file": "Small_TV/src/resources/timezones/Asia__Kolkata.tzif",
+      "sha256": "3a00bdbe1bc4959e727567c730ba51b03455ecd455f7c190c5ad14386eb79b0d"
+    },
+    {
+      "file": "Small_TV/src/resources/timezones/Asia__Shanghai.tzif",
+      "sha256": "bf8b7ed82fe6e63e6d98f8cea934eeac901cd16aba85eb5755ce3f8b4289ea8a"
+    },
+    {
+      "file": "Small_TV/src/resources/timezones/Australia__Sydney.tzif",
+      "sha256": "820d45a868a88f81c731d5b2c758b4ed000039b6260a80433f8e0f094a604b59"
+    },
+    {
+      "file": "Small_TV/src/resources/timezones/Europe__London.tzif",
+      "sha256": "676541f0b8ad457c744c093f807589adcad909e3fd03f901787d08786eedbd33"
+    }
+  ],
+  "scope": "Follow natural calendar/DST transitions from real NTP packets to complete LCD frames.\n\nOnly synthetic HTTP settings and external NTP/weather responses are supplied.\nHardware breakpoints and bounded reads observe immutable running programs.\nIndependent pinned IANA TZif and real factory RV32 renderers form the references.\n",
+  "expected_negative": true,
+  "error": "Settings response failed its six-guest-second bound: {'path': '/SetTimeModeValue', 'status': 200, 'guest_seconds': 6.127902000000006, 'host_seconds': 8.71799999999348}",
+  "flows": {
+    "original": {
+      "passed": true,
+      "completed_transitions": 42,
+      "completed_frames": 84,
+      "cases": [
+        {
+          "theme": "classic",
+          "name": "sunday",
+          "country": "CN",
+          "kind": "weekday",
+          "boundary_utc": 1792252800,
+          "date_format": 0,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1792252790.190424,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "4ab013be83dea3013b89fcc5eb4669649255e14e71e9072354d3684cbe27296a",
+              "expected_rgb_sha256": "4ab013be83dea3013b89fcc5eb4669649255e14e71e9072354d3684cbe27296a"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1792252802.170035,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "08c2c63ea764c4226f834f9be54ca7d6768676bd1c3ead717d784591caad8c82",
+              "expected_rgb_sha256": "08c2c63ea764c4226f834f9be54ca7d6768676bd1c3ead717d784591caad8c82"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "new-year",
+          "country": "CN",
+          "kind": "year",
+          "boundary_utc": 1767196800,
+          "date_format": 1,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1767196790.169684,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 551,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "9ebb016535066f81d0c5bebd46c6c574956e6ae00e05441a34329b16c92690d5",
+              "expected_rgb_sha256": "290829b665dcc49c14c0e7aa57c8b7aec440705f502bba9cec8e61fec83e4803"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1767196802.170594,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "40afdb4fb3cd83a09041d096ed35274d06cbc46ac6745bef665a123fef2811db",
+              "expected_rgb_sha256": "40afdb4fb3cd83a09041d096ed35274d06cbc46ac6745bef665a123fef2811db"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "month-end",
+          "country": "CN",
+          "kind": "month",
+          "boundary_utc": 1777564800,
+          "date_format": 2,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1777564790.120398,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 619,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "ef74b543aa942c6e0aae0dca75f1604238128e98dafe164ff08b389ea13ca75c",
+              "expected_rgb_sha256": "6f60af214d4910557402cea6805729dc9fd2f81f7ff49126f0c8513eca19cc52"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1777564802.111216,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "b130c777861b93380f01ebed84aa821bc04ff19a5dad5c7b1f76885e8429a779",
+              "expected_rgb_sha256": "b130c777861b93380f01ebed84aa821bc04ff19a5dad5c7b1f76885e8429a779"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "leap-day-start",
+          "country": "CN",
+          "kind": "leap",
+          "boundary_utc": 1835366400,
+          "date_format": 0,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1835366390.169648,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 460,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "dfd596d1051e15b689704975a34d6097650be8710d3c01f30a02c7b6918cad94",
+              "expected_rgb_sha256": "7527ef707324189b6da02fc91e25a9367071f7093b6c5e387bc765349ead4a84"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1835366402.181407,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "9ef5fc55bb90848b2986b15a641bae755c70f3b203c06d0a2f517f1a776dab9f",
+              "expected_rgb_sha256": "9ef5fc55bb90848b2986b15a641bae755c70f3b203c06d0a2f517f1a776dab9f"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "leap-day-end",
+          "country": "CN",
+          "kind": "leap",
+          "boundary_utc": 1835452800,
+          "date_format": 1,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1835452790.210027,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 326,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "b48add792da4d8a84dce1807d7ed093a83295b24a8021d68a7af1b35aa7bdda8",
+              "expected_rgb_sha256": "b63dd87c5d6222fd09bca9a805ea1b2c28f7e9c0a37c67bc0b08eecb3cb1708d"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1835452802.132213,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "0aa5fe1c0380416d6a8777e0e3b0f229508c8bcb14ccaad8243b34065dfe19c4",
+              "expected_rgb_sha256": "0aa5fe1c0380416d6a8777e0e3b0f229508c8bcb14ccaad8243b34065dfe19c4"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "noon",
+          "country": "CN",
+          "kind": "noon",
+          "boundary_utc": 1767240000,
+          "date_format": 2,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1767239990.151183,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 345,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "be2dc45c7fb51fc67941eb3d3148dcd61f784b6606ba67c3246226db12683050",
+              "expected_rgb_sha256": "11d5255e4d43b75d5012a4f941fb75cd5da994ac3d9be1c79e85dc688c6d97a2"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1767240002.139837,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "c15c6fb6a4648660e73f50d4c60dc54ea8cbc63545c28ced0c231ada6d29b003",
+              "expected_rgb_sha256": "c15c6fb6a4648660e73f50d4c60dc54ea8cbc63545c28ced0c231ada6d29b003"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "gb-spring",
+          "country": "GB",
+          "kind": "dst-forward",
+          "boundary_utc": 1774746000,
+          "date_format": 0,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1774745990.141409,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 709,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "4beed25ab5fdbacba813c8531312d582e3dea8dba2607d1ad7878811536ba032",
+              "expected_rgb_sha256": "e551db4699b374ba2502f041dd7189bc73efa14836f8734206946cdd9143de30"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1774746002.099957,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "820b32197dae3cb80203c7c8acb0bf7d69bc8f352a70d3fb58899b1d45a326ef",
+              "expected_rgb_sha256": "820b32197dae3cb80203c7c8acb0bf7d69bc8f352a70d3fb58899b1d45a326ef"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "gb-autumn",
+          "country": "GB",
+          "kind": "dst-backward",
+          "boundary_utc": 1792890000,
+          "date_format": 1,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1792889990.200947,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "1f58ac11ae6fa583682f96365aa690e803ff14cb32d4f8011633a4d0d17726c4",
+              "expected_rgb_sha256": "1f58ac11ae6fa583682f96365aa690e803ff14cb32d4f8011633a4d0d17726c4"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1792890002.190436,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "bbc5a9d13626c21ca16d945b6c09c260c518edff346067b83fae722d8338e73a",
+              "expected_rgb_sha256": "bbc5a9d13626c21ca16d945b6c09c260c518edff346067b83fae722d8338e73a"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "us-spring",
+          "country": "US-E",
+          "kind": "dst-forward",
+          "boundary_utc": 1772953200,
+          "date_format": 2,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1772953190.149694,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 536,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "61531a323561379fecfcfafad533926a38085076931f9d92588bbf0171bce4bd",
+              "expected_rgb_sha256": "315fb082a18b982c12b79c1f86545869478591866c102afa27454ca7b75c102e"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1772953202.11076,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "d84e420c185850d34883a64eae67b59fa7719d3886f7012214251b31326399eb",
+              "expected_rgb_sha256": "d84e420c185850d34883a64eae67b59fa7719d3886f7012214251b31326399eb"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "us-autumn",
+          "country": "US-E",
+          "kind": "dst-backward",
+          "boundary_utc": 1793512800,
+          "date_format": 0,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1793512790.250024,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 572,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "39d7fc245e1631963ca190c059c6ded2c38680cd6490c5be0eb4529894412793",
+              "expected_rgb_sha256": "3a143970ab0418ca33ed7f73812489dfd083523e9fbfd4286de52c948d639959"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1793512802.131137,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "7967d805a3788a22a444beb780d3bd8a2877278be00f3469c5078d2fb1e5a7f7",
+              "expected_rgb_sha256": "7967d805a3788a22a444beb780d3bd8a2877278be00f3469c5078d2fb1e5a7f7"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "au-spring",
+          "country": "AU-E",
+          "kind": "dst-forward",
+          "boundary_utc": 1791043200,
+          "date_format": 1,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1791043190.180223,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 164,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "c885b595ea8c6faab7d7166394f224768532f30b7be8d28a007d8262f69baa69",
+              "expected_rgb_sha256": "e51d6ffc847f35787411c3e87b59a0dc3c1d6b15bf9d5d428df39b5db0e6b113"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1791043202.030539,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "294003d57c2b3b27b7b7c3f7625173a4025290f1a799cdab56e0ca9cf64f6834",
+              "expected_rgb_sha256": "294003d57c2b3b27b7b7c3f7625173a4025290f1a799cdab56e0ca9cf64f6834"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "au-autumn",
+          "country": "AU-E",
+          "kind": "dst-backward",
+          "boundary_utc": 1775318400,
+          "date_format": 2,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1775318390.23048,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 279,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "87c26d3d38815d3104ecd528fefcc409e3f6983b3eaf9c1d7f82575956ac15ae",
+              "expected_rgb_sha256": "fab5eb31d304b1a69648a1cd0f9f922b83a51463b0190b88c9dfc08f826afdf9"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1775318402.190446,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "eaf2db4e8bed3a3b5ebf5af46008754f0f30a0fd8178e393558a6536bec82d88",
+              "expected_rgb_sha256": "eaf2db4e8bed3a3b5ebf5af46008754f0f30a0fd8178e393558a6536bec82d88"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "fractional-midnight",
+          "country": "NP",
+          "kind": "fractional",
+          "boundary_utc": 1767291300,
+          "date_format": 0,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1767291290.160218,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "4a1818ab684ccc2b4677e60455d8afc2d9b0d47ac5d4f8c807d7b9d8b6ffce34",
+              "expected_rgb_sha256": "4a1818ab684ccc2b4677e60455d8afc2d9b0d47ac5d4f8c807d7b9d8b6ffce34"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1767291302.159887,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "decaedb63902a108e20c055d7fb33cfbbb6306c7c23ed1a983ef563ba127fdd5",
+              "expected_rgb_sha256": "decaedb63902a108e20c055d7fb33cfbbb6306c7c23ed1a983ef563ba127fdd5"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "post-2038-midnight",
+          "country": "IN",
+          "kind": "post-2038",
+          "boundary_utc": 2147538600,
+          "date_format": 1,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 2147538590.110347,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "6dd47b156b0aab165785c543149ad503272648c64dba06d0ac8285ee26f7f969",
+              "expected_rgb_sha256": "6dd47b156b0aab165785c543149ad503272648c64dba06d0ac8285ee26f7f969"
+            },
+            {
+              "passed": true,
+              "packet_utc": 2147538602.230174,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "3a4061d33fd9b3f7cb8ffc5ab28c04201b6f889b2ce132a6c249738c1aedd110",
+              "expected_rgb_sha256": "3a4061d33fd9b3f7cb8ffc5ab28c04201b6f889b2ce132a6c249738c1aedd110"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "sunday",
+          "country": "CN",
+          "kind": "weekday",
+          "boundary_utc": 1792252800,
+          "date_format": 0,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1792252790.209608,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 2664,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "373487ddc2075ac4907bc1adbe58d051942d8505ab93b515156cea53eaf9a9d7",
+              "expected_rgb_sha256": "80f21e22c2ae3b3a74183eefcc7b442533a50dd953d6586e6bacc2edb7e93ac5"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1792252802.110365,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 2333,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "60042763e2a2edb282a0bb23d1684778ca74012e2d6886340216303afcf33fb8",
+              "expected_rgb_sha256": "28427cd8bd5e615de5742c49412e3bb245e8501b7413b784415f7243819774c0"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "new-year",
+          "country": "CN",
+          "kind": "year",
+          "boundary_utc": 1767196800,
+          "date_format": 1,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1767196790.139917,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 591,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "a200c04119db0ced333fb1773969544272283d56c9bf18861adb7f33d85d7f33",
+              "expected_rgb_sha256": "146e1ca23a5e68355ee4b8a63a3708ec336ede09c070d2a6a844394c5bf0bcab"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1767196802.240439,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 2540,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "a200c04119db0ced333fb1773969544272283d56c9bf18861adb7f33d85d7f33",
+              "expected_rgb_sha256": "0041a702eddc2526b9f0c5bf125f38fcbb67935937441256dc6284ae6a9c8a80"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "month-end",
+          "country": "CN",
+          "kind": "month",
+          "boundary_utc": 1777564800,
+          "date_format": 2,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1777564790.210287,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 803,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "eb3b6413b7845f1618fca47e44dfa935ad3a6b6a62c5d02c773c67b9a04637de",
+              "expected_rgb_sha256": "d1e456d3b1e0068de97fff0d0e11bfb261ff0497abc306345b1f8a4eac94f8a3"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1777564802.109577,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 2442,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f8a9d404e8e43d9932a7ea975375511e3892ec3c30d7d7c1452cc7112f084316",
+              "expected_rgb_sha256": "3751dca958aa2f9d45835af70975b7e6a2445acc26fc0c862264d2eb38c8c051"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "leap-day-start",
+          "country": "CN",
+          "kind": "leap",
+          "boundary_utc": 1835366400,
+          "date_format": 0,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1835366390.140939,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 529,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "dea4de40c94fa9d4342110c1360b592de5c433e8693bd87f1a7cea271963c08e",
+              "expected_rgb_sha256": "680c6bcc0ff35e9e097ab1b2d4996c0fb640fa65845c30de1a873eee801fb488"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1835366402.240659,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 3084,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "dea4de40c94fa9d4342110c1360b592de5c433e8693bd87f1a7cea271963c08e",
+              "expected_rgb_sha256": "88776f801521f6549a097f5d59b07c56c266e58501237fdbadcb125484152891"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "leap-day-end",
+          "country": "CN",
+          "kind": "leap",
+          "boundary_utc": 1835452800,
+          "date_format": 1,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1835452790.199921,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 239,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "b1ead4026546a371f9ab30d4e4e21035d01075a611867d7c9182c81fc716499f",
+              "expected_rgb_sha256": "b6d0615fbd5b568a549b02cd415479dc376e6c4a734729f1ee16df21da94a9f5"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1835452802.10009,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 3507,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "6cc5dcb30f196f235bb921463b6c37ab56dc3c084f525ce5dbbb61d2af774e6e",
+              "expected_rgb_sha256": "be88910159fb1e93fe5db66c870a058465a4c986547336ec3e4f600496d353cb"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "noon",
+          "country": "CN",
+          "kind": "noon",
+          "boundary_utc": 1767240000,
+          "date_format": 2,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1767239990.160016,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 849,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "dff87f28b30f9d25251e612277a75b9a6344d9075201af166587aad94c8407a1",
+              "expected_rgb_sha256": "54c75c8257230b26de3927575aac6f56091c451d2005ac8294d239e8fc0e725f"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1767240002.259789,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 2373,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "dff87f28b30f9d25251e612277a75b9a6344d9075201af166587aad94c8407a1",
+              "expected_rgb_sha256": "c23e03c5a450426e94edb36e877681b82c8af04f824687628cd97fa8deb19da3"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "gb-spring",
+          "country": "GB",
+          "kind": "dst-forward",
+          "boundary_utc": 1774746000,
+          "date_format": 0,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1774745990.199848,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 1584,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "5c964a52c0edc7d68e14664871ee2d3f424cea5c7d8de11080867f818bc8d71c",
+              "expected_rgb_sha256": "b124a561b539a64db995a5e05db4c56c110588aaad95216e847cc1c18dcd99b4"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1774746002.101044,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 1898,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "2686279d321b718c9d11dd6ca075b423e2790685d52f40d7f29661fffe842ace",
+              "expected_rgb_sha256": "fb94a698203a462a1e44ce11d6d47d4793b833aeb7f8059d721a09226b1233be"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "gb-autumn",
+          "country": "GB",
+          "kind": "dst-backward",
+          "boundary_utc": 1792890000,
+          "date_format": 1,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1792889990.130055,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 1302,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "b03af3d44b07ba7e248c68022452435308900fccc82dcce047716ad13b4643dd",
+              "expected_rgb_sha256": "ee8ab80afa5dbf08d80ea5d114b001463d31e3e7890879137622bedbdac367e7"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1792890002.23082,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 2674,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "bad24bda93bdeceebcdae52da2aa8b0b79ba70e5468c8fee73b4682061b0c844",
+              "expected_rgb_sha256": "6bcb00ef20a098e14d7038c26f445a230e514dc25ab94b6aade4733e13eb2401"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "us-spring",
+          "country": "US-E",
+          "kind": "dst-forward",
+          "boundary_utc": 1772953200,
+          "date_format": 2,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1772953190.210211,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 2218,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "ca1dc5097015eabe813bdd8d7bbd9724c219877ac99f7d78dab8600532ca7a11",
+              "expected_rgb_sha256": "efd9ae265dfc07d6d4467155558882c1299b940d12f89109d2f08486404035aa"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1772953202.110425,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 2363,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "5748fa8d36b1ee49cf1d47ae921f681730230892741c302d40f7673b44a5829b",
+              "expected_rgb_sha256": "9cd69db2ea16495745ded179d066bbfa41e23b7bd14b9712f383856ebb82f67a"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "us-autumn",
+          "country": "US-E",
+          "kind": "dst-backward",
+          "boundary_utc": 1793512800,
+          "date_format": 0,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1793512790.149629,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 1212,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "b6ee93d1faf372eb6072f76d8bda73b097d3ff318513d58a44fde8bb83c93c1f",
+              "expected_rgb_sha256": "40c48f9b4ce4826b85dd982747c5c5602ff3a6c4fd10fbfc917f1dd361861957"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1793512802.258746,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 1374,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "d426e5cdf0aee27e457c46ce4716dccc6e25d34e3b44d2770ceb7c0a927575bf",
+              "expected_rgb_sha256": "98b4c54ca4325c9b9c07314890a52ecf674b13f2376f9fe505129e3f1b970394"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "au-spring",
+          "country": "AU-E",
+          "kind": "dst-forward",
+          "boundary_utc": 1791043200,
+          "date_format": 1,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1791043190.220279,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 1133,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "05a6cc8dba87504156d1d9c56e8bc7135402fbd6d8a8db0e1bac6b0f1652a4b5",
+              "expected_rgb_sha256": "73d58b3ba17520c7c1c7aaf0cd61fc7f6ba1b29dc4312712eaafbcb6de6421b4"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1791043202.120993,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 1384,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "b6d975f2f38696633b0bd2dcccf512b15f0158e199baf3749eaca1854f90ccb3",
+              "expected_rgb_sha256": "b7228af60c28ef83331d65e2e40ff1d82bcfa7e3977c381adf15a7816a861804"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "au-autumn",
+          "country": "AU-E",
+          "kind": "dst-backward",
+          "boundary_utc": 1775318400,
+          "date_format": 2,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1775318390.260751,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 1045,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "9a91d803c7a13119e23b0cca6988983c7eb51bb42ac647792bb7590a921b44d5",
+              "expected_rgb_sha256": "79c035bf2ecd7c9464b6586cf006c7dbe025e26ce2ec3caca75a8b1141e6c0f2"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1775318402.16067,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 2350,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "9530d45692e96ea5207da74382060683f6590ccf92525339ec50afc04ef7d93d",
+              "expected_rgb_sha256": "efd19570a5d5a16159e21e5e98b3b0fc474ed51370a25d7185e6ed2cf0ccfac7"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "fractional-midnight",
+          "country": "NP",
+          "kind": "fractional",
+          "boundary_utc": 1767291300,
+          "date_format": 0,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1767291290.219675,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 3152,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f9a499922fccbe38f1d684b4d6a4ad63cf1a4ad090161b2a14b73242f70ae678",
+              "expected_rgb_sha256": "2e2d2e0eb4e87b0f472d222504c0ecbc681b0da95eb3796c618c6dd4aac02cf2"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1767291302.130488,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 152,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "c7a91ba383684b9f7d2892b045480640ce986011443be8b59785493caf491339",
+              "expected_rgb_sha256": "b9365b0448291bb7254b7f721ca0288cfbf9cfc09dea07190b6294d5ac6d08fd"
+            }
+          ]
+        },
+        {
+          "theme": "simple",
+          "name": "post-2038-midnight",
+          "country": "IN",
+          "kind": "post-2038",
+          "boundary_utc": 2147538600,
+          "date_format": 1,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 2147538590.140193,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 2523,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "9403957314ea7e1db6700005853b8ffb929655d882629b37e25ae51b216254cb",
+              "expected_rgb_sha256": "e39d75f175f41f973df7d470cfbf9f0038ef62b46b704ba83cfb92325b892c6e"
+            },
+            {
+              "passed": true,
+              "packet_utc": 2147538602.140246,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 3560,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "9403957314ea7e1db6700005853b8ffb929655d882629b37e25ae51b216254cb",
+              "expected_rgb_sha256": "fbc63be94e9fbaad29c355d87ce1b27b5471ad2e9e0e980bf11a20774a2d993d"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "sunday",
+          "country": "CN",
+          "kind": "weekday",
+          "boundary_utc": 1792252800,
+          "date_format": 0,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1792252790.210796,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 547,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "04afde4663066a487280471425ac2af15af07826fad7339ce926ce9fe06ff229",
+              "expected_rgb_sha256": "ca4eec6745fe5cf1348f0775850952147b24325a688b57e5feedb8b769a5568b"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1792252802.419536,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 598,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f792ed1574f26925a89dc155d28029bdd3bfd2087734719f9a5d6d3b000bbc6d",
+              "expected_rgb_sha256": "0b8a511ee972464c4300a684688f54d237c70d121eb9b1d606df7cf1d9f06619"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "new-year",
+          "country": "CN",
+          "kind": "year",
+          "boundary_utc": 1767196800,
+          "date_format": 1,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1767196790.81029,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 547,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "04afde4663066a487280471425ac2af15af07826fad7339ce926ce9fe06ff229",
+              "expected_rgb_sha256": "ca4eec6745fe5cf1348f0775850952147b24325a688b57e5feedb8b769a5568b"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1767196803.010354,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 598,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f792ed1574f26925a89dc155d28029bdd3bfd2087734719f9a5d6d3b000bbc6d",
+              "expected_rgb_sha256": "0b8a511ee972464c4300a684688f54d237c70d121eb9b1d606df7cf1d9f06619"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "month-end",
+          "country": "CN",
+          "kind": "month",
+          "boundary_utc": 1777564800,
+          "date_format": 2,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1777564791.239869,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 485,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "db3d8cd72888549d4489e1337b29bdc40ca9429a135ddc5d79765b98954c16c4",
+              "expected_rgb_sha256": "04dfc2a8f67644496fe699e26e3979871c20094cc4e97efe76028974aa2bf6b3"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1777564802.380734,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 598,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f792ed1574f26925a89dc155d28029bdd3bfd2087734719f9a5d6d3b000bbc6d",
+              "expected_rgb_sha256": "0b8a511ee972464c4300a684688f54d237c70d121eb9b1d606df7cf1d9f06619"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "leap-day-start",
+          "country": "CN",
+          "kind": "leap",
+          "boundary_utc": 1835366400,
+          "date_format": 0,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1835366390.499456,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 547,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "04afde4663066a487280471425ac2af15af07826fad7339ce926ce9fe06ff229",
+              "expected_rgb_sha256": "ca4eec6745fe5cf1348f0775850952147b24325a688b57e5feedb8b769a5568b"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1835366402.65872,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 598,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f792ed1574f26925a89dc155d28029bdd3bfd2087734719f9a5d6d3b000bbc6d",
+              "expected_rgb_sha256": "0b8a511ee972464c4300a684688f54d237c70d121eb9b1d606df7cf1d9f06619"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "leap-day-end",
+          "country": "CN",
+          "kind": "leap",
+          "boundary_utc": 1835452800,
+          "date_format": 1,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1835452791.009731,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 547,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "04afde4663066a487280471425ac2af15af07826fad7339ce926ce9fe06ff229",
+              "expected_rgb_sha256": "ca4eec6745fe5cf1348f0775850952147b24325a688b57e5feedb8b769a5568b"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1835452803.210265,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 588,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "ef26e4e923fc6ba7f948b508186c2eeac093605f98345a94d9f52f5bcef056e9",
+              "expected_rgb_sha256": "2e4869a84e26fb5029decf61b0db31c8a89b7cd92135fec8472c8315054ab507"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "noon",
+          "country": "CN",
+          "kind": "noon",
+          "boundary_utc": 1767240000,
+          "date_format": 2,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1767239990.625962,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 547,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "04afde4663066a487280471425ac2af15af07826fad7339ce926ce9fe06ff229",
+              "expected_rgb_sha256": "ca4eec6745fe5cf1348f0775850952147b24325a688b57e5feedb8b769a5568b"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1767240002.826024,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 598,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f792ed1574f26925a89dc155d28029bdd3bfd2087734719f9a5d6d3b000bbc6d",
+              "expected_rgb_sha256": "0b8a511ee972464c4300a684688f54d237c70d121eb9b1d606df7cf1d9f06619"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "gb-spring",
+          "country": "GB",
+          "kind": "dst-forward",
+          "boundary_utc": 1774746000,
+          "date_format": 0,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1774745990.850891,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 572,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f4f4ea5b22200a857ee4a67613cfe6e673024c88ca663514aa74d9bfa83bcbb5",
+              "expected_rgb_sha256": "d85121b8a5ac573c548082a201bd986a750e0c699d7d0461b0ae80f701374602"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1774746003.050417,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 632,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "43dd8cfb5822c0b7be9ed79c15a7c63b25d1e01315247df37a03da7ed3d4dfb3",
+              "expected_rgb_sha256": "042a93f8cf1b9c24ab804fb67868d165e68a4fbd31b120f7fad9139a66027a94"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "gb-autumn",
+          "country": "GB",
+          "kind": "dst-backward",
+          "boundary_utc": 1792890000,
+          "date_format": 1,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1792889990.320215,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 572,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f4f4ea5b22200a857ee4a67613cfe6e673024c88ca663514aa74d9bfa83bcbb5",
+              "expected_rgb_sha256": "d85121b8a5ac573c548082a201bd986a750e0c699d7d0461b0ae80f701374602"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1792890002.511077,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 632,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "43dd8cfb5822c0b7be9ed79c15a7c63b25d1e01315247df37a03da7ed3d4dfb3",
+              "expected_rgb_sha256": "042a93f8cf1b9c24ab804fb67868d165e68a4fbd31b120f7fad9139a66027a94"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "us-spring",
+          "country": "US-E",
+          "kind": "dst-forward",
+          "boundary_utc": 1772953200,
+          "date_format": 2,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1772953190.207583,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 572,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f4f4ea5b22200a857ee4a67613cfe6e673024c88ca663514aa74d9bfa83bcbb5",
+              "expected_rgb_sha256": "d85121b8a5ac573c548082a201bd986a750e0c699d7d0461b0ae80f701374602"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1772953202.40732,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 768,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "80a60ab07db62e872fd48ea6d18f5c7a29e32d2fc91722b155ba0e7fcfd05deb",
+              "expected_rgb_sha256": "a8b30b1bcb77c27d15ac7b359ff77e54b8bc1f4ed946d89697f296f6231e0f9b"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "us-autumn",
+          "country": "US-E",
+          "kind": "dst-backward",
+          "boundary_utc": 1793512800,
+          "date_format": 0,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1793512790.560601,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 572,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f4f4ea5b22200a857ee4a67613cfe6e673024c88ca663514aa74d9bfa83bcbb5",
+              "expected_rgb_sha256": "d85121b8a5ac573c548082a201bd986a750e0c699d7d0461b0ae80f701374602"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1793512802.750444,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 695,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "9e38eafea3e4433d2ef0c549b66cb3dfed4a82557671df49c4fb5e0d2b905877",
+              "expected_rgb_sha256": "bed1e66983ea41726345fb027a4d8615b0e3cb36e3e1aa9a25dd11c63a397c1c"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "au-spring",
+          "country": "AU-E",
+          "kind": "dst-forward",
+          "boundary_utc": 1791043200,
+          "date_format": 1,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1791043190.961047,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 706,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "43c9eeae2f05b8b84c76dae2cf80a2783a7cb504b17d05dc7cd8199edb986c92",
+              "expected_rgb_sha256": "968ab61599dff59439b2db3e3ce01f1753cd141e877008b8a2de4e2de33bb906"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1791043202.070046,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 759,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "288382c21e262c7042b79368542d2fb8d1afdf96dd57c7a72882aba5dc5dfca8",
+              "expected_rgb_sha256": "e6d4c4ca2313ff65180e4226b748d134c3ba5da0899a436fe33af01e58327b47"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "au-autumn",
+          "country": "AU-E",
+          "kind": "dst-backward",
+          "boundary_utc": 1775318400,
+          "date_format": 2,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1775318391.151202,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 644,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "9d6e6814dee1deff9d3be8a28e6bc643dffd68de81d0da68bf6acc2209269940",
+              "expected_rgb_sha256": "800df7c9f6f45742f01f4085015259bf92f63254507b22e104bf1c11cac77953"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1775318402.250508,
+              "matches_iana": false,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 768,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "80a60ab07db62e872fd48ea6d18f5c7a29e32d2fc91722b155ba0e7fcfd05deb",
+              "expected_rgb_sha256": "a8b30b1bcb77c27d15ac7b359ff77e54b8bc1f4ed946d89697f296f6231e0f9b"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "fractional-midnight",
+          "country": "NP",
+          "kind": "fractional",
+          "boundary_utc": 1767291300,
+          "date_format": 0,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1767291290.340025,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 547,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "04afde4663066a487280471425ac2af15af07826fad7339ce926ce9fe06ff229",
+              "expected_rgb_sha256": "ca4eec6745fe5cf1348f0775850952147b24325a688b57e5feedb8b769a5568b"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1767291302.480993,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 598,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f792ed1574f26925a89dc155d28029bdd3bfd2087734719f9a5d6d3b000bbc6d",
+              "expected_rgb_sha256": "0b8a511ee972464c4300a684688f54d237c70d121eb9b1d606df7cf1d9f06619"
+            }
+          ]
+        },
+        {
+          "theme": "dial",
+          "name": "post-2038-midnight",
+          "country": "IN",
+          "kind": "post-2038",
+          "boundary_utc": 2147538600,
+          "date_format": 1,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 2147538590.400268,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 547,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "04afde4663066a487280471425ac2af15af07826fad7339ce926ce9fe06ff229",
+              "expected_rgb_sha256": "ca4eec6745fe5cf1348f0775850952147b24325a688b57e5feedb8b769a5568b"
+            },
+            {
+              "passed": true,
+              "packet_utc": 2147538602.55104,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 598,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f792ed1574f26925a89dc155d28029bdd3bfd2087734719f9a5d6d3b000bbc6d",
+              "expected_rgb_sha256": "0b8a511ee972464c4300a684688f54d237c70d121eb9b1d606df7cf1d9f06619"
+            }
+          ]
+        }
+      ],
+      "checks": {
+        "all_pixels_checked": true,
+        "natural_transitions": true,
+        "hardware_breakpoints_only": true,
+        "real_ntp_packets": true,
+        "no_guest_state_writes": true,
+        "executable_media_unchanged": true,
+        "no_panic": true
+      },
+      "http_observations": [
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14164699999999897,
+          "host_seconds": 0.3120000000053551
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13083600000000217,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1440969999999986,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14606900000000067,
+          "host_seconds": 0.2340000000258442
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.13764500000000268,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14062599999999748,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13789899999999733,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.1416719999999998,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14368799999999737,
+          "host_seconds": 0.23399999999674037
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13142900000000424,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.13971200000000294,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14376899999999893,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13627700000000686,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14439500000000294,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.13628099999999677,
+          "host_seconds": 0.15600000001722947
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.12435899999999833,
+          "host_seconds": 0.21899999998277053
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.13146899999999562,
+          "host_seconds": 0.14100000000325963
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1383249999999947,
+          "host_seconds": 0.21799999999348074
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14381099999999947,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14401000000000863,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14171799999999735,
+          "host_seconds": 0.21899999998277053
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13758799999999383,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14412599999999998,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14529100000000028,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1432140000000004,
+          "host_seconds": 0.28099999998812564
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14291299999999296,
+          "host_seconds": 0.15600000001722947
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14251400000000558,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14058799999999394,
+          "host_seconds": 0.2029999999795109
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14068100000000072,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.15112599999999077,
+          "host_seconds": 0.23399999999674037
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14421000000000106,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13556199999999308,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14264800000000832,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.1395429999999891,
+          "host_seconds": 0.21899999998277053
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.16658700000000692,
+          "host_seconds": 0.3120000000053551
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13894200000000012,
+          "host_seconds": 0.2029999999795109
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1307999999999936,
+          "host_seconds": 0.264999999984866
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14847199999999816,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14001000000001795,
+          "host_seconds": 0.17100000000209548
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14985799999999472,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1486229999999864,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.156407999999999,
+          "host_seconds": 0.2659999999741558
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14582999999998947,
+          "host_seconds": 0.26600000000325963
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14458199999998556,
+          "host_seconds": 0.17100000000209548
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1476690000000076,
+          "host_seconds": 0.26600000000325963
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.12963600000000497,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1388200000000097,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.15208699999999453,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.15360099999998056,
+          "host_seconds": 0.28099999998812564
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.15033000000002517,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1504059999999754,
+          "host_seconds": 0.26500000001396984
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14322000000001367,
+          "host_seconds": 0.20399999999790452
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14579999999997995,
+          "host_seconds": 0.23499999998603016
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14100400000000946,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14430300000000784,
+          "host_seconds": 0.28099999998812564
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13136099999999828,
+          "host_seconds": 0.15600000001722947
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14529600000000187,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13730699999999274,
+          "host_seconds": 0.21899999998277053
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.13589100000001508,
+          "host_seconds": 0.23399999999674037
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14832699999999477,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1496349999999893,
+          "host_seconds": 0.28099999998812564
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.1293659999999761,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.12614600000000564,
+          "host_seconds": 0.14100000000325963
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13307900000000927,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.15326500000000465,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14159799999998768,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13413099999999645,
+          "host_seconds": 0.3120000000053551
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14809399999998618,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1470589999999845,
+          "host_seconds": 0.3279999999795109
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.12732500000001323,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.15482500000001664,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13255699999999138,
+          "host_seconds": 0.21899999998277053
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14674800000000232,
+          "host_seconds": 0.28099999998812564
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13063900000000217,
+          "host_seconds": 0.14100000000325963
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.13609399999998573,
+          "host_seconds": 0.17100000000209548
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14746100000002116,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.13710100000000125,
+          "host_seconds": 0.23399999999674037
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13914800000000582,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13869600000003857,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.1327309999999784,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14224899999999252,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13506899999998723,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14208300000001373,
+          "host_seconds": 0.23499999998603016
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13651399999997693,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1332219999999893,
+          "host_seconds": 0.23399999999674037
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13860800000003337,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14608200000003535,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13631899999995767,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.15060399999998708,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1391900000000419,
+          "host_seconds": 0.14000000001396984
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1472259999999892,
+          "host_seconds": 0.2960000000020955
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13792600000004995,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.12467599999996537,
+          "host_seconds": 0.139999999984866
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13510700000000497,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.18210200000004306,
+          "host_seconds": 0.21899999998277053
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1372199999999566,
+          "host_seconds": 0.15600000001722947
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1542880000000082,
+          "host_seconds": 0.21899999998277053
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14521299999995563,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14976100000001225,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.15174000000001797,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.12839499999995496,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14044800000004898,
+          "host_seconds": 0.20399999999790452
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13817299999999477,
+          "host_seconds": 0.2659999999741558
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13954899999998815,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14325999999999794,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.132850000000019,
+          "host_seconds": 0.2029999999795109
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.15791999999999007,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14225000000004684,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.15251499999999396,
+          "host_seconds": 0.3120000000053551
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13346799999999348,
+          "host_seconds": 0.1409999999741558
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1264770000000226,
+          "host_seconds": 0.14000000001396984
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.1409659999999917,
+          "host_seconds": 0.20399999999790452
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.15046200000000454,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1478400000000306,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1476149999999734,
+          "host_seconds": 0.28100000001722947
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13479399999999941,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.15453600000000733,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13955600000002732,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14722000000000435,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14509699999996428,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14394300000003568,
+          "host_seconds": 0.2659999999741558
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.1415169999999648,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1397110000000339,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.128153999999995,
+          "host_seconds": 0.15600000001722947
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1484350000000063,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1254289999999969,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1393319999999676,
+          "host_seconds": 0.26600000000325963
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.12624099999999316,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14561600000001818,
+          "host_seconds": 0.15600000001722947
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.1372459999999478,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1275009999999952,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13404900000000453,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.15210799999999836,
+          "host_seconds": 0.39100000000325963
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13931900000000041,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.15658200000001443,
+          "host_seconds": 0.26600000000325963
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13933500000001686,
+          "host_seconds": 0.4529999999795109
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14471299999996745,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14246600000001308,
+          "host_seconds": 0.21899999998277053
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.12903299999999263,
+          "host_seconds": 0.235000000015134
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.1355310000000145,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1499380000000201,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13374899999996614,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1515569999999684,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14451800000000503,
+          "host_seconds": 0.2340000000258442
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13855499999999665,
+          "host_seconds": 0.264999999984866
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14527500000002647,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.13572199999998702,
+          "host_seconds": 0.15600000001722947
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.1308080000000018,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1431039999999939,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1413479999999936,
+          "host_seconds": 0.23399999999674037
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13390599999996766,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14249000000000933,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.12422400000002654,
+          "host_seconds": 0.14100000000325963
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13373300000000654,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14056499999998096,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13380300000000034,
+          "host_seconds": 0.14000000001396984
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13924099999996997,
+          "host_seconds": 0.3279999999795109
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13786500000003343,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14897100000007413,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.1445009999999911,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14037599999994654,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14177300000005744,
+          "host_seconds": 0.1409999999741558
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14923700000008466,
+          "host_seconds": 0.28200000000651926
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13600699999994958,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.13685000000009495,
+          "host_seconds": 0.14000000001396984
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.11979199999996126,
+          "host_seconds": 0.1409999999741558
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1465130000000272,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13177599999994527,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14418399999999565,
+          "host_seconds": 0.35899999999674037
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.1381050000001096,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.13940499999989697,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13723200000004,
+          "host_seconds": 0.28099999998812564
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1525259999999662,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1417180000000826,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14837899999997717,
+          "host_seconds": 0.3279999999795109
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.12481999999999971,
+          "host_seconds": 0.39000000001396984
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14925100000004932,
+          "host_seconds": 0.20399999999790452
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.1369040000000723,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.13685499999996864,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.16382000000010066,
+          "host_seconds": 0.264999999984866
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.15278699999998935,
+          "host_seconds": 0.32800000000861473
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.130561000000057,
+          "host_seconds": 0.39100000000325963
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14292699999998604,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14291900000000624,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.15391999999997097,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14480700000001434,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1434030000000348,
+          "host_seconds": 0.3129999999946449
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13134900000000016,
+          "host_seconds": 0.40599999998812564
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.13188900000000103,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14638700000000426,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14659099999994396,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14345200000002478,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1364170000000513,
+          "host_seconds": 0.32800000000861473
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.12824299999999766,
+          "host_seconds": 0.5
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.15986099999997805,
+          "host_seconds": 0.23499999998603016
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13796500000000833,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14410499999996773,
+          "host_seconds": 0.2340000000258442
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1224809999999934,
+          "host_seconds": 0.3909999999741558
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14261099999998805,
+          "host_seconds": 0.375
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.1270240000000058,
+          "host_seconds": 0.4539999999979045
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14020300000004227,
+          "host_seconds": 0.23399999999674037
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14489099999991595,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.12635499999998956,
+          "host_seconds": 0.39100000000325963
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1465930000000526,
+          "host_seconds": 0.28099999998812564
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14224699999999757,
+          "host_seconds": 0.29699999999138527
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.12786400000004505,
+          "host_seconds": 0.39100000000325963
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.13585999999997966,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14063599999997223,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14925400000004174,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14110900000002857,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13801999999998316,
+          "host_seconds": 0.360000000015134
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13706500000000688,
+          "host_seconds": 0.5779999999795109
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1334429999999429,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.138274000000024,
+          "host_seconds": 0.1720000000204891
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1337660000000369,
+          "host_seconds": 0.3120000000053551
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14063499999997475,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14405199999998786,
+          "host_seconds": 0.3120000000053551
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.1381979999999885,
+          "host_seconds": 0.39100000000325963
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14112499999998818,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.12913500000001932,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.13565700000003744,
+          "host_seconds": 0.42199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1388849999999593,
+          "host_seconds": 0.45300000000861473
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.15371000000004642,
+          "host_seconds": 0.34299999999348074
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13295899999991434,
+          "host_seconds": 0.375
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14629899999999907,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14688799999998992,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1651040000000421,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.16414499999996224,
+          "host_seconds": 0.20300000000861473
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13287700000000768,
+          "host_seconds": 0.26500000001396984
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13133399999992434,
+          "host_seconds": 0.39000000001396984
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.13902300000006562,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.1420620000000099,
+          "host_seconds": 0.15700000000651926
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.13492300000007162,
+          "host_seconds": 0.14100000000325963
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.15870399999994333,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1424499999999398,
+          "host_seconds": 0.2960000000020955
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.1348280000000841,
+          "host_seconds": 0.39100000000325963
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1367449999999053,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14933200000007218,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1440820000000258,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.12812800000006064,
+          "host_seconds": 0.125
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.12950899999998455,
+          "host_seconds": 0.25
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14051100000006045,
+          "host_seconds": 0.6560000000172295
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1395669999999427,
+          "host_seconds": 0.21899999998277053
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.12849800000003597,
+          "host_seconds": 0.15600000001722947
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14202099999999973,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.12502100000006067,
+          "host_seconds": 0.26500000001396984
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1313119999999799,
+          "host_seconds": 0.264999999984866
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13697700000000168,
+          "host_seconds": 0.40700000000651926
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14165700000000925,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13401499999997668,
+          "host_seconds": 0.15599999998812564
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.16219899999998688,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13308600000004844,
+          "host_seconds": 0.235000000015134
+        }
+      ],
+      "factory_advanced_observation": {
+        "saved_server": "cn.pool.ntp.org",
+        "client_initialized": true,
+        "no_new_reply": true,
+        "observed_virtual_seconds": 3.0330309999999976
+      }
+    },
+    "reconstructed": {
+      "passed": false,
+      "completed_transitions": 5,
+      "completed_frames": 10,
+      "cases": [
+        {
+          "theme": "classic",
+          "name": "sunday",
+          "country": "CN",
+          "kind": "weekday",
+          "boundary_utc": 1792252800,
+          "date_format": 0,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1792252790.051018,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "512988cda0cff1e83e94774fa1886e5bc6f1500bac6ec4f128ee8304a6a125fa",
+              "expected_rgb_sha256": "512988cda0cff1e83e94774fa1886e5bc6f1500bac6ec4f128ee8304a6a125fa"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1792252802.716097,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "0e88cdc6c564f253979d4fa143067a5d23a612a8533cac4fb748c10f5c9740eb",
+              "expected_rgb_sha256": "0e88cdc6c564f253979d4fa143067a5d23a612a8533cac4fb748c10f5c9740eb"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "new-year",
+          "country": "CN",
+          "kind": "year",
+          "boundary_utc": 1767196800,
+          "date_format": 1,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1767196791.09075,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "c880c0fe461319d3d7b55dd7dd98fd1e6c7ee115b98ba7853772d92a221270b6",
+              "expected_rgb_sha256": "c880c0fe461319d3d7b55dd7dd98fd1e6c7ee115b98ba7853772d92a221270b6"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1767196802.690694,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "88223018203f83f88247ba6fe314f5cf0bb701608b233c946d7eeed717bae86e",
+              "expected_rgb_sha256": "88223018203f83f88247ba6fe314f5cf0bb701608b233c946d7eeed717bae86e"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "month-end",
+          "country": "CN",
+          "kind": "month",
+          "boundary_utc": 1777564800,
+          "date_format": 2,
+          "hour12": 0,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1777564791.126259,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "21e9081f4013e5aeb89646f7544ae858c1d63f2f154b11ded9d4709e05cd7569",
+              "expected_rgb_sha256": "21e9081f4013e5aeb89646f7544ae858c1d63f2f154b11ded9d4709e05cd7569"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1777564803.117107,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "f895f9f65eb6fb355ceb803383ff05d86cd6c40b838dcf1aeadc53f7cde645ee",
+              "expected_rgb_sha256": "f895f9f65eb6fb355ceb803383ff05d86cd6c40b838dcf1aeadc53f7cde645ee"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "leap-day-start",
+          "country": "CN",
+          "kind": "leap",
+          "boundary_utc": 1835366400,
+          "date_format": 0,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1835366390.120121,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "9d3a4d55a4373bb2cddeca1137470446fa4662c9876f2d3205933fa7b67dee1a",
+              "expected_rgb_sha256": "9d3a4d55a4373bb2cddeca1137470446fa4662c9876f2d3205933fa7b67dee1a"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1835366402.131039,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "fd2a76d7aa9bd287d04d36a0c0688bd436fa11574db1202551ddeb38fc8df09d",
+              "expected_rgb_sha256": "fd2a76d7aa9bd287d04d36a0c0688bd436fa11574db1202551ddeb38fc8df09d"
+            }
+          ]
+        },
+        {
+          "theme": "classic",
+          "name": "leap-day-end",
+          "country": "CN",
+          "kind": "leap",
+          "boundary_utc": 1835452800,
+          "date_format": 1,
+          "hour12": 1,
+          "passed": true,
+          "natural_transition_without_resync": true,
+          "samples": [
+            {
+              "passed": true,
+              "packet_utc": 1835452791.120378,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "e430cafd70115a8c13f658025683f0507504761b463138f7dd049093fbe8479b",
+              "expected_rgb_sha256": "e430cafd70115a8c13f658025683f0507504761b463138f7dd049093fbe8479b"
+            },
+            {
+              "passed": true,
+              "packet_utc": 1835452803.109985,
+              "matches_iana": true,
+              "matches_literal_factory_calendar": true,
+              "corrected_different_pixels": 0,
+              "literal_replay_different_bytes": 0,
+              "code_unchanged": true,
+              "rgb_sha256": "2db966e9d3bd6aa8adea87b9d408704aafcd9594e26da4e466cb2f7b3ebc92e1",
+              "expected_rgb_sha256": "2db966e9d3bd6aa8adea87b9d408704aafcd9594e26da4e466cb2f7b3ebc92e1"
+            }
+          ]
+        }
+      ],
+      "checks": {
+        "executable_media_unchanged": true,
+        "no_panic": true
+      },
+      "http_observations": [
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.1363979999999998,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.13866999999999763,
+          "host_seconds": 0.15600000001722947
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.15778200000000098,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.14079300000000217,
+          "host_seconds": 0.23399999999674037
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1503980000000027,
+          "host_seconds": 0.3120000000053551
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.19478399999999851,
+          "host_seconds": 0.26600000000325963
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.15817499999999995,
+          "host_seconds": 0.32800000000861473
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.17046200000000056,
+          "host_seconds": 0.23399999999674037
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.1900410000000008,
+          "host_seconds": 0.3129999999946449
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1980739999999983,
+          "host_seconds": 0.28099999998812564
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.15590100000000007,
+          "host_seconds": 0.21799999999348074
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14919500000000596,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.1423459999999892,
+          "host_seconds": 0.26600000000325963
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13412999999999897,
+          "host_seconds": 0.21799999999348074
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.1250519999999966,
+          "host_seconds": 0.3129999999946449
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.15347500000000025,
+          "host_seconds": 0.21900000001187436
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.14314300000000912,
+          "host_seconds": 0.17199999999138527
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.14524299999999357,
+          "host_seconds": 0.29699999999138527
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.1411240000000049,
+          "host_seconds": 0.28100000001722947
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.14460399999998685,
+          "host_seconds": 0.1870000000053551
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.13696500000000356,
+          "host_seconds": 0.2029999999795109
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 0.15450799999999276,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 0.12895299999999565,
+          "host_seconds": 0.28100000001722947
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 0.13766499999999837,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/advancedset",
+          "status": 200,
+          "guest_seconds": 0.13692199999999843,
+          "host_seconds": 0.1879999999946449
+        },
+        {
+          "path": "/updateCity",
+          "status": 200,
+          "guest_seconds": 0.14730699999999786,
+          "host_seconds": 0.235000000015134
+        },
+        {
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 6.127902000000006,
+          "host_seconds": 8.71799999999348
+        }
+      ]
+    }
+  },
+  "failing_action": {
+    "theme": "classic",
+    "case": "noon",
+    "http_path": "/SetTimeModeValue",
+    "virtual_seconds": 121.666463
+  },
+  "failing_response": {
+    "path": "/SetTimeModeValue",
+    "status": 200,
+    "guest_seconds": 6.127902000000006,
+    "host_seconds": 8.71799999999348
+  },
+  "full_suite_finished_utc": "2026-10-16T16:44:38.5536268Z",
+  "note": "Failed six-guest-second HTTP timing gate after 42 original and five native transitions; remaining native matrix, completed scenes and global equivalence are not proven by this attempt."
+}

@@ -18,7 +18,7 @@ def check(value, message):
 
 
 def main():
-    """Test real boot/reset/DHCP/SNTP plus all five visible scenes; close every VM."""
+    """Test real network/calendar transitions and complete scenes; close every owned VM."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--qemu-root', type=Path, default=Path('C:/Work/QEMU-ESP32'))
     parser.add_argument('--output', type=Path, required=True)
@@ -43,8 +43,8 @@ def main():
                                             'esp_board.py', 'esp_services.py')}}
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
               **inputs,
-              'boot_reset': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
-              'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP setup and synthetic weather HTTP/value/LCD checks. Whole-frame scene similarity is measured, not a parity gate. No physical hardware or Internet weather service.'}
+              'boot_reset': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
+              'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP, synthetic weather, natural calendar/DST transitions and complete instruction-replayed frames. The separate unsynchronized scene similarity remains diagnostic. No physical hardware or Internet weather service.'}
     try:
         for variant in ('original', 'reconstructed'):
             options.firmware = variant
@@ -70,6 +70,9 @@ def main():
         from regional_qemu import run_suite as run_regional
         report['regional_http'] = run_regional(options, args.output / 'regional-http')
         check(report['regional_http']['passed'], 'Regional HTTP/raw/calendar/cold boot checks failed')
+        from calendar_qemu import run_suite as run_calendar
+        report['calendar_http'] = run_calendar(options, args.output / 'calendar-http')
+        check(report['calendar_http']['passed'], 'Natural SNTP calendar/DST/frame transitions failed')
         from scene_qemu import run_suite as run_completed_scenes
         report['completed_scenes'] = run_completed_scenes(options, args.output / 'completed-scenes')
         check(report['completed_scenes']['passed'], 'Completed whole-frame instruction replay failed')

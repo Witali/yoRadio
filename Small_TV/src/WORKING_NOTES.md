@@ -31,6 +31,81 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   Коммитить завершённые изменения отдельно, не включать посторонние правки,
   временные ВМ и журналы с пользовательскими данными.
 
+## В работе: календарные переходы через SNTP
+
+2026-10-16: новый `tests/calendar_qemu.py` готовит natural-transition matrix:
+14 границ (Sunday/year/month/leap/noon, GB/US/AU DST, NP fractional offset,
+post-2038), каждая в classic/simple/dial. Три date formats и оба hour modes
+чередуются по случаям: все шесть сочетаний встречаются в каждой теме. Это
+42 transitions / 84 completed frames на прошивку, не полный декартов продукт
+всех параметров. Между before/after не разрешается новый NTP reply; ход часов
+не подменяется. Наблюдаются реальные args/flags/calendar и все 57 600 пикселей.
+
+Native календарь обязан совпасть с pinned IANA TZif; literal factory Newlib
+исполняется отдельно и сохраняет implicit-DST ошибки. Чистый pixel reference
+исполняет реальные factory renderers с ранее объявленными коррекциями; буквальный
+factory replay сохраняет фактические flags/cache и entry background в отдельной
+модели. Рабочая QEMU-прошивка не получает записей RAM/PC/регистров/инструкций.
+
+Пробный Sunday прошёл во всех трёх темах отдельно для factory и native. Literal
+factory replay даёт 0, native clean corrected reference даёт 0. В native один
+POST занял 5.75 guest / 8.14 host seconds; H09/network latency этим не закрыт.
+Новый helper измеряет обе длительности, не повторяет failed requests, ограничивает
+ответ шестью гостевыми секундами и внешним wall guard 20 s. Old five-host-second
+timeouts сохранены, не выданы за успехи или окончательно объяснённые product bugs.
+
+Неверный NTP-log path и повторный breakpoint на прежнем PC исправлены в harness.
+Native integer-Celsius field хранится как double: теперь проверяется точная
+целочисленность и канонический Inputs использует int, как factory ABI. Поздний
+city-triggered ответ не должен считаться ADV restart; перед ADV ждём реальные
+initialized/sync flags. Stable factory наблюдение подтвердило saved host,
+initialized client и отсутствие новой синхронизации в течение 3.01 guest seconds.
+
+Full `calendar-final-20261016`, shell `97647`, завершился exit 1. Все 42 factory
+перехода и первые пять reconstructed/classic прошли. Следующий `/SetTimeModeValue`
+вернул 200 за 6.128 guest / 8.718 host s, превысив новый шестисекундный предел.
+Это failed run, не общий passing checkpoint; native matrix не завершена.
+Output `.build/small-tv-functional/calendar-final-20261016`; log
+`.build/small-tv-calendar-full.log`. Новый полный результат не опубликован.
+Приложение остаётся 9e4f856a, ELF 7e34a29b. Не повышать тайм-аут без изучения
+транспорта; причина задержки пока не установлена.
+
+Независимая ветка `codex/small-tv-offline-clock` в `.worktree/small-tv-offline-clock`
+содержит исправление зависания активных часов/фото-fade без STA и подмены IP
+адресом AP. App 072135ee / source e10dd9f6 / ELF eec972f2 собран и сохранён в
+firmware ветки; 33 platform cases прошли. Новые реальные RV32 network traces
+дают expected fail прежней сборки и pass кандидата: DHCP .15→.21, четыре retry,
+сброс счётчика, сохранение IP; 16 factory main dispatch states продолжают темы
+offline. Кандидат не прошёл полный QEMU и natural link-loss test, не в main.
+Его scoped reports/ассемблер/описание находятся в worktree, не выдавать прежние
+опубликованные общие результаты за подтверждение нового app.
+Исправление/тесты/сборка сохранены и отправлены как `6f10bc46`; exact staged
+50 production inputs, network/adapter bytes, 24 platform test/stub files,
+LFS app и paired ELF сверены. Platform: 33 cases / 1,181,610 checks.
+
+PCAP diagnostic `.build/small-tv-parity/http-latency-pcap-20261016-03` воспроизвёл
+три медленных POST из 60: первый SYN не дал ответа, повтор через 5.82–5.94 guest s,
+после прихода HTTP headers ответ через 42–49 ms. Это локализует фазу задержки,
+но не доказывает RX DMA/SLIRP/SDK причину. Обезличенная сводка —
+`../qemu/parity/http-latency-observation.json`; raw PCAP не публикуется.
+Failed calendar summary — `calendar-transport-observation.json`.
+Тестовая diagnostic VM закрыта. Создан отдельный QEMU worktree
+`C:/Work/QEMU-ESP32/.worktree/small-tv-wifi-link`, ветка `codex/small-tv-wifi-link`,
+от 1c7e4c0512. Там добавлена только opt-in RX drop logging; отдельная сборка
+shell 43346, log `.build/small-tv-qemu-rx-build.log`. Main QEMU source/bin прежние.
+
+Новый участок для последующего анализа: `settings.c` сохраняет через 1 s покоя;
+factory dirty countdown начинает с 50 и сохраняет на 51-м eligible loop pass;
+в loop передаётся delay 10 ticks, но factory tick frequency ещё не измерена.
+Игнорируемый persistence_probe использует явную модель 100 ms/eligible pass;
+получает single 5.1 s против native 1 s, burst один save против трёх. Это
+model timestamps, не измеренные RF/RTOS задержки. Счётчик
+останавливается на blocking weather и не выполняется в setup branch. Адреса
+`0x420090e2..0x420090f8`, save call `0x4200916a`, loop delay `0x42008fd2`;
+bounded assembly в `.build/small-tv-save-delay-assembly`. Это установленная
+разница алгоритмов, требующая отдельного теста/coalescing analysis, не закрыта
+текущим календарным gate. Возможная связь с HTTP latency пока только гипотеза.
+
 ## Последний проверенный участок: завершённые кадры и яркость цифровой темы
 
 2026-10-16: добавлен строгий gate полного кадра: реальные QEMU renderer entry/return
