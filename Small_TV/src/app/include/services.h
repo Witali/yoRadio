@@ -10,7 +10,7 @@ typedef struct
     bool valid;
     double temperature_c, wind_mps, temperature_min_c, temperature_max_c;
     int humidity, timezone_seconds;
-    char icon[4], description[65], city[65], country[3];
+    char icon[4], description[65], city[65], country[TV_COUNTRY_BYTES];
     char main[16], wind_direction[20];
     uint32_t generation;
 } weather_snapshot_t;

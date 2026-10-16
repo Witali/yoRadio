@@ -101,6 +101,26 @@ def main():
             or not next(row for row in native_text['cases'] if row['case'] == 'unicode-scroll')['scroll']['passed']
             or not text_http['factory_utf8_city_fault']['passed']):
         raise ValueError('UTF-8 HTTP gate omitted native field/scroll guards or literal factory fault')
+    regional = qemu['regional_http']
+    if (not regional['passed'] or regional['qemu_sha256'] != qemu['qemu_sha256'] or
+            regional['settings_layout']['elf_sha256'] != text['native_elf_sha256']):
+        raise ValueError('Regional settings gate used a different executable or emulator')
+    regional_keys = {row['country'] for row in json.loads(
+        (ROOT/'Small_TV/src/resources/timezones/manifest.json').read_text())['countries']
+                     if '-' in row['country']}
+    for variant in ('original','reconstructed'):
+        flow = regional['flows'][variant]
+        if (not flow['passed'] or not all(flow['checks'].values()) or
+                {row['key'] for row in flow['cases']} != regional_keys or
+                not flow['raw_import']['passed'] or not flow['cold_boot']['passed'] or
+                any(not row['passed'] or not row['raw_persistence'] for row in flow['cases'])):
+            raise ValueError('Regional settings gate omitted keys/import/persistence/calendar')
+    if (not regional['flows']['reconstructed']['maximum_input']['passed'] or
+            regional['flows']['reconstructed']['invalid_inputs_rejected'] != 3 or
+            not regional['nvs_migration']['passed'] or not all(regional['nvs_migration']['checks'].values()) or
+            any(not row['matches_iana'] for row in regional['flows']['reconstructed']['cases']) or
+            any(not row['weather_key_preserved'] for row in regional['flows']['reconstructed']['cases'])):
+        raise ValueError('Regional settings gate omitted maximum inputs/cache/rejection checks')
     qemu_sources = [qemu['boot_reset']['reconstructed']['prepared']['sources']]
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
     qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
@@ -108,6 +128,7 @@ def main():
     qemu_sources.append(fields['flows']['reconstructed']['sources'])
     qemu_sources.append(time_http['flows']['reconstructed']['sources'])
     qemu_sources.append(native_text['sources'])
+    qemu_sources.append(regional['flows']['reconstructed']['sources'])
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -173,6 +194,7 @@ def main():
                        'weather_http': qemu['weather_http'],
                        'time_http': time_http,
                        'text_http': text_http,
+                       'regional_http': regional,
                        'boot_reset': {name: {key: row[key] for key in ('passed', 'checks', 'duration_seconds', 'network')}
                                       for name, row in qemu['boot_reset'].items()},
                        'scenes': {name: {'passed': True,

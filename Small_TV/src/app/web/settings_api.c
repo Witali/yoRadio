@@ -137,9 +137,11 @@ static bool read_brightness(httpd_req_t *req, const char *key, unsigned *out)
 
 static bool update_city(tv_settings_t *s, const cJSON *object)
 {
-    /* Split and validate the city/country pair supplied by the original web page. */
+    /* Split and validate the city/country pair supplied by the original web page.
+     * FIXED_RECONSTRUCTION: 0x4200f2c0 copies the complete regional suffix into
+     * a 20-byte field; accept AU-W/US-H rather than requiring exactly two letters. */
 
-    char value[72];
+    char value[sizeof(s->city) + 3 + sizeof(s->country) - 1];
     if (!copy_string(object, "city", value, sizeof(value)))
         return false;
     char *separator = strrchr(value, ',');
@@ -152,17 +154,16 @@ static bool update_city(tv_settings_t *s, const cJSON *object)
     if (!separator)
         return false;
     char *country = separator + comma_bytes;
-    if (strlen(country) != 2 || !isalpha((unsigned char)country[0]) ||
-        !isalpha((unsigned char)country[1]))
+    if (strlen(country) >= sizeof(s->country) || !settings_country_valid(country))
         return false;
     *separator = 0;
     size_t length = strlen(value);
     if (!length || length >= sizeof(s->city))
         return false;
     strcpy(s->city, value);
-    s->country[0] = toupper((unsigned char)country[0]);
-    s->country[1] = toupper((unsigned char)country[1]);
-    s->country[2] = 0;
+    size_t country_length = strlen(country);
+    for (size_t i = 0; i <= country_length; ++i)
+        s->country[i] = toupper((unsigned char)country[i]);
     return true;
 }
 

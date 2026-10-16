@@ -46,7 +46,7 @@ static void time_sync_task(void *unused)
      * 0x42010c3e restarts it every 21 invalid-year updates and starves server 3. */
 
     (void)unused;
-    char configured_ntp[65] = "", configured_country[3] = "", configured_city[65] = "";
+    char configured_ntp[65] = "", configured_country[TV_COUNTRY_BYTES] = "", configured_city[65] = "";
     char configured_zone[32] = "";
     bool timezone_ready = false, sntp_started = false;
     for (;;)

@@ -15,6 +15,7 @@
 #include "web.h"
 #include "dns_packet.h"
 #include "factory_settings.h"
+#include "../app/services/country_timezones.h"
 #include "esp_flash.h"
 #include "esp_partition.h"
 #include "nvs.h"
@@ -157,9 +158,9 @@ static void test_factory_settings(void)
 {
     /* Exercise an independent original-sector fixture, including mode 2 with
      * an existing SSID: it must stay in setup after a failed station attempt. */
-    CHECK(sizeof(tv_settings_t)==344);
-    CHECK(offsetof(tv_settings_t,wifi_mode)==323);
-    CHECK(offsetof(tv_settings_t,photo_size)==324);
+    CHECK(sizeof(tv_settings_t)==364);
+    CHECK(offsetof(tv_settings_t,wifi_mode)==341);
+    CHECK(offsetof(tv_settings_t,photo_size)==344);
     tv_settings_t s; settings_snapshot(&s);
     uint8_t raw[FACTORY_SETTINGS_BYTES]; memset(raw,255,sizeof(raw));
     CHECK(!factory_settings_decode(raw,&s));
@@ -184,10 +185,113 @@ static void test_factory_settings(void)
     CHECK(le32(factory_sector+0x1a8)==s.photo_size[0]);
     CHECK(!strcmp((char *)factory_sector+0xdb,"London"));
     CHECK(factory_sector[FACTORY_SETTINGS_BYTES]==255);
-    /* Legacy NVS uses the same blob size but had no explicit mode byte. */
+    /* Version 2 mode zero is an explicit setup request, not legacy padding. */
     memset(factory_sector,255,sizeof(factory_sector));
-    saved_nvs[323]=0;
-    CHECK(settings_init()==ESP_OK); settings_snapshot(&s); CHECK(s.wifi_mode==1);
+    saved_nvs[341]=0;
+    CHECK(settings_init()==ESP_OK); settings_snapshot(&s); CHECK(s.wifi_mode==0);
+}
+
+static void put32(uint8_t *out, uint32_t value)
+{
+    /* Build historical persisted fixtures independently of the current C ABI. */
+    for (unsigned i=0;i<4;++i) out[i]=(uint8_t)(value>>(8*i));
+}
+
+static void legacy_settings_fixture(void)
+{
+    /* Literal version 1 offsets remain fixed even if the production struct moves. */
+    memset(saved_nvs,0,sizeof(saved_nvs)); saved_nvs_length=344;
+    put32(saved_nvs,1);
+    strcpy((char *)saved_nvs+4,"old-ssid");
+    strcpy((char *)saved_nvs+37,"12345678");
+    strcpy((char *)saved_nvs+102,"OldCity");
+    strcpy((char *)saved_nvs+167,"GB");
+    strcpy((char *)saved_nvs+170,"fixture.invalid");
+    strcpy((char *)saved_nvs+235,"disabled");
+    const uint16_t levels_colors[]={730,180,0x1234,0x4567,0x89ab};
+    for(unsigned i=0;i<5;++i) {
+        saved_nvs[300+i*2]=(uint8_t)levels_colors[i];
+        saved_nvs[301+i*2]=(uint8_t)(levels_colors[i]>>8);
+    }
+    const uint8_t tail[]={2,4,1,21,7,19,1,1,0,1,1,9,21,2};
+    memcpy(saved_nvs+310,tail,sizeof(tail));
+    for(unsigned i=0;i<5;++i)put32(saved_nvs+324+i*4,111*(i+1));
+}
+
+static void test_settings_migration(void)
+{
+    /* Preserve every old field, normalize only old padding, reject invalid blobs,
+     * and retain the original raw sector's precedence over either native version. */
+    static const tv_settings_t expected={.version=TV_SETTINGS_VERSION,.ssid="old-ssid",.password="12345678",
+        .city="OldCity",.country="GB",.ntp="fixture.invalid",.weather_key="disabled",
+        .day_level=730,.night_level=180,.colors={0x1234,0x4567,0x89ab},
+        .theme=2,.animation=4,.date_format=1,.night_start=21,.night_stop=7,.photo_seconds=19,
+        .fahrenheit=1,.hour12=1,.miles=0,.browser_time=1,.night_mode=1,.click_count=9,
+        .photo_mask=21,.wifi_mode=2,.photo_size={111,222,333,444,555}};
+    tv_settings_t s, original;
+    settings_snapshot(&original);
+    memset(factory_sector,255,sizeof(factory_sector)); legacy_settings_fixture();
+    CHECK(settings_init()==ESP_OK); settings_snapshot(&s);
+    CHECK(!memcmp(&s,&expected,sizeof(s)) && settings_valid(&s));
+    CHECK(settings_flush()==ESP_OK && saved_nvs_length==364 && le32(saved_nvs)==2);
+    memset(factory_sector,255,sizeof(factory_sector));
+    CHECK(settings_init()==ESP_OK); settings_snapshot(&s); CHECK(!memcmp(&s,&expected,sizeof(s)));
+    for(unsigned empty=0;empty<2;++empty) {
+        legacy_settings_fixture(); saved_nvs[323]=0; if(empty)saved_nvs[4]=0;
+        CHECK(settings_init()==ESP_OK); settings_snapshot(&s);
+        CHECK(s.wifi_mode==(empty?2:1) && !strcmp(s.country,"GB"));
+    }
+    for(unsigned bad=0;bad<4;++bad) {
+        legacy_settings_fixture();
+        if(bad==0)put32(saved_nvs,99);
+        if(bad==1)saved_nvs_length=343;
+        if(bad==2)memset(saved_nvs+167,'X',3);
+        if(bad==3)memset(saved_nvs+170,'X',65);
+        CHECK(settings_init()==ESP_OK); settings_snapshot(&s);
+        CHECK(s.version==2 && !strcmp(s.city,"Shenzhen") && !strcmp(s.country,"CN"));
+    }
+    s=expected; strcpy(s.country,"AU-W"); strcpy(s.city,"Perth");
+    factory_settings_encode(&s,factory_sector); legacy_settings_fixture();
+    CHECK(settings_init()==ESP_OK); settings_snapshot(&s);
+    CHECK(!strcmp(s.country,"AU-W") && !strcmp(s.city,"Perth"));
+    CHECK(settings_flush()==ESP_OK && saved_nvs_length==364);
+    CHECK(!strcmp((char *)saved_nvs+offsetof(tv_settings_t,country),"AU-W"));
+    CHECK(settings_replace(&original)==ESP_OK && settings_flush()==ESP_OK);
+}
+
+static void test_regional_settings(void)
+{
+    /* Every recovered key must survive HTTP, raw import/export and cold settings load. */
+    tv_settings_t s,restored;
+    uint8_t raw[FACTORY_SETTINGS_BYTES];
+    for(unsigned i=0;i<sizeof(country_timezones)/sizeof(country_timezones[0]);++i) {
+        char json[128]; snprintf(json,sizeof(json),"{\"city\":\"Fixture,%s\"}",country_timezones[i].country);
+        post("/updateCity",json,200); settings_snapshot(&s);
+        CHECK(!strcmp(s.country,country_timezones[i].country));
+        factory_settings_encode(&s,raw);
+        CHECK(!strcmp((char *)raw+0xc7,country_timezones[i].country));
+        CHECK(!strcmp((char *)raw+0xdb,"Fixture"));
+        restored=s; strcpy(restored.country,"CN");
+        CHECK(factory_settings_decode(raw,&restored) && !strcmp(restored.country,s.country));
+        CHECK(settings_flush()==ESP_OK && settings_init()==ESP_OK); settings_snapshot(&restored);
+        CHECK(!strcmp(restored.country,s.country) && restored.version==TV_SETTINGS_VERSION);
+    }
+    post("/updateCity","{\"city\":\"Perth,au-w\"}",200); settings_snapshot(&s); CHECK(!strcmp(s.country,"AU-W"));
+    post("/updateCity","{\"city\":\"Honolulu\xef\xbc\x8c" "us-h\"}",200); settings_snapshot(&s); CHECK(!strcmp(s.country,"US-H"));
+    char city[65],json[160]; memset(city,'C',64); city[64]=0;
+    snprintf(json,sizeof(json),"{\"city\":\"%s\xef\xbc\x8c" "ZZ-ABCDEFGHIJKLMNOP\"}",city);
+    post("/updateCity",json,200); settings_snapshot(&s);
+    CHECK(!strcmp(s.city,city) && strlen(s.country)==19 && settings_valid(&s));
+    CHECK(settings_flush()==ESP_OK && settings_init()==ESP_OK); settings_snapshot(&restored);
+    CHECK(!strcmp(s.country,restored.country) && !strcmp(restored.city,city));
+    const char *invalid[]={"","U","USA","US-","U1","US_1","US-H/","US-H&x","US-H%20","US-ABCDEFGHIJKLMNOPQ"};
+    for(unsigned i=0;i<sizeof(invalid)/sizeof(invalid[0]);++i) {
+        snprintf(json,sizeof(json),"{\"city\":\"Fixture,%s\"}",invalid[i]);
+        post("/updateCity",json,400); settings_snapshot(&restored); CHECK(!memcmp(&s,&restored,sizeof(s)));
+    }
+    factory_settings_encode(&s,raw); memset(raw+0xc7,'A',20);
+    CHECK(!factory_settings_decode(raw,&restored));
+    post("/updateCity","{\"city\":\"London,GB\"}",200);
 }
 
 static void test_utf8(void)
@@ -356,7 +460,7 @@ int main(int argc,char **argv)
     CHECK(argc==2 || argc==3);FILE *file=fopen(argv[1],"rb");CHECK(file!=NULL);CHECK(fread(flash_bytes,1,sizeof(flash_bytes),file)==sizeof(flash_bytes));CHECK(fgetc(file)==EOF);fclose(file);
     CHECK(web_start()==ESP_OK);CHECK(registered_routes==40);
     for(unsigned i=0;i<registered_routes;++i)for(unsigned j=i+1;j<registered_routes;++j)CHECK(route_table[i]->method!=route_table[j]->method || strcmp(route_table[i]->uri,route_table[j]->uri));
-    test_settings();test_factory_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_uploads();test_multipart();test_dns();
+    test_settings();test_factory_settings();test_settings_migration();test_regional_settings();test_utf8();test_weather();test_assets();test_http_contracts();test_uploads();test_multipart();test_dns();
     for(unsigned i=0;i<registered_routes;++i)CHECK(route_success[i]>0);
     if(argc==3)write_native_report(argv[2]);
     printf("PASS: %u checks; 107 JPEGs, 98 animation frames, 18 BMPs; factory settings, Kelvin weather, flash uploads and HTTP handlers\n",checks);

@@ -42,7 +42,9 @@ static unsigned bounded(const uint8_t *raw, unsigned offset, unsigned low, unsig
 
 bool factory_settings_decode(const uint8_t raw[FACTORY_SETTINGS_BYTES], tv_settings_t *s)
 {
-    /* Import the original raw settings layout into validated native fields. */
+    /* Import the original raw settings layout into validated native fields.
+     * FIXED_RECONSTRUCTION: retain the complete 20-byte country slot at 0xc7;
+     * truncating AU-W/US-H selected a different timezone after every reboot. */
 
     bool present = false;
     for (unsigned i = 0; i < FACTORY_SETTINGS_BYTES; ++i)
@@ -58,7 +60,14 @@ bool factory_settings_decode(const uint8_t raw[FACTORY_SETTINGS_BYTES], tv_setti
      * The compact native struct uses different widths and must not be memcpy'd. */
     read_string(s->password, sizeof(s->password), raw + 0x45, 65);
     read_string(s->ntp, sizeof(s->ntp), raw + 0x86, 65);
-    read_string(s->country, sizeof(s->country), raw + 0xc7, 20);
+    if (raw[0xc7] && raw[0xc7] != 0xff)
+    {
+        /* A full unterminated slot is malformed, not a shorter regional key. */
+        if (!memchr(raw + 0xc7, 0, TV_COUNTRY_BYTES) &&
+            !memchr(raw + 0xc7, 0xff, TV_COUNTRY_BYTES))
+            return false;
+        read_string(s->country, sizeof(s->country), raw + 0xc7, TV_COUNTRY_BYTES);
+    }
     read_string(s->city, sizeof(s->city), raw + 0xdb, 65);
     read_string(s->weather_key, sizeof(s->weather_key), raw + 0x11c, 65);
     s->wifi_mode = bounded(raw, 0x160, 0, 2, s->ssid[0] ? 1 : 2);
@@ -86,14 +95,16 @@ bool factory_settings_decode(const uint8_t raw[FACTORY_SETTINGS_BYTES], tv_setti
 
 void factory_settings_encode(const tv_settings_t *s, uint8_t raw[FACTORY_SETTINGS_BYTES])
 {
-    /* Serialize native preferences into the factory-compatible raw sector. */
+    /* Serialize native preferences into the factory-compatible raw sector.
+     * FIXED_RECONSTRUCTION: save the suffix copied by factory 0x4200f2c0,
+     * without moving the following city field at 0xdb. */
 
     memset(raw, 0, FACTORY_SETTINGS_BYTES);
     write32(raw, s->photo_mask);
     memcpy(raw + 4, s->ssid, strlen(s->ssid));
     memcpy(raw + 0x45, s->password, strlen(s->password));
     memcpy(raw + 0x86, s->ntp, strlen(s->ntp));
-    memcpy(raw + 0xc7, s->country, 2);
+    memcpy(raw + 0xc7, s->country, strlen(s->country));
     memcpy(raw + 0xdb, s->city, strlen(s->city));
     memcpy(raw + 0x11c, s->weather_key, strlen(s->weather_key));
     write32(raw + 0x160, s->wifi_mode);

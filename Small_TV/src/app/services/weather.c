@@ -137,7 +137,7 @@ static void weather_task(void *unused)
     /* Execute requests scheduled by the factory main loop and reject stale results. */
 
     (void)unused;
-    char last_city[65] = "", last_country[3] = "", last_key[65] = "";
+    char last_city[65] = "", last_country[TV_COUNTRY_BYTES] = "", last_key[65] = "";
     for (;;)
     {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);

@@ -1,0 +1,47 @@
+{
+  "native_elf_sha256": "bde762ed5653506d3aadb65cb30c135dabef65f0b5da62cfa42b67375ac68da5",
+  "assembly": "native-settings.asm",
+  "functions": [
+    {
+      "function": "settings_country_valid",
+      "start": "0x4200bf08",
+      "bytes": 128,
+      "code_sha256": "6dddc5d297994b70f19b931958e52c0c9eeef2d603a57dc7b8e2af71b555f6a2"
+    },
+    {
+      "function": "settings_valid",
+      "start": "0x4200bf88",
+      "bytes": 348,
+      "code_sha256": "7861e4824ade1ea5c639264e0b49167704cfc2af83d60bd570cb6e57bfbd5791"
+    },
+    {
+      "function": "settings_init",
+      "start": "0x4200c21c",
+      "bytes": 628,
+      "code_sha256": "ce34ac46a0a3ef49212e2aecd57d8bd97701d8f8bc14b5d0a086fdc1f22808f6"
+    },
+    {
+      "function": "factory_settings_decode",
+      "start": "0x4200c698",
+      "bytes": 674,
+      "code_sha256": "75fb1b08725434cd510bfd297e41605155e3d1aca1c1d68e721077c95c2685f9"
+    },
+    {
+      "function": "factory_settings_encode",
+      "start": "0x4200c93a",
+      "bytes": 418,
+      "code_sha256": "f3000a0cfa6011a9e1660ea735c6b4e1195a5ba8207c152f0a5df9d14a01531a"
+    },
+    {
+      "function": "web_settings_post",
+      "start": "0x42011e4a",
+      "bytes": 1488,
+      "code_sha256": "e77c61971d0b74d237c9e5119ee8b1ecff8b87aa861defc6b5513114a663d335"
+    }
+  ],
+  "inlined_helpers": {
+    "load_nvs": "settings_init",
+    "update_city": "web_settings_post"
+  },
+  "scope": "Exact compiled region validation, settings/NVS migration, raw codec and HTTP instructions."
+}

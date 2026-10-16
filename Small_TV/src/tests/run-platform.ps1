@@ -23,6 +23,7 @@ $batch=Join-Path $output "compile.cmd"
 if ($LASTEXITCODE) {throw "Platform test compilation failed"}
 $cases=@("wifi_setup","wifi_reconnect_scan","wifi_open_station","wifi_fallback_timeout","wifi_failed_retries","restart_persistence_failure","wifi_allocation_failure","wifi_task_failure","weather_worker","time_worker","time_zone_boundaries","backlight_schedule","display_protocol_clipping","ui_transitions","text_field_windows","weather_field_cleanup","clock_coordinator","timer_driver_failures","clock_animation_selection","clock_text_scroll","clock_calendar_classic","clock_calendar_simple","clock_timezone_classic","clock_timezone_simple")
 $cases+=@("clock_sync_classic","clock_sync_simple")
+$cases+=@("regional_time_worker","regional_weather_worker")
 $results=@()
 foreach($case in $cases) {
     $path=Join-Path $output "$case.json"

@@ -718,6 +718,53 @@ static void test_time_zone_boundaries(void)
     run_task("time_sync", time_boundary_scenario);
 }
 
+static const struct { const char *key, *tz; } regional_times[] = {
+    {"AU-W","UTC-8:00:00"}, {"US-H","UTC+10:00:00"},
+    {"AU","UTC-11:00:00"}, {"ZZ-ABCDEFGHIJKLMNOP","UTC-0:00:00"},
+};
+static void regional_time_scenario(void)
+{
+    /* Change only the regional key, keeping the same city and UTC epoch offline. */
+    CHECK(!strcmp(timezone,regional_times[time_step].tz) && sntp_inits==0);
+    if(++time_step==sizeof(regional_times)/sizeof(regional_times[0])) {
+        CHECK(timezone_updates==4); longjmp(blocked,1);
+    }
+    strcpy(preferences.country,regional_times[time_step].key);
+}
+static void test_regional_time_worker(void)
+{
+    /* Exercise full-length time-task buffers, regional selection and unknown-key fallback. */
+    station_start(); fake_time=1767248047;
+    strcpy(preferences.country,regional_times[0].key);
+    services_start(); run_task("time_sync",regional_time_scenario);
+}
+
+static unsigned regional_weather_step;
+static void regional_weather_scenario(void)
+{
+    /* Inspect the real worker's publication before changing only the country suffix. */
+    static const char *keys[]={"US-H","AU-W","ZZ-ABCDEFGHIJKLMNOP"};
+    weather_snapshot_t snapshot; weather_snapshot(&snapshot);
+    if(regional_weather_step) {
+        CHECK(snapshot.valid && !strcmp(snapshot.country,keys[regional_weather_step-1]));
+        CHECK(snapshot.generation==2*regional_weather_step);
+        char expected[96]; snprintf(expected,sizeof(expected),"q=Fixture,%s&appid=",keys[regional_weather_step-1]);
+        CHECK(strstr(fetched_url,expected)!=NULL);
+    }
+    if(regional_weather_step==3)longjmp(blocked,1);
+    strcpy(preferences.country,keys[regional_weather_step++]);
+    weather_request_update();
+}
+static void test_regional_weather_worker(void)
+{
+    /* Verify key changes invalidate the old cache and preserve suffixes in URLs/results. */
+    station_start(); got_ip(); strcpy(preferences.city,"Fixture");
+    strcpy(preferences.weather_key,"disabled");
+    http_body=weather_body; http_length=sizeof(weather_body)-1;
+    weather_start(); run_task("weather_http",regional_weather_scenario);
+    CHECK(http_calls==3 && http_cleanups==3);
+}
+
 static esp_err_t driver_result = ESP_OK;
 static ledc_timer_config_t ledc_timer;
 static ledc_channel_config_t ledc_channel;
@@ -1692,6 +1739,8 @@ int main(int argc, char **argv)
                  {"weather_worker", test_weather_worker},
                  {"time_worker", test_time_worker},
                  {"time_zone_boundaries", test_time_zone_boundaries},
+                 {"regional_time_worker", test_regional_time_worker},
+                 {"regional_weather_worker", test_regional_weather_worker},
                  {"backlight_schedule", test_backlight},
                  {"display_protocol_clipping", test_display},
                  {"ui_transitions", test_ui_transitions},

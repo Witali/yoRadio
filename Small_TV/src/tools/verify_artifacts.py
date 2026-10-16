@@ -77,6 +77,10 @@ def main():
     require(text_gate['font_source_sha256'] == text_network['font_source_sha256'] == hashlib.sha256(
         (ROOT/'third_party/spleen/spleen-6x12.bdf').read_bytes()).hexdigest(), 'Unicode font source changed')
     require(app == (BUILD / 'small_tv_reconstructed.bin').read_bytes(), 'Build and archive differ')
+    regional = groups['qemu']['regional_http']
+    require(regional['passed'] and regional['qemu_sha256'] == groups['qemu']['qemu_sha256'] and
+            regional['settings_layout']['elf_sha256'] == state['native_elf_sha256'],
+            'Regional settings gate tested a different executable/emulator')
     generated = BUILD / 'verification-resources'
     subprocess.run([sys.executable, str(ROOT / 'tools/prepare_resources.py'), '--output', str(generated)], check=True)
     source = read(generated / 'source-manifest.json')
@@ -169,6 +173,11 @@ def main():
     report['unicode_glyphs'] = text_gate['unicode_glyphs']
     report['qemu_text_report'] = '../qemu/text-http-validation.json'
     report['qemu_text_native_cases'] = len(text_network['flows']['reconstructed']['cases'])
+    report['qemu_regional_report'] = '../qemu/regional-http-validation.json'
+    report['qemu_regional_keys'] = len(regional['flows']['reconstructed']['cases'])
+    report['settings_version'] = 2
+    report['settings_nvs_bytes'] = regional['settings_layout']['size']
+    report['settings_nvs_v1_migration_verified'] = regional['nvs_migration']['passed']
     report['work_status'] = 'Reconstructed firmware; confirmed factory corrections are marked and tested'
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(f'Verified application {app_sha}: {len(app)} bytes, {partitions["factory"] - len(app)} bytes free')

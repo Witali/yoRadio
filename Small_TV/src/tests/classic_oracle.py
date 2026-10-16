@@ -14,30 +14,13 @@ from pathlib import Path
 import re
 import struct
 
-from machine_oracle import Machine, Panel, ROOT, SCRATCH, ELFFile, UC_HOOK_CODE, REGS, rv
+from machine_oracle import Machine, Panel, ROOT, SCRATCH, ELFFile, UC_HOOK_CODE, REGS, rv, layout
 from control_oracle import verify_inputs
 
 FLASH_READ = 0x40392326  # AUIPC/JALR at 0x4200b632/0x4200b636, not the ROM namesake.
 FRAME_CURSOR = 0x3fcc3a24
 CURSOR = SCRATCH + 0x800
 WEATHER = SCRATCH + 0x400
-
-
-def layout(name):
-    """Read the compiled structure size/member offsets from this ELF's DWARF."""
-    path = ROOT / '.build/small-tv-esp32c2/small_tv_reconstructed.elf'
-    with path.open('rb') as stream:
-        elf = ELFFile(stream)
-        for cu in elf.get_dwarf_info().iter_CUs():
-            for die in cu.iter_DIEs():
-                attr = die.attributes.get('DW_AT_name')
-                if die.tag == 'DW_TAG_typedef' and attr and attr.value == name.encode():
-                    structure = die.get_DIE_from_attribute('DW_AT_type')
-                    return structure.attributes['DW_AT_byte_size'].value, {
-                        child.attributes['DW_AT_name'].value.decode():
-                        child.attributes['DW_AT_data_member_location'].value
-                        for child in structure.iter_children() if child.tag == 'DW_TAG_member'}
-    raise AssertionError('Missing compiled structure: ' + name)
 
 
 @dataclass(frozen=True)
@@ -88,7 +71,7 @@ class ClassicMachine(Machine):
         else:
             self.settings_size, self.settings_fields = layout('tv_settings_t')
             self.weather_size, self.weather_fields = layout('weather_snapshot_t')
-            if self.settings_size != 344:
+            if self.settings_size != 364:
                 raise AssertionError('Unexpected settings ABI')
             self.adapt(self.symbols['network_address'], 'synthetic-address', self.address)
             self.adapt(self.symbols['media_draw_jpeg'], 'jpeg-output-recorded', self.jpeg)

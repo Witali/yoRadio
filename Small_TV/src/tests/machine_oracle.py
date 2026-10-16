@@ -8,6 +8,7 @@ preferences and framebuffer hashes, never firmware strings or owner settings.
 """
 import argparse
 from array import array
+from functools import lru_cache
 import hashlib
 import json
 from pathlib import Path
@@ -28,6 +29,24 @@ REGS=[getattr(rv,f'UC_RISCV_REG_X{index}') for index in range(32)]
 STACK=0x2007f000
 RETURN=0x2007e000
 SCRATCH=0x20000000
+
+
+@lru_cache(maxsize=None)
+def layout(name):
+    """Read actual native structure sizes/offsets instead of freezing the old NVS ABI."""
+    path=ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf'
+    with path.open('rb') as stream:
+        elf=ELFFile(stream)
+        for cu in elf.get_dwarf_info().iter_CUs():
+            for die in cu.iter_DIEs():
+                attr=die.attributes.get('DW_AT_name')
+                if die.tag=='DW_TAG_typedef' and attr and attr.value==name.encode():
+                    structure=die.get_DIE_from_attribute('DW_AT_type')
+                    return structure.attributes['DW_AT_byte_size'].value, {
+                        child.attributes['DW_AT_name'].value.decode():
+                        child.attributes['DW_AT_data_member_location'].value
+                        for child in structure.iter_children() if child.tag=='DW_TAG_member'}
+    raise AssertionError('Missing compiled structure: '+name)
 
 
 class Panel:
@@ -265,9 +284,10 @@ class Machine:
             self.cpu.mem_write(0x3fcb7b84,address)
             self.cpu.mem_write(0x3fcbffc8,struct.pack('<I6B',2026,10,13,hour,minute,second,weekday))
         else:
-            settings=bytearray(344)
-            struct.pack_into('<I',settings,0,1)
-            settings[312]=date_format; settings[317]=hour12
+            size,fields=layout('tv_settings_t')
+            settings=bytearray(size)
+            struct.pack_into('<I',settings,fields['version'],2)
+            settings[fields['date_format']]=date_format; settings[fields['hour12']]=hour12
             self.cpu.mem_write(SCRATCH,bytes(settings))
             self.cpu.mem_write(SCRATCH+0x200,struct.pack('<9i',second,minute,hour,13,9,126,weekday,285,0)+bytes(8))
             self.cpu.mem_write(SCRATCH+0x300,address)
