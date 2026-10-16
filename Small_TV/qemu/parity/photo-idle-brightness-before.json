@@ -1,0 +1,177 @@
+{
+  "passed": false,
+  "app_sha256": "ad7a9009c984ab8dc302530e231d896b907ca4ec1b75589a90e568e8f8f4c41d",
+  "source_sha256": "f411bf0e7af2230294e25f1bf9da5a15eecb85e7d1961f375bdc305f3e5edebc",
+  "native_elf_sha256": "6d7b586f29874663e1dcf68d44ac5d34e523555cae3c83bd930e6e35a06bddf3",
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "helper_sha256": {
+    "small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+  },
+  "profile_sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+  "test_inputs": [
+    {
+      "file": "Small_TV/src/tests/photo_brightness_qemu.py",
+      "sha256": "57f6e84602225302232ce2b4d59819a0fe50eb2b01fa070788bb6f6ec0e87bb4"
+    },
+    {
+      "file": "Small_TV/src/tests/photo_frames_qemu.py",
+      "sha256": "35cdd4efd3b0edd2ca665014d999cec3195948ee1687a8c61330fa3f4cd2a677"
+    },
+    {
+      "file": "Small_TV/src/tests/photo_frame_replay.py",
+      "sha256": "f567780d22400e0b4b86a7607a0f89a20c47bafa0b0a985f09dd632ab82a09e8"
+    },
+    {
+      "file": "Small_TV/src/tests/photo_frame_contract.py",
+      "sha256": "eb603bbcce1588a90eaf0b50b1bb818fd9043a18d5bca48c312d2874df4e9cb9"
+    },
+    {
+      "file": "Small_TV/src/tests/jpeg_oracle.py",
+      "sha256": "354048940b1d6bd065428a83a03133f333a5334154eee7472806e25d1a893e89"
+    },
+    {
+      "file": "Small_TV/src/tests/scene_qemu.py",
+      "sha256": "797304412870bee54e2af631833d84cbd9e7c114f643fd60a6e60ce64e09098c"
+    },
+    {
+      "file": "Small_TV/src/tests/frame_replay.py",
+      "sha256": "5a7ed3dbb6738fa2002e6aaecacdf3b0bab769fa4e2e9a12f52cee7ecb253251"
+    },
+    {
+      "file": "Small_TV/src/tests/machine_oracle.py",
+      "sha256": "009af0436897d63044f692baac40b45ade60e69a511a9f36befd3aed09705ff2"
+    },
+    {
+      "file": "Small_TV/src/tests/classic_oracle.py",
+      "sha256": "92401ddcf595125ae6108dbcd65f54cc276e16f531f2b5952dfcc9e082dd5667"
+    },
+    {
+      "file": "Small_TV/src/tests/control_oracle.py",
+      "sha256": "f7df352f24bdad4e978dad327cd66c1f88383bfa46a07fa4399a274594335d8a"
+    },
+    {
+      "file": "Small_TV/src/tests/weather_render_oracle.py",
+      "sha256": "ccc566ba5ab138340c269c34b5e12cefbf16e881d3c08b1c1da7b286af76f724"
+    },
+    {
+      "file": "Small_TV/src/tests/weather_qemu.py",
+      "sha256": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9"
+    },
+    {
+      "file": "Small_TV/src/tests/gdb_observer.py",
+      "sha256": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83"
+    },
+    {
+      "file": "Small_TV/qemu/parity/compare.py",
+      "sha256": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84"
+    },
+    {
+      "file": "Small_TV/qemu/profiles/small-tv-c2.json",
+      "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+    }
+  ],
+  "flows": {
+    "original": {
+      "passed": true,
+      "checks": {
+        "first_photo_complete": true,
+        "settings_changed": true,
+        "idle_brightness_bounded": true,
+        "complete_photo_frame": true,
+        "no_new_fade": true,
+        "hardware_breakpoints_only": true,
+        "no_guest_state_writes": true,
+        "executable_media_unchanged": true,
+        "no_panic": true
+      },
+      "photo_interval": 60,
+      "sources": {
+        "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+      },
+      "idle_state_before": [
+        0,
+        1
+      ],
+      "http_status": 200,
+      "http_guest_seconds": 0.15252299999999863,
+      "backlight": {
+        "brightness": 501,
+        "high_duty": 4095,
+        "resolution_bits": 13,
+        "gpio_routing": 45
+      },
+      "after_request_guest_seconds": 0.1376249999999999,
+      "different_pixels": 0,
+      "qemu_rgb_sha256": "99a9fdafa057f251457c8cde6d494807a1c946647656ed051b18f0f84e789b50",
+      "replayed_rgb_sha256": "99a9fdafa057f251457c8cde6d494807a1c946647656ed051b18f0f84e789b50"
+    },
+    "reconstructed": {
+      "passed": false,
+      "checks": {
+        "first_photo_complete": true,
+        "settings_changed": true,
+        "idle_brightness_bounded": false,
+        "complete_photo_frame": false,
+        "no_new_fade": true,
+        "hardware_breakpoints_only": true,
+        "no_guest_state_writes": true,
+        "executable_media_unchanged": true,
+        "no_panic": true
+      },
+      "photo_interval": 60,
+      "sources": {
+        "images": [
+          {
+            "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+            "bytes": 19248,
+            "offset": "0x0",
+            "file": "bootloader.bin"
+          },
+          {
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+            "bytes": 3072,
+            "offset": "0x8000",
+            "file": "partition-table.bin"
+          },
+          {
+            "sha256": "ad7a9009c984ab8dc302530e231d896b907ca4ec1b75589a90e568e8f8f4c41d",
+            "bytes": 1176272,
+            "offset": "0x10000",
+            "file": "app.bin"
+          },
+          {
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+            "bytes": 1994752,
+            "offset": "0x200000",
+            "file": "assets.bin"
+          }
+        ],
+        "source_sha256": "f411bf0e7af2230294e25f1bf9da5a15eecb85e7d1961f375bdc305f3e5edebc"
+      },
+      "idle_state_before": [
+        0,
+        1
+      ],
+      "http_status": 200,
+      "http_guest_seconds": 0.15689200000000003,
+      "backlight": {
+        "brightness": 901,
+        "high_duty": 819,
+        "resolution_bits": 13,
+        "gpio_routing": 45
+      },
+      "after_request_guest_seconds": 0.6543039999999998,
+      "different_pixels": 57581,
+      "qemu_rgb_sha256": "3f22786db7cc18b337cb9452ef93267fe2d036d08159f49083c952688cea3f2d",
+      "replayed_rgb_sha256": "99a9fdafa057f251457c8cde6d494807a1c946647656ed051b18f0f84e789b50"
+    }
+  },
+  "scope": "Apply real HTTP brightness changes while photos wait for a 60-second timer.",
+  "inputs_unchanged": true,
+  "expected_negative": true
+}

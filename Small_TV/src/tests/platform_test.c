@@ -1463,6 +1463,67 @@ static void test_first_digital_brightness(void)
     clock_ui_start(); run_task("clock_display",digital_entry_scenario);
 }
 
+static unsigned idle_photo_transfers, idle_photo_duty_updates;
+static void photo_idle_brightness_scenario(void)
+{
+    /* Settings and day/night changes must not wait for the next 60-second photo event. */
+    ++clock_step;
+    if (clock_step >= 6)
+        CHECK(photo_draws == 1);
+    if (clock_step == 6)
+    {
+        CHECK(duty == 819);
+        idle_photo_transfers = transfers;
+        preferences.day_level = 500;
+        ++preferences_generation;
+    }
+    if (clock_step >= 7)
+        CHECK(transfers == idle_photo_transfers);
+    if (clock_step == 7)
+    {
+        CHECK(duty == 4095);
+        preferences.night_mode = 1;
+        preferences.night_level = 800;
+        fake_time = 1791907200; /* CN 2026-10-14 00:00:00, synchronized night. */
+        ++preferences_generation;
+    }
+    if (clock_step == 8)
+    {
+        CHECK(duty == 6552);
+        fake_time = 1791885600; /* CN 18:00:00; calendar change without a settings write. */
+    }
+    if (clock_step == 9)
+    {
+        CHECK(duty == 4095);
+        preferences.day_level = 0;
+        ++preferences_generation;
+    }
+    if (clock_step == 10)
+    {
+        CHECK(duty == 0);
+        idle_photo_duty_updates = duty_updates;
+    }
+    if (clock_step == 15)
+    {
+        CHECK(duty_updates == idle_photo_duty_updates);
+        longjmp(blocked, 1);
+    }
+    tick_clock(1);
+}
+static void test_photo_idle_brightness(void)
+{
+    /* Exercise the real photo coordinator and cached LEDC setter during an idle interval. */
+    preferences.wifi_mode = 1; strcpy(preferences.ssid, "fixture");
+    preferences.theme = 2; preferences.photo_seconds = 60;
+    preferences.photo_mask = 1; preferences.photo_size[0] = 100;
+    preferences.day_level = 100; preferences.night_mode = 0;
+    preferences.night_start = 22; preferences.night_stop = 9;
+    CHECK(clock_ui_timer_init() == ESP_OK);
+    CHECK(network_init() == ESP_OK); got_ip(); start_synced_clock_services();
+    CHECK(display_init() == ESP_OK && backlight_init() == ESP_OK);
+    clock_ui_start(); run_task("clock_display", photo_idle_brightness_scenario);
+}
+
 static void startup_ready_scenario(void)
 {
     /* A usable station clock must render at the first task pass, before 181 timer ticks. */
@@ -2072,6 +2133,7 @@ int main(int argc, char **argv)
                  {"weather_field_cleanup", test_weather_field_cleanup},
                  {"clock_coordinator", test_clock_coordinator},
                  {"clock_first_digital_brightness", test_first_digital_brightness},
+                 {"clock_photo_idle_brightness", test_photo_idle_brightness},
                  {"clock_startup_ready_classic", test_startup_ready_classic},
                  {"clock_startup_ready_simple", test_startup_ready_simple},
                  {"clock_startup_ready_photo", test_startup_ready_photo},

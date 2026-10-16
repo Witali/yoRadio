@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 from photo_frame_contract import validate_photo_frames
+from photo_brightness_contract import validate_photo_brightness
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -95,7 +96,7 @@ def main():
         raise ValueError('Profile validation and firmware used different profile/compiler inputs')
     if not qemu['inputs_unchanged']:
         raise ValueError('Emulator or helpers changed during execution')
-    for name in ('startup_wait', 'weather_wait', 'photo_http', 'photo_frames'):
+    for name in ('startup_wait', 'weather_wait', 'photo_http', 'photo_frames', 'photo_brightness'):
         gate = qemu[name]
         if (not gate['passed'] or not gate['inputs_unchanged'] or
                 gate['app_sha256'] != report['app_sha256'] or
@@ -111,6 +112,12 @@ def main():
     photo = qemu['photo_http']
     frames = qemu['photo_frames']
     validate_photo_frames(frames)
+    if len(frames['contract_checks']) != 10 or any(not row['passed'] for row in frames['contract_checks']):
+        raise ValueError('Photo frame contract rejection checks did not pass')
+    idle_brightness = qemu['photo_brightness']
+    validate_photo_brightness(idle_brightness)
+    if idle_brightness['profile_sha256'] != qemu['profile_sha256'] or idle_brightness['source_sha256'] != report['source_sha256']:
+        raise ValueError('Photo brightness tested a different profile/source')
     if (frames['profile_sha256'] != qemu['profile_sha256'] or
             frames['source_sha256'] != report['source_sha256'] or
             frames['factory_elf_sha256'] != text['factory_elf_sha256'] or
@@ -265,6 +272,7 @@ def main():
     qemu_sources.append(calendar_http['flows']['reconstructed']['sources'])
     qemu_sources.extend(flows['reconstructed']['sources'] for flows in completed['scenes'].values())
     qemu_sources.extend(flow['sources'] for flow in frames['flows']['reconstructed'].values())
+    qemu_sources.append(idle_brightness['flows']['reconstructed']['sources'])
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -333,6 +341,7 @@ def main():
                        'weather_wait': held_weather,
                        'photo_http': photo,
                        'photo_frames': frames,
+                       'photo_brightness': idle_brightness,
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],
                        'time_http': time_http,

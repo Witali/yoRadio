@@ -30,3 +30,10 @@ factory на настоящих декодерах: все фото, skip/wrap, 
 прерывание flash write, браузер/физическая панель и длительная работа. Предварительный
 observer ошибочно ждал SNTP до первого кадра и пропускал первый slot; это ошибка
 теста, не прошивки. Финальный baseline учитывает ранний запуск photo.
+
+Позже подтверждена и исправлена idle brightness задержка (см.
+[проверки яркости](photo-idle-brightness-checks.md)). На candidatee3902939/
+b9787790/d73c9146 все84 frames и9 scenes повторно прошли, включая проверку
+реального decoder entry/flash reads и10 negative contract cases. Результат в
+photo-frames-candidate.json; baseline ad7a9009 не переименовывается. HTTP-смена
+яркости в idle теперь покрыта отдельным actual guest gate, mask/fade edits остаются.

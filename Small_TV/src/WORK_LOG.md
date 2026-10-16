@@ -991,6 +991,33 @@
   isolated replay проверки, новый full QEMU run здесь не заявлен. Baseline84
   сохраняет прежние observer hashes и не перепривязан к новому helper.
 
+### 2026-10-16 — подтверждённая задержка photo-idle brightness
+
+- Новый C-case упал на old coordinator: duty4095 не применён после изменения
+  day_level между fade. Реальный QEMU HTTP повторил: factory POST50→duty4095,
+  old native POST50/GET50→прежний819. Source main09128..09140 применяет flag39f2
+  после handlersd5ac/d66a; в C schedule стоял только на action.finished.
+- Clock_task исправлен с FIXED_RECONSTRUCTION: idle или finished применяют
+  cached schedule; active fade сохраняется. Build app e3902939/sourceb9787790/
+  ELFd73c9146,1,176,288 bytes/free359,712 сохранён в firmware этой ветки.
+  Все44 platform cases/1,182,252 checks pass, новыйcase48checks охватывает day/
+  night/calendar/full brightness и отсутствие лишних SPI/LEDC writes.
+- Теми же observer/helper bytes actual HTTP обеих app pass. Candidate request
+  .167458 guest s, проверка duty4095/.501 brightness через.141715 guest s после
+  ответа,0 differing pixels на всём photo/footer и без новой fade. ВМ этого
+  stage закрыты. Before backup BIN/ELF/platform.exe сохранён отдельно.
+- Следующий stage того же handle86675 — повтор84 photo/fade frames и9 canonical
+  scenes на candidate; ещё live. Branch consumer gates требуют frames+idle HTTP,
+  shared contract также проверяет полноту/panic/integrity и10 negative mutations.
+  Root92411/его63 input bytes не менялись, выполняется региональная матрица.
+
+- Handle86675 завершён exit0: оба HTTP flows pass, candidate84 full frames и9
+  canonical scenes повторно совпали, actual JPEG entry/read assertions и10
+  incomplete-evidence rejection checks pass. Все input/archive/helper hashes
+  сохранились, все owned VMs закрыты. Архивированы candidate/before HTTP,
+  C negative executable/hash и44-case platform result. Root92411 отдельно
+  перешёл к natural calendar; его результат не приписан новому firmware.
+
 ### 2026-10-16 — постоянные JPEG inputs и baseline headers
 
 - Создан sparse worktree .worktree/small-tv-jpeg-inputs / branch

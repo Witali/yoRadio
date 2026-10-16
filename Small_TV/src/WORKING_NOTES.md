@@ -7,6 +7,26 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Candidate проверки завершены: handle86675 exit0. E3902939/B9787790/D73C9146
+прошёл actual HTTP idle brightness обеих app, повтор84 full photo/fade frames,
+9 canonical scenes и10 negative contract checks. Все input/image/helper hashes
+unchanged, все ВМ закрыты. Пакет results и actual factory/native assembly
+сохранён в parity; platform44/1,182,252 pass. Это scoped candidate result,
+полный root92411 на AD7A не завершён, source/test bytes main не менять.
+Следующий шаг — дождаться terminal root run, сверить63 initial pins, опубликовать
+его через 19-group publisher, затем интегрировать эту ветку с новыми photo gates
+и выполнить полный объединённый набор. До этого candidate full parity не заявлять.
+
+Подтверждён и исправлен photo-idle brightness gap: oldad7a9009 принимает HTTP50,
+но оставляет duty819 до следующей фотографии; factory сразу4095. Один observer
+до/после + новый C-case воспроизвели fail. Clock_task теперь применяет schedule
+на idle/finished, сохраняя active fade. Candidate app e3902939 / source b9787790 /
+ELF d73c9146,1,176,288 bytes/free359,712 архивирован в firmware ветки; все44
+platform cases /1,182,252 checks и actual HTTP обеих app проходят. Повтор84
+photo/fade frames сейчас идёт handle86675 (после успешного HTTP stage), source/
+test/image bytes этой ветки не менять до terminal. Root full92411 жив отдельно
+на ad7a9009, региональная стадия. Новые сведения — photo-idle-brightness-checks.md.
+
 Новая ветка codex/small-tv-photo-frames от main6a02d8c0, worktree под .worktree.
 Полный photo/fade baseline на том же ad7a9009/f411bf0e/6d7b586f/FDE3 прошёл:
 84 QEMU frames (обе app × masks31/10/0, все фото/шесть фаз, day/night/dark),

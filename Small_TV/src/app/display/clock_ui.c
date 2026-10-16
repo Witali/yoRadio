@@ -116,6 +116,8 @@ static void clock_task(void *unused)
      * FIXED_RECONSTRUCTION: 0x42008e56 keeps rendering its active clock while
      * station retries run. A lost link must not freeze the time, hands or fade;
      * an explicit setup AP still selects the setup screen above this branch.
+     * FIXED_RECONSTRUCTION: photo idle must apply settings/calendar brightness
+     * changes as 0x4200913c does, without waiting for another photo timer event.
      * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
      * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
      * after the photo fade rather than 0x4200bc36's full-brightness ending.
@@ -275,10 +277,12 @@ static void clock_task(void *unused)
                 if (action.finished)
                 {
                     timer_snapshot(TV_TIMER_PHOTO, settings.photo_seconds);
-                    /* Correct the stock fade's full-brightness ending when
-                     * an explicit day/night brightness was requested. */
-                    backlight_update(&settings, local.tm_hour, local.tm_min, valid);
                 }
+                /* Preserve active fade levels. Between fades, apply a slider or
+                 * day/night change on the next pass; the cached setter avoids
+                 * redundant LEDC writes while the photograph remains unchanged. */
+                if (!action.set_duty || action.finished)
+                    backlight_update(&settings, local.tm_hour, local.tm_min, valid);
             }
             else if (timer_snapshot(TV_TIMER_SECOND, settings.photo_seconds).pending || reset_theme || changed)
             {

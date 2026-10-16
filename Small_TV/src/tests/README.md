@@ -90,6 +90,13 @@ HTTP 503 записана как ошибка; наша прошивка отк�
 политикам; все шесть фаз проверяются на следующих переходах. Подробности —
 [photo-frames-checks.md](../../qemu/parity/photo-frames-checks.md).
 
+`photo_brightness_qemu.py` посылает настоящий brightness form в idle между
+фотографиями, проверяет новый PWM, все pixels/footer и отсутствие новой fade.
+Factory и исправленный C должны применить изменение за ограниченное время,
+не ожидая interval60. C-case `clock_photo_idle_brightness` проверяет также
+day/night/calendar изменения и отсутствие лишних SPI/LEDC операций.
+См. [photo-idle-brightness-checks.md](../../qemu/parity/photo-idle-brightness-checks.md).
+
 `report_aggregation` проверяет реальный общий JSON reader и serializer: даты
 сохраняются строками с исходным country offset, включая midnight, DST overlap и
 дробный offset. PowerShell `ConvertFrom-Json -DateKind String` предотвращает
