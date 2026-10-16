@@ -437,3 +437,51 @@
   Перед коммитом проверены exact staged bytes: 50 test inputs, 50 production
   inputs, 106 TZif и font/LFS app/native ELF; profile/board/comparer/launcher
   fingerprints проверяются отдельно тем же staged-byte checker.
+
+### 2026-10-16 — региональные ключи и миграция NVS, проверка в работе
+
+- После нового чтения main `612a23d3` Small TV не менялась со времени checkpoint
+  `f4c48ab1`; посторонние C3/AAC/patch-файлы сохранены. QEMU main `1c7e4c0512`
+  не меняется, физические платы не прошиваются.
+- В оригинале `0x4200f380..0x4200f39e` подтверждены memset(20) и копирование
+  всего country suffix в `0x3fcb7c63`. В нашей прежней сборке настоящий QEMU
+  с raw `AU-W` показывал 17:15 вместо независимого Perth 14:15: импорт обрезал
+  ключ до `AU`. Отрицательный `regional-before-20261016` сохранён с прежними
+  app `2acdf34f` и ELF `570d62ad`; он не переименовывается в успешный результат.
+- Общий country capacity теперь 20; обновлены raw codec, HTTP city pair,
+  time/weather task buffers и weather cache. NVS v2 = 364 bytes, исторический
+  v1 = 344. Проверены все поля миграции, старый padding mode, явный v2 mode 0,
+  raw precedence и отклонение неверных blobs. Host: 3,884 checks; платформа:
+  прежние 26 и два новых региональных сценария. Метки FIXED_RECONSTRUCTION,
+  исходный raw ABI и GB fallback сохранены. Машинные тесты читают ABI из DWARF.
+- В актуальной таблице 15 региональных ключей, включая CA-* и PT-AZ, а не только
+  примеры US-*/AU-W. Host проводит все 109 ключей через API/codec/persistence.
+  Native QEMU preflight прошёл все 15, максимум 64 city + 19 region + UTF-8
+  comma bytes, cache/invalid inputs и холодный старт. Настоящий SDK NVS generator
+  создал v1 fixture: QEMU подтвердил все поля миграции и повторную загрузку из
+  одного NVS v2 при стёртом raw-секторе.
+- Два factory preflight сохранили буквальную задержку simple redraw: внутренний
+  календарь уже Dec 31, экран ещё Jan 1. Один скачок NTP не заменяет периодический
+  minute event. Для региональных factory pixels используется реальный dial→simple
+  HTTP transition; native проверяется без него. AU-C/AU-E отдельно сохраняют
+  установленную ошибку implicit US DST (январь без южного летнего времени).
+  Native всегда обязан совпадать с IANA; эти различия не маскируются.
+- Новая сборка сохранена: app `446a5c3c`, ELF `bde762ed`; исходные инструкции и
+  exact native-settings/time/text snippets архивированы. Full `regional-final-20261016`
+  уже прошёл host/JS/integrity/timezone-source и все RV32 groups; QEMU продолжается.
+  Опубликованные старые отчёты пока не выданы за новый passing checkpoint.
+
+
+- Full `regional-final-20261016` прошёл без объединения разных попыток: все
+  host/RV/QEMU groups и five scene pairs. App/source/test/profile/helper hashes
+  проверены publisher/verifier. Новые `regional_http` и actual NVS v1/v2 gates
+  включены в обязательную публикацию. Новые positive reports относятся только
+  к app 446a5c3c; historical board/negative evidence не переименовано.
+- Code/build/tests сохранены в commit `f27401af`. Exact staged-byte check
+  проверил test inputs, production inputs, TZif, font, LFS app и ELF. Published
+  metrics: app 1,176,096, free 359,904,
+  DIRAM 80,706, comments 157,
+  markers 50. Owned VMs закрыты.
+- Regional settings item закрыт; следующие задачи: actual calendar/DST matrix,
+  exact fixed-state scene differences, adversarial JPEG, concurrency/long-run,
+  browser/physical acceptance. all_functionality_verified остаётся false.

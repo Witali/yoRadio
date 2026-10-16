@@ -31,7 +31,47 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   Коммитить завершённые изменения отдельно, не включать посторонние правки,
   временные ВМ и журналы с пользовательскими данными.
 
-## Последний завершённый запрос: новый сетевой профиль QEMU
+## Последний проверенный участок: региональные ключи и NVS v2
+
+2026-10-16: восстановлены все 20 байт country slot, HTTP, raw import/export,
+time/weather buffers и cache. NVS v2 = 364 bytes; v1 = 344 bytes мигрируется
+по прежнему ABI с сохранением всех полей. Raw sector имеет прежние смещения
+и приоритет. Нулевой legacy mode нормализуется только для v1; v2 mode 0
+сохраняется. Неизвестный корректный ключ продолжает использовать GB fallback;
+город не определяет часовой пояс. Details: `../qemu/parity/regional-settings-checks.md`.
+
+Host проводит все 109 ключей через API/codec/persistence. Actual QEMU проверяет
+все 15 regional keys (US/CA/AU/PT-AZ), clock/date pixels, weather cache, max
+64-byte city + 19-byte region + full-width comma, rejected inputs и cold boot.
+Настоящий SDK NVS fixture проверил все поля v1 migration и загрузку только из
+NVS v2 после стирания raw sector в остановленной disposable VM.
+
+`regional-final-20261016` полностью прошёл host/RV32/QEMU, все пять scene pairs:
+native 3,884, platform 28 /
+1,145,676 checks, timezones 109 / 36,404 comparisons,
+JPEG 107, UTF-8 и transport gates. Сходство полных кадров не является критерием
+parity; аппаратная плата, браузер и soak не проверены. Дамп не менялся.
+
+App `446a5c3c5484c43a9f1645fd4e4487e62cf8443ccc4e76637c266ae4745d0bfb`; source `031eec92fad917e25cf7250e2427edb24524a7b29ae13cd90131101b0c766619`;
+ELF `bde762ed5653506d3aadb65cb30c135dabef65f0b5da62cfa42b67375ac68da5`. App 1,176,096 bytes,
+free 359,904; DIRAM 80,706.
+Runtime heap/stack не измерены. Entry comments 157,
+correction markers 50. Code/build commit `f27401af`.
+QEMU main `1c7e4c0512`, compiled source `5e136b6eab`, executable c970591d unchanged.
+Новые эмуляторные изменения и физическая прошивка не выполнялись.
+
+Отрицательный `regional-before.json` относится к прежнему native app 2acdf34f:
+AU-W обрезался до AU и показывал на три часа больше. `regional-factory-delay.json`
+побитно подтверждает старую дату Jan 1 при обновлённом календаре Dec 31.
+Оригинальная simple theme проверяется после штатного dial→simple re-entry,
+наша — без него. AU-C/AU-E сохраняют объявленную factory implicit-DST разницу;
+native обязан совпадать с IANA. Отрицательные результаты не переименованы в green.
+
+Полное функциональное соответствие ещё не установлено: остались integration
+calendar/DST, классификация whole-frame различий, дополнительные JPEG,
+concurrency/browser/physical/long-run сценарии ниже.
+
+## Предыдущий проверенный участок: новый сетевой профиль QEMU
 
 Repo-owned `Small_TV/qemu/profiles/small-tv-c2.json` хранит schema 1 hardware,
 factory SPI2/ST7789 wiring, network URLs/NTP hosts/SSID. `qemu/run.ps1` передаёт
@@ -306,27 +346,20 @@ runtime-память платы не измерялась. Entry comments у 142
 
 Остаются явно не проверенные или не восстановленные пути:
 
-1. Восстановить regional country keys: factory slot 20 bytes и table содержит
-   AU-W/US-H, native `country[3]`, raw encoder и HTTP parser оставляют два символа.
-   Pure timezone helper проверяет все 109, но это не доказывает доступность через
-   settings/HTTP. Нужны API/import/persistence и ABI/NVS migration проверки.
-   Country defaults нельзя выдавать за city timezone inference. Старый manifest
-   scope с «previously unreachable» надо исправить при следующем проверенном
-   обновлении: raw factory slot действительно вмещает эти строки.
-2. Расширить реальные UDP-проверки midnight/Sunday/country/DST/всех тем/форматов.
+1. Расширить реальные UDP-проверки midnight/Sunday/country/DST/всех тем/форматов.
    SNTP validity/retries/same-second cache/reset уже проходят обязательные gates,
    IANA helper исполняет libc, но весь transport/locale путь ими не покрыт.
    Unicode gate охватывает bundled 452 scalars и '?' для остальных; это не все
    письменности, shaping/bidi/NFC или полный fuzz всех HTTP input strings.
-3. JPEG: новый gate охватывает все публичные ресурсы и ограниченные ошибки/обрезку.
+2. JPEG: новый gate охватывает все публичные ресурсы и ограниченные ошибки/обрезку.
    Произвольные пользовательские JPEG, разные subsampling и malformed Huffman/
    restart marker требуют дополнительных фикстур. Classic oracle сохраняет
    media-вызовы как границу; JPEG/BMP исполняются отдельными gates.
-4. Проверить более длительные сетевые/загрузочные сценарии и расход памяти во
+3. Проверить более длительные сетевые/загрузочные сценарии и расход памяти во
    время работы. Аппаратные и браузерные сценарии описаны в `tests/README.md`;
    их нельзя объявлять выполненными по результату других тестов.
 
-5. Классифицировать оставшиеся classic/dial whole-frame differences по
+4. Классифицировать оставшиеся classic/dial whole-frame differences по
    фиксированным времени/состоянию и независимому pixel oracle. Известные factory
    corrections и разная фаза кадра не должны скрывать ещё не восстановленный
    путь. Scene similarity percentage остаётся наблюдением, не критерием parity.
@@ -341,7 +374,7 @@ runtime-память платы не измерялась. Entry comments у 142
 доказательством полной идентичности. Синтетическая погода не проверяет живой сервис.
 
 QEMU находится в `C:\Work\QEMU-ESP32`; изменения ESP32-C2, модульных SPI/I2C и
-виртуальной сети объединены и отправлены в `main` до `b90e2131b8`. Сохранять
+виртуальной сети объединены и отправлены в `main` до `1c7e4c0512` (kernel built from `5e136b6eab`). Сохранять
 совместимость CYD и ESP32-C3 OLED. При изменении эмулятора выполнять их регрессии.
 Закрывать созданные для проверки ненужные ВМ. Физические платы в текущих
 проверках не прошиваются.
