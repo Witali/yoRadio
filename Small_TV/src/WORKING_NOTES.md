@@ -7,6 +7,19 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Живой новый full run: `.build/small-tv-functional/jpeg-integrated-full-20261016`,
+shell handle `92411`, старт после commit `9a7e341c` (отправлен main). Initial pins
+фиксируют 63 test source files, appad7a9009/ELF6d7b586f/QEMUfde38d53. Уже прошли
+report_aggregation14, native3,884, platform43/1,182,204, frontend, integrity и
+timezone_sources; идёт machine. Финального результата ещё нет. Опросить тот же
+handle, не запускать второй run; root source/test/helpers заморожены. Контекстные
+Markdown менять можно. После terminal сверить pins, затем штатные publisher и
+verifier; при успехе обновить canonical raw scoped reports из этого же run.
+Ignored collector `.build/small-tv-parity/archive_immutable_run.py` написан для
+прошлого 17-group запуска: перед новым использованием добавить новые
+machine_jpeg_inputs/report_aggregation/photo_http artifacts, не применять его
+вслепую. Новый сборщик уже сохраняет DateKind String, восстановление дат не нужно.
+
 Текущая интеграция: merge `3aede06f` включил JPEG branch28bfa638 в main и
 сохранил JSON DateKind fix39e666e1, оба журнала и все 19 mandatory groups.
 Root rebuild успешен: app `ad7a9009` / source `f411bf0e` / ELF `6d7b586f`,

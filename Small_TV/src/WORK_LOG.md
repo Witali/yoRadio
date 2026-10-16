@@ -951,6 +951,12 @@
   перепривязаны. Следом один новый полный run jpeg-integrated-full-20261016,
   с initial input pins; полный positive report пока остаётся для0d8b7585.
 
+- Сборка/ASM сохранены commit9a7e341c и отправлены в main вместе с merge и
+  report fix. Freeze_test_inputs записал63 test files, BIN/ELF/QEMU до запуска.
+  Единственный live handle92411: report_aggregation14, native3,884,
+  platform43/1,182,204, frontend/integrity/TZ sources pass; идёт machine.
+  Нового полного результата пока нет, тестовые/source/helper bytes не менять.
+
 ### 2026-10-16 — постоянные JPEG inputs и baseline headers
 
 - Создан sparse worktree .worktree/small-tv-jpeg-inputs / branch
