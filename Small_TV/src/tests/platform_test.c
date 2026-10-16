@@ -1031,6 +1031,7 @@ static void test_display(void)
 }
 
 static unsigned animation_calls, weather_draws, jpeg_draws, photo_draws, last_animation, last_frame;
+static unsigned last_photo_slot;
 static bool weather_pixels;
 static esp_err_t weather_draw_result;
 unsigned media_animation_frames(unsigned animation)
@@ -1066,6 +1067,7 @@ esp_err_t media_draw_photo(unsigned slot)
 {
     assert(slot < 5);
     ++photo_draws;
+    last_photo_slot = slot;
     return ESP_OK;
 }
 static void test_ui_transitions(void)
@@ -1581,6 +1583,39 @@ static void test_photo_reselect(void)
     CHECK(network_init() == ESP_OK); got_ip(); start_synced_clock_services();
     CHECK(display_init() == ESP_OK && backlight_init() == ESP_OK);
     clock_ui_start(); run_task("clock_display", photo_reselect_scenario);
+}
+
+static void photo_active_reselect_scenario(void)
+{
+    /* Restart a cancelled fade after its photo draw, retaining the next slot. */
+    ++clock_step;
+    if (clock_step == 3)
+    {
+        CHECK(photo_draws == 1 && last_photo_slot == 0 && duty == 8191);
+        CHECK(settings_select_theme(2) == ESP_OK);
+    }
+    if (clock_step == 4)
+        CHECK(duty == 2457); /* Reinit must begin at phase zero after clearing the old picture. */
+    if (clock_step == 6)
+        CHECK(photo_draws == 2 && last_photo_slot == 1);
+    if (clock_step == 9)
+    {
+        CHECK(photo_draws == 2 && duty == 0);
+        longjmp(blocked, 1);
+    }
+    tick_clock(1);
+}
+static void test_photo_active_reselect(void)
+{
+    /* A same-theme command during fade must not leave a blank screen for 60 seconds. */
+    preferences.wifi_mode = 1; strcpy(preferences.ssid, "fixture");
+    preferences.theme = 2; preferences.photo_seconds = 60; preferences.photo_mask = 3;
+    for (unsigned slot = 0; slot < 5; ++slot) preferences.photo_size[slot] = 100;
+    preferences.day_level = 0; preferences.night_mode = 0;
+    CHECK(clock_ui_timer_init() == ESP_OK);
+    CHECK(network_init() == ESP_OK); got_ip(); start_synced_clock_services();
+    CHECK(display_init() == ESP_OK && backlight_init() == ESP_OK);
+    clock_ui_start(); run_task("clock_display", photo_active_reselect_scenario);
 }
 
 static void startup_ready_scenario(void)
@@ -2194,6 +2229,7 @@ int main(int argc, char **argv)
                  {"clock_first_digital_brightness", test_first_digital_brightness},
                  {"clock_photo_idle_brightness", test_photo_idle_brightness},
                  {"clock_photo_reselect", test_photo_reselect},
+                 {"clock_photo_active_reselect", test_photo_active_reselect},
                  {"clock_startup_ready_classic", test_startup_ready_classic},
                  {"clock_startup_ready_simple", test_startup_ready_simple},
                  {"clock_startup_ready_photo", test_startup_ready_photo},

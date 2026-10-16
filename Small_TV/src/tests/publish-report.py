@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 from photo_frame_contract import validate_photo_frames
-from photo_controls_contract import validate_photo_brightness, validate_photo_controls
+from photo_controls_contract import validate_photo_brightness, validate_photo_controls, validate_photo_reinit
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -96,7 +96,7 @@ def main():
         raise ValueError('Profile validation and firmware used different profile/compiler inputs')
     if not qemu['inputs_unchanged']:
         raise ValueError('Emulator or helpers changed during execution')
-    for name in ('startup_wait', 'weather_wait', 'photo_http', 'photo_frames', 'photo_brightness', 'photo_controls'):
+    for name in ('startup_wait', 'weather_wait', 'photo_http', 'photo_frames', 'photo_brightness', 'photo_controls', 'photo_reinit'):
         gate = qemu[name]
         if (not gate['passed'] or not gate['inputs_unchanged'] or
                 gate['app_sha256'] != report['app_sha256'] or
@@ -118,6 +118,10 @@ def main():
     validate_photo_brightness(idle_brightness)
     controls_http = qemu['photo_controls']
     validate_photo_controls(controls_http)
+    reinit_http = qemu['photo_reinit']
+    validate_photo_reinit(reinit_http)
+    if reinit_http['profile_sha256'] != qemu['profile_sha256'] or reinit_http['source_sha256'] != report['source_sha256']:
+        raise ValueError('Photo active commands tested different profile/source inputs')
     if controls_http['profile_sha256'] != qemu['profile_sha256'] or controls_http['source_sha256'] != report['source_sha256']:
         raise ValueError('Photo theme commands tested different profile/source inputs')
     if idle_brightness['profile_sha256'] != qemu['profile_sha256'] or idle_brightness['source_sha256'] != report['source_sha256']:
@@ -278,6 +282,7 @@ def main():
     qemu_sources.extend(flow['sources'] for flow in frames['flows']['reconstructed'].values())
     qemu_sources.append(idle_brightness['flows']['reconstructed']['sources'])
     qemu_sources.append(controls_http['flows']['reconstructed']['sources'])
+    qemu_sources.append(reinit_http['flows']['reconstructed']['sources'])
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -348,6 +353,7 @@ def main():
                        'photo_frames': frames,
                        'photo_brightness': idle_brightness,
                        'photo_controls': controls_http,
+                       'photo_reinit': reinit_http,
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],
                        'time_http': time_http,

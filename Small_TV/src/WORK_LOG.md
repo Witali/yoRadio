@@ -1110,3 +1110,31 @@
   и опубликовать его19-group result, затем merge/build/full с тремя photo gates.
   QEMU/физическая плата не менялись. User clarification про software delays
   сохраняется: убирать лишние UI waits, оставлять task yield и аппаратный timing.
+
+### 2026-10-16 — отменённый фотопереход и чёрный экран
+
+- Установлен заводской дефект: init0x42008e08 очищает экран, init0x4200bb20
+  сохраняет fade phase. Повторный HTTP выбор фототемы после её фазы2 оставляет
+  только фазы3…5 и теряет картинку до следующего интервала. Permanent observer
+  подтверждает саму команду на фазе3. Factory и old2EB7 после неё дают[0,1],
+  duty0 и все57,600 чёрных pixels,57,594 отличия от следующей фотографии.
+- Первый запуск остановился при старте QEMU из-за недоступного loopback в
+  sandbox; это инфраструктурная ошибка, не firmware evidence. PID10152 исчез.
+  Реальный before31895 terminal exit1 — ожидаемый native negative; factory
+  known defect напрямую подтверждён, observer/image bytes неизменны, ВМ закрыты.
+- Новое исправление FIXED_FACTORY сбрасывает только slideshow.fade при init
+  фототемы; next_slot сохраняется. Permanent production C-case до правки падает
+  на duty==2457; после неё все46/platform1,182,310 и native3909 проходят.
+- Build32350 terminal exit0: app6bf6a61c/source0baa7e03/ELF7de6fec2,
+  1,176,480 bytes/free359,520 сохранён в firmware. Новая RV32 запись0x4200d4c6
+  проверена по assembly и сохранена отдельно. SDKconfig отличается только EOL,
+  эта побочная правка убрана до runtime tests.
+- Batch77905 terminal exit0: тот же active-command observer, повторные idle
+  команды, brightness,84 frames/9 scenes проходят. Native новый фото/IP за
+  1.094945 guest s,0 pixel differences;10 frame и10 active-contract guards pass.
+  Все owned VMs закрыты. Отдельные before/candidate/C/assembly reports сохранены;
+  исторические сборки не переименованы. Новый gate обязателен в branch suite.
+- Root92411 пока жив на AD7A, native dial fractional-midnight. Все63 tests /
+  root app/ELF сохранились; production/tests root не менялись. После terminal
+  сначала опубликовать его19-group result, затем merge/build/full с четырьмя
+  новыми photo gates. Физическая плата и QEMU не менялись.

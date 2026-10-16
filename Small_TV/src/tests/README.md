@@ -105,6 +105,12 @@ revision. Host tests дополнительно исключают лишние 
 используется publisher/verifier для brightness и theme command evidence.
 См. [photo-reselect-checks.md](../../qemu/parity/photo-reselect-checks.md).
 
+`photo_reinit_qemu.py` повторно выбирает фототему во время незавершённого
+перехода. Точка останова в реальном HTTP handler подтверждает активную фазу;
+проверяется следующий полный кадр. Заводской чёрный экран сохраняется в отчёте
+как установленная ошибка, исправленный C должен начать переход заново, сохранив
+очередь фотографий. См. [photo-reinit-checks.md](../../qemu/parity/photo-reinit-checks.md).
+
 `report_aggregation` проверяет реальный общий JSON reader и serializer: даты
 сохраняются строками с исходным country offset, включая midnight, DST overlap и
 дробный offset. PowerShell `ConvertFrom-Json -DateKind String` предотвращает

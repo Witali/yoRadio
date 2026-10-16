@@ -124,6 +124,10 @@ static void clock_task(void *unused)
      * FIXED_FACTORY: repaint simple-clock digits at real minute rollover instead
      * of waiting for 0x4200bd8c's 66-second flag, and restore configured brightness
      * after the photo fade rather than 0x4200bc36's full-brightness ending.
+     * FIXED_FACTORY: restart the fade after clearing/reinitializing the photo
+     * theme. 0x42008e08 clears the picture, but 0x4200bb20 retains an active
+     * phase; reselecting after phase two then leaves a blank screen until the
+     * next photo interval. Retain the round-robin slot, not the cancelled fade.
      * REQUESTED_CHANGE: advance clipped text fields in the active display loop.
      * REQUESTED_CHANGE: do not suspend the active clock/fade for asynchronous
      * weather work; its mutex-protected snapshot is safe to render meanwhile.
@@ -207,6 +211,8 @@ static void clock_task(void *unused)
             if (reset_theme)
             {
                 display_fill(0, 0, 240, 240, 0);
+                if (settings.theme == 2)
+                    slideshow.fade = 0;
                 changed = true;
                 /* 0x42008e08/0x4200aebe retain the animation cursor across
                  * theme switches; only initial boot starts it at zero. */

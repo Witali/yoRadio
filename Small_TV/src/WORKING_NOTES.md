@@ -7,6 +7,21 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Новый завершённый этап: исправлен подтверждённый чёрный экран при повторной
+инициализации фототемы во время fade. Заводские init очищают дисплей, сохраняя
+фазу 3…5, и теряют изображение до следующего интервала. В обеих программах
+до исправления наблюдались все чёрные pixels и состояние [0,1]; настоящая HTTP
+команда подтверждена аппаратной точкой на фазе 3. C теперь начинает фазу 0,
+сохраняя следующий slot. Метка FIXED_FACTORY, инструкции и детали —
+photo-reinit-checks.md. Candidate app6bf6a61c/source0baa7e03/ELF7de6fec2,
+1 176 480 байт/free359 520 сохранён в firmware. Same-observer before/after:
+новое фото/IP за1.094945 guest s,0 differing pixels. Batch77905 terminal exit0:
+idle theme commands, brightness,84 frames/9 scenes и20 guard checks pass;
+host3909/platform46/1,182,310 pass. Все ВМ серии закрыты. Четвёртый gate
+photo_reinit включён в branch suite/publisher/verifier; другие scoped результаты
+не переименованы. Root92411 всё ещё жив на AD7A: native dial fractional-midnight,
+до terminal и публикации root19-group result исходники root/tests не менять.
+
 Актуально после terminal handle47090 exit0: исправлен повторный выбор той же
 темы. Factory0x4200d854 безусловно сбрасывает theme-init latch; старый C терял
 команду при одинаковых bytes. Новый transient revision и единый mutex snapshot
