@@ -1069,3 +1069,29 @@
   ветку до terminal и публикации root19-group result; после merge/build нужен
   полный набор с тремя новыми photo gates. Main production/tests не менялись.
   Физических действий или изменений QEMU не было; посторонние файлы сохранены.
+
+### 2026-10-16 — полный интегрированный JPEG-прогон завершён
+
+- Handle92411 terminal exit0. Все19 автоматических групп прошли на appAD7A9009 /
+  sourceF411BF0E / ELF6D7B586F / QEMUFDE38D53: host3884, platform43/1,182,204,
+  report aggregation14, все machine gates,41 дополнительных JPEG cases,
+  настоящий photo HTTP21, AP→STA/NVS, weather/scroll/time/UTF8/regional,
+  84 natural calendar transitions и24 completed frames без pixel differences.
+  40 normalized scenes pass; пять несинхронизированных scene pairs остаются
+  диагностикой, их similarity не является критерием соответствия.
+- Initial/final63 test files и app/ELF/QEMU/helper hashes совпали. Новый reader
+  сохранил даты строками; исправление агрегата задним числом не требовалось.
+  Штатные publisher/verifier прошли; опубликованы25 positive artifacts,
+  validation считает158 entry comments /52 markers, DIRAM80,714, app1,176,272 /
+  free359,728. Отдельный audit jpeg-integrated-run-inputs.json сохраняет initial
+  pins и hash полного raw report; ELF/app до merge скопированы в ignored backup.
+- Этот19-group результат относится к AD7A, не к photo branch6BF6. Теперь можно
+  объединять отправленную ветку aded56bf, пересобирать main и выполнять новый
+  полный набор с четырьмя photo gates. Все VM полного прогона закрыты.
+- Отдельная браузерная проверка идёт на собственном snapshot-guest6BF6/PID30908,
+  state .build/small-tv-browser/controls-20261016. Настройки синтетические.
+  Браузерные изменения видны после reload; QMP/DWARF подтвердил London/GB и
+  dirty=false. Base flash.bin в snapshot-режиме закономерно остаётся прежним;
+  его ошибочно использованный первый read не является firmware defect.
+  Браузерная VM ещё нужна для продолжения приёмки, не закрывать до сохранения
+  результата. Browser/physical/soak не объявлены завершёнными.
