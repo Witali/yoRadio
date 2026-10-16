@@ -256,6 +256,17 @@ SPI-байты в RGB565. При тестировании классическо
 отдельно: настоящий JPEG/BMP decoder проверяется в первом наборе.
 
 Детерминированная подача событий не проверяет гонки настоящего FreeRTOS.
+Отдельный `startup_qemu.py` измеряет первый actual classic frame после настоящего
+UDP SNTP notification через read-only аппаратные GDB breakpoints. Критерий —
+не более 0,5 guest s после callback; отсутствие SNTP/IP и photo theme покрыты
+платформенными сценариями. Тест пока запускается отдельно от полного suite:
+
+```powershell
+python Small_TV/src/tests/startup_qemu.py --dependency-root C:/Work/yoRadio `
+  --qemu-root C:/Work/QEMU-ESP32/.worktree/small-tv-wifi-link `
+  --output .build/startup-check
+```
+
 Число `checks` включает обходы диапазонов и пикселей и не является процентом
 покрытия кода. Никакой результат успешного host HTTP не выдаётся за успешный
 запрос погоды из QEMU или физической платы. Сравнение QEMU-снимков измеряет

@@ -1341,7 +1341,11 @@ static void clock_scenario(void)
     if (clock_step < 182)
         CHECK(animation_calls == 0 && photo_draws == 0);
     if (clock_step == 182)
+    {
         CHECK(animation_calls == 1);
+        struct timeval event = {.tv_sec = fake_time};
+        sntp_callback(&event);
+    }
     if (clock_step == 200)
     {
         preferences.theme = 1;
@@ -1418,7 +1422,9 @@ static void test_clock_coordinator(void)
           alarm_config.flags.auto_reload_on_alarm);
     CHECK(network_init() == ESP_OK);
     got_ip();
-    start_synced_clock_services();
+    services_start();
+    run_task("time_sync", stop_time_worker_once); /* Exercise the unchanged startup timeout. */
+    CHECK(sntp_callback && !services_time_synced());
     strcpy(preferences.weather_key, "fixture-key");
     run_task("weather_http", seed_weather);
     CHECK(display_init() == ESP_OK);
@@ -1431,13 +1437,12 @@ static void digital_entry_scenario(void)
 {
     /* Observe colored SPI pixels, rather than merely checking duty after a frame. */
     ++clock_step;
-    if (clock_step==181)digital_brightness_probe=true;
-    if (clock_step==182) {
+    if (clock_step==1) {
         CHECK(digital_ink>0); digital_ink=0;
         preferences.theme=1; ++preferences_generation;
         backlight_set_level(800); /* Simulate entering from a different visible duty. */
     }
-    if (clock_step==183) {
+    if (clock_step==2) {
         CHECK(digital_ink>0 && duty==expected_digital_duty);
         longjmp(blocked,1);
     }
@@ -1454,7 +1459,124 @@ static void test_first_digital_brightness(void)
     run_task("weather_http",seed_weather);
     CHECK(display_init()==ESP_OK && backlight_init()==ESP_OK);
     CHECK(duty==819);
+    digital_brightness_probe=true;
     clock_ui_start(); run_task("clock_display",digital_entry_scenario);
+}
+
+static void startup_ready_scenario(void)
+{
+    /* A usable station clock must render at the first task pass, before 181 timer ticks. */
+    CHECK(clock_step == 0 && network_connected());
+    if (preferences.theme == 0)
+        CHECK(animation_calls == 1);
+    else if (preferences.theme == 2)
+        CHECK(duty == 2457); /* First 30%-brightness fade action, without SNTP. */
+    else
+    {
+        uint16_t rendered[240 * 240];
+        memcpy(rendered, panel, sizeof(rendered));
+        struct tm local;
+        CHECK(services_local_time(preferences.country, fake_time, &local));
+        if (preferences.theme == 1)
+            factory_draw_simple(&preferences, &local, "10.0.2.15", true, true, true);
+        else
+            factory_draw_dial(&local, "10.0.2.15", true);
+        CHECK(!memcmp(rendered, panel, sizeof(rendered)));
+    }
+    ++clock_step;
+    longjmp(blocked, 1);
+}
+static void test_startup_ready(unsigned theme)
+{
+    /* Exercise the real coordinator's early-ready path for each independently booted theme. */
+    preferences.wifi_mode = 1; strcpy(preferences.ssid, "fixture");
+    preferences.theme = theme; preferences.day_level = 500;
+    CHECK(clock_ui_timer_init() == ESP_OK);
+    CHECK(network_init() == ESP_OK); got_ip();
+    if (theme != 2)
+        start_synced_clock_services();
+    else
+        services_start();
+    CHECK(display_init() == ESP_OK && backlight_init() == ESP_OK);
+    clock_ui_start(); run_task("clock_display", startup_ready_scenario);
+    CHECK(clock_step == 1);
+}
+static void test_startup_ready_classic(void)
+{
+    /* Start classic rendering as soon as the clock is ready. */
+    test_startup_ready(0);
+}
+static void test_startup_ready_simple(void)
+{
+    /* Start the simple clock as soon as its calendar is ready. */
+    test_startup_ready(1);
+}
+static void test_startup_ready_photo(void)
+{
+    /* A connected photo theme needs no time synchronization. */
+    test_startup_ready(2);
+}
+static void test_startup_ready_dial(void)
+{
+    /* Start analog rendering as soon as the calendar is ready. */
+    test_startup_ready(3);
+}
+
+static bool startup_wait_address;
+static void startup_wait_scenario(void)
+{
+    /* Supply the missing prerequisite after two passes; a lost link must not restart startup. */
+    ++clock_step;
+    if (clock_step <= 2)
+        CHECK(animation_calls == 0);
+    if (clock_step == 2)
+    {
+        if (startup_wait_address)
+            got_ip();
+        else
+        {
+            struct timeval event = {.tv_sec = fake_time};
+            sntp_callback(&event);
+        }
+    }
+    if (clock_step == 3)
+    {
+        CHECK(animation_calls == 1);
+        disconnected();
+    }
+    if (clock_step == 4)
+    {
+        CHECK(animation_calls == 2 && !network_connected());
+        longjmp(blocked, 1);
+    }
+    tick_clock(1);
+}
+static void test_startup_wait(bool address)
+{
+    /* Retain the startup screen until both a station lease and confirmed time are available. */
+    startup_wait_address = address;
+    preferences.wifi_mode = 1; strcpy(preferences.ssid, "fixture");
+    CHECK(clock_ui_timer_init() == ESP_OK && network_init() == ESP_OK); got_ip();
+    services_start(); run_task("time_sync", stop_time_worker_once);
+    CHECK(sntp_callback && !services_time_synced());
+    if (address)
+    {
+        struct timeval event = {.tv_sec = fake_time}; sntp_callback(&event);
+        disconnected();
+    }
+    CHECK(display_init() == ESP_OK);
+    clock_ui_start(); run_task("clock_display", startup_wait_scenario);
+    CHECK(clock_step == 4);
+}
+static void test_startup_wait_sync(void)
+{
+    /* A station lease alone does not prove the clock is synchronized. */
+    test_startup_wait(false);
+}
+static void test_startup_wait_address(void)
+{
+    /* A previously synchronized clock still waits for its initial station lease. */
+    test_startup_wait(true);
 }
 static void test_timer_driver_failures(void)
 {
@@ -1471,26 +1593,26 @@ static void animation_scenario(void)
 {
     /* Follow the factory cursor across a shorter GIF and a temporary theme switch. */
     ++clock_step;
-    if (clock_step == 202)
+    if (clock_step == 21)
     {
         CHECK(animation_calls == 21 && last_animation == 2 && last_frame == 20);
         preferences.animation = 1; /* 25 -> 15 frames, old cursor is 21. */
         ++preferences_generation;
     }
-    if (clock_step == 203)
+    if (clock_step == 22)
     {
         CHECK(last_animation == 1 && last_frame == 0);
         preferences.theme = 1;
         ++preferences_generation;
     }
-    if (clock_step > 203 && clock_step <= 209)
+    if (clock_step > 22 && clock_step <= 28)
         CHECK(animation_calls == 22);
-    if (clock_step == 209)
+    if (clock_step == 28)
     {
         preferences.theme = 0;
         ++preferences_generation;
     }
-    if (clock_step == 210)
+    if (clock_step == 29)
     {
         CHECK(animation_calls == 23 && last_frame == 1);
         longjmp(blocked, 1);
@@ -1513,7 +1635,7 @@ static void test_clock_animation_selection(void)
     CHECK(display_init() == ESP_OK);
     clock_ui_start();
     run_task("clock_display", animation_scenario);
-    CHECK(clock_step == 210);
+    CHECK(clock_step == 29);
 }
 
 static uint16_t clock_first_frame[240*240];
@@ -1950,6 +2072,12 @@ int main(int argc, char **argv)
                  {"weather_field_cleanup", test_weather_field_cleanup},
                  {"clock_coordinator", test_clock_coordinator},
                  {"clock_first_digital_brightness", test_first_digital_brightness},
+                 {"clock_startup_ready_classic", test_startup_ready_classic},
+                 {"clock_startup_ready_simple", test_startup_ready_simple},
+                 {"clock_startup_ready_photo", test_startup_ready_photo},
+                 {"clock_startup_ready_dial", test_startup_ready_dial},
+                 {"clock_startup_wait_sync", test_startup_wait_sync},
+                 {"clock_startup_wait_address", test_startup_wait_address},
                  {"clock_offline_dst_classic", test_offline_dst_classic},
                  {"clock_offline_dst_simple", test_offline_dst_simple},
                  {"clock_offline_dst_dial", test_offline_dst_dial},

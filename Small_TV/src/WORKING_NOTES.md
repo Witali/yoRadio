@@ -7,6 +7,27 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+2026-10-16, software-delay audit: после app a2b6129b удалено также безусловное
+ожидание startup при уже готовых Wi-Fi/SNTP. Кандидат app `743fa69f`, source
+`2583ac4c`, ELF `7bda9d7d` сохранён в firmware; 43 platform cases / 1,182,204
+checks и actual RV32 network regression прошли. Один и тот же QEMU observer
+измерил ожидание после SNTP 13,353327 guest s на старом app и 0,040202 на новом;
+полный первый кадр завершён за 0,101856. Дополнительный real HTTP weather-wait
+regression тоже прошёл: RUNNING=1, новый кадр через .971445 guest s до ответа.
+Точные инструкции, отдельные отчёты и оставшиеся delay —
+`../qemu/parity/software-delays.md`. Общие published reports всё ещё старые;
+startup/weather observers ещё требуется включить в полный gate, а frozen-scroll
+ожидание в field_qemu обновить. Нельзя считать всю прошивку проверенной.
+
+В QEMU candidate `962cda7a6f` / executable `fde38d53` добавлено отключение
+внешнего AP через реальный 802.11 deauth, QOM station-ap-online. Все восемь
+packet tests, 11 helper tests, SPI/I2C/SD, CYD/C3 legacy/modular boots и actual
+HTTP AP->STA обеих прошивок прошли. Scoped real native app a2b6129b показывает
+ход simple clock при connected=false и последующий reconnect; все три полных
+кадра имеют 0 отличий от исправленной factory reference. Это graceful AP
+shutdown, не внезапная RF-потеря. Canonical QEMU main/executable не заменён;
+собственные ВМ закрыты. Более длинные outage/другие темы требуют отдельного gate.
+
 Добиться функционального соответствия заводской прошивке. Подтверждённые ошибки
 оригинала исправлять, как попросил пользователь. Намеренные исправления учитывать
 отдельно от ошибок нашего переноса; полное совпадение пока не установлено.
@@ -29,7 +50,8 @@ before/after воспроизводит 6.735 guest s old wait и .932 guest s c
 second-event frame при RUNNING=1. Результаты/точные compiled instructions —
 `../qemu/parity/software-weather-wait-checks.md`. Старые reports 072135ee не
 переименовывать. Нужны integration нового test в full gate, обновление прежнего
-frozen-scroll ожидания field_qemu, full regression и natural station link loss.
+frozen-scroll ожидания field_qemu и full regression. Отдельный natural station
+shutdown/recovery для app a2b6129b уже прошёл, как описано выше.
 
 - Сопоставлять оригинальные инструкции с реально скомпилированным C ELF, а не
   только с псевдокодом Ghidra. Не менять исходный `Small_TV/full-flash.bin`.

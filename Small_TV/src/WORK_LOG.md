@@ -578,3 +578,36 @@
   а field_qemu frozen-scroll ожидание заменить проверкой отзывчивости. Natural
   station disconnect/reconnect, дальнейший software-delay audit и полный набор
   остаются обязательной последующей работой.
+
+### 2026-10-16 — startup по готовности вместо лишнего программного ожидания
+
+- Пользователь уточнил software delays. Исследованы factory timer
+  0x42008278..0x42008296 и actual compiled clock_task. Подтверждённое ожидание
+  181 тика сохранялось даже при готовом clock. REQUESTED_CHANGE завершает его
+  по station lease + confirmed SNTP; photo theme не нуждается в SNTP.
+- Startup latch и его event сбрасываются под ISR critical section без сброса
+  остальных timer counters. При отсутствии условий остаётся старый тайм-аут.
+  Yield 100 ms, дисплейные init delays и фоновые timers не удалялись.
+- Новые platform cases classic/simple/dial воспроизвели старый startup. Ошибка
+  mutex раннего photo prototype исправлена в самом test; этот сбой не выдан за
+  дефект production. После исправления все 43 cases / 1,182,204 checks прошли,
+  включая четыре темы, ожидание IP/SNTP и отсутствие возврата startup при потере
+  Wi-Fi. Старый timeout и требование яркости первого кадра проверены отдельно.
+- Portable startup_qemu.py наблюдает actual callback/renderer hardware GDB
+  breakpoints: прежний app 9e4f856a — ожидаемый fail, 13.353327 guest s; новый
+  743fa69f — pass, .040202 до renderer / .101856 до полного кадра. Guest RAM,
+  инструкции, PC и время не меняются, test/helper hashes одинаковы до/после.
+- Сборка app 1,176,224 / free 359,776, source 2583ac4c / ELF 7bda9d7d сохранена
+  в firmware. Отдельно сохранены точные compiled instructions и отчёты.
+  Actual RV32 network (4 traces / 16 dispatch states) прошёл; real external
+  weather-wait regression тоже pass: RUNNING=1, frame через .971445 guest s.
+- QEMU graceful AP control завершён отдельным коммитом 962cda7a6f и отправлен
+  в codex/small-tv-wifi-link. Восемь packet tests, 11 helper tests, modular
+  SPI/I2C/SD, CYD/C3 boots и actual HTTP setup/AP->STA/persistence обеих app
+  прошли на executable fde38d53. Native a2b6129b также продолжает simple clock
+  во время live SDK disconnect, сохраняет station IP и восстанавливает HTTP;
+  три полных кадра имеют 0 отличий от declared corrected reference.
+- Canonical QEMU не заменялся, физической платы не касались, собственные ВМ
+  закрыты. Whole-suite нового app ещё не проходил: observers следует включить
+  в полный gate и обновить старое frozen-scroll ожидание. Общие старые positive
+  reports не переименовываются в результаты кандидата; parity остаётся неполной.

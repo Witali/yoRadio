@@ -29,6 +29,7 @@ $cases+=@("regional_time_worker","regional_weather_worker")
 $cases+=@("clock_first_digital_brightness")
 $cases+=@("clock_offline_dst_classic","clock_offline_dst_simple","clock_offline_dst_dial","clock_offline_photo")
 $cases+=@("clock_weather_pending_classic","clock_weather_pending_simple","clock_weather_pending_dial","clock_weather_pending_photo")
+$cases+=@("clock_startup_ready_classic","clock_startup_ready_simple","clock_startup_ready_photo","clock_startup_ready_dial","clock_startup_wait_sync","clock_startup_wait_address")
 $results=@()
 foreach($case in $cases) {
     $path=Join-Path $output "$case.json"
