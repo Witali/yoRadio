@@ -957,6 +957,28 @@
   platform43/1,182,204, frontend/integrity/TZ sources pass; идёт machine.
   Нового полного результата пока нет, тестовые/source/helper bytes не менять.
 
+### 2026-10-16 — полные photo/fade frames в отдельной ветке
+
+- Создан sparse worktree .worktree/small-tv-photo-frames / branch от main6a02d8c0.
+  Root run92411 не затронут; сохранены exact ELF/BIN/factory ELF/ROM copies.
+- Новый PhotoMachine сохраняет настоящий JPEG/фото selector/footer/LEDC code,
+  SDK flash/mutex/allocation и LCD transport остаются boundaries. Девять canonical
+  frames all5/skip/wrap/none и три IP дают0 pixel differences.
+- QEMU baseline6 owned VMs:84 full frames,28/10/4 на вариант для all/masked/none.
+  Все57,600 pixels, exact13-bit duty, phase continuity, photo order и immutable
+  executable/media проверены. Factory literal replay совпал; native endpoint
+  fade restore сравнивается с отдельно заявленным brightness correction.
+  Phase0/1 до первого полного JPEG не считаются проверкой startup; все6 phases
+  покрываются последующими кадрами. Source/observer/helper fingerprints unchanged.
+- Early prototype пытался ждать SNTP перед первым фото и ошибочно требовалslot0
+  после пропуска; corrected observer проверяет первый JPEG до синхронизации.
+  Night profile действительно использовал duty819 до SNTP и4095 после него.
+  Это test assumption fix, не production bug. Baseline архивирован отдельно,
+  branch suite/publisher/verifier требуют новый gate; root92411 остаётся своим run.
+- Следующий real HTTP случай — изменение яркости в idle между снимками:
+  factory handlers0x4200d5ac/0x4200d66a выставляют flag3fcc39f2, main4200913c
+  применяет его; C пока обновляет schedule только на finished. Проверить before.
+
 ### 2026-10-16 — постоянные JPEG inputs и baseline headers
 
 - Создан sparse worktree .worktree/small-tv-jpeg-inputs / branch

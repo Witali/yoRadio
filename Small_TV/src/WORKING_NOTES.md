@@ -7,6 +7,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Новая ветка codex/small-tv-photo-frames от main6a02d8c0, worktree под .worktree.
+Полный photo/fade baseline на том же ad7a9009/f411bf0e/6d7b586f/FDE3 прошёл:
+84 QEMU frames (обе app × masks31/10/0, все фото/шесть фаз, day/night/dark),
+0 differing pixels, плюс9 canonical raw scenes на реальном JPEG/glyph pipeline.
+Production code не менялся, все ВМ закрыты. Новый branch gate включён в
+suite/publisher/verifier, общий результат root92411 им не подменять.
+См. ../qemu/parity/photo-frames-checks.md. Дальше проверить actual HTTP смену
+яркости между фото: C вызывает backlight_update только на finished, тогда как
+factory handlers ставят update flag для следующего main pass. Это пока
+подозрение по коду, не подтверждённый runtime defect.
+
 Живой новый full run: `.build/small-tv-functional/jpeg-integrated-full-20261016`,
 shell handle `92411`, старт после commit `9a7e341c` (отправлен main). Initial pins
 фиксируют 63 test source files, appad7a9009/ELF6d7b586f/QEMUfde38d53. Уже прошли

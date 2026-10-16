@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from photo_frame_contract import validate_photo_frames
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -94,7 +95,7 @@ def main():
         raise ValueError('Profile validation and firmware used different profile/compiler inputs')
     if not qemu['inputs_unchanged']:
         raise ValueError('Emulator or helpers changed during execution')
-    for name in ('startup_wait', 'weather_wait', 'photo_http'):
+    for name in ('startup_wait', 'weather_wait', 'photo_http', 'photo_frames'):
         gate = qemu[name]
         if (not gate['passed'] or not gate['inputs_unchanged'] or
                 gate['app_sha256'] != report['app_sha256'] or
@@ -108,6 +109,15 @@ def main():
                 raise ValueError('Guest observer changed: ' + path)
     startup, held_weather = qemu['startup_wait'], qemu['weather_wait']
     photo = qemu['photo_http']
+    frames = qemu['photo_frames']
+    validate_photo_frames(frames)
+    if (frames['profile_sha256'] != qemu['profile_sha256'] or
+            frames['source_sha256'] != report['source_sha256'] or
+            frames['factory_elf_sha256'] != text['factory_elf_sha256'] or
+            frames['normalized']['app_sha256'] != frames['app_sha256'] or
+            frames['normalized']['native_elf_sha256'] != frames['native_elf_sha256'] or
+            frames['normalized']['factory_elf_sha256'] != frames['factory_elf_sha256']):
+        raise ValueError('Photo frames or normalized scenes used different inputs')
     photo_checks = {'valid_gray_published', 'malformed_huffman_rejected', 'busy_and_retry_policy',
                     'valid_published', 'download_exact', 'first_boot_no_panic', 'owned_flash_changed',
                     'cold_boot_new_vm', 'cold_boot_metadata', 'cold_boot_download_exact', 'cold_boot_no_panic',
@@ -254,6 +264,7 @@ def main():
     qemu_sources.append(regional['flows']['reconstructed']['sources'])
     qemu_sources.append(calendar_http['flows']['reconstructed']['sources'])
     qemu_sources.extend(flows['reconstructed']['sources'] for flows in completed['scenes'].values())
+    qemu_sources.extend(flow['sources'] for flow in frames['flows']['reconstructed'].values())
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -321,6 +332,7 @@ def main():
                        'startup_wait': startup,
                        'weather_wait': held_weather,
                        'photo_http': photo,
+                       'photo_frames': frames,
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],
                        'time_http': time_http,

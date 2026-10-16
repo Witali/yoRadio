@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parents[1]
 ARCHIVE = REPO / 'firmware/development/small-tv-esp32c2-reconstructed'
 BUILD = REPO / '.build/small-tv-esp32c2'
+sys.path.insert(0, str(ROOT/'tests'))
+from photo_frame_contract import validate_photo_frames
 
 
 def read(path):
@@ -80,16 +82,28 @@ def main():
     for item in jpeg_inputs['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
                 'Additional JPEG fixture/adapter changed: ' + item['file'])
-    for name in ('startup_wait', 'weather_wait', 'photo_http'):
+    for name in ('startup_wait', 'weather_wait', 'photo_http', 'photo_frames'):
         gate = groups['qemu'][name]
+        gate_source = gate['source_sha256'] if name == 'photo_frames' else gate['sources']['source_sha256']
         require(gate['passed'] and gate['inputs_unchanged'] and gate['app_sha256'] == app_sha and
                 gate['native_elf_sha256'] == state['native_elf_sha256'] and
                 gate['qemu_sha256'] == groups['qemu']['qemu_sha256'] and
                 gate['helper_sha256'] == groups['qemu']['helper_sha256'] and
-                gate['sources']['source_sha256'] == manifest['source_sha256'],
+                gate_source == manifest['source_sha256'],
                 'Guest observer tested different inputs: ' + name)
     startup, held_weather = groups['qemu']['startup_wait'], groups['qemu']['weather_wait']
     photo = groups['qemu']['photo_http']
+    frames = groups['qemu']['photo_frames']
+    validate_photo_frames(frames)
+    require(frames['profile_sha256'] == groups['qemu']['profile_sha256'] and
+            frames['factory_elf_sha256'] == state['factory_elf_sha256'] and
+            frames['normalized']['app_sha256'] == frames['app_sha256'] and
+            frames['normalized']['native_elf_sha256'] == frames['native_elf_sha256'] and
+            frames['normalized']['factory_elf_sha256'] == frames['factory_elf_sha256'],
+            'Photo frames or normalized scenes used different inputs')
+    for item in frames['test_inputs']:
+        require(hashlib.sha256((REPO/item['file']).read_bytes()).hexdigest() == item['sha256'],
+                'Photo frame input changed since execution: '+item['file'])
     photo_checks = {'valid_gray_published', 'malformed_huffman_rejected', 'busy_and_retry_policy',
                     'valid_published', 'download_exact', 'first_boot_no_panic', 'owned_flash_changed',
                     'cold_boot_new_vm', 'cold_boot_metadata', 'cold_boot_download_exact', 'cold_boot_no_panic',
@@ -265,6 +279,8 @@ def main():
     report['settings_nvs_v1_migration_verified'] = regional['nvs_migration']['passed']
     report['qemu_completed_scene_report'] = '../qemu/completed-scenes-validation.json'
     report['qemu_completed_frames'] = sum(len(flow['samples']) for scene in completed['scenes'].values() for flow in scene.values())
+    report['qemu_photo_completed_frames'] = sum(len(flow['samples']) for flows in frames['flows'].values() for flow in flows.values())
+    report['normalized_photo_cases'] = len(frames['normalized']['cases'])
     report['normalized_complete_scene_cases'] = len(completed['normalized']['cases'])
     report['qemu_calendar_transport_report'] = '../qemu/calendar-transport-validation.json'
     report['qemu_calendar_transitions'] = sum(flow.get('transitions',len(flow.get('cases',[])))

@@ -83,6 +83,13 @@ HTTP 503 записана как ошибка; наша прошивка отк�
 
 ## Что проверяется автоматически
 
+`photo_frames_qemu.py` проверяет полный JPEG/IP-footer/fade pipeline обеих
+прошивок: 84 actual completed frames и девять одинаково заданных сцен с настоящими
+декодерами. Сохраняется отличие исправленного восстановления яркости после fade.
+Начальные phase0/1 до первого полного изображения относятся к разным startup
+политикам; все шесть фаз проверяются на следующих переходах. Подробности —
+[photo-frames-checks.md](../../qemu/parity/photo-frames-checks.md).
+
 `report_aggregation` проверяет реальный общий JSON reader и serializer: даты
 сохраняются строками с исходным country offset, включая midnight, DST overlap и
 дробный offset. PowerShell `ConvertFrom-Json -DateKind String` предотвращает
