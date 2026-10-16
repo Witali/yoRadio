@@ -7,6 +7,36 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Актуально 2026-10-16, после предыдущих промежуточных записей:
+
+- JPEG branch `codex/small-tv-jpeg-inputs` отправлена до `28bfa63881bb`.
+  `9a59cb07` исправляет три header ошибки, `49a50986` — oversubscribed Huffman
+  trees, `28bfa638` добавляет настоящий HTTP/flash upload/download и cold boot.
+  Candidate app `131ce792` / source `f411bf0e` / ELF `9184b08b`, 1,176,272 bytes,
+  сохранён в firmware этой ветки. Root app `0d8b7585` пока не заменён.
+- Все 41 machine JPEG cases (12 valid / 29 invalid), 107 public assets с 35
+  errors / 7 placements и 3,884 host checks проходят на candidate. Общий producer
+  JPEG выделен в helper; после рефакторинга 41-case gate повторно прошёл.
+- Permanent photo HTTP observer проверил 21 сценарий на четырёх процессах без
+  debounce-пауз. Malformed363 раньше получал200/exists, теперь400/absent. Valid
+  gray/RGB, chunks, busy/order/retries, точное скачивание, finish→cold boot,
+  start незавершённой замены→cold boot и следующая загрузка проходят.
+  settings_photo_size() уже сохраняет размер синхронно; гипотеза о RAM-only окне
+  опровергнута, дополнительные flush/задержки не нужны. Подробности/точные hashes
+  в `../qemu/parity/{huffman,photo-http}-checks.md` JPEG worktree.
+- Root full run `22926` всё ещё жив: региональный HTTP/NVS и все 42 factory
+  natural calendar transitions прошли; native classic/simple завершены, dial
+  продолжается. Впереди complete scenes. Все 58 start test inputs и app/ELF
+  оставались неизменными. Не перезапускать живой run и не выдавать его за terminal.
+- До terminal result менять только эти context/log Markdown в root. Затем
+  проверить исходные hashes, публиковать только настоящий результат, объединить
+  JPEG branch, пересобрать root и выполнить полный набор с новыми обязательными
+  machine_jpeg_inputs/photo_http gates. Ни один отдельный JPEG/photo report не
+  заменяет весь suite. Browser cropper/photo-fade frames/soak/physical остаются gaps.
+
+Ниже сохранены исторические записи; их «далее» и live progress относятся к
+моменту записи. Текущий порядок действий задаёт блок выше.
+
 Новый независимый результат: branch `codex/small-tv-jpeg-inputs`, worktree
 `.worktree/small-tv-jpeg-inputs`, commit `9a59cb07`, отправлен в origin.
 В нём закреплены восемь JPEG variations и 12 malformed cases. Найдены и исправлены
@@ -669,7 +699,8 @@ runtime-память платы не измерялась. Entry comments у 142
 доказательством полной идентичности. Синтетическая погода не проверяет живой сервис.
 
 QEMU находится в `C:\Work\QEMU-ESP32`; изменения ESP32-C2, модульных SPI/I2C и
-виртуальной сети объединены и отправлены в `main` до `1c7e4c0512` (kernel built from `5e136b6eab`). Сохранять
+виртуальной сети объединены и отправлены в `main` до `962cda7a6f`; установленный
+RISC-V executable `fde38d53`, Xtensa binary не менялся. Сохранять
 совместимость CYD и ESP32-C3 OLED. При изменении эмулятора выполнять их регрессии.
 Закрывать созданные для проверки ненужные ВМ. Физические платы в текущих
 проверках не прошиваются.

@@ -875,3 +875,31 @@
   позже и не доказывала проверку таблицы. Следующий приоритет — постоянный case и
   исправление Huffman builder в JPEG worktree. Before header candidate BIN/ELF
   сохранён в .build/small-tv-parity/jpeg-header-before-huffman/.
+
+### 2026-10-16 — Huffman validation и реальные photo HTTP/cold-boot проверки
+
+- Пока root full run 22926 остаётся живым, JPEG branch отправлена отдельными
+  focused commits 49a50986 и 28bfa638. uint32 prefix-space проверка исправляет
+  принятие 17 impossible trees (DC1, AC1…16) в factory и прежнем native коде.
+  Четыре valid trees с 1/16-bit codes сохраняют pixels. Все 41 JPEG inputs,
+  107 public assets/35 errors/7 placements и host3,884 проходят.
+  Production candidate app131ce792/sourcef411bf0e/ELF9184b08b архивирован в ветке;
+  root замороженные source/test/image/helper bytes не менялись.
+- Permanent photo_qemu провёл actual SDK HTTP multipart/flash без app-server mock:
+  21 checks на четырёх процессах, valid gray/RGB38488, ten chunks, busy/order/
+  early finish/exact retry/conflicting retry, metadata и точное скачивание.
+  Тот же observer на old0d8b7585 принимает malformed363, candidate даёт400/absent;
+  это единственный отрицательный check старой сборки.
+- Без debounce-пауз проверены cold boot сразу после successful finish и после
+  start незавершённой замены: опубликованные bytes/длина переживают первый,
+  частичный slot скрыт после второго и следующая загрузка доступна. Candidate
+  response→stop 0/.143098 guest s, max request .298990 guest s. Все UART-фазы
+  проверены, owned flash меняется, source archive неизменён, ВМ закрыты.
+  settings_photo_size() уже вызывает settings_flush() синхронно: гипотеза о
+  background-only сохранении опровергнута, production change не нужен.
+- Общий минимальный JPEG producer выделен в helper, 41-case gate повторён.
+  Новые gates обязательны в branch suite/publisher/verifier; root run их ещё
+  не содержит. Последний root progress: factory42 natural calendar transitions
+  pass, native classic/simple pass, dial продолжается; затем complete scenes.
+  Terminal full result пока отсутствует. После него сверить frozen inputs,
+  объединить JPEG branch, собрать main и проверить актуальный полный набор.
