@@ -128,9 +128,14 @@ weather. Сборка app a2b6129b / source 246397dd / ELF 00ef2763 сохран
 timeout; candidate дал кадр через .740 guest s при реальном REQUEST_RUNNING=1
 и удержанном внешнем ответе. Prototype runs:
 `.build/small-tv-parity/weather-wait-*-20261016-02`.
-Переносимый постоянный тест добавлен в branch tests/weather_wait_qemu.py;
-повтор с input/code fingerprints сейчас идёт: shell 14536 / 87620, output
-`.build/small-tv-parity/weather-wait-permanent-*-20261016`.
+Переносимый постоянный test branch tests/weather_wait_qemu.py тоже прошёл:
+candidate .932 guest s / RUNNING=1; old image 6.735 guest s / state=0, expected
+negative. App/ELF/test/helper/code checks прошли, ВМ закрыты. Output
+`.build/small-tv-parity/weather-wait-permanent-*-20261016`. Code/tests/build/
+scoped evidence сохранены commit `e547d98a` в codex/small-tv-offline-clock.
+Нужно включить test в full gate, обновить прежний frozen-scroll contract в
+field_qemu под запрос отзывчивости и провести новый полный набор. Кандидат ещё
+не в main; published general reports по-прежнему относятся к 9e4f856a.
 Первый probe неверно считал RUNNING bit=2; исправленный читает реальный DWARF enum
 REQUEST_RUNNING=1. Early failed harness attempts не являются доказательством bug.
 

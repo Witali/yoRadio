@@ -674,3 +674,16 @@
   Обе VM закрыты, app/ELF inputs не менялись. Постоянный portable regression
   создан в branch tests/weather_wait_qemu.py с DWARF enum и source/helper/code
   fingerprints; отдельный before/after repeat shell 14536 / 87620 в работе.
+
+- Постоянный weather-wait regression завершён: a2b6129b проходит, даёт кадр
+  за .932 guest s при RUNNING=1 до внешнего ответа. Прежний 9e4f856a показывает
+  expected fail: 6.735 guest s до кадра, state=0 после weather timeout. All input
+  hashes/code checks сохранены, ВМ закрыты. Code/build/test/scoped reports
+  сохранены в branch commit e547d98a. Это намеренное удаление программного
+  ожидания, не заявление полного паритета. Следующее — merge/integration
+  branch, full gate для нового теста и обновление старого frozen-scroll expectation.
+- Root native-only календарный результат сохранён/отправлен commit 92a38121,
+  main remote SHA подтверждён. Во всех 42/84 native calendar cases совпали IANA
+  и corrected frame reference; общий attempt остался failed по старому HTTP
+  timing. QEMU candidate 9d4da15732/E812 остаётся отдельной веткой, canonical
+  main/bin пока 1c7e4c0512/c970591d. Текущих собственных ВМ нет.
