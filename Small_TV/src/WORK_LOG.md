@@ -687,3 +687,32 @@
   и corrected frame reference; общий attempt остался failed по старому HTTP
   timing. QEMU candidate 9d4da15732/E812 остаётся отдельной веткой, canonical
   main/bin пока 1c7e4c0512/c970591d. Текущих собственных ВМ нет.
+
+### 2026-10-16 — проверено удаление лишнего startup-ожидания
+
+- По уточнению пользователя о software delays продолжен аудит factory/C.
+  Factory timer 0x42008278..0x42008296 держал startup 181 тик даже после
+  готовности сети. В branch b10ccf4c startup заканчивается по Wi-Fi/SNTP;
+  фото не требует SNTP. Оставлены timeout, task yield и аппаратные паузы.
+- Все 43 platform cases / 1,182,204 checks проходят, включая четыре темы,
+  отсутствие IP/SNTP, старый timeout, GIF и яркость первого кадра. Negative
+  classic/simple/dial воспроизводили прежнее ожидание; photo harness mutex
+  был исправлен как ошибка теста, не выдан за production defect.
+- Portable startup_qemu.py через hardware breakpoints измерил старый 9e4f856a:
+  13.353327 guest s от actual SNTP callback до первого renderer (expected fail).
+  Новый 743fa69f: .040202 s до renderer, .101856 до полного кадра (pass).
+  Гостевые инструкции, RAM, PC и время не менялись; observer/helper hashes
+  одинаковые, app/ELF inputs сохранены. Реальный delayed-weather regression
+  повторно pass при RUNNING=1 и .971445 guest s до следующего кадра.
+- Новая branch сборка app 1,176,224 / source 2583ac4c / ELF 7bda9d7d сохранена
+  в firmware и отправлена в codex/small-tv-offline-clock. RV32 network тоже
+  pass: четыре event traces, 16 factory dispatch states. Точные инструкции,
+  отчёты и software-delay inventory находятся в этой ветке; main app не заменён.
+- QEMU graceful AP control завершён и отправлен commit 962cda7a6f: восемь
+  packet tests, 11 helper tests, modular devices, CYD/C3 boots и actual HTTP
+  setup обеих app прошли. На real native a2b6129b подтверждены SDK disconnect,
+  ход simple clock offline, station IP и reconnect; три полных кадра имеют
+  0 отличий от corrected reference. Executable fde38d53 пока отдельный кандидат.
+- QEMU canonical/main не заменялся, физические платы не затрагивались,
+  собственные ВМ закрыты. Далее integration веток/обязательных gates, обновление
+  frozen-scroll expectation и полный стабильный набор. Общий parity не заявлен.

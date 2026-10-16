@@ -38,6 +38,34 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## В работе: календарные переходы через SNTP
 
+Последний завершённый участок (2026-10-16): в отдельной ветке
+`codex/small-tv-offline-clock`, commit `b10ccf4c`, удалено startup-ожидание
+после готовности station/SNTP; фото не ждёт SNTP. Сохранён тайм-аут 181 тик
+для отсутствующих условий, остальные timer counters и task yield не менялись.
+App `743fa69f` / source `2583ac4c` / ELF `7bda9d7d` сохранён в firmware ветки:
+1,176,224 bytes / free 359,776. Все 43 platform cases / 1,182,204 checks,
+RV32 network и повтор real external weather-wait test прошли. Один и тот же
+startup observer на actual QEMU замерил 13.353327 guest s старого ожидания
+против .040202 до нового renderer / .101856 до полного первого кадра.
+Точные инструкции и отдельные отчёты — `Small_TV/qemu/parity/software-delays.md`
+в этой ветке. Startup/weather gates ещё нужно включить в общий run-all;
+field_qemu всё ещё содержит устаревшее ожидание frozen scroll. Main app/reports
+пока прежние 9e4f856a; полного suite кандидата не было.
+
+QEMU branch `codex/small-tv-wifi-link` отправлена до `962cda7a6f`, executable
+`fde38d53`: runtime station-ap-online моделирует graceful external AP shutdown
+настоящим 802.11 deauth. Восемь packet и 11 helper tests, modular SPI/I2C/SD,
+CYD/C3 legacy/modular boots и actual AP->STA HTTP/persistence обеих app прошли.
+Native app a2b6129b действительно продолжает simple clock при connected=false,
+сохраняет station IP и восстанавливает HTTP; три полных кадра дают 0 отличий
+от declared corrected reference. Это scoped проверка graceful AP shutdown,
+а не длительных outage/RF/security. Canonical QEMU main/bin ещё 1c7e4c0512 /
+c970591d; они не заменялись. Собственные ВМ закрыты, физических действий нет.
+
+Ближайшее: объединить main calendar tests с app branch, добавить startup/weather
+в полный gate, обновить field_qemu и повторить весь набор на новой QEMU. Ниже
+сохранена история календарных attempts; разные запуски не склеивать в passed suite.
+
 2026-10-16: новый `tests/calendar_qemu.py` готовит natural-transition matrix:
 14 границ (Sunday/year/month/leap/noon, GB/US/AU DST, NP fractional offset,
 post-2038), каждая в classic/simple/dial. Три date formats и оба hour modes
