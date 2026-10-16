@@ -7,7 +7,31 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
-Актуально после исправления расширенного NTP-редактора.
+Актуально после проверки изменений фотонастроек во время fade.
+
+- Эта ветка — codex/small-tv-photo-settings, worktree .worktree/small-tv-photo-settings,
+  baselinecc65d379. Production C/BIN не менялись: appDAF/sourceC839/ELFB06,
+  QEMUFDE3. Новый photo_settings gate: шесть actual HTTP scenarios на обеих
+  firmware,24 completed frames/0 pixel differences,14 contract rejections pass.
+  Handle2990 terminal exit0; ВМ набора закрыты.74 initial test files сохранены.
+  RAW backend/media/panic/ROM identities проверены. Детали photo-settings-checks.md.
+- Предварительные failures касались harness: missing replay ROM/type passed to
+  digest; затем неверное ожидание counter<new_interval после60->3; затем HTTP
+  response wait позволил пропустить первый конец fade. Счётчик17 сохраняется
+  правильно; captures теперь идут под hardware stops до response wait. Native
+  smoke4374 и окончательный12-case2990 проходят на тех же firmware bytes.
+- Нельзя сливать ветку в main до terminal/publish root96792. Root frozen full:
+  .build/small-tv-functional/controls-integrated-full-20261016,72 initial test
+  files/appDAF/ELFB06/QEMUFDE3. Все machine и новые photo/NTP gates/setup/weather/
+  fields прошли; сейчас real SNTP stage. Опросить тот же handle. Root production,
+  tests, generated media, BIN/ELF/QEMU/helpers сохранять до terminal; контекстные
+  Markdown можно менять. Далее root archive_immutable_run.py, только потом merge.
+- Перед интеграцией ветки требуется terminal/publish root96792; scoped evidence
+  сохраняется отдельным focused commit. Browser night/setup/crop/upload/responsive,
+  H09 и soak/heap/stack/physical acceptance
+  остаются. Пассивный memory-observer подготовлен только на уровне DWARF/SDK
+  layout: .build/small-tv-parity/native-memory-layout-20261016.json в root,
+  registered_heaps/TCB/list offsets и byte StackType_t; runtime H10 не проверен.
 
 - Main объединён с photo branch aded56bf merge95eddf55. Root photo buildD978 /
   source0BAA / ELF8AC сохранён и отправлен в ba349b5a. Исправлены idle brightness,
@@ -25,7 +49,7 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   prefill/save/reload/empty/HTML isolation pass; нет console errors.
   Источники/assembly/SDK/C/browser evidence — advanced-editor-checks.md.
 - Все собственные ВМ30908/14684/12152 и CUA tab1 закрыты после сохранения
-  scoped evidence. Активного полного прогона сейчас нет. Browser2 binding
+  scoped evidence. Новый root full96792 описан выше. Browser2 binding
   smallTvBrowser остаётся выбранным, но smallTvTab закрыт. Для продолжения
   использовать новую временную вкладку в том же IAB. computer-use skill,
   guidance/confirmations, browser docs и local-web-development прочитаны.

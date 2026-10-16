@@ -1,0 +1,73 @@
+{
+  "app_sha256": "daf5595dd615be24636ae0dcc506dc67ad2b31225931c20d4d2918a2232846ea",
+  "source_sha256": "c83941ff9c078ae5fcd53a084dee236288046ecee6e4e22794626c5968eb9047",
+  "functions": [
+    {
+      "variant": "factory",
+      "function": "timer_callback",
+      "start": "0x4200826a",
+      "bytes": 332,
+      "code_sha256": "c9954cad4bba5dee342ce1472d258401c6b0dcda02fb83d0c0fa0f0276038d2e"
+    },
+    {
+      "variant": "factory",
+      "function": "next_enabled_photo",
+      "start": "0x4200bb4c",
+      "bytes": 234,
+      "code_sha256": "36e5a10634818fe9029775e70d0ea11b7833ca98a0e445b4033351402647085a"
+    },
+    {
+      "variant": "factory",
+      "function": "photo_mask_http",
+      "start": "0x4200e2ec",
+      "bytes": 836,
+      "code_sha256": "2543d1cd7db9cd436ba4a256d6ef5c34e6d266494fcbe81f1e6d015d67be72ce"
+    },
+    {
+      "variant": "factory",
+      "function": "photo_interval_store",
+      "start": "0x4200f764",
+      "bytes": 70,
+      "code_sha256": "21b49736913fba2e8b944188c605efbdd053d483799a060ba3316c87879e7768"
+    },
+    {
+      "variant": "native",
+      "function": "settings_replace",
+      "start": "0x4200c598",
+      "bytes": 152,
+      "code_sha256": "2c8ad727a8cf746c429e83316024d9cb9671821059dd3da4ab7f5f16845aa51c"
+    },
+    {
+      "variant": "native",
+      "function": "factory_timer_tick",
+      "start": "0x40381f6c",
+      "bytes": 242,
+      "code_sha256": "c8cf23ea86e55e59cc6113ffe689920210c88cb47c35a656c4ca986173c5cc12"
+    },
+    {
+      "variant": "native",
+      "function": "factory_photo_step",
+      "start": "0x4200d8c8",
+      "bytes": 162,
+      "code_sha256": "1301215868f1207540765fed3c37af1ff41151b035b95e947d75abd885f80ef3"
+    },
+    {
+      "variant": "native",
+      "function": "clock_task",
+      "start": "0x4200d31a",
+      "bytes": 1138,
+      "code_sha256": "77d6b54df900aea91e8c1ff82f8b939c1e0b48ee9e24a840148a13adc3ce2c3d"
+    }
+  ],
+  "scope": "Immutable actual instructions; no firmware edits. HTTP setting publication keeps photo/timer state, and the >= timer comparison accepts a retained counter above a newly shortened interval.",
+  "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+  "factory_assembly": {
+    "file": "factory-photo-settings.asm",
+    "sha256": "cb41865405a438df06b41954d74b55487f4d768ae8f38c1c6daf999ab5b3cbe4"
+  },
+  "native_elf_sha256": "b06ce81048b556cb83ea3cb738af48b6c38c7d5dc154811b6715211c506fa1a3",
+  "native_assembly": {
+    "file": "native-photo-settings.asm",
+    "sha256": "d3d7095dec21a1a49770c9be36a084a861dff4eafed7493f32a9c18af6db4219"
+  }
+}

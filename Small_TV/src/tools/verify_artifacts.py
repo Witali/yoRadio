@@ -16,6 +16,7 @@ BUILD = REPO / '.build/small-tv-esp32c2'
 sys.path.insert(0, str(ROOT/'tests'))
 from photo_frame_contract import validate_photo_frames
 from photo_controls_contract import validate_photo_brightness, validate_photo_controls, validate_photo_reinit
+from photo_settings_contract import validate_photo_settings
 from advanced_qemu import validate_advanced
 
 
@@ -84,9 +85,9 @@ def main():
     for item in jpeg_inputs['test_inputs']:
         require(hashlib.sha256((REPO / item['file']).read_bytes()).hexdigest() == item['sha256'],
                 'Additional JPEG fixture/adapter changed: ' + item['file'])
-    for name in ('startup_wait', 'weather_wait', 'advanced_http', 'photo_http', 'photo_frames', 'photo_brightness', 'photo_controls', 'photo_reinit'):
+    for name in ('startup_wait', 'weather_wait', 'advanced_http', 'photo_http', 'photo_frames', 'photo_brightness', 'photo_controls', 'photo_reinit', 'photo_settings'):
         gate = groups['qemu'][name]
-        gate_source = gate['source_sha256'] if name in ('photo_frames', 'photo_brightness', 'photo_controls', 'photo_reinit') else gate['sources']['source_sha256']
+        gate_source = gate['source_sha256'] if name in ('photo_frames', 'photo_brightness', 'photo_controls', 'photo_reinit', 'photo_settings') else gate['sources']['source_sha256']
         require(gate['passed'] and gate['inputs_unchanged'] and gate['app_sha256'] == app_sha and
                 gate['native_elf_sha256'] == state['native_elf_sha256'] and
                 gate['qemu_sha256'] == groups['qemu']['qemu_sha256'] and
@@ -115,6 +116,15 @@ def main():
     validate_photo_controls(controls_http)
     reinit_http = groups['qemu']['photo_reinit']
     validate_photo_reinit(reinit_http)
+    photo_settings = groups['qemu']['photo_settings']
+    validate_photo_settings(photo_settings)
+    require(len(photo_settings['contract_checks']) == 14 and all(row['passed'] for row in photo_settings['contract_checks']) and
+            photo_settings['profile_sha256'] == groups['qemu']['profile_sha256'] and
+            photo_settings['factory_elf_sha256'] == state['factory_elf_sha256'],
+            'Photo in-flight settings omitted rejection checks or used different inputs')
+    for item in photo_settings['test_inputs']:
+        require(hashlib.sha256((REPO/item['file']).read_bytes()).hexdigest() == item['sha256'],
+                'Photo in-flight setting input changed: '+item['file'])
     require(reinit_http['profile_sha256'] == groups['qemu']['profile_sha256'],
             'Photo active commands used a different hardware profile')
     for item in reinit_http['test_inputs']:
