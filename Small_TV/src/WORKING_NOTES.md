@@ -7,6 +7,51 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Актуально после завершения root-прогона 92411 и объединения photo branch.
+
+- Root92411 terminal exit0: все19 автоматических групп прошли на appAD7A9009 /
+  sourceF411BF0E / ELF6D7B586F / QEMUFDE38D53. Совпали63 initial/final inputs;
+  publisher/verifier прошли,25 scoped artifacts и отдельный initial/final audit
+  опубликованы commit dbbef80d. Все84 calendar transitions /24 full frames /
+  40 normalized scenes pass; unsynchronized scene similarity — только диагностика.
+- В main объединяется ветка codex/small-tv-photo-frames до aded56bf: полный
+  photo/fade pipeline, idle brightness, повторный выбор темы и исправление
+  заводского чёрного экрана при повторной инициализации во время fade.
+  Последний branch candidate6BF6A61C/source0BAA7E03/ELF7DE6FEC2 прошёл host3909,
+  platform46/1,182,310, четыре real HTTP/frame сценария,84 frames/9 scenes
+  и20 rejection checks. Подробности photo-{frames,idle-brightness,reselect,reinit}-checks.md.
+- После merge обязательно пересобрать root и сохранить его actual BIN/ELF/hash;
+  branch source0BAA ожидается тем же, но root app/ELF будут отдельной сборкой.
+  Затем новый full suite с обязательными photo_frames/photo_brightness/
+  photo_controls/photo_reinit. Результат AD7A не считать проверкой нового образа.
+  До начала нового full сохранить initial test/app/ELF/QEMU pins, далее не менять
+  его source/tests/helpers, опрашивать один живой handle.
+- Собственная браузерная VM6BF6, PID30908, state
+  .build/small-tv-browser/controls-20261016, URL http://127.0.0.1:18081.
+  QMP подтвердил running и имя SmallTV-cbd9d8d529ec. В CUA Browser2 tab1,
+  binding smallTvTab; сейчас страница /photo. Все настройки синтетические.
+  Проверены flags,4 themes,5 GIFs,3 dates,3 colors,brightness0 и cityLondon/GB;
+  reload действительно читает сохранённые API values. QMP/DWARF видит countryGB,
+  cityLondon,dirty=false. Маски0/10/31 и интервалы60/3/4 наблюдались в браузере;
+  пять превью240×240 декодируются. Браузерная приёмка ещё продолжается.
+- Использован computer-use skill (SKILL.md и guidance/confirmations прочитаны),
+  browser plugin выбран по его рекомендации. CUA browser docs и local-web-
+  development прочитаны. Native app APIs disabled. Tab временный, закрыть по
+  окончании; если нужен в следующем turn — markHandoff. VM не закрывать до
+  сохранения результата; затем stop именно этого state. Base flash.bin остаётся
+  исходным из-за -snapshot: для текущих настроек читать typed QMP или reset guest,
+  не приписывать неизменность basefile потере сохранения.
+- Дальше в H03: night/advanced/setup controls, повтор JPEG crop/upload и viewport,
+  нормальный guest reset с проверкой сохранения. Маска/интервал во время active
+  fade, длительная нагрузка и физическая панель остаются отдельными gaps.
+  Не воспроизводить подтверждённые factory bugs. Лишние software waits убирать,
+  task yield/периоды эффектов/необходимый ST7789 timing сохранять.
+
+## Исторические записи
+
+Ниже сохранены прежние наблюдения. Их live handles и «следующие шаги» относятся
+к моменту записи; порядок продолжения задаёт актуальный блок выше.
+
 Последний завершённый этап: photo branch отправлена до `a8b119e3`.
 Повторный `/setclocktype` с прежним номером теперь остаётся командой
 переинициализации, как безусловный сброс флага `0x4200d854` у factory.
@@ -52,6 +97,68 @@ photo_frames/photo_brightness QEMU gates. Старый full результат �
 report_aggregation/machine_jpeg_inputs/photo_http этого19-group run; перед запуском
 прочитать его текущий код. Phase0/1 до первого полного фото и изменения маски
 во время fade/browser/physical/soak остаются отдельными границами доказательств.
+
+Новый завершённый этап: исправлен подтверждённый чёрный экран при повторной
+инициализации фототемы во время fade. Заводские init очищают дисплей, сохраняя
+фазу 3…5, и теряют изображение до следующего интервала. В обеих программах
+до исправления наблюдались все чёрные pixels и состояние [0,1]; настоящая HTTP
+команда подтверждена аппаратной точкой на фазе 3. C теперь начинает фазу 0,
+сохраняя следующий slot. Метка FIXED_FACTORY, инструкции и детали —
+photo-reinit-checks.md. Candidate app6bf6a61c/source0baa7e03/ELF7de6fec2,
+1 176 480 байт/free359 520 сохранён в firmware. Same-observer before/after:
+новое фото/IP за1.094945 guest s,0 differing pixels. Batch77905 terminal exit0:
+idle theme commands, brightness,84 frames/9 scenes и20 guard checks pass;
+host3909/platform46/1,182,310 pass. Все ВМ серии закрыты. Четвёртый gate
+photo_reinit включён в branch suite/publisher/verifier; другие scoped результаты
+не переименованы. Root92411 всё ещё жив на AD7A: native dial fractional-midnight,
+до terminal и публикации root19-group result исходники root/tests не менять.
+
+Актуально после terminal handle47090 exit0: исправлен повторный выбор той же
+темы. Factory0x4200d854 безусловно сбрасывает theme-init latch; старый C терял
+команду при одинаковых bytes. Новый transient revision и единый mutex snapshot
+восстанавливают reinit без дополнительных NVS writes. Candidate app2eb7bb69 /
+sourceefc9fc36 / ELF4dc4e444,1,176,480 bytes/free359,520 сохранён в firmware.
+Тот же actual HTTP observer до/после: старый E390 fail, новый три раза запускает
+photo1/0/1, все pixels совпали, каждый переход1.04…1.12 guest s. Host3909,
+platform45/1,182,288, idle-brightness HTTP,84 frames/9 scenes,10 frame guards
+и9 control guards pass. Все ВМ этой серии закрыты; actual assembly и отдельные
+scoped reports в photo-reselect-checks.md. Исторические E390/AD7A не заменены.
+Root full92411 по-прежнему жив на frozenAD7A: native classic natural calendar
+через us-spring, до terminal не менять root source/tests/helpers. После terminal
+сначала19-group publisher, затем интеграция всей этой ветки и новый full suite.
+Новая photo_controls проверка обязательна в branch suite/publisher/verifier;
+photo_controls_contract объединяет прежний brightness и новый command contract.
+
+Candidate проверки завершены: handle86675 exit0. E3902939/B9787790/D73C9146
+прошёл actual HTTP idle brightness обеих app, повтор84 full photo/fade frames,
+9 canonical scenes и10 negative contract checks. Все input/image/helper hashes
+unchanged, все ВМ закрыты. Пакет results и actual factory/native assembly
+сохранён в parity; platform44/1,182,252 pass. Это scoped candidate result,
+полный root92411 на AD7A не завершён, source/test bytes main не менять.
+Следующий шаг — дождаться terminal root run, сверить63 initial pins, опубликовать
+его через 19-group publisher, затем интегрировать эту ветку с новыми photo gates
+и выполнить полный объединённый набор. До этого candidate full parity не заявлять.
+
+Подтверждён и исправлен photo-idle brightness gap: oldad7a9009 принимает HTTP50,
+но оставляет duty819 до следующей фотографии; factory сразу4095. Один observer
+до/после + новый C-case воспроизвели fail. Clock_task теперь применяет schedule
+на idle/finished, сохраняя active fade. Candidate app e3902939 / source b9787790 /
+ELF d73c9146,1,176,288 bytes/free359,712 архивирован в firmware ветки; все44
+platform cases /1,182,252 checks и actual HTTP обеих app проходят. Повтор84
+photo/fade frames сейчас идёт handle86675 (после успешного HTTP stage), source/
+test/image bytes этой ветки не менять до terminal. Root full92411 жив отдельно
+на ad7a9009, региональная стадия. Новые сведения — photo-idle-brightness-checks.md.
+
+Новая ветка codex/small-tv-photo-frames от main6a02d8c0, worktree под .worktree.
+Полный photo/fade baseline на том же ad7a9009/f411bf0e/6d7b586f/FDE3 прошёл:
+84 QEMU frames (обе app × masks31/10/0, все фото/шесть фаз, day/night/dark),
+0 differing pixels, плюс9 canonical raw scenes на реальном JPEG/glyph pipeline.
+Production code не менялся, все ВМ закрыты. Новый branch gate включён в
+suite/publisher/verifier, общий результат root92411 им не подменять.
+См. ../qemu/parity/photo-frames-checks.md. Дальше проверить actual HTTP смену
+яркости между фото: C вызывает backlight_update только на finished, тогда как
+factory handlers ставят update flag для следующего main pass. Это пока
+подозрение по коду, не подтверждённый runtime defect.
 
 Живой новый full run: `.build/small-tv-functional/jpeg-integrated-full-20261016`,
 shell handle `92411`, старт после commit `9a7e341c` (отправлен main). Initial pins

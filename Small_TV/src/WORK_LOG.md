@@ -982,6 +982,67 @@
   опубликовать именно его19-group result; затем merge photo branch/build/full.
   Физических действий, правок QEMU или посторонних файлов не было.
 
+### 2026-10-16 — полные photo/fade frames в отдельной ветке
+
+- Создан sparse worktree .worktree/small-tv-photo-frames / branch от main6a02d8c0.
+  Root run92411 не затронут; сохранены exact ELF/BIN/factory ELF/ROM copies.
+- Новый PhotoMachine сохраняет настоящий JPEG/фото selector/footer/LEDC code,
+  SDK flash/mutex/allocation и LCD transport остаются boundaries. Девять canonical
+  frames all5/skip/wrap/none и три IP дают0 pixel differences.
+- QEMU baseline6 owned VMs:84 full frames,28/10/4 на вариант для all/masked/none.
+  Все57,600 pixels, exact13-bit duty, phase continuity, photo order и immutable
+  executable/media проверены. Factory literal replay совпал; native endpoint
+  fade restore сравнивается с отдельно заявленным brightness correction.
+  Phase0/1 до первого полного JPEG не считаются проверкой startup; все6 phases
+  покрываются последующими кадрами. Source/observer/helper fingerprints unchanged.
+- Early prototype пытался ждать SNTP перед первым фото и ошибочно требовалslot0
+  после пропуска; corrected observer проверяет первый JPEG до синхронизации.
+  Night profile действительно использовал duty819 до SNTP и4095 после него.
+  Это test assumption fix, не production bug. Baseline архивирован отдельно,
+  branch suite/publisher/verifier требуют новый gate; root92411 остаётся своим run.
+- Следующий real HTTP случай — изменение яркости в idle между снимками:
+  factory handlers0x4200d5ac/0x4200d66a выставляют flag3fcc39f2, main4200913c
+  применяет его; C пока обновляет schedule только на finished. Проверить before.
+
+### 2026-10-16 — защита полноты photo evidence
+
+- Shared contract теперь требует явных panic/immutable/state-write checks и
+  совпадающих normalized executable identities. Десять отрицательных mutations
+  (missing variant/profile/phase/panic, wrong order/duty/window, changed code,
+  missing normalized case/mixed ELF) отклонены на committed baseline57ef94ae.
+- Photo replay требует настоящий decoder entry и flash reads для выбранного
+  фото; все9 raw scenes повторно прошли на старом ad7a9009 ELF. Scoped hashes
+  и результаты сохранены в photo-frame-guard-validation.json. Это postprocessor/
+  isolated replay проверки, новый full QEMU run здесь не заявлен. Baseline84
+  сохраняет прежние observer hashes и не перепривязан к новому helper.
+
+### 2026-10-16 — подтверждённая задержка photo-idle brightness
+
+- Новый C-case упал на old coordinator: duty4095 не применён после изменения
+  day_level между fade. Реальный QEMU HTTP повторил: factory POST50→duty4095,
+  old native POST50/GET50→прежний819. Source main09128..09140 применяет flag39f2
+  после handlersd5ac/d66a; в C schedule стоял только на action.finished.
+- Clock_task исправлен с FIXED_RECONSTRUCTION: idle или finished применяют
+  cached schedule; active fade сохраняется. Build app e3902939/sourceb9787790/
+  ELFd73c9146,1,176,288 bytes/free359,712 сохранён в firmware этой ветки.
+  Все44 platform cases/1,182,252 checks pass, новыйcase48checks охватывает day/
+  night/calendar/full brightness и отсутствие лишних SPI/LEDC writes.
+- Теми же observer/helper bytes actual HTTP обеих app pass. Candidate request
+  .167458 guest s, проверка duty4095/.501 brightness через.141715 guest s после
+  ответа,0 differing pixels на всём photo/footer и без новой fade. ВМ этого
+  stage закрыты. Before backup BIN/ELF/platform.exe сохранён отдельно.
+- Следующий stage того же handle86675 — повтор84 photo/fade frames и9 canonical
+  scenes на candidate; ещё live. Branch consumer gates требуют frames+idle HTTP,
+  shared contract также проверяет полноту/panic/integrity и10 negative mutations.
+  Root92411/его63 input bytes не менялись, выполняется региональная матрица.
+
+- Handle86675 завершён exit0: оба HTTP flows pass, candidate84 full frames и9
+  canonical scenes повторно совпали, actual JPEG entry/read assertions и10
+  incomplete-evidence rejection checks pass. Все input/archive/helper hashes
+  сохранились, все owned VMs закрыты. Архивированы candidate/before HTTP,
+  C negative executable/hash и44-case platform result. Root92411 отдельно
+  перешёл к natural calendar; его результат не приписан новому firmware.
+
 ### 2026-10-16 — постоянные JPEG inputs и baseline headers
 
 - Создан sparse worktree .worktree/small-tv-jpeg-inputs / branch
@@ -1095,3 +1156,68 @@
   его ошибочно использованный первый read не является firmware defect.
   Браузерная VM ещё нужна для продолжения приёмки, не закрывать до сохранения
   результата. Browser/physical/soak не объявлены завершёнными.
+
+### 2026-10-16 — повторный выбор той же темы
+
+- Factory handler0x4200d7f0 записывает тему и всегда сбрасывает39e9. Наш
+  settings_replace игнорировал одинаковые bytes, coordinator не видел команды.
+  Permanent same-observer negative: factory трижды меняет фото; oldE390 даёт200,
+  но остаётся[0,1],57,492 different pixels через2.283872 guest s. Code/media и
+  helpers неизменны, panic отсутствует; bounded result не выдаётся за60s wait.
+- settings_select_theme публикует transient command revision. Единый snapshot
+  preferences/configuration/theme revisions под mutex исключает рассогласование
+  с HTTP. Активный coordinator подтверждает reinit, photo cursor сохраняется;
+  повторные запросы до одного pass coalesce. ABI364/version2 не менялся.
+- Candidate2eb7bb69/sourceefc9fc36/ELF4dc4e444 собран и сохранён в firmware,
+  1,176,480 bytes/free359,520. Три actual HTTP перехода photo1/0/1 совпали по
+  всем pixels/footer и duty, каждый1.04…1.12 guest s. Host3909 и platform45 /
+  1,182,288 pass, включая отсутствие новых NVS commits и coalescing команд.
+- Batch47090 terminal exit0: новый HTTP, прежний idle brightness и84 frames /
+  9 scenes проходят на одной exact сборке;10 frame guards и9 control mutations
+  отклоняют неполное evidence. Все owned VMs закрыты. Scoped before/candidate,
+  host/platform reports и actual factory/native assembly сохранены отдельно;
+  старые positive results не переименованы. Подробности photo-reselect-checks.md.
+- Root92411 по-прежнему жив на AD7A, native classic calendar через us-spring.
+  Root production/tests не менялись. Сначала дождаться terminal, сверить63 pins
+  и опубликовать его19-group result, затем merge/build/full с тремя photo gates.
+  QEMU/физическая плата не менялись. User clarification про software delays
+  сохраняется: убирать лишние UI waits, оставлять task yield и аппаратный timing.
+
+### 2026-10-16 — отменённый фотопереход и чёрный экран
+
+- Установлен заводской дефект: init0x42008e08 очищает экран, init0x4200bb20
+  сохраняет fade phase. Повторный HTTP выбор фототемы после её фазы2 оставляет
+  только фазы3…5 и теряет картинку до следующего интервала. Permanent observer
+  подтверждает саму команду на фазе3. Factory и old2EB7 после неё дают[0,1],
+  duty0 и все57,600 чёрных pixels,57,594 отличия от следующей фотографии.
+- Первый запуск остановился при старте QEMU из-за недоступного loopback в
+  sandbox; это инфраструктурная ошибка, не firmware evidence. PID10152 исчез.
+  Реальный before31895 terminal exit1 — ожидаемый native negative; factory
+  known defect напрямую подтверждён, observer/image bytes неизменны, ВМ закрыты.
+- Новое исправление FIXED_FACTORY сбрасывает только slideshow.fade при init
+  фототемы; next_slot сохраняется. Permanent production C-case до правки падает
+  на duty==2457; после неё все46/platform1,182,310 и native3909 проходят.
+- Build32350 terminal exit0: app6bf6a61c/source0baa7e03/ELF7de6fec2,
+  1,176,480 bytes/free359,520 сохранён в firmware. Новая RV32 запись0x4200d4c6
+  проверена по assembly и сохранена отдельно. SDKconfig отличается только EOL,
+  эта побочная правка убрана до runtime tests.
+- Batch77905 terminal exit0: тот же active-command observer, повторные idle
+  команды, brightness,84 frames/9 scenes проходят. Native новый фото/IP за
+  1.094945 guest s,0 pixel differences;10 frame и10 active-contract guards pass.
+  Все owned VMs закрыты. Отдельные before/candidate/C/assembly reports сохранены;
+  исторические сборки не переименованы. Новый gate обязателен в branch suite.
+- Root92411 пока жив на AD7A, native dial fractional-midnight. Все63 tests /
+  root app/ELF сохранились; production/tests root не менялись. После terminal
+  сначала опубликовать его19-group result, затем merge/build/full с четырьмя
+  новыми photo gates. Физическая плата и QEMU не менялись.
+
+### 2026-10-16 — объединение фото-ветки
+
+- После terminal root92411 и checkpointdbbef80d объединяется photo branchaded56bf.
+  Конфликты были только в WORKING_NOTES/WORK_LOG; обе истории сохранены, свежий
+  контекст явно отделён от исторических live-записей. Production/test inputs
+  photo branch сохранены; следующим шагом нужны root build и новый full suite.
+- Browser6BF6/PID30908 ещё используется: controls после reload, cityQMP,
+  mask0/10/31,interval60/3/4 и пять decoded previews наблюдались. Full H03 не
+  завершён, dedicated state не закрыт. Снимок baseline flash в -snapshot не
+  отражает guest writes; это объясняет ошибочную первую проверку файла.

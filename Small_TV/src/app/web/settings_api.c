@@ -172,12 +172,14 @@ esp_err_t web_settings_post(httpd_req_t *req)
     /* Validate and apply one original settings request and its follow-up action.
      * FIXED_FACTORY: /wifireset at 0x4200e84c overwrites the supplied credentials
      * with unrelated scratch buffers. Persist the validated JSON SSID/password.
+     * FIXED_RECONSTRUCTION: /setclocktype is a reinitialization command even
+     * when its value is unchanged, as in 0x4200d7f0. Publish that intent explicitly.
      * Both credential routes accept normal JSON whitespace instead of relying
      * on the factory handlers' literal substring parsing. */
 
     tv_settings_t s;
     settings_snapshot(&s);
-    bool valid = false, restart = false, weather = false;
+    bool valid = false, restart = false, weather = false, select_theme = false;
     if (!strcmp(req->uri, "/restart"))
     {
         if (req->content_len)
@@ -215,7 +217,10 @@ esp_err_t web_settings_post(httpd_req_t *req)
                 valid =
                     web_integer(object, integers[i].key, integers[i].min, integers[i].max, &value);
                 if (valid)
+                {
                     *((uint8_t *)&s + integers[i].offset) = value;
+                    select_theme = !strcmp(req->uri, "/setclocktype");
+                }
             }
         if (!strcmp(req->uri, "/settings"))
         {
@@ -297,7 +302,7 @@ esp_err_t web_settings_post(httpd_req_t *req)
         }
         cJSON_Delete(object);
     }
-    if (!valid || settings_replace(&s) != ESP_OK)
+    if (!valid || (select_theme ? settings_select_theme(s.theme) : settings_replace(&s)) != ESP_OK)
         return web_error(req, "Invalid setting or value");
     if (weather)
         weather_request_update();

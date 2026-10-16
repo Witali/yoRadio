@@ -83,6 +83,34 @@ HTTP 503 записана как ошибка; наша прошивка отк�
 
 ## Что проверяется автоматически
 
+`photo_frames_qemu.py` проверяет полный JPEG/IP-footer/fade pipeline обеих
+прошивок: 84 actual completed frames и девять одинаково заданных сцен с настоящими
+декодерами. Сохраняется отличие исправленного восстановления яркости после fade.
+Начальные phase0/1 до первого полного изображения относятся к разным startup
+политикам; все шесть фаз проверяются на следующих переходах. Подробности —
+[photo-frames-checks.md](../../qemu/parity/photo-frames-checks.md).
+
+`photo_brightness_qemu.py` посылает настоящий brightness form в idle между
+фотографиями, проверяет новый PWM, все pixels/footer и отсутствие новой fade.
+Factory и исправленный C должны применить изменение за ограниченное время,
+не ожидая interval60. C-case `clock_photo_idle_brightness` проверяет также
+day/night/calendar изменения и отсутствие лишних SPI/LEDC операций.
+См. [photo-idle-brightness-checks.md](../../qemu/parity/photo-idle-brightness-checks.md).
+
+`photo_controls_qemu.py` трижды отправляет `/setclocktype` с прежним номером
+фототемы. Каждый запрос запускает следующий fade за ограниченное время,
+сохраняя photo round-robin; проверяются весь кадр, LEDC и transient command
+revision. Host tests дополнительно исключают лишние NVS commits, platform case
+проверяет объединение команд до прохода UI. Общий `photo_controls_contract.py`
+используется publisher/verifier для brightness и theme command evidence.
+См. [photo-reselect-checks.md](../../qemu/parity/photo-reselect-checks.md).
+
+`photo_reinit_qemu.py` повторно выбирает фототему во время незавершённого
+перехода. Точка останова в реальном HTTP handler подтверждает активную фазу;
+проверяется следующий полный кадр. Заводской чёрный экран сохраняется в отчёте
+как установленная ошибка, исправленный C должен начать переход заново, сохранив
+очередь фотографий. См. [photo-reinit-checks.md](../../qemu/parity/photo-reinit-checks.md).
+
 `report_aggregation` проверяет реальный общий JSON reader и serializer: даты
 сохраняются строками с исходным country offset, включая midnight, DST overlap и
 дробный offset. PowerShell `ConvertFrom-Json -DateKind String` предотвращает

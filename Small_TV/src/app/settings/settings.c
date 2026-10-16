@@ -14,6 +14,7 @@ static tv_settings_t current_settings;
 static SemaphoreHandle_t settings_mutex;
 static nvs_handle_t settings_store;
 static uint32_t generation;
+static uint32_t theme_selection_generation;
 static bool dirty;
 static int64_t last_change_us;
 
@@ -243,6 +244,7 @@ esp_err_t settings_init(void)
     dirty = dirty || migrated;
     last_change_us = esp_timer_get_time();
     generation = 1;
+    theme_selection_generation = 0;
     return xTaskCreate(persistence_task, "settings", 2048, NULL, 1, NULL) == pdPASS
                ? ESP_OK
                : ESP_ERR_NO_MEM;
@@ -252,9 +254,46 @@ void settings_snapshot(tv_settings_t *out)
 {
     /* Copy a consistent settings snapshot while holding the mutex. */
 
+    settings_snapshot_with_revisions(out, NULL, NULL);
+}
+
+void settings_snapshot_with_revisions(tv_settings_t *out, uint32_t *configuration_revision,
+                                      uint32_t *theme_selection_revision)
+{
+    /* Copy display values and command revisions under one lock.
+     * FIXED_RECONSTRUCTION: a same-value theme selection is an explicit reset
+     * command at 0x4200d7f0. Keep its revision coherent with the copied theme so
+     * a concurrent HTTP selection cannot reset an older or already-seen theme. */
+
     xSemaphoreTake(settings_mutex, portMAX_DELAY);
     *out = current_settings;
+    if (configuration_revision)
+        *configuration_revision = generation;
+    if (theme_selection_revision)
+        *theme_selection_revision = theme_selection_generation;
     xSemaphoreGive(settings_mutex);
+}
+
+esp_err_t settings_select_theme(unsigned theme)
+{
+    /* Publish every valid theme command, including unchanged selections.
+     * FIXED_RECONSTRUCTION: 0x4200d7f0 clears the theme-init latch unconditionally.
+     * The transient command counter is not persisted; unchanged configuration
+     * bytes do not need another flash write. Repeated commands may coalesce. */
+
+    if (theme > 3)
+        return ESP_ERR_INVALID_ARG;
+    xSemaphoreTake(settings_mutex, portMAX_DELAY);
+    if (current_settings.theme != theme)
+    {
+        current_settings.theme = (uint8_t)theme;
+        ++generation;
+        dirty = true;
+        last_change_us = esp_timer_get_time();
+    }
+    ++theme_selection_generation;
+    xSemaphoreGive(settings_mutex);
+    return ESP_OK;
 }
 
 esp_err_t settings_replace(const tv_settings_t *s)

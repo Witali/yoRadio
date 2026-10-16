@@ -50,6 +50,7 @@ typedef struct
 static captured_task_t tasks[16];
 static unsigned task_count;
 static uint32_t preferences_generation = 1;
+static uint32_t theme_selection_generation;
 static bool uploading, in_alarm;
 static time_t fake_time = 1791885600;
 static struct tm fake_local = {
@@ -58,6 +59,22 @@ static struct tm fake_local = {
 void settings_snapshot(tv_settings_t *out)
 {
     *out = preferences;
+}
+void settings_snapshot_with_revisions(tv_settings_t *out, uint32_t *configuration_revision,
+                                      uint32_t *theme_selection_revision)
+{
+    /* Model one coherent settings/UI-command input to the production task. */
+    *out = preferences;
+    if (configuration_revision) *configuration_revision = preferences_generation;
+    if (theme_selection_revision) *theme_selection_revision = theme_selection_generation;
+}
+esp_err_t settings_select_theme(unsigned theme)
+{
+    /* Keep explicit commands separate from stored configuration changes. */
+    if (theme > 3) return ESP_ERR_INVALID_ARG;
+    if (preferences.theme != theme) {preferences.theme = (uint8_t)theme; ++preferences_generation;}
+    ++theme_selection_generation;
+    return ESP_OK;
 }
 esp_err_t settings_replace(const tv_settings_t *value)
 {
@@ -1014,6 +1031,7 @@ static void test_display(void)
 }
 
 static unsigned animation_calls, weather_draws, jpeg_draws, photo_draws, last_animation, last_frame;
+static unsigned last_photo_slot;
 static bool weather_pixels;
 static esp_err_t weather_draw_result;
 unsigned media_animation_frames(unsigned animation)
@@ -1049,6 +1067,7 @@ esp_err_t media_draw_photo(unsigned slot)
 {
     assert(slot < 5);
     ++photo_draws;
+    last_photo_slot = slot;
     return ESP_OK;
 }
 static void test_ui_transitions(void)
@@ -1461,6 +1480,142 @@ static void test_first_digital_brightness(void)
     CHECK(duty==819);
     digital_brightness_probe=true;
     clock_ui_start(); run_task("clock_display",digital_entry_scenario);
+}
+
+static unsigned idle_photo_transfers, idle_photo_duty_updates;
+static void photo_idle_brightness_scenario(void)
+{
+    /* Settings and day/night changes must not wait for the next 60-second photo event. */
+    ++clock_step;
+    if (clock_step >= 6)
+        CHECK(photo_draws == 1);
+    if (clock_step == 6)
+    {
+        CHECK(duty == 819);
+        idle_photo_transfers = transfers;
+        preferences.day_level = 500;
+        ++preferences_generation;
+    }
+    if (clock_step >= 7)
+        CHECK(transfers == idle_photo_transfers);
+    if (clock_step == 7)
+    {
+        CHECK(duty == 4095);
+        preferences.night_mode = 1;
+        preferences.night_level = 800;
+        fake_time = 1791907200; /* CN 2026-10-14 00:00:00, synchronized night. */
+        ++preferences_generation;
+    }
+    if (clock_step == 8)
+    {
+        CHECK(duty == 6552);
+        fake_time = 1791885600; /* CN 18:00:00; calendar change without a settings write. */
+    }
+    if (clock_step == 9)
+    {
+        CHECK(duty == 4095);
+        preferences.day_level = 0;
+        ++preferences_generation;
+    }
+    if (clock_step == 10)
+    {
+        CHECK(duty == 0);
+        idle_photo_duty_updates = duty_updates;
+    }
+    if (clock_step == 15)
+    {
+        CHECK(duty_updates == idle_photo_duty_updates);
+        longjmp(blocked, 1);
+    }
+    tick_clock(1);
+}
+static void test_photo_idle_brightness(void)
+{
+    /* Exercise the real photo coordinator and cached LEDC setter during an idle interval. */
+    preferences.wifi_mode = 1; strcpy(preferences.ssid, "fixture");
+    preferences.theme = 2; preferences.photo_seconds = 60;
+    preferences.photo_mask = 1; preferences.photo_size[0] = 100;
+    preferences.day_level = 100; preferences.night_mode = 0;
+    preferences.night_start = 22; preferences.night_stop = 9;
+    CHECK(clock_ui_timer_init() == ESP_OK);
+    CHECK(network_init() == ESP_OK); got_ip(); start_synced_clock_services();
+    CHECK(display_init() == ESP_OK && backlight_init() == ESP_OK);
+    clock_ui_start(); run_task("clock_display", photo_idle_brightness_scenario);
+}
+
+static void photo_reselect_scenario(void)
+{
+    /* Two explicit same-theme commands must each start one new six-step fade. */
+    ++clock_step;
+    if (clock_step == 6)
+    {
+        CHECK(photo_draws == 1 && duty == 0);
+        CHECK(settings_select_theme(2) == ESP_OK);
+    }
+    if (clock_step == 7 || clock_step == 13)
+        CHECK(duty == 2457); /* A new fade starts immediately instead of waiting 60 seconds. */
+    if (clock_step == 9)
+        CHECK(photo_draws == 2);
+    if (clock_step == 12)
+    {
+        CHECK(photo_draws == 2 && duty == 0);
+        /* Factory flags coalesce two commands arriving before the next pass. */
+        CHECK(settings_select_theme(2) == ESP_OK && settings_select_theme(2) == ESP_OK);
+    }
+    if (clock_step == 15)
+        CHECK(photo_draws == 3);
+    if (clock_step == 18)
+    {
+        CHECK(photo_draws == 3 && duty == 0);
+        CHECK(theme_selection_generation == 3);
+        longjmp(blocked, 1);
+    }
+    tick_clock(1);
+}
+static void test_photo_reselect(void)
+{
+    /* Exercise the real coordinator with unchanged settings and transient selection revisions. */
+    preferences.wifi_mode = 1; strcpy(preferences.ssid, "fixture");
+    preferences.theme = 2; preferences.photo_seconds = 60; preferences.photo_mask = 31;
+    for (unsigned slot = 0; slot < 5; ++slot) preferences.photo_size[slot] = 100;
+    preferences.day_level = 0; preferences.night_mode = 0;
+    CHECK(clock_ui_timer_init() == ESP_OK);
+    CHECK(network_init() == ESP_OK); got_ip(); start_synced_clock_services();
+    CHECK(display_init() == ESP_OK && backlight_init() == ESP_OK);
+    clock_ui_start(); run_task("clock_display", photo_reselect_scenario);
+}
+
+static void photo_active_reselect_scenario(void)
+{
+    /* Restart a cancelled fade after its photo draw, retaining the next slot. */
+    ++clock_step;
+    if (clock_step == 3)
+    {
+        CHECK(photo_draws == 1 && last_photo_slot == 0 && duty == 8191);
+        CHECK(settings_select_theme(2) == ESP_OK);
+    }
+    if (clock_step == 4)
+        CHECK(duty == 2457); /* Reinit must begin at phase zero after clearing the old picture. */
+    if (clock_step == 6)
+        CHECK(photo_draws == 2 && last_photo_slot == 1);
+    if (clock_step == 9)
+    {
+        CHECK(photo_draws == 2 && duty == 0);
+        longjmp(blocked, 1);
+    }
+    tick_clock(1);
+}
+static void test_photo_active_reselect(void)
+{
+    /* A same-theme command during fade must not leave a blank screen for 60 seconds. */
+    preferences.wifi_mode = 1; strcpy(preferences.ssid, "fixture");
+    preferences.theme = 2; preferences.photo_seconds = 60; preferences.photo_mask = 3;
+    for (unsigned slot = 0; slot < 5; ++slot) preferences.photo_size[slot] = 100;
+    preferences.day_level = 0; preferences.night_mode = 0;
+    CHECK(clock_ui_timer_init() == ESP_OK);
+    CHECK(network_init() == ESP_OK); got_ip(); start_synced_clock_services();
+    CHECK(display_init() == ESP_OK && backlight_init() == ESP_OK);
+    clock_ui_start(); run_task("clock_display", photo_active_reselect_scenario);
 }
 
 static void startup_ready_scenario(void)
@@ -2072,6 +2227,9 @@ int main(int argc, char **argv)
                  {"weather_field_cleanup", test_weather_field_cleanup},
                  {"clock_coordinator", test_clock_coordinator},
                  {"clock_first_digital_brightness", test_first_digital_brightness},
+                 {"clock_photo_idle_brightness", test_photo_idle_brightness},
+                 {"clock_photo_reselect", test_photo_reselect},
+                 {"clock_photo_active_reselect", test_photo_active_reselect},
                  {"clock_startup_ready_classic", test_startup_ready_classic},
                  {"clock_startup_ready_simple", test_startup_ready_simple},
                  {"clock_startup_ready_photo", test_startup_ready_photo},
