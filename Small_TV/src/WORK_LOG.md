@@ -957,6 +957,31 @@
   platform43/1,182,204, frontend/integrity/TZ sources pass; идёт machine.
   Нового полного результата пока нет, тестовые/source/helper bytes не менять.
 
+### 2026-10-16 — полный photo pipeline и исправление idle brightness в отдельной ветке
+
+- Не меняя frozen root92411, создан .worktree/small-tv-photo-frames от6a02d8c0.
+  Actual84 photo/fade frames обеих app и9 canonical raw scenes проходят наAD7A;
+  настоящий JPEG/glyph/LEDC code, SDK/LCD boundaries only. Затем guards требуют
+  panic/immutable/code checks и10 negative mutations; selected photo обязан
+  входить в real decoder и читать flash. Commits57ef94ae/31fce447.
+- Найден подтверждённый C defect: между фото brightness POST50/GET50 оставлял
+  duty819; factory handlers выставляют39f2, main0913c сразу пишет4095. Новый
+  production C-case тоже падает на oldcode. Исправлено условие schedule update
+  на idle илиfinished, active fade не меняется; FIXED_RECONSTRUCTION задокументирован.
+- Build candidateE3902939/sourceB9787790/ELFD73C9146,1,176,288 bytes/free359,712
+  сохранён в firmware ветки. Все44 platform cases/1,182,252 checks pass; новый
+  case покрывает day/night/calendar/full brightness и silent idle без SPI/LEDC.
+  Same-observer HTTP обеих app pass, native проверен4095 через.141715 guest s
+  после ответа, full photo/footer0pixel differences, новой fade нет.
+- Candidate84 frames/9 canonical scenes и10 guard checks повторены:pass,
+  source/image/helper bytes unchanged, все owned VMs закрыты. Factory/native
+  actual assembly сохранён; exact staged input+image+ELF proof прошёл.
+  Commit2a949010de70 и оба родителя отправлены в codex/small-tv-photo-frames.
+- Root92411 жив, в natural calendar после успешных regional/NVS stages.
+  Все63 test input bytes, rootAD7A BIN/ELF/QEMU сохранены. Сначала дождаться и
+  опубликовать именно его19-group result; затем merge photo branch/build/full.
+  Физических действий, правок QEMU или посторонних файлов не было.
+
 ### 2026-10-16 — постоянные JPEG inputs и baseline headers
 
 - Создан sparse worktree .worktree/small-tv-jpeg-inputs / branch

@@ -7,6 +7,30 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
+Новая завершённая ветка `codex/small-tv-photo-frames`, worktree
+`.worktree/small-tv-photo-frames`, отправлена до `2a949010de70`.
+`57ef94ae` добавляет84 full photo/fade frames и9 canonical scenes на AD7A,
+`31fce447` усиливает evidence/real decoder checks, `2a949010` исправляет реальный
+photo-idle brightness bug. Factory POST50 сразу даёт duty4095; oldAD7A принимает
+GET50, но держит819 до следующего фото. Новый candidateE3902939 / sourceB9787790 /
+ELFD73C9146 (1,176,288 bytes/free359,712) применяет cached schedule на idle или
+finished, сохраняя active fade. Сборка в firmware ветки; source/assembly proof и
+same-observer before/after в `photo-idle-brightness-checks.md` ветки.
+Все44 platform cases /1,182,252 checks, actual HTTP обеих app, повтор84 full
+frames/9 scenes и10 negative contract checks прошли; owned VMs закрыты.
+
+Root full92411 подтверждён живым: все machine/boot/waits/photo HTTP/AP->STA/
+weather/scroll/SNTP/UTF8/regional/NVS stages прошли; идёт natural calendar
+factory classic (через noon). Все63 initial test inputs и appAD7A/ELF6D7B
+сохранены. Не менять root source/tests/helpers, не перезапускать этот handle.
+После terminal сначала опубликовать его19-group result со сверкой initial pins,
+затем интегрировать новую photo ветку, build root и полный набор с дополнительными
+photo_frames/photo_brightness QEMU gates. Старый full результат не считать
+проверкой E390 candidate. Collector archive_immutable_run.py уже адаптирован для
+report_aggregation/machine_jpeg_inputs/photo_http этого19-group run; перед запуском
+прочитать его текущий код. Phase0/1 до первого полного фото и изменения маски
+во время fade/browser/physical/soak остаются отдельными границами доказательств.
+
 Живой новый full run: `.build/small-tv-functional/jpeg-integrated-full-20261016`,
 shell handle `92411`, старт после commit `9a7e341c` (отправлен main). Initial pins
 фиксируют 63 test source files, appad7a9009/ELF6d7b586f/QEMUfde38d53. Уже прошли
