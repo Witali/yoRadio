@@ -9,7 +9,7 @@ SHA-256 приложения и исходников. Он включает вс
 
 ## Запуск
 
-Из корня репозитория в PowerShell:
+Из корня репозитория в PowerShell 7.5 или новее:
 
 ```powershell
 & .\Small_TV\src\tests\run-all.ps1
@@ -82,6 +82,11 @@ HTTP 503 записана как ошибка; наша прошивка отк�
 реального сервиса OpenWeatherMap остаётся отдельной ручной проверкой.
 
 ## Что проверяется автоматически
+
+`report_aggregation` проверяет реальный общий JSON reader и serializer: даты
+сохраняются строками с исходным country offset, включая midnight, DST overlap и
+дробный offset. PowerShell `ConvertFrom-Json -DateKind String` предотвращает
+неявное преобразование независимой календарной reference в host timezone.
 
 Группа `machine_timezones` исполняет настоящий код преобразования времени и libc:
 36,404 сравнения для 109 исходных ключей стран, все записанные переходы ±1 секунду,

@@ -15,7 +15,7 @@ def main():
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding='utf-8-sig'))
     groups = {row['name']: row for row in report['groups']}
-    required = ('native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu')
+    required = ('report_aggregation', 'native', 'platform', 'frontend', 'integrity', 'timezone_sources', 'machine', 'machine_control', 'machine_classic', 'machine_weather', 'machine_calendar', 'machine_jpeg', 'machine_timezones', 'machine_time_state', 'machine_text', 'machine_network', 'qemu_profile', 'qemu')
     if not report['passed'] or report['automatic_profile'] != 'host_machine_qemu':
         raise ValueError('Only a complete passing automated run may replace the published result')
     if any(groups[name]['status'] != 'passed' for name in required):
@@ -227,6 +227,7 @@ def main():
                                            'automatic_profile', 'all_functionality_verified',
                                            'source_sha256', 'app_sha256', 'test_inputs', 'notes')}
     summary['native'] = groups['native']['result']
+    summary['report_aggregation'] = groups['report_aggregation']['result']
     summary['platform'] = groups['platform']['result']
     summary['frontend'] = groups['frontend']['result']
     summary['integrity'] = groups['integrity']['result']

@@ -923,3 +923,17 @@
   из одного запуска; исторические negatives/board reports не переименованы.
 - Далее исправить date aggregation, объединить завершённую JPEG branch,
   пересобрать root и прогнать новый полный gate с JPEG inputs/photo HTTP.
+
+### 2026-10-16 — сохранение ISO date strings в тестовом агрегате
+
+- Общий Read-SmallTvTestResult использует ConvertFrom-Json -DateKind String.
+  Invoke-TestGroup и control/manifest читаются через него; требуется PowerShell7.5+.
+  Новая обязательная report_aggregation группа проверяет 14 условий на реальном
+  helper и serializer: midnight CN, повторяющийся час US DST, NP fractional
+  offset и UTC subsecond timestamp остаются точными строками.
+- Reduced run json-date-aggregation-20261016 завершён exit0: все шесть локальных
+  групп pass, native3,884 и platform43/1,182,204. Независимый Python сравнил
+  вложенный aggregation result с исходным child JSON — байтовые значения дат
+  сохранились. Scoped source hashes/result сохранены в report-aggregation-checks.
+  Production app0d8b7585 не менялся; полный machine/QEMU здесь не повторялся.
+  Checkpoint73687652 сохраняет точный прежний 17-group набор и даты его запуска.

@@ -9,6 +9,13 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 Актуально 2026-10-16, после предыдущих промежуточных записей:
 
+JSON reader исправлен: общий Read-SmallTvTestResult использует DateKind String,
+минимум PowerShell7.5 указан явно. Новый обязательный report_aggregation gate
+проверяет 14 условий, включая настоящий повторный serializer/reader и aggregate.
+Все шесть групп reduced host run pass; machine/QEMU для этой script-only правки
+не повторялись. Полный завершённый checkpoint сохранён commit73687652 и остаётся
+историческим набором до добавления этого gate. Следом объединить JPEG branch.
+
 Полный root run `22926` завершён с exit0. Все 17 automatic groups pass;
 84 natural calendar transitions / 168 complete frames, 24 completed scene frames
 с 0 differences и 40 normalized scenes прошли. Все 58 initial test files,

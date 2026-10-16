@@ -1,3 +1,4 @@
+#Requires -Version 7.5
 [CmdletBinding()]
 param(
     [switch]$SkipMachine,
@@ -10,6 +11,7 @@ param(
     [string]$OutputDirectory
 )
 $ErrorActionPreference="Stop"
+. (Join-Path $PSScriptRoot "read-result.ps1")
 $repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\..\.."))
 if (!$PythonPath) {$PythonPath=Join-Path $repo ".idf\tools-v6.1\python_env\idf6.1_py3.12_env\Scripts\python.exe"}
 if (!$OutputDirectory) {$OutputDirectory=Join-Path $repo (".build\small-tv-functional\"+[DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss-fff"))}
@@ -23,7 +25,7 @@ function Invoke-TestGroup([string]$Name,[scriptblock]$Action,[string]$ResultPath
     try {
         if(Test-Path -LiteralPath $ResultPath){Remove-Item -LiteralPath $ResultPath}
         & $Action *>&1 | Tee-Object -FilePath (Join-Path $OutputDirectory "$Name.log") | Out-Host
-        $data=Get-Content -Raw -LiteralPath $ResultPath | ConvertFrom-Json
+        $data=Read-SmallTvTestResult $ResultPath
         if (!$data.passed) {throw "Result did not pass: $ResultPath"}
         $groups.Add(@{name=$Name;status="passed";seconds=$watch.Elapsed.TotalSeconds;result=$data})
     } catch {
@@ -31,6 +33,10 @@ function Invoke-TestGroup([string]$Name,[scriptblock]$Action,[string]$ResultPath
         Write-Warning "$Name failed: $($_.Exception.Message)"
     }
 }
+$aggregationReport=Join-Path $OutputDirectory "report-aggregation.json"
+Invoke-TestGroup "report_aggregation" {
+    & (Join-Path $PSScriptRoot "json-report-test.ps1") -OutputPath $aggregationReport
+} $aggregationReport
 $nativeReport=Join-Path $repo ".build\small-tv-esp32c2\native-tests\report.json"
 Invoke-TestGroup "native" {& (Join-Path $PSScriptRoot "run.ps1") -VsDevCmd $VsDevCmd} $nativeReport
 $platformReport=Join-Path $repo ".build\small-tv-esp32c2\platform-tests\report.json"
@@ -60,7 +66,7 @@ else {
     } (Join-Path $machineFolder "report.json")
     # The renderer and control checks are separate gates; never accept an old control result.
     if(Test-Path -LiteralPath $controlReport){
-        $control=Get-Content -Raw -LiteralPath $controlReport | ConvertFrom-Json
+        $control=Read-SmallTvTestResult $controlReport
         $groups.Add(@{name="machine_control";status=$(if($control.passed){"passed"}else{"failed"});result=$control})
     }else{$groups.Add(@{name="machine_control";status="failed";error="No fresh control report"})}
 }
@@ -148,7 +154,7 @@ else {
 }
 $groups.Add(@{name="hardware_browser_soak";status="not_run";reason="Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately"})
 $archive=Join-Path $repo "firmware\development\small-tv-esp32c2-reconstructed"
-$manifest=Get-Content -Raw -LiteralPath (Join-Path $archive "manifest.json") | ConvertFrom-Json
+$manifest=Read-SmallTvTestResult (Join-Path $archive "manifest.json")
 $testInputs=@(Get-ChildItem -LiteralPath $PSScriptRoot -Recurse -File | Where-Object {$_.Extension -in @('.c','.h','.inc','.ps1','.py','.txt')} | Sort-Object FullName | ForEach-Object {
     @{file=$_.FullName.Substring($repo.Length+1).Replace('\','/');sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()}
 })
