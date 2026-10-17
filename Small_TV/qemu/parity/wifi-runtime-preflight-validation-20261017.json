@@ -1,0 +1,2125 @@
+{
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Combined eight-cycle preflight of6324 with real weather/uploads, four AP outages, supervisor and independent UART guard. Not a24-hour or steady-state memory acceptance.",
+  "workload": {
+    "schema_version": 4,
+    "passed": true,
+    "all_functionality_verified": false,
+    "scope": "Observe native Small TV heap/stack during real HTTP/weather/photo activity.\n\nThe requested cycle count or guest duration defines this workload's scope.\nShort runs do not establish the 24-hour H10 or physical-board acceptance.\nThe guest runs its unmodified archived application. Hardware breakpoints and\nread-only RSP inspect SDK counters; no guest functions are called by the host.\n",
+    "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+    "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+    "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+    "cycles_requested": 8,
+    "duration_requested_guest_seconds": null,
+    "interval_guest_seconds": 2.0,
+    "outage_every_cycles": 2,
+    "outage_guest_seconds": 1.0,
+    "completed_cycles": 8,
+    "inputs_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tests\\runtime_qemu.py": "cf5bab160df9360b3b8a48df9030110be2d796d875b57d5fb6e1ddf5b7c677c0",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tests\\runtime_memory.py": "6354f9a322124d5d8d4af691dfed68fca130335951b09815a3b18a3ffa1b58ff",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tests\\runtime_heap_rom.py": "fcc120a6b92260a9ee2f6e9eb6055acb3ca7c37f82f242f7ca0e9e31fd1163a1",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tests\\runtime_state.py": "3bad4e096e505d096f356d35e49ca5dec1830a423e4ecf661b9197ce9ebf33a6",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tests\\runtime_weather.py": "bb3461e542b30afd9579860bc06adc68af457fc938017d256bd50a247f68ec1f",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\small-tv-esp32c2\\small_tv_reconstructed.elf": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\firmware\\development\\small-tv-esp32c2-reconstructed\\app.bin": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\qemu\\profiles\\small-tv-c2.json": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\esp-rom-elfs\\20260528\\esp32c2_rev200_rom.elf": "289ce00e79c024d9efeb29a7fbc2d21853a1cbc383a2b9c2ece85c54fa829dd9",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\qemu\\parity\\compare.py": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tests\\fixtures\\jpeg\\rgb-420.jpg": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tests\\gdb_observer.py": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tests\\weather_qemu.py": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tests\\time_qemu.py": "65dc11c59bb41b29d9222671ffdb82738d121e7223f4ab2bc884ea564905e856",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\firmware\\development\\small-tv-esp32c2-reconstructed\\bootloader.bin": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\firmware\\development\\small-tv-esp32c2-reconstructed\\partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\firmware\\development\\small-tv-esp32c2-reconstructed\\source-manifest.json": "67e43d5fc0c8ed71b58748584a8bc98a6f52ecd191a8182d3fe4eff88774001d",
+      "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\heap\\heap_private.h": "502fa2f57dc2b7bf044ea4129694c4e97669321525e82bcd7e2435b626407f0c",
+      "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\heap\\multi_heap.c": "e9a61ae252353ba9095bb97a922db49c164111a3c1afb97f0a967996d0b15045",
+      "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\heap\\heap_caps.c": "16ba43d4868f4eaff39ae83e2ede6bfe6cb33cfd57e23fab64a3e658d4bb5610",
+      "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\freertos\\FreeRTOS-Kernel\\tasks.c": "8e02bca581de35d3ea446752e84f5d71ff90ef818d3b3a7a03865dfc95f3c7b6",
+      "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\freertos\\FreeRTOS-Kernel\\portable\\riscv\\include\\freertos\\portmacro.h": "d781637967d016af1d69f05c686130e83505fdbcc9fcb3f80c68816bce22abf1",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-qemu-frozen-20261017\\tools\\small_tv_vm.py": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-qemu-frozen-20261017\\tools\\small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-qemu-frozen-20261017\\tools\\small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-qemu-frozen-20261017\\tools\\small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-qemu-frozen-20261017\\tools\\esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-qemu-frozen-20261017\\tools\\esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-qemu-frozen-20261017\\tools\\esp_elf.py": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-qemu-frozen-20261017\\bin\\qemu-system-riscv32.exe": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b"
+    },
+    "weather_layout": {
+      "address": 1070266848,
+      "size": 248,
+      "fields": {
+        "valid": 0,
+        "temperature_c": 8,
+        "wind_mps": 16,
+        "temperature_min_c": 24,
+        "temperature_max_c": 32,
+        "humidity": 40,
+        "timezone_seconds": 44,
+        "icon": 48,
+        "description": 52,
+        "city": 117,
+        "country": 182,
+        "main": 202,
+        "wind_direction": 218,
+        "generation": 240
+      },
+      "request_state_address": 1070282864,
+      "elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299"
+    },
+    "limitations": [
+      "Native firmware only; no factory heap/stack equivalence claim.",
+      "Short workload is not the 24-hour H10 or physical-board acceptance.",
+      "Stack fill is a historical SDK watermark; sampled frames do not prove all execution peaks.",
+      "Sum of per-heap minimum counters follows SDK semantics, not a simultaneous global minimum."
+    ],
+    "sources": {
+      "images": [
+        {
+          "sha256": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f",
+          "bytes": 16928,
+          "file": "bootloader.bin",
+          "offset": "0x0"
+        },
+        {
+          "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+          "bytes": 3072,
+          "file": "partition-table.bin",
+          "offset": "0x8000"
+        },
+        {
+          "sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+          "bytes": 1169904,
+          "file": "app.bin",
+          "offset": "0x10000"
+        },
+        {
+          "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+          "bytes": 1994752,
+          "file": "assets.bin",
+          "offset": "0x200000"
+        }
+      ],
+      "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48"
+    },
+    "workload_start_guest_seconds": 25.063939,
+    "summary": {
+      "events": 69,
+      "snapshots": 9,
+      "http_requests": 64,
+      "outages": 4,
+      "minimum_sampled_free_heap_bytes": 79268,
+      "minimum_sdk_sum_of_per_heap_minima_bytes": 59216,
+      "minimum_task_stack_fill_bytes_by_name": {
+        "IDLE": 1240,
+        "captive_dns": 1848,
+        "clock_display": 1752,
+        "esp_timer": 3680,
+        "httpd": 3888,
+        "settings": 480,
+        "sys_evt": 2152,
+        "tcpip": 2684,
+        "time_sync": 1940,
+        "weather_http": 5372,
+        "wifi": 5352,
+        "wifi_fallback": 1436
+      },
+      "maximum_http_or_batch_guest_seconds": 0.2874130000000008,
+      "first_snapshot": {
+        "label": "ready",
+        "guest_seconds": 25.084499,
+        "heap": {
+          "caps": 4,
+          "free_bytes": 87864,
+          "minimum_free_bytes": 72600,
+          "heaps": [
+            {
+              "free_bytes": 4,
+              "minimum_free_bytes": 4,
+              "pool_size": 10252,
+              "caps": 6158
+            },
+            {
+              "free_bytes": 87860,
+              "minimum_free_bytes": 72596,
+              "pool_size": 168124,
+              "caps": 6158
+            }
+          ]
+        },
+        "tasks": [
+          {
+            "name": "IDLE",
+            "recorded_stack_span_bytes": 1533,
+            "stack_high_water_free_bytes": 1240
+          },
+          {
+            "name": "captive_dns",
+            "recorded_stack_span_bytes": 3065,
+            "stack_high_water_free_bytes": 1848
+          },
+          {
+            "name": "clock_display",
+            "recorded_stack_span_bytes": 4089,
+            "stack_high_water_free_bytes": 2264
+          },
+          {
+            "name": "esp_timer",
+            "recorded_stack_span_bytes": 4081,
+            "stack_high_water_free_bytes": 3680
+          },
+          {
+            "name": "httpd",
+            "recorded_stack_span_bytes": 6129,
+            "stack_high_water_free_bytes": 4448
+          },
+          {
+            "name": "settings",
+            "recorded_stack_span_bytes": 2045,
+            "stack_high_water_free_bytes": 1788
+          },
+          {
+            "name": "sys_evt",
+            "recorded_stack_span_bytes": 2809,
+            "stack_high_water_free_bytes": 2152
+          },
+          {
+            "name": "tcpip",
+            "recorded_stack_span_bytes": 3581,
+            "stack_high_water_free_bytes": 2684
+          },
+          {
+            "name": "time_sync",
+            "recorded_stack_span_bytes": 3061,
+            "stack_high_water_free_bytes": 1940
+          },
+          {
+            "name": "weather_http",
+            "recorded_stack_span_bytes": 8189,
+            "stack_high_water_free_bytes": 5372
+          },
+          {
+            "name": "wifi",
+            "recorded_stack_span_bytes": 6645,
+            "stack_high_water_free_bytes": 5352
+          },
+          {
+            "name": "wifi_fallback",
+            "recorded_stack_span_bytes": 2045,
+            "stack_high_water_free_bytes": 1436
+          }
+        ],
+        "weather": {
+          "worker_state": 0,
+          "valid": true,
+          "generation": 2,
+          "humidity": 67
+        }
+      },
+      "snapshot_tail": [
+        {
+          "label": "ready",
+          "guest_seconds": 25.084499,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87864,
+            "minimum_free_bytes": 72600,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87860,
+                "minimum_free_bytes": 72596,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 2264
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 4448
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1788
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 2,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-0",
+          "guest_seconds": 27.744703,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87632,
+            "minimum_free_bytes": 64072,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87628,
+                "minimum_free_bytes": 64068,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1912
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 4256
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 3,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-1",
+          "guest_seconds": 33.96538,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87828,
+            "minimum_free_bytes": 64072,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87824,
+                "minimum_free_bytes": 64068,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1912
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 4256
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 5,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-2",
+          "guest_seconds": 39.663613,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 79268,
+            "minimum_free_bytes": 64072,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 79264,
+                "minimum_free_bytes": 64068,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1784
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 7,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-3",
+          "guest_seconds": 45.192634,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87696,
+            "minimum_free_bytes": 64072,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87692,
+                "minimum_free_bytes": 64068,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1752
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": false,
+            "generation": 8
+          }
+        },
+        {
+          "label": "cycle-4",
+          "guest_seconds": 47.82489,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87464,
+            "minimum_free_bytes": 59216,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87460,
+                "minimum_free_bytes": 59212,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1752
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 10,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-5",
+          "guest_seconds": 54.144166,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87696,
+            "minimum_free_bytes": 59216,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87692,
+                "minimum_free_bytes": 59212,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1752
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 12,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-6",
+          "guest_seconds": 59.744606,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87452,
+            "minimum_free_bytes": 59216,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87448,
+                "minimum_free_bytes": 59212,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1752
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 14,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-7",
+          "guest_seconds": 65.413837,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87456,
+            "minimum_free_bytes": 59216,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87452,
+                "minimum_free_bytes": 59212,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1752
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 16,
+            "humidity": 67
+          }
+        }
+      ]
+    },
+    "workload_end_guest_seconds": 65.413905,
+    "elapsed_guest_seconds": 40.349965999999995,
+    "radio_clock_wraps": 0,
+    "no_panic": true,
+    "journal": {
+      "file": "events.jsonl",
+      "sha256": "e853e492233ba9b072b9e9863b0012a67ee8b9a8c9792769e644183f46a9838e"
+    },
+    "rom_counter_crosscheck": {
+      "rom_elf_sha256": "289ce00e79c024d9efeb29a7fbc2d21853a1cbc383a2b9c2ece85c54fa829dd9",
+      "checks": 36,
+      "scope": "Exact two ROM getters executed outside the VM on copied typed headers, not invoked in the guest."
+    },
+    "inputs_unchanged": true,
+    "weather_fixture": {
+      "requests": 9,
+      "responses_ok": 9,
+      "all_synthetic_locations": true,
+      "all_synthetic_keys": true
+    },
+    "weather_observation": {
+      "snapshots": 9,
+      "quiescent_samples": 9,
+      "valid_samples": 8,
+      "distinct_valid_generations": 8,
+      "first_fresh_guest_seconds": 25.084499,
+      "last_fresh_guest_seconds": 65.413837,
+      "maximum_fresh_gap_guest_seconds": 8.161277000000005
+    },
+    "weather_coverage_passed": true
+  },
+  "supervisor": {
+    "schema_version": 1,
+    "status": "complete",
+    "passed": true,
+    "all_functionality_verified": false,
+    "supervisor_pid": 33812,
+    "supervisor_started_utc": "2026-10-17T19:37:35.0326789Z",
+    "run_directory": "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-preflight-20261017",
+    "scope": "Child process supervision only; not a 24-hour or memory-trend acceptance.",
+    "sources_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tools\\runtime_supervisor.ps1": "8c91874bee1797c5ff8b317d9b7d430b403fd64cda56050fdd9ebb40f276a500",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tests\\runtime_qemu.py": "cf5bab160df9360b3b8a48df9030110be2d796d875b57d5fb6e1ddf5b7c677c0",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-qemu-frozen-20261017\\tools\\small_tv_vm.py": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\Small_TV\\src\\tools\\runtime_run_guard.py": "df024edc6653e2dd4bdc4b92bc57c33994d866cb350d3588f51af90a4a59cbd9"
+    },
+    "workload_pid": 25552,
+    "workload_started_utc": "2026-10-17T19:37:35.1006251Z",
+    "observed_at_utc": "2026-10-17T19:39:01.7126575Z",
+    "guard_pid": 20256,
+    "completed_cycles_observed": 7,
+    "workload_exit_code": 0,
+    "guard_exit_code": 0,
+    "sources_unchanged": true,
+    "finished_utc": "2026-10-17T19:39:03.0962500Z"
+  },
+  "analysis": {
+    "schema_version": 1,
+    "status": "completed_scope_requires_review",
+    "h10_checks_passed": false,
+    "all_functionality_verified": false,
+    "scope": "Audit a native runtime journal and compare free heap in equal workload phases.\n\nThis reads files only and never connects to or pauses the guest. A diagnostic\nprefix of an active workload is explicitly pending, never a completed H10 pass.\n",
+    "run_directory": "C:\\Work\\yoRadio\\.worktree\\small-tv-h10-wifi\\.build\\wifi-runtime-preflight-20261017",
+    "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+    "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+    "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+    "inputs_verified": 31,
+    "journal_observed_sha256": "e853e492233ba9b072b9e9863b0012a67ee8b9a8c9792769e644183f46a9838e",
+    "journal_prefix_only": false,
+    "trailing_partial_bytes": 0,
+    "pending_events": 0,
+    "complete_cycles_audited": 8,
+    "elapsed_guest_seconds_observed": 40.349965999999995,
+    "checks": {
+      "workload_complete": true,
+      "duration_request_at_least_24h": false,
+      "observed_at_least_24h": false,
+      "start_record_matches": false,
+      "independent_terminal_guard_matches": true,
+      "periodic_guest_disconnect_reconnect": true,
+      "all_steady_windows_cover_all_workload_phases": false,
+      "no_retained_loss_flagged": true,
+      "weather_refreshed_throughout_workload": true
+    },
+    "uart": {
+      "passed": true,
+      "bytes": 1053,
+      "rom_boots": 1,
+      "errors": []
+    },
+    "summary": {
+      "events": 69,
+      "snapshots": 9,
+      "http_requests": 64,
+      "outages": 4,
+      "minimum_sampled_free_heap_bytes": 79268,
+      "minimum_sdk_sum_of_per_heap_minima_bytes": 59216,
+      "minimum_task_stack_fill_bytes_by_name": {
+        "IDLE": 1240,
+        "captive_dns": 1848,
+        "clock_display": 1752,
+        "esp_timer": 3680,
+        "httpd": 3888,
+        "settings": 480,
+        "sys_evt": 2152,
+        "tcpip": 2684,
+        "time_sync": 1940,
+        "weather_http": 5372,
+        "wifi": 5352,
+        "wifi_fallback": 1436
+      },
+      "maximum_http_or_batch_guest_seconds": 0.2874130000000008,
+      "first_snapshot": {
+        "label": "ready",
+        "guest_seconds": 25.084499,
+        "heap": {
+          "caps": 4,
+          "free_bytes": 87864,
+          "minimum_free_bytes": 72600,
+          "heaps": [
+            {
+              "free_bytes": 4,
+              "minimum_free_bytes": 4,
+              "pool_size": 10252,
+              "caps": 6158
+            },
+            {
+              "free_bytes": 87860,
+              "minimum_free_bytes": 72596,
+              "pool_size": 168124,
+              "caps": 6158
+            }
+          ]
+        },
+        "tasks": [
+          {
+            "name": "IDLE",
+            "recorded_stack_span_bytes": 1533,
+            "stack_high_water_free_bytes": 1240
+          },
+          {
+            "name": "captive_dns",
+            "recorded_stack_span_bytes": 3065,
+            "stack_high_water_free_bytes": 1848
+          },
+          {
+            "name": "clock_display",
+            "recorded_stack_span_bytes": 4089,
+            "stack_high_water_free_bytes": 2264
+          },
+          {
+            "name": "esp_timer",
+            "recorded_stack_span_bytes": 4081,
+            "stack_high_water_free_bytes": 3680
+          },
+          {
+            "name": "httpd",
+            "recorded_stack_span_bytes": 6129,
+            "stack_high_water_free_bytes": 4448
+          },
+          {
+            "name": "settings",
+            "recorded_stack_span_bytes": 2045,
+            "stack_high_water_free_bytes": 1788
+          },
+          {
+            "name": "sys_evt",
+            "recorded_stack_span_bytes": 2809,
+            "stack_high_water_free_bytes": 2152
+          },
+          {
+            "name": "tcpip",
+            "recorded_stack_span_bytes": 3581,
+            "stack_high_water_free_bytes": 2684
+          },
+          {
+            "name": "time_sync",
+            "recorded_stack_span_bytes": 3061,
+            "stack_high_water_free_bytes": 1940
+          },
+          {
+            "name": "weather_http",
+            "recorded_stack_span_bytes": 8189,
+            "stack_high_water_free_bytes": 5372
+          },
+          {
+            "name": "wifi",
+            "recorded_stack_span_bytes": 6645,
+            "stack_high_water_free_bytes": 5352
+          },
+          {
+            "name": "wifi_fallback",
+            "recorded_stack_span_bytes": 2045,
+            "stack_high_water_free_bytes": 1436
+          }
+        ],
+        "weather": {
+          "worker_state": 0,
+          "valid": true,
+          "generation": 2,
+          "humidity": 67
+        }
+      },
+      "snapshot_tail": [
+        {
+          "label": "ready",
+          "guest_seconds": 25.084499,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87864,
+            "minimum_free_bytes": 72600,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87860,
+                "minimum_free_bytes": 72596,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 2264
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 4448
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1788
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 2,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-0",
+          "guest_seconds": 27.744703,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87632,
+            "minimum_free_bytes": 64072,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87628,
+                "minimum_free_bytes": 64068,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1912
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 4256
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 3,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-1",
+          "guest_seconds": 33.96538,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87828,
+            "minimum_free_bytes": 64072,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87824,
+                "minimum_free_bytes": 64068,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1912
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 4256
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 5,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-2",
+          "guest_seconds": 39.663613,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 79268,
+            "minimum_free_bytes": 64072,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 79264,
+                "minimum_free_bytes": 64068,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1784
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 7,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-3",
+          "guest_seconds": 45.192634,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87696,
+            "minimum_free_bytes": 64072,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87692,
+                "minimum_free_bytes": 64068,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1752
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": false,
+            "generation": 8
+          }
+        },
+        {
+          "label": "cycle-4",
+          "guest_seconds": 47.82489,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87464,
+            "minimum_free_bytes": 59216,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87460,
+                "minimum_free_bytes": 59212,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1752
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 10,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-5",
+          "guest_seconds": 54.144166,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87696,
+            "minimum_free_bytes": 59216,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87692,
+                "minimum_free_bytes": 59212,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1752
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 12,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-6",
+          "guest_seconds": 59.744606,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87452,
+            "minimum_free_bytes": 59216,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87448,
+                "minimum_free_bytes": 59212,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1752
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 14,
+            "humidity": 67
+          }
+        },
+        {
+          "label": "cycle-7",
+          "guest_seconds": 65.413837,
+          "heap": {
+            "caps": 4,
+            "free_bytes": 87456,
+            "minimum_free_bytes": 59216,
+            "heaps": [
+              {
+                "free_bytes": 4,
+                "minimum_free_bytes": 4,
+                "pool_size": 10252,
+                "caps": 6158
+              },
+              {
+                "free_bytes": 87452,
+                "minimum_free_bytes": 59212,
+                "pool_size": 168124,
+                "caps": 6158
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "name": "IDLE",
+              "recorded_stack_span_bytes": 1533,
+              "stack_high_water_free_bytes": 1240
+            },
+            {
+              "name": "captive_dns",
+              "recorded_stack_span_bytes": 3065,
+              "stack_high_water_free_bytes": 1848
+            },
+            {
+              "name": "clock_display",
+              "recorded_stack_span_bytes": 4089,
+              "stack_high_water_free_bytes": 1752
+            },
+            {
+              "name": "esp_timer",
+              "recorded_stack_span_bytes": 4081,
+              "stack_high_water_free_bytes": 3680
+            },
+            {
+              "name": "httpd",
+              "recorded_stack_span_bytes": 6129,
+              "stack_high_water_free_bytes": 3888
+            },
+            {
+              "name": "settings",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 480
+            },
+            {
+              "name": "sys_evt",
+              "recorded_stack_span_bytes": 2809,
+              "stack_high_water_free_bytes": 2152
+            },
+            {
+              "name": "tcpip",
+              "recorded_stack_span_bytes": 3581,
+              "stack_high_water_free_bytes": 2684
+            },
+            {
+              "name": "time_sync",
+              "recorded_stack_span_bytes": 3061,
+              "stack_high_water_free_bytes": 1940
+            },
+            {
+              "name": "weather_http",
+              "recorded_stack_span_bytes": 8189,
+              "stack_high_water_free_bytes": 5372
+            },
+            {
+              "name": "wifi",
+              "recorded_stack_span_bytes": 6645,
+              "stack_high_water_free_bytes": 5352
+            },
+            {
+              "name": "wifi_fallback",
+              "recorded_stack_span_bytes": 2045,
+              "stack_high_water_free_bytes": 1436
+            }
+          ],
+          "weather": {
+            "worker_state": 0,
+            "valid": true,
+            "generation": 16,
+            "humidity": 67
+          }
+        }
+      ]
+    },
+    "trend": {
+      "status": "insufficient_steady_state_data",
+      "warmup_guest_seconds": 3600,
+      "window_guest_seconds": 3600,
+      "complete_windows_expected": 0,
+      "usable_windows": 0,
+      "phase_period_cycles": 20,
+      "windows": [],
+      "phases": {},
+      "flags": [],
+      "limitations": [
+        "Observed phase/window medians and variation do not prove absence of every possible leak.",
+        "SDK minimum is cumulative; a constant minimum can coexist with declining current free heap.",
+        "Retained changes require an explanation or a firmware fix before accepting the soak."
+      ]
+    },
+    "weather": {
+      "snapshots": 9,
+      "quiescent_samples": 9,
+      "valid_samples": 8,
+      "distinct_valid_generations": 8,
+      "first_fresh_guest_seconds": 25.084499,
+      "last_fresh_guest_seconds": 65.413837,
+      "maximum_fresh_gap_guest_seconds": 8.161277000000005
+    },
+    "weather_freshness_bound_guest_seconds": 3600,
+    "limitations": [
+      "This audits native QEMU runtime only; it does not establish physical-board acceptance.",
+      "The workload uses a fixed NTP epoch; this is not a continuous calendar/DST test.",
+      "Task stack fill and sampled free heap cannot prove every interrupt or transient allocation peak.",
+      "Retained memory loss is a finding to investigate, not automatically an allowed SDK cache."
+    ]
+  },
+  "raw_sha256": {
+    "wifi-runtime-preflight-20261017-events.jsonl.gz": {
+      "sha256": "0681ff7612d5b50a9a230e9902200c528804e3146aa161b3087b40a0fbf3c2e2",
+      "uncompressed_sha256": "e853e492233ba9b072b9e9863b0012a67ee8b9a8c9792769e644183f46a9838e",
+      "uncompressed_bytes": 19402
+    },
+    "wifi-runtime-preflight-20261017-uart.log.gz": {
+      "sha256": "6878f84508c7f72a9c7256d52f76f7d16c122a374b7c8ce0e572f43db2dc6337",
+      "uncompressed_sha256": "72b9fc72227120191f2470548131ed55924b75f0b5565a6efae4b1dc3ef1292f",
+      "uncompressed_bytes": 1053
+    }
+  },
+  "cleanup": {
+    "observed_utc": "2026-10-17T19:43:23.8710856Z",
+    "all_owned_vms_stopped": true,
+    "records": [
+      {
+        "group": "preflight",
+        "pid": 30036,
+        "name": "SmallTV-bc06e3ad48a2",
+        "owned_vm_alive": false
+      }
+    ]
+  }
+}
