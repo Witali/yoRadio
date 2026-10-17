@@ -1,6 +1,22 @@
 # Small TV comparison checkpoints
 
-The latest completed-frame checkpoint (2026-10-16) is documented in
+The completed full automated run on 2026-10-17 passed all 19 host/machine/QEMU
+groups for ordinary application `ef66d557…`, source `81cf614c…`, ELF `8fce7524…`
+and QEMU `a74f3324…`. All 184 frozen input fingerprints remained unchanged.
+The [published functional evidence](../../src/tests/functional-validation.json)
+includes 84 natural calendar transitions, 168 associated completed frames,
+and 24 strict scene frames with zero differing pixels against instruction replay.
+These are scoped automated results; full equivalence and physical-board
+acceptance remain unproven. Subsequent Wi-Fi HTML corrections live in separate
+branches and have different application identities.
+
+The separate RSSI-candidate 24-hour runtime test was interrupted after 187 cycles
+and 3,096.125371 observed guest seconds. Its VM and controllers were absent at
+the process audit; the report had no terminal footer. The
+[interruption record](runtime-rssi-interrupted-20261017.json) preserves the
+numeric journal and input identities. It is not a completed H10 pass.
+
+The earlier completed-frame checkpoint (2026-10-16) is documented in
 [completed-scene checks](completed-scene-checks.md), with exact identities in
 [the current results](../completed-scenes-validation.json). All 24 real QEMU
 frames match instruction replay. At identical canonical inputs, 33 complete

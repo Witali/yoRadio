@@ -1927,3 +1927,23 @@ guard99431 жив. Последний независимый audit:99cycles/1632
 30inputs verified, ROMboot1, panic нет, status pending. Пока недостаточно данных
 для steady trend. Ветки и installed helper не интегрировать до terminal/publish
 основного full; H10 input worktree и frozen bundle сохранять до его завершения.
+
+### 2026-10-17 — полный quiet firmware gate завершён, H10 прерван
+
+Новая авторитетная проверка: старые tool handles больше не доступны. Full report
+имеет passed=true/finished UTC17:04:52 и все19 автоматических groups passed.
+Проверены все184 frozen fingerprints; publish-report и verify_artifacts прошли.
+Опубликованы EF66/81CF/8FCE/A74 результаты:84 calendar transitions/168 completed
+frames,24 strict scene frames/pixel diff0, native3950/platform46,162 entry
+comments/56markers,DIRAM80540,app1169888/free366112. Это не полный H03/H10/hardware
+и не full следующих RSSI/manual-SSID candidates. Теперь допустима интеграция.
+
+H10 не завершился: VM PID13544 отсутствует, WMI не обнаружил runtime/guard
+процессов; raw report без terminal journal/inputs_unchanged. Последние files
+записаны около UTC17:10, внешний audit около17:27; причина остановки неизвестна.
+Independent prefix audit:187 complete cycles,3096.125371guest s,188snapshots,
+1504HTTP,3real outages,4pending events,30source SHA verified,ROMboot1/no panic.
+Незавершённый elapsed нельзя засчитать как24h. Numeric journal и UART сохранены
+в детерминированные gzip с SHA; отдельный interruption JSON не меняет raw report.
+Guard status running был устаревшим. Следующий запуск должен проверять жизнь
+workload и уметь пережить границу tool session либо закончиться в активном turn.

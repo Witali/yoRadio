@@ -7,6 +7,22 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Full `debug-integrated-full-20261017` ЗАВЕРШЁН: 19 automatic groups pass,
+  finished UTC17:04:52, EF66/81CF/8FCE/A74. Все184 frozen SHA совпали;
+  publish-report.py и verify_artifacts.py прошли. Опубликованы functional-
+  validation.json и validation.json: 84 natural calendar transitions/168 frames,
+  24 strict scene frames с pixel diff0, native3950/platform46. Entry comments162,
+  correction markers56, DIRAM80540, app1169888/free366112. Теперь можно
+  интегрировать подготовленные ветки и обновить main helper; не приписывать
+  этот completed full более поздним RSSI/manual-SSID images.
+- H10 ПРЕРВАН: runtime/guard tool handles missing, VM PID13544 отсутствует,
+  системных runtime/guard процессов нет. Raw report без terminal footer,
+  последний journal187 cycles/3096.125371 guest s,188 snapshots/1504HTTP/3outages,
+  pending4 events. Один ROM boot, panic нет,30 inputs совпали, но это НЕ24h pass.
+  Причина остановки не установлена. Полный numeric JSONL и UART сохранены gzip
+  в ../qemu/parity/runtime-rssi-interrupted-20261017-*, отдельный JSON фиксирует
+  внешний process audit. Старые running строки ниже — исторические checkpoint.
+  Нужен новый долгий запуск на следующем кандидате с контролем жизни workload.
 - Сохранены и отправлены новые follow-up ветки, пока НЕ включённые в main:
   `codex/small-tv-runtime-analysis` / `e0d276ac` в worktree
   `.worktree/small-tv-runtime-observer` — read-only полный JSONL audit и анализ
