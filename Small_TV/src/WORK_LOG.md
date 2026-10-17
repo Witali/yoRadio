@@ -2228,3 +2228,30 @@ pending,31inputs verified,start_record_matches=true. Наличие running фа
 доказывает process survival через конец assistant turn; следующий turn должен
 повторно проверить OS identities и footer. Пока нет24h/trend acceptance. Это
 новый запуск, прежний187-cycle interrupted H10 остаётся отдельным evidence.
+
+### 2026-10-17 — H10 пережил assistant turn; helper для дальнейшей сверки готов
+
+В начале следующего goal turn проверены OS PID/creation times/commands всех
+четырёх H10 roles:30128/2252/18740/26440 совпали с initial record; workload
+продолжает циклы и supervisor обновляет heartbeat. Это настоящая process
+survival через завершение предыдущего сообщения, а не stale running JSON.
+Повторный exact-tick audit сохранён в uri-runtime-process-survival-20261017.json.
+Его первая команда наткнулась на ConvertFrom-Json automatic DateTime →
+локализованную строку; повтор с DateKind String/InvariantCulture прошёл. Ошибка
+была в one-off audit, не в workload или supervisor; исходный record не менялся.
+
+File-only progress audit:35полных циклов/587.116241guest s,31source inputs
+verified,36valid quiescent weather generations/maxfreshgap20.006810s, начальные
+hashes совпадают. Это pending: ещё нет24h,terminal guard,60-cycle outages и
+часовых steady windows. Full90679 жив, дошёл до QEMU photo fade после passing
+boot/reset/SNTP/body/concurrency/URI gates. Published reports не заменены.
+
+По прежнему запросу о скрипте переноса алгоритмов завершён отдельный tool CLI
+в codex/small-tv-port-assistant/6b10c200, отправлен в origin. Worktree под .worktree
+содержит отдельные16unit/CLI tests и61real assembly reports/9796instructions.
+Исправлены короткие targets,gap blocks,offset-jalr return,layout validation;
+добавлены bounds/names/JSON/Markdown/epilogue и fingerprints. Real getclocktype
+доказывает50instructions,32-byteframe,4calls и shared backwards join без natural
+loop. Область — analysis/review, не C instruction execution. Branch оставлена
+отдельно до terminal/full publication, чтобы не менять frozen inputs текущих
+firmware проверок. Детальный proof и CLI usage находятся в этой feature ветке.

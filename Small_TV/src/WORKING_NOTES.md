@@ -7,6 +7,24 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Проверка после границы assistant turn пройдена: все четыре H10 roles живы,
+  точные PID/start times совпали с launch record, команды принадлежат этому run.
+  Evidence: `uri-runtime-process-survival-20261017.json`. Это устраняет прежнюю
+  неопределённость detached supervisor survival; не доказывает24h completion.
+  File audit35completed cycles/587.116241guest s,31inputs verified,36weather
+  generations/maxgap20.006810s, start_record_matches=true, statuspending.
+  До первого outageevery60 ещё не дошли. Старые строки «survival unproven» ниже
+  являются initial checkpoint; при продолжении заново сверять OS и footer.
+- Tooling branch `codex/small-tv-port-assistant` / `6b10c200` pushed, worktree
+  `.worktree/small-tv-port-assistant`. Рабочий CLI для CFG/loops/prologue/
+  epilogue/calls/C branch conditions;16tests и61assembly excerpts/9796decoded
+  instructions проходят. Точный getclocktype excerpt50instructions/12blocks/
+  32-byteframe/4calls/0natural loops. Tool не исполняет машинные инструкции и
+  не генерирует готовую C реализацию. Merge оставить после frozen full terminal
+  и публикации; не менять текущие192frozen identities во время прогона.
+- Новый full90679 продолжает QEMU: boot/reset/SNTP обеих прошивок, body deadline,
+  H09concurrency и URI targets gates прошли; идёт photo fade/frames. Full report
+  ещё не terminal. Source/app остаются BE5802D6/8304F1A4, publishedfull — EF66.
 - Main/origin now0fe92f18; transport candidate8304F1A4/ELF62E040B5/sourceBE5802D6
   интегрирован и отправлен. Canonical resources59 совпали с archive; BIN/ELF/map
   перенесены без CMake cache, прежняя922 сохранена в pre-uri-dispatch-main-20261017.
