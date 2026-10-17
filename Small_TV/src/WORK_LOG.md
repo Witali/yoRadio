@@ -1444,3 +1444,13 @@
   production правки требуется новый полный run с этим gate и новым collector.
 - PNG browser fixtures явно исключены из text normalization. Staged PNG
   декодируются, их точные SHA совпадают с report; сборка и источники не менялись.
+
+### 2026-10-17 — стабильные переводы строк archive manifest
+
+- Windows Set-Content создавал CRLF в manifest.json, тогда как Git хранит этот
+  файл с LF. Builder теперь явно пишет UTF-8 без BOM и LF, чтобы точные хеши
+  служебных метаданных сохранялись после checkout. Декодированные значения,
+  source identity и бинарные образы от этой правки не меняются.
+- Уже собранный manifest нормализован с проверкой равенства JSON. Первое
+  browser-after evidence сохранено в ignored run; финальная браузерная проверка
+  будет выполнена заново с каноническими байтами manifest до публикации отчёта.

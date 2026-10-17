@@ -51,6 +51,8 @@ if (!$NoArchive) {
     $images = @(@{file="bootloader.bin"; offset="0x0"},@{file="partition-table.bin";offset="0x8000"},@{file="app.bin";offset="0x10000"},@{file="assets.bin";offset="0x200000"})
     foreach ($image in $images) { $image.sha256 = (Get-FileHash -LiteralPath (Join-Path $destination $image.file) -Algorithm SHA256).Hash.ToLower(); $image.bytes = (Get-Item -LiteralPath (Join-Path $destination $image.file)).Length }
     $source=Get-Content -LiteralPath (Join-Path $destination "source-manifest.json") -Raw | ConvertFrom-Json
-    @{target="esp32c2";idf_revision=$expected;source_sha256=$source.aggregate_sha256;xtal_mhz=26;flash_bytes=4194304;status="compiled; hardware unverified";images=$images} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $destination "manifest.json") -Encoding utf8
+    $smallTvArchiveManifest = @{target="esp32c2";idf_revision=$expected;source_sha256=$source.aggregate_sha256;xtal_mhz=26;flash_bytes=4194304;status="compiled; hardware unverified";images=$images} | ConvertTo-Json -Depth 5
+    # Keep fingerprinted archive metadata identical after Git's LF checkout filter.
+    [IO.File]::WriteAllText((Join-Path $destination "manifest.json"), $smallTvArchiveManifest.Replace("`r`n", "`n") + "`n", [Text.UTF8Encoding]::new($false))
     Write-Host "Saved firmware to $destination"
 }
