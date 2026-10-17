@@ -1886,3 +1886,15 @@ Debug fixed8host reset smoke не дождался SNTP, connectedtrue/notifyfal
 дляобоих native pass. SDK delay иQEMUdevicecode не менялись. Scoped MD/JSON сохранены.
 Root full67941 наEF66/81CF/8FCE/A74 продолжает исполняться,184 frozen fingerprints
 повторно unchanged. До terminal/save этогоfull ветки не интегрировать.
+
+### 2026-10-17 — отдельный UART guard длительного теста
+
+Приаудите H10 выяснено: clean_uart проверяет panic tokens, но не silent resets;
+radio time сохраняется приreset, поэтому один elapsed24h не доказываетнепрерывный
+app uptime. Добавлен отдельный runtime_run_guard.py: весьUART, ROM banner+Build,
+count1,panic/watchdog,truncation.7unitcases pass,включаяresetпосреди незавершённой
+строки иliteral embedded marker. Guardread-only, отдельныйJSON,не меняет30 H10inputs.
+Первыйattach QMPtimeout: workloadдержитsoleconnection. Присоединениеисправлено
+наfile-only guard, никакогоновогосоединения; этотpreflightнеfirmwaredefect.
+Guard99431 работаетрядом с H10 31890 наD78A/F5F3/frozenA74+FF0819. Guardиmemory
+trend обязательны дляприёмки H10; ранние samples/основнойpassed не замена.
