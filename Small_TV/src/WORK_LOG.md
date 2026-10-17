@@ -1817,3 +1817,19 @@ QEMU OFF0B3F6F69 / ONF3D7B024. UTC проверяется до/после reset 
 Publisher/verifier пересчитывают UTC из чисел;29 actual consumer rejection controls
 pass. Helper/unit hashes включены в полный suite и15 producers. См. quiet-boot-state-*
 MD/JSON. Старый общий DD41 pass остаётся историческим; нового full/24h пока нет.
+
+### 2026-10-17 — интеграция проверенных веток
+
+Main merge5e41962d объединяет ordinary/debug firmware, request-body deadline,
+H09/runtime observer и quiet boot checks. Конфликт журнала разрешён сохранением
+обеих историй. QEMU main FF доadb66701b3; canonical diagnostic build запущен,
+новый full ещё не начат. OFF/ON legacy boot CYD/C3 OLED и modules прошли на
+0B3F/F3D7; Xtensa unchanged. Все scoped результаты остаются с исходными hashes.
+
+В root перенесены exact tested8FCE ELF/EF66 BIN/map;59 source/generated inputs
+и BIN ELF-header binding совпали. Старые B4/DD41/map и newline-only sdkconfig
+сохранены отдельно; CMake cache не переносился. Main host reduced pass:
+3950 C assertions/platform46/frontend/integrity6/timezone9/aggregation14;
+DEBUG reused-build/CRLF/idempotence unit pass. Артефакт promotion JSON сохранён.
+Следующий full должен использовать stable installed diagnostic QEMU и заранее
+замороженные test/helper/production inputs. Предыдущий DD41 full не заменяет его.

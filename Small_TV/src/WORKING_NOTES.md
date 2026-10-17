@@ -7,6 +7,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Интеграция завершена: main merge5e41962d включает HTTP body/H09/runtime/DEBUG
+  и quiet boot gate. QEMU main fast-forward доadb66701b3; идёт каноническая
+  diagnostic сборка из main для расширенных transport tests. Старый installed30F
+  и marker сохранены в pre-debug-qemu-install-20261017. Не запускать full, пока
+  новый executable и marker не готовы.
+- В main перенесены точные проверенные ELF8FCE/BINEF66/map, без копирования
+  CMake cache. Все59 production inputs и ELF SHA в app header совпали. Старые
+  ELF/BIN/map сохранены в pre-debug-main-build-20261017; CRLF-only sdkconfig
+  отдельно сохранён до merge. Host reduced3950/platform46/frontend/integrity/
+  timezone/aggregation и DEBUG config reuse test после merge прошли.
+
 - Актуальное продолжение DEBUG: boot helper больше не требует INFO. Matched-ELF
   flags и SDK timekeeping offsets читаются read-only; QEMU `last-ntp-reply`
   доступен при esp_debug OFF/ON. Все6 boot/reset scenarios,12 ELF units,
