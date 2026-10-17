@@ -462,6 +462,29 @@ API-ключи и фото с личными метаданными в отчё�
 После завершения native QEMU workload проверяйте **полный** `events.jsonl`, а не
 только последние 32 снимка `report.json`:
 
+Для длительного Windows-прогона используйте `tools/runtime_supervisor.ps1`.
+Он держит точные Process handles workload и UART guard; исчезновение любого
+дочернего процесса не становится успешным тестом. При ошибке закрывается только
+VM из собственного session.json. Состояние и stdout/stderr сохраняются отдельно
+в `<OutputDirectory>-supervisor`; незавершённый raw report не переписывается.
+Для фонового запуска:
+
+```powershell
+Start-Process -FilePath (Get-Command pwsh).Source -WindowStyle Hidden -PassThru `
+  -ArgumentList @('-NoProfile', '-File',
+    'C:/Work/yoRadio/Small_TV/src/tools/runtime_supervisor.ps1',
+    '-YoradioRoot', 'C:/Work/yoRadio', '-QemuRoot', 'C:/Work/QEMU-ESP32',
+    '-OutputDirectory', 'C:/Work/yoRadio/.build/small-tv-parity/new-runtime-24h')
+```
+
+Выберите новый каталог. По умолчанию — 86 400 гостевых секунд, интервал 15 с,
+краткое отключение AP каждые 60 циклов. Для короткого preflight можно передать
+`-Cycles 4 -IntervalSeconds 1.2 -OutageEvery 2`. Наличие `status=running` в JSON
+не доказывает живой процесс: сверяйте supervisor/workload/guard PID, время старта
+и command line через системный process audit. Проверка выживания через границу
+assistant turn остаётся отдельным наблюдением. Terminal supervisor pass также
+не заменяет полный journal/trend audit и не подтверждает аппаратную приёмку.
+
 ```powershell
 python Small_TV/src/tools/analyze_runtime.py `
   --run C:/Work/yoRadio/.build/small-tv-parity/rssi-runtime-24h-20261017 `

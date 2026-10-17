@@ -7,6 +7,16 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Новое продолжение в `codex/small-tv-runtime-supervisor`: Windows tool
+  `tools/runtime_supervisor.ps1` держит handles workload/guard, фиксирует выход
+  без footer как failed и закрывает только собственную VM. Real preflight4
+  cycles/2outages завершён, worker/guard exits0; независимый journal audit pass
+  в коротком scope, не H10. Два отдельных failure-injection прогона (kill только
+  своего worker или своего guard) дали expected failure и удалили все свои
+  дочерние процессы/VM. Source SHA8C91874B. Выживание через assistant turn пока
+  не подтверждено; running JSON требует внешнего process audit. До нового H10
+  проверить, что workload подтверждает фактический разбор погодных ответов,
+  а не лишь постановку запроса `/updateCity`.
 - Full `debug-integrated-full-20261017` ЗАВЕРШЁН: 19 automatic groups pass,
   finished UTC17:04:52, EF66/81CF/8FCE/A74. Все184 frozen SHA совпали;
   publish-report.py и verify_artifacts.py прошли. Опубликованы functional-

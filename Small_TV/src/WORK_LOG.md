@@ -2039,3 +2039,24 @@ Independent prefix audit:187 complete cycles,3096.125371guest s,188snapshots,
 в детерминированные gzip с SHA; отдельный interruption JSON не меняет raw report.
 Guard status running был устаревшим. Следующий запуск должен проверять жизнь
 workload и уметь пережить границу tool session либо закончиться в активном turn.
+
+### 2026-10-17 — supervisor замечает исчезновение workload или guard
+
+Добавлен Windows runtime_supervisor.ps1 с точными .NET Process handles и
+структурированными arguments без shell interpolation. Контроллер живёт отдельно
+от foreground exec, запускается скрытым Start-Process. Успешный worker без
+terminal footer не принимается; потеря guard во время workload тоже failed.
+Ошибочный запуск останавливает только свои children и VM через identity-checking
+helper. Status/child logs отдельные, raw workload report сохраняется как есть.
+Наличие running JSON не заменяет внешнюю проверку PID/start time/command line.
+
+Source8c91874b: реальный preflight4 cycles/2outages прошёл; worker/guard exits0,
+source hashes unchanged. Независимый audit проверил все30 inputs и полный журнал,
+короткий scope не стал H10 pass. Отдельно остановлен только проверенный worker
+PID25988: supervisor failed/exit -1/no terminal footer, VM cleanup0. Затем отдельно
+остановлен guard33428: supervisor failed с guard error и закрыл worker/VM.
+Все созданные VM и дочерние процессы этих случаев отсутствуют по process audit.
+Сбой специально внедрён, не является firmware defect. Внешний boundary survival
+пока не проверен. Следующий длительный запуск должен подтвердить его отдельно.
+До него также нужно закрыть пробел weather workload: одни POST /updateCity и
+heap snapshots ещё не доказывают повторный фактический разбор ответов сервиса.
