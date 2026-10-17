@@ -1,0 +1,91 @@
+{
+  "passed": true,
+  "all_H03_verified": false,
+  "scope": "Actual browser initial Wi-Fi setup on native quiet firmware, synthetic open station AP, no physical RF or factory/browser parity claim.",
+  "checks": {
+    "credentials_remain_empty_after_invalid_password": true,
+    "mode_remains_setup": true,
+    "single_boot_after_invalid_password": true,
+    "test_ssid_persisted": true,
+    "mode_is_station": true,
+    "single_restart_after_valid_submit": true,
+    "browser_rendered_real_setup": true,
+    "browser_scan_contains_test_ap": true,
+    "browser_invalid_password_alert": true,
+    "browser_rendered_station_settings": true,
+    "station_settings_finished_loading": true,
+    "station_tab_has_no_js_errors": true,
+    "consecutive_distinct_loopback_ports": true,
+    "actual_guest_connected": true,
+    "actual_guest_ap_disabled": true,
+    "actual_guest_station_dhcp": true,
+    "actual_guest_sntp": true,
+    "no_guest_panic": true,
+    "archive_and_executable_media_regions_unchanged": true
+  },
+  "check_count": 19,
+  "sources": {
+    "images": [
+      {
+        "offset": "0x0",
+        "bytes": 16928,
+        "file": "bootloader.bin",
+        "sha256": "b8a88cde4763db2ca92bc02730dac65254c8334e9b686f2ffa89b43fef949336"
+      },
+      {
+        "offset": "0x8000",
+        "bytes": 3072,
+        "file": "partition-table.bin",
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+      },
+      {
+        "offset": "0x10000",
+        "bytes": 1169888,
+        "file": "app.bin",
+        "sha256": "ef66d5575f6bcdd123dac2b0ba3a2afa26fbf6a44411a071486961197773fce3"
+      },
+      {
+        "offset": "0x200000",
+        "bytes": 1994752,
+        "file": "assets.bin",
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+      }
+    ],
+    "source_sha256": "81cf614c9b31ea22c632e0588975c1903e43a11fd0bd9815115b555e5f7b4ca2"
+  },
+  "native_elf_sha256": "8fce7524d9379a1fbd5c15711d0fedbef9ce14544d73a60df93ab3f4648e77a9",
+  "qemu_sha256": "f3d7b0243606e21c12e0b57e3cb084524a577cc732bf24f0fc055f35bc08fdc5",
+  "station_observation": {
+    "station_state": {
+      "connected": true,
+      "ap_active": false,
+      "station_address": "192.168.43.15",
+      "time_synced": true
+    },
+    "ntp_reply": {
+      "count": 1,
+      "unix_seconds": 1792251485,
+      "virtual_us": 27289223
+    }
+  },
+  "ui": {
+    "setup_title": "WiFi Configuration",
+    "setup_url": "http://127.0.0.1:18080",
+    "station_title": "Smart Weather Clock",
+    "station_url": "http://127.0.0.1:18081",
+    "test_network": "yoRadio-QEMU",
+    "success_screenshot": "Displayed in browser tool output; not saved as an archive artifact."
+  },
+  "cleanup": {
+    "vm_stopped": true,
+    "station_tab_closed": true,
+    "setup_tab_close": "Browser URL policy blocked close on its generated error page; unmarked temporary tab is eligible for automatic end-of-turn cleanup."
+  },
+  "harness_errors": [
+    "Original setup tab stopped answering CDP after successful submit/reboot; new station tab rendered and loaded all controls without JS errors.",
+    "First LCD capture used a relative QMP path and failed; retried with an absolute path, guest unchanged."
+  ],
+  "follow_up": [
+    "setup.html:187 and settings.html:464 use Math.abs(network.rssi), displaying positive numbers with dBm. Review and correct this proven UI sign error after the frozen integrated run."
+  ]
+}

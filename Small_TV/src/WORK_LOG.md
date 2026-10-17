@@ -1833,3 +1833,22 @@ H09/runtime observer и quiet boot checks. Конфликт журнала ра�
 DEBUG reused-build/CRLF/idempotence unit pass. Артефакт promotion JSON сохранён.
 Следующий full должен использовать stable installed diagnostic QEMU и заранее
 замороженные test/helper/production inputs. Предыдущий DD41 full не заменяет его.
+
+### 2026-10-17 — canonical QEMU готов; browser initial setup
+
+Canonical main adb66701b3 собран с esp_debug=true, установлен A74F3324; marker
+commit/mode проверены. На этом executable12 packet cases иmodules pass. Main
+обоих репозиториев отправлен. Native ordinary EF66/8FCE/source81CF прежние,
+production59 inputs совпадают; новый immutable full ещё не объявляется прошедшим.
+
+Browser initial setup на real quiet firmware:19 conditions pass, настоящий scan,
+неверный short пароль дал alert/error без записи credentials или restart.
+Valid open yoRadio-QEMU сохранён через форму; один restart, modeSTA и реальная
+STA web page/настройки загрузились, JS errors в новой station вкладке отсутствуют.
+SDK connected/SNTP/AP-disabled/DHCP192.168.43.15 и NTP reply прочитаны отдельно,
+все executable/media/source regions unchanged. ВМ закрыта. Первая вкладка после
+submit не отвечала CDP; новая отобразила интерфейс. Station tab закрыта, старую
+setup error page close блокирует browser URL policy; temporary auto cleanup.
+Screenshot показан tool inline, архивного browser PNG нет. JSON scope сохранён;
+full H03/factory browser/physical/24h не объявлены. Отдельно отмечена заводская
+Math.abs RSSI dBm sign ошибка в HTML; исправить после текущего frozen full.

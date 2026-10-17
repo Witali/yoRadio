@@ -7,6 +7,22 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Canonical diagnostic QEMU main adb66701b3 собран и установлен: executable
+  A74F3324430B306618AA88A52649DBB93C32EAC6D0B87926D335754346ABBF0B,
+  marker commit/mode совпадают;12 packet tests и modules на нём прошли.
+  Main обоих репозиториев отправлен. Новый full готовить в отдельном каталоге
+  debug-integrated-full-20261017; не переиспользовать старые output folders.
+- Browser initial Wi-Fi setup на quiet EF66 прошёл19 scoped conditions:
+  scan/invalid password без restart или сохранения, valid open test AP,
+  один restart/STA/DHCP/SNTP, реальная STA settings page и controls loaded.
+  См. ../qemu/browser-setup-quiet-20261017.json. ВМ закрыта, station tab закрыта;
+  старую setup-tab на generated error page блокирует browser URL policy,
+  unmarked temporary tab оставлена для штатной automatic turn cleanup.
+- Найдена отдельная UI ошибка: local_site/pages/setup.html:187 и settings.html:464
+  применяют Math.abs(network.rssi) перед подписью dBm. Исправить знак и добавить
+  frontend regression следующим отдельным изменением после immutable full;
+  сейчас production/test inputs нового full не менять. Это не ошибка RSSI DMA.
+
 - Интеграция завершена: main merge5e41962d включает HTTP body/H09/runtime/DEBUG
   и quiet boot gate. QEMU main fast-forward доadb66701b3; идёт каноническая
   diagnostic сборка из main для расширенных transport tests. Старый installed30F
