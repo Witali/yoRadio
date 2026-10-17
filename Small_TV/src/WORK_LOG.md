@@ -1484,3 +1484,16 @@
   Новый полный run main ещё требуется после merge/build и обновления collector/
   freeze для photo_settings/.mjs. H03/setup, concurrency, memory/soak и physical
   acceptance остаются; заводские ошибки исправляются, а не воспроизводятся.
+
+### 2026-10-17 — main после оптимизации uploader
+
+- c5f51a04 и de3e9ddd объединены в main через1a946c38. Root build84004 terminal0:
+  appDD41A536/source96A111EC/ELFB4AF3C2A,1 176 880 bytes/free359 120,
+  cached bootloader3FB735A3. Архив firmware обновлён штатным builder. Обе
+  executable sections (.iram0.text/.flash.text) полностью совпадают с branch
+  DD4EB76E/B7BE7CCC; сохранён отдельный main-build report без переноса runtime
+  passes на другой app identity. Прежний B06 ELF/BIN/map/resources сохранён ignored.
+- Full ещё не запущен. Freeze helper включает75 test sources, frontend и57
+  production inputs; collector дополнен обязательным photo_settings. После
+  фиксации архива выполнить один новый frozen run, прежний interrupted controls
+  не продолжать и не публиковать как полный pass.

@@ -44,9 +44,14 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 - JSON manifest теперь пишется LF без BOM (отдельный c5f51a04); после этого
   выполнена новая финальная browser series, не подменявшая первую CRLF-проверку.
   Все собственные ВМ и tabs этой серии закрыты. См. photo-upload-waits-checks.md.
-  Далее commit/merge этой ветки, root build и новый единый full с photo_settings.
-  Freeze helper должен включать .mjs, collector — photo_settings; исходные
- 72/74 старых pin lists не переименовывать. H03/setup, H09/H10 и physical остаются.
+  Ветка объединена в main через1a946c38. Root build84004 terminal0:
+  текущий main appDD41A536/source96A111EC/ELFB4AF3C2A,1 176 880 bytes/free359 120;
+  bootloader3FB735A3. Обе executable sections совпадают с проверенной веткой,
+  см. photo-upload-waits-main-build.json; её scoped reports сохраняют DD4EB76E.
+  B06/DAF ELF/BIN/map/resources сохранены в controls-pre-upload-build-20261017.
+  Новый единый full с photo_settings ещё нужно запустить. Freeze helper включает
+  .mjs, frontend и все57 production inputs, collector — photo_settings; исходные
+  72/74 старых pin lists не переименовывать. H03/setup, H09/H10 и physical остаются.
 
 ## Цель и принятые решения
 
