@@ -157,6 +157,13 @@
     </div>
 
     <script>
+/** Format a network option while preserving the API's signed RSSI in dBm. */
+function formatWifiNetworkLabel(network) {
+    // FIXED_FACTORY: Math.abs erased the sign of received signal power.
+    const suffix = Number.isFinite(network.rssi) ? ` (${network.rssi}dBm)` : '';
+    return network.ssid + suffix;
+}
+
         document.addEventListener('DOMContentLoaded', function() {
             const ssidSelect = document.getElementById('ssid');
 
@@ -182,10 +189,7 @@
                         networks.forEach((network, index) => {
                             const option = document.createElement('option');
                             option.value = network.ssid;
-                            option.textContent = network.ssid;
-                            if (network.rssi) {
-                                option.textContent += ` (${Math.abs(network.rssi)}dBm)`;
-                            }
+                            option.textContent = formatWifiNetworkLabel(network);
                             ssidSelect.appendChild(option);
 
                             // 默认选中第一个

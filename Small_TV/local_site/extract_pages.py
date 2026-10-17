@@ -24,6 +24,21 @@ def recover() -> None:
         (ROOT / "source").mkdir(exist_ok=True)
         (ROOT / "source" / f"{name}.html").write_bytes(raw)
         page = raw.decode("gb18030").replace("\r\n", "\n")
+        if name in ("setup", "settings"):
+            # FIXED_FACTORY: both scan lists erased the RSSI sign with Math.abs.
+            # Keep the formatter in one module and embed it for offline use.
+            formatter = (ROOT / "wifi_network.js").read_text(encoding="utf-8").rstrip()
+            if name == "setup":
+                original = ("option.textContent = network.ssid;\n"
+                            "                            if (network.rssi) {\n"
+                            "                                option.textContent += ` (${Math.abs(network.rssi)}dBm)`;\n"
+                            "                            }")
+            else:
+                original = "option.textContent = network.ssid + (network.rssi ? ` (${Math.abs(network.rssi)}dBm)` : '');"
+            if page.count(original) != 1:
+                raise ValueError("Missing factory Wi-Fi label formatter: " + name)
+            page = page.replace(original, "option.textContent = formatWifiNetworkLabel(network);", 1)
+            page = page.replace("<script>", "<script>\n" + formatter + "\n", 1)
         if name == "settings":
             # Raw-sector flags are part of the factory API: 1 selects Fahrenheit
             # and km/h, despite the opposite captions in the original HTML.

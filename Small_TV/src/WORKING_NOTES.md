@@ -7,6 +7,22 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Отдельная ветка codex/small-tv-rssi-label исправляет найденный Math.abs RSSI
+  label bug. Общий formatter local_site/wifi_network.js с FIXED_FACTORY встроен
+  exporter в setup/settings. 8 actual callback cases: old8fail/new8pass; real
+  browser показывает -24/-28/-40dBm, SSID values/selection прежние, JS errors0.
+  ВМ и все временные browser tabs закрыты. Фото-страница не менялась.
+- Candidate ordinary appD78A7639/ELFF5F39276, debug5E468EB3/8FAE6071,
+  sourceF8A3A6A8/59inputs; изменён только generated/web_pages.c. Оба архива
+  сохранены. Host3950/platform46/frontend/integrity6/timezone9/aggregation14 pass.
+  См. rssi-ui-checks/validation-20261017. Это scoped checks, не новый full/H10.
+- Debug reset выявил ненадёжный fixed8host wait. Failed attempt сохранён;
+  SDK SNTP startup jitter до5guest s подтверждён lwipopts.h:1626. QEMU feature
+  commit2a593f8d00 отправлен: state-based wait, limits15guest/60host, UTC<1s,
+  19units и3actual flows pass, consumer29/native variant. Canonical main helper
+  НЕ менять до terminal текущего full. После него интегрировать обе ветки и
+  включить wifi_network.js в freeze collector перед следующим full.
+
 - Новый immutable full ЗАПУЩЕН: handle67941,
   .build/small-tv-functional/debug-integrated-full-20261017, controller log
   .build/small-tv-parity/debug-integrated-full-20261017.log. Не запускать копию

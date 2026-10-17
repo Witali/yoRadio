@@ -29,25 +29,38 @@ def main():
     if not transfer['passed']:
         raise ValueError('Photo transfer sequencing/retry checks failed')
     report['photo_transfer'] = transfer
+    wifi_source = (SITE / 'wifi_network.js').read_text(encoding='utf-8').rstrip()
+    for page in ('setup', 'settings'):
+        if (SITE / ('pages/' + page + '.html')).read_text(encoding='utf-8').count(wifi_source) != 1:
+            raise ValueError('Regenerate Wi-Fi page after changing its formatter: ' + page)
+    wifi_test = Path(__file__).with_name('wifi_scan_test.mjs')
+    wifi_run = subprocess.run([args.node, str(wifi_test), str(SITE / 'pages')],
+                              check=True, capture_output=True, text=True)
+    wifi = json.loads(wifi_run.stdout)
+    if not wifi['passed']:
+        raise ValueError('Signed Wi-Fi scan labels failed')
+    report['wifi_scan'] = wifi
     manifest = json.loads((SITE / 'pages-manifest.json').read_text(encoding='utf-8'))
     for page in report['pages']:
         recorded = next(row for row in manifest['pages'] if row['name'] == page['page'])
         if recorded['local_page_sha256'] != page['sha256']:
             raise ValueError('Page changed without regeneration: ' + page['page'])
     paths = ['check_scripts.mjs', 'jpeg_metadata.js', 'photo_crop.js', 'photo_crop.html', 'photo_upload.js',
-             'extract_pages.py', 'pages-manifest.json']
+             'wifi_network.js', 'extract_pages.py', 'pages-manifest.json']
     paths += ['pages/' + page['page'] + '.html' for page in report['pages']]
     report['inputs'] = [{'file': (SITE / name).relative_to(ROOT).as_posix(),
                         'sha256': hashlib.sha256((SITE / name).read_bytes()).hexdigest()}
                        for name in paths]
     report['inputs'].append({'file': transfer_test.relative_to(ROOT).as_posix(),
                              'sha256': hashlib.sha256(transfer_test.read_bytes()).hexdigest()})
-    report['scope'] = ('JavaScript syntax, crop/metadata and controlled HTTP transfer checks; '
+    report['inputs'].append({'file': wifi_test.relative_to(ROOT).as_posix(),
+                            'sha256': hashlib.sha256(wifi_test.read_bytes()).hexdigest()})
+    report['scope'] = ('JavaScript syntax, signed Wi-Fi labels, crop/metadata and controlled HTTP transfer checks; '
                        'real browser Canvas and guest upload are recorded separately.')
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(f"PASS frontend: {report['scripts']} scripts, {report['metadata_checks']} JPEG checks, "
           f"{report['crop_checks']} crop, {report['resize_checks']} resize, "
-          f"{len(transfer['checks'])} photo transfer checks")
+          f"{len(transfer['checks'])} photo transfer, {len(wifi['checks'])} Wi-Fi label checks")
 
 
 if __name__ == '__main__':

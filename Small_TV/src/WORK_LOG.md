@@ -1862,3 +1862,27 @@ Frozen92 test sources и92 дополнительных inputs; после ст�
 общего результата ещё нет. Audit сохраняет только input identities, status running.
 Дополнительный installed-A74 CYD/C3 boot handle85263 тоже пока не объявлен pass.
 Ни BIN/ELF, ни production/test/helper inputs при этой записи не менялись.
+
+### 2026-10-17 — signed RSSI labels в отдельной ветке
+
+В codex/small-tv-rssi-label устранён factory Math.abs bug в HTML по flash offsets
+0x26edc/0x2963b. Форматтер вынесен в wifi_network.js и встроен exporter в обе
+страницы; option values/selection сохранены. Negative controls8fail наold,
+8pass наnew: signed/zero/missing/malformed/literalSSID/nonfinite. Повторный export
+идемпотентен, photo page прежняя. Реальный browser на SDK/QEMU показал
+yoRadio-QEMU(-24dBm), QEMU-2(-28dBm), QEMU-3(-40dBm);0JS errors. ВМ/tabs закрыты.
+
+Ordinary D78A7639/F5F39276 иdebug5E468EB3/8FAE6071 собраны, sourceF8A3A6A8;
+среди59inputs изменёнтолько generated/web_pages.c. Size ordinary1 169 888,
+free366 112. Оба development archives сохранены. Host3950/platform46/frontend/
+integrity6/timezone9/aggregation14 pass. Первые DOM mocks исправлены (getter,
+изоляция посторонних GET); early artifact run без native coverage сохранёнfailed.
+
+Debug fixed8host reset smoke не дождался SNTP, connectedtrue/notifyfalse/NTPcount1
+на6.46guest s. Source подтверждает randomized startup LWIP_RAND()%5000. Oldfailed
+сохранён, отдельный probe успешен. В QEMUfeature2a593f8d00 state-based readiness
+с15guest/60host deadline и прежнимUTC<1s:19units/3actual guests pass. Ordinary
+5.688host/3.913510guest;debug8.250/6.415086;factory9.031/7.767985. Consumer29 checks
+дляобоих native pass. SDK delay иQEMUdevicecode не менялись. Scoped MD/JSON сохранены.
+Root full67941 наEF66/81CF/8FCE/A74 продолжает исполняться,184 frozen fingerprints
+повторно unchanged. До terminal/save этогоfull ветки не интегрировать.
