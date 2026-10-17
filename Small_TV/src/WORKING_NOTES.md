@@ -60,6 +60,10 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   требует photo_settings. После terminal сверить initial/final pins и выполнить
   strict archive_immutable_run.py. Старые72/74 pin lists не переименовывать.
   H03/setup, H09/H10 и physical остаются.
+- Отдельный main browser proof DD41/B4:16 checks pass, реальный DOM script SHA
+  654c2ee3 совпал с generated page; JPEG47837 bytes полностью прежний. Raw backing,
+  соседние4 slots, inputs и protected regions проверены; ВМ18016/tab4 закрыты.
+  См. photo-upload-waits-main-ui.json. Это не результат полного62455.
 
 ## Цель и принятые решения
 

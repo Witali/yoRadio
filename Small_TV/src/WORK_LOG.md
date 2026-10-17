@@ -1509,3 +1509,13 @@
   integrity6 и timezone-source9 pass. Machine renderer активен; общего результата
   ещё нет. Не перезапускать по timeout наблюдения. Source/data/ELF/BIN заморожены;
   независимая новая работа допустима в своей ветке, context Markdown не в pins.
+
+### 2026-10-17 — браузерный proof текущего main
+
+- Дополнительная собственная ВМ18016 main-ui-20261017 использовала DD41/B4.
+  Реальный DOM inline-script совпал с generated page по SHA654c2ee3, затем
+  actual browser upload47837 bytes/12 chunks дал прежний JPEGa73dc807. Все16
+  browser/raw/protected/source/helper checks pass; slots1–4 не менялись.
+  ВМ и tab4 закрыты, console[]. Сохранены отдельные main-ui JSON/screenshot.
+- Предыдущий push доc5f4d57a завершился успешно. Full62455 продолжает machine
+  stage на неизменных75+88 inputs; эти scoped browser results не его aggregate.
