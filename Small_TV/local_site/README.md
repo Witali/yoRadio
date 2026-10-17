@@ -13,6 +13,11 @@ correction removes the original `Math.abs` sign error; SSID option values remain
 unchanged. Regenerate both pages with `extract_pages.py` after editing the module.
 `src/tests/wifi_scan_test.mjs` executes their actual scan callbacks with synthetic
 HTTP/DOM boundaries; the legacy settings control is supplied only for that test.
+The setup page identifies its manual-entry fallback by option metadata. A real
+access point named `manual` is submitted normally; cancellation still sends no
+configuration request. The same test executes these actual form callbacks and
+checks the outgoing payload. The factory setup document at flash offset
+`0x026edc` used the SSID value itself as the command, causing a name collision.
 
 ## Start and stop
 

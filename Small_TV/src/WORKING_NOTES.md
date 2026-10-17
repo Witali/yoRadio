@@ -7,6 +7,16 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- В `codex/small-tv-manual-ssid` исправлена коллизия настоящего SSID `manual`
+  со служебным пунктом setup. Helper в wifi_network.js помечен FIXED_FACTORY,
+  exporter ставит метку только двум fallback option. Factory и предыдущая
+  страница воспроизводят лишний prompt; новая проходит 15 scan/submit тестов.
+  Обычная A5439306/8485A233 и debug D1E7660D/EB4FDFB5 сохранены, source721E26BD.
+  Из 59 inputs меняется только generated/web_pages.c. Host checks проходят.
+  Real browser + отдельная QEMU сеть manual: submit, restart, STA UI и SDK
+  connected/DHCP/SNTP подтверждены. VM закрыта; старая setup error-tab не
+  закрывается из-за browser URL policy и оставлена для автоматической очистки.
+  См. manual-ssid-checks/validation-20261017. Это ещё не новый full или H10.
 - В отдельной ветке `codex/small-tv-runtime-analysis` добавлен read-only анализ
   полного runtime журнала: `tools/analyze_runtime.py`, `runtime_evidence.py`,
   `runtime_trend.py`. 20 тестов проходят, включая утечку при постоянном SDK

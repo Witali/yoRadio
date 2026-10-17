@@ -38,7 +38,7 @@ def main():
                               check=True, capture_output=True, text=True)
     wifi = json.loads(wifi_run.stdout)
     if not wifi['passed']:
-        raise ValueError('Signed Wi-Fi scan labels failed')
+        raise ValueError('Wi-Fi scan labels or setup submission failed')
     report['wifi_scan'] = wifi
     manifest = json.loads((SITE / 'pages-manifest.json').read_text(encoding='utf-8'))
     for page in report['pages']:
@@ -55,12 +55,12 @@ def main():
                              'sha256': hashlib.sha256(transfer_test.read_bytes()).hexdigest()})
     report['inputs'].append({'file': wifi_test.relative_to(ROOT).as_posix(),
                             'sha256': hashlib.sha256(wifi_test.read_bytes()).hexdigest()})
-    report['scope'] = ('JavaScript syntax, signed Wi-Fi labels, crop/metadata and controlled HTTP transfer checks; '
+    report['scope'] = ('JavaScript syntax, signed Wi-Fi labels, setup submission, crop/metadata and controlled HTTP transfer checks; '
                        'real browser Canvas and guest upload are recorded separately.')
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(f"PASS frontend: {report['scripts']} scripts, {report['metadata_checks']} JPEG checks, "
           f"{report['crop_checks']} crop, {report['resize_checks']} resize, "
-          f"{len(transfer['checks'])} photo transfer, {len(wifi['checks'])} Wi-Fi label checks")
+          f"{len(transfer['checks'])} photo transfer, {len(wifi['checks'])} Wi-Fi scan/setup checks")
 
 
 if __name__ == '__main__':

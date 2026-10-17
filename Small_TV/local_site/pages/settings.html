@@ -444,6 +444,12 @@ function formatWifiNetworkLabel(network) {
     return network.ssid + suffix;
 }
 
+/** Distinguish the manual-entry option from a real access point's SSID. */
+function isManualWifiSelection(select) {
+    // FIXED_FACTORY: the literal SSID "manual" is a valid discovered network.
+    return select.selectedOptions[0]?.dataset.manualEntry === 'true';
+}
+
         /*****************************************************************
          * WiFi网络相关功能
          *****************************************************************/

@@ -164,6 +164,12 @@ function formatWifiNetworkLabel(network) {
     return network.ssid + suffix;
 }
 
+/** Distinguish the manual-entry option from a real access point's SSID. */
+function isManualWifiSelection(select) {
+    // FIXED_FACTORY: the literal SSID "manual" is a valid discovered network.
+    return select.selectedOptions[0]?.dataset.manualEntry === 'true';
+}
+
         document.addEventListener('DOMContentLoaded', function() {
             const ssidSelect = document.getElementById('ssid');
 
@@ -209,6 +215,7 @@ function formatWifiNetworkLabel(network) {
                         // 添加手动输入选项
                         const manualOption = document.createElement('option');
                         manualOption.value = "manual";
+                        manualOption.dataset.manualEntry = "true";
                         manualOption.textContent = "Manually enter SSID";
                         ssidSelect.appendChild(manualOption);
                     }
@@ -227,6 +234,7 @@ function formatWifiNetworkLabel(network) {
 
                     const manualOption = document.createElement('option');
                     manualOption.value = "manual";
+                        manualOption.dataset.manualEntry = "true";
                     manualOption.textContent = "Manually enter SSID";
                     ssidSelect.appendChild(manualOption);
                 });
@@ -239,7 +247,7 @@ function formatWifiNetworkLabel(network) {
             const ssid = document.getElementById('ssid').value;
             const password = document.getElementById('password').value;
 
-            if (ssid === "manual") {
+            if (isManualWifiSelection(document.getElementById("ssid"))) {
                 const manualSsid = prompt("Please enter the WiFi SSID:");
                 if (!manualSsid) return;
 

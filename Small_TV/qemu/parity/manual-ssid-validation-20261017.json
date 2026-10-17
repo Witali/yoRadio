@@ -1,0 +1,492 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Confirmed factory HTML name collision; scan/submit callbacks, host checks, ordinary real-browser/QEMU setup. No new full-regression, debug runtime, physical board or H10 claim.",
+  "factory_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4",
+  "factory_setup_flash_offset": "0x026edc",
+  "sources_sha256": {
+    "Small_TV/local_site/wifi_network.js": "8e6e114e446a2aace10890d0e0a0eb3a665d558b6fc669deb6a4e8b4e804f45b",
+    "Small_TV/local_site/extract_pages.py": "df5179cfa97ad4522259a45dc2ccff83d52956a9fb052e7d3c8f94968a59ed81",
+    "Small_TV/local_site/pages-manifest.json": "0112793e499c1b72b9a7977d5c419995c92a0c4d251d306995000094c43be572",
+    "Small_TV/local_site/pages/setup.html": "0a0c7b223ba82dd2df35c9e6b89933476df6512d6d70672b138bdf5da0eb11b1",
+    "Small_TV/local_site/pages/settings.html": "548740d1326340566950c434748746b2359b91235d85bf8a85d8ff4c549ae5a7",
+    "Small_TV/local_site/pages/photo.html": "6aa893c2806184daff7c30b798d1a89d17586c2025cc8be6530ed601fb49a736",
+    "Small_TV/src/tests/wifi_scan_test.mjs": "67edc04ab3e107cbeb9c9e645139cab58f5c7ff7886d65d8751930f07fd5459b",
+    "Small_TV/src/tests/frontend_test.py": "5fb0774c74bd0d692a96d55bfa316da1856f93e31fc83853bec8e0d01eb2a907",
+    "Small_TV/local_site/source/setup.html": "7e554c9b8e443c9a6f2f0adefb32ee9dab4fce760786c58ed7e986515ac62892"
+  },
+  "exporter_idempotent": true,
+  "negative_controls": {
+    "previous_native": {
+      "file_sha256": "a287db316aa96588cdde3837813611186f944af0604ef89aa5398e066446372e",
+      "checks": [
+        {
+          "page": "setup",
+          "case": "signed-dbms",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "zero-and-missing",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "literal-ssid",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "non-finite",
+          "passed": true
+        },
+        {
+          "page": "settings",
+          "case": "signed-dbms",
+          "passed": true
+        },
+        {
+          "page": "settings",
+          "case": "zero-and-missing",
+          "passed": true
+        },
+        {
+          "page": "settings",
+          "case": "literal-ssid",
+          "passed": true
+        },
+        {
+          "page": "settings",
+          "case": "non-finite",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "real-ssid-manual",
+          "passed": false,
+          "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+        },
+        {
+          "page": "setup",
+          "case": "real-ssid-ordinary",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "manual-entry",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "manual-entry-literal-manual",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "manual-cancel",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "manual-empty",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "manual-after-scan-error",
+          "passed": true
+        }
+      ],
+      "pages": {
+        "setup": "bf6cda30e48bfb675f042b39adf310c7d8c3efda3698c5a66e4403a772decd56",
+        "settings": "2b055ed173fcaf81d7629204dc5bfe0c1fbfcae818f72b6651c792a5b809b5ff"
+      },
+      "expected_failure": "real-ssid-manual prompts for a different SSID"
+    },
+    "factory": {
+      "file_sha256": "dfe2695d45389c525a795d6816de6107b2eda9928d9c678a206756acc3efee26",
+      "checks": [
+        {
+          "page": "setup",
+          "case": "signed-dbms",
+          "passed": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'Near (22dBm)',\n+   'Far (91dBm)',\n+   'Limit (127dBm)'\n-   'Near (-22dBm)',\n-   'Far (-91dBm)',\n-   'Limit (-127dBm)'\n  ]\n"
+        },
+        {
+          "page": "setup",
+          "case": "zero-and-missing",
+          "passed": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'Zero',\n-   'Zero (0dBm)',\n    'Unknown',\n+   'Bad (NaNdBm)'\n-   'Bad'\n  ]\n"
+        },
+        {
+          "page": "setup",
+          "case": "literal-ssid",
+          "passed": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   '<img src=x onerror=alert(1)> & \"quoted\" (40dBm)'\n-   '<img src=x onerror=alert(1)> & \"quoted\" (-40dBm)'\n  ]\n"
+        },
+        {
+          "page": "setup",
+          "case": "non-finite",
+          "passed": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'NaN',\n+   'Inf (InfinitydBm)'\n-   'Inf'\n  ]\n"
+        },
+        {
+          "page": "settings",
+          "case": "signed-dbms",
+          "passed": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'Near (22dBm)',\n+   'Far (91dBm)',\n+   'Limit (127dBm)'\n-   'Near (-22dBm)',\n-   'Far (-91dBm)',\n-   'Limit (-127dBm)'\n  ]\n"
+        },
+        {
+          "page": "settings",
+          "case": "zero-and-missing",
+          "passed": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'Zero',\n-   'Zero (0dBm)',\n    'Unknown',\n+   'Bad (NaNdBm)'\n-   'Bad'\n  ]\n"
+        },
+        {
+          "page": "settings",
+          "case": "literal-ssid",
+          "passed": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   '<img src=x onerror=alert(1)> & \"quoted\" (40dBm)'\n-   '<img src=x onerror=alert(1)> & \"quoted\" (-40dBm)'\n  ]\n"
+        },
+        {
+          "page": "settings",
+          "case": "non-finite",
+          "passed": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'NaN',\n+   'Inf (InfinitydBm)'\n-   'Inf'\n  ]\n"
+        },
+        {
+          "page": "setup",
+          "case": "real-ssid-manual",
+          "passed": false,
+          "error": "Expected values to be strictly equal:\n\n1 !== 0\n"
+        },
+        {
+          "page": "setup",
+          "case": "real-ssid-ordinary",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "manual-entry",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "manual-entry-literal-manual",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "manual-cancel",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "manual-empty",
+          "passed": true
+        },
+        {
+          "page": "setup",
+          "case": "manual-after-scan-error",
+          "passed": true
+        }
+      ],
+      "pages": {
+        "setup": "bcd6558ecb842bec032960b1fb39f38088541e25f6a7fcad1bd9624dbb5b37f0",
+        "settings": "b91bf487f70404a3c99486af18e468f76aaec1520de151d0e8116813c9e8d75d"
+      },
+      "expected_failure": "real-ssid-manual prompts for a different SSID"
+    }
+  },
+  "after": {
+    "passed": true,
+    "checks": [
+      {
+        "page": "setup",
+        "case": "signed-dbms",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "zero-and-missing",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "literal-ssid",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "non-finite",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "signed-dbms",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "zero-and-missing",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "literal-ssid",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "non-finite",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "real-ssid-manual",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "real-ssid-ordinary",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-entry",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-entry-literal-manual",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-cancel",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-empty",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-after-scan-error",
+        "passed": true
+      }
+    ],
+    "pages": {
+      "setup": "0a0c7b223ba82dd2df35c9e6b89933476df6512d6d70672b138bdf5da0eb11b1",
+      "settings": "548740d1326340566950c434748746b2359b91235d85bf8a85d8ff4c549ae5a7"
+    },
+    "scope": "Actual generated scan and setup-submit handlers; mocked DOM/HTTP/prompt. Settings legacy scan is tested with its optional control present. Browser/RF acceptance remains separate."
+  },
+  "builds": {
+    "ordinary": {
+      "app_sha256": "a5439306d341ae10258cd26fce6555f18da05375be8112d8c90c5dd78d92f0ca",
+      "elf_sha256": "8485a233273516d4ea2c0651da5e3283471bbfd4ec4c3c661c75128362e2e1cd",
+      "source_sha256": "721e26bdeb12b4f31a94dae151fbf9d017b2f6e407e39b38f01f85171d7ab6ef",
+      "source_inputs": 59,
+      "changed_production_inputs": [
+        "generated/web_pages.c"
+      ],
+      "debug_logging": false,
+      "app_bytes": 1169888,
+      "app_partition_free_bytes": 366112
+    },
+    "debug": {
+      "app_sha256": "d1e7660d81647cba68466bd09c84eede282033a459439fa329aea1fd66c843fc",
+      "elf_sha256": "eb4fdfb526e8bd7006b61fb637aed4297511604d6deb19fcef3f63eea35bafe1",
+      "source_sha256": "721e26bdeb12b4f31a94dae151fbf9d017b2f6e407e39b38f01f85171d7ab6ef",
+      "source_inputs": 59,
+      "changed_production_inputs": [
+        "generated/web_pages.c"
+      ],
+      "debug_logging": true,
+      "app_bytes": 1230384,
+      "app_partition_free_bytes": 305616
+    }
+  },
+  "host": {
+    "report_sha256": "824e5f98ffd6d237a058703cc7a55d40d8d7f23a20e9e7bc4cd7da54af7f2291",
+    "passed": true,
+    "groups": [
+      {
+        "name": "report_aggregation",
+        "status": "passed"
+      },
+      {
+        "name": "native",
+        "status": "passed"
+      },
+      {
+        "name": "platform",
+        "status": "passed"
+      },
+      {
+        "name": "frontend",
+        "status": "passed"
+      },
+      {
+        "name": "integrity",
+        "status": "passed"
+      },
+      {
+        "name": "timezone_sources",
+        "status": "passed"
+      },
+      {
+        "name": "machine",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_classic",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_weather",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_calendar",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_jpeg",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_jpeg_inputs",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_timezones",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_time_state",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_text",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_network",
+        "status": "not_run"
+      },
+      {
+        "name": "qemu_profile",
+        "status": "not_run"
+      },
+      {
+        "name": "qemu",
+        "status": "not_run"
+      },
+      {
+        "name": "hardware_browser_soak",
+        "status": "not_run"
+      }
+    ],
+    "native_checks": 3950,
+    "platform_scenarios": 46,
+    "wifi_scan_setup_cases": 15,
+    "integrity_cases": 6,
+    "timezone_cases": 9,
+    "aggregation_cases": 14
+  },
+  "browser_ui": {
+    "scope": "Observed real browser interaction with a disposable QEMU guest; no physical board.",
+    "selectedBeforeSubmit": {
+      "selected": [
+        {
+          "label": "manual (-16dBm)",
+          "manualEntry": null,
+          "value": "manual"
+        }
+      ],
+      "value": "manual"
+    },
+    "submitResult": "Configuration saved successfully!",
+    "successScreenshot": "browser-success.png",
+    "stationPage": {
+      "title": "Smart Weather Clock",
+      "settingsLoaded": true,
+      "temperatureEnabled": true,
+      "theme": "0"
+    },
+    "stationScreenshot": "browser-station.png",
+    "stationTabClosed": true,
+    "setupTabCleanup": "CDP focus/snapshot timeout after AP disappeared; close and Escape attempts failed. Temporary unmarked tab remains for automatic turn cleanup. Last close after VM stop was blocked by generated error-page URL policy."
+  },
+  "browser_guest": {
+    "layout": {
+      "elf_sha256": "8485a233273516d4ea2c0651da5e3283471bbfd4ec4c3c661c75128362e2e1cd",
+      "symbols": {
+        "s_correction_us": {
+          "address": 1070282696,
+          "size": 8
+        },
+        "last_station_address": {
+          "address": 1070282840,
+          "size": 4
+        },
+        "connected": {
+          "address": 1070282848,
+          "size": 1
+        },
+        "ap_active": {
+          "address": 1070282847,
+          "size": 1
+        },
+        "time_synced": {
+          "address": 1070282860,
+          "size": 1
+        },
+        "s_microseconds_offset": {
+          "address": 1070282680,
+          "size": 8
+        }
+      },
+      "converter_sha256": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9",
+      "vm_helper_sha256": "ff0819a307fecd4fc72fab6c054df47150761af709578ab80c948f6c0780666f"
+    },
+    "state": {
+      "connected": true,
+      "ap_active": false,
+      "station_address": "192.168.43.15",
+      "time_synced": true
+    },
+    "ntp": {
+      "method": "model_response_timestamp",
+      "response_count": 1,
+      "server_epoch": 1792254905,
+      "sent_virtual_us": 25975285,
+      "boot_time_us": 1792254877072544,
+      "virtual_us": 47945036,
+      "systimer_ticks": 498563891,
+      "rtc_hrt_offset_us": 23275170,
+      "system_correction_us": -21102282,
+      "since_boot_us": 50111723,
+      "actual_utc_seconds": 1792254927.184267,
+      "expected_utc_seconds": 1792254926.969751,
+      "difference_seconds": 0.21451616287231445
+    }
+  },
+  "cleanup": {
+    "source_images_unchanged": true,
+    "no_panic": true,
+    "rom_boots": 2,
+    "vm_stopped": true
+  },
+  "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+  "qemu_helper_sha256": "ff0819a307fecd4fc72fab6c054df47150761af709578ab80c948f6c0780666f",
+  "test_profile_sha256": "de306eb2863fdba7d4334b00bc6aa4aa702adc0384c0204e13ae463e05a4e2ce",
+  "screenshot": {
+    "file": "manual-ssid-setup-success-20261017.png",
+    "sha256": "ac2c443129e2040773a4757fc5c1dfa1eb306ac06c6bafb7f60f4921a8605bd5"
+  }
+}

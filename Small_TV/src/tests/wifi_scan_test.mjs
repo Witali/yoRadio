@@ -10,15 +10,18 @@ if (!directory) throw new Error('Pass the generated pages directory');
 const checks = [];
 const pages = {};
 
-async function scan(page, records) {
+async function scan(page, records, {scanFails = false} = {}) {
     /* Run the shipped scan handlers; mocks supply only DOM and HTTP boundaries. */
     const html = readFileSync(path.join(directory, page + '.html'), 'utf8');
     pages[page] = crypto.createHash('sha256').update(html).digest('hex');
     const code = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(match => match[1]).join('\n');
-    const ready = [], nodes = new Map(), requests = [], errors = [];
+    const ready = [], nodes = new Map(), requests = [], errors = [], prompts = [];
+    let promptReply = null;
     function element() {
-        return {children: [], value: '', style: {}, addEventListener() {},
+        return {children: [], value: '', style: {}, dataset: {}, listeners: {},
+            addEventListener(event, callback) {this.listeners[event] = callback;},
             appendChild(child) {this.children.push(child);},
+            get selectedOptions() {return this.children.filter(child => child.selected);},
             set innerHTML(value) {this.children = [];},
             get textContent() {return this.label ?? '';},
             set textContent(value) {this.label = String(value);}};
@@ -30,18 +33,29 @@ async function scan(page, records) {
     };
     const context = vm.createContext({document, window: {addEventListener() {}},
         console: {log() {}, error(error) {errors.push(String(error));}},
-        fetch: async url => {requests.push(url);
+        prompt(message) {prompts.push(message); return promptReply;},
+        fetch: async (url, options) => {requests.push({url, options});
             // Hold unrelated settings initialization reads at the HTTP boundary.
             if (url !== '/scan') return new Promise(() => {});
+            if (scanFails) throw new Error('Synthetic scan failure');
             return {ok: true, json: async () => records};},
         setInterval() {}, setTimeout() {}});
     new vm.Script(code, {filename: page + '.html'}).runInContext(context);
     if (page === 'setup') ready.forEach(callback => callback());
     else context.refreshList(); // Legacy optional settings control, with its DOM present.
     for (let attempt = 0; attempt < 20; attempt++) await new Promise(setImmediate);
-    assert.deepEqual(errors, []);
-    assert.deepEqual(requests.filter(url => url === '/scan'), ['/scan']);
-    return nodes.get(page === 'setup' ? 'ssid' : 'wifi_list').children;
+    if (!scanFails) assert.deepEqual(errors, []);
+    assert.deepEqual(requests.filter(row => row.url === '/scan').map(row => row.url), ['/scan']);
+    const select = nodes.get(page === 'setup' ? 'ssid' : 'wifi_list');
+    return {options: select.children, prompts, requests,
+        submit(index, reply) {
+            /* Exercise the actual form listener and selected option identity. */
+            promptReply = reply;
+            select.children.forEach((option, position) => {option.selected = position === index;});
+            select.value = select.children[index].value;
+            document.getElementById('password').value = 'synthetic-test-pass';
+            nodes.get('wifiForm').listeners.submit({preventDefault() {}});
+        }};
 }
 
 for (const page of ['setup', 'settings']) {
@@ -55,7 +69,7 @@ for (const page of ['setup', 'settings']) {
         ['non-finite', [{ssid: 'NaN', rssi: NaN}, {ssid: 'Inf', rssi: Infinity}], ['NaN', 'Inf']]
     ]) {
         try {
-            const options = await scan(page, records);
+            const {options} = await scan(page, records);
             assert.deepEqual(options.map(option => option.label), labels);
             assert.deepEqual(options.map(option => option.value), records.map(row => row.ssid));
             if (page === 'setup') assert.equal(options[0].selected, true);
@@ -63,7 +77,33 @@ for (const page of ['setup', 'settings']) {
         } catch (error) {checks.push({page, case: name, passed: false, error: error.message});}
     }
 }
+for (const scenario of [
+    {name: 'real-ssid-manual', records: [{ssid: 'manual', rssi: -32}], index: 0,
+     promptReply: 'wrong-network', promptCount: 0, sent: 'manual'},
+    {name: 'real-ssid-ordinary', records: [{ssid: 'Kitchen & <TV>', rssi: -50}], index: 0,
+     promptCount: 0, sent: 'Kitchen & <TV>'},
+    {name: 'manual-entry', records: [], index: 1, promptReply: 'Hidden TV', promptCount: 1, sent: 'Hidden TV'},
+    {name: 'manual-entry-literal-manual', records: [], index: 1, promptReply: 'manual', promptCount: 1, sent: 'manual'},
+    {name: 'manual-cancel', records: [], index: 1, promptReply: null, promptCount: 1, sent: null},
+    {name: 'manual-empty', records: [], index: 1, promptReply: '', promptCount: 1, sent: null},
+    {name: 'manual-after-scan-error', records: [], index: 1, scanFails: true,
+     promptReply: 'Recovery TV', promptCount: 1, sent: 'Recovery TV'}
+]) {
+    try {
+        const loaded = await scan('setup', scenario.records, scenario);
+        loaded.submit(scenario.index, scenario.promptReply);
+        assert.equal(loaded.prompts.length, scenario.promptCount);
+        const sent = loaded.requests.filter(row => row.url === '/configure');
+        assert.equal(sent.length, scenario.sent === null ? 0 : 1);
+        if (sent.length) {
+            assert.equal(sent[0].options.method, 'POST');
+            assert.deepEqual(JSON.parse(sent[0].options.body),
+                {ssid: scenario.sent, password: 'synthetic-test-pass'});
+        }
+        checks.push({page: 'setup', case: scenario.name, passed: true});
+    } catch (error) {checks.push({page: 'setup', case: scenario.name, passed: false, error: error.message});}
+}
 const report = {passed: checks.every(row => row.passed), checks, pages,
-    scope: 'Actual generated scan handlers; mocked DOM/HTTP. Settings legacy scan is tested with its optional control present. Browser/RF acceptance remains separate.'};
+    scope: 'Actual generated scan and setup-submit handlers; mocked DOM/HTTP/prompt. Settings legacy scan is tested with its optional control present. Browser/RF acceptance remains separate.'};
 console.log(JSON.stringify(report, null, 2));
 if (!report.passed) process.exitCode = 1;

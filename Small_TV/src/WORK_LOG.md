@@ -1924,3 +1924,33 @@ files в redirected sandbox TEMP (WinError5); повтор с TEMP внутри 
 Реальный короткий preflight и префикс H10 успешно прочитаны, все 30 source SHA
 совпали. Анализ preflight не объявлен 24h pass. H10 и полный frozen regression
 продолжаются; входы выполняющихся процессов не изменены.
+
+### 2026-10-17 — коллизия настоящего SSID manual
+
+В отдельном worktree исправлен factory setup HTML flash offset 0x026edc:
+условие ssid==manual принимало реальную сеть за команду ручного ввода. Новый
+isManualWifiSelection в общем Wi-Fi module помечен FIXED_FACTORY и читает
+метку selected option. Два fallback option помечаются exporter; передача
+SSID/password и отмена prompt сохранены. Все 15 actual scan/submit callback
+cases проходят. Negative control на заводском и прежнем native HTML показывает
+лишний prompt именно для настоящего SSID manual. Первый mock run имел ошибку
+фикстуры: password node создавался лениво, но тест обращался к нему напрямую.
+После исправления фикстуры 14 случаев old pass, один old fail, все new pass.
+
+Ordinary и debug production builds успешно сохранены. App A5439306/8485A233 и
+D1E7660D/EB4FDFB5; source721E26BD/59 inputs, меняется только generated/web_pages.c.
+SDK config прежний. Ordinary 1 169 888 байт/free366112; debug 1 230 384 байта.
+Host reduced: native3950/platform46/frontend15 Wi-Fi cases/integrity6/timezone9/
+aggregation14 проходят. Main frozen full не изменён, все184 identities совпали.
+
+Browser на отдельной QEMU VM с профилем station_ssid=manual: выбран настоящий
+option manual(-16dBm), manualEntry отсутствует. Submit приводит к success alert,
+configuration complete и после штатного reset к STA странице с загруженными
+controls. Matched-ELF SDK connected=true/AP=false/IP192.168.43.15/time_synced=true,
+UTC difference0.214516163. Два ROM boots, panic нет, source images unchanged,
+VM остановлена. Снимки сохранены; setup complete PNG добавлен к scoped proof.
+STA tab закрыта; setup tab после исчезновения AP дал CDP timeout, затем error
+page URL policy блокирует close. Он не помечен handoff/deliverable и оставлен
+для штатной automatic cleanup. Это не firmware defect и не полный H03/H10.
+Основной full67941 и длительный H10 31890/guard99431 продолжаются на своих
+прежних images; новый app не объявлен прошедшим эти прогоны.

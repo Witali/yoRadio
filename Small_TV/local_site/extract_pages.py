@@ -126,6 +126,16 @@ def recover() -> None:
                            "document.getElementById('advancedSettingsForm')"]:
                 page = page.replace(f"{target}.addEventListener", f"{target}?.addEventListener")
         if name == "setup":
+            # FIXED_FACTORY: setup HTML at flash offset 0x026edc reserves the
+            # real SSID "manual" as a command.
+            # Identify the two synthetic fallback options by metadata instead.
+            original = 'manualOption.value = "manual";'
+            if page.count(original) != 2 or page.count('if (ssid === "manual") {') != 1:
+                raise ValueError('Missing factory manual Wi-Fi selection')
+            page = page.replace(original, original + '\n'
+                '                        manualOption.dataset.manualEntry = "true";')
+            page = page.replace('if (ssid === "manual") {',
+                'if (isManualWifiSelection(document.getElementById("ssid"))) {', 1)
             page = page.replace("function handleResponse(response)", "function readResponse(response)")
             page = page.replace(".then(handleResponse)", ".then(readResponse).then(handleResponse)")
         if name == "photo":

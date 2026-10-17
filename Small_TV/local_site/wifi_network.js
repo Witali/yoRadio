@@ -4,3 +4,9 @@ function formatWifiNetworkLabel(network) {
     const suffix = Number.isFinite(network.rssi) ? ` (${network.rssi}dBm)` : '';
     return network.ssid + suffix;
 }
+
+/** Distinguish the manual-entry option from a real access point's SSID. */
+function isManualWifiSelection(select) {
+    // FIXED_FACTORY: the literal SSID "manual" is a valid discovered network.
+    return select.selectedOptions[0]?.dataset.manualEntry === 'true';
+}
