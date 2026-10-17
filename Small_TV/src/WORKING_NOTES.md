@@ -7,6 +7,18 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- По запросу commit/push сохранён browser checkpoint на текущем8304F1A4:
+  IABbrowser2/tab2, `http://127.0.0.1:18082/?probe=1` показывает WiFi Setup,
+  scan завершён и даёт literal signed RSSI -21/-22/-39dBm. Screenshot/JSON:
+  `uri-setup-browser-checkpoint-20261017.*`. Browser tab marked handoff для
+  продолжения; VM SmallTV-af1d9b420488/PID18416, state
+  `.build/small-tv-browser/uri-current-20261017-2`, station18083. Это только
+  page/scan checkpoint: submit, about:blank, station settings/photo/advanced и
+  persistence ещё не проверены в этом browser flow. Полныйrun90679 и H10
+  продолжаются; H10 на момент сохранения43cycles/statusrunning/noerror.
+  Первая browser VM PID33980 остановлена после слишком строгого test-only
+  query-block length assertion; штатный owned raw matcher во второй прошёл.
+  После продолжения сверить browser/VM identity и закончить flow/cleanup.
 - Проверка после границы assistant turn пройдена: все четыре H10 roles живы,
   точные PID/start times совпали с launch record, команды принадлежат этому run.
   Evidence: `uri-runtime-process-survival-20261017.json`. Это устраняет прежнюю

@@ -1,0 +1,96 @@
+{
+  "status": "in_progress_browser_handoff",
+  "all_functionality_verified": false,
+  "scope": "Current ordinary firmware: real browser renders AP setup for /?probe=1 and completes synthetic Wi-Fi scan. Configuration submission, station controls and persistence remain pending in this browser flow.",
+  "app_sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+  "sources": {
+    "images": [
+      {
+        "bytes": 16928,
+        "sha256": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b",
+        "offset": "0x0",
+        "file": "bootloader.bin"
+      },
+      {
+        "bytes": 3072,
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "offset": "0x8000",
+        "file": "partition-table.bin"
+      },
+      {
+        "bytes": 1169904,
+        "sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+        "offset": "0x10000",
+        "file": "app.bin"
+      },
+      {
+        "bytes": 1994752,
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "offset": "0x200000",
+        "file": "assets.bin"
+      }
+    ],
+    "source_sha256": "be5802d60f7e113aeb6e5fc77bc144f3088f5dbb791a6ab4c46db4cbb02b0726"
+  },
+  "inputs_sha256": {
+    "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\app.bin": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+    "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\bootloader.bin": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b",
+    "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+    "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+    "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\source-manifest.json": "a6f99785457fa80cf4bb77e97cefaa647ba41e4d054f008c15367558d50c8f39",
+    "C:\\Work\\yoRadio\\Small_TV\\src\\tests\\qemu_storage.py": "3fa00b82379b90c76939ad61d1756f1fcefe03ded492bd16c7df1b532578dc3d",
+    "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-riscv32.exe": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+    "C:\\Work\\yoRadio\\Small_TV\\qemu\\profiles\\small-tv-c2.json": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+    "C:\\Work\\yoRadio\\.build\\small-tv-esp32c2\\small_tv_reconstructed.elf": "62e040b592d6bd526b25c6035005e31a3a40eebb5a9beb994abe49f089addebb",
+    "C:\\Work\\yoRadio\\Small_TV\\local_site\\pages\\setup.html": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
+    "C:\\Work\\yoRadio\\Small_TV\\local_site\\pages\\settings.html": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
+    "C:\\Work\\yoRadio\\Small_TV\\local_site\\pages\\photo.html": "6aa893c2806184daff7c30b798d1a89d17586c2025cc8be6530ed601fb49a736",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_vm.py": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "C:\\Work\\QEMU-ESP32\\tools\\esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "C:\\Work\\QEMU-ESP32\\tools\\esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+    "C:\\Work\\QEMU-ESP32\\tools\\esp_elf.py": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f"
+  },
+  "inputs_unchanged_at_checkpoint": true,
+  "direct_raw_backing": true,
+  "browser": {
+    "browser_id": "2",
+    "tab_id": "2",
+    "title": "WiFi Configuration",
+    "url": "http://127.0.0.1:18082/?probe=1",
+    "handoff": true,
+    "observed_network_labels": [
+      "yoRadio-QEMU (-21dBm)",
+      "QEMU-2 (-22dBm)",
+      "QEMU-3 (-39dBm)"
+    ],
+    "selected_network": "yoRadio-QEMU"
+  },
+  "vm": {
+    "name": "SmallTV-af1d9b420488",
+    "pid": 18416,
+    "state_directory": "C:\\Work\\yoRadio\\.build\\small-tv-browser\\uri-current-20261017-2",
+    "web_urls": {
+      "setup": "http://127.0.0.1:18082",
+      "station": "http://127.0.0.1:18083"
+    },
+    "purpose": "Continue real browser flow after the requested progress commit."
+  },
+  "screenshot": {
+    "file": "uri-setup-browser-checkpoint-20261017.png",
+    "sha256": "bcca6e14898ea28d90809b7d144e832ef85790d7575d5bbe7deca96141a1f224"
+  },
+  "initial_probe_error": {
+    "state_directory": ".build/small-tv-browser/uri-current-20261017",
+    "error": "One-off assertion incorrectly required the entire query-block list to contain exactly one entry. Replaced with the existing owned raw-image matcher; no emulator/firmware fix needed.",
+    "vm_pid": 33980,
+    "vm_stopped": true
+  },
+  "continuation": [
+    "Revalidate browser tab and VM identity, then submit synthetic setup credentials and observe factory about:blank completion.",
+    "Use station forward to check settings/photo/advanced controls, query-path rendering and persistence.",
+    "Close only this browser VM/tab after completing its flow; preserve the active full run and isolated H10."
+  ]
+}

@@ -2255,3 +2255,22 @@ boot/reset/SNTP/body/concurrency/URI gates. Published reports не замене�
 loop. Область — analysis/review, не C instruction execution. Branch оставлена
 отдельно до terminal/full publication, чтобы не менять frozen inputs текущих
 firmware проверок. Детальный proof и CLI usage находятся в этой feature ветке.
+
+### 2026-10-17 — браузерный checkpoint и запрошенное сохранение прогресса
+
+На новой8304F1A4 запущен отдельный disposable persistent raw VM для реальной
+browser acceptance. Первая попытка ошибочно требовала len(query-block)==1;
+finally остановил PID33980, внешний OS audit подтвердил отсутствие. Во второй
+использован штатный qemu_storage.direct_flash_backing: точное совпадение own
+raw flash path, writable backend, без snapshot overlay. VM SmallTV-af1d9b420488,
+PID18416,state .build/small-tv-browser/uri-current-20261017-2,ports18082/18083.
+
+В IABbrowser2/tab2 видны titleWiFiConfiguration и setup для /?probe=1; scan
+завершился с тремя синтетическими SSID и signed -21/-22/-39dBm, выбранyoRadio-QEMU.
+Сохранены screenshot и scoped JSON с19input identities/direct raw proof;
+configuration submission и station controls в этом browser flow ещё pending.
+По пользовательскому запросу «закоммить и запушь текущий прогресс» вкладка
+marked handoff, собственная browser VM нужна для продолжения. Full90679/H10
+не останавливаются; на checkpoint H10running43cycles/noerror, full проходит
+photo_reinit и продолжает photo_settings. Собственные изменения, checkpoint и
+контекст сохраняются отдельно от чужих patch/tmp/untracked файлов.
