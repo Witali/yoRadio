@@ -1600,3 +1600,21 @@ appDD41/source96A/ELFB4/QEMU30F/source0d27a7ca98. Frozen75 tests/88 extras;
 production и test inputs не менять до завершения. Aggregation14/native3924/
 platform46/frontend/integrity6/timezone9 pass, machine выполняется. Это начало
 нового прогона, ещё не общий положительный результат. Старый failed run сохранён.
+
+### 2026-10-17 — runtime память проверена в независимой ветке
+
+Ветка codex/small-tv-runtime-observer /9adf0fb0 отправлена. Standalone decoder
+читает актуальный DWARF, heaps/FreeRTOS lists и stack fill на vTaskDelay entry;
+ROM getters исполняются вне QEMU на typed header copies. 15 parser +4 ROM tests
+pass. Первый40-cycle runtime-workload run имел Python HTTP name shadow доbinary
+chunk; предыдущие import/unused API-deadline attempts тоже сохранены как harness
+errors, ВМ без panic. Новый40-cycle -02 завершён успешно, все inputsunchanged.
+
+121.076406 guest seconds,41 samples всех12tasks,10 JPEG uploads,240 recorded
+HTTP+80 concurrent GET, max.405659s. First/last free heap87 668/86 268,
+min sampled78 264, сумма SDK per-heap minima47 028. Lowest stack480bytes(settings),
+ROM checks164. Это ограниченный native preflight; H09/H10/24h/leak-free/physical/
+ISR stack и factory memory parity не объявлены. ВМ закрыта, snapshot memory bytes
+не экспортируются. Код/документ/JSON сохранены в отдельной ветке, main frozen75+88
+inputs общего run11075 не изменены. Его18 pre-QEMU groups и QEMU gates до
+photo_reinit прошли, photo_settings выполняется; полный результат пока отсутствует.

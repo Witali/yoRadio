@@ -87,9 +87,24 @@ max6.186934, new30F max.238274. Все200/no panic, ВМ закрыты. Исп�
 
 Новый единственный run link-timing-integrated-full-20261017 запущен, handle11075,
 initialHEADaf7c8c17, QEMU30F/source0d27a7ca98. Pins:75 tests/88 extras,
-appDD41/source96A/ELFB4. Host/frontend/integrity/timezone passed; идёт machine.
+appDD41/source96A/ELFB4. Все18 pre-QEMU groups passed; текущий QEMU stage прошёл
+boot/reset/SNTP, startup/weather_wait/advanced/photo, photo_frames/brightness/
+controls/reinit; выполняется photo_settings. Общего результата пока нет.
 Не запускать дубль по timeout наблюдения. До terminal report не менять frozen
 inputs и не публиковать новый pass. Контекстные Markdown не входят в pins.
+
+Независимая ветка codex/small-tv-runtime-observer /9adf0fb0 сохранена и отправлена,
+worktree .worktree/small-tv-runtime-observer. В ней standalone read-only observer
+и19 parser/ROM tests; main/test pins не менялись, merge до terminal full не делать.
+Новый40-cycle runtime-workload-20261017-02 завершён:121.076406 guest s,
+41 samples всех12tasks,10 uploads,240 recorded HTTP +80 concurrent GET,
+max.405659s, inputs unchanged/no panic/ВМclosed. SDK heap minima sum47 028,
+lowest task stack480bytes(settings); last free heap86 268. ROMcrosschecks164.
+Scoped doc/JSON runtime-memory-* находятся в ветке; они не объявляют H09/H10,
+24h leak-free/physical/ISR stack или factory memory equivalence выполненными.
+Ошибки прежних попыток harness сохранены отдельно. Root app/source/ELF прежние.
+Следующая работа с observer: объединить после сохранения immutable full result,
+затем расширять duration/reconnect/concurrent writes/restart/ISR observation.
 
 ### История измерений до исправления timing
 
