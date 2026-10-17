@@ -7,6 +7,24 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- `codex/small-tv-setup-redirect`: восстановлен factory `about:blank` после
+  Wi-Fi configure/reset. Local exporter ошибочно делал `/`, reload старого AP
+  после его shutdown. Это объясняет часть прежних browser CDP/error-page сбоев;
+  прежнее «только tooling» было неполным выводом. Factory target controls2pass,
+  before2fail/new18scan-submit-success-error cases pass; сохранён timer3000ms.
+  Real browser на новой ordinary922DA963/ELF71DED1E1: success, auto about:blank,
+  штатный close, tabs0. SDK connected/APfalse/IP192.168.43.15/SNTPtrue,
+  UTCerr0.471599s; VM закрыта. Первый clock-only probe ожидал10.0.2.15 и
+  timeout; correct setup-context read прошёл, это не firmware fault.
+  Ordinary922DA963/71DED1E1 и debugC37B7B5E/BA060CE6 сохранены, source9D2367EB/59inputs,
+  только generated/web_pages.c изменён, SDK config прежний. Host checks pass.
+  Full/H10 этого кандидата ещё не запускались. Перед ними подготовить отдельный
+  неизменяемый app/QEMU worktree для H10 и проверить detached supervisor через
+  границу assistant turn. Published full остаётся на EF66/81CF/A74.
+- Возможный следующий пробел для проверки, ещё НЕ подтверждённый баг: SDK
+  выбирает handlers по path, а native web dispatch сравнивает req->uri через
+  strcmp. Проверить query suffix (`/getclocktype?probe=1` и подобные) на factory
+  и native, прежде чем фиксировать следующий финальный full/H10 набор.
 - Следующий кандидат runtime schema4 (`codex/small-tv-runtime-weather`) закрывает
   пробел фактического weather workload. Четыре числовых поля читаются по точному
   ELF/DWARF только при idle worker; никаких строк/ключей/URL или вызовов гостя.

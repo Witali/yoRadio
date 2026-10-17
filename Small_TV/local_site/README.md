@@ -18,6 +18,12 @@ access point named `manual` is submitted normally; cancellation still sends no
 configuration request. The same test executes these actual form callbacks and
 checks the outgoing payload. The factory setup document at flash offset
 `0x026edc` used the SSID value itself as the command, causing a name collision.
+Successful setup and the optional legacy Wi-Fi reset retain the factory's
+three-second `about:blank` target. The earlier local exporter rewrote it to `/`,
+which made real firmware reload an AP address after that AP had stopped. The
+completion handlers carry `FIXED_RECONSTRUCTION`; scan/setup tests execute the
+real success callbacks and their controlled timers, including a failed save
+that must keep the form open and schedule no navigation.
 
 ## Start and stop
 

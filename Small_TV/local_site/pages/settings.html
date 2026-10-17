@@ -867,6 +867,8 @@ function isManualWifiSelection(select) {
          *****************************************************************/
         // 表单提交处理
         document.getElementById('wifiscanForm')?.addEventListener('submit', function(e) {
+            // FIXED_RECONSTRUCTION: keep the factory blank-page target after Wi-Fi restart.
+            // Reloading the old AP URL fails once the device becomes a station.
             e.preventDefault();
 
             // 获取表单数据
@@ -889,7 +891,7 @@ function isManualWifiSelection(select) {
 	                alert('Configuration saved successfully!');
 //	                document.getElementById('wifiscanForm').style.display = 'none';
 //	                document.querySelector('.container').innerHTML += '<h3 style="text-align:center;margin-top:20px;">Configuration complete! You may close this page.</h3>';
-	                setTimeout(() => { window.location.href = '/'; }, 3000);
+	                setTimeout(() => { window.location.href = 'about:blank'; }, 3000);
                 } else {
                     throw new Error('Failed to save settings');
                 }

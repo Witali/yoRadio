@@ -1,0 +1,421 @@
+{
+  "schema_version": 1,
+  "checks_passed": true,
+  "all_functionality_verified": false,
+  "scope": "Restore exact factory post-configuration target and timer. Actual Node callbacks and real ordinary QEMU/browser setup. No new full machine/QEMU, debug runtime, H10 or physical-board acceptance.",
+  "sources_sha256": {
+    "Small_TV/local_site/extract_pages.py": "cb60ffbaae324d3c63c530abb89e6028926e0fefb1534766eeae240d4943d617",
+    "Small_TV/local_site/pages-manifest.json": "97926516bd8efe193e3606c493fc9469264ad475102926f8e57ee72261ff1d27",
+    "Small_TV/local_site/pages/setup.html": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
+    "Small_TV/local_site/pages/settings.html": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
+    "Small_TV/src/tests/wifi_scan_test.mjs": "0a969f30a789457b018760a5d19fd3e85d3ab6ea0cb53bfb0eb5e9c78c3bb75d",
+    "Small_TV/src/tests/frontend_test.py": "5fb0774c74bd0d692a96d55bfa316da1856f93e31fc83853bec8e0d01eb2a907"
+  },
+  "factory_dump_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4",
+  "factory_target_controls": [
+    {
+      "page": "setup",
+      "case": "success-preserves-factory-blank-target",
+      "passed": true
+    },
+    {
+      "page": "settings",
+      "case": "success-preserves-factory-blank-target",
+      "passed": true
+    }
+  ],
+  "before": {
+    "passed": false,
+    "checks": [
+      {
+        "page": "setup",
+        "case": "signed-dbms",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "zero-and-missing",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "literal-ssid",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "non-finite",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "signed-dbms",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "zero-and-missing",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "literal-ssid",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "non-finite",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "real-ssid-manual",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "real-ssid-ordinary",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-entry",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-entry-literal-manual",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-cancel",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-empty",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-after-scan-error",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "success-preserves-factory-blank-target",
+        "passed": false,
+        "error": "Expected values to be strictly equal:\n\n'/' !== 'about:blank'\n"
+      },
+      {
+        "page": "settings",
+        "case": "success-preserves-factory-blank-target",
+        "passed": false,
+        "error": "Expected values to be strictly equal:\n\n'/' !== 'about:blank'\n"
+      },
+      {
+        "page": "setup",
+        "case": "failed-save-never-navigates",
+        "passed": true
+      }
+    ],
+    "pages": {
+      "setup": "0a0c7b223ba82dd2df35c9e6b89933476df6512d6d70672b138bdf5da0eb11b1",
+      "settings": "548740d1326340566950c434748746b2359b91235d85bf8a85d8ff4c549ae5a7"
+    },
+    "scope": "Actual generated scan and setup-submit handlers; mocked DOM/HTTP/prompt. Settings legacy scan is tested with its optional control present. Browser/RF acceptance remains separate."
+  },
+  "after": {
+    "passed": true,
+    "checks": [
+      {
+        "page": "setup",
+        "case": "signed-dbms",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "zero-and-missing",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "literal-ssid",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "non-finite",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "signed-dbms",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "zero-and-missing",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "literal-ssid",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "non-finite",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "real-ssid-manual",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "real-ssid-ordinary",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-entry",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-entry-literal-manual",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-cancel",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-empty",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "manual-after-scan-error",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "success-preserves-factory-blank-target",
+        "passed": true
+      },
+      {
+        "page": "settings",
+        "case": "success-preserves-factory-blank-target",
+        "passed": true
+      },
+      {
+        "page": "setup",
+        "case": "failed-save-never-navigates",
+        "passed": true
+      }
+    ],
+    "pages": {
+      "setup": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
+      "settings": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7"
+    },
+    "scope": "Actual generated scan and setup-submit handlers; mocked DOM/HTTP/prompt. Settings legacy scan is tested with its optional control present. Browser/RF acceptance remains separate."
+  },
+  "photo_page_unchanged": true,
+  "exporter_idempotent": true,
+  "builds": {
+    "ordinary": {
+      "app_sha256": "922da96359834f815f9de0b344ea265cb6a48e2122760a39aa8b28b923ae3d8b",
+      "native_elf_sha256": "71ded1e16ecb779a03b9c025895e639552c2af6856209083c8aae5ebb08307a8",
+      "source_sha256": "9d2367ebe11dc4097b8121eaac6d7bfed0c2bee9f5a0c48333ee288e9a669cbc",
+      "source_inputs": 59,
+      "changed_production_inputs": [
+        "generated/web_pages.c"
+      ],
+      "sdkconfig_unchanged": true,
+      "debug_logging": false,
+      "app_bytes": 1169888,
+      "app_partition_free_bytes": 366112
+    },
+    "debug": {
+      "app_sha256": "c37b7b5ed621c857cd9a7c5b2f226817ba019e4dc5b31234dcef485bc8c8bc6c",
+      "native_elf_sha256": "ba060ce6b76b4130788dd9f73ca15476cca9ba4360147f102d79453dd38e930f",
+      "source_sha256": "9d2367ebe11dc4097b8121eaac6d7bfed0c2bee9f5a0c48333ee288e9a669cbc",
+      "source_inputs": 59,
+      "changed_production_inputs": [
+        "generated/web_pages.c"
+      ],
+      "sdkconfig_unchanged": true,
+      "debug_logging": true,
+      "app_bytes": 1230736,
+      "app_partition_free_bytes": 305264
+    }
+  },
+  "host": {
+    "passed": true,
+    "report_sha256": "7a0ff31087a3e45a11067f7b770517b765ad461dd010d4211f8fdc83a0ba567f",
+    "groups": [
+      {
+        "name": "report_aggregation",
+        "status": "passed"
+      },
+      {
+        "name": "native",
+        "status": "passed"
+      },
+      {
+        "name": "platform",
+        "status": "passed"
+      },
+      {
+        "name": "frontend",
+        "status": "passed"
+      },
+      {
+        "name": "integrity",
+        "status": "passed"
+      },
+      {
+        "name": "timezone_sources",
+        "status": "passed"
+      },
+      {
+        "name": "machine",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_classic",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_weather",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_calendar",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_jpeg",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_jpeg_inputs",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_timezones",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_time_state",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_text",
+        "status": "not_run"
+      },
+      {
+        "name": "machine_network",
+        "status": "not_run"
+      },
+      {
+        "name": "qemu_profile",
+        "status": "not_run"
+      },
+      {
+        "name": "qemu",
+        "status": "not_run"
+      },
+      {
+        "name": "hardware_browser_soak",
+        "status": "not_run"
+      }
+    ]
+  },
+  "browser_ui": {
+    "scope": "Actual browser setup against a disposable QEMU guest with synthetic open Wi-Fi. No physical board.",
+    "before": {
+      "target": "http://127.0.0.1:18080/",
+      "value": "yoRadio-QEMU"
+    },
+    "successDialog": "Configuration saved successfully!",
+    "dialogType": "alert",
+    "dialogDismissedWithDialogAPI": true,
+    "completionScreenshot": "browser-success.png",
+    "observedAutomaticTarget": "about:blank",
+    "setupTabClosed": true,
+    "browserTabsAfterClose": []
+  },
+  "browser_guest": {
+    "layout": {
+      "elf_sha256": "71ded1e16ecb779a03b9c025895e639552c2af6856209083c8aae5ebb08307a8",
+      "symbols": {
+        "s_correction_us": {
+          "address": 1070282696,
+          "size": 8
+        },
+        "last_station_address": {
+          "address": 1070282840,
+          "size": 4
+        },
+        "connected": {
+          "address": 1070282848,
+          "size": 1
+        },
+        "ap_active": {
+          "address": 1070282847,
+          "size": 1
+        },
+        "time_synced": {
+          "address": 1070282860,
+          "size": 1
+        },
+        "s_microseconds_offset": {
+          "address": 1070282680,
+          "size": 8
+        }
+      },
+      "converter_sha256": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f",
+      "vm_helper_sha256": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae"
+    },
+    "runtime": {
+      "connected": true,
+      "ap_active": false,
+      "station_address": "192.168.43.15",
+      "time_synced": true
+    },
+    "ntp": {
+      "method": "model_response_timestamp",
+      "response_count": 1,
+      "server_epoch": 1792259884,
+      "sent_virtual_us": 33624420,
+      "boot_time_us": 1792259847926083,
+      "virtual_us": 121015588,
+      "systimer_ticks": 1258504019,
+      "rtc_hrt_offset_us": 31349471,
+      "system_correction_us": -28422788,
+      "since_boot_us": 123936684,
+      "actual_utc_seconds": 1792259971.862767,
+      "expected_utc_seconds": 1792259971.391168,
+      "difference_seconds": 0.47159886360168457
+    },
+    "rom_boots": 2,
+    "probe_note": "Initial clock-only wait expected 10.0.2.15 and timed out in the setup 192.168.43.15 network. Direct matched-ELF observation is used instead; failed probe did not modify guest data.",
+    "station_http_ready": true,
+    "source_images_unchanged": true,
+    "vm_stopped": true,
+    "no_panic": true
+  },
+  "screenshot": {
+    "file": "setup-redirect-success-20261017.png",
+    "sha256": "84d541790e6380b8a1d74c585c397b65207b78ab99442060f4270df62b2d3521"
+  },
+  "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+  "qemu_helper_sha256": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae"
+}

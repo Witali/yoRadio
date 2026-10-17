@@ -2094,3 +2094,37 @@ archive; ELF/BIN/map перенесены без CMake cache, старые backu
 QEMU main2a593f8d00 pushed; actual helper raw6B7F — CRLF представление FF0819,
 normalized equality проверена.19 canonical units pass, compiledA74 не менялся.
 Следующие full/H10 должны использовать новые source identities после integration.
+
+### 2026-10-17 — восстановлена заводская цель post-setup navigation
+
+Разобран повторный browser error после настройки: factory HTML offsets0x026edc/
+0x02963b назначает timer3000ms к about:blank; local exporter подменял target на/.
+После успешной configure AP выключается, и наш reload старого AP URL создавал
+недоступную страницу. Прежняя классификация как исключительно tooling была
+неполной. Удалена подмена, entry comments двух completion handlers помечены
+FIXED_RECONSTRUCTION. Сохранён factory timer и остальные fixes:readResponse,
+RSSI sign/manualSSID. Photo page byte-identical. Повторный export идентичен.
+
+Два actual callback/timer negative controls fail на прежних страницах, проходят
+на factory source; новый generated frontend проходит18 случаев, включая failed
+save без timer/navigation. Ordinary922DA963/71DED1E1 иdebugC37B7B5E/BA060CE6
+собраны/архивированы, source9D2367EB/59inputs: толькоgenerated/web_pages.c меняется,
+SDKconfig прежний. Ordinary1169888/free366112;debug1230736bytes. Старый build
+observer ELF/BIN/map отдельно backup до сборки. Host native3950/platform46/
+frontend18/integrity6/timezone9/aggregation14 проходят. Controller1739 terminal0,
+host25992 terminal0. Новый full machine/QEMU и H10 ещё не выполнялись.
+
+Real browser/QEMU новогоordinary: scan/selectedyoRadio-QEMU, success alert,
+dialog.dismiss через API, complete screenshot, autoURLabout:blank, close иtabs0.
+Matched ELF SDK connected=true/AP=false/IP192.168.43.15/SNTP=true,UTCerr0.471598864,
+STA HTTP ready,ROMboots2,no panic,sourceimagesunchanged,VMstopped. Первая probe
+ошибочно использовала clock-only readiness с hardcoded10.0.2.15: timeout15guest s.
+Это ошибка probe контекста, не firmware failure; direct read правильной setup
+подсети прошёл. Screenshot и UI/guest observation сохранены в scoped proof.
+
+До следующего final freeze проверить потенциальную URI query-suffix регрессию:
+handlers SDK могут выбираться по path, а native dispatch использует strcmp всей
+req->uri. Гипотеза ещё не подтверждена; нужны actual factory/native запросы.
+H10 повторно пока не запущен: сначала закрепить новый кандидат и isolated
+worktree/bundle, затем supervisor/schema4 preflight и24h. Не переносить старые
+зелёные результаты на другой app/source или на прерванный187-cycle workload.

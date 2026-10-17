@@ -278,10 +278,12 @@ function isManualWifiSelection(select) {
             }
 
             function handleResponse(data) {
+                // FIXED_RECONSTRUCTION: keep the factory blank-page target.
+                // The AP URL no longer serves this page after station setup.
                 alert('Configuration saved successfully!');
                 document.getElementById('wifiForm').style.display = 'none';
                 document.querySelector('.container').innerHTML += '<h3 style="text-align:center;margin-top:20px;">Configuration complete! You may close this page.</h3>';
-                setTimeout(() => { window.location.href = '/'; }, 3000);
+                setTimeout(() => { window.location.href = 'about:blank'; }, 3000);
             }
 
             function handleError(error) {

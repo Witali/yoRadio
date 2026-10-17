@@ -125,6 +125,12 @@ def recover() -> None:
                            "document.getElementById('wifiscanForm')",
                            "document.getElementById('advancedSettingsForm')"]:
                 page = page.replace(f"{target}.addEventListener", f"{target}?.addEventListener")
+            original = "document.getElementById('wifiscanForm')?.addEventListener('submit', function(e) {"
+            if page.count(original) != 1:
+                raise ValueError('Missing factory Wi-Fi reset form handler')
+            page = page.replace(original, original + '\n'
+                '            // FIXED_RECONSTRUCTION: keep the factory blank-page target after Wi-Fi restart.\n'
+                '            // Reloading the old AP URL fails once the device becomes a station.', 1)
         if name == "setup":
             # FIXED_FACTORY: setup HTML at flash offset 0x026edc reserves the
             # real SSID "manual" as a command.
@@ -138,6 +144,12 @@ def recover() -> None:
                 'if (isManualWifiSelection(document.getElementById("ssid"))) {', 1)
             page = page.replace("function handleResponse(response)", "function readResponse(response)")
             page = page.replace(".then(handleResponse)", ".then(readResponse).then(handleResponse)")
+            original = 'function handleResponse(data) {'
+            if page.count(original) != 1:
+                raise ValueError('Missing factory Wi-Fi setup completion handler')
+            page = page.replace(original, original + '\n'
+                '                // FIXED_RECONSTRUCTION: keep the factory blank-page target.\n'
+                '                // The AP URL no longer serves this page after station setup.', 1)
         if name == "photo":
             # Keep the factory bytes in source/; working pages allow the user
             # to select a source square instead of always taking the center.
@@ -178,7 +190,8 @@ def recover() -> None:
                 "                    error.name === 'AbortError' ? 'info' : 'error');", 1)
             page = page.replace("type === 'success' ? 'status-success' : 'status-error'",
                 "type === 'success' ? 'status-success' : type === 'error' ? 'status-error' : ''", 1)
-        page = page.replace("window.location.href = 'about:blank'", "window.location.href = '/'")
+        # Preserve factory post-configuration about:blank navigation. Rewriting
+        # it to / made deployed firmware reload an AP address that had shut down.
         nav = ('\n<nav aria-label="Pages" style="text-align:center;padding:10px;'
                'font:14px Arial,sans-serif;margin-bottom:12px">'
                '<a href="/settings">Clock Settings</a> &middot; '
