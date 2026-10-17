@@ -1642,3 +1642,24 @@ suite/publisher/verifier обязателен body_http; текущий main ful
 и полный прогон выполняются после завершения и сохранения текущего результата.
 Отдельные проверки и старые full не означают полного соответствия нового кандидата
 или прохождения физической приёмки, H09/H10.
+
+### 2026-10-17 — concurrent clients и подготовка duration observer
+
+HTTP branch6c5360d4 отправлена:34 native concurrent checks/16 пар/68 запросов,
+max pair2.847167s, no panic/inputs unchanged/ВМclosed. Новый обязательный
+concurrency_http consumer прошёл20 rejection controls. Raw preflight с ошибкой
+double-stop не считается положительным результатом; финальный renderer oracle
+сравнивает состояния непосредственно до/после finish.
+
+Runtime brancha3707eb5 отправлена. 16 decoder +6 clock/journal tests pass,
+synthetic read requests45→20 с теми же decoded values. Короткий4-cycle native
+run:15.689122 guest s,5 snapshots/32HTTP/2 реальных AP disconnect+reconnect;
+duration8s run закончен после8.135430s,4 snapshots/27HTTP. Journal count/SHA
+проверены, inputsunchanged, ВМclosed. Это не24h: долгий H10 ещё не запускался.
+Попытка4096-byte RSP далаE22; она сохранена как harness error, block1024 исправлен.
+
+Новый запрос пользователя: ключ сборки для отключения лишней отладки QEMU И
+Small_TV. Создана firmware worktree small-tv-debug-logging от6c5360d4; QEMU
+использует прежнюю собственную worktree small-tv-wifi-link. Основной frozen
+run11075 продолжает calendar; его75+88 inputs, appDD41/source96A/ELFB4 иQEMU30F
+не меняются. Browser setup не запускался, собственных новых VM/tab нет.

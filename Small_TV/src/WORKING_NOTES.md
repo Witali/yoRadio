@@ -95,7 +95,7 @@ controls/reinit/settings, initial setup, weather/fields/time/text и regional
 Не запускать дубль по timeout наблюдения. До terminal report не менять frozen
 inputs и не публиковать новый pass. Контекстные Markdown не входят в pins.
 
-Независимая ветка codex/small-tv-runtime-observer /9adf0fb0 сохранена и отправлена,
+Независимая ветка codex/small-tv-runtime-observer /a3707eb5 сохранена и отправлена,
 worktree .worktree/small-tv-runtime-observer. В ней standalone read-only observer
 и19 parser/ROM tests; main/test pins не менялись, merge до terminal full не делать.
 Новый40-cycle runtime-workload-20261017-02 завершён:121.076406 guest s,
@@ -105,10 +105,15 @@ lowest task stack480bytes(settings); last free heap86 268. ROMcrosschecks164.
 Scoped doc/JSON runtime-memory-* находятся в ветке; они не объявляют H09/H10,
 24h leak-free/physical/ISR stack или factory memory equivalence выполненными.
 Ошибки прежних попыток harness сохранены отдельно. Root app/source/ELF прежние.
-Следующая работа с observer: объединить после сохранения immutable full result,
-затем расширять duration/reconnect/concurrent writes/restart/ISR observation.
+В a3707eb5 добавлены duration, unwrap low32 guest microseconds, append-only
+JSONL и последние32 samples в summary. 16 decoder +6 journal/clock tests pass;
+на одной SRAM-фикстуре чтения45→20 с теми же результатами. Два коротких native
+запуска прошли:4 cycles/15.689122s/2 реальных disconnect/reconnect и запрос8s,
+завершённый после8.135430s. Это проверка инструмента, не H10/24h. Ошибка попытки
+4096-byte RSP/E22 сохранена; рабочий transport block1024. После immutable full
+объединить, затем запускать длительный workload на окончательной сборке.
 
-Вторая независимая ветка codex/small-tv-http-body-deadline /79445774 (основной
+Вторая независимая ветка codex/small-tv-http-body-deadline /6c5360d4 (основной
 фикс35b6bdce) отправлена; worktree .worktree/small-tv-http-body-deadline.
 Доказан новый дефект НАШЕЙ HTTP-обвязки: partial JSON блокирует второйGET24.69s,
 trickle27.61s, oversized9.70s. В factory0x4200d7f0 один recv на0x4200d808;
@@ -124,6 +129,22 @@ ASM hashes проверены через checkout filter, LF attribute сохр�
 root build и запустить один новый frozen full с обязательным body_http. Результаты
 веток не приписывать root app с другим ELF/BIN identity. Код/документы/сборка
 находятся в feature branches, все собственные диагностические ВМ закрыты.
+
+В этой же ветке2d31a617/6c5360d4: реальный concurrent HTTP workload прошёл34
+conditions,16 paired batches и68 sequential requests, max pair2.847167s,
+single.306982s. Upload/scan/held weather/settings/retry/warm+new-process cold
+boot и5 protected flash ranges проверены. 20 consumer rejection controls pass;
+новому полному suite обязателен concurrency_http вместе с body_http. Это один
+ограниченный H09 сценарий. Первый harness preflight с double-stop и слабым
+renderer oracle сохранён отдельно, не считается acceptance.
+
+Пользователь17 октября потребовал отключаемую при сборке отладку В ОБОИХ
+проектах. Реализация идёт в .worktree/small-tv-debug-logging (от6c5360d4) и
+прежней QEMU .worktree/small-tv-wifi-link; canonical main/QEMU30F не менять до
+terminal11075. Browser initial-setup ещё не начат: CUA inventory пустой,
+новые browser VM/tab не создавались. Следующий полный запуск должен учитывать
+режим logging и не принимать отсутствие отключённых диагностических сообщений
+за ошибку поведения. Отладочные BIN и их scoped результаты сохранять отдельно.
 
 ### История измерений до исправления timing
 
