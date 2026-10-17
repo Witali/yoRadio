@@ -7,6 +7,24 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Текущее main10557472 объединяет все подготовленные fixes/tools; новая
+  ordinary922DA963/ELF71DED1E1/source9D2367EB и debugC37B7B5E/BA060CE6 в
+  development archives. Точные ordinary ELF/BIN/map перенесены в canonical
+  .build без CMake cache;59 production inputs совпали, A543 build backup в
+  pre-setup-redirect-main-build-20261017. Старые branch/not-integrated строки
+  ниже — исторические. Published full всё ещё относится к EF66/81CF/A74.
+- Все созданные preflight/browser VM завершены; новых full/H10 сейчас НЕТ.
+  Следующий шаг — actual factory/native query-suffix probe до нового freeze.
+  SDK httpd_uri.c:314 выбирает callback по UF_PATH, но req->uri сохраняет query
+  (httpd_parse.c:1037). В native server/settings/photo dispatch есть strcmp
+  полной строки. Нужно проверить не только GET/POST с `?probe=1`, но и page
+  selection; нельзя глобально обрезать req->uri, потому что /get_Photo_File
+  использует штатные query parameters. Учитывать SDK absolute-form UF_PATH.off.
+  Пока это гипотеза, не объявлять исправленным или доказанным без native/factory.
+- После transport проверки: latest build, совместный supervisor/schema4
+  preflight, новый frozen full и isolated24h H10. Для H10 сохранить отдельный
+  неизменяемый worktree и QEMU bundle, проверить реальные PID/start time/args
+  после границы assistant turn. Старый rssi H10 прерван и не засчитывается.
 - `codex/small-tv-setup-redirect`: восстановлен factory `about:blank` после
   Wi-Fi configure/reset. Local exporter ошибочно делал `/`, reload старого AP
   после его shutdown. Это объясняет часть прежних browser CDP/error-page сбоев;

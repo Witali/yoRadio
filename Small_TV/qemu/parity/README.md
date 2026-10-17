@@ -7,8 +7,11 @@ The [published functional evidence](../../src/tests/functional-validation.json)
 includes 84 natural calendar transitions, 168 associated completed frames,
 and 24 strict scene frames with zero differing pixels against instruction replay.
 These are scoped automated results; full equivalence and physical-board
-acceptance remain unproven. Subsequent Wi-Fi HTML corrections live in separate
-branches and have different application identities.
+acceptance remain unproven. Subsequent Wi-Fi HTML corrections were merged after
+that run. The current ordinary archive is `922da963…`, source `9d2367eb…`,
+ELF `71ded1e1…`; it has scoped host/browser evidence and awaits its own full run.
+The [post-setup redirect correction](setup-redirect-checks-20261017.md) restores
+the exact factory `about:blank` target instead of reloading a disconnected AP.
 
 The separate RSSI-candidate 24-hour runtime test was interrupted after 187 cycles
 and 3,096.125371 observed guest seconds. Its VM and controllers were absent at

@@ -2128,3 +2128,21 @@ req->uri. Гипотеза ещё не подтверждена; нужны actu
 H10 повторно пока не запущен: сначала закрепить новый кандидат и isolated
 worktree/bundle, затем supervisor/schema4 preflight и24h. Не переносить старые
 зелёные результаты на другой app/source или на прерванный187-cycle workload.
+
+### 2026-10-17 — canonical main содержит redirect candidate; следующий transport probe
+
+Main fast-forward до10557472, source9D2367EB. Root59 production inputs после
+prepare_resources точно совпали с архивом. Перенесены ordinary922DA963/71DED1E1
+BIN/ELF/map без CMake cache; прежние A543 artifacts сохранены в
+.build/small-tv-parity/pre-setup-redirect-main-build-20261017. DebugC37B7B5E/BA060CE6
+тоже в tracked development. Новые scoped проверки не заменяют full старогоEF66.
+Все текущие реальные preflight/browser VM остановлены, browser tabs0. Новых
+full/H10 пока нет. Первый старый H10 остаётся documented interrupted.
+
+Следующий transport audit: SDK использует UF_PATH при выборе handler, но полный
+req->uri сохраняетquery; наш dispatch strcmp может расходиться с factory отдельными
+callbacks. Проверить на живых factory/native GET, POST и HTML pages сquerysuffix.
+Не обрезать req->uri глобально: photo download зависит от query. Также проверить
+absolute-form URI, поскольку SDK выделяет UF_PATH по offset. Это ещё гипотеза,
+а не доказанная регрессия. После проверки/исправления подготовить окончательный
+кандидат и новый frozen full плюс isolated24h H10 с supervisor/schema4 weather.
