@@ -19,6 +19,25 @@
   --output C:/Work/yoRadio/.build/small-tv-parity/runtime-memory-new --cycles 40
 ```
 
+Для длительного запуска вместо числа циклов задаётся гостевая длительность:
+
+```powershell
+& ./.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe `
+  ./Small_TV/src/tests/runtime_state_test.py
+& ./.idf/tools-v6.1/python_env/idf6.1_py3.12_env/Scripts/python.exe `
+  ./Small_TV/src/tests/runtime_qemu.py --yoradio C:/Work/yoRadio `
+  --qemu-root C:/Work/QEMU-ESP32 `
+  --output C:/Work/yoRadio/.build/small-tv-parity/runtime-24h-new `
+  --duration-seconds 86400 --interval-seconds 15 --outage-every 60 --outage-seconds 1
+```
+
+Команда описывает будущий H10 workload, а не уже выполненный результат. Она
+переключает все темы/GIF, повторяет публичные фото и HTTP, периодически выключает
+внешнюю виртуальную точку доступа. Прошивка получает настоящие 802.11 management
+frames и проходит свой reconnect/DHCP путь. Проверяются QOM state, новые guest
+disconnect/reconnect markers и доступность station HTTP; гостевые флаги связи
+не подменяются. Короткое отключение не заменяет проверку полного AP fallback.
+
 Каталог результата должен быть новым. Из worktree тот же `--yoradio` позволяет
 читать готовые ELF и архив основной копии, не пересобирая и не меняя их. Скрипт
 создаёт только собственную локальную ВМ без SDL и закрывает её в `finally`.
@@ -37,6 +56,26 @@
   Снимок снимается на входе в естественно вызванный `vTaskDelay`, после завершения
   изменений allocator и списков задач. Гость останавливается hardware breakpoint;
   программные breakpoints, запись RAM и присваивание PC не используются.
+- `runtime_state.py` разворачивает переполнение low32 radio microseconds и
+  сохраняет append-only `events.jsonl`. Счётчик QEMU глобален для жизни ВМ;
+  guest reset его не сбрасывает. Между чтениями должно пройти меньше одного
+  периода 2**32 us; runner опрашивает его многократно за цикл, интервал ограничен
+  60 секундами. Переполнение около 71,6 минуты не сокращает заданные 24 часа.
+
+Schema 2 сохраняет все события один раз в JSONL, а в `report.json` — счётчики,
+минимумы, первый снимок и последние 32. RAM хоста и размер каждой перезаписи
+summary не растут вместе со всем журналом. Digest журнала записывается после
+закрытия; для анализа всех ранних samples нужен сам `events.jsonl`. Время запуска
+не включает startup до ready. Целевой срок — минимум: начатый цикл завершается
+целиком, поэтому итог может немного превышать запрос. 24h нельзя выводить из
+короткого успешного smoke или из host duration.
+
+Чтения sentinel links используют уже прочитанный xLIST; stack scan идёт блоками
+до 1024 байт, помещающимися в RSP hex reply. Проба с 4096 bytes дала E22 и была
+исключена как ошибка transport observer. На одной синтетической SRAM-фикстуре
+45 memory requests уменьшены до20 при одинаковых decoded heap/tasks; это не
+измерение ускорения физического чипа. В клиентском сокете отключён Nagle, чтобы
+маленький debugger ACK не задерживал следующий read.
 
 Проверки parser включают испорченные heap/list chains и счётчики, дублирующуюся
 задачу, короткое чтение, недопустимый стек и нулевой запас. ROM-тесты используют

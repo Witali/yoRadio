@@ -156,6 +156,18 @@ class MemoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'field outside'):
             MemorySnapshot(self.read, self.layout).heaps()
 
+    def test_large_stack_respects_debugger_reply_limit(self):
+        self.word(0x800 + 68, self.base + 0x4FFF)
+        self.word(0x900 + 48, self.base + 0x5000)
+        self.word(0x900 + 68, self.base + 0x50FF)
+        self.put(0x4000, b'\xA5' * 3500)
+        def limited_read(address, size):
+            if size > 2048:
+                raise ValueError('RSP reply would exceed its packet size')
+            return self.read(address, size)
+        tasks = MemorySnapshot(limited_read, self.layout).tasks()
+        self.assertEqual(tasks[0]['stack_high_water_free_bytes'], 3500)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

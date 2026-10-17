@@ -1618,3 +1618,21 @@ crosschecks164. Короткий runtime preflight не доказывает lea
 factory memory equivalence или physical/ISR stack. ВМ закрыта; осталась только
 ВМ общего full11075. Его frozen75+88 inputs не затронуты. Отчёт и scope сохранены
 в runtime-memory-*; standalone tests пока не включены в текущий full gate.
+
+### 2026-10-17 — наблюдатель подготовлен к длительному запуску
+
+Runtime_state разворачивает low32 microsecond counter и пишет последовательный
+JSONL; summary ограничен первым/последними32 samples и агрегатами. Новый runner
+поддерживает cycles либо duration до7дней, interval<=60s, короткие виртуальные
+AP outages с реальными guest disconnect/reconnect и HTTP recovery. Проверки
+переполнений/journal6 иdecoder16 pass. Сравнение старого/нового decoder на одной
+SRAM даёт одинаковые heap/tasks при45→20 memory reads.
+
+Первая реальная проба4096-byte scan дала RSP E22 до ready snapshot: transport
+preflight invalid, не firmware defect. Исправлено на1024bytes, добавлен test
+packet limit. Новый4-cycle run с2×1s outages прошёл за15.689122guest s:
+5snapshots/32HTTP/35journal events, по1guestdisconnect+reconnect наотключение.
+Отдельный duration8s завершился после8.135430s:3cycles/4samples/27HTTP/28events.
+Журналы/digests иinputs unchanged/no panic, ВМ закрыты. AppDD41/96A/B4/QEMU30F
+прежние; source/C/BIN не менялись. Short validation сохранена вruntime-duration-*
+JSON, это НЕ24h/H10/physical и не переименование прежнего40-cycle proof9adf.

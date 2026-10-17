@@ -1,6 +1,7 @@
 """Observe native Small TV heap/stack during real HTTP/weather/photo activity.
 
-This bounded workload is a runtime preflight, not the 24-hour H10 acceptance.
+The requested cycle count or guest duration defines this workload's scope.
+Short runs do not establish the 24-hour H10 or physical-board acceptance.
 The guest runs its unmodified archived application. Hardware breakpoints and
 read-only RSP inspect SDK counters; no guest functions are called by the host.
 """
@@ -9,6 +10,7 @@ import concurrent.futures
 import hashlib
 import http.client
 import json
+import math
 from pathlib import Path
 import socket
 import sys
@@ -16,6 +18,7 @@ from types import SimpleNamespace
 from urllib.parse import urlsplit
 
 from runtime_memory import MemorySnapshot, native_layout
+from runtime_state import GuestMicroseconds, RuntimeJournal
 
 
 def main():
@@ -24,10 +27,23 @@ def main():
     parser.add_argument('--yoradio', type=Path, required=True)
     parser.add_argument('--qemu-root', type=Path, default=Path('C:/Work/QEMU-ESP32'))
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--cycles', type=int, default=20)
+    length = parser.add_mutually_exclusive_group()
+    length.add_argument('--cycles', type=int)
+    length.add_argument('--duration-seconds', type=int)
+    parser.add_argument('--interval-seconds', type=float, default=1.2)
+    parser.add_argument('--outage-every', type=int, default=0)
+    parser.add_argument('--outage-seconds', type=float, default=1)
     args = parser.parse_args()
-    if not 1 <= args.cycles <= 10000:
-        raise ValueError('Expected 1..10000 bounded workload cycles')
+    if args.cycles is None and args.duration_seconds is None:
+        args.cycles = 20
+    if args.cycles is not None and not 1 <= args.cycles <= 100000:
+        raise ValueError('Expected 1..100000 bounded workload cycles')
+    if args.duration_seconds is not None and not 1 <= args.duration_seconds <= 604800:
+        raise ValueError('Expected a duration of 1 second through seven days')
+    if not math.isfinite(args.interval_seconds) or not .1 <= args.interval_seconds <= 60:
+        raise ValueError('Expected a guest interval of 0.1..60 seconds')
+    if not 0 <= args.outage_every <= 100000 or not math.isfinite(args.outage_seconds) or not 0 < args.outage_seconds <= 5:
+        raise ValueError('Expected bounded short virtual AP outages')
     root = args.yoradio.resolve()
     args.output.mkdir(parents=True, exist_ok=False)
     sys.path[:0] = [str(root / '.build/small-tv-parity/oracle-deps'),
@@ -53,13 +69,13 @@ def main():
     if app.read_bytes()[176:208] != bytes.fromhex(layout['elf_sha256']):
         raise ValueError('Archived app and inspected ELF do not match')
     files = [Path(__file__), Path(__file__).with_name('runtime_memory.py'),
-             Path(__file__).with_name('runtime_heap_rom.py'), elf, app, profile, rom,
+             Path(__file__).with_name('runtime_heap_rom.py'), Path(__file__).with_name('runtime_state.py'), elf, app, profile, rom,
              root / 'Small_TV/qemu/parity/compare.py',
              root / 'Small_TV/src/tests/fixtures/jpeg/rgb-420.jpg']
     files += [root / 'Small_TV/src/tests' / name for name in ('gdb_observer.py', 'weather_qemu.py', 'time_qemu.py')]
     archive = app.parent
     files += [archive / name for name in ('bootloader.bin', 'partition-table.bin', 'assets.bin', 'source-manifest.json')]
-    files += [root / '.idf/v6.1' / name for name in (
+    files += [root / '.idf/v6.1-9a97f6c54ec6' / name for name in (
         'components/heap/heap_private.h', 'components/heap/multi_heap.c', 'components/heap/heap_caps.c',
         'components/freertos/FreeRTOS-Kernel/tasks.c',
         'components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos/portmacro.h')]
@@ -68,9 +84,13 @@ def main():
     executable = args.qemu_root / 'bin/qemu-system-riscv32.exe'
     files.append(executable)
     inputs = {str(path.resolve()): digest(path) for path in files}
-    result = {'passed': False, 'scope': __doc__, 'native_elf_sha256': layout['elf_sha256'],
+    result = {'schema_version': 2, 'passed': False, 'all_functionality_verified': False,
+              'scope': __doc__, 'native_elf_sha256': layout['elf_sha256'],
               'app_sha256': digest(app), 'qemu_sha256': digest(executable), 'cycles_requested': args.cycles,
-              'completed_cycles': 0, 'snapshots': [], 'requests': [], 'inputs_sha256': inputs,
+              'duration_requested_guest_seconds': args.duration_seconds,
+              'interval_guest_seconds': args.interval_seconds,
+              'outage_every_cycles': args.outage_every, 'outage_guest_seconds': args.outage_seconds,
+              'completed_cycles': 0, 'inputs_sha256': inputs,
               'limitations': ['Native firmware only; no factory heap/stack equivalence claim.',
                               'Short workload is not the 24-hour H10 or physical-board acceptance.',
                               'Stack fill is a historical SDK watermark; sampled frames do not prove all execution peaks.',
@@ -89,20 +109,31 @@ def main():
     vm.seed_clock_network = seed_settings
     compare.CURRENT_THEME = 'simple'
     session = observer = None
+    guest_clock = GuestMicroseconds()
+    journal_path = args.output / 'events.jsonl'
+    journal = RuntimeJournal(journal_path)
     try:
         session, prepared = vm.launch(options, state)
         result['sources'] = prepared['sources']
         observer = Observer(gdb_port)
+        observer.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         observer.socket.settimeout(20)
         reader = MemorySnapshot(observer.memory, layout, counters.validate)
         symbols = {name: row['address'] for name, row in layout['symbols'].items()}
         with vm.QMP(session['qmp_port'], session['name']) as qmp:
+            def guest_seconds():
+                """Unwrap the radio's low 32 bits without changing guest clock state."""
+                raw = int.from_bytes(weather.read_bytes(qmp, 0x6004d000, 4), 'little')
+                return guest_clock.update(raw) / 1000000
+
             clock.service(qmp, 1781265600, 0, False)
             observer.resume()
             url = session['web_urls']['station']
             wait_http(url, '/getclocktype')
             weather.wait_display(qmp)
-            result['workload_start_guest_seconds'] = weather.virtual_seconds(qmp)
+            result['workload_start_guest_seconds'] = guest_seconds()
+            until = (result['workload_start_guest_seconds'] + args.duration_seconds
+                     if args.duration_seconds is not None else None)
 
             def capture(label):
                 """Pause at an SDK entry where allocator/state-list edits are complete."""
@@ -113,9 +144,10 @@ def main():
                         observer.breakpoint(address)
                         observer.continue_to(address)
                         observer.breakpoint(address, False)
-                    row = {'label': label, 'guest_seconds': weather.virtual_seconds(qmp),
+                    row = {'label': label, 'guest_seconds': guest_seconds(),
                            'heap': reader.heaps(), 'tasks': reader.tasks()}
-                    result['snapshots'].append(row)
+                    journal.append('snapshot', row)
+                    result['summary'] = journal.summary()
                     if row['heap']['minimum_free_bytes'] == 0 or any(
                             task['stack_high_water_free_bytes'] == 0 for task in row['tasks']):
                         raise AssertionError('Zero runtime heap or task stack headroom')
@@ -125,7 +157,7 @@ def main():
 
             def request(path, payload=None, content_type='application/json'):
                 """Record only method/path/status/timing, never HTTP contents."""
-                started = weather.virtual_seconds(qmp)
+                started = guest_seconds()
                 if isinstance(payload, bytes):
                     endpoint = urlsplit(url)
                     if endpoint.hostname != '127.0.0.1':
@@ -140,8 +172,8 @@ def main():
                         connection.close()
                 else:
                     status, body = guest_http(url, path, payload, 20, url)
-                elapsed = weather.virtual_seconds(qmp) - started
-                result['requests'].append({'path': path, 'status': status, 'guest_seconds': elapsed})
+                elapsed = guest_seconds() - started
+                journal.append('http', {'path': path, 'status': status, 'guest_seconds': elapsed})
                 if status != 200 or len(body) > 262144 or elapsed > 6:
                     raise AssertionError('HTTP status, size or unchanged six-second latency bound failed')
                 return body
@@ -163,44 +195,93 @@ def main():
 
             capture('ready')
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-                for cycle in range(args.cycles):
+                cycle = 0
+                while (cycle < args.cycles if args.cycles is not None else guest_seconds() < until):
                     request('/setclocktype', {'clocktype': cycle % 4})
                     request('/setgifvalue', {'gif': cycle % 5})
                     request('/updateCity', {'city': ['Shenzhen,CN', 'Fixture,CN'][cycle % 2]})
                     # Two clients are real concurrent network requests; their results
                     # are recorded outside this worker pool to keep QMP framing serial.
+                    started = guest_seconds()
                     pending = [pool.submit(guest_http, url, path, None, 20, url)
                                for path in ('/getsettings', '/get_checkbox_state')]
                     for request_result in pending:
                         status, body = request_result.result()
                         if status != 200 or not isinstance(json.loads(body), dict):
                             raise AssertionError('Concurrent settings GET failed')
+                    elapsed = guest_seconds() - started
+                    journal.append('http', {'paths': ['/getsettings', '/get_checkbox_state'],
+                                            'request_count': 2, 'guest_seconds': elapsed})
+                    if elapsed > 6:
+                        raise AssertionError('Concurrent settings GET exceeded the response bound')
                     if cycle % 4 == 2:
                         upload_photo()
-                    target = weather.virtual_seconds(qmp) + 1.2
-                    wait_for(lambda: weather.virtual_seconds(qmp) >= target, 'Guest clock stalled')
+                    if args.outage_every and (cycle + 1) % args.outage_every == 0:
+                        offline_started = guest_seconds()
+                        uart_before = (state / 'uart.log').read_text(errors='replace')
+                        disconnects_before = uart_before.count('wifi:state: run -> init')
+                        connections_before = uart_before.count('wifi:connected with ')
+                        qmp.execute('qom-set', path='/machine/wifi', property='station-ap-online', value=False)
+                        try:
+                            if qmp.execute('qom-get', path='/machine/wifi', property='station-ap-online'):
+                                raise AssertionError('Virtual AP did not go offline')
+                            wait_for(lambda: guest_seconds() >= offline_started + args.outage_seconds,
+                                     'Guest clock stalled during external AP outage')
+                        finally:
+                            qmp.execute('qom-set', path='/machine/wifi', property='station-ap-online', value=True)
+                        wait_http(url, '/getclocktype', seconds=30)
+                        uart_after = (state / 'uart.log').read_text(errors='replace')
+                        disconnected = uart_after.count('wifi:state: run -> init') - disconnects_before
+                        reconnected = uart_after.count('wifi:connected with ') - connections_before
+                        ap_online = qmp.execute('qom-get', path='/machine/wifi', property='station-ap-online')
+                        journal.append('outage', {'offline_started_guest_seconds': offline_started,
+                            'requested_offline_guest_seconds': args.outage_seconds,
+                            'recovered_guest_seconds': guest_seconds(),
+                            'ap_online_after': ap_online, 'guest_disconnects': disconnected,
+                            'guest_reconnections': reconnected})
+                        if not ap_online or disconnected < 1 or reconnected < 1:
+                            raise AssertionError('No real guest disconnect/reconnect observed')
+                    target = guest_seconds() + args.interval_seconds
+                    if until is not None:
+                        target = min(target, until)
+                    wait_for(lambda: guest_seconds() >= target, 'Guest clock stalled')
                     capture('cycle-' + str(cycle))
                     result['completed_cycles'] = cycle + 1
-                    print('runtime cycle', cycle + 1, 'heap', result['snapshots'][-1]['heap']['free_bytes'], flush=True)
-            result['workload_end_guest_seconds'] = weather.virtual_seconds(qmp)
+                    print('runtime cycle', cycle + 1, 'heap', result['summary']['snapshot_tail'][-1]['heap']['free_bytes'], flush=True)
+                    cycle += 1
+            result['workload_end_guest_seconds'] = guest_seconds()
+            result['elapsed_guest_seconds'] = result['workload_end_guest_seconds'] - result['workload_start_guest_seconds']
+            result['radio_clock_wraps'] = guest_clock.wraps
+            if args.duration_seconds is not None and result['elapsed_guest_seconds'] < args.duration_seconds:
+                raise AssertionError('Requested guest duration was not reached')
             result['passed'] = True
     except Exception as error:
         result['error'] = str(error)
         raise
     finally:
-        if observer:
-            observer.close()
-        if session:
-            vm.control(state, 'stop')
-            vm.ensure_stopped(state)
-            result['no_panic'] = clean_uart(state)
-        fixture.close()
-        vm.seed_clock_network = previous_seed
-        result['rom_counter_crosscheck'] = {'rom_elf_sha256': counters.sha256, 'checks': counters.checks,
-            'scope': 'Exact two ROM getters executed outside the VM on copied typed headers, not invoked in the guest.'}
-        result['inputs_unchanged'] = all(digest(Path(path)) == sha for path, sha in inputs.items())
-        result['passed'] &= result['inputs_unchanged'] and result.get('no_panic', False)
-        vm.save_json(args.output / 'report.json', result)
+        try:
+            if observer:
+                observer.close()
+            if session:
+                try:
+                    vm.control(state, 'stop')
+                finally:
+                    vm.ensure_stopped(state)
+                result['no_panic'] = clean_uart(state)
+        except Exception as error:
+            result['cleanup_error'] = type(error).__name__
+            result['passed'] = False
+        finally:
+            fixture.close()
+            journal.close()
+            vm.seed_clock_network = previous_seed
+            result['summary'] = journal.summary()
+            result['journal'] = {'file': 'events.jsonl', 'sha256': digest(journal_path)}
+            result['rom_counter_crosscheck'] = {'rom_elf_sha256': counters.sha256, 'checks': counters.checks,
+                'scope': 'Exact two ROM getters executed outside the VM on copied typed headers, not invoked in the guest.'}
+            result['inputs_unchanged'] = all(digest(Path(path)) == sha for path, sha in inputs.items())
+            result['passed'] &= result['inputs_unchanged'] and result.get('no_panic', False)
+            vm.save_json(args.output / 'report.json', result)
     return 0 if result['passed'] else 1
 
 

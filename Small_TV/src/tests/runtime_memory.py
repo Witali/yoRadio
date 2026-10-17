@@ -161,11 +161,17 @@ class MemorySnapshot:
         """Walk one FreeRTOS state list, validating sentinel and both link directions."""
         data = self.structure('xLIST', address)
         count = self.number('xLIST', data, 'uxNumberOfItems')
-        sentinel = address + self.layout['structures']['xLIST']['fields']['xListEnd']['offset']
+        sentinel_offset = self.layout['structures']['xLIST']['fields']['xListEnd']['offset']
+        sentinel = address + sentinel_offset
         next_offset = self.layout['structures']['xLIST_ITEM']['fields']['pxNext']['offset']
         previous_offset = self.layout['structures']['xLIST_ITEM']['fields']['pxPrevious']['offset']
-        pointer = int.from_bytes(self.memory(sentinel + next_offset, 4), 'little')
-        tail = int.from_bytes(self.memory(sentinel + previous_offset, 4), 'little')
+        # Both sentinel links are already inside the complete xLIST read. Avoid
+        # two extra debugger round trips for every empty priority/state list.
+        offsets = (sentinel_offset + next_offset, sentinel_offset + previous_offset)
+        if any(offset < 0 or offset + 4 > len(data) for offset in offsets):
+            raise ValueError('Sentinel links outside the observed list structure')
+        pointer = int.from_bytes(data[offsets[0]:offsets[0] + 4], 'little')
+        tail = int.from_bytes(data[offsets[1]:offsets[1] + 4], 'little')
         if count > 64:
             raise ValueError('Oversized FreeRTOS state list')
         seen, owners, previous = set(), [], sentinel
@@ -189,7 +195,9 @@ class MemorySnapshot:
             raise ValueError('Invalid recorded task stack extent')
         free = 0
         while start + free <= end:
-            data = self.memory(start + free, min(256, end - start - free + 1))
+            # The RSP hex reply doubles the raw bytes. Stay below QEMU's packet
+            # limit while avoiding the many 256-byte reads used by the preflight.
+            data = self.memory(start + free, min(1024, end - start - free + 1))
             used = next((index for index, byte in enumerate(data) if byte != 0xA5), len(data))
             free += used
             if used < len(data):
