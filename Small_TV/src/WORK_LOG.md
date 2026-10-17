@@ -1663,3 +1663,19 @@ Small_TV. Создана firmware worktree small-tv-debug-logging от6c5360d4; 
 использует прежнюю собственную worktree small-tv-wifi-link. Основной frozen
 run11075 продолжает calendar; его75+88 inputs, appDD41/source96A/ELFB4 иQEMU30F
 не меняются. Browser setup не запускался, собственных новых VM/tab нет.
+
+### 2026-10-17 — immutable full на исправленном Wi-Fi timing прошёл
+
+Link-timing-integrated-full-20261017 /11075 завершён terminal0. Все19 groups,
+native3924/platform46,84 natural calendar transitions/168 frames,24 completed
+frames с0 pixel differences и40 diagnostic captures прошли. Frozen75 test
+files/88 дополнительных inputs повторно совпали; appDD41/source96A/ELFB4,
+QEMU30F/source0d27a7ca98 прежние. Publisher и verifier6 pass;32 positive artifacts
+сохранены. Entry comments161, marked functions55, DIRAM80 722; app1 176 880,
+free359 120. Старые failed/negative runs сохранены, physical/H03/H10 не объявлены.
+
+Этот passing checkpoint предшествует HTTP deadline и DEBUG: он не доказывает
+прохождение нового кандидата EF66/81CF/8FCE или debug11DD/DBE5. Audit сохранён
+вlink-timing-integrated-full-inputs-20261017.json. Новые функции/сборки находятся
+в отдельных ветках; после публикации текущего результата их можно интегрировать
+и готовить один новый общий запуск с body_http/concurrency_http.

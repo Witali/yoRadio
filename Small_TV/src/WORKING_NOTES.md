@@ -85,15 +85,17 @@ max6.186934, new30F max.238274. Все200/no panic, ВМ закрыты. Исп�
 не менять во время нового прогона. Данные ниже сохраняют ход диагностики до
 исправления; прежний запрет нового suite после локализации больше не актуален.
 
-Новый единственный run link-timing-integrated-full-20261017 запущен, handle11075,
-initialHEADaf7c8c17, QEMU30F/source0d27a7ca98. Pins:75 tests/88 extras,
-appDD41/source96A/ELFB4. Все18 pre-QEMU groups passed; текущий QEMU stage прошёл
-boot/reset/SNTP, startup/weather_wait/advanced/photo, photo_frames/brightness/
-controls/reinit/settings, initial setup, weather/fields/time/text и regional
-обеих firmware, NVS migration. Следующий/текущий stage — calendar. Общего
-результата пока нет.
-Не запускать дубль по timeout наблюдения. До terminal report не менять frozen
-inputs и не публиковать новый pass. Контекстные Markdown не входят в pins.
+Общий link-timing-integrated-full-20261017 завершён успешно (terminal0),
+handle11075 больше не жив. InitialHEADaf7c8c17, QEMU30F/source0d27a7ca98,
+appDD41/source96A/ELFB4. Все75 test files/88 extra inputs повторно совпали.
+Все19 groups прошли, включая84 natural calendar transitions/168 frames,
+24 completed frames с0 различий и40 normalized diagnostic captures. Последние
+проценты сходства не являются gate или процентом покрытия. Publisher/verifier
+прошли;32 positive artifacts сохранены, historical negatives не переписаны.
+Audit: link-timing-integrated-full-inputs-20261017.json. Это checkpoint DD41,
+который не включает новый HTTP deadline, observer и DEBUG branch. Их отдельные
+проверки не приписывать этому общему результату. Запрет изменений frozen inputs
+после его сохранения снят; следующему кандидату нужен собственный полный прогон.
 
 Независимая ветка codex/small-tv-runtime-observer /a3707eb5 сохранена и отправлена,
 worktree .worktree/small-tv-runtime-observer. В ней standalone read-only observer
