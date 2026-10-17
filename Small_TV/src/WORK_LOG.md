@@ -2481,3 +2481,21 @@ BIN/ELF/map заменены exact6324/9E2C из worktree, CMake cache не ко
 production59inputs должны совпадать с new archive53D3. Следующий scoped gate —
 детерминированное наблюдение настоящей night restore; затем fresh full. Existing
 H10 работает со своим frozen83 и не получает новую версию/приёмку.
+
+### 2026-10-17 — photo night observation с настоящим задержанным SNTP
+
+Photo frame observer сохраняет первые два fade, затем при отсутствии actual
+night restore продолжает целые6frame cycles, не больше6cycles всего. Ни pixels,
+ни PWM, ни state continuity/round-robin не ослаблены. Contract пересчитывает
+наблюдённые phases/order и отклоняет бюджет7 и отсутствие actual clock_valid.
+Suite publisher/verifier требуют14negative controls; FIXED_TEST описан отдельно.
+
+Первый scoped run6324 прошёл84frames/9normalized scenes, но его SNTP успел во
+втором cycle. Поэтому fixture сделан детерминированным: native masked-night
+получает ntp-drop-mask7 до окончания двухcycles, потом внешний NTP отпускается.
+Новый полный photo gate69551 прошёл102frames,9normalized и14rejections;5cycles
+в night case, первые4restoreclock_validFalse и пятоеTrue/duty4095. Все102full
+frames имеют0different pixels и exactLEDC, slots1,3,1,3,1 идут циклически.
+Контроль clock_valid читается у настоящего backlight_update через hardware
+breakpoint; RAM/registers/time не подставляются. Production59inputs/app6324/
+ELF9E2C/source53D3 не менялись. Scoped report сохранён; full/H10 не объявляются.

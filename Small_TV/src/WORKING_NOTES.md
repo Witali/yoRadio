@@ -7,6 +7,13 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Photo night observation исправлен и проверен на текущей6324/9E2C/53D3.
+  Все6profiles обеих прошивок:102whole frames/0pixel differences,9normalized
+  scenes,14contract guards. NTP внешне блокируется до двухначальныхcycles,
+  далее full cycles до actual sync/night restore, cap6. Наблюдалось5cycles:
+  clock_validFalse×4, затемTrue/night duty4095; порядок1,3,1,3,1 сохранён.
+  Proof `photo-night-observation-validation-20261017.json`. Firmware59inputs
+  с моментаWiFi fix не менялись. Это scoped pass; нужен fresh full новой6324.
 - Wi-Fi27f1b23e интегрирован после сохранения terminal failed mainfull.
   Current ordinary6324C55A/ELF9E2C7719/source53D38223; BIN/ELF/map скопированы
   byte-exact из worktree без CMake cache, предыдущие83/62E0 сохранены в

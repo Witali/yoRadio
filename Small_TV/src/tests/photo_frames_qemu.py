@@ -54,7 +54,13 @@ def native_entries():
 
 
 def exercise(options, output, variant, case, symbols, loop_end):
-    """Observe complete steps without modifying running guest code, RAM, PC or time."""
+    """Observe complete steps without modifying running guest code, RAM, PC or time.
+
+    FIXED_TEST: fast photo startup may finish two fades before the SDK's first
+    randomized SNTP request. Keep all initial frames and continue complete
+    cycles, at most six, until the night case actually exercises synchronized
+    restoration. Never substitute a calendar or waive the night requirement.
+    """
     import compare
     from small_tv_http_test import clean_uart
     previous_seed = vm.seed_clock_network
@@ -93,12 +99,19 @@ def exercise(options, output, variant, case, symbols, loop_end):
         entry = 0x4200bc36 if variant == 'original' else symbols['factory_photo_step']
         expected_state = None
         remaining = 4+(case['cycles']-1)*6
+        observed_cycles = case['cycles']
         with vm.QMP(session['qmp_port'], session['name']) as qmp:
             report['checks']['direct_flash_backing'] = direct_flash_backing(qmp, output)
             if not report['checks']['direct_flash_backing']:
                 raise AssertionError('Flash integrity cannot be checked behind a snapshot overlay')
             qmp.execute('qom-set', path='/machine/wifi', property='ntp-unix-seconds',
                         value=int(dt.datetime(2026, 10, 13, 16, 34, 30, tzinfo=dt.timezone.utc).timestamp()))
+            if variant == 'reconstructed' and case['night_mode']:
+                # Keep early photo frames genuinely unsynchronized. Releasing
+                # the external server after two cycles exercises continuation
+                # regardless of the SDK's randomized initial SNTP delay.
+                qmp.execute('qom-set', path='/machine/wifi', property='ntp-drop-mask', value=7)
+                report['night_ntp_control'] = {'initial_drop_mask': 7}
             while remaining:
                 observer.breakpoint(entry)
                 observer.continue_to(entry)
@@ -190,11 +203,25 @@ def exercise(options, output, variant, case, symbols, loop_end):
                     write_rgb_png(output/(str(len(report['samples']))+'-expected.png'), expected)
                     raise AssertionError('Real photo/fade frame or brightness differs')
                 remaining -= 1
+                if (not remaining and variant == 'reconstructed' and case['night_mode'] and
+                        not any(sample['restore_calendar'] and sample['restore_calendar']['clock_valid'] and
+                                sample['restore_calendar']['night_selected'] for sample in report['samples'])):
+                    if observed_cycles == case['cycles']:
+                        qmp.execute('qom-set', path='/machine/wifi', property='ntp-drop-mask', value=0)
+                        report['night_ntp_control'].update(released_after_cycles=observed_cycles,
+                            released_guest_seconds=weather.virtual_seconds(qmp))
+                    if observed_cycles >= 6:
+                        raise AssertionError('No synchronized night restoration within six photo cycles')
+                    remaining = 6
+                    observed_cycles += 1
         report['checks'].update({'all_pixels_checked': True, 'expected_fade_steps': set(row['fade_before'] for row in report['samples']) ==
                             ({2, 3, 4, 5} if case['cycles'] == 1 else set(range(6))),
                             'hardware_breakpoints_only': True, 'no_guest_state_writes': True})
         selected = [slot for row in report['samples'] for slot in row['selected']]
-        report['checks']['photo_order'] = selected == [slot for slot in range(5) if case['mask'] & (1 << slot)]
+        enabled = [slot for slot in range(5) if case['mask'] & (1 << slot)]
+        expected_order = [enabled[index % len(enabled)] for index in range(observed_cycles)] if enabled else []
+        report['checks']['photo_order'] = selected == expected_order
+        report['cycles_observed'] = observed_cycles
         if case['night_mode'] and variant == 'reconstructed':
             report['checks']['synchronized_night_restore'] = any(
                 row['restore_calendar'] and row['restore_calendar']['clock_valid'] and

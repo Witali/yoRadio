@@ -1,0 +1,3916 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-17T19:42:06.975725+00:00",
+  "scope": "Photo observation repair only; no production change after the6324 Wi-Fi fix. Both applications,102 complete frames,9 normalized complete scenes,14 evidence rejections. The native night case buffers real external NTP replies for two initial cycles, then follows complete fades until real synchronized night restoration, bounded at six cycles.",
+  "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+  "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48",
+  "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+  "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+  "previous_incomplete_run": "uri-bounded-full-failed-20261017.json",
+  "report": {
+    "passed": true,
+    "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+    "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48",
+    "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+    "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+    "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+    "helper_sha256": {
+      "small_tv_vm.py": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae",
+      "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+      "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+      "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+      "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+      "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+      "esp_elf.py": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f"
+    },
+    "profile_sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+    "test_inputs": [
+      {
+        "file": "Small_TV/src/tests/photo_frames_qemu.py",
+        "sha256": "244cd4b12cf8af40de0e3cb7e3e21a2fbcb764d2924d636ee76c934c33b00a01"
+      },
+      {
+        "file": "Small_TV/src/tests/photo_frame_replay.py",
+        "sha256": "f567780d22400e0b4b86a7607a0f89a20c47bafa0b0a985f09dd632ab82a09e8"
+      },
+      {
+        "file": "Small_TV/src/tests/photo_frame_contract.py",
+        "sha256": "7cb73a653a271e2584d0cdb286ecb7d4888999e0220312d7c850eb4668630d0f"
+      },
+      {
+        "file": "Small_TV/src/tests/qemu_storage.py",
+        "sha256": "3fa00b82379b90c76939ad61d1756f1fcefe03ded492bd16c7df1b532578dc3d"
+      },
+      {
+        "file": "Small_TV/src/tests/jpeg_oracle.py",
+        "sha256": "354048940b1d6bd065428a83a03133f333a5334154eee7472806e25d1a893e89"
+      },
+      {
+        "file": "Small_TV/src/tests/machine_oracle.py",
+        "sha256": "009af0436897d63044f692baac40b45ade60e69a511a9f36befd3aed09705ff2"
+      },
+      {
+        "file": "Small_TV/src/tests/classic_oracle.py",
+        "sha256": "92401ddcf595125ae6108dbcd65f54cc276e16f531f2b5952dfcc9e082dd5667"
+      },
+      {
+        "file": "Small_TV/src/tests/control_oracle.py",
+        "sha256": "f7df352f24bdad4e978dad327cd66c1f88383bfa46a07fa4399a274594335d8a"
+      },
+      {
+        "file": "Small_TV/src/tests/scene_qemu.py",
+        "sha256": "797304412870bee54e2af631833d84cbd9e7c114f643fd60a6e60ce64e09098c"
+      },
+      {
+        "file": "Small_TV/src/tests/frame_replay.py",
+        "sha256": "5a7ed3dbb6738fa2002e6aaecacdf3b0bab769fa4e2e9a12f52cee7ecb253251"
+      },
+      {
+        "file": "Small_TV/src/tests/weather_qemu.py",
+        "sha256": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9"
+      },
+      {
+        "file": "Small_TV/src/tests/weather_render_oracle.py",
+        "sha256": "ccc566ba5ab138340c269c34b5e12cefbf16e881d3c08b1c1da7b286af76f724"
+      },
+      {
+        "file": "Small_TV/src/tests/gdb_observer.py",
+        "sha256": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83"
+      },
+      {
+        "file": "Small_TV/qemu/parity/compare.py",
+        "sha256": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84"
+      },
+      {
+        "file": "Small_TV/qemu/profiles/small-tv-c2.json",
+        "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+      },
+      {
+        "file": "firmware/development/small-tv-esp32c2-reconstructed/app.bin",
+        "sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe"
+      },
+      {
+        "file": "firmware/development/small-tv-esp32c2-reconstructed/bootloader.bin",
+        "sha256": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f"
+      },
+      {
+        "file": "firmware/development/small-tv-esp32c2-reconstructed/partition-table.bin",
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+      },
+      {
+        "file": "firmware/development/small-tv-esp32c2-reconstructed/assets.bin",
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+      },
+      {
+        "file": "firmware/development/small-tv-esp32c2-reconstructed/manifest.json",
+        "sha256": "a5ce07e64074d4d5b6ab2d1a1f44af819817fecd24dabf9919a1aa75a61e1d8d"
+      },
+      {
+        "file": "firmware/development/small-tv-esp32c2-reconstructed/source-manifest.json",
+        "sha256": "67e43d5fc0c8ed71b58748584a8bc98a6f52ecd191a8182d3fe4eff88774001d"
+      },
+      {
+        "file": "firmware/development/small-tv-esp32c2-reconstructed/assets-manifest.json",
+        "sha256": "9f034fa7d5793c24da9a5399c68d93f921d6716b923fb6193a7a54a1ec7a6e0b"
+      },
+      {
+        "file": "Small_TV/assets/manifest.json",
+        "sha256": "fa859726835cc9eca3fc96307b43bcc48f83a99d46702de323aa81582c0c9f6a"
+      },
+      {
+        "file": "Small_TV/assets/photos/photo-1.jpg",
+        "sha256": "6fcc8993393f01139f60ed26e4ab14ad03daa4f4b453f8068002156f8d924d53"
+      },
+      {
+        "file": "Small_TV/assets/photos/photo-2.jpg",
+        "sha256": "39a768551307bec2ace95beaf3899345372b4d78910b077b47dd0629a3b1625b"
+      },
+      {
+        "file": "Small_TV/assets/photos/photo-3.jpg",
+        "sha256": "8747779c6b2b57ee7f8bf84bfe19029d6d7f47be976f6e7566cd574fc3523446"
+      },
+      {
+        "file": "Small_TV/assets/photos/photo-4.jpg",
+        "sha256": "4df977c348bec9bdce2c22ec55a8a16bd3891870cb5f7e2f4b694e8bc433b624"
+      },
+      {
+        "file": "Small_TV/assets/photos/photo-5.jpg",
+        "sha256": "85e32f88906a8661d876aed965e78870d3e5ce64882bc9dbe6044337e97f7d79"
+      }
+    ],
+    "flows": {
+      "original": {
+        "all-photos": {
+          "passed": true,
+          "samples": [
+            {
+              "fade_before": 2,
+              "next_slot_before": 0,
+              "state_after": [
+                3,
+                1
+              ],
+              "selected": [
+                0
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.504654,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 1,
+              "state_after": [
+                4,
+                1
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.591702,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "4e124e358a38c17e309f39106bdf55f66b1357810f6d269d6645e515e5fc7a04",
+              "replayed_rgb_sha256": "4e124e358a38c17e309f39106bdf55f66b1357810f6d269d6645e515e5fc7a04",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 1,
+              "state_after": [
+                5,
+                1
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.699866,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "5363ca601e32e8152ff53330d6232d95110ad0f60d19e30269e4f3e5a51a207f",
+              "replayed_rgb_sha256": "5363ca601e32e8152ff53330d6232d95110ad0f60d19e30269e4f3e5a51a207f",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 1,
+              "state_after": [
+                0,
+                1
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.800216,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "e53c459b3ab2e36ddacccf88dbfffa7e1e7414f8fdb6cecac114b7b97bffe9db",
+              "replayed_rgb_sha256": "e53c459b3ab2e36ddacccf88dbfffa7e1e7414f8fdb6cecac114b7b97bffe9db",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 1,
+              "state_after": [
+                1,
+                1
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.840564,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "5363ca601e32e8152ff53330d6232d95110ad0f60d19e30269e4f3e5a51a207f",
+              "replayed_rgb_sha256": "5363ca601e32e8152ff53330d6232d95110ad0f60d19e30269e4f3e5a51a207f",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 1,
+              "state_after": [
+                2,
+                1
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.940623,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "4e124e358a38c17e309f39106bdf55f66b1357810f6d269d6645e515e5fc7a04",
+              "replayed_rgb_sha256": "4e124e358a38c17e309f39106bdf55f66b1357810f6d269d6645e515e5fc7a04",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 1,
+              "state_after": [
+                3,
+                2
+              ],
+              "selected": [
+                1
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 24.397753,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 2,
+              "state_after": [
+                4,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 24.480449,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 2,
+              "state_after": [
+                5,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 24.580746,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 2,
+              "state_after": [
+                0,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 24.690759,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "e670534508341ef129e2d550a1da8f5b7717b84e748bc967afe2523328a9dafb",
+              "replayed_rgb_sha256": "e670534508341ef129e2d550a1da8f5b7717b84e748bc967afe2523328a9dafb",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 2,
+              "state_after": [
+                1,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 29.360549,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 2,
+              "state_after": [
+                2,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 29.460448,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 2,
+              "state_after": [
+                3,
+                3
+              ],
+              "selected": [
+                2
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 29.887934,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 3,
+              "state_after": [
+                4,
+                3
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 29.980025,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "3f259245fd4fbf7bacbe76f49a6994be33d1682f30adc5ab5566e5e750a4106c",
+              "replayed_rgb_sha256": "3f259245fd4fbf7bacbe76f49a6994be33d1682f30adc5ab5566e5e750a4106c",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 3,
+              "state_after": [
+                5,
+                3
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 30.080725,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "5e94e2a5dbbf4f265d5d60669d363a22bfb9cf1f0f2eb33e6d5ae7ce588f3554",
+              "replayed_rgb_sha256": "5e94e2a5dbbf4f265d5d60669d363a22bfb9cf1f0f2eb33e6d5ae7ce588f3554",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 3,
+              "state_after": [
+                0,
+                3
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 30.180505,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "7935d108eb7aeb02c5359ef9dd356fadd909eb7152913cb1734d85393e4cdf79",
+              "replayed_rgb_sha256": "7935d108eb7aeb02c5359ef9dd356fadd909eb7152913cb1734d85393e4cdf79",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 3,
+              "state_after": [
+                1,
+                3
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 34.871648,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "5e94e2a5dbbf4f265d5d60669d363a22bfb9cf1f0f2eb33e6d5ae7ce588f3554",
+              "replayed_rgb_sha256": "5e94e2a5dbbf4f265d5d60669d363a22bfb9cf1f0f2eb33e6d5ae7ce588f3554",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 3,
+              "state_after": [
+                2,
+                3
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 34.980397,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "3f259245fd4fbf7bacbe76f49a6994be33d1682f30adc5ab5566e5e750a4106c",
+              "replayed_rgb_sha256": "3f259245fd4fbf7bacbe76f49a6994be33d1682f30adc5ab5566e5e750a4106c",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 3,
+              "state_after": [
+                3,
+                4
+              ],
+              "selected": [
+                3
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 35.356817,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 4,
+              "state_after": [
+                4,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 35.451398,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "replayed_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 4,
+              "state_after": [
+                5,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 35.550725,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "replayed_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 4,
+              "state_after": [
+                0,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 35.651021,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "0564595a9d1f199d0002c8cf73c9105a2bffd159aaad8419f1e64616da2c7b08",
+              "replayed_rgb_sha256": "0564595a9d1f199d0002c8cf73c9105a2bffd159aaad8419f1e64616da2c7b08",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 4,
+              "state_after": [
+                1,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 40.401593,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "replayed_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 4,
+              "state_after": [
+                2,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 40.510092,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "replayed_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 4,
+              "state_after": [
+                3,
+                0
+              ],
+              "selected": [
+                4
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 40.925979,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 0,
+              "state_after": [
+                4,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 41.020086,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "0af99fc3d28605bd5f36362ded54cd520d0f0a1528291de01b5777ce81f15e00",
+              "replayed_rgb_sha256": "0af99fc3d28605bd5f36362ded54cd520d0f0a1528291de01b5777ce81f15e00",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 0,
+              "state_after": [
+                5,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 41.121033,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "64f16b3852f537f2f4dbbacfec093a4c02c0e6b3f307327d57425b42c5c04291",
+              "replayed_rgb_sha256": "64f16b3852f537f2f4dbbacfec093a4c02c0e6b3f307327d57425b42c5c04291",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 0,
+              "state_after": [
+                0,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 41.23038,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "248c607fa9a243980c6a563fbdd023f50b92a8f1c7ff76dbac5ded59bf84be2f",
+              "replayed_rgb_sha256": "248c607fa9a243980c6a563fbdd023f50b92a8f1c7ff76dbac5ded59bf84be2f",
+              "passed": true
+            }
+          ],
+          "checks": {
+            "direct_flash_backing": true,
+            "all_pixels_checked": true,
+            "expected_fade_steps": true,
+            "hardware_breakpoints_only": true,
+            "no_guest_state_writes": true,
+            "photo_order": true,
+            "executable_media_unchanged": true,
+            "no_panic": true
+          },
+          "case": {
+            "name": "all-photos",
+            "mask": 31,
+            "cycles": 5,
+            "day": 0,
+            "night_mode": 0,
+            "night": 500
+          },
+          "sources": {
+            "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+          },
+          "cycles_observed": 5
+        },
+        "masked-night": {
+          "passed": true,
+          "samples": [
+            {
+              "fade_before": 2,
+              "next_slot_before": 0,
+              "state_after": [
+                3,
+                2
+              ],
+              "selected": [
+                1
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.578059,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 2,
+              "state_after": [
+                4,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.660524,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 2,
+              "state_after": [
+                5,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.770614,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 2,
+              "state_after": [
+                0,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.870741,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "e670534508341ef129e2d550a1da8f5b7717b84e748bc967afe2523328a9dafb",
+              "replayed_rgb_sha256": "e670534508341ef129e2d550a1da8f5b7717b84e748bc967afe2523328a9dafb",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 2,
+              "state_after": [
+                1,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.83095,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 2,
+              "state_after": [
+                2,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.931748,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 2,
+              "state_after": [
+                3,
+                4
+              ],
+              "selected": [
+                3
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 24.307806,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 4,
+              "state_after": [
+                4,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 24.390702,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "replayed_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 4,
+              "state_after": [
+                5,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 24.491388,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "replayed_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 4,
+              "state_after": [
+                0,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 24.590592,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "0564595a9d1f199d0002c8cf73c9105a2bffd159aaad8419f1e64616da2c7b08",
+              "replayed_rgb_sha256": "0564595a9d1f199d0002c8cf73c9105a2bffd159aaad8419f1e64616da2c7b08",
+              "passed": true
+            }
+          ],
+          "checks": {
+            "direct_flash_backing": true,
+            "all_pixels_checked": true,
+            "expected_fade_steps": true,
+            "hardware_breakpoints_only": true,
+            "no_guest_state_writes": true,
+            "photo_order": true,
+            "executable_media_unchanged": true,
+            "no_panic": true
+          },
+          "case": {
+            "name": "masked-night",
+            "mask": 10,
+            "cycles": 2,
+            "day": 100,
+            "night_mode": 1,
+            "night": 500
+          },
+          "sources": {
+            "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+          },
+          "cycles_observed": 2
+        },
+        "none-dark": {
+          "passed": true,
+          "samples": [
+            {
+              "fade_before": 2,
+              "next_slot_before": 0,
+              "state_after": [
+                3,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.235499,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 0,
+              "state_after": [
+                4,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.321048,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "2bacc2a44769b992fa400b8117015f1c8cc7925bd0813223bb4992af1aac16cf",
+              "replayed_rgb_sha256": "2bacc2a44769b992fa400b8117015f1c8cc7925bd0813223bb4992af1aac16cf",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 0,
+              "state_after": [
+                5,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.430115,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "cea258ffbaa8712c7999401d5be768cc561ba2f90194ab0420d50e2f6dce9d18",
+              "replayed_rgb_sha256": "cea258ffbaa8712c7999401d5be768cc561ba2f90194ab0420d50e2f6dce9d18",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 0,
+              "state_after": [
+                0,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 20.530242,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "e0fb89432c6df10023c60477589ad181ef8aa4706bb301760e03404b7dbbb82c",
+              "replayed_rgb_sha256": "e0fb89432c6df10023c60477589ad181ef8aa4706bb301760e03404b7dbbb82c",
+              "passed": true
+            }
+          ],
+          "checks": {
+            "direct_flash_backing": true,
+            "all_pixels_checked": true,
+            "expected_fade_steps": true,
+            "hardware_breakpoints_only": true,
+            "no_guest_state_writes": true,
+            "photo_order": true,
+            "executable_media_unchanged": true,
+            "no_panic": true
+          },
+          "case": {
+            "name": "none-dark",
+            "mask": 0,
+            "cycles": 1,
+            "day": 1000,
+            "night_mode": 0,
+            "night": 500
+          },
+          "sources": {
+            "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+          },
+          "cycles_observed": 1
+        }
+      },
+      "reconstructed": {
+        "all-photos": {
+          "passed": true,
+          "samples": [
+            {
+              "fade_before": 2,
+              "next_slot_before": 0,
+              "state_after": [
+                3,
+                1
+              ],
+              "selected": [
+                0
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.459365,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 1,
+              "state_after": [
+                4,
+                1
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.554074,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "4e124e358a38c17e309f39106bdf55f66b1357810f6d269d6645e515e5fc7a04",
+              "replayed_rgb_sha256": "4e124e358a38c17e309f39106bdf55f66b1357810f6d269d6645e515e5fc7a04",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 1,
+              "state_after": [
+                5,
+                1
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.655154,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "5363ca601e32e8152ff53330d6232d95110ad0f60d19e30269e4f3e5a51a207f",
+              "replayed_rgb_sha256": "5363ca601e32e8152ff53330d6232d95110ad0f60d19e30269e4f3e5a51a207f",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 1,
+              "state_after": [
+                0,
+                1
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 17,
+                "minute": 4,
+                "clock_valid": false,
+                "night_selected": false
+              },
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.755136,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "e53c459b3ab2e36ddacccf88dbfffa7e1e7414f8fdb6cecac114b7b97bffe9db",
+              "replayed_rgb_sha256": "e53c459b3ab2e36ddacccf88dbfffa7e1e7414f8fdb6cecac114b7b97bffe9db",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 1,
+              "state_after": [
+                1,
+                1
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 6.153994,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "5363ca601e32e8152ff53330d6232d95110ad0f60d19e30269e4f3e5a51a207f",
+              "replayed_rgb_sha256": "5363ca601e32e8152ff53330d6232d95110ad0f60d19e30269e4f3e5a51a207f",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 1,
+              "state_after": [
+                2,
+                1
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 6.254206,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "4e124e358a38c17e309f39106bdf55f66b1357810f6d269d6645e515e5fc7a04",
+              "replayed_rgb_sha256": "4e124e358a38c17e309f39106bdf55f66b1357810f6d269d6645e515e5fc7a04",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 1,
+              "state_after": [
+                3,
+                2
+              ],
+              "selected": [
+                1
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 6.818097,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 2,
+              "state_after": [
+                4,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 6.914322,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 2,
+              "state_after": [
+                5,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 7.014788,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 2,
+              "state_after": [
+                0,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 0,
+                "minute": 34,
+                "clock_valid": true,
+                "night_selected": false
+              },
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 7.115447,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "e670534508341ef129e2d550a1da8f5b7717b84e748bc967afe2523328a9dafb",
+              "replayed_rgb_sha256": "e670534508341ef129e2d550a1da8f5b7717b84e748bc967afe2523328a9dafb",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 2,
+              "state_after": [
+                1,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 11.715446,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 2,
+              "state_after": [
+                2,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 11.81395,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 2,
+              "state_after": [
+                3,
+                3
+              ],
+              "selected": [
+                2
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 12.350698,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 3,
+              "state_after": [
+                4,
+                3
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 12.444522,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "3f259245fd4fbf7bacbe76f49a6994be33d1682f30adc5ab5566e5e750a4106c",
+              "replayed_rgb_sha256": "3f259245fd4fbf7bacbe76f49a6994be33d1682f30adc5ab5566e5e750a4106c",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 3,
+              "state_after": [
+                5,
+                3
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 12.545698,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "5e94e2a5dbbf4f265d5d60669d363a22bfb9cf1f0f2eb33e6d5ae7ce588f3554",
+              "replayed_rgb_sha256": "5e94e2a5dbbf4f265d5d60669d363a22bfb9cf1f0f2eb33e6d5ae7ce588f3554",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 3,
+              "state_after": [
+                0,
+                3
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 0,
+                "minute": 34,
+                "clock_valid": true,
+                "night_selected": false
+              },
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 12.644182,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "7935d108eb7aeb02c5359ef9dd356fadd909eb7152913cb1734d85393e4cdf79",
+              "replayed_rgb_sha256": "7935d108eb7aeb02c5359ef9dd356fadd909eb7152913cb1734d85393e4cdf79",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 3,
+              "state_after": [
+                1,
+                3
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 17.343811,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "5e94e2a5dbbf4f265d5d60669d363a22bfb9cf1f0f2eb33e6d5ae7ce588f3554",
+              "replayed_rgb_sha256": "5e94e2a5dbbf4f265d5d60669d363a22bfb9cf1f0f2eb33e6d5ae7ce588f3554",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 3,
+              "state_after": [
+                2,
+                3
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 17.443745,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "3f259245fd4fbf7bacbe76f49a6994be33d1682f30adc5ab5566e5e750a4106c",
+              "replayed_rgb_sha256": "3f259245fd4fbf7bacbe76f49a6994be33d1682f30adc5ab5566e5e750a4106c",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 3,
+              "state_after": [
+                3,
+                4
+              ],
+              "selected": [
+                3
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 17.942916,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 4,
+              "state_after": [
+                4,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 18.034245,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "replayed_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 4,
+              "state_after": [
+                5,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 18.133895,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "replayed_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 4,
+              "state_after": [
+                0,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 0,
+                "minute": 34,
+                "clock_valid": true,
+                "night_selected": false
+              },
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 18.234676,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "0564595a9d1f199d0002c8cf73c9105a2bffd159aaad8419f1e64616da2c7b08",
+              "replayed_rgb_sha256": "0564595a9d1f199d0002c8cf73c9105a2bffd159aaad8419f1e64616da2c7b08",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 4,
+              "state_after": [
+                1,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 22.834472,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "replayed_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 4,
+              "state_after": [
+                2,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 22.933709,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "replayed_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 4,
+              "state_after": [
+                3,
+                0
+              ],
+              "selected": [
+                4
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.467584,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 0,
+              "state_after": [
+                4,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.563832,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "0af99fc3d28605bd5f36362ded54cd520d0f0a1528291de01b5777ce81f15e00",
+              "replayed_rgb_sha256": "0af99fc3d28605bd5f36362ded54cd520d0f0a1528291de01b5777ce81f15e00",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 0,
+              "state_after": [
+                5,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.664358,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "64f16b3852f537f2f4dbbacfec093a4c02c0e6b3f307327d57425b42c5c04291",
+              "replayed_rgb_sha256": "64f16b3852f537f2f4dbbacfec093a4c02c0e6b3f307327d57425b42c5c04291",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 0,
+              "state_after": [
+                0,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1000,
+                "high_duty": 0,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 0,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 0,
+                "minute": 34,
+                "clock_valid": true,
+                "night_selected": false
+              },
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.763909,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "248c607fa9a243980c6a563fbdd023f50b92a8f1c7ff76dbac5ded59bf84be2f",
+              "replayed_rgb_sha256": "248c607fa9a243980c6a563fbdd023f50b92a8f1c7ff76dbac5ded59bf84be2f",
+              "passed": true
+            }
+          ],
+          "checks": {
+            "direct_flash_backing": true,
+            "all_pixels_checked": true,
+            "expected_fade_steps": true,
+            "hardware_breakpoints_only": true,
+            "no_guest_state_writes": true,
+            "photo_order": true,
+            "executable_media_unchanged": true,
+            "no_panic": true
+          },
+          "case": {
+            "name": "all-photos",
+            "mask": 31,
+            "cycles": 5,
+            "day": 0,
+            "night_mode": 0,
+            "night": 500
+          },
+          "sources": {
+            "images": [
+              {
+                "sha256": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f",
+                "bytes": 16928,
+                "file": "bootloader.bin",
+                "offset": "0x0"
+              },
+              {
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                "bytes": 3072,
+                "file": "partition-table.bin",
+                "offset": "0x8000"
+              },
+              {
+                "sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+                "bytes": 1169904,
+                "file": "app.bin",
+                "offset": "0x10000"
+              },
+              {
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+                "bytes": 1994752,
+                "file": "assets.bin",
+                "offset": "0x200000"
+              }
+            ],
+            "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48"
+          },
+          "cycles_observed": 5
+        },
+        "masked-night": {
+          "passed": true,
+          "samples": [
+            {
+              "fade_before": 2,
+              "next_slot_before": 0,
+              "state_after": [
+                3,
+                2
+              ],
+              "selected": [
+                1
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.518554,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 2,
+              "state_after": [
+                4,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.614174,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 2,
+              "state_after": [
+                5,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.713804,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 2,
+              "state_after": [
+                0,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 901,
+                "high_duty": 819,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 819,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 17,
+                "minute": 4,
+                "clock_valid": false,
+                "night_selected": false
+              },
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.81571,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "f27edd5b2caeeb63b8cc02bd6f4480f879732b8195c85039322c21133f7bb0ad",
+              "replayed_rgb_sha256": "f27edd5b2caeeb63b8cc02bd6f4480f879732b8195c85039322c21133f7bb0ad",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 2,
+              "state_after": [
+                1,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 6.214197,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 2,
+              "state_after": [
+                2,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 6.315194,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 2,
+              "state_after": [
+                3,
+                4
+              ],
+              "selected": [
+                3
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 6.833686,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 4,
+              "state_after": [
+                4,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 6.933861,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "replayed_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 4,
+              "state_after": [
+                5,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 7.033736,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "replayed_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 4,
+              "state_after": [
+                0,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 901,
+                "high_duty": 819,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 819,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 17,
+                "minute": 4,
+                "clock_valid": false,
+                "night_selected": false
+              },
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 7.134308,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8edc82f5913615b8c5312a201686a3b96340b46d803e93160110e208b3c852a3",
+              "replayed_rgb_sha256": "8edc82f5913615b8c5312a201686a3b96340b46d803e93160110e208b3c852a3",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 4,
+              "state_after": [
+                1,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 11.735346,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "replayed_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 4,
+              "state_after": [
+                2,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 11.835403,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "replayed_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 4,
+              "state_after": [
+                3,
+                2
+              ],
+              "selected": [
+                1
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 12.397147,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 2,
+              "state_after": [
+                4,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 12.494465,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 2,
+              "state_after": [
+                5,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 12.594095,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 2,
+              "state_after": [
+                0,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 901,
+                "high_duty": 819,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 819,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 17,
+                "minute": 4,
+                "clock_valid": false,
+                "night_selected": false
+              },
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 12.695316,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "f27edd5b2caeeb63b8cc02bd6f4480f879732b8195c85039322c21133f7bb0ad",
+              "replayed_rgb_sha256": "f27edd5b2caeeb63b8cc02bd6f4480f879732b8195c85039322c21133f7bb0ad",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 2,
+              "state_after": [
+                1,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 17.294901,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 2,
+              "state_after": [
+                2,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 17.394394,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 2,
+              "state_after": [
+                3,
+                4
+              ],
+              "selected": [
+                3
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 17.892433,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 4,
+              "state_after": [
+                4,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 17.984092,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "replayed_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 4,
+              "state_after": [
+                5,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 18.084214,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "replayed_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 4,
+              "state_after": [
+                0,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 901,
+                "high_duty": 819,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 819,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 17,
+                "minute": 4,
+                "clock_valid": false,
+                "night_selected": false
+              },
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 18.184083,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8edc82f5913615b8c5312a201686a3b96340b46d803e93160110e208b3c852a3",
+              "replayed_rgb_sha256": "8edc82f5913615b8c5312a201686a3b96340b46d803e93160110e208b3c852a3",
+              "passed": true
+            },
+            {
+              "fade_before": 0,
+              "next_slot_before": 4,
+              "state_after": [
+                1,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 22.784544,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "replayed_rgb_sha256": "84ed85802d0aec09719fa34d0c482929fefa4f29d8e85aaed6784d17dd78be10",
+              "passed": true
+            },
+            {
+              "fade_before": 1,
+              "next_slot_before": 4,
+              "state_after": [
+                2,
+                4
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 22.884086,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "replayed_rgb_sha256": "a98c145fb5ac8cd5ab47d32f5b97dc5ebed33a2600db0a38481c72814131a7ec",
+              "passed": true
+            },
+            {
+              "fade_before": 2,
+              "next_slot_before": 4,
+              "state_after": [
+                3,
+                2
+              ],
+              "selected": [
+                1
+              ],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.447135,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 2,
+              "state_after": [
+                4,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.544542,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "replayed_rgb_sha256": "b1513600c3e458695235073765ac47c539caaaa683e571dd0e31e117ee70b1e6",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 2,
+              "state_after": [
+                5,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.644052,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "replayed_rgb_sha256": "8bd0515e5a9e8c54fd58d0fc243c97024137044c1b694d17f9f41338dd6b6821",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 2,
+              "state_after": [
+                0,
+                2
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 501,
+                "high_duty": 4095,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 4095,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 0,
+                "minute": 34,
+                "clock_valid": true,
+                "night_selected": true
+              },
+              "time_synced_at_entry": true,
+              "compared_pixels": 57600,
+              "guest_seconds": 23.744516,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "8304fadd7890216bfd2f7d45fabbe74e1ce6a9db672ec8c4a63017a722cb8c95",
+              "replayed_rgb_sha256": "8304fadd7890216bfd2f7d45fabbe74e1ce6a9db672ec8c4a63017a722cb8c95",
+              "passed": true
+            }
+          ],
+          "checks": {
+            "direct_flash_backing": true,
+            "all_pixels_checked": true,
+            "expected_fade_steps": true,
+            "hardware_breakpoints_only": true,
+            "no_guest_state_writes": true,
+            "photo_order": true,
+            "synchronized_night_restore": true,
+            "executable_media_unchanged": true,
+            "no_panic": true
+          },
+          "case": {
+            "name": "masked-night",
+            "mask": 10,
+            "cycles": 2,
+            "day": 100,
+            "night_mode": 1,
+            "night": 500
+          },
+          "sources": {
+            "images": [
+              {
+                "sha256": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f",
+                "bytes": 16928,
+                "file": "bootloader.bin",
+                "offset": "0x0"
+              },
+              {
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                "bytes": 3072,
+                "file": "partition-table.bin",
+                "offset": "0x8000"
+              },
+              {
+                "sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+                "bytes": 1169904,
+                "file": "app.bin",
+                "offset": "0x10000"
+              },
+              {
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+                "bytes": 1994752,
+                "file": "assets.bin",
+                "offset": "0x200000"
+              }
+            ],
+            "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48"
+          },
+          "night_ntp_control": {
+            "initial_drop_mask": 7,
+            "released_after_cycles": 2,
+            "released_guest_seconds": 7.134308
+          },
+          "cycles_observed": 5
+        },
+        "none-dark": {
+          "passed": true,
+          "samples": [
+            {
+              "fade_before": 2,
+              "next_slot_before": 0,
+              "state_after": [
+                3,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 8191,
+              "expected_duty": 8191,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.067202,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            },
+            {
+              "fade_before": 3,
+              "next_slot_before": 0,
+              "state_after": [
+                4,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 401,
+                "high_duty": 4914,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 4914,
+              "expected_duty": 4914,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.164574,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "2bacc2a44769b992fa400b8117015f1c8cc7925bd0813223bb4992af1aac16cf",
+              "replayed_rgb_sha256": "2bacc2a44769b992fa400b8117015f1c8cc7925bd0813223bb4992af1aac16cf",
+              "passed": true
+            },
+            {
+              "fade_before": 4,
+              "next_slot_before": 0,
+              "state_after": [
+                5,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 701,
+                "high_duty": 2457,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 2457,
+              "expected_duty": 2457,
+              "brightness_restore_correction": false,
+              "different_pixels": 0,
+              "restore_calendar": null,
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.264717,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "cea258ffbaa8712c7999401d5be768cc561ba2f90194ab0420d50e2f6dce9d18",
+              "replayed_rgb_sha256": "cea258ffbaa8712c7999401d5be768cc561ba2f90194ab0420d50e2f6dce9d18",
+              "passed": true
+            },
+            {
+              "fade_before": 5,
+              "next_slot_before": 0,
+              "state_after": [
+                0,
+                0
+              ],
+              "selected": [],
+              "address": "10.0.2.15",
+              "backlight": {
+                "brightness": 1,
+                "high_duty": 8191,
+                "resolution_bits": 13,
+                "gpio_routing": 45
+              },
+              "literal_factory_duty": 0,
+              "expected_duty": 8191,
+              "brightness_restore_correction": true,
+              "different_pixels": 0,
+              "restore_calendar": {
+                "hour": 17,
+                "minute": 4,
+                "clock_valid": false,
+                "night_selected": false
+              },
+              "time_synced_at_entry": false,
+              "compared_pixels": 57600,
+              "guest_seconds": 2.364157,
+              "code_unchanged": true,
+              "qemu_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "replayed_rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b",
+              "passed": true
+            }
+          ],
+          "checks": {
+            "direct_flash_backing": true,
+            "all_pixels_checked": true,
+            "expected_fade_steps": true,
+            "hardware_breakpoints_only": true,
+            "no_guest_state_writes": true,
+            "photo_order": true,
+            "executable_media_unchanged": true,
+            "no_panic": true
+          },
+          "case": {
+            "name": "none-dark",
+            "mask": 0,
+            "cycles": 1,
+            "day": 1000,
+            "night_mode": 0,
+            "night": 500
+          },
+          "sources": {
+            "images": [
+              {
+                "sha256": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f",
+                "bytes": 16928,
+                "file": "bootloader.bin",
+                "offset": "0x0"
+              },
+              {
+                "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+                "bytes": 3072,
+                "file": "partition-table.bin",
+                "offset": "0x8000"
+              },
+              {
+                "sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+                "bytes": 1169904,
+                "file": "app.bin",
+                "offset": "0x10000"
+              },
+              {
+                "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+                "bytes": 1994752,
+                "file": "assets.bin",
+                "offset": "0x200000"
+              }
+            ],
+            "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48"
+          },
+          "cycles_observed": 1
+        }
+      }
+    },
+    "scope": "Compare real photo/fade QEMU frames with complete literal factory instruction replay.",
+    "normalized": {
+      "passed": true,
+      "cases": [
+        {
+          "mask": 1,
+          "next_slot": 1,
+          "address": "10.0.2.15",
+          "factory": {
+            "fade": 3,
+            "next_slot": 1,
+            "pending": true,
+            "selected": [
+              0
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "native": {
+            "fade": 3,
+            "next_slot": 1,
+            "pending": true,
+            "selected": [
+              0
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "compared_pixels": 57600,
+          "different_pixels": 0,
+          "passed": true
+        },
+        {
+          "mask": 2,
+          "next_slot": 2,
+          "address": "10.0.2.15",
+          "factory": {
+            "fade": 3,
+            "next_slot": 2,
+            "pending": true,
+            "selected": [
+              1
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "native": {
+            "fade": 3,
+            "next_slot": 2,
+            "pending": true,
+            "selected": [
+              1
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "compared_pixels": 57600,
+          "different_pixels": 0,
+          "passed": true
+        },
+        {
+          "mask": 4,
+          "next_slot": 3,
+          "address": "10.0.2.15",
+          "factory": {
+            "fade": 3,
+            "next_slot": 3,
+            "pending": true,
+            "selected": [
+              2
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "native": {
+            "fade": 3,
+            "next_slot": 3,
+            "pending": true,
+            "selected": [
+              2
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "compared_pixels": 57600,
+          "different_pixels": 0,
+          "passed": true
+        },
+        {
+          "mask": 8,
+          "next_slot": 4,
+          "address": "10.0.2.15",
+          "factory": {
+            "fade": 3,
+            "next_slot": 4,
+            "pending": true,
+            "selected": [
+              3
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "native": {
+            "fade": 3,
+            "next_slot": 4,
+            "pending": true,
+            "selected": [
+              3
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "compared_pixels": 57600,
+          "different_pixels": 0,
+          "passed": true
+        },
+        {
+          "mask": 16,
+          "next_slot": 0,
+          "address": "10.0.2.15",
+          "factory": {
+            "fade": 3,
+            "next_slot": 0,
+            "pending": true,
+            "selected": [
+              4
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "native": {
+            "fade": 3,
+            "next_slot": 0,
+            "pending": true,
+            "selected": [
+              4
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "compared_pixels": 57600,
+          "different_pixels": 0,
+          "passed": true
+        },
+        {
+          "mask": 31,
+          "next_slot": 4,
+          "address": "192.168.43.1",
+          "factory": {
+            "fade": 3,
+            "next_slot": 0,
+            "pending": true,
+            "selected": [
+              4
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "native": {
+            "fade": 3,
+            "next_slot": 0,
+            "pending": true,
+            "selected": [
+              4
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "compared_pixels": 57600,
+          "different_pixels": 0,
+          "passed": true
+        },
+        {
+          "mask": 10,
+          "next_slot": 4,
+          "address": "255.255.255.255",
+          "factory": {
+            "fade": 3,
+            "next_slot": 2,
+            "pending": true,
+            "selected": [
+              1
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "native": {
+            "fade": 3,
+            "next_slot": 2,
+            "pending": true,
+            "selected": [
+              1
+            ],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": true
+          },
+          "compared_pixels": 57600,
+          "different_pixels": 0,
+          "passed": true
+        },
+        {
+          "mask": 0,
+          "next_slot": 0,
+          "address": "10.0.2.15",
+          "factory": {
+            "fade": 3,
+            "next_slot": 0,
+            "pending": true,
+            "selected": [],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": false
+          },
+          "native": {
+            "fade": 3,
+            "next_slot": 0,
+            "pending": true,
+            "selected": [],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": false
+          },
+          "compared_pixels": 57600,
+          "different_pixels": 0,
+          "passed": true
+        },
+        {
+          "mask": 0,
+          "next_slot": 4,
+          "address": "192.168.43.1",
+          "factory": {
+            "fade": 3,
+            "next_slot": 4,
+            "pending": true,
+            "selected": [],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": false
+          },
+          "native": {
+            "fade": 3,
+            "next_slot": 4,
+            "pending": true,
+            "selected": [],
+            "events": [
+              [
+                "set",
+                8191
+              ],
+              [
+                "update"
+              ]
+            ],
+            "duty": 8191,
+            "decoder_started": false
+          },
+          "compared_pixels": 57600,
+          "different_pixels": 0,
+          "passed": true
+        }
+      ],
+      "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+      "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+      "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+      "scope": "Replay complete factory photo/fade output with genuine JPEG, glyph and LEDC code.\n\nOnly flash, allocation, mutex, LEDC driver and LCD transport boundaries are\nadapted. Photo selection, fade state, JPEG decoding and footer glyphs execute\nfrom the immutable RV32 firmware. Native scene helpers also execute their real\nELF bytes; their coordinator calls are composed explicitly for isolated checks.\n"
+    },
+    "inputs_unchanged": true,
+    "contract_checks": [
+      {
+        "case": "missing-variant",
+        "passed": true
+      },
+      {
+        "case": "missing-profile",
+        "passed": true
+      },
+      {
+        "case": "missing-phase",
+        "passed": true
+      },
+      {
+        "case": "wrong-photo-order",
+        "passed": true
+      },
+      {
+        "case": "missing-no-panic",
+        "passed": true
+      },
+      {
+        "case": "missing-direct-backing",
+        "passed": true
+      },
+      {
+        "case": "snapshot-backing",
+        "passed": true
+      },
+      {
+        "case": "code-changed",
+        "passed": true
+      },
+      {
+        "case": "wrong-duty",
+        "passed": true
+      },
+      {
+        "case": "wrong-schedule-window",
+        "passed": true
+      },
+      {
+        "case": "missing-normalized-photo",
+        "passed": true
+      },
+      {
+        "case": "mixed-executable",
+        "passed": true
+      },
+      {
+        "case": "excess-night-budget",
+        "passed": true
+      },
+      {
+        "case": "no-real-night-sync",
+        "passed": true
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "file": "Small_TV/src/tests/photo_frames_qemu.py",
+      "sha256": "244cd4b12cf8af40de0e3cb7e3e21a2fbcb764d2924d636ee76c934c33b00a01"
+    },
+    {
+      "file": "Small_TV/src/tests/photo_frame_contract.py",
+      "sha256": "7cb73a653a271e2584d0cdb286ecb7d4888999e0220312d7c850eb4668630d0f"
+    },
+    {
+      "file": "Small_TV/src/tests/publish-report.py",
+      "sha256": "806076d217988f80a4678c6af6985b08c81b60b24ce86dcfbb551985f471b3ae"
+    },
+    {
+      "file": "Small_TV/src/tools/verify_artifacts.py",
+      "sha256": "5aa441138e8b2797b71247ec3d131307ecc4854562828eb6e71ef113174f8d12"
+    },
+    {
+      "file": "Small_TV/src/CORRECTION_MARKERS.md",
+      "sha256": "13a8c41ad7c15d02c64a8008d5e1b190ec5ffbdbb0217a57ba2b43f7973dc938"
+    }
+  ],
+  "cleanup": {
+    "observed_utc": "2026-10-17T19:43:23.8710856Z",
+    "all_owned_vms_stopped": true,
+    "records": [
+      {
+        "group": "initial-photo",
+        "pid": 13860,
+        "name": "SmallTV-d0106f150b4c",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "initial-photo",
+        "pid": 10996,
+        "name": "SmallTV-6a0d21073005",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "initial-photo",
+        "pid": 11704,
+        "name": "SmallTV-495daf183ccb",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "initial-photo",
+        "pid": 33856,
+        "name": "SmallTV-d8ca1cf5c55d",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "initial-photo",
+        "pid": 32240,
+        "name": "SmallTV-ccb2350d6e57",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "initial-photo",
+        "pid": 21456,
+        "name": "SmallTV-4e179366af1c",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "controlled-photo",
+        "pid": 9812,
+        "name": "SmallTV-d349a6807672",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "controlled-photo",
+        "pid": 28036,
+        "name": "SmallTV-e5eb4880ddd3",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "controlled-photo",
+        "pid": 21884,
+        "name": "SmallTV-24ecf0c9732a",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "controlled-photo",
+        "pid": 28528,
+        "name": "SmallTV-36aa5c2ff5e5",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "controlled-photo",
+        "pid": 28640,
+        "name": "SmallTV-b293544d1d2b",
+        "owned_vm_alive": false
+      },
+      {
+        "group": "controlled-photo",
+        "pid": 19440,
+        "name": "SmallTV-a78eb80f0335",
+        "owned_vm_alive": false
+      }
+    ]
+  }
+}

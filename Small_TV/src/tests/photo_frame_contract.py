@@ -28,10 +28,25 @@ def validate_photo_frames(data):
             if variant == 'reconstructed' and night_mode:
                 required_checks.add('synchronized_night_restore')
             require(required_checks <= set(flow['checks']), 'missing integrity/panic/state-write check')
-            phases = [2, 3, 4, 5]+list(range(6))*(cycles-1)
+            observed_cycles = flow.get('cycles_observed')
+            require(isinstance(observed_cycles, int), 'missing observed cycle count')
+            if variant == 'reconstructed' and night_mode:
+                require(cycles < observed_cycles <= 6, 'unbounded or unexercised night observation')
+                control = flow.get('night_ntp_control', {})
+                require(control.get('initial_drop_mask') == 7 and control.get('released_after_cycles') == cycles,
+                        'missing controlled external SNTP delay')
+                early = [row['restore_calendar'] for row in flow['samples'][:4+6*(cycles-1)]
+                         if row['restore_calendar']]
+                require(len(early) == cycles and all(not row['clock_valid'] for row in early),
+                        'early frames were not actually unsynchronized')
+            else:
+                require(observed_cycles == cycles, 'unexpected extra/omitted photo cycle')
+            phases = [2, 3, 4, 5]+list(range(6))*(observed_cycles-1)
             require([row['fade_before'] for row in flow['samples']] == phases, 'missing/reordered fade phase')
             selected = [slot for row in flow['samples'] for slot in row['selected']]
-            require(selected == [slot for slot in range(5) if mask & (1 << slot)], 'incorrect photo order')
+            enabled = [slot for slot in range(5) if mask & (1 << slot)]
+            expected_order = [enabled[index % len(enabled)] for index in range(observed_cycles)] if enabled else []
+            require(selected == expected_order, 'incorrect photo order')
             previous = None
             night_verified = False
             for row in flow['samples']:
@@ -98,6 +113,9 @@ def contract_rejection_checks(data):
         ('wrong-schedule-window', lambda item: item['flows']['reconstructed']['masked-night']['samples'][-1]['restore_calendar'].update(night_selected=False)),
         ('missing-normalized-photo', lambda item: item['normalized']['cases'].pop()),
         ('mixed-executable', lambda item: item['normalized'].update(native_elf_sha256='0'*64)),
+        ('excess-night-budget', lambda item: item['flows']['reconstructed']['masked-night'].update(cycles_observed=7)),
+        ('no-real-night-sync', lambda item: [row['restore_calendar'].update(clock_valid=False)
+            for row in item['flows']['reconstructed']['masked-night']['samples'] if row['restore_calendar']]),
     ]
     checks = []
     for name, mutate in mutations:
