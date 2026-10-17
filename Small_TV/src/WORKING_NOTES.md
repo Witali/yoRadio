@@ -141,12 +141,32 @@ boot и5 protected flash ranges проверены. 20 consumer rejection contro
 renderer oracle сохранён отдельно, не считается acceptance.
 
 Пользователь17 октября потребовал отключаемую при сборке отладку В ОБОИХ
-проектах. Реализация идёт в .worktree/small-tv-debug-logging (от6c5360d4) и
-прежней QEMU .worktree/small-tv-wifi-link; canonical main/QEMU30F не менять до
-terminal11075. Browser initial-setup ещё не начат: CUA inventory пустой,
-новые browser VM/tab не создавались. Следующий полный запуск должен учитывать
-режим logging и не принимать отсутствие отключённых диагностических сообщений
-за ошибку поведения. Отладочные BIN и их scoped результаты сохранять отдельно.
+проектах. Готовы и отправлены: FW codex/small-tv-debug-logging /cf220f21,
+QEMU codex/small-tv-wifi-link /04443f07dc. FW branch включает завершённые body/
+concurrency/runtime ветки через8fecd9e1. По умолчанию OFF; -DebugLogging включает
+FW CMake DEBUG и QEMU esp_debug. FW SDK/app/bootloader levels2/4; отдельный debug
+archive. Полные OFF/ON/OFF builds и20 logging conditions/run проходят. Обычный
+UART0 I/D/V/3W. QEMU11 packet tests в3 режимах, modules иlegacy boot gates pass;
+normalpixels прежние, debugC3modular scroller/AP phase другая — equality не заявлена.
+FW finalEF66/source81CF/ELF8FCE; debug11DD/DBE5. QEMU OFF76A, ON9994; canonical
+main/installed остаются0d27/30F. Новые scope JSON/MD находятся в FW worktree.
+Quiet runtime4cycles/16.475576s/2outages читает настоящий connected bool вместо
+UART; H09 quiet34/16/68 иbody4cases прошли, все собственные ВМ закрыты.
+
+Старый boot-console gate всё ещё ищет INFO строки FW: перед новым quiet full
+адаптировать его к настоящему гостевому состоянию с проверкой соответствующего
+ELF/BIN (либо достоверному HTTP/LCD наблюдению), не ослаблять проверку readiness.
+Если добавляется отдельный Python helper, включить его во все transitive input
+pin lists и новый frozen collector. Transport parity использует DNS/NTP traces
+QEMU: для него нужен diagnostic EXE, firmware при этом должна остаться обычной.
+Затем объединить сохранённые ветки в main, сохранив passing DD41 checkpoint61d1f8ee
+и не приписывая его новому кандидату; подготовить root ELF/BIN/resources с одной
+identity и новый full сbody_http/concurrency_http. Точный протестированный EF66/
+8FCE можно перенести из worktree при совпадении всех59 production inputs; новый
+root rebuild может изменить app descriptor/ELF и требует новых identities.
+Root sdkconfig имеет прежнюю CRLF-only generated правку: проверить/сохранить её
+перед merge, не стирать посторонние файлы. Actual24h/H10 ещё не запускался.
+Browser initial-setup ещё не начат: CUA inventory пустой, VM/tab не создавались.
 
 ### История измерений до исправления timing
 

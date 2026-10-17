@@ -1679,3 +1679,14 @@ free359 120. Старые failed/negative runs сохранены, physical/H03/
 вlink-timing-integrated-full-inputs-20261017.json. Новые функции/сборки находятся
 в отдельных ветках; после публикации текущего результата их можно интегрировать
 и готовить один новый общий запуск с body_http/concurrency_http.
+
+### 2026-10-17 — DEBUG-участок сохранён в рабочих ветках
+
+FW cf220f21 /codex/small-tv-debug-logging отправлен вместе с обоими архивами и
+scope JSON/MD; включает body/concurrency/runtime merge8fecd9e1. QEMU04443f07dc
+отправлен вcodex/small-tv-wifi-link. OFF/ON/OFF builds иlogging20/run, packet11
+в3 состояниях, modules иlegacyboot pass. Normalpixels совпали; debugC3modular
+host-timed scroller/AP phase другая — pixel equivalence не заявлена. Короткий
+quietobserver/H09/body прошли; ВМ/CUA tabs отсутствуют. Root passing61d1f8ee и
+QEMUmain0d27/installed30F прежние. Передquiet full требуется исправить старую
+INFO-зависимую consoleboot oracle, затем интеграция и свежий frozen full.
