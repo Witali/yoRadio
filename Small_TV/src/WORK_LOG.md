@@ -1621,19 +1621,24 @@ photo_reinit прошли, photo_settings выполняется; полный �
 
 ### 2026-10-17 — исправление HTTP body starvation в отдельной ветке
 
-Ветка codex/small-tv-http-body-deadline:35b6bdce исправление/test/build/evidence,
-79445774 закрепляет LF audit bytes; оба отправлены. Старый DD41 на том же final
-http_body_qemu.py даёт3 expected failures: второйGET24.693549/27.605321/9.702162s.
-В sharedwebbody3timeouts и SDK remaining-body purge; factory0x4200d808 одинrecv.
-Новый модульrequest_body.c имеет5s deadline иread shutdown передошибкой/cleanup,
-перечитываетremaining timeout без0/infinite, успешныйbody восстанавливаетстарый.
-Новые real cases4pass с4.695327/4.703467/.204119s, ordinaryfragments200.
+Ветка codex/small-tv-http-body-deadline: 35b6bdce содержит исправление, тесты,
+сборку и свидетельства; 79445774 закрепляет LF в ассемблерном аудите. Оба отправлены.
+Старый DD41 на том же http_body_qemu.py даёт три ожидаемых отказа: второй GET
+занимает 24.693549/27.605321/9.702162 s. Причина — три тайм-аута общего web_body
+и очистка оставшегося тела в SDK. У factory на 0x4200d808 один вызов recv.
+Новый request_body.c ограничивает чтение общим сроком 5 s и прекращает чтение
+перед ответом об ошибке и cleanup. Остаток срока не превращается в нулевой,
+бесконечный тайм-аут; успешное чтение восстанавливает прежнюю настройку сокета.
+Четыре реальных сценария прошли; задержки 4.695327/4.703467/.204119 s,
+обычные фрагментированные данные по-прежнему получают HTTP 200.
 
-App3C599124/source1741EA14/ELF342C0127,1 177 216/free358 784,58prodinputsmatch.
-Native3950/platform46/frontend/integrity/timezone/aggregation reducedpass,
-SDKphoto21pass, consumerguards15pass. Код/сборка/ASM/scoped JSON/doc в ветке.
-Новому suite/publisher/verifier обязателенbody_http; mainfull11075 старойDD41
-этотgate не выполняет. Main frozen75+88 files прежние; он прошёл gates доregional
-обеихfirmware/NVSmigration, идёткcalendar. Новая общаясборка/full — после terminal
-и сохранения текущего результата. Ни scoped checks, ни старые full не означают
-полное соответствие нового кандидата или физическую/H09/H10 приёмку.
+App 3C599124 / source1741EA14 / ELF342C0127: 1 177 216 байт, свободно 358 784;
+все 58 production inputs совпали. Native 3950, platform 46, frontend, integrity,
+timezone и aggregation прошли в reduced profile; SDK photo — 21, consumer guards — 15.
+Код, сборка, ASM и отдельные JSON/документ находятся в ветке. Следующему полному
+suite/publisher/verifier обязателен body_http; текущий main full11075 старой DD41
+этот gate не выполняет. Его frozen75+88 inputs прежние. Он прошёл региональные
+проверки обеих прошивок и миграцию NVS, переходит к календарю. Новая общая сборка
+и полный прогон выполняются после завершения и сохранения текущего результата.
+Отдельные проверки и старые full не означают полного соответствия нового кандидата
+или прохождения физической приёмки, H09/H10.
