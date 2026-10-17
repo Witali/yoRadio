@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "scope": "Analysis tool validation only; neither a completed real H10 nor full firmware acceptance.",
+  "unit_tests": {
+    "passed": true,
+    "tests": 20,
+    "command": "python Small_TV/src/tests/runtime_analysis_test.py",
+    "temporary_directory": ".build/runtime-analysis-temp",
+    "initial_environment_failure": "Redirected sandbox TEMP denied nested writes; rerun in repository .build passed."
+  },
+  "sources_sha256": {
+    "Small_TV/src/tools/analyze_runtime.py": "c6d23914f217287b96bfd6d21e81dba4e96c05f3a53d1b865ee8d32901e11613",
+    "Small_TV/src/tools/runtime_evidence.py": "072fd00ddcb6abe7ce068861f9907fade289a3bf443110159fcc90db6cd2952e",
+    "Small_TV/src/tools/runtime_trend.py": "a3f9cde02016fa69d6a543caed8eb28d9f2a0daa469bbd3f1a6a9598b9b60302",
+    "Small_TV/src/tools/runtime_run_guard.py": "df024edc6653e2dd4bdc4b92bc57c33994d866cb350d3588f51af90a4a59cbd9",
+    "Small_TV/src/tests/runtime_analysis_test.py": "bc54266d78f4bb64d40f0ffa2e51a950f3e93b567f2f0ab7b81d789a3f5df3e5",
+    "Small_TV/src/tests/runtime_state.py": "3bad4e096e505d096f356d35e49ca5dec1830a423e4ecf661b9197ce9ebf33a6"
+  },
+  "observations": [
+    {
+      "file": "C:\\Work\\yoRadio\\.build\\small-tv-parity\\runtime-analysis-preflight-20261017-2.json",
+      "sha256": "003f1ab6940153de11e11f063b0de421be1c4c323a5981ccaf99f8bbb12f2ac8",
+      "status": "completed_scope_requires_review",
+      "h10_checks_passed": false,
+      "inputs_verified": 30,
+      "complete_cycles_audited": 8,
+      "elapsed_guest_seconds_observed": 27.160648,
+      "journal_prefix_only": false,
+      "journal_observed_sha256": "432d4781077bff6e9f2fed49a5655ad62f8252553457cfd3fe7b3f736ff78029",
+      "checks": {
+        "workload_complete": true,
+        "duration_request_at_least_24h": false,
+        "observed_at_least_24h": false,
+        "start_record_matches": false,
+        "independent_terminal_guard_matches": false,
+        "periodic_guest_disconnect_reconnect": true,
+        "all_steady_windows_cover_all_workload_phases": false,
+        "no_retained_loss_flagged": true
+      },
+      "uart": {
+        "passed": true,
+        "bytes": 735,
+        "rom_boots": 1,
+        "errors": []
+      },
+      "trend_status": "insufficient_steady_state_data",
+      "phase_period_cycles": 20,
+      "sampled_minimum_heap_bytes": 87036,
+      "task_stack_fill_minima_bytes": {
+        "IDLE": 1240,
+        "captive_dns": 1848,
+        "clock_display": 1784,
+        "esp_timer": 3680,
+        "httpd": 3888,
+        "settings": 480,
+        "sys_evt": 2152,
+        "tcpip": 2684,
+        "time_sync": 1940,
+        "weather_http": 5372,
+        "wifi": 5252,
+        "wifi_fallback": 1420
+      }
+    },
+    {
+      "file": "C:\\Work\\yoRadio\\.build\\small-tv-parity\\runtime-analysis-progress-20261017-2.json",
+      "sha256": "b1337da6e9b6796ac60dab382f5d372c0556d9d850a9794ea870c5c1296ae391",
+      "status": "pending",
+      "h10_checks_passed": false,
+      "inputs_verified": 30,
+      "complete_cycles_audited": 64,
+      "elapsed_guest_seconds_observed": 1054.19975,
+      "journal_prefix_only": true,
+      "journal_observed_sha256": "03a7898cf049bbbad25b8c1af345d5bb2271e36717e10b78a217875a53bf6835",
+      "checks": {
+        "workload_complete": false,
+        "duration_request_at_least_24h": true,
+        "observed_at_least_24h": false,
+        "start_record_matches": true,
+        "independent_terminal_guard_matches": false,
+        "periodic_guest_disconnect_reconnect": false,
+        "all_steady_windows_cover_all_workload_phases": false,
+        "no_retained_loss_flagged": true
+      },
+      "uart": {
+        "passed": true,
+        "bytes": 620,
+        "rom_boots": 1,
+        "errors": []
+      },
+      "trend_status": "insufficient_steady_state_data",
+      "phase_period_cycles": 60,
+      "sampled_minimum_heap_bytes": 79324,
+      "task_stack_fill_minima_bytes": {
+        "IDLE": 1240,
+        "captive_dns": 1848,
+        "clock_display": 1752,
+        "esp_timer": 3680,
+        "httpd": 3872,
+        "settings": 480,
+        "sys_evt": 2152,
+        "tcpip": 2684,
+        "time_sync": 1940,
+        "weather_http": 5372,
+        "wifi": 5352,
+        "wifi_fallback": 1420
+      }
+    }
+  ]
+}

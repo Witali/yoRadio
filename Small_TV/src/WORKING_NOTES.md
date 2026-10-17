@@ -7,6 +7,21 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- В отдельной ветке `codex/small-tv-runtime-analysis` добавлен read-only анализ
+  полного runtime журнала: `tools/analyze_runtime.py`, `runtime_evidence.py`,
+  `runtime_trend.py`. 20 тестов проходят, включая утечку при постоянном SDK
+  minimum и сохранённую ступенчатую потерю. Начальный прогрев 1 час, полные
+  часовые окна с одинаковыми фазами темы/GIF/upload/outage; для текущего H10
+  период 60 циклов. Любая найденная сохранённая потеря требует объяснения.
+  Короткий preflight успешно прочитан, но H10 не засчитан; live H10 также pending.
+  Этот инструмент не меняет 30 входов текущего workload и не подключается к ВМ.
+  Интеграцию отложить до завершения frozen full; команду см. tests/README.md.
+- H10 уже запущен: controller 31890, guard 99431, каталог
+  `.build/small-tv-parity/rssi-runtime-24h-20261017`. Сохранить RSSI worktree и
+  его frozen QEMU bundle до terminal. Стартовый checkpoint содержит 30 SHA и
+  guard source SHA; сам по себе это не completed pass. Guard проверяет полный
+  UART на единственный ROM boot, panic/watchdog и потерю истории. Длительность
+  24 часа ещё не достигнута. Физическая плата не прошивается.
 - Отдельная ветка codex/small-tv-rssi-label исправляет найденный Math.abs RSSI
   label bug. Общий formatter local_site/wifi_network.js с FIXED_FACTORY встроен
   exporter в setup/settings. 8 actual callback cases: old8fail/new8pass; real

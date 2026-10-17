@@ -1898,3 +1898,29 @@ count1,panic/watchdog,truncation.7unitcases pass,включаяresetпосред
 наfile-only guard, никакогоновогосоединения; этотpreflightнеfirmwaredefect.
 Guard99431 работаетрядом с H10 31890 наD78A/F5F3/frozenA74+FF0819. Guardиmemory
 trend обязательны дляприёмки H10; ранние samples/основнойpassed не замена.
+
+### 2026-10-17 — независимый анализ полного runtime журнала
+
+В отдельном analysis worktree добавлены три инструмента: runtime_evidence
+проверяет полный журнал и identities, runtime_trend сравнивает heap в равных
+фазах, analyze_runtime формирует отдельное заключение. Анализ файлов не требует
+QMP, не останавливает гостя и не меняет входы workload. Сверяются каждый cycle,
+HTTP/upload/outage, арифметика heap, ROM crosscheck, app/ELF binding, elapsed,
+wraps, начальный checkpoint и terminal UART guard. Pending и короткие прогоны
+не получают H10 pass. Старый preflight без guard читается в своём ограниченном
+объёме, но не повышается до приёмки 24 часов.
+
+Trend: прогрев 1 час; полные часовые окна; НОК(20, outage cadence) фаз, то есть
+60 для H10 с отключением каждые 60 циклов. Неизменный SDK minimum не скрывает
+убывающий free heap. Устойчивое снижение или сохранённая потеря выше начального
+разброса требуют дальнейшего исследования. Результат ограничен разрешением
+замеров; физическая плата, ISR peaks и непрерывный календарь не подтверждаются.
+
+20 unit tests проходят: настоящая сериализация RuntimeJournal, фальсифицированные
+идентификаторы/агрегаты/время, недостающий upload chunk, ложный reconnect,
+переставленные snapshots, reset, усечённый JSONL, live prefix, phase jitter,
+утечка и retained step, synthetic 24h. Первый запуск не смог создать nested
+files в redirected sandbox TEMP (WinError5); повтор с TEMP внутри .build прошёл.
+Реальный короткий preflight и префикс H10 успешно прочитаны, все 30 source SHA
+совпали. Анализ preflight не объявлен 24h pass. H10 и полный frozen regression
+продолжаются; входы выполняющихся процессов не изменены.
