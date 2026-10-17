@@ -1852,3 +1852,13 @@ setup error page close блокирует browser URL policy; temporary auto cle
 Screenshot показан tool inline, архивного browser PNG нет. JSON scope сохранён;
 full H03/factory browser/physical/24h не объявлены. Отдельно отмечена заводская
 Math.abs RSSI dBm sign ошибка в HTML; исправить после текущего frozen full.
+
+### 2026-10-17 — новый frozen full запущен
+
+Debug-integrated-full-20261017 /handle67941 начал полный host/machine/QEMU набор
+на ordinary EF66/81CF/8FCE и canonical diagnostic QEMU A74/sourceadb66701b3.
+Frozen92 test sources и92 дополнительных inputs; после старта все184 fingerprints
+повторно совпали. Pre-run HEADdef6914d. Host groups pass, machine пока выполняется;
+общего результата ещё нет. Audit сохраняет только input identities, status running.
+Дополнительный installed-A74 CYD/C3 boot handle85263 тоже пока не объявлен pass.
+Ни BIN/ELF, ни production/test/helper inputs при этой записи не менялись.

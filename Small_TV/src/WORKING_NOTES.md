@@ -7,6 +7,20 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Новый immutable full ЗАПУЩЕН: handle67941,
+  .build/small-tv-functional/debug-integrated-full-20261017, controller log
+  .build/small-tv-parity/debug-integrated-full-20261017.log. Не запускать копию
+  и не считать poll timeout завершением. Frozen92 test files +92 extra inputs;
+  EF66/81CF/8FCE/QEMU A74, qemu sourceadb66701b3, pre-run HEADdef6914d.
+  Все184 fingerprints повторно совпали после старта. Host groups pass;
+  machine oracle ещё выполняется. Audit debug-integrated-full-inputs-* —
+  только identities, НЕ completed pass. Tests/helpers/production inputs не менять.
+- Дополнительный exact-installed A74 CYD/C3 boot run handle85263 ещё выполнялся
+  при записи этого checkpoint; не дублировать. Ранее обе mode-регрессии0B3F/F3D7
+  уже завершились успешно. После завершения общего full проверить unchanged
+  fingerprints, publisher/verifier, сохранить результаты; затем отдельный RSSI
+  UI fix и H10. Перед заменой installed QEMU дождаться terminal full.
+
 - Canonical diagnostic QEMU main adb66701b3 собран и установлен: executable
   A74F3324430B306618AA88A52649DBB93C32EAC6D0B87926D335754346ABBF0B,
   marker commit/mode совпадают;12 packet tests и modules на нём прошли.
