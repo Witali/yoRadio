@@ -1895,3 +1895,35 @@ RSSIworktree и frozenbundle сохранять доterminal; после24h ан
 открываетвторойQMP (workloadдержитsoleconnection); исходныйattachtimeout сохранёнкак
 harness attempt. H10start JSON содержитguard SHA/commit/handle. Нужныterminalguard
 ианализjournal; это не24hpass. Оба набора frozeninputs повторно unchanged.
+
+### 2026-10-17 — сохранены отдельные runtime-analysis и manual-SSID ветки
+
+Отправлен e0d276ac в codex/small-tv-runtime-analysis (worktree runtime-observer):
+полный JSONL audit, равные theme/GIF/upload/outage фазы, 20 unit tests. В анализ
+не подмешивается QMP или изменение workload. Реальные preflight и pending H10
+успешно читаются, все30 source SHA совпадают; короткий запуск не стал H10 pass.
+
+Отправлен c72b4b45 в codex/small-tv-manual-ssid. Factory setup HTML ошибочно
+использовал реальный SSID manual как команду. Helper с FIXED_FACTORY читает метку
+option, exporter помечает лишь служебные fallback варианты. 15 callback cases
+pass; factory и прежний native воспроизводят лишний prompt. Host3950/platform46/
+frontend/integrity6/timezone9/aggregation14 pass. Ordinary A5439306/8485A233,
+debug D1E7660D/EB4FDFB5 сохранены в development архивах этой ветки; source721E26BD,
+из59 inputs отличается лишь generated/web_pages.c, SDK config прежний.
+
+Real browser/QEMU manual network: selected value manual без ручной метки,
+success и complete экран, один restart, STA UI с загруженными controls.
+Matched ELF SDK connected=true/AP=false/IP192.168.43.15/SNTP=true,
+UTC difference0.214516163. Два ROM boots, panic нет, source images unchanged;
+VM закрыта, STA tab закрыта. Старый setup tab после исчезновения AP не отвечает
+CDP, затем generated error page запрещает close по browser URL policy.
+Не помечен handoff/deliverable; штатная очистка конца turn. Scoped MD/JSON/PNG
+находятся в ветке manual-ssid; её полный machine/QEMU/H10 ещё не выполнен.
+
+Основной full67941 остаётся на EF66/81CF/8FCE/A74 и прежнем main helper BA400.
+Все184 frozen inputs повторно unchanged. Factory42 calendar transitions pass,
+выполняется native classic. H10 31890 на D78A/F5F3/frozenA74+FF0819 продолжается;
+guard99431 жив. Последний независимый audit:99cycles/1632.639162guest seconds,
+30inputs verified, ROMboot1, panic нет, status pending. Пока недостаточно данных
+для steady trend. Ветки и installed helper не интегрировать до terminal/publish
+основного full; H10 input worktree и frozen bundle сохранять до его завершения.

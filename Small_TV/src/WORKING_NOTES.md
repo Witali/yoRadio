@@ -7,6 +7,24 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Сохранены и отправлены новые follow-up ветки, пока НЕ включённые в main:
+  `codex/small-tv-runtime-analysis` / `e0d276ac` в worktree
+  `.worktree/small-tv-runtime-observer` — read-only полный JSONL audit и анализ
+  heap по равным фазам, 20 unit tests. `codex/small-tv-manual-ssid` / `c72b4b45`
+  в `.worktree/small-tv-manual-ssid` — исправление factory setup HTML: настоящая
+  сеть `manual` больше не вызывает prompt. 15 scan/submit cases, host checks и
+  настоящий browser/QEMU setup проходят. Scoped MD/JSON/PNG находятся в ветке.
+  Ordinary A5439306/8485A233 и debug D1E7660D/EB4FDFB5 сохранены в её development
+  архивах, source721E26BD; только generated/web_pages.c отличается от RSSI.
+  До terminal/publish frozen full не интегрировать ни эти ветки, ни QEMU helper.
+- Последний read-only audit H10: 99 полных циклов, 1 632,639162 гостевой секунды,
+  30 входных SHA совпали, один ROM boot, panic нет. Это pending, не 24h pass;
+  для trend после прогрева пока недостаточно часовых окон. Controller31890 и
+  guard99431 живы. Full67941 прошёл все 42 factory calendar transitions и
+  продолжает native classic. Его 184 frozen inputs повторно совпали.
+  Временная VM проверки manual остановлена, STA browser tab закрыта; старую
+  setup error-tab блокирует browser URL policy. Она временная, без handoff,
+  для штатной очистки конца turn. Основной full и H10 не останавливать.
 - Следующие исправления уже готовы в отдельных отправленных ветках: FW
   codex/small-tv-rssi-label /56df5baf (папка .worktree/small-tv-rssi-label),
   QEMU codex/small-tv-wifi-link /2a593f8d00. Signed RSSI formatter/8cases/browser
