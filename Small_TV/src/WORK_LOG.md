@@ -1600,3 +1600,21 @@ appDD41/source96A/ELFB4/QEMU30F/source0d27a7ca98. Frozen75 tests/88 extras;
 production и test inputs не менять до завершения. Aggregation14/native3924/
 platform46/frontend/integrity6/timezone9 pass, machine выполняется. Это начало
 нового прогона, ещё не общий положительный результат. Старый failed run сохранён.
+
+### 2026-10-17 — отдельный runtime observer памяти
+
+В codex/small-tv-runtime-observer подготовлены отдельные модули DWARF/list/stack
+decoder, ROM counter crosscheck и workload driver. Production appDD41/source96A/
+ELFB4 не менялись. ВМ закрыты в finally; GDB только read/hardware breakpoints,
+присваивания PC/RAM нет. 15 parser и4 exact-ROM tests pass, включая негативные
+ABI/list controls. Module import, unused natural API deadline и HTTP name shadow
+сохранены как harness errors, а не firmware defects.
+
+Итог нового40-cycle workload:121.076406 guest s,41 snapshots всех12tasks,
+10 JPEG uploads,240 recorded HTTP +80 concurrent GET, max.405659s, no panic,
+inputs unchanged. Heap sampled87 668→86 268, min sampled78 264; SDK сумма
+per-heap minima47 028. Lowest stack watermark480 у settings. ROM counter
+crosschecks164. Короткий runtime preflight не доказывает leak-free/24h H10,
+factory memory equivalence или physical/ISR stack. ВМ закрыта; осталась только
+ВМ общего full11075. Его frozen75+88 inputs не затронуты. Отчёт и scope сохранены
+в runtime-memory-*; standalone tests пока не включены в текущий full gate.
