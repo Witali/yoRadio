@@ -1591,3 +1591,12 @@ GPIO и CYD/C3 legacy/modular pass, source/pixel hashes прежние; scopeCYD
 сохранён. QEMU main и feature branch0d27a7ca98 отправлены, installed30F/marker
 проверены, oldFDE backup ignored. Сохранены отдельные scoped report/doc; новый
 полный firmware suite ещё нужен, прежний failed full остаётся failed.
+
+### 2026-10-17 — новый общий прогон на исправленной QEMU
+
+Результаты timing сохранены и отправлены af7c8c17. Начат единственный
+link-timing-integrated-full-20261017, handle11075, initialHEADaf7c8c17,
+appDD41/source96A/ELFB4/QEMU30F/source0d27a7ca98. Frozen75 tests/88 extras;
+production и test inputs не менять до завершения. Aggregation14/native3924/
+platform46/frontend/integrity6/timezone9 pass, machine выполняется. Это начало
+нового прогона, ещё не общий положительный результат. Старый failed run сохранён.

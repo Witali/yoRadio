@@ -85,6 +85,12 @@ max6.186934, new30F max.238274. Все200/no panic, ВМ закрыты. Исп�
 не менять во время нового прогона. Данные ниже сохраняют ход диагностики до
 исправления; прежний запрет нового suite после локализации больше не актуален.
 
+Новый единственный run link-timing-integrated-full-20261017 запущен, handle11075,
+initialHEADaf7c8c17, QEMU30F/source0d27a7ca98. Pins:75 tests/88 extras,
+appDD41/source96A/ELFB4. Host/frontend/integrity/timezone passed; идёт machine.
+Не запускать дубль по timeout наблюдения. До terminal report не менять frozen
+inputs и не публиковать новый pass. Контекстные Markdown не входят в pins.
+
 ### История измерений до исправления timing
 
 Пользователь напомнил прежнюю шестисекундную ошибку QEMU и попросил изучить
