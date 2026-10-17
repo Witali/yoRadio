@@ -9,6 +9,7 @@ import sys
 from types import SimpleNamespace
 from http_body_contract import contract_rejection_checks
 from concurrency_contract import contract_rejection_checks as concurrency_rejections
+from boot_state_contract import validate_boot_state, rejection_checks as boot_rejections
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -39,21 +40,32 @@ def main():
                               persistent=False, paused=False, gdb_port=0, seconds=args.seconds,
                               http_helper_overlay=args.http_helper_overlay)
     inputs = {'qemu_sha256': hashlib.sha256(Path(options.qemu).read_bytes()).hexdigest(),
+              'boot_observer_test_sha256': hashlib.sha256((args.qemu_root / 'tests/esp_elf_test.py').read_bytes()).hexdigest(),
               'profile_sha256': hashlib.sha256(profile.read_bytes()).hexdigest(),
               'helper_sha256': {name: hashlib.sha256((args.qemu_root / 'tools' / name).read_bytes()).hexdigest()
                                for name in ('small_tv_vm.py', 'small_tv_network.py', 'small_tv_web.py', 'small_tv_http_test.py',
-                                            'esp_board.py', 'esp_services.py')}}
+                                            'esp_board.py', 'esp_services.py', 'esp_elf.py')}}
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
               **inputs,
               'boot_reset': {}, 'startup_wait': {}, 'weather_wait': {}, 'advanced_http': {}, 'body_http': {}, 'concurrency_http': {}, 'photo_http': {}, 'photo_frames': {}, 'photo_brightness': {}, 'photo_controls': {}, 'photo_reinit': {}, 'photo_settings': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
               'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP, synthetic weather, natural calendar/DST transitions and complete instruction-replayed frames. The separate unsynchronized scene similarity remains diagnostic. No physical hardware or Internet weather service.'}
     try:
+        unit_path = args.output / 'boot-observer-unit.json'
+        subprocess.run([sys.executable, str(args.qemu_root / 'tests/esp_elf_test.py'),
+                        '--output', str(unit_path), '--temp-root', str(args.output / 'boot-observer-unit-temp')], check=True)
+        report['boot_observer_unit'] = json.loads(unit_path.read_text(encoding='utf-8'))
         for variant in ('original', 'reconstructed'):
             options.firmware = variant
             result = vm.test_vm(options, args.output / 'boot-reset' / variant)
             report['boot_reset'][variant] = result
             check(result['passed'], f'{variant}: boot/reset/SNTP checks failed')
             print('PASS QEMU boot/reset/SNTP:', variant, flush=True)
+        expected_boot = {
+            'app_sha256': hashlib.sha256((ROOT / 'firmware/development/small-tv-esp32c2-reconstructed/app.bin').read_bytes()).hexdigest(),
+            'elf_sha256': hashlib.sha256((ROOT / '.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()).hexdigest(),
+            'observer_test_sha256': inputs['boot_observer_test_sha256']}
+        validate_boot_state(report, expected_boot)
+        report['boot_observer_contract_checks'] = boot_rejections(report, expected_boot)
         for name, key in (('startup', 'startup_wait'), ('weather_wait', 'weather_wait'),
                           ('advanced', 'advanced_http'), ('http_body', 'body_http'), ('concurrency', 'concurrency_http'), ('photo', 'photo_http'), ('photo_frames', 'photo_frames'),
                           ('photo_brightness', 'photo_brightness'), ('photo_controls', 'photo_controls'),
@@ -152,6 +164,7 @@ def main():
         raise
     finally:
         unchanged = (inputs['qemu_sha256'] == hashlib.sha256(Path(options.qemu).read_bytes()).hexdigest()
+                     and inputs['boot_observer_test_sha256'] == hashlib.sha256((args.qemu_root / 'tests/esp_elf_test.py').read_bytes()).hexdigest()
                      and inputs['profile_sha256'] == hashlib.sha256(profile.read_bytes()).hexdigest()
                      and all(value == hashlib.sha256((args.qemu_root / 'tools' / name).read_bytes()).hexdigest()
                              for name, value in inputs['helper_sha256'].items()))

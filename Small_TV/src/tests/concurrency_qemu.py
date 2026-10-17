@@ -56,7 +56,7 @@ def main():
     files += [root / 'Small_TV/qemu/parity/compare.py']
     files += [archive / name for name in ('app.bin', 'bootloader.bin', 'partition-table.bin', 'assets.bin', 'manifest.json', 'source-manifest.json')]
     files += [args.qemu_root / 'tools' / name for name in ('small_tv_vm.py', 'small_tv_http_test.py',
-              'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py')]
+              'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py')]
     files += [root / 'Small_TV/qemu/profiles/small-tv-c2.json', args.qemu_root / 'bin/qemu-system-riscv32.exe']
     pins = {str(path): sha(path) for path in files}
     report = {'passed': False, 'all_functionality_verified': False, 'scope': __doc__,

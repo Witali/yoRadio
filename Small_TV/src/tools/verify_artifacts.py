@@ -20,6 +20,7 @@ from photo_settings_contract import validate_photo_settings
 from advanced_qemu import validate_advanced
 from http_body_contract import validate_http_body, validate_http_body_guards
 from concurrency_contract import validate_concurrency, validate_concurrency_guards
+from boot_state_contract import validate_boot_state, validate_boot_rejections
 
 
 def read(path):
@@ -64,6 +65,10 @@ def main():
             'Profile validation and firmware used different profile/compiler inputs')
     app = (ARCHIVE / 'app.bin').read_bytes()
     app_sha = hashlib.sha256(app).hexdigest()
+    validate_boot_state(groups['qemu'], {'app_sha256': app_sha,
+        'elf_sha256': hashlib.sha256((BUILD / 'small_tv_reconstructed.elf').read_bytes()).hexdigest(),
+        'observer_test_sha256': groups['qemu']['boot_observer_test_sha256']})
+    validate_boot_rejections(groups['qemu'])
     body_http = groups['qemu']['body_http']
     validate_http_body(body_http, {'app_sha256': app_sha, 'source_sha256': manifest['source_sha256'],
         'qemu_sha256': groups['qemu']['qemu_sha256'],

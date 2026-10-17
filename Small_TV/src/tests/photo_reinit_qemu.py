@@ -179,7 +179,7 @@ def main():
          ROOT/'Small_TV/qemu/parity/compare.py', Path(options.hardware_profile)]
     inputs = [{'file': path.relative_to(ROOT).as_posix(), 'sha256': vm.digest(path.read_bytes())} for path in paths]
     helpers = {name: vm.digest((args.qemu_root/'tools'/name).read_bytes()) for name in
-        ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py')}
+        ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py')}
     result = {'passed': False, 'app_sha256': verify_inputs(),
         'source_sha256': json.loads((ROOT/'firmware/development/small-tv-esp32c2-reconstructed/manifest.json').read_text())['source_sha256'],
         'native_elf_sha256': vm.digest((ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()),

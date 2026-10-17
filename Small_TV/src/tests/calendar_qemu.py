@@ -354,7 +354,7 @@ def run_suite(options,output,themes=('classic','simple','dial'),names=None,varia
                   for path in paths]
     helper_folder=Path(vm.__file__).parent
     helpers={name:hashlib.sha256((helper_folder/name).read_bytes()).hexdigest() for name in
-             ('small_tv_vm.py','small_tv_network.py','small_tv_web.py','small_tv_http_test.py','esp_board.py','esp_services.py')}
+             ('small_tv_vm.py','small_tv_network.py','small_tv_web.py','small_tv_http_test.py','esp_board.py','esp_services.py', 'esp_elf.py')}
     report={'passed':False,'tested_at_utc':dt.datetime.now(dt.timezone.utc).isoformat(),
             'app_sha256':app,'source_sha256':json.loads((ROOT/'firmware/development/small-tv-esp32c2-reconstructed/manifest.json').read_text())['source_sha256'],
             'native_elf_sha256':regional.settings_layout()['elf_sha256'],'flows':{},'requirements':cases,

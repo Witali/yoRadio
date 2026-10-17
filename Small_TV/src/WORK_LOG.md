@@ -1727,3 +1727,21 @@ Scope JSON/документ сохранены. Root full75+88 inputs повто
 отдельные результаты, не общий pass нового кандидата/24h. Перед quiet full нужно
 адаптировать старый boot-console gate, который зависит от INFO, затем интегрировать
 ветки и запускать один новый общий набор сbody_http/concurrency_http.
+
+### 2026-10-17 — boot/reset без зависимости от логов
+
+Boot helper адаптирован к quiet firmware: actual connected/AP/DHCP/SNTP objects
+из matched ELF вместо INFO. ELF32 converter вынесен в esp_elf.py; ABI/RAM/bounds,
+BIN ELF SHA и read-only observation проверены12 unit cases. QEMU хранит3 numeric
+NTP response fields (24bytes) независимо от диагностики; QMP read-only getter,
+drop/malformed/reset/counter tests. По12 DMA/network tests OFF/ON и modules pass.
+
+Все6 actual boot/reset flows прошли: ordinary EF66/8FCE clock OFF/ON QEMU,
+factory clock OFF/ON, ordinary offline AP и debug11DD/DBE5. Source81CF прежний.
+QEMU OFF0B3F6F69 / ONF3D7B024. UTC проверяется до/после reset с прежним <1s;
+нужен новый NTP reply. Ошибочные host-wall oracle и RTC-only reset oracle
+сохранены отдельно. По SDK source и factory assembly0x420b288c/0x403802da выявлены
+две signed64 corrections; правильный observer читает их и UNIT0 без guest writes.
+Publisher/verifier пересчитывают UTC из чисел;29 actual consumer rejection controls
+pass. Helper/unit hashes включены в полный suite и15 producers. См. quiet-boot-state-*
+MD/JSON. Старый общий DD41 pass остаётся историческим; нового full/24h пока нет.
