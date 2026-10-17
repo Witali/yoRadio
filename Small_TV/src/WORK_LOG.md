@@ -2274,3 +2274,39 @@ marked handoff, собственная browser VM нужна для продол
 не останавливаются; на checkpoint H10running43cycles/noerror, full проходит
 photo_reinit и продолжает photo_settings. Собственные изменения, checkpoint и
 контекст сохраняются отдельно от чужих patch/tmp/untracked файлов.
+
+### 2026-10-17 — сохранение нового браузерного прогресса и failed full
+
+По повторному запросу commit/push проверены main и активные Small_TV worktrees:
+все ранее созданные commits уже находятся в соответствующих origin branches.
+QEMU main2a593f8d и его feature branch совпадают с GitHub, рабочие деревья чистые.
+Чужие patch/tmp/untracked файлы не добавляются; port-assistant6b10c200 остаётся
+в отдельной опубликованной ветке, код прошивки и frozen H10 inputs не меняются.
+
+Full90679 завершился18:50:53UTC:18passed groups, QEMUfailed, manualnot_run.
+Failure в time_qemu.py/reset_before_notification: displayed date не совпала
+с2025/9/19, lastdecodedstate unsynced1900/1/0, boot_time_seconds2147483574.466206.
+Это terminal failure без установленной причины, не новый successful full.
+Проверены все192начальных fingerprints; raw report сжат воспроизводимо и
+проверен распаковкой: uri-full-failed-20261017.report.json.gz. Scoped checkpoint
+содержит group statuses, failure log tail, freeze и identities. Published
+functional-validation/validation остаются прежними; publisher не запускался.
+
+В реальном browser8304 выполнены setup submit и station query controls.
+Success alert наблюдался, следующий UI state about:blank; old dialog dismissal
+после screenshot был stale, причина не установлена. Read-only exactELF probe:
+connectedtrue/APfalse/IP192.168.43.15/SNTPtrue, UTCdiff0.871993s, no panic.
+Settings после reload: units flags1/dateDD/MM/YYYY,
+brightness63/GIF5/Dial; colors после RGB565 quantization10aa31/3155ad/adcfef.
+Synthetic cityPerth/AU-W saved; advanced night20→8/brightness12/NTP192.168.43.2
+подтверждены UI. Failed initial fill+Tab22/9 и subsequent keyboard success
+сохранены отдельными observations, не объявлены firmware bug. Intermediate
+public API snapshotstart19 предшествует final UI20, cold-boot ещё pending.
+
+На photo page initial interval5/mask31; две картинки natural240x240, три complete
+с natural size0. Причину ещё не исследовали; photo/cold persistence acceptance
+не засчитаны. Сохранены JSON и два screenshots без пользовательских данных.
+Owned browser VM18416/tab2 оставлены handoff для продолжения, затем cleanup.
+H10 checkpoint77cycles/1outage, no reported error, supervisor/guardrunning;
+OS18:52:31UTC подтвердил exact PID/start/commands30128/2252/18740/26440.
+Full9896 завершён. H10 не имеет terminal24h acceptance и не перезапускался.

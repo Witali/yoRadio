@@ -1,0 +1,1400 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-10-17T18:52:50.762664+00:00",
+  "status": "progress_checkpoint_with_failed_full_regression",
+  "all_functionality_verified": false,
+  "scope": "Progress preservation only. The latest full regression failed; browser and isolated 24-hour acceptance remain incomplete. Historical successful published reports were not replaced.",
+  "app_sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+  "source_sha256": "be5802d60f7e113aeb6e5fc77bc144f3088f5dbb791a6ab4c46db4cbb02b0726",
+  "native_elf_sha256": "62e040b592d6bd526b25c6035005e31a3a40eebb5a9beb994abe49f089addebb",
+  "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+  "full_regression": {
+    "started_utc": "2026-10-17T18:21:51.4713725Z",
+    "finished_utc": "2026-10-17T18:50:53.3455646Z",
+    "passed": false,
+    "group_counts": {
+      "passed": 18,
+      "failed": 1,
+      "not_run": 1
+    },
+    "groups": [
+      {
+        "status": "passed",
+        "name": "report_aggregation",
+        "seconds": 0.070491
+      },
+      {
+        "status": "passed",
+        "name": "native",
+        "seconds": 2.9560297
+      },
+      {
+        "status": "passed",
+        "name": "platform",
+        "seconds": 3.4723708
+      },
+      {
+        "status": "passed",
+        "name": "frontend",
+        "seconds": 0.3190315
+      },
+      {
+        "status": "passed",
+        "name": "integrity",
+        "seconds": 0.177331
+      },
+      {
+        "status": "passed",
+        "name": "timezone_sources",
+        "seconds": 0.6387357
+      },
+      {
+        "status": "passed",
+        "name": "machine",
+        "seconds": 190.6356896
+      },
+      {
+        "status": "passed",
+        "name": "machine_control"
+      },
+      {
+        "status": "passed",
+        "name": "machine_classic",
+        "seconds": 30.294452
+      },
+      {
+        "status": "passed",
+        "name": "machine_weather",
+        "seconds": 24.1477518
+      },
+      {
+        "status": "passed",
+        "name": "machine_calendar",
+        "seconds": 19.6617335
+      },
+      {
+        "status": "passed",
+        "name": "machine_jpeg",
+        "seconds": 45.4544933
+      },
+      {
+        "status": "passed",
+        "name": "machine_jpeg_inputs",
+        "seconds": 24.9055162
+      },
+      {
+        "status": "passed",
+        "name": "machine_timezones",
+        "seconds": 6.8211605
+      },
+      {
+        "status": "passed",
+        "name": "machine_time_state",
+        "seconds": 0.9744659
+      },
+      {
+        "status": "passed",
+        "name": "machine_text",
+        "seconds": 2.9451451
+      },
+      {
+        "status": "passed",
+        "name": "machine_network",
+        "seconds": 5.3711221
+      },
+      {
+        "status": "passed",
+        "name": "qemu_profile",
+        "seconds": 0.1663301
+      },
+      {
+        "status": "failed",
+        "name": "qemu",
+        "seconds": 1382.5926349,
+        "error": "Full-firmware QEMU tests failed"
+      },
+      {
+        "status": "not_run",
+        "name": "hardware_browser_soak",
+        "reason": "Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately"
+      }
+    ],
+    "failure": "time_qemu.py: reset_before_notification never matched displayed date 2025/9/19. Last decoded state unsynced (1900/1/0), boot_time_seconds 2147483574.466206. Root cause not established.",
+    "failure_log_tail": [
+      "PASS QEMU guest regression: photo_settings",
+      "PASS real HTTP initial setup/AP->STA/persistence: original",
+      "PASS real HTTP initial setup/AP->STA/persistence: reconstructed",
+      "PASS real guest weather HTTP/parsed values: original",
+      "PASS real guest weather HTTP/parsed values: reconstructed",
+      "PASS real guest field HTTP/scroll: original",
+      "PASS real guest field HTTP/scroll: reconstructed",
+      "PASS real SNTP fallback/time/LCD: original",
+      "Traceback (most recent call last):",
+      "  File \"C:\\Work\\yoRadio\\Small_TV\\src\\tests\\qemu_suite.py\", line 181, in <module>",
+      "    main()",
+      "  File \"C:\\Work\\yoRadio\\Small_TV\\src\\tests\\qemu_suite.py\", line 114, in main",
+      "    report['time_http'] = run_time(options, args.output / 'time-http')",
+      "                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+      "  File \"C:\\Work\\yoRadio\\Small_TV\\src\\tests\\time_qemu.py\", line 309, in run_suite",
+      "    report['flows'][variant]=exercise(options,run/variant,layout)",
+      "                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+      "  File \"C:\\Work\\yoRadio\\Small_TV\\src\\tests\\time_qemu.py\", line 264, in exercise",
+      "    result['stages']['reset_before_notification']=date_capture(qmp,folder,'reconstructed',layout,'2025/9/19')",
+      "                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+      "  File \"C:\\Work\\yoRadio\\Small_TV\\src\\tests\\time_qemu.py\", line 110, in date_capture",
+      "    raise AssertionError('Displayed date never matched '+expected_text+': '+str(last))",
+      "AssertionError: Displayed date never matched 2025/9/19: {'state': {'synced': False, 'year': 1900, 'month': 1, 'day': 0, 'hour': 0, 'minute': 0, 'second': 0, 'weekday': 0}, 'date': '2025/9/19', 'different_bytes': 1883, 'clean_different_bytes': 1883, 'boot_time_seconds': 2147483574.466206}",
+      "WARNING: qemu failed: Full-firmware QEMU tests failed",
+      "Functional report: C:\\Work\\yoRadio\\.build\\small-tv-functional\\uri-integrated-full-20261017\\report.json",
+      "Exception: C:\\Work\\yoRadio\\Small_TV\\src\\tests\\run-all.ps1:177",
+      "Line |",
+      " 177 |  … (!$passed) {throw \"One or more functional groups failed. See report.j …",
+      "     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "     | One or more functional groups failed. See report.json and per-group logs."
+    ],
+    "raw_report_archive": {
+      "file": "uri-full-failed-20261017.report.json.gz",
+      "sha256": "70e69cd6af58ae207de9d6f50221d196159cb9842b95b3e93a03ca335be91a7e",
+      "uncompressed_sha256": "1da3e3088cf7b9f11e24d842149f6561afae8db121cf7c7e698af9e8311fadf8"
+    },
+    "frozen_inputs_verified_unchanged": 192,
+    "freeze": {
+      "git_head": "0fe92f1839451aec12f5d776cb0fa328a8ac5b5e",
+      "app_sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+      "elf_sha256": "62e040b592d6bd526b25c6035005e31a3a40eebb5a9beb994abe49f089addebb",
+      "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+      "tests": [
+        {
+          "file": "Small_TV/src/tests/advanced_qemu.py",
+          "sha256": "1d7eaf06c546469ae0951f381bc3020e85664f388b570ab244aca855626789c3"
+        },
+        {
+          "file": "Small_TV/src/tests/artifact_test.py",
+          "sha256": "c9187b43a2c83c8c8a433343c4a10026ee630c5a656773cd362e7b51a3a3e6dc"
+        },
+        {
+          "file": "Small_TV/src/tests/backlight_oracle.py",
+          "sha256": "e82766a5b4eab35605d25c63095445fa4c1ada1b2833a50638c54e293f50ea19"
+        },
+        {
+          "file": "Small_TV/src/tests/boot_state_contract.py",
+          "sha256": "cd8d018628ced02d3854ea683e9801fcbdeb3fecf3a30b1bc6c9218fa61a653a"
+        },
+        {
+          "file": "Small_TV/src/tests/calendar_oracle.py",
+          "sha256": "e0b4fa1a9a32658f3f809e149e44c622068202a890020fd3a79abb1295f09b06"
+        },
+        {
+          "file": "Small_TV/src/tests/calendar_qemu.py",
+          "sha256": "04cf300578c84647ed573f908eb529b5715fb4e68bfabc3cae414a6024deb275"
+        },
+        {
+          "file": "Small_TV/src/tests/classic_oracle.py",
+          "sha256": "92401ddcf595125ae6108dbcd65f54cc276e16f531f2b5952dfcc9e082dd5667"
+        },
+        {
+          "file": "Small_TV/src/tests/concurrency_contract.py",
+          "sha256": "f1e7680bf15ceb28e7e5814e9e0c0c3f45b19e11124c424267beb716a35b0263"
+        },
+        {
+          "file": "Small_TV/src/tests/concurrency_qemu.py",
+          "sha256": "d26d9841283c3ee6ff26e0ae4aab1be5af4025c0ffd1d900f42a30bdfa95f23d"
+        },
+        {
+          "file": "Small_TV/src/tests/control_oracle.py",
+          "sha256": "f7df352f24bdad4e978dad327cd66c1f88383bfa46a07fa4399a274594335d8a"
+        },
+        {
+          "file": "Small_TV/src/tests/debug_logging_test.py",
+          "sha256": "9135724dfaddf0d785699002dc55eb904bd1c01913a71b48e2ec2b2998577a8b"
+        },
+        {
+          "file": "Small_TV/src/tests/field_qemu.py",
+          "sha256": "5d935d1f2523d51a378c5c15d28f30d52e950011e9f333c95662af90f3e60e06"
+        },
+        {
+          "file": "Small_TV/src/tests/frame_replay.py",
+          "sha256": "5a7ed3dbb6738fa2002e6aaecacdf3b0bab769fa4e2e9a12f52cee7ecb253251"
+        },
+        {
+          "file": "Small_TV/src/tests/frontend_test.py",
+          "sha256": "5fb0774c74bd0d692a96d55bfa316da1856f93e31fc83853bec8e0d01eb2a907"
+        },
+        {
+          "file": "Small_TV/src/tests/gdb_observer.py",
+          "sha256": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83"
+        },
+        {
+          "file": "Small_TV/src/tests/http_body_contract.py",
+          "sha256": "594e1468127e5d3a99bc1d7062d1f2f822ccd5eb8f0887dd33386a0df83eb5d3"
+        },
+        {
+          "file": "Small_TV/src/tests/http_body_qemu.py",
+          "sha256": "0b3a2c6ba35c4a5c8861884add8667864bc16a6f9d7ee0a735e945fc6434d92a"
+        },
+        {
+          "file": "Small_TV/src/tests/http_contracts.inc",
+          "sha256": "59f12f99f15a85a949129f2f97d974a06b68d21cc6a7d92ac77d1913bc7ab588"
+        },
+        {
+          "file": "Small_TV/src/tests/http_targets.inc",
+          "sha256": "f2227d87ff4e5d5938fde883cae2f9d6759f7f47a9575cdf78f86eb6fbebc3ce"
+        },
+        {
+          "file": "Small_TV/src/tests/jpeg_inputs_oracle.py",
+          "sha256": "1bb212bc3e5ae7fe8127ca2f36cdd35a5dcf021b11eef740307b30752c130189"
+        },
+        {
+          "file": "Small_TV/src/tests/jpeg_oracle.py",
+          "sha256": "354048940b1d6bd065428a83a03133f333a5334154eee7472806e25d1a893e89"
+        },
+        {
+          "file": "Small_TV/src/tests/jpeg_test_fixtures.py",
+          "sha256": "980004c204a67c2664caa2fcde647bc40ef4635dae91770ff612436fe097a92d"
+        },
+        {
+          "file": "Small_TV/src/tests/json-report-test.ps1",
+          "sha256": "9bd099b9ab878ffa9a47800e81064e2e4c3db285b9d6ceb8cdfc808556b70b82"
+        },
+        {
+          "file": "Small_TV/src/tests/logging_qemu.py",
+          "sha256": "93302bef5b5a51efcdb28759166b0d5fecbdd682ffaf839ebccbc6f56c205bd8"
+        },
+        {
+          "file": "Small_TV/src/tests/machine_oracle.py",
+          "sha256": "009af0436897d63044f692baac40b45ade60e69a511a9f36befd3aed09705ff2"
+        },
+        {
+          "file": "Small_TV/src/tests/native_test.c",
+          "sha256": "c3081ae78ca637645d5971206ed57b95cba1bad71d2d346a5c237bcc1aeb9406"
+        },
+        {
+          "file": "Small_TV/src/tests/network_oracle.py",
+          "sha256": "0a766cedb9b6aaf07c92d8e97b6fdd88d2ff2097f7a78ba557ca0c55ee241488"
+        },
+        {
+          "file": "Small_TV/src/tests/oracle-requirements.txt",
+          "sha256": "3ac351c1e919f4b505b9e5f9951783babeffd0a599ecd9a69ae4644bc2757967"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_brightness_qemu.py",
+          "sha256": "120aea1d7a6a914e4099df588581b4ae5cc87cd857571539d827f90a013cdbc7"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_controls_contract.py",
+          "sha256": "94dffad27715cbdaf0072797a1d9748f6ce58c8163c2ace9be9652208ccaa3b6"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_controls_qemu.py",
+          "sha256": "6248c2f8c765c0d087e63a359c93c85c7c057c04a0f95c00270f98887e0defe4"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_frame_contract.py",
+          "sha256": "672e5986605d63dee1c7490a6a20d9a1ff0624247fa2515c30a5431624716afe"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_frame_replay.py",
+          "sha256": "f567780d22400e0b4b86a7607a0f89a20c47bafa0b0a985f09dd632ab82a09e8"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_frames_qemu.py",
+          "sha256": "528e59cbd954e0fc0f7ce45155452d0291017ed4659236af9cd189eed87fe230"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_protocol.py",
+          "sha256": "1f8aeaa8ac9c8bdfc58405afba1f51a9664e2dfe85fea029adce3856eb7d23ef"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_protocol_test.py",
+          "sha256": "b207b94b516bc7640184d15b7923fee70b321da8a368b36488fc66551d5a890c"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_qemu.py",
+          "sha256": "5335063953b2395c94bb8a0fdf163c2ab72328ace4dec83c181fa603efb74e45"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_reinit_qemu.py",
+          "sha256": "892a5992e20535a48ad115e176e973ab9f0428ebd484c8489ea1ae2975ccee9c"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_settings_contract.py",
+          "sha256": "a8472f02bca1f510142fffd66741e29f1c2278ad138edf8a8b2f5712cd3daf87"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_settings_qemu.py",
+          "sha256": "688c0011aaf2cccb9a426eb0a7b7f2275b8501726ec18bdb63ae511229b41f88"
+        },
+        {
+          "file": "Small_TV/src/tests/photo_transfer_test.mjs",
+          "sha256": "7db6296f615a32a0345424b2e5f4b6402b4ee814895afa7fdace72379e4a7a6a"
+        },
+        {
+          "file": "Small_TV/src/tests/platform_test.c",
+          "sha256": "e8b7ccfde80f27da4b39b0c1b55566f19800ff47bd4b300c9a77eea1bf35f39b"
+        },
+        {
+          "file": "Small_TV/src/tests/profile_test.py",
+          "sha256": "1ab2bc605282de7cc455df7f80ce18d973761aef6ff5b0926274b522e20a3cb4"
+        },
+        {
+          "file": "Small_TV/src/tests/publish-report.py",
+          "sha256": "da13d08d448dc5cdd88f68cc4708db4835cdf7c90ba5e2b13541358398ee86f9"
+        },
+        {
+          "file": "Small_TV/src/tests/qemu_storage.py",
+          "sha256": "3fa00b82379b90c76939ad61d1756f1fcefe03ded492bd16c7df1b532578dc3d"
+        },
+        {
+          "file": "Small_TV/src/tests/qemu_suite.py",
+          "sha256": "48589db7436ca693e1d3a5d80685b29a5556cf4428a0af0ad6abd2af7b1e95d8"
+        },
+        {
+          "file": "Small_TV/src/tests/read-result.ps1",
+          "sha256": "e8efd2ad5a8ac7cbc6670691494d1f66a43d4e794aea5e385ce2148808e3c190"
+        },
+        {
+          "file": "Small_TV/src/tests/regional_qemu.py",
+          "sha256": "99432c612416fde7eb7f826262bd9607ab611cedf5e4816253032c6c2c808b37"
+        },
+        {
+          "file": "Small_TV/src/tests/run-all.ps1",
+          "sha256": "065e805bfd5452e59bcb9186917982e9b45bc08b6473a286e89a5d4d26135d50"
+        },
+        {
+          "file": "Small_TV/src/tests/run-machine-oracle.ps1",
+          "sha256": "cf6e4daf3beb4cfe18cd7fe867e70bff5ab00bc708a73f8467135cf9b5df5037"
+        },
+        {
+          "file": "Small_TV/src/tests/run-platform.ps1",
+          "sha256": "fd67838657087df84df4e5d253913baea46688c3d1d56c244af1bec3e1d198e1"
+        },
+        {
+          "file": "Small_TV/src/tests/run.ps1",
+          "sha256": "4b48156da03f81b4d551246cd36a6f7b118ce6b0ba93fc108816b96e64897fd9"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_analysis_test.py",
+          "sha256": "5a8d0a0fc96bcf7bd906971e187f7529a09db0381d9f02051c4d6d736d4d327b"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_guard_test.py",
+          "sha256": "5bfdf536e080085288b9a04d2a5d83e2d4c4d58496eee9655a2b9c6fa205c067"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_heap_rom.py",
+          "sha256": "fcc120a6b92260a9ee2f6e9eb6055acb3ca7c37f82f242f7ca0e9e31fd1163a1"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_heap_rom_test.py",
+          "sha256": "73e21ea50df71a35ada4b26c9cef0954946719295658657d33fa4c5fc68d3e02"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_memory.py",
+          "sha256": "6354f9a322124d5d8d4af691dfed68fca130335951b09815a3b18a3ffa1b58ff"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_memory_test.py",
+          "sha256": "497f3e65be86446b2dcc9aa9a489e5481ea8782b8e6bef3e38fae2c782a105bc"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_qemu.py",
+          "sha256": "cf5bab160df9360b3b8a48df9030110be2d796d875b57d5fb6e1ddf5b7c677c0"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_state.py",
+          "sha256": "3bad4e096e505d096f356d35e49ca5dec1830a423e4ecf661b9197ce9ebf33a6"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_state_test.py",
+          "sha256": "44b188c653bd5a8d86ed277d3b61027b847409ff78eb1f1531e68066ec109138"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_weather.py",
+          "sha256": "bb3461e542b30afd9579860bc06adc68af457fc938017d256bd50a247f68ec1f"
+        },
+        {
+          "file": "Small_TV/src/tests/runtime_weather_test.py",
+          "sha256": "25d8385a3327dc061b1c3c97e37a7229a1efcbee2a88e84da2f1b65c1e4b84b5"
+        },
+        {
+          "file": "Small_TV/src/tests/scene_qemu.py",
+          "sha256": "797304412870bee54e2af631833d84cbd9e7c114f643fd60a6e60ce64e09098c"
+        },
+        {
+          "file": "Small_TV/src/tests/startup_qemu.py",
+          "sha256": "6708ca95ac3fc212c85630afa32e1688bf04277c7c002a14a54de25db1ef1884"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/driver/gpio.h",
+          "sha256": "cb03cea98c5d32fb07c0cfbdc7926af161a94c3fd65c153ac48830754bbfe465"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/driver/gptimer.h",
+          "sha256": "d137cf8197b1edca31e7beea249a3c939d7d653316feb4a59c24efaf8e8bcf0e"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/driver/ledc.h",
+          "sha256": "28742a7d5ec88c4e2a86f186a127ff8ec4464aebb0c2ef215003de6e174aa3d9"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/driver/spi_master.h",
+          "sha256": "69435ae97362f945e681ba755ac824d1093430f025873c18bee0fc6e18fd44fd"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_attr.h",
+          "sha256": "eeb17565d81d387240a34f855611453654e19d747bd5a19c81765840ad0a331c"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_crt_bundle.h",
+          "sha256": "b3adf106d95b8934f690943f2921308b90be5b766c4c8ba250c792de56400201"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_err.h",
+          "sha256": "ff324f4c58f3e452d1044ddcafec4650debfcdc15a874203f1db0bc47cb6f030"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_event.h",
+          "sha256": "320a206756661470135eca864cb42c5881653aaf9a23002461b246039dd0e8bb"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_flash.h",
+          "sha256": "ae113fca498474504de520266ae0c4ea5566b662b198076d7671e42c2b5563d0"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_http_client.h",
+          "sha256": "f6f9e755cd9bcf4843c490bfae493bf15b9e2118c3ec623eb74a307926e32ef5"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_http_server.h",
+          "sha256": "612be2480cebfaafa1a70429dcf0fa9b96a1462b883fedd5c03b9702a8b89541"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_netif.h",
+          "sha256": "f4f9c0e2b6244653544dd0fe1e927848a8636cab6dc0c43e66e24748d6f8beae"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_netif_sntp.h",
+          "sha256": "ffff057b6df9d5c1aa546c583141ad8bc8d773b45949e9fc74c5dd68d66f07a4"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_partition.h",
+          "sha256": "ccc2bbc1bed4688f32d2087416cf6a6c7f5a5c55f59f20da97142f66ac2158cd"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_system.h",
+          "sha256": "2236f53f34f441564332e95ae002a00b7d4b773759293241b0ca1276dcfc1dbe"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_timer.h",
+          "sha256": "82a7c14acf5d1cdcbea1b23bab880c69562da88013adc34ff5f2ae2115fb08d1"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/esp_wifi.h",
+          "sha256": "ac167813c9d550c3aef904b0ee426d6e292df6fad85894c648f7501dc4d92d4b"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/freertos/FreeRTOS.h",
+          "sha256": "0e8480e3c8d57cd5b1bccb7bc0d7766c502bde4bdb3beae786747591a80413b7"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/freertos/semphr.h",
+          "sha256": "0793f354d1c08d741fb54fa5a6f7af8cf09ebe8d0a72c91242e1f7af2bd0ff9e"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/freertos/task.h",
+          "sha256": "8c2f1876858dce1348c4125744812dd979ccd902b5d367dc2c1686c1fc045152"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/lwip/sockets.h",
+          "sha256": "476b174e9d84c11a532614ee12e7146edc3b2e8b9d9cc6daab11ee19366a8a4a"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/nvs.h",
+          "sha256": "5f6b13a4f8f655556c0e1b23be778eb064dc6a00c199cf349663088b40511e9a"
+        },
+        {
+          "file": "Small_TV/src/tests/stubs/time_adapter.h",
+          "sha256": "14aa359e1ce977a8bc520a67c0d3d6ed6bb8fd5c61960fedb2fbc7f5f79b8559"
+        },
+        {
+          "file": "Small_TV/src/tests/text_oracle.py",
+          "sha256": "8e436f4a2fbfe75e036fd3490812df87e5b3fbe26d7cb41d76b1c8fde312ba29"
+        },
+        {
+          "file": "Small_TV/src/tests/text_qemu.py",
+          "sha256": "eddf0f6963479ea9596cf10213d9dbcc26e761f458e9c8c480779d9ab4105e2f"
+        },
+        {
+          "file": "Small_TV/src/tests/time_qemu.py",
+          "sha256": "ef7e8ea96884e0ed87c16bdf2648465f32700dd047903231f3fc608811d534c0"
+        },
+        {
+          "file": "Small_TV/src/tests/time_state_oracle.py",
+          "sha256": "b291d5f8057e8d5ce28f15f2c0097d9900807221cbdeb6b187df16f551e626ba"
+        },
+        {
+          "file": "Small_TV/src/tests/timezone_oracle.py",
+          "sha256": "d382200126c7d3e3594c279b1a2fb68c2261cdf2ab7122355b32c1999694970e"
+        },
+        {
+          "file": "Small_TV/src/tests/timezone_update_test.py",
+          "sha256": "1a7314f1f76f28fd85962e5c870eff87f5657667c9bd60b4cf0f8f20d782c7c1"
+        },
+        {
+          "file": "Small_TV/src/tests/uri_targets_qemu.py",
+          "sha256": "8cb1e7ead0c6514986fb3ec29b173d87f9ee49df7475a19f98a1ba78efc0fdf2"
+        },
+        {
+          "file": "Small_TV/src/tests/weather_qemu.py",
+          "sha256": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9"
+        },
+        {
+          "file": "Small_TV/src/tests/weather_render_oracle.py",
+          "sha256": "ccc566ba5ab138340c269c34b5e12cefbf16e881d3c08b1c1da7b286af76f724"
+        },
+        {
+          "file": "Small_TV/src/tests/weather_wait_qemu.py",
+          "sha256": "1c98b0ad160b2ef24c26e297a4277a7a82bb268a235983e888544afb66659321"
+        },
+        {
+          "file": "Small_TV/src/tests/wifi_scan_test.mjs",
+          "sha256": "0a969f30a789457b018760a5d19fd3e85d3ab6ea0cb53bfb0eb5e9c78c3bb75d"
+        }
+      ],
+      "extra_inputs": [
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/tools/verify_artifacts.py",
+          "sha256": "2c1aa5b155354bbf65dfe818bd108efecb61b8d6dfbb312dcec464674855ea91"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/qemu/profiles/small-tv-c2.json",
+          "sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/qemu/parity/compare.py",
+          "sha256": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/full-flash.bin",
+          "sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+        },
+        {
+          "root": "yoRadio",
+          "file": ".build/small-tv-reverse/factory-analysis.elf",
+          "sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882"
+        },
+        {
+          "root": "yoRadio",
+          "file": "firmware/development/small-tv-esp32c2-reconstructed/app.bin",
+          "sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae"
+        },
+        {
+          "root": "yoRadio",
+          "file": "firmware/development/small-tv-esp32c2-reconstructed/bootloader.bin",
+          "sha256": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b"
+        },
+        {
+          "root": "yoRadio",
+          "file": "firmware/development/small-tv-esp32c2-reconstructed/partition-table.bin",
+          "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+        },
+        {
+          "root": "yoRadio",
+          "file": "firmware/development/small-tv-esp32c2-reconstructed/assets.bin",
+          "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+        },
+        {
+          "root": "yoRadio",
+          "file": "firmware/development/small-tv-esp32c2-reconstructed/manifest.json",
+          "sha256": "ccadf9ef9fd52478b922c49c7180e851f675f9144a20563f17dd74f3fd9cd07b"
+        },
+        {
+          "root": "yoRadio",
+          "file": "firmware/development/small-tv-esp32c2-reconstructed/source-manifest.json",
+          "sha256": "a6f99785457fa80cf4bb77e97cefaa647ba41e4d054f008c15367558d50c8f39"
+        },
+        {
+          "root": "yoRadio",
+          "file": "firmware/development/small-tv-esp32c2-reconstructed/assets-manifest.json",
+          "sha256": "9f034fa7d5793c24da9a5399c68d93f921d6716b923fb6193a7a54a1ec7a6e0b"
+        },
+        {
+          "root": "qemu",
+          "file": "tools/small_tv_vm.py",
+          "sha256": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae"
+        },
+        {
+          "root": "qemu",
+          "file": "tools/small_tv_http_test.py",
+          "sha256": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94"
+        },
+        {
+          "root": "qemu",
+          "file": "tools/small_tv_network.py",
+          "sha256": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0"
+        },
+        {
+          "root": "qemu",
+          "file": "tools/small_tv_web.py",
+          "sha256": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2"
+        },
+        {
+          "root": "qemu",
+          "file": "tools/esp_board.py",
+          "sha256": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752"
+        },
+        {
+          "root": "qemu",
+          "file": "tools/esp_services.py",
+          "sha256": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+        },
+        {
+          "root": "qemu",
+          "file": "tools/esp_elf.py",
+          "sha256": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f"
+        },
+        {
+          "root": "qemu",
+          "file": "bin/.qemu-esp32c3-commit",
+          "sha256": "66bc2e87ae9fc87746afd6757a5f582202dcd3ca940fa8e09554dae5e0036ca6"
+        },
+        {
+          "root": "qemu",
+          "file": "tests/esp_elf_test.py",
+          "sha256": "1059c941231b4df2f59cc8a6f11c686d72ebb4671ceaf303942ba345c38cfbb8"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/check_scripts.mjs",
+          "sha256": "49b87b9caa7d650cfa8ae0b8fe585293fd0e2c28ca90d0bbe08abe0d2b3384d4"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/jpeg_metadata.js",
+          "sha256": "82ceae4f0ea5d7aeec9808d924e29fe46136e7cdca40644b3cccd45c226a7710"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/photo_crop.js",
+          "sha256": "20e5667451ee71b30b0103206f9a3b13c111573ce773fddcbe015ad222beb484"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/photo_crop.html",
+          "sha256": "208062b9f19395049775f58ade19f648ee50fe2b8390c2d579e2519ed2313dcf"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/photo_upload.js",
+          "sha256": "a601e35b7ad172db892628ade534d3f2eb6c7f2f593664ccc684581aa4ac5009"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/wifi_network.js",
+          "sha256": "8e6e114e446a2aace10890d0e0a0eb3a665d558b6fc669deb6a4e8b4e804f45b"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/extract_pages.py",
+          "sha256": "cb60ffbaae324d3c63c530abb89e6028926e0fefb1534766eeae240d4943d617"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/pages-manifest.json",
+          "sha256": "97926516bd8efe193e3606c493fc9469264ad475102926f8e57ee72261ff1d27"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/pages/photo.html",
+          "sha256": "6aa893c2806184daff7c30b798d1a89d17586c2025cc8be6530ed601fb49a736"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/pages/settings.html",
+          "sha256": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/local_site/pages/setup.html",
+          "sha256": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/build.ps1",
+          "sha256": "5354a100ff2f761810bda4a337b6b5d0198b492e7adc6dd264d6ce1c12bedff3"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/tools/prepare_resources.py",
+          "sha256": "ed44a389baf4d2acf879345d60ca0480f8374208f9762f3fb1e77536d93e023e"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/app_main.c",
+          "sha256": "299c34b3b1faffb96887183004326ebd2f10a17fcfdb8930d8da58ebad7bd015"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/display/backlight.c",
+          "sha256": "bb59bf2e72ef4b42bf9f2d0d5cb6f5ec8674ff89ea1fccfe8b3e5543ccc0ab03"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/display/clock_ui.c",
+          "sha256": "3d1ff2524cef46ab59cf1dd913d292871cb484a0c4b38980139c3ebed1462663"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/display/factory_animation.c",
+          "sha256": "4a6f441cdcce6b2a40859f5cf6377c0c6768b794d19613d000484123cd865d09"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/display/factory_fonts.c",
+          "sha256": "a0e98417e6464d0825f8361dfce1d97cc826da8a77f0a7c44aa0b25cc20ff231"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/display/factory_photo.c",
+          "sha256": "1a12f6e63dafe015570d1312138729785cee33449c0f5e9b24af29fb779764af"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/display/factory_timer.c",
+          "sha256": "563706d717d3429544bfc8a2cafa5f028b3fd76403cd078b05323338274641fe"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/display/st7789.c",
+          "sha256": "e3194452d0b8ccaa4cbdb3b51fa229d94c92f11f2eaab80f3a127ffaf49ce17f"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/display/ui_renderer.c",
+          "sha256": "2da92adadef583678d8c06666107cde45c1e1545635eae34766fdbf042a35ed3"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/media/assets.c",
+          "sha256": "21a3553ad69f31c3ac3ae2fb1d38d7c02b6a2a3fda99db4108a2051953ac9c41"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/media/photo_upload.c",
+          "sha256": "e234368f41edabca3d92d14f6eaa37a7caec3a0de3b7dbcb35f32ea0a8475f04"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/network/dns.c",
+          "sha256": "a4bee538e60a4bca3aba5a7b00233c17a9c08ff39779aefde9965e3a17234025"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/network/dns_packet.c",
+          "sha256": "cb807af1329c04c534d61296138529f71e0ac5b2b2c3cf5eeb225ac763d6feb1"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/network/wifi.c",
+          "sha256": "07ae2abbab61b658d6d6c9ce53c94140cc72683d26615f89d951afe28599db07"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/services/time_sync.c",
+          "sha256": "7acd830a2456d73f7372aef5611855c4f88ab4c91f7bdec1d83bd94b55f1d830"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/services/timezones.c",
+          "sha256": "b7ff1ad5ce79358fa6f7967cb7dce05819636c67a74928165c2dc821ee6c7069"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/services/weather.c",
+          "sha256": "28e22b32bcfeab96c716126ac042a64c72b27c337366889cf185aa8161a7e66b"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/services/weather_parser.c",
+          "sha256": "af09595b9843d4d559526d39db7afd84cd45b6497408b3a7d23c2f61e8ced6e5"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/settings/factory_settings.c",
+          "sha256": "81ad9a3cef18df97d9c345abe1106c5c62ecd4e3c60ebba677200f612d7faa9b"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/settings/settings.c",
+          "sha256": "32ebbcdc473b64bc57e4f993514026761247f838aa2956f2dc5138ab87a74dca"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/text/text.c",
+          "sha256": "6bfc03e4cfbd149ff4a277e74290f200981d86d27903d240f10a0cd5038750fa"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/web/photo_api.c",
+          "sha256": "f5935dfe63bd1679855791c58f92e023b36bfba61e6dba995b7259e25eee0400"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/web/request_body.c",
+          "sha256": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/web/server.c",
+          "sha256": "8cb1a4ede2558c05abe825c1046b205b0d039a0ecad13bfed6962c91812e56b4"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/web/settings_api.c",
+          "sha256": "2c1b9db64dd8f8ae66883e35a106c8f731d6505691ba006ec4327a3a99ddbb0a"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/board.h",
+          "sha256": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/display.h",
+          "sha256": "3f38992b7da73f45e3a11e1e567a075c8e1cfc3cc4f3553783e2e92e13e38b09"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/dns_packet.h",
+          "sha256": "d03a8d292118201158ce35ba3915b2b23f2641863f28af20fbed53fbe8227107"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/factory_animation.h",
+          "sha256": "326c35c61c56dfa38f8a861091eb9ca45a5056a1a12c51eea079a356c913daa3"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/factory_photo.h",
+          "sha256": "9ee99645bdddb1a05769eb22e181d84e727aa1c4eb52a6ee6fc263313bec341a"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/factory_settings.h",
+          "sha256": "81743a6d77d761902589b6c073b351efbce072744aea7ca0dc5d04b3f3473dda"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/factory_timer.h",
+          "sha256": "dbed083df5fb927ef764042d496dcd36bfb1113f05fe2fb40cea98f788a69e2d"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/factory_ui.h",
+          "sha256": "28d4e15bb91fbf79adbb6d4b60c357a0d44ee8cc9228c9299b14e5aeef314321"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/media.h",
+          "sha256": "d75d4172760d302ba31a914947bcdbf21f3eee73ae73ec661f371f78be8ad995"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/network.h",
+          "sha256": "fc88fdbbb10f4dec709f480cbd260371c7816923f5a0b9c757652e5aed5d708f"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/services.h",
+          "sha256": "657f7d8c7d295c1689429aa2e8b93570c53156041d186115d00bce0ebd01c598"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/settings.h",
+          "sha256": "3e1ca00437b6183c74be4dd7f82aaafc3335c2c8546f6c47be86cababac5d492"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/text.h",
+          "sha256": "150044cb34ad45edbd4d3d267d7c066aafaf3b6e2635e6e2a93ec88775b3a3ef"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/timezones.h",
+          "sha256": "b0f6bc81cea6a32a60a48a9746ff999922b0c7af1f137d2cbe34d2e436e859f8"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/include/web.h",
+          "sha256": "fb5d64e86859718aa5f1ee0f0519d9194c33c0df8d831b30ff4e252e4cd89a23"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/media/media_internal.h",
+          "sha256": "a18fc231725ee9297d539ed239085b88f661c7349632f17b56556996946a2a32"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/services/country_timezones.h",
+          "sha256": "d3098a16a798f3831d1321f1c8c7754c9528a38aa5523d9c2b92f65d30f11b8b"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/third_party/cjson/cJSON.c",
+          "sha256": "298581a04a36c0165da4b0aade235c23088cb2faa58651d720ea2f3706ed0b0d"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/third_party/tjpgd/tjpgd.c",
+          "sha256": "836ce775d6381a11a664bfc09b5e774636962d27318f049ea8f51ffee875cbc9"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/third_party/cjson/cJSON.h",
+          "sha256": "25b0145150d500498e4d209cec69c18c42cf818bffcc54690be3b895a2a16dee"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/third_party/tjpgd/tjpgd.h",
+          "sha256": "12efc83b2878e99f0bf11409cf9640055e851d1152367c934465475192002e26"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/third_party/tjpgd/tjpgdcnf.h",
+          "sha256": "36f8d018658dc190fc7270e5e5912f3d404e8c8f06975cdb489e06ca9a1b4760"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/CMakeLists.txt",
+          "sha256": "65e7993d226d6e6a1e9fb03e643db8a3efb7a1d5cb61f9300c521d827a0e35a8"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/app/CMakeLists.txt",
+          "sha256": "a8a9fc445d975c0041ec19baa28c8845ccff3bde0d4f2776fcf32a2b25d57e1b"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/sdkconfig.defaults",
+          "sha256": "adb76e6e816c443fc20a72e1d4f0069673e8598679f640a07cbc62852ce9d835"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/partitions.csv",
+          "sha256": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e"
+        },
+        {
+          "root": "yoRadio",
+          "file": "Small_TV/src/cmake/debug_logging.cmake",
+          "sha256": "90865e05ffb0f4237e757057c96b52158672390e0d8ff09e30fd39c0df89284c"
+        },
+        {
+          "root": "yoRadio",
+          "file": ".build/small-tv-esp32c2/resources/web_pages.c",
+          "sha256": "e2212afcba7d25b2b70e8ce1136a875a74db6b0ead51107f33022e67bd0cd265"
+        },
+        {
+          "root": "yoRadio",
+          "file": ".build/small-tv-esp32c2/resources/font6x12.h",
+          "sha256": "ddc7b0004c76cdccef22de21b7183f1bb537765afd1a4b1e8f12c7aebab1fb5e"
+        },
+        {
+          "root": "yoRadio",
+          "file": ".build/small-tv-esp32c2/resources/unicode_bitmaps.h",
+          "sha256": "ec25007920f18729c51dac7305df5048f1f8afbe03cbeac40424f483f90ac6d4"
+        },
+        {
+          "root": "yoRadio",
+          "file": ".build/small-tv-esp32c2/resources/factory_bitmaps.c",
+          "sha256": "7898c5f7490e525048e45b2ac1724425e55eb7e438ce7f7c9015ef7460cdbb42"
+        },
+        {
+          "root": "yoRadio",
+          "file": ".build/small-tv-esp32c2/resources/factory_bitmaps.h",
+          "sha256": "26faf234604a389f78385828e095832525ef93ab15cad0c96f9a4d42b21236c3"
+        },
+        {
+          "root": "yoRadio",
+          "file": ".build/small-tv-esp32c2/resources/asset_defaults.h",
+          "sha256": "af9db1feb8360b8a216f1414c8df31873641d8bc454aaf9bb44bdf8cdf4019e5"
+        },
+        {
+          "root": "yoRadio",
+          "file": ".build/small-tv-esp32c2/resources/timezone_data.h",
+          "sha256": "11e9f9f0b13b182852e4045abd90e20d20f0f823b35c841da18475c840947d01"
+        }
+      ],
+      "qemu_source_commit": "2a593f8d00c9be312ddc6e600dbb778f0e6459eb"
+    }
+  },
+  "browser": {
+    "status": "in_progress_handoff",
+    "start": {
+      "scope": "Owned disposable VM for real browser setup/query-path/control/storage checks; synthetic network and images.",
+      "inputs_sha256": {
+        "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\app.bin": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+        "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\bootloader.bin": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b",
+        "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\source-manifest.json": "a6f99785457fa80cf4bb77e97cefaa647ba41e4d054f008c15367558d50c8f39",
+        "C:\\Work\\yoRadio\\Small_TV\\src\\tests\\qemu_storage.py": "3fa00b82379b90c76939ad61d1756f1fcefe03ded492bd16c7df1b532578dc3d",
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-riscv32.exe": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+        "C:\\Work\\yoRadio\\Small_TV\\qemu\\profiles\\small-tv-c2.json": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+        "C:\\Work\\yoRadio\\.build\\small-tv-esp32c2\\small_tv_reconstructed.elf": "62e040b592d6bd526b25c6035005e31a3a40eebb5a9beb994abe49f089addebb",
+        "C:\\Work\\yoRadio\\Small_TV\\local_site\\pages\\setup.html": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
+        "C:\\Work\\yoRadio\\Small_TV\\local_site\\pages\\settings.html": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
+        "C:\\Work\\yoRadio\\Small_TV\\local_site\\pages\\photo.html": "6aa893c2806184daff7c30b798d1a89d17586c2025cc8be6530ed601fb49a736",
+        "C:\\Work\\QEMU-ESP32\\tools\\small_tv_vm.py": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae",
+        "C:\\Work\\QEMU-ESP32\\tools\\small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+        "C:\\Work\\QEMU-ESP32\\tools\\small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+        "C:\\Work\\QEMU-ESP32\\tools\\small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+        "C:\\Work\\QEMU-ESP32\\tools\\esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+        "C:\\Work\\QEMU-ESP32\\tools\\esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+        "C:\\Work\\QEMU-ESP32\\tools\\esp_elf.py": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f"
+      },
+      "sources": {
+        "images": [
+          {
+            "bytes": 16928,
+            "sha256": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b",
+            "offset": "0x0",
+            "file": "bootloader.bin"
+          },
+          {
+            "bytes": 3072,
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+            "offset": "0x8000",
+            "file": "partition-table.bin"
+          },
+          {
+            "bytes": 1169904,
+            "sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+            "offset": "0x10000",
+            "file": "app.bin"
+          },
+          {
+            "bytes": 1994752,
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+            "offset": "0x200000",
+            "file": "assets.bin"
+          }
+        ],
+        "source_sha256": "be5802d60f7e113aeb6e5fc77bc144f3088f5dbb791a6ab4c46db4cbb02b0726"
+      },
+      "session_name": "SmallTV-af1d9b420488",
+      "direct_raw_backing": true
+    },
+    "inputs_unchanged": true,
+    "observations": {
+      "captured_at": "2026-10-17T18:51:30.923Z",
+      "status": "in_progress",
+      "checks": [
+        {
+          "case": "settings-query-page-reload",
+          "observed": {
+            "brightness": "63",
+            "colors": [
+              "#10aa31",
+              "#3155ad",
+              "#adcfef"
+            ],
+            "date": "DD/MM/YYYY",
+            "fahrenheit": true,
+            "gif": "GIF File 5",
+            "hour12": true,
+            "kmh": true,
+            "theme": "Dial"
+          },
+          "expected": {
+            "fahrenheit": true,
+            "hour12": true,
+            "kmh": true,
+            "date": "DD/MM/YYYY",
+            "brightness": "63",
+            "colors": [
+              "#10aa31",
+              "#3155ad",
+              "#adcfef"
+            ],
+            "gif": "GIF File 5",
+            "theme": "Dial"
+          },
+          "passed": true
+        },
+        {
+          "case": "regional-city-browser-submit",
+          "passed": true,
+          "observed": "City updated successfully",
+          "submitted": "Perth,AU-W"
+        },
+        {
+          "case": "advanced-user-keyboard-save",
+          "passed": true,
+          "observed": {
+            "brightness": "12",
+            "night": true,
+            "ntp": "192.168.43.2",
+            "start": "20",
+            "stop": "8"
+          },
+          "expected": {
+            "night": true,
+            "start": "20",
+            "stop": "8",
+            "brightness": "12",
+            "ntp": "192.168.43.2"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "case": "advanced-query-page-reload",
+          "passed": false,
+          "observed": {
+            "brightness": "12",
+            "night": true,
+            "ntp": "192.168.43.2",
+            "start": "22",
+            "stop": "9"
+          },
+          "expected": {
+            "night": true,
+            "start": "19",
+            "stop": "8",
+            "brightness": "12",
+            "ntp": "192.168.43.2"
+          },
+          "note": "The initial fill-and-Tab sequence did not persist number fields. Subsequent keyboard stepping and sequential digit entry produced saved values and an OK response."
+        }
+      ],
+      "photo_initial_observation": {
+        "images": [
+          {
+            "complete": true,
+            "height": 240,
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 0,
+            "width": 0
+          },
+          {
+            "complete": true,
+            "height": 0,
+            "width": 0
+          },
+          {
+            "complete": true,
+            "height": 0,
+            "width": 0
+          }
+        ],
+        "interval": "5",
+        "mask": [
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    "setup_guest": {
+      "layout": {
+        "elf_sha256": "62e040b592d6bd526b25c6035005e31a3a40eebb5a9beb994abe49f089addebb",
+        "symbols": {
+          "s_correction_us": {
+            "address": 1070282696,
+            "size": 8
+          },
+          "last_station_address": {
+            "address": 1070282840,
+            "size": 4
+          },
+          "connected": {
+            "address": 1070282848,
+            "size": 1
+          },
+          "ap_active": {
+            "address": 1070282847,
+            "size": 1
+          },
+          "time_synced": {
+            "address": 1070282860,
+            "size": 1
+          },
+          "s_microseconds_offset": {
+            "address": 1070282680,
+            "size": 8
+          }
+        },
+        "converter_sha256": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f",
+        "vm_helper_sha256": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae"
+      },
+      "runtime": {
+        "connected": true,
+        "ap_active": false,
+        "station_address": "192.168.43.15",
+        "time_synced": true
+      },
+      "ntp": {
+        "method": "model_response_timestamp",
+        "response_count": 1,
+        "server_epoch": 1792262501,
+        "sent_virtual_us": 82285503,
+        "boot_time_us": 1792262411592835,
+        "virtual_us": 113584674,
+        "systimer_ticks": 1181239131,
+        "rtc_hrt_offset_us": 85668429,
+        "system_correction_us": -77670785,
+        "since_boot_us": 121578329,
+        "actual_utc_seconds": 1792262533.171164,
+        "expected_utc_seconds": 1792262532.299171,
+        "difference_seconds": 0.8719930648803711
+      },
+      "rom_boots": 2,
+      "station_http_ready": true,
+      "no_panic": true
+    },
+    "advanced_api_intermediate": {
+      "/GetNightStartTime": {
+        "status": 200,
+        "body": "19"
+      },
+      "/GetNightStopTime": {
+        "status": 200,
+        "body": "8"
+      },
+      "/get_night_brightness": {
+        "status": 200,
+        "body": "{\"brightness\":12}"
+      },
+      "/getsettings": {
+        "status": 200,
+        "body": "{\"tempUnit\":1,\"hourFormat\":1,\"mileDisplay\":1,\"timeSync\":0,\"nightmode\":1}"
+      },
+      "raw_public_city": {
+        "country": "AU-W",
+        "city": "Perth"
+      }
+    },
+    "advanced_api_note": "API snapshot predates final sequential keyboard entry: start19 became20 in the subsequent successful browser observation. No final API or cold-boot claim.",
+    "setup_ui_observation": "Configuration saved successfully alert observed; subsequent fresh UI state was about:blank. An intervening screenshot/old dialog dismissal encountered a stale dialog; cause not established.",
+    "photo_preview_note": "Initial photo DOM reports two complete 240x240 previews and three complete images with zero natural dimensions. Requires investigation; not marked passed or diagnosed.",
+    "pending": [
+      "Photo preview diagnosis and controls",
+      "Cold-boot persistence",
+      "Full browser acceptance",
+      "Owned browser VM/tab cleanup after continuation"
+    ],
+    "screenshots": [
+      {
+        "file": "uri-settings-reloaded-20261017.png",
+        "sha256": "2e60a3b6abbd5b001cbdace630f4760c83dce413a1a68f12a590c28ef8ac9261"
+      },
+      {
+        "file": "uri-advanced-saved-20261017.png",
+        "sha256": "3a4de9a58783bbefd5a90d78952533ea2cb80951fdc19819fef9933a5870f8f7"
+      }
+    ]
+  },
+  "h10": {
+    "status": "running_not_accepted",
+    "completed_cycles": 77,
+    "outages_observed": 1,
+    "requested_guest_seconds": 86400,
+    "error": null,
+    "supervisor": {
+      "schema_version": 1,
+      "status": "running",
+      "passed": false,
+      "all_functionality_verified": false,
+      "supervisor_pid": 30128,
+      "supervisor_started_utc": "2026-10-17T18:23:08.1330529Z",
+      "run_directory": "C:\\Work\\yoRadio\\.worktree\\small-tv-manual-ssid\\.build\\uri-runtime-24h-20261017",
+      "scope": "Child process supervision only; not a 24-hour or memory-trend acceptance.",
+      "sources_sha256": {
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-manual-ssid\\Small_TV\\src\\tools\\runtime_run_guard.py": "df024edc6653e2dd4bdc4b92bc57c33994d866cb350d3588f51af90a4a59cbd9",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-manual-ssid\\.build\\uri-runtime-qemu-frozen-20261017\\tools\\small_tv_vm.py": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-manual-ssid\\Small_TV\\src\\tools\\runtime_supervisor.ps1": "8c91874bee1797c5ff8b317d9b7d430b403fd64cda56050fdd9ebb40f276a500",
+        "C:\\Work\\yoRadio\\.worktree\\small-tv-manual-ssid\\Small_TV\\src\\tests\\runtime_qemu.py": "cf5bab160df9360b3b8a48df9030110be2d796d875b57d5fb6e1ddf5b7c677c0"
+      },
+      "workload_pid": 2252,
+      "workload_started_utc": "2026-10-17T18:23:08.1750864Z",
+      "observed_at_utc": "2026-10-17T18:52:50.6072790Z",
+      "guard_pid": 18740,
+      "completed_cycles_observed": 77
+    },
+    "guard": {
+      "scope": "Independent UART boot/panic guard; not a memory trend or 24-hour pass.",
+      "status": "running",
+      "passed": false,
+      "polls": 350,
+      "vm_name": "SmallTV-c9f119029618",
+      "source_file": "vm/uart.log",
+      "last_observation": {
+        "passed": true,
+        "bytes": 623,
+        "rom_boots": 1,
+        "errors": []
+      }
+    },
+    "process_observation": {
+      "observed_utc": "2026-10-17T18:52:31.2082613Z",
+      "runtime_processes": [
+        {
+          "role": "vm",
+          "pid": 26440,
+          "alive": true,
+          "started_utc": "2026-10-17T18:23:11.3095500Z",
+          "start_matches": true,
+          "command_matches": true
+        },
+        {
+          "role": "workload",
+          "pid": 2252,
+          "alive": true,
+          "started_utc": "2026-10-17T18:23:08.1750860Z",
+          "start_matches": true,
+          "command_matches": true
+        },
+        {
+          "role": "guard",
+          "pid": 18740,
+          "alive": true,
+          "started_utc": "2026-10-17T18:23:40.4571240Z",
+          "start_matches": true,
+          "command_matches": true
+        },
+        {
+          "role": "supervisor",
+          "pid": 30128,
+          "alive": true,
+          "started_utc": "2026-10-17T18:23:07.7730700Z",
+          "start_matches": true,
+          "command_matches": true
+        }
+      ],
+      "browser_vm_alive": true,
+      "browser_vm_name_matches": true,
+      "full_controller_alive": false
+    },
+    "scope": "Live progress only; no terminal footer, 24-hour acceptance or steady-state trend conclusion."
+  },
+  "next_steps": [
+    "Investigate the terminal time/reset failure using captured artifacts before rerunning or publishing a full report.",
+    "Continue the current browser photo and cold-boot flow, preserving failed attempts.",
+    "Leave frozen H10 inputs unchanged and revalidate process identities at the next turn.",
+    "Keep port-assistant changes on their already pushed feature branch until integration is appropriate."
+  ]
+}

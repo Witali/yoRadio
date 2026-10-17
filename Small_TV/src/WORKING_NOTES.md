@@ -7,6 +7,31 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Последний checkpoint по запросу commit/push: full90679 завершился
+  **неуспешно** в18:50:53UTC. 18групп passed, QEMU failed, manual acceptance
+  not_run. `time_qemu.py/reset_before_notification` не дождался даты2025/9/19:
+  last state unsynced1900/1/0, boot_time_seconds2147483574.466206. Причина пока
+  не установлена. Все192frozen inputs совпали; raw report сохранён отдельно
+  в `uri-full-failed-20261017.report.json.gz`, результаты/continuation в
+  `uri-progress-checkpoint-20261017.json`. Published EF66 не заменять этим
+  прогоном; сначала изучить reset/time failure. Ниже running full — история.
+- Browser8304 продвинут дальше initial scan: setup success alert, затем
+  about:blank; SDK connected/APfalse/IP192.168.43.15/SNTPtrue, UTCerr0.871993s.
+  Settings query-page reload сохранил units/date/brightness63/GIF5/Dial и
+  RGB565 colors; synthetic cityPerth/AU-W сохранён. Advanced night20→8,
+  brightness12 и NTP192.168.43.2 подтверждены UI. Initial fill+Tab для чисел
+  не сохранился; keyboard stepping/digit entry с OK сработали, failed attempt
+  сохранён, firmware bug этим не доказан. Intermediate API snapshot ещё start19,
+  final start20/cold-boot API пока не проверены. Photo page: interval5/mask31;
+  две preview240x240, три complete с natural size0 — исследовать до acceptance.
+  Скриншоты settings/advanced и scoped JSON сохранены; VM18416/tab2 handoff
+  остаются для продолжения и последующего cleanup. Upload/crop в этом flow
+  не повторяли, cold persistence и photo controls ещё pending.
+- H10 продолжает отдельный неизменяемый run: checkpoint77cycles/1outage,
+  supervisor/guard running, no reported error. OS audit18:52:31UTC подтвердил
+  все четыре PID/start times/commands; full controller9896 уже отсутствует,
+  browser VM18416 принадлежит этой задаче. Это не24h/trend acceptance; не
+  менять H10 inputs и заново проверить identities/footer в следующем turn.
 - По запросу commit/push сохранён browser checkpoint на текущем8304F1A4:
   IABbrowser2/tab2, `http://127.0.0.1:18082/?probe=1` показывает WiFi Setup,
   scan завершён и даёт literal signed RSSI -21/-22/-39dBm. Screenshot/JSON:
