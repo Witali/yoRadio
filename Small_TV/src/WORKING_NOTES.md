@@ -7,6 +7,19 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Fresh full после mergecdc54723 запущен19:05:32UTC: session42964, OS pwsh30656,
+  `.build/small-tv-functional/uri-bounded-full-20261017`. Immutable freeze100tests+
+  93extras=193inputs повторно проверен после старта; sourceBE58/app8304/ELF62E0/
+  QEMUA74 прежние. Start record `uri-bounded-full-start-20261017.json` сохраняет
+  все identities и controller command. Full ещё выполняется, не публиковать
+  старый failed run. Не менять frozen test/verifier/production/QEMU inputs.
+- H10 независим и жив: OS19:06:07UTC подтвердил прежние4PID/start times.
+  File audit113cycles/1868.948064guest s,31inputs verified,start matchtrue,
+  111valid quiescent weather generations/maxgap65.741273s,UART1boot/noerrors.
+  Statuspending:нет24h/terminalguard/steady-hour windows. В следующем turn
+  снова сверить OS identities; controller timeout не означает остановку.
+  Tests README обновлён: старые31DAF browser cases исторические, current8304
+  имеет отдельный8case proof; weather_wait/machine_network уже включены в gate.
 - Tooling6b10c200 объединён после terminal failed full и перед новым freeze.
   Повторно16unit/CLI pass; actual read_clock_theme report50instructions/
   12blocks/4calls/0natural loops. Конфликты только в журнале/контексте,

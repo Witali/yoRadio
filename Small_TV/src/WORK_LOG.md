@@ -2401,3 +2401,20 @@ Production images/sources не меняются; H10 использует сво
 Следующий verifier publication заменит прежнее stale "untested library draft"
 ограничением actual review scope. Historical validation.json сейчас не меняли,
 passing full не объявлен. Новый freeze должен включать updated verifier/tests.
+
+### 2026-10-17 — fresh full193inputs и актуальный H10 prefix
+
+На maincdc54723 зафиксирован новый freeze100test sources+93extras=193 hashes.
+SourceBE5802D6/app8304F1A4/ELF62E040B5/QEMUA74 unchanged. Full запущен19:05:32UTC
+в uri-bounded-full-20261017, exec42964, pwsh30656; OS identity/command сохранены
+в uri-bounded-full-start-20261017.json. Повторная проверка193inputs после старта
+прошла. Fresh host группы проходят, идёт machine comparison; terminal full
+ещё нет, published EF66 не заменён. Не менять замороженные inputs во время run.
+
+H10file-only auditor113полных циклов/1868.948064guest s,31inputs verified и
+initial record matches;111valid quiescent weather generations,maxgap65.741273s.
+UART1ROMboot/noerrors. OS19:06:07UTC подтвердил30128/2252/18740/26440 с точными
+launch times. Это pending prefix без24h/terminalguard/steady windows, не pass.
+H10 files/bundle не менялись; browser/NTP probe VMs закрыты. README manual
+coverage исправлен: current8case8304 отдельно от historical31caseDAF; stale
+«weather_wait ещё не включён» заменено actual mandatory gate description.

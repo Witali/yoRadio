@@ -418,28 +418,35 @@ python Small_TV/src/tests/startup_qemu.py --dependency-root C:/Work/yoRadio `
 
 ## Приёмочные сценарии для платы и браузера
 
-В отдельном [кандидате offline clock](../../qemu/parity/offline-clock-checks.md)
-исправлены остановка активной темы и подмена IP при потере Wi-Fi. Новые
+В интегрированном [исправлении offline clock](../../qemu/parity/offline-clock-checks.md)
+устранены остановка активной темы и подмена IP при потере Wi-Fi.
 `clock_offline_dst_*` и `clock_offline_photo` проходят с production C и SDK
 адаптерами; `network_oracle.py` сравнивает реальные RV32 event/cache instructions
-и bounded original dispatch. `machine_network` обязателен для следующей полной
-публикации. Текущие общие отчёты относятся к предыдущей сборке; естественный
-QEMU link loss и полный прогон кандидата ещё требуются.
+и bounded original dispatch. `machine_network` включён в обязательный общий
+набор; естественная потеря сети также проверяется в отдельном QEMU workload.
 
 По уточнению о программных задержках удалён guard, который приостанавливал UI
-до завершения асинхронного HTTP погоды. Новые `clock_weather_pending_*` дают
-37 passing platform scenarios той сборки. Обязательный `weather_wait_qemu.py` удерживает
+до завершения асинхронного HTTP погоды. Сценарии `clock_weather_pending_*`
+проверяют активные часы во время запроса. Обязательный `weather_wait_qemu.py` удерживает
 реальный внешний ответ и проверяет смену минуты при RUNNING=1; старый app
 воспроизводит ожидание тайм-аута. См.
 [software-weather-wait-checks.md](../../qemu/parity/software-weather-wait-checks.md).
-Этот новый test ещё нужно включить в общий gate и пересмотреть старое ожидание
-frozen scroll в `field_qemu.py`. Прежние published reports не подтверждают новый app.
+Этот test включён в `qemu_suite.py`; `field_qemu.py` проверяет прокрутку при
+удерживаемом ответе, а publisher требует `responsive_refresh_phase`.
 
 Полная приёмка по таблице ниже пока **не выполнена**. Часть H03/H04 проверена
-на текущей DAF:31 браузерный случай и21 storage/identity checks; ночной режим,
+на исторической DAF:31 браузерный случай и21 storage/identity checks; ночной режим,
 desktop/mobile crop/upload/cancel, настройки и cold boot. Подробный объём и
 ограничения: [browser-controls-20261017.md](../../qemu/browser-controls-20261017.md).
 Эта проверка не закрывает H03/setup целиком, H09/H10 или физическую плату.
+На текущей `8304f1a4` отдельный [восьмисценарный браузерный прогон](../../qemu/parity/uri-browser-controls-validation-20261017.json)
+подтвердил setup→STA, query pages, настройки часов/ночного режима, пять превью,
+интервалы3/60, маски17/0 и cold persistence. API и raw settings до/после совпали;
+upload/crop/mobile этим прогоном не перепроверялись. Полный прогон кандидата
+сначала завершился до окончания startup в host-only ожидании даты. После
+исправления наблюдателя [повторная SNTP/reset проверка обеих прошивок](../../qemu/parity/time-reset-observation-validation-20261017.json)
+прошла; новая полная регрессия выполняется отдельно. Не смешивать scoped pass
+с успешной полной публикацией или аппаратной приёмкой.
 Для каждого оставшегося сценария нужно записать версию/SHA
 приложения, дату, шаги, результат и свидетельства. Используйте отдельную
 тестовую точку доступа и вымышленные SSID/города; не сохраняйте Wi-Fi пароли,
