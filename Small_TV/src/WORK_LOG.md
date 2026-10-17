@@ -2228,3 +2228,30 @@ pending,31inputs verified,start_record_matches=true. Наличие running фа
 доказывает process survival через конец assistant turn; следующий turn должен
 повторно проверить OS identities и footer. Пока нет24h/trend acceptance. Это
 новый запуск, прежний187-cycle interrupted H10 остаётся отдельным evidence.
+
+### 2026-10-17 — рабочий CLI для переноса алгоритмов из RISC-V
+
+В отдельной codex/small-tv-port-assistant завершён report-интерфейс ранее
+неработающего черновика assist_c_port.py. CLI принимает decoded objdump,
+точные start/stop, logical name и symbol-map; выдаёт JSON/Markdown с blocks,
+dominator-proven natural loops, calls, stack save/restore hints и C conditions.
+Source/tool/map fingerprints включены, input/map/tool overwrite запрещены.
+Calls внутри диапазона, unknown indirect transfers,traps,gaps иexternal
+branches остаются review warnings. C bodies/external calls по-прежнему требуют
+ручного восстановления и сравнения; отчёт не объявляет firmware equivalence.
+
+Независимые маленькие CFG/CLI fixtures выявили реальные дефекты черновика:
+короткие hex branch targets терялись; gap склеивался с предыдущим block;
+jalr zero,4(ra) ошибочно считался ret; не было layout validation/CLI/epilogue.
+Old13tests:10failures/4errors (subtests), corrected16tests pass. Отдельный
+case проверяет descending addresses разных ELF sections; они допустимы,
+overlap/out-of-order внутри функции отклоняется. Natural loops отличаются от
+irreducible backward edges; signed/unsigned C branch conditions сохранены.
+
+Actual read_clock_theme_at_4200dfdc.asm получен pinned objdump из factory ELF
+строго до0x4200e074:50instructions,12blocks,32-byteframe,4externalcalls иret
+0x4200e068. Backwards jump0x4200e072 вshared completion не является циклом;
+отчёт подтверждает это. Все61retained excerpts/9796decoded instructions
+разобраны CLI,44natural-loop edges; это parser scope, не семантическая проверка
+всех9796instructions. Separate tools/tests не меняют frozen firmware tests.
+Scoped validation JSON и reference/CLI documentation сохранены в этой ветке.

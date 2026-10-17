@@ -90,9 +90,55 @@ that real endpoint for factory re-entry and records the advanced-only observatio
 
 `../../tools/disassemble_factory.py` reproduces exports with an explicit local
 objdump path and a list of addresses or bounded IROM ranges.
-`../../tools/assist_c_port.py` is an unfinished library draft for the next stage:
-instruction parsing, basic blocks, dominators/natural loops, ABI stack hints and
-C branch conditions exist; a complete C-draft emitter, CLI and tests are pending.
+### Control-flow review tool
+
+`../../tools/assist_c_port.py` reads decoded RV32/RVC objdump text and generates
+JSON plus a Markdown review with the original instructions beside C branch
+conditions. Run from the repository root with Python 3.10 or newer:
+
+```powershell
+python ./Small_TV/src/tools/assist_c_port.py `
+  ./Small_TV/src/reference/assembly/read_clock_theme_at_4200dfdc.asm `
+  --symbols ./Small_TV/src/symbol-map.json `
+  --json ./.build/port-assistant/clock-theme.json `
+  --markdown ./.build/port-assistant/clock-theme.md
+```
+
+Use `--start 0x4200dfdc --stop 0x4200e074` to bound a larger input; stop is
+exclusive and neither boundary may split an instruction. `--name` labels one
+selected function. Optional `--symbols` binds exact addresses to established
+logical names and native C modules; unmatched calls retain their addresses.
+Use `--force` to replace a generated report. Input, symbol map and tool files
+are protected against accidental output overwrites. Without output flags JSON
+is written to stdout. Every report records source/tool/symbol-map SHA-256.
+
+The CFG uses direct intraprocedural flow and the possible return from calls.
+Indirect transfers, traps, gaps, outgoing branches and a call inside the selected
+range produce explicit review warnings. A backwards edge is called a natural
+loop only when its target dominates its source. The original getclocktype
+handler has a backwards jump at `0x4200e072` into its shared completion block;
+the report correctly finds no natural loop. Its 50 instructions include a
+32-byte frame, one return at `0x4200e068`, and four external calls. The excerpt
+ends at `0x4200e074` before the next function, with the original dump unchanged.
+
+Stack allocation/save/restore matches are ABI hints. C conditions refer to a
+conceptual `uint32_t r[32]`; the tool leaves instruction implementations,
+external-call behavior, indirect control flow and high-level algorithm recovery
+to manual work and machine-code comparison. Successful report generation is a
+parser/analysis result, not evidence of firmware equivalence.
+
+Run the separate tool tests without changing a firmware test run:
+
+```powershell
+python ./Small_TV/src/tools/tests/test_assist_c_port.py `
+  --temp-root ./.build/port-assistant-tests
+```
+
+The tests cover compressed fallthrough, short targets, canonical/offset returns,
+disconnected and irreducible graphs, natural loops, malformed layouts, multiple
+ELF sections, bounded CLI output, exact name bindings and the real factory
+getclocktype excerpt. Reproducible results are recorded separately in
+`../../../qemu/parity/port-assistant-validation-20261017.json`.
 
 `application_main_at_42008e56.asm` preserves the actual active-clock dispatch:
 `0x42009054..0x420090c0` gates weather retry by station state, while all four

@@ -7,6 +7,13 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Отдельная `codex/small-tv-port-assistant` завершает запрошенный review tool:
+  рабочий CLI/JSON/Markdown, exact bounds, logical symbol bindings,16CFG/CLI
+  tests и61factory excerpts/9796instructions/44natural-loop edges проходят.
+  Example read_clock_theme:50instructions,12blocks,32-byteframe,4calls,0loops.
+  Отчёты не исполняют инструкции и не заменяют C/manual parity проверки.
+  Новая tooling ветка подготовлена отдельно от frozen full/H10; объединять
+  после terminal/full publication, чтобы не менять его зафиксированные входы.
 - Main/origin now0fe92f18; transport candidate8304F1A4/ELF62E040B5/sourceBE5802D6
   интегрирован и отправлен. Canonical resources59 совпали с archive; BIN/ELF/map
   перенесены без CMake cache, прежняя922 сохранена в pre-uri-dispatch-main-20261017.
@@ -1432,6 +1439,7 @@ RISC-V executable `fde38d53`, Xtensa binary не менялся. Сохраня�
 Закрывать созданные для проверки ненужные ВМ. Физические платы в текущих
 проверках не прошиваются.
 
-Отдельные незавершённые черновики, например `tools/assist_c_port.py`, не считать
-готовыми инструментами. Чужие файлы `.karadio-*.patch`, `tmp/` и другие
+`tools/assist_c_port.py` теперь имеет рабочий review CLI и отдельные tests;
+не считать его автоматическим генератором эквивалентной C-прошивки. Чужие
+файлы `.karadio-*.patch`, `tmp/` и другие
 посторонние изменения не относятся к этой задаче.
