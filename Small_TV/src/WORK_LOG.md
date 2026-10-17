@@ -1539,3 +1539,19 @@ post-2038-midnight занял6.150371 guest s при пределе6. Ещё д�
 Complete-scenes и diagnostic comparison не достигнуты. Новый full pass не
 объявлен, прежние canonical reports сохранены. Компактный failed summary с
 хешами исходного report и pins сохранён в qemu/parity; исходные журналы ignored.
+
+### 2026-10-17 — повторная диагностика HTTP admission и история QEMU
+
+По напоминанию пользователя проверены история и точный diff9d4da15732:
+прежняя no-descriptor потеря SYN исправлена, фикс входит в962cda7a6f/FDE38D53.
+Все8 packet regressions повторно pass. Прямых обходов inject timer к
+Esp32_sendFrame нет; mapped16 shared POST routes и11 GET routes. Три180-request
+scoped probes завершены:5.8s задержки до handler, сам handler<=11ms, повтор SYN,
+валидные checksums. Dedicated RX trace0 drops. Сырые логи/PCAP ignored; компактная
+сводка и call-path document подготовлены. Production firmware и QEMU не менялись.
+
+Corrected TCP preflight60 pass как диагностическое выполнение:1.55s body case
+имел быстрый SYN/admission и ненулевой PCB. Weather FIN_WAIT_2 накапливаются до13,
+TCP limit16; причина5–6s ещё не доказана. Отрицательные попытки observer сохранены
+как harness errors (same-PC loop; competing breakpoint), без firmware conclusions.
+Запущен более узкий admission probe6201 на точных B4 адресах, каждый BP one-shot.

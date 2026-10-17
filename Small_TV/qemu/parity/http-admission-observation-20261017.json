@@ -1,0 +1,141 @@
+{
+  "scope": "Read-only diagnosis, not a passing functional gate or final root cause",
+  "app_sha256": "dd41a53642b66f822b8bb55ba11c5350855d8b0d63565c0d4ffe6e51935391af",
+  "elf_sha256": "b4af3c2a72cacd0c348f5d966d1998660fd5811622589d1d24bda7dbdb775415",
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "previous_fix": {
+    "commit": "9d4da15732c44581aadced96fb71b9310bbee8b9",
+    "included_in_head": "962cda7a6f58a3a7a71934239c3204c1483be8d4"
+  },
+  "packet_regression": {
+    "passed": true,
+    "tests": 8,
+    "failures": [],
+    "errors": [],
+    "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+    "scope": "QOM validation/reset and real DNS/NTP packets through Wi-Fi DMA; qtest executes no guest instructions, no firmware or Internet."
+  },
+  "probes": {
+    "http-latency-probe-20261017": {
+      "completed_requests": 180,
+      "maximum_guest_seconds": 5.918805000000006,
+      "raw_report_sha256": "2e7f3b6b6e56ad2e0bc09e51e861159cd0f1896cad0504214e9bff8bf203cbd6",
+      "diagnostic_script_sha256": "fb9d9b488589eb1d31ba0b94112512d1b0b4684bf15918a254c7d13036062055",
+      "no_panic": true,
+      "vm_closed": true,
+      "delayed_requests": [
+        {
+          "index": 87,
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 1.2223400000000026,
+          "host_seconds": 1.8119999999762513
+        },
+        {
+          "index": 177,
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 5.918805000000006,
+          "host_seconds": 7.60899999999674
+        }
+      ]
+    },
+    "http-latency-wire-20261017": {
+      "completed_requests": 180,
+      "maximum_guest_seconds": 5.813200999999999,
+      "raw_report_sha256": "ec760f3b25011903db3aecf9b89299f36e70dcda709f8df071b3c4b2f4b3a0e9",
+      "diagnostic_script_sha256": "3274a116a6131107146130feb58c13b9eaad8a2451f71172e32fc7a384c036a7",
+      "no_panic": true,
+      "vm_closed": true,
+      "delayed_requests": [
+        {
+          "index": 42,
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 5.813200999999999,
+          "host_seconds": 7.4060000000172295,
+          "before_handler_guest_seconds": 5.738762999999999,
+          "handler_guest_seconds": 0.0006160000000008381
+        },
+        {
+          "index": 72,
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 5.751901000000004,
+          "host_seconds": 7.5310000000172295,
+          "before_handler_guest_seconds": 5.683926999999997,
+          "handler_guest_seconds": 0.0006160000000079435
+        },
+        {
+          "index": 133,
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 5.6790869999999956,
+          "host_seconds": 7.186999999976251,
+          "before_handler_guest_seconds": 5.6126059999999995,
+          "handler_guest_seconds": 0.000506999999998925
+        },
+        {
+          "index": 162,
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 1.290216000000001,
+          "host_seconds": 1.9839999999967404,
+          "before_handler_guest_seconds": 1.20944200000001,
+          "handler_guest_seconds": 0.010983999999993443
+        }
+      ],
+      "pcap_sha256": "d651d3843c9cdcd1c1b8c49c9d4d0fad370f2658a316c89f2a5e5d3e1057fb58"
+    },
+    "http-latency-rx-trace-20261017": {
+      "completed_requests": 180,
+      "maximum_guest_seconds": 5.697895000000003,
+      "raw_report_sha256": "401c88d2cca7cf1af33ed4e7b5a2d4c46b27e7ea7055d11f82043d550d1b2466",
+      "diagnostic_script_sha256": "1b7a48e5e32369cd2e91b22940ec501615370b03987bad4861d126d5f179e7a0",
+      "no_panic": true,
+      "vm_closed": true,
+      "delayed_requests": [
+        {
+          "index": 88,
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 1.445442,
+          "host_seconds": 2.4369999999762513,
+          "before_handler_guest_seconds": 1.3750120000000052,
+          "handler_guest_seconds": 0.010839999999994632
+        },
+        {
+          "index": 132,
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 5.697895000000003,
+          "host_seconds": 7.922000000020489,
+          "before_handler_guest_seconds": 5.630482999999998,
+          "handler_guest_seconds": 0.0006460000000032551
+        }
+      ],
+      "pcap_sha256": "de09cb6f47514e4a0b8419b895cde32867829c4fdfc13b4844cf1e1090517e6d",
+      "model_rx_drop_events": 0
+    }
+  },
+  "shared_http_post_routes": [
+    "/set_checkbox_state",
+    "/set_display_time",
+    "/wifireset",
+    "/advancedset",
+    "/restart",
+    "/SetNightStopTime",
+    "/SetNightStartTime",
+    "/set_night_brightness",
+    "/set_clock_color",
+    "/set_led_brightness",
+    "/updateCity",
+    "/SetTimeModeValue",
+    "/settings",
+    "/setclocktype",
+    "/setgifvalue",
+    "/configure"
+  ],
+  "firmware_and_qemu_unchanged": true,
+  "unresolved": "The current model still sometimes has an unanswered initial SYN; the older no-descriptor regression passes and the new dedicated trace emits no RX drop. Follow guest TCP admission next."
+}

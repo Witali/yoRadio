@@ -66,6 +66,32 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   соседние4 slots, inputs и protected regions проверены; ВМ18016/tab4 закрыты.
   См. photo-upload-waits-main-ui.json. Это не результат полного62455.
 
+## Текущая диагностика HTTP — 2026-10-17
+
+Пользователь напомнил прежнюю шестисекундную ошибку QEMU и попросил изучить
+весь путь до обработчика и другие места его использования. Старый фикс
+9d4da15732 присутствует в main962cda7a6f и установленном FDE38D53; повторные
+8 packet regressions проходят. В Esp32_sendFrame только один caller —
+исправленный inject timer. web_settings_post используется16 POST routes.
+Три read-only probes по180 POST завершены, ВМ закрыты. Порог не менялся:
+новый SYN retry даёт5.8s до HTTP, сам handler <=11ms; RX-drop trace не выдал
+событий. См. ../qemu/parity/http-admission-investigation-20261017.md и JSON.
+
+Corrected TCP preflight60 завершён: в одном1.55s запросе первый SYN пришёл
+в TCP через20ms, listen pending0/backlog5, tcp_alloc вернул ненулевой PCB.
+Наблюдается накопление weather TCP FIN_WAIT_2 до13 при active TCP limit16;
+это ещё не доказанная причина5–6s stalls. Первый TCP observer зациклился на
+непродвинутом breakpoint и был остановлен; layered observer остановился на
+вмешавшемся breakpoint во время естественного entry advance. Эти две ошибки
+harness сохранены ignored и не являются firmware failures.
+
+Сейчас единственный live probe: handle6201,
+.build/small-tv-parity/http-latency-admission-20261017. Он наблюдает actual B4
+inlined listen path0x420229b2 до backlog и0x420229c6 после tcp_alloc, затем
+HTTP entry/return; каждый breakpoint снимается после первого попадания.
+ELF SHA проверяется перед стартом; программа/данные/PC не подменяются.
+Продолжить этот probe, не запускать новый full. Firmware/QEMU не менялись.
+
 ## Цель и принятые решения
 
 Предыдущие этапы ниже сохраняют историю; актуальный порядок продолжения указан
