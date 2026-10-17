@@ -277,6 +277,9 @@ def main():
                 marked_count += 1
     classic = groups['machine_classic']
     report = read(args.output) if args.output.exists() else {}
+    report['limitations'] = [item for item in report.get('limitations', [])
+                             if not item.startswith('The C-port assistant ')] + [
+        'The C-port assistant reports decoded control flow; it does not emit or verify an executable C implementation.']
     report.update(target=manifest['target'], date=suite['finished_utc'][:10], sdk_revision=manifest['idf_revision'],
                   source_sha256=manifest['source_sha256'], app_sha256=app_sha, app_bytes=len(app),
                   app_partition_bytes=partitions['factory'], app_partition_free_bytes=partitions['factory'] - len(app),

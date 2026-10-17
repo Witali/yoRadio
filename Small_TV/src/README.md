@@ -82,9 +82,13 @@ timer thresholds, photo fades, MIME binary parsing and DNS packet bounds.
 Where machine instructions were checked directly, comments cite their original
 addresses. [Assembly audit](reference/assembly/README.md) separates those checks
 from inference based on the Ghidra export.
-`tools/assist_c_port.py` is an unfinished draft: it parses instructions, finds CFG
-blocks/natural loops and renders branch conditions. Its complete C-draft emitter
-and command-line interface have not yet been implemented or tested.
+`tools/assist_c_port.py` produces JSON and Markdown review reports from decoded
+objdump text: basic blocks, natural loops, calls, stack-frame hints and signed/
+unsigned C branch conditions. It can apply the logical names and C-module paths
+from `symbol-map.json`. Gaps, indirect transfers and outgoing branches stay visible
+for manual review. The tool reports control-flow facts; instruction bodies and
+external calls still need a C implementation and behavior comparison. See the
+[command examples and tests](reference/assembly/README.md#control-flow-review-tool).
 
 The broader export used for organization came from the existing analyzed
 factory ELF, including application functions and SDK callers. Its SHA-256

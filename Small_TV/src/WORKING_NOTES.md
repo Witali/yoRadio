@@ -7,6 +7,13 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Tooling6b10c200 объединён после terminal failed full и перед новым freeze.
+  Повторно16unit/CLI pass; actual read_clock_theme report50instructions/
+  12blocks/4calls/0natural loops. Конфликты только в журнале/контексте,
+  обе истории сохранены. Historical validation пока не перепубликуется;
+  verifier при следующем passing full заменит устаревшее «untested draft»
+  точным ограничением: review tool не выдаёт и не доказывает C implementation.
+  Frozen isolated H10 inputs остались прежними.
 - Failed full/reset-date исследован: кадр показывал startup, не неверную дату.
   Unchanged8304 baseline прошёл; после reset startup31→181 ticks занял15.284530
   guest/19.672host seconds. Старый30host deadline воспроизводимо отклоняет
@@ -83,6 +90,14 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 - Новый full90679 продолжает QEMU: boot/reset/SNTP обеих прошивок, body deadline,
   H09concurrency и URI targets gates прошли; идёт photo fade/frames. Full report
   ещё не terminal. Source/app остаются BE5802D6/8304F1A4, publishedfull — EF66.
+
+- Отдельная `codex/small-tv-port-assistant` завершает запрошенный review tool:
+  рабочий CLI/JSON/Markdown, exact bounds, logical symbol bindings,16CFG/CLI
+  tests и61factory excerpts/9796instructions/44natural-loop edges проходят.
+  Example read_clock_theme:50instructions,12blocks,32-byteframe,4calls,0loops.
+  Отчёты не исполняют инструкции и не заменяют C/manual parity проверки.
+  Новая tooling ветка подготовлена отдельно от frozen full/H10; объединять
+  после terminal/full publication, чтобы не менять его зафиксированные входы.
 - Main/origin now0fe92f18; transport candidate8304F1A4/ELF62E040B5/sourceBE5802D6
   интегрирован и отправлен. Canonical resources59 совпали с archive; BIN/ELF/map
   перенесены без CMake cache, прежняя922 сохранена в pre-uri-dispatch-main-20261017.
@@ -1508,6 +1523,7 @@ RISC-V executable `fde38d53`, Xtensa binary не менялся. Сохраня�
 Закрывать созданные для проверки ненужные ВМ. Физические платы в текущих
 проверках не прошиваются.
 
-Отдельные незавершённые черновики, например `tools/assist_c_port.py`, не считать
-готовыми инструментами. Чужие файлы `.karadio-*.patch`, `tmp/` и другие
+`tools/assist_c_port.py` теперь имеет рабочий review CLI и отдельные tests;
+не считать его автоматическим генератором эквивалентной C-прошивки. Чужие
+файлы `.karadio-*.patch`, `tmp/` и другие
 посторонние изменения не относятся к этой задаче.
