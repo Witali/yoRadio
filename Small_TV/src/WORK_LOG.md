@@ -1618,3 +1618,22 @@ ISR stack и factory memory parity не объявлены. ВМ закрыта,
 не экспортируются. Код/документ/JSON сохранены в отдельной ветке, main frozen75+88
 inputs общего run11075 не изменены. Его18 pre-QEMU groups и QEMU gates до
 photo_reinit прошли, photo_settings выполняется; полный результат пока отсутствует.
+
+### 2026-10-17 — исправление HTTP body starvation в отдельной ветке
+
+Ветка codex/small-tv-http-body-deadline:35b6bdce исправление/test/build/evidence,
+79445774 закрепляет LF audit bytes; оба отправлены. Старый DD41 на том же final
+http_body_qemu.py даёт3 expected failures: второйGET24.693549/27.605321/9.702162s.
+В sharedwebbody3timeouts и SDK remaining-body purge; factory0x4200d808 одинrecv.
+Новый модульrequest_body.c имеет5s deadline иread shutdown передошибкой/cleanup,
+перечитываетremaining timeout без0/infinite, успешныйbody восстанавливаетстарый.
+Новые real cases4pass с4.695327/4.703467/.204119s, ordinaryfragments200.
+
+App3C599124/source1741EA14/ELF342C0127,1 177 216/free358 784,58prodinputsmatch.
+Native3950/platform46/frontend/integrity/timezone/aggregation reducedpass,
+SDKphoto21pass, consumerguards15pass. Код/сборка/ASM/scoped JSON/doc в ветке.
+Новому suite/publisher/verifier обязателенbody_http; mainfull11075 старойDD41
+этотgate не выполняет. Main frozen75+88 files прежние; он прошёл gates доregional
+обеихfirmware/NVSmigration, идёткcalendar. Новая общаясборка/full — после terminal
+и сохранения текущего результата. Ни scoped checks, ни старые full не означают
+полное соответствие нового кандидата или физическую/H09/H10 приёмку.

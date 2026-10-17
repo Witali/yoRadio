@@ -89,7 +89,9 @@ max6.186934, new30F max.238274. Все200/no panic, ВМ закрыты. Исп�
 initialHEADaf7c8c17, QEMU30F/source0d27a7ca98. Pins:75 tests/88 extras,
 appDD41/source96A/ELFB4. Все18 pre-QEMU groups passed; текущий QEMU stage прошёл
 boot/reset/SNTP, startup/weather_wait/advanced/photo, photo_frames/brightness/
-controls/reinit; выполняется photo_settings. Общего результата пока нет.
+controls/reinit/settings, initial setup, weather/fields/time/text и regional
+обеих firmware, NVS migration. Следующий/текущий stage — calendar. Общего
+результата пока нет.
 Не запускать дубль по timeout наблюдения. До terminal report не менять frozen
 inputs и не публиковать новый pass. Контекстные Markdown не входят в pins.
 
@@ -105,6 +107,23 @@ Scoped doc/JSON runtime-memory-* находятся в ветке; они не �
 Ошибки прежних попыток harness сохранены отдельно. Root app/source/ELF прежние.
 Следующая работа с observer: объединить после сохранения immutable full result,
 затем расширять duration/reconnect/concurrent writes/restart/ISR observation.
+
+Вторая независимая ветка codex/small-tv-http-body-deadline /79445774 (основной
+фикс35b6bdce) отправлена; worktree .worktree/small-tv-http-body-deadline.
+Доказан новый дефект НАШЕЙ HTTP-обвязки: partial JSON блокирует второйGET24.69s,
+trickle27.61s, oversized9.70s. В factory0x4200d7f0 один recv на0x4200d808;
+нашего3-timeoutloop нет. Новыйrequest_body.c:5s absolute budget, remaining
+SO_RCVTIMEOceil1ms, SHUT_RD при отказе против SDK purge, restore при успехе.
+App3C599124/source1741EA14/ELF342C0127,1 177 216bytes/free358 784,58 source inputs.
+Все4 identical actual HTTP cases pass:4.695327/4.703467/.204119s; native3950,
+platform46/frontend/integrity/timezone/aggregation reduced pass; SDK photo21pass.
+15 consumer controls pass; body_http обязателен в НОВОМ suite/publisher/verifier.
+ASM hashes проверены через checkout filter, LF attribute сохранён. Старый main
+не изменялся, текущий full11075 НЕ включает эту исправленную сборку/новый gate.
+После terminal/publish текущего DD41 объединить завершённые ветки, восстановить
+root build и запустить один новый frozen full с обязательным body_http. Результаты
+веток не приписывать root app с другим ELF/BIN identity. Код/документы/сборка
+находятся в feature branches, все собственные диагностические ВМ закрыты.
 
 ### История измерений до исправления timing
 
