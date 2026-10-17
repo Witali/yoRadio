@@ -1,0 +1,84 @@
+{
+  "passed": false,
+  "run": "upload-integrated-full-20261017",
+  "initial_git_head": "053337e404ccd823ceffcd729bb9346e30bec2ed",
+  "app_sha256": "dd41a53642b66f822b8bb55ba11c5350855d8b0d63565c0d4ffe6e51935391af",
+  "elf_sha256": "b4af3c2a72cacd0c348f5d966d1998660fd5811622589d1d24bda7dbdb775415",
+  "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "full_report_sha256": "24243b86b564d8e1f125ac08896f644edbb1be37e36bbde9d1b4ca605fb284cf",
+  "inputs_before_sha256": "2f0c94f469174e27ba58bdb175e845c40b21bc76bc55741b94a068a6ab659712",
+  "unchanged_inputs": {
+    "tests": 75,
+    "extras": 88
+  },
+  "failure": "calendar settings_http_latency_bounded; bound remains 6 guest seconds",
+  "diagnosis": "Pending; do not attribute to firmware or harness without reproduction",
+  "calendar": {
+    "original": {
+      "cases": 42,
+      "samples": 84,
+      "all_case_pixels_passed": true,
+      "checks": {
+        "all_pixels_checked": true,
+        "natural_transitions": true,
+        "hardware_breakpoints_only": true,
+        "real_ntp_packets": true,
+        "no_guest_state_writes": true,
+        "settings_http_latency_bounded": true,
+        "executable_media_unchanged": true,
+        "no_panic": true
+      },
+      "http_requests": 252,
+      "max_guest_seconds": 0.17679199999997763,
+      "slow_requests": []
+    },
+    "reconstructed": {
+      "cases": 42,
+      "samples": 84,
+      "all_case_pixels_passed": true,
+      "checks": {
+        "all_pixels_checked": true,
+        "natural_transitions": true,
+        "hardware_breakpoints_only": true,
+        "real_ntp_packets": true,
+        "no_guest_state_writes": true,
+        "settings_http_latency_bounded": false,
+        "executable_media_unchanged": true,
+        "no_panic": true
+      },
+      "http_requests": 210,
+      "max_guest_seconds": 6.15037099999995,
+      "slow_requests": [
+        {
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 5.702424000000008,
+          "host_seconds": 7.969000000011874,
+          "theme": "simple",
+          "case": "sunday"
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 5.882957000000033,
+          "host_seconds": 7.344000000011874,
+          "theme": "dial",
+          "case": "au-spring"
+        },
+        {
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 6.15037099999995,
+          "host_seconds": 7.85999999998603,
+          "theme": "dial",
+          "case": "post-2038-midnight"
+        }
+      ]
+    }
+  },
+  "not_reached": [
+    "completed scenes",
+    "diagnostic scene comparison"
+  ],
+  "publication": "Historical successful full reports are unchanged; this run is failed"
+}

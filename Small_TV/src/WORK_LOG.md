@@ -1527,3 +1527,15 @@
 вывод на экран, сеть, настройки, хранение, конвертеры форматов. Правило добавлено
 в WORKING_NOTES.md. Разрешённые оптимизации сохраняют функциональное поведение
 и сопровождаются проверками затронутого участка.
+
+### 2026-10-17 — полный прогон завершён с ошибкой задержки HTTP
+
+Full upload-integrated-full-20261017 завершился failed; report записан13:47:20.
+Все75+88 frozen inputs неизменны. Pre-QEMU18 groups pass; calendar обеих firmware:
+84 natural transitions/168 full frames pass, но native /setclocktype в dial /
+post-2038-midnight занял6.150371 guest s при пределе6. Ещё два ответа5.702424 и
+5.882957; остальные native <=0.184099, factory max0.176792. Причина пока не
+доказана. Порог оставлен прежним; начато read-only исследование HTTP/flash/сети.
+Complete-scenes и diagnostic comparison не достигнуты. Новый full pass не
+объявлен, прежние canonical reports сохранены. Компактный failed summary с
+хешами исходного report и pins сохранён в qemu/parity; исходные журналы ignored.
