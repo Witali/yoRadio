@@ -1370,3 +1370,30 @@
   промежуточное наблюдение harness, не подтверждённый дефект firmware.
 - Точка остановки сохранена в WORKING_NOTES.md. Продолжать только после явной
   команды пользователя; старое указание опрашивать handle96792 отменено.
+
+### 2026-10-17 — возобновление и браузерная приёмка текущей DAF
+
+- После явного ответа «Возобновить проверки» создан новый собственный raw guest
+  acceptance-20261017 на прежних DAF/C839/B06/QEMUFDE3.31 final browser cases и
+  21 storage/identity checks pass; scoped report и2 screenshots сохранены в qemu.
+  Три синтетические PNG сохранены как fixtures/browser; личных файлов не было.
+- Проверены ночные18/23 и5/12, яркость2/99/off; флаги/day0/три RGB565 цвета,
+  все4 темы/5 GIF/3 даты с reload; resize рамки обоими направлениями, выбранные
+  RGB области240x240 без APP/COM; mobile390x844, Cancel/Escape, mask0/31 и3/60.
+  Новый процесс после холодного запуска читает прежние settings и два JPEG.
+  Защищённые flash regions и незатронутые slots1–3 неизменны; HTTP JPEG совпадает
+  с raw; source/archive/ELF/QEMU/profile/helpers unchanged. Console errors=[]
+- Два неправильных ожидания harness сохранены отдельно: исчезнувший status
+  ошибочно искался как Upload complete и ожидалось сохранение8-bit RGB вместо
+  заводского RGB565. Видимый успех следующей загрузки проверен точной строкой;
+  нормализация цветов совпала с factory0x42008a34/0x42008a6a и прежним native test.
+  Styled switches нажимались по label; networkidle timeout не считался концом
+  ВМ/ошибкой UI, последующее наблюдение подтверждало все5 превью/ready controls.
+- ВМ10724 закрыта перед cold boot; ВМ24764 и вкладка закрыты после отчёта,
+  mobile viewport reset. General full остаётся прерванным, photo-settings branch
+  ещё не merged. H03/setup/concurrency/soak/physical acceptance этим не закрыты.
+- Пользователь подтвердил исправление factory bugs и разрешил оптимизации.
+  Для следующей правки выявлена лишняя пауза50ms после каждого upload ACK;
+  ACK следует за синхронной flash write. Baseline noise upload47837 bytes/12chunks
+  pass, JPEG SHA a73dc807e3ebd4a0339641f95a0c45f587a14892a7b1ce08ebfecd73a62825dc.
+  Пока код не менялся: сначала sequencing/retry regression, потом after build/UI.

@@ -1,0 +1,848 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "31 actual-browser controls/crop/mobile/persistence checks against the pinned reconstructed QEMU firmware. Not full H03/setup, concurrency, soak, physical acceptance or global factory equivalence.",
+  "checks": {
+    "no_panic": true,
+    "direct_flash_backing": true,
+    "guest_stopped": true,
+    "protected_flash_unchanged": true,
+    "frontend_unchanged": true,
+    "firmware_archive_unchanged": true,
+    "elf_unchanged": true,
+    "app_matches_elf": true,
+    "qemu_unchanged": true,
+    "profile_unchanged": true,
+    "helpers_unchanged": true,
+    "untouched_photo_slots_unchanged": true,
+    "cancel_and_cold_preserve_landscape": true,
+    "cold_preserves_portrait": true,
+    "jpeg_dimensions_and_metadata": true,
+    "selected_landscape_pixels": true,
+    "selected_portrait_pixels": true,
+    "raw_photos_match_http": true,
+    "cold_boot_verified": true,
+    "all_final_browser_checks_passed": true,
+    "console_errors_and_warnings_absent": true
+  },
+  "browser_checks": [
+    {
+      "case": "night-minimum-reload",
+      "values": {
+        "brightness": "2",
+        "night": true,
+        "start": "18",
+        "stop": "12"
+      },
+      "passed": true
+    },
+    {
+      "case": "night-maximum-reload",
+      "values": {
+        "brightness": "99",
+        "night": true,
+        "start": "23",
+        "stop": "5"
+      },
+      "passed": true
+    },
+    {
+      "case": "night-disable-retains-schedule",
+      "values": {
+        "brightness": "99",
+        "night": false,
+        "start": "23",
+        "stop": "5"
+      },
+      "passed": true
+    },
+    {
+      "case": "photo-initial-previews",
+      "values": {
+        "previews": [
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail1",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail2",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail3",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail4",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail5",
+            "width": 240
+          }
+        ],
+        "speed": "5"
+      },
+      "passed": true
+    },
+    {
+      "case": "crop-corner-shrink",
+      "values": {
+        "horizontal": "59",
+        "vertical": "100",
+        "zoom": "1.15"
+      },
+      "passed": true
+    },
+    {
+      "case": "crop-corner-enlarge",
+      "values": {
+        "horizontal": "54",
+        "vertical": "100",
+        "zoom": "1.05"
+      },
+      "passed": true
+    },
+    {
+      "case": "crop-cancel-button",
+      "values": {
+        "controlsEnabled": true,
+        "dialogOpen": false,
+        "status": "Upload cancelled"
+      },
+      "passed": true
+    },
+    {
+      "case": "crop-cancel-escape",
+      "values": {
+        "controlsEnabled": true,
+        "dialogOpen": false,
+        "status": "Upload cancelled"
+      },
+      "passed": true
+    },
+    {
+      "case": "mobile-photo-layout",
+      "values": {
+        "documentWidth": 375,
+        "fileInputs": [
+          {
+            "id": "imageFile1",
+            "left": 28.80000114440918,
+            "right": 284.8000011444092
+          },
+          {
+            "id": "imageFile2",
+            "left": 28.80000114440918,
+            "right": 284.8000011444092
+          },
+          {
+            "id": "imageFile3",
+            "left": 28.80000114440918,
+            "right": 284.8000011444092
+          },
+          {
+            "id": "imageFile4",
+            "left": 28.80000114440918,
+            "right": 284.8000011444092
+          },
+          {
+            "id": "imageFile5",
+            "left": 28.80000114440918,
+            "right": 284.8000011444092
+          }
+        ],
+        "previews": [
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail1",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail2",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail3",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail4",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail5",
+            "width": 240
+          }
+        ],
+        "width": 390
+      },
+      "passed": true
+    },
+    {
+      "case": "mobile-portrait-crop-layout",
+      "values": {
+        "canvas": {
+          "height": 222.90000915527344,
+          "left": 39,
+          "right": 336.20001220703125,
+          "width": 297.20001220703125
+        },
+        "dialog": {
+          "bottom": 766.9500274658203,
+          "left": 19,
+          "right": 356.20001220703125,
+          "top": 77.05000305175781
+        },
+        "height": 844,
+        "horizontal": "100",
+        "vertical": "100",
+        "width": 390,
+        "zoom": "2.4"
+      },
+      "passed": true
+    },
+    {
+      "case": "mobile-portrait-upload-success-visible",
+      "values": {
+        "controlsEnabled": true,
+        "status": "File 4 uploaded successfully"
+      },
+      "passed": true
+    },
+    {
+      "case": "mobile-settings-layout",
+      "values": {
+        "width": 390,
+        "documentWidth": 375
+      },
+      "passed": true
+    },
+    {
+      "case": "mobile-settings-save-reload-rgb565",
+      "requestedColors": [
+        "#123456",
+        "#abcdef",
+        "#654321"
+      ],
+      "expectedColors": [
+        "#103452",
+        "#adcfef",
+        "#634121"
+      ],
+      "values": {
+        "brightness": "0",
+        "colors": [
+          "#103452",
+          "#adcfef",
+          "#634121"
+        ],
+        "date": "0",
+        "fahrenheit": true,
+        "gif": "4",
+        "hour12": true,
+        "kmh": true,
+        "theme": "3",
+        "timeSyncDisabled": true
+      },
+      "passed": true
+    },
+    {
+      "case": "theme-reload-0",
+      "value": "0",
+      "passed": true
+    },
+    {
+      "case": "theme-reload-1",
+      "value": "1",
+      "passed": true
+    },
+    {
+      "case": "theme-reload-2",
+      "value": "2",
+      "passed": true
+    },
+    {
+      "case": "theme-reload-3",
+      "value": "3",
+      "passed": true
+    },
+    {
+      "case": "gif-reload-0",
+      "value": "0",
+      "passed": true
+    },
+    {
+      "case": "gif-reload-1",
+      "value": "1",
+      "passed": true
+    },
+    {
+      "case": "gif-reload-2",
+      "value": "2",
+      "passed": true
+    },
+    {
+      "case": "gif-reload-3",
+      "value": "3",
+      "passed": true
+    },
+    {
+      "case": "gif-reload-4",
+      "value": "4",
+      "passed": true
+    },
+    {
+      "case": "date-reload-0",
+      "value": "0",
+      "passed": true
+    },
+    {
+      "case": "date-reload-1",
+      "value": "1",
+      "passed": true
+    },
+    {
+      "case": "date-reload-2",
+      "value": "2",
+      "passed": true
+    },
+    {
+      "case": "cold-boot-settings-persist",
+      "values": {
+        "brightness": "0",
+        "colors": [
+          "#103452",
+          "#adcfef",
+          "#634121"
+        ],
+        "date": "2",
+        "fahrenheit": true,
+        "gif": "4",
+        "hour12": true,
+        "kmh": true,
+        "theme": "3",
+        "timeSyncDisabled": true
+      },
+      "passed": true
+    },
+    {
+      "case": "cold-boot-night-persist",
+      "values": {
+        "brightness": "99",
+        "night": false,
+        "start": "23",
+        "stop": "5"
+      },
+      "passed": true
+    },
+    {
+      "case": "cold-boot-five-previews",
+      "values": [
+        {
+          "complete": true,
+          "height": 240,
+          "id": "thumbnail1",
+          "width": 240
+        },
+        {
+          "complete": true,
+          "height": 240,
+          "id": "thumbnail2",
+          "width": 240
+        },
+        {
+          "complete": true,
+          "height": 240,
+          "id": "thumbnail3",
+          "width": 240
+        },
+        {
+          "complete": true,
+          "height": 240,
+          "id": "thumbnail4",
+          "width": 240
+        },
+        {
+          "complete": true,
+          "height": 240,
+          "id": "thumbnail5",
+          "width": 240
+        }
+      ],
+      "passed": true
+    },
+    {
+      "case": "photo-none-minimum-reload",
+      "values": {
+        "mask": 0,
+        "seconds": "3"
+      },
+      "passed": true
+    },
+    {
+      "case": "photo-all-maximum-reload",
+      "values": {
+        "mask": 31,
+        "seconds": "60"
+      },
+      "passed": true
+    },
+    {
+      "case": "noise-multichunk-upload-success-visible",
+      "values": {
+        "controlsEnabled": true,
+        "status": "File 5 uploaded successfully"
+      },
+      "passed": true
+    }
+  ],
+  "intermediate_assertions": [
+    {
+      "case": "crop-landscape-upload",
+      "values": {
+        "controlsEnabled": true,
+        "previews": [
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail1",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail2",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail3",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail4",
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail5",
+            "width": 240
+          }
+        ],
+        "text": "Clock Settings · Photos · Wi-Fi Setup\nSmart Weather Clock\nPhoto Mode\nPlay Speed: 3-60 Seconds  5s\nRETURN"
+      },
+      "passed": false,
+      "classification": "Intermediate harness check used the wrong success text and observed after its automatic clear; this is not evidence of a firmware failure. Actual JPEG verified separately."
+    },
+    {
+      "case": "mobile-settings-save-reload",
+      "values": {
+        "brightness": "0",
+        "colors": [
+          "#103452",
+          "#adcfef",
+          "#634121"
+        ],
+        "date": "0",
+        "fahrenheit": true,
+        "gif": "4",
+        "hour12": true,
+        "kmh": true,
+        "theme": "3",
+        "timeSyncDisabled": true
+      },
+      "passed": false,
+      "classification": "Intermediate oracle assumed RGB888 persistence. Factory stores RGB565 and expands channels (0x42008a34/0x42008a6a); native test already expects #123456 -> #103452."
+    }
+  ],
+  "observer_notes": [
+    "Direct setChecked was blocked by the styled settings slider overlay; clicking its visible label worked.",
+    "Photo preview loading exceeded the networkidle observer deadline twice; later DOM inspection showed all five images loaded and controls enabled.",
+    "Two incorrect intermediate assertions are retained with their classification and are not firmware failure claims."
+  ],
+  "console": [],
+  "inputs_before": {
+    "sources": {
+      "images": [
+        {
+          "file": "bootloader.bin",
+          "bytes": 19248,
+          "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+          "offset": "0x0"
+        },
+        {
+          "file": "partition-table.bin",
+          "bytes": 3072,
+          "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+          "offset": "0x8000"
+        },
+        {
+          "file": "app.bin",
+          "bytes": 1177568,
+          "sha256": "daf5595dd615be24636ae0dcc506dc67ad2b31225931c20d4d2918a2232846ea",
+          "offset": "0x10000"
+        },
+        {
+          "file": "assets.bin",
+          "bytes": 1994752,
+          "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+          "offset": "0x200000"
+        }
+      ],
+      "source_sha256": "c83941ff9c078ae5fcd53a084dee236288046ecee6e4e22794626c5968eb9047"
+    },
+    "native_elf_sha256": "b06ce81048b556cb83ea3cb738af48b6c38c7d5dc154811b6715211c506fa1a3",
+    "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+    "profile_sha256": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+    "helper_sha256": {
+      "small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+      "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+      "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+      "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+      "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+      "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4"
+    },
+    "frontend_inputs": [
+      {
+        "file": "Small_TV/local_site/photo_crop.html",
+        "sha256": "208062b9f19395049775f58ade19f648ee50fe2b8390c2d579e2519ed2313dcf"
+      },
+      {
+        "file": "Small_TV/local_site/photo_crop.js",
+        "sha256": "20e5667451ee71b30b0103206f9a3b13c111573ce773fddcbe015ad222beb484"
+      },
+      {
+        "file": "Small_TV/local_site/jpeg_metadata.js",
+        "sha256": "82ceae4f0ea5d7aeec9808d924e29fe46136e7cdca40644b3cccd45c226a7710"
+      },
+      {
+        "file": "Small_TV/local_site/pages-manifest.json",
+        "sha256": "d39f4cd3b03548262f8be48bb1c20b841ef88eeb3f4adda1a8ed0a9c1b829f14"
+      },
+      {
+        "file": "Small_TV/local_site/extract_pages.py",
+        "sha256": "356b02b9c760e9dc7900438d3994d446474a3dfe8ef6a545a02a8e89b50a4759"
+      },
+      {
+        "file": "Small_TV/local_site/pages/photo.html",
+        "sha256": "53339fa44d5d6d8a8a3c2c1951abb688f5bb87923279ff5b555dc9fd57072445"
+      },
+      {
+        "file": "Small_TV/local_site/pages/settings.html",
+        "sha256": "839e1c445080193d517fc6099d137523a24e9a91ccca8dd57a76e9e286693a40"
+      },
+      {
+        "file": "Small_TV/local_site/pages/setup.html",
+        "sha256": "b0e13e311a2c2e34b557557f858bff40f6a77f76bd7ff5d662aa938e8d86213a"
+      },
+      {
+        "file": "Small_TV/src/tests/qemu_storage.py",
+        "sha256": "3fa00b82379b90c76939ad61d1756f1fcefe03ded492bd16c7df1b532578dc3d"
+      },
+      {
+        "file": "Small_TV/qemu/parity/compare.py",
+        "sha256": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84"
+      },
+      {
+        "file": ".build/small-tv-browser/launch_acceptance_20261017.py",
+        "sha256": "5b3ad55b15d6cb496956bb320aa591e3ceba632edc826cfcf0905a02373784da"
+      }
+    ],
+    "artifact_inputs": [
+      {
+        "file": "app.bin",
+        "sha256": "daf5595dd615be24636ae0dcc506dc67ad2b31225931c20d4d2918a2232846ea"
+      },
+      {
+        "file": "bootloader.bin",
+        "sha256": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016"
+      },
+      {
+        "file": "partition-table.bin",
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+      },
+      {
+        "file": "assets.bin",
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+      },
+      {
+        "file": "manifest.json",
+        "sha256": "3a1096423a5fede0ab093a16a6ce3f70c50a79e8e978c26fed62e2993846da8c"
+      },
+      {
+        "file": "source-manifest.json",
+        "sha256": "bc6d460c68f3a183ec465c948dd57eea65dc60e1ee97b0c77b5e99eeba1edcb3"
+      },
+      {
+        "file": "assets-manifest.json",
+        "sha256": "9f034fa7d5793c24da9a5399c68d93f921d6716b923fb6193a7a54a1ec7a6e0b"
+      }
+    ],
+    "direct_flash_backing": true,
+    "protected_ranges": [
+      {
+        "start": 0,
+        "end": 36864,
+        "sha256": "bbd771fffdc532488bfa9e6c757164a1669ce73a48deb9554258464c25e99276"
+      },
+      {
+        "start": 65536,
+        "end": 2097152,
+        "sha256": "49c98d3adfa0b1154ddd3f4b1fe766d87955ef318d3d3a338a96e380b2de773a"
+      },
+      {
+        "start": 2609152,
+        "end": 4091904,
+        "sha256": "723061c4eaeab4c986b62c7aac933e3f42c952fa2711f47d38a168dcb1369441"
+      }
+    ],
+    "scope": "Fresh owned headless guest with synthetic station preferences and genuinely empty weather key. Browser actions recorded separately; source firmware untouched."
+  },
+  "cold_boot": {
+    "no_panic_before": true,
+    "direct_flash_backing_before": true,
+    "protected_ranges_unchanged": true,
+    "new_vm_name": true,
+    "raw_flash_preserved_at_launch": true,
+    "direct_flash_backing_after": true,
+    "no_panic_after": true,
+    "url": "http://127.0.0.1:18080",
+    "pid": 24764,
+    "passed": true
+  },
+  "saved_photos": {
+    "landscape-upload": {
+      "slot": 5,
+      "bytes": 607,
+      "sha256": "00d6efe7315e9560ed95154641d982ff300a5058e4996e5916325ab7aec26a87",
+      "size": [
+        240,
+        240
+      ],
+      "markers": [
+        "0xdb",
+        "0xdb",
+        "0xc0",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xda"
+      ],
+      "sample": [
+        30,
+        70,
+        230
+      ],
+      "center": [
+        30,
+        70,
+        230
+      ],
+      "metadata_absent": true
+    },
+    "landscape-after-cancel": {
+      "slot": 5,
+      "bytes": 607,
+      "sha256": "00d6efe7315e9560ed95154641d982ff300a5058e4996e5916325ab7aec26a87",
+      "size": [
+        240,
+        240
+      ],
+      "markers": [
+        "0xdb",
+        "0xdb",
+        "0xc0",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xda"
+      ],
+      "sample": [
+        30,
+        70,
+        230
+      ],
+      "center": [
+        30,
+        70,
+        230
+      ],
+      "metadata_absent": true
+    },
+    "landscape-after-cold": {
+      "slot": 5,
+      "bytes": 607,
+      "sha256": "00d6efe7315e9560ed95154641d982ff300a5058e4996e5916325ab7aec26a87",
+      "size": [
+        240,
+        240
+      ],
+      "markers": [
+        "0xdb",
+        "0xdb",
+        "0xc0",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xda"
+      ],
+      "sample": [
+        30,
+        70,
+        230
+      ],
+      "center": [
+        30,
+        70,
+        230
+      ],
+      "metadata_absent": true
+    },
+    "portrait-upload": {
+      "slot": 4,
+      "bytes": 607,
+      "sha256": "e958af6a87d39eee086e8e75cf6e22b67c4de75cedc34fc8fd574e4c4a2853ca",
+      "size": [
+        240,
+        240
+      ],
+      "markers": [
+        "0xdb",
+        "0xdb",
+        "0xc0",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xda"
+      ],
+      "sample": [
+        231,
+        190,
+        20
+      ],
+      "center": [
+        231,
+        190,
+        20
+      ],
+      "metadata_absent": true
+    },
+    "portrait-after-cold": {
+      "slot": 4,
+      "bytes": 607,
+      "sha256": "e958af6a87d39eee086e8e75cf6e22b67c4de75cedc34fc8fd574e4c4a2853ca",
+      "size": [
+        240,
+        240
+      ],
+      "markers": [
+        "0xdb",
+        "0xdb",
+        "0xc0",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xda"
+      ],
+      "sample": [
+        231,
+        190,
+        20
+      ],
+      "center": [
+        231,
+        190,
+        20
+      ],
+      "metadata_absent": true
+    },
+    "noise-upload": {
+      "slot": 5,
+      "bytes": 47837,
+      "sha256": "a73dc807e3ebd4a0339641f95a0c45f587a14892a7b1ce08ebfecd73a62825dc",
+      "size": [
+        240,
+        240
+      ],
+      "markers": [
+        "0xdb",
+        "0xdb",
+        "0xc0",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xc4",
+        "0xda"
+      ],
+      "sample": [
+        107,
+        99,
+        80
+      ],
+      "center": [
+        136,
+        179,
+        149
+      ],
+      "metadata_absent": true
+    }
+  },
+  "fixtures": [
+    {
+      "file": "Small_TV/src/tests/fixtures/browser/landscape-bands.png",
+      "sha256": "1a8bd4e774c10c4ec3b82b2664bc4c4df01929a14a3a70a46670bc4db50787bd",
+      "synthetic": true
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/browser/portrait-bands.png",
+      "sha256": "2dad70f54527c46c3a7cc28da9b2df0f1c4e02abd115b1aba91c36ef2f497118",
+      "synthetic": true
+    },
+    {
+      "file": "Small_TV/src/tests/fixtures/browser/noise-240.png",
+      "sha256": "58f2ee1863aa4846216ac1ee00ad4da4fe31675511ae837f67227b2bfe6ad777",
+      "synthetic": true
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "browser-controls-20261017-crop.jpg",
+      "sha256": "3efd55ac8106d834ed1f9ef5a7157c5e38142eb78dfe3d4aabdf9111c5e3ffd9"
+    },
+    {
+      "file": "browser-controls-20261017-mobile.jpg",
+      "sha256": "86d9d57cd0882e57fd9ac638f56a80395785d5e80700c769433c79d6fe8f98a6"
+    }
+  ],
+  "noise_upload_chunks": 12
+}
