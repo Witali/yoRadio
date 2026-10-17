@@ -1637,3 +1637,7 @@ SDK photo HTTP21pass; consumer guards15pass. ASM/manifest и scoped report/doc
 Это не общий full pass нового app. Main DD41/75+88 frozen inputs текущего11075
 не менялись; он проходит отдельную проверку на QEMU30F. Merge/build/full нового
 кандидата выполнять после terminal/сохранения этого прогона, не подменяя identities.
+
+ASM body-reader audit получил явный eol=lf в Small_TV/.gitattributes. Проверка
+git cat-file --filters даёт тот же SHA, что manifest; checkout не меняет
+fingerprinted bytes. Production sources, ELF/app и scoped runtime results прежние.
