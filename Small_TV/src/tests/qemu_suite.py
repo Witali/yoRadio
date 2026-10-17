@@ -67,7 +67,8 @@ def main():
         validate_boot_state(report, expected_boot)
         report['boot_observer_contract_checks'] = boot_rejections(report, expected_boot)
         for name, key in (('startup', 'startup_wait'), ('weather_wait', 'weather_wait'),
-                          ('advanced', 'advanced_http'), ('http_body', 'body_http'), ('concurrency', 'concurrency_http'), ('photo', 'photo_http'), ('photo_frames', 'photo_frames'),
+                          ('advanced', 'advanced_http'), ('http_body', 'body_http'), ('concurrency', 'concurrency_http'),
+                          ('uri_targets', 'uri_targets_http'), ('photo', 'photo_http'), ('photo_frames', 'photo_frames'),
                           ('photo_brightness', 'photo_brightness'), ('photo_controls', 'photo_controls'),
                           ('photo_reinit', 'photo_reinit'), ('photo_settings', 'photo_settings')):
             folder = args.output / ({'advanced': 'advanced-http', 'http_body': 'http-body', 'concurrency': 'concurrency-http', 'photo': 'photo-http', 'photo_frames': 'photo-frames',

@@ -187,6 +187,15 @@ def main():
         raise ValueError('Clock did not advance while the weather reply was withheld')
     if not qemu['http_initial_setup']['passed']:
         raise ValueError('Real HTTP initial setup did not pass')
+    uri_targets = qemu['uri_targets_http']
+    if (not uri_targets['passed'] or not uri_targets['inputs_unchanged'] or
+            uri_targets['app_sha256'] != report['app_sha256'] or
+            uri_targets['source_sha256'] != report['source_sha256'] or
+            uri_targets['qemu_sha256'] != qemu['qemu_sha256'] or
+            set(uri_targets['variants']) != {'original', 'reconstructed'} or
+            any(not row['vm_stopped'] or not row['no_panic'] or not row['checks'] or
+                not all(row['checks'].values()) for row in uri_targets['variants'].values())):
+        raise ValueError('URI request-target comparison omitted a firmware or used different inputs')
     if not qemu['weather_http']['passed']:
         raise ValueError('Real weather HTTP/value/LCD comparison did not pass')
     fields = qemu['field_http']
@@ -395,6 +404,7 @@ def main():
                        'photo_controls': controls_http,
                        'photo_reinit': reinit_http,
                        'photo_settings': photo_settings, 'body_http': body_http, 'concurrency_http': concurrency_http,
+                       'uri_targets_http': uri_targets,
                        'advanced_http': advanced,
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],

@@ -1,0 +1,837 @@
+{
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Registered HTTP path dispatch, factory comparison and four request-target forms. Not a full regression or 24-hour H10 acceptance.",
+  "factory_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4",
+  "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+  "before": {
+    "app_sha256": "922da96359834f815f9de0b344ea265cb6a48e2122760a39aa8b28b923ae3d8b",
+    "variants": {
+      "original": {
+        "vm_stopped": true,
+        "no_panic": true,
+        "observations": [
+          {
+            "method": "GET",
+            "route": "/getclocktype",
+            "base": {
+              "status": 200,
+              "bytes": 1,
+              "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "value": "0"
+            },
+            "query": {
+              "status": 200,
+              "bytes": 1,
+              "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "value": "0"
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/getgifvalue",
+            "base": {
+              "status": 200,
+              "bytes": 1,
+              "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "value": "0"
+            },
+            "query": {
+              "status": 200,
+              "bytes": 1,
+              "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "value": "0"
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/getsettings",
+            "base": {
+              "status": 200,
+              "bytes": 72,
+              "sha256": "fae385330b886afaa26e5f9e254cb7564904476a3df7ba9cea39d58608f51462",
+              "value": "{\"tempUnit\":0,\"hourFormat\":0,\"mileDisplay\":0,\"timeSync\":0,\"nightmode\":0}"
+            },
+            "query": {
+              "status": 200,
+              "bytes": 72,
+              "sha256": "fae385330b886afaa26e5f9e254cb7564904476a3df7ba9cea39d58608f51462",
+              "value": "{\"tempUnit\":0,\"hourFormat\":0,\"mileDisplay\":0,\"timeSync\":0,\"nightmode\":0}"
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/",
+            "base": {
+              "status": 200,
+              "bytes": 10077,
+              "sha256": "b7e474c7e5826de0d11d65884e598e31b2cf1df408b968f428e72aaa50ef5289",
+              "value": null
+            },
+            "query": {
+              "status": 200,
+              "bytes": 10077,
+              "sha256": "b7e474c7e5826de0d11d65884e598e31b2cf1df408b968f428e72aaa50ef5289",
+              "value": null
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/photo",
+            "base": {
+              "status": 200,
+              "bytes": 26175,
+              "sha256": "1014f4cd6f4df2c2ecabb3d408d0079382dce0261b1ccef8c3b001e38f712aab",
+              "value": null
+            },
+            "query": {
+              "status": 200,
+              "bytes": 26175,
+              "sha256": "1014f4cd6f4df2c2ecabb3d408d0079382dce0261b1ccef8c3b001e38f712aab",
+              "value": null
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/get_Photo_File?file=1&chunk=0&size=0",
+            "base": {
+              "status": 200,
+              "bytes": 28,
+              "sha256": "9f39226c9f70b42ab746107881a17119aeb25b33ee921c67eff5843550d31cf3",
+              "value": "{\"exists\":true,\"size\":69583}"
+            },
+            "query": {
+              "status": 200,
+              "bytes": 28,
+              "sha256": "9f39226c9f70b42ab746107881a17119aeb25b33ee921c67eff5843550d31cf3",
+              "value": "{\"exists\":true,\"size\":69583}"
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/getclocktype",
+            "absolute_bare": {
+              "status": 200,
+              "bytes": 1,
+              "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "value": "0"
+            },
+            "absolute_query": {
+              "status": 200,
+              "bytes": 1,
+              "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "value": "0"
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/photo",
+            "absolute_bare": {
+              "status": 200,
+              "bytes": 26175,
+              "sha256": "1014f4cd6f4df2c2ecabb3d408d0079382dce0261b1ccef8c3b001e38f712aab",
+              "value": null
+            },
+            "absolute_query": {
+              "status": 200,
+              "bytes": 26175,
+              "sha256": "1014f4cd6f4df2c2ecabb3d408d0079382dce0261b1ccef8c3b001e38f712aab",
+              "value": null
+            }
+          }
+        ],
+        "post_query": {
+          "status": 200,
+          "bytes": 2,
+          "sha256": "565339bc4d33d72817b583024112eb7f5cdf3e5eef0252d6ec1b9c9a94e12bb3",
+          "value": "OK"
+        },
+        "after_post_query": {
+          "status": 200,
+          "bytes": 1,
+          "sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+          "value": "2"
+        }
+      },
+      "reconstructed": {
+        "vm_stopped": true,
+        "no_panic": true,
+        "observations": [
+          {
+            "method": "GET",
+            "route": "/getclocktype",
+            "base": {
+              "status": 200,
+              "bytes": 1,
+              "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "value": "0"
+            },
+            "query": {
+              "status": 400,
+              "bytes": 15,
+              "sha256": "d7117ae83b6d458fd01f628c0c74690ad1a58302649c711e92467795640bc40c",
+              "value": "Unknown setting"
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/getgifvalue",
+            "base": {
+              "status": 200,
+              "bytes": 1,
+              "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "value": "0"
+            },
+            "query": {
+              "status": 400,
+              "bytes": 15,
+              "sha256": "d7117ae83b6d458fd01f628c0c74690ad1a58302649c711e92467795640bc40c",
+              "value": "Unknown setting"
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/getsettings",
+            "base": {
+              "status": 200,
+              "bytes": 72,
+              "sha256": "fae385330b886afaa26e5f9e254cb7564904476a3df7ba9cea39d58608f51462",
+              "value": "{\"tempUnit\":0,\"hourFormat\":0,\"mileDisplay\":0,\"timeSync\":0,\"nightmode\":0}"
+            },
+            "query": {
+              "status": 400,
+              "bytes": 15,
+              "sha256": "d7117ae83b6d458fd01f628c0c74690ad1a58302649c711e92467795640bc40c",
+              "value": "Unknown setting"
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/",
+            "base": {
+              "status": 200,
+              "bytes": 10559,
+              "sha256": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
+              "value": null
+            },
+            "query": {
+              "status": 200,
+              "bytes": 40860,
+              "sha256": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
+              "value": null
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/photo",
+            "base": {
+              "status": 200,
+              "bytes": 33972,
+              "sha256": "6aa893c2806184daff7c30b798d1a89d17586c2025cc8be6530ed601fb49a736",
+              "value": null
+            },
+            "query": {
+              "status": 200,
+              "bytes": 40860,
+              "sha256": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
+              "value": null
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/get_Photo_File?file=1&chunk=0&size=0",
+            "base": {
+              "status": 200,
+              "bytes": 28,
+              "sha256": "f6e9bf3ba029cc1353449548a87cf8f9c4de38bd3bdb9c849a8b31f0aaf68f5f",
+              "value": "{\"exists\":true,\"size\":69565}"
+            },
+            "query": {
+              "status": 200,
+              "bytes": 28,
+              "sha256": "f6e9bf3ba029cc1353449548a87cf8f9c4de38bd3bdb9c849a8b31f0aaf68f5f",
+              "value": "{\"exists\":true,\"size\":69565}"
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/getclocktype",
+            "absolute_bare": {
+              "status": 400,
+              "bytes": 15,
+              "sha256": "d7117ae83b6d458fd01f628c0c74690ad1a58302649c711e92467795640bc40c",
+              "value": "Unknown setting"
+            },
+            "absolute_query": {
+              "status": 400,
+              "bytes": 15,
+              "sha256": "d7117ae83b6d458fd01f628c0c74690ad1a58302649c711e92467795640bc40c",
+              "value": "Unknown setting"
+            }
+          },
+          {
+            "method": "GET",
+            "route": "/photo",
+            "absolute_bare": {
+              "status": 200,
+              "bytes": 40860,
+              "sha256": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
+              "value": null
+            },
+            "absolute_query": {
+              "status": 200,
+              "bytes": 40860,
+              "sha256": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
+              "value": null
+            }
+          }
+        ],
+        "post_query": {
+          "status": 400,
+          "bytes": 24,
+          "sha256": "c665b7dab8b5ac9f3c202bb4a65d742bb08af43bf87fec76e6bd6b97d292d952",
+          "value": "Invalid setting or value"
+        },
+        "after_post_query": {
+          "status": 200,
+          "bytes": 1,
+          "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "value": "1"
+        }
+      }
+    }
+  },
+  "after": {
+    "original": {
+      "sources": {
+        "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+      },
+      "checks": {
+        "/getclocktype:base": true,
+        "/getclocktype:form1": true,
+        "/getclocktype:form2": true,
+        "/getclocktype:form3": true,
+        "/getgifvalue:base": true,
+        "/getgifvalue:form1": true,
+        "/getgifvalue:form2": true,
+        "/getgifvalue:form3": true,
+        "/getsettings:base": true,
+        "/getsettings:form1": true,
+        "/getsettings:form2": true,
+        "/getsettings:form3": true,
+        "/:base": true,
+        "/:form1": true,
+        "/:form2": true,
+        "/:form3": true,
+        "/photo:base": true,
+        "/photo:form1": true,
+        "/photo:form2": true,
+        "/photo:form3": true,
+        "/get_Photo_File?file=1&chunk=0&size=0:base": true,
+        "/get_Photo_File?file=1&chunk=0&size=0:form1": true,
+        "/get_Photo_File?file=1&chunk=0&size=0:form2": true,
+        "/get_Photo_File?file=1&chunk=0&size=0:form3": true,
+        "/get_Photo_File?file=1&chunk=0&size=1024:base": true,
+        "/get_Photo_File?file=1&chunk=0&size=1024:form1": true,
+        "/get_Photo_File?file=1&chunk=0&size=1024:form2": true,
+        "/get_Photo_File?file=1&chunk=0&size=1024:form3": true,
+        "settings-post:0": true,
+        "settings-readback:0": true,
+        "settings-post:1": true,
+        "settings-readback:1": true,
+        "settings-post:2": true,
+        "settings-readback:2": true,
+        "settings-post:3": true,
+        "settings-readback:3": true
+      },
+      "request_count": 36,
+      "vm_stopped": true,
+      "no_panic": true
+    },
+    "reconstructed": {
+      "sources": {
+        "images": [
+          {
+            "bytes": 16928,
+            "sha256": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b",
+            "offset": "0x0",
+            "file": "bootloader.bin"
+          },
+          {
+            "bytes": 3072,
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+            "offset": "0x8000",
+            "file": "partition-table.bin"
+          },
+          {
+            "bytes": 1169904,
+            "sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+            "offset": "0x10000",
+            "file": "app.bin"
+          },
+          {
+            "bytes": 1994752,
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+            "offset": "0x200000",
+            "file": "assets.bin"
+          }
+        ],
+        "source_sha256": "be5802d60f7e113aeb6e5fc77bc144f3088f5dbb791a6ab4c46db4cbb02b0726"
+      },
+      "checks": {
+        "/getclocktype:base": true,
+        "/getclocktype:form1": true,
+        "/getclocktype:form2": true,
+        "/getclocktype:form3": true,
+        "/getgifvalue:base": true,
+        "/getgifvalue:form1": true,
+        "/getgifvalue:form2": true,
+        "/getgifvalue:form3": true,
+        "/getsettings:base": true,
+        "/getsettings:form1": true,
+        "/getsettings:form2": true,
+        "/getsettings:form3": true,
+        "/:base": true,
+        "/:form1": true,
+        "/:form2": true,
+        "/:form3": true,
+        "/photo:base": true,
+        "/photo:form1": true,
+        "/photo:form2": true,
+        "/photo:form3": true,
+        "/get_Photo_File?file=1&chunk=0&size=0:base": true,
+        "/get_Photo_File?file=1&chunk=0&size=0:form1": true,
+        "/get_Photo_File?file=1&chunk=0&size=0:form2": true,
+        "/get_Photo_File?file=1&chunk=0&size=0:form3": true,
+        "/get_Photo_File?file=1&chunk=0&size=1024:base": true,
+        "/get_Photo_File?file=1&chunk=0&size=1024:form1": true,
+        "/get_Photo_File?file=1&chunk=0&size=1024:form2": true,
+        "/get_Photo_File?file=1&chunk=0&size=1024:form3": true,
+        "settings-post:0": true,
+        "settings-readback:0": true,
+        "settings-post:1": true,
+        "settings-readback:1": true,
+        "settings-post:2": true,
+        "settings-readback:2": true,
+        "settings-post:3": true,
+        "settings-readback:3": true,
+        "photo-start:0": true,
+        "photo-chunk:0:0": true,
+        "photo-chunk:0:1": true,
+        "photo-chunk:0:2": true,
+        "photo-chunk:0:3": true,
+        "photo-chunk:0:4": true,
+        "photo-chunk:0:5": true,
+        "photo-chunk:0:6": true,
+        "photo-chunk:0:7": true,
+        "photo-chunk:0:8": true,
+        "photo-chunk:0:9": true,
+        "photo-finish:0": true,
+        "photo-download:0:0": true,
+        "photo-download:0:1": true,
+        "photo-download:0:2": true,
+        "photo-download:0:3": true,
+        "photo-download:0:4": true,
+        "photo-download:0:5": true,
+        "photo-download:0:6": true,
+        "photo-download:0:7": true,
+        "photo-download:0:8": true,
+        "photo-download:0:9": true,
+        "photo-start:1": true,
+        "photo-chunk:1:0": true,
+        "photo-chunk:1:1": true,
+        "photo-chunk:1:2": true,
+        "photo-chunk:1:3": true,
+        "photo-chunk:1:4": true,
+        "photo-chunk:1:5": true,
+        "photo-chunk:1:6": true,
+        "photo-chunk:1:7": true,
+        "photo-chunk:1:8": true,
+        "photo-chunk:1:9": true,
+        "photo-finish:1": true,
+        "photo-download:1:0": true,
+        "photo-download:1:1": true,
+        "photo-download:1:2": true,
+        "photo-download:1:3": true,
+        "photo-download:1:4": true,
+        "photo-download:1:5": true,
+        "photo-download:1:6": true,
+        "photo-download:1:7": true,
+        "photo-download:1:8": true,
+        "photo-download:1:9": true,
+        "photo-start:2": true,
+        "photo-chunk:2:0": true,
+        "photo-chunk:2:1": true,
+        "photo-chunk:2:2": true,
+        "photo-chunk:2:3": true,
+        "photo-chunk:2:4": true,
+        "photo-chunk:2:5": true,
+        "photo-chunk:2:6": true,
+        "photo-chunk:2:7": true,
+        "photo-chunk:2:8": true,
+        "photo-chunk:2:9": true,
+        "photo-finish:2": true,
+        "photo-download:2:0": true,
+        "photo-download:2:1": true,
+        "photo-download:2:2": true,
+        "photo-download:2:3": true,
+        "photo-download:2:4": true,
+        "photo-download:2:5": true,
+        "photo-download:2:6": true,
+        "photo-download:2:7": true,
+        "photo-download:2:8": true,
+        "photo-download:2:9": true,
+        "photo-start:3": true,
+        "photo-chunk:3:0": true,
+        "photo-chunk:3:1": true,
+        "photo-chunk:3:2": true,
+        "photo-chunk:3:3": true,
+        "photo-chunk:3:4": true,
+        "photo-chunk:3:5": true,
+        "photo-chunk:3:6": true,
+        "photo-chunk:3:7": true,
+        "photo-chunk:3:8": true,
+        "photo-chunk:3:9": true,
+        "photo-finish:3": true,
+        "photo-download:3:0": true,
+        "photo-download:3:1": true,
+        "photo-download:3:2": true,
+        "photo-download:3:3": true,
+        "photo-download:3:4": true,
+        "photo-download:3:5": true,
+        "photo-download:3:6": true,
+        "photo-download:3:7": true,
+        "photo-download:3:8": true,
+        "photo-download:3:9": true
+      },
+      "request_count": 124,
+      "vm_stopped": true,
+      "no_panic": true
+    }
+  },
+  "builds": {
+    "small-tv-esp32c2": {
+      "app_sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+      "elf_sha256": "62e040b592d6bd526b25c6035005e31a3a40eebb5a9beb994abe49f089addebb",
+      "source_sha256": "be5802d60f7e113aeb6e5fc77bc144f3088f5dbb791a6ab4c46db4cbb02b0726",
+      "debug_logging": false,
+      "bytes": 1169904,
+      "production_inputs": 59
+    },
+    "small-tv-esp32c2-debug": {
+      "app_sha256": "a8c337bc13d6fa1f6651a5f3fdd7d17890d8c94b0694c27ab6cfccbea687ef53",
+      "elf_sha256": "86b7275d7231691840c528c717e5463a821d79f5f4982b8b44fe9afb568bb03d",
+      "source_sha256": "be5802d60f7e113aeb6e5fc77bc144f3088f5dbb791a6ab4c46db4cbb02b0726",
+      "debug_logging": true,
+      "bytes": 1230752,
+      "production_inputs": 59
+    }
+  },
+  "host": {
+    "report_aggregation": {
+      "checks": 14,
+      "passed": true,
+      "preserved_dates": [
+        "2026-10-17T23:59:59+08:00",
+        "2026-10-18T00:00:00+08:00",
+        "2026-11-01T01:59:59-04:00",
+        "2026-11-01T01:00:00-05:00",
+        "2026-01-01T23:59:59+05:45",
+        "2026-10-16T17:50:43.178681+00:00"
+      ],
+      "scope": "Actual suite JSON reader and serializer preserve country offsets, midnight, DST overlap and fractional UTC offsets as strings"
+    },
+    "native": {
+      "passed": true,
+      "checks": 5531,
+      "groups": [
+        "settings",
+        "factory_settings",
+        "weather_parser",
+        "assets",
+        "http_contracts",
+        "uploads",
+        "multipart",
+        "dns"
+      ],
+      "routes": [
+        {
+          "method": "GET",
+          "uri": "/get_Photo_File",
+          "successes": 80,
+          "errors": 20
+        },
+        {
+          "method": "POST",
+          "uri": "/set_checkbox_state",
+          "successes": 15,
+          "errors": 3
+        },
+        {
+          "method": "GET",
+          "uri": "/get_checkbox_state",
+          "successes": 19,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/set_display_time",
+          "successes": 121,
+          "errors": 14
+        },
+        {
+          "method": "GET",
+          "uri": "/get_display_time",
+          "successes": 66,
+          "errors": 0
+        },
+        {
+          "method": "GET",
+          "uri": "/photo",
+          "successes": 9,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/wifireset",
+          "successes": 5,
+          "errors": 1
+        },
+        {
+          "method": "POST",
+          "uri": "/advancedset",
+          "successes": 6,
+          "errors": 2
+        },
+        {
+          "method": "POST",
+          "uri": "/restart",
+          "successes": 6,
+          "errors": 0
+        },
+        {
+          "method": "GET",
+          "uri": "/GetNightStopTime",
+          "successes": 16,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/SetNightStopTime",
+          "successes": 21,
+          "errors": 13
+        },
+        {
+          "method": "GET",
+          "uri": "/GetNightStartTime",
+          "successes": 14,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/SetNightStartTime",
+          "successes": 17,
+          "errors": 13
+        },
+        {
+          "method": "POST",
+          "uri": "/set_night_brightness",
+          "successes": 106,
+          "errors": 7
+        },
+        {
+          "method": "GET",
+          "uri": "/get_night_brightness",
+          "successes": 110,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/set_clock_color",
+          "successes": 8,
+          "errors": 4
+        },
+        {
+          "method": "GET",
+          "uri": "/get_clock_colors",
+          "successes": 10,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/set_led_brightness",
+          "successes": 106,
+          "errors": 8
+        },
+        {
+          "method": "GET",
+          "uri": "/get_led_brightness",
+          "successes": 110,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/updateCity",
+          "successes": 119,
+          "errors": 15
+        },
+        {
+          "method": "GET",
+          "uri": "/GetTimeModeValue",
+          "successes": 11,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/SetTimeModeValue",
+          "successes": 10,
+          "errors": 13
+        },
+        {
+          "method": "GET",
+          "uri": "/getsettings",
+          "successes": 19,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/settings",
+          "successes": 15,
+          "errors": 10
+        },
+        {
+          "method": "GET",
+          "uri": "/getclocktype",
+          "successes": 15,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/setclocktype",
+          "successes": 18,
+          "errors": 34
+        },
+        {
+          "method": "GET",
+          "uri": "/getgifvalue",
+          "successes": 13,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/setgifvalue",
+          "successes": 14,
+          "errors": 14
+        },
+        {
+          "method": "GET",
+          "uri": "/scan",
+          "successes": 10,
+          "errors": 1
+        },
+        {
+          "method": "POST",
+          "uri": "/configure",
+          "successes": 6,
+          "errors": 4
+        },
+        {
+          "method": "GET",
+          "uri": "/",
+          "successes": 10,
+          "errors": 0
+        },
+        {
+          "method": "POST",
+          "uri": "/finish_upload",
+          "successes": 4,
+          "errors": 5
+        },
+        {
+          "method": "POST",
+          "uri": "/upload_chunk",
+          "successes": 69,
+          "errors": 3
+        },
+        {
+          "method": "POST",
+          "uri": "/start_upload",
+          "successes": 4,
+          "errors": 5
+        },
+        {
+          "method": "GET",
+          "uri": "/setup",
+          "successes": 9,
+          "errors": 0
+        },
+        {
+          "method": "GET",
+          "uri": "/setup.html",
+          "successes": 9,
+          "errors": 0
+        },
+        {
+          "method": "GET",
+          "uri": "/settings",
+          "successes": 9,
+          "errors": 0
+        },
+        {
+          "method": "GET",
+          "uri": "/settings.html",
+          "successes": 9,
+          "errors": 0
+        },
+        {
+          "method": "GET",
+          "uri": "/photo.html",
+          "successes": 9,
+          "errors": 0
+        },
+        {
+          "method": "GET",
+          "uri": "/advanced",
+          "successes": 13,
+          "errors": 0
+        }
+      ]
+    },
+    "platform": {
+      "passed": true
+    },
+    "frontend": {
+      "passed": true
+    },
+    "integrity": {
+      "passed": true
+    },
+    "timezone_sources": {
+      "passed": true
+    }
+  },
+  "raw_reports_sha256": {
+    ".build/uri-dispatch/before-20261017/report.json": "00961507e25f5c61ad075d6506e19e745b77fec43cb10b54a5416c814e537e24",
+    ".worktree/small-tv-runtime-observer/.build/uri-targets-after-20261017/report.json": "0c8fb673f759e8dd960159a9960d09ce9699cd56f296799149c8433eede509ac",
+    ".worktree/small-tv-runtime-observer/.build/uri-targets-host-20261017/report.json": "3f7844a0bfbbc5104fa8b9371f755672d0e76c142edc5b47f03c4a67c67ca767"
+  },
+  "debug_configuration_unit": {
+    "passed": true,
+    "modes": [
+      "OFF",
+      "ON",
+      "OFF"
+    ],
+    "scope": "Retain unrelated SDK choices and maximum level, CRLF, repeated-mode idempotence."
+  },
+  "native_negative_control": {
+    "old_production_failed": true,
+    "condition": "Valid query GET returned HTTP 400 instead of 200",
+    "log_sha256": "f02197cc029978baadc1331d6962fca1495033c1f8f990a5750dcddd102d2722"
+  },
+  "limitations": [
+    "Latest debug variant compile/configuration checked; this URI VM run used ordinary firmware.",
+    "Historical full regression remains tied to its EF66 application; new full run and H10 have not yet started.",
+    "No physical device flashed or reset."
+  ]
+}

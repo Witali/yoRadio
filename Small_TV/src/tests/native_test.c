@@ -37,6 +37,7 @@ static esp_err_t scan_result=ESP_OK,write_result=ESP_OK;
 static esp_err_t (*not_found)(httpd_req_t *,httpd_err_code_t);
 static const esp_partition_t partition={ASSETS_BASE,sizeof(flash_bytes)};
 static const httpd_uri_t *route_table[48];
+static httpd_uri_t registered_handlers[48];
 extern const unsigned char web_setup[],web_settings[],web_photo[];
 extern const size_t web_setup_length,web_settings_length,web_photo_length;
 
@@ -153,7 +154,13 @@ esp_err_t httpd_query_key_value(const char *query,const char *key,char *out,size
 esp_err_t httpd_start(httpd_handle_t *server,const httpd_config_t *config) {(void)config;*server=(void *)1;return ESP_OK;}
 esp_err_t httpd_stop(httpd_handle_t server) {(void)server;return ESP_OK;}
 esp_err_t httpd_register_uri_handler(httpd_handle_t server,const httpd_uri_t *uri)
-{(void)server;assert(registered_routes<48);route_table[registered_routes++]=uri;return ESP_OK;}
+{
+    /* ESP-IDF copies the registration; its caller may use a temporary descriptor. */
+    (void)server;assert(registered_routes<48);
+    registered_handlers[registered_routes]=*uri;
+    route_table[registered_routes]=&registered_handlers[registered_routes];
+    ++registered_routes;return ESP_OK;
+}
 esp_err_t httpd_register_err_handler(httpd_handle_t server,httpd_err_code_t code,esp_err_t (*handler)(httpd_req_t *,httpd_err_code_t))
 {(void)server;assert(code==HTTPD_404_NOT_FOUND);not_found=handler;return ESP_OK;}
 
@@ -162,11 +169,21 @@ static void prepare(const char *uri,const void *body,size_t length,const char *t
 {memset(&request,0,sizeof(request));request.uri=uri;request.input=body;request.content_len=length;request.content_type=type;request.host="192.168.43.1";request.status=200;request.recv_timeout_us=5000000;}
 static void dispatch(httpd_method_t method)
 {
-    /* Exercise the registered method/URI handler, retaining successful/error coverage. */
-    size_t length=strcspn(request.uri,"?");
+    /* Model SDK path selection for the valid origin/absolute targets in these tests.
+     * This adapter is not an HTTP parser: real SDK parsing is exercised in QEMU.
+     * Keep the complete request URI and attach the registered handler's context. */
+    const char *path=request.uri;
+    if(!strncmp(path,"http://",7) || !strncmp(path,"https://",8))
+    {
+        const char *authority=strstr(path,"://")+3;
+        path=strpbrk(authority,"/?#");
+        CHECK(path && *path=='/');
+    }
+    size_t length=strcspn(path,"?#");
     for(unsigned i=0;i<registered_routes;++i)
-        if(route_table[i]->method==method && strlen(route_table[i]->uri)==length && !memcmp(route_table[i]->uri,request.uri,length))
+        if(route_table[i]->method==method && strlen(route_table[i]->uri)==length && !memcmp(route_table[i]->uri,path,length))
         {
+            request.user_ctx=route_table[i]->user_ctx;
             route_table[i]->handler(&request);
             if(request.status==200)++route_success[i];else ++route_errors[i];
             return;
@@ -199,7 +216,7 @@ static void test_settings(void)
     post("/advancedset","{\"ntp\":\"pool.ntp.org\",\"openweathermapKey\":\"\",\"clickCount\":0}",200);CHECK(weather_requests==2);
     post("/set_display_time","{\"display_time\":60}",200);post("/set_display_time","{\"display_time\":61}",400);
     post("/SetNightStartTime","{\"StartTime\":18}",200);post("/SetNightStopTime","{\"StopTime\":12}",200);
-    prepare("/settings","{\"hourFormat\":0}",16,"application/json");request.origin="http://evil.example";web_settings_post(&request);CHECK(request.status==400);
+    prepare("/settings","{\"hourFormat\":0}",16,"application/json");request.origin="http://evil.example";dispatch(HTTP_POST);CHECK(request.status==400);
     post("/configure","{\"ssid\":\"Home\",\"password\":\"12345678\"}",200);CHECK(restart_requests==1);
     CHECK(settings_flush()==ESP_OK);CHECK(settings_init()==ESP_OK);settings_snapshot(&s);CHECK(!strcmp(s.ssid,"Home") && s.wifi_mode==1);
     CHECK(rgb888_from_rgb565(rgb565_from_rgb888(0xffffff))==0xffffff);
@@ -519,9 +536,9 @@ static void test_multipart(void)
     char body[6000];uint8_t binary[20]={255,0xd8,0,'-', '-', '-',13,10};size_t pos=0;
     CHECK(photo_upload_start(4,sizeof(binary),1)==ESP_OK);
     pos=append_part(body,pos,"chunk",binary,sizeof(binary));pos=append_part(body,pos,"file_number","5",1);pos=append_part(body,pos,"chunk_index","0",1);pos=append_part(body,pos,"total_chunks","1",1);pos+=sprintf(body+pos,"--test-boundary--\r\n");
-    prepare("/upload_chunk",body,pos,"multipart/form-data; boundary=test-boundary");web_photo_post(&request);CHECK(request.status==200);CHECK(!memcmp(flash_bytes+4*PHOTO_SLOT_BYTES,binary,sizeof(binary)));
-    prepare("/upload_chunk",body,pos-4,"multipart/form-data; boundary=test-boundary");web_photo_post(&request);CHECK(request.status==400);
-    prepare("/upload_chunk",body,pos,"multipart/form-data; boundary=incorrect");web_photo_post(&request);CHECK(request.status==400);
+    prepare("/upload_chunk",body,pos,"multipart/form-data; boundary=test-boundary");dispatch(HTTP_POST);CHECK(request.status==200);CHECK(!memcmp(flash_bytes+4*PHOTO_SLOT_BYTES,binary,sizeof(binary)));
+    prepare("/upload_chunk",body,pos-4,"multipart/form-data; boundary=test-boundary");dispatch(HTTP_POST);CHECK(request.status==400);
+    prepare("/upload_chunk",body,pos,"multipart/form-data; boundary=incorrect");dispatch(HTTP_POST);CHECK(request.status==400);
     clock_us+=120000001;
     prepare("/get_Photo_File?file=1&chunk=0&size=10240","",0,NULL);web_photo_get(&request);CHECK(request.status==200 && request.response_length==10240);
     prepare("/get_Photo_File?file=1&chunk=100&size=12288","",0,NULL);web_photo_get(&request);CHECK(request.status==400);

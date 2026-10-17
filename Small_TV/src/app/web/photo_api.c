@@ -222,9 +222,12 @@ static esp_err_t upload_multipart(httpd_req_t *req)
 
 esp_err_t web_photo_post(httpd_req_t *req)
 {
-    /* Dispatch the original photo start/chunk/finish request contracts. */
+    /* Dispatch the original photo start/chunk/finish request contracts.
+     * FIXED_RECONSTRUCTION: use the registered path so query parameters and
+     * absolute targets do not bypass the multipart/start/finish dispatch. */
 
-    if (!strcmp(req->uri, "/upload_chunk"))
+    const char *uri = req->user_ctx;
+    if (!strcmp(uri, "/upload_chunk"))
         return upload_multipart(req);
     cJSON *object = web_parse_json(req);
     if (!object)
@@ -233,14 +236,14 @@ esp_err_t web_photo_post(httpd_req_t *req)
     esp_err_t result = ESP_ERR_INVALID_ARG;
     if (web_integer(object, "file_number", 1, PHOTO_COUNT, &slot))
     {
-        if (!strcmp(req->uri, "/start_upload"))
+        if (!strcmp(uri, "/start_upload"))
         {
             int length, chunks;
             if (web_integer(object, "file_size", 4, PHOTO_SLOT_BYTES, &length) &&
                 web_integer(object, "total_chunks", 1, 25, &chunks))
                 result = photo_upload_start(slot - 1, length, chunks);
         }
-        else if (!strcmp(req->uri, "/finish_upload"))
+        else if (!strcmp(uri, "/finish_upload"))
         {
             const cJSON *name = cJSON_GetObjectItemCaseSensitive(object, "file_name");
             char expected[16];

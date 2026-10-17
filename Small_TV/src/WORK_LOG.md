@@ -2146,3 +2146,48 @@ callbacks. Проверить на живых factory/native GET, POST и HTML p
 absolute-form URI, поскольку SDK выделяет UF_PATH по offset. Это ещё гипотеза,
 а не доказанная регрессия. После проверки/исправления подготовить окончательный
 кандидат и новый frozen full плюс isolated24h H10 с supervisor/schema4 weather.
+
+### 2026-10-17 — factory-compatible HTTP request-target dispatch
+
+Actual factory/native probe подтвердил гипотезу: factory GET getclocktype,
+getgifvalue,getsettings с query дают200 и прежнее тело;922 native давала400.
+Factory /?probe=1 и /photo?probe=1 возвращают соответствующую страницу; native
+ошибочно возвращала settings. Factory POST setgifvalue?probe=1 сохраняет2,
+native отклоняла400 и оставляла1. Absolute HTTP request targets имеют тот же
+дефект. Photo metadata с настоящим query работали в обоих вариантах.
+
+Сверены factory registry GET0x4200dfdc/POST0x4200d8b8/photo0x4200d54c,
+decompilation и полный getclocktype RISC-V body/epilogue0x4200dfdc..0x4200e074:
+callback выбирает символ из сохранённой темы и передаёт req в response APIs,
+URI заново не разбирает. ESP-IDF httpd_uri.c:314 использует UF_PATH/off/len,
+а затем присваивает req->user_ctx из скопированного registration descriptor.
+Shared native callbacks теперь используют canonical static path в user_ctx.
+Это сохраняет SDK exact/case-sensitive matching и весь req->uri для photo query,
+не добавляет allocation/parser/буфер на каждый запрос. Внесены entry comments
+FIXED_RECONSTRUCTION; код остаётся в соответствующих web-модулях.
+
+Native adapter теперь копирует descriptor как SDK и передаёт context. Несколько
+старых прямых вызовов заменены dispatch, чтобы тестировать реальную регистрацию.
+В отдельном http_targets.inc проверены все GET в AP/connected mode,16 settings
+POST с теми же результатами/actions, negative prefix/case/encoded delimiter,
+query с похожим route в значении. Полный photo start/chunk/finish/download
+повторяется в origin/absolute forms с query и без него. До production fix новая
+проверка падает на реальном GET status400, после —5531 checks/40 routes pass.
+Первый test-only context assertion разыменовал NULL на старом registration;
+убран как зависимость теста от реализации, отрицательный контроль повторён.
+
+Ordinary8304F1A4/ELF62E040B5 иdebugA8C337BC/ELF86B7275D собраны и сохранены в
+development archives; sourceBE5802D6/59inputs. App1169904/free366096bytes,
+debug1230752bytes; SDK/app/bootloader levels2/4. DEBUG config reuse OFF/ON/OFF
+unit, host native5531/platform46/frontend18/integrity6/timezone9/aggregation14
+pass. Первичная sandbox toolchain activation дала Windows DLL relocation;
+штатный unsandboxed build прошёл, SDK не переустанавливался. Новый debug BIN
+пока проверен сборкой/configuration, actual URI ВМ использует ordinary.
+
+Новый uri_targets_qemu.py включает реальные factory36/native124 conditions:
+одинаковые ответы на семь GET во всех четырёх forms, четыре POST/readback,
+четыре полных native JPEG upload/download cycles с byte equality.160 HTTP
+requests, no panic, immutable inputs unchanged; owned VM PID19552/16896
+остановлены и отсутствуют при внешнем OS audit. Test добавлен в обязательный
+qemu_suite и publisher. Scoped JSON сохраняет before/after и identities; старый
+полный EF66 checkpoint не переименован. Новый full/H10 ещё не начаты.

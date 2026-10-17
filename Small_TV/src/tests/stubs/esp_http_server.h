@@ -20,6 +20,7 @@ typedef void *httpd_handle_t;
 typedef struct
 {
     const char *uri, *input, *content_type, *host, *origin;
+    void *user_ctx;
     size_t content_len, position, response_length;
     unsigned status;
     unsigned recv_timeouts;
@@ -35,6 +36,7 @@ typedef struct
     const char *uri;
     httpd_method_t method;
     esp_err_t (*handler)(httpd_req_t *);
+    void *user_ctx;
 } httpd_uri_t;
 typedef struct
 {

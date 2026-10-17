@@ -7,6 +7,21 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Transport audit завершён в `codex/small-tv-uri-dispatch`: factory принимает
+  query/absolute targets, тогда как922 native давала400 либо settings вместо
+  setup/photo. Shared callbacks теперь получают SDK-selected static path через
+  user_ctx; полный req->uri и photo query сохранены. Нет второго URI parser.
+  Обычная8304F1A4/ELF62E040B5, debugA8C337BC/ELF86B7275D, sourceBE5802D6;
+ 59 inputs, ordinary1169904/free366096. Host5531/platform46/frontend18/
+  integrity6/timezone9/aggregation14 и DEBUG OFF/ON/OFF unit проходят.
+  Actual QEMU: factory36/native124 acceptance conditions,160 HTTP requests,
+  четыре полных upload/download cycles с точным JPEG, inputs unchanged,
+  обе ВМ закрыты и PID отсутствуют. Новая regression включена в qemu_suite
+  и publisher; scoped JSON `uri-targets-validation-20261017.json`.
+  Это не новый full/H10. Следующий шаг: интеграция кандидата, fresh full freeze,
+  совместный supervisor/schema4 preflight и isolated24h workload.
+- Следующие строки о query «гипотезе» и candidate922 — предыдущий checkpoint;
+  они сохраняют историю, актуальный transport результат приведён выше.
 - Текущее main10557472 объединяет все подготовленные fixes/tools; новая
   ordinary922DA963/ELF71DED1E1/source9D2367EB и debugC37B7B5E/BA060CE6 в
   development archives. Точные ordinary ELF/BIN/map перенесены в canonical

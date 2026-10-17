@@ -98,17 +98,20 @@ bool web_integer(const cJSON *object, const char *name, int minimum, int maximum
 
 static esp_err_t page(httpd_req_t *req)
 {
-    /* Serve the recovered setup, settings or photo page for the current URI/mode. */
+    /* Serve the recovered setup, settings or photo page for the selected route/mode.
+     * FIXED_RECONSTRUCTION: SDK routing uses only the path, including in an
+     * absolute request target. Query parameters must not select another page. */
 
+    const char *uri = req->user_ctx;
     const unsigned char *data = web_settings;
     size_t length = web_settings_length;
-    if (!strcmp(req->uri, "/photo") || !strcmp(req->uri, "/photo.html"))
+    if (!strcmp(uri, "/photo") || !strcmp(uri, "/photo.html"))
     {
         data = web_photo;
         length = web_photo_length;
     }
-    else if (!strcmp(req->uri, "/setup") || !strcmp(req->uri, "/setup.html") ||
-             (!strcmp(req->uri, "/") && !network_connected()))
+    else if (!strcmp(uri, "/setup") || !strcmp(uri, "/setup.html") ||
+             (!strcmp(uri, "/") && !network_connected()))
     {
         data = web_setup;
         length = web_setup_length;
@@ -271,7 +274,9 @@ static const httpd_uri_t routes[] = {
 
 esp_err_t web_start(void)
 {
-    /* Start HTTP and register the recovered routes plus compatibility aliases. */
+    /* Start HTTP and register the recovered routes plus compatibility aliases.
+     * FIXED_RECONSTRUCTION: pass the SDK-selected canonical path to shared
+     * callbacks. Keep req->uri intact for the SDK's photo query extraction. */
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.max_uri_handlers = 48;
@@ -289,7 +294,11 @@ esp_err_t web_start(void)
         return result;
     for (unsigned i = 0; i < sizeof(routes) / sizeof(routes[0]); ++i)
     {
-        result = httpd_register_uri_handler(server, &routes[i]);
+        /* ESP-IDF copies the descriptor; its context points to a static string.
+         * Reuse SDK path selection rather than parsing every request twice. */
+        httpd_uri_t route = routes[i];
+        route.user_ctx = (void *)route.uri;
+        result = httpd_register_uri_handler(server, &route);
         if (result != ESP_OK)
         {
             httpd_stop(server);

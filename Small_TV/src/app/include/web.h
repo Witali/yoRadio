@@ -3,6 +3,8 @@
 #include "esp_http_server.h"
 #include "cJSON.h"
 esp_err_t web_start(void);
+/* Registered callbacks receive their canonical static route string in user_ctx.
+ * req->uri remains the complete SDK request target, including any query. */
 esp_err_t web_settings_get(httpd_req_t *req);
 esp_err_t web_settings_post(httpd_req_t *req);
 esp_err_t web_scan(httpd_req_t *req);

@@ -37,17 +37,20 @@ static const struct
 esp_err_t web_settings_get(httpd_req_t *req)
 {
     /* Return the requested setting using its original response shape.
+     * FIXED_RECONSTRUCTION: use the registered path, independent of query
+     * parameters or an absolute request target retained in req->uri.
      * FIXED_RECONSTRUCTION: /get_display_time must return the displaytime JSON
      * field, as in 0x4200e7b6, rather than a scalar that breaks the stock page. */
 
+    const char *uri = req->user_ctx;
     tv_settings_t s;
     settings_snapshot(&s);
     cJSON *result = NULL;
     for (unsigned i = 0; i < sizeof(integers) / sizeof(integers[0]); ++i)
-        if (!strcmp(req->uri, integers[i].get))
+        if (!strcmp(uri, integers[i].get))
         {
             unsigned value = *((const uint8_t *)&s + integers[i].offset);
-            if (!strcmp(req->uri, "/get_display_time"))
+            if (!strcmp(uri, "/get_display_time"))
             {
                 result = cJSON_CreateObject();
                 cJSON_AddNumberToObject(result, "displaytime", value);
@@ -58,13 +61,13 @@ esp_err_t web_settings_get(httpd_req_t *req)
             return httpd_resp_send(req, text, HTTPD_RESP_USE_STRLEN);
         }
     result = cJSON_CreateObject();
-    if (!strcmp(req->uri, "/getsettings"))
+    if (!strcmp(uri, "/getsettings"))
     {
         for (unsigned i = 0; i < sizeof(switches) / sizeof(switches[0]); ++i)
             cJSON_AddNumberToObject(result, switches[i].key,
                                     *((const uint8_t *)&s + switches[i].offset));
     }
-    else if (!strcmp(req->uri, "/get_clock_colors"))
+    else if (!strcmp(uri, "/get_clock_colors"))
     {
         for (unsigned i = 0; i < 3; ++i)
         {
@@ -75,7 +78,7 @@ esp_err_t web_settings_get(httpd_req_t *req)
             cJSON_AddStringToObject(result, name, color);
         }
     }
-    else if (!strcmp(req->uri, "/get_checkbox_state"))
+    else if (!strcmp(uri, "/get_checkbox_state"))
     {
         for (unsigned i = 0; i < PHOTO_COUNT; ++i)
         {
@@ -84,9 +87,9 @@ esp_err_t web_settings_get(httpd_req_t *req)
             cJSON_AddBoolToObject(result, name, s.photo_mask & (1u << i));
         }
     }
-    else if (!strcmp(req->uri, "/get_led_brightness") || !strcmp(req->uri, "/get_night_brightness"))
+    else if (!strcmp(uri, "/get_led_brightness") || !strcmp(uri, "/get_night_brightness"))
     {
-        unsigned level = !strcmp(req->uri, "/get_led_brightness") ? s.day_level : s.night_level;
+        unsigned level = !strcmp(uri, "/get_led_brightness") ? s.day_level : s.night_level;
         cJSON_AddNumberToObject(result, "brightness", 100 - level / 10);
     }
     else
@@ -170,6 +173,8 @@ static bool update_city(tv_settings_t *s, const cJSON *object)
 esp_err_t web_settings_post(httpd_req_t *req)
 {
     /* Validate and apply one original settings request and its follow-up action.
+     * FIXED_RECONSTRUCTION: dispatch by the SDK-selected registered path, so
+     * appending a query or authority does not reject valid settings/actions.
      * FIXED_FACTORY: /wifireset at 0x4200e84c overwrites the supplied credentials
      * with unrelated scratch buffers. Persist the validated JSON SSID/password.
      * FIXED_RECONSTRUCTION: /setclocktype is a reinitialization command even
@@ -177,10 +182,11 @@ esp_err_t web_settings_post(httpd_req_t *req)
      * Both credential routes accept normal JSON whitespace instead of relying
      * on the factory handlers' literal substring parsing. */
 
+    const char *uri = req->user_ctx;
     tv_settings_t s;
     settings_snapshot(&s);
     bool valid = false, restart = false, weather = false, select_theme = false;
-    if (!strcmp(req->uri, "/restart"))
+    if (!strcmp(uri, "/restart"))
     {
         if (req->content_len)
         {
@@ -192,9 +198,9 @@ esp_err_t web_settings_post(httpd_req_t *req)
         network_restart_later();
         return web_ok(req);
     }
-    if (!strcmp(req->uri, "/set_led_brightness") || !strcmp(req->uri, "/set_night_brightness"))
+    if (!strcmp(uri, "/set_led_brightness") || !strcmp(uri, "/set_night_brightness"))
     {
-        bool day = !strcmp(req->uri, "/set_led_brightness");
+        bool day = !strcmp(uri, "/set_led_brightness");
         unsigned percent;
         valid = read_brightness(req, day ? "ledBrightness" : "NightBrightness", &percent);
         if (valid)
@@ -211,7 +217,7 @@ esp_err_t web_settings_post(httpd_req_t *req)
         if (!object)
             return web_error(req, "Expected a bounded JSON object");
         for (unsigned i = 0; i < sizeof(integers) / sizeof(integers[0]); ++i)
-            if (!strcmp(req->uri, integers[i].post))
+            if (!strcmp(uri, integers[i].post))
             {
                 int value;
                 valid =
@@ -219,10 +225,10 @@ esp_err_t web_settings_post(httpd_req_t *req)
                 if (valid)
                 {
                     *((uint8_t *)&s + integers[i].offset) = value;
-                    select_theme = !strcmp(req->uri, "/setclocktype");
+                    select_theme = !strcmp(uri, "/setclocktype");
                 }
             }
-        if (!strcmp(req->uri, "/settings"))
+        if (!strcmp(uri, "/settings"))
         {
             valid = true;
             bool any = false;
@@ -240,7 +246,7 @@ esp_err_t web_settings_post(httpd_req_t *req)
                 }
             valid = valid && any;
         }
-        else if (!strcmp(req->uri, "/configure") || !strcmp(req->uri, "/wifireset"))
+        else if (!strcmp(uri, "/configure") || !strcmp(uri, "/wifireset"))
         {
             valid = copy_string(object, "ssid", s.ssid, sizeof(s.ssid)) && s.ssid[0] &&
                     copy_string(object, "password", s.password, sizeof(s.password));
@@ -250,7 +256,7 @@ esp_err_t web_settings_post(httpd_req_t *req)
             if (valid)
                 s.wifi_mode = 1;
         }
-        else if (!strcmp(req->uri, "/advancedset"))
+        else if (!strcmp(uri, "/advancedset"))
         {
             int clicks;
             valid =
@@ -263,12 +269,12 @@ esp_err_t web_settings_post(httpd_req_t *req)
                 weather = true;
             }
         }
-        else if (!strcmp(req->uri, "/updateCity"))
+        else if (!strcmp(uri, "/updateCity"))
         {
             valid = update_city(&s, object);
             weather = valid;
         }
-        else if (!strcmp(req->uri, "/set_clock_color"))
+        else if (!strcmp(uri, "/set_clock_color"))
         {
             int index;
             const cJSON *color = cJSON_GetObjectItemCaseSensitive(object, "color");
@@ -283,7 +289,7 @@ esp_err_t web_settings_post(httpd_req_t *req)
                     s.colors[index] = rgb565_from_rgb888(strtoul(color->valuestring + 1, NULL, 16));
             }
         }
-        else if (!strcmp(req->uri, "/set_checkbox_state"))
+        else if (!strcmp(uri, "/set_checkbox_state"))
         {
             const cJSON *id = cJSON_GetObjectItemCaseSensitive(object, "checkbox_id"),
                         *checked = cJSON_GetObjectItemCaseSensitive(object, "checked");
@@ -308,7 +314,7 @@ esp_err_t web_settings_post(httpd_req_t *req)
         weather_request_update();
     if (restart)
         network_restart_later();
-    if (!strcmp(req->uri, "/advancedset"))
+    if (!strcmp(uri, "/advancedset"))
         return httpd_resp_send(req, "Settings saved", HTTPD_RESP_USE_STRLEN);
     return web_ok(req);
 }
