@@ -49,9 +49,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   bootloader3FB735A3. Обе executable sections совпадают с проверенной веткой,
   см. photo-upload-waits-main-build.json; её scoped reports сохраняют DD4EB76E.
   B06/DAF ELF/BIN/map/resources сохранены в controls-pre-upload-build-20261017.
-  Новый единый full с photo_settings ещё нужно запустить. Freeze helper включает
-  .mjs, frontend и все57 production inputs, collector — photo_settings; исходные
-  72/74 старых pin lists не переименовывать. H03/setup, H09/H10 и physical остаются.
+  Новый единый full запущен: handle62455,
+  `.build/small-tv-functional/upload-integrated-full-20261017`, initialHEAD053337e4.
+  Frozen75 test sources и88 production/frontend/archive/helper files проверены
+  повторно unchanged. Host3924/platform46/frontend11/integrity6/timezone9/aggregation14
+  уже pass; идёт machine renderer, затем остальные machine/QEMU groups.
+  Опросить тот же handle; не запускать второй full и не менять root production,
+  tests, frontend, generated inputs, ELF/BIN и QEMU/helpers до terminal. Markdown
+  context разрешён. Freeze включает .mjs/все57 production inputs; collector уже
+  требует photo_settings. После terminal сверить initial/final pins и выполнить
+  strict archive_immutable_run.py. Старые72/74 pin lists не переименовывать.
+  H03/setup, H09/H10 и physical остаются.
 
 ## Цель и принятые решения
 

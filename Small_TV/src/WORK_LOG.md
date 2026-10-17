@@ -1497,3 +1497,15 @@
   production inputs; collector дополнен обязательным photo_settings. После
   фиксации архива выполнить один новый frozen run, прежний interrupted controls
   не продолжать и не публиковать как полный pass.
+
+### 2026-10-17 — новый frozen full для main
+
+- Запущен единственный run upload-integrated-full-20261017, handle62455,
+  initialHEAD053337e4, appDD41A536/source96A111EC/ELFB4AF3C2A/QEMUFDE38D53.
+  Зафиксированы75 test files и88 дополнительных inputs, включая все57 production
+  inputs, frontend, archive, profile и helpers. Повторная проверка после host
+  stages подтвердила неизменность всех байтов.
+- Aggregation14, native3924, platform46, frontend (включая11 transfer cases),
+  integrity6 и timezone-source9 pass. Machine renderer активен; общего результата
+  ещё нет. Не перезапускать по timeout наблюдения. Source/data/ELF/BIN заморожены;
+  независимая новая работа допустима в своей ветке, context Markdown не в pins.
