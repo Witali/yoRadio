@@ -87,7 +87,7 @@ def validate_snapshot(row):
                 integer(task['recorded_stack_span_bytes'], 'stack span', 1), 'Stack headroom exceeds its observed span')
 
 
-def journal_evidence(path, chunks, outage_every, allow_partial=False):
+def journal_evidence(path, chunks, outage_every, allow_partial=False, require_weather=False):
     """Stream complete events, recompute aggregates, and retain a lean time series."""
     summary = {'events': 0, 'snapshots': 0, 'http_requests': 0, 'outages': 0,
                'minimum_sampled_free_heap_bytes': None, 'minimum_sdk_sum_of_per_heap_minima_bytes': None,
@@ -96,6 +96,10 @@ def journal_evidence(path, chunks, outage_every, allow_partial=False):
     tail, series, pending = deque(maxlen=32), [], []
     digest, rom_calls, cycle, partial = hashlib.sha256(), 0, 0, 0
     heap_shape, last_minimum, last_time, recovery = None, None, None, None
+    weather = {'snapshots': 0, 'quiescent_samples': 0, 'valid_samples': 0, 'distinct_valid_generations': 0,
+               'first_fresh_guest_seconds': None, 'last_fresh_guest_seconds': None,
+               'maximum_fresh_gap_guest_seconds': 0}
+    generations, last_generation = set(), None
     with path.open('rb') as stream:
         for number, line in enumerate(stream, 1):
             require(len(line) <= 262144, 'Oversized runtime event')
@@ -111,6 +115,36 @@ def journal_evidence(path, chunks, outage_every, allow_partial=False):
             if kind == 'snapshot':
                 validate_snapshot(row)
                 when = row['guest_seconds']
+                require(not require_weather or 'weather' in row, 'Missing weather observation')
+                if 'weather' in row:
+                    observed = row['weather']
+                    state = integer(observed['worker_state'], 'weather state')
+                    require(state <= 3, 'Invalid weather worker state')
+                    weather['snapshots'] += 1
+                    if state:
+                        require(set(observed) == {'worker_state'}, 'Cache read while weather worker was active')
+                    else:
+                        weather['quiescent_samples'] += 1
+                        require(type(observed['valid']) is bool, 'Invalid weather valid flag')
+                        generation = integer(observed['generation'], 'weather generation')
+                        require(generation <= 0xffffffff and (last_generation is None or generation >= last_generation),
+                                'Weather generation regressed or exceeded RV32')
+                        last_generation = generation
+                        keys = {'worker_state', 'valid', 'generation'}
+                        if observed['valid']:
+                            require(type(observed['humidity']) is int and observed['humidity'] == 67 and generation > 0,
+                                    'Synthetic weather was not parsed correctly')
+                            keys.add('humidity')
+                            weather['valid_samples'] += 1
+                            if generation not in generations:
+                                generations.add(generation)
+                                if weather['first_fresh_guest_seconds'] is None:
+                                    weather['first_fresh_guest_seconds'] = when
+                                if weather['last_fresh_guest_seconds'] is not None:
+                                    weather['maximum_fresh_gap_guest_seconds'] = max(
+                                        weather['maximum_fresh_gap_guest_seconds'], when - weather['last_fresh_guest_seconds'])
+                                weather['last_fresh_guest_seconds'] = when
+                        require(set(observed) == keys, 'Unexpected weather observation fields')
                 require(last_time is None or when > last_time, 'Snapshot clock is not increasing')
                 require(recovery is None or when >= recovery, 'Snapshot precedes outage recovery')
                 if last_time is None:
@@ -177,15 +211,16 @@ def journal_evidence(path, chunks, outage_every, allow_partial=False):
     require(summary['snapshots'] > 0, 'No complete snapshots')
     require(allow_partial or not pending, 'Unfinished workload cycle')
     summary['snapshot_tail'] = list(tail)
+    weather['distinct_valid_generations'] = len(generations)
     return {'summary': summary, 'series': series, 'cycles': cycle, 'rom_calls': rom_calls,
-            'sha256': digest.hexdigest(), 'trailing_partial_bytes': partial, 'pending_events': len(pending)}
+            'sha256': digest.hexdigest(), 'trailing_partial_bytes': partial, 'pending_events': len(pending), 'weather': weather}
 
 
 def audit_run(folder, repository_root, start_record=None, allow_progress=False, extra_roots=()):
     """Bind final journal, UART guard, source files, image/ELF and elapsed guest time."""
     folder, repository_root = Path(folder).resolve(), Path(repository_root).resolve()
     report = decode((folder / 'report.json').read_bytes())
-    require(report['schema_version'] == 3, 'Unsupported runtime report schema')
+    require(report['schema_version'] in (3, 4), 'Unsupported runtime report schema')
     terminal = 'journal' in report and 'inputs_unchanged' in report
     require(terminal or allow_progress, 'Runtime workload has not finished')
     roots = (repository_root, *map(Path, extra_roots))
@@ -207,9 +242,11 @@ def audit_run(folder, repository_root, start_record=None, allow_progress=False, 
     require(sha(named('qemu-system-riscv32.exe')) == report['qemu_sha256'], 'Emulator identity differs')
     chunks = (named('rgb-420.jpg').stat().st_size + 4095) // 4096
     every = integer(report['outage_every_cycles'], 'outage cadence')
-    evidence = journal_evidence(folder / 'events.jsonl', chunks, every, allow_partial=not terminal)
+    weather_required = report['schema_version'] == 4
+    evidence = journal_evidence(folder / 'events.jsonl', chunks, every, allow_partial=not terminal,
+                                require_weather=weather_required)
     result = {'terminal': terminal, 'inputs_verified': len(inputs), 'evidence': evidence, 'report': report,
-              'uart': inspect_uart((folder / 'vm/uart.log').read_bytes())}
+              'uart': inspect_uart((folder / 'vm/uart.log').read_bytes()), 'weather_evidence_verified': False}
     require(result['uart']['passed'], 'UART contains a reset, panic or incomplete boot capture')
     if terminal:
         require(report['passed'] is True and report['inputs_unchanged'] is True and report['no_panic'] is True and
@@ -233,6 +270,17 @@ def audit_run(folder, repository_root, start_record=None, allow_progress=False, 
         if requested is not None:
             require(elapsed >= integer(requested, 'requested duration', 1), 'Requested duration was not reached')
         require(evidence['summary']['outages'] == (evidence['cycles'] // every if every else 0), 'Outage count differs')
+        if weather_required:
+            named('runtime_weather.py')
+            require(report['weather_layout']['elf_sha256'] == report['native_elf_sha256'], 'Weather layout ELF differs')
+            require(report['weather_coverage_passed'] is True and report['weather_observation'] == evidence['weather'] and
+                    evidence['weather']['valid_samples'] > 0, 'Weather observation aggregates differ or no parsed weather')
+            fixture = report['weather_fixture']
+            require(1 <= integer(fixture['responses_ok'], 'weather responses', 1) <=
+                    integer(fixture['requests'], 'weather requests', 1) and
+                    fixture['all_synthetic_locations'] is True and fixture['all_synthetic_keys'] is True,
+                    'Missing successful synthetic weather exchange')
+            result['weather_evidence_verified'] = True
     # Earlier short preflights have a complete UART capture but predate the
     # independent running guard. Audit them without promoting them to H10.
     guard_path = folder / 'uptime-guard.json'

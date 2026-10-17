@@ -2060,3 +2060,37 @@ PID25988: supervisor failed/exit -1/no terminal footer, VM cleanup0. Затем 
 пока не проверен. Следующий длительный запуск должен подтвердить его отдельно.
 До него также нужно закрыть пробел weather workload: одни POST /updateCity и
 heap snapshots ещё не доказывают повторный фактический разбор ответов сервиса.
+
+### 2026-10-17 — в runtime workload подтверждён разбор погодных ответов
+
+После supervisor найден scope gap: POST updateCity и heap samples не доказывали
+фактическую обработку ответа сервиса. Новый runtime_weather.py читает 13 байт
+числовых полей по matched ELF/DWARF: request_state, valid, generation, humidity.
+Cache читается лишь при state0: weather_task ставит RUNNING перед invalidation/
+fetch/copy и снимает после публикации под mutex. Active/PENDING samples содержат
+только состояние worker, чтобы не трактовать частично скопированный struct как
+результат. Строки/URL/keys/buffers не читаются и guest functions не вызываются.
+
+Schema4 сохраняет эти observations, независимый auditor пересчитывает поколения
+и сверяет reports с JSONL. Fixture отдельно считает настоящие synthetic200
+responses/location/key. H10 требует новые parsed generations в пределах гостевого
+часа от начала/конца и между обновлениями; старый валидный кеш не заменяет
+24h weather activity. Schema3 остаётся читаемым в старом ограниченном объёме.
+8observer+24analysis unit tests pass: ABI/bounds, busy cache, bad flags/humidity,
+zero/regressing generation, repeated cache, missing weather, forged aggregates,
+legacy day и два ранних refresh с последующей стагнацией на сутки.
+
+Реальный preflight A543/8485/source721E, canonical QEMU A74/6B7F helper:8cycles,
+27.549604guest s,9snapshots/9 valid generations,9synthetic200, maxgap5.009813.
+31inputs unchanged, no error/cleanup error, VM отсутствует по PID audit. Полный
+UART guard запускался после workload: это posthoc no-reset/panic check, а не
+concurrent supervision данного case. Первая команда guard ошибочно получила
+QEMU root вместо tools и ModuleNotFoundError; повтор с правильным tools path
+прошёл. Новый analyzer проверил полный schema4 JSONL/ROM counters и старый
+прерванный schema3 stream; короткий запуск и старый префикс не стали H10 pass.
+
+В main уже merged91aa/8ab, точные59 production inputs совпали с manual-SSID
+archive; ELF/BIN/map перенесены без CMake cache, старые backup сохранены.
+QEMU main2a593f8d00 pushed; actual helper raw6B7F — CRLF представление FF0819,
+normalized equality проверена.19 canonical units pass, compiledA74 не менялся.
+Следующие full/H10 должны использовать новые source identities после integration.

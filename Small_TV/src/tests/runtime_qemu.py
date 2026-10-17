@@ -19,6 +19,7 @@ from urllib.parse import urlsplit
 
 from runtime_memory import MemorySnapshot, native_layout
 from runtime_state import GuestMicroseconds, RuntimeJournal
+from runtime_weather import WeatherSnapshot
 
 
 def main():
@@ -59,6 +60,7 @@ def main():
     from compare import seed_settings
     import compare
     from runtime_heap_rom import RomHeapCounters
+    from esp_elf import object_symbols
 
     weather.vm, weather.wait_for = vm, wait_for
     digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
@@ -66,12 +68,15 @@ def main():
     app = root / 'firmware/development/small-tv-esp32c2-reconstructed/app.bin'
     profile = root / 'Small_TV/qemu/profiles/small-tv-c2.json'
     layout = native_layout(elf)
+    weather_layout = weather.native_layout()
+    weather_objects = object_symbols(elf.read_bytes(), ('cached_weather', 'request_state'))
     rom = deps / '.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'
     counters = RomHeapCounters(rom)
     if app.read_bytes()[176:208] != bytes.fromhex(layout['elf_sha256']):
         raise ValueError('Archived app and inspected ELF do not match')
     files = [Path(__file__), Path(__file__).with_name('runtime_memory.py'),
-             Path(__file__).with_name('runtime_heap_rom.py'), Path(__file__).with_name('runtime_state.py'), elf, app, profile, rom,
+             Path(__file__).with_name('runtime_heap_rom.py'), Path(__file__).with_name('runtime_state.py'),
+             Path(__file__).with_name('runtime_weather.py'), elf, app, profile, rom,
              root / 'Small_TV/qemu/parity/compare.py',
              root / 'Small_TV/src/tests/fixtures/jpeg/rgb-420.jpg']
     files += [root / 'Small_TV/src/tests' / name for name in ('gdb_observer.py', 'weather_qemu.py', 'time_qemu.py')]
@@ -86,13 +91,13 @@ def main():
     executable = args.qemu_root / 'bin/qemu-system-riscv32.exe'
     files.append(executable)
     inputs = {str(path.resolve()): digest(path) for path in files}
-    result = {'schema_version': 3, 'passed': False, 'all_functionality_verified': False,
+    result = {'schema_version': 4, 'passed': False, 'all_functionality_verified': False,
               'scope': __doc__, 'native_elf_sha256': layout['elf_sha256'],
               'app_sha256': digest(app), 'qemu_sha256': digest(executable), 'cycles_requested': args.cycles,
               'duration_requested_guest_seconds': args.duration_seconds,
               'interval_guest_seconds': args.interval_seconds,
               'outage_every_cycles': args.outage_every, 'outage_guest_seconds': args.outage_seconds,
-              'completed_cycles': 0, 'inputs_sha256': inputs,
+              'completed_cycles': 0, 'inputs_sha256': inputs, 'weather_layout': weather_layout,
               'limitations': ['Native firmware only; no factory heap/stack equivalence claim.',
                               'Short workload is not the 24-hour H10 or physical-board acceptance.',
                               'Stack fill is a historical SDK watermark; sampled frames do not prove all execution peaks.',
@@ -110,7 +115,7 @@ def main():
     previous_seed = vm.seed_clock_network
     vm.seed_clock_network = seed_settings
     compare.CURRENT_THEME = 'simple'
-    session = observer = None
+    session = observer = weather_reader = None
     guest_clock = GuestMicroseconds()
     journal_path = args.output / 'events.jsonl'
     journal = RuntimeJournal(journal_path)
@@ -121,6 +126,7 @@ def main():
         observer.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         observer.socket.settimeout(20)
         reader = MemorySnapshot(observer.memory, layout, counters.validate)
+        weather_reader = WeatherSnapshot(reader.memory, weather_layout, weather_objects, layout['elf_sha256'])
         symbols = {name: row['address'] for name, row in layout['symbols'].items()}
         if layout['symbols']['connected']['size'] != 1:
             raise ValueError('Expected a one-byte atomic station connection flag')
@@ -150,6 +156,7 @@ def main():
                         observer.breakpoint(address, False)
                     row = {'label': label, 'guest_seconds': guest_seconds(),
                            'heap': reader.heaps(), 'tasks': reader.tasks()}
+                    row['weather'] = weather_reader.sample(row['guest_seconds'])
                     journal.append('snapshot', row)
                     result['summary'] = journal.summary()
                     if row['heap']['minimum_free_bytes'] == 0 or any(
@@ -290,6 +297,19 @@ def main():
             result['rom_counter_crosscheck'] = {'rom_elf_sha256': counters.sha256, 'checks': counters.checks,
                 'scope': 'Exact two ROM getters executed outside the VM on copied typed headers, not invoked in the guest.'}
             result['inputs_unchanged'] = all(digest(Path(path)) == sha for path, sha in inputs.items())
+            with fixture.lock:
+                requests = list(fixture.requests)
+            result['weather_fixture'] = {'requests': len(requests),
+                'responses_ok': sum(row['status'] == 200 for row in requests),
+                'all_synthetic_locations': all(row['synthetic_location'] for row in requests),
+                'all_synthetic_keys': all(row['synthetic_key'] for row in requests)}
+            result['weather_observation'] = weather_reader.summary() if weather_reader else {}
+            result['weather_coverage_passed'] = bool(weather_reader and weather_reader.valid and
+                result['weather_fixture']['responses_ok'] and result['weather_fixture']['all_synthetic_locations'] and
+                result['weather_fixture']['all_synthetic_keys'])
+            if not result['weather_coverage_passed']:
+                result.setdefault('error', 'No parsed synthetic weather response was observed')
+            result['passed'] &= result['weather_coverage_passed']
             result['passed'] &= result['inputs_unchanged'] and result.get('no_panic', False)
             vm.save_json(args.output / 'report.json', result)
     return 0 if result['passed'] else 1

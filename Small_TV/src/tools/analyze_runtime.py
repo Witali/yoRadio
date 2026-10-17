@@ -25,6 +25,11 @@ def analyze(folder, repository_root, start_record=None, diagnostic=False, extra_
     phase_period = math.lcm(20, report['outage_every_cycles'] or 1)
     trend = analyze_trend(evidence['series'], start, end, phase_period=phase_period)
     summary = evidence['summary']
+    weather = evidence['weather']
+    weather_current = (audit['weather_evidence_verified'] and weather['distinct_valid_generations'] >= 2 and
+                       weather['first_fresh_guest_seconds'] <= start + 3600 and
+                       weather['last_fresh_guest_seconds'] >= end - 3600 and
+                       weather['maximum_fresh_gap_guest_seconds'] <= 3600)
     checks = {
         'workload_complete': audit['terminal'],
         'duration_request_at_least_24h': (report['duration_requested_guest_seconds'] or 0) >= 86400,
@@ -34,6 +39,7 @@ def analyze(folder, repository_root, start_record=None, diagnostic=False, extra_
         'periodic_guest_disconnect_reconnect': summary['outages'] >= 2,
         'all_steady_windows_cover_all_workload_phases': trend['status'] != 'insufficient_steady_state_data',
         'no_retained_loss_flagged': not trend['flags'],
+        'weather_refreshed_throughout_workload': weather_current,
     }
     passed = all(checks.values())
     return {'schema_version': 1, 'status': ('h10_checks_passed' if passed else
@@ -48,6 +54,7 @@ def analyze(folder, repository_root, start_record=None, diagnostic=False, extra_
             'pending_events': evidence['pending_events'], 'complete_cycles_audited': evidence['cycles'],
             'elapsed_guest_seconds_observed': end - start,
             'checks': checks, 'uart': audit['uart'], 'summary': summary, 'trend': trend,
+            'weather': weather, 'weather_freshness_bound_guest_seconds': 3600,
             'limitations': ['This audits native QEMU runtime only; it does not establish physical-board acceptance.',
                 'The workload uses a fixed NTP epoch; this is not a continuous calendar/DST test.',
                 'Task stack fill and sampled free heap cannot prove every interrupt or transient allocation peak.',

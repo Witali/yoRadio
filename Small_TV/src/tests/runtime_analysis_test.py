@@ -19,6 +19,7 @@ BOOT = b'ESP-ROM:esp32c2-eco4-20240515\r\nBuild:May 15 2024\r\n'
 def snapshot(label, when, free=90000):
     """Model the observer ABI, including a constant cumulative SDK minimum."""
     return {'label': label, 'guest_seconds': when,
+            'weather': {'worker_state': 0, 'valid': True, 'humidity': 67, 'generation': round((when - 25) / 60) + 1},
             'heap': {'caps': 4, 'free_bytes': free, 'minimum_free_bytes': 50000,
                      'heaps': [{'caps': 6158, 'free_bytes': free, 'minimum_free_bytes': 50000,
                                 'pool_size': 160000}]},
@@ -36,14 +37,15 @@ class RunFixture:
         for name, data in [('small_tv_reconstructed.elf', b'matched ELF'),
                            ('qemu-system-riscv32.exe', b'test emulator'),
                            ('esp32c2_rev200_rom.elf', b'ROM'), ('rgb-420.jpg', b'x' * 4097),
-                           ('guard.py', b'guard identity'), ('runtime_qemu.py', b'workload identity')]:
+                           ('guard.py', b'guard identity'), ('runtime_qemu.py', b'workload identity'),
+                           ('runtime_weather.py', b'weather observer identity')]:
             path = root / name
             path.write_bytes(data)
             files[name] = path
         app = root / 'app.bin'
         app.write_bytes(b'\0' * 176 + bytes.fromhex(sha(files['small_tv_reconstructed.elf'])))
         files['app.bin'] = app
-        self.report = {'schema_version': 3, 'passed': True, 'inputs_unchanged': True, 'no_panic': True,
+        self.report = {'schema_version': 4, 'passed': True, 'inputs_unchanged': True, 'no_panic': True,
             'app_sha256': sha(app), 'native_elf_sha256': sha(files['small_tv_reconstructed.elf']),
             'qemu_sha256': sha(files['qemu-system-riscv32.exe']),
             'inputs_sha256': {str(path): sha(path) for path in files.values()},
@@ -53,6 +55,14 @@ class RunFixture:
             'radio_clock_wraps': int((25 + cycles * interval) * 1e6) // 2**32,
             'rom_counter_crosscheck': {'checks': (cycles + 1) * 2,
                                      'rom_elf_sha256': sha(files['esp32c2_rev200_rom.elf'])}}
+        self.report.update(weather_coverage_passed=True,
+            weather_layout={'elf_sha256': self.report['native_elf_sha256']},
+            weather_fixture={'requests': cycles + 1, 'responses_ok': cycles + 1,
+                             'all_synthetic_locations': True, 'all_synthetic_keys': True},
+            weather_observation={'snapshots': cycles + 1, 'quiescent_samples': cycles + 1,
+                'valid_samples': cycles + 1, 'distinct_valid_generations': cycles + 1,
+                'first_fresh_guest_seconds': 25, 'last_fresh_guest_seconds': 25 + cycles * interval,
+                'maximum_fresh_gap_guest_seconds': interval})
         journal = RuntimeJournal(self.folder / 'events.jsonl')
         journal.append('snapshot', snapshot('ready', 25))
         for cycle in range(cycles):
@@ -192,6 +202,23 @@ class EvidenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'UART'):
             self.run.audit()
 
+    def test_missing_or_torn_weather_observation_is_rejected(self):
+        path = self.run.folder / 'events.jsonl'
+        original = path.read_bytes()
+        for change, message in [(lambda row: row.pop('weather'), 'Missing weather'),
+                (lambda row: row['weather'].update(worker_state=1), 'Cache read'),
+                (lambda row: row['weather'].update(humidity=41), 'not parsed')]:
+            with self.subTest(message=message):
+                path.write_bytes(original)
+                self.run.change_event(lambda rows: change(rows[0]['data']))
+                with self.assertRaisesRegex(ValueError, message):
+                    self.run.audit()
+
+    def test_successful_http_without_parsed_weather_is_not_coverage(self):
+        self.run.report['weather_fixture']['responses_ok'] = 0
+        with self.assertRaisesRegex(ValueError, 'weather responses'):
+            self.run.audit()
+
     def test_failed_guard_overrules_good_uart(self):
         self.run.save(self.run.folder / 'uptime-guard.json', {'status': 'failed', 'vm_name': 'test-vm',
                                                             'last_observation': {'passed': False}})
@@ -270,6 +297,29 @@ class TrendTests(unittest.TestCase):
             self.assertFalse(analyze(run.folder, run.root)['h10_checks_passed'])
             (run.folder / 'uptime-guard.json').unlink()
             self.assertFalse(analyze(run.folder, run.root, run.start)['h10_checks_passed'])
+
+    def test_legacy_day_without_weather_proof_is_not_promoted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            run = RunFixture(Path(temp), cycles=1440, requested=86400)
+            run.report['schema_version'] = 3
+            run.write_report()
+            self.assertFalse(analyze(run.folder, run.root, run.start)['checks']['weather_refreshed_throughout_workload'])
+
+    def test_a_valid_but_stale_weather_cache_is_not_a_day_of_refreshes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            run = RunFixture(Path(temp), cycles=1440, requested=86400)
+            run.change_event(lambda rows: [row['data']['weather'].update(
+                generation=1 if row['data']['label'] == 'ready' else 2)
+                for row in rows if row['kind'] == 'snapshot'])
+            run.report['summary']['first_snapshot']['weather']['generation'] = 1
+            for row in run.report['summary']['snapshot_tail']:
+                row['weather']['generation'] = 2
+            run.report['weather_observation'].update(distinct_valid_generations=2,
+                last_fresh_guest_seconds=85, maximum_fresh_gap_guest_seconds=60)
+            run.write_report()
+            result = analyze(run.folder, run.root, run.start)
+            self.assertFalse(result['h10_checks_passed'])
+            self.assertFalse(result['checks']['weather_refreshed_throughout_workload'])
 
 
 if __name__ == '__main__':

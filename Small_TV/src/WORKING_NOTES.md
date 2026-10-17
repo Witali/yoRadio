@@ -7,6 +7,24 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Следующий кандидат runtime schema4 (`codex/small-tv-runtime-weather`) закрывает
+  пробел фактического weather workload. Четыре числовых поля читаются по точному
+  ELF/DWARF только при idle worker; никаких строк/ключей/URL или вызовов гостя.
+  8 observer +24 analysis tests проходят, включая частично скопированный кеш,
+  неверный ABI, регресс поколения и сутки чтения старого валидного кеша.
+  Real preflight на A543/8485:8 cycles/27.549604guest s,9 synthetic responses200,
+  9 quiescent valid snapshots/9 разных поколений, max fresh gap5.009813s,
+  31input hashes unchanged. UART guard сделан posthoc по полному capture;
+  он подтверждает отсутствие reset/panic, не concurrent supervision этого case.
+  VM закрыта. Ошибка первой команды guard была неверным --qemu-tools (root
+  вместо tools); повтор корректен. Старый schema3 audit также читается, но
+  остаётся прерванным/pending в file-only анализаторе, не H10 pass.
+- В main уже включены RSSI/manual-SSID/analysis/supervisor до8ab53a27; ordinary
+  A5439306/8485A233 и source721E26BD перенесены в canonical .build с backup
+  прежнего EF66 build. QEMU main2a593f8d00 отправлен; C executable A74 прежний.
+  Main helper rawSHA6B7FF996 отличается от branch FF0819 лишь CRLF; normalized
+  SHA FF0819 совпадает. 19 canonical readiness units прошли на фактическом файле.
+  Новый полный прогон текущего app ещё не запускался; published full — EF66.
 - Новое продолжение в `codex/small-tv-runtime-supervisor`: Windows tool
   `tools/runtime_supervisor.ps1` держит handles workload/guard, фиксирует выход
   без footer как failed и закрывает только собственную VM. Real preflight4
