@@ -204,6 +204,8 @@ def main():
     if not fields['flows']['reconstructed']['checks']['responsive_refresh_phase']:
         raise ValueError('Field scroll was not checked during a held weather reply')
     time_http = qemu['time_http']
+    if (not qemu['date_capture_unit']['passed'] or qemu['date_capture_unit']['tests'] != 6):
+        raise ValueError('Calendar observation deadline gate did not pass every case')
     if (not time_http['passed'] or time_http['qemu_sha256'] != qemu['qemu_sha256']
             or time_http['layout']['elf_sha256'] != time_state['native_elf_sha256']):
         raise ValueError('Real SNTP comparison used a different emulator or compiled time-state image')
@@ -409,6 +411,7 @@ def main():
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],
                        'time_http': time_http,
+                       'date_capture_unit': qemu['date_capture_unit'],
                        'text_http': text_http,
                        'regional_http': regional,
                        'calendar_http': {**{key:calendar_http[key] for key in

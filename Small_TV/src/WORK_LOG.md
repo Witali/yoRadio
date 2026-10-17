@@ -2334,3 +2334,33 @@ Scoped8case JSON и screenshot сохранены как uri-browser-controls-va
 Upload/crop/mobile здесь не повторяли, полного manual acceptance не объявляем.
 Tab2 закрыт, VM1960 остановлена; external OS19:01:24UTC подтвердил отсутствие
 18416/1960 и baseline time VM6624. H10 и повторный two-variant time test сохранены.
+
+### 2026-10-17 — раздельное guest/host ожидание календаря после reset
+
+У failed full рассмотрен сам frame: startup "Connecting to WiFi", календарь ещё
+не рисовался, cache struct tm нулевой. Отдельный инструментированный baseline
+на unchanged8304 прошёл весь native flow: после reset startup31→181 за15.284530
+guest/19.672host s; затем preset date bytes equal, fresh UDP notification2038
+и recovered calendar equal. Диагностика читает реальные timer_state/MMIO,
+не меняет guest RAM/registers/functions. Не найдено оснований менять firmware.
+
+Date capture раньше ограничивался30host s, которые при icount не гарантируют
+окончания18.1guest startup. Теперь30guest с отдельным90host bound; factory
+minute case90guest/270host. Оба elapsed/limits попадают в observation, low32
+MMIO wrap учтён, stop всегда снимается finally; все date-band pixels остаются
+обязательными. FIXED_TEST отмечает изменение теста, отдельно от firmware fixes;
+новая метка добавлена в CORRECTION_MARKERS.md.
+
+Six independent fake-clock/display cases проходят: slow host>30s с готовым
+18.1guest frame, fast guest timeout, stalled virtual clock, single bad pixel,
+32-bit wrap и exception resume. Старый function из HEAD на новом slow case
+даёт ожидаемый failure; новая версия6pass. Первый sandbox unit invocation
+использовал OS temp, cleanup получил Windows access denied, затем console
+cp1252 не вывел русскую ошибку. Temp перенесён в repo .build, UTF8 test run
+прошёл; это не ошибка гостя. Gate включён в qemu_suite и publisher.
+
+Повторный real time_qemu suite71743 завершился: factory и native passed,
+fallback/time corrections/year jump/backward leap/post2038/reset stages
+прошли; scoped JSON сохраняет целый report, negative control и input hashes.
+Все59production source inputs совпали с archive, app/ELF не менялись. Failed
+full остаётся отдельным evidence; новый passing full ещё не опубликован.

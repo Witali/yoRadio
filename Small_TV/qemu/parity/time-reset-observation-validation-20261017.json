@@ -1,0 +1,881 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "tested_utc": "2026-10-17T19:03:35.842278+00:00",
+  "scope": "Calendar observation deadline correction only. Six polling regressions and real factory/native SNTP/calendar/reset flows; application bytes and all 59 production source inputs unchanged. This is not a passing full run or H10 acceptance.",
+  "app_sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+  "source_sha256": "be5802d60f7e113aeb6e5fc77bc144f3088f5dbb791a6ab4c46db4cbb02b0726",
+  "native_elf_sha256": "62e040b592d6bd526b25c6035005e31a3a40eebb5a9beb994abe49f089addebb",
+  "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+  "inputs": [
+    {
+      "file": "Small_TV/src/tests/time_qemu.py",
+      "sha256": "65dc11c59bb41b29d9222671ffdb82738d121e7223f4ab2bc884ea564905e856"
+    },
+    {
+      "file": "Small_TV/src/tests/time_capture_test.py",
+      "sha256": "1ecae88297286d3e6ddba892f5afc1c1d8eb8b4fdaed62918bb1349d0e1f3776"
+    },
+    {
+      "file": "Small_TV/src/tests/qemu_suite.py",
+      "sha256": "51ee1601114ac88f1860766ff26fcdf047af563ea83624a91793b250475f6271"
+    },
+    {
+      "file": "Small_TV/src/tests/publish-report.py",
+      "sha256": "957a7614f19610f5c58aaef28c2e3fdacf1a94884f23ff5d5cf5b95981397d42"
+    },
+    {
+      "file": "Small_TV/src/CORRECTION_MARKERS.md",
+      "sha256": "3c8f7c515ac6d781a4fc37ece06cebc9a815122029324fcfbfdf020ea0ebcad5"
+    }
+  ],
+  "unit": {
+    "passed": true,
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "output": "......\n----------------------------------------------------------------------\nRan 6 tests in 2.491s\n\nOK\n",
+    "scope": "Check calendar-pixel polling with independent host and guest clock schedules."
+  },
+  "previous_implementation_negative_control": {
+    "old_deadline_rejected_valid_slow_frame": true,
+    "failures": 1,
+    "errors": 0,
+    "output": "F\n======================================================================\nFAIL: test_slow_guest_can_finish_startup_after_thirty_host_seconds (time_capture_test.DateCaptureTest.test_slow_guest_can_finish_startup_after_thirty_host_seconds)\nA valid frame at 18.1 guest seconds must survive slower host execution.\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"C:\\Work\\yoRadio\\Small_TV\\src\\tests\\time_capture_test.py\", line 60, in test_slow_guest_can_finish_startup_after_thirty_host_seconds\n    self.assertIsNone(error)\nAssertionError: AssertionError(\"Displayed date never matched 2025/9/19: {'state': {'synced': False}, 'date': '2025/9/19', 'different_bytes': 1305, 'clean_different_bytes': 1305, 'boot_time_seconds': 0.0}\") is not None\n\n----------------------------------------------------------------------\nRan 1 test in 0.365s\n\nFAILED (failures=1)\n"
+  },
+  "unchanged_test_native_baseline": {
+    "passed": true,
+    "timing": [
+      {
+        "expected": "2025/9/19",
+        "before": {
+          "virtual_us": 21125139,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "after": {
+          "virtual_us": 21132160,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "host_seconds": 0.0779999999795109
+      },
+      {
+        "expected": "2024/2/29",
+        "before": {
+          "virtual_us": 36139535,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "after": {
+          "virtual_us": 36140124,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "host_seconds": 0.0470000000204891
+      },
+      {
+        "expected": "2025/1/1",
+        "before": {
+          "virtual_us": 70113621,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "after": {
+          "virtual_us": 70120798,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "host_seconds": 0.031000000017229468
+      },
+      {
+        "expected": "2026/1/1",
+        "before": {
+          "virtual_us": 71783997,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "after": {
+          "virtual_us": 71790619,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "host_seconds": 0.030999999959021807
+      },
+      {
+        "expected": "2024/2/29",
+        "before": {
+          "virtual_us": 77127249,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "after": {
+          "virtual_us": 77323736,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "host_seconds": 0.25
+      },
+      {
+        "expected": "2038/1/19",
+        "before": {
+          "virtual_us": 82684982,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "after": {
+          "virtual_us": 82690047,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "host_seconds": 0.031000000017229468
+      },
+      {
+        "expected": "2025/9/19",
+        "before": {
+          "virtual_us": 86466942,
+          "startup_progress": 31,
+          "startup_active": true
+        },
+        "after": {
+          "virtual_us": 101751472,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "host_seconds": 19.67200000002049
+      },
+      {
+        "expected": "2038/1/19",
+        "before": {
+          "virtual_us": 105267809,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "after": {
+          "virtual_us": 105274462,
+          "startup_progress": 181,
+          "startup_active": false
+        },
+        "host_seconds": 0.014999999955762178
+      }
+    ],
+    "checks": {
+      "literal_factory_failure_or_corrected_three_server_fallback": true,
+      "actual_sntp_clock_update": true,
+      "first_notification_required": true,
+      "date_pixels_checked": true,
+      "no_panic": true,
+      "executable_media_unchanged": true
+    }
+  },
+  "real_sntp_report": {
+    "passed": true,
+    "tested_at_utc": "2026-10-17T18:59:57.109660+00:00",
+    "flows": {
+      "original": {
+        "passed": true,
+        "sources": {
+          "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+        },
+        "stages": {
+          "before_first_reply": {
+            "state": {
+              "synced": false,
+              "year": 2025,
+              "month": 9,
+              "day": 19,
+              "hour": 17,
+              "minute": 4,
+              "second": 40,
+              "weekday": 5
+            },
+            "date": "2025/9/19",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 0.0,
+            "host_seconds": 0.015000000013969839,
+            "guest_seconds": 0.009724,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          },
+          "factory_fallback_starvation": {
+            "requests": [
+              {
+                "server": 1,
+                "virtual_us": 3837499
+              },
+              {
+                "server": 2,
+                "virtual_us": 18858455
+              },
+              {
+                "server": 2,
+                "virtual_us": 22469926
+              },
+              {
+                "server": 2,
+                "virtual_us": 23890241
+              },
+              {
+                "server": 2,
+                "virtual_us": 26701438
+              },
+              {
+                "server": 2,
+                "virtual_us": 30151405
+              },
+              {
+                "server": 2,
+                "virtual_us": 30609924
+              },
+              {
+                "server": 2,
+                "virtual_us": 35700768
+              }
+            ],
+            "drops": [
+              1,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "responses": [],
+            "times": []
+          },
+          "synchronized_2024": {
+            "state": {
+              "synced": true,
+              "year": 2025,
+              "month": 9,
+              "day": 19,
+              "hour": 17,
+              "minute": 4,
+              "second": 40,
+              "weekday": 5
+            },
+            "date": "2025/9/19",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 1709179373.259575,
+            "host_seconds": 0.01600000000325963,
+            "guest_seconds": 0.0,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          },
+          "initial_trace": {
+            "requests": [
+              {
+                "server": 1,
+                "virtual_us": 3837499
+              },
+              {
+                "server": 2,
+                "virtual_us": 18858455
+              },
+              {
+                "server": 2,
+                "virtual_us": 22469926
+              },
+              {
+                "server": 2,
+                "virtual_us": 23890241
+              },
+              {
+                "server": 2,
+                "virtual_us": 26701438
+              },
+              {
+                "server": 2,
+                "virtual_us": 30151405
+              },
+              {
+                "server": 2,
+                "virtual_us": 30609924
+              },
+              {
+                "server": 2,
+                "virtual_us": 35700768
+              },
+              {
+                "server": 2,
+                "virtual_us": 46710239
+              }
+            ],
+            "drops": [
+              1,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "responses": [
+              2
+            ],
+            "times": [
+              {
+                "epoch": 1709179420,
+                "virtual_us": 46710239
+              }
+            ]
+          },
+          "factory_date_waits_for_minute": {
+            "state": {
+              "synced": true,
+              "year": 2025,
+              "month": 1,
+              "day": 1,
+              "hour": 18,
+              "minute": 14,
+              "second": 7,
+              "weekday": 3
+            },
+            "date": "2025/9/19",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 1735726387.609159,
+            "host_seconds": 0.031000000017229468,
+            "guest_seconds": 0.009297,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          },
+          "server_2_2025": {
+            "state": {
+              "synced": true,
+              "year": 2025,
+              "month": 1,
+              "day": 1,
+              "hour": 18,
+              "minute": 14,
+              "second": 15,
+              "weekday": 3
+            },
+            "date": "2025/1/1",
+            "different_bytes": 0,
+            "clean_different_bytes": 165,
+            "boot_time_seconds": 1735726387.609159,
+            "host_seconds": 9.922000000020489,
+            "guest_seconds": 8.780753,
+            "host_limit_seconds": 270,
+            "guest_limit_seconds": 90
+          }
+        },
+        "checks": {
+          "literal_factory_failure_or_corrected_three_server_fallback": true,
+          "actual_sntp_clock_update": true,
+          "first_notification_required": true,
+          "date_pixels_checked": true,
+          "no_panic": true,
+          "executable_media_unchanged": true
+        },
+        "clock_observations": {
+          "first_notification": {
+            "actual_utc_seconds": 1709179420.030713,
+            "expected_utc_seconds": 1709179420.060899,
+            "difference_seconds": -0.030185937881469727,
+            "boot_time_us": 1709179373259575,
+            "since_boot_us": 46771138,
+            "virtual_us": 46771138
+          },
+          "server_2_2025": {
+            "actual_utc_seconds": 1735726447.019503,
+            "expected_utc_seconds": 1735726447.043182,
+            "difference_seconds": -0.02367877960205078,
+            "boot_time_us": 1735726387609159,
+            "since_boot_us": 59410344,
+            "virtual_us": 59410344
+          }
+        },
+        "ntp_control_contract": {
+          "defaults_unchanged": true,
+          "invalid_inputs_rejected": 4
+        },
+        "trace": {
+          "requests": [
+            {
+              "server": 1,
+              "virtual_us": 3837499
+            },
+            {
+              "server": 2,
+              "virtual_us": 18858455
+            },
+            {
+              "server": 2,
+              "virtual_us": 22469926
+            },
+            {
+              "server": 2,
+              "virtual_us": 23890241
+            },
+            {
+              "server": 2,
+              "virtual_us": 26701438
+            },
+            {
+              "server": 2,
+              "virtual_us": 30151405
+            },
+            {
+              "server": 2,
+              "virtual_us": 30609924
+            },
+            {
+              "server": 2,
+              "virtual_us": 35700768
+            },
+            {
+              "server": 2,
+              "virtual_us": 46710239
+            },
+            {
+              "server": 2,
+              "virtual_us": 59367162
+            }
+          ],
+          "drops": [
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "responses": [
+            2,
+            2
+          ],
+          "times": [
+            {
+              "epoch": 1709179420,
+              "virtual_us": 46710239
+            },
+            {
+              "epoch": 1735726447,
+              "virtual_us": 59367162
+            }
+          ]
+        }
+      },
+      "reconstructed": {
+        "passed": true,
+        "sources": {
+          "images": [
+            {
+              "bytes": 16928,
+              "sha256": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b",
+              "offset": "0x0",
+              "file": "bootloader.bin"
+            },
+            {
+              "bytes": 3072,
+              "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+              "offset": "0x8000",
+              "file": "partition-table.bin"
+            },
+            {
+              "bytes": 1169904,
+              "sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+              "offset": "0x10000",
+              "file": "app.bin"
+            },
+            {
+              "bytes": 1994752,
+              "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+              "offset": "0x200000",
+              "file": "assets.bin"
+            }
+          ],
+          "source_sha256": "be5802d60f7e113aeb6e5fc77bc144f3088f5dbb791a6ab4c46db4cbb02b0726"
+        },
+        "stages": {
+          "before_first_reply": {
+            "state": {
+              "synced": false,
+              "year": 2025,
+              "month": 9,
+              "day": 19,
+              "hour": 17,
+              "minute": 4,
+              "second": 40,
+              "weekday": 5
+            },
+            "date": "2025/9/19",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 0.0,
+            "host_seconds": 0.031000000017229468,
+            "guest_seconds": 0.008401,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          },
+          "synchronized_2024": {
+            "state": {
+              "synced": true,
+              "year": 2024,
+              "month": 2,
+              "day": 29,
+              "hour": 12,
+              "minute": 3,
+              "second": 40,
+              "weekday": 4
+            },
+            "date": "2024/2/29",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 1709179383.233574,
+            "host_seconds": 0.015000000013969839,
+            "guest_seconds": 0.0,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          },
+          "initial_trace": {
+            "requests": [
+              {
+                "server": 1,
+                "virtual_us": 6685343
+              },
+              {
+                "server": 2,
+                "virtual_us": 21717178
+              },
+              {
+                "server": 3,
+                "virtual_us": 36740429
+              }
+            ],
+            "drops": [
+              1,
+              2
+            ],
+            "responses": [
+              3
+            ],
+            "times": [
+              {
+                "epoch": 1709179420,
+                "virtual_us": 36740429
+              }
+            ]
+          },
+          "server_2_2025": {
+            "state": {
+              "synced": true,
+              "year": 2025,
+              "month": 1,
+              "day": 1,
+              "hour": 18,
+              "minute": 14,
+              "second": 7,
+              "weekday": 3
+            },
+            "date": "2025/1/1",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 1735726378.971543,
+            "host_seconds": 0.25,
+            "guest_seconds": 0.189503,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          },
+          "year-jump": {
+            "state": {
+              "synced": true,
+              "year": 2026,
+              "month": 1,
+              "day": 1,
+              "hour": 18,
+              "minute": 14,
+              "second": 7,
+              "weekday": 4
+            },
+            "date": "2026/1/1",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 1767262377.844264,
+            "host_seconds": 0.25,
+            "guest_seconds": 0.198538,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          },
+          "backward-leap-day": {
+            "state": {
+              "synced": true,
+              "year": 2024,
+              "month": 2,
+              "day": 29,
+              "hour": 12,
+              "minute": 3,
+              "second": 40,
+              "weekday": 4
+            },
+            "date": "2024/2/29",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 1709179346.162819,
+            "host_seconds": 0.01600000000325963,
+            "guest_seconds": 0.0,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          },
+          "post-2038": {
+            "state": {
+              "synced": true,
+              "year": 2038,
+              "month": 1,
+              "day": 19,
+              "hour": 11,
+              "minute": 14,
+              "second": 8,
+              "weekday": 2
+            },
+            "date": "2038/1/19",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 2147483570.127737,
+            "host_seconds": 0.014999999955762178,
+            "guest_seconds": 0.0,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          },
+          "reset_before_notification": {
+            "state": {
+              "synced": false,
+              "year": 2025,
+              "month": 9,
+              "day": 19,
+              "hour": 17,
+              "minute": 4,
+              "second": 40,
+              "weekday": 5
+            },
+            "date": "2025/9/19",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 2147483570.127737,
+            "host_seconds": 26.68699999997625,
+            "guest_seconds": 17.066124,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          },
+          "reset_recovered": {
+            "state": {
+              "synced": true,
+              "year": 2038,
+              "month": 1,
+              "day": 19,
+              "hour": 11,
+              "minute": 14,
+              "second": 8,
+              "weekday": 2
+            },
+            "date": "2038/1/19",
+            "different_bytes": 0,
+            "clean_different_bytes": 0,
+            "boot_time_seconds": 2147483542.69477,
+            "host_seconds": 0.01600000000325963,
+            "guest_seconds": 0.0,
+            "host_limit_seconds": 90,
+            "guest_limit_seconds": 30
+          }
+        },
+        "checks": {
+          "literal_factory_failure_or_corrected_three_server_fallback": true,
+          "actual_sntp_clock_update": true,
+          "first_notification_required": true,
+          "date_pixels_checked": true,
+          "no_panic": true,
+          "executable_media_unchanged": true
+        },
+        "clock_observations": {
+          "first_notification": {
+            "actual_utc_seconds": 1709179420.103371,
+            "expected_utc_seconds": 1709179420.123623,
+            "difference_seconds": -0.020251989364624023,
+            "boot_time_us": 1709179383233574,
+            "since_boot_us": 36869797,
+            "virtual_us": 36864052,
+            "systimer_ticks": 383378473,
+            "rtc_hrt_offset_us": 69376,
+            "system_correction_us": -62893
+          },
+          "server_2_2025": {
+            "actual_utc_seconds": 1735726447.040842,
+            "expected_utc_seconds": 1735726447.059177,
+            "difference_seconds": -0.01833486557006836,
+            "boot_time_us": 1735726378971543,
+            "since_boot_us": 68069299,
+            "virtual_us": 68064192,
+            "systimer_ticks": 707853290,
+            "rtc_hrt_offset_us": 69376,
+            "system_correction_us": -62893
+          },
+          "year-jump": {
+            "actual_utc_seconds": 1767262447.024308,
+            "expected_utc_seconds": 1767262447.041223,
+            "difference_seconds": -0.016915082931518555,
+            "boot_time_us": 1767262377844264,
+            "since_boot_us": 69180044,
+            "virtual_us": 69174968,
+            "systimer_ticks": 719405042,
+            "rtc_hrt_offset_us": 69376,
+            "system_correction_us": -62893
+          },
+          "backward-leap-day": {
+            "actual_utc_seconds": 1709179420.132022,
+            "expected_utc_seconds": 1709179420.150488,
+            "difference_seconds": -0.01846599578857422,
+            "boot_time_us": 1709179346162819,
+            "since_boot_us": 73969203,
+            "virtual_us": 73964235,
+            "systimer_ticks": 769212291,
+            "rtc_hrt_offset_us": 69376,
+            "system_correction_us": -62893
+          },
+          "post-2038": {
+            "actual_utc_seconds": 2147483648.116519,
+            "expected_utc_seconds": 2147483648.13985,
+            "difference_seconds": -0.023331165313720703,
+            "boot_time_us": 2147483570127737,
+            "since_boot_us": 77988782,
+            "virtual_us": 77983904,
+            "systimer_ticks": 811015919,
+            "rtc_hrt_offset_us": 69376,
+            "system_correction_us": -62893
+          },
+          "reset_recovered": {
+            "actual_utc_seconds": 2147483648.136966,
+            "expected_utc_seconds": 2147483648.159912,
+            "difference_seconds": -0.022945880889892578,
+            "boot_time_us": 2147483542694770,
+            "since_boot_us": 105442196,
+            "virtual_us": 97407765,
+            "systimer_ticks": 1013019692,
+            "rtc_hrt_offset_us": 86090671,
+            "system_correction_us": -78054214
+          }
+        },
+        "ntp_control_contract": {
+          "defaults_unchanged": true,
+          "invalid_inputs_rejected": 4
+        },
+        "trace": {
+          "requests": [
+            {
+              "server": 1,
+              "virtual_us": 6685343
+            },
+            {
+              "server": 2,
+              "virtual_us": 21717178
+            },
+            {
+              "server": 3,
+              "virtual_us": 36740429
+            },
+            {
+              "server": 3,
+              "virtual_us": 37964054
+            },
+            {
+              "server": 1,
+              "virtual_us": 52975809
+            },
+            {
+              "server": 2,
+              "virtual_us": 68005015
+            },
+            {
+              "server": 2,
+              "virtual_us": 69133745
+            },
+            {
+              "server": 2,
+              "virtual_us": 73813747
+            },
+            {
+              "server": 2,
+              "virtual_us": 77844054
+            },
+            {
+              "server": 1,
+              "virtual_us": 82222603
+            },
+            {
+              "server": 2,
+              "virtual_us": 97247853
+            }
+          ],
+          "drops": [
+            1,
+            2,
+            3,
+            1,
+            1
+          ],
+          "responses": [
+            3,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "times": [
+            {
+              "epoch": 1709179420,
+              "virtual_us": 36740429
+            },
+            {
+              "epoch": 1735726447,
+              "virtual_us": 68005015
+            },
+            {
+              "epoch": 1767262447,
+              "virtual_us": 69133745
+            },
+            {
+              "epoch": 1709179420,
+              "virtual_us": 73813747
+            },
+            {
+              "epoch": 2147483648,
+              "virtual_us": 77844054
+            },
+            {
+              "epoch": 2147483648,
+              "virtual_us": 97247853
+            }
+          ]
+        }
+      }
+    },
+    "layout": {
+      "sync_address": 1070282860,
+      "calendar_address": 1070266008,
+      "microseconds_offset_address": 1070282680,
+      "system_correction_address": 1070282696,
+      "elf_sha256": "62e040b592d6bd526b25c6035005e31a3a40eebb5a9beb994abe49f089addebb"
+    },
+    "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+    "scope": "Exercise actual UDP SNTP fallback, clock updates and displayed dates in QEMU.\n\nQMP changes only the opt-in service's responses. Guest registers, RAM, clocks and\nexecutable bytes are never patched. Initial flash changes are synthetic settings\nin disposable copies; both production applications and source images stay intact.\n"
+  },
+  "previous_full_failure": "uri-progress-checkpoint-20261017.json",
+  "conclusion": "The failed full capture was still on startup. A separate unchanged-binary probe completed startup after 15.28 guest seconds of observation; the old host-only deadline rejects a modeled slow VM. The replacement bounds guest and host time separately and retains byte-exact date-band comparison. No production firmware change was justified.",
+  "cleanup": {
+    "observed_utc": "2026-10-17T19:03:48.7080271Z",
+    "vm_pids_absent": [
+      13292,
+      16524
+    ]
+  }
+}

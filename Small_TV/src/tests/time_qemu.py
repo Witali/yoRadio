@@ -76,8 +76,16 @@ def service(qmp,epoch=None,mask=None,separate=None):
 
 
 def date_capture(qmp,folder,variant,layout,expected_text,seconds=30,previous_text=None):
-    """Compare every date-band pixel with independently decoded immutable factory glyphs."""
-    deadline=time.monotonic()+seconds
+    """Compare every date-band pixel within bounded guest and host time.
+
+    A reset without SNTP retains the normal 18.1-second startup animation.
+    FIXED_TEST: thirty host seconds can contain less guest time under icount;
+    do not mistake that unfinished animation for incorrect calendar pixels.
+    Keep a separate host bound for stalled guests and failed observations.
+    """
+    started=time.monotonic()
+    initial_virtual=int.from_bytes(read_bytes(qmp,0x6004d000,4),'little')
+    host_limit=max(90,seconds*3)
     clean=text_pixels(expected_text,240,0,0xffff)
     expected=clean
     if previous_text is not None:
@@ -92,7 +100,7 @@ def date_capture(qmp,folder,variant,layout,expected_text,seconds=30,previous_tex
             retained[a:b]=clean[a:b]
         expected=bytes(retained)
     last=None
-    while time.monotonic()<deadline:
+    while True:
         qmp.execute('stop')
         try:
             state=snapshot(qmp,variant,layout)
@@ -102,8 +110,14 @@ def date_capture(qmp,folder,variant,layout,expected_text,seconds=30,previous_tex
             path.with_suffix('.ppm').unlink()
             last={'state':state,'date':expected_text,'different_bytes':sum(a!=b for a,b in zip(pixels,expected)),
                   'clean_different_bytes':sum(a!=b for a,b in zip(pixels,clean)),
-                  'boot_time_seconds':int.from_bytes(read_bytes(qmp,0x60008050,8),'little')/1e6}
+                  'boot_time_seconds':int.from_bytes(read_bytes(qmp,0x60008050,8),'little')/1e6,
+                  'host_seconds':time.monotonic()-started,
+                  # The low counter may wrap during this short bounded wait.
+                  'guest_seconds':((int.from_bytes(read_bytes(qmp,0x6004d000,4),'little')-
+                                    initial_virtual)&0xffffffff)/1e6,
+                  'host_limit_seconds':host_limit,'guest_limit_seconds':seconds}
         finally:qmp.execute('cont')
+        if last['host_seconds']>=host_limit or last['guest_seconds']>=seconds:break
         if not last['different_bytes']:return last
         time.sleep(.2)
     vm.save_json(folder/'failed-date-observation.json',last)

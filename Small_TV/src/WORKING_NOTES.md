@@ -7,6 +7,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Failed full/reset-date исследован: кадр показывал startup, не неверную дату.
+  Unchanged8304 baseline прошёл; после reset startup31→181 ticks занял15.284530
+  guest/19.672host seconds. Старый30host deadline воспроизводимо отклоняет
+  модель медленной ВМ. `date_capture` теперь ограничен30guest/90host seconds
+  (для factory minute case90guest/270host), пишет оба elapsed; pixel comparison
+  не ослаблен.6unit cases:slow guest,guest timeout,stalled guest,one wrong pixel,
+  counter wrap,resume after capture error. QEMU suite/publisher требуют эту
+  проверку; `FIXED_TEST` описан в CORRECTION_MARKERS.md. Повторный actual SNTP
+  factory+native прошёл, включая reset/no fresh notification→recovery/post2038.
+  Proof `time-reset-observation-validation-20261017.json`; production59inputs и
+  app8304/ELF62E0 не изменены. Это scoped pass, ещё не новый successful full.
 - Browser8304 focused flow завершён:8passing observations, включая настройки
   часов/advanced, photo interval3/60, mask17/0 и настоящий cold boot persistent
   raw. Public API и выбранные raw settings до/после совпали; все4image regions

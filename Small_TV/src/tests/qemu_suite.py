@@ -50,6 +50,9 @@ def main():
               'boot_reset': {}, 'startup_wait': {}, 'weather_wait': {}, 'advanced_http': {}, 'body_http': {}, 'concurrency_http': {}, 'photo_http': {}, 'photo_frames': {}, 'photo_brightness': {}, 'photo_controls': {}, 'photo_reinit': {}, 'photo_settings': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
               'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP, synthetic weather, natural calendar/DST transitions and complete instruction-replayed frames. The separate unsynchronized scene similarity remains diagnostic. No physical hardware or Internet weather service.'}
     try:
+        from time_capture_test import run_tests as calendar_observation_tests
+        report['date_capture_unit'] = calendar_observation_tests()
+        check(report['date_capture_unit']['passed'], 'Calendar observation deadline tests failed')
         unit_path = args.output / 'boot-observer-unit.json'
         subprocess.run([sys.executable, str(args.qemu_root / 'tests/esp_elf_test.py'),
                         '--output', str(unit_path), '--temp-root', str(args.output / 'boot-observer-unit-temp')], check=True)
