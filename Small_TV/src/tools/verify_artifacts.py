@@ -18,6 +18,7 @@ from photo_frame_contract import validate_photo_frames
 from photo_controls_contract import validate_photo_brightness, validate_photo_controls, validate_photo_reinit
 from photo_settings_contract import validate_photo_settings
 from advanced_qemu import validate_advanced
+from http_body_contract import validate_http_body, validate_http_body_guards
 
 
 def read(path):
@@ -62,6 +63,11 @@ def main():
             'Profile validation and firmware used different profile/compiler inputs')
     app = (ARCHIVE / 'app.bin').read_bytes()
     app_sha = hashlib.sha256(app).hexdigest()
+    body_http = groups['qemu']['body_http']
+    validate_http_body(body_http, {'app_sha256': app_sha, 'source_sha256': manifest['source_sha256'],
+        'qemu_sha256': groups['qemu']['qemu_sha256'],
+        'test_sha256': hashlib.sha256((ROOT / 'tests/http_body_qemu.py').read_bytes()).hexdigest()})
+    validate_http_body_guards(body_http)
     require(suite['app_sha256'] == app_sha and suite['source_sha256'] == manifest['source_sha256'],
             'Suite tested a different application/source archive')
     state, network = groups['machine_time_state'], groups['qemu']['time_http']

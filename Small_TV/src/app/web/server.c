@@ -43,45 +43,6 @@ esp_err_t web_json(httpd_req_t *req, cJSON *object)
     return result;
 }
 
-char *web_body(httpd_req_t *req, size_t max_length)
-{
-    /* Read a bounded request body, enforcing origin checks and receive timeouts. */
-    /* Requests from the recovered pages are same-origin. CLI requests omit Origin. */
-    size_t origin_length = httpd_req_get_hdr_value_len(req, "Origin");
-    if (origin_length)
-    {
-        char origin[160], host[128], expected[160];
-        if (origin_length >= sizeof(origin) ||
-            httpd_req_get_hdr_value_str(req, "Origin", origin, sizeof(origin)) != ESP_OK ||
-            httpd_req_get_hdr_value_str(req, "Host", host, sizeof(host)) != ESP_OK)
-            return NULL;
-        snprintf(expected, sizeof(expected), "http://%s", host);
-        if (strcmp(origin, expected))
-            return NULL;
-    }
-    if (req->content_len == 0 || req->content_len > max_length)
-        return NULL;
-    char *body = malloc(req->content_len + 1);
-    if (!body)
-        return NULL;
-    size_t received = 0;
-    unsigned timeouts = 0;
-    while (received < req->content_len)
-    {
-        int bytes = httpd_req_recv(req, body + received, req->content_len - received);
-        if (bytes == HTTPD_SOCK_ERR_TIMEOUT && ++timeouts < 3)
-            continue;
-        if (bytes <= 0)
-        {
-            free(body);
-            return NULL;
-        }
-        received += bytes;
-    }
-    body[received] = 0;
-    return body;
-}
-
 cJSON *web_parse_json(httpd_req_t *req)
 {
     /* Read and parse a bounded JSON object from the HTTP request. */

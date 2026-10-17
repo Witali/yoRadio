@@ -1,6 +1,7 @@
 #pragma once
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "esp_err.h"
 #define HTTPD_RESP_USE_STRLEN -1
 #define HTTPD_SOCK_ERR_TIMEOUT -2
@@ -22,6 +23,9 @@ typedef struct
     size_t content_len, position, response_length;
     unsigned status;
     unsigned recv_timeouts;
+    unsigned recv_calls, recv_block_bytes, shutdown_calls, timeout_set_calls, fail_timeout_set_call;
+    int64_t recv_timeout_us, recv_step_us;
+    bool read_shutdown, fail_timeout_get;
     bool recv_disconnect, response_complete;
     char response_type[64], location[128], cache_control[64];
     char response[98305];
@@ -48,6 +52,7 @@ size_t httpd_req_get_hdr_value_len(httpd_req_t *req, const char *name);
 esp_err_t httpd_req_get_hdr_value_str(httpd_req_t *req, const char *name, char *out,
                                       size_t capacity);
 int httpd_req_recv(httpd_req_t *req, char *out, size_t length);
+int httpd_req_to_sockfd(httpd_req_t *req);
 esp_err_t httpd_req_get_url_query_str(httpd_req_t *req, char *out, size_t capacity);
 esp_err_t httpd_query_key_value(const char *query, const char *key, char *out, size_t capacity);
 esp_err_t httpd_start(httpd_handle_t *server, const httpd_config_t *config);

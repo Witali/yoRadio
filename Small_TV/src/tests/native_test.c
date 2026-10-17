@@ -20,6 +20,7 @@
 #include "esp_partition.h"
 #include "nvs.h"
 #include "freertos/semphr.h"
+#include "lwip/sockets.h"
 
 static unsigned checks;
 #define CHECK(condition) do {++checks;if (!(condition)) {fprintf(stderr,"Check failed at %s:%d: %s\n",__FILE__,__LINE__,#condition);exit(1);}} while (0)
@@ -102,8 +103,49 @@ static const char *header(httpd_req_t *req,const char *name)
 size_t httpd_req_get_hdr_value_len(httpd_req_t *req,const char *name) {const char *value=header(req,name);return value?strlen(value):0;}
 esp_err_t httpd_req_get_hdr_value_str(httpd_req_t *req,const char *name,char *out,size_t capacity)
 {const char *value=header(req,name);if(!value || strlen(value)>=capacity)return ESP_ERR_INVALID_SIZE;strcpy(out,value);return ESP_OK;}
+static httpd_req_t *socket_request;
+int httpd_req_to_sockfd(httpd_req_t *req) {socket_request=req;return 42;}
+int test_getsockopt(int socket,int level,int option,void *value,socklen_t *size)
+{
+    assert(socket==42 && level==SOL_SOCKET && option==SO_RCVTIMEO && *size==sizeof(struct timeval));
+    if(socket_request->fail_timeout_get)return -1;
+    struct timeval *timeout=value;
+    timeout->tv_sec=(long)(socket_request->recv_timeout_us/1000000);
+    timeout->tv_usec=(long)(socket_request->recv_timeout_us%1000000);
+    return 0;
+}
+int test_setsockopt(int socket,int level,int option,const void *value,socklen_t size)
+{
+    assert(socket==42 && level==SOL_SOCKET && option==SO_RCVTIMEO && size==sizeof(struct timeval));
+    if(++socket_request->timeout_set_calls==socket_request->fail_timeout_set_call)return -1;
+    const struct timeval *timeout=value;
+    socket_request->recv_timeout_us=(int64_t)timeout->tv_sec*1000000+timeout->tv_usec;
+    assert(socket_request->recv_timeout_us>0);
+    return 0;
+}
+int test_shutdown(int socket,int how)
+{
+    assert(socket==42 && how==SHUT_RD);
+    socket_request->read_shutdown=true;
+    ++socket_request->shutdown_calls;
+    return 0;
+}
 int httpd_req_recv(httpd_req_t *req,char *out,size_t length)
-{if(req->recv_timeouts){--req->recv_timeouts;return HTTPD_SOCK_ERR_TIMEOUT;}if(req->recv_disconnect)return 0;if(length>req->content_len-req->position)length=req->content_len-req->position;if(length>137)length=137;memcpy(out,req->input+req->position,length);req->position+=length;return (int)length;}
+{
+    ++req->recv_calls;
+    if(req->read_shutdown || req->recv_disconnect)return 0;
+    if(req->recv_timeouts || req->recv_step_us>req->recv_timeout_us)
+    {
+        if(req->recv_timeouts)--req->recv_timeouts;
+        clock_us+=req->recv_timeout_us;
+        return HTTPD_SOCK_ERR_TIMEOUT;
+    }
+    clock_us+=req->recv_step_us;
+    if(length>req->content_len-req->position)length=req->content_len-req->position;
+    unsigned block=req->recv_block_bytes ? req->recv_block_bytes : 137;
+    if(length>block)length=block;
+    memcpy(out,req->input+req->position,length);req->position+=length;return (int)length;
+}
 esp_err_t httpd_req_get_url_query_str(httpd_req_t *req,char *out,size_t capacity)
 {const char *query=strchr(req->uri,'?');if(!query || strlen(query+1)>=capacity)return ESP_ERR_INVALID_SIZE;strcpy(out,query+1);return ESP_OK;}
 esp_err_t httpd_query_key_value(const char *query,const char *key,char *out,size_t capacity)
@@ -117,7 +159,7 @@ esp_err_t httpd_register_err_handler(httpd_handle_t server,httpd_err_code_t code
 
 static httpd_req_t request;
 static void prepare(const char *uri,const void *body,size_t length,const char *type)
-{memset(&request,0,sizeof(request));request.uri=uri;request.input=body;request.content_len=length;request.content_type=type;request.host="192.168.43.1";request.status=200;}
+{memset(&request,0,sizeof(request));request.uri=uri;request.input=body;request.content_len=length;request.content_type=type;request.host="192.168.43.1";request.status=200;request.recv_timeout_us=5000000;}
 static void dispatch(httpd_method_t method)
 {
     /* Exercise the registered method/URI handler, retaining successful/error coverage. */

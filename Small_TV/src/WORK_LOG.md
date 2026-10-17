@@ -1618,3 +1618,22 @@ ISR stack и factory memory parity не объявлены. ВМ закрыта,
 не экспортируются. Код/документ/JSON сохранены в отдельной ветке, main frozen75+88
 inputs общего run11075 не изменены. Его18 pre-QEMU groups и QEMU gates до
 photo_reinit прошли, photo_settings выполняется; полный результат пока отсутствует.
+
+### 2026-10-17 — общий deadline HTTP-тела вместо блокировки других клиентов
+
+В отдельной .worktree/small-tv-http-body-deadline воспроизведён дефект DD41:
+неполный JSON удерживает второй GET24.69s, trickle27.61s, oversized9.70s.
+В factory0x4200d7f0 на0x4200d808 один recv, нашего retry-loop нет. SDK pending
+data +3timeouts +remaining-body purge объясняют около25s. Новый request_body.c
+имеет5s absolute deadline, per-read remaining timeout с ceil1ms, SHUT_RD при
+отказе и восстановление original timeout при успехе; FIXED_RECONSTRUCTION.
+
+Новый app3C599124/source1741EA14/ELF342C0127,1 177 216bytes/free358 784,
+58 production inputs, сохранён в branch firmware/development. Final identical
+body QEMU test наold:3 failures, наnew:4pass; задержки4.695327/4.703467/.204119s.
+Host3950/platform46/frontend/integrity/timezone/aggregation reduced pass;
+SDK photo HTTP21pass; consumer guards15pass. ASM/manifest и scoped report/doc
+сохранены. Добавлен mandatory body_http в следующий suite/publisher/verifier.
+Это не общий full pass нового app. Main DD41/75+88 frozen inputs текущего11075
+не менялись; он проходит отдельную проверку на QEMU30F. Merge/build/full нового
+кандидата выполнять после terminal/сохранения этого прогона, не подменяя identities.
