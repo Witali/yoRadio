@@ -20,7 +20,7 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   результат не заменяет общий прогон. При интеграции повторно прошли14 guards,
   сохранность74 исходных test pins/57 production inputs/8 instruction ranges.
   Collector перед новым full обновить.
-- Текущая DAF/C839/B06 проверена в новом raw-backed browser guest:
+- Серия DAF/C839/B06 до оптимизации проверена в новом raw-backed browser guest:
   31 финальная браузерная проверка и21 storage/identity checks прошли. Ночное
   расписание на обеих границах/яркость2–99/off, все4 темы/5 GIF/3 даты, флаги,
   day0 и3 цвета RGB565, desktop resize/crop, mobile390px portrait, отмена/Escape,
@@ -30,12 +30,23 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   дефектов firmware этот набор не установил. ВМ24764 и временная вкладка закрыты,
   viewport сброшен. User подтвердил: штатное поведение factory сохранять,
   её доказанные ошибки исправлять; оптимизации разрешены с проверкой результата.
-- Найдена лишняя browser-пауза50ms после каждого успешного upload chunk:
-  native HTTP возвращает успех после синхронного esp_partition_write. До правки
-  сохранён noise JPEG47837 bytes/12chunks, SHA a73dc807, в собственном state
-  `.build/small-tv-browser/acceptance-20261017`. Удаление паузы ещё не выполнено;
-  нужны проверка sequencing/retries, регенерация pages, production build и real
-  multichunk upload after с побайтовым сравнением. H09/H10 и physical остаются.
+- В .worktree/small-tv-photo-upload-waits выполнена оптимизация uploader:
+  canonical photo_upload.js встроен exporter; удалены50ms после успешного ACK
+  и2500ms после пятой неудачи, backoff между попытками сохранён. Native ACK
+  следует за esp_partition_write. Комментарий REQUESTED_CHANGE и отдельные tests.
+- Candidate этой ветки: appDD4EB76E/source96A111EC/ELFB7BE7CCC,1 176 880 bytes,
+  free359 120. Код четырёх native upload/HTTP functions побайтово прежний.
+  Final frontend11 pass; тот же MJS на старой странице даёт6 ожидаемых failures.
+  Host3924/platform46/frontend/integrity/timezone/aggregation pass (reduced);
+  SDK photo HTTP21 pass. Actual browser/raw22 checks pass: JPEG47837 bytes,
+  12chunks, SHA a73dc807 полностью идентичен baseline DAF. Metadata отсутствуют,
+  slots1–4 и executable/media regions unchanged; helpers/QEMU unchanged.
+- JSON manifest теперь пишется LF без BOM (отдельный c5f51a04); после этого
+  выполнена новая финальная browser series, не подменявшая первую CRLF-проверку.
+  Все собственные ВМ и tabs этой серии закрыты. См. photo-upload-waits-checks.md.
+  Далее commit/merge этой ветки, root build и новый единый full с photo_settings.
+  Freeze helper должен включать .mjs, collector — photo_settings; исходные
+ 72/74 старых pin lists не переименовывать. H03/setup, H09/H10 и physical остаются.
 
 ## Цель и принятые решения
 

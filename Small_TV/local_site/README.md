@@ -73,6 +73,14 @@ checks its final length and JPEG dimensions, removes APP/COM metadata,
 and saves the result only when the upload is complete. A subsequent page
 load downloads the saved image in chunks, as the firmware page does.
 
+`photo_upload.js` supplies the upload function embedded by `extract_pages.py`.
+It waits for each acknowledged write before sending the next block. Successful
+blocks need no additional 50 ms sleep. Up to five attempts retain increasing
+backoff between retries; the final failed attempt reports its error immediately.
+The transfer checks execute the actual generated page script with held replies,
+exact multipart bytes and retry/error cases. See
+[the upload pacing evidence](../qemu/parity/photo-upload-waits-checks.md).
+
 Local state, uploaded pictures, logs and the process ID are held under
 `.runtime/`, which is ignored by Git. The state file can contain values
 entered into Wi-Fi and advanced settings; it is not served as a public

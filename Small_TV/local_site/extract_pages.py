@@ -125,6 +125,15 @@ def recover() -> None:
             if start < 0:
                 raise ValueError('Missing factory image processing block')
             page = page[:start] + crop_script + '\n\n' + page[end:]
+            # Keep the factory protocol while pacing writes by actual ACKs,
+            # without a sleep after success or after the last failed attempt.
+            start = page.index('        async function uploadImageInChunks(file, fileNumber) {')
+            start = page.rfind('        /**', 0, start)
+            end = page.index('        // 分块下载图片', start)
+            if start < 0:
+                raise ValueError('Missing factory upload block')
+            upload_script = (ROOT / 'photo_upload.js').read_text(encoding='utf-8')
+            page = page[:start] + upload_script + '\n\n' + page[end:]
             # Browser Canvas encoders may insert ICC APP2 even after EXIF was
             # removed by drawing pixels. Strip all APP/COM before device upload.
             cleaner = (ROOT / 'jpeg_metadata.js').read_text(encoding='utf-8')
