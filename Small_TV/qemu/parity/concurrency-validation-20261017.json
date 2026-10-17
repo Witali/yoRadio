@@ -1,0 +1,773 @@
+{
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Exercise real concurrent Small TV clients, weather, uploads and restarts.\n\nOnly a disposable persistent flash copy is writable. The immutable production\nimages, guest instructions, registers and RAM are never modified by the host.\nThis is a bounded native H09 scenario, not complete concurrency or H10 coverage.\n",
+  "app_sha256": "3c599124ac449179747fabaa212fbc95489770d977555d33419ebecec8e2024e",
+  "native_elf_sha256": "342c0127ed709f9c7408e00713dd52d74d4a89c03e8aee03f929da72ab729e56",
+  "source_sha256": "1741ea14341e8769c79f91c8c72e0baef08430fcb1983503bca5d94556317633",
+  "qemu_sha256": "30f9a68ef5fda4af12ccc525f0951a8a08caf40b0e363db5d90587054ff66d74",
+  "checks": {
+    "clock_cache_advances_during_weather": true,
+    "exactly_one_upload_session": true,
+    "active_photo_unpublished": true,
+    "concurrent_exact_retries_accepted": true,
+    "concurrent_conflicting_retry_rejected": true,
+    "scan_and_settings_during_upload": true,
+    "concurrent_settings_both_accepted": true,
+    "independent_fields_preserved": true,
+    "weather_still_in_flight_during_upload": true,
+    "chunk_and_get_1": true,
+    "chunk_and_get_2": true,
+    "chunk_and_get_3": true,
+    "chunk_and_get_4": true,
+    "chunk_and_get_5": true,
+    "chunk_and_get_6": true,
+    "chunk_and_get_7": true,
+    "chunk_and_get_8": true,
+    "chunk_and_get_9": true,
+    "completed_photo_exact": true,
+    "clock_resumes_after_upload": true,
+    "pre_restart_settings_accepted": true,
+    "both_restart_requests_acknowledged": true,
+    "one_observed_restart_for_pair": true,
+    "settings_survive_warm_restart": true,
+    "partial_photo_hidden_after_restart": true,
+    "complete_photo_survives_restart": true,
+    "first_vm_no_panic": true,
+    "cold_boot_uses_new_vm": true,
+    "settings_survive_cold_boot": true,
+    "partial_photo_hidden_after_cold_boot": true,
+    "complete_photo_survives_cold_boot": true,
+    "new_upload_after_interrupted_restart": true,
+    "cold_boot_no_panic": true,
+    "protected_regions_unchanged": true
+  },
+  "requests": [
+    {
+      "path": "/updateCity",
+      "status": 200,
+      "guest_seconds": 0.14282400000000095
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.16711499999999901
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.23844000000000065
+    },
+    {
+      "path": "/GetTimeModeValue",
+      "status": 200,
+      "guest_seconds": 0.145582000000001
+    },
+    {
+      "path": "/getgifvalue",
+      "status": 200,
+      "guest_seconds": 0.154952999999999
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.29507599999999456
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.144601999999999
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1413220000000024
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=1&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13880600000000243
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=2&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14445500000000067
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=3&size=4096",
+      "status": 200,
+      "guest_seconds": 0.16243799999999453
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=4&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1445280000000011
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=5&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1486540000000005
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=6&size=4096",
+      "status": 200,
+      "guest_seconds": 0.147586000000004
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=7&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15310699999999855
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=8&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15050600000000003
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=9&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15343899999999877
+    },
+    {
+      "path": "/setclocktype",
+      "status": 200,
+      "guest_seconds": 0.13767800000000108
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.14378899999999817
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.2251540000000034
+    },
+    {
+      "path": "/GetTimeModeValue",
+      "status": 200,
+      "guest_seconds": 0.14567800000000375
+    },
+    {
+      "path": "/getgifvalue",
+      "status": 200,
+      "guest_seconds": 0.13444099999999537
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.15408500000000203
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14214300000000435
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=1&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14923799999999687
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=2&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15435399999999788
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=3&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1572800000000001
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=4&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14742100000000136
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=5&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1540120000000016
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=6&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14515600000000006
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=7&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1431350000000009
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=8&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1603539999999981
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=9&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13740800000000064
+    },
+    {
+      "path": "/GetTimeModeValue",
+      "status": 200,
+      "guest_seconds": 0.14300599999999974
+    },
+    {
+      "path": "/getgifvalue",
+      "status": 200,
+      "guest_seconds": 0.12901000000000007
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=0",
+      "status": 200,
+      "guest_seconds": 0.15099600000000013
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1436529999999996
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=1&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15030300000000008
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=2&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15894500000000011
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=3&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15896199999999983
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=4&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1328990000000001
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=5&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14337200000000028
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=6&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15149800000000013
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=7&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13955499999999965
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=8&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13625799999999977
+    },
+    {
+      "path": "/get_Photo_File?file=4&chunk=9&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13165899999999997
+    },
+    {
+      "path": "/start_upload",
+      "status": 200,
+      "guest_seconds": 0.14817599999999942
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.2505930000000003
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.21562199999999976
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.23202000000000034
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.25253499999999995
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.24251999999999985
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.24000900000000058
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.22700299999999984
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.22624699999999986
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.22543299999999977
+    },
+    {
+      "path": "/upload_chunk",
+      "status": 200,
+      "guest_seconds": 0.1820890000000004
+    },
+    {
+      "path": "/finish_upload",
+      "status": 200,
+      "guest_seconds": 0.30698199999999964
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=0&size=4096",
+      "status": 200,
+      "guest_seconds": 0.13886300000000062
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=1&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1454960000000014
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=2&size=4096",
+      "status": 200,
+      "guest_seconds": 0.1711469999999995
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=3&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14796499999999924
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=4&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15923599999999993
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=5&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15285599999999988
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=6&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14260600000000068
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=7&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14914500000000075
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=8&size=4096",
+      "status": 200,
+      "guest_seconds": 0.15165700000000015
+    },
+    {
+      "path": "/get_Photo_File?file=5&chunk=9&size=4096",
+      "status": 200,
+      "guest_seconds": 0.14175800000000116
+    }
+  ],
+  "paired_batches": [
+    {
+      "label": "competing-upload-starts",
+      "paths": [
+        "/start_upload",
+        "/start_upload"
+      ],
+      "statuses": [
+        200,
+        400
+      ],
+      "guest_seconds": 0.1405990000000017
+    },
+    {
+      "label": "identical-chunk-retries",
+      "paths": [
+        "/upload_chunk",
+        "/upload_chunk"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.33052299999999946
+    },
+    {
+      "label": "exact-and-conflicting-retries",
+      "paths": [
+        "/upload_chunk",
+        "/upload_chunk"
+      ],
+      "statuses": [
+        200,
+        400
+      ],
+      "guest_seconds": 0.3368380000000002
+    },
+    {
+      "label": "scan-and-settings-during-upload",
+      "paths": [
+        "/scan",
+        "/getsettings"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 2.847166999999999
+    },
+    {
+      "label": "independent-setting-writes",
+      "paths": [
+        "/SetTimeModeValue",
+        "/setgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.1470880000000001
+    },
+    {
+      "label": "chunk-and-get-1",
+      "paths": [
+        "/upload_chunk",
+        "/getgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.24270100000000028
+    },
+    {
+      "label": "chunk-and-get-2",
+      "paths": [
+        "/upload_chunk",
+        "/getgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.2475430000000003
+    },
+    {
+      "label": "chunk-and-get-3",
+      "paths": [
+        "/upload_chunk",
+        "/getgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.24936999999999898
+    },
+    {
+      "label": "chunk-and-get-4",
+      "paths": [
+        "/upload_chunk",
+        "/getgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.23799100000000095
+    },
+    {
+      "label": "chunk-and-get-5",
+      "paths": [
+        "/upload_chunk",
+        "/getgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.23178399999999755
+    },
+    {
+      "label": "chunk-and-get-6",
+      "paths": [
+        "/upload_chunk",
+        "/getgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.23861900000000347
+    },
+    {
+      "label": "chunk-and-get-7",
+      "paths": [
+        "/upload_chunk",
+        "/getgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.23173399999999944
+    },
+    {
+      "label": "chunk-and-get-8",
+      "paths": [
+        "/upload_chunk",
+        "/getgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.2406790000000001
+    },
+    {
+      "label": "chunk-and-get-9",
+      "paths": [
+        "/upload_chunk",
+        "/getgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.2038569999999993
+    },
+    {
+      "label": "settings-before-restart",
+      "paths": [
+        "/SetTimeModeValue",
+        "/setgifvalue"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.14228599999999858
+    },
+    {
+      "label": "duplicate-restart-requests",
+      "paths": [
+        "/restart",
+        "/restart"
+      ],
+      "statuses": [
+        200,
+        200
+      ],
+      "guest_seconds": 0.1555840000000046
+    }
+  ],
+  "inputs_sha256": {
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\concurrency_qemu.py": "e6cf90fd64fae540b6b625272887e7039c4b296bbb004c04cf334dacbab5d934",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_protocol.py": "1f8aeaa8ac9c8bdfc58405afba1f51a9664e2dfe85fea029adce3856eb7d23ef",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\.build\\small-tv-esp32c2\\small_tv_reconstructed.elf": "342c0127ed709f9c7408e00713dd52d74d4a89c03e8aee03f929da72ab729e56",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\fixtures\\jpeg\\rgb-420.jpg": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\advanced_qemu.py": "a27d41f076b530f18f931f4f14450c9df6f7eda0bb54ee09ebca2cd8ed100ae0",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\artifact_test.py": "c9187b43a2c83c8c8a433343c4a10026ee630c5a656773cd362e7b51a3a3e6dc",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\backlight_oracle.py": "e82766a5b4eab35605d25c63095445fa4c1ada1b2833a50638c54e293f50ea19",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\calendar_oracle.py": "e0b4fa1a9a32658f3f809e149e44c622068202a890020fd3a79abb1295f09b06",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\calendar_qemu.py": "8f71b8a51f7a2a48db544cf3bd46302a0029d0e8974760bce6a4b36c6fe322fd",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\classic_oracle.py": "92401ddcf595125ae6108dbcd65f54cc276e16f531f2b5952dfcc9e082dd5667",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\control_oracle.py": "f7df352f24bdad4e978dad327cd66c1f88383bfa46a07fa4399a274594335d8a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\field_qemu.py": "5d935d1f2523d51a378c5c15d28f30d52e950011e9f333c95662af90f3e60e06",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\frame_replay.py": "5a7ed3dbb6738fa2002e6aaecacdf3b0bab769fa4e2e9a12f52cee7ecb253251",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\frontend_test.py": "e2a50b0b5b292b549882b7f239089f922630bf235d711c5d4f3007897423ca7e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\gdb_observer.py": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\http_body_contract.py": "594e1468127e5d3a99bc1d7062d1f2f822ccd5eb8f0887dd33386a0df83eb5d3",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\http_body_qemu.py": "1d78045855cfcc993de414811b40e72eb7a81ab62e0066c560d63bbca6fa0a86",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\http_contracts.inc": "6686965cdbcbd6d7a76bd668e495a955401e7ac5b7b85f7070508c7167b266fe",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\jpeg_inputs_oracle.py": "1bb212bc3e5ae7fe8127ca2f36cdd35a5dcf021b11eef740307b30752c130189",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\jpeg_oracle.py": "354048940b1d6bd065428a83a03133f333a5334154eee7472806e25d1a893e89",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\jpeg_test_fixtures.py": "980004c204a67c2664caa2fcde647bc40ef4635dae91770ff612436fe097a92d",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\json-report-test.ps1": "9bd099b9ab878ffa9a47800e81064e2e4c3db285b9d6ceb8cdfc808556b70b82",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\machine_oracle.py": "009af0436897d63044f692baac40b45ade60e69a511a9f36befd3aed09705ff2",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\native_test.c": "c59c2157e587eb4781e15e04f33f348f8b22e3ba91ccfa9e0995965c1a395398",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\network_oracle.py": "0a766cedb9b6aaf07c92d8e97b6fdd88d2ff2097f7a78ba557ca0c55ee241488",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\oracle-requirements.txt": "3ac351c1e919f4b505b9e5f9951783babeffd0a599ecd9a69ae4644bc2757967",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_brightness_qemu.py": "ade29a9b05fbfc8af8ad70ad103ded62a1cc1c7c004f40d49a6dd4250f9b07a1",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_controls_contract.py": "94dffad27715cbdaf0072797a1d9748f6ce58c8163c2ace9be9652208ccaa3b6",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_controls_qemu.py": "bf7ddee478941d10368c7a18bab036d128166bb597b9de6618a2d18736297a4f",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_frames_qemu.py": "c93ed36209140100355af45dbde5772fe421b949b378bbc221aeaff298e230b0",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_frame_contract.py": "672e5986605d63dee1c7490a6a20d9a1ff0624247fa2515c30a5431624716afe",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_frame_replay.py": "f567780d22400e0b4b86a7607a0f89a20c47bafa0b0a985f09dd632ab82a09e8",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_protocol_test.py": "b207b94b516bc7640184d15b7923fee70b321da8a368b36488fc66551d5a890c",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_qemu.py": "44fe0fe608debadc52bc88a812cef181a85ba50d76b0ed026c96d39baba48c7c",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_reinit_qemu.py": "50f5480dbddb5c9692b016a5be2a3f4dbecfb386b89348f396e1d33f2974f642",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_settings_contract.py": "a8472f02bca1f510142fffd66741e29f1c2278ad138edf8a8b2f5712cd3daf87",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_settings_qemu.py": "66cfd3f421ed88bf0f8c60ed371cff634bd2fb2fdbcefec64b67e05e85ccec0e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\photo_transfer_test.mjs": "7db6296f615a32a0345424b2e5f4b6402b4ee814895afa7fdace72379e4a7a6a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\platform_test.c": "e8b7ccfde80f27da4b39b0c1b55566f19800ff47bd4b300c9a77eea1bf35f39b",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\profile_test.py": "1ab2bc605282de7cc455df7f80ce18d973761aef6ff5b0926274b522e20a3cb4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\publish-report.py": "5b422f17d7b2b513cf5ab44e78383aa0428ecceccc8a49c9ec18d277276774c7",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\qemu_storage.py": "3fa00b82379b90c76939ad61d1756f1fcefe03ded492bd16c7df1b532578dc3d",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\qemu_suite.py": "c83ba6d15075344cf90f52c988e66a161bb61736e85d6263fe50389966a4a4db",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\read-result.ps1": "e8efd2ad5a8ac7cbc6670691494d1f66a43d4e794aea5e385ce2148808e3c190",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\regional_qemu.py": "99432c612416fde7eb7f826262bd9607ab611cedf5e4816253032c6c2c808b37",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\run-all.ps1": "065e805bfd5452e59bcb9186917982e9b45bc08b6473a286e89a5d4d26135d50",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\run-machine-oracle.ps1": "cf6e4daf3beb4cfe18cd7fe867e70bff5ab00bc708a73f8467135cf9b5df5037",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\run-platform.ps1": "fd67838657087df84df4e5d253913baea46688c3d1d56c244af1bec3e1d198e1",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\run.ps1": "4b48156da03f81b4d551246cd36a6f7b118ce6b0ba93fc108816b96e64897fd9",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\scene_qemu.py": "797304412870bee54e2af631833d84cbd9e7c114f643fd60a6e60ce64e09098c",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\startup_qemu.py": "6b12018b710960df2cd046870afc0d2fbd4bdfb3f908067d54b7134bd87220bc",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\text_oracle.py": "8e436f4a2fbfe75e036fd3490812df87e5b3fbe26d7cb41d76b1c8fde312ba29",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\text_qemu.py": "eddf0f6963479ea9596cf10213d9dbcc26e761f458e9c8c480779d9ab4105e2f",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\timezone_oracle.py": "d382200126c7d3e3594c279b1a2fb68c2261cdf2ab7122355b32c1999694970e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\timezone_update_test.py": "1a7314f1f76f28fd85962e5c870eff87f5657667c9bd60b4cf0f8f20d782c7c1",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\time_qemu.py": "ef7e8ea96884e0ed87c16bdf2648465f32700dd047903231f3fc608811d534c0",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\time_state_oracle.py": "b291d5f8057e8d5ce28f15f2c0097d9900807221cbdeb6b187df16f551e626ba",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\weather_qemu.py": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\weather_render_oracle.py": "ccc566ba5ab138340c269c34b5e12cefbf16e881d3c08b1c1da7b286af76f724",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\weather_wait_qemu.py": "6b6f8dc0c38309109050a55cc1dd915004d4e32c691ee9a930d7f7695a56b3da",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_attr.h": "eeb17565d81d387240a34f855611453654e19d747bd5a19c81765840ad0a331c",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_crt_bundle.h": "b3adf106d95b8934f690943f2921308b90be5b766c4c8ba250c792de56400201",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_err.h": "ff324f4c58f3e452d1044ddcafec4650debfcdc15a874203f1db0bc47cb6f030",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_event.h": "320a206756661470135eca864cb42c5881653aaf9a23002461b246039dd0e8bb",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_flash.h": "ae113fca498474504de520266ae0c4ea5566b662b198076d7671e42c2b5563d0",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_http_client.h": "f6f9e755cd9bcf4843c490bfae493bf15b9e2118c3ec623eb74a307926e32ef5",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_http_server.h": "24d62ce30f98b26b4d7933e2955380d34efaa1d47c2821a35baa00575603c248",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_netif.h": "f4f9c0e2b6244653544dd0fe1e927848a8636cab6dc0c43e66e24748d6f8beae",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_netif_sntp.h": "ffff057b6df9d5c1aa546c583141ad8bc8d773b45949e9fc74c5dd68d66f07a4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_partition.h": "ccc2bbc1bed4688f32d2087416cf6a6c7f5a5c55f59f20da97142f66ac2158cd",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_system.h": "2236f53f34f441564332e95ae002a00b7d4b773759293241b0ca1276dcfc1dbe",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_timer.h": "82a7c14acf5d1cdcbea1b23bab880c69562da88013adc34ff5f2ae2115fb08d1",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\esp_wifi.h": "ac167813c9d550c3aef904b0ee426d6e292df6fad85894c648f7501dc4d92d4b",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\nvs.h": "5f6b13a4f8f655556c0e1b23be778eb064dc6a00c199cf349663088b40511e9a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\time_adapter.h": "14aa359e1ce977a8bc520a67c0d3d6ed6bb8fd5c61960fedb2fbc7f5f79b8559",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\driver\\gpio.h": "cb03cea98c5d32fb07c0cfbdc7926af161a94c3fd65c153ac48830754bbfe465",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\driver\\gptimer.h": "d137cf8197b1edca31e7beea249a3c939d7d653316feb4a59c24efaf8e8bcf0e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\driver\\ledc.h": "28742a7d5ec88c4e2a86f186a127ff8ec4464aebb0c2ef215003de6e174aa3d9",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\driver\\spi_master.h": "69435ae97362f945e681ba755ac824d1093430f025873c18bee0fc6e18fd44fd",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\freertos\\FreeRTOS.h": "0e8480e3c8d57cd5b1bccb7bc0d7766c502bde4bdb3beae786747591a80413b7",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\freertos\\semphr.h": "0793f354d1c08d741fb54fa5a6f7af8cf09ebe8d0a72c91242e1f7af2bd0ff9e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\freertos\\task.h": "8c2f1876858dce1348c4125744812dd979ccd902b5d367dc2c1686c1fc045152",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\src\\tests\\stubs\\lwip\\sockets.h": "476b174e9d84c11a532614ee12e7146edc3b2e8b9d9cc6daab11ee19366a8a4a",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\qemu\\parity\\compare.py": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\firmware\\development\\small-tv-esp32c2-reconstructed\\app.bin": "3c599124ac449179747fabaa212fbc95489770d977555d33419ebecec8e2024e",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\firmware\\development\\small-tv-esp32c2-reconstructed\\bootloader.bin": "1653dc91d0de90f770ac560c939352d872423a11c1043cf6da123b85ece07d0f",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\firmware\\development\\small-tv-esp32c2-reconstructed\\partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\firmware\\development\\small-tv-esp32c2-reconstructed\\manifest.json": "853ad7b8c88e44f6dc127a95cc801a32acaff6c2533d7c5f0e6e5558db064877",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\firmware\\development\\small-tv-esp32c2-reconstructed\\source-manifest.json": "b6088c57a7a3010032435a01512e175e46cbb241a6a4c44214f4f99ace4688f4",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "C:\\Work\\QEMU-ESP32\\tools\\esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "C:\\Work\\QEMU-ESP32\\tools\\esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-http-body-deadline\\Small_TV\\qemu\\profiles\\small-tv-c2.json": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+    "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-riscv32.exe": "30f9a68ef5fda4af12ccc525f0951a8a08caf40b0e363db5d90587054ff66d74"
+  },
+  "sources": {
+    "images": [
+      {
+        "bytes": 19248,
+        "sha256": "1653dc91d0de90f770ac560c939352d872423a11c1043cf6da123b85ece07d0f",
+        "offset": "0x0",
+        "file": "bootloader.bin"
+      },
+      {
+        "bytes": 3072,
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "offset": "0x8000",
+        "file": "partition-table.bin"
+      },
+      {
+        "bytes": 1177216,
+        "sha256": "3c599124ac449179747fabaa212fbc95489770d977555d33419ebecec8e2024e",
+        "offset": "0x10000",
+        "file": "app.bin"
+      },
+      {
+        "bytes": 1994752,
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "offset": "0x200000",
+        "file": "assets.bin"
+      }
+    ],
+    "source_sha256": "1741ea14341e8769c79f91c8c72e0baef08430fcb1983503bca5d94556317633"
+  },
+  "protected_before": {
+    "boot_and_partitions": "d47997f87edddfde74235df0ee8d4b7cf7e2da7304f4068516555179beba9724",
+    "application_and_gap": "aad14b394a7bf6268cb14fe4a15b245bd6bee1b42af4f89c9365c590975b2551",
+    "photos_1_to_3": "ad2b982efbcac4f6b341134b7d463ea7731a1c0b3ef7f4df0de7eb86f82f75b1",
+    "animations_and_weather": "723061c4eaeab4c986b62c7aac933e3f42c952fa2711f47d38a168dcb1369441",
+    "unused_tail": "1bffa7ef9c11319de313a60f5ae2cbcc486e5e40ebb3e25f31b550ca8aa916b0"
+  },
+  "winner_slot": 4,
+  "loser_slot": 5,
+  "held_weather_worker_state": 1,
+  "renderer_resume": {
+    "before_finish": {
+      "synced": true,
+      "year": 2026,
+      "month": 6,
+      "day": 12,
+      "hour": 20,
+      "minute": 0,
+      "second": 21,
+      "weekday": 5
+    },
+    "after_finish": {
+      "synced": true,
+      "year": 2026,
+      "month": 6,
+      "day": 12,
+      "hour": 20,
+      "minute": 0,
+      "second": 29,
+      "weekday": 5
+    }
+  },
+  "protected_after": {
+    "boot_and_partitions": "d47997f87edddfde74235df0ee8d4b7cf7e2da7304f4068516555179beba9724",
+    "application_and_gap": "aad14b394a7bf6268cb14fe4a15b245bd6bee1b42af4f89c9365c590975b2551",
+    "photos_1_to_3": "ad2b982efbcac4f6b341134b7d463ea7731a1c0b3ef7f4df0de7eb86f82f75b1",
+    "animations_and_weather": "723061c4eaeab4c986b62c7aac933e3f42c952fa2711f47d38a168dcb1369441",
+    "unused_tail": "1bffa7ef9c11319de313a60f5ae2cbcc486e5e40ebb3e25f31b550ca8aa916b0"
+  },
+  "inputs_unchanged": true,
+  "raw_report_sha256": "ccfc69895607c4df928035a5dcb744ccc2edd3ef550258dd678b107a3ae88ce8",
+  "format_tests": {
+    "passed": true,
+    "tests": 4,
+    "source_sha256": "b207b94b516bc7640184d15b7923fee70b321da8a368b36488fc66551d5a890c",
+    "formatter_sha256": "1f8aeaa8ac9c8bdfc58405afba1f51a9664e2dfe85fea029adce3856eb7d23ef"
+  },
+  "invalid_preflight": {
+    "valid_acceptance_run": false,
+    "firmware_failure": false,
+    "error": "Second attempt to stop an explicitly stopped VM prevented final report/fixture cleanup.",
+    "oracle_issue": "Clock resume compared against pre-weather time rather than the last blocked renderer cache.",
+    "attempt_source_sha256": "a0d3ff223190e0345c86de095d40f46c251fc5f4e12b476059bfcac9ee2bca3d",
+    "vm_already_stopped": true,
+    "raw_report_sha256": "d1315074c07129e182723751bd5b9e7a7a5e58647d15ae84bfbd77c9102238f7"
+  },
+  "limitations": [
+    "Native firmware only; factory upload error paths are not a comparison oracle.",
+    "One controlled interleaving is not proof for every possible scheduler/network interleaving.",
+    "Renderer progress is observed through its compiled cache, not a whole-frame pixel comparison.",
+    "Warm restart is counted from application boot markers; the separate platform test checks single task creation.",
+    "No physical RF/board test or 24-hour H10 acceptance is claimed."
+  ]
+}

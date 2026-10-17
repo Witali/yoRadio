@@ -1641,3 +1641,20 @@ SDK photo HTTP21pass; consumer guards15pass. ASM/manifest и scoped report/doc
 ASM body-reader audit получил явный eol=lf в Small_TV/.gitattributes. Проверка
 git cat-file --filters даёт тот же SHA, что manifest; checkout не меняет
 fingerprinted bytes. Production sources, ELF/app и scoped runtime results прежние.
+
+### 2026-10-17 — реальная конкурентная работа в QEMU
+
+На прежних app3C599124/source1741EA14/ELF342C0127 прошёл standalone H09 scenario:
+34 checks,16 paired batches,68 sequential requests. Одновременные start upload
+дают ровно200/400; exact retries200/200, exact/conflicting200/400; scan+GET,
+независимые настройки, chunk+GET, held weather и renderer resume проходят.
+Максимальная пара2.847167guest s (scan/GET), single.306982s, порог6 прежний.
+После двух restart ACK наблюдался один warm boot; настройки/готовое фото сохранились,
+частичное скрыто. Cold boot — отдельная новая ВМ с тем же raw backing; новое
+upload после прерывания проходит. Все protected regions/первые3photos прежние.
+
+Первый preflight invalid: double-stop cleanup error и слабая renderer resume
+oracle. Исправленный новый run сравнивает cache передfinish/после:20:00:21→29;
+inputs98 unchanged, ВМ закрыты, no panic. Multipart formatter выделен отдельно,
+4 protocol tests pass. Полная H09/24h H10/physical не заявлены; source/C иproduction
+archive не менялись. Main frozen full11075 продолжает calendar на прежнейDD41.
