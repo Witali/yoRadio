@@ -1862,3 +1862,36 @@ Frozen92 test sources и92 дополнительных inputs; после ст�
 общего результата ещё нет. Audit сохраняет только input identities, status running.
 Дополнительный installed-A74 CYD/C3 boot handle85263 тоже пока не объявлен pass.
 Ни BIN/ELF, ни production/test/helper inputs при этой записи не менялись.
+
+### 2026-10-17 — RSSI и reset readiness follow-up, запуск H10
+
+Canonical A74 CYD/C3 legacy85263 завершёнpass. Root full67941 остаётсяжив,
+прошёлhost/machine/profile, boot/reset, startup/weatherwait, advanced/body/H09,
+photo family, реальную Wi-Fi setup/persistence, weather иfields; идётSNTP/time.
+184 frozen inputs повторноunchanged. Полный результат пока отсутствует.
+
+Покаmain frozen, в .worktree/small-tv-rssi-label подготовлен иотправлен56df5baf:
+factory Math.abs RSSI bug исправлен общим JSformatter,8oldfail/newpass, actualbrowser
+-24/-28/-40dBm/SSIDvalues/selection/errors0, host reduced pass. OrdinaryD78A/F5F3,
+debug5E46/8FAE, sourceF8A3; changedonly generated/web_pages.c из59inputs. QEMUfeature
+2a593f8d00 отправленотдельно: waitactualNTPreply/SDKUTC/flags послеreset вместо8host,
+limits15guest/60host,UTC<1s;19unit/3actualguest/29consumer pernative pass. Reset
+ordinary5.688host/3.913510guest;debug8.250/6.415086;factory9.031/7.767985.
+Failed fixed8wait иprobe сохранены; SDK rand()%5000 подтверждён. ВМ/tabs закрыты.
+Новые ветки main текущего full не меняют; послеterminal сохранитьpass/fail иинтегрировать.
+
+H10 подготовлен наD78A/F5F3 с отдельной immutable копией A74+helperFF0819; canonical
+QEMUбольше не его изменяемыйinput. Preflight8cycles/27.160648guest/9snapshots/64HTTP/
+2outages/67events прошёл,30inputs+JSONLSHAverified,nopanic. Heap min87036,SDKmin55352,
+stackmin480. Outer launcher после Python ошибся сexit\\0; raw successful workload
+проверен, эта ошибочная попытка не переименована. Длительный controllerliteral.ps1.
+H10 handle31890 начал86400guest seconds,interval15,outageevery60cycles/1second.
+Приcheckpoint ужеесть completed cycles; этоrunning, НЕ24hpass/leak-free. Source
+RSSIworktree и frozenbundle сохранять доterminal; после24h анализировать полныйjournal.
+
+Независимый read-only UART guard99431 присоединён кH10;7unitcases pass. Source
+сохранёнв RSSIbranch2e85ab8d. ОнсчитаетROM banner+Build,count1,panic/watchdog и
+потерюистории; silentreset можетскрытьутечку, radio timeне сбрасывается. Guardне
+открываетвторойQMP (workloadдержитsoleconnection); исходныйattachtimeout сохранёнкак
+harness attempt. H10start JSON содержитguard SHA/commit/handle. Нужныterminalguard
+ианализjournal; это не24hpass. Оба набора frozeninputs повторно unchanged.

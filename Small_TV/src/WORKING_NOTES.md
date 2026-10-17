@@ -7,6 +7,41 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Следующие исправления уже готовы в отдельных отправленных ветках: FW
+  codex/small-tv-rssi-label /56df5baf (папка .worktree/small-tv-rssi-label),
+  QEMU codex/small-tv-wifi-link /2a593f8d00. Signed RSSI formatter/8cases/browser
+  и два новых archives: ordinaryD78A7639/F5F39276, debug5E468EB3/8FAE6071,
+  sourceF8A3A6A8/59inputs (только generated/web_pages.c изменён). Host reduced pass.
+  QEMU helper ждётactual SNTP reset readiness,19unit/3VM/29consumer pernative pass.
+  Старый debug fixed8host failure сохранён; configrandomdelayдо5guest s подтверждён.
+  См. branch rssi-ui-checks/validation-20261017. Интегрировать после terminal/save
+  текущего root full67941; добавить wifi_network.js в следующий freeze collector.
+- H10/24 guest hours ЗАПУЩЕН: handle31890,
+  .build/small-tv-parity/rssi-runtime-24h-20261017; controller/log одноимённые
+  в .build/small-tv-parity, НЕ запускать дубль. AppD78A/ELFF5F3/sourceF8A3,
+  executableA74 и helperFF0819 взяты в отдельный frozen bundle внутри RSSI worktree:
+  .build/runtime-qemu-frozen-20261017. Canonical QEMU/main могут быть обновлены
+  после root full, bundle H10 менять нельзя. Также сохранять 30 input files
+  ветки/SDK из H10 report; не архивировать RSSI worktree до terminal H10.
+- H10 preflight8cycles/27.160648guest s/9snapshots/64HTTP/2real outages/67events
+  прошёл,30inputs/journalSHA unchanged, no panic/ВМclosed. Min sampledheap87036,
+  sumSDKminima55352, minstack480. Внешний launcher после Python дал quoting error;
+  raw workload result проверен отдельно, ошибочный launcher сохранён. H10 controller
+  — отдельный literal .ps1 без этой ошибки. Pending H10 report passed=false при
+  живом handle и error=null не является terminal failure. После24h отдельно
+  анализировать trend по полному events.jsonl; ранние samples не доказывают leak-free.
+- H10 read-only UART guard handle99431 также жив: uptime-guard.json в H10 run,
+  source в RSSI branch2e85ab8d (отправлен). 7unitcases pass; ROM banner+Build
+  считается даже после незавершённой строки приложения. Нужен terminal guard pass
+  и полный UART сcount1; основной runtime passed сам по себе не исключает silent
+  reset, radio counter продолжаетвремяпослеreset. Guard не подключается кQMP,
+  workload держитsoleconnection; перваяattach-попытка получилаtimeout, guestнеизменён.
+  GuardfileSHA записанв runtime-rssi-h10-start-*.json; кодguard тоже сохранять.
+- Root full67941 всё ещё жив; host/machine/profile, boot/reset, startup/weatherwait,
+  body/concurrency/photo и initial setup/weather/fields gates прошли; продолжается
+  SNTP/time. Canonical A74 CYD/C3 legacy run85263 terminal0/pass. 184 fingerprints
+  проверялись повторно unchanged; текущие новые ветки их не меняют. Browser tabs0.
+
 - Новый immutable full ЗАПУЩЕН: handle67941,
   .build/small-tv-functional/debug-integrated-full-20261017, controller log
   .build/small-tv-parity/debug-integrated-full-20261017.log. Не запускать копию
