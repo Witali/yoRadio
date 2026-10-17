@@ -10,6 +10,7 @@ from advanced_qemu import validate_advanced
 from http_body_contract import validate_http_body, validate_http_body_guards
 from concurrency_contract import validate_concurrency, validate_concurrency_guards
 from boot_state_contract import validate_boot_state, validate_boot_rejections
+from wifi_fallback_contract import validate_wifi_fallback, validate_wifi_fallback_guards
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -91,6 +92,12 @@ def main():
     if any(data['app_sha256'] != report['app_sha256'] for data in (machine, controls, classic, weather, calendar, jpeg, timezones, time_state, text, groups['integrity']['result'])):
         raise ValueError('Groups tested different applications')
     qemu = groups['qemu']['result']
+    wifi_wait = qemu['wifi_fallback_http']
+    validate_wifi_fallback(wifi_wait, {'app_sha256':report['app_sha256'],
+        'source_sha256':report['source_sha256'],'qemu_sha256':qemu['qemu_sha256'],
+        'native_elf_sha256':text['native_elf_sha256'],
+        'test_sha256':hashlib.sha256((ROOT/'Small_TV/src/tests/wifi_fallback_qemu.py').read_bytes()).hexdigest()})
+    validate_wifi_fallback_guards(wifi_wait)
     profile = groups['qemu_profile']['result']
     for row in profile['inputs']:
         if hashlib.sha256((ROOT / row['file']).read_bytes()).hexdigest() != row['sha256']:
@@ -399,6 +406,7 @@ def main():
                        'boot_observer_contract_checks': qemu['boot_observer_contract_checks'],
                        'inputs_unchanged': qemu['inputs_unchanged'],
                        'startup_wait': startup,
+                       'wifi_fallback_http': wifi_wait,
                        'weather_wait': held_weather,
                        'photo_http': photo,
                        'photo_frames': frames,

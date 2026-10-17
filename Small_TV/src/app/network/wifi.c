@@ -20,7 +20,9 @@ static void wifi_event(void *context, esp_event_base_t base, int32_t id, void *d
     /* Track station connectivity and handle the configured reconnect policy.
      * FIXED_RECONSTRUCTION: 0x4200c602 retains its last GOT_IP address across
      * station retries. Cache it atomically instead of inventing the AP address
-     * whenever connectivity temporarily drops. */
+     * whenever connectivity temporarily drops.
+     * FIXED_RECONSTRUCTION: a new successful lease retires the previous failure;
+     * do not reboot on its stale latch during the next reconnect attempt. */
 
     (void)context;
     if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP)
@@ -31,6 +33,7 @@ static void wifi_event(void *context, esp_event_base_t base, int32_t id, void *d
         /* The event owns the assigned lease; a later netif query may already
          * reflect a following disconnect or address change. */
         atomic_store(&last_station_address, event->ip_info.ip.addr);
+        atomic_store(&station_failed, false);
         atomic_store(&connected, true);
         station_retries = 0;
     }
@@ -66,16 +69,17 @@ static esp_err_t start_access_point(void)
 
 static void fallback_task(void *unused)
 {
-    /* Persist setup mode and restart after the factory station retries fail. */
+    /* Persist setup mode and restart after the factory station retries fail.
+     * FIXED_RECONSTRUCTION: 0x4200cc0e..0x4200cc30 waits for the SDK's success
+     * or retry-exhausted event, with portMAX_DELAY. The independent 181-tick
+     * startup display is not a Wi-Fi/DHCP deadline. Preserve a pending lease
+     * instead of overwriting saved station mode after eighteen seconds. */
 
     (void)unused;
-    unsigned offline_seconds = 0;
     for (;;)
     {
         vTaskDelay(pdMS_TO_TICKS(1000));
-        if (network_connected())
-            offline_seconds = 0;
-        else if ((++offline_seconds >= 18 || atomic_load(&station_failed)) && !network_ap_active())
+        if (atomic_load(&station_failed) && !network_connected() && !network_ap_active())
         {
             /* Keep flash writes out of the Wi-Fi event callback. The saved mode
              * makes the next boot go directly to the setup screen, as in stock. */

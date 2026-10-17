@@ -7,6 +7,21 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Изолированная `codex/small-tv-wifi-fallback`: исправлено преждевременное
+  mode2/reset после18s безIP. Factory0x4200cc0e..cc30 ждёт SDK success/failure
+  с portMAX_DELAY;181display ticks не network timeout. Actual delayedDHCP:
+  factory держала mode1/boot1 до30guest, старая8304 стала mode2/boot2; новая
+ 6324C55A/ELF9E2C7719/source53D38223 сохраняет STA и подключается послеrelease.
+  GOT_IP также очищает старый failure latch. Before2host cases fail, after47pass;
+ 4realQEMU cases(factory/native DHCP и missingAP) и23contract rejections pass.
+  RV32network4traces/16dispatch states pass. Production binary архивирован здесь
+  в firmware/development. Main83 full/H10 этим не заменяются и не засчитываются
+  новой6324; branch не объединять, пока не сохранён terminal main report.
+- Main bounded full42964 завершился failed photo_frames/masked-night: все
+ 10frames pixel/duty equal, но обеrestore были доSNTP(guest2.81/7.16s), так что
+  synchronized_night_restore=False. Это невыполненная цель night-case, не
+  доказанная ошибка firmware. Main193inputs не менялись; сохранить failed
+  evidence, затем поправить детерминированность этого теста отдельно.
 - Fresh full после mergecdc54723 запущен19:05:32UTC: session42964, OS pwsh30656,
   `.build/small-tv-functional/uri-bounded-full-20261017`. Immutable freeze100tests+
   93extras=193inputs повторно проверен после старта; sourceBE58/app8304/ELF62E0/

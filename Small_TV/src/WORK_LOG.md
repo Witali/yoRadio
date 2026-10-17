@@ -2418,3 +2418,35 @@ launch times. Это pending prefix без24h/terminalguard/steady windows, не
 H10 files/bundle не менялись; browser/NTP probe VMs закрыты. README manual
 coverage исправлен: current8case8304 отдельно от historical31caseDAF; stale
 «weather_wait ещё не включён» заменено actual mandatory gate description.
+
+### 2026-10-17 — station mode сохраняется во время DHCP, SDK failure остаётся рабочим
+
+После revalidation mainfull30656/H10processes найдена отдельная parity ошибка:
+fallback_task принимал18s безIP за отказ, хотя factory0x4200cc0e..cc22 ждёт
+event group(mask3,portMAX_DELAY), а181ticks принадлежат только startup display.
+Factory0x4200cc26 отдаёт приоритет success; failure0x4200ce20 сохраняет mode2.
+
+В изолированном worktree packet-delay probe на старой8304 подтвердил: factory
+через30guest s всё ещё mode1/boot1 и подключилась после release, native стала
+mode2/boot2. Два host сценария также failed: pending DHCP и stale failure после
+GOT_IP/reconnect. Удалён ложный timeout, GOT_IP очищает прежний failure latch.
+Осталась реакция на пять реальных disconnect events(initial+4retries).
+
+47platform cases/1182314checks проходят. Ordinary DEBUGOFF production build:
+6324C55A/ELF9E2C7719/source53D38223,1169904bytes/free366096,59inputs; всё в
+worktree firmware/development. New4case network regression сравнила обе
+прошивки: holdDHCP30guest→STA HTTP безreset; missingAP→SDK retries→mode2/
+одинreset→setup HTTP, восстановленный externalAP не подключает retained SSID.
+23negative evidence controls общие в suite/publisher/verifier. RV32oracle:
+4actual event traces и16factorydispatch states passed.
+
+Первая одноразовая попытка разбора HMP backend не учла prefix "\\ #net000";
+owned VM остановлена, parser исправлен. Проба missingAP сначала пыталась
+изменить static link-down property послеrealize и получила штатный отказ QEMU;
+перешла на поддерживаемый station-ap-online. Это harness errors, не firmware
+faults. Все isolated VMs закрываются finally; исходный dump/code/media неизменны.
+
+Существующий mainfull42964 тем временем terminalfailed на photo_frames native
+masked-night:10frames/duties совпали, но обеrestore2.81/7.16guest s были доSNTP.
+Night target не был проверен; не объявляем это runtime brightness bug и не
+публикуем новый fullpass. H10 продолжает старый83, не подтверждает новый6324.

@@ -1,0 +1,4398 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-17T19:26:48.939444+00:00",
+  "scope": "Correct station-mode persistence while DHCP is pending and retire a recovered failure latch. 47 adapted platform cases, four real factory/native QEMU network cases, 23 evidence rejections and the existing real RV32 event oracle. No full-suite,24-hour or physical-RF acceptance.",
+  "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+  "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48",
+  "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+  "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+  "app_bytes": 1169904,
+  "changed_production_inputs": [
+    "app/network/wifi.c"
+  ],
+  "production_inputs_verified": 59,
+  "archive_manifest": {
+    "xtal_mhz": 26,
+    "status": "compiled; hardware unverified",
+    "target": "esp32c2",
+    "images": [
+      {
+        "sha256": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f",
+        "bytes": 16928,
+        "file": "bootloader.bin",
+        "offset": "0x0"
+      },
+      {
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+        "bytes": 3072,
+        "file": "partition-table.bin",
+        "offset": "0x8000"
+      },
+      {
+        "sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+        "bytes": 1169904,
+        "file": "app.bin",
+        "offset": "0x10000"
+      },
+      {
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+        "bytes": 1994752,
+        "file": "assets.bin",
+        "offset": "0x200000"
+      }
+    ],
+    "flash_bytes": 4194304,
+    "idf_revision": "9a97f6c54ec638111ce55cd36581b3c192f15207",
+    "debug_logging": false,
+    "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48"
+  },
+  "factory_instruction_ranges": [
+    {
+      "start": "0x4200cc0e",
+      "stop": "0x4200cc34",
+      "sha256": "a61845fa8a81a15784d5f29dab2e5f336dcd9381156296083e7d6a400a659b55",
+      "meaning": "Wait for SDK bits1/2 indefinitely; prefer success."
+    },
+    {
+      "start": "0x4200ce20",
+      "stop": "0x4200ce40",
+      "sha256": "b668bdc39112420902a9909b22034c1d4e4c83df2a6fae79c481635cb72d787a",
+      "meaning": "Save mode2 and restart after failure."
+    },
+    {
+      "start": "0x4200c644",
+      "stop": "0x4200c688",
+      "sha256": "42f0d42c152193e04bb7b05d26beea386bb370d7523aef8ae9988b45161bb26f",
+      "meaning": "Four retries, then signal failure."
+    }
+  ],
+  "before": {
+    "scope": "Delay only the external Ethernet backend while the real Wi-Fi radio associates.",
+    "application_sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+    "flows": {
+      "original": {
+        "passed": true,
+        "observations": [
+          {
+            "guest_seconds": 7.2e-05,
+            "rom_boots": 0,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 0.40069,
+            "rom_boots": 1,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 0.90056,
+            "rom_boots": 1,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 1.350545,
+            "rom_boots": 1,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 1.665825,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 1.900219,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 2.359923,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 2.8507,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 3.320379,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 3.81084,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 4.290534,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 4.789997,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 5.2706,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 5.741737,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 6.231678,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 6.720351,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 7.200173,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 7.690004,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 8.180432,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 8.670518,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 9.15068,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 9.619796,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 10.101063,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 10.589869,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 11.081195,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 11.561337,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 12.039797,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 12.53001,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 13.010656,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 13.480899,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 13.96116,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 14.441613,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 14.929827,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 15.410231,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 15.889828,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 16.381495,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 16.861203,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 17.330429,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 17.810777,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 18.289863,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 18.780198,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 19.251705,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 19.730213,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 20.221617,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 20.710702,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 21.209947,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 21.680451,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 22.17041,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 22.661092,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 23.162121,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 23.650503,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 24.140157,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 24.639871,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 25.13168,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 25.610142,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 26.100861,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 26.589802,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 27.081095,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 27.57172,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 28.070096,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 28.560079,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 29.054392,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 29.520677,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 30.011378,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 30.031023,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 30.499961,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 30.970308,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 31.360889,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": true,
+            "ap_active": false,
+            "factory_station_state": 2
+          }
+        ],
+        "session": {
+          "name": "SmallTV-ac058895e540",
+          "pid": 26744,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          }
+        },
+        "backend": "#net045",
+        "filter": {
+          "status": "on",
+          "queue": "tx",
+          "interval": 120000000,
+          "netdev": "#net045"
+        },
+        "before_release": {
+          "guest_seconds": 30.011378,
+          "rom_boots": 1,
+          "mode_ram": 1,
+          "mode_raw": 1,
+          "connected": false,
+          "ap_active": false,
+          "factory_station_state": 1
+        },
+        "after_release": {
+          "guest_seconds": 31.360889,
+          "rom_boots": 1,
+          "mode_ram": 1,
+          "mode_raw": 1,
+          "connected": true,
+          "ap_active": false,
+          "factory_station_state": 2
+        },
+        "executable_media_unchanged": true
+      },
+      "reconstructed": {
+        "passed": false,
+        "observations": [
+          {
+            "guest_seconds": 7e-05,
+            "rom_boots": 0,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 0.344212,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 0.655205,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 1.064624,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 1.49455,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 1.945242,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 2.374211,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 2.843677,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 3.304433,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 3.754074,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 4.213938,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 4.657485,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 5.12554,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 5.583759,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 6.057914,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 6.525375,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 6.993685,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 7.458367,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 7.913716,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 8.356579,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 8.814279,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 9.274509,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 9.753734,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 10.215477,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 10.67436,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 11.144261,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 11.604337,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 12.069783,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 12.503745,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 12.975451,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 13.433818,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 13.89427,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 14.363654,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 14.834286,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 15.295857,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 15.75496,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 16.214105,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 16.664209,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 17.095005,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 17.573917,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 18.030301,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 18.488379,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 18.954545,
+            "rom_boots": 1,
+            "mode_ram": 2,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 19.444602,
+            "rom_boots": 1,
+            "mode_ram": 2,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 19.742002,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 20.172204,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 20.522108,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 20.881468,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 21.221746,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 21.508996,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 21.731943,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 22.079937,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 22.433777,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 22.780348,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 23.065386,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 23.302344,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 23.642415,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 23.985832,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 24.292086,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 24.586101,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 24.81276,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 25.18713,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 25.539101,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 25.863582,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 26.151747,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 26.392922,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 26.746473,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 27.099086,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 27.401884,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 27.703495,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 27.943197,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 28.303808,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 28.659311,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 29.002564,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 29.282031,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 29.522517,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 29.87174,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 30.223543,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 30.242037,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          }
+        ],
+        "session": {
+          "name": "SmallTV-c51a3df30294",
+          "pid": 33200,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          }
+        },
+        "backend": "#net056",
+        "filter": {
+          "status": "on",
+          "queue": "tx",
+          "interval": 120000000,
+          "netdev": "#net056"
+        },
+        "before_release": {
+          "guest_seconds": 30.223543,
+          "rom_boots": 2,
+          "mode_ram": 2,
+          "mode_raw": 2,
+          "connected": false,
+          "ap_active": true,
+          "factory_station_state": null
+        },
+        "after_release": {
+          "guest_seconds": 30.242037,
+          "rom_boots": 2,
+          "mode_ram": 2,
+          "mode_raw": 2,
+          "connected": false,
+          "ap_active": true,
+          "factory_station_state": null
+        },
+        "executable_media_unchanged": true
+      }
+    }
+  },
+  "before_platform_failures": {
+    "pending_dhcp": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\Small_TV\\src\\tests\\platform_test.c:436: preferences.wifi_mode == 1 && task_count == 1",
+    "recovered_failure": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\Small_TV\\src\\tests\\platform_test.c:463: preferences.wifi_mode == 1 && task_count == 1"
+  },
+  "after": {
+    "passed": true,
+    "all_functionality_verified": false,
+    "scope": "Compare real station DHCP waiting without replacing Wi-Fi, TCP/IP or firmware.\n\nThe built-in QEMU filter buffers external Ethernet replies while the radio still\nassociates normally. Only disposable synthetic settings and network delivery are\nchanged; guest RAM, registers, instructions and archived images stay untouched.\n",
+    "tested_utc": "2026-10-17T19:21:58.828882+00:00",
+    "inputs_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\Small_TV\\src\\tests\\wifi_fallback_qemu.py": "abcd0771a3f3ce18da83cfcee3b017099ee1920b145e0920bc8be478feef262c",
+      "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-riscv32.exe": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\Small_TV\\qemu\\profiles\\small-tv-c2.json": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\esp-rom-elfs\\20260528\\esp32c2_rev200_rom.elf": "289ce00e79c024d9efeb29a7fbc2d21853a1cbc383a2b9c2ece85c54fa829dd9",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\Small_TV\\full-flash.bin": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\.build\\small-tv-esp32c2\\small_tv_reconstructed.elf": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+      "C:\\Work\\QEMU-ESP32\\tools\\small_tv_vm.py": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae",
+      "C:\\Work\\QEMU-ESP32\\tools\\small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+      "C:\\Work\\QEMU-ESP32\\tools\\small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+      "C:\\Work\\QEMU-ESP32\\tools\\small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+      "C:\\Work\\QEMU-ESP32\\tools\\esp_elf.py": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f",
+      "C:\\Work\\QEMU-ESP32\\tools\\esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+      "C:\\Work\\QEMU-ESP32\\tools\\esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\firmware\\development\\small-tv-esp32c2-reconstructed\\app.bin": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\firmware\\development\\small-tv-esp32c2-reconstructed\\bootloader.bin": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\firmware\\development\\small-tv-esp32c2-reconstructed\\partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\firmware\\development\\small-tv-esp32c2-reconstructed\\manifest.json": "a5ce07e64074d4d5b6ab2d1a1f44af819817fecd24dabf9919a1aa75a61e1d8d",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\firmware\\development\\small-tv-esp32c2-reconstructed\\source-manifest.json": "67e43d5fc0c8ed71b58748584a8bc98a6f52ecd191a8182d3fe4eff88774001d",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\Small_TV\\src\\tests\\weather_qemu.py": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\Small_TV\\src\\tests\\regional_qemu.py": "99432c612416fde7eb7f826262bd9607ab611cedf5e4816253032c6c2c808b37",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\Small_TV\\src\\tests\\qemu_storage.py": "3fa00b82379b90c76939ad61d1756f1fcefe03ded492bd16c7df1b532578dc3d",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-wifi-fallback\\Small_TV\\src\\tests\\machine_oracle.py": "009af0436897d63044f692baac40b45ade60e69a511a9f36befd3aed09705ff2"
+    },
+    "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+    "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+    "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+    "flows": {
+      "original": {
+        "passed": true,
+        "sources": {
+          "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+        },
+        "observations": [
+          {
+            "guest_seconds": 8e-05,
+            "rom_boots": 0,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 0.401675,
+            "rom_boots": 1,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 0.900425,
+            "rom_boots": 1,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 1.350445,
+            "rom_boots": 1,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 1.676368,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 1.971865,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 2.440758,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 2.930251,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 3.400785,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 3.890589,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 4.380949,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 4.870482,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 5.343924,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 5.831243,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 6.320781,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 6.810321,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 7.300302,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 7.780756,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 8.270013,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 8.759927,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 9.249895,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 9.720432,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 10.200858,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 10.689954,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 11.179841,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 11.670038,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 12.150118,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 12.641096,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 13.120549,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 13.589838,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 14.080517,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 14.570419,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 15.051179,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 15.54078,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 16.020165,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 16.51055,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 16.990213,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 17.460322,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 17.940346,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 18.430563,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 18.911087,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 19.390357,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 19.88013,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 20.371088,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 20.859813,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 21.348657,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 21.830467,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 22.330282,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 22.821295,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 23.311545,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 23.810154,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 24.30068,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 24.790203,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 25.290462,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 25.761553,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 26.250296,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 26.740324,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 27.240484,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 27.730148,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 28.220078,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 28.720276,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 29.21069,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 29.690189,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 30.181576,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 30.201389,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 30.6518,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 31.130991,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 31.5414,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": true,
+            "ap_active": false,
+            "factory_station_state": 2
+          }
+        ],
+        "session": {
+          "name": "SmallTV-a5d3b70d104a",
+          "pid": 23344,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          }
+        },
+        "filter": {
+          "status": "on",
+          "queue": "tx",
+          "interval": 120000000,
+          "netdev": "#net018"
+        },
+        "before_release": {
+          "guest_seconds": 30.181576,
+          "rom_boots": 1,
+          "mode_ram": 1,
+          "mode_raw": 1,
+          "connected": false,
+          "ap_active": false,
+          "factory_station_state": 1
+        },
+        "after_release": {
+          "guest_seconds": 31.5414,
+          "rom_boots": 1,
+          "mode_ram": 1,
+          "mode_raw": 1,
+          "connected": true,
+          "ap_active": false,
+          "factory_station_state": 2
+        },
+        "checks": {
+          "held_station_mode": true,
+          "no_premature_restart": true,
+          "no_ip_before_release": true,
+          "recovered_station": true,
+          "saved_station_mode": true,
+          "same_boot_after_release": true,
+          "no_panic": true,
+          "station_http": true
+        },
+        "executable_media_unchanged": true
+      },
+      "reconstructed": {
+        "passed": true,
+        "sources": {
+          "images": [
+            {
+              "sha256": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f",
+              "bytes": 16928,
+              "file": "bootloader.bin",
+              "offset": "0x0"
+            },
+            {
+              "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+              "bytes": 3072,
+              "file": "partition-table.bin",
+              "offset": "0x8000"
+            },
+            {
+              "sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+              "bytes": 1169904,
+              "file": "app.bin",
+              "offset": "0x10000"
+            },
+            {
+              "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+              "bytes": 1994752,
+              "file": "assets.bin",
+              "offset": "0x200000"
+            }
+          ],
+          "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48"
+        },
+        "observations": [
+          {
+            "guest_seconds": 7.6e-05,
+            "rom_boots": 0,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 0.354653,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 0.655423,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 1.094916,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 1.533774,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 2.004479,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 2.443846,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 2.903645,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 3.374051,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 3.845057,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 4.283976,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 4.757829,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 5.213831,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 5.673997,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 6.145042,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 6.604252,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 7.074122,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 7.545409,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 8.014516,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 8.464831,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 8.924071,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 9.394575,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 9.868257,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 10.334092,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 10.794873,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 11.269515,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 11.734457,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 12.204439,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 12.643921,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 13.114397,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 13.584473,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 14.05462,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 14.524622,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 14.984704,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 15.454523,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 15.913985,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 16.364014,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 16.823827,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 17.294264,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 17.763627,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 18.224477,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 18.693687,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 19.173639,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 19.674148,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 20.163974,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 20.634928,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 21.124379,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 21.624511,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 22.118126,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 22.60495,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 23.103721,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 23.594599,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 24.08536,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 24.55426,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 25.044473,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 25.545351,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 26.036748,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 26.524392,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 27.013951,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 27.515756,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 28.004377,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 28.474583,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 28.964143,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 29.45547,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 29.953781,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 30.444846,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 30.464658,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 30.904863,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 31.375525,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 31.733999,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": true,
+            "ap_active": false,
+            "factory_station_state": null
+          }
+        ],
+        "session": {
+          "name": "SmallTV-02943402ae99",
+          "pid": 26180,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          }
+        },
+        "filter": {
+          "status": "on",
+          "queue": "tx",
+          "interval": 120000000,
+          "netdev": "#net054"
+        },
+        "before_release": {
+          "guest_seconds": 30.444846,
+          "rom_boots": 1,
+          "mode_ram": 1,
+          "mode_raw": 1,
+          "connected": false,
+          "ap_active": false,
+          "factory_station_state": null
+        },
+        "after_release": {
+          "guest_seconds": 31.733999,
+          "rom_boots": 1,
+          "mode_ram": 1,
+          "mode_raw": 1,
+          "connected": true,
+          "ap_active": false,
+          "factory_station_state": null
+        },
+        "checks": {
+          "held_station_mode": true,
+          "no_premature_restart": true,
+          "no_ip_before_release": true,
+          "recovered_station": true,
+          "saved_station_mode": true,
+          "same_boot_after_release": true,
+          "no_panic": true,
+          "station_http": true
+        },
+        "executable_media_unchanged": true
+      }
+    },
+    "failure_flows": {
+      "original": {
+        "passed": true,
+        "sources": {
+          "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+        },
+        "observations": [
+          {
+            "guest_seconds": 3.2e-05,
+            "rom_boots": 0,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 0.410082,
+            "rom_boots": 1,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 0.900377,
+            "rom_boots": 1,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 1.359868,
+            "rom_boots": 1,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 1.678181,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 2.070651,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 2.561469,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 3.050762,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 3.541109,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 4.03055,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 4.49991,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 4.98152,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 5.470072,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 5.950473,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 6.44009,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 6.914128,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 7.400427,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 7.880404,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 8.37069,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 8.859799,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 9.330326,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 9.810066,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 10.293816,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 10.780194,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 11.270775,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 11.740712,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 12.22055,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 12.699972,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 13.190328,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 13.680111,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": 1
+          },
+          {
+            "guest_seconds": 14.059259,
+            "rom_boots": 2,
+            "mode_ram": 0,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 14.549571,
+            "rom_boots": 2,
+            "mode_ram": 0,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 14.999548,
+            "rom_boots": 2,
+            "mode_ram": 0,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 15.445692,
+            "rom_boots": 2,
+            "mode_ram": 0,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 15.69936,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": 0
+          },
+          {
+            "guest_seconds": 18.48475,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": 5
+          }
+        ],
+        "session": {
+          "name": "SmallTV-cb4297d56580",
+          "pid": 19432,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          }
+        },
+        "before_restore": {
+          "guest_seconds": 15.69936,
+          "rom_boots": 2,
+          "mode_ram": 2,
+          "mode_raw": 2,
+          "connected": false,
+          "ap_active": true,
+          "factory_station_state": 0
+        },
+        "external_ap_was_offline": true,
+        "after_restore": {
+          "guest_seconds": 18.48475,
+          "rom_boots": 2,
+          "mode_ram": 2,
+          "mode_raw": 2,
+          "connected": false,
+          "ap_active": true,
+          "factory_station_state": 5
+        },
+        "checks": {
+          "setup_saved": true,
+          "restart_once": true,
+          "external_ap_offline": true,
+          "setup_http": true,
+          "no_station_after_restore": true,
+          "setup_active": true,
+          "no_panic": true
+        },
+        "executable_media_unchanged": true
+      },
+      "reconstructed": {
+        "passed": true,
+        "sources": {
+          "images": [
+            {
+              "sha256": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f",
+              "bytes": 16928,
+              "file": "bootloader.bin",
+              "offset": "0x0"
+            },
+            {
+              "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+              "bytes": 3072,
+              "file": "partition-table.bin",
+              "offset": "0x8000"
+            },
+            {
+              "sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+              "bytes": 1169904,
+              "file": "app.bin",
+              "offset": "0x10000"
+            },
+            {
+              "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+              "bytes": 1994752,
+              "file": "assets.bin",
+              "offset": "0x200000"
+            }
+          ],
+          "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48"
+        },
+        "observations": [
+          {
+            "guest_seconds": 6.7e-05,
+            "rom_boots": 0,
+            "mode_ram": 0,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 0.364707,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 0.69366,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 1.159373,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 1.625558,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 2.08496,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 2.556269,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 3.020586,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 3.457078,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 3.914462,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 4.374311,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 4.839588,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 5.294264,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 5.733729,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 6.194641,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 6.664529,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 7.133762,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 7.604233,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 8.047038,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 8.504589,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 8.96496,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 9.43405,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 9.904605,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 10.356662,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 10.81515,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 11.273961,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 11.744388,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 12.213652,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 12.674162,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 13.143724,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 13.605313,
+            "rom_boots": 1,
+            "mode_ram": 1,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 14.074,
+            "rom_boots": 1,
+            "mode_ram": 2,
+            "mode_raw": 1,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 14.486914,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": false,
+            "factory_station_state": null
+          },
+          {
+            "guest_seconds": 16.34437,
+            "rom_boots": 2,
+            "mode_ram": 2,
+            "mode_raw": 2,
+            "connected": false,
+            "ap_active": true,
+            "factory_station_state": null
+          }
+        ],
+        "session": {
+          "name": "SmallTV-bec89a351ef4",
+          "pid": 17624,
+          "web_urls": {
+            "setup": "http://127.0.0.1:18082",
+            "station": "http://127.0.0.1:18083"
+          }
+        },
+        "before_restore": {
+          "guest_seconds": 14.486914,
+          "rom_boots": 2,
+          "mode_ram": 2,
+          "mode_raw": 2,
+          "connected": false,
+          "ap_active": false,
+          "factory_station_state": null
+        },
+        "external_ap_was_offline": true,
+        "after_restore": {
+          "guest_seconds": 16.34437,
+          "rom_boots": 2,
+          "mode_ram": 2,
+          "mode_raw": 2,
+          "connected": false,
+          "ap_active": true,
+          "factory_station_state": null
+        },
+        "checks": {
+          "setup_saved": true,
+          "restart_once": true,
+          "external_ap_offline": true,
+          "setup_http": true,
+          "no_station_after_restore": true,
+          "setup_active": true,
+          "no_panic": true
+        },
+        "executable_media_unchanged": true
+      }
+    },
+    "inputs_unchanged": true,
+    "contract_checks": [
+      {
+        "name": "failed",
+        "passed": true
+      },
+      {
+        "name": "changed-inputs",
+        "passed": true
+      },
+      {
+        "name": "wrong-app",
+        "passed": true
+      },
+      {
+        "name": "wrong-elf",
+        "passed": true
+      },
+      {
+        "name": "wrong-qemu",
+        "passed": true
+      },
+      {
+        "name": "wrong-test",
+        "passed": true
+      },
+      {
+        "name": "missing-factory",
+        "passed": true
+      },
+      {
+        "name": "wrong-source",
+        "passed": true
+      },
+      {
+        "name": "early-setup",
+        "passed": true
+      },
+      {
+        "name": "early-reset",
+        "passed": true
+      },
+      {
+        "name": "early-ip",
+        "passed": true
+      },
+      {
+        "name": "short-delay",
+        "passed": true
+      },
+      {
+        "name": "filter-off",
+        "passed": true
+      },
+      {
+        "name": "filter-flushed",
+        "passed": true
+      },
+      {
+        "name": "no-recovery",
+        "passed": true
+      },
+      {
+        "name": "no-http",
+        "passed": true
+      },
+      {
+        "name": "panic",
+        "passed": true
+      },
+      {
+        "name": "changed-media",
+        "passed": true
+      },
+      {
+        "name": "missing-failure-case",
+        "passed": true
+      },
+      {
+        "name": "ap-not-offline",
+        "passed": true
+      },
+      {
+        "name": "failure-not-saved",
+        "passed": true
+      },
+      {
+        "name": "restart-loop",
+        "passed": true
+      },
+      {
+        "name": "missing-setup-http",
+        "passed": true
+      }
+    ]
+  },
+  "platform": {
+    "cases": [
+      {
+        "case": "wifi_setup",
+        "passed": true,
+        "checks": 11
+      },
+      {
+        "case": "wifi_reconnect_scan",
+        "passed": true,
+        "checks": 23
+      },
+      {
+        "case": "wifi_open_station",
+        "passed": true,
+        "checks": 5
+      },
+      {
+        "case": "wifi_pending_dhcp",
+        "passed": true,
+        "checks": 7
+      },
+      {
+        "case": "wifi_failure_recovered",
+        "passed": true,
+        "checks": 6
+      },
+      {
+        "case": "wifi_failed_retries",
+        "passed": true,
+        "checks": 6
+      },
+      {
+        "case": "restart_persistence_failure",
+        "passed": true,
+        "checks": 7
+      },
+      {
+        "case": "wifi_allocation_failure",
+        "passed": true,
+        "checks": 4
+      },
+      {
+        "case": "wifi_task_failure",
+        "passed": true,
+        "checks": 4
+      },
+      {
+        "case": "weather_worker",
+        "passed": true,
+        "checks": 67
+      },
+      {
+        "case": "time_worker",
+        "passed": true,
+        "checks": 20
+      },
+      {
+        "case": "time_zone_boundaries",
+        "passed": true,
+        "checks": 19
+      },
+      {
+        "case": "backlight_schedule",
+        "passed": true,
+        "checks": 138257
+      },
+      {
+        "case": "display_protocol_clipping",
+        "passed": true,
+        "checks": 57629
+      },
+      {
+        "case": "ui_transitions",
+        "passed": true,
+        "checks": 315
+      },
+      {
+        "case": "text_field_windows",
+        "passed": true,
+        "checks": 865840
+      },
+      {
+        "case": "weather_field_cleanup",
+        "passed": true,
+        "checks": 62393
+      },
+      {
+        "case": "clock_coordinator",
+        "passed": true,
+        "checks": 20322
+      },
+      {
+        "case": "timer_driver_failures",
+        "passed": true,
+        "checks": 8
+      },
+      {
+        "case": "clock_animation_selection",
+        "passed": true,
+        "checks": 49
+      },
+      {
+        "case": "clock_text_scroll",
+        "passed": true,
+        "checks": 22
+      },
+      {
+        "case": "clock_calendar_classic",
+        "passed": true,
+        "checks": 13
+      },
+      {
+        "case": "clock_calendar_simple",
+        "passed": true,
+        "checks": 13
+      },
+      {
+        "case": "clock_timezone_classic",
+        "passed": true,
+        "checks": 16
+      },
+      {
+        "case": "clock_timezone_simple",
+        "passed": true,
+        "checks": 16
+      },
+      {
+        "case": "clock_sync_classic",
+        "passed": true,
+        "checks": 203
+      },
+      {
+        "case": "clock_sync_simple",
+        "passed": true,
+        "checks": 203
+      },
+      {
+        "case": "regional_time_worker",
+        "passed": true,
+        "checks": 9
+      },
+      {
+        "case": "regional_weather_worker",
+        "passed": true,
+        "checks": 20
+      },
+      {
+        "case": "clock_first_digital_brightness",
+        "passed": true,
+        "checks": 34867
+      },
+      {
+        "case": "clock_photo_idle_brightness",
+        "passed": true,
+        "checks": 48
+      },
+      {
+        "case": "clock_photo_reselect",
+        "passed": true,
+        "checks": 36
+      },
+      {
+        "case": "clock_photo_active_reselect",
+        "passed": true,
+        "checks": 22
+      },
+      {
+        "case": "clock_offline_dst_classic",
+        "passed": true,
+        "checks": 221
+      },
+      {
+        "case": "clock_offline_dst_simple",
+        "passed": true,
+        "checks": 221
+      },
+      {
+        "case": "clock_offline_dst_dial",
+        "passed": true,
+        "checks": 221
+      },
+      {
+        "case": "clock_offline_photo",
+        "passed": true,
+        "checks": 214
+      },
+      {
+        "case": "clock_weather_pending_classic",
+        "passed": true,
+        "checks": 222
+      },
+      {
+        "case": "clock_weather_pending_simple",
+        "passed": true,
+        "checks": 222
+      },
+      {
+        "case": "clock_weather_pending_dial",
+        "passed": true,
+        "checks": 222
+      },
+      {
+        "case": "clock_weather_pending_photo",
+        "passed": true,
+        "checks": 214
+      },
+      {
+        "case": "clock_startup_ready_classic",
+        "passed": true,
+        "checks": 12
+      },
+      {
+        "case": "clock_startup_ready_simple",
+        "passed": true,
+        "checks": 13
+      },
+      {
+        "case": "clock_startup_ready_photo",
+        "passed": true,
+        "checks": 9
+      },
+      {
+        "case": "clock_startup_ready_dial",
+        "passed": true,
+        "checks": 13
+      },
+      {
+        "case": "clock_startup_wait_sync",
+        "passed": true,
+        "checks": 15
+      },
+      {
+        "case": "clock_startup_wait_address",
+        "passed": true,
+        "checks": 15
+      }
+    ],
+    "passed": true,
+    "scope": "Production worker/driver code with deterministic ESP-IDF adapters; no real RF, scheduling, electrical or TLS validation."
+  },
+  "network_machine": {
+    "passed": true,
+    "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+    "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48",
+    "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+    "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+    "input_hashes": {
+      "native_elf": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+      "factory_elf": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+      "rom_elf": "289ce00e79c024d9efeb29a7fbc2d21853a1cbc383a2b9c2ece85c54fa829dd9",
+      "test": "0a766cedb9b6aaf07c92d8e97b6fdd88d2ff2097f7a78ba557ca0c55ee241488",
+      "machine_adapter": "009af0436897d63044f692baac40b45ade60e69a511a9f36befd3aed09705ff2",
+      "input_verifier": "f7df352f24bdad4e978dad327cd66c1f88383bfa46a07fa4399a274594335d8a"
+    },
+    "event_cases": {
+      "factory": [
+        {
+          "case": "new-dhcp-lease",
+          "first_lease": "10.0.2.15",
+          "new_lease": "10.0.2.21",
+          "disconnections": [
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 1
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 2
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 3
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 4
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 4
+            }
+          ],
+          "passed": true,
+          "elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+          "adapters": {
+            "sdk-ip4-to-string": 2,
+            "sdk-http-start": 2,
+            "sdk-task-notification": 3,
+            "sdk-wifi-connect": 4,
+            "sdk-http-stop": 1
+          }
+        },
+        {
+          "case": "reconnect-resets-retries",
+          "first_lease": "10.0.2.15",
+          "new_lease": "10.0.2.21",
+          "disconnections": [
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 4
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 5
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 6
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 7
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 7
+            }
+          ],
+          "passed": true,
+          "elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+          "adapters": {
+            "sdk-ip4-to-string": 2,
+            "sdk-http-start": 2,
+            "sdk-task-notification": 3,
+            "sdk-wifi-connect": 7,
+            "sdk-http-stop": 1
+          }
+        }
+      ],
+      "native": [
+        {
+          "case": "new-dhcp-lease",
+          "first_lease": "10.0.2.15",
+          "new_lease": "10.0.2.21",
+          "disconnections": [
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 1
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 2
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 3
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 4
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 4
+            }
+          ],
+          "passed": true,
+          "elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+          "adapters": {
+            "snprintf": 7,
+            "sdk-wifi-connect": 4
+          }
+        },
+        {
+          "case": "reconnect-resets-retries",
+          "first_lease": "10.0.2.15",
+          "new_lease": "10.0.2.21",
+          "disconnections": [
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 4
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 5
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 6
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 7
+            },
+            {
+              "address": "10.0.2.21",
+              "connect_calls": 7
+            }
+          ],
+          "passed": true,
+          "elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+          "adapters": {
+            "snprintf": 7,
+            "sdk-wifi-connect": 7
+          }
+        }
+      ]
+    },
+    "factory_dispatch": [
+      {
+        "theme": 0,
+        "station_state": 0,
+        "calls": [
+          "classic",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 0,
+        "station_state": 1,
+        "calls": [
+          "classic",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 0,
+        "station_state": 2,
+        "calls": [
+          "classic",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 0,
+        "station_state": 5,
+        "calls": [
+          "classic",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 1,
+        "station_state": 0,
+        "calls": [
+          "simple",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 1,
+        "station_state": 1,
+        "calls": [
+          "simple",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 1,
+        "station_state": 2,
+        "calls": [
+          "simple",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 1,
+        "station_state": 5,
+        "calls": [
+          "simple",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 2,
+        "station_state": 0,
+        "calls": [
+          "photo",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 2,
+        "station_state": 1,
+        "calls": [
+          "photo",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 2,
+        "station_state": 2,
+        "calls": [
+          "photo",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 2,
+        "station_state": 5,
+        "calls": [
+          "photo",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 3,
+        "station_state": 0,
+        "calls": [
+          "dial",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 3,
+        "station_state": 1,
+        "calls": [
+          "dial",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 3,
+        "station_state": 2,
+        "calls": [
+          "dial",
+          "local-time"
+        ],
+        "passed": true
+      },
+      {
+        "theme": 3,
+        "station_state": 5,
+        "calls": [
+          "dial",
+          "local-time"
+        ],
+        "passed": true
+      }
+    ],
+    "scope": "Execute original and rebuilt RV32 station events and the original active loop.\n\nSynthetic DHCP leases and Wi-Fi events enter the actual compiled handlers. SDK\nconnect/notification/HTTP lifecycle and IPv4 formatting are boundaries; field\nselection, cache, counters and native address formatting remain machine code.\nThe bounded original main-loop slice records dispatch, without substituting its\nbranches. This is not a radio, whole FreeRTOS scheduler or live QEMU link test.\n"
+  },
+  "cleanup": {
+    "observed_utc": "2026-10-17T19:26:22.2831333Z",
+    "all_owned_vms_stopped": true,
+    "records": [
+      {
+        "name": "SmallTV-7ca88412f085",
+        "pid": 9300,
+        "owned_vm_alive": false,
+        "pid_present": false
+      },
+      {
+        "name": "SmallTV-d8f2fb17be94",
+        "pid": 32112,
+        "owned_vm_alive": false,
+        "pid_present": false
+      },
+      {
+        "name": "SmallTV-72a4b60dc12d",
+        "pid": 31584,
+        "owned_vm_alive": false,
+        "pid_present": false
+      },
+      {
+        "name": "SmallTV-ac058895e540",
+        "pid": 26744,
+        "owned_vm_alive": false,
+        "pid_present": false
+      },
+      {
+        "name": "SmallTV-c51a3df30294",
+        "pid": 33200,
+        "owned_vm_alive": false,
+        "pid_present": false
+      },
+      {
+        "name": "SmallTV-6e2d667bc5d8",
+        "pid": 11760,
+        "owned_vm_alive": false,
+        "pid_present": true
+      },
+      {
+        "name": "SmallTV-21d5ced7dad0",
+        "pid": 3400,
+        "owned_vm_alive": false,
+        "pid_present": false
+      },
+      {
+        "name": "SmallTV-02cad828ccf1",
+        "pid": 19148,
+        "owned_vm_alive": false,
+        "pid_present": false
+      },
+      {
+        "name": "SmallTV-cb4297d56580",
+        "pid": 19432,
+        "owned_vm_alive": false,
+        "pid_present": false
+      },
+      {
+        "name": "SmallTV-bec89a351ef4",
+        "pid": 17624,
+        "owned_vm_alive": false,
+        "pid_present": false
+      },
+      {
+        "name": "SmallTV-a5d3b70d104a",
+        "pid": 23344,
+        "owned_vm_alive": false,
+        "pid_present": false
+      },
+      {
+        "name": "SmallTV-02943402ae99",
+        "pid": 26180,
+        "owned_vm_alive": false,
+        "pid_present": false
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "file": "Small_TV/src/app/network/wifi.c",
+      "sha256": "6cd64e914af476041916a4bd2111c2c1d1593e78c46f0476bffa3babb54b575f"
+    },
+    {
+      "file": "Small_TV/src/tests/platform_test.c",
+      "sha256": "06c62e5a33cadcdf37e2b1bf32074d1285d236d20cf7dd3ee6e93f5a7602ce10"
+    },
+    {
+      "file": "Small_TV/src/tests/run-platform.ps1",
+      "sha256": "1395c5c0ac00727b15c350ae11938f2654697b79aff499b22517721aae8c3959"
+    },
+    {
+      "file": "Small_TV/src/tests/wifi_fallback_qemu.py",
+      "sha256": "abcd0771a3f3ce18da83cfcee3b017099ee1920b145e0920bc8be478feef262c"
+    },
+    {
+      "file": "Small_TV/src/tests/wifi_fallback_contract.py",
+      "sha256": "40e21b9807c42924c787ecf0ef04fb202102e7b72ed86a5eb270e88d7e5ae13e"
+    },
+    {
+      "file": "Small_TV/src/tests/qemu_suite.py",
+      "sha256": "40d6d172d36347e61e42c92c1fd5d44b7eecce81726ee9ace55845cc2b6bdd6f"
+    },
+    {
+      "file": "Small_TV/src/tests/publish-report.py",
+      "sha256": "36fb9d2afe6889a0659f243f12c048626e9612b271ed4986f29559cfa9e7b45f"
+    },
+    {
+      "file": "Small_TV/src/tools/verify_artifacts.py",
+      "sha256": "4769ffa6f0e35f716673f7717a619c6df0f87545d86abb0e121511b7e66edc17"
+    }
+  ],
+  "harness_corrections": [
+    "The first one-off probe misread the HMP backend tree prefix; its VM was stopped and the parser corrected.",
+    "Static link-down cannot be changed after realize; the unavailable-AP probe instead uses the supported station-ap-online runtime property."
+  ],
+  "limitations": [
+    "This candidate is isolated on codex/small-tv-wifi-fallback; the main full/H10 runs still belong to image8304 and must not be relabeled.",
+    "The main full failed separately because the photo night case finished before SNTP. All its captured pixels/PWM matched; its test setup still requires correction."
+  ]
+}
