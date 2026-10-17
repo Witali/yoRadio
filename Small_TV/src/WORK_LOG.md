@@ -1571,3 +1571,23 @@ beforeF207 max6.167475, after6238 max6.186934, оба at index117. RSSI испр
 но не устраняет stall. Detailed passive five-route180 max.220060/drops0
 не воспроизводит этот timing; все ВМ закрыты. Следующий шаг — low-volume SYN
 DMA/IRQ/CPU-context trace. Полный passing firmware checkpoint не обновлялся.
+
+### 2026-10-17 — исправлена длительность Wi-Fi backlog в QEMU
+
+Sparse SYN trace72f106db81 воспроизвёл6.201632s: первый SYN дошёл в DMA через
+17.639ms, SYNACK появился только после retry. Detailed trace отдельно показал
+до4 DMA completions в одной микросекунде. Старый MAX(now, nominal) схлопывал
+просроченный FIFO вопреки bandwidth4Mbit/s. Исправление0d27a7ca98 учитывает
+полный frame transfer time на всех5 RX/TX scheduling sites; calculations вынесены
+в esp32c3_wifi_link.c/.h, bandwidth0 unlimited сохранён. Software sleeps/HTTP gate
+и сама прошивка DD41/96A/B4 не менялись.
+
+Новый QTest с двумя112-byte NTP frames после5s без descriptors: oldD18 failure
+(оба за1ns), new30F10/10 pass (по112us на8Mbit/s). Тот же quiet180 HTTP probe:
+correct-RSSI6238 max6.186934, finite-timing30F max.238274, все200/no panic/ВМclosed.
+Optional PCAP в обоих quiet runs не включился (qom-type spelling); таймер QMP
+работал, packet выводы основаны на отдельных корректных trace runs. SPI/I2C/SD/
+GPIO и CYD/C3 legacy/modular pass, source/pixel hashes прежние; scopeCYDboot
+сохранён. QEMU main и feature branch0d27a7ca98 отправлены, installed30F/marker
+проверены, oldFDE backup ignored. Сохранены отдельные scoped report/doc; новый
+полный firmware suite ещё нужен, прежний failed full остаётся failed.

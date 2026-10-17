@@ -1,0 +1,228 @@
+{
+  "scope": "QEMU finite-bandwidth backlog fix; scoped checks passed, new full firmware comparison still required",
+  "qemu_source_commit": "0d27a7ca98eeeedab601bd150324a2c5c846f389",
+  "qemu_commits": {
+    "rssi": "1a142bcf51",
+    "passive_trace": "3279a6c2f1",
+    "sparse_syn_trace": "72f106db81",
+    "link_timing": "0d27a7ca98"
+  },
+  "candidate_qemu_sha256": "30f9a68ef5fda4af12ccc525f0951a8a08caf40b0e363db5d90587054ff66d74",
+  "packet_test_source_sha256": "b070738894da74dcc76c25e2c56be44588189c140400e28754ce59eec57add4b",
+  "http_probe_source_sha256": "b325b1197290b55ad70477e8ebe16dfedb9732c63b523cd97b2b55cf5cd4fd43",
+  "reproduced_scheduler_defect": {
+    "before": "An expired nominal deadline could complete every queued frame at the same virtual instant.",
+    "after": "Each RX/TX FIFO head retains at least one complete frame transfer time at the configured finite bandwidth.",
+    "scheduling_sites": [
+      "first TX",
+      "next TX",
+      "RX descriptor wake",
+      "next RX",
+      "first RX"
+    ],
+    "unlimited_bandwidth_zero_retained": true,
+    "negative_control": "Two queued 112-byte NTP frames after five seconds without RX descriptors: old binary completes both within one nanosecond; fixed binary completes one per 112 microseconds at 8 Mbit/s.",
+    "before_packet_regression": {
+      "passed": false,
+      "tests": 10,
+      "failures": [
+        "test_c2_backlog_preserves_finite_receive_bandwidth (__main__.WifiServicesTests.test_c2_backlog_preserves_finite_receive_bandwidth)"
+      ],
+      "errors": [],
+      "qemu_sha256": "d18b3c3abb89ef0f615a6b5bc2df9d42093811cec6d3efe09483948671785cfa",
+      "scope": "QOM validation/reset and real DNS/NTP packets through Wi-Fi DMA; qtest executes no guest instructions, no firmware or Internet."
+    },
+    "after_packet_regression": {
+      "passed": true,
+      "tests": 10,
+      "failures": [],
+      "errors": [],
+      "qemu_sha256": "30f9a68ef5fda4af12ccc525f0951a8a08caf40b0e363db5d90587054ff66d74",
+      "scope": "QOM validation/reset and real DNS/NTP packets through Wi-Fi DMA; qtest executes no guest instructions, no firmware or Internet."
+    }
+  },
+  "sparse_syn_observation": {
+    "source_qemu_sha256": "d18b3c3abb89ef0f615a6b5bc2df9d42093811cec6d3efe09483948671785cfa",
+    "request_index": 42,
+    "route": "/settings",
+    "elapsed_guest_seconds": 6.201632,
+    "first_enqueue_guest_seconds": 42.907021,
+    "first_dma_guest_seconds": 42.92466,
+    "retry_enqueue_guest_seconds": 48.910006,
+    "retry_dma_guest_seconds": 48.940898,
+    "guest_synack_tx_guest_seconds": 48.951462,
+    "note": "First SYN reaches DMA promptly; this trace alone does not prove which guest instruction discards it. Detailed passive trace separately observed up to four DMA completions per microsecond."
+  },
+  "same_workload_http": {
+    "before_correct_rssi_old_timing": {
+      "requests": 180,
+      "all_status_200": true,
+      "no_panic": true,
+      "qemu_sha256": "62386f10f0ab19fa1608c820455b0167816932b3e39a88ddb491dd46317d4416",
+      "elf_sha256": "b4af3c2a72cacd0c348f5d966d1998660fd5811622589d1d24bda7dbdb775415",
+      "source_sha256": "96a111ece507ef13c0214678a5d16f05cfd831d5ae7d5d558f56a93fd1924807",
+      "app_sha256": "dd41a53642b66f822b8bb55ba11c5350855d8b0d63565c0d4ffe6e51935391af",
+      "max_guest_seconds": 6.186933999999994,
+      "slowest": {
+        "index": 117,
+        "path": "/settings",
+        "status": 200,
+        "guest_seconds": 6.186933999999994,
+        "host_seconds": 8.186999999976251,
+        "bytes": 2
+      },
+      "pcap_available": false,
+      "pcap_note": "Optional object-add capture failed with qom-type missing in both runs; timing uses QMP guest time, no debugger stops or packet trace."
+    },
+    "after_correct_rssi_finite_timing": {
+      "requests": 180,
+      "all_status_200": true,
+      "no_panic": true,
+      "qemu_sha256": "30f9a68ef5fda4af12ccc525f0951a8a08caf40b0e363db5d90587054ff66d74",
+      "elf_sha256": "b4af3c2a72cacd0c348f5d966d1998660fd5811622589d1d24bda7dbdb775415",
+      "source_sha256": "96a111ece507ef13c0214678a5d16f05cfd831d5ae7d5d558f56a93fd1924807",
+      "app_sha256": "dd41a53642b66f822b8bb55ba11c5350855d8b0d63565c0d4ffe6e51935391af",
+      "max_guest_seconds": 0.2382740000000041,
+      "slowest": {
+        "index": 94,
+        "path": "/advancedset",
+        "status": 200,
+        "guest_seconds": 0.2382740000000041,
+        "host_seconds": 0.35999999998603016,
+        "bytes": 14
+      },
+      "pcap_available": false,
+      "pcap_note": "Optional object-add capture failed with qom-type missing in both runs; timing uses QMP guest time, no debugger stops or packet trace."
+    }
+  },
+  "modular_regression": {
+    "passed": true,
+    "checks": {
+      "profile_validation": {
+        "unsupported_bus": true,
+        "flash_gpio": true,
+        "conflicting_pins": true,
+        "always_selected_shared_bus": true,
+        "duplicate_id": true
+      },
+      "c2_shared_spi": {
+        "lcd_sd_transfer": true,
+        "topology": "shared_bus",
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "cs_isolation": true,
+        "wrong_sck_blocked": true,
+        "wrong_miso_blocked": true,
+        "sd_snapshot_unchanged": true
+      },
+      "c3_shared_spi": {
+        "lcd_sd_transfer": true,
+        "topology": "shared_bus",
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "cs_isolation": true,
+        "wrong_sck_blocked": true,
+        "wrong_miso_blocked": true,
+        "sd_snapshot_unchanged": true
+      },
+      "esp32_dual_spi": {
+        "lcd_sd_transfer": true,
+        "topology": "two_hosts",
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "cs_isolation": true,
+        "wrong_sck_blocked": true,
+        "wrong_miso_blocked": true,
+        "sd_snapshot_unchanged": true
+      },
+      "c2_i2c": {
+        "alternate_gpio_oled": true,
+        "wrong_scl_nack": true
+      },
+      "c3_i2c": {
+        "alternate_gpio_oled": true,
+        "wrong_scl_nack": true
+      },
+      "legacy_cyd_mmio": {
+        "legacy_flags": true,
+        "lcd_pixels": true,
+        "sd_sector_write_read": true,
+        "sd_idle_high": true,
+        "snapshot_unchanged": true
+      }
+    },
+    "qemu_sha256": {
+      "riscv32": "30f9a68ef5fda4af12ccc525f0951a8a08caf40b0e363db5d90587054ff66d74",
+      "xtensa": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35"
+    }
+  },
+  "legacy_regression": {
+    "passed": true,
+    "same_pixels_and_source_images_as_previous": true,
+    "boards": {
+      "cyd": {
+        "passed": true,
+        "checks": {
+          "running": true,
+          "console_has_content": true,
+          "display_dimensions": true,
+          "no_panic_or_watchdog": true,
+          "source_flash_unchanged": true,
+          "source_artifacts_unchanged": true
+        },
+        "qemu_sha256": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35",
+        "firmware_sources": {
+          "flash.bin": "1050294c50955df7a4b09e5a44950601b1da11a299b3aea6a30031353103b8a8"
+        },
+        "pixel_sha256": "4afa1d8c3cb4023eef448bc04e36e1ae6b4568da007c43777935b32a1ea995d7"
+      },
+      "c3_oled": {
+        "passed": true,
+        "checks": {
+          "running": true,
+          "console_has_content": true,
+          "display_dimensions": true,
+          "no_panic_or_watchdog": true,
+          "source_flash_unchanged": true,
+          "source_artifacts_unchanged": true
+        },
+        "qemu_sha256": "30f9a68ef5fda4af12ccc525f0951a8a08caf40b0e363db5d90587054ff66d74",
+        "firmware_sources": {
+          "flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+        },
+        "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3"
+      },
+      "c3_modular": {
+        "passed": true,
+        "checks": {
+          "running": true,
+          "console_has_content": true,
+          "display_dimensions": true,
+          "no_panic_or_watchdog": true,
+          "source_flash_unchanged": true,
+          "source_artifacts_unchanged": true
+        },
+        "qemu_sha256": "30f9a68ef5fda4af12ccc525f0951a8a08caf40b0e363db5d90587054ff66d74",
+        "firmware_sources": {
+          "flash.bin": "162f05aef80094523616ca200ec510cbc8738172069858e6045463ec12e48b11"
+        },
+        "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3"
+      }
+    },
+    "cyd_boot_scope": "Boot, console and panic checks; LCD transactions are verified separately by QTest"
+  },
+  "raw_report_sha256": {
+    "rx-bandwidth-before-20261017.json": "caed3205fe8b3641d597c5abcbe6acb0d4a443704cfe1500fcb8fb8c231dd664",
+    "rx-bandwidth-after-20261017.json": "6ff9231def43249699b9516bf1a43a311290c952c811ad7d153be309a221ec12",
+    "http-rssi-five-after-20261017/report.json": "cff60edf78c090f7d3c4635e4617af00c65ad513ea03f82c6e87b834463a62aa",
+    "http-bandwidth-five-after-20261017/report.json": "846f7085c7d7de46b1e1f1bab3c2ca3a8dc922d300b762828c6ee51236e9b165",
+    "bandwidth-modules-20261017/modular-report.json": "f4a01d52c27e90813f39f6b3b70dd4a555fc3bf49e1161b3fbfb24a86b1d6f35",
+    "bandwidth-legacy-20261017/legacy-report.json": "4f3b8812b4debff947996494e20b4b966944144e209a453605d8b6172ca9fa06",
+    "rssi-legacy-20261017/legacy-report.json": "fe22a984756456d4f04a9b4b71b085d4c497983df02b62c0dbe38cefcc1d89fc"
+  },
+  "limitations": [
+    "No physical board execution.",
+    "No firmware source, app, ELF, HTTP latency limit or guest software delay changed.",
+    "The earlier failed integrated run remains failed; scoped HTTP timing is not a new full-suite pass."
+  ]
+}

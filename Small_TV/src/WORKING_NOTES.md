@@ -66,7 +66,26 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   соседние4 slots, inputs и protected regions проверены; ВМ18016/tab4 закрыты.
   См. photo-upload-waits-main-ui.json. Это не результат полного62455.
 
-## Текущая диагностика HTTP — 2026-10-17
+## Текущий результат диагностики HTTP — 2026-10-17
+
+QEMU main и origin/main теперь0d27a7ca98; installed executable30F9A68E.
+RSSI1a142bcf51 и trace3279a6c2f1 дополнены sparse SYN trace72f106db81 и
+finite-link timing0d27a7ca98. Последний устраняет схлопывание просроченных
+RX/TX frames в один virtual instant; учитывается полный transfer time на всех
+пяти scheduling sites, unlimited bandwidth0 сохранён. Link calculations выделены
+в свой модуль. Новый QTest на oldD18 ожидаемо failing, на30F все10 pass.
+Modules и CYD/C3 legacy/modular boots pass с прежними source/pixel hashes.
+Quiet five-route180 на неизменных appDD41/source96A/ELFB4: old correct-RSSI6238
+max6.186934, new30F max.238274. Все200/no panic, ВМ закрыты. Исправление merged
+и pushed в QEMU main и feature branch; canonical EXE и marker проверены.
+См. ../qemu/parity/wifi-link-timing-checks-20261017.md и отдельный JSON.
+
+Следующий шаг — один новый frozen full на canonical30F. Старый failed run
+не переименовывать в passed, порог6 не менять; firmware и75+88 test/extra inputs
+не менять во время нового прогона. Данные ниже сохраняют ход диагностики до
+исправления; прежний запрет нового suite после локализации больше не актуален.
+
+### История измерений до исправления timing
 
 Пользователь напомнил прежнюю шестисекундную ошибку QEMU и попросил изучить
 весь путь до обработчика и другие места его использования. Старый фикс

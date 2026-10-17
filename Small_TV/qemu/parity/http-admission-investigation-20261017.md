@@ -5,6 +5,13 @@
 Ниже — отдельные диагностические наблюдения; новый общий pass не установлен.
 Сводка измерений: [http-admission-observation-20261017.json](http-admission-observation-20261017.json).
 
+Продолжение установило ошибку finite-bandwidth scheduler QEMU. Исправление
+`0d27a7ca98` вошло в main: после задержки FIFO каждый кадр сохраняет время
+передачи. На том же quiet180 максимум снизился с6,186934 до0,238274 guest s;
+новый отрицательный QTest воспроизводит прежний zero-time burst. Подробности и
+границы результата: [wifi-link-timing-checks-20261017.md](wifi-link-timing-checks-20261017.md).
+Ниже сохранена история прежних наблюдений; новый полный firmware suite ещё нужен.
+
 ## Прежнее исправление QEMU
 
 Коммит `9d4da15732c44581aadced96fb71b9310bbee8b9` сохраняет C2 frame в bounded
