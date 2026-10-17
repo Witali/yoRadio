@@ -1666,3 +1666,39 @@ interleaving, вторую upload session, конфликтующий retry, sta
 неработающий weather worker, повреждение flash и подмену app/ELF/QEMU/test/formatter.
 Это проверка потребителей исторического standalone результата; его начальные
 input hashes не переписывались, C/ELF/BIN не менялись, нового full pass нет.
+
+### 2026-10-17 — отдельный runtime observer памяти
+
+В codex/small-tv-runtime-observer подготовлены отдельные модули DWARF/list/stack
+decoder, ROM counter crosscheck и workload driver. Production appDD41/source96A/
+ELFB4 не менялись. ВМ закрыты в finally; GDB только read/hardware breakpoints,
+присваивания PC/RAM нет. 15 parser и4 exact-ROM tests pass, включая негативные
+ABI/list controls. Module import, unused natural API deadline и HTTP name shadow
+сохранены как harness errors, а не firmware defects.
+
+Итог нового40-cycle workload:121.076406 guest s,41 snapshots всех12tasks,
+10 JPEG uploads,240 recorded HTTP +80 concurrent GET, max.405659s, no panic,
+inputs unchanged. Heap sampled87 668→86 268, min sampled78 264; SDK сумма
+per-heap minima47 028. Lowest stack watermark480 у settings. ROM counter
+crosschecks164. Короткий runtime preflight не доказывает leak-free/24h H10,
+factory memory equivalence или physical/ISR stack. ВМ закрыта; осталась только
+ВМ общего full11075. Его frozen75+88 inputs не затронуты. Отчёт и scope сохранены
+в runtime-memory-*; standalone tests пока не включены в текущий full gate.
+
+### 2026-10-17 — наблюдатель подготовлен к длительному запуску
+
+Runtime_state разворачивает low32 microsecond counter и пишет последовательный
+JSONL; summary ограничен первым/последними32 samples и агрегатами. Новый runner
+поддерживает cycles либо duration до7дней, interval<=60s, короткие виртуальные
+AP outages с реальными guest disconnect/reconnect и HTTP recovery. Проверки
+переполнений/journal6 иdecoder16 pass. Сравнение старого/нового decoder на одной
+SRAM даёт одинаковые heap/tasks при45→20 memory reads.
+
+Первая реальная проба4096-byte scan дала RSP E22 до ready snapshot: transport
+preflight invalid, не firmware defect. Исправлено на1024bytes, добавлен test
+packet limit. Новый4-cycle run с2×1s outages прошёл за15.689122guest s:
+5snapshots/32HTTP/35journal events, по1guestdisconnect+reconnect наотключение.
+Отдельный duration8s завершился после8.135430s:3cycles/4samples/27HTTP/28events.
+Журналы/digests иinputs unchanged/no panic, ВМ закрыты. AppDD41/96A/B4/QEMU30F
+прежние; source/C/BIN не менялись. Short validation сохранена вruntime-duration-*
+JSON, это НЕ24h/H10/physical и не переименование прежнего40-cycle proof9adf.
