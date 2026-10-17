@@ -1444,3 +1444,43 @@
   production правки требуется новый полный run с этим gate и новым collector.
 - PNG browser fixtures явно исключены из text normalization. Staged PNG
   декодируются, их точные SHA совпадают с report; сборка и источники не менялись.
+
+### 2026-10-17 — стабильные переводы строк archive manifest
+
+- Windows Set-Content создавал CRLF в manifest.json, тогда как Git хранит этот
+  файл с LF. Builder теперь явно пишет UTF-8 без BOM и LF, чтобы точные хеши
+  служебных метаданных сохранялись после checkout. Декодированные значения,
+  source identity и бинарные образы от этой правки не меняются.
+- Уже собранный manifest нормализован с проверкой равенства JSON. Первое
+  browser-after evidence сохранено в ignored run; финальная браузерная проверка
+  будет выполнена заново с каноническими байтами manifest до публикации отчёта.
+
+### 2026-10-17 — upload ACK заменяет лишнюю программную паузу
+
+- Собственная ветка codex/small-tv-photo-upload-waits от main5de17c6c. Uploader
+  выделен в photo_upload.js и детерминированно встроен в photo.html. Removed
+  50ms после успешного блока и2500ms после последней неудачи. Пять попыток,
+  порядок, поля, размеры блоков и задержки500/1000/1500/2000 между повторами
+  сохранены. Клиент по-прежнему ждёт ACK каждого блока до следующего/finish.
+- Node исполняет actual generated page code:11 final cases pass, на прежнем
+  HTML тот же финальный тест даёт6 ожидаемых отрицательных результатов. Таймеры
+  успешных1/3/25 chunks раньше50/150/1250ms, теперь0. Это измеренные requested
+  timers, не benchmark общей сети/flash. New frontend includes exact module
+  inclusion and MJS fingerprint in full run inputs; metadata/crop/resize pass.
+- Build74435 terminal0, архив в firmware/development: appDD4EB76E/source96A111EC/
+  ELFB7BE7CCC,1 176 880 bytes/free359 120. App меньше DAF на688 bytes. Actual
+  native photo_upload_start/chunk/finish/web_photo_post instructions полностью
+  совпали с B06; сохранены четыре диапазона и хеши. Серверный C не менялся.
+- Host57538 terminal0:3924 native,46 platform, frontend, integrity, timezone
+  и aggregation pass в reduced profile. Native SDK HTTP28482 terminal0:21 checks,
+  включая malformed Huffman, retries, immediate cut/cold boot, interrupted upload.
+  ВМ этого набора закрыты. Это scoped, не новый полный machine/QEMU checkpoint.
+- Browser-after25000 и затем final28044 на том же DD4 raw image:47 837-byte
+  JPEG через12 chunks побайтово равен DAF baseline (SHA a73dc807). All22 final
+  checks pass: raw=HTTP, APP/COM отсутствуют, slots1–4/защищённые regions unchanged,
+  sources/archive/ELF/QEMU/helpers unchanged, console[]. Вкладки и ВМ закрыты.
+  Финальный запуск использовал LF manifest; первый CRLF report сохранён ignored.
+- Отчёты/actual assembly и screenshot сохранены как photo-upload-waits-*.
+  Новый полный run main ещё требуется после merge/build и обновления collector/
+  freeze для photo_settings/.mjs. H03/setup, concurrency, memory/soak и physical
+  acceptance остаются; заводские ошибки исправляются, а не воспроизводятся.

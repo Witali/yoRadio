@@ -163,7 +163,7 @@ else {
 $groups.Add(@{name="hardware_browser_soak";status="not_run";reason="Physical board/RF/live weather service, long-run memory and full browser acceptance remain manual; focused browser regression is recorded separately"})
 $archive=Join-Path $repo "firmware\development\small-tv-esp32c2-reconstructed"
 $manifest=Read-SmallTvTestResult (Join-Path $archive "manifest.json")
-$testInputs=@(Get-ChildItem -LiteralPath $PSScriptRoot -Recurse -File | Where-Object {$_.Extension -in @('.c','.h','.inc','.ps1','.py','.txt')} | Sort-Object FullName | ForEach-Object {
+$testInputs=@(Get-ChildItem -LiteralPath $PSScriptRoot -Recurse -File | Where-Object {$_.Extension -in @('.c','.h','.inc','.ps1','.py','.mjs','.txt')} | Sort-Object FullName | ForEach-Object {
     @{file=$_.FullName.Substring($repo.Length+1).Replace('\','/');sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()}
 })
 $passed=@($groups | Where-Object {$_.status -eq "failed"}).Count -eq 0

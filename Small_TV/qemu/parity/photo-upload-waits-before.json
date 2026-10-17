@@ -1,0 +1,110 @@
+{
+  "expected_before_failure": true,
+  "test_sha256": "7db6296f615a32a0345424b2e5f4b6402b4ee814895afa7fdace72379e4a7a6a",
+  "result": {
+    "passed": false,
+    "checks": [
+      {
+        "case": "ordered-upload-no-success-sleep-4096",
+        "passed": false,
+        "error": "Successful acknowledgements must not add software sleeps\n+ actual - expected\n\n+ [\n+   50\n+ ]\n- []\n"
+      },
+      {
+        "case": "ordered-upload-no-success-sleep-8229",
+        "passed": false,
+        "error": "Successful acknowledgements must not add software sleeps\n+ actual - expected\n\n+ [\n+   50,\n+   50,\n+   50\n+ ]\n- []\n"
+      },
+      {
+        "case": "ordered-upload-no-success-sleep-102400",
+        "passed": false,
+        "error": "Successful acknowledgements must not add software sleeps\n+ actual - expected\n\n+ [\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50,\n+   50\n+ ]\n- []\n"
+      },
+      {
+        "case": "next-chunk-and-finish-wait-for-ack",
+        "passed": true
+      },
+      {
+        "case": "http-retry-keeps-identical-chunk",
+        "passed": false,
+        "error": "Keep retry backoff, without a successful-chunk sleep\n+ actual - expected\n\n  [\n    500,\n    1000,\n+   50\n  ]\n"
+      },
+      {
+        "case": "network-retry-keeps-identical-chunk",
+        "passed": false,
+        "error": "Keep retry backoff, without a successful-chunk sleep\n+ actual - expected\n\n  [\n    500,\n    1000,\n+   50\n  ]\n"
+      },
+      {
+        "case": "five-failures-remain-bounded-and-do-not-finish",
+        "passed": false,
+        "error": "Do not sleep after the final failed attempt\n+ actual - expected\n\n  [\n    500,\n    1000,\n    1500,\n    2000,\n+   2500\n  ]\n"
+      },
+      {
+        "case": "start-failure-does-not-write-any-chunk",
+        "passed": true
+      },
+      {
+        "case": "finish-failure-is-not-reported-as-success",
+        "passed": true
+      },
+      {
+        "case": "preview-download-keeps-exact-bytes-and-order",
+        "passed": true
+      },
+      {
+        "case": "preview-http-error-stops-the-download",
+        "passed": true
+      }
+    ],
+    "successful_transfer_timers": [
+      {
+        "bytes": 4096,
+        "chunks": 1,
+        "requested_delays_ms": [
+          50
+        ]
+      },
+      {
+        "bytes": 8229,
+        "chunks": 3,
+        "requested_delays_ms": [
+          50,
+          50,
+          50
+        ]
+      },
+      {
+        "bytes": 102400,
+        "chunks": 25,
+        "requested_delays_ms": [
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50
+        ]
+      }
+    ],
+    "page_sha256": "53339fa44d5d6d8a8a3c2c1951abb688f5bb87923279ff5b555dc9fd57072445",
+    "scope": "Actual generated page JavaScript, controlled acknowledgements, exact multipart bytes and bounded retry behavior; no real browser or guest flash claim."
+  }
+}
