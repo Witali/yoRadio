@@ -116,6 +116,75 @@
       ],
       "pcap_sha256": "de09cb6f47514e4a0b8419b895cde32867829c4fdfc13b4844cf1e1090517e6d",
       "model_rx_drop_events": 0
+    },
+    "http-latency-tcp-20261017-fixed": {
+      "completed_requests": 60,
+      "maximum_guest_seconds": 1.5517040000000009,
+      "raw_report_sha256": "824144980b3a666141395e633ddfb67e701a37e5075bde81ca9409f40167116b",
+      "diagnostic_script_sha256": "9ea1f2d730181c7ac59fc4f2800a6f059fdb9633c6b611bb117dd97c3aa8b05e",
+      "no_panic": true,
+      "vm_closed": true,
+      "delayed_requests": [
+        {
+          "index": 43,
+          "path": "/setclocktype",
+          "status": 200,
+          "guest_seconds": 1.5517040000000009,
+          "host_seconds": 2.4839999999967404,
+          "first_syn_seconds": 0.02042700000000508,
+          "handler_guest_seconds": 0.010852999999997337
+        }
+      ],
+      "null_pcb_returns": 0
+    },
+    "http-latency-admission-20261017": {
+      "completed_requests": 180,
+      "maximum_guest_seconds": 1.5656750000000024,
+      "raw_report_sha256": "c03b26412b2219e8453947a736672e9b8d1d9ba3d87eba38be1884b52cf07ad9",
+      "diagnostic_script_sha256": "f084b009bebf065ada9ea9039d41437014b5cd0ecc485e52221be7aea9aa4285",
+      "no_panic": true,
+      "vm_closed": true,
+      "delayed_requests": [
+        {
+          "index": 11,
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 1.5656750000000024,
+          "host_seconds": 2.860000000044238,
+          "first_syn_seconds": 0.023292000000001423,
+          "handler_guest_seconds": 0.010850000000001359
+        },
+        {
+          "index": 57,
+          "path": "/settings",
+          "status": 200,
+          "guest_seconds": 1.4911239999999992,
+          "host_seconds": 2.375,
+          "first_syn_seconds": 0.019961000000002116,
+          "handler_guest_seconds": 0.011014000000002966
+        }
+      ],
+      "null_pcb_returns": 0
+    },
+    "http-latency-netif-20261017": {
+      "completed_requests": 180,
+      "maximum_guest_seconds": 1.5880599999999987,
+      "raw_report_sha256": "3f06108ba72ddf85f6cdf8c32d1eb3376687d60d0e2242884be59fa412036789",
+      "diagnostic_script_sha256": "e91784efb56a6ac972eb2172a8bb7d36b8f11ec8b1f22212dc8f7a0b53ab5214",
+      "no_panic": true,
+      "vm_closed": true,
+      "delayed_requests": [
+        {
+          "index": 26,
+          "path": "/SetTimeModeValue",
+          "status": 200,
+          "guest_seconds": 1.5880599999999987,
+          "host_seconds": 2.75,
+          "first_syn_seconds": 0.024151000000003364,
+          "handler_guest_seconds": 0.01088500000000181
+        }
+      ],
+      "null_pcb_returns": 0
     }
   },
   "shared_http_post_routes": [
@@ -137,5 +206,5 @@
     "/configure"
   ],
   "firmware_and_qemu_unchanged": true,
-  "unresolved": "The current model still sometimes has an unanswered initial SYN; the older no-descriptor regression passes and the new dedicated trace emits no RX drop. Follow guest TCP admission next."
+  "unresolved": "No PCB allocation failure in 180-request admission probe; a netif probe saw the first HTTP DATA at the SLIRP wire but only its retransmission at the observed SDK receive entry. Continue passive model tracing to remove debugger scheduling effects and receive-observer gaps."
 }

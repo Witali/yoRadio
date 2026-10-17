@@ -1555,3 +1555,19 @@ Corrected TCP preflight60 pass как диагностическое выпол�
 TCP limit16; причина5–6s ещё не доказана. Отрицательные попытки observer сохранены
 как harness errors (same-PC loop; competing breakpoint), без firmware conclusions.
 Запущен более узкий admission probe6201 на точных B4 адресах, каждый BP one-shot.
+
+### 2026-10-17 — доказанный RSSI-дефект QEMU и отрицательный latency A/B
+
+У общего new_frame отсутствовала signal_strength initialization. RSSI -25
+добавлен1a142bcf51; simultaneous8 frames regression на FDE даёт2 failures
+(C2/C3), на candidate62386F10 все9 pass. Первый sequential test скрывал
+heap reuse; attempt с runtime-set latency был harness error, не negative control.
+3279a6c2f1 выделяет passive format tracing в отдельный модуль;1646 actual TCP
+identifiers совпали с PCAP. Оба commits отправлены в QEMU feature branch.
+Main/installedFDE/firmwareDD41 прежние. Modules и CYD/C3 boots/pixels pass.
+
+Four-route after240 max.214052. Однако identical five-route quiet A/B180 each:
+beforeF207 max6.167475, after6238 max6.186934, оба at index117. RSSI исправлен,
+но не устраняет stall. Detailed passive five-route180 max.220060/drops0
+не воспроизводит этот timing; все ВМ закрыты. Следующий шаг — low-volume SYN
+DMA/IRQ/CPU-context trace. Полный passing firmware checkpoint не обновлялся.

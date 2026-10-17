@@ -85,12 +85,28 @@ Corrected TCP preflight60 завершён: в одном1.55s запросе п
 вмешавшемся breakpoint во время естественного entry advance. Эти две ошибки
 harness сохранены ignored и не являются firmware failures.
 
-Сейчас единственный live probe: handle6201,
-.build/small-tv-parity/http-latency-admission-20261017. Он наблюдает actual B4
-inlined listen path0x420229b2 до backlog и0x420229c6 после tcp_alloc, затем
-HTTP entry/return; каждый breakpoint снимается после первого попадания.
-ELF SHA проверяется перед стартом; программа/данные/PC не подменяются.
-Продолжить этот probe, не запускать новый full. Firmware/QEMU не менялись.
+Admission180 завершён: TCP PCB refusals0. Netif180 завершён; один DATA repeat
+появился в observed netif только через1.4s. Внешний packet может быть потерян
+до передачи Wi-Fi→stack; debugger scheduling/entry-return gaps требуют passive
+подтверждения. Все ВМ этих попыток закрыты, полного passing gate по-прежнему нет.
+
+В прежней чистой QEMU worktree .worktree/small-tv-wifi-link, branch
+codex/small-tv-wifi-link, выполнены и отправлены1a142bcf51 (общий constructor
+RSSI -25 вместо uninitialized heap) и3279a6c2f1 (отдельный passive trace module).
+Тот же queued8-data-frame test на FDE дал2 failures C2/C3; на candidate62386F10
+все9 pass. Modules и CYD/C3 legacy/modular boots pass, pixels/source hashes
+совпали с прежними. Main QEMU/installedFDE и firmwareDD41/B4 не заменены.
+Trace-only before F207BA0D и after62386F10 сохранены как отдельные immutable EXE.
+
+Одинаковый quiet five-route A/B34683 завершён: before180 max6.167475,
+after180 max6.186934, оба превышают6. RSSI — реальный отдельный дефект,
+НЕ установленная причина stall. Four-route240 after max.214052 не заменяет
+этот отрицательный результат. Passive five-route87774 с подробным log дал
+180/max.220060, drops0, RX_CTRL=0x80000000 (кроме двух startup writes).
+Подробное логирование меняет наблюдаемые timing; следующий шаг — малошумная
+SYN-only queue/DMA trace с CPU PC/IRQ context. Все текущие ВМ закрыты.
+См. ../qemu/parity/rssi-frame-validation-20261017.json. Не ослаблять gate и
+не запускать новый общий suite до локализации оставшегося network пути.
 
 ## Цель и принятые решения
 

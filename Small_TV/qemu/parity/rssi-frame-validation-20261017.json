@@ -1,0 +1,177 @@
+{
+  "scope": "Confirmed QEMU metadata defect and scoped candidate checks; six-second latency root cause remains under investigation",
+  "qemu_commits": {
+    "rssi": "1a142bcf51",
+    "passive_trace": "3279a6c2f1"
+  },
+  "installed_qemu_unchanged_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+  "candidate_qemu_sha256": "62386f10f0ab19fa1608c820455b0167816932b3e39a88ddb491dd46317d4416",
+  "before_packet_regression": {
+    "passed": false,
+    "tests": 9,
+    "failures": [
+      "test_data_frames_have_initialized_signal_strength (__main__.WifiServicesTests.test_data_frames_have_initialized_signal_strength) (c2=False)",
+      "test_data_frames_have_initialized_signal_strength (__main__.WifiServicesTests.test_data_frames_have_initialized_signal_strength) (c2=True)"
+    ],
+    "errors": [],
+    "qemu_sha256": "fde38d5311cf05b7c22e9ed114b2b57f22ce25f0f06d3f31b02bf519cc8d42eb",
+    "scope": "QOM validation/reset and real DNS/NTP packets through Wi-Fi DMA; qtest executes no guest instructions, no firmware or Internet."
+  },
+  "after_packet_regression": {
+    "passed": true,
+    "tests": 9,
+    "failures": [],
+    "errors": [],
+    "qemu_sha256": "62386f10f0ab19fa1608c820455b0167816932b3e39a88ddb491dd46317d4416",
+    "scope": "QOM validation/reset and real DNS/NTP packets through Wi-Fi DMA; qtest executes no guest instructions, no firmware or Internet."
+  },
+  "test_source_sha256": "8becd3cf2f611a770d8de99d28ed6d07fbb35cb4655132698d8209a2d12a3914",
+  "modular_checks": {
+    "profile_validation": {
+      "unsupported_bus": true,
+      "flash_gpio": true,
+      "conflicting_pins": true,
+      "always_selected_shared_bus": true,
+      "duplicate_id": true
+    },
+    "c2_shared_spi": {
+      "lcd_sd_transfer": true,
+      "topology": "shared_bus",
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "cs_isolation": true,
+      "wrong_sck_blocked": true,
+      "wrong_miso_blocked": true,
+      "sd_snapshot_unchanged": true
+    },
+    "c3_shared_spi": {
+      "lcd_sd_transfer": true,
+      "topology": "shared_bus",
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "cs_isolation": true,
+      "wrong_sck_blocked": true,
+      "wrong_miso_blocked": true,
+      "sd_snapshot_unchanged": true
+    },
+    "esp32_dual_spi": {
+      "lcd_sd_transfer": true,
+      "topology": "two_hosts",
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "cs_isolation": true,
+      "wrong_sck_blocked": true,
+      "wrong_miso_blocked": true,
+      "sd_snapshot_unchanged": true
+    },
+    "c2_i2c": {
+      "alternate_gpio_oled": true,
+      "wrong_scl_nack": true
+    },
+    "c3_i2c": {
+      "alternate_gpio_oled": true,
+      "wrong_scl_nack": true
+    },
+    "legacy_cyd_mmio": {
+      "legacy_flags": true,
+      "lcd_pixels": true,
+      "sd_sector_write_read": true,
+      "sd_idle_high": true,
+      "snapshot_unchanged": true
+    }
+  },
+  "quiet_http": {
+    "requests": 240,
+    "max_guest_seconds": 0.21405200000000235,
+    "all_status_200": true,
+    "raw_report_sha256": "75f3bb64497a04c6e40b9406d3fa3f2f7529fa92f7d16b404c464b721d81b8b8"
+  },
+  "passive_formatter": {
+    "tcp_dma_records_matched_to_pcap": 1646,
+    "payload_not_logged": true
+  },
+  "same_workload_ab": {
+    "before": {
+      "requests": 180,
+      "qemu_sha256": "f207ba0dea2a826efb76dcd50a7536c44af36dbcde3234f56e533abec6098720",
+      "max_guest_seconds": 6.167474999999996,
+      "over_six_seconds": [
+        {
+          "index": 117,
+          "path": "/settings",
+          "samples": [],
+          "status": 200,
+          "guest_seconds": 6.167474999999996,
+          "host_seconds": 7.796999999962281,
+          "bytes": 2
+        }
+      ],
+      "latency_bound_passed": false,
+      "raw_report_sha256": "1b278127736309c7f7ce01a5739d5deb2888d39a9fd4e9e618271a68a45c19af"
+    },
+    "after": {
+      "requests": 180,
+      "qemu_sha256": "62386f10f0ab19fa1608c820455b0167816932b3e39a88ddb491dd46317d4416",
+      "max_guest_seconds": 6.186933999999994,
+      "over_six_seconds": [
+        {
+          "index": 117,
+          "path": "/settings",
+          "samples": [],
+          "status": 200,
+          "guest_seconds": 6.186933999999994,
+          "host_seconds": 8.186999999976251,
+          "bytes": 2
+        }
+      ],
+      "latency_bound_passed": false,
+      "raw_report_sha256": "cff60edf78c090f7d3c4635e4617af00c65ad513ea03f82c6e87b834463a62aa"
+    }
+  },
+  "full_gate": "previous full remains failed; no replacement passing full report",
+  "legacy_boots": {
+    "cyd": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "pixel_sha256": "4afa1d8c3cb4023eef448bc04e36e1ae6b4568da007c43777935b32a1ea995d7",
+      "same_pixels_as_previous_checkpoint": true,
+      "same_firmware_sources": true
+    },
+    "c3_oled": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
+      "same_pixels_as_previous_checkpoint": true,
+      "same_firmware_sources": true
+    },
+    "c3_modular": {
+      "passed": true,
+      "checks": {
+        "running": true,
+        "console_has_content": true,
+        "display_dimensions": true,
+        "no_panic_or_watchdog": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "pixel_sha256": "e1700979728aa0372a5aad7055bd671af33ee2714dd3889347cdb91623cbcca3",
+      "same_pixels_as_previous_checkpoint": true,
+      "same_firmware_sources": true
+    }
+  },
+  "conclusion": "RSSI initialization defect is fixed and independently tested; identical five-route workloads still reproduce the six-second stall before and after. Do not call RSSI the latency root cause."
+}
