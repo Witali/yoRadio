@@ -7,6 +7,19 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Bounded full42964/30656 terminalfailed photo_frames/native masked-night.
+  Все10frames/pixels/PWM совпали, но обеrestore2.814699/7.163766guest s были
+  до первого SNTP: clock_validFalse, поэтому synchronized_night_restoreFalse.
+  Это невыполненный night target, не доказанная brightness ошибка приложения.
+ 193inputs заново verifiedunchanged в terminal checkpoint; полный raw report
+  и scoped JSON сохранены как `uri-bounded-full-failed-20261017.*`. Не публиковать.
+- Отдельная `codex/small-tv-wifi-fallback`/27f1b23e готова: исправляет ложный
+  mode2/reset после18s pendingDHCP и stale failure послеGOT_IP. Ordinary6324C55A,
+  ELF9E2C7719/source53D38223,59inputs (менялся только app/network/wifi.c).
+ 47platform cases,4realnetworkQEMU cases и23contract guards, RV32eventoracle
+  проходят.12ownedVMs остановлены; доказательство в feature branch. Перед
+  интеграцией сохранить terminal currentfull (сделано); затем исправить photo
+  observation и запускать новый full. Existing H10 остаётся83, не proof6324.
 - Fresh full после mergecdc54723 запущен19:05:32UTC: session42964, OS pwsh30656,
   `.build/small-tv-functional/uri-bounded-full-20261017`. Immutable freeze100tests+
   93extras=193inputs повторно проверен после старта; sourceBE58/app8304/ELF62E0/

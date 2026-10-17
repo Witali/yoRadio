@@ -2418,3 +2418,24 @@ launch times. Это pending prefix без24h/terminalguard/steady windows, не
 H10 files/bundle не менялись; browser/NTP probe VMs закрыты. README manual
 coverage исправлен: current8case8304 отдельно от historical31caseDAF; stale
 «weather_wait ещё не включён» заменено actual mandatory gate description.
+
+### 2026-10-17 — terminal bounded full: night-case закончился до SNTP
+
+В начале turn подтверждены exact PID/start/commands30656 и четыреH10roles;
+предыдущий turn дал concrete progress, оба прогона пережили границу сообщения.
+Full42964 затем terminalfailed в photo_frames/native masked-night.10полных
+кадров и PWM совпали с literal replay/corrections; только synchronized_night_restore
+False. Обеrestore2.814699/7.163766guest s имелиclock_validFalse и preset17:04.
+Два fade завершились до первой SNTP notification при разрешённом fast photo
+startup. Это непроверенная night цель, не установленная ошибка яркости.
+
+Заново verified193frozen inputs; terminal raw report сжат и round-trip проверен,
+scoped JSON сохраняет все10samples/checks и subgroup statuses. Published EF66
+не заменялся. Следующее исправление должно сохранять точные pixels/PWM и
+обязательную настоящую night-sync proof, а не отменять этот assert.
+
+Параллельно в .worktree/small-tv-wifi-fallback подготовлена27f1b23e: реальная
+ошибка18s network fallback, не связанная с display timer.47platform cases,
+4actualnetworkQEMU/23contract guards и RV32oracle проходят; twelveownedVMs
+закрыты. New6324/source53D3 ещё не в main; main/H10 продолжают означать83.
+Сохранение этого terminal checkpoint разрешает интеграцию до нового freeze.
