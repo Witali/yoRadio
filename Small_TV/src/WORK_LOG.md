@@ -1658,3 +1658,11 @@ oracle. Исправленный новый run сравнивает cache пе�
 inputs98 unchanged, ВМ закрыты, no panic. Multipart formatter выделен отдельно,
 4 protocol tests pass. Полная H09/24h H10/physical не заявлены; source/C иproduction
 archive не менялись. Main frozen full11075 продолжает calendar на прежнейDD41.
+
+H09-сценарий включён в следующий обязательный qemu.concurrency_http. Producer,
+publisher и verifier требуют все 34 условия/16 пар/68 запросов и точные identities.
+20 consumer mutations на captured успешном report отвергнуты, включая missing
+interleaving, вторую upload session, конфликтующий retry, stale renderer,
+неработающий weather worker, повреждение flash и подмену app/ELF/QEMU/test/formatter.
+Это проверка потребителей исторического standalone результата; его начальные
+input hashes не переписывались, C/ELF/BIN не менялись, нового full pass нет.

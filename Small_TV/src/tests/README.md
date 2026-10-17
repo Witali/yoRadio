@@ -299,6 +299,16 @@ verifier проверяют все четыре случая, 15 отрицат�
 точные input identities. Это часть H09, а не полная конкурентная/24h приёмка.
 См. [http-body-deadline-checks-20261017.md](../../qemu/parity/http-body-deadline-checks-20261017.md).
 
+`qemu.concurrency_http` обязательно проверяет два одновременно стартующих
+HTTP-клиента: конкурирующие upload sessions, одинаковые/конфликтующие повторы,
+scan и GET, независимые настройки и одновременный restart во время частичной
+загрузки. Реальные weather/renderer cache, warm/cold boot, все JPEG bytes и
+защищённые области raw flash проверяются без guest state writes. Требуются
+34 условия, 16 пар и 20 consumer rejection controls; ограничение каждой пары
+остаётся 6 guest seconds. Это заданный H09-сценарий, не исчерпывающий перебор
+interleavings или аппаратная/24h приёмка. Подробности:
+[concurrency-checks-20261017.md](../../qemu/parity/concurrency-checks-20261017.md).
+
 Группа `frontend` компилирует JavaScript трёх страниц и проверяет удаление
 APP/COM без изменения JPEG scan, ошибочные заголовки и 156 вариантов геометрии
 кадрирования (края, масштаб, портрет/альбом и недопустимые параметры), а также

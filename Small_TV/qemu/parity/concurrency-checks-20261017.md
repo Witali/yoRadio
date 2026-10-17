@@ -44,3 +44,13 @@ renderer до/после окончания фото.
 браузерные действия или физическое радио. H09 в целом и 24-часовой H10 пока
 не объявлены завершёнными. Текущий immutable full на main проверяет другой DD41
 и не включает этот standalone тест. Новый дефект прошивки этим сценарием не найден.
+
+Следующий общий suite требует `qemu.concurrency_http`. Publisher/verifier
+проверяют все 34 условия, 16 пар, 68 запросов, точные app/source/ELF/QEMU/test/
+formatter identities, cache resume и protected hashes. На captured guest report
+прошли 20 отрицательных consumer controls: пропуски/ложные результаты, вторая
+upload session, принятый конфликтующий блок, задержка/NaN, неподвижный renderer,
+неактивная погода, порча flash и подмена входов отвергаются. См.
+[concurrency-consumer-validation-20261017.json](concurrency-consumer-validation-20261017.json).
+Добавление producer/consumer gate не меняло C/ELF/app и не является новым общим
+прогоном; исходный standalone report сохраняет свои pre-gate input hashes.

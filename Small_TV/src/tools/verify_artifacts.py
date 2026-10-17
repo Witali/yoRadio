@@ -19,6 +19,7 @@ from photo_controls_contract import validate_photo_brightness, validate_photo_co
 from photo_settings_contract import validate_photo_settings
 from advanced_qemu import validate_advanced
 from http_body_contract import validate_http_body, validate_http_body_guards
+from concurrency_contract import validate_concurrency, validate_concurrency_guards
 
 
 def read(path):
@@ -68,6 +69,13 @@ def main():
         'qemu_sha256': groups['qemu']['qemu_sha256'],
         'test_sha256': hashlib.sha256((ROOT / 'tests/http_body_qemu.py').read_bytes()).hexdigest()})
     validate_http_body_guards(body_http)
+    concurrency_http = groups['qemu']['concurrency_http']
+    validate_concurrency(concurrency_http, {'app_sha256': app_sha, 'source_sha256': manifest['source_sha256'],
+        'qemu_sha256': groups['qemu']['qemu_sha256'],
+        'native_elf_sha256': hashlib.sha256((BUILD / 'small_tv_reconstructed.elf').read_bytes()).hexdigest(),
+        'test_sha256': hashlib.sha256((ROOT / 'tests/concurrency_qemu.py').read_bytes()).hexdigest(),
+        'formatter_sha256': hashlib.sha256((ROOT / 'tests/photo_protocol.py').read_bytes()).hexdigest()})
+    validate_concurrency_guards(concurrency_http)
     require(suite['app_sha256'] == app_sha and suite['source_sha256'] == manifest['source_sha256'],
             'Suite tested a different application/source archive')
     state, network = groups['machine_time_state'], groups['qemu']['time_http']

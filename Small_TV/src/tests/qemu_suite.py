@@ -8,6 +8,7 @@ import subprocess
 import sys
 from types import SimpleNamespace
 from http_body_contract import contract_rejection_checks
+from concurrency_contract import contract_rejection_checks as concurrency_rejections
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -44,7 +45,7 @@ def main():
                                             'esp_board.py', 'esp_services.py')}}
     report = {'passed': False, 'tested_at_utc': dt.datetime.now(dt.timezone.utc).isoformat(),
               **inputs,
-              'boot_reset': {}, 'startup_wait': {}, 'weather_wait': {}, 'advanced_http': {}, 'body_http': {}, 'photo_http': {}, 'photo_frames': {}, 'photo_brightness': {}, 'photo_controls': {}, 'photo_reinit': {}, 'photo_settings': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
+              'boot_reset': {}, 'startup_wait': {}, 'weather_wait': {}, 'advanced_http': {}, 'body_http': {}, 'concurrency_http': {}, 'photo_http': {}, 'photo_frames': {}, 'photo_brightness': {}, 'photo_controls': {}, 'photo_reinit': {}, 'photo_settings': {}, 'http_initial_setup': {}, 'weather_http': {}, 'field_http': {}, 'time_http': {}, 'text_http': {}, 'regional_http': {}, 'calendar_http': {}, 'completed_scenes': {}, 'scenes': {}, 'errors': [],
               'scope': 'Real firmware boot/reset/DHCP/SNTP, localhost HTTP, synthetic weather, natural calendar/DST transitions and complete instruction-replayed frames. The separate unsynchronized scene similarity remains diagnostic. No physical hardware or Internet weather service.'}
     try:
         for variant in ('original', 'reconstructed'):
@@ -54,16 +55,16 @@ def main():
             check(result['passed'], f'{variant}: boot/reset/SNTP checks failed')
             print('PASS QEMU boot/reset/SNTP:', variant, flush=True)
         for name, key in (('startup', 'startup_wait'), ('weather_wait', 'weather_wait'),
-                          ('advanced', 'advanced_http'), ('http_body', 'body_http'), ('photo', 'photo_http'), ('photo_frames', 'photo_frames'),
+                          ('advanced', 'advanced_http'), ('http_body', 'body_http'), ('concurrency', 'concurrency_http'), ('photo', 'photo_http'), ('photo_frames', 'photo_frames'),
                           ('photo_brightness', 'photo_brightness'), ('photo_controls', 'photo_controls'),
                           ('photo_reinit', 'photo_reinit'), ('photo_settings', 'photo_settings')):
-            folder = args.output / ({'advanced': 'advanced-http', 'http_body': 'http-body', 'photo': 'photo-http', 'photo_frames': 'photo-frames',
+            folder = args.output / ({'advanced': 'advanced-http', 'http_body': 'http-body', 'concurrency': 'concurrency-http', 'photo': 'photo-http', 'photo_frames': 'photo-frames',
                                      'photo_brightness': 'photo-brightness',
                                      'photo_controls': 'photo-controls',
                                      'photo_reinit': 'photo-reinit', 'photo_settings': 'photo-settings'}.get(name, name+'-observer'))
             command = [sys.executable, str(Path(__file__).with_name(name + '_qemu.py')),
                        '--qemu-root', str(args.qemu_root), '--output', str(folder)]
-            if name == 'http_body':
+            if name in ('http_body', 'concurrency'):
                 command += ['--yoradio', str(ROOT), '--dependency-root', str(ROOT)]
             process = subprocess.run(command)
             result = json.loads((folder / 'report.json').read_text(encoding='utf-8-sig'))
@@ -77,6 +78,15 @@ def main():
                     'app_sha256': hashlib.sha256((archive / 'app.bin').read_bytes()).hexdigest(),
                     'source_sha256': manifest['source_sha256'], 'qemu_sha256': inputs['qemu_sha256'],
                     'test_sha256': hashlib.sha256(Path(__file__).with_name('http_body_qemu.py').read_bytes()).hexdigest()})
+            if name == 'concurrency':
+                archive = ROOT / 'firmware/development/small-tv-esp32c2-reconstructed'
+                manifest = json.loads((archive / 'manifest.json').read_text())
+                result['contract_checks'] = concurrency_rejections(result, {
+                    'app_sha256': hashlib.sha256((archive / 'app.bin').read_bytes()).hexdigest(),
+                    'source_sha256': manifest['source_sha256'], 'qemu_sha256': inputs['qemu_sha256'],
+                    'native_elf_sha256': hashlib.sha256((ROOT / '.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()).hexdigest(),
+                    'test_sha256': hashlib.sha256(Path(__file__).with_name('concurrency_qemu.py').read_bytes()).hexdigest(),
+                    'formatter_sha256': hashlib.sha256(Path(__file__).with_name('photo_protocol.py').read_bytes()).hexdigest()})
             print('PASS QEMU guest regression:', name, flush=True)
         from small_tv_http_test import run_suite
         report['http_initial_setup'] = run_suite(options, args.output / 'http-initial-setup')
