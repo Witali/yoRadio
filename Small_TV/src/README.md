@@ -47,7 +47,7 @@ meaning. The executable files in `app/` use real C types and descriptive
 functions, configuration fields, buffers and state variables. SDK code is
 provided by ESP-IDF rather than stubbed out or mapped to old machine addresses.
 
-All 157 production C functions have an entry comment explaining their purpose.
+All 162 production C functions have an entry comment explaining their purpose.
 Corrected functions also carry searchable entry-comment markers:
 `FIXED_FACTORY` identifies a deliberate correction of an original firmware bug;
 `FIXED_RECONSTRUCTION` identifies a repair of our C implementation to restore
