@@ -25,6 +25,7 @@ def main():
     """Run one owned disposable VM and preserve evidence even if a check fails."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--yoradio', type=Path, required=True)
+    parser.add_argument('--dependency-root', type=Path, help='Shared SDK/ROM/oracle packages for an isolated worktree')
     parser.add_argument('--qemu-root', type=Path, default=Path('C:/Work/QEMU-ESP32'))
     parser.add_argument('--output', type=Path, required=True)
     length = parser.add_mutually_exclusive_group()
@@ -45,8 +46,9 @@ def main():
     if not 0 <= args.outage_every <= 100000 or not math.isfinite(args.outage_seconds) or not 0 < args.outage_seconds <= 5:
         raise ValueError('Expected bounded short virtual AP outages')
     root = args.yoradio.resolve()
+    deps = args.dependency_root.resolve() if args.dependency_root else root
     args.output.mkdir(parents=True, exist_ok=False)
-    sys.path[:0] = [str(root / '.build/small-tv-parity/oracle-deps'),
+    sys.path[:0] = [str(deps / '.build/small-tv-parity/oracle-deps'),
                    str(root / 'Small_TV/src/tests'), str(root / 'Small_TV/qemu/parity'),
                    str(args.qemu_root / 'tools')]
     import small_tv_vm as vm
@@ -64,7 +66,7 @@ def main():
     app = root / 'firmware/development/small-tv-esp32c2-reconstructed/app.bin'
     profile = root / 'Small_TV/qemu/profiles/small-tv-c2.json'
     layout = native_layout(elf)
-    rom = root / '.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'
+    rom = deps / '.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'
     counters = RomHeapCounters(rom)
     if app.read_bytes()[176:208] != bytes.fromhex(layout['elf_sha256']):
         raise ValueError('Archived app and inspected ELF do not match')
@@ -75,7 +77,7 @@ def main():
     files += [root / 'Small_TV/src/tests' / name for name in ('gdb_observer.py', 'weather_qemu.py', 'time_qemu.py')]
     archive = app.parent
     files += [archive / name for name in ('bootloader.bin', 'partition-table.bin', 'assets.bin', 'source-manifest.json')]
-    files += [root / '.idf/v6.1-9a97f6c54ec6' / name for name in (
+    files += [deps / '.idf/v6.1-9a97f6c54ec6' / name for name in (
         'components/heap/heap_private.h', 'components/heap/multi_heap.c', 'components/heap/heap_caps.c',
         'components/freertos/FreeRTOS-Kernel/tasks.c',
         'components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos/portmacro.h')]
@@ -84,7 +86,7 @@ def main():
     executable = args.qemu_root / 'bin/qemu-system-riscv32.exe'
     files.append(executable)
     inputs = {str(path.resolve()): digest(path) for path in files}
-    result = {'schema_version': 2, 'passed': False, 'all_functionality_verified': False,
+    result = {'schema_version': 3, 'passed': False, 'all_functionality_verified': False,
               'scope': __doc__, 'native_elf_sha256': layout['elf_sha256'],
               'app_sha256': digest(app), 'qemu_sha256': digest(executable), 'cycles_requested': args.cycles,
               'duration_requested_guest_seconds': args.duration_seconds,
@@ -101,7 +103,7 @@ def main():
         reservation.bind(('127.0.0.1', 0))
         gdb_port = reservation.getsockname()[1]
     options = SimpleNamespace(yoradio=str(root), qemu=str(executable),
-        rom_elf=str(root / '.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),
+        rom_elf=str(rom),
         hardware_profile=str(profile), network='clock', display='none', persistent=False,
         paused=True, gdb_port=gdb_port, firmware='reconstructed', service_port=fixture.port)
     state = args.output / 'vm'
@@ -120,6 +122,8 @@ def main():
         observer.socket.settimeout(20)
         reader = MemorySnapshot(observer.memory, layout, counters.validate)
         symbols = {name: row['address'] for name, row in layout['symbols'].items()}
+        if layout['symbols']['connected']['size'] != 1:
+            raise ValueError('Expected a one-byte atomic station connection flag')
         with vm.QMP(session['qmp_port'], session['name']) as qmp:
             def guest_seconds():
                 """Unwrap the radio's low 32 bits without changing guest clock state."""
@@ -217,29 +221,35 @@ def main():
                     if cycle % 4 == 2:
                         upload_photo()
                     if args.outage_every and (cycle + 1) % args.outage_every == 0:
+                        def station_connected():
+                            """Read the guest's actual atomic flag, independent of UART verbosity."""
+                            value = weather.read_bytes(qmp, symbols['connected'], 1)[0]
+                            if value not in (0, 1):
+                                raise AssertionError('Invalid observed station connection flag')
+                            return bool(value)
+
+                        wait_for(station_connected, 'Guest station was not connected before outage')
                         offline_started = guest_seconds()
-                        uart_before = (state / 'uart.log').read_text(errors='replace')
-                        disconnects_before = uart_before.count('wifi:state: run -> init')
-                        connections_before = uart_before.count('wifi:connected with ')
                         qmp.execute('qom-set', path='/machine/wifi', property='station-ap-online', value=False)
                         try:
                             if qmp.execute('qom-get', path='/machine/wifi', property='station-ap-online'):
                                 raise AssertionError('Virtual AP did not go offline')
+                            wait_for(lambda: not station_connected(), 'Guest did not handle AP disconnect')
+                            disconnected = not station_connected()
                             wait_for(lambda: guest_seconds() >= offline_started + args.outage_seconds,
                                      'Guest clock stalled during external AP outage')
                         finally:
                             qmp.execute('qom-set', path='/machine/wifi', property='station-ap-online', value=True)
                         wait_http(url, '/getclocktype', seconds=30)
-                        uart_after = (state / 'uart.log').read_text(errors='replace')
-                        disconnected = uart_after.count('wifi:state: run -> init') - disconnects_before
-                        reconnected = uart_after.count('wifi:connected with ') - connections_before
+                        wait_for(station_connected, 'Guest did not reconnect after AP recovery')
+                        reconnected = station_connected()
                         ap_online = qmp.execute('qom-get', path='/machine/wifi', property='station-ap-online')
                         journal.append('outage', {'offline_started_guest_seconds': offline_started,
                             'requested_offline_guest_seconds': args.outage_seconds,
                             'recovered_guest_seconds': guest_seconds(),
-                            'ap_online_after': ap_online, 'guest_disconnects': disconnected,
-                            'guest_reconnections': reconnected})
-                        if not ap_online or disconnected < 1 or reconnected < 1:
+                            'ap_online_after': ap_online, 'guest_disconnected': disconnected,
+                            'guest_reconnected': reconnected})
+                        if not ap_online or not disconnected or not reconnected:
                             raise AssertionError('No real guest disconnect/reconnect observed')
                     target = guest_seconds() + args.interval_seconds
                     if until is not None:

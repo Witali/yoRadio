@@ -1702,3 +1702,28 @@ packet limit. Новый4-cycle run с2×1s outages прошёл за15.689122gu
 Журналы/digests иinputs unchanged/no panic, ВМ закрыты. AppDD41/96A/B4/QEMU30F
 прежние; source/C/BIN не менялись. Short validation сохранена вruntime-duration-*
 JSON, это НЕ24h/H10/physical и не переименование прежнего40-cycle proof9adf.
+
+### 2026-10-17 — DEBUG в прошивке и QEMU
+
+По уточнению пользователя оба проекта получили build-time switch, по умолчанию
+OFF. FW CMake DEBUG=ON/OFF, PS -DebugLogging; SDK/app/bootloader level2/4, отдельный
+debug archive, manifest boolean и LF metadata. В QEMU esp_debug исключает packet
+formatter/RX-MMIO/DNS-NTP diagnostics, QOM capability read-only; сырой frame dump
+выключен. QEMU04443f07dc отправлен в feature branch, canonical main30F не менялся.
+
+Полные OFF/ON/OFF rebuilds в одних каталогах прошли. Четыре logging runs по20
+проверок actualROM/Wi-Fi/SNTP/HTTP/themes/LCD прошли; OFF0 I/D/V/3W, ON79I/3883D/3W.
+AppEF66/ELF8FCE и debug11DD/DBE5 сохранены, source81CF/59inputs. QEMU E210/9994/76A
+прошли11 packet cases каждый; modules иCYD/C3 boot gates pass. Normal pixel hashes
+прежние, debugC3modular host-timed scroller/AP phase другой — equality не заявлена.
+First/final OFF PE sections совпали кроме export timestamp. Ошибки preflight
+oracles/Windows cleanup/Meson define сохранены отдельно, не firmware defects.
+
+Observer schema3 читает настоящий atomic connected flag вместо debugUART;4cycles,
+16.475576s/5samples/32HTTP/2outages, minheap87576/minstack480. Parser16/state6 и
+build config reuse/CRLF/idempotence test pass. Final quiet EF66 H09:34checks/16pairs/
+68requests; body4cases pass, secondGET4.494401/4.539967/.133139s. AllVMs closed.
+Scope JSON/документ сохранены. Root full75+88 inputs повторно unchanged; это
+отдельные результаты, не общий pass нового кандидата/24h. Перед quiet full нужно
+адаптировать старый boot-console gate, который зависит от INFO, затем интегрировать
+ветки и запускать один новый общий набор сbody_http/concurrency_http.

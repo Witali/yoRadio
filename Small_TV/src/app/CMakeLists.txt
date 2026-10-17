@@ -17,3 +17,4 @@ idf_component_register(
 )
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Werror=implicit-function-declaration)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE CJSON_NESTING_LIMIT=16)
+target_compile_definitions(${COMPONENT_LIB} PRIVATE DEBUG=$<BOOL:${DEBUG}>)

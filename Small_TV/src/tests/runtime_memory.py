@@ -45,7 +45,7 @@ def native_layout(path):
         if elf.elfclass != 32 or not elf.little_endian or elf['e_machine'] != 'EM_RISCV':
             raise ValueError('Expected a little-endian RV32 ELF')
         wanted = set(LISTS) | {'registered_heaps', 'uxCurrentNumberOfTasks', 'pxCurrentTCBs',
-                              'vTaskDelay', 'heap_caps_get_free_size'}
+                              'vTaskDelay', 'heap_caps_get_free_size', 'connected'}
         symbols = {row.name: {'address': row['st_value'], 'size': row['st_size']}
                    for row in elf.get_section_by_name('.symtab').iter_symbols()
                    if row.name in wanted and row['st_value']}

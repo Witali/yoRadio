@@ -147,8 +147,8 @@ def main():
         return ('/start_upload', {'file_number': slot, 'file_size': len(jpeg), 'total_chunks': chunks})
 
     def boot_count():
-        """Count only the application marker, never export the full UART log."""
-        return (state / 'uart.log').read_text(errors='replace').count('Reconstructed ESP32-C2 clock started')
+        """Count immutable ROM boot markers, independent of application log level."""
+        return (state / 'uart.log').read_text(errors='replace').count('ESP-ROM:esp32c2')
 
     protected = {'boot_and_partitions': (0, 0x9000), 'application_and_gap': (0x10000, 0x200000),
                  'photos_1_to_3': (0x200000, 0x24B000), 'animations_and_weather': (0x27D000, 0x3E7000),

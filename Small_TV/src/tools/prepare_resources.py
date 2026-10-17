@@ -219,6 +219,7 @@ def main():
     compiled = sorted((ROOT / "app").rglob("*.c")) + sorted((ROOT / "app").rglob("*.h"))
     compiled += sorted((ROOT / "third_party").rglob("*.c")) + sorted((ROOT / "third_party").rglob("*.h"))
     compiled += [ROOT / "CMakeLists.txt", ROOT / "app/CMakeLists.txt", ROOT / "sdkconfig.defaults", ROOT / "partitions.csv"]
+    compiled += [ROOT / "cmake/debug_logging.cmake"]
     records = [{"file":str(path.relative_to(ROOT)).replace("\\","/"), "sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for path in compiled]
     for name in ("web_pages.c", "font6x12.h", "unicode_bitmaps.h", "factory_bitmaps.c", "factory_bitmaps.h", "asset_defaults.h", "timezone_data.h"):
         records.append({"file":"generated/"+name,"sha256":hashlib.sha256((args.output/name).read_bytes()).hexdigest()})
