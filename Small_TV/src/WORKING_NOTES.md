@@ -7,6 +7,27 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Main/origin now0fe92f18; transport candidate8304F1A4/ELF62E040B5/sourceBE5802D6
+  интегрирован и отправлен. Canonical resources59 совпали с archive; BIN/ELF/map
+  перенесены без CMake cache, прежняя922 сохранена в pre-uri-dispatch-main-20261017.
+  Fresh full `.build/small-tv-functional/uri-integrated-full-20261017` запущен,
+  controller90679 (OS pwsh9896), freeze99tests+93extras=192 identities, unchanged
+  при начальном аудите. Full ещё НЕ завершён; published full остаётся EF66.
+- Совместный latest preflight:8cycles/33.975877guest s,9quiescent valid weather
+  generations/maxgap5.419394s,4outages,31inputs unchanged. Workload/guard exit0,
+  supervisor complete. File-only audit подтверждает journal/weather/guard;
+  H10 duration/window/start conditions ожидаемо не пройдены коротким тестом.
+  Scoped proof `uri-runtime-preflight-validation-20261017.json` + gzip journals.
+- H10 запущен через hidden supervisor из `.worktree/small-tv-manual-ssid`,
+  новая immutable branch `codex/small-tv-h10-uri` на0fe92f18. Frozen QEMU view
+  `.build/uri-runtime-qemu-frozen-20261017`,11files; exeA74/helper6B7F source2a59.
+  Run `.build/uri-runtime-24h-20261017` внутри worktree, request86400guest s,
+  interval15/outageevery60. Start record `uri-runtime-24h-start-20261017.json`
+  binds31inputs and guard; file auditor pending/start_record_matches=true.
+  External OS audit18:24UTC: supervisor30128,workload2252,guard18740,VM26440.
+  Это launch snapshot, НЕ completion. В следующем assistant turn ОБЯЗАТЕЛЬНО
+  проверить PID/start time/args: survival across turn пока не доказана; stale
+  running JSON недостаточно. Не менять isolated files/QEMU/SDK inputs до footer.
 - Transport audit завершён в `codex/small-tv-uri-dispatch`: factory принимает
   query/absolute targets, тогда как922 native давала400 либо settings вместо
   setup/photo. Shared callbacks теперь получают SDK-selected static path через

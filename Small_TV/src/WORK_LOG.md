@@ -2191,3 +2191,40 @@ requests, no panic, immutable inputs unchanged; owned VM PID19552/16896
 остановлены и отсутствуют при внешнем OS audit. Test добавлен в обязательный
 qemu_suite и publisher. Scoped JSON сохраняет before/after и identities; старый
 полный EF66 checkpoint не переименован. Новый full/H10 ещё не начаты.
+
+### 2026-10-17 — новый full и изолированный supervised H10 кандидата8304
+
+0fe92f18 fast-forward в main и pushed вместе с feature branch; origin/main
+совпадает, QEMU main2a593f8d clean. Canonical prepare_resources подтвердил59
+BE5802D6 inputs, exact8304F1A4/ELF62E040B5 BIN/ELF/map перенесены из build
+worktree без CMake cache. Прежняя922 сохранена в pre-uri-dispatch-main backup.
+
+Fresh full controller90679 запущен18:21:51UTC: report directory
+.build/small-tv-functional/uri-integrated-full-20261017. Freeze99test files и
+93extra inputs (включая wifi_network.js),192 fingerprints unchanged после старта.
+OS pwsh9896 с точной командой подтверждён, старый full не переименовывается.
+На момент записи full незавершён; текущие machine oracle диагностические pixel
+differences сами по себе не являются провалом: штатная verification passed.
+
+Existing clean manual-SSID worktree переведён на новую codex/small-tv-h10-uri
+из main0fe92f18. Old A543 build сохранён отдельно. В него перенесены exact new
+ELF/BIN/map, resources/source manifest совпали. QEMU bundle11files скопирован
+побайтово: executableA74F3324, compileadb66701b3, canonical helper6B7FF996,
+source main2a593f8d. Изолированные файлы не менять до окончания нагрузки.
+
+Combined8cycle preflight прошёл на этой exact паре:33.975877guest s,9quiescent
+valid snapshots и9разных weather generations,maxfreshgap5.419394s,31inputs
+unchanged. Workload/guard exit0, supervisor complete/sources unchanged. File
+auditor заново проверил8циклов,weather,journal иindependent terminal guard.
+Его exit1/status completed_scope_requires_review ожидаем: короткий запуск не
+проходит24h duration/steady windows/start-record checks и не объявляется H10.
+Scoped JSON и reproducible gzip полного JSONL/UART сохранены в parity/.
+
+H10 started18:23:07UTC через Start-Process Hidden;86400guest seconds,interval15,
+outageevery60/1guest s. Immutable start record создан18:24:08UTC после проверки
+реальных ролей/времён запуска: supervisor30128,worker2252,guard18740,VM26440.
+State в isolated .build/uri-runtime-24h-20261017. File-only diagnostic auditor:
+pending,31inputs verified,start_record_matches=true. Наличие running файла не
+доказывает process survival через конец assistant turn; следующий turn должен
+повторно проверить OS identities и footer. Пока нет24h/trend acceptance. Это
+новый запуск, прежний187-cycle interrupted H10 остаётся отдельным evidence.
