@@ -21,6 +21,7 @@ from advanced_qemu import validate_advanced
 from http_body_contract import validate_http_body, validate_http_body_guards
 from concurrency_contract import validate_concurrency, validate_concurrency_guards
 from boot_state_contract import validate_boot_state, validate_boot_rejections
+from wifi_fallback_contract import validate_wifi_fallback, validate_wifi_fallback_guards
 
 
 def read(path):
@@ -69,6 +70,12 @@ def main():
         'elf_sha256': hashlib.sha256((BUILD / 'small_tv_reconstructed.elf').read_bytes()).hexdigest(),
         'observer_test_sha256': groups['qemu']['boot_observer_test_sha256']})
     validate_boot_rejections(groups['qemu'])
+    wifi_wait = groups['qemu']['wifi_fallback_http']
+    validate_wifi_fallback(wifi_wait, {'app_sha256':app_sha,
+        'source_sha256':manifest['source_sha256'],'qemu_sha256':groups['qemu']['qemu_sha256'],
+        'native_elf_sha256':hashlib.sha256((BUILD/'small_tv_reconstructed.elf').read_bytes()).hexdigest(),
+        'test_sha256':hashlib.sha256((ROOT/'tests/wifi_fallback_qemu.py').read_bytes()).hexdigest()})
+    validate_wifi_fallback_guards(wifi_wait)
     body_http = groups['qemu']['body_http']
     validate_http_body(body_http, {'app_sha256': app_sha, 'source_sha256': manifest['source_sha256'],
         'qemu_sha256': groups['qemu']['qemu_sha256'],

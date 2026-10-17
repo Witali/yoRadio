@@ -220,11 +220,13 @@ The native program implements all 34 recovered method/URI pairs listed in
 At first start, join the open `Small_TV` access point and open
 `http://192.168.43.1/`. The setup page scans real networks and saves station
 credentials. After four failed station retries, the program saves factory Wi-Fi
-mode 2 and restarts into setup. Its safety timeout also covers a missing event.
+mode 2 and restarts into setup. A pending association or DHCP lease retains
+station mode; the independent 18.1-second display animation is not a network
+failure deadline. A successful lease clears an earlier failed-attempt latch.
 An existing mode-2 sector enters setup even when it retains an SSID. The original
 444-byte sector at `0x3e7000` takes precedence over the earlier native NVS blob;
-settings changes update both formats. The new mode byte reuses padding, keeping
-the NVS layout at 344 bytes. Restart requests wait for persistence and a response
+settings changes update both formats. Current NVS v2 uses 364 bytes and imports
+the prior 344-byte v1 layout. Restart requests wait for persistence and a response
 opportunity. No original settings, credentials or keys are embedded in sources.
 
 `/advanced` configures the NTP server, the owner's OpenWeatherMap key and

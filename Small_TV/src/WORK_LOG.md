@@ -2439,3 +2439,45 @@ scoped JSON сохраняет все10samples/checks и subgroup statuses. Publ
 4actualnetworkQEMU/23contract guards и RV32oracle проходят; twelveownedVMs
 закрыты. New6324/source53D3 ещё не в main; main/H10 продолжают означать83.
 Сохранение этого terminal checkpoint разрешает интеграцию до нового freeze.
+
+### 2026-10-17 — station mode сохраняется во время DHCP, SDK failure остаётся рабочим
+
+После revalidation mainfull30656/H10processes найдена отдельная parity ошибка:
+fallback_task принимал18s безIP за отказ, хотя factory0x4200cc0e..cc22 ждёт
+event group(mask3,portMAX_DELAY), а181ticks принадлежат только startup display.
+Factory0x4200cc26 отдаёт приоритет success; failure0x4200ce20 сохраняет mode2.
+
+В изолированном worktree packet-delay probe на старой8304 подтвердил: factory
+через30guest s всё ещё mode1/boot1 и подключилась после release, native стала
+mode2/boot2. Два host сценария также failed: pending DHCP и stale failure после
+GOT_IP/reconnect. Удалён ложный timeout, GOT_IP очищает прежний failure latch.
+Осталась реакция на пять реальных disconnect events(initial+4retries).
+
+47platform cases/1182314checks проходят. Ordinary DEBUGOFF production build:
+6324C55A/ELF9E2C7719/source53D38223,1169904bytes/free366096,59inputs; всё в
+worktree firmware/development. New4case network regression сравнила обе
+прошивки: holdDHCP30guest→STA HTTP безreset; missingAP→SDK retries→mode2/
+одинreset→setup HTTP, восстановленный externalAP не подключает retained SSID.
+23negative evidence controls общие в suite/publisher/verifier. RV32oracle:
+4actual event traces и16factorydispatch states passed.
+
+Первая одноразовая попытка разбора HMP backend не учла prefix "\\ #net000";
+owned VM остановлена, parser исправлен. Проба missingAP сначала пыталась
+изменить static link-down property послеrealize и получила штатный отказ QEMU;
+перешла на поддерживаемый station-ap-online. Это harness errors, не firmware
+faults. Все isolated VMs закрываются finally; исходный dump/code/media неизменны.
+
+Существующий mainfull42964 тем временем terminalfailed на photo_frames native
+masked-night:10frames/duties совпали, но обеrestore2.81/7.16guest s были доSNTP.
+Night target не был проверен; не объявляем это runtime brightness bug и не
+публикуем новый fullpass. H10 продолжает старый83, не подтверждает новый6324.
+
+### 2026-10-17 — интеграция Wi-Fi fix после terminal snapshot
+
+Feature27f1b23e pushed и объединён в main после commit346fb11e с failed full.
+Конфликты затронули только рабочие notes/log; обе истории сохранены. Canonical
+BIN/ELF/map заменены exact6324/9E2C из worktree, CMake cache не копировался,
+старые83/62E0 в pre-wifi-fallback-main-20261017. Resources регенерированы;
+production59inputs должны совпадать с new archive53D3. Следующий scoped gate —
+детерминированное наблюдение настоящей night restore; затем fresh full. Existing
+H10 работает со своим frozen83 и не получает новую версию/приёмку.

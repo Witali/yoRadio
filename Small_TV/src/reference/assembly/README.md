@@ -36,6 +36,17 @@ claim that every execution path has been checked. The corresponding production
 C comments retain verified addresses. Safety/privacy fixes and the ESP-IDF SDK
 version difference are documented in `../../README.md`.
 
+`initialize_wifi_station_at_4200ca30.asm` sets event-group mask3 and
+`portMAX_DELAY` at `0x4200cc0e..0x4200cc22`. `0x4200cc26` gives success-bit1
+priority over failure-bit2; the failure branch at `0x4200ce20..0x4200ce3c`
+persists mode2 and restarts. The independent 181 display ticks are not a
+station/DHCP deadline. An earlier native18-second fallback was incorrect:
+actual factory DHCP waiting at30guest seconds retained mode1, while native
+had already rebooted into setup. The corrected native waits for the SDK's
+retry exhaustion and retires its failure latch on a new lease. Four real
+packet/network QEMU cases, source platform tests and the RV32 event oracle
+are recorded in `../../../qemu/parity/wifi-fallback-validation-20261017.json`.
+
 [Executable checks](../../../qemu/parity/machine-checks.md) now exercise
 the simple and analog renderer instructions against the compiled C. The report
 retains literal factory pixel differences and separately verifies the deliberate

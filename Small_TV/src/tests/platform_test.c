@@ -429,22 +429,14 @@ static void test_wifi_open(void)
 }
 static void test_wifi_fallback(void)
 {
-    /* The safety timeout changes saved mode only after 18 disconnected seconds. */
+    /* Pending DHCP is not failed Wi-Fi: retain credentials while the SDK connects. */
     station_start();
-    stop_after = 18;
+    stop_after = 61;
     run_task("wifi_fallback", stop_at_delay);
     CHECK(preferences.wifi_mode == 1 && task_count == 1);
-    steps = 0;
-    stop_after = 19;
-    run_task("wifi_fallback", stop_at_delay);
-    CHECK(preferences.wifi_mode == 2 && task_count == 2);
-    CHECK(!strcmp(tasks[1].name, "restart"));
-    stop_after = 1;
-    steps = 0;
-    run_task("restart", stop_at_delay);
-    CHECK(restarts == 0);
-    run_task("restart", NULL);
-    CHECK(restarts == 1 && flushes == 1);
+    CHECK(!network_connected() && !restarts && !flushes);
+    got_ip();
+    CHECK(network_connected() && preferences.wifi_mode == 1);
 }
 static void test_wifi_failed_retries(void)
 {
@@ -457,6 +449,19 @@ static void test_wifi_failed_retries(void)
     CHECK(preferences.wifi_mode == 2 && task_count == 2);
     run_task("restart", NULL);
     CHECK(restarts == 1);
+}
+static void test_wifi_failure_recovered(void)
+{
+    /* A fresh lease retires an old failure before the next reconnect attempt. */
+    station_start();
+    for (unsigned i = 0; i < 5; ++i)
+        disconnected();
+    got_ip();
+    disconnected();
+    stop_after = 2;
+    run_task("wifi_fallback", stop_at_delay);
+    CHECK(preferences.wifi_mode == 1 && task_count == 1);
+    CHECK(!restarts && !flushes);
 }
 static void test_restart_failure(void)
 {
@@ -2210,7 +2215,8 @@ int main(int argc, char **argv)
     } cases[] = {{"wifi_setup", test_wifi_setup},
                  {"wifi_reconnect_scan", test_wifi_reconnect},
                  {"wifi_open_station", test_wifi_open},
-                 {"wifi_fallback_timeout", test_wifi_fallback},
+                 {"wifi_pending_dhcp", test_wifi_fallback},
+                 {"wifi_failure_recovered", test_wifi_failure_recovered},
                  {"wifi_failed_retries", test_wifi_failed_retries},
                  {"restart_persistence_failure", test_restart_failure},
                  {"wifi_allocation_failure", test_wifi_allocation_failure},
