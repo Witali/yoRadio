@@ -1325,6 +1325,40 @@
   проверить initial/final pins и strict publisher/verifier через адаптированный
   archive_immutable_run.py. Контекстные Markdown не входят в frozen test bytes.
 
+### 2026-10-16 — изменение фотонастроек во время fade
+
+- Создана собственная ветка codex/small-tv-photo-settings под .worktree от
+  cc65d379, чтобы не менять root72 frozen tests. Скопированы и проверены DAF
+  BIN/ELFB06/factory ELF и ROM для read-only instruction replay. Production C,
+  QEMU и физическая плата не изменены.
+- Новый photo_settings_qemu выполняет mask disable-before/after-image, none,
+  enable-next и60->3/5->9 interval changes внутри реальной active fade. HTTP
+  handler publication наблюдается hardware breakpoints; guest RAM/PC/time/code
+  не переписываются. Проверяются два полных кадра, state/PWM и естественный
+  следующий event по фактическим ISR counters. Direct raw/media/panic обязательны.
+- Первые probe failures были инфраструктурой harness: отсутствовал ROM в новом
+  worktree и в digest ошибочно передавался Path. Затем исходное предположение
+  counter<new_interval оказалось неверным: factory сохраняет17 после60->3,
+  callback >= сбрасывает его на следующей секундной границе. Исправлена формула
+  ticks=11*max(1,P-c)-subsecond. Это не bug в прошивке.
+- Вторая версия30669 пропустила первый native frame после shortening: API wait
+  был раньше hardware capture. Состояние[0,2] относилось уже к следующему фото.
+  Capture двух кадров перенесён до ожидания response; native smoke4374 pass
+  на неизменных firmware bytes. Новый контракт проверяет и хронологию наблюдений.
+- Окончательный2990 terminal exit0:12 actual scenarios/24 complete frames с0
+  отличающихся pixels/14 rejection checks. До него frozen74 test files; observer,
+  BIN/ELF/ROM/QEMU/helpers unchanged. Все ВМ набора закрыты. Сохранены candidate,
+  guard/input reports и8 actual factory/native instruction ranges с hashes.
+- Новый child gate добавлен в branch suite/publisher/verifier. Main96792 остаётся
+  жив на исходных72 test files; machine, early startup/weather UI, advanced NTP,
+  upload,84 frames/9 scenes/brightness/theme commands/reinit/setup/weather/fields
+  уже pass, идёт SNTP. Root suite не подменять scoped result; дождаться terminal
+  и strict публикации, потом интегрировать новую ветку.
+- Для следующего H10 изучены ELF DWARF и SDK heap/TCB/list layouts, StackType_t
+  здесь однобайтовый. Layout-only metadata в root .build сохранён, но runtime
+  heap/stack/soak не выполнены. Browser skill/docs перечитаны для дальнейшей H03;
+  новых вкладок/браузерных ВМ в этом этапе не открывалось.
+
 ### 2026-10-16 — закрыта проверка фотонастроек при active fade
 
 - Отдельная .worktree/small-tv-photo-settings от maincc65d379 не меняла frozen
@@ -1397,3 +1431,16 @@
   ACK следует за синхронной flash write. Baseline noise upload47837 bytes/12chunks
   pass, JPEG SHA a73dc807e3ebd4a0339641f95a0c45f587a14892a7b1ce08ebfecd73a62825dc.
   Пока код не менялся: сначала sequencing/retry regression, потом after build/UI.
+
+### 2026-10-17 — интеграция photo-settings gate
+
+- Ветка459b93bd объединена с main после подтверждённой остановки прежнего full.
+  Конфликты только в контексте/журнале/Git-атрибутах: обе истории и оба правила
+  сохранены. Production DAF/C839/B06 и QEMU не менялись; никакой scoped результат
+  не выдавался за законченный общий прогон.
+- На перенесённых байтах повторно исполнены14 consumer mutations. Проверены
+  74 исходных test pins,57 production inputs, BIN/ELF, helpers и8 instruction
+  ranges. Новый child обязателен в suite/publisher/verifier. После следующей
+  production правки требуется новый полный run с этим gate и новым collector.
+- PNG browser fixtures явно исключены из text normalization. Staged PNG
+  декодируются, их точные SHA совпадают с report; сборка и источники не менялись.

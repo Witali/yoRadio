@@ -15,8 +15,11 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
   результата и публикации для DAF нет. Прежние указания опрашивать handle96792
   больше не актуальны. При возобновлении сначала оценить сохранённые частичные
   результаты и состав входов, затем отдельно планировать новый полный запуск.
-- Ветка `codex/small-tv-photo-settings` / `459b93bd` отправлена, но ещё не
-  объединена с main. Её отдельный успешный результат не заменяет общий прогон.
+- Ветка `codex/small-tv-photo-settings` / `459b93bd` объединена с main;
+  новый gate обязателен для suite/publisher/verifier. Её отдельный успешный
+  результат не заменяет общий прогон. При интеграции повторно прошли14 guards,
+  сохранность74 исходных test pins/57 production inputs/8 instruction ranges.
+  Collector перед новым full обновить.
 - Текущая DAF/C839/B06 проверена в новом raw-backed browser guest:
   31 финальная браузерная проверка и21 storage/identity checks прошли. Ночное
   расписание на обеих границах/яркость2–99/off, все4 темы/5 GIF/3 даты, флаги,
@@ -36,7 +39,15 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Цель и принятые решения
 
-Актуально после исправления расширенного NTP-редактора.
+Предыдущие этапы ниже сохраняют историю; актуальный порядок продолжения указан
+в верхнем блоке. Старые live handles и запрет merge до завершения96792 отменены
+после явной паузы пользователя и подтверждённой остановки этого прогона.
+
+- Интегрирован photo_settings gate из459b93bd: шесть actual HTTP scenarios на
+  обеих firmware,24 completed frames/0 pixel differences и14 contract rejections.
+  Исторический scoped result2990 относится к прежним DAF/C839/B06; это не новый
+  полный запуск main. RAW/media/panic/ROM,74 initial pins и8 instruction ranges
+  сохранены. См. photo-settings-checks.md. H09/H10 и physical остаются.
 
 - Main объединён с photo branch aded56bf merge95eddf55. Root photo buildD978 /
   source0BAA / ELF8AC сохранён и отправлен в ba349b5a. Исправлены idle brightness,
