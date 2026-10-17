@@ -1,0 +1,549 @@
+{
+  "schema_version": 1,
+  "status": "focused_browser_controls_and_cold_boot_passed",
+  "passed": true,
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-17T19:01:50.139946+00:00",
+  "scope": "Real browser setup, query pages, clock and advanced controls, photo mask/interval edges, factory previews and cold persistence. This flow did not repeat upload/crop or mobile acceptance.",
+  "app_sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+  "source_sha256": "be5802d60f7e113aeb6e5fc77bc144f3088f5dbb791a6ab4c46db4cbb02b0726",
+  "inputs_unchanged": true,
+  "start": {
+    "scope": "Owned disposable VM for real browser setup/query-path/control/storage checks; synthetic network and images.",
+    "inputs_sha256": {
+      "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\app.bin": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+      "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\bootloader.bin": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b",
+      "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+      "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+      "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\source-manifest.json": "a6f99785457fa80cf4bb77e97cefaa647ba41e4d054f008c15367558d50c8f39",
+      "C:\\Work\\yoRadio\\Small_TV\\src\\tests\\qemu_storage.py": "3fa00b82379b90c76939ad61d1756f1fcefe03ded492bd16c7df1b532578dc3d",
+      "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-riscv32.exe": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+      "C:\\Work\\yoRadio\\Small_TV\\qemu\\profiles\\small-tv-c2.json": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+      "C:\\Work\\yoRadio\\.build\\small-tv-esp32c2\\small_tv_reconstructed.elf": "62e040b592d6bd526b25c6035005e31a3a40eebb5a9beb994abe49f089addebb",
+      "C:\\Work\\yoRadio\\Small_TV\\local_site\\pages\\setup.html": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
+      "C:\\Work\\yoRadio\\Small_TV\\local_site\\pages\\settings.html": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
+      "C:\\Work\\yoRadio\\Small_TV\\local_site\\pages\\photo.html": "6aa893c2806184daff7c30b798d1a89d17586c2025cc8be6530ed601fb49a736",
+      "C:\\Work\\QEMU-ESP32\\tools\\small_tv_vm.py": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae",
+      "C:\\Work\\QEMU-ESP32\\tools\\small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+      "C:\\Work\\QEMU-ESP32\\tools\\small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+      "C:\\Work\\QEMU-ESP32\\tools\\small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+      "C:\\Work\\QEMU-ESP32\\tools\\esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+      "C:\\Work\\QEMU-ESP32\\tools\\esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+      "C:\\Work\\QEMU-ESP32\\tools\\esp_elf.py": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f"
+    },
+    "sources": {
+      "images": [
+        {
+          "bytes": 16928,
+          "sha256": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b",
+          "offset": "0x0",
+          "file": "bootloader.bin"
+        },
+        {
+          "bytes": 3072,
+          "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+          "offset": "0x8000",
+          "file": "partition-table.bin"
+        },
+        {
+          "bytes": 1169904,
+          "sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae",
+          "offset": "0x10000",
+          "file": "app.bin"
+        },
+        {
+          "bytes": 1994752,
+          "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+          "offset": "0x200000",
+          "file": "assets.bin"
+        }
+      ],
+      "source_sha256": "be5802d60f7e113aeb6e5fc77bc144f3088f5dbb791a6ab4c46db4cbb02b0726"
+    },
+    "session_name": "SmallTV-af1d9b420488",
+    "direct_raw_backing": true
+  },
+  "browser_observations": {
+    "captured_at": "2026-10-17T19:01:00.893Z",
+    "status": "focused_controls_and_cold_boot_completed",
+    "checks": [
+      {
+        "case": "settings-query-page-reload",
+        "observed": {
+          "brightness": "63",
+          "colors": [
+            "#10aa31",
+            "#3155ad",
+            "#adcfef"
+          ],
+          "date": "DD/MM/YYYY",
+          "fahrenheit": true,
+          "gif": "GIF File 5",
+          "hour12": true,
+          "kmh": true,
+          "theme": "Dial"
+        },
+        "expected": {
+          "fahrenheit": true,
+          "hour12": true,
+          "kmh": true,
+          "date": "DD/MM/YYYY",
+          "brightness": "63",
+          "colors": [
+            "#10aa31",
+            "#3155ad",
+            "#adcfef"
+          ],
+          "gif": "GIF File 5",
+          "theme": "Dial"
+        },
+        "passed": true
+      },
+      {
+        "case": "regional-city-browser-submit",
+        "passed": true,
+        "observed": "City updated successfully",
+        "submitted": "Perth,AU-W"
+      },
+      {
+        "case": "advanced-user-keyboard-save",
+        "passed": true,
+        "observed": {
+          "brightness": "12",
+          "night": true,
+          "ntp": "192.168.43.2",
+          "start": "20",
+          "stop": "8"
+        },
+        "expected": {
+          "night": true,
+          "start": "20",
+          "stop": "8",
+          "brightness": "12",
+          "ntp": "192.168.43.2"
+        }
+      },
+      {
+        "case": "photo-five-previews-completed",
+        "passed": true,
+        "observed": [
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail1",
+            "srcSet": true,
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail2",
+            "srcSet": true,
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail3",
+            "srcSet": true,
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail4",
+            "srcSet": true,
+            "width": 240
+          },
+          {
+            "complete": true,
+            "height": 240,
+            "id": "thumbnail5",
+            "srcSet": true,
+            "width": 240
+          }
+        ]
+      },
+      {
+        "case": "photo-minimum-interval-selected-slots",
+        "passed": true,
+        "observed": {
+          "interval": "3",
+          "mask": [
+            true,
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        "api_proof": "photo-min-observed.json"
+      },
+      {
+        "case": "photo-max-interval-zero-mask-cold-boot",
+        "passed": true,
+        "observed": {
+          "images": [
+            {
+              "complete": true,
+              "height": 240,
+              "id": "thumbnail1",
+              "width": 240
+            },
+            {
+              "complete": true,
+              "height": 240,
+              "id": "thumbnail2",
+              "width": 240
+            },
+            {
+              "complete": true,
+              "height": 240,
+              "id": "thumbnail3",
+              "width": 240
+            },
+            {
+              "complete": true,
+              "height": 240,
+              "id": "thumbnail4",
+              "width": 240
+            },
+            {
+              "complete": true,
+              "height": 240,
+              "id": "thumbnail5",
+              "width": 240
+            }
+          ],
+          "interval": "60",
+          "mask": [
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      },
+      {
+        "case": "clock-controls-cold-boot",
+        "passed": true,
+        "observed": {
+          "brightness": "63",
+          "colors": [
+            "#10aa31",
+            "#3155ad",
+            "#adcfef"
+          ],
+          "date": "DD/MM/YYYY",
+          "fahrenheit": true,
+          "gif": "GIF File 5",
+          "hour12": true,
+          "kmh": true,
+          "theme": "Dial"
+        },
+        "expected": {
+          "brightness": "63",
+          "colors": [
+            "#10aa31",
+            "#3155ad",
+            "#adcfef"
+          ],
+          "date": "DD/MM/YYYY",
+          "fahrenheit": true,
+          "gif": "GIF File 5",
+          "hour12": true,
+          "kmh": true,
+          "theme": "Dial"
+        }
+      },
+      {
+        "case": "advanced-cold-boot",
+        "passed": true,
+        "observed": {
+          "brightness": "12",
+          "night": true,
+          "ntp": "192.168.43.2",
+          "start": "20",
+          "stop": "8"
+        },
+        "expected": {
+          "night": true,
+          "start": "20",
+          "stop": "8",
+          "brightness": "12",
+          "ntp": "192.168.43.2"
+        }
+      }
+    ],
+    "attempts": [
+      {
+        "case": "advanced-query-page-reload",
+        "passed": false,
+        "observed": {
+          "brightness": "12",
+          "night": true,
+          "ntp": "192.168.43.2",
+          "start": "22",
+          "stop": "9"
+        },
+        "expected": {
+          "night": true,
+          "start": "19",
+          "stop": "8",
+          "brightness": "12",
+          "ntp": "192.168.43.2"
+        },
+        "note": "The initial fill-and-Tab sequence did not persist number fields. Subsequent keyboard stepping and sequential digit entry produced saved values and an OK response."
+      }
+    ],
+    "scope": "Real browser setup, query pages, clock and advanced controls, photo mask/interval edges, factory previews and cold persistence. This flow did not repeat upload/crop or mobile acceptance."
+  },
+  "photo_initial_observation_explained": "The earlier complete=true/zero natural dimensions belonged to img elements without a src while sequential loading was still in progress. Later all five acquired a source and decoded to240x240; browser errors absent. No firmware fix required.",
+  "minimum_photo_api": {
+    "session_name": "SmallTV-af1d9b420488",
+    "api": {
+      "/get_display_time": "{\"displaytime\":3}",
+      "/get_checkbox_state": "{\"file1_switch\":true,\"file2_switch\":false,\"file3_switch\":false,\"file4_switch\":false,\"file5_switch\":true}",
+      "/GetNightStartTime": "20",
+      "/GetNightStopTime": "8",
+      "/get_night_brightness": "{\"brightness\":12}",
+      "/getsettings": "{\"tempUnit\":1,\"hourFormat\":1,\"mileDisplay\":1,\"timeSync\":0,\"nightmode\":1}",
+      "/GetTimeModeValue": "1",
+      "/get_clock_colors": "{\"color0\":\"#10aa31\",\"color1\":\"#3155ad\",\"color2\":\"#adcfef\"}",
+      "/get_led_brightness": "{\"brightness\":63}",
+      "/getclocktype": "3",
+      "/getgifvalue": "4"
+    },
+    "raw_public_settings": {
+      "animation": 4,
+      "theme": 3,
+      "fahrenheit": 1,
+      "hour12": 1,
+      "miles": 1,
+      "date_format": 1,
+      "day_level": 370,
+      "night_mode": 1,
+      "night_start": 20,
+      "night_stop": 8,
+      "night_level": 880,
+      "photo_seconds": 3,
+      "photo_mask": 17,
+      "country": "AU-W",
+      "city": "Perth",
+      "ntp": "192.168.43.2"
+    },
+    "immutable_images": [
+      {
+        "name": "bootloader.bin",
+        "sha256": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b"
+      },
+      {
+        "name": "partition-table.bin",
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+      },
+      {
+        "name": "app.bin",
+        "sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae"
+      },
+      {
+        "name": "assets.bin",
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+      }
+    ]
+  },
+  "before_cold": {
+    "session_name": "SmallTV-af1d9b420488",
+    "api": {
+      "/get_display_time": "{\"displaytime\":60}",
+      "/get_checkbox_state": "{\"file1_switch\":false,\"file2_switch\":false,\"file3_switch\":false,\"file4_switch\":false,\"file5_switch\":false}",
+      "/GetNightStartTime": "20",
+      "/GetNightStopTime": "8",
+      "/get_night_brightness": "{\"brightness\":12}",
+      "/getsettings": "{\"tempUnit\":1,\"hourFormat\":1,\"mileDisplay\":1,\"timeSync\":0,\"nightmode\":1}",
+      "/GetTimeModeValue": "1",
+      "/get_clock_colors": "{\"color0\":\"#10aa31\",\"color1\":\"#3155ad\",\"color2\":\"#adcfef\"}",
+      "/get_led_brightness": "{\"brightness\":63}",
+      "/getclocktype": "3",
+      "/getgifvalue": "4"
+    },
+    "raw_public_settings": {
+      "animation": 4,
+      "theme": 3,
+      "fahrenheit": 1,
+      "hour12": 1,
+      "miles": 1,
+      "date_format": 1,
+      "day_level": 370,
+      "night_mode": 1,
+      "night_start": 20,
+      "night_stop": 8,
+      "night_level": 880,
+      "photo_seconds": 60,
+      "photo_mask": 0,
+      "country": "AU-W",
+      "city": "Perth",
+      "ntp": "192.168.43.2"
+    },
+    "immutable_images": [
+      {
+        "name": "bootloader.bin",
+        "sha256": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b"
+      },
+      {
+        "name": "partition-table.bin",
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+      },
+      {
+        "name": "app.bin",
+        "sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae"
+      },
+      {
+        "name": "assets.bin",
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+      }
+    ]
+  },
+  "cold_restart": {
+    "old_name": "SmallTV-af1d9b420488",
+    "old_pid": 18416,
+    "new_name": "SmallTV-37b25755c090",
+    "new_pid": 1960,
+    "new_urls": {
+      "setup": "http://127.0.0.1:18082",
+      "station": "http://127.0.0.1:18083"
+    },
+    "flash_unchanged_before_execution": true,
+    "flash_sha256_before_execution": "8e9261c59769aa3759936c6e92b1289915d33aefc4786d24ef98e66ef468af93",
+    "direct_raw_backing": true,
+    "station_http_ready": true
+  },
+  "after_cold": {
+    "session_name": "SmallTV-37b25755c090",
+    "api": {
+      "/get_display_time": "{\"displaytime\":60}",
+      "/get_checkbox_state": "{\"file1_switch\":false,\"file2_switch\":false,\"file3_switch\":false,\"file4_switch\":false,\"file5_switch\":false}",
+      "/GetNightStartTime": "20",
+      "/GetNightStopTime": "8",
+      "/get_night_brightness": "{\"brightness\":12}",
+      "/getsettings": "{\"tempUnit\":1,\"hourFormat\":1,\"mileDisplay\":1,\"timeSync\":0,\"nightmode\":1}",
+      "/GetTimeModeValue": "1",
+      "/get_clock_colors": "{\"color0\":\"#10aa31\",\"color1\":\"#3155ad\",\"color2\":\"#adcfef\"}",
+      "/get_led_brightness": "{\"brightness\":63}",
+      "/getclocktype": "3",
+      "/getgifvalue": "4"
+    },
+    "raw_public_settings": {
+      "animation": 4,
+      "theme": 3,
+      "fahrenheit": 1,
+      "hour12": 1,
+      "miles": 1,
+      "date_format": 1,
+      "day_level": 370,
+      "night_mode": 1,
+      "night_start": 20,
+      "night_stop": 8,
+      "night_level": 880,
+      "photo_seconds": 60,
+      "photo_mask": 0,
+      "country": "AU-W",
+      "city": "Perth",
+      "ntp": "192.168.43.2"
+    },
+    "immutable_images": [
+      {
+        "name": "bootloader.bin",
+        "sha256": "4a6e9e8b94571193534149aaceba0c3a482e9b12373c5ac6397fc58e3667bc9b"
+      },
+      {
+        "name": "partition-table.bin",
+        "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+      },
+      {
+        "name": "app.bin",
+        "sha256": "8304f1a44be9af0b814f6d90f504b395ec4894dc00a585fa6739f15a2a59d9ae"
+      },
+      {
+        "name": "assets.bin",
+        "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+      }
+    ]
+  },
+  "public_api_and_raw_settings_equal_after_cold": true,
+  "setup_guest": {
+    "layout": {
+      "elf_sha256": "62e040b592d6bd526b25c6035005e31a3a40eebb5a9beb994abe49f089addebb",
+      "symbols": {
+        "s_correction_us": {
+          "address": 1070282696,
+          "size": 8
+        },
+        "last_station_address": {
+          "address": 1070282840,
+          "size": 4
+        },
+        "connected": {
+          "address": 1070282848,
+          "size": 1
+        },
+        "ap_active": {
+          "address": 1070282847,
+          "size": 1
+        },
+        "time_synced": {
+          "address": 1070282860,
+          "size": 1
+        },
+        "s_microseconds_offset": {
+          "address": 1070282680,
+          "size": 8
+        }
+      },
+      "converter_sha256": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f",
+      "vm_helper_sha256": "6b7ff9969e16fe3427c9789994761478d623aecbbead160f34041863a2fc2eae"
+    },
+    "runtime": {
+      "connected": true,
+      "ap_active": false,
+      "station_address": "192.168.43.15",
+      "time_synced": true
+    },
+    "ntp": {
+      "method": "model_response_timestamp",
+      "response_count": 1,
+      "server_epoch": 1792262501,
+      "sent_virtual_us": 82285503,
+      "boot_time_us": 1792262411592835,
+      "virtual_us": 113584674,
+      "systimer_ticks": 1181239131,
+      "rtc_hrt_offset_us": 85668429,
+      "system_correction_us": -77670785,
+      "since_boot_us": 121578329,
+      "actual_utc_seconds": 1792262533.171164,
+      "expected_utc_seconds": 1792262532.299171,
+      "difference_seconds": 0.8719930648803711
+    },
+    "rom_boots": 2,
+    "station_http_ready": true,
+    "no_panic": true
+  },
+  "cleanup": {
+    "observed_utc": "2026-10-17T19:01:24.2116056Z",
+    "browser_vm_pids_absent": [
+      18416,
+      1960
+    ],
+    "baseline_vm_pid_absent": 6624,
+    "browser_tab_closed": true
+  },
+  "screenshot": {
+    "file": "uri-photo-cold-20261017.png",
+    "sha256": "dc384042481b9738495a1dcc93366360132879313bf535578f471d395225c88f"
+  },
+  "limitations": [
+    "This eight-case flow did not repeat upload/crop, mobile layout or every manual browser requirement.",
+    "The first numeric fill+Tab attempt did not persist. Its subsequent keyboard save and cold persistence succeeded; the failed attempt remains in the report.",
+    "H10 and the fresh full regression remain separate incomplete gates."
+  ]
+}

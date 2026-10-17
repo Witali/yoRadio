@@ -7,6 +7,16 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Browser8304 focused flow завершён:8passing observations, включая настройки
+  часов/advanced, photo interval3/60, mask17/0 и настоящий cold boot persistent
+  raw. Public API и выбранные raw settings до/после совпали; все4image regions
+  неизменны,19source fingerprints совпали. Доказательство:
+  `uri-browser-controls-validation-20261017.json`, screenshot `uri-photo-cold-20261017.png`.
+  Прежние zero-size previews были ещё без src во время последовательной загрузки;
+  затем все5decoded240x240, browser errors отсутствуют. Firmware fix не нужен.
+  Final advanced20→8/brightness12 теперь подтверждены API/raw и cold UI.
+  Owned VM18416 и cold VM1960 остановлены, OS подтвердил отсутствие; tab2 закрыт.
+  Upload/crop/mobile и полный manual checklist этим8case flow не засчитываются.
 - Последний checkpoint по запросу commit/push: full90679 завершился
   **неуспешно** в18:50:53UTC. 18групп passed, QEMU failed, manual acceptance
   not_run. `time_qemu.py/reset_before_notification` не дождался даты2025/9/19:

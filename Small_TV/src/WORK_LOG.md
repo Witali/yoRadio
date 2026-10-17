@@ -2310,3 +2310,27 @@ Owned browser VM18416/tab2 оставлены handoff для продолжен�
 H10 checkpoint77cycles/1outage, no reported error, supervisor/guardrunning;
 OS18:52:31UTC подтвердил exact PID/start/commands30128/2252/18740/26440.
 Full9896 завершён. H10 не имеет terminal24h acceptance и не перезапускался.
+
+### 2026-10-17 — browser8304: photo controls и настоящее cold persistence
+
+Продолжение initial zero-size preview observation показало: сначала img3–5
+не имели src, загрузка шла последовательно; позже все пять получили src и
+decoded240x240, error/warn logs пусты. Это незавершённая загрузка, не доказанный
+дефект прошивки. Через реальные checkbox/keyboard range controls выставлены
+mask17/interval3, затем mask0/interval60; public API подтвердил оба состояния.
+
+Owned persistent VM18416 остановлена и cold launched с тем же networksetup,
+без reseed. Пока новая VM paused, полный flash hash совпал с последним guest
+состоянием. Новый1960/SmallTV-37b25755c090 использует прямой writable raw.
+После запуска public API11routes и выбранные raw settings совпали до/после:
+units/date/GIF5/Dial/brightness63/colorsRGB565/cityPerth/AU-W/night20→8/12,
+photo0/60. Bootloader/partition/app/assets byte-equal архиву;19inputs unchanged.
+Реальный browser после ожидания initial loading подтвердил photo0/60+5previews,
+clock controls и advanced20→8/12. Initial stale/default DOM не засчитывался.
+
+Scoped8case JSON и screenshot сохранены как uri-browser-controls-validation-
+20261017.json и uri-photo-cold-20261017.png. Failed initial numeric fill+Tab
+сохранён отдельно; keyboard save плюс cold persistence теперь подтверждены.
+Upload/crop/mobile здесь не повторяли, полного manual acceptance не объявляем.
+Tab2 закрыт, VM1960 остановлена; external OS19:01:24UTC подтвердил отсутствие
+18416/1960 и baseline time VM6624. H10 и повторный two-variant time test сохранены.
