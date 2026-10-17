@@ -7,6 +7,18 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Работа возобновлена пользователем — 2026-10-17
 
+- Актуальное продолжение DEBUG: boot helper больше не требует INFO. Matched-ELF
+  flags и SDK timekeeping offsets читаются read-only; QEMU `last-ntp-reply`
+  доступен при esp_debug OFF/ON. Все6 boot/reset scenarios,12 ELF units,
+  29 consumer controls и по12 network cases/modes прошли. Ordinary EF66/8FCE,
+  debug11DD/DBE5, source81CF; новые QEMU0B3F6F69/F3D7B024. См. quiet-boot-state-*
+  MD/JSON. Не путать с историческими E210/9994/76A DEBUG smoke runs.
+- Для нового full нужны интеграция feature веток, точные ordinary BIN/ELF и
+  diagnostic QEMU (остальные transport gates ещё читают его события). До запуска
+  заморозить также esp_elf.py и tests/esp_elf_test.py. Во время full не менять
+  helpers/tests/production inputs. Обязательны body_http, concurrency_http,
+  boot_observer_unit и29 boot consumer controls. H10/24h пока не запускался.
+
 - Пользователь явно разрешил «Возобновить проверки». Прежние контроллеры общего
   прогона остановлены, оставшиеся две собственные ВМ были закрыты через QMP с
   проверкой имени; остальные 32 session уже не работали. Временная вкладка

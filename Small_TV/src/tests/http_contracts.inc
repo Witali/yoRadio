@@ -171,11 +171,11 @@ static void test_http_ranges(void)
 
 static void test_http_transport(void)
 {
-    /* Short reads are normal; only two timeouts may be retried, and origins must match. */
+    /* Short reads are normal; a receive timeout closes reads, and origins must match. */
     const char *body = "{\"clocktype\":0}";
     prepare("/setclocktype", body, strlen(body), "application/json");
     request.origin = "http://192.168.43.1";
-    request.recv_timeouts = 2;
+    request.recv_block_bytes = 1;
     dispatch(HTTP_POST);
     CHECK(request.status == 200 && request.position == strlen(body));
     tv_settings_t before, after;
@@ -184,7 +184,7 @@ static void test_http_transport(void)
     {
         prepare("/setclocktype", body, strlen(body), "application/json");
         if (mode == 0)
-            request.recv_timeouts = 3;
+            request.recv_timeouts = 1;
         if (mode == 1)
             request.recv_disconnect = true;
         if (mode == 2)
@@ -198,6 +198,7 @@ static void test_http_transport(void)
         }
         dispatch(HTTP_POST);
         CHECK(request.status == 400);
+        CHECK(request.read_shutdown && request.shutdown_calls == 1);
         settings_snapshot(&after);
         CHECK(!memcmp(&before, &after, sizeof(before)));
     }
@@ -245,6 +246,62 @@ static void test_http_transport(void)
     CHECK(settings_init() == ESP_OK);
     settings_snapshot(&after);
     CHECK(after.theme == 2 && !strcmp(after.ssid, "fixture"));
+}
+
+static void test_http_body_deadline(void)
+{
+    /* Progress cannot reset the total budget; failed reads never publish settings,
+     * while valid fragments restore the socket's original keep-alive timeout. */
+    const char *body = "{\"clocktype\":0}";
+    prepare("/setclocktype", body, strlen(body), "application/json");
+    request.recv_block_bytes = 1;
+    request.recv_step_us = 100000;
+    request.recv_timeout_us = 3000000;
+    dispatch(HTTP_POST);
+    CHECK(request.status == 200 && request.position == strlen(body));
+    CHECK(request.recv_timeout_us == 3000000 && !request.read_shutdown);
+
+    tv_settings_t before, after;
+    settings_snapshot(&before);
+    for (unsigned mode = 0; mode < 5; ++mode)
+    {
+        prepare("/setclocktype", body, strlen(body), "application/json");
+        int64_t started = clock_us;
+        if (mode == 0)
+        {
+            request.recv_block_bytes = 1;
+            request.recv_step_us = 400000;
+        }
+        if (mode == 1)
+        {
+            request.recv_block_bytes = 1;
+            request.recv_step_us = 4999500;
+        }
+        if (mode == 2)
+            request.fail_timeout_get = true;
+        if (mode == 3)
+            request.fail_timeout_set_call = 1;
+        if (mode == 4)
+            request.fail_timeout_set_call = 2;
+        dispatch(HTTP_POST);
+        CHECK(request.status == 400 && request.read_shutdown && request.shutdown_calls == 1);
+        settings_snapshot(&after);
+        CHECK(!memcmp(&before, &after, sizeof(before)));
+        if (mode < 2)
+        {
+            CHECK(clock_us - started >= 5000000 && clock_us - started <= 5001000);
+            CHECK(request.position < strlen(body));
+        }
+        if (mode == 2 || mode == 3)
+            CHECK(request.recv_calls == 0);
+        if (mode == 4)
+            CHECK(request.position == strlen(body));
+    }
+    prepare("/setclocktype", body, strlen(body), "application/json");
+    request.recv_timeouts = 2;
+    dispatch(HTTP_POST);
+    CHECK(request.status == 400 && request.recv_calls == 1 && request.recv_timeouts == 1);
+    CHECK(request.read_shutdown && request.shutdown_calls == 1);
 }
 
 static void test_http_photo_cycle(void)
@@ -313,6 +370,7 @@ static void test_http_contracts(void)
     test_http_pages();
     test_http_ranges();
     test_http_transport();
+    test_http_body_deadline();
     test_http_photo_cycle();
     for (unsigned i = 0; i < registered_routes; ++i)
         if (route_table[i]->method == HTTP_POST && strcmp(route_table[i]->uri, "/restart"))

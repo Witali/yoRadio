@@ -103,6 +103,34 @@ From the repository root on this Windows workspace:
 & .\Small_TV\src\build.ps1
 ```
 
+The default is `DEBUG=OFF`: application, ESP-IDF and bootloader logs are limited
+to warnings and errors. Info/debug/verbose source logging is excluded by the SDK
+maximum level. The immutable ROM boot message is independent of this setting.
+For diagnostic logging, use:
+
+```powershell
+& .\Small_TV\src\build.ps1 -DebugLogging
+```
+
+This passes `-DDEBUG=ON` to CMake and selects the SDK debug level. With plain
+`idf.py`, add `-DDEBUG=ON` or `-DDEBUG=OFF` before `build`. This changes logging,
+not optimization, assertions or GDB symbols. Reusing an explicit build directory
+works in both directions; the wrapper always passes a mode rather than retaining
+the previous CMake cache value. PowerShell's common `-Debug` parameter controls
+PowerShell itself; the firmware switch is `-DebugLogging`.
+
+Default debug builds use `.build/small-tv-esp32c2-debug` and are archived under
+`firmware/development/small-tv-esp32c2-reconstructed-debug/`. Ordinary builds keep
+the original directories. Each archive manifest records `debug_logging`, so a
+diagnostic build cannot silently replace the ordinary hand-off image.
+
+QEMU has a separate `-DebugLogging` build switch for its packet/DNS/NTP traces.
+The existing transport parity tests that explicitly assert those diagnostic
+events need a diagnostic QEMU binary; ordinary HTTP, DMA, LCD and SNTP behavior
+must also be exercised with the release binary. A missing disabled log message
+is not evidence of a firmware failure. See QEMU's Small TV README and the
+[scoped logging checks](../qemu/parity/debug-logging-checks-20261017.md).
+
 The script uses the already installed ESP-IDF v6.1 development checkout
 `.idf/v6.1-9a97f6c54ec6`, pinned to commit
 `9a97f6c54ec638111ce55cd36581b3c192f15207`, and tools in `.idf/tools-v6.1`.

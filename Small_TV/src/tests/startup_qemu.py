@@ -57,7 +57,7 @@ fingerprints = {str(path.relative_to(ROOT)).replace('\\', '/'): vm.digest(path.r
                 for path in paths}
 helpers = {name: vm.digest((args.qemu_root / 'tools' / name).read_bytes()) for name in
            ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py',
-            'small_tv_web.py', 'esp_board.py', 'esp_services.py')}
+            'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py')}
 result = {'passed': False, 'scope': __doc__, 'app_sha256': app_sha,
           'native_elf_sha256': elf_sha, 'test_inputs': fingerprints,
           'helper_sha256': helpers, 'qemu_sha256': vm.digest(Path(options.qemu).read_bytes())}

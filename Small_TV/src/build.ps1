@@ -2,12 +2,16 @@
 param(
     [string]$DependencyRoot = "",
     [string]$BuildDirectory = "",
+    [switch]$DebugLogging,
     [switch]$NoArchive
 )
 $ErrorActionPreference = "Stop"
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
 if (!$DependencyRoot) { $DependencyRoot = Join-Path $repo ".idf" }
-if (!$BuildDirectory) { $BuildDirectory = Join-Path $repo ".build\small-tv-esp32c2" }
+if (!$BuildDirectory) {
+    $buildVariant = if ($DebugLogging) { "small-tv-esp32c2-debug" } else { "small-tv-esp32c2" }
+    $BuildDirectory = Join-Path $repo ".build\$buildVariant"
+}
 $BuildDirectory = [IO.Path]::GetFullPath($BuildDirectory)
 $idf = Join-Path $DependencyRoot "v6.1-9a97f6c54ec6"
 $expected = "9a97f6c54ec638111ce55cd36581b3c192f15207"
@@ -31,7 +35,8 @@ try {
     $toolPath = @(Get-ChildItem Env: | Where-Object { $_.Name -imatch '^path$' -and $_.Value.Contains('tools\ninja') } | Select-Object -First 1 -ExpandProperty Value)[0]
     Push-Location $PSScriptRoot
     try {
-        $arguments = @((Join-Path $idf "tools\idf.py"), "-B", $BuildDirectory, "--no-ccache", "-D", "SDKCONFIG=$BuildDirectory/sdkconfig", "-D", "SDKCONFIG_DEFAULTS=$PSScriptRoot/sdkconfig.defaults", "build")
+        $debugValue = if ($DebugLogging) { "ON" } else { "OFF" }
+        $arguments = @((Join-Path $idf "tools\idf.py"), "-B", $BuildDirectory, "--no-ccache", "-D", "SDKCONFIG=$BuildDirectory/sdkconfig", "-D", "SDKCONFIG_DEFAULTS=$PSScriptRoot/sdkconfig.defaults", "-D", "DEBUG=$debugValue", "build")
         $process = Start-Process -Wait -PassThru -NoNewWindow -FilePath $python -ArgumentList $arguments -Environment @{ PATH = $toolPath }
         if ($process.ExitCode -ne 0) { throw "Firmware build failed" }
     } finally { Pop-Location }
@@ -39,7 +44,8 @@ try {
     foreach ($key in $saved.Keys) { [Environment]::SetEnvironmentVariable($key,$saved[$key]) }
 }
 if (!$NoArchive) {
-    $destination = Join-Path $repo "firmware\development\small-tv-esp32c2-reconstructed"
+    $archiveVariant = if ($DebugLogging) { "small-tv-esp32c2-reconstructed-debug" } else { "small-tv-esp32c2-reconstructed" }
+    $destination = Join-Path $repo "firmware\development\$archiveVariant"
     New-Item -ItemType Directory -Force -Path $destination | Out-Null
     Copy-Item -LiteralPath (Join-Path $BuildDirectory "small_tv_reconstructed.bin") -Destination (Join-Path $destination "app.bin")
     Copy-Item -LiteralPath (Join-Path $BuildDirectory "bootloader\bootloader.bin") -Destination (Join-Path $destination "bootloader.bin")
@@ -47,11 +53,12 @@ if (!$NoArchive) {
     Copy-Item -LiteralPath (Join-Path $BuildDirectory "resources\assets.bin") -Destination (Join-Path $destination "assets.bin")
     Copy-Item -LiteralPath (Join-Path $BuildDirectory "resources\assets-manifest.json") -Destination (Join-Path $destination "assets-manifest.json")
     Copy-Item -LiteralPath (Join-Path $BuildDirectory "resources\source-manifest.json") -Destination (Join-Path $destination "source-manifest.json")
-    Copy-Item -LiteralPath (Join-Path $BuildDirectory "sdkconfig") -Destination (Join-Path $destination "sdkconfig")
+    $archivedConfig = [IO.File]::ReadAllText((Join-Path $BuildDirectory "sdkconfig")).Replace("`r`n", "`n")
+    [IO.File]::WriteAllText((Join-Path $destination "sdkconfig"), $archivedConfig, [Text.UTF8Encoding]::new($false))
     $images = @(@{file="bootloader.bin"; offset="0x0"},@{file="partition-table.bin";offset="0x8000"},@{file="app.bin";offset="0x10000"},@{file="assets.bin";offset="0x200000"})
     foreach ($image in $images) { $image.sha256 = (Get-FileHash -LiteralPath (Join-Path $destination $image.file) -Algorithm SHA256).Hash.ToLower(); $image.bytes = (Get-Item -LiteralPath (Join-Path $destination $image.file)).Length }
     $source=Get-Content -LiteralPath (Join-Path $destination "source-manifest.json") -Raw | ConvertFrom-Json
-    $smallTvArchiveManifest = @{target="esp32c2";idf_revision=$expected;source_sha256=$source.aggregate_sha256;xtal_mhz=26;flash_bytes=4194304;status="compiled; hardware unverified";images=$images} | ConvertTo-Json -Depth 5
+    $smallTvArchiveManifest = @{target="esp32c2";idf_revision=$expected;source_sha256=$source.aggregate_sha256;debug_logging=[bool]$DebugLogging;xtal_mhz=26;flash_bytes=4194304;status="compiled; hardware unverified";images=$images} | ConvertTo-Json -Depth 5
     # Keep fingerprinted archive metadata identical after Git's LF checkout filter.
     [IO.File]::WriteAllText((Join-Path $destination "manifest.json"), $smallTvArchiveManifest.Replace("`r`n", "`n") + "`n", [Text.UTF8Encoding]::new($false))
     Write-Host "Saved firmware to $destination"

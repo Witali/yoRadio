@@ -1,0 +1,206 @@
+{
+  "scope": "Bounded native runtime heap/task observation; not a factory parity, leak-free, 24-hour H10 or physical-board acceptance claim.",
+  "passed": true,
+  "all_functionality_verified": false,
+  "app_sha256": "dd41a53642b66f822b8bb55ba11c5350855d8b0d63565c0d4ffe6e51935391af",
+  "source_sha256": "96a111ece507ef13c0214678a5d16f05cfd831d5ae7d5d558f56a93fd1924807",
+  "native_elf_sha256": "b4af3c2a72cacd0c348f5d966d1998660fd5811622589d1d24bda7dbdb775415",
+  "qemu_sha256": "30f9a68ef5fda4af12ccc525f0951a8a08caf40b0e363db5d90587054ff66d74",
+  "completed_cycles": 40,
+  "snapshots": 41,
+  "observed_tasks_per_snapshot": 12,
+  "workload_guest_seconds": 121.076406,
+  "recorded_http_requests": 240,
+  "concurrent_settings_gets_derived_from_completed_cycles": 80,
+  "completed_uploads": 10,
+  "max_recorded_http_guest_seconds": 0.4056590000000142,
+  "first_free_heap_bytes": 87668,
+  "last_free_heap_bytes": 86268,
+  "minimum_observed_free_heap_bytes": 78264,
+  "minimum_sdk_sum_of_per_heap_minimum_bytes": 47028,
+  "minimum_stack_watermarks": [
+    {
+      "name": "IDLE",
+      "recorded_stack_span_bytes": 1533,
+      "stack_high_water_free_bytes": 1240
+    },
+    {
+      "name": "captive_dns",
+      "recorded_stack_span_bytes": 3061,
+      "stack_high_water_free_bytes": 1844
+    },
+    {
+      "name": "clock_display",
+      "recorded_stack_span_bytes": 4085,
+      "stack_high_water_free_bytes": 1748
+    },
+    {
+      "name": "esp_timer",
+      "recorded_stack_span_bytes": 4081,
+      "stack_high_water_free_bytes": 3648
+    },
+    {
+      "name": "httpd",
+      "recorded_stack_span_bytes": 6141,
+      "stack_high_water_free_bytes": 3904
+    },
+    {
+      "name": "settings",
+      "recorded_stack_span_bytes": 2045,
+      "stack_high_water_free_bytes": 480
+    },
+    {
+      "name": "sys_evt",
+      "recorded_stack_span_bytes": 2809,
+      "stack_high_water_free_bytes": 2100
+    },
+    {
+      "name": "tcpip",
+      "recorded_stack_span_bytes": 3581,
+      "stack_high_water_free_bytes": 2684
+    },
+    {
+      "name": "time_sync",
+      "recorded_stack_span_bytes": 3057,
+      "stack_high_water_free_bytes": 1936
+    },
+    {
+      "name": "weather_http",
+      "recorded_stack_span_bytes": 8185,
+      "stack_high_water_free_bytes": 5336
+    },
+    {
+      "name": "wifi",
+      "recorded_stack_span_bytes": 6645,
+      "stack_high_water_free_bytes": 5104
+    },
+    {
+      "name": "wifi_fallback",
+      "recorded_stack_span_bytes": 2041,
+      "stack_high_water_free_bytes": 1416
+    }
+  ],
+  "rom_counter_crosscheck": {
+    "rom_elf_sha256": "289ce00e79c024d9efeb29a7fbc2d21853a1cbc383a2b9c2ece85c54fa829dd9",
+    "checks": 164,
+    "scope": "Exact two ROM getters executed outside the VM on copied typed headers, not invoked in the guest."
+  },
+  "unit_tests": [
+    {
+      "file": "Small_TV/src/tests/runtime_memory_test.py",
+      "tests": 15,
+      "passed": true,
+      "source_sha256": "6819262059e91e1499116b88f5d7478f03fc17704d5da3a2151f557f043773dc"
+    },
+    {
+      "file": "Small_TV/src/tests/runtime_heap_rom_test.py",
+      "tests": 4,
+      "passed": true,
+      "source_sha256": "73e21ea50df71a35ada4b26c9cef0954946719295658657d33fa4c5fc68d3e02"
+    }
+  ],
+  "raw_report_sha256": "bc813a1488309841290b1aec9cf3d609252dff33453587ff9ed4649e26d4bcc4",
+  "runtime_inputs_sha256": {
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-observer\\Small_TV\\src\\tests\\runtime_qemu.py": "dea03393966e68ca65ecb77b7b86842a34a285a54fd6bd1aad76c4e6d8825525",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-observer\\Small_TV\\src\\tests\\runtime_memory.py": "48838e2a1c4087dc85fd7417d4b4f4d94d964d20fa91923d780a6a069638c66d",
+    "C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-observer\\Small_TV\\src\\tests\\runtime_heap_rom.py": "fcc120a6b92260a9ee2f6e9eb6055acb3ca7c37f82f242f7ca0e9e31fd1163a1",
+    "C:\\Work\\yoRadio\\.build\\small-tv-esp32c2\\small_tv_reconstructed.elf": "b4af3c2a72cacd0c348f5d966d1998660fd5811622589d1d24bda7dbdb775415",
+    "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\app.bin": "dd41a53642b66f822b8bb55ba11c5350855d8b0d63565c0d4ffe6e51935391af",
+    "C:\\Work\\yoRadio\\Small_TV\\qemu\\profiles\\small-tv-c2.json": "1b845328ad77cc4ecd9d6a41d046aff7b88580e5e7468e3e3f5b64e8e178de92",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\esp-rom-elfs\\20260528\\esp32c2_rev200_rom.elf": "289ce00e79c024d9efeb29a7fbc2d21853a1cbc383a2b9c2ece85c54fa829dd9",
+    "C:\\Work\\yoRadio\\Small_TV\\qemu\\parity\\compare.py": "5972c62cf5c9188a20210392e2016c0f4af64a8bb60da37a5ce5a13e462b2f84",
+    "C:\\Work\\yoRadio\\Small_TV\\src\\tests\\fixtures\\jpeg\\rgb-420.jpg": "1d20200846f992e307131a60754a0e33db6ae9f24553f7383bf253fb2b568ff8",
+    "C:\\Work\\yoRadio\\Small_TV\\src\\tests\\gdb_observer.py": "50f683016f75b2072901cc4d699f7e8bef109dbb5ff2d0d6d66ef0f7dda2eb83",
+    "C:\\Work\\yoRadio\\Small_TV\\src\\tests\\weather_qemu.py": "2808b79a63758616d45c898d822480796b0de109fa48da84baf989cd16dcffb9",
+    "C:\\Work\\yoRadio\\Small_TV\\src\\tests\\time_qemu.py": "ef7e8ea96884e0ed87c16bdf2648465f32700dd047903231f3fc608811d534c0",
+    "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\bootloader.bin": "3fb735a3ef92838b0d5f624db2cd0a286add28f45c1fa6d7ade05d9b92116016",
+    "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\partition-table.bin": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+    "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+    "C:\\Work\\yoRadio\\firmware\\development\\small-tv-esp32c2-reconstructed\\source-manifest.json": "771cd6a548736bb7f516255dd88d0512760c67b37aa9e1d3f25637bde81f5114",
+    "C:\\Work\\yoRadio\\.idf\\v6.1\\components\\heap\\heap_private.h": "502fa2f57dc2b7bf044ea4129694c4e97669321525e82bcd7e2435b626407f0c",
+    "C:\\Work\\yoRadio\\.idf\\v6.1\\components\\heap\\multi_heap.c": "e9a61ae252353ba9095bb97a922db49c164111a3c1afb97f0a967996d0b15045",
+    "C:\\Work\\yoRadio\\.idf\\v6.1\\components\\heap\\heap_caps.c": "16ba43d4868f4eaff39ae83e2ede6bfe6cb33cfd57e23fab64a3e658d4bb5610",
+    "C:\\Work\\yoRadio\\.idf\\v6.1\\components\\freertos\\FreeRTOS-Kernel\\tasks.c": "8e02bca581de35d3ea446752e84f5d71ff90ef818d3b3a7a03865dfc95f3c7b6",
+    "C:\\Work\\yoRadio\\.idf\\v6.1\\components\\freertos\\FreeRTOS-Kernel\\portable\\riscv\\include\\freertos\\portmacro.h": "d781637967d016af1d69f05c686130e83505fdbcc9fcb3f80c68816bce22abf1",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_vm.py": "6dd223c63fe6b1265ab7e17c444a4e8fb70212eb8d04ed0dbaf5d0fbd6fe2cda",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "C:\\Work\\QEMU-ESP32\\tools\\small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "C:\\Work\\QEMU-ESP32\\tools\\esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "C:\\Work\\QEMU-ESP32\\tools\\esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+    "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-riscv32.exe": "30f9a68ef5fda4af12ccc525f0951a8a08caf40b0e363db5d90587054ff66d74"
+  },
+  "earlier_harness_attempts": [
+    {
+      "folder": "runtime-preflight-20261017",
+      "raw_sha256": "d4ba8f7785acb895205868168b9be8088ec96e614de5e3ba9a2165f5246e2ed5",
+      "valid_firmware_failure": false,
+      "note": "Missing import directory before any VM started."
+    },
+    {
+      "folder": "runtime-preflight-20261017-02",
+      "raw_sha256": "d260a8f7d94105e4b73ee6169b527cb1c03a392dbb33abc23af1f36e220a8b9e",
+      "valid_firmware_failure": false,
+      "note": "Assumed a naturally executed heap-size API call; no call occurred before the observer deadline. VM closed without panic."
+    },
+    {
+      "folder": "runtime-workload-20261017",
+      "raw_sha256": "82439b7d83a388052e120fe64b2b0508f1314761d69f3c80b0bfa89d1a3ff3ce",
+      "valid_firmware_failure": false,
+      "note": "Imported HTTP function shadowed the Python HTTP module before binary upload. VM closed without panic."
+    }
+  ],
+  "inputs_unchanged": true,
+  "no_panic": true,
+  "limitations": [
+    "Native firmware only; no factory heap/stack equivalence claim.",
+    "Short workload is not the 24-hour H10 or physical-board acceptance.",
+    "Stack fill is a historical SDK watermark; sampled frames do not prove all execution peaks.",
+    "Sum of per-heap minimum counters follows SDK semantics, not a simultaneous global minimum.",
+    "Separate ISR stack is not observed.",
+    "Debugger pauses affect host duration and external timing; only observed guest time is reported."
+  ],
+  "samples": [
+    {"label":"ready","guest_seconds":25.27163,"free_heap_bytes":87668,"sdk_sum_of_per_heap_minimum_bytes":72388,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":2292,"esp_timer":3680,"httpd":4460,"settings":1788,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-0","guest_seconds":27.401732,"free_heap_bytes":87432,"sdk_sum_of_per_heap_minimum_bytes":54976,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1892,"esp_timer":3680,"httpd":4284,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-1","guest_seconds":29.679104,"free_heap_bytes":87228,"sdk_sum_of_per_heap_minimum_bytes":54976,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1892,"esp_timer":3680,"httpd":4284,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-2","guest_seconds":36.472463,"free_heap_bytes":86884,"sdk_sum_of_per_heap_minimum_bytes":54976,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3680,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-3","guest_seconds":38.468764,"free_heap_bytes":86660,"sdk_sum_of_per_heap_minimum_bytes":54976,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3680,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-4","guest_seconds":40.488604,"free_heap_bytes":86460,"sdk_sum_of_per_heap_minimum_bytes":50524,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3680,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-5","guest_seconds":42.729315,"free_heap_bytes":86244,"sdk_sum_of_per_heap_minimum_bytes":50524,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3680,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-6","guest_seconds":49.002984,"free_heap_bytes":86456,"sdk_sum_of_per_heap_minimum_bytes":50524,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3680,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-7","guest_seconds":51.1797,"free_heap_bytes":86448,"sdk_sum_of_per_heap_minimum_bytes":50524,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3680,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-8","guest_seconds":53.19305,"free_heap_bytes":86244,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3680,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-9","guest_seconds":55.477364,"free_heap_bytes":86036,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3680,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-10","guest_seconds":61.708938,"free_heap_bytes":86108,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3664,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-11","guest_seconds":63.869211,"free_heap_bytes":86108,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3664,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-12","guest_seconds":66.062812,"free_heap_bytes":86244,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3664,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5368,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-13","guest_seconds":68.370187,"free_heap_bytes":86028,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3664,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-14","guest_seconds":74.746633,"free_heap_bytes":86452,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3664,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-15","guest_seconds":76.688432,"free_heap_bytes":86244,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3664,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-16","guest_seconds":78.699465,"free_heap_bytes":86240,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3664,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-17","guest_seconds":80.991743,"free_heap_bytes":86028,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1796,"esp_timer":3664,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-18","guest_seconds":87.31162,"free_heap_bytes":86452,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-19","guest_seconds":89.438786,"free_heap_bytes":86100,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-20","guest_seconds":91.504643,"free_heap_bytes":86240,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-21","guest_seconds":93.77812,"free_heap_bytes":86036,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-22","guest_seconds":100.046219,"free_heap_bytes":78264,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-23","guest_seconds":101.949998,"free_heap_bytes":86240,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-24","guest_seconds":103.91949,"free_heap_bytes":86248,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-25","guest_seconds":105.937741,"free_heap_bytes":86036,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-26","guest_seconds":110.757239,"free_heap_bytes":86104,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-27","guest_seconds":112.756646,"free_heap_bytes":86108,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-28","guest_seconds":114.666714,"free_heap_bytes":86024,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-29","guest_seconds":116.686534,"free_heap_bytes":86024,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-30","guest_seconds":121.427081,"free_heap_bytes":86048,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-31","guest_seconds":123.347275,"free_heap_bytes":86056,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-32","guest_seconds":125.237805,"free_heap_bytes":86048,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-33","guest_seconds":127.256912,"free_heap_bytes":86048,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-34","guest_seconds":132.107347,"free_heap_bytes":86048,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-35","guest_seconds":134.033719,"free_heap_bytes":85908,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-36","guest_seconds":136.001959,"free_heap_bytes":85916,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-37","guest_seconds":138.177165,"free_heap_bytes":86056,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-38","guest_seconds":144.407174,"free_heap_bytes":86264,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}},
+    {"label":"cycle-39","guest_seconds":146.273431,"free_heap_bytes":86268,"sdk_sum_of_per_heap_minimum_bytes":47028,"task_stack_free_bytes":{"IDLE":1240,"captive_dns":1844,"clock_display":1748,"esp_timer":3648,"httpd":3904,"settings":480,"sys_evt":2100,"tcpip":2684,"time_sync":1936,"weather_http":5336,"wifi":5104,"wifi_fallback":1416}}
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "scope": "Instruction audit of the shared native body reader; not a whole-firmware equivalence claim.",
+  "native_elf_sha256": "342c0127ed709f9c7408e00713dd52d74d4a89c03e8aee03f929da72ab729e56",
+  "app_sha256": "3c599124ac449179747fabaa212fbc95489770d977555d33419ebecec8e2024e",
+  "source_sha256": "1741ea14341e8769c79f91c8c72e0baef08430fcb1983503bca5d94556317633",
+  "native_functions": [
+    {
+      "function": "reject_body.isra.0",
+      "address": "0x42011d2a",
+      "bytes": 38,
+      "code_sha256": "c1df1929a19f1935af6d21b246748481c924e8b0d91caa572a2569e3ca0f7d8d"
+    },
+    {
+      "function": "web_body",
+      "address": "0x42011d50",
+      "bytes": 538,
+      "code_sha256": "66b5918d3817c9e7201794d90d5e63e889b4b1c0efc811d000ab0d63115fc062"
+    }
+  ],
+  "native_assembly_sha256": "68c467036403c4e9b5e365bf6b5782aae94de6fd0c99bd755a205bc8abde6fcf",
+  "native_source_sha256": "17f34111ba6df88102d8fa84f953f9e848bf18ad32b05b56fe8bd72b7feb8d85",
+  "factory_reference": {
+    "file": "Small_TV/src/reference/assembly/http_setclocktype_at_4200d7f0.asm",
+    "sha256": "74728cff99084bef9237f7b8f6807c24efa98612d35bbeb3ece0a4081fb7f8d0",
+    "handler": "0x4200d7f0",
+    "recv_call": "0x4200d808",
+    "recv_target": "0x4203b694",
+    "nonpositive_branch": "0x4200d80c -> 0x4200d8aa",
+    "observation": "Original handler makes one receive call; it has no three-timeout reconstruction loop."
+  },
+  "sdk_inputs": {
+    "httpd_txrx.c": "db2e0165c4c6aaff43615f68357cd3adc4f2f3a0cea8fe988e72ff31f0735436",
+    "httpd_parse.c": "e32809f8f0bf820382759756b7fc3bb73fb4cf6ff3410d3fc26f27fc6e6cd280"
+  },
+  "native_observations": [
+    "Five-second absolute esp_timer deadline; no retry counter.",
+    "Per-read SO_RCVTIMEO uses remaining milliseconds rounded upward, never a zero/infinite final timeout.",
+    "Failed/incomplete reads shut down only the socket read side before the caller sends 400, avoiding IDF remaining-body purge waits.",
+    "Successful bodies restore the preexisting receive timeout before JSON/field processing."
+  ]
+}

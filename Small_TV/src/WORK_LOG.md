@@ -1690,3 +1690,130 @@ host-timed scroller/AP phase другая — pixel equivalence не заявл�
 quietobserver/H09/body прошли; ВМ/CUA tabs отсутствуют. Root passing61d1f8ee и
 QEMUmain0d27/installed30F прежние. Передquiet full требуется исправить старую
 INFO-зависимую consoleboot oracle, затем интеграция и свежий frozen full.
+
+### 2026-10-17 — общий deadline HTTP-тела вместо блокировки других клиентов
+
+В отдельной .worktree/small-tv-http-body-deadline воспроизведён дефект DD41:
+неполный JSON удерживает второй GET24.69s, trickle27.61s, oversized9.70s.
+В factory0x4200d7f0 на0x4200d808 один recv, нашего retry-loop нет. SDK pending
+data +3timeouts +remaining-body purge объясняют около25s. Новый request_body.c
+имеет5s absolute deadline, per-read remaining timeout с ceil1ms, SHUT_RD при
+отказе и восстановление original timeout при успехе; FIXED_RECONSTRUCTION.
+
+Новый app3C599124/source1741EA14/ELF342C0127,1 177 216bytes/free358 784,
+58 production inputs, сохранён в branch firmware/development. Final identical
+body QEMU test наold:3 failures, наnew:4pass; задержки4.695327/4.703467/.204119s.
+Host3950/platform46/frontend/integrity/timezone/aggregation reduced pass;
+SDK photo HTTP21pass; consumer guards15pass. ASM/manifest и scoped report/doc
+сохранены. Добавлен mandatory body_http в следующий suite/publisher/verifier.
+Это не общий full pass нового app. Main DD41/75+88 frozen inputs текущего11075
+не менялись; он проходит отдельную проверку на QEMU30F. Merge/build/full нового
+кандидата выполнять после terminal/сохранения этого прогона, не подменяя identities.
+
+ASM body-reader audit получил явный eol=lf в Small_TV/.gitattributes. Проверка
+git cat-file --filters даёт тот же SHA, что manifest; checkout не меняет
+fingerprinted bytes. Production sources, ELF/app и scoped runtime results прежние.
+
+### 2026-10-17 — реальная конкурентная работа в QEMU
+
+На прежних app3C599124/source1741EA14/ELF342C0127 прошёл standalone H09 scenario:
+34 checks,16 paired batches,68 sequential requests. Одновременные start upload
+дают ровно200/400; exact retries200/200, exact/conflicting200/400; scan+GET,
+независимые настройки, chunk+GET, held weather и renderer resume проходят.
+Максимальная пара2.847167guest s (scan/GET), single.306982s, порог6 прежний.
+После двух restart ACK наблюдался один warm boot; настройки/готовое фото сохранились,
+частичное скрыто. Cold boot — отдельная новая ВМ с тем же raw backing; новое
+upload после прерывания проходит. Все protected regions/первые3photos прежние.
+
+Первый preflight invalid: double-stop cleanup error и слабая renderer resume
+oracle. Исправленный новый run сравнивает cache передfinish/после:20:00:21→29;
+inputs98 unchanged, ВМ закрыты, no panic. Multipart formatter выделен отдельно,
+4 protocol tests pass. Полная H09/24h H10/physical не заявлены; source/C иproduction
+archive не менялись. Main frozen full11075 продолжает calendar на прежнейDD41.
+
+H09-сценарий включён в следующий обязательный qemu.concurrency_http. Producer,
+publisher и verifier требуют все 34 условия/16 пар/68 запросов и точные identities.
+20 consumer mutations на captured успешном report отвергнуты, включая missing
+interleaving, вторую upload session, конфликтующий retry, stale renderer,
+неработающий weather worker, повреждение flash и подмену app/ELF/QEMU/test/formatter.
+Это проверка потребителей исторического standalone результата; его начальные
+input hashes не переписывались, C/ELF/BIN не менялись, нового full pass нет.
+
+### 2026-10-17 — отдельный runtime observer памяти
+
+В codex/small-tv-runtime-observer подготовлены отдельные модули DWARF/list/stack
+decoder, ROM counter crosscheck и workload driver. Production appDD41/source96A/
+ELFB4 не менялись. ВМ закрыты в finally; GDB только read/hardware breakpoints,
+присваивания PC/RAM нет. 15 parser и4 exact-ROM tests pass, включая негативные
+ABI/list controls. Module import, unused natural API deadline и HTTP name shadow
+сохранены как harness errors, а не firmware defects.
+
+Итог нового40-cycle workload:121.076406 guest s,41 snapshots всех12tasks,
+10 JPEG uploads,240 recorded HTTP +80 concurrent GET, max.405659s, no panic,
+inputs unchanged. Heap sampled87 668→86 268, min sampled78 264; SDK сумма
+per-heap minima47 028. Lowest stack watermark480 у settings. ROM counter
+crosschecks164. Короткий runtime preflight не доказывает leak-free/24h H10,
+factory memory equivalence или physical/ISR stack. ВМ закрыта; осталась только
+ВМ общего full11075. Его frozen75+88 inputs не затронуты. Отчёт и scope сохранены
+в runtime-memory-*; standalone tests пока не включены в текущий full gate.
+
+### 2026-10-17 — наблюдатель подготовлен к длительному запуску
+
+Runtime_state разворачивает low32 microsecond counter и пишет последовательный
+JSONL; summary ограничен первым/последними32 samples и агрегатами. Новый runner
+поддерживает cycles либо duration до7дней, interval<=60s, короткие виртуальные
+AP outages с реальными guest disconnect/reconnect и HTTP recovery. Проверки
+переполнений/journal6 иdecoder16 pass. Сравнение старого/нового decoder на одной
+SRAM даёт одинаковые heap/tasks при45→20 memory reads.
+
+Первая реальная проба4096-byte scan дала RSP E22 до ready snapshot: transport
+preflight invalid, не firmware defect. Исправлено на1024bytes, добавлен test
+packet limit. Новый4-cycle run с2×1s outages прошёл за15.689122guest s:
+5snapshots/32HTTP/35journal events, по1guestdisconnect+reconnect наотключение.
+Отдельный duration8s завершился после8.135430s:3cycles/4samples/27HTTP/28events.
+Журналы/digests иinputs unchanged/no panic, ВМ закрыты. AppDD41/96A/B4/QEMU30F
+прежние; source/C/BIN не менялись. Short validation сохранена вruntime-duration-*
+JSON, это НЕ24h/H10/physical и не переименование прежнего40-cycle proof9adf.
+
+### 2026-10-17 — DEBUG в прошивке и QEMU
+
+По уточнению пользователя оба проекта получили build-time switch, по умолчанию
+OFF. FW CMake DEBUG=ON/OFF, PS -DebugLogging; SDK/app/bootloader level2/4, отдельный
+debug archive, manifest boolean и LF metadata. В QEMU esp_debug исключает packet
+formatter/RX-MMIO/DNS-NTP diagnostics, QOM capability read-only; сырой frame dump
+выключен. QEMU04443f07dc отправлен в feature branch, canonical main30F не менялся.
+
+Полные OFF/ON/OFF rebuilds в одних каталогах прошли. Четыре logging runs по20
+проверок actualROM/Wi-Fi/SNTP/HTTP/themes/LCD прошли; OFF0 I/D/V/3W, ON79I/3883D/3W.
+AppEF66/ELF8FCE и debug11DD/DBE5 сохранены, source81CF/59inputs. QEMU E210/9994/76A
+прошли11 packet cases каждый; modules иCYD/C3 boot gates pass. Normal pixel hashes
+прежние, debugC3modular host-timed scroller/AP phase другой — equality не заявлена.
+First/final OFF PE sections совпали кроме export timestamp. Ошибки preflight
+oracles/Windows cleanup/Meson define сохранены отдельно, не firmware defects.
+
+Observer schema3 читает настоящий atomic connected flag вместо debugUART;4cycles,
+16.475576s/5samples/32HTTP/2outages, minheap87576/minstack480. Parser16/state6 и
+build config reuse/CRLF/idempotence test pass. Final quiet EF66 H09:34checks/16pairs/
+68requests; body4cases pass, secondGET4.494401/4.539967/.133139s. AllVMs closed.
+Scope JSON/документ сохранены. Root full75+88 inputs повторно unchanged; это
+отдельные результаты, не общий pass нового кандидата/24h. Перед quiet full нужно
+адаптировать старый boot-console gate, который зависит от INFO, затем интегрировать
+ветки и запускать один новый общий набор сbody_http/concurrency_http.
+
+### 2026-10-17 — boot/reset без зависимости от логов
+
+Boot helper адаптирован к quiet firmware: actual connected/AP/DHCP/SNTP objects
+из matched ELF вместо INFO. ELF32 converter вынесен в esp_elf.py; ABI/RAM/bounds,
+BIN ELF SHA и read-only observation проверены12 unit cases. QEMU хранит3 numeric
+NTP response fields (24bytes) независимо от диагностики; QMP read-only getter,
+drop/malformed/reset/counter tests. По12 DMA/network tests OFF/ON и modules pass.
+
+Все6 actual boot/reset flows прошли: ordinary EF66/8FCE clock OFF/ON QEMU,
+factory clock OFF/ON, ordinary offline AP и debug11DD/DBE5. Source81CF прежний.
+QEMU OFF0B3F6F69 / ONF3D7B024. UTC проверяется до/после reset с прежним <1s;
+нужен новый NTP reply. Ошибочные host-wall oracle и RTC-only reset oracle
+сохранены отдельно. По SDK source и factory assembly0x420b288c/0x403802da выявлены
+две signed64 corrections; правильный observer читает их и UNIT0 без guest writes.
+Publisher/verifier пересчитывают UTC из чисел;29 actual consumer rejection controls
+pass. Helper/unit hashes включены в полный suite и15 producers. См. quiet-boot-state-*
+MD/JSON. Старый общий DD41 pass остаётся историческим; нового full/24h пока нет.

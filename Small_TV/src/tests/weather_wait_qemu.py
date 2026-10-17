@@ -47,7 +47,7 @@ fingerprints=[{'file':str(path.relative_to(ROOT)).replace('\\','/'),
                'sha256':hashlib.sha256(path.read_bytes()).hexdigest()} for path in test_paths]
 helpers={name:hashlib.sha256((args.qemu_root/'tools'/name).read_bytes()).hexdigest()
          for name in ('small_tv_vm.py','small_tv_http_test.py','small_tv_network.py',
-                      'small_tv_web.py','esp_board.py','esp_services.py')}
+                      'small_tv_web.py','esp_board.py','esp_services.py', 'esp_elf.py')}
 session=observer=None
 result={'passed':False,'scope':__doc__,'native_elf_sha256':elf_sha,
         'app_sha256':vm.digest(app.read_bytes()),'qemu_sha256':vm.digest(Path(options.qemu).read_bytes()),

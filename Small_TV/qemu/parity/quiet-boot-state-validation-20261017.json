@@ -1,0 +1,981 @@
+{
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Matched-ELF boot/reset and exact SDK/NTP time, factory/reconstructed clock, native offline AP, firmware DEBUG on/off and QEMU diagnostics on/off. Not a new full parity, physical or 24-hour result.",
+  "guest_functions_invoked_by_host": false,
+  "guest_memory_written": false,
+  "unit_controls": {
+    "passed": true,
+    "tests": 12,
+    "failures": [],
+    "errors": [],
+    "source_sha256": "f743322b3791c3ee77595cab1d2934ff8411ddf37c44c5f7b24d2787f95c5c08",
+    "converter_sha256": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9",
+    "vm_helper_sha256": "bad0c129c0a5fadfbdde340fd3432e2d6d4dbb3af6c332374879d2f6b016ef4d"
+  },
+  "consumer_rejection_controls": {
+    "passed": true,
+    "checks": 29,
+    "rejections": {
+      "missing_units": true,
+      "failed_units": true,
+      "omitted_units": true,
+      "wrong_unit_source": true,
+      "wrong_converter": true,
+      "wrong_vm_helper": true,
+      "wrong_elf": true,
+      "missing_observation": true,
+      "disconnected": true,
+      "reset_not_synced": true,
+      "reset_wrong_dhcp": true,
+      "station_is_ap": true,
+      "outside_ram": true,
+      "wrong_bool_size": true,
+      "missing_symbols": true,
+      "wrong_qemu": true,
+      "reset_not_ready": true,
+      "uart_only_readiness": true,
+      "wrong_layout_helper": true,
+      "coarse_ntp_only": true,
+      "missing_ntp": true,
+      "wrong_ntp_base": true,
+      "wrong_ntp_expectation": true,
+      "reset_missing_ntp": true,
+      "reset_wrong_ntp_base": true,
+      "reset_old_ntp_reply": true,
+      "wrong_sdk_clock_layout": true,
+      "wrong_clock_object_size": true,
+      "wrong_sdk_offset": true
+    }
+  },
+  "helper_sha256": {
+    "small_tv_vm.py": "bad0c129c0a5fadfbdde340fd3432e2d6d4dbb3af6c332374879d2f6b016ef4d",
+    "small_tv_network.py": "2f00b8d14aa04bd59bdf7e7958a9d6534ec6092d9e0dbbc1d389c63b56a601c0",
+    "small_tv_web.py": "9ab7c76742fed64c0aeb68b37499119fe9502a01a1eff6e41f6fc57d14978ed2",
+    "small_tv_http_test.py": "222c3b17f3cf9fc4aed123fda4939678f7366076cd8f86373d3e59b630b22c94",
+    "esp_board.py": "4ce867c705124e891f1ec4f4aba359caf5a74a73d5d26d6b231fa66ce7677752",
+    "esp_services.py": "8fb453b77afb38c60f83432291dc038d57c84443ed118a77a1ae6d2a567460c4",
+    "esp_elf.py": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9"
+  },
+  "flows": {
+    "native-silent": {
+      "passed": true,
+      "firmware": "reconstructed",
+      "network": "clock",
+      "checks": {
+        "machine_still_running": true,
+        "rom_and_bootloader": true,
+        "lcd_240x240": true,
+        "lcd_has_content": true,
+        "no_panic_or_watchdog": true,
+        "application_runtime_ready": true,
+        "animation_updates": true,
+        "ntp_reply_sent": true,
+        "guest_clock_set_by_sntp": true,
+        "wifi_associated": true,
+        "station_dhcp": true,
+        "sntp_notification_received": true,
+        "clock_recovered_after_reset": true,
+        "runtime_ready_after_reset": true,
+        "no_panic_after_reset": true,
+        "reset_reboots": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "qemu_sha256": "0b3f6f69c28be627faf8b68135435728a4648a417f07016bb576c872e41616e6",
+      "runtime_observation": {
+        "layout": {
+          "elf_sha256": "8fce7524d9379a1fbd5c15711d0fedbef9ce14544d73a60df93ab3f4648e77a9",
+          "symbols": {
+            "s_correction_us": {
+              "address": 1070282696,
+              "size": 8
+            },
+            "last_station_address": {
+              "address": 1070282840,
+              "size": 4
+            },
+            "connected": {
+              "address": 1070282848,
+              "size": 1
+            },
+            "ap_active": {
+              "address": 1070282847,
+              "size": 1
+            },
+            "time_synced": {
+              "address": 1070282860,
+              "size": 1
+            },
+            "s_microseconds_offset": {
+              "address": 1070282680,
+              "size": 8
+            }
+          },
+          "converter_sha256": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9",
+          "vm_helper_sha256": "bad0c129c0a5fadfbdde340fd3432e2d6d4dbb3af6c332374879d2f6b016ef4d"
+        },
+        "before_reset": {
+          "connected": true,
+          "ap_active": false,
+          "station_address": "10.0.2.15",
+          "time_synced": true
+        },
+        "after_reset": {
+          "connected": true,
+          "ap_active": false,
+          "station_address": "10.0.2.15",
+          "time_synced": true
+        }
+      },
+      "clock_layout": {
+        "elf_sha256": "8fce7524d9379a1fbd5c15711d0fedbef9ce14544d73a60df93ab3f4648e77a9",
+        "symbols": {
+          "s_correction_us": {
+            "address": 1070282696,
+            "size": 8
+          },
+          "last_station_address": {
+            "address": 1070282840,
+            "size": 4
+          },
+          "connected": {
+            "address": 1070282848,
+            "size": 1
+          },
+          "ap_active": {
+            "address": 1070282847,
+            "size": 1
+          },
+          "time_synced": {
+            "address": 1070282860,
+            "size": 1
+          },
+          "s_microseconds_offset": {
+            "address": 1070282680,
+            "size": 8
+          }
+        },
+        "converter_sha256": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9",
+        "vm_helper_sha256": "bad0c129c0a5fadfbdde340fd3432e2d6d4dbb3af6c332374879d2f6b016ef4d"
+      },
+      "ntp_observation": {
+        "method": "model_response_timestamp",
+        "response_count": 1,
+        "server_epoch": 1792250846,
+        "sent_virtual_us": 6256737,
+        "boot_time_us": 1792250840586820,
+        "virtual_us": 19775361,
+        "systimer_ticks": 205629884,
+        "rtc_hrt_offset_us": 69517,
+        "system_correction_us": -63020,
+        "since_boot_us": 19778601,
+        "actual_utc_seconds": 1792250860.365421,
+        "expected_utc_seconds": 1792250859.518624,
+        "difference_seconds": 0.846796989440918
+      },
+      "reset_ntp_observation": {
+        "method": "model_response_timestamp",
+        "response_count": 2,
+        "server_epoch": 1792250879,
+        "sent_virtual_us": 25748979,
+        "boot_time_us": 1792250851300346,
+        "virtual_us": 25917219,
+        "systimer_ticks": 269528279,
+        "rtc_hrt_offset_us": 21884923,
+        "system_correction_us": -19841528,
+        "since_boot_us": 27959575,
+        "actual_utc_seconds": 1792250879.259921,
+        "expected_utc_seconds": 1792250879.16824,
+        "difference_seconds": 0.09168100357055664
+      },
+      "qemu_diagnostics_enabled": false,
+      "sources": {
+        "images": [
+          {
+            "offset": "0x0",
+            "bytes": 16928,
+            "file": "bootloader.bin",
+            "sha256": "b8a88cde4763db2ca92bc02730dac65254c8334e9b686f2ffa89b43fef949336"
+          },
+          {
+            "offset": "0x8000",
+            "bytes": 3072,
+            "file": "partition-table.bin",
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+          },
+          {
+            "offset": "0x10000",
+            "bytes": 1169888,
+            "file": "app.bin",
+            "sha256": "ef66d5575f6bcdd123dac2b0ba3a2afa26fbf6a44411a071486961197773fce3"
+          },
+          {
+            "offset": "0x200000",
+            "bytes": 1994752,
+            "file": "assets.bin",
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+          }
+        ],
+        "source_sha256": "81cf614c9b31ea22c632e0588975c1903e43a11fd0bd9815115b555e5f7b4ca2"
+      },
+      "raw_report_sha256": "bbd9751c73cb53247b155515cf3cd40b324ee7d06a928ecb0d29fa7f18c1b0d7"
+    },
+    "original-silent": {
+      "passed": true,
+      "firmware": "original",
+      "network": "clock",
+      "checks": {
+        "machine_still_running": true,
+        "rom_and_bootloader": true,
+        "lcd_240x240": true,
+        "lcd_has_content": true,
+        "no_panic_or_watchdog": true,
+        "ntp_reply_sent": true,
+        "guest_clock_set_by_sntp": true,
+        "clock_recovered_after_reset": true,
+        "no_panic_after_reset": true,
+        "reset_reboots": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "qemu_sha256": "0b3f6f69c28be627faf8b68135435728a4648a417f07016bb576c872e41616e6",
+      "runtime_observation": {
+        "layout": null,
+        "before_reset": null,
+        "after_reset": null
+      },
+      "clock_layout": {
+        "factory_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4",
+        "symbols": {
+          "s_microseconds_offset": {
+            "address": 1070348672,
+            "size": 8
+          },
+          "s_correction_us": {
+            "address": 1070348424,
+            "size": 8
+          }
+        }
+      },
+      "ntp_observation": {
+        "method": "model_response_timestamp",
+        "response_count": 1,
+        "server_epoch": 1792250886,
+        "sent_virtual_us": 5234697,
+        "boot_time_us": 1792250880755687,
+        "virtual_us": 28997147,
+        "systimer_ticks": 301555087,
+        "rtc_hrt_offset_us": 65298,
+        "system_correction_us": -59196,
+        "since_boot_us": 29001783,
+        "actual_utc_seconds": 1792250909.75747,
+        "expected_utc_seconds": 1792250909.76245,
+        "difference_seconds": -0.0049800872802734375
+      },
+      "reset_ntp_observation": {
+        "method": "model_response_timestamp",
+        "response_count": 2,
+        "server_epoch": 1792250916,
+        "sent_virtual_us": 33060039,
+        "boot_time_us": 1792250880430336,
+        "virtual_us": 36129086,
+        "systimer_ticks": 375734365,
+        "rtc_hrt_offset_us": 32060552,
+        "system_correction_us": -29067712,
+        "since_boot_us": 39121144,
+        "actual_utc_seconds": 1792250919.55148,
+        "expected_utc_seconds": 1792250919.069047,
+        "difference_seconds": 0.4824330806732178
+      },
+      "qemu_diagnostics_enabled": false,
+      "sources": {
+        "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+      },
+      "raw_report_sha256": "8fe35bfcff8cc9fcc124f9a53217ad4e36af11a4d7651926cfd0223747d56644"
+    },
+    "native-diagnostic": {
+      "passed": true,
+      "firmware": "reconstructed",
+      "network": "clock",
+      "checks": {
+        "machine_still_running": true,
+        "rom_and_bootloader": true,
+        "lcd_240x240": true,
+        "lcd_has_content": true,
+        "no_panic_or_watchdog": true,
+        "application_runtime_ready": true,
+        "animation_updates": true,
+        "ntp_reply_sent": true,
+        "guest_clock_set_by_sntp": true,
+        "wifi_associated": true,
+        "station_dhcp": true,
+        "sntp_notification_received": true,
+        "clock_recovered_after_reset": true,
+        "runtime_ready_after_reset": true,
+        "no_panic_after_reset": true,
+        "reset_reboots": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "qemu_sha256": "f3d7b0243606e21c12e0b57e3cb084524a577cc732bf24f0fc055f35bc08fdc5",
+      "runtime_observation": {
+        "layout": {
+          "elf_sha256": "8fce7524d9379a1fbd5c15711d0fedbef9ce14544d73a60df93ab3f4648e77a9",
+          "symbols": {
+            "s_correction_us": {
+              "address": 1070282696,
+              "size": 8
+            },
+            "last_station_address": {
+              "address": 1070282840,
+              "size": 4
+            },
+            "connected": {
+              "address": 1070282848,
+              "size": 1
+            },
+            "ap_active": {
+              "address": 1070282847,
+              "size": 1
+            },
+            "time_synced": {
+              "address": 1070282860,
+              "size": 1
+            },
+            "s_microseconds_offset": {
+              "address": 1070282680,
+              "size": 8
+            }
+          },
+          "converter_sha256": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9",
+          "vm_helper_sha256": "bad0c129c0a5fadfbdde340fd3432e2d6d4dbb3af6c332374879d2f6b016ef4d"
+        },
+        "before_reset": {
+          "connected": true,
+          "ap_active": false,
+          "station_address": "10.0.2.15",
+          "time_synced": true
+        },
+        "after_reset": {
+          "connected": true,
+          "ap_active": false,
+          "station_address": "10.0.2.15",
+          "time_synced": true
+        }
+      },
+      "clock_layout": {
+        "elf_sha256": "8fce7524d9379a1fbd5c15711d0fedbef9ce14544d73a60df93ab3f4648e77a9",
+        "symbols": {
+          "s_correction_us": {
+            "address": 1070282696,
+            "size": 8
+          },
+          "last_station_address": {
+            "address": 1070282840,
+            "size": 4
+          },
+          "connected": {
+            "address": 1070282848,
+            "size": 1
+          },
+          "ap_active": {
+            "address": 1070282847,
+            "size": 1
+          },
+          "time_synced": {
+            "address": 1070282860,
+            "size": 1
+          },
+          "s_microseconds_offset": {
+            "address": 1070282680,
+            "size": 8
+          }
+        },
+        "converter_sha256": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9",
+        "vm_helper_sha256": "bad0c129c0a5fadfbdde340fd3432e2d6d4dbb3af6c332374879d2f6b016ef4d"
+      },
+      "ntp_observation": {
+        "method": "model_response_timestamp",
+        "response_count": 1,
+        "server_epoch": 1792250926,
+        "sent_virtual_us": 5048336,
+        "boot_time_us": 1792250920948661,
+        "virtual_us": 24176088,
+        "systimer_ticks": 251419384,
+        "rtc_hrt_offset_us": 69722,
+        "system_correction_us": -63207,
+        "since_boot_us": 24181455,
+        "actual_utc_seconds": 1792250945.130116,
+        "expected_utc_seconds": 1792250945.127752,
+        "difference_seconds": 0.002363920211791992
+      },
+      "reset_ntp_observation": {
+        "method": "model_response_timestamp",
+        "response_count": 2,
+        "server_epoch": 1792250955,
+        "sent_virtual_us": 27225317,
+        "boot_time_us": 1792250926047646,
+        "virtual_us": 30302977,
+        "systimer_ticks": 315136344,
+        "rtc_hrt_offset_us": 26734097,
+        "system_correction_us": -24237853,
+        "since_boot_us": 32797815,
+        "actual_utc_seconds": 1792250958.845461,
+        "expected_utc_seconds": 1792250958.07766,
+        "difference_seconds": 0.7678008079528809
+      },
+      "qemu_diagnostics_enabled": true,
+      "sources": {
+        "images": [
+          {
+            "offset": "0x0",
+            "bytes": 16928,
+            "file": "bootloader.bin",
+            "sha256": "b8a88cde4763db2ca92bc02730dac65254c8334e9b686f2ffa89b43fef949336"
+          },
+          {
+            "offset": "0x8000",
+            "bytes": 3072,
+            "file": "partition-table.bin",
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+          },
+          {
+            "offset": "0x10000",
+            "bytes": 1169888,
+            "file": "app.bin",
+            "sha256": "ef66d5575f6bcdd123dac2b0ba3a2afa26fbf6a44411a071486961197773fce3"
+          },
+          {
+            "offset": "0x200000",
+            "bytes": 1994752,
+            "file": "assets.bin",
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+          }
+        ],
+        "source_sha256": "81cf614c9b31ea22c632e0588975c1903e43a11fd0bd9815115b555e5f7b4ca2"
+      },
+      "raw_report_sha256": "426f62c3b91ba219614c83091df97cea1e84dac5715c337353b340ea1994d901"
+    },
+    "native-offline": {
+      "passed": true,
+      "firmware": "reconstructed",
+      "network": "offline",
+      "checks": {
+        "machine_still_running": true,
+        "rom_and_bootloader": true,
+        "lcd_240x240": true,
+        "lcd_has_content": true,
+        "no_panic_or_watchdog": true,
+        "application_runtime_ready": true,
+        "ap_started": true,
+        "runtime_ready_after_reset": true,
+        "no_panic_after_reset": true,
+        "reset_reboots": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "qemu_sha256": "0b3f6f69c28be627faf8b68135435728a4648a417f07016bb576c872e41616e6",
+      "runtime_observation": {
+        "layout": {
+          "elf_sha256": "8fce7524d9379a1fbd5c15711d0fedbef9ce14544d73a60df93ab3f4648e77a9",
+          "symbols": {
+            "s_correction_us": {
+              "address": 1070282696,
+              "size": 8
+            },
+            "last_station_address": {
+              "address": 1070282840,
+              "size": 4
+            },
+            "connected": {
+              "address": 1070282848,
+              "size": 1
+            },
+            "ap_active": {
+              "address": 1070282847,
+              "size": 1
+            },
+            "time_synced": {
+              "address": 1070282860,
+              "size": 1
+            },
+            "s_microseconds_offset": {
+              "address": 1070282680,
+              "size": 8
+            }
+          },
+          "converter_sha256": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9",
+          "vm_helper_sha256": "bad0c129c0a5fadfbdde340fd3432e2d6d4dbb3af6c332374879d2f6b016ef4d"
+        },
+        "before_reset": {
+          "connected": false,
+          "ap_active": true,
+          "station_address": "0.0.0.0",
+          "time_synced": false
+        },
+        "after_reset": {
+          "connected": false,
+          "ap_active": true,
+          "station_address": "0.0.0.0",
+          "time_synced": false
+        }
+      },
+      "clock_layout": {
+        "elf_sha256": "8fce7524d9379a1fbd5c15711d0fedbef9ce14544d73a60df93ab3f4648e77a9",
+        "symbols": {
+          "s_correction_us": {
+            "address": 1070282696,
+            "size": 8
+          },
+          "last_station_address": {
+            "address": 1070282840,
+            "size": 4
+          },
+          "connected": {
+            "address": 1070282848,
+            "size": 1
+          },
+          "ap_active": {
+            "address": 1070282847,
+            "size": 1
+          },
+          "time_synced": {
+            "address": 1070282860,
+            "size": 1
+          },
+          "s_microseconds_offset": {
+            "address": 1070282680,
+            "size": 8
+          }
+        },
+        "converter_sha256": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9",
+        "vm_helper_sha256": "bad0c129c0a5fadfbdde340fd3432e2d6d4dbb3af6c332374879d2f6b016ef4d"
+      },
+      "ntp_observation": null,
+      "reset_ntp_observation": null,
+      "qemu_diagnostics_enabled": false,
+      "sources": {
+        "images": [
+          {
+            "offset": "0x0",
+            "bytes": 16928,
+            "file": "bootloader.bin",
+            "sha256": "b8a88cde4763db2ca92bc02730dac65254c8334e9b686f2ffa89b43fef949336"
+          },
+          {
+            "offset": "0x8000",
+            "bytes": 3072,
+            "file": "partition-table.bin",
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79"
+          },
+          {
+            "offset": "0x10000",
+            "bytes": 1169888,
+            "file": "app.bin",
+            "sha256": "ef66d5575f6bcdd123dac2b0ba3a2afa26fbf6a44411a071486961197773fce3"
+          },
+          {
+            "offset": "0x200000",
+            "bytes": 1994752,
+            "file": "assets.bin",
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1"
+          }
+        ],
+        "source_sha256": "81cf614c9b31ea22c632e0588975c1903e43a11fd0bd9815115b555e5f7b4ca2"
+      },
+      "raw_report_sha256": "5b02e5ac87955064f1c19efa84e945f45d21101862b1a010df55070470e3a280"
+    },
+    "original-diagnostic": {
+      "passed": true,
+      "firmware": "original",
+      "network": "clock",
+      "checks": {
+        "machine_still_running": true,
+        "rom_and_bootloader": true,
+        "lcd_240x240": true,
+        "lcd_has_content": true,
+        "no_panic_or_watchdog": true,
+        "ntp_reply_sent": true,
+        "guest_clock_set_by_sntp": true,
+        "clock_recovered_after_reset": true,
+        "no_panic_after_reset": true,
+        "reset_reboots": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "qemu_sha256": "f3d7b0243606e21c12e0b57e3cb084524a577cc732bf24f0fc055f35bc08fdc5",
+      "runtime_observation": {
+        "layout": null,
+        "before_reset": null,
+        "after_reset": null
+      },
+      "clock_layout": {
+        "factory_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4",
+        "symbols": {
+          "s_microseconds_offset": {
+            "address": 1070348672,
+            "size": 8
+          },
+          "s_correction_us": {
+            "address": 1070348424,
+            "size": 8
+          }
+        }
+      },
+      "ntp_observation": {
+        "method": "model_response_timestamp",
+        "response_count": 1,
+        "server_epoch": 1792251009,
+        "sent_virtual_us": 7890713,
+        "boot_time_us": 1792251001803712,
+        "virtual_us": 29191190,
+        "systimer_ticks": 303581811,
+        "rtc_hrt_offset_us": 65512,
+        "system_correction_us": -59391,
+        "since_boot_us": 29196679,
+        "actual_utc_seconds": 1792251031.000391,
+        "expected_utc_seconds": 1792251030.300477,
+        "difference_seconds": 0.6999139785766602
+      },
+      "reset_ntp_observation": {
+        "method": "model_response_timestamp",
+        "response_count": 2,
+        "server_epoch": 1792251037,
+        "sent_virtual_us": 33059886,
+        "boot_time_us": 1792251001236964,
+        "virtual_us": 36357767,
+        "systimer_ticks": 378112578,
+        "rtc_hrt_offset_us": 32278153,
+        "system_correction_us": -29264997,
+        "since_boot_us": 39370134,
+        "actual_utc_seconds": 1792251040.607098,
+        "expected_utc_seconds": 1792251040.297881,
+        "difference_seconds": 0.3092172145843506
+      },
+      "qemu_diagnostics_enabled": true,
+      "sources": {
+        "full_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+      },
+      "raw_report_sha256": "26600b6c4faa4551aa493005397bf184e07de34101db726974a17de973e8e631"
+    },
+    "debug-diagnostic": {
+      "passed": true,
+      "firmware": "reconstructed",
+      "network": "clock",
+      "checks": {
+        "machine_still_running": true,
+        "rom_and_bootloader": true,
+        "lcd_240x240": true,
+        "lcd_has_content": true,
+        "no_panic_or_watchdog": true,
+        "application_runtime_ready": true,
+        "animation_updates": true,
+        "ntp_reply_sent": true,
+        "guest_clock_set_by_sntp": true,
+        "wifi_associated": true,
+        "station_dhcp": true,
+        "sntp_notification_received": true,
+        "clock_recovered_after_reset": true,
+        "runtime_ready_after_reset": true,
+        "no_panic_after_reset": true,
+        "reset_reboots": true,
+        "source_flash_unchanged": true,
+        "source_artifacts_unchanged": true
+      },
+      "qemu_sha256": "f3d7b0243606e21c12e0b57e3cb084524a577cc732bf24f0fc055f35bc08fdc5",
+      "runtime_observation": {
+        "layout": {
+          "elf_sha256": "dbe574c95688f28dfd60a54add5e835c0b80280ee9dbc0be0e3acf2b941c2a4a",
+          "symbols": {
+            "s_correction_us": {
+              "address": 1070283520,
+              "size": 8
+            },
+            "last_station_address": {
+              "address": 1070283664,
+              "size": 4
+            },
+            "connected": {
+              "address": 1070283672,
+              "size": 1
+            },
+            "ap_active": {
+              "address": 1070283671,
+              "size": 1
+            },
+            "time_synced": {
+              "address": 1070283684,
+              "size": 1
+            },
+            "s_microseconds_offset": {
+              "address": 1070283504,
+              "size": 8
+            }
+          },
+          "converter_sha256": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9",
+          "vm_helper_sha256": "bad0c129c0a5fadfbdde340fd3432e2d6d4dbb3af6c332374879d2f6b016ef4d"
+        },
+        "before_reset": {
+          "connected": true,
+          "ap_active": false,
+          "station_address": "10.0.2.15",
+          "time_synced": true
+        },
+        "after_reset": {
+          "connected": true,
+          "ap_active": false,
+          "station_address": "10.0.2.15",
+          "time_synced": true
+        }
+      },
+      "clock_layout": {
+        "elf_sha256": "dbe574c95688f28dfd60a54add5e835c0b80280ee9dbc0be0e3acf2b941c2a4a",
+        "symbols": {
+          "s_correction_us": {
+            "address": 1070283520,
+            "size": 8
+          },
+          "last_station_address": {
+            "address": 1070283664,
+            "size": 4
+          },
+          "connected": {
+            "address": 1070283672,
+            "size": 1
+          },
+          "ap_active": {
+            "address": 1070283671,
+            "size": 1
+          },
+          "time_synced": {
+            "address": 1070283684,
+            "size": 1
+          },
+          "s_microseconds_offset": {
+            "address": 1070283504,
+            "size": 8
+          }
+        },
+        "converter_sha256": "e3df95bed3d782bae56ed5d75117bbf2a85a49d7ad2c43a0293df74c4d01bdd9",
+        "vm_helper_sha256": "bad0c129c0a5fadfbdde340fd3432e2d6d4dbb3af6c332374879d2f6b016ef4d"
+      },
+      "ntp_observation": {
+        "method": "model_response_timestamp",
+        "response_count": 1,
+        "server_epoch": 1792251053,
+        "sent_virtual_us": 6822394,
+        "boot_time_us": 1792251046178537,
+        "virtual_us": 20436345,
+        "systimer_ticks": 212528848,
+        "rtc_hrt_offset_us": 79642,
+        "system_correction_us": -72004,
+        "since_boot_us": 20443104,
+        "actual_utc_seconds": 1792251066.621641,
+        "expected_utc_seconds": 1792251066.613951,
+        "difference_seconds": 0.007689952850341797
+      },
+      "reset_ntp_observation": {
+        "method": "model_response_timestamp",
+        "response_count": 2,
+        "server_epoch": 1792251078,
+        "sent_virtual_us": 24666946,
+        "boot_time_us": 1792251051926988,
+        "virtual_us": 26360356,
+        "systimer_ticks": 274136395,
+        "rtc_hrt_offset_us": 22627069,
+        "system_correction_us": -20514188,
+        "since_boot_us": 28472149,
+        "actual_utc_seconds": 1792251080.399137,
+        "expected_utc_seconds": 1792251079.69341,
+        "difference_seconds": 0.7057271003723145
+      },
+      "qemu_diagnostics_enabled": true,
+      "sources": {
+        "images": [
+          {
+            "bytes": 22448,
+            "offset": "0x0",
+            "sha256": "f2c15689faafad37629f1f8413ce271b238b48cf29378cc0efbb1d8423e8dc64",
+            "file": "bootloader.bin"
+          },
+          {
+            "bytes": 3072,
+            "offset": "0x8000",
+            "sha256": "93896bbc70f839f31c18e5f67ec7e3384e8bec089de7c9bd01e60c8ac101bd79",
+            "file": "partition-table.bin"
+          },
+          {
+            "bytes": 1229248,
+            "offset": "0x10000",
+            "sha256": "11ddce4994d40111211baffe5296db650534bae700633fbe3fea0e41e2ea222f",
+            "file": "app.bin"
+          },
+          {
+            "bytes": 1994752,
+            "offset": "0x200000",
+            "sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+            "file": "assets.bin"
+          }
+        ],
+        "source_sha256": "81cf614c9b31ea22c632e0588975c1903e43a11fd0bd9815115b555e5f7b4ca2"
+      },
+      "raw_report_sha256": "35d125f9e40603c01be5de5910415e3a835f8275fc67bae7ccc78ce15dd80435"
+    }
+  },
+  "packet_regressions": {
+    "off": {
+      "passed": true,
+      "tests": 12,
+      "failures": [],
+      "errors": [],
+      "qemu_sha256": "0b3f6f69c28be627faf8b68135435728a4648a417f07016bb576c872e41616e6",
+      "expected_debug_logging": "off",
+      "scope": "QOM validation/reset and real DNS/NTP packets through Wi-Fi DMA; qtest executes no guest instructions, no firmware or Internet."
+    },
+    "on": {
+      "passed": true,
+      "tests": 12,
+      "failures": [],
+      "errors": [],
+      "qemu_sha256": "f3d7b0243606e21c12e0b57e3cb084524a577cc732bf24f0fc055f35bc08fdc5",
+      "expected_debug_logging": "on",
+      "scope": "QOM validation/reset and real DNS/NTP packets through Wi-Fi DMA; qtest executes no guest instructions, no firmware or Internet."
+    }
+  },
+  "module_regressions": {
+    "off": {
+      "passed": true,
+      "checks": {
+        "profile_validation": {
+          "unsupported_bus": true,
+          "flash_gpio": true,
+          "conflicting_pins": true,
+          "always_selected_shared_bus": true,
+          "duplicate_id": true
+        },
+        "c2_shared_spi": {
+          "lcd_sd_transfer": true,
+          "topology": "shared_bus",
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "cs_isolation": true,
+          "wrong_sck_blocked": true,
+          "wrong_miso_blocked": true,
+          "sd_snapshot_unchanged": true
+        },
+        "c3_shared_spi": {
+          "lcd_sd_transfer": true,
+          "topology": "shared_bus",
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "cs_isolation": true,
+          "wrong_sck_blocked": true,
+          "wrong_miso_blocked": true,
+          "sd_snapshot_unchanged": true
+        },
+        "esp32_dual_spi": {
+          "lcd_sd_transfer": true,
+          "topology": "two_hosts",
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "cs_isolation": true,
+          "wrong_sck_blocked": true,
+          "wrong_miso_blocked": true,
+          "sd_snapshot_unchanged": true
+        },
+        "c2_i2c": {
+          "alternate_gpio_oled": true,
+          "wrong_scl_nack": true
+        },
+        "c3_i2c": {
+          "alternate_gpio_oled": true,
+          "wrong_scl_nack": true
+        },
+        "legacy_cyd_mmio": {
+          "legacy_flags": true,
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "sd_idle_high": true,
+          "snapshot_unchanged": true
+        }
+      },
+      "qemu_sha256": {
+        "riscv32": "0b3f6f69c28be627faf8b68135435728a4648a417f07016bb576c872e41616e6",
+        "xtensa": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35"
+      }
+    },
+    "on": {
+      "passed": true,
+      "checks": {
+        "profile_validation": {
+          "unsupported_bus": true,
+          "flash_gpio": true,
+          "conflicting_pins": true,
+          "always_selected_shared_bus": true,
+          "duplicate_id": true
+        },
+        "c2_shared_spi": {
+          "lcd_sd_transfer": true,
+          "topology": "shared_bus",
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "cs_isolation": true,
+          "wrong_sck_blocked": true,
+          "wrong_miso_blocked": true,
+          "sd_snapshot_unchanged": true
+        },
+        "c3_shared_spi": {
+          "lcd_sd_transfer": true,
+          "topology": "shared_bus",
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "cs_isolation": true,
+          "wrong_sck_blocked": true,
+          "wrong_miso_blocked": true,
+          "sd_snapshot_unchanged": true
+        },
+        "esp32_dual_spi": {
+          "lcd_sd_transfer": true,
+          "topology": "two_hosts",
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "cs_isolation": true,
+          "wrong_sck_blocked": true,
+          "wrong_miso_blocked": true,
+          "sd_snapshot_unchanged": true
+        },
+        "c2_i2c": {
+          "alternate_gpio_oled": true,
+          "wrong_scl_nack": true
+        },
+        "c3_i2c": {
+          "alternate_gpio_oled": true,
+          "wrong_scl_nack": true
+        },
+        "legacy_cyd_mmio": {
+          "legacy_flags": true,
+          "lcd_pixels": true,
+          "sd_sector_write_read": true,
+          "sd_idle_high": true,
+          "snapshot_unchanged": true
+        }
+      },
+      "qemu_sha256": {
+        "riscv32": "f3d7b0243606e21c12e0b57e3cb084524a577cc732bf24f0fc055f35bc08fdc5",
+        "xtensa": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35"
+      }
+    }
+  },
+  "failed_oracles": [
+    {
+      "report": "quiet-boot-final-native-silent-20261017/test-report.json",
+      "reason": "Later host wall time is not the icount guest time scale; no firmware defect established."
+    },
+    {
+      "report": "ntp-boot-original-silent-20261017/test-report.json",
+      "reason": "RTC STORE2/3 alone omits SDK reset-relative timer corrections. Verified stock RV32 loads at 0x420b288c/0x403802da locate both signed offsets; corrected calculation passes the unchanged one-second bound."
+    }
+  ],
+  "failed_attempts_preserved": true
+}

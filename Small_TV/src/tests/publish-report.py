@@ -7,6 +7,9 @@ from photo_frame_contract import validate_photo_frames
 from photo_controls_contract import validate_photo_brightness, validate_photo_controls, validate_photo_reinit
 from photo_settings_contract import validate_photo_settings
 from advanced_qemu import validate_advanced
+from http_body_contract import validate_http_body, validate_http_body_guards
+from concurrency_contract import validate_concurrency, validate_concurrency_guards
+from boot_state_contract import validate_boot_state, validate_boot_rejections
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -98,6 +101,10 @@ def main():
         raise ValueError('Profile validation and firmware used different profile/compiler inputs')
     if not qemu['inputs_unchanged']:
         raise ValueError('Emulator or helpers changed during execution')
+    validate_boot_state(qemu, {
+        'app_sha256': report['app_sha256'], 'elf_sha256': text['native_elf_sha256'],
+        'observer_test_sha256': qemu['boot_observer_test_sha256']})
+    validate_boot_rejections(qemu)
     for name in ('startup_wait', 'weather_wait', 'advanced_http', 'photo_http', 'photo_frames', 'photo_brightness', 'photo_controls', 'photo_reinit', 'photo_settings'):
         gate = qemu[name]
         if (not gate['passed'] or not gate['inputs_unchanged'] or
@@ -114,6 +121,17 @@ def main():
     photo = qemu['photo_http']
     advanced = qemu['advanced_http']
     validate_advanced(advanced)
+    body_http = qemu['body_http']
+    validate_http_body(body_http, {'app_sha256': report['app_sha256'], 'source_sha256': report['source_sha256'],
+        'qemu_sha256': qemu['qemu_sha256'],
+        'test_sha256': hashlib.sha256((ROOT / 'Small_TV/src/tests/http_body_qemu.py').read_bytes()).hexdigest()})
+    validate_http_body_guards(body_http)
+    concurrency_http = qemu['concurrency_http']
+    validate_concurrency(concurrency_http, {'app_sha256': report['app_sha256'], 'source_sha256': report['source_sha256'],
+        'qemu_sha256': qemu['qemu_sha256'], 'native_elf_sha256': text['native_elf_sha256'],
+        'test_sha256': hashlib.sha256((ROOT / 'Small_TV/src/tests/concurrency_qemu.py').read_bytes()).hexdigest(),
+        'formatter_sha256': hashlib.sha256((ROOT / 'Small_TV/src/tests/photo_protocol.py').read_bytes()).hexdigest()})
+    validate_concurrency_guards(concurrency_http)
     if advanced['profile_sha256'] != qemu['profile_sha256'] or advanced['source_sha256'] != report['source_sha256']:
         raise ValueError('Advanced editor tested different profile/source inputs')
     for item in advanced['artifact_inputs']:
@@ -288,6 +306,8 @@ def main():
     qemu_sources.extend(row['reconstructed']['source'] for row in qemu['scenes'].values())
     qemu_sources.append(qemu['http_initial_setup']['flows']['reconstructed']['sources'])
     qemu_sources.append(qemu['weather_http']['flows']['reconstructed']['sources'])
+    qemu_sources.append(body_http['sources'])
+    qemu_sources.append(concurrency_http['sources'])
     qemu_sources.append(fields['flows']['reconstructed']['sources'])
     qemu_sources.append(time_http['flows']['reconstructed']['sources'])
     qemu_sources.append(native_text['sources'])
@@ -363,6 +383,9 @@ def main():
     summary['qemu'] = {'passed': qemu['passed'], 'qemu_sha256': qemu['qemu_sha256'],
                        'profile_sha256': qemu['profile_sha256'], 'scope': qemu['scope'],
                        'helper_sha256': qemu['helper_sha256'],
+                       'boot_observer_test_sha256': qemu['boot_observer_test_sha256'],
+                       'boot_observer_unit': qemu['boot_observer_unit'],
+                       'boot_observer_contract_checks': qemu['boot_observer_contract_checks'],
                        'inputs_unchanged': qemu['inputs_unchanged'],
                        'startup_wait': startup,
                        'weather_wait': held_weather,
@@ -371,7 +394,7 @@ def main():
                        'photo_brightness': idle_brightness,
                        'photo_controls': controls_http,
                        'photo_reinit': reinit_http,
-                       'photo_settings': photo_settings,
+                       'photo_settings': photo_settings, 'body_http': body_http, 'concurrency_http': concurrency_http,
                        'advanced_http': advanced,
                        'http_initial_setup': qemu['http_initial_setup'],
                        'weather_http': qemu['weather_http'],
@@ -386,7 +409,10 @@ def main():
                                'literal_iana_differences':sum(not sample['matches_iana'] for row in flow['cases'] for sample in row['samples'])}
                                for variant,flow in calendar_http['flows'].items()}},
                        'completed_scenes': completed,
-                       'boot_reset': {name: {key: row[key] for key in ('passed', 'checks', 'duration_seconds', 'network')}
+                       'boot_reset': {name: {**{key: row[key] for key in ('passed', 'checks', 'duration_seconds', 'network',
+                                                                      'firmware', 'qemu_sha256', 'runtime_observation',
+                                                                      'clock_layout', 'ntp_observation', 'reset_ntp_observation', 'qemu_diagnostics_enabled')},
+                                                   'prepared': {'sources': row['prepared']['sources']}}
                                       for name, row in qemu['boot_reset'].items()},
                        'scenes': {name: {'passed': True,
                                         'variants': {variant: {key: row[variant][key] for key in ('no_panic', 'ntp_reply', 'virtual_seconds')}
