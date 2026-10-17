@@ -1863,6 +1863,98 @@ Frozen92 test sources и92 дополнительных inputs; после ст�
 Дополнительный installed-A74 CYD/C3 boot handle85263 тоже пока не объявлен pass.
 Ни BIN/ELF, ни production/test/helper inputs при этой записи не менялись.
 
+### 2026-10-17 — signed RSSI labels в отдельной ветке
+
+В codex/small-tv-rssi-label устранён factory Math.abs bug в HTML по flash offsets
+0x26edc/0x2963b. Форматтер вынесен в wifi_network.js и встроен exporter в обе
+страницы; option values/selection сохранены. Negative controls8fail наold,
+8pass наnew: signed/zero/missing/malformed/literalSSID/nonfinite. Повторный export
+идемпотентен, photo page прежняя. Реальный browser на SDK/QEMU показал
+yoRadio-QEMU(-24dBm), QEMU-2(-28dBm), QEMU-3(-40dBm);0JS errors. ВМ/tabs закрыты.
+
+Ordinary D78A7639/F5F39276 иdebug5E468EB3/8FAE6071 собраны, sourceF8A3A6A8;
+среди59inputs изменёнтолько generated/web_pages.c. Size ordinary1 169 888,
+free366 112. Оба development archives сохранены. Host3950/platform46/frontend/
+integrity6/timezone9/aggregation14 pass. Первые DOM mocks исправлены (getter,
+изоляция посторонних GET); early artifact run без native coverage сохранёнfailed.
+
+Debug fixed8host reset smoke не дождался SNTP, connectedtrue/notifyfalse/NTPcount1
+на6.46guest s. Source подтверждает randomized startup LWIP_RAND()%5000. Oldfailed
+сохранён, отдельный probe успешен. В QEMUfeature2a593f8d00 state-based readiness
+с15guest/60host deadline и прежнимUTC<1s:19units/3actual guests pass. Ordinary
+5.688host/3.913510guest;debug8.250/6.415086;factory9.031/7.767985. Consumer29 checks
+дляобоих native pass. SDK delay иQEMUdevicecode не менялись. Scoped MD/JSON сохранены.
+Root full67941 наEF66/81CF/8FCE/A74 продолжает исполняться,184 frozen fingerprints
+повторно unchanged. До terminal/save этогоfull ветки не интегрировать.
+
+### 2026-10-17 — отдельный UART guard длительного теста
+
+Приаудите H10 выяснено: clean_uart проверяет panic tokens, но не silent resets;
+radio time сохраняется приreset, поэтому один elapsed24h не доказываетнепрерывный
+app uptime. Добавлен отдельный runtime_run_guard.py: весьUART, ROM banner+Build,
+count1,panic/watchdog,truncation.7unitcases pass,включаяresetпосреди незавершённой
+строки иliteral embedded marker. Guardread-only, отдельныйJSON,не меняет30 H10inputs.
+Первыйattach QMPtimeout: workloadдержитsoleconnection. Присоединениеисправлено
+наfile-only guard, никакогоновогосоединения; этотpreflightнеfirmwaredefect.
+Guard99431 работаетрядом с H10 31890 наD78A/F5F3/frozenA74+FF0819. Guardиmemory
+trend обязательны дляприёмки H10; ранние samples/основнойpassed не замена.
+
+### 2026-10-17 — независимый анализ полного runtime журнала
+
+В отдельном analysis worktree добавлены три инструмента: runtime_evidence
+проверяет полный журнал и identities, runtime_trend сравнивает heap в равных
+фазах, analyze_runtime формирует отдельное заключение. Анализ файлов не требует
+QMP, не останавливает гостя и не меняет входы workload. Сверяются каждый cycle,
+HTTP/upload/outage, арифметика heap, ROM crosscheck, app/ELF binding, elapsed,
+wraps, начальный checkpoint и terminal UART guard. Pending и короткие прогоны
+не получают H10 pass. Старый preflight без guard читается в своём ограниченном
+объёме, но не повышается до приёмки 24 часов.
+
+Trend: прогрев 1 час; полные часовые окна; НОК(20, outage cadence) фаз, то есть
+60 для H10 с отключением каждые 60 циклов. Неизменный SDK minimum не скрывает
+убывающий free heap. Устойчивое снижение или сохранённая потеря выше начального
+разброса требуют дальнейшего исследования. Результат ограничен разрешением
+замеров; физическая плата, ISR peaks и непрерывный календарь не подтверждаются.
+
+20 unit tests проходят: настоящая сериализация RuntimeJournal, фальсифицированные
+идентификаторы/агрегаты/время, недостающий upload chunk, ложный reconnect,
+переставленные snapshots, reset, усечённый JSONL, live prefix, phase jitter,
+утечка и retained step, synthetic 24h. Первый запуск не смог создать nested
+files в redirected sandbox TEMP (WinError5); повтор с TEMP внутри .build прошёл.
+Реальный короткий preflight и префикс H10 успешно прочитаны, все 30 source SHA
+совпали. Анализ preflight не объявлен 24h pass. H10 и полный frozen regression
+продолжаются; входы выполняющихся процессов не изменены.
+
+### 2026-10-17 — коллизия настоящего SSID manual
+
+В отдельном worktree исправлен factory setup HTML flash offset 0x026edc:
+условие ssid==manual принимало реальную сеть за команду ручного ввода. Новый
+isManualWifiSelection в общем Wi-Fi module помечен FIXED_FACTORY и читает
+метку selected option. Два fallback option помечаются exporter; передача
+SSID/password и отмена prompt сохранены. Все 15 actual scan/submit callback
+cases проходят. Negative control на заводском и прежнем native HTML показывает
+лишний prompt именно для настоящего SSID manual. Первый mock run имел ошибку
+фикстуры: password node создавался лениво, но тест обращался к нему напрямую.
+После исправления фикстуры 14 случаев old pass, один old fail, все new pass.
+
+Ordinary и debug production builds успешно сохранены. App A5439306/8485A233 и
+D1E7660D/EB4FDFB5; source721E26BD/59 inputs, меняется только generated/web_pages.c.
+SDK config прежний. Ordinary 1 169 888 байт/free366112; debug 1 230 384 байта.
+Host reduced: native3950/platform46/frontend15 Wi-Fi cases/integrity6/timezone9/
+aggregation14 проходят. Main frozen full не изменён, все184 identities совпали.
+
+Browser на отдельной QEMU VM с профилем station_ssid=manual: выбран настоящий
+option manual(-16dBm), manualEntry отсутствует. Submit приводит к success alert,
+configuration complete и после штатного reset к STA странице с загруженными
+controls. Matched-ELF SDK connected=true/AP=false/IP192.168.43.15/time_synced=true,
+UTC difference0.214516163. Два ROM boots, panic нет, source images unchanged,
+VM остановлена. Снимки сохранены; setup complete PNG добавлен к scoped proof.
+STA tab закрыта; setup tab после исчезновения AP дал CDP timeout, затем error
+page URL policy блокирует close. Он не помечен handoff/deliverable и оставлен
+для штатной automatic cleanup. Это не firmware defect и не полный H03/H10.
+Основной full67941 и длительный H10 31890/guard99431 продолжаются на своих
+прежних images; новый app не объявлен прошедшим эти прогоны.
+
 ### 2026-10-17 — RSSI и reset readiness follow-up, запуск H10
 
 Canonical A74 CYD/C3 legacy85263 завершёнpass. Root full67941 остаётсяжив,

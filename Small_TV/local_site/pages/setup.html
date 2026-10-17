@@ -157,6 +157,19 @@
     </div>
 
     <script>
+/** Format a network option while preserving the API's signed RSSI in dBm. */
+function formatWifiNetworkLabel(network) {
+    // FIXED_FACTORY: Math.abs erased the sign of received signal power.
+    const suffix = Number.isFinite(network.rssi) ? ` (${network.rssi}dBm)` : '';
+    return network.ssid + suffix;
+}
+
+/** Distinguish the manual-entry option from a real access point's SSID. */
+function isManualWifiSelection(select) {
+    // FIXED_FACTORY: the literal SSID "manual" is a valid discovered network.
+    return select.selectedOptions[0]?.dataset.manualEntry === 'true';
+}
+
         document.addEventListener('DOMContentLoaded', function() {
             const ssidSelect = document.getElementById('ssid');
 
@@ -182,10 +195,7 @@
                         networks.forEach((network, index) => {
                             const option = document.createElement('option');
                             option.value = network.ssid;
-                            option.textContent = network.ssid;
-                            if (network.rssi) {
-                                option.textContent += ` (${Math.abs(network.rssi)}dBm)`;
-                            }
+                            option.textContent = formatWifiNetworkLabel(network);
                             ssidSelect.appendChild(option);
 
                             // 默认选中第一个
@@ -205,6 +215,7 @@
                         // 添加手动输入选项
                         const manualOption = document.createElement('option');
                         manualOption.value = "manual";
+                        manualOption.dataset.manualEntry = "true";
                         manualOption.textContent = "Manually enter SSID";
                         ssidSelect.appendChild(manualOption);
                     }
@@ -223,6 +234,7 @@
 
                     const manualOption = document.createElement('option');
                     manualOption.value = "manual";
+                        manualOption.dataset.manualEntry = "true";
                     manualOption.textContent = "Manually enter SSID";
                     ssidSelect.appendChild(manualOption);
                 });
@@ -235,7 +247,7 @@
             const ssid = document.getElementById('ssid').value;
             const password = document.getElementById('password').value;
 
-            if (ssid === "manual") {
+            if (isManualWifiSelection(document.getElementById("ssid"))) {
                 const manualSsid = prompt("Please enter the WiFi SSID:");
                 if (!manualSsid) return;
 

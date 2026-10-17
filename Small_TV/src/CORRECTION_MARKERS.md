@@ -54,6 +54,8 @@
 | `backlight_init`, `backlight_set_level`, `backlight_update` | Последовательность включения LEDC, пропуск неизменившегося уровня и восстановление яркости после фото |
 | `captive_dns_reply` | Проверка границ DNS-пакета |
 | `web_settings_get`, `read_brightness`, `web_settings_post`, `web_scan` | Формат ответа, диапазон яркости, сохранение Wi-Fi и пустой результат сканирования |
+| `formatWifiNetworkLabel` (`local_site/wifi_network.js`) | Signed RSSI сохраняет минус перед dBm; нулевое измерение выводится, отсутствующее или нечисловое не получает выдуманную единицу |
+| `isManualWifiSelection` (`local_site/wifi_network.js`) | Служебный пункт ручного ввода определяется по метке option; настоящая сеть с SSID `manual` отправляется без лишнего prompt |
 | `settings_valid`, `settings_init`, `load_nvs`, `factory_settings_decode`, `factory_settings_encode`, `update_city` | Полный 20-байтный ключ страны/региона; миграция старого NVS без потери полей, исходный raw ABI сохранён |
 | `fetch_weather` | Отклонение ответа с ошибочным HTTP-статусом вместо публикации его JSON как погоды |
 | `timezone_utc_offset`, `time_sync_task`, `factory_local_time` | Явные переходы IANA вместо неявных американских DST-правил; обновление смещения при переходе и безопасная обработка ошибки календаря |
