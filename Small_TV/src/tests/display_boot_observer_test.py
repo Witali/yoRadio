@@ -1,5 +1,6 @@
 """Test exact-frame decisions; real PPM parsing is the existing display module's job."""
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -86,7 +87,9 @@ def main():
     args=parser.parse_args();args.temp_root.mkdir(parents=True,exist_ok=True);TEMP=args.temp_root
     suite=unittest.defaultTestLoader.loadTestsFromTestCase(ExactFrameTests)
     result=unittest.TextTestRunner(verbosity=2).run(suite)
+    sha=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
     report=dict(passed=result.wasSuccessful(),tests=result.testsRun,
+        test_source_sha256=sha(Path(__file__)),observer_source_sha256=sha(Path(__file__).with_name('display_boot_observer.py')),
         failures=[str(case) for case,_ in result.failures],errors=[str(case) for case,_ in result.errors])
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(report,indent=2)+'\n',newline='\n')
