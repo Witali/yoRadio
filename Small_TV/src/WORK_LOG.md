@@ -2866,3 +2866,11 @@ true. Это только начало нового прогона, не 24 ча
   browser-photo-validation-20261018.json +5rawgzip+2PNG. Первый development
   run также pass; final добавляет source tags и explicit ROM/VM identities.
   Production не менялся, frozen full533 и active H10 не редактировались.
+
+### 2026-10-18 — совместимость start record с file-only analyzer
+
+- Первая проверка нового start record получила evidence_rejected: отсутствовал
+  top-level guard metadata, хотя его исходный SHA уже был в supervisor snapshot.
+  Добавлены guard/source_file+source_sha256 и canonical duration field86400.
+  Формат исходного ee896b31 сохранён в Git; добавлена явная reconciliation note.
+  Ни workload, ни его31runtime/11QEMU inputs не менялись и не перезапускались.
