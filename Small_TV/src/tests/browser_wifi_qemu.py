@@ -58,7 +58,7 @@ def main():
     paths += [ROOT / 'Small_TV/local_site' / name for name in
         ('pages/setup.html', 'pages/settings.html', 'wifi_network.js')]
     paths += [args.qemu_root / 'tools' / name for name in ('small_tv_vm.py', 'small_tv_http_test.py',
-        'small_tv_web.py', 'small_tv_network.py', 'esp_board.py', 'esp_elf.py', 'esp_services.py')]
+        'small_tv_web.py', 'small_tv_network.py', 'esp_board.py', 'small_tv_display.py', 'esp_elf.py', 'esp_services.py')]
     inputs = {str(path.resolve()): digest(path) for path in paths}
     report = dict(passed=False, all_functionality_verified=False, tested_utc=dt.datetime.now(dt.timezone.utc).isoformat(),
         app_sha256=digest(archive / 'app.bin'), native_elf_sha256=digest(elf), qemu_sha256=digest(Path(options.qemu)),

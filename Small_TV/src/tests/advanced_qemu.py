@@ -64,7 +64,7 @@ def main():
     digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
     inputs = [{'file': path.relative_to(ROOT).as_posix(), 'sha256': digest(path)} for path in paths]
     helpers = {name: digest(args.qemu_root/'tools'/name) for name in
-        ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py')}
+        ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py', 'small_tv_display.py')}
     args.output.mkdir(parents=True, exist_ok=False)
     options = SimpleNamespace(yoradio=str(args.artifact_root), qemu=str(args.qemu_root/'bin/qemu-system-riscv32.exe'),
         rom_elf=str(args.dependency_root/'.idf/tools-v6.1/tools/esp-rom-elfs/20260528/esp32c2_rev200_rom.elf'),

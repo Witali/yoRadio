@@ -45,7 +45,7 @@ def main():
     files += [archive / name for name in ('manifest.json', 'source-manifest.json', 'sdkconfig',
               'app.bin', 'bootloader.bin', 'partition-table.bin', 'assets.bin', 'assets-manifest.json')]
     files += [args.qemu_root / 'tools' / name for name in ('small_tv_vm.py', 'small_tv_http_test.py',
-              'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py')]
+              'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'small_tv_display.py', 'esp_elf.py')]
     pins = {str(path.resolve()): sha(path) for path in files}
     report = {'passed': False, 'all_functionality_verified': False, 'scope': __doc__,
               'firmware_debug': firmware_debug, 'qemu_debug': qemu_debug, 'checks': {},

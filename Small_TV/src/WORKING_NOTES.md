@@ -2040,3 +2040,17 @@ WORK_LOG/WORKING_NOTES и 539/31+11 входов ради обновления �
 Следующие обязательные шаги: расследовать CYD-разницу, выполнить полный набор
 на окончательной паре 0592/новый QEMU и затем полный H10 с проверкой живых
 process handles, footer, UART и memory trend. Физическая плата не прошивалась.
+
+## Актуальный контекст: отдельные reset-проверки, 2026-10-18
+
+Рабочая ветка codex/small-tv-reset-display. Старые jpeg-uploads, H10 и
+small-tv-runtime-supervision frozen; их src/SDK/archive/snapshot не редактировать.
+Результат failed full553 сохранён bc9aff58; ложное условие объединяло
+ROM reboot и мгновенный кадр после network-ready. Готовность сети и дисплея
+теперь имеют независимые observers, tests и решения. См. tests/RESET_SUBSYSTEMS.md.
+Наш app0592/ELFaea10675/sourceD338 и QEMU D64 неизменны. Новый helper лежит
+в отдельном QEMU tools/small_tv_display.py; его fingerprint добавлен в связанные
+input registries, чтобы публикация не принимала старые зависимости.
+Native short: original +3 reconstructed pass. Требуются terminal полный suite,
+продолжающийся H10 (его sole QMP/RSP принадлежит workload) и расследование CYD.
+Следующие записи после freeze полного прогона вести только в qemu/parity.

@@ -439,6 +439,8 @@ def main():
                        'helper_sha256': qemu['helper_sha256'],
                        'boot_observer_test_sha256': qemu['boot_observer_test_sha256'],
                        'boot_observer_unit': qemu['boot_observer_unit'],
+                       'display_observer_unit': qemu['display_observer_unit'],
+                       'display_observer_test_sha256': qemu['display_observer_test_sha256'],
                        'boot_observer_contract_checks': qemu['boot_observer_contract_checks'],
                        'inputs_unchanged': qemu['inputs_unchanged'],
                        'startup_wait': startup,
@@ -472,7 +474,8 @@ def main():
                        'completed_scenes': completed,
                        'boot_reset': {name: {**{key: row[key] for key in ('passed', 'checks', 'duration_seconds', 'network',
                                                                       'firmware', 'qemu_sha256', 'runtime_observation',
-                                                                      'clock_layout', 'ntp_observation', 'reset_ntp_observation', 'qemu_diagnostics_enabled')},
+                                                                      'clock_layout', 'ntp_observation', 'reset_ntp_observation', 'qemu_diagnostics_enabled',
+                                                                      'reset_display_observation', 'checks_by_subsystem', 'boot_observation')},
                                                    'prepared': {'sources': row['prepared']['sources']}}
                                       for name, row in qemu['boot_reset'].items()},
                        'scenes': {name: {'passed': True,

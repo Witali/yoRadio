@@ -2967,3 +2967,25 @@ true. Это только начало нового прогона, не 24 ча
   воспроизведением ENOSPC. См. tests/RUNTIME_SUPERVISION.md и новый proof в
   Small_TV/qemu/parity. Полный новый H10, полный набор на новом QEMU и CYD
   PHY/cache расследование остаются обязательными следующими шагами.
+
+## 2026-10-18 — независимые проверки сети и дисплея после reset
+
+- Старый полный 0592/D64 завершился с failed QEMU: 18 других групп pass,
+  network/DHCP/SNTP после reset pass, два ROM-баннера, но единственный
+  after-reset кадр полностью чёрный. Все 553 frozen inputs совпали.
+  Сырой failure и live H10 checkpoint сохранены коммитом bc9aff58.
+- В отдельной ВМ с прежним неизменным helper воспроизведён partial frame
+  624 -> 11629 RGB-байтов за 0.034633 гостевой секунды. Это гонка host capture
+  с очисткой/отрисовкой, а не доказанный отказ SNTP или перезагрузки.
+- По требованию пользователя результаты разделены на boot/network/display/
+  source_integrity. Дисплей вынесен в small_tv_display.py, наблюдает только
+  240x240 PPM и bounded clocks. Сеть использует прежний SDK/NTP observer.
+  Network timeout не пропускает display; display error не стирает network.
+  Метки FIXED_TEST объясняют исправление; production app/ELF/source не менялись.
+- Пройдены независимые 9 panel +3 isolation, прежние 19 ELF/SNTP,
+  8 consumer tests и 38 реальных report rejection controls. Отдельный native
+  прогон original + три reconstructed завершён успешно на неизменном D64;
+  это короткая проверка, а не полный suite или H10 acceptance.
+- Новая ветка codex/small-tv-reset-display создана от bc9aff58. Live H10
+  остаётся в small-tv-runtime-supervision с прежним frozen helper; новых
+  QMP/RSP клиентов к нему нет. Полный новый прогон и CYD ещё не приняты.

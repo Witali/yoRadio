@@ -216,7 +216,7 @@ def main():
         ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf']}
     pins.update({str(args.qemu_root/'tools'/name):digest(args.qemu_root/'tools'/name) for name in
         ['small_tv_vm.py','small_tv_http_test.py','small_tv_network.py','small_tv_web.py',
-         'esp_elf.py','esp_board.py','esp_services.py']})
+         'small_tv_display.py', 'esp_elf.py','esp_board.py','esp_services.py']})
     archive=ROOT/'firmware/development/small-tv-esp32c2-reconstructed'
     pins.update({str(archive/name):digest(archive/name) for name in
         ['app.bin','bootloader.bin','partition-table.bin','assets.bin','manifest.json','source-manifest.json']})

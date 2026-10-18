@@ -37,7 +37,7 @@ def main():
            args.qemu_root/'bin/qemu-system-riscv32.exe',args.node,args.browser_executable]
     files += [archive/name for name in ('app.bin','bootloader.bin','partition-table.bin','assets.bin','manifest.json','source-manifest.json')]
     files += [ROOT/'Small_TV/local_site'/name for name in ('pages/photo.html','photo_crop.js','photo_crop.html','jpeg_metadata.js','photo_upload.js')]
-    files += [args.qemu_root/'tools'/name for name in ('small_tv_vm.py','small_tv_web.py','small_tv_http_test.py','small_tv_network.py','esp_board.py','esp_services.py','esp_elf.py')]
+    files += [args.qemu_root/'tools'/name for name in ('small_tv_vm.py','small_tv_web.py','small_tv_http_test.py','small_tv_network.py','esp_board.py','esp_services.py','small_tv_display.py', 'esp_elf.py')]
     inputs={str(path.resolve()):digest(path) for path in files}
     state=args.output/'vm'
     options=SimpleNamespace(yoradio=str(ROOT),firmware='reconstructed',

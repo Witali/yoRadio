@@ -46,7 +46,7 @@ def main():
     files += [deps / 'Small_TV/src/tests' / name for name in ('weather_qemu.py', 'time_qemu.py')]
     files += [deps / 'Small_TV/qemu/parity/compare.py']
     files += [args.qemu_root / 'tools' / name for name in
-              ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'esp_elf.py')]
+              ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py', 'esp_board.py', 'esp_services.py', 'small_tv_display.py', 'esp_elf.py')]
     archive = root / 'firmware/development/small-tv-esp32c2-reconstructed'
     files += ([root / 'Small_TV/full-flash.bin'] if args.firmware == 'original' else
               [archive / name for name in ('app.bin', 'bootloader.bin', 'partition-table.bin', 'assets.bin', 'source-manifest.json')])

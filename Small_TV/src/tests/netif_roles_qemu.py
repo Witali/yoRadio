@@ -130,7 +130,7 @@ def main():
              root / 'Small_TV/full-flash.bin', root / 'Small_TV/manifest.json']
     paths += [args.qemu_root / 'tools' / name for name in
               ('small_tv_vm.py', 'small_tv_http_test.py', 'small_tv_network.py', 'small_tv_web.py',
-               'esp_elf.py', 'esp_board.py', 'esp_services.py')]
+               'small_tv_display.py', 'esp_elf.py', 'esp_board.py', 'esp_services.py')]
     paths += [archive / name for name in ('app.bin', 'bootloader.bin', 'partition-table.bin', 'assets.bin',
                                          'manifest.json', 'source-manifest.json', 'assets-manifest.json')]
     pins = {str(path.resolve()): observer.digest(path) for path in paths}
