@@ -128,3 +128,11 @@ are retained: the CYD header-name comparison was made explicit; the C3 `.c`
 include is an intentional compatibility translation unit, documented locally
 with a single rule annotation after compiling it in both firmware and host
 tests. No general analyzer or memory-safety check was disabled.
+
+After continuous frame routing, full runs cover
+[14 CYD units](../tests/results/native-lint-20261018/cyd-frames/report.json)
+(11 warnings) and [all 49 C3 units](../tests/results/native-lint-20261018/c3-frames/report.json)
+(98 warnings), with zero parse/tool errors. The shared queue has no diagnostics.
+The additional CYD warning is the existing frame-info zero initialization with
+an enum whose named values begin at one; keep it in the sentinel/type review
+queue. It is not evidence of an observed invalid frame or memory failure.
