@@ -1,0 +1,66 @@
+{
+  "passed": false,
+  "source_sha256": {
+    "tests/run-flac-stream-eof.py": "2a29dadac3baf1aad6f185b9df3433b958186faf22ac14960e2092613093b8e2",
+    "tests/native/flac_stream_eof/main.cpp": "a083ccfa6a05ad31e4fdf350e054ca1ae683d4f951236f8e2b948206566d1667",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.h": "d5c561cd2136a0c8390a67fb6640ec5f01d8c0f515341f4301104487bf636859",
+    "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.cpp": "920069ad2fe6d92de9b778ca6752fec67f29ec24d2a90f193efe32b4ebc81459",
+    "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.h": "f500ddeadc2edf3ee256c3e3504e8e7b9ba475325f0f96747f17dd270ee6c519",
+    "tools/audio_test_server/generate_flac_depths.py": "6f15589438a6fd31fb937e95e7f840a3288ff083c5e3771b6e9b486cede9f4c1",
+    "tests/native/flac_bounds/Arduino.h": "628aa1fa77fc1f1f89201aca3c8b03b5ba7a09806ee4ef143929a42f3bc12713",
+    "tests/native/flac_depths/esp_log.h": "49aec4db379ab4897c025a85d6c7431c04b3634e61d84f8b899c7d48bd3ce0e3",
+    "tests/native/flac_depths/esp_timer.h": "2167a9e5540cc84aa19d0d620c0ea15d742bf54dfa8a822c89df60e92f83ed3d",
+    "tests/native/flac_depths/freertos/FreeRTOS.h": "648f54077655cc28cab1a906ba83b33c74fdf867ecb29b0e08cffe7c848ed5ea",
+    "tests/native/flac_depths/freertos/task.h": "8e45a8b6916d5f9bcb36977a0bd161f028cfe58ba507d518b242b32a6ee4aaab"
+  },
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "current": {
+    "exit_code": 1,
+    "groups": 5387,
+    "failures": 4308,
+    "metadata_bytes": 1077
+  },
+  "commands": [
+    [
+      "g++",
+      "-std=c++14",
+      "-O2",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-DFLAC_SEGMENTED_WORKSPACE=1",
+      "-DFLAC_OUTPUT_FRAMES=512",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-stream-eof-before-01/sources/tests/native/flac_bounds",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-stream-eof-before-01/sources/tests/native/flac_depths",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-stream-eof-before-01/sources/yoRadio/src/audioI2S/flac_decoder",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-stream-eof-before-01/sources/idf/esp32c3-oled-native/components/custom_flac",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-stream-eof-before-01/sources/yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-stream-eof-before-01/sources/idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.cpp",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-stream-eof-before-01/sources/tests/native/flac_stream_eof/main.cpp",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-stream-eof-before-01/current"
+    ],
+    [
+      "env",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1",
+      "timeout",
+      "90",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-stream-eof-before-01/current",
+      "cuts",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-stream-eof-before-01/metadata.flac",
+      "1077"
+    ]
+  ],
+  "scope": "Actual streaming FLAC metadata EOF regressions and unchanged exact PCM.\n\nPlatform seams are the existing timer/log/FreeRTOS/Arduino host headers. The\nproduction adapter and decoder compile unchanged, including every include.\nNo target scheduling, heap capacity, DMA or full FLAC conformance is claimed.\n",
+  "valid_pcm": [],
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+}
