@@ -4,7 +4,9 @@ config YORADIO_NATIVE_WEBSOCKET_TRANSPORT
     bool
     default y
     select HTTPD_WS_SUPPORT
+    select HTTPD_WS_PRE_HANDSHAKE_CB_SUPPORT
     select HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT
+    select HTTPD_WS_STRICTER_RFC6455
 
 config YORADIO_SHARED_DECODER_ARENA
     bool "Reserve one reusable heap for the decoder task (experimental)"

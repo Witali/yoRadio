@@ -272,6 +272,9 @@ idf_component_register(
     custom_legacy_codecs
     esp_audio_codec)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../esp32-cyd2usb-native/main/compat/httpd_rfc6455/enable.cmake")
+native_enable_httpd_rfc6455()
+
 yoradio_aac_profile()
 yoradio_vorbis_repair()
 if(CONFIG_YORADIO_SHARED_DECODER_ARENA)

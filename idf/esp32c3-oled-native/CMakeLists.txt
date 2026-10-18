@@ -185,9 +185,9 @@ endif()
 list(APPEND yoradio_lwip_sources "${yoradio_tcp_fixed}")
 set_property(TARGET ${yoradio_lwip_lib} PROPERTY SOURCES "${yoradio_lwip_sources}")
 
-# The original IDF 6.1 tag lacks the Content-Length guard; the pinned newer
-# revision has it. Preserve native guarded sources or generate a local
-# backport for audited older SDKs. Reject unknown sources rather than guessing.
+# Keep the audited Content-Length gate while the RFC6455 overlay owns the
+# compiled parser. The pinned SDK already contains this guard. A different
+# SDK that needs the older backport must be reviewed with that overlay too.
 idf_component_get_property(yoradio_httpd_lib esp_http_server COMPONENT_LIB)
 idf_component_get_property(yoradio_httpd_dir esp_http_server COMPONENT_DIR)
 set(yoradio_httpd_original "${yoradio_httpd_dir}/src/httpd_parse.c")
@@ -201,19 +201,11 @@ execute_process(COMMAND "${yoradio_python}" "${yoradio_httpd_generator}"
 if(NOT yoradio_httpd_patch_result EQUAL 0)
     message(FATAL_ERROR "Cannot preserve the audited HTTP Content-Length guard")
 endif()
-get_target_property(yoradio_httpd_sources ${yoradio_httpd_lib} SOURCES)
-set(yoradio_httpd_replaced 0)
-foreach(yoradio_source IN LISTS yoradio_httpd_sources)
-    if(yoradio_source MATCHES "(^|/)src/httpd_parse\\.c$")
-        list(REMOVE_ITEM yoradio_httpd_sources "${yoradio_source}")
-        math(EXPR yoradio_httpd_replaced "${yoradio_httpd_replaced}+1")
-    endif()
-endforeach()
-if(NOT yoradio_httpd_replaced EQUAL 1)
-    message(FATAL_ERROR "Expected exactly one HTTP parser source to replace")
+file(SHA256 "${yoradio_httpd_original}" yoradio_httpd_original_sha)
+file(SHA256 "${yoradio_httpd_fixed}" yoradio_httpd_guarded_sha)
+if(NOT yoradio_httpd_original_sha STREQUAL yoradio_httpd_guarded_sha)
+    message(FATAL_ERROR "RFC6455 overlay requires the SDK's native Content-Length guard")
 endif()
-list(APPEND yoradio_httpd_sources "${yoradio_httpd_fixed}")
-set_property(TARGET ${yoradio_httpd_lib} PROPERTY SOURCES "${yoradio_httpd_sources}")
 target_include_directories(${yoradio_httpd_lib} PRIVATE "${yoradio_httpd_dir}/src")
 set_source_files_properties("${yoradio_tcp_fixed}" PROPERTIES COMPILE_OPTIONS "-Wno-type-limits")
 
