@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "source_sha256": {
+    "tests/run-native-wifi-json.py": "b16bd257fc43d1cae6a6fc89195d02bb60f67d4816fb8b0c3fb5e236a043728a",
+    "tests/native/native_wifi_json_test.c": "5721773113c376960123a99946480111afff840bce1302b0995dd7278d6f2b6a",
+    "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+    "idf/components/native_wifi_store/native_wifi_json.c": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541",
+    "idf/components/native_wifi_store/include/native_wifi_file.h": "bf7e4a8e86383b74d477920b5a8b645afe4fe98e03ad0fd47180f1dd85b764fc",
+    "idf/components/native_wifi_store/include/native_wifi_http.h": "669661b5dc39e62e4cf6b5d71bcd8b728bad38f80e96540a1acb966288b817ae",
+    "idf/components/native_wifi_store/include/native_wifi_json.h": "e043d651d35b3c25d8a5ed948ff374892310b4be18064cab1660b920fed1ffd0",
+    "idf/components/native_wifi_store/include/native_wifi_public.h": "d70766490ef13378d9a85c644f6b37ddf5f8920caaba377e3f373b5d10fc8dc0",
+    "idf/components/native_wifi_store/include/native_wifi_request_io.h": "a5a3a59e41626630bf446e108214cc7f4ea394f79eb6809bb34b4b27be181265",
+    "idf/components/native_wifi_store/include/native_wifi_store.h": "060dda87c1d72a884cfeb16559c772963dfc018c73adf78804dad69462d76110",
+    "idf/components/native_wifi_store/CMakeLists.txt": "1e77bb717ee1a62775a65cb8a1d2491385797cf87eb35bd8e5f88e1859686b78"
+  },
+  "result": "2445 JSON groups passed; 20000 deterministic malformed-input probes",
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "semantic_controls": {
+    "accept-duplicate-member": {
+      "rejected": true
+    },
+    "retain-secret-after-invalid-json": {
+      "rejected": true
+    },
+    "accept-trailing-data": {
+      "rejected": true
+    },
+    "invalid-utf8-in-metadata": {
+      "rejected": true
+    }
+  },
+  "scope": "Actual production bounded JSON decoder/metadata encoder. Complete source frozen; synthetic values only. HTTP transport, UI and persistence separately qualified."
+}

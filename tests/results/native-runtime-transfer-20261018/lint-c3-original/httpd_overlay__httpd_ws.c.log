@@ -1,0 +1,34 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:163:13: warning: Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result' [clang-analyzer-deadcode.DeadStores]
+  163 |     while ((result = native_httpd_next_header(&headers, &item)) == 1) {
+      |             ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:163:13: note: Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result'
+  163 |     while ((result = native_httpd_next_header(&headers, &item)) == 1) {
+      |             ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:219:56: warning: incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings [bugprone-inc-dec-in-conditions]
+  219 |                         if (!any || p == item.end || *p++ != '"') return false;
+      |                                                        ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:219:37: note: variable is referenced here
+  219 |                         if (!any || p == item.end || *p++ != '"') return false;
+      |                                     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:274:9: warning: function 'strcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+  274 |     if (strcmp(version, "13"))
+      |         ^                    
+      |                               != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-web-transfer\native-httpd-rfc6455\httpd_ws.c:100:37: warning: narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  100 |     int supported_subprotocol_len = strlen(supported_subprotocol);
+      |                                     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-web-transfer\native-httpd-rfc6455\httpd_ws.c:154:5: warning: Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119 [clang-analyzer-security.insecureAPI.strcpy]
+  154 |     strcpy(server_raw_text, sec_key_encoded);
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-web-transfer\native-httpd-rfc6455\httpd_ws.c:154:5: note: Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119
+  154 |     strcpy(server_raw_text, sec_key_encoded);
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-web-transfer\native-httpd-rfc6455\httpd_ws.c:155:5: warning: Call to function 'strcat' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcat'. CWE-119 [clang-analyzer-security.insecureAPI.strcpy]
+  155 |     strcat(server_raw_text, ws_magic_uuid);
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-web-transfer\native-httpd-rfc6455\httpd_ws.c:155:5: note: Call to function 'strcat' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcat'. CWE-119
+  155 |     strcat(server_raw_text, ws_magic_uuid);
+      |     ^~~~~~
+27 warnings generated.
+Suppressed 21 warnings (21 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

@@ -308,8 +308,9 @@ retention, wakeup, погоды или deep-sleep hooks.
   прежних core-0 display/network bindings, AP-only startup, delayed GOT_IP,
   disconnect/LOST_IP, обнуление старого адреса, RAM storage и отсутствие
   подключения retained profile при пустом CSV на CYD/C3. CYD defaults теперь
-  задаёт `CONFIG_LWIP_SNTP_MAX_SERVERS=2`; старые build sdkconfig требуют
-  явного применения этой настройки при новой квалификации.
+  задаёт `CONFIG_LWIP_SNTP_MAX_SERVERS=2`; production wrapper поднимает
+  меньшую ёмкость до двух только в изолированном build sdkconfig, сохраняя
+  исходный seed и остальные настройки. Экспорт проверяет эту ёмкость.
 - [CYD HTTP handlers](../idf/esp32-cyd2usb-native/main/web_time.c): GET
   показывает desired/applied revisions и valid/invalid clock отдельно от
   сохранённых настроек. POST принимает ровно четыре query fields, валидирует
@@ -317,10 +318,13 @@ retention, wakeup, погоды или deep-sleep hooks.
   закрывается без HTTPD purge. 69 checks/7 groups +5 semantic controls проходят
   с ASan/UBSan; три actual response body разобраны JSON parser.
 
-Далее: завершение compact WebUI integration и общего evidence archive,
-actual SDK build + полный lint после заморозки исходников, физическая
-проверка ресурсов/сети. TFT clock widget, OLED/deep-sleep/RTC features
-в этот сервис не входят.
+Compact WebUI и [общий evidence archive](../tests/results/native-runtime-transfer-20261018/HOST.md)
+готовы. Полный clang-tidy охватывает 46 CYD/64 C3 units без tool errors.
+Реальный HTTPD/parser/session с API времени проходит 23 TCP и 23 native TLS
+сценария; два точных отрицательных контроля выявляют SDK body purge при
+возврате ESP_OK. [SDK qualification](../tests/results/native-runtime-transfer-20261018/SDK.md)
+фиксирует отдельные target builds. Физическая проверка ресурсов/сети
+остаётся. TFT clock widget, OLED/deep-sleep/RTC features в сервис не входят.
 
 Дополнительная проверка singleton ownership обнаружила disabled numeric-IP
 slot без имени: прежний guard считал его свободным, после чего actual apply

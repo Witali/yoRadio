@@ -180,8 +180,13 @@ authentication support.
   and target `web_wifi.c` adapters expose metadata and bounded typed edits.
   Request/session ownership, stale revision conflicts, timeouts, transport
   pending bytes and foreign session contexts have executable SDK-backed tests.
-  HTTP/TLS socket qualification and the explicit CSV import cutover remain
-  separate gates while their common request I/O helper is being integrated.
+  The [frozen qualification](../tests/results/native-runtime-transfer-20261018/HOST.md)
+  covers CYD97/C3107 handler groups, eight semantic controls per target and
+  124 actual HTTP/TLS socket cases. All three legacy import routes now use
+  the small shared I/O context and clear their whole private workspaces.
+  They reserve reboot before publishing any live asset, playlist or Wi-Fi
+  file; a durable Wi-Fi publication commits that reboot even if the response
+  fails. Terminal handlers close without invoking SDK unread-body purge.
 - [Public path boundary](../idf/components/native_wifi_store/include/native_wifi_public.h)
   runs before target asynchronous admission and again before the worker opens
   or recovers a file. Only exact `/data/playlist.csv` is public. CYD startup

@@ -1,0 +1,24 @@
+CASE get-null: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE get-valid: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE post-pending: requests=2 handler=2 req_delete=2 purge_calls=0 purge_bytes=0 commits=1
+CASE post-two: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=1
+CASE missing: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE duplicate: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE encoded-duplicate: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE nul: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE bad-percent: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE unknown: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE numeric: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE bounds: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE host-limit: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE get-query: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE uri-limit: requests=1 handler=0 req_delete=0 purge_calls=0 purge_bytes=0 commits=0
+CASE wrong-route: requests=1 handler=0 req_delete=0 purge_calls=0 purge_bytes=0 commits=0
+CASE wrong-method: requests=1 handler=0 req_delete=0 purge_calls=0 purge_bytes=0 commits=0
+CASE commit-failure: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=1
+CASE unavailable: requests=1 handler=1 req_delete=1 purge_calls=0 purge_bytes=0 commits=0
+CASE body-get: requests=1 handler=1 req_delete=0 purge_calls=0 purge_bytes=0 commits=0
+CASE body-post: requests=1 handler=1 req_delete=0 purge_calls=0 purge_bytes=0 commits=0
+CASE body-unread-large: requests=1 handler=1 req_delete=0 purge_calls=0 purge_bytes=0 commits=0
+CASE body-slow: requests=1 handler=1 req_delete=0 purge_calls=0 purge_bytes=0 commits=0
+PASS CYD time wire: 23 actual TCP/HTTPD/parser/session/native transport cases; plaintext or CA+hostname verified TLS; no SDK body purge

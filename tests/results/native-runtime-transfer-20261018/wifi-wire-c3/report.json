@@ -1,0 +1,216 @@
+{
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-native-wifi-integration.py": "f53d890cfdf60b74169fd335a589f080f34dcae52db32a7b6d251e3df6a98125",
+    "tests/native/wifi_integration/client.py": "b70579c30d4af7ff0a120dbb286eddfddbecf85400929f224eacca8673bf75b5",
+    "tests/native/wifi_integration/platform.c": "a2b6fd01366a20145c2684a2bf777732181ce190d04b843d2c4f709200e7e733",
+    "tests/native/wifi_integration/test.c": "01117342c059eddcf534b5c9f820a040d41dcba84fe69c1a204c843758d7cf5e",
+    "tests/run-native-ota-http.py": "d037297acc35d78776e1e0f1289583e9d82fa0509139b8c19363c9fc3e2f2b5c",
+    "idf/esp32-cyd2usb-native/main/web_static.c": "2284e19bcf704d1671ac1a72c4b14aee6f73915ba604ec791f5cbd40793bc5a8",
+    "idf/esp32c3-oled-native/main/web_service.c": "ecd4d9572e36dfe1796a1cddcffacc0234fccf6ab07290651594f1f524c27220"
+  },
+  "variants": {
+    "c3-plain": {
+      "passed": true,
+      "result": "PASS Wi-Fi wire integration: 31 localhost HTTP cases; 31 actual SDK session deletions; parser/URI/owner/JSON/import/private guards, pending body, 2s sender pause, real 10s idle/30s total, response OOM, reboot commit and full workspace wipes",
+      "wifi_source_sha256": {
+        "tests/run-native-wifi-http.py": "78ea2ac136aec48b9004c957f9a63c9edd48b370ee5bf87acf25945440cb1689",
+        "tests/run-native-ota-http.py": "d037297acc35d78776e1e0f1289583e9d82fa0509139b8c19363c9fc3e2f2b5c",
+        "tests/native/wifi_http/host.h": "8532b3faa32d968f8ca26a9b3ca17dffdfd2e1510306716fc8a08647c2f2e699",
+        "tests/native/wifi_http/platform.c": "a3cede8ebaa238fa6f7dabace83acbf47d7781f017f049f651165e7dd0b3f45c",
+        "tests/native/wifi_http/test.c": "3f11102a66cf7d9584506ee162d62183374c62b4d5cc3d629dd34ca3407bcba1",
+        "idf/components/native_wifi_store/native_wifi_file.c": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf",
+        "idf/components/native_wifi_store/native_wifi_http.c": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751",
+        "idf/components/native_wifi_store/native_wifi_json.c": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541",
+        "idf/components/native_wifi_store/native_wifi_request_io.c": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493",
+        "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+        "idf/components/native_wifi_store/include/native_wifi_file.h": "bf7e4a8e86383b74d477920b5a8b645afe4fe98e03ad0fd47180f1dd85b764fc",
+        "idf/components/native_wifi_store/include/native_wifi_http.h": "669661b5dc39e62e4cf6b5d71bcd8b728bad38f80e96540a1acb966288b817ae",
+        "idf/components/native_wifi_store/include/native_wifi_json.h": "e043d651d35b3c25d8a5ed948ff374892310b4be18064cab1660b920fed1ffd0",
+        "idf/components/native_wifi_store/include/native_wifi_public.h": "d70766490ef13378d9a85c644f6b37ddf5f8920caaba377e3f373b5d10fc8dc0",
+        "idf/components/native_wifi_store/include/native_wifi_request_io.h": "a5a3a59e41626630bf446e108214cc7f4ea394f79eb6809bb34b4b27be181265",
+        "idf/components/native_wifi_store/include/native_wifi_store.h": "060dda87c1d72a884cfeb16559c772963dfc018c73adf78804dad69462d76110",
+        "idf/components/native_wifi_store/CMakeLists.txt": "1e77bb717ee1a62775a65cb8a1d2491385797cf87eb35bd8e5f88e1859686b78",
+        "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+        "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b",
+        "idf/components/native_storage/include/web_file_form.h": "7a153796492ac086eb1fe4a34b0f8fb2d7a98b346198b1e71fa8dedb5d634153",
+        "idf/components/native_storage/include/web_multipart.h": "0a09a6302365c4e13f34f5f43744ca58ffd659258178a489461ae581b06f214c",
+        "idf/esp32-cyd2usb-native/main/web_wifi.c": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd",
+        "idf/esp32-cyd2usb-native/main/web_wifi.h": "5ddaa1855ebe13e35015f016947b09c79cf1341c872b01d5c041a4c115ef0bca",
+        "idf/esp32-cyd2usb-native/main/web_reboot.c": "399aaa9ca4a55528214e62d3b445abf8a43527443a824fa00177a553b805444e",
+        "idf/esp32-cyd2usb-native/main/web_reboot.h": "a224058b4cf48a49bd467ca50af7b8ed2acb8e9adfeb2cd2938e4d7e47479b76",
+        "idf/esp32-cyd2usb-native/main/network_service.c": "9535499210c1a55351a60b3a20522e8d402b855c0fb1f34afea7ee456f58ebdf",
+        "idf/esp32-cyd2usb-native/main/network_service.h": "280fc6c1a5e90d40d5fe73126ad45f030653b5d5f933af2aabb65edbe0ec6fce",
+        "idf/esp32c3-oled-native/main/web_wifi.c": "376f16a46b01b6b6b9141020711dcab0617c5bcd6a5f11cb1fd66d49fa27d172",
+        "idf/esp32c3-oled-native/main/web_wifi.h": "d07085058b3c51b5ff7a47fd281ae4528ec4b3554db9fe5dccd657310b18ccb3",
+        "idf/esp32c3-oled-native/main/network_service.c": "7a38632ac391250131e280827f53e718cb42a2594e4009b2fed5ad7c740fc42d",
+        "idf/esp32c3-oled-native/main/network_service.h": "511056597bab5c3f1048b1295ffd9e7cd948e4bba07abbebbe120c59c3634f3e",
+        "idf/esp32c3-oled-native/main/websocket_service.c": "a48c3e5d13223a136f87cee4a53a1ded93a22469fb6da959ea10cba45813d8a6",
+        "idf/esp32c3-oled-native/main/websocket_service.h": "870786b4028900c2d14022f2316d05f3246254db35737af3d52d6e6a1b797a07",
+        "idf/esp32c3-oled-native/main/web_service.c": "ecd4d9572e36dfe1796a1cddcffacc0234fccf6ab07290651594f1f524c27220",
+        "idf/esp32-cyd2usb-native/main/web_upload.c": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7",
+        "idf/esp32-cyd2usb-native/main/web_upload.h": "c13fbe33f581520e2b92fd1cbbfe116d5e6f0036e77a2de9517300533b7df6b0",
+        "idf/esp32c3-oled-native/main/web_upload.c": "ed9675ef52483d9cc2f8c9756f3dba3ecb21025876ee498efe9f6446f3b044ce",
+        "idf/esp32c3-oled-native/main/web_upload.h": "00a9d16e304d9b1097008f3200e9bfe888181afb87a5a06a1ef62bc60a9ea1ba"
+      },
+      "sdk_overlay": {
+        "sdk_profile": "6.1",
+        "sdk_source_sha256": {
+          "httpd_ws.c": "744304f779c54064d6453d2af3dcabde36c3b255a7930cbd903c0e8e4225eb3a",
+          "httpd_parse.c": "e32809f8f0bf820382759756b7fc3bb73fb4cf6ff3410d3fc26f27fc6e6cd280"
+        },
+        "sdk_header_sha256": {
+          "src/esp_httpd_priv.h": "e7032f9425979c2063548360249f58da2d945c86ed3bb6fafd3e5cf6101a708a",
+          "include/esp_http_server.h": "70cc75089d4a6a443e88d01cdbc8dff829c952d03bdece657da66d266294d8c7"
+        },
+        "generated_sha256": {
+          "httpd_ws.c": "33fad3dbb01815db3d20cfb4efbe450135cec03e57b0e5e34bcb90ae811ff946",
+          "httpd_parse.c": "1dff87c03c8abcf13ab5d0aacac088c685a8953b737bae674fde245d791ff396"
+        }
+      },
+      "sdk_sha256": {
+        "components/esp_http_server/src/httpd_ws.c": "744304f779c54064d6453d2af3dcabde36c3b255a7930cbd903c0e8e4225eb3a",
+        "components/esp_http_server/src/httpd_parse.c": "e32809f8f0bf820382759756b7fc3bb73fb4cf6ff3410d3fc26f27fc6e6cd280",
+        "components/esp_http_server/src/httpd_sess.c": "96fb619e14b097e2f485db8cf3372e8768117d68cfefc5f7ee036804caf2f904",
+        "components/esp_http_server/src/httpd_txrx.c": "db2e0165c4c6aaff43615f68357cd3adc4f2f3a0cea8fe988e72ff31f0735436",
+        "components/esp_http_server/src/httpd_uri.c": "c26d04fd77cd3a5bb9836588718b9e4fc69ba145b9654f56aed7ac51468f43d1",
+        "components/esp_http_server/src/esp_httpd_priv.h": "e7032f9425979c2063548360249f58da2d945c86ed3bb6fafd3e5cf6101a708a",
+        "components/esp_http_server/include/esp_http_server.h": "70cc75089d4a6a443e88d01cdbc8dff829c952d03bdece657da66d266294d8c7",
+        "components/http_parser/http_parser.c": "bc5750d936bdb1ca6064f65ec31f66578c9fee2a691ac298081fbc73a668be34",
+        "components/http_parser/http_parser.h": "caa7e5e6571a9067008b1bcb999c46f84157121163df2abec537fc39eeb8ba4d",
+        "components/mbedtls/mbedtls/tf-psa-crypto/utilities/base64.c": "5a8eb4e03e548aa95e33e14b92b2d663347d93a5ea338d9ed74f67aee437a42a"
+      },
+      "composed_sha256": {
+        "crypto.inc": "56cf9dce5918896e13b7fa78485458a071b73e0f787ce2b375fc42db328d4f95",
+        "network.inc": "58272c1af7b599054083b923dc2f5ce09981fcfe8437d05b55055d5b7adb4c19",
+        "reboot.inc": "2f4009be0b590d1c1d6972056e1a868fcbc38f62cb6e02687a3b7a52b3bdb4b5",
+        "sdk-base64.inc": "48491978ffd930cea3dc901e8ae792189cfa6e89dc8ba6c8b74bcfcd14b53b35",
+        "sdk-parse.inc": "b304767e9d84740d493c45322d6e0a5136927a78c47d25e804841a650174db9e",
+        "sdk-response.inc": "a1a833ef66b68c8fdac419d63706cf1660d8b7ce8752531417642adf313ee83f",
+        "sdk-sess.inc": "6aa7c0ba85628109fc1872490f1db21cd81925e1f235f8de0ffbba38f4c0494e",
+        "sdk-txrx.inc": "2aace20557fea8adf57ab88a333e2458bbcd4c9c947273b62b743f1b0a89e345",
+        "sdk-uri.inc": "ae27199027dd072ac149255c061934787b4f25ee1995a9c2554c6254dc34532c",
+        "sdk-ws.inc": "234a9491c790111b5cf0cbbaf30469b8aa70b761aa590cd16c8c67e6e11eab01",
+        "static.inc": "3c4e2dc15665dcfb06403df81344f345e1c07c6ca67a059c52bcaf9af1d58d34",
+        "target.inc": "ec7e6dba6615e6b103e8449ba37a4a814e9f79d5dfdda9c5cb32cb4800507c56",
+        "upload.inc": "f261021035d6f824c50d1936a6ac97a891ec6c9739aa9a8e032fad130f28906f"
+      },
+      "generated_model_sha256": "218ae54f9c98a0943d6ecee6ac789b9dbe72aa0fedd70b029b28258be138981d"
+    },
+    "c3-tls": {
+      "passed": true,
+      "result": "PASS Wi-Fi wire integration: 31 localhost HTTP cases; 31 actual SDK session deletions; parser/URI/owner/JSON/import/private guards, pending body, 2s sender pause, real 10s idle/30s total, response OOM, reboot commit and full workspace wipes",
+      "wifi_source_sha256": {
+        "tests/run-native-wifi-http.py": "78ea2ac136aec48b9004c957f9a63c9edd48b370ee5bf87acf25945440cb1689",
+        "tests/run-native-ota-http.py": "d037297acc35d78776e1e0f1289583e9d82fa0509139b8c19363c9fc3e2f2b5c",
+        "tests/native/wifi_http/host.h": "8532b3faa32d968f8ca26a9b3ca17dffdfd2e1510306716fc8a08647c2f2e699",
+        "tests/native/wifi_http/platform.c": "a3cede8ebaa238fa6f7dabace83acbf47d7781f017f049f651165e7dd0b3f45c",
+        "tests/native/wifi_http/test.c": "3f11102a66cf7d9584506ee162d62183374c62b4d5cc3d629dd34ca3407bcba1",
+        "idf/components/native_wifi_store/native_wifi_file.c": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf",
+        "idf/components/native_wifi_store/native_wifi_http.c": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751",
+        "idf/components/native_wifi_store/native_wifi_json.c": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541",
+        "idf/components/native_wifi_store/native_wifi_request_io.c": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493",
+        "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+        "idf/components/native_wifi_store/include/native_wifi_file.h": "bf7e4a8e86383b74d477920b5a8b645afe4fe98e03ad0fd47180f1dd85b764fc",
+        "idf/components/native_wifi_store/include/native_wifi_http.h": "669661b5dc39e62e4cf6b5d71bcd8b728bad38f80e96540a1acb966288b817ae",
+        "idf/components/native_wifi_store/include/native_wifi_json.h": "e043d651d35b3c25d8a5ed948ff374892310b4be18064cab1660b920fed1ffd0",
+        "idf/components/native_wifi_store/include/native_wifi_public.h": "d70766490ef13378d9a85c644f6b37ddf5f8920caaba377e3f373b5d10fc8dc0",
+        "idf/components/native_wifi_store/include/native_wifi_request_io.h": "a5a3a59e41626630bf446e108214cc7f4ea394f79eb6809bb34b4b27be181265",
+        "idf/components/native_wifi_store/include/native_wifi_store.h": "060dda87c1d72a884cfeb16559c772963dfc018c73adf78804dad69462d76110",
+        "idf/components/native_wifi_store/CMakeLists.txt": "1e77bb717ee1a62775a65cb8a1d2491385797cf87eb35bd8e5f88e1859686b78",
+        "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+        "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b",
+        "idf/components/native_storage/include/web_file_form.h": "7a153796492ac086eb1fe4a34b0f8fb2d7a98b346198b1e71fa8dedb5d634153",
+        "idf/components/native_storage/include/web_multipart.h": "0a09a6302365c4e13f34f5f43744ca58ffd659258178a489461ae581b06f214c",
+        "idf/esp32-cyd2usb-native/main/web_wifi.c": "915276ca112e33bac61a918bb22239158b71966c71e1402e7438a535dbde6dbd",
+        "idf/esp32-cyd2usb-native/main/web_wifi.h": "5ddaa1855ebe13e35015f016947b09c79cf1341c872b01d5c041a4c115ef0bca",
+        "idf/esp32-cyd2usb-native/main/web_reboot.c": "399aaa9ca4a55528214e62d3b445abf8a43527443a824fa00177a553b805444e",
+        "idf/esp32-cyd2usb-native/main/web_reboot.h": "a224058b4cf48a49bd467ca50af7b8ed2acb8e9adfeb2cd2938e4d7e47479b76",
+        "idf/esp32-cyd2usb-native/main/network_service.c": "9535499210c1a55351a60b3a20522e8d402b855c0fb1f34afea7ee456f58ebdf",
+        "idf/esp32-cyd2usb-native/main/network_service.h": "280fc6c1a5e90d40d5fe73126ad45f030653b5d5f933af2aabb65edbe0ec6fce",
+        "idf/esp32c3-oled-native/main/web_wifi.c": "376f16a46b01b6b6b9141020711dcab0617c5bcd6a5f11cb1fd66d49fa27d172",
+        "idf/esp32c3-oled-native/main/web_wifi.h": "d07085058b3c51b5ff7a47fd281ae4528ec4b3554db9fe5dccd657310b18ccb3",
+        "idf/esp32c3-oled-native/main/network_service.c": "7a38632ac391250131e280827f53e718cb42a2594e4009b2fed5ad7c740fc42d",
+        "idf/esp32c3-oled-native/main/network_service.h": "511056597bab5c3f1048b1295ffd9e7cd948e4bba07abbebbe120c59c3634f3e",
+        "idf/esp32c3-oled-native/main/websocket_service.c": "a48c3e5d13223a136f87cee4a53a1ded93a22469fb6da959ea10cba45813d8a6",
+        "idf/esp32c3-oled-native/main/websocket_service.h": "870786b4028900c2d14022f2316d05f3246254db35737af3d52d6e6a1b797a07",
+        "idf/esp32c3-oled-native/main/web_service.c": "ecd4d9572e36dfe1796a1cddcffacc0234fccf6ab07290651594f1f524c27220",
+        "idf/esp32-cyd2usb-native/main/web_upload.c": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7",
+        "idf/esp32-cyd2usb-native/main/web_upload.h": "c13fbe33f581520e2b92fd1cbbfe116d5e6f0036e77a2de9517300533b7df6b0",
+        "idf/esp32c3-oled-native/main/web_upload.c": "ed9675ef52483d9cc2f8c9756f3dba3ecb21025876ee498efe9f6446f3b044ce",
+        "idf/esp32c3-oled-native/main/web_upload.h": "00a9d16e304d9b1097008f3200e9bfe888181afb87a5a06a1ef62bc60a9ea1ba"
+      },
+      "sdk_overlay": {
+        "sdk_profile": "6.1",
+        "sdk_source_sha256": {
+          "httpd_ws.c": "744304f779c54064d6453d2af3dcabde36c3b255a7930cbd903c0e8e4225eb3a",
+          "httpd_parse.c": "e32809f8f0bf820382759756b7fc3bb73fb4cf6ff3410d3fc26f27fc6e6cd280"
+        },
+        "sdk_header_sha256": {
+          "src/esp_httpd_priv.h": "e7032f9425979c2063548360249f58da2d945c86ed3bb6fafd3e5cf6101a708a",
+          "include/esp_http_server.h": "70cc75089d4a6a443e88d01cdbc8dff829c952d03bdece657da66d266294d8c7"
+        },
+        "generated_sha256": {
+          "httpd_ws.c": "33fad3dbb01815db3d20cfb4efbe450135cec03e57b0e5e34bcb90ae811ff946",
+          "httpd_parse.c": "1dff87c03c8abcf13ab5d0aacac088c685a8953b737bae674fde245d791ff396"
+        }
+      },
+      "sdk_sha256": {
+        "components/esp_http_server/src/httpd_ws.c": "744304f779c54064d6453d2af3dcabde36c3b255a7930cbd903c0e8e4225eb3a",
+        "components/esp_http_server/src/httpd_parse.c": "e32809f8f0bf820382759756b7fc3bb73fb4cf6ff3410d3fc26f27fc6e6cd280",
+        "components/esp_http_server/src/httpd_sess.c": "96fb619e14b097e2f485db8cf3372e8768117d68cfefc5f7ee036804caf2f904",
+        "components/esp_http_server/src/httpd_txrx.c": "db2e0165c4c6aaff43615f68357cd3adc4f2f3a0cea8fe988e72ff31f0735436",
+        "components/esp_http_server/src/httpd_uri.c": "c26d04fd77cd3a5bb9836588718b9e4fc69ba145b9654f56aed7ac51468f43d1",
+        "components/esp_http_server/src/esp_httpd_priv.h": "e7032f9425979c2063548360249f58da2d945c86ed3bb6fafd3e5cf6101a708a",
+        "components/esp_http_server/include/esp_http_server.h": "70cc75089d4a6a443e88d01cdbc8dff829c952d03bdece657da66d266294d8c7",
+        "components/http_parser/http_parser.c": "bc5750d936bdb1ca6064f65ec31f66578c9fee2a691ac298081fbc73a668be34",
+        "components/http_parser/http_parser.h": "caa7e5e6571a9067008b1bcb999c46f84157121163df2abec537fc39eeb8ba4d",
+        "components/mbedtls/mbedtls/tf-psa-crypto/utilities/base64.c": "5a8eb4e03e548aa95e33e14b92b2d663347d93a5ea338d9ed74f67aee437a42a"
+      },
+      "composed_sha256": {
+        "crypto.inc": "56cf9dce5918896e13b7fa78485458a071b73e0f787ce2b375fc42db328d4f95",
+        "network.inc": "58272c1af7b599054083b923dc2f5ce09981fcfe8437d05b55055d5b7adb4c19",
+        "reboot.inc": "2f4009be0b590d1c1d6972056e1a868fcbc38f62cb6e02687a3b7a52b3bdb4b5",
+        "sdk-base64.inc": "48491978ffd930cea3dc901e8ae792189cfa6e89dc8ba6c8b74bcfcd14b53b35",
+        "sdk-functions.inc": "fbc52d77ef17bfa55d45c4063bed304e293f95086df2adb2162de376796e70b0",
+        "sdk-parse.inc": "b304767e9d84740d493c45322d6e0a5136927a78c47d25e804841a650174db9e",
+        "sdk-response.inc": "a1a833ef66b68c8fdac419d63706cf1660d8b7ce8752531417642adf313ee83f",
+        "sdk-sess.inc": "6aa7c0ba85628109fc1872490f1db21cd81925e1f235f8de0ffbba38f4c0494e",
+        "sdk-txrx.inc": "2aace20557fea8adf57ab88a333e2458bbcd4c9c947273b62b743f1b0a89e345",
+        "sdk-uri.inc": "ae27199027dd072ac149255c061934787b4f25ee1995a9c2554c6254dc34532c",
+        "sdk-ws.inc": "234a9491c790111b5cf0cbbaf30469b8aa70b761aa590cd16c8c67e6e11eab01",
+        "static.inc": "3c4e2dc15665dcfb06403df81344f345e1c07c6ca67a059c52bcaf9af1d58d34",
+        "target.inc": "ec7e6dba6615e6b103e8449ba37a4a814e9f79d5dfdda9c5cb32cb4800507c56",
+        "transport-production.inc": "a31e761e70c173ece5e4e1dff20c9df1f500f41cfcdc705dae2dd4d9a5a82b6a",
+        "upload.inc": "f261021035d6f824c50d1936a6ac97a891ec6c9739aa9a8e032fad130f28906f"
+      },
+      "generated_model_sha256": "218ae54f9c98a0943d6ecee6ac789b9dbe72aa0fedd70b029b28258be138981d",
+      "tls_report_sha256": "68da9d2f0e27117a5682876fc4aa34732643e626d3fa5668bc5294896ca9ae58",
+      "crypto_archive_sha256": "72b9a557501ccca26a90a7ab409f4be2c093cfd2748b6e9c1f7645a3c9e8e60d",
+      "tls_source_sha256": {
+        "tests/run-native-web-tls.py": "f7ca992ce6848190c3f8454a6b9d85935f8feb316637431d9f1cb4c1214b5b97",
+        "tests/native/native_web_transport/esp_tls_host.c": "8d529fe6aca7fdd572adda6e9e4a4ec813b29943dd539c040a2c31583e0bfde8",
+        "tests/native/native_web_transport/tls_client.py": "e1a242917f3396845e0def67c250e080c175f500e63ac22b7656f9a2717a3325",
+        "idf/components/native_web_transport/native_web_transport.c": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf",
+        "idf/components/native_web_transport/include/native_web_transport.h": "c4122c3f2d960e8922ceaa1c179c415e15e3d74abdea86424e6fde4633e0a045",
+        "idf/components/native_web_transport/tools/pack_tls_bundle.py": "e9986a083e0e08de45662b3012b6e3c912f2ace75dce33676e012f749615e6f8",
+        "sdk/components/esp-tls/esp_tls.c": "5b575c188acedd581d8438e2b4125f74170237dce6da876c7b3912d0291d59f2",
+        "sdk/components/esp-tls/esp_tls_mbedtls.c": "cacc35f509cfda8779d058ff7ed6e01ce2218967443079f90281dc8718510055",
+        "sdk/components/esp-tls/esp_tls.h": "c000a387e2babf2138c06ae29733dfec51cab3316638fd1333e145f2aed34a50",
+        "sdk/components/esp-tls/esp_tls_errors.h": "5ec732e7dee5c82c4523cfa6a471f077ac7e88adbfe6d1855087865e3318dd2a",
+        "sdk/components/esp-tls/private_include/esp_tls_private.h": "0e1d6a28215231594aec1d6ed500458872ee764a07563746eaaa41e3f06476e5",
+        "sdk/components/esp-tls/private_include/esp_tls_mbedtls.h": "58df4a52cbcfe6a5193bad9a06bddc0a28be83139e2736d8d4b4ec2bfb198762",
+        "sdk/components/esp_security/include/esp_key_config.h": "0d599045f12c91b4e6e730ed2630a61b22c6805669e7828e910a8b2bf41146c9"
+      }
+    }
+  },
+  "input_report_sha256": {
+    "wifi": "b32cece1f94513c14796fa7ece66c7722c78bf482044e50b701bb932a0d11a44",
+    "ws": "781efdbeb0cabac9d197d0bf2a6fe196258613b8f70ebb0006613960689f3cec"
+  },
+  "passed": true,
+  "scope": "Real localhost TCP and CA/hostname-verified OpenSSL TLS1.2 client, frozen pinned HTTPD parser/URI/pending-body/response/session, actual Wi-Fi owner/JSON/HTTP/request I/O/target adapters/reboot reservations and full legacy import handlers; exact static admission and worker bodies (CYD private activation variable renamed to avoid single-TU collision). Native TLS uses actual transport, selected pinned ESP-TLS and pinned software MbedTLS. Host field layouts, foreground sess_process, inline async/static queue, NVS transport provision and synthetic host filesystem with SPIFFS rename rule are explicit seams. Publication-late advances clock only after durable host rename; idle/overall tests use real time. No target RAM/ABI/RTOS scheduling, actual SPIFFS/power-loss, radio reconnect, or hardware TLS claim."
+}

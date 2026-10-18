@@ -1,0 +1,106 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:163:13: warning: Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result' [clang-analyzer-deadcode.DeadStores]
+  163 |     while ((result = native_httpd_next_header(&headers, &item)) == 1) {
+      |             ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:163:13: note: Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result'
+  163 |     while ((result = native_httpd_next_header(&headers, &item)) == 1) {
+      |             ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:219:56: warning: incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings [bugprone-inc-dec-in-conditions]
+  219 |                         if (!any || p == item.end || *p++ != '"') return false;
+      |                                                        ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:219:37: note: variable is referenced here
+  219 |                         if (!any || p == item.end || *p++ != '"') return false;
+      |                                     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:274:9: warning: function 'strcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+  274 |     if (strcmp(version, "13"))
+      |         ^                    
+      |                               != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:137:35: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  137 |     if ((parser_data->last.length += length) > raux->max_uri_len) {
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:137:35: note: if it should be an assignment, move it out of the 'if' condition
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:137:35: note: if it is meant to be an equality check, change '=' to '=='
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:155:24: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined [bugprone-narrowing-conversions]
+  155 |     ssize_t unparsed = parser_data->raw_datalen - (at - ra->scratch);
+      |                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:328:36: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined [bugprone-narrowing-conversions]
+  328 |         ssize_t remaining_length = parser_data->raw_datalen - (at - ra->scratch);
+      |                                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:598:20: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  598 |             return nparsed;
+      |                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:632:12: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  632 |     return offset + nparsed;
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:673:22: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  673 |         if ((blk_len = read_block(r, &parser, offset, PARSER_BLOCK_SIZE)) < 0) {
+      |              ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:673:22: note: if it should be an assignment, move it out of the 'if' condition
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:673:22: note: if it is meant to be an equality check, change '=' to '=='
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:692:21: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  692 |         if ((offset = parse_block(&parser, offset, blk_len)) < 0) {
+      |              ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:692:21: note: if it should be an assignment, move it out of the 'if' condition
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:692:21: note: if it is meant to be an equality check, change '=' to '=='
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:742:51: warning: Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd') [clang-analyzer-core.NullDereference]
+  742 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |                                                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:855:5: note: Loop condition is false. Execution continues on line 879
+  855 |     while (ra->remaining_len) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:879:30: note: Assuming field 'sd' is null
+  879 |     bool native_ws_closing = ra->sd && ra->sd->ws_close;
+      |                              ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:879:37: note: Left side of '&&' is false
+  879 |     bool native_ws_closing = ra->sd && ra->sd->ws_close;
+      |                                     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:883:5: note: Calling 'httpd_req_cleanup'
+  883 |     httpd_req_cleanup(r);
+      |     ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:742:10: note: Assuming the condition is true
+  742 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:742:9: note: Left side of '&&' is true
+  742 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:742:51: note: Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd')
+  742 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |                                                   ^   ~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:750:17: warning: Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd') [clang-analyzer-core.NullDereference]
+  750 |     ra->sd->ctx = r->sess_ctx;
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:855:5: note: Loop condition is false. Execution continues on line 879
+  855 |     while (ra->remaining_len) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:879:30: note: Assuming field 'sd' is null
+  879 |     bool native_ws_closing = ra->sd && ra->sd->ws_close;
+      |                              ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:879:37: note: Left side of '&&' is false
+  879 |     bool native_ws_closing = ra->sd && ra->sd->ws_close;
+      |                                     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:883:5: note: Calling 'httpd_req_cleanup'
+  883 |     httpd_req_cleanup(r);
+      |     ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:742:10: note: Assuming the condition is false
+  742 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:742:47: note: Left side of '&&' is false
+  742 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |                                               ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:750:17: note: Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd')
+  750 |     ra->sd->ctx = r->sess_ctx;
+      |         ~~      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:927:14: warning: function 'strncasecmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+  927 |             (strncasecmp(qry_ptr, key, offset))) {
+      |              ^                                
+      |                                                != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:1056:14: warning: function 'strncasecmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+ 1056 |             (strncasecmp(hdr_ptr, field, strlen(field)))) {
+      |              ^                                         
+      |                                                         != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\build-lint-health\native-httpd-rfc6455\httpd_parse.c:1111:14: warning: function 'strncasecmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+ 1111 |             (strncasecmp(hdr_ptr, field, strlen(field)))) {
+      |              ^                                         
+      |                                                         != 0
+33 warnings generated.
+Suppressed 18 warnings (18 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

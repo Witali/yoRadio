@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "sdk": "v6.0.2",
+  "crypto_source_count": 117,
+  "crypto_fingerprint": "368ca86ba3c72c4ffa6f4d7391c6a2eb2750450eeb97f22e5fa3540cbae313c8",
+  "crypto_cache_used": true,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "openssl_client": "OpenSSL 3.0.13 30 Jan 2024",
+  "physical_hardware": false,
+  "private_key_container": "Qualified unencrypted RSA PKCS1 PEM; matching PKCS8 explicitly rejected",
+  "source_sha256": {
+    "tests/run-native-web-tls.py": "f7ca992ce6848190c3f8454a6b9d85935f8feb316637431d9f1cb4c1214b5b97",
+    "tests/native/native_web_transport/esp_tls_host.c": "8d529fe6aca7fdd572adda6e9e4a4ec813b29943dd539c040a2c31583e0bfde8",
+    "tests/native/native_web_transport/tls_client.py": "e1a242917f3396845e0def67c250e080c175f500e63ac22b7656f9a2717a3325",
+    "idf/components/native_web_transport/native_web_transport.c": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf",
+    "idf/components/native_web_transport/include/native_web_transport.h": "c4122c3f2d960e8922ceaa1c179c415e15e3d74abdea86424e6fde4633e0a045",
+    "idf/components/native_web_transport/tools/pack_tls_bundle.py": "e9986a083e0e08de45662b3012b6e3c912f2ace75dce33676e012f749615e6f8",
+    "sdk/components/esp-tls/esp_tls.c": "1790a0c7de2b41f1f44caceae0fbc0a0fd366e3e6570750eeb4fa0a91fe2f93f",
+    "sdk/components/esp-tls/esp_tls_mbedtls.c": "72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7",
+    "sdk/components/esp-tls/esp_tls.h": "ce5b788664885025e509cc17fed24844b9fc4ed3a8cec8da5c87c199fd8e168d",
+    "sdk/components/esp-tls/esp_tls_errors.h": "5ec732e7dee5c82c4523cfa6a471f077ac7e88adbfe6d1855087865e3318dd2a",
+    "sdk/components/esp-tls/private_include/esp_tls_private.h": "132fed94eed0f33d480037f4c58944b98d2fefc5de64f11197a79ab9e0343dad",
+    "sdk/components/esp-tls/private_include/esp_tls_mbedtls.h": "58df4a52cbcfe6a5193bad9a06bddc0a28be83139e2736d8d4b4ec2bfb198762"
+  },
+  "backend_functions": [
+    "esp_mbedtls_cleanup",
+    "set_ca_cert",
+    "set_pki_context",
+    "set_server_config",
+    "esp_create_mbedtls_handle",
+    "esp_mbedtls_get_ssl_context",
+    "esp_mbedtls_read",
+    "esp_mbedtls_write",
+    "esp_mbedtls_get_bytes_avail",
+    "esp_mbedtls_server_session_init",
+    "esp_mbedtls_server_session_continue_async",
+    "esp_mbedtls_server_session_delete"
+  ],
+  "public_functions": [
+    "esp_tls_init",
+    "esp_tls_server_session_init",
+    "esp_tls_server_session_continue_async",
+    "esp_tls_server_session_delete",
+    "esp_tls_get_bytes_avail",
+    "esp_tls_get_ssl_context",
+    "esp_tls_set_conn_state",
+    "esp_tls_conn_read",
+    "esp_tls_conn_write"
+  ],
+  "cases": 8,
+  "mbedtls_version": "Mbed TLS 4.1.0",
+  "want_read": 2,
+  "want_write": 3,
+  "partial_writes": 3,
+  "provisioning": {
+    "qualified_pkcs1": "accepted; real TLS successful",
+    "matching_pkcs8": "independently OpenSSL-valid; packer rejects without output; pinned embedded pair check rejects without NVS mutation",
+    "mismatched_pkcs1": "pinned embedded pair check rejects without NVS mutation"
+  },
+  "scope": "Actual native_web_transport with pinned MbedTLS software crypto and verbatim selected ESP-TLS server/public functions; real loopback sockets and Python OpenSSL trusted client. Host HTTPD/NVS/type-layout/log/error-tracker/client-only configuration seams; generic software MbedTLS configuration, no ESP hardware acceleration/dynamic-buffer, target ABI/RAM/timing or NVS power-loss claim. Ephemeral certificate/private keys never archived."
+}

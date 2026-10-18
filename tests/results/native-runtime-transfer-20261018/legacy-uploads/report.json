@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "physical_hardware": false,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-cyd-uploads.py": "21a096f4031af85b0d287b930763dbca746a8fdab743cec45a4bc4c1cd7a20ed",
+    "tests/native/cyd_upload_test.c": "3bc10cd63db211316419de8a291efba0fc432d5c867cfcefe33944a491a03e68",
+    "tests/native/cyd_upload_reboot_test.c": "bea7301918de117329c2a9bd8235959321091b880953db010ddf2b0f2f2517e0",
+    "tests/native/cyd_upload_pair_test.c": "48a06b6dd86592eafd5f5184fce37fc132e18201b18ad011e55cd9c5167ef1e8",
+    "tests/run-web-warning-regressions.py": "b74ce4aec3f2c8d658825065f66432779764b4a7e8e5a33c0c308b36233529a7",
+    "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+    "idf/components/native_wifi_store/native_wifi_file.c": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf",
+    "idf/components/native_wifi_store/include/native_wifi_store.h": "060dda87c1d72a884cfeb16559c772963dfc018c73adf78804dad69462d76110",
+    "idf/components/native_wifi_store/include/native_wifi_file.h": "bf7e4a8e86383b74d477920b5a8b645afe4fe98e03ad0fd47180f1dd85b764fc",
+    "idf/esp32c3-oled-native/main/web_upload.c": "ed9675ef52483d9cc2f8c9756f3dba3ecb21025876ee498efe9f6446f3b044ce",
+    "idf/esp32c3-oled-native/main/web_upload.h": "00a9d16e304d9b1097008f3200e9bfe888181afb87a5a06a1ef62bc60a9ea1ba",
+    "idf/esp32-cyd2usb-native/main/web_upload.c": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7",
+    "idf/esp32-cyd2usb-native/main/web_upload.h": "c13fbe33f581520e2b92fd1cbbfe116d5e6f0036e77a2de9517300533b7df6b0",
+    "idf/esp32-cyd2usb-native/main/web_reboot.c": "399aaa9ca4a55528214e62d3b445abf8a43527443a824fa00177a553b805444e",
+    "idf/esp32-cyd2usb-native/main/web_reboot.h": "a224058b4cf48a49bd467ca50af7b8ed2acb8e9adfeb2cd2938e4d7e47479b76",
+    "idf/esp32-cyd2usb-native/main/network_service.c": "9535499210c1a55351a60b3a20522e8d402b855c0fb1f34afea7ee456f58ebdf",
+    "idf/esp32-cyd2usb-native/main/network_service.h": "280fc6c1a5e90d40d5fe73126ad45f030653b5d5f933af2aabb65edbe0ec6fce",
+    "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+    "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b",
+    "idf/components/native_storage/include/credential_line.h": "4d09bb3fc82c7125b82f6940778757a1aaebe4cf76dd8b9a6aff9641b7863fa2",
+    "idf/components/native_storage/include/web_file_form.h": "7a153796492ac086eb1fe4a34b0f8fb2d7a98b346198b1e71fa8dedb5d634153",
+    "idf/components/native_storage/include/web_multipart.h": "0a09a6302365c4e13f34f5f43744ca58ffd659258178a489461ae581b06f214c"
+  },
+  "variants": {
+    "upload": {
+      "passed": true,
+      "scenarios": 69
+    },
+    "upload-c3": {
+      "passed": true,
+      "scenarios": 68
+    },
+    "reboot": {
+      "passed": true,
+      "scenarios": 10
+    },
+    "pair": {
+      "passed": true,
+      "scenarios": 105
+    }
+  },
+  "scope": "Actual full CYD and C3 upload handlers and sink, shared multipart/form/transaction, actual CYD Wi-Fi persistence (also used as the explicit Wi-Fi API seam in the C3 upload leg); mapped host files with SPIFFS no-overwrite rename rule, HTTP fragmentation/errors/time budgets, bounded heap and IO faults. Radio candidate index preparation, scoped HTTP I/O/context and reboot lease are explicit models in the upload leg; canonical Wi-Fi HTTP suite separately qualifies actual request I/O and SDK context functions. Actual pair publication/rollback and interruption states and actual reboot task qualified separately. No claim of multi-file publication atomicity, physical SPIFFS durability, Wi-Fi reconnection, or hardware timing."
+}

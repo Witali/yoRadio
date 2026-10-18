@@ -211,3 +211,17 @@ clean source `3b8e5d2f`. GCC emits zero warnings for C3/PDM/continuous. The thre
 legacy warnings are deprecated APLL API calls in the pinned IDF 5.5.4 driver;
 the existing CYD configuration disables those APLL branches. They remain
 visible, with their origin and qualification limits recorded in the report.
+
+The time/private-Wi-Fi checkpoint completes
+[46 CYD units / 77 warnings](../tests/results/native-runtime-transfer-20261018/lint-cyd/report.json)
+and [64 C3 units / 127 warnings](../tests/results/native-runtime-transfer-20261018/lint-c3-final/report.json),
+with zero parse/tool errors. The C3 recovery keeps 61 completed original logs,
+runs two unfinished units and separately analyzes the newly registered
+`web_wifi.c`; its reconstructed source attribution is explicitly documented.
+The [delta review](../tests/results/native-runtime-transfer-20261018/lint-review/report.json)
+identifies no newly confirmed high-risk defect. A JSON bounds trace is infeasible; an
+independent guard argument and 416,784 ASan/UBSan helper checks support that
+classification without suppressing the warning. The AAC owner-view finding
+remains deferred. Experimental Xtensa Clang 20.1.1 optimized code generation
+crashes in `time_settings_valid`; successful AST analysis is separate from
+the production GCC image checks.

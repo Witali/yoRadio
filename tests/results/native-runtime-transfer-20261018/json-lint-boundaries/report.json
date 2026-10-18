@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "source_sha256": {
+    "idf/components/native_wifi_store/native_wifi_json.c": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541",
+    "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+    "idf/components/native_wifi_store/include/native_wifi_file.h": "bf7e4a8e86383b74d477920b5a8b645afe4fe98e03ad0fd47180f1dd85b764fc",
+    "idf/components/native_wifi_store/include/native_wifi_http.h": "669661b5dc39e62e4cf6b5d71bcd8b728bad38f80e96540a1acb966288b817ae",
+    "idf/components/native_wifi_store/include/native_wifi_json.h": "e043d651d35b3c25d8a5ed948ff374892310b4be18064cab1660b920fed1ffd0",
+    "idf/components/native_wifi_store/include/native_wifi_public.h": "d70766490ef13378d9a85c644f6b37ddf5f8920caaba377e3f373b5d10fc8dc0",
+    "idf/components/native_wifi_store/include/native_wifi_request_io.h": "a5a3a59e41626630bf446e108214cc7f4ea394f79eb6809bb34b4b27be181265",
+    "idf/components/native_wifi_store/include/native_wifi_store.h": "060dda87c1d72a884cfeb16559c772963dfc018c73adf78804dad69462d76110"
+  },
+  "result": "416784 direct helper boundary checks passed; all BMP escapes and representative surrogate/raw UTF-8 boundaries; exact actual helper code",
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "scope": "Focused synthetic boundary investigation only: actual static append/string/hex4 helpers included unmodified. Supports mathematical invariant; finite probes are not exhaustive verification over all size_t values or all JSON inputs.",
+  "proof": "At append entry successful guard gives used<capacity and size<capacity-used, hence used+size<capacity and no size_t overflow; trailing NUL is in bounds. hex4 returns at most 65535, so saved Clang path takes impossible >=65536 non-surrogate branch. No production change or suppression."
+}

@@ -1,0 +1,1840 @@
+{
+  "tool": "LLVM (http://llvm.org/):\n  LLVM version 21.1.3\n  Optimized build.",
+  "build_dir": "idf/esp32c3-oled-native/build-lint-web-transfer",
+  "include_httpd_overlay": true,
+  "config_sha256": "27b1de038a07a9476ab195865192e9eebc8b58d036b0f359a6689caf2b7aed64",
+  "source_commit": "3f1da5f4843e744634a9e21167d6d31aeed9befd",
+  "dirty": true,
+  "units": 63,
+  "complete": true,
+  "results": [
+    {
+      "file": "idf/components/audio_level_led/audio_level_led.c",
+      "source_sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.726845+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__audio_level_led__audio_level_led.c.log",
+      "log_sha256": "bef90ac162c34c42bfc79ffebdd68aba47ceb11628aacdeb850f17aca2be2e04"
+    },
+    {
+      "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+      "source_sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T16:50:20.151511+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__custom_flac__custom_flac_adapter.cpp.log",
+      "log_sha256": "02109c4628a5c8f64fdae56483b79668b900ec0b007241fc3b87ad239c57df9e"
+    },
+    {
+      "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+      "source_sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.731044+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_legacy_codecs/custom_legacy_adapter.h",
+          "line": 11,
+          "column": 9,
+          "severity": "warning",
+          "message": "enum 'custom_legacy_kind_t' uses a larger base type ('unsigned int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size",
+          "check": "performance-enum-size"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_legacy_codecs\\custom_legacy_adapter.cpp",
+          "line": 276,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_legacy_codecs\\custom_legacy_adapter.cpp",
+          "line": 305,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__custom_legacy_codecs__custom_legacy_adapter.cpp.log",
+      "log_sha256": "0ff8bd25ae86799e9ccd7e37354f920c679e49f553d1aeb5cc3ea2ca60976ea1"
+    },
+    {
+      "file": "idf/components/native_audio_settings/native_audio_settings.c",
+      "source_sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.733133+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_audio_settings__native_audio_settings.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/components/native_ota/native_ota_form.c",
+      "source_sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T16:04:57.334881+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 48,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 55,
+          "column": 20,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 86,
+          "column": 26,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 170,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 271,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 300,
+          "column": 38,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 19,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 47,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\native_ota_form.c",
+          "line": 20,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\native_ota_form.c",
+          "line": 23,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_ota__native_ota_form.c.log",
+      "log_sha256": "b26647e43c715cb10eb38ae91cfb47037da18ed89cdf21aef4b50a09d9e27211"
+    },
+    {
+      "file": "idf/components/native_ota/native_ota_http.c",
+      "source_sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T16:21:29.677459+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 48,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 55,
+          "column": 20,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 86,
+          "column": 26,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 170,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 271,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 300,
+          "column": 38,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 19,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 47,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_ota__native_ota_http.c.log",
+      "log_sha256": "2f3d1d6fc42108a94d58b25ecdf8c75e32829cce58c98c6fdd5912c3f172a642"
+    },
+    {
+      "file": "idf/components/native_ota/native_ota_sink.c",
+      "source_sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T16:01:22.683325+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_ota__native_ota_sink.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/components/native_storage/file_transaction.c",
+      "source_sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T14:57:42.343998+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_storage__file_transaction.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/components/native_time/native_time_sntp.c",
+      "source_sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T16:55:19.983696+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_time__native_time_sntp.c.log",
+      "log_sha256": "5826a5244924cbb250158159a480a20769e18d07bf91cf265d6cd5253ca7cf65"
+    },
+    {
+      "file": "idf/components/native_time/native_time_sntp_context.c",
+      "source_sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T17:24:49.059247+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_time__native_time_sntp_context.c.log",
+      "log_sha256": "5826a5244924cbb250158159a480a20769e18d07bf91cf265d6cd5253ca7cf65"
+    },
+    {
+      "file": "idf/components/native_web_transport/native_web_transport.c",
+      "source_sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T16:21:23.574821+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_web_transport\\native_web_transport.c",
+          "line": 59,
+          "column": 48,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_web_transport__native_web_transport.c.log",
+      "log_sha256": "9755c3dc719f4e434066e544b63f6a8a94161b04588a58a2e0ebd071f8b5d128"
+    },
+    {
+      "file": "idf/components/native_wifi_store/native_wifi_file.c",
+      "source_sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T16:53:36.614595+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_file.c",
+          "line": 12,
+          "column": 12,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_file.c",
+          "line": 13,
+          "column": 12,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_file.c",
+          "line": 14,
+          "column": 12,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_wifi_store__native_wifi_file.c.log",
+      "log_sha256": "ee58b1e033535ff50c890518079be1a0bd0c70277a943bfc6bcacae9e44f9293"
+    },
+    {
+      "file": "idf/components/native_wifi_store/native_wifi_http.c",
+      "source_sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T17:21:27.841361+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_http.c",
+          "line": 42,
+          "column": 9,
+          "severity": "warning",
+          "message": "function 'strcasecmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_wifi_store__native_wifi_http.c.log",
+      "log_sha256": "0223dc55d7452e1b15ad964d86288e0efb52fb09739e5d6b1504c1d8bf478dec"
+    },
+    {
+      "file": "idf/components/native_wifi_store/native_wifi_json.c",
+      "source_sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T16:57:07.023822+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_json.c",
+          "line": 61,
+          "column": 5,
+          "severity": "warning",
+          "message": "Out of bound access to memory after the end of 'action'",
+          "check": "clang-analyzer-security.ArrayBound"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_wifi_store__native_wifi_json.c.log",
+      "log_sha256": "2cb7594cdbfbcfa09438ae5310db7f1418f3d8e09cda000cea03e49a266e4684"
+    },
+    {
+      "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+      "source_sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T17:21:28.706380+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_wifi_store__native_wifi_request_io.c.log",
+      "log_sha256": "5826a5244924cbb250158159a480a20769e18d07bf91cf265d6cd5253ca7cf65"
+    },
+    {
+      "file": "idf/components/native_wifi_store/native_wifi_store.c",
+      "source_sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T16:53:35.914308+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_store.c",
+          "line": 199,
+          "column": 9,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_store.c",
+          "line": 200,
+          "column": 26,
+          "severity": "warning",
+          "message": "an assignment within an 'if' condition is bug-prone",
+          "check": "bugprone-assignment-in-if-condition"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__components__native_wifi_store__native_wifi_store.c.log",
+      "log_sha256": "abf74b830a7e05f4c01fa69f4538a9f1d43b37b88e91c69b4e9db4a35715b88c"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/build-lint-web-transfer/native-httpd-rfc6455/httpd_parse.c",
+      "source_sha256": "1dff87c03c8abcf13ab5d0aacac088c685a8953b737bae674fde245d791ff396",
+      "source_proof": "Generated HTTPD overlay snapshot; original file mtime predates persisted log",
+      "source_mtime_utc": "2026-10-18T17:27:39.928247+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 163,
+          "column": 13,
+          "severity": "warning",
+          "message": "Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result'",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 219,
+          "column": 56,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 274,
+          "column": 9,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 142,
+          "column": 35,
+          "severity": "warning",
+          "message": "an assignment within an 'if' condition is bug-prone",
+          "check": "bugprone-assignment-in-if-condition"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 160,
+          "column": 24,
+          "severity": "warning",
+          "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 333,
+          "column": 36,
+          "severity": "warning",
+          "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 609,
+          "column": 20,
+          "severity": "warning",
+          "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 643,
+          "column": 12,
+          "severity": "warning",
+          "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 684,
+          "column": 22,
+          "severity": "warning",
+          "message": "an assignment within an 'if' condition is bug-prone",
+          "check": "bugprone-assignment-in-if-condition"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 703,
+          "column": 21,
+          "severity": "warning",
+          "message": "an assignment within an 'if' condition is bug-prone",
+          "check": "bugprone-assignment-in-if-condition"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 753,
+          "column": 51,
+          "severity": "warning",
+          "message": "Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd')",
+          "check": "clang-analyzer-core.NullDereference"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 761,
+          "column": 17,
+          "severity": "warning",
+          "message": "Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd')",
+          "check": "clang-analyzer-core.NullDereference"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 940,
+          "column": 14,
+          "severity": "warning",
+          "message": "function 'strncasecmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 1111,
+          "column": 13,
+          "severity": "warning",
+          "message": "function 'strncasecmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/httpd_overlay__httpd_parse.c.log",
+      "log_sha256": "f1e1d42d93715222ca6ce4c93341031957ed7a49ac813fa79d458d2d83e5f5e3"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/build-lint-web-transfer/native-httpd-rfc6455/httpd_ws.c",
+      "source_sha256": "33fad3dbb01815db3d20cfb4efbe450135cec03e57b0e5e34bcb90ae811ff946",
+      "source_proof": "Generated HTTPD overlay snapshot; original file mtime predates persisted log",
+      "source_mtime_utc": "2026-10-18T17:27:39.927246+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 163,
+          "column": 13,
+          "severity": "warning",
+          "message": "Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result'",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 219,
+          "column": 56,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 274,
+          "column": 9,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_ws.c",
+          "line": 100,
+          "column": 37,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_ws.c",
+          "line": 154,
+          "column": 5,
+          "severity": "warning",
+          "message": "Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119",
+          "check": "clang-analyzer-security.insecureAPI.strcpy"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer\\native-httpd-rfc6455\\httpd_ws.c",
+          "line": 155,
+          "column": 5,
+          "severity": "warning",
+          "message": "Call to function 'strcat' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcat'. CWE-119",
+          "check": "clang-analyzer-security.insecureAPI.strcpy"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/httpd_overlay__httpd_ws.c.log",
+      "log_sha256": "6971d9a0d4a2810eeb7b3fe53ced34229bcae9bda01e4b0d887b8bdb7f130d5b"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_compact_owner.c",
+      "source_sha256": "63bfbf7faa9277acf72a6ef586eda171cd112295aef496cd079ad16a8dc166bf",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T14:24:15.831385+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 35,
+          "severity": "warning",
+          "message": "do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead",
+          "check": "bugprone-casting-through-void"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 53,
+          "severity": "warning",
+          "message": "Out of bound access to memory preceding the field 'frame'",
+          "check": "clang-analyzer-security.ArrayBound"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 200,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 203,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__aac_compact_owner.c.log",
+      "log_sha256": "d9b26e8950e8bdd6a40e05ae8ab3d5a972ea3a87cadb30548e75bf95dedf41d7"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_fill_parser.c",
+      "source_sha256": "3f629e2b1df7dc7bd742df5f55970902eb9db38eb8b797a1e33debe5258b0766",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T10:58:40.764415+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\aac_fill_parser.c",
+          "line": 67,
+          "column": 37,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int32_t' (aka 'int') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\aac_fill_parser.c",
+          "line": 68,
+          "column": 36,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int32_t' (aka 'int') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__aac_fill_parser.c.log",
+      "log_sha256": "d865b4f4295b6f33582b54f3a9e14ffc4552671cc1ec069da9f7b3a9dd42749e"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_fill_wrappers.c",
+      "source_sha256": "9dbefde9e5ac320a815edbf1e12c3d86a26d4074864a488fcced668c8606bb3f",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T10:58:40.765415+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__aac_fill_wrappers.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_high_history.c",
+      "source_sha256": "e3ddc3ada1409b6cf08d992704a71dc73f0716276fac642ce674a75f868d725f",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T10:58:40.765920+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 35,
+          "severity": "warning",
+          "message": "do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead",
+          "check": "bugprone-casting-through-void"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 200,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 203,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__aac_high_history.c.log",
+      "log_sha256": "634559a2b6c2bb63444fa73717f79bee0137df39e5fa1ab5661d074e62999c49"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_profile.c",
+      "source_sha256": "192e2128ea9a637508a20b42e5e1a0d02b1c2d961e3c1b438891a0735eeddbad",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.770138+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 35,
+          "severity": "warning",
+          "message": "do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead",
+          "check": "bugprone-casting-through-void"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 200,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 203,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__aac_profile.c.log",
+      "log_sha256": "fd172eccb55dbfd0273839d79cb790e9242b8b2bb0742efa03db25b15489a7fc"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_sbr_reserve.c",
+      "source_sha256": "0ee26dde52102178114e84f236b03417361f509bd3bfd3dca6f3a25372c9f699",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T10:58:40.772144+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__aac_sbr_reserve.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_scratch_reserve.c",
+      "source_sha256": "422a60601f5746247678cadb38cdcb173f6e77bf716b1239db1db48a43397e8a",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T10:58:40.773144+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__aac_scratch_reserve.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_smoothing_history.c",
+      "source_sha256": "c5b5da4a71048c030ea832ea47e104b8ae56e495e7f47827a558a7a6bcab3035",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T10:58:40.774143+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 35,
+          "severity": "warning",
+          "message": "do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead",
+          "check": "bugprone-casting-through-void"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 200,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 203,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__aac_smoothing_history.c.log",
+      "log_sha256": "634559a2b6c2bb63444fa73717f79bee0137df39e5fa1ab5661d074e62999c49"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/adaptive_input.c",
+      "source_sha256": "dd8ae2f4030205d949a362165e49558ac4baeb92daa3c9df8240180baae7a239",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T11:49:53.347688+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__adaptive_input.c.log",
+      "log_sha256": "eb7162ab5ca33d98624c0fa1a2ce6de802ddd59882b58af614dff27e7c9f333d"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/app_main.c",
+      "source_sha256": "1ec056470034e4c1ec9f06e9d0fdb21b044c25f10b12ab921997eb565c4bf0cc",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.776143+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\app_main.c",
+          "line": 564,
+          "column": 29,
+          "severity": "warning",
+          "message": "The value '-1' provided to the cast expression is not in the valid range of values for the enum",
+          "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\app_main.c",
+          "line": 640,
+          "column": 37,
+          "severity": "warning",
+          "message": "The value '-1' provided to the cast expression is not in the valid range of values for the enum",
+          "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__app_main.c.log",
+      "log_sha256": "b426674870ec33958d5ac0f06c55f112d7be5a9cbb8c7cf56c2da1b435f5fd38"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/audio_service.c",
+      "source_sha256": "c98f0ab7f4e07bd561c0b88b307ecabda5885ea9e8540987f98c58d049f5a674",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T16:34:15.269706+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_stream/include/stream_frames.h",
+          "line": 47,
+          "column": 33,
+          "severity": "warning",
+          "message": "The value '0' provided to the cast expression is not in the valid range of values for the enum",
+          "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c",
+          "line": 450,
+          "column": 14,
+          "severity": "warning",
+          "message": "Value stored to 'load_tenths' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c",
+          "line": 454,
+          "column": 14,
+          "severity": "warning",
+          "message": "Value stored to 'speed_hundredths' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c",
+          "line": 2267,
+          "column": 5,
+          "severity": "warning",
+          "message": "Value stored to 'encoded_ring_size' is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__audio_service.c.log",
+      "log_sha256": "ba33eeeb239ff4e47993203fce1fa8246b262e88d99e78ed8ebfc47b3b2b6c29"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/codec_memory_trace.c",
+      "source_sha256": "ddc3a44711a76a5cb5cae60055c0427998314254f2cbd420ff07c7348e4394a8",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.780143+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__codec_memory_trace.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/cpu_profiler.c",
+      "source_sha256": "f06ff4fe60b2fd95311309485e7a4da22b6a910bbfc948ccf6ad53b81369ea8f",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T12:43:06.468582+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__cpu_profiler.c.log",
+      "log_sha256": "f513f27ba76ff364fba64352ea2383b21743c2e78f20cd20a308ae6abe1a2ff9"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/decoder_registration.c",
+      "source_sha256": "5381c1fb82755086c9a5922041212434417da8c531122d5512a7d2f35f573a1b",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.784947+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__decoder_registration.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/deep_sleep_clock.c",
+      "source_sha256": "e0f78c6bb5a8bac07f358acdb517eb0c4d17939b0e51739fc5a368957b46646c",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.786146+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__deep_sleep_clock.c.log",
+      "log_sha256": "f513f27ba76ff364fba64352ea2383b21743c2e78f20cd20a308ae6abe1a2ff9"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/display_settings.c",
+      "source_sha256": "c8303799f7884febb60dba10544976fed2a29e9a2f266ac0d0d925bcf38fbb99",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.786146+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__display_settings.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/encoder_input.c",
+      "source_sha256": "19799302ab9af83182370ab00134b0a749f370ef0d749c4020bc37ab3aec408d",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.787151+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__encoder_input.c.log",
+      "log_sha256": "f513f27ba76ff364fba64352ea2383b21743c2e78f20cd20a308ae6abe1a2ff9"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/icy_title.c",
+      "source_sha256": "f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T11:42:21.411526+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__icy_title.c.log",
+      "log_sha256": "14ad5f766c8dde93cab93fa31509360349ec269b768053b4cf2f977774552bd9"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/native_aac_decoder.c",
+      "source_sha256": "3564dd39668b191ce1c8485436afd35f41049e2be9fda8997b2f8962fc149f6a",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T10:58:40.794151+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 35,
+          "severity": "warning",
+          "message": "do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead",
+          "check": "bugprone-casting-through-void"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 200,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 203,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__native_aac_decoder.c.log",
+      "log_sha256": "634559a2b6c2bb63444fa73717f79bee0137df39e5fa1ab5661d074e62999c49"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/native_audio_normalizer.cpp",
+      "source_sha256": "58702deb2e6c58b7298e57d3622b893054365ac980aa17451846bcbab228807f",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.795151+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__native_audio_normalizer.cpp.log",
+      "log_sha256": "14f2b284a458d2bd4b5c86c992b353be72f05e39843fe683e01ca5bf4a26e9e1"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/native_audio_output.c",
+      "source_sha256": "b62f3a5e698ceb1beb89d2049b718949b6774700ba3c3c39249955d6155c5e93",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T16:24:14.567127+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\native_audio_output.c",
+          "line": 203,
+          "column": 31,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\native_audio_output.c",
+          "line": 204,
+          "column": 31,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\native_audio_output.c",
+          "line": 499,
+          "column": 18,
+          "severity": "warning",
+          "message": "Value stored to 'tenths' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__native_audio_output.c.log",
+      "log_sha256": "d87d194bde4e2bfb5996597bd6b0841bd66fe124a71e8b4b39d031b934582724"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/native_state.c",
+      "source_sha256": "1a0810c82a0593656313fccad8cd10b5afb9098d765e531bcd3196e0f1135425",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T16:22:49.993783+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__native_state.c.log",
+      "log_sha256": "f513f27ba76ff364fba64352ea2383b21743c2e78f20cd20a308ae6abe1a2ff9"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/network_service.c",
+      "source_sha256": "7a38632ac391250131e280827f53e718cb42a2594e4009b2fed5ad7c740fc42d",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T17:19:02.922489+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__network_service.c.log",
+      "log_sha256": "5826a5244924cbb250158159a480a20769e18d07bf91cf265d6cd5253ca7cf65"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/oled_display.c",
+      "source_sha256": "5f61ab4ae6db0b602c961f854a798b4196d94da58769855d8073d387db078926",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.803150+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\oled_display.c",
+          "line": 437,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\oled_display.c",
+          "line": 438,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\oled_display.c",
+          "line": 439,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\oled_display.c",
+          "line": 440,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__oled_display.c.log",
+      "log_sha256": "98c9427f026c11bd392d57f792cbdfba522346c28ed71b47f26b359edb76fe30"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/ota_upload.c",
+      "source_sha256": "7d50473fa6b3dbed2e1603d0755cc3fb2faf25c6e650f7674cf9e2fc7488efaf",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T16:04:58.243124+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 48,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 55,
+          "column": 20,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 86,
+          "column": 26,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 170,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 271,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 300,
+          "column": 38,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 19,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 47,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__ota_upload.c.log",
+      "log_sha256": "34c8557a9637fee854ebb803d450284b86f8e9a381cbb4f6c3e2fe97330da7ae"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/radio_control.c",
+      "source_sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T12:51:20.779660+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/radio_control_impl.h",
+          "line": 256,
+          "column": 14,
+          "severity": "warning",
+          "message": "Value stored to 'elapsed_ms' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__radio_control.c.log",
+      "log_sha256": "594fc3b207c965ec615e4c7c33bbf799b315c5236cd2aa9f43e2ad505124ea85"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/rtc_wake_stub_clock.c",
+      "source_sha256": "e9482268337a41d76b7c34d459d8e602dfcfac7427261b071a6a7c62cc4ef120",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.836650+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__rtc_wake_stub_clock.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/runtime_settings.c",
+      "source_sha256": "5a7d5d6f55169ee810953a317ebcaeba3d68bdaf95b5594ffab96fe79393eba1",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T16:50:13.532047+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__runtime_settings.c.log",
+      "log_sha256": "f513f27ba76ff364fba64352ea2383b21743c2e78f20cd20a308ae6abe1a2ff9"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/stream_http_reader.c",
+      "source_sha256": "3e6d5bb1d9eb487d16de96eb763f23bdcd7a73a94a572bb251a05bae29420dfe",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.840650+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__stream_http_reader.c.log",
+      "log_sha256": "5826a5244924cbb250158159a480a20769e18d07bf91cf265d6cd5253ca7cf65"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/tcp_pcb_pool.c",
+      "source_sha256": "971e826b6753db9ee21e8031f6550c0eaf3ed8f0992621b3e048440550a72e87",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T10:58:40.844650+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__tcp_pcb_pool.c.log",
+      "log_sha256": "5826a5244924cbb250158159a480a20769e18d07bf91cf265d6cd5253ca7cf65"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/time_service.c",
+      "source_sha256": "320a2ee380a1929ec5282792d8f332469da81a65d36f03689f04f55262816b90",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T17:06:04.538045+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\time_service.c",
+          "line": 98,
+          "column": 16,
+          "severity": "warning",
+          "message": "'signed char' to 'int' conversion; consider casting to 'unsigned char' first.",
+          "check": "bugprone-signed-char-misuse,cert-str34-c"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__time_service.c.log",
+      "log_sha256": "e868f66dd721e1f92f7c9410e9e65ff615dc6c5cf85c3efe664a9e31f7f18fb7"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/tls_input_reserve.c",
+      "source_sha256": "5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.845650+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_input_reserve.c",
+          "line": 77,
+          "column": 5,
+          "severity": "warning",
+          "message": "Value stored to 'stats' is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_input_reserve.c",
+          "line": 165,
+          "column": 28,
+          "severity": "warning",
+          "message": "Value stored to 'stats' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__tls_input_reserve.c.log",
+      "log_sha256": "74d09e73c6bd510ccc8e11418e4a8d0f55df39ce662d8eb90070b28b1499d3a5"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/tls_large_reserve.c",
+      "source_sha256": "3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.846650+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__tls_large_reserve.c.log",
+      "log_sha256": "8c7b366cf0b4b7a0b9e323ae742b496f612d6e2b5db990a11d48a149cf47f184"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/tls_stream_eof.c",
+      "source_sha256": "0a89386376e576398c3d6edb7e8cf3beb4017439ebf8fb7c733e7ee9698786e8",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T11:39:20.408784+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__tls_stream_eof.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/vorbis_repair/output.c",
+      "source_sha256": "7e7a49a1ba68b2417514ab4b0adb37c9ed31e2d1b65032fa06dbf4b2830c25e2",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.850650+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__vorbis_repair__output.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/vorbis_repair/setup.c",
+      "source_sha256": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T14:22:27.792053+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 33,
+          "column": 3,
+          "severity": "warning",
+          "message": "switching on non-enum value without default case may not cover all cases",
+          "check": "bugprone-switch-missing-default-case"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 137,
+          "column": 12,
+          "severity": "warning",
+          "message": "narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 148,
+          "column": 10,
+          "severity": "warning",
+          "message": "narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'long' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 151,
+          "column": 12,
+          "severity": "warning",
+          "message": "narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 220,
+          "column": 5,
+          "severity": "warning",
+          "message": "switching on non-enum value without default case may not cover all cases",
+          "check": "bugprone-switch-missing-default-case"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 703,
+          "column": 11,
+          "severity": "warning",
+          "message": "Although the value stored to 'k' is used in the enclosing expression, the value is never actually read from 'k'",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 914,
+          "column": 22,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'vorbis_info_floor **' (aka 'void **') to 'void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 980,
+          "column": 20,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'int32_t **' (aka 'int **') to 'void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 981,
+          "column": 20,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'int32_t **' (aka 'int **') to 'void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 989,
+          "column": 17,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'void *' to 'int32_t **' (aka 'int **'), please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 990,
+          "column": 22,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'void *' to 'int32_t **' (aka 'int **'), please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 1082,
+          "column": 19,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'void *' to 'vorbis_info_floor **' (aka 'void **'), please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__vorbis_repair__setup.c.log",
+      "log_sha256": "ad680d6a6724d8ce4b92393523f83499576b38cbfbc8d63d9fb88c49665620df"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/vorbis_repair/simple.c",
+      "source_sha256": "4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.851650+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__vorbis_repair__simple.c.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/web_ota.c",
+      "source_sha256": "67ac4bb57c8cca388d33ce76fe6e3be43e56c3fb04b297f25e35055af5b3736b",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T16:23:31.570337+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__web_ota.c.log",
+      "log_sha256": "5826a5244924cbb250158159a480a20769e18d07bf91cf265d6cd5253ca7cf65"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/web_pages_bridge.cpp",
+      "source_sha256": "e735d11e8832c36a198b020bdc6d9ce5f77932e479313dda9d42de787457ac15",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:58:40.856649+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__web_pages_bridge.cpp.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/web_service.c",
+      "source_sha256": "ecd4d9572e36dfe1796a1cddcffacc0234fccf6ab07290651594f1f524c27220",
+      "source_proof": "Exact source bytes in recorded campaign HEAD",
+      "source_mtime_utc": "2026-10-18T17:09:03.900917+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\web_service.c",
+          "line": 463,
+          "column": 51,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'httpd_req_t **' (aka 'struct httpd_req **') to 'void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\web_service.c",
+          "line": 518,
+          "column": 9,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'httpd_req_t **' (aka 'struct httpd_req **') to 'const void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__web_service.c.log",
+      "log_sha256": "f919ccd122853c1885a23c35e7e9e26f25ee0dc3863eb04d3c7639260df63a43"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/web_upload.c",
+      "source_sha256": "ed9675ef52483d9cc2f8c9756f3dba3ecb21025876ee498efe9f6446f3b044ce",
+      "source_proof": "Uncommitted upload candidate byte-identical to complete pre-analysis -02 frozen source/report",
+      "source_mtime_utc": "2026-10-18T17:25:38.976650+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_file_form.h",
+          "line": 79,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_file_form.h",
+          "line": 87,
+          "column": 21,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_file_form.h",
+          "line": 87,
+          "column": 55,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 48,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 55,
+          "column": 20,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 86,
+          "column": 26,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 170,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 271,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 300,
+          "column": 38,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 19,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 47,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\web_upload.c",
+          "line": 170,
+          "column": 9,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/idf__esp32c3-oled-native__main__web_upload.c.log",
+      "log_sha256": "3a5814cc7be671d09ceb9b98cdc795c6d7a13f862db611c4744016e4a4490afc"
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/websocket_service.c",
+      "source_sha256": "a48c3e5d13223a136f87cee4a53a1ded93a22469fb6da959ea10cba45813d8a6",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T16:55:23.061742+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+          "line": 658,
+          "column": 56,
+          "severity": "warning",
+          "message": "repeated branch body in conditional chain",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+          "line": 975,
+          "column": 14,
+          "severity": "warning",
+          "message": "Value stored to 'tenths' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+          "line": 1006,
+          "column": 24,
+          "severity": "warning",
+          "message": "comparing object representation of type 'webui_status_key_t' which does not have a unique object representation; consider comparing the members of the object manually",
+          "check": "bugprone-suspicious-memory-comparison"
+        }
+      ],
+      "origin": "Fresh resume: missing original log/exit",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\esp-clang\\esp-21.1.3_20260408\\esp-clang\\bin\\clang-tidy.exe",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+        "-p",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer",
+        "--config-file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.clang-tidy",
+        "--header-filter=C:[/\\\\]Work[/\\\\]yoRadio[/\\\\]\\.worktree[/\\\\]esp32\\-cyd\\-c3\\-review[/\\\\]",
+        "--export-fixes=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\lint-c3-runtime-transfer-resumed-02\\idf__esp32c3-oled-native__main__websocket_service.c.yaml"
+      ],
+      "log_path": ".build/lint-c3-runtime-transfer-resumed-02/idf__esp32c3-oled-native__main__websocket_service.c.log",
+      "log_sha256": "2b597042304e26645079cc767285527605c9db99cb572ff926885759f0cdc8ff"
+    },
+    {
+      "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+      "source_sha256": "6f63381940380c24a667cfdc6b984ea761bf87a21efcf6c9029a6fb2c52cb67e",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:59:02.368020+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/yoRadio__src__audioI2S__AudioNormalizer.cpp.log",
+      "log_sha256": "fe11bbaa53611fc7395877dc66c029d2b38c16e11ee9d9648ce8602d2c75bce5"
+    },
+    {
+      "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+      "source_sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T10:59:02.369020+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [],
+      "origin": "Recovered persisted successful exit and original log",
+      "log_path": ".build/lint-c3-runtime-transfer-full/yoRadio__src__audioI2S__CodecMemoryArena.cpp.log",
+      "log_sha256": "444f60f4d2f83f48e1c6c0b0e807c566c7718f3eea259bec8624848b60f0a989"
+    },
+    {
+      "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "source_sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14",
+      "source_proof": "Recorded campaign HEAD blob with standard checkout CRLF conversion; exact analyzed checkout bytes frozen in this report",
+      "source_mtime_utc": "2026-10-18T14:29:54.747309+00:00",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 673,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 688,
+          "column": 18,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 693,
+          "column": 26,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 705,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 708,
+          "column": 40,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'int32_t' (aka 'int') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 712,
+          "column": 27,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        }
+      ],
+      "origin": "Fresh resume: missing original log/exit",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\esp-clang\\esp-21.1.3_20260408\\esp-clang\\bin\\clang-tidy.exe",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+        "-p",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer",
+        "--config-file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.clang-tidy",
+        "--header-filter=C:[/\\\\]Work[/\\\\]yoRadio[/\\\\]\\.worktree[/\\\\]esp32\\-cyd\\-c3\\-review[/\\\\]",
+        "--export-fixes=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\lint-c3-runtime-transfer-resumed-02\\yoRadio__src__audioI2S__flac_decoder__flac_decoder.cpp.yaml"
+      ],
+      "log_path": ".build/lint-c3-runtime-transfer-resumed-02/yoRadio__src__audioI2S__flac_decoder__flac_decoder.cpp.log",
+      "log_sha256": "72b96884a00cbf48cf2edd4d62e03dc55f1ee7ca3328b744f2559a080d1c9042"
+    }
+  ],
+  "recovery": {
+    "original_directory": ".build/lint-c3-runtime-transfer-full",
+    "persisted_exit_log": ".build/runtime-analysis-c3.out.log",
+    "reused_units": 61,
+    "resumed_units": 2,
+    "scope": "Original interrupted run has no final source-hash report. Attribution reconstructed from unchanged HEAD bytes, matching pre-analysis frozen upload candidate, and source mtimes preceding original completed logs. This is not a pre-analysis snapshot of the complete original run. Missing units analyzed now; old evidence never overwritten."
+  },
+  "warnings": 127,
+  "errors": 0
+}
