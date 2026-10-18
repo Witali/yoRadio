@@ -6,6 +6,7 @@ if(NOT DEFINED ENV{YORADIO_AUDIO_CODEC_COMPONENT})
 endif()
 
 set(EXTRA_COMPONENT_DIRS
+  "${CMAKE_CURRENT_LIST_DIR}/../components/native_stream"
   "$ENV{YORADIO_AUDIO_CODEC_COMPONENT}"
   "${CMAKE_CURRENT_LIST_DIR}/../components/audio_level_led"
   "${CMAKE_CURRENT_LIST_DIR}/../components/native_audio_settings"

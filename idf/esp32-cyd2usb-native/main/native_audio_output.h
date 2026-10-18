@@ -15,4 +15,7 @@ uint8_t native_audio_output_get_volume(void);
 void native_audio_output_set_balance(int8_t balance);
 int8_t native_audio_output_get_balance(void);
 void native_audio_output_idle(void);
+// Only the output task may discard history or submit the final partial block.
+void native_audio_output_discard_pcm(void);
+esp_err_t native_audio_output_flush_pcm(void);
 const char *native_audio_output_name(void);

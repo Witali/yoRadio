@@ -325,6 +325,17 @@ void native_audio_output_idle(void) {
     // an underrun instead of repeating the last block.
 }
 
+void native_audio_output_discard_pcm(void) {
+    s_buffered_samples = 0;
+    reset_resampler();
+}
+
+esp_err_t native_audio_output_flush_pcm(void) {
+    esp_err_t result = pdm_flush();
+    reset_resampler();
+    return result;
+}
+
 const char *native_audio_output_name(void) {
     return "I2S PDM";
 }
@@ -398,6 +409,14 @@ void native_audio_output_idle(void) {
 
 const char *native_audio_output_name(void) {
     return "internal DAC";
+}
+
+void native_audio_output_discard_pcm(void) {
+    // Continuous DAC has no software PCM tail or resampler history.
+}
+
+esp_err_t native_audio_output_flush_pcm(void) {
+    return ESP_OK;
 }
 
 #elif CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC
@@ -567,6 +586,16 @@ void native_audio_output_idle(void) {
 
 const char *native_audio_output_name(void) {
     return "legacy I2S/DAC x16";
+}
+
+void native_audio_output_discard_pcm(void) {
+    s_legacy_fractional_error = 0;
+}
+
+esp_err_t native_audio_output_flush_pcm(void) {
+    // Each legacy write submits its complete on-the-fly conversion.
+    s_legacy_fractional_error = 0;
+    return ESP_OK;
 }
 
 #else

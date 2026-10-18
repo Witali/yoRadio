@@ -35,8 +35,8 @@ allocation и численные настройки C3 являются канд
 
 | Этап | Статус | Результат и критерий завершения |
 | --- | --- | --- |
-| CYD-C3-00 | В работе | План, базовая сборка и исправные host-проверки донорских модулей. Зафиксировать SDK, hash, размер приложения; аппаратные baseline отдельно. |
-| CYD-C3-01 | Открыт | Generation на всех стадиях, освобождение decoder/PCM на Stop/EOF/error, terminal marker после последнего PCM, reset/flush output. Тесты реального кода и сборки трёх backends. |
+| CYD-C3-00 | Программная база готова | План, исходная сборка IDF 6.0.2 и исправные host-проверки донора. Первоначальный полный clang-tidy прогон CYD и C3 сохранён. Аппаратный baseline отдельно. |
+| CYD-C3-01 | Код и host проверки готовы | Generation на всех стадиях, освобождение decoder/PCM на Stop/EOF/error, terminal marker после последнего PCM, reset/flush output. Первые сборки трёх backends проходят; финальные images после фиксации кода и физическая приёмка учитываются отдельно. |
 | CYD-C3-02 | Открыт | HTTP/TLS read contract, redirects/status, timeout/retry, ICY metadata и fragmented signatures. Фрагментация 1/7/2048 байт, неверный MIME, ошибки и отмена. |
 | CYD-C3-03 | Открыт | Подтверждение MP3/ADTS кадров, ID3, форматные переходы и codec drain. Byte-exact replay, truncated EOF, ложные headers и ограниченный search budget. |
 | CYD-C3-04 | Открыт | Queue leases, независимый terminal/control slot, ограниченный рост, prefill и tail coalescing. Concurrent producer/consumer и OOM; выбрать ёмкости по CYD. |
@@ -157,3 +157,18 @@ allocation и численные настройки C3 являются канд
   empty stream, stale completion, cancellation и codec drain.
 - Уточнение пользователя: аппаратно-зависимые функции C3 исключены;
   CYD-C3-11 снят с очереди, драйверы и схема CYD сохраняются.
+- По запросу пользователя подключены clang-tidy и Clang Static Analyzer:
+  [полные отчёты C3 и CYD, процедура и очередь замечаний](NATIVE_STATIC_ANALYSIS.md).
+  Повторять полный анализ после существенных правок. Первые прогоны завершены:
+  CYD 11 translation units / 29 warning instances, C3 49 / 504, без parse/tool
+  errors. Warning не считается подтверждённым дефектом до разбора.
+- CYD-C3-01: generation защищает очередь команд, state и обе очереди данных;
+  decoder закрывается без нового input, до следующего TLS open. PCM completion
+  следует после отложенных frames; PDM tail flush/discard выполняет output owner.
+  [Host-тест](../tests/run-cyd-lifecycle.py) проверяет Espressif/Helix/minimp3
+  ветви с codec mocks, OOM/error/Stop/EOF, frame alignment, queue cancellation,
+  переключение при пробуждении output и 2000 конкурентных Play/Stop с настоящими
+  host mutex. Это проверка lifecycle, не PCM vendor codecs и не физический SMP/DMA.
+- По уточнению пользователя непокрытые случаи дополняются исполняемыми
+  регрессионными тестами. Уже добавлены отдельные конкурентные и cancellation
+  случаи; существующие 57 source/WebUI/settings проверок проходят.

@@ -18,6 +18,7 @@ typedef struct {
     native_network_mode_t network_mode;
     bool web_ready;
     bool audio_running;
+    uint32_t audio_generation;
     int8_t wifi_rssi;
     uint32_t ipv4;
     char station[96];
@@ -29,4 +30,8 @@ void native_state_set_network(native_state_t *state,
                               native_network_mode_t mode,
                               uint32_t ipv4);
 void native_state_snapshot(native_state_t *state, native_state_t *snapshot);
+void native_state_begin_audio(native_state_t *state, uint32_t generation,
+                              const char *station, const char *format);
+void native_state_set_audio(native_state_t *state, uint32_t generation,
+                            bool running, const char *format);
 

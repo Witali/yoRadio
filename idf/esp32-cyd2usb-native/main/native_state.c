@@ -33,3 +33,29 @@ void native_state_snapshot(native_state_t *state, native_state_t *snapshot) {
     }
 }
 
+void native_state_begin_audio(native_state_t *state, uint32_t generation,
+                              const char *station, const char *format) {
+    if (!state || !state->lock) return;
+    if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
+        state->audio_generation = generation;
+        state->audio_running = false;
+        if (station) strlcpy(state->station, station, sizeof(state->station));
+        strlcpy(state->stream_format, format, sizeof(state->stream_format));
+        xSemaphoreGive(state->lock);
+    }
+}
+
+void native_state_set_audio(native_state_t *state, uint32_t generation,
+                            bool running, const char *format) {
+    if (!state || !state->lock) return;
+    if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
+        // Check under the mutex: Play/Stop may race an old decoder callback.
+        if (state->audio_generation == generation) {
+            state->audio_running = running;
+            if (format) strlcpy(state->stream_format, format,
+                                sizeof(state->stream_format));
+        }
+        xSemaphoreGive(state->lock);
+    }
+}
+

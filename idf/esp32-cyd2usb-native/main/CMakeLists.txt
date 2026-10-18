@@ -48,6 +48,7 @@ idf_component_register(
     spiffs
     audio_level_led
     native_audio_settings
+    native_stream
     custom_legacy_codecs
     esp_audio_codec)
 

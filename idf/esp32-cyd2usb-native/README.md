@@ -92,7 +92,23 @@ the same `Fs x 16` rule. Each input sample is expanded on the fly into adjacent
 full oversampled stream is stored in RAM. The error accumulator is preserved
 between PCM samples and reset only when the input sample rate changes.
 
-The pipeline uses 8 KiB compressed and 8 KiB PCM rings and logs free heap
+The pipeline uses 16 KiB compressed and 8 KiB PCM rings and logs free heap
 after allocating them. Ring-buffer items
 are acquired in place instead of being allocated for every audio block, so
 continuous playback does not churn the general heap.
+
+Play and Stop serialize their generation changes. The decoder releases its
+workspace on Stop even when no more input arrives, and acknowledges release
+before the next stream opens TLS. Obsolete encoded/PCM packets and callbacks
+cannot change the new station's state. EOF and read/decode failures pass an
+ordered completion marker through the PCM queue; cached Ogg output drains
+before the decoder closes. The output owner flushes the final PDM tail once
+and discards software history on a station change, including equal-rate changes.
+Already submitted hardware DMA is allowed to finish.
+
+Run `tests/run-cyd-lifecycle.py` from the repository root for host regressions
+with ASan/UBSan. They exercise actual pipeline/state/tail functions with mocked
+codec/driver APIs, real host mutexes, queue-wait cancellation and concurrent
+commands. They do not qualify the vendor decoder PCM or physical DMA timing.
+See the [transfer plan](../../docs/ESP32_CYD_C3_TRANSFER_PLAN.md) and
+[static analysis procedure](../../docs/NATIVE_STATIC_ANALYSIS.md).

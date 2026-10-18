@@ -1,0 +1,297 @@
+#include <assert.h>
+#include <setjmp.h>
+#include <stdatomic.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "native_state.h"
+#include "audio_completion.h"
+
+typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC,
+               NATIVE_CODEC_FLAC, NATIVE_CODEC_OGG } native_codec_t;
+typedef int esp_err_t;
+typedef int esp_audio_err_t;
+typedef unsigned esp_audio_simple_dec_type_t;
+typedef void *esp_audio_simple_dec_handle_t;
+typedef struct { unsigned dec_type; void *dec_cfg; unsigned cfg_size; bool use_frame_dec; } esp_audio_simple_dec_cfg_t;
+typedef struct { uint8_t *buffer; size_t len, consumed; unsigned eos; } esp_audio_simple_dec_raw_t;
+typedef struct { uint8_t *buffer; size_t len, needed_size, decoded_size; } esp_audio_simple_dec_out_t;
+typedef struct { uint32_t sample_rate, bitrate; uint8_t bits_per_sample, channel; } esp_audio_simple_dec_info_t;
+typedef void *QueueHandle_t, *RingbufHandle_t;
+#define ESP_AUDIO_SIMPLE_DEC_TYPE_AAC 2
+#define ESP_AUDIO_SIMPLE_DEC_TYPE_FLAC 3
+#define ESP_AUDIO_SIMPLE_DEC_TYPE_OGG 4
+#define ESP_AUDIO_SIMPLE_DEC_TYPE_MP3 1
+#define ESP_AUDIO_ERR_OK 0
+#define ESP_AUDIO_ERR_BUFF_NOT_ENOUGH -8
+#define ESP_OK 0
+#define ESP_FAIL -1
+#define ESP_ERR_INVALID_ARG -2
+#define ESP_ERR_INVALID_STATE -3
+#define ESP_LOGE(...) ((void)0)
+#define ESP_LOGW(...) ((void)0)
+
+typedef struct { void *items[32]; unsigned used, next; } test_ring_t;
+static test_ring_t encoded, pcm;
+static native_state_t state;
+static jmp_buf task_exit;
+static void (*empty_hook)(void);
+static void (*receive_hook)(void);
+static atomic_uint s_generation;
+static unsigned open_handles, opens, closes, writes, flushes, discards;
+static unsigned eos_frames;
+static bool fail_open, fail_realloc, fail_process, fail_write, cancel_acquire;
+static uint32_t active_generation;
+static uint8_t last_sample;
+static void native_audio_output_discard_pcm(void) { ++discards; }
+static int native_audio_output_flush_pcm(void) { ++flushes; return ESP_OK; }
+static int native_audio_output_configure(uint32_t rate) { assert(rate == 48000); return ESP_OK; }
+static const char *native_audio_output_name(void) { return "test"; }
+static void native_audio_output_idle(void) {}
+static void audio_level_led_update_peak(int peak) { (void)peak; }
+static void audio_level_led_update_pcm(const uint8_t *p, size_t n, uint8_t b, uint8_t c) {
+    (void)p; (void)n; (void)b; (void)c;
+}
+static int native_audio_output_write_pcm(const uint8_t *p, size_t n, uint8_t b, uint8_t c) {
+    assert(state.audio_running && n && b == 16 && c == 2);
+    last_sample = *p; ++writes; return fail_write ? ESP_FAIL : ESP_OK;
+}
+static const char *esp_err_to_name(int result) { (void)result; return "test"; }
+static void esp_flac_dec_register(void) {}
+static void esp_vorbis_dec_register(void) {}
+static void esp_opus_dec_register(void) {}
+static void esp_audio_simple_dec_register_default(void) {}
+static int esp_audio_simple_dec_open(const esp_audio_simple_dec_cfg_t *cfg, void **handle) {
+    (void)cfg;
+    if (fail_open) return ESP_FAIL;
+    *handle = malloc(8); assert(*handle); ++opens; ++open_handles; eos_frames=2; return ESP_OK;
+}
+static void esp_audio_simple_dec_close(void *handle) { assert(open_handles); --open_handles; ++closes; free(handle); }
+static int esp_audio_simple_dec_process(void *handle, esp_audio_simple_dec_raw_t *raw,
+                                      esp_audio_simple_dec_out_t *out) {
+    assert(handle && out->len >= 16);
+    if (fail_process) return ESP_FAIL;
+    raw->consumed = raw->len;
+    out->decoded_size = raw->len ? 16 : eos_frames ? (--eos_frames, 8) : 0;
+    memset(out->buffer, raw->len ? raw->buffer[0] : 0xee, out->decoded_size);
+    return ESP_OK;
+}
+static int esp_audio_simple_dec_get_info(void *handle, esp_audio_simple_dec_info_t *info) {
+    assert(handle); *info = (esp_audio_simple_dec_info_t){48000,128000,16,2}; return ESP_OK;
+}
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+typedef void custom_legacy_decoder_t;
+typedef struct { uint32_t sample_rate, bitrate; uint8_t bits_per_sample, channels; } custom_legacy_info_t;
+typedef struct { unsigned unused; } custom_legacy_feed_stats_t;
+enum { CUSTOM_LEGACY_AAC, CUSTOM_LEGACY_MP3 };
+static custom_legacy_decoder_t *custom_legacy_decoder_create(unsigned codec) {
+    (void)codec; void *p=NULL;
+    esp_audio_simple_dec_cfg_t cfg={0};
+    esp_audio_simple_dec_open(&cfg,&p); return p;
+}
+static void custom_legacy_decoder_destroy(custom_legacy_decoder_t *p) { esp_audio_simple_dec_close(p); }
+static int custom_legacy_decoder_feed(custom_legacy_decoder_t *p, const uint8_t *data,
+        size_t size, bool eos, bool (*output)(void *,const custom_legacy_info_t *,const uint8_t *,size_t),
+        void *user, custom_legacy_feed_stats_t *stats) {
+    (void)stats; assert(p);
+    if (fail_process) return ESP_FAIL;
+    custom_legacy_info_t info={48000,128000,16,2}; uint8_t samples[16];
+    if (size) { memset(samples,data[0],sizeof(samples)); if (!output(user,&info,samples,16)) return ESP_FAIL; }
+    if (eos) for (unsigned i=0;i<2;++i) {
+        memset(samples,0xee,sizeof(samples)); if (!output(user,&info,samples,8)) return ESP_FAIL;
+    }
+    return 0;
+}
+#endif
+static void *test_realloc(void *p, size_t n) {
+    if (fail_realloc) return NULL;
+    return realloc(p,n);
+}
+static int xRingbufferSendAcquire(void *ring, void **p, size_t size, unsigned wait) {
+    (void)ring; (void)wait;
+    if (cancel_acquire) { atomic_store(&s_generation,++active_generation); cancel_acquire = false; return 0; }
+    *p = malloc(size); assert(*p); memset(*p,0xa5,size); return pdTRUE;
+}
+static int xRingbufferSendComplete(void *ring, void *p) {
+    test_ring_t *q=ring; assert(q->used<32); q->items[q->used++]=p; return pdTRUE;
+}
+static void *xRingbufferReceive(void *ring, size_t *size, unsigned wait) {
+    (void)size; (void)wait;
+    test_ring_t *q=ring;
+    if (receive_hook) receive_hook();
+    if (q->next<q->used) return q->items[q->next++];
+    if (empty_hook) { empty_hook(); return NULL; }
+    longjmp(task_exit,1);
+}
+static void vRingbufferReturnItem(void *ring, void *p) { (void)ring; free(p); }
+static int xQueueOverwrite(void *q, const void *p);
+
+size_t strlcpy(char *to, const char *from, size_t capacity) {
+    size_t n=strlen(from); if (capacity) { size_t copy=n<capacity-1?n:capacity-1; memcpy(to,from,copy); to[copy]=0; } return n;
+}
+#define realloc test_realloc
+#include "production.inc"
+#undef realloc
+
+static uint32_t queued_generation;
+static int xQueueOverwrite(void *q, const void *p) {
+    assert(q && p);
+    const play_command_t *command=p;
+    assert(command->generation>queued_generation);
+    queued_generation=command->generation; return pdTRUE;
+}
+
+static void begin(unsigned gen) {
+    assert(!open_handles);
+    encoded=(test_ring_t){0}; pcm=(test_ring_t){0}; empty_hook=receive_hook=NULL;
+    opens=closes=writes=flushes=discards=0;
+    fail_open=fail_realloc=fail_process=fail_write=cancel_acquire=false;
+    s_state=&state; s_commands=(void *)3; s_encoded=&encoded; s_pcm=&pcm;
+    if (!s_control_lock) s_control_lock=xSemaphoreCreateMutex();
+    queued_generation=0;
+    active_generation=gen;
+    atomic_store(&s_generation,gen); atomic_store(&s_failed_generation,0);
+    native_state_begin_audio(&state,gen,"test","connecting");
+}
+static void run_task(void (*task)(void *)) { if (!setjmp(task_exit)) task(NULL); }
+static void input(unsigned gen, unsigned reason, unsigned bytes) {
+    encoded_packet_t *p=calloc(1,sizeof(*p)+bytes); assert(p);
+    p->generation=gen; p->codec=NATIVE_CODEC_AAC; p->end_of_stream=reason;
+    p->data_size=bytes; memset(p->data,0x37,bytes);
+    assert(xRingbufferSendComplete(s_encoded,p));
+}
+static void decode_once_then_stop(void) {
+    audio_service_stop(); empty_hook=NULL;
+    // Give the real task a timeout iteration to observe the new generation.
+    empty_hook=NULL;
+}
+static void fail_next_decode(void) { fail_process=true; empty_hook=NULL; input(active_generation,AUDIO_CONTINUE,3); }
+static void switch_before_receive_returns(void) {
+    receive_hook=NULL;
+    assert(audio_service_play("http://new.example/audio",NATIVE_CODEC_AAC)==ESP_OK);
+    uint32_t gen=atomic_load(&s_generation);
+    state_set_audio(gen,true,"new station");
+    esp_audio_simple_dec_info_t info={48000,0,16,2};
+    const uint8_t sample[4]={0x44};
+    assert(send_pcm(gen,&info,sample,sizeof(sample)) && send_pcm_end(gen,AUDIO_END_EOF));
+}
+static void *command_thread(void *arg) {
+    for (unsigned i=0;i<1000;++i) {
+        if ((i+(uintptr_t)arg)%2) audio_service_stop();
+        else assert(audio_service_play("http://test.example/audio",NATIVE_CODEC_AAC)==ESP_OK);
+        native_state_set_audio(&state,1,true,"stale callback");
+    }
+    return NULL;
+}
+
+#define PDM_DMA_SAMPLES 512
+static int16_t s_sample_buffer[PDM_DMA_SAMPLES];
+static size_t s_buffered_samples;
+static bool s_resampler_has_previous;
+static int16_t s_resampler_previous;
+static uint32_t s_resampler_next_phase;
+static unsigned pdm_blocks;
+static int pdm_write_block(const int16_t *samples, size_t count) {
+    assert(count==PDM_DMA_SAMPLES && samples[0]==123);
+    for (size_t i=3;i<count;++i) assert(samples[i]==0);
+    ++pdm_blocks; return ESP_OK;
+}
+#define native_audio_output_discard_pcm tested_pdm_discard
+#define native_audio_output_flush_pcm tested_pdm_flush
+#include "pdm-tail.inc"
+#undef native_audio_output_discard_pcm
+#undef native_audio_output_flush_pcm
+
+int main(void) {
+    native_state_init(&state);
+    begin(1); input(1,AUDIO_CONTINUE,3); input(1,AUDIO_END_EOF,0);
+    run_task(decoder_task);
+    assert(opens==1 && closes==1 && !open_handles && state.audio_running);
+    assert(pcm.used==4); // Initial PCM, two cached EOS packets, terminal marker.
+    run_task(output_task);
+    assert(writes==3 && last_sample==0xee && flushes==1 && !state.audio_running);
+    assert(!strcmp(state.stream_format,"stream ended"));
+
+    begin(2); input(2,AUDIO_END_READ_FAILED,0); run_task(decoder_task);
+    assert(!opens && pcm.used==1); run_task(output_task);
+    assert(!strcmp(state.stream_format,"stream read failed"));
+
+    begin(3); input(2,AUDIO_CONTINUE,3); input(3,AUDIO_CONTINUE,3);
+    empty_hook=decode_once_then_stop; run_task(decoder_task);
+    assert(!open_handles && closes==1 && atomic_load(&s_decoder_released_generation)==4);
+    run_task(output_task); assert(!writes && !strcmp(state.stream_format,"stopped"));
+    native_state_set_audio(&state,3,true,"stale");
+    assert(!state.audio_running && !strcmp(state.stream_format,"stopped"));
+
+    begin(5); input(5,AUDIO_CONTINUE,3); empty_hook=fail_next_decode;
+    run_task(decoder_task); assert(!open_handles && pcm.used==2 && state.audio_running);
+    run_task(output_task); assert(writes==1 && !strcmp(state.stream_format,"decode failed"));
+
+    begin(6); fail_open=true; input(6,AUDIO_CONTINUE,3); run_task(decoder_task);
+    assert(!open_handles && pcm.used==1); run_task(output_task);
+    assert(!strcmp(state.stream_format,"decoder allocation failed"));
+    begin(7); fail_realloc=true; input(7,AUDIO_CONTINUE,3);
+    ((encoded_packet_t *)encoded.items[0])->codec=NATIVE_CODEC_FLAC;
+    run_task(decoder_task);
+    assert(!opens && pcm.used==1); run_task(output_task);
+
+    begin(8); input(8,AUDIO_CONTINUE,3); input(8,AUDIO_END_EOF,0);
+    run_task(decoder_task); fail_write=true; run_task(output_task);
+    assert(writes==1 && !flushes && !strcmp(state.stream_format,"audio output failed"));
+
+    begin(9); atomic_store(&s_generation,10); input(9,AUDIO_CONTINUE,3); run_task(decoder_task);
+    assert(!opens && !pcm.used);
+    begin(11); native_state_set_audio(&state,11,true,"playing");
+    esp_audio_simple_dec_info_t layout={48000,0,24,3};
+    uint8_t bytes[7002]={0}; assert(send_pcm(11,&layout,bytes,sizeof(bytes)));
+    for (unsigned i=0;i<pcm.used;++i) {
+        pcm_packet_t *p=pcm.items[i];
+        assert(p->data_size%9==0 && p->end_of_stream==AUDIO_CONTINUE);
+        assert((uintptr_t)p->data%4==0); free(p);
+    }
+    pcm=(test_ring_t){0};
+    atomic_store(&s_generation,12); assert(!send_pcm_end(11,AUDIO_END_EOF));
+
+    begin(15); input(15,AUDIO_CONTINUE,3); input(15,AUDIO_END_EOF,0);
+    ((encoded_packet_t *)encoded.items[0])->codec=NATIVE_CODEC_MP3;
+    ((encoded_packet_t *)encoded.items[1])->codec=NATIVE_CODEC_MP3;
+    run_task(decoder_task); run_task(output_task);
+    assert(opens==1 && closes==1 && writes==3 && !open_handles);
+
+    begin(30); input(30,AUDIO_CONTINUE,3); input(30,AUDIO_END_EOF,0);
+    run_task(decoder_task); receive_hook=switch_before_receive_returns;
+    run_task(output_task);
+    assert(discards==1 && writes==1 && last_sample==0x44 && flushes==1);
+    assert(state.audio_generation==31 && !state.audio_running);
+
+    begin(40); cancel_acquire=true; assert(!send_pcm_end(40,AUDIO_END_EOF));
+    assert(!pcm.used && atomic_load(&s_generation)==41);
+    begin(42); cancel_acquire=true; layout=(esp_audio_simple_dec_info_t){48000,0,16,2};
+    assert(!send_pcm(42,&layout,bytes,4) && !pcm.used);
+
+    begin(100);
+    pthread_t first, second;
+    assert(!pthread_create(&first,NULL,command_thread,(void *)0));
+    assert(!pthread_create(&second,NULL,command_thread,(void *)1));
+    assert(!pthread_join(first,NULL) && !pthread_join(second,NULL));
+    assert(atomic_load(&s_generation)==2100);
+    audio_service_stop();
+    assert(state.audio_generation==2101 && !state.audio_running);
+    assert(!strcmp(state.stream_format,"stopped"));
+
+    s_buffered_samples=3; s_sample_buffer[0]=s_sample_buffer[1]=s_sample_buffer[2]=123;
+    s_resampler_has_previous=true; s_resampler_previous=456; s_resampler_next_phase=789;
+    assert(tested_pdm_flush()==ESP_OK && pdm_blocks==1 && !s_buffered_samples);
+    assert(!s_resampler_has_previous && !s_resampler_previous && !s_resampler_next_phase);
+    assert(tested_pdm_flush()==ESP_OK && pdm_blocks==1);
+    s_buffered_samples=2; s_resampler_has_previous=true; tested_pdm_discard();
+    assert(!s_buffered_samples && !s_resampler_has_previous && pdm_blocks==1);
+    puts("PASS CYD: delayed PCM precedes EOF/error; decoder/PCM freed on EOF, Stop, OOM and failure");
+    puts("PASS CYD: stale generations cannot decode/play/publish; output failure is preserved; PCM frame alignment");
+    puts("PASS CYD PDM: flush final tail once with zero padding; discard/reset without replay; ASan/UBSan");
+    puts("PASS CYD: cancellation during queue waits; Play while output wakes; 2000 concurrent Play/Stop commands and stale callbacks");
+    assert(!pthread_mutex_destroy(s_control_lock)); free(s_control_lock);
+    assert(!pthread_mutex_destroy(state.lock)); free(state.lock);
+    return 0;
+}

@@ -96,7 +96,7 @@ with their recorded configuration hashes.
 
 | Finding | Review and next action |
 | --- | --- |
-| CYD stream-buffer null path | The analyzer assumes `vTaskDelete(NULL)` returns. Add an explicit return after self-deletion; keep allocation failure visible. |
+| CYD stream-buffer null path | The analyzer assumes `vTaskDelete(NULL)` returns. The lifecycle change adds an explicit return after self-deletion; keep allocation failure visible. |
 | CYD resampler signed/unsigned conversion | Use signed rounding constants explicitly and compare PCM, including negative samples and stream boundaries. |
 | C3 FLAC shift bounds | Existing code checks input depth and wasted bits. Revalidate the reduced depth before shifting, then run malformed input and PCM fixtures. Do not infer an observed crash from the static report. |
 | C3 AAC private overlay bounds | Inspect the right-channel overlay and reset call chain against the audited layout and allocation. Retain the warning until checked; do not suppress an ABI access solely because historical playback passed. |

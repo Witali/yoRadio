@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "audio_level_led.h"
+#include "audio_completion.h"
 #include "board_config.h"
 #include "esp_audio_dec_default.h"
 #include "esp_audio_simple_dec.h"
@@ -41,7 +42,7 @@ typedef struct {
     uint32_t generation;
     native_codec_t codec;
     uint16_t data_size;
-    bool end_of_stream;
+    uint8_t end_of_stream;
     uint8_t data[];
 } encoded_packet_t;
 
@@ -51,6 +52,7 @@ typedef struct {
     uint8_t bits_per_sample;
     uint8_t channels;
     uint16_t data_size;
+    uint32_t end_of_stream;
     uint8_t data[];
 } pcm_packet_t;
 
@@ -60,6 +62,9 @@ static QueueHandle_t s_commands;
 static RingbufHandle_t s_encoded;
 static RingbufHandle_t s_pcm;
 static atomic_uint s_generation;
+static atomic_uint s_decoder_released_generation;
+static atomic_uint s_failed_generation;
+static SemaphoreHandle_t s_control_lock;
 
 static native_codec_t codec_from_content_type(const char *content_type) {
     if (!content_type) return NATIVE_CODEC_AUTO;
@@ -113,22 +118,30 @@ static const char *codec_name(native_codec_t codec) {
     }
 }
 
-static void state_set_audio(bool running, const char *format) {
-    if (!s_state || !s_state->lock) return;
-    if (xSemaphoreTake(s_state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
-        s_state->audio_running = running;
-        if (format) strlcpy(s_state->stream_format, format,
-                            sizeof(s_state->stream_format));
-        xSemaphoreGive(s_state->lock);
+static void state_set_audio(uint32_t generation, bool running,
+                             const char *format) {
+    if (running && atomic_load(&s_failed_generation) == generation) return;
+    native_state_set_audio(s_state, generation, running, format);
+}
+
+static void fail_generation(uint32_t generation) {
+    xSemaphoreTake(s_control_lock, portMAX_DELAY);
+    if (generation == atomic_load(&s_generation)) {
+        atomic_store(&s_failed_generation, generation);
     }
+    xSemaphoreGive(s_control_lock);
 }
 
 static bool send_encoded(uint32_t generation, native_codec_t codec,
-                         const uint8_t *data, size_t size, bool eos) {
+                         const uint8_t *data, size_t size, uint8_t eos) {
     size_t packet_size = sizeof(encoded_packet_t) + size;
     encoded_packet_t *packet = NULL;
-    if (xRingbufferSendAcquire(s_encoded, (void **)&packet, packet_size,
-                               pdMS_TO_TICKS(1000)) != pdTRUE) return false;
+    for (;;) {
+        if (atomic_load(&s_generation) != generation ||
+            atomic_load(&s_failed_generation) == generation) return false;
+        if (xRingbufferSendAcquire(s_encoded, (void **)&packet, packet_size,
+                                   pdMS_TO_TICKS(50)) == pdTRUE) break;
+    }
     packet->generation = generation;
     packet->codec = codec;
     packet->data_size = (uint16_t)size;
@@ -143,11 +156,18 @@ static void stream_task(void *argument) {
     if (!buffer) {
         ESP_LOGE(TAG, "No memory for stream input buffer");
         vTaskDelete(NULL);
+        return;
     }
     while (true) {
         play_command_t command;
         xQueueReceive(s_commands, &command, portMAX_DELAY);
-        state_set_audio(false, "connecting");
+        // Release the old decoder/PCM workspace before the next TLS peak.
+        while (atomic_load(&s_generation) == command.generation &&
+               atomic_load(&s_decoder_released_generation) != command.generation) {
+            vTaskDelay(pdMS_TO_TICKS(1));
+        }
+        if (atomic_load(&s_generation) != command.generation) continue;
+        state_set_audio(command.generation, false, "connecting");
 
         esp_http_client_config_t config = {
             .url = command.url,
@@ -162,14 +182,14 @@ static void stream_task(void *argument) {
         };
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (!client) {
-            state_set_audio(false, "HTTP allocation failed");
+            state_set_audio(command.generation, false, "HTTP allocation failed");
             continue;
         }
         esp_http_client_set_header(client, "Icy-MetaData", "0");
         esp_err_t result = esp_http_client_open(client, 0);
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Stream open failed: %s", esp_err_to_name(result));
-            state_set_audio(false, "connection failed");
+            state_set_audio(command.generation, false, "connection failed");
             esp_http_client_cleanup(client);
             continue;
         }
@@ -183,11 +203,14 @@ static void stream_task(void *argument) {
             }
         }
         bool first_chunk = true;
-        while (atomic_load(&s_generation) == command.generation) {
+        uint8_t end_reason = AUDIO_END_EOF;
+        while (atomic_load(&s_generation) == command.generation &&
+               atomic_load(&s_failed_generation) != command.generation) {
             int received = esp_http_client_read(client, (char *)buffer,
                                                 STREAM_CHUNK_SIZE);
             if (received < 0) {
                 ESP_LOGW(TAG, "Stream read failed");
+                end_reason = AUDIO_END_READ_FAILED;
                 break;
             }
             if (received == 0) {
@@ -200,15 +223,16 @@ static void stream_task(void *argument) {
                 if (codec == NATIVE_CODEC_AUTO) {
                     codec = codec_from_signature(buffer, received);
                 }
-                state_set_audio(false, codec_name(codec));
+                state_set_audio(command.generation, false, codec_name(codec));
             }
             if (!send_encoded(command.generation, codec, buffer, received,
                               false)) {
                 ESP_LOGW(TAG, "Compressed audio buffer stalled");
+                end_reason = AUDIO_END_BUFFER_STALLED;
                 break;
             }
         }
-        send_encoded(command.generation, codec, NULL, 0, true);
+        send_encoded(command.generation, codec, NULL, 0, end_reason);
         esp_http_client_close(client);
         esp_http_client_cleanup(client);
     }
@@ -217,24 +241,46 @@ static void stream_task(void *argument) {
 static bool send_pcm(uint32_t generation,
                      const esp_audio_simple_dec_info_t *info,
                      const uint8_t *data, size_t size) {
+    size_t frame_bytes = (size_t)info->channel * info->bits_per_sample / 8U;
+    if (!info->bits_per_sample || info->bits_per_sample % 8U ||
+        !frame_bytes || frame_bytes > PCM_PACKET_DATA_SIZE ||
+        size % frame_bytes) return false;
     while (size) {
         size_t chunk = size > PCM_PACKET_DATA_SIZE ? PCM_PACKET_DATA_SIZE
                                                    : size;
+        chunk -= chunk % frame_bytes;
         size_t packet_size = sizeof(pcm_packet_t) + chunk;
         pcm_packet_t *packet = NULL;
-        if (xRingbufferSendAcquire(s_pcm, (void **)&packet, packet_size,
-                                   pdMS_TO_TICKS(1000)) != pdTRUE) return false;
+        for (;;) {
+            if (generation != atomic_load(&s_generation)) return false;
+            if (xRingbufferSendAcquire(s_pcm, (void **)&packet, packet_size,
+                                       pdMS_TO_TICKS(50)) == pdTRUE) break;
+        }
         packet->generation = generation;
         packet->sample_rate = info->sample_rate;
         packet->bits_per_sample = info->bits_per_sample;
         packet->channels = info->channel;
         packet->data_size = (uint16_t)chunk;
+        packet->end_of_stream = AUDIO_CONTINUE;
         memcpy(packet->data, data, chunk);
         if (xRingbufferSendComplete(s_pcm, packet) != pdTRUE) return false;
         data += chunk;
         size -= chunk;
     }
     return true;
+}
+
+static bool send_pcm_end(uint32_t generation, uint8_t reason) {
+    pcm_packet_t *packet = NULL;
+    for (;;) {
+        if (generation != atomic_load(&s_generation)) return false;
+        if (xRingbufferSendAcquire(s_pcm, (void **)&packet, sizeof(*packet),
+                                   pdMS_TO_TICKS(50)) == pdTRUE) break;
+    }
+    memset(packet, 0, sizeof(*packet));
+    packet->generation = generation;
+    packet->end_of_stream = reason;
+    return xRingbufferSendComplete(s_pcm, packet) == pdTRUE;
 }
 
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
@@ -260,11 +306,20 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
         snprintf(format, sizeof(format), "%lu kHz %s",
                  (unsigned long)(info->sample_rate / 1000),
                  info->channels == 1 ? "mono" : "stereo");
-        state_set_audio(true, format);
+        state_set_audio(context->generation, true, format);
     }
     return send_pcm(context->generation, &context->stream_info, pcm, pcm_size);
 }
 #endif
+
+static void decoder_release(esp_audio_simple_dec_handle_t *decoder,
+                             uint8_t **output, size_t *output_size) {
+    if (*decoder) esp_audio_simple_dec_close(*decoder);
+    *decoder = NULL;
+    free(*output);
+    *output = NULL;
+    *output_size = 0;
+}
 
 static void decoder_task(void *argument) {
     (void)argument;
@@ -289,12 +344,37 @@ static void decoder_task(void *argument) {
 #endif
     uint32_t generation = 0;
     native_codec_t codec = NATIVE_CODEC_AUTO;
+    uint32_t failed_generation = 0;
 
     while (true) {
+        uint32_t current_generation = atomic_load(&s_generation);
+        if (generation != current_generation ||
+            atomic_load(&s_failed_generation) == current_generation) {
+            decoder_release(&decoder, &output, &output_size);
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+            if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
+            legacy_decoder = NULL;
+#endif
+            generation = current_generation;
+            codec = NATIVE_CODEC_AUTO;
+            atomic_store(&s_decoder_released_generation, generation);
+        }
         size_t item_size = 0;
         encoded_packet_t *packet = xRingbufferReceive(
-            s_encoded, &item_size, portMAX_DELAY);
+            s_encoded, &item_size, pdMS_TO_TICKS(20));
         if (!packet) continue;
+        if (packet->generation != atomic_load(&s_generation) ||
+            packet->generation == failed_generation ||
+            packet->generation == atomic_load(&s_failed_generation)) {
+            vRingbufferReturnItem(s_encoded, packet);
+            continue;
+        }
+        uint8_t end_reason = packet->end_of_stream;
+        if (!packet->data_size && end_reason && !decoder
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+            && !legacy_decoder
+#endif
+        ) goto packet_done;
         if (packet->generation != generation || packet->codec != codec) {
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
@@ -325,7 +405,7 @@ static void decoder_task(void *argument) {
                 if (!legacy_decoder) {
                     ESP_LOGE(TAG, "Custom %s decoder allocation failed",
                              codec_name(codec));
-                    state_set_audio(false, "decoder allocation failed");
+                    end_reason = AUDIO_END_ALLOCATION_FAILED;
                 }
             } else
 #endif
@@ -334,9 +414,8 @@ static void decoder_task(void *argument) {
                 if (!resized) {
                     ESP_LOGE(TAG, "%s PCM buffer allocation failed",
                              codec_name(codec));
-                    state_set_audio(false, "PCM allocation failed");
-                    vRingbufferReturnItem(s_encoded, packet);
-                    continue;
+                    end_reason = AUDIO_END_ALLOCATION_FAILED;
+                    goto packet_done;
                 }
                 output = resized;
                 output_size = DECODE_BUFFER_INITIAL;
@@ -351,7 +430,7 @@ static void decoder_task(void *argument) {
                 if (open_result != ESP_AUDIO_ERR_OK) {
                     ESP_LOGE(TAG, "%s decoder open failed: %d",
                              codec_name(codec), open_result);
-                    state_set_audio(false, "decoder allocation failed");
+                    end_reason = AUDIO_END_ALLOCATION_FAILED;
                 }
             }
         }
@@ -374,16 +453,14 @@ static void decoder_task(void *argument) {
                     generation == atomic_load(&s_generation)) {
                     ESP_LOGW(TAG, "Custom %s decode error: %d",
                              codec_name(codec), result);
-                    state_set_audio(false, "decode failed");
+                    end_reason = AUDIO_END_DECODE_FAILED;
                 }
             }
-            vRingbufferReturnItem(s_encoded, packet);
-            continue;
+            goto packet_done;
         }
 #endif
         if (!decoder) {
-            vRingbufferReturnItem(s_encoded, packet);
-            continue;
+            goto packet_done;
         }
         esp_audio_simple_dec_raw_t raw = {
             .buffer = packet->data,
@@ -391,6 +468,7 @@ static void decoder_task(void *argument) {
             .eos = packet->end_of_stream,
         };
         while (raw.len || raw.eos) {
+            if (generation != atomic_load(&s_generation)) break;
             esp_audio_simple_dec_out_t frame = {
                 .buffer = output,
                 .len = output_size,
@@ -399,9 +477,13 @@ static void decoder_task(void *argument) {
             esp_audio_err_t result =
                 esp_audio_simple_dec_process(decoder, &raw, &frame);
             if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
+                if (frame.needed_size <= output_size) {
+                    end_reason = AUDIO_END_DECODE_FAILED;
+                    break;
+                }
                 uint8_t *larger = realloc(output, frame.needed_size);
                 if (!larger) {
-                    state_set_audio(false, "PCM allocation failed");
+                    end_reason = AUDIO_END_ALLOCATION_FAILED;
                     break;
                 }
                 output = larger;
@@ -411,12 +493,14 @@ static void decoder_task(void *argument) {
             if (result != ESP_AUDIO_ERR_OK) {
                 ESP_LOGW(TAG, "%s decode error: %d", codec_name(codec),
                          result);
+                end_reason = AUDIO_END_DECODE_FAILED;
                 break;
             }
             if (raw.consumed > raw.len) {
                 ESP_LOGE(TAG, "%s decoder consumed invalid input size %lu/%lu",
                          codec_name(codec), (unsigned long)raw.consumed,
                          (unsigned long)raw.len);
+                end_reason = AUDIO_END_DECODE_FAILED;
                 break;
             }
             raw.buffer += raw.consumed;
@@ -429,10 +513,11 @@ static void decoder_task(void *argument) {
                     snprintf(format, sizeof(format), "%lu kHz %s",
                              (unsigned long)(info.sample_rate / 1000),
                              info.channel == 1 ? "mono" : "stereo");
-                    state_set_audio(true, format);
+                    state_set_audio(generation, true, format);
                     if (!send_pcm(generation, &info, output,
                                   frame.decoded_size)) {
                         ESP_LOGW(TAG, "PCM buffer stalled");
+                        end_reason = AUDIO_END_BUFFER_STALLED;
                         break;
                     }
                 }
@@ -440,9 +525,30 @@ static void decoder_task(void *argument) {
             if (!raw.consumed && !frame.decoded_size && !raw.eos) {
                 ESP_LOGE(TAG, "%s decoder made no input progress",
                          codec_name(codec));
+                end_reason = AUDIO_END_DECODE_FAILED;
                 break;
             }
-            if (packet->end_of_stream || raw.len == 0) break;
+            // Ogg may retain several packets: EOS drains until no PCM remains.
+            if (raw.eos ? (!raw.len && !frame.decoded_size) : raw.len == 0) break;
+        }
+packet_done:
+        if (end_reason) {
+            decoder_release(&decoder, &output, &output_size);
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+            if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
+            legacy_decoder = NULL;
+#endif
+            if (audio_completion_is_terminal(end_reason)) {
+                failed_generation = packet->generation;
+                // Stop reads after a decoder failure, without cancelling its
+                // already queued PCM or letting HTTP EOF overwrite the error.
+                if (end_reason != packet->end_of_stream &&
+                    packet->generation == atomic_load(&s_generation)) {
+                    fail_generation(packet->generation);
+                }
+                send_pcm_end(packet->generation, end_reason);
+            }
+            codec = NATIVE_CODEC_AUTO;
         }
         vRingbufferReturnItem(s_encoded, packet);
     }
@@ -451,13 +557,40 @@ static void decoder_task(void *argument) {
 static void output_task(void *argument) {
     (void)argument;
     uint32_t sample_rate = 0;
+    uint32_t generation = atomic_load(&s_generation);
+    uint32_t failed_generation = 0;
     while (true) {
+        uint32_t current_generation = atomic_load(&s_generation);
+        if (generation != current_generation) {
+            native_audio_output_discard_pcm();
+            generation = current_generation;
+            sample_rate = 0;
+        }
         size_t item_size = 0;
         pcm_packet_t *packet = xRingbufferReceive(s_pcm, &item_size,
                                                   pdMS_TO_TICKS(5));
         if (!packet) {
             audio_level_led_update_peak(0);
             native_audio_output_idle();
+            continue;
+        }
+        current_generation = atomic_load(&s_generation);
+        if (generation != current_generation) {
+            native_audio_output_discard_pcm();
+            generation = current_generation;
+            sample_rate = 0;
+        }
+        if (packet->generation != current_generation ||
+            packet->generation == failed_generation) {
+            vRingbufferReturnItem(s_pcm, packet);
+            continue;
+        }
+        if (packet->end_of_stream) {
+            esp_err_t result = native_audio_output_flush_pcm();
+            state_set_audio(packet->generation, false,
+                result == ESP_OK ? audio_completion_status(packet->end_of_stream)
+                                 : audio_completion_status(AUDIO_END_OUTPUT_FAILED));
+            vRingbufferReturnItem(s_pcm, packet);
             continue;
         }
         if (packet->sample_rate != sample_rate) {
@@ -469,9 +602,16 @@ static void output_task(void *argument) {
                          (unsigned long)packet->sample_rate,
                          esp_err_to_name(result));
                 vRingbufferReturnItem(s_pcm, packet);
+                failed_generation = generation;
+                fail_generation(generation);
+                state_set_audio(generation, false, "audio output failed");
                 continue;
             }
             sample_rate = packet->sample_rate;
+        }
+        if (packet->generation != atomic_load(&s_generation)) {
+            vRingbufferReturnItem(s_pcm, packet);
+            continue;
         }
         audio_level_led_update_pcm(packet->data, packet->data_size,
                                    packet->bits_per_sample,
@@ -482,6 +622,9 @@ static void output_task(void *argument) {
         if (result != ESP_OK) {
             ESP_LOGW(TAG, "%s write failed: %s", native_audio_output_name(),
                      esp_err_to_name(result));
+            failed_generation = generation;
+            fail_generation(generation);
+            state_set_audio(generation, false, "audio output failed");
         }
         vRingbufferReturnItem(s_pcm, packet);
     }
@@ -494,10 +637,13 @@ esp_err_t audio_service_start(native_state_t *state) {
     ESP_RETURN_ON_ERROR(audio_level_led_init(), TAG,
                         "initialize audio level LED");
     atomic_init(&s_generation, 0);
+    atomic_init(&s_decoder_released_generation, 0);
+    atomic_init(&s_failed_generation, 0);
+    s_control_lock = xSemaphoreCreateMutex();
     s_commands = xQueueCreate(1, sizeof(play_command_t));
     s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
-    if (!s_commands || !s_encoded || !s_pcm) return ESP_ERR_NO_MEM;
+    if (!s_control_lock || !s_commands || !s_encoded || !s_pcm) return ESP_ERR_NO_MEM;
     if (xTaskCreatePinnedToCore(stream_task, "radio_stream",
                                 BOARD_TASK_STACK_RADIO_STREAM, NULL, 3,
                                 NULL, 0) != pdPASS ||
@@ -520,21 +666,24 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     if (!url || !url[0] || strlen(url) >= sizeof(((play_command_t *)0)->url)) {
         return ESP_ERR_INVALID_ARG;
     }
+    if (!s_control_lock || !s_commands) return ESP_ERR_INVALID_STATE;
+    xSemaphoreTake(s_control_lock, portMAX_DELAY);
     play_command_t command = {
         .generation = atomic_fetch_add(&s_generation, 1) + 1,
         .requested_codec = codec,
     };
     strlcpy(command.url, url, sizeof(command.url));
-    if (s_state && s_state->lock &&
-        xSemaphoreTake(s_state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
-        strlcpy(s_state->station, url, sizeof(s_state->station));
-        xSemaphoreGive(s_state->lock);
-    }
-    return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
-                                                            : ESP_FAIL;
+    native_state_begin_audio(s_state, command.generation, url, "connecting");
+    esp_err_t result = xQueueOverwrite(s_commands, &command) == pdTRUE
+                         ? ESP_OK : ESP_FAIL;
+    xSemaphoreGive(s_control_lock);
+    return result;
 }
 
 void audio_service_stop(void) {
-    atomic_fetch_add(&s_generation, 1);
-    state_set_audio(false, "stopped");
+    if (!s_control_lock) return;
+    xSemaphoreTake(s_control_lock, portMAX_DELAY);
+    uint32_t generation = atomic_fetch_add(&s_generation, 1) + 1;
+    native_state_begin_audio(s_state, generation, NULL, "stopped");
+    xSemaphoreGive(s_control_lock);
 }
