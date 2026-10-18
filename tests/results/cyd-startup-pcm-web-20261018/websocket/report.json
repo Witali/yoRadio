@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "maximum_json_bytes": 4828,
+  "status_capacity": 5120,
+  "websocket_client_limit": 2,
+  "queued_status_work_limit": 1,
+  "application_send_frame_budget_us": 1000000,
+  "application_receive_handler_budget_us": 1000000,
+  "separate_budgets": "HTTPD opcode read before handler and SDK control reads use separate finite per-read fallback budgets; TCP/RTOS timing remains unverified.",
+  "source_sha256": {
+    "tests/run-cyd-websocket.py": "ac8d6d491fd860ca90012ac72f4fd82386f55b6a1ba1d54a6ffeefef06dfb83c",
+    "tests/native/cyd_websocket_test.c": "1158174f75791799999e2a81fed2bc72919b406f8878b43eaed2397a81108517",
+    "idf/esp32-cyd2usb-native/main/websocket_service.c": "87380987854b2fa367fcc55546611b2ef680dc32f79c91c2d32aceb417ed2257",
+    "idf/esp32-cyd2usb-native/main/websocket_service.h": "8a4a492b2690a7ff561d997ff61ae0d2304438a301fc3f1384a23bcf7610a562",
+    "idf/esp32-cyd2usb-native/main/native_state.h": "1a46bbe3fd0542792ecf045a99d21f0b24d22cc24179bb78593871f0f7d1ae69",
+    "idf/esp32-cyd2usb-native/main/audio_service.h": "cc8e32f9128502a2ef610d803a8c42c3e33b092067eba08fd730994037d68847",
+    "idf/esp32-cyd2usb-native/main/native_health.h": "bbe6d2b4aae2f0e17119b051245099a3105f8bb8707134bf7c576c8a0a023da0",
+    "idf/esp32-cyd2usb-native/main/native_audio_output.h": "ed00a79805de4095c8e3afb4f77b2524920cb799687afab441e0086331ec46a9",
+    "idf/components/native_audio_settings/native_audio_settings.h": "21d0492056a4f52a2d065918d975bc461db677fe82fb739eaacd6b3786ce19c7",
+    "idf/components/native_storage/include/radio_control.h": "0f8b7a80961116e2f56bd08be56a496d42db0ee0a4dff4f2784b5a82c7c3650b",
+    "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30"
+  },
+  "scope": "Actual production WS core with deferred HTTPD callbacks, synchronous send completion seams and real concurrent polling producers; no IDF framing/TCP/hardware/stack timing proof."
+}

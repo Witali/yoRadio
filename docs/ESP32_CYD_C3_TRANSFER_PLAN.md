@@ -67,10 +67,10 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-04 | Программная часть выполнена | Общая SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 и независимый control node подключены. Default-off bounded prefill проверен host-тестами и GCC/clang-tidy профилем 250 ms; image source `112c871f` сохранён. Физическая приёмка и выбор ёмкости/TLS reclaim — отдельно, этап 13. |
 | CYD-C3-05 | В работе | SMP-safe health подключён к pipeline и `/api/native/health`: heap/internal/DMA, input occupancy, ошибки, optional CPU/stack по двум ядрам. Host core/HTTP/lifecycle, SDK quiet/diagnostic и полный lint проходят; images `b7362172` сохранены. Backend DMA telemetry и физические измерения отдельно. |
 | CYD-C3-06 | В работе | Общий radio controller, index recovery, last station/SmartStart, Next/Prev/Toggle и HTTP API подключены к CYD. Pending-state, boot/NVS failure, stale cache и concurrency проверены. Возобновлённый format/bitrate и audio settings [программно квалифицированы](../tests/results/cyd-c3-format-dsp-20261018/README.md): 51 stream/80 settings запросов, обе startup/format цели, SDK и полный lint проходят. Дальнейшие WebUI/runtime settings относятся к этапам 07/09; физическая приёмка отдельно. |
-| CYD-C3-07 | Открыт | WebSocket snapshot/events, динамические страницы, capabilities, async static workers, bounded uploads. Две вкладки, медленный клиент, reconnect и rollback файлов. |
+| CYD-C3-07 | В работе | [Host-квалификация](../tests/results/cyd-startup-pcm-web-20261018/HOST.md): WebSocket snapshots/events, native embedded UI/capabilities и два async static workers реализованы; 38 WS-групп, HTTP rollback и 5 UI-сценариев проходят. Bounded uploads/rollback файлов, интеграция SDK и физические две вкладки/медленный клиент остаются. |
 | CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
 | CYD-C3-09 | Открыт | Wi-Fi profiles/reconnect/RSSI, power policy, timezone/SNTP и runtime settings. AP/client и поздняя потеря сети. |
-| CYD-C3-10 | В работе | Gain рассчитывается один раз на packet; [общий normalizer](../tests/results/cyd-normalizer-20261018/README.md) подключён ко всем трём backend через owner-only DSP без изменения input PCM. [Итоговая квалификация](../tests/results/cyd-c3-format-dsp-20261018/README.md): HTTP controls, golden PCM, reset/layout/EOF, три SDK images и полный lint проходят; DSP symbols занимают 554 B DRAM, LUT — 1170 B flash. Расширение PCM layout, дополнительные resampler проверки и физическая приёмка остаются. |
+| CYD-C3-10 | В работе | Gain рассчитывается один раз на packet; [общий normalizer](../tests/results/cyd-normalizer-20261018/README.md) подключён ко всем трём backend через owner-only DSP без изменения input PCM. [Итоговая квалификация](../tests/results/cyd-c3-format-dsp-20261018/README.md): HTTP controls, golden PCM, reset/layout/EOF, три SDK images и полный lint проходят; DSP symbols занимают 554 B DRAM, LUT — 1170 B flash. [PCM 8/16/24/32 и resampler](../tests/results/cyd-startup-pcm-web-20261018/HOST.md) квалифицированы: до 1359 сценариев/backend, исправлены PDM rate-tail и DAC priming/short writes. SDK новых правок и физическая приёмка остаются. |
 | CYD-C3-11 | Исключён | Перенос дисплея, рендеринга, физических controls и других аппаратных функций C3 не входит в задачу по уточнению пользователя. |
 | CYD-C3-12 | Открыт | Portable custom FLAC и оптимизации hot loops против Espressif. PCM exactness, 8–24 bit/decorrelation/LPC/Rice, watchdog и физический A/B. |
 | CYD-C3-13 | Открыт | TLS/heap/IRAM/stack политика после измерений CYD. Full-record TLS, раннее освобождение старого codec, сохранение сетевого headroom. |
@@ -171,12 +171,33 @@ allocation и численные настройки C3 являются канд
 
 ## Журнал выполнения
 
+- [Новый блок startup/PCM/WebUI](../tests/results/cyd-startup-pcm-web-20261018/HOST.md)
+  прошёл host/ASan/UBSan: проверенная регистрация decoder, готовность/gate трёх
+  задач и rollback/retry закрывают init-failure хвост этапа 01 (228 сценариев).
+  PCM 8/16/24/32, rate-tail, DAC retry/short writes проверены во всех трёх backend.
+  WebSocket/embedded native UI/capabilities/static workers проверены отдельно;
+  bounded uploads этапа 07 ещё не реализованы. Новые web units проходят lint без
+  предупреждений, полный CYD — 24 units/8 warnings/0 errors; C3 — 50/97/0.
+  По новой просьбе пользователя начат приоритетный аудит опасных предупреждений
+  до следующих production builds. Физическая приёмка и SDK новых правок впереди.
+
+- Уточнения следующих переносов по read-only аудиту: этап 08 требует maintenance
+  ownership и ожидания quiescence всех трёх audio tasks; асинхронный Stop донора
+  этого не доказывает. CYD OTA slots имеют 0x1B0000 bytes, project
+  `yoradio_cyd2usb_native`, chip ESP32; размеры/идентичность C3 не копировать.
+  Portable custom FLAC этапа 12 поддерживает source 4–24 bit, mono/stereo и
+  выдаёт PCM16 через единственного owner; vendor CYD поддерживает также 32-bit,
+  поэтому нужна явная vendor/custom selection/fallback без потери capability.
+  Отдельно проверить донор C3 WebSocket short I/O: его IDF 6.1, как и CYD 6.0.2,
+  считает положительную короткую запись кадра успешной. CYD уже имеет bounded
+  public session overrides, перенос аналогичной гарантии в C3 пока открыт.
+
 - [Интегрированная квалификация format/bitrate/DSP](../tests/results/cyd-c3-format-dsp-20261018/README.md)
   завершена для программного блока: CYD PDM/continuous/legacy `e1b1539a` и C3
   `8c302697` собраны, сохранены с manifest/config и проверены полным lint.
   Нормализованные SDK профили совпадают с предыдущими. Отложенный пункт успешно
   возобновлён; историческая пометка о пропуске ниже сохранена. Платы не прошивались.
-  Дополнительный хвост раннего аудита остаётся открытым: проверить CYD
+  На этом этапе дополнительный хвост раннего аудита оставался открытым: проверить CYD
   decoder registration errors и rollback/readiness при частичном startup failure;
   текущие lifecycle тесты доказывают runtime ownership, а не все init failure paths.
 

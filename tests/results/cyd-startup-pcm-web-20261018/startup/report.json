@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "physical_hardware": false,
+  "scope": "Actual startup/control/readiness/cleanup, codec registration and adaptive queue, including all nested adaptive allocations; pthread notification gate and concurrent/reentrant callers. Driver/RTOS APIs are deterministic host seams; no DMA/target scheduler evidence.",
+  "variants": {
+    "ring-vendor": "PASS CYD startup: every allocation/task/registration failure, rollback/retry, notification gate, concurrent/reentrant controls, permanent output init retained; ASan/UBSan\nscenarios=25 allocation_failure_points=12 registration_failure_points=6",
+    "ring-mp3-vendor": "PASS CYD startup: every allocation/task/registration failure, rollback/retry, notification gate, concurrent/reentrant controls, permanent output init retained; ASan/UBSan\nscenarios=23 allocation_failure_points=11 registration_failure_points=5",
+    "ring-aac-vendor": "PASS CYD startup: every allocation/task/registration failure, rollback/retry, notification gate, concurrent/reentrant controls, permanent output init retained; ASan/UBSan\nscenarios=23 allocation_failure_points=11 registration_failure_points=5",
+    "ring-custom": "PASS CYD startup: every allocation/task/registration failure, rollback/retry, notification gate, concurrent/reentrant controls, permanent output init retained; ASan/UBSan\nscenarios=21 allocation_failure_points=10 registration_failure_points=4",
+    "adaptive-vendor": "PASS CYD startup: every allocation/task/registration failure, rollback/retry, notification gate, concurrent/reentrant controls, permanent output init retained; ASan/UBSan\nscenarios=36 allocation_failure_points=22 registration_failure_points=6",
+    "adaptive-mp3-vendor": "PASS CYD startup: every allocation/task/registration failure, rollback/retry, notification gate, concurrent/reentrant controls, permanent output init retained; ASan/UBSan\nscenarios=34 allocation_failure_points=21 registration_failure_points=5",
+    "adaptive-aac-vendor": "PASS CYD startup: every allocation/task/registration failure, rollback/retry, notification gate, concurrent/reentrant controls, permanent output init retained; ASan/UBSan\nscenarios=34 allocation_failure_points=21 registration_failure_points=5",
+    "adaptive-custom": "PASS CYD startup: every allocation/task/registration failure, rollback/retry, notification gate, concurrent/reentrant controls, permanent output init retained; ASan/UBSan\nscenarios=32 allocation_failure_points=20 registration_failure_points=4"
+  },
+  "source_sha256": {
+    "tests/run-cyd-startup.py": "76b42683ed3374605e9d3984ff1988fec4d2daabb994629524d9d33e472ff394",
+    "tests/native/cyd_startup_test.c": "04199d9c39a2d799fe11439d932b25252213667d970eb1f2bf36abdc7fde7c80",
+    "tests/run-cyd-lifecycle.py": "2b76c7735f35dd543e93dfe79d26cbcf1ff127ccff4f7360d11343dee12ec2e7",
+    "idf/esp32-cyd2usb-native/main/audio_service.c": "6abe2432fe6cd597194f1c68b20453a0bd3e3456dd3bfaf107fc5ed138ee5187",
+    "idf/esp32-cyd2usb-native/main/audio_service.h": "cc8e32f9128502a2ef610d803a8c42c3e33b092067eba08fd730994037d68847",
+    "idf/esp32-cyd2usb-native/main/native_state.c": "bdd322edc58735949b7a9b0975603cbfb6b80da6c7f90c2106f1552deae3595b",
+    "idf/esp32-cyd2usb-native/main/native_state.h": "1a46bbe3fd0542792ecf045a99d21f0b24d22cc24179bb78593871f0f7d1ae69",
+    "idf/esp32-cyd2usb-native/main/native_health.h": "bbe6d2b4aae2f0e17119b051245099a3105f8bb8707134bf7c576c8a0a023da0",
+    "idf/esp32-cyd2usb-native/main/decoder_registration.c": "079bc521537a90ec12c503aba8d4879d48a7844c211eeacc774396c2ff844375",
+    "idf/esp32-cyd2usb-native/main/decoder_registration.h": "54f427c8f3b9cf5dbfb4a8c304f5aa27755ccd321454fcf1bd3c39445b6f72e0",
+    "idf/components/native_stream/adaptive_input.c": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca",
+    "idf/components/native_stream/include/adaptive_input.h": "e025c6fc0174ce59456936915330070cda4430fef25500200cc90fbb5e23f198",
+    "idf/components/native_stream/include/stream_probe.h": "92e6b91104e143bff921a55791e3de630824e57903d8ea65b6812b30d7c58d5a",
+    "idf/components/native_stream/include/stream_bitrate.h": "358bd3ba8909c1db7556c0b82e2e63e9db1f241c441077832cfa661913e33bf8"
+  }
+}

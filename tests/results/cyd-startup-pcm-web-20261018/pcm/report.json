@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "variants": {
+    "pdm": "PASS packed PCM: 1359 stream cases, signed LE8/16/24/32, immutable unaligned input, mono/stereo/first-two mix, split/partial frames, driver faults, rate/EOF; conversion checks=721152 PDM checks=1278222 max rational error=2 LSB",
+    "dac": "PASS packed PCM: 1358 stream cases, signed LE8/16/24/32, immutable unaligned input, mono/stereo/first-two mix, split/partial frames, driver faults, rate/EOF; conversion checks=721152 PDM checks=0 max rational error=0 LSB",
+    "legacy": "PASS packed PCM: 1358 stream cases, signed LE8/16/24/32, immutable unaligned input, mono/stereo/first-two mix, split/partial frames, driver faults, rate/EOF; conversion checks=721152 PDM checks=0 max rational error=0 LSB"
+  },
+  "sources": {
+    "idf/esp32-cyd2usb-native/main/native_audio_output.c": "6bf72033bea3650268b2a9399760ea84e62236901a00f98e214bc2709eb19a36",
+    "tests/native/cyd_pcm_layout_test.c": "a407d9e3af34db3d5c964a665cc53ecef1facc3555ae6c9d33a3efe30a1b9f7f",
+    "tests/native/cyd_normalizer_test.c": "849143c6839435c591c6c46c9647e5a8e835ca0fc4cd517191cb6538ca74f712",
+    "tests/native/cyd_normalizer_reference.cpp": "58a7ae31c48c3680e8c52f595fbcd155b67c8845f64749689553ad6076f4b395",
+    "tests/run-cyd-pcm-layout.py": "90408022216efbbf82776fea0598a1b7f564fbc5b48a66ee2d68f0ae89bd3fc9",
+    "tests/run-cyd-output-gain.py": "01d5dd70a8fb4306ef0e3f1112aa0061f24ceda1fa8933c58a495466581b1c4f",
+    "idf/esp32-cyd2usb-native/main/native_audio_output.h": "ed00a79805de4095c8e3afb4f77b2524920cb799687afab441e0086331ec46a9",
+    "idf/components/native_audio_normalizer/native_audio_normalizer.cpp": "cfa9f64eaf21707578097c144c8c8f5b6a4e165dd3139c42ce3201a300b76272",
+    "idf/components/native_audio_normalizer/native_audio_normalizer.h": "c31413d86f7cd00005a15c669aabb6e6b5862294dee2935c93a7374191d07b61",
+    "yoRadio/src/audioI2S/AudioNormalizer.cpp": "6f63381940380c24a667cfdc6b984ea761bf87a21efcf6c9029a6fb2c52cb67e",
+    "yoRadio/src/audioI2S/AudioNormalizer.h": "56cedb155a270a8914fc87ff33126b1b57e82fbda4389743c45fe49f323f7515"
+  },
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "scope": "Qualify actual CYD packed PCM conversion and resampling without changing hardware clocks.\n\nAll backend producers and PDM interpolation/buffering are production functions.\nDriver captures and deterministic faults replace hardware; the shared normalizer\nruns unchanged. Independent wide-integer references verify packed signed LE\n8/16/24/32 conversion, gain/mix, resampling and complete-frame boundaries.\n",
+  "physical_hardware": false
+}

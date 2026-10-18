@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: native boards share Arduino-compatible persistent audio settings
+ok 1 - native boards share Arduino-compatible persistent audio settings
+  ---
+  duration_ms: 3.8803
+  type: 'test'
+  ...
+# Subtest: esp32c3-oled-native initializes and consumes shared audio settings
+ok 2 - esp32c3-oled-native initializes and consumes shared audio settings
+  ---
+  duration_ms: 2.4443
+  type: 'test'
+  ...
+# Subtest: esp32-cyd2usb-native initializes and consumes shared audio settings
+ok 3 - esp32-cyd2usb-native initializes and consumes shared audio settings
+  ---
+  duration_ms: 1.4848
+  type: 'test'
+  ...
+# Subtest: native balance direction matches Arduino on both ESP32 targets
+ok 4 - native balance direction matches Arduino on both ESP32 targets
+  ---
+  duration_ms: 1.0074
+  type: 'test'
+  ...
+# Subtest: C3 persists Arduino three-state Smart Start and exposes it to WebUI
+ok 5 - C3 persists Arduino three-state Smart Start and exposes it to WebUI
+  ---
+  duration_ms: 1.0043
+  type: 'test'
+  ...
+# Subtest: classic ESP32 native HTTP API reports and changes persisted gain
+ok 6 - classic ESP32 native HTTP API reports and changes persisted gain
+  ---
+  duration_ms: 0.9927
+  type: 'test'
+  ...
+# Subtest: C3 persists, reports, and applies WebUI normalization settings
+ok 7 - C3 persists, reports, and applies WebUI normalization settings
+  ---
+  duration_ms: 3.1392
+  type: 'test'
+  ...
+# Subtest: PDM hardware always runs at 48 kHz with a 6.144 MHz carrier
+ok 8 - PDM hardware always runs at 48 kHz with a 6.144 MHz carrier
+  ---
+  duration_ms: 1.3071
+  type: 'test'
+  ...
+# Subtest: PDM linearly upsamples source rates below 48 kHz
+ok 9 - PDM linearly upsamples source rates below 48 kHz
+  ---
+  duration_ms: 0.446
+  type: 'test'
+  ...
+# Subtest: native PDM outputs use the same division-free resampler
+ok 10 - native PDM outputs use the same division-free resampler
+  ---
+  duration_ms: 1.0748
+  type: 'test'
+  ...
+# Subtest: PDM channel configuration uses the typed I2S port required by IDF 5
+ok 11 - PDM channel configuration uses the typed I2S port required by IDF 5
+  ---
+  duration_ms: 0.2019
+  type: 'test'
+  ...
+# Subtest: PDM stereo uses two DAC lines and keeps channels interleaved
+ok 12 - PDM stereo uses two DAC lines and keeps channels interleaved
+  ---
+  duration_ms: 0.9779
+  type: 'test'
+  ...
+# Subtest: minimal IDF build corrects fractional fp/fs PDM clock calculation
+ok 13 - minimal IDF build corrects fractional fp/fs PDM clock calculation
+  ---
+  duration_ms: 1.1547
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 121.1345

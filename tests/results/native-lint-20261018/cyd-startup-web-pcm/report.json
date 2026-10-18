@@ -1,0 +1,299 @@
+{
+  "tool": "LLVM (http://llvm.org/):\n  LLVM version 20.1.1\n  Optimized build.",
+  "build_dir": "idf/esp32-cyd2usb-native/build-lint-health",
+  "config_sha256": "27b1de038a07a9476ab195865192e9eebc8b58d036b0f359a6689caf2b7aed64",
+  "source_commit": "2852dc4458ebd5924ea2cb43d1a7ca45ef718651",
+  "dirty": false,
+  "units": 24,
+  "complete": true,
+  "results": [
+    {
+      "file": "idf/components/audio_level_led/audio_level_led.c",
+      "source_sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+      "source_sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_legacy_codecs/custom_legacy_adapter.h",
+          "line": 11,
+          "column": 9,
+          "severity": "warning",
+          "message": "enum 'custom_legacy_kind_t' uses a larger base type ('unsigned int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size",
+          "check": "performance-enum-size"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_legacy_codecs\\custom_legacy_adapter.cpp",
+          "line": 276,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_legacy_codecs\\custom_legacy_adapter.cpp",
+          "line": 305,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        }
+      ]
+    },
+    {
+      "file": "idf/components/native_audio_normalizer/native_audio_normalizer.cpp",
+      "source_sha256": "cfa9f64eaf21707578097c144c8c8f5b6a4e165dd3139c42ce3201a300b76272",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_audio_settings/native_audio_settings.c",
+      "source_sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_storage/file_transaction.c",
+      "source_sha256": "51ff248cd25434b8d8161bc9cee4df27cf97c19e3ea63e82e0f9b3c35aa62e38",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_stream/adaptive_input.c",
+      "source_sha256": "3b437f2d7e254cd09f3229a4ba68fea889c32f158a550a450ff54283f5c628ca",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_stream/icy_title.c",
+      "source_sha256": "b41ddc1647b1540865c55c696c833d6c4b5587354727f852b1a16d872da5e780",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/app_main.c",
+      "source_sha256": "f6f9a91d2ffb9b8b9b27cc2ad69a2b7c0613195424cf5589449563ce65bd5c0c",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c",
+          "line": 55,
+          "column": 38,
+          "severity": "warning",
+          "message": "The value '-1' provided to the cast expression is not in the valid range of values for the enum",
+          "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+      "source_sha256": "6abe2432fe6cd597194f1c68b20453a0bd3e3456dd3bfaf107fc5ed138ee5187",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h",
+          "line": 47,
+          "column": 33,
+          "severity": "warning",
+          "message": "The value '0' provided to the cast expression is not in the valid range of values for the enum",
+          "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/cyd_display.c",
+      "source_sha256": "ec0e84b798d88ac3a7d8995956a2687ee29d0e8ec70173615c84b698d43210bb",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+      "source_sha256": "079bc521537a90ec12c503aba8d4879d48a7844c211eeacc774396c2ff844375",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/native_audio_output.c",
+      "source_sha256": "6bf72033bea3650268b2a9399760ea84e62236901a00f98e214bc2709eb19a36",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_audio_output.c",
+          "line": 203,
+          "column": 15,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_audio_output.c",
+          "line": 326,
+          "column": 14,
+          "severity": "warning",
+          "message": "performing an implicit widening conversion to type 'unsigned long long' of a multiplication performed in type 'unsigned int'",
+          "check": "bugprone-implicit-widening-of-multiplication-result"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_audio_output.c",
+          "line": 388,
+          "column": 45,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/native_health.c",
+      "source_sha256": "aae7e2d7b3287f81a4cb5dc3bedf72e1552d68127286c2173c32df76065986e5",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/native_health_json.c",
+      "source_sha256": "08ffb00a3380819cfe33619e9f2249ef998e3bafd441232e1c678f01b59ab49f",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/native_state.c",
+      "source_sha256": "bdd322edc58735949b7a9b0975603cbfb6b80da6c7f90c2106f1552deae3595b",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/network_service.c",
+      "source_sha256": "977723603095f89bcbf5f40f860d41e4240d8ac726dd6ab41a5eaca515abdb84",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/radio_control.c",
+      "source_sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/tls_stream_eof.c",
+      "source_sha256": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/web_pages.cpp",
+      "source_sha256": "2afe27dcd5c07e3b812bc90a420081623bb1450f304fd39af2b5ed0b3ed4b6ef",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/web_service.c",
+      "source_sha256": "acaf842b5033caaa32ddeec9bbcd643159a433f8ea34160436d3a74d8754a6e6",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/web_static.c",
+      "source_sha256": "93b55e586ce85f0afd2add2fa2272c53234b7e4427b9b5345a5d9d7be5399b67",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_static.c",
+          "line": 65,
+          "column": 39,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_static.c",
+          "line": 72,
+          "column": 18,
+          "severity": "warning",
+          "message": "function 'strncmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_static.c",
+          "line": 114,
+          "column": 39,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'httpd_req_t **' (aka 'struct httpd_req **') to 'void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_static.c",
+          "line": 162,
+          "column": 9,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'httpd_req_t **' (aka 'struct httpd_req **') to 'const void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+      "source_sha256": "0abaed800844bb9e729723854acb1ca2d2d4972f0669fb651637c68ce8ba8d9f",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\websocket_service.c",
+          "line": 212,
+          "column": 13,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\websocket_service.c",
+          "line": 286,
+          "column": 29,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ]
+    },
+    {
+      "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+      "source_sha256": "6f63381940380c24a667cfdc6b984ea761bf87a21efcf6c9029a6fb2c52cb67e",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+      "source_sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    }
+  ],
+  "warnings": 14,
+  "errors": 0
+}
