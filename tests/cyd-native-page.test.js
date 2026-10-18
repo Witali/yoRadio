@@ -17,11 +17,12 @@ function harness(failBoot = false, overrides = {}) {
   };
   const radioButtons = ['previous','toggle','next','stop'].map(action => ({...element(action),dataset:{radio:action}}));
   const buttons = [...radioButtons,element('station-submit'),element('audio-submit'),element('reconnect'),
-    ...['playlist','assets','wifi'].map(name=>element(name+'-submit'))];
-  const timers = new Map(), intervals = [], sockets = [], requests = [];
+    ...['playlist','assets','wifi','firmware'].map(name=>element(name+'-submit'))];
+  const timers = new Map(), intervals = [], sockets = [], requests = [], firmwareRequests = [];
   let nextTimer = 0, now = 1000, failSettings = false, failStatus = false, failUpload = '', holdUpload = false;
   const pendingUploads = [];
   const capabilities = {audio_output:'PDM',websocket:true,smartstart:true,wifi_reconnect:true,
+    ota:false,ota_max_bytes:1769472,ota_body_max_bytes:1773568,
     playlist_upload:true,asset_upload:true,wifi_upload:true,upload_max_bytes:98304,upload_max_files:16,
     upload_name_max_bytes:22,wifi_file_max_bytes:799,wifi_body_max_bytes:4096,
     wifi_ssid_max_bytes:31,wifi_password_max_bytes:63,...overrides};
@@ -35,7 +36,17 @@ function harness(failBoot = false, overrides = {}) {
     open() { this.readyState=1;this.onopen?.(); }
     message(value) { this.onmessage?.({data:JSON.stringify(value)}); }
   }
-  const context = vm.createContext({console,URL,URLSearchParams,FormData,Request,TextEncoder,WebSocket:Socket,
+  class FirmwareRequest {
+    constructor() { this.upload={};this.headers={};firmwareRequests.push(this); }
+    open(method,url,async) { Object.assign(this,{method,url,async}); }
+    setRequestHeader(name,value) { this.headers[name]=value; }
+    send(body) { this.body=body; }
+    progress(loaded,total,lengthComputable=true) { this.upload.onprogress?.({loaded,total,lengthComputable}); }
+    uploaded() { this.upload.onload?.(); }
+    finish(status=200,responseText='OK') { Object.assign(this,{status,responseText});this.onload?.(); }
+    fail(kind='error') { this['on'+kind]?.(); }
+  }
+  const context = vm.createContext({console,URL,URLSearchParams,FormData,Request,TextEncoder,WebSocket:Socket,XMLHttpRequest:FirmwareRequest,
     location:{protocol:'http:',host:'radio.local',href:'http://radio.local/'},Date:{now:()=>now},
     document:{getElementById:element,activeElement:null,
       querySelectorAll: selector => selector === '[data-radio]' ? radioButtons : buttons},
@@ -62,7 +73,7 @@ function harness(failBoot = false, overrides = {}) {
       return {ok:true,json:async()=>structuredClone(data)};
     }});
   vm.runInContext(script,context);
-  return {element,context,buttons,radioButtons,sockets,requests,timers,intervals,settings,radio,state,capabilities,
+  return {element,context,buttons,radioButtons,sockets,requests,firmwareRequests,timers,intervals,settings,radio,state,capabilities,
     setNow(value) { now=value; },failSettings() { failSettings=true; },failStatus() { failStatus=true; },
     failUpload(text) { failUpload=text; },holdUploads() { holdUpload=true; },
     releaseUploads() { holdUpload=false;for(const resolve of pendingUploads.splice(0))resolve(); },
@@ -82,7 +93,8 @@ test('native page boots sequentially and renders status as plain text', async ()
   await tick();
   assert.deepEqual(h.requests.map(request=>request.url),[
     '/api/native/capabilities','/api/native/status','/api/native/radio','/api/native/settings']);
-  assert(h.buttons.every(button=>!button.disabled));
+  assert(h.buttons.filter(button=>button.id!=='firmware-submit').every(button=>!button.disabled));
+  assert.equal(h.element('firmware-submit').disabled,true);
   assert.equal(h.element('volume').value,123);
   assert.equal(h.element('station-number').value,7);
   assert.equal(h.element('station-number').max,'15');
@@ -262,4 +274,95 @@ test('a saved playlist with failed status refresh reports saved data without ret
   await waitFor(()=>h.uploads().length===1&&!h.element('playlist-fields').disabled);
   assert.match(h.element('message').textContent,/Файлы сохранены.*Не удалось обновить состояние/);
   assert.equal(h.uploads().length,1);
+});
+
+test('firmware capability gates the form and rejects unsupported or premature submission', async () => {
+  const h=harness();await tick();
+  assert.equal(h.element('firmware').hidden,true);assert.equal(h.element('firmware-fields').disabled,true);
+  h.element('firmware-file').files=[file('app.bin','image')];submit(h,'firmware');await tick();
+  assert.match(h.element('message').textContent,/недоступно/);assert.equal(h.firmwareRequests.length,0);
+  const failed=harness(true,{ota:true});submit(failed,'firmware');await tick();
+  assert.equal(failed.firmwareRequests.length,0);assert.equal(failed.element('firmware-submit').disabled,true);
+});
+
+test('firmware checks selected file and the advertised app limit before network or audio pause', async () => {
+  const h=harness(false,{ota:true,ota_max_bytes:512});await tick();
+  assert.equal(h.element('firmware').hidden,false);assert.equal(h.element('firmware-fields').disabled,false);
+  assert.match(h.element('firmware-limits').textContent,/PDM.*512 байт/);
+  for(const selected of [undefined,file('app.bin',''),file('app.bin',new Uint8Array(513)),file('flash.txt','x')]){
+    h.element('firmware-file').files=selected?[selected]:[];submit(h,'firmware');await tick();
+    assert.equal(h.firmwareRequests.length,0);assert.equal(h.sockets.length,1);
+    assert.equal(h.element('firmware-fields').disabled,false);assert(h.element('message').textContent);
+  }
+});
+
+test('firmware uses ordered canonical multipart fields, browser boundary and honest transfer progress', async () => {
+  const h=harness(false,{ota:true,ota_max_bytes:512});await tick();h.sockets[0].open();
+  const selected=file('my CYD build.BIN',new Uint8Array(512));h.element('firmware-file').files=[selected];
+  submit(h,'firmware');await waitFor(()=>h.firmwareRequests.length===1);
+  const request=h.firmwareRequests[0];
+  assert.equal(request.method,'POST');assert.equal(request.url,'/update');assert.equal(request.async,true);
+  assert.equal(request.timeout,190000);assert.deepEqual(request.headers,{});
+  assert.deepEqual([...request.body.keys()],['updatetarget','update']);
+  assert.equal(request.body.get('updatetarget'),'fw');
+  assert.equal(request.body.get('update').name,'app.bin');assert.equal(request.body.get('update').size,512);
+  const encoded=new Request('http://radio.local/update',{method:'POST',body:request.body});
+  assert.match(encoded.headers.get('content-type'),/^multipart\/form-data; boundary=/);
+  assert.equal((await encoded.formData()).get('update').size,512);
+  assert(h.buttons.every(button=>button.disabled));assert.equal(h.element('smartstart').disabled,true);
+  assert.equal(h.sockets[0].readyState,3);assert.equal(h.timers.size,0);
+  request.progress(42,100);assert.equal(h.element('firmware-progress').value,42);
+  assert.match(h.element('firmware-status').textContent,/Передача.*42%/);
+  request.progress(1000,100,false);assert.equal(h.element('firmware-progress').value,42);
+  request.uploaded();assert.match(h.element('firmware-status').textContent,/Файл передан.*Проверка/);
+  request.finish();await tick();assert.match(h.element('firmware-status').textContent,/Образ проверен.*перезапускается/);
+});
+
+test('successful firmware upload waits for reboot without background requests or claiming verified boot', async () => {
+  const h=harness(false,{ota:true});await tick();h.element('firmware-file').files=[file('app.bin','image')];
+  submit(h,'firmware');await waitFor(()=>h.firmwareRequests.length===1);h.firmwareRequests[0].finish();await tick();
+  assert(h.buttons.every(button=>button.disabled));assert.equal(h.element('firmware-refresh').hidden,false);
+  assert.match(h.element('message').textContent,/Успешный запуск.*ещё нужно проверить/);
+  const before=h.requests.length;h.intervals[0]();h.sockets[0].close();
+  for(const timer of h.timers.values())timer.fn();
+  h.radioButtons[0].listeners.click();submit(h,'firmware');submit(h,'playlist');await tick();
+  assert.equal(h.requests.length,before);assert.equal(h.sockets.length,1);assert.equal(h.firmwareRequests.length,1);
+});
+
+test('server rejection keeps firmware selection and restores capability-specific controls', async () => {
+  const h=harness(false,{ota:true,smartstart:false,wifi_reconnect:false});await tick();
+  const selected=file('app.bin','image');h.element('firmware-file').files=[selected];
+  submit(h,'firmware');await waitFor(()=>h.firmwareRequests.length===1);
+  h.firmwareRequests[0].finish(503,'Audio busy <b>try again</b>');await tick();
+  assert.equal(h.element('message').textContent,'Audio busy <b>try again</b>');
+  assert.equal(h.element('message').innerHTML,undefined);assert.equal(h.element('firmware-file').files[0],selected);
+  assert.equal(h.element('firmware-fields').disabled,false);assert.equal(h.element('playlist-fields').disabled,false);
+  assert.equal(h.element('smartstart').disabled,true);assert.equal(h.element('reconnect').disabled,true);
+  assert.equal(h.element('firmware-progress').hidden,true);assert.equal(h.firmwareRequests.length,1);
+  assert.equal(h.sockets.length,2);
+});
+
+test('network, timeout and abort outcomes never automatically retry firmware', async () => {
+  for(const kind of ['error','timeout','abort']){
+    const h=harness(false,{ota:true});await tick();h.element('firmware-file').files=[file('app.bin','image')];
+    submit(h,'firmware');await waitFor(()=>h.firmwareRequests.length===1);h.firmwareRequests[0].fail(kind);await tick();
+    assert.match(h.element('message').textContent,/перед повторной попыткой/);
+    assert.equal(h.element('firmware-refresh').hidden,false);assert.equal(h.firmwareRequests.length,1);
+    assert.equal(h.element('firmware-fields').disabled,false);
+    for(const timer of h.timers.values())timer.fn();await tick();assert.equal(h.firmwareRequests.length,1);
+  }
+});
+
+test('firmware and file forms serialize uploads and block control actions during installation', async () => {
+  const h=harness(false,{ota:true});await tick();h.holdUploads();
+  h.element('playlist-file').files=[file('stations.csv')];submit(h,'playlist');await waitFor(()=>h.uploads().length===1);
+  h.element('firmware-file').files=[file('app.bin','image')];submit(h,'firmware');await tick();
+  assert.equal(h.firmwareRequests.length,0);assert.match(h.element('message').textContent,/Дождитесь/);
+  h.releaseUploads();await waitFor(()=>!h.element('playlist-fields').disabled);
+  submit(h,'firmware');await waitFor(()=>h.firmwareRequests.length===1);
+  const before=h.requests.length;h.radioButtons[1].listeners.click();submit(h,'playlist');h.intervals[0]();await tick();
+  assert.equal(h.requests.length,before);assert.equal(h.firmwareRequests.length,1);
+  h.firmwareRequests[0].finish(400,'Choose CYD application');await tick();
+  submit(h,'firmware');await waitFor(()=>h.firmwareRequests.length===2);
+  h.firmwareRequests[1].finish();await tick();
 });

@@ -16,6 +16,7 @@ label{display:inline-flex;align-items:center;gap:.5rem;margin:.4rem .6rem .4rem 
 #message{min-height:1.5rem;color:#e7d877}#title{font-size:1.2rem}#details{font-variant-numeric:tabular-nums}
 input[type=file]{max-width:100%;min-width:0;box-sizing:border-box}.upload-form{border-top:1px solid #65716e;padding-top:.4rem;margin-top:1rem}
 .upload-form label{display:flex;flex-wrap:wrap;max-width:100%}
+progress{width:24rem;max-width:100%}
 </style>
 <h1>ёRadio · ESP32 CYD</h1><p id="connection" role="status">Подключение…</p>
 <p id="message" role="alert"></p>
@@ -52,13 +53,22 @@ input[type=file]{max-width:100%;min-width:0;box-sizing:border-box}.upload-form{b
 <label>Пароль <input id="wifi-password" name="pass" type="password" maxlength="63" autocomplete="new-password"></label><br>
 <small id="wifi-limits"></small><br><button id="wifi-submit" disabled>Сохранить Wi-Fi</button>
 </fieldset></form></section>
+<section id="firmware" hidden><h2>Обновление прошивки</h2>
+<form id="firmware-form" action="/update" method="post" enctype="multipart/form-data">
+<fieldset id="firmware-fields" disabled><p id="firmware-limits"></p>
+<label>Application app.bin для ESP32 CYD <input id="firmware-file" type="file" accept=".bin,application/octet-stream" required></label>
+<p><small>На время установки звук остановится. Настройки и файлы радио сохранятся.
+Не отключайте питание до перезапуска.</small></p>
+<button id="firmware-submit" disabled>Установить прошивку</button></fieldset></form>
+<p id="firmware-status" role="status"></p><progress id="firmware-progress" max="100" value="0" hidden></progress>
+<p><a id="firmware-refresh" href="/" hidden>Открыть радио после перезапуска</a></p></section>
 <small id="backend"></small>
 <script>
 // NATIVE_UI_BEGIN
 'use strict';
 const el = id => document.getElementById(id);
 let socket, retryTimer, retryDelay = 1000, lastSeen = 0, ready = false, settingsDirty = false;
-let capabilities = {}, uploadBusy = false;
+let capabilities = {}, uploadBusy = false, firmwareBusy = false, awaitingRestart = false;
 const message = text => { el('message').textContent = text; };
 async function api(path, query, method = 'GET') {
   const suffix = query ? '?' + new URLSearchParams(query).toString() : '';
@@ -90,6 +100,7 @@ function renderSettings(settings, force = true) {
   el('normalization').checked = settings.normalization;
 }
 async function action(work) {
+  if (firmwareBusy || awaitingRestart) { message('Дождитесь перезапуска радио'); return; }
   message('');
   try { await work(); } catch (error) { message(error.message); }
 }
@@ -125,18 +136,19 @@ el('reconnect').addEventListener('click', () => action(async () => {
 const byteLength = text => new TextEncoder().encode(text).length;
 const uploadLimit = (name, fallback) => Number.isSafeInteger(capabilities[name]) && capabilities[name] > 0 ? capabilities[name] : fallback;
 function updateUploadControls() {
+  const blocked = uploadBusy || awaitingRestart;
   let available = false;
   for (const [name, capability] of [['playlist','playlist_upload'],['assets','asset_upload'],['wifi','wifi_upload']]) {
     const supported = capabilities[capability] === true;
     available ||= supported;
     el(name + '-form').hidden = !supported;
-    el(name + '-fields').disabled = !ready || uploadBusy || !supported;
-    el(name + '-submit').disabled = !ready || uploadBusy || !supported;
+    el(name + '-fields').disabled = !ready || blocked || !supported;
+    el(name + '-submit').disabled = !ready || blocked || !supported;
   }
   el('uploads').hidden = !available;
   for (const [name, capability] of [['playlist','playlist_upload'],['wifi','wifi_upload']]) {
     el('asset-' + name + '-label').hidden = capabilities[capability] !== true;
-    el('asset-' + name).disabled = uploadBusy || capabilities[capability] !== true;
+    el('asset-' + name).disabled = blocked || capabilities[capability] !== true;
   }
   el('upload-limits').textContent = 'До ' + uploadLimit('upload_max_bytes', 98304) +
     ' байт на запрос, включая оформление формы; до ' + uploadLimit('upload_max_files', 16) +
@@ -145,6 +157,13 @@ function updateUploadControls() {
   el('wifi-limits').textContent = 'SSID — до ' + uploadLimit('wifi_ssid_max_bytes', 31) +
     ' байт, пароль — до ' + uploadLimit('wifi_password_max_bytes', 63) +
     ' байт. Пустой пароль — открытая сеть. После сохранения радио перезапустится.';
+  const firmware = capabilities.ota === true;
+  el('firmware').hidden = !firmware;
+  el('firmware-fields').disabled = !ready || blocked || !firmware;
+  el('firmware-submit').disabled = !ready || blocked || !firmware;
+  el('firmware-limits').textContent = 'Текущий аудиовыход: ' + (capabilities.audio_output || '—') +
+    '. Размер app.bin — до ' + uploadLimit('ota_max_bytes', 1769472) +
+    ' байт. Образы ESP32-C3, bootloader и полного flash не подходят.';
 }
 function checkedFile(file, maximum) {
   if (!file || !file.size) throw new Error('Выберите непустой файл');
@@ -192,7 +211,7 @@ function uploadForm(kind) {
   return {form, wifi, playlist};
 }
 async function sendUpload(kind, path, capability) {
-  if (uploadBusy) { message('Дождитесь завершения текущей загрузки'); return; }
+  if (uploadBusy || awaitingRestart) { message('Дождитесь завершения текущей загрузки и перезапуска'); return; }
   if (!ready || capabilities[capability] !== true) { message('Эта загрузка недоступна'); return; }
   uploadBusy = true; updateUploadControls(); message('Проверка файлов…');
   let saved = false;
@@ -223,7 +242,70 @@ async function sendUpload(kind, path, capability) {
 }
 for (const [kind, path, capability] of [['playlist','/upload','playlist_upload'],['assets','/webboard','asset_upload'],['wifi','/','wifi_upload']])
   el(kind + '-form').addEventListener('submit', event => { event.preventDefault(); sendUpload(kind, path, capability); });
+function updateFirmwareControls() {
+  for (const button of document.querySelectorAll('button'))
+    button.disabled = !ready || firmwareBusy || awaitingRestart;
+  el('smartstart').disabled = !ready || firmwareBusy || awaitingRestart || !capabilities.smartstart;
+  el('reconnect').disabled = !ready || firmwareBusy || awaitingRestart || !capabilities.wifi_reconnect;
+  updateUploadControls();
+}
+async function sendFirmware() {
+  if (uploadBusy || awaitingRestart) { message('Дождитесь завершения текущей загрузки и перезапуска'); return; }
+  if (!ready || capabilities.ota !== true) { message('Обновление прошивки недоступно'); return; }
+  let selected;
+  try {
+    selected = checkedFile(el('firmware-file').files[0], uploadLimit('ota_max_bytes', 1769472));
+    if (!/\.bin$/i.test(selected.name)) throw new Error('Выберите application app.bin для ESP32 CYD');
+  } catch (error) { message(error.message); return; }
+  firmwareBusy = uploadBusy = true;
+  updateFirmwareControls(); message('');
+  clearTimeout(retryTimer);
+  const previous = socket; socket = null;
+  if (previous) previous.close();
+  el('connection').textContent = 'Обновление прошивки…';
+  el('firmware-progress').hidden = false; el('firmware-progress').value = 0;
+  el('firmware-status').textContent = 'Передача файла…';
+  try {
+    const form = new FormData();
+    form.append('updatetarget', 'fw');
+    form.append('update', selected, 'app.bin');
+    await new Promise((resolve, reject) => {
+      const request = new XMLHttpRequest();
+      request.open('POST', '/update', true);
+      request.timeout = 190000;
+      request.upload.onprogress = event => {
+        if (!event.lengthComputable || !event.total) return;
+        const percent = Math.max(0, Math.min(100, Math.floor(event.loaded * 100 / event.total)));
+        el('firmware-progress').value = percent;
+        el('firmware-status').textContent = 'Передача файла — ' + percent + '%';
+      };
+      request.upload.onload = () => { el('firmware-status').textContent = 'Файл передан. Проверка образа…'; };
+      request.onload = () => request.status >= 200 && request.status < 300 ? resolve() :
+        reject(new Error(request.responseText || 'Обновление отклонено: HTTP ' + request.status));
+      request.onerror = () => reject(new Error('Связь прервана. Радио могло начать перезапуск; откройте его страницу перед повторной попыткой.'));
+      request.ontimeout = () => reject(new Error('Время ожидания истекло. Проверьте страницу радио перед повторной попыткой.'));
+      request.onabort = () => reject(new Error('Передача отменена. Проверьте состояние радио перед повторной попыткой.'));
+      // The browser supplies Content-Type and its matching multipart boundary.
+      request.send(form);
+    });
+    awaitingRestart = true;
+    el('firmware-status').textContent = 'Образ проверен. Радио перезапускается…';
+    el('firmware-progress').value = 100;
+    el('firmware-refresh').hidden = false;
+    message('После перезапуска откройте страницу радио. Успешный запуск новой прошивки ещё нужно проверить.');
+  } catch (error) {
+    el('firmware-status').textContent = 'Проверьте результат перед повторной установкой';
+    el('firmware-progress').hidden = true;
+    el('firmware-refresh').hidden = false;
+    message(error.message);
+  } finally {
+    firmwareBusy = uploadBusy = false; updateFirmwareControls();
+    if (!awaitingRestart && capabilities.websocket) connect();
+  }
+}
+el('firmware-form').addEventListener('submit', event => { event.preventDefault(); sendFirmware(); });
 function connect() {
+  if (firmwareBusy || awaitingRestart) return;
   const current = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
   socket = current;
   current.onopen = () => {
@@ -253,7 +335,7 @@ function connect() {
   };
 }
 setInterval(() => {
-  if (!ready || uploadBusy) return;
+  if (!ready || uploadBusy || awaitingRestart) return;
   if (socket && socket.readyState === WebSocket.OPEN && Date.now() - lastSeen > 6000) socket.close();
   if (!socket || socket.readyState !== WebSocket.OPEN)
     action(async () => { renderStatus(await api('status')); renderRadio(await api('radio')); });
