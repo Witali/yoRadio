@@ -790,7 +790,7 @@ static void stream_task(void *argument) {
         tls_input_reserve_prepare_connection();
 #endif
         network_service_set_streaming(true);
-        state_set_audio(command.generation, false, "connecting");
+        native_state_set_connecting(s_state, command.generation);
 
         esp_http_client_config_t config = {
             .url = command.url,
@@ -2094,8 +2094,7 @@ static esp_err_t play_locked(const char *url, native_codec_t codec) {
     native_state_set_station(s_state, url);
     // Clear a previous station's playing state before the command is queued.
     // The stream task switches it back after open_stream() succeeds.
-    state_set_audio(command.generation, false, "connecting");
-    native_state_set_pending(s_state, command.generation, true);
+    native_state_set_connecting(s_state, command.generation);
     if (xQueueOverwrite(s_commands, &command) == pdTRUE) return ESP_OK;
     if (atomic_load(&s_generation) == command.generation) {
         state_set_audio(command.generation, false, "command failed");

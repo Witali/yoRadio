@@ -1011,7 +1011,7 @@ test("native WebUI publishes player changes promptly and uses buffer percent", (
 
   assert.match(
     audio,
-    /play_locked[\s\S]*state_set_audio\(command\.generation, false, "connecting"\)/,
+    /play_locked[\s\S]*native_state_set_connecting\(s_state, command\.generation\)/,
   );
   assert.match(audio, /open_stream[\s\S]*state_set_audio\(command\.generation, true, "connected"\)/);
   assert.match(audio, /state_set_audio\(generation, true, codec_name\(\*codec\)\)/);

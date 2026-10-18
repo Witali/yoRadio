@@ -83,6 +83,19 @@ void native_state_set_pending(native_state_t *state, uint32_t generation, bool p
     }
 }
 
+void native_state_set_connecting(native_state_t *state, uint32_t generation) {
+    if (!state || !state->lock) return;
+    if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
+        if (state->audio_generation == generation) {
+            clear_stream_info(state);
+            state->audio_running = false;
+            state->audio_pending = true;
+            strcpy(state->stream_format, "connecting");
+        }
+        xSemaphoreGive(state->lock);
+    }
+}
+
 void native_state_set_bitrate(native_state_t *state, uint32_t generation,
                               uint32_t bitrate_kbps) {
     if (!state || !state->lock) return;

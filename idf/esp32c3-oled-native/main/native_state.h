@@ -59,6 +59,7 @@ void native_state_set_audio(native_state_t *state, uint32_t generation,
 void native_state_set_bitrate(native_state_t *state, uint32_t generation,
                               uint32_t bitrate_kbps);
 void native_state_set_pending(native_state_t *state, uint32_t generation, bool pending);
+void native_state_set_connecting(native_state_t *state, uint32_t generation);
 // Returns true only when the current generation's confirmed format changes.
 bool native_state_set_stream_info(native_state_t *state, uint32_t generation,
                                   const native_stream_info_t *info);

@@ -170,6 +170,7 @@ static int esp_http_client_set_timeout_ms(esp_http_client_handle_t c,int timeout
 }
 static int esp_http_client_open(esp_http_client_handle_t c,int write_length) {
     assert(c==&client && !write_length && opens<8);++opens;
+    assert(state.audio_pending && !state.audio_running);
     clock_us+=(uint64_t)open_delay_ms*1000;
     if(open_error)return open_error;
     c->open=true;return ESP_OK;

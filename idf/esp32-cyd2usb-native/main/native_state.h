@@ -40,4 +40,5 @@ void native_state_set_title(native_state_t *state, uint32_t generation,
                             const char *title);
 void native_state_set_station(native_state_t *state, const char *station);
 void native_state_set_pending(native_state_t *state, uint32_t generation, bool pending);
+void native_state_set_connecting(native_state_t *state, uint32_t generation);
 

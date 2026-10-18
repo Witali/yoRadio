@@ -81,7 +81,7 @@ static void begin_audio(const char *url,const char *status) {
 esp_err_t audio_service_play(const char *url,native_codec_t codec) {
     assert(url && !strncmp(url,"http",4) && codec==NATIVE_CODEC_AUTO);
     if(fail_play)return ESP_FAIL;
-    ++plays;begin_audio(url,"connecting");native_state_set_pending(&state,generation,true);return ESP_OK;
+    ++plays;begin_audio(url,"connecting");native_state_set_connecting(&state,generation);return ESP_OK;
 }
 void audio_service_stop(void) {++stops;begin_audio(NULL,"stopped");}
 void native_audio_output_request_normalizer_reset(void) {++resets;}
@@ -127,6 +127,7 @@ int main(void) {
     native_state_set_pending(&state,generation-1,false);assert(state.audio_pending);
     native_state_set_audio(&state,generation-1,true,"stale");assert(state.audio_pending && !state.audio_running);
     native_state_set_audio(&state,generation,true,"PCM");assert(state.audio_running && !state.audio_pending);
+    native_state_set_connecting(&state,generation-1);assert(state.audio_running && !state.audio_pending);
     native_state_set_audio(&state,generation,false,"EOF");assert(!state.audio_pending);
     assert(radio_control_toggle()==ESP_OK && state.audio_pending);
     fail_commit=true;assert(radio_control_set_smartstart_enabled(true)==ESP_FAIL);

@@ -146,6 +146,12 @@ allocation и численные настройки C3 являются канд
 
 ## Журнал выполнения
 
+- [Дополнительная pending-регрессия](../tests/results/radio-pending-20261018/README.md)
+  расширена до фактической stream task и выявила сброс нового флага перед
+  HTTP open. Обе цели используют atomic-per-generation connecting transition
+  под state mutex; old callbacks не восстанавливают подключение после PCM/Stop.
+  Все шесть CYD lifecycle ветвей, HTTP, C3 commands и общий controller проходят.
+
 - [Stale cache регрессия](../tests/results/playlist-cache-20261018/README.md)
   воспроизвела принятие старых offsets после сдвига CSV-строк. Общий bounded
   iterator теперь сверяет весь raw index с CSV при boot, сохраняя прямой seek

@@ -1,0 +1,18 @@
+test: /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/native/cyd_stream_test.c:173: esp_http_client_open: Assertion `state.audio_pending && !state.audio_running' failed.
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\run-cyd-stream.py", line 96, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\run-cyd-stream.py", line 60, in main
+    log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tools\codec_benchmark\run_output_dma_host.py", line 23, in run
+    return subprocess.check_output((['wsl.exe','--exec'] if sys.platform=='win32' else [])+args,stderr=subprocess.STDOUT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['wsl.exe', '--exec', 'env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1', 'UBSAN_OPTIONS=halt_on_error=1', '/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-stream/test']' returned non-zero exit status 134.

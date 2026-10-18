@@ -393,7 +393,7 @@ static void stream_task(void *argument) {
         // Between connections only; never alter published/leased storage.
         adaptive_input_restore(s_encoded);
 #endif
-        state_set_audio(command.generation, false, "connecting");
+        native_state_set_connecting(s_state, command.generation);
 
         stream_headers_t headers = {.valid=true};
         esp_http_client_config_t config = {
@@ -985,7 +985,7 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     };
     strlcpy(command.url, url, sizeof(command.url));
     native_state_begin_audio(s_state, command.generation, url, "connecting");
-    native_state_set_pending(s_state, command.generation, true);
+    native_state_set_connecting(s_state, command.generation);
     esp_err_t result = xQueueOverwrite(s_commands, &command) == pdTRUE
                          ? ESP_OK : ESP_FAIL;
     if (result != ESP_OK) native_state_set_audio(s_state, command.generation, false, "command failed");
