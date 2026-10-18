@@ -20,6 +20,20 @@ Wi-Fi association, DHCP, HTTP и SNTP относятся к сетевым пр�
 сетевых unit tests связана с запрещённой записью временных файлов за пределами
 workspace; повторный запуск с `--temp-root` внутри workspace успешен.
 
+## JPEG segment headers — 2026-10-18
+
+Текущая ветка `codex/small-tv-jpeg-headers`: appF1ADA8B4 / ELF91E26EB2 /
+sourceF849F5BF, production correction2cd72264. Проверены133 случая заголовков:
+14 корректных сохраняют пиксели,119 повреждённых отклоняются до декомпрессии.
+Прежняя сборка принимала115 из119. Старые107 public JPEG,41 extra inputs,
+128 DHT cases,5531 host C checks и6 artifact checks проходят. HTTP на одном
+неизменном D64/harness: раньше5 из6 повреждённых upload принимались, теперь
+все6 получают400 и отсутствуют в storage; custom RGB component IDs0/17/255
+сохраняются побайтно. Evidence `jpeg-header-correction-20261018.json` +31gzip.
+Это отдельные декодерные и HTTP проверки; полного suite/H10 этой F1 пока нет.
+Full561 и H10 в прежних замороженных деревьях продолжают проверять0592/D64.
+Не менять их входы и не подключать новых QMP/RSP клиентов к H10.
+
 ## JPEG DHT grammar — 2026-10-18
 
 Текущий candidate в codex/small-tv-jpeg-uploads: app0592b510/ELFaea10675/
