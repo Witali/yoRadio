@@ -70,7 +70,7 @@ static ogg_uint32_t decpack(long entry,long used_entry,long quantvals,
 
 static ogg_int32_t _float32_unpack(long val,int *point){
   long   mant=val&0x1fffff;
-  int    sign=val&0x80000000;
+  bool   sign=((uint32_t)val & UINT32_C(0x80000000)) != 0;
 
   *point=((val&0x7fe00000L)>>21)-788;
 
@@ -425,11 +425,20 @@ static int repair_vorbis_book_unpack(oggpack_buffer *opb,codebook *s){
 
   /* Do we have a mapping to unpack? */
 
-  if((maptype=tremor_oggpack_read(opb,4))>0){
-    s->q_min=_float32_unpack(tremor_oggpack_read(opb,32),&s->q_minp);
-    s->q_del=_float32_unpack(tremor_oggpack_read(opb,32),&s->q_delp);
-    s->q_bits=tremor_oggpack_read(opb,4)+1;
-    s->q_seq=tremor_oggpack_read(opb,1);
+  maptype=tremor_oggpack_read(opb,4);
+  if(maptype<0 || maptype>2)goto _eofout;
+  if(maptype>0){
+    long minimum=tremor_oggpack_read(opb,32);
+    long delta=tremor_oggpack_read(opb,32);
+    long quant_bits=tremor_oggpack_read(opb,4);
+    long sequence=tremor_oggpack_read(opb,1);
+    // EOF is -1: adding one would create zero q_bits, later used as a
+    // divisor. Validate all quantization fields before any shift/division.
+    if(tremor_oggpack_eop(opb) || quant_bits<0 || sequence<0)goto _eofout;
+    s->q_min=_float32_unpack(minimum,&s->q_minp);
+    s->q_del=_float32_unpack(delta,&s->q_delp);
+    s->q_bits=(int)quant_bits+1;
+    s->q_seq=(int)sequence;
 
     s->q_del>>=s->q_bits;
     s->q_delp+=s->q_bits;
@@ -458,8 +467,8 @@ static int repair_vorbis_book_unpack(oggpack_buffer *opb,codebook *s){
     /* dec_type choices here are 1,2; 3 doesn't make sense */
     {
       /* packed values */
-      long total1=(s->q_bits*s->dim+8)/8; /* remember flag bit */
       if (s->dim > (INT_MAX-8)/s->q_bits) goto _eofout;
+      long total1=(s->q_bits*s->dim+8)/8; /* remember flag bit */
       /* vector of column offsets; remember flag bit */
       long total2=(_ilog(quantvals-1)*s->dim+8)/8+(s->q_bits+7)/8;
 
@@ -778,8 +787,13 @@ static int repair_res_unpack(vorbis_info_residue *info,
   if(!info->stagemasks || !info->stagebooks)goto errout;
   for(j=0;j<info->partitions;j++){
     int cascade=tremor_oggpack_read(opb,3);
-    if(tremor_oggpack_read(opb,1))
-      cascade|=(tremor_oggpack_read(opb,5)<<3);
+    int extended=tremor_oggpack_read(opb,1);
+    if(cascade<0 || extended<0)goto errout;
+    if(extended){
+      int high=tremor_oggpack_read(opb,5);
+      if(high<0)goto errout;
+      cascade|=high<<3;
+    }
     info->stagemasks[j]=cascade;
   }
 
@@ -991,9 +1005,13 @@ failed:
 
 static int repair_header(vorbis_info *info, uint8_t *data, size_t size,
                          int (*unpack)(vorbis_info *, oggpack_buffer *)) {
-    ogg_buffer buffer = {.data = data, .size = size};
-    ogg_reference reference = {.buffer = &buffer, .length = size};
-    oggpack_buffer bits = {.headptr = data, .headend = size, .head = &reference};
+    // The pinned RV32 Ogg ABI uses signed 32-bit byte counts. Reject before
+    // narrowing so an oversized config cannot become a negative bitreader span.
+    if (!data || !size || size > INT32_MAX) return OV_EBADHEADER;
+    long length = (long)size;
+    ogg_buffer buffer = {.data = data, .size = length};
+    ogg_reference reference = {.buffer = &buffer, .length = length};
+    oggpack_buffer bits = {.headptr = data, .headend = length, .head = &reference};
     return unpack(info, &bits);
 }
 
@@ -1004,7 +1022,8 @@ esp_audio_err_t __wrap_esp_vorbis_dec_open(void *configuration, uint32_t bytes,
     if (!configuration || bytes != sizeof(esp_vorbis_dec_cfg_t))
         return ESP_AUDIO_ERR_INVALID_PARAMETER;
     esp_vorbis_dec_cfg_t *cfg = configuration;
-    if (!cfg->info_header || !cfg->info_size || !cfg->setup_header || !cfg->setup_size)
+    if (!cfg->info_header || !cfg->info_size || !cfg->setup_header || !cfg->setup_size ||
+        cfg->info_size > INT32_MAX || cfg->setup_size > INT32_MAX)
         return ESP_AUDIO_ERR_INVALID_PARAMETER;
     esp_audio_err_t result = ESP_AUDIO_ERR_MEM_LACK;
     vorbis_wrapper *wrapper = repair_alloc(sizeof(*wrapper));
