@@ -1,0 +1,372 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/custom_codec_support/Arduino.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder/flac_decoder.h:16:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+   16 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:182:20: warning: narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int32_t' (aka 'int') is implementation-defined [bugprone-narrowing-conversions]
+  182 |     int32_t temp = readUint(nBits) << (32 - nBits);
+      |                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:445:19: warning: 'signed char' to 'int' conversion; consider casting to 'unsigned char' first. [bugprone-signed-char-misuse,cert-str34-c]
+  445 |         int ret = decodeSubframes();
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:446:29: warning: narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined [bugprone-narrowing-conversions]
+  446 |         if(ret != 0) return ret;
+      |                             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:595:17: warning: narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  595 |     int shift = readUint(1);
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:630:44: warning: Left shift overflows the capacity of 'int' [clang-analyzer-core.BitwiseShift]
+  630 |     const int32_t sampleLimit = INT32_C(1) << (sampleDepth - 1);
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:8: note: Assuming 'bytesLeft' is non-null
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |        ^~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:8: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:22: note: Assuming 'outbuf' is non-null
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |                      ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:8: note: Left side of '||' is false
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:33: note: Assuming 'inbuf' is non-null
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |                                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:8: note: Left side of '||' is false
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:43: note: Assuming the condition is false
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |                                           ^~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:5: note: Taking false branch
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:309:8: note: Assuming 'm_readError' is 0
+  309 |     if(m_readError) return m_readError;
+      |        ^~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:309:5: note: Taking false branch
+  309 |     if(m_readError) return m_readError;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:311:8: note: Assuming the condition is false
+  311 |     if(m_f_OggS_found == true){
+      |        ^~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:311:5: note: Taking false branch
+  311 |     if(m_f_OggS_found == true){
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:319:8: note: Assuming 'm_status' is not equal to OUT_SAMPLES
+  319 |     if(m_status != OUT_SAMPLES){
+      |        ^~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:319:5: note: Taking true branch
+  319 |     if(m_status != OUT_SAMPLES){
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:325:8: note: Assuming 'm_status' is not equal to DECODE_FRAME
+  325 |     if(m_status == DECODE_FRAME){  // Read a ton of header fields, and ignore most of them
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:325:5: note: Taking false branch
+  325 |     if(m_status == DECODE_FRAME){  // Read a ton of header fields, and ignore most of them
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:442:8: note: Assuming 'm_status' is equal to DECODE_SUBFRAMES
+  442 |     if(m_status == DECODE_SUBFRAMES){
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:442:5: note: Taking true branch
+  442 |     if(m_status == DECODE_SUBFRAMES){
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:445:19: note: Calling 'decodeSubframes'
+  445 |         int ret = decodeSubframes();
+      |                   ^~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:548:8: note: Assuming field 'chanAsgn' is <= 7
+  548 |     if(FLACFrameHeader->chanAsgn <= 7) {
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:548:5: note: Taking true branch
+  548 |     if(FLACFrameHeader->chanAsgn <= 7) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:549:26: note: Assuming 'ch' is < field 'numChannels'
+  549 |         for (int ch = 0; ch < FLACMetadataBlock->numChannels; ch++) {
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:549:9: note: Loop condition is true.  Entering loop body
+  549 |         for (int ch = 0; ch < FLACMetadataBlock->numChannels; ch++) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:550:35: note: Calling 'decodeSubframe'
+  550 |             const int8_t result = decodeSubframe(FLACMetadataBlock->bitsPerSample, ch);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:590:8: note: Assuming 'sampleDepth' is >= 1
+  590 |     if(sampleDepth < 1 || sampleDepth > FLAC_MAX_BITS_PER_SAMPLE + 1)
+      |        ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:590:8: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:590:27: note: Assuming the condition is false
+  590 |     if(sampleDepth < 1 || sampleDepth > FLAC_MAX_BITS_PER_SAMPLE + 1)
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:590:5: note: Taking false branch
+  590 |     if(sampleDepth < 1 || sampleDepth > FLAC_MAX_BITS_PER_SAMPLE + 1)
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:596:9: note: Assuming 'shift' is not equal to 1
+  596 |     if (shift == 1) {
+      |         ^~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:596:5: note: Taking false branch
+  596 |     if (shift == 1) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:602:8: note: Assuming 'm_readError' is 0
+  602 |     if(m_readError) return m_readError;
+      |        ^~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:602:5: note: Taking false branch
+  602 |     if(m_readError) return m_readError;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:603:8: note: Assuming 'shift' is < 'sampleDepth'
+  603 |     if(shift >= sampleDepth) return ERR_FLAC_INVALID_DATA;
+      |        ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:603:5: note: Taking false branch
+  603 |     if(shift >= sampleDepth) return ERR_FLAC_INVALID_DATA;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:606:8: note: Assuming 'type' is not equal to 0
+  606 |     if(type == 0){  // Constant coding
+      |        ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:606:5: note: Taking false branch
+  606 |     if(type == 0){  // Constant coding
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:612:14: note: Assuming 'type' is not equal to 1
+  612 |     else if (type == 1) {  // Verbatim coding
+      |              ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:612:10: note: Taking false branch
+  612 |     else if (type == 1) {  // Verbatim coding
+      |          ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:616:14: note: Assuming 'type' is >= 8
+  616 |     else if (8 <= type && type <= 12){
+      |              ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:616:14: note: Left side of '&&' is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:616:27: note: Assuming 'type' is <= 12
+  616 |     else if (8 <= type && type <= 12){
+      |                           ^~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:616:10: note: Taking true branch
+  616 |     else if (8 <= type && type <= 12){
+      |          ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:617:15: note: Calling 'decodeFixedPredictionSubframe'
+  617 |         ret = decodeFixedPredictionSubframe(type - 8, sampleDepth, ch);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:640:8: note: 'predOrder' is <= 4
+  640 |     if(predOrder > 4 || predOrder >= m_blockSize) return ERR_FLAC_PREORDER_TOO_BIG;
+      |        ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:640:8: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:640:25: note: Assuming 'predOrder' is < 'm_blockSize'
+  640 |     if(predOrder > 4 || predOrder >= m_blockSize) return ERR_FLAC_PREORDER_TOO_BIG;
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:640:5: note: Taking false branch
+  640 |     if(predOrder > 4 || predOrder >= m_blockSize) return ERR_FLAC_PREORDER_TOO_BIG;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:642:24: note: Assuming 'i' is < 'predOrder'
+  642 |     for(uint8_t i = 0; i < predOrder; i++)
+      |                        ^~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:642:5: note: Loop condition is true.  Entering loop body
+  642 |     for(uint8_t i = 0; i < predOrder; i++)
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:642:24: note: Assuming 'i' is >= 'predOrder'
+  642 |     for(uint8_t i = 0; i < predOrder; i++)
+      |                        ^~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:642:5: note: Loop condition is false. Execution continues on line 644
+  642 |     for(uint8_t i = 0; i < predOrder; i++)
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:645:8: note: Assuming 'ret' is 0
+  645 |     if(ret) return ret;
+      |        ^~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:645:5: note: Taking false branch
+  645 |     if(ret) return ret;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:647:8: note: 'predOrder' is equal to 1
+  647 |     if(predOrder == 1) { coefs[0] = 1; }
+      |        ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:647:5: note: Taking true branch
+  647 |     if(predOrder == 1) { coefs[0] = 1; }
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:648:8: note: 'predOrder' is not equal to 2
+  648 |     if(predOrder == 2) { coefs[0] = 2; coefs[1] = -1; }
+      |        ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:648:5: note: Taking false branch
+  648 |     if(predOrder == 2) { coefs[0] = 2; coefs[1] = -1; }
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:649:8: note: 'predOrder' is not equal to 3
+  649 |     if(predOrder == 3) { coefs[0] = 3; coefs[1] = -3; coefs[2] = 1; }
+      |        ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:649:5: note: Taking false branch
+  649 |     if(predOrder == 3) { coefs[0] = 3; coefs[1] = -3; coefs[2] = 1; }
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:650:8: note: 'predOrder' is not equal to 4
+  650 |     if(predOrder == 4) { coefs[0] = 4; coefs[1] = -6; coefs[2] = 4; coefs[3] = -1; }
+      |        ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:650:5: note: Taking false branch
+  650 |     if(predOrder == 4) { coefs[0] = 4; coefs[1] = -6; coefs[2] = 4; coefs[3] = -1; }
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:651:8: note: 'predOrder' is <= 4
+  651 |     if(predOrder > 4) return ERR_FLAC_PREORDER_TOO_BIG; // Error: preorder > 4"
+      |        ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:651:5: note: Taking false branch
+  651 |     if(predOrder > 4) return ERR_FLAC_PREORDER_TOO_BIG; // Error: preorder > 4"
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:652:5: note: Value assigned to 'm_readError', which participates in a condition later
+  652 |     restoreLinearPrediction(ch, 0);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:653:5: note: Returning zero, which participates in a condition later
+  653 |     return ERR_FLAC_NONE;
+      |     ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:617:15: note: Returning from 'decodeFixedPredictionSubframe'
+  617 |         ret = decodeFixedPredictionSubframe(type - 8, sampleDepth, ch);
+      |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:618:12: note: 'ret' is 0
+  618 |         if(ret) return ret;
+      |            ^~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:618:9: note: Taking false branch
+  618 |         if(ret) return ret;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:627:8: note: Assuming 'm_readError' is 0
+  627 |     if(m_readError) return m_readError;
+      |        ^~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:627:5: note: Taking false branch
+  627 |     if(m_readError) return m_readError;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:630:44: note: The result of left shift is undefined because the right operand is not smaller than 32, the capacity of 'int'
+  630 |     const int32_t sampleLimit = INT32_C(1) << (sampleDepth - 1);
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:630:44: warning: Right operand is negative in left shift [clang-analyzer-core.BitwiseShift]
+  630 |     const int32_t sampleLimit = INT32_C(1) << (sampleDepth - 1);
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:8: note: Assuming 'bytesLeft' is non-null
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |        ^~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:8: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:22: note: Assuming 'outbuf' is non-null
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |                      ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:8: note: Left side of '||' is false
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:33: note: Assuming 'inbuf' is non-null
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |                                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:8: note: Left side of '||' is false
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:43: note: Assuming the condition is false
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |                                           ^~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:308:5: note: Taking false branch
+  308 |     if(!bytesLeft || !outbuf || !inbuf || *bytesLeft < 0) return ERR_FLAC_INVALID_DATA;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:309:8: note: Assuming 'm_readError' is 0
+  309 |     if(m_readError) return m_readError;
+      |        ^~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:309:5: note: Taking false branch
+  309 |     if(m_readError) return m_readError;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:311:8: note: Assuming the condition is false
+  311 |     if(m_f_OggS_found == true){
+      |        ^~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:311:5: note: Taking false branch
+  311 |     if(m_f_OggS_found == true){
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:319:8: note: Assuming 'm_status' is not equal to OUT_SAMPLES
+  319 |     if(m_status != OUT_SAMPLES){
+      |        ^~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:319:5: note: Taking true branch
+  319 |     if(m_status != OUT_SAMPLES){
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:325:8: note: Assuming 'm_status' is not equal to DECODE_FRAME
+  325 |     if(m_status == DECODE_FRAME){  // Read a ton of header fields, and ignore most of them
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:325:5: note: Taking false branch
+  325 |     if(m_status == DECODE_FRAME){  // Read a ton of header fields, and ignore most of them
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:442:8: note: Assuming 'm_status' is equal to DECODE_SUBFRAMES
+  442 |     if(m_status == DECODE_SUBFRAMES){
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:442:5: note: Taking true branch
+  442 |     if(m_status == DECODE_SUBFRAMES){
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:445:19: note: Calling 'decodeSubframes'
+  445 |         int ret = decodeSubframes();
+      |                   ^~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:548:8: note: Assuming field 'chanAsgn' is <= 7
+  548 |     if(FLACFrameHeader->chanAsgn <= 7) {
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:548:5: note: Taking true branch
+  548 |     if(FLACFrameHeader->chanAsgn <= 7) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:549:26: note: Assuming 'ch' is < field 'numChannels'
+  549 |         for (int ch = 0; ch < FLACMetadataBlock->numChannels; ch++) {
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:549:9: note: Loop condition is true.  Entering loop body
+  549 |         for (int ch = 0; ch < FLACMetadataBlock->numChannels; ch++) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:550:35: note: Calling 'decodeSubframe'
+  550 |             const int8_t result = decodeSubframe(FLACMetadataBlock->bitsPerSample, ch);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:590:8: note: Assuming 'sampleDepth' is >= 1
+  590 |     if(sampleDepth < 1 || sampleDepth > FLAC_MAX_BITS_PER_SAMPLE + 1)
+      |        ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:590:8: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:590:27: note: Assuming the condition is false
+  590 |     if(sampleDepth < 1 || sampleDepth > FLAC_MAX_BITS_PER_SAMPLE + 1)
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:590:5: note: Taking false branch
+  590 |     if(sampleDepth < 1 || sampleDepth > FLAC_MAX_BITS_PER_SAMPLE + 1)
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:596:9: note: Assuming 'shift' is not equal to 1
+  596 |     if (shift == 1) {
+      |         ^~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:596:5: note: Taking false branch
+  596 |     if (shift == 1) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:602:8: note: Assuming 'm_readError' is 0
+  602 |     if(m_readError) return m_readError;
+      |        ^~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:602:5: note: Taking false branch
+  602 |     if(m_readError) return m_readError;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:603:8: note: Assuming 'shift' is < 'sampleDepth'
+  603 |     if(shift >= sampleDepth) return ERR_FLAC_INVALID_DATA;
+      |        ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:603:5: note: Taking false branch
+  603 |     if(shift >= sampleDepth) return ERR_FLAC_INVALID_DATA;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:606:8: note: Assuming 'type' is equal to 0
+  606 |     if(type == 0){  // Constant coding
+      |        ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:606:5: note: Taking true branch
+  606 |     if(type == 0){  // Constant coding
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:608:22: note: Assuming 'i' is >= 'm_blockSize'
+  608 |         for(int i=0; i < m_blockSize; i++){
+      |                      ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:608:9: note: Loop condition is false. Execution continues on line 627
+  608 |         for(int i=0; i < m_blockSize; i++){
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:627:8: note: 'm_readError' is 0
+  627 |     if(m_readError) return m_readError;
+      |        ^~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:627:5: note: Taking false branch
+  627 |     if(m_readError) return m_readError;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:630:44: note: The result of left shift is undefined because the right operand is negative
+  630 |     const int32_t sampleLimit = INT32_C(1) << (sampleDepth - 1);
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:645:20: warning: narrowing conversion from 'uint8_t' (aka 'unsigned char') to signed type 'int8_t' (aka 'signed char') is implementation-defined [bugprone-narrowing-conversions]
+  645 |     if(ret) return ret;
+      |                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:662:21: warning: narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  662 |     int precision = readUint(4) + 1;
+      |                     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:677:18: warning: narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  677 |     int method = readUint(2);
+      |                  ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:682:26: warning: narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  682 |     int partitionOrder = readUint(4);
+      |                          ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:694:21: warning: narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  694 |         int param = readUint(paramBits);
+      |                     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:697:40: warning: narrowing conversion from 'int64_t' (aka 'long long') to signed type 'int32_t' (aka 'int') is implementation-defined [bugprone-narrowing-conversions]
+  697 |                 samplesBuffer[ch][j] = readRiceSignedInt(param);
+      |                                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\yoRadio\src\audioI2S\flac_decoder\flac_decoder.cpp:701:27: warning: narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  701 |             int numBits = readUint(5);
+      |                           ^
+72 warnings generated.
+Suppressed 56 warnings (55 in non-user code, 1 with check filters).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

@@ -1,6 +1,7 @@
 [CmdletBinding(PositionalBinding = $false)]
 param(
     [string]$BuildDirectory = "build",
+    [string]$Sdkconfig = "",
     [string]$DependencyRoot = "",
     [Alias("DacBackend")]
     [ValidateSet("pdm", "continuous", "legacy")]
@@ -80,6 +81,9 @@ try {
                   "SDKCONFIG_DEFAULTS=sdkconfig.defaults;sdkconfig.legacy-dac.defaults")
             }
             default { @("-D", "SDKCONFIG=sdkconfig") }
+        }
+        if (-not [string]::IsNullOrWhiteSpace($Sdkconfig)) {
+            $profileArguments[1] = "SDKCONFIG=$Sdkconfig"
         }
         $arguments = @(
             (Join-Path $idf "tools\idf.py"),

@@ -1,0 +1,570 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:85:22: warning: Null pointer passed as 1st argument to memory comparison function [clang-analyzer-unix.cstring.NullArg]
+   85 |     if (size >= 4 && memcmp(data, "fLaC", 4) == 0) return NATIVE_CODEC_FLAC;
+      |                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:155:5: note: 'buffer' initialized here
+  155 |     uint8_t *buffer = malloc(STREAM_CHUNK_SIZE);
+      |     ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:156:9: note: Assuming 'buffer' is null
+  156 |     if (!buffer) {
+      |         ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:156:5: note: Taking true branch
+  156 |     if (!buffer) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Taking true branch
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:61: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Taking true branch
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:94: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                                                              ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:220:9: note: expanded from macro 'ESP_LOG_LEVEL'
+  220 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Loop condition is false.  Exiting loop
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:94: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                                                              ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:219:50: note: expanded from macro 'ESP_LOG_LEVEL'
+  219 | #define ESP_LOG_LEVEL(configs, tag, format, ...) do { \
+      |                                                  ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Loop condition is false.  Exiting loop
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:56: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Loop condition is false.  Exiting loop
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:36: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:160:5: note: Loop condition is true.  Entering loop body
+  160 |     while (true) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:164:16: note: Assuming the condition is false
+  164 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:164:65: note: Left side of '&&' is false
+  164 |         while (atomic_load(&s_generation) == command.generation &&
+      |                                                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:168:13: note: Assuming the condition is false
+  168 |         if (atomic_load(&s_generation) != command.generation) continue;
+      |             ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:168:9: note: Taking false branch
+  168 |         if (atomic_load(&s_generation) != command.generation) continue;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:183:13: note: Assuming 'client' is non-null
+  183 |         if (!client) {
+      |             ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:183:9: note: Taking false branch
+  183 |         if (!client) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:189:13: note: Assuming 'result' is equal to ESP_OK
+  189 |         if (result != ESP_OK) {
+      |             ^~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:189:9: note: Taking false branch
+  189 |         if (result != ESP_OK) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:197:13: note: Assuming 'codec' is equal to NATIVE_CODEC_AUTO
+  197 |         if (codec == NATIVE_CODEC_AUTO) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:197:9: note: Taking true branch
+  197 |         if (codec == NATIVE_CODEC_AUTO) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:199:17: note: Assuming the condition is false
+  199 |             if (esp_http_client_get_response_header(
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  200 |                     client, "Content-Type", &content_type) == ESP_OK) {
+      |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:199:13: note: Taking false branch
+  199 |             if (esp_http_client_get_response_header(
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:206:16: note: Assuming the condition is true
+  206 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:206:16: note: Left side of '&&' is true
+  206 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:206:9: note: Loop condition is true.  Entering loop body
+  206 |         while (atomic_load(&s_generation) == command.generation &&
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:210:17: note: Assuming 'received' is >= 0
+  210 |             if (received < 0) {
+      |                 ^~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:210:13: note: Taking false branch
+  210 |             if (received < 0) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:215:17: note: Assuming 'received' is not equal to 0
+  215 |             if (received == 0) {
+      |                 ^~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:215:13: note: Taking false branch
+  215 |             if (received == 0) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:220:17: note: 'first_chunk' is true
+  220 |             if (first_chunk) {
+      |                 ^~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:220:13: note: Taking true branch
+  220 |             if (first_chunk) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:222:21: note: 'codec' is equal to NATIVE_CODEC_AUTO
+  222 |                 if (codec == NATIVE_CODEC_AUTO) {
+      |                     ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:222:17: note: Taking true branch
+  222 |                 if (codec == NATIVE_CODEC_AUTO) {
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:223:50: note: Passing null pointer value via 1st parameter 'data'
+  223 |                     codec = codec_from_signature(buffer, received);
+      |                                                  ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:223:29: note: Calling 'codec_from_signature'
+  223 |                     codec = codec_from_signature(buffer, received);
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:85:9: note: Assuming 'size' is >= 4
+   85 |     if (size >= 4 && memcmp(data, "fLaC", 4) == 0) return NATIVE_CODEC_FLAC;
+      |         ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:85:9: note: Left side of '&&' is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:85:22: note: Null pointer passed as 1st argument to memory comparison function
+   85 |     if (size >= 4 && memcmp(data, "fLaC", 4) == 0) return NATIVE_CODEC_FLAC;
+      |                      ^      ~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:87:22: warning: Null pointer passed as 1st argument to memory comparison function [clang-analyzer-unix.cstring.NullArg]
+   87 |     if (size >= 3 && memcmp(data, "ID3", 3) == 0) return NATIVE_CODEC_MP3;
+      |                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:155:5: note: 'buffer' initialized here
+  155 |     uint8_t *buffer = malloc(STREAM_CHUNK_SIZE);
+      |     ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:156:9: note: Assuming 'buffer' is null
+  156 |     if (!buffer) {
+      |         ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:156:5: note: Taking true branch
+  156 |     if (!buffer) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Taking true branch
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:61: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Taking true branch
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:94: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                                                              ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:220:9: note: expanded from macro 'ESP_LOG_LEVEL'
+  220 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Loop condition is false.  Exiting loop
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:94: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                                                              ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:219:50: note: expanded from macro 'ESP_LOG_LEVEL'
+  219 | #define ESP_LOG_LEVEL(configs, tag, format, ...) do { \
+      |                                                  ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Loop condition is false.  Exiting loop
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:56: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Loop condition is false.  Exiting loop
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:36: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:160:5: note: Loop condition is true.  Entering loop body
+  160 |     while (true) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:164:16: note: Assuming the condition is false
+  164 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:164:65: note: Left side of '&&' is false
+  164 |         while (atomic_load(&s_generation) == command.generation &&
+      |                                                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:168:13: note: Assuming the condition is false
+  168 |         if (atomic_load(&s_generation) != command.generation) continue;
+      |             ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:168:9: note: Taking false branch
+  168 |         if (atomic_load(&s_generation) != command.generation) continue;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:183:13: note: Assuming 'client' is non-null
+  183 |         if (!client) {
+      |             ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:183:9: note: Taking false branch
+  183 |         if (!client) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:189:13: note: Assuming 'result' is equal to ESP_OK
+  189 |         if (result != ESP_OK) {
+      |             ^~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:189:9: note: Taking false branch
+  189 |         if (result != ESP_OK) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:197:13: note: Assuming 'codec' is equal to NATIVE_CODEC_AUTO
+  197 |         if (codec == NATIVE_CODEC_AUTO) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:197:9: note: Taking true branch
+  197 |         if (codec == NATIVE_CODEC_AUTO) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:199:17: note: Assuming the condition is false
+  199 |             if (esp_http_client_get_response_header(
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  200 |                     client, "Content-Type", &content_type) == ESP_OK) {
+      |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:199:13: note: Taking false branch
+  199 |             if (esp_http_client_get_response_header(
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:206:16: note: Assuming the condition is true
+  206 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:206:16: note: Left side of '&&' is true
+  206 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:206:9: note: Loop condition is true.  Entering loop body
+  206 |         while (atomic_load(&s_generation) == command.generation &&
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:210:17: note: Assuming 'received' is >= 0
+  210 |             if (received < 0) {
+      |                 ^~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:210:13: note: Taking false branch
+  210 |             if (received < 0) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:215:17: note: Assuming 'received' is not equal to 0
+  215 |             if (received == 0) {
+      |                 ^~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:215:13: note: Taking false branch
+  215 |             if (received == 0) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:220:17: note: 'first_chunk' is true
+  220 |             if (first_chunk) {
+      |                 ^~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:220:13: note: Taking true branch
+  220 |             if (first_chunk) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:222:21: note: 'codec' is equal to NATIVE_CODEC_AUTO
+  222 |                 if (codec == NATIVE_CODEC_AUTO) {
+      |                     ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:222:17: note: Taking true branch
+  222 |                 if (codec == NATIVE_CODEC_AUTO) {
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:223:50: note: Passing null pointer value via 1st parameter 'data'
+  223 |                     codec = codec_from_signature(buffer, received);
+      |                                                  ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:223:29: note: Calling 'codec_from_signature'
+  223 |                     codec = codec_from_signature(buffer, received);
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:85:9: note: Assuming 'size' is < 4
+   85 |     if (size >= 4 && memcmp(data, "fLaC", 4) == 0) return NATIVE_CODEC_FLAC;
+      |         ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:85:19: note: Left side of '&&' is false
+   85 |     if (size >= 4 && memcmp(data, "fLaC", 4) == 0) return NATIVE_CODEC_FLAC;
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:86:9: note: 'size' is < 4
+   86 |     if (size >= 4 && memcmp(data, "OggS", 4) == 0) return NATIVE_CODEC_OGG;
+      |         ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:86:19: note: Left side of '&&' is false
+   86 |     if (size >= 4 && memcmp(data, "OggS", 4) == 0) return NATIVE_CODEC_OGG;
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:87:9: note: Assuming 'size' is >= 3
+   87 |     if (size >= 3 && memcmp(data, "ID3", 3) == 0) return NATIVE_CODEC_MP3;
+      |         ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:87:9: note: Left side of '&&' is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:87:22: note: Null pointer passed as 1st argument to memory comparison function
+   87 |     if (size >= 3 && memcmp(data, "ID3", 3) == 0) return NATIVE_CODEC_MP3;
+      |                      ^      ~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:88:22: warning: Array access (from variable 'data') results in a null pointer dereference [clang-analyzer-core.NullDereference]
+   88 |     if (size >= 2 && data[0] == 0xff && (data[1] & 0xf6) == 0xf0) {
+      |                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:155:5: note: 'buffer' initialized here
+  155 |     uint8_t *buffer = malloc(STREAM_CHUNK_SIZE);
+      |     ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:156:9: note: Assuming 'buffer' is null
+  156 |     if (!buffer) {
+      |         ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:156:5: note: Taking true branch
+  156 |     if (!buffer) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Taking true branch
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:61: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Taking true branch
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:94: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                                                              ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:220:9: note: expanded from macro 'ESP_LOG_LEVEL'
+  220 |         if (ESP_LOG_GET_LEVEL(configs)==ESP_LOG_ERROR)        { esp_log(ESP_LOG_CONFIG_INIT(ESP_LOG_ERROR),   tag, LOG_FORMAT(E, format), esp_log_timestamp(), tag, ##__VA_ARGS__); } \
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Loop condition is false.  Exiting loop
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:94: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                                                              ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:219:50: note: expanded from macro 'ESP_LOG_LEVEL'
+  219 | #define ESP_LOG_LEVEL(configs, tag, format, ...) do { \
+      |                                                  ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Loop condition is false.  Exiting loop
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:41: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:165:56: note: expanded from macro 'ESP_LOG_LEVEL_LOCAL'
+  165 | #define ESP_LOG_LEVEL_LOCAL(configs, tag, format, ...) do { if (_ESP_LOG_ENABLED(configs)) { ESP_LOG_LEVEL(configs, tag, format, ##__VA_ARGS__); } } while(0)
+      |                                                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:157:9: note: Loop condition is false.  Exiting loop
+  157 |         ESP_LOGE(TAG, "No memory for stream input buffer");
+      |         ^
+C:/Work/yoRadio/.idf/v6.0.2/components/log/include/esp_log.h:123:36: note: expanded from macro 'ESP_LOGE'
+  123 | #define ESP_LOGE(tag, format, ...) do { ESP_LOG_LEVEL_LOCAL(ESP_LOG_ERROR, tag, format, ##__VA_ARGS__); } while(0)
+      |                                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:160:5: note: Loop condition is true.  Entering loop body
+  160 |     while (true) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:164:16: note: Assuming the condition is false
+  164 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:164:65: note: Left side of '&&' is false
+  164 |         while (atomic_load(&s_generation) == command.generation &&
+      |                                                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:168:13: note: Assuming the condition is false
+  168 |         if (atomic_load(&s_generation) != command.generation) continue;
+      |             ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:168:9: note: Taking false branch
+  168 |         if (atomic_load(&s_generation) != command.generation) continue;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:183:13: note: Assuming 'client' is non-null
+  183 |         if (!client) {
+      |             ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:183:9: note: Taking false branch
+  183 |         if (!client) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:189:13: note: Assuming 'result' is equal to ESP_OK
+  189 |         if (result != ESP_OK) {
+      |             ^~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:189:9: note: Taking false branch
+  189 |         if (result != ESP_OK) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:197:13: note: Assuming 'codec' is equal to NATIVE_CODEC_AUTO
+  197 |         if (codec == NATIVE_CODEC_AUTO) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:197:9: note: Taking true branch
+  197 |         if (codec == NATIVE_CODEC_AUTO) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:199:17: note: Assuming the condition is false
+  199 |             if (esp_http_client_get_response_header(
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  200 |                     client, "Content-Type", &content_type) == ESP_OK) {
+      |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:199:13: note: Taking false branch
+  199 |             if (esp_http_client_get_response_header(
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:206:16: note: Assuming the condition is true
+  206 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:206:16: note: Left side of '&&' is true
+  206 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:372:2: note: expanded from macro 'atomic_load'
+  372 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.0.2\tools\esp-clang\esp-20.1.1_20250829\esp-clang\bin/../lib/clang-runtimes/xtensa-esp-unknown-elf/esp32/include/stdatomic.h:265:2: note: expanded from macro 'atomic_load_explicit'
+  265 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:206:9: note: Loop condition is true.  Entering loop body
+  206 |         while (atomic_load(&s_generation) == command.generation &&
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:210:17: note: Assuming 'received' is >= 0
+  210 |             if (received < 0) {
+      |                 ^~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:210:13: note: Taking false branch
+  210 |             if (received < 0) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:215:17: note: Assuming 'received' is not equal to 0
+  215 |             if (received == 0) {
+      |                 ^~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:215:13: note: Taking false branch
+  215 |             if (received == 0) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:220:17: note: 'first_chunk' is true
+  220 |             if (first_chunk) {
+      |                 ^~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:220:13: note: Taking true branch
+  220 |             if (first_chunk) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:222:21: note: 'codec' is equal to NATIVE_CODEC_AUTO
+  222 |                 if (codec == NATIVE_CODEC_AUTO) {
+      |                     ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:222:17: note: Taking true branch
+  222 |                 if (codec == NATIVE_CODEC_AUTO) {
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:223:50: note: Passing null pointer value via 1st parameter 'data'
+  223 |                     codec = codec_from_signature(buffer, received);
+      |                                                  ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:223:29: note: Calling 'codec_from_signature'
+  223 |                     codec = codec_from_signature(buffer, received);
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:85:9: note: Assuming 'size' is < 4
+   85 |     if (size >= 4 && memcmp(data, "fLaC", 4) == 0) return NATIVE_CODEC_FLAC;
+      |         ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:85:19: note: Left side of '&&' is false
+   85 |     if (size >= 4 && memcmp(data, "fLaC", 4) == 0) return NATIVE_CODEC_FLAC;
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:86:9: note: 'size' is < 4
+   86 |     if (size >= 4 && memcmp(data, "OggS", 4) == 0) return NATIVE_CODEC_OGG;
+      |         ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:86:19: note: Left side of '&&' is false
+   86 |     if (size >= 4 && memcmp(data, "OggS", 4) == 0) return NATIVE_CODEC_OGG;
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:87:9: note: Assuming 'size' is < 3
+   87 |     if (size >= 3 && memcmp(data, "ID3", 3) == 0) return NATIVE_CODEC_MP3;
+      |         ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:87:19: note: Left side of '&&' is false
+   87 |     if (size >= 3 && memcmp(data, "ID3", 3) == 0) return NATIVE_CODEC_MP3;
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:88:9: note: Assuming 'size' is >= 2
+   88 |     if (size >= 2 && data[0] == 0xff && (data[1] & 0xf6) == 0xf0) {
+      |         ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:88:9: note: Left side of '&&' is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:88:22: note: Array access (from variable 'data') results in a null pointer dereference
+   88 |     if (size >= 2 && data[0] == 0xff && (data[1] & 0xf6) == 0xf0) {
+      |                      ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:149:15: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  149 |     if (size) memcpy(packet->data, data, size);
+      |               ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:149:15: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  149 |     if (size) memcpy(packet->data, data, size);
+      |               ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:263:9: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  263 |         memcpy(packet->data, data, chunk);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:263:9: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  263 |         memcpy(packet->data, data, chunk);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:278:5: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  278 |     memset(packet, 0, sizeof(*packet));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:278:5: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  278 |     memset(packet, 0, sizeof(*packet));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:511:21: warning: Call to function 'snprintf' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'snprintf_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  511 |                     snprintf(format, sizeof(format), "%lu kHz %s",
+      |                     ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\audio_service.c:511:21: note: Call to function 'snprintf' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'snprintf_s' in case of C11
+  511 |                     snprintf(format, sizeof(format), "%lu kHz %s",
+      |                     ^~~~~~~~
+25 warnings generated.
+Suppressed 18 warnings (18 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

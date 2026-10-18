@@ -1,0 +1,24 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint/config/sdkconfig.h:5:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    5 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/board_config.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/runtime_settings.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/time_service.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\time_service.c:67:16: warning: 'signed char' to 'int' conversion; consider casting to 'unsigned char' first. [bugprone-signed-char-misuse,cert-str34-c]
+   67 |     int hour = runtime_settings_get_timezone_hour();
+      |                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\time_service.c:74:5: warning: Call to function 'snprintf' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'snprintf_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   74 |     snprintf(timezone, sizeof(timezone), "UTC%c%d:%02d",
+      |     ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\time_service.c:74:5: note: Call to function 'snprintf' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'snprintf_s' in case of C11
+   74 |     snprintf(timezone, sizeof(timezone), "UTC%c%d:%02d",
+      |     ^~~~~~~~
+86 warnings generated.
+Suppressed 79 warnings (79 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

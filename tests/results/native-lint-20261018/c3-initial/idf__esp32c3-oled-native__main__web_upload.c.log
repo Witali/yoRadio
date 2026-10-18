@@ -1,0 +1,151 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint/config/sdkconfig.h:5:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    5 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/native_state.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/network_service.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/radio_control.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:52:5: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   52 |     memcpy(out, base, n + 1);
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:52:5: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+   52 |     memcpy(out, base, n + 1);
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:79:17: warning: function 'strcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   79 |             if (strcmp(field, "www") && strcmp(field, "data")) return false;
+      |                 ^
+      |                                      != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:87:21: warning: function 'strcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   87 |                 if (strcmp(field, "www") || n <= 3 || strcmp(name + n - 3, ".gz"))
+      |                     ^
+      |                                          != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:87:55: warning: function 'strcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   87 |                 if (strcmp(field, "www") || n <= 3 || strcmp(name + n - 3, ".gz"))
+      |                                                       ^                          
+      |                                                                                   != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:92:13: warning: Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119 [clang-analyzer-security.insecureAPI.strcpy]
+   92 |             strcpy(name, is_playlist ? "playlist.csv" : "wifi.csv");
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:92:13: note: Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119
+   92 |             strcpy(name, is_playlist ? "playlist.csv" : "wifi.csv");
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:104:9: warning: Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119 [clang-analyzer-security.insecureAPI.strcpy]
+  104 |         strcpy(u->names[u->files], name);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:104:9: note: Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119
+  104 |         strcpy(u->names[u->files], name);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:132:9: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  132 |         memcpy(out + u->part_bytes, data, length);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_file_form.h:132:9: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  132 |         memcpy(out + u->part_bytes, data, length);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:28:5: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   28 |     memset(p, 0, sizeof(*p));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:28:5: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   28 |     memset(p, 0, sizeof(*p));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:29:5: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   29 |     memcpy(p->marker, "\r\n--", 4);
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:29:5: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+   29 |     memcpy(p->marker, "\r\n--", 4);
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:30:5: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   30 |     memcpy(p->marker + 4, boundary, n);
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:30:5: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+   30 |     memcpy(p->marker + 4, boundary, n);
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:39:5: warning: Call to function 'memmove' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memmove_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   39 |     memmove(p->buffer, p->buffer + n, p->used);
+      |     ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:39:5: note: Call to function 'memmove' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memmove_s' in case of C11
+   39 |     memmove(p->buffer, p->buffer + n, p->used);
+      |     ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:47:17: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   47 |             if (memcmp(p->buffer, p->marker + 2, n) ||
+      |                 ^
+      |                                                     != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:54:20: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   54 |                    memcmp(p->buffer + n, "\r\n\r\n", 4)) ++n;
+      |                    ^                                   
+      |                                                         != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:85:26: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   85 |             if (!last && memcmp(p->buffer, "\r\n", 2)) return false;
+      |                          ^                           
+      |                                                       != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:102:9: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  102 |         memcpy(p->buffer + p->used, data, count);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:102:9: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  102 |         memcpy(p->buffer + p->used, data, count);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:121:9: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  121 |         memcpy(out, value, (size_t)(end - value));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:121:9: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  121 |         memcpy(out, value, (size_t)(end - value));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_upload.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/websocket_service.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:31:5: warning: Call to function 'snprintf' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'snprintf_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   31 |     snprintf(path, capacity, "/spiffs/data/web-upload-%02u.tmp", slot);
+      |     ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:31:5: note: Call to function 'snprintf' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'snprintf_s' in case of C11
+   31 |     snprintf(path, capacity, "/spiffs/data/web-upload-%02u.tmp", slot);
+      |     ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:62:9: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   62 |         memcpy(sink->buffer + sink->buffered, data, count);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:62:9: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+   62 |         memcpy(sink->buffer + sink->buffered, data, count);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:85:9: warning: function 'strncmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   85 |         strncmp(type, "multipart/form-data;", 20)) return false;
+      |         ^                                        
+      |                                                   != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:121:5: warning: Call to function 'snprintf' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'snprintf_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  121 |     snprintf(destination, sizeof(destination), "/spiffs/%s/%s",
+      |     ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:121:5: note: Call to function 'snprintf' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'snprintf_s' in case of C11
+  121 |     snprintf(destination, sizeof(destination), "/spiffs/%s/%s",
+      |     ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:173:5: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  173 |     memset(form.wifi, 0, sizeof(form.wifi));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:173:5: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  173 |     memset(form.wifi, 0, sizeof(form.wifi));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:174:5: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  174 |     memset(form.ssid, 0, sizeof(form.ssid));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:174:5: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  174 |     memset(form.ssid, 0, sizeof(form.ssid));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:175:5: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  175 |     memset(form.password, 0, sizeof(form.password));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_upload.c:175:5: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  175 |     memset(form.password, 0, sizeof(form.password));
+      |     ^~~~~~
+96 warnings generated.
+Suppressed 65 warnings (65 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

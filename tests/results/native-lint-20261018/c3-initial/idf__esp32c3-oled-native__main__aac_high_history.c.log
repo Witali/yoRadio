@@ -1,0 +1,84 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint/config/sdkconfig.h:5:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    5 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_compact_owner.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h:179:35: warning: do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead [bugprone-casting-through-void]
+  179 |     return ((aac_high_channel_t *)(void *)channel)->ps_synthesis;
+      |                                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h:200:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  200 |     return (void *)((uintptr_t)frame+aac_high_frame_channel(frame)->low_real_relative);
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h:203:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  203 |     return (void *)((uintptr_t)frame+aac_high_frame_channel(frame)->low_imag_relative);
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_pointer_audit.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_profile.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_abi.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/packed_complex16.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/packed_complex16_fast.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/packed_complex_storage.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:120:16: warning: Call to function 'memmove' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memmove_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  120 |         return memmove(dest,source,bytes);
+      |                ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:120:16: note: Call to function 'memmove' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memmove_s' in case of C11
+  120 |         return memmove(dest,source,bytes);
+      |                ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:147:5: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  147 |     memcpy(work.matrix.real,f->low_real,sizeof(f->low_real));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:147:5: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  147 |     memcpy(work.matrix.real,f->low_real,sizeof(f->low_real));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:148:5: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  148 |     memcpy(work.matrix.imag,f->low_imag,sizeof(f->low_imag));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:148:5: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  148 |     memcpy(work.matrix.imag,f->low_imag,sizeof(f->low_imag));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:190:5: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  190 |     memcpy(f->low_real,work.matrix.real,sizeof(f->low_real));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:190:5: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  190 |     memcpy(f->low_real,work.matrix.real,sizeof(f->low_real));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:192:26: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  192 |     if(!state->real_only)memcpy(f->low_imag,work.matrix.imag,sizeof(f->low_imag));
+      |                          ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:192:26: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  192 |     if(!state->real_only)memcpy(f->low_imag,work.matrix.imag,sizeof(f->low_imag));
+      |                          ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:217:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  217 |     if(both)memset(state->pc19_extra[state->pc19_channel],0,sizeof(state->pc19_extra[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:217:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  217 |     if(both)memset(state->pc19_extra[state->pc19_channel],0,sizeof(state->pc19_extra[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:219:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  219 |     if(both)memset(&f->high_history,0,sizeof(f->high_history));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_high_history.c:219:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  219 |     if(both)memset(&f->high_history,0,sizeof(f->high_history));
+      |             ^~~~~~
+40 warnings generated.
+Suppressed 20 warnings (20 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

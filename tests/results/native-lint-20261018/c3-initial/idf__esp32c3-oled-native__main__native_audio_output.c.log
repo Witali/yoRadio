@@ -1,0 +1,69 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/audio_level_led/audio_level_led.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_audio_settings/native_audio_settings.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint/config/sdkconfig.h:5:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    5 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/audio_pipeline_probe.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/board_config.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/native_audio_normalizer.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/native_audio_output.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:159:5: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  159 |     memcpy(left, frame, sizeof(*left));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:159:5: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  159 |     memcpy(left, frame, sizeof(*left));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:161:9: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  161 |         memcpy(right, frame + sizeof(*left), sizeof(*right));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:161:9: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  161 |         memcpy(right, frame + sizeof(*left), sizeof(*right));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:202:31: warning: narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined [bugprone-narrowing-conversions]
+  202 |                             ? ramp_sample(first + frame, count, ramp_up)
+      |                               ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:203:31: warning: narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined [bugprone-narrowing-conversions]
+  203 |                             : (ramp_up ? 0 : INT16_MIN);
+      |                               ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:339:29: warning: narrowing conversion from constant value 4294950912 (0xFFFFC000) of type 'unsigned int' to signed type 'int32_t' (aka 'int') is implementation-defined [bugprone-narrowing-conversions]
+  339 |                           : -(int32_t)(RESAMPLER_SCALE / 2U);
+      |                             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:497:18: warning: Value stored to 'tenths' during its initialization is never read [clang-analyzer-deadcode.DeadStores]
+  497 |         uint64_t tenths = s_stats_audio_us
+      |                  ^~~~~~   ~~~~~~~~~~~~~~~~
+  498 |                               ? s_stats_normalize_us * 1000ULL /
+      |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  499 |                                     s_stats_audio_us
+      |                                     ~~~~~~~~~~~~~~~~
+  500 |                               : 0;
+      |                               ~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:497:18: note: Value stored to 'tenths' during its initialization is never read
+  497 |         uint64_t tenths = s_stats_audio_us
+      |                  ^~~~~~   ~~~~~~~~~~~~~~~~
+  498 |                               ? s_stats_normalize_us * 1000ULL /
+      |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  499 |                                     s_stats_audio_us
+      |                                     ~~~~~~~~~~~~~~~~
+  500 |                               : 0;
+      |                               ~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:563:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  563 |         memset(s_frame_buffer + tail_frames * 2U, 0,
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:563:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  563 |         memset(s_frame_buffer + tail_frames * 2U, 0,
+      |         ^~~~~~
+82 warnings generated.
+Suppressed 68 warnings (68 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

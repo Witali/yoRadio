@@ -469,9 +469,12 @@ if(CONFIG_YORADIO_AAC_COMPACT_SBR OR CONFIG_YORADIO_QEMU_AAC_SMOOTHING_TEST)
   if(NOT COMPACT5_LAYOUT_RESULT EQUAL 0)
     message(FATAL_ERROR "AAC compiler ABI layout checks failed")
   endif()
+  # GCC supplies an absolute CMAKE_AR, while the supported Clang toolchain
+  # may supply only llvm-ar. The patcher changes cwd when extracting objects.
+  find_program(YORADIO_AAC_ARCHIVER NAMES "${CMAKE_AR}" REQUIRED)
   execute_process(COMMAND "${PYTHON}" "${YORADIO_ROOT}/../tools/codec_benchmark/${AAC_LAYOUT_PATCHER}"
     --archive "${PINNED_AAC_ARCHIVE}" --output "${COMPACT5_DIR}"
-    --ar "${CMAKE_AR}" --objcopy "${CMAKE_OBJCOPY}"
+    --ar "${YORADIO_AAC_ARCHIVER}" --objcopy "${CMAKE_OBJCOPY}"
     --layout-object "${COMPACT5_DIR}/layout.o"
     RESULT_VARIABLE COMPACT5_RESULT)
   if(NOT COMPACT5_RESULT EQUAL 0)

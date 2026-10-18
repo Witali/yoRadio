@@ -1,0 +1,38 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:44:5: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   44 |     memcpy(&left, frame, sizeof(left));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:44:5: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+   44 |     memcpy(&left, frame, sizeof(left));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:51:5: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   51 |     memcpy(&right, frame + sizeof(right), sizeof(right));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:51:5: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+   51 |     memcpy(&right, frame + sizeof(right), sizeof(right));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:117:5: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  117 |     memset(s_sample_buffer + s_buffered_samples, 0,
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:117:5: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  117 |     memset(s_sample_buffer + s_buffered_samples, 0,
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:151:14: warning: performing an implicit widening conversion to type 'unsigned long long' of a multiplication performed in type 'unsigned int' [bugprone-implicit-widening-of-multiplication-result]
+  151 |             ((PDM_DMA_DESCRIPTORS + 1U) * PDM_DMA_SAMPLES * 1000ULL +
+      |              ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:151:14: note: make conversion explicit to silence this warning
+    5 |             ((PDM_DMA_DESCRIPTORS + 1U) * PDM_DMA_SAMPLES * 1000ULL +
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |              (unsigned long long)(                       )
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:151:14: note: perform multiplication in a wider type
+  151 |             ((PDM_DMA_DESCRIPTORS + 1U) * PDM_DMA_SAMPLES * 1000ULL +
+      |              ^
+      |               (unsigned long long)
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:213:45: warning: narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined [bugprone-narrowing-conversions]
+  213 |                                           ? ramp_sample(index++, count, true)
+      |                                             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:272:33: warning: narrowing conversion from constant value 4294950912 (0xFFFFC000) of type 'unsigned int' to signed type 'int32_t' (aka 'int') is implementation-defined [bugprone-narrowing-conversions]
+  272 |                               : -(int32_t)(RESAMPLER_SCALE / 2U);
+      |                                 ^
+12 warnings generated.
+Suppressed 6 warnings (6 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

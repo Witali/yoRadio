@@ -1,0 +1,382 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint/config/sdkconfig.h:5:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    5 | #pragma once
+      | ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/../tools/codec_benchmark/aac_analysis_core.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/yoRadio/../tools/codec_benchmark/aac_analysis_regions.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_compact_owner.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h:179:35: warning: do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead [bugprone-casting-through-void]
+  179 |     return ((aac_high_channel_t *)(void *)channel)->ps_synthesis;
+      |                                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h:179:53: warning: Out of bound access to memory preceding the field 'frame' [clang-analyzer-security.ArrayBound]
+  179 |     return ((aac_high_channel_t *)(void *)channel)->ps_synthesis;
+      |                                                     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:261:8: note: Assuming 'state' is non-null
+  261 |     if(!state){__real_PVMP4AudioDecoderResetBuffer(opaque);return;}
+      |        ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:261:5: note: Taking false branch
+  261 |     if(!state){__real_PVMP4AudioDecoderResetBuffer(opaque);return;}
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:266:8: note: Assuming 'owner' is non-null
+  266 |     if(!owner){aac_sbr_reset_core(core,NULL);return;}
+      |        ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:266:5: note: Taking false branch
+  266 |     if(!owner){aac_sbr_reset_core(core,NULL);return;}
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:267:12: note: Assuming 'owner' is equal to field 'owner'
+  267 |     assert(owner==state->owner && !state->inside_sbr);ps_pointer(state);
+      |            ^
+C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include/assert.h:45:42: note: expanded from macro 'assert'
+   45 | #define assert(__e) (__builtin_expect(!!(__e), 1) ? (void)0 : __assert_func (__FILENAME__, __LINE__, \
+      |                                          ^~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:267:12: note: Left side of '&&' is true
+  267 |     assert(owner==state->owner && !state->inside_sbr);ps_pointer(state);
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:267:35: note: Assuming field 'inside_sbr' is false
+  267 |     assert(owner==state->owner && !state->inside_sbr);ps_pointer(state);
+      |                                   ^
+C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include/assert.h:45:42: note: expanded from macro 'assert'
+   45 | #define assert(__e) (__builtin_expect(!!(__e), 1) ? (void)0 : __assert_func (__FILENAME__, __LINE__, \
+      |                                          ^~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:267:5: note: '?' condition is true
+  267 |     assert(owner==state->owner && !state->inside_sbr);ps_pointer(state);
+      |     ^
+C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include/assert.h:45:22: note: expanded from macro 'assert'
+   45 | #define assert(__e) (__builtin_expect(!!(__e), 1) ? (void)0 : __assert_func (__FILENAME__, __LINE__, \
+      |                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:273:5: note: Calling 'aac_high_reset_core'
+  273 |     aac_sbr_reset_core(core,&view);
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:28:28: note: expanded from macro 'aac_sbr_reset_core'
+   28 | #define aac_sbr_reset_core aac_high_reset_core
+      |                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:7:5: note: Loop condition is true.  Entering loop body
+    7 |     for(unsigned ch=0;ch<AAC_SBR_CHANNELS;++ch)
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:7:5: note: Loop condition is true.  Entering loop body
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:7:5: note: Loop condition is false. Execution continues on line 9
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:9:8: note: 'sbr' is non-null
+    9 |     if(sbr && !*sbr->initialize_ps && core->plus_enabled) {
+      |        ^~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:9:8: note: Left side of '&&' is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:9:15: note: Assuming the condition is true
+    9 |     if(sbr && !*sbr->initialize_ps && core->plus_enabled) {
+      |               ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:9:8: note: Left side of '&&' is true
+    9 |     if(sbr && !*sbr->initialize_ps && core->plus_enabled) {
+      |        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:9:39: note: Assuming field 'plus_enabled' is not equal to 0
+    9 |     if(sbr && !*sbr->initialize_ps && core->plus_enabled) {
+      |                                       ^~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:9:5: note: Taking true branch
+    9 |     if(sbr && !*sbr->initialize_ps && core->plus_enabled) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:11:9: note: Loop condition is true.  Entering loop body
+   11 |         for(unsigned ch=0;ch<AAC_SBR_CHANNELS;++ch) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:17:32: note: 'ch' is 0
+   17 |             int16_t *synthesis=ch && core->ps_present==1 && sbr->ps_initialized ?
+      |                                ^~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:17:35: note: Left side of '&&' is false
+   17 |             int16_t *synthesis=ch && core->ps_present==1 && sbr->ps_initialized ?
+      |                                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:11:9: note: Loop condition is true.  Entering loop body
+   11 |         for(unsigned ch=0;ch<AAC_SBR_CHANNELS;++ch) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:17:32: note: 'ch' is 1
+   17 |             int16_t *synthesis=ch && core->ps_present==1 && sbr->ps_initialized ?
+      |                                ^~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:17:32: note: Left side of '&&' is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:17:38: note: Assuming field 'ps_present' is equal to 1
+   17 |             int16_t *synthesis=ch && core->ps_present==1 && sbr->ps_initialized ?
+      |                                      ^~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:17:32: note: Left side of '&&' is true
+   17 |             int16_t *synthesis=ch && core->ps_present==1 && sbr->ps_initialized ?
+      |                                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:17:66: note: Field 'ps_initialized' is true
+   17 |             int16_t *synthesis=ch && core->ps_present==1 && sbr->ps_initialized ?
+      |                                                                  ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:17:32: note: '?' condition is true
+   17 |             int16_t *synthesis=ch && core->ps_present==1 && sbr->ps_initialized ?
+      |                                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:18:17: note: Calling 'aac_high_ps_synthesis'
+   18 |                 aac_high_ps_synthesis(owner_channel):frame->synthesis;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h:179:53: note: Access of the field 'frame' at negative byte offset -96
+  179 |     return ((aac_high_channel_t *)(void *)channel)->ps_synthesis;
+      |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h:200:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  200 |     return (void *)((uintptr_t)frame+aac_high_frame_channel(frame)->low_real_relative);
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h:203:12: warning: integer to pointer cast pessimizes optimization opportunities [performance-no-int-to-ptr]
+  203 |     return (void *)((uintptr_t)frame+aac_high_frame_channel(frame)->low_imag_relative);
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:8:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+    8 |         memset(core->channel[ch].overlap,0,sizeof(core->channel[ch].overlap));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:8:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+    8 |         memset(core->channel[ch].overlap,0,sizeof(core->channel[ch].overlap));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:13:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   13 |             memset(channel->ltp_history,0,288*sizeof(channel->ltp_history[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:13:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   13 |             memset(channel->ltp_history,0,288*sizeof(channel->ltp_history[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:14:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   14 |             memset(channel->ltp_history+1312,0,288*sizeof(channel->ltp_history[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:14:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   14 |             memset(channel->ltp_history+1312,0,288*sizeof(channel->ltp_history[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:19:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   19 |             memset(synthesis,0,sizeof(frame->synthesis));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:19:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   19 |             memset(synthesis,0,sizeof(frame->synthesis));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:20:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   20 |             memset(frame->previous_noise,0,sizeof(frame->previous_noise));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:20:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   20 |             memset(frame->previous_noise,0,sizeof(frame->previous_noise));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:23:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   23 |         memset(left->low_real,0,8*sizeof(left->low_real[0]));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:23:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   23 |         memset(left->low_real,0,8*sizeof(left->low_real[0]));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:24:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   24 |         memset(left->previous_bandwidth,0,sizeof(left->previous_bandwidth));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:24:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   24 |         memset(left->previous_bandwidth,0,sizeof(left->previous_bandwidth));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:25:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   25 |         memset(left->gain_mantissa,0,sizeof(left->gain_mantissa));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:25:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   25 |         memset(left->gain_mantissa,0,sizeof(left->gain_mantissa));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:26:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   26 |         memset(left->noise_mantissa,0,sizeof(left->noise_mantissa));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:26:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   26 |         memset(left->noise_mantissa,0,sizeof(left->noise_mantissa));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:30:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   30 |             memset(right->low_real,0,8*sizeof(right->low_real[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:30:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   30 |             memset(right->low_real,0,8*sizeof(right->low_real[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:32:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   32 |             memset(right->previous_bandwidth,0,sizeof(right->previous_bandwidth));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:32:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   32 |             memset(right->previous_bandwidth,0,sizeof(right->previous_bandwidth));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:33:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   33 |             memset(right->gain_mantissa,0,sizeof(right->gain_mantissa));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:33:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   33 |             memset(right->gain_mantissa,0,sizeof(right->gain_mantissa));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:34:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   34 |             memset(right->noise_mantissa,0,sizeof(right->noise_mantissa));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:34:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   34 |             memset(right->noise_mantissa,0,sizeof(right->noise_mantissa));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:38:17: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   38 |                 memset(hybrid->real_history[row],0,12*sizeof(int32_t));
+      |                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:38:17: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   38 |                 memset(hybrid->real_history[row],0,12*sizeof(int32_t));
+      |                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:39:17: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   39 |                 memset(hybrid->imag_history[row],0,12*sizeof(int32_t));
+      |                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h:39:17: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   39 |                 memset(hybrid->imag_history[row],0,12*sizeof(int32_t));
+      |                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_pointer_audit.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_profile.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_abi.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:1:1: warning: avoid 'pragma once' directive; use include guards instead [portability-avoid-pragma-once]
+    1 | #pragma once
+      | ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:20:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   20 |         memset(core->channel[ch].overlap,0,sizeof(core->channel[ch].overlap));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:20:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   20 |         memset(core->channel[ch].overlap,0,sizeof(core->channel[ch].overlap));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:25:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   25 |             memset(channel->ltp_history,0,288*sizeof(channel->ltp_history[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:25:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   25 |             memset(channel->ltp_history,0,288*sizeof(channel->ltp_history[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:26:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   26 |             memset(channel->ltp_history+1312,0,288*sizeof(channel->ltp_history[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:26:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   26 |             memset(channel->ltp_history+1312,0,288*sizeof(channel->ltp_history[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:28:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   28 |             memset(frame->synthesis,0,sizeof(frame->synthesis));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:28:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   28 |             memset(frame->synthesis,0,sizeof(frame->synthesis));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:29:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   29 |             memset(frame->previous_noise,0,sizeof(frame->previous_noise));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:29:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   29 |             memset(frame->previous_noise,0,sizeof(frame->previous_noise));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:32:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   32 |         memset(left->low_real,0,8*sizeof(left->low_real[0]));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:32:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   32 |         memset(left->low_real,0,8*sizeof(left->low_real[0]));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:33:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   33 |         memset(left->previous_bandwidth,0,sizeof(left->previous_bandwidth));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:33:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   33 |         memset(left->previous_bandwidth,0,sizeof(left->previous_bandwidth));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:34:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   34 |         memset(left->gain_mantissa,0,sizeof(left->gain_mantissa));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:34:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   34 |         memset(left->gain_mantissa,0,sizeof(left->gain_mantissa));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:35:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   35 |         memset(left->noise_mantissa,0,sizeof(left->noise_mantissa));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:35:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   35 |         memset(left->noise_mantissa,0,sizeof(left->noise_mantissa));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:36:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   36 |         memset(left->high_real_history,0,sizeof(left->high_real_history));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:36:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   36 |         memset(left->high_real_history,0,sizeof(left->high_real_history));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:37:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   37 |         memset(left->high_imag_history,0,sizeof(left->high_imag_history));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:37:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   37 |         memset(left->high_imag_history,0,sizeof(left->high_imag_history));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:40:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   40 |             memset(right->low_real,0,8*sizeof(right->low_real[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:40:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   40 |             memset(right->low_real,0,8*sizeof(right->low_real[0]));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:41:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   41 |             memset(right->high_real_history,0,sizeof(right->high_real_history));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:41:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   41 |             memset(right->high_real_history,0,sizeof(right->high_real_history));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:42:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   42 |             memset(right->previous_bandwidth,0,sizeof(right->previous_bandwidth));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:42:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   42 |             memset(right->previous_bandwidth,0,sizeof(right->previous_bandwidth));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:43:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   43 |             memset(right->gain_mantissa,0,sizeof(right->gain_mantissa));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:43:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   43 |             memset(right->gain_mantissa,0,sizeof(right->gain_mantissa));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:44:13: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   44 |             memset(right->noise_mantissa,0,sizeof(right->noise_mantissa));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:44:13: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   44 |             memset(right->noise_mantissa,0,sizeof(right->noise_mantissa));
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:48:17: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   48 |                 memset(hybrid->real_history[row],0,12*sizeof(int32_t));
+      |                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:48:17: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   48 |                 memset(hybrid->real_history[row],0,12*sizeof(int32_t));
+      |                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:49:17: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+   49 |                 memset(hybrid->imag_history[row],0,12*sizeof(int32_t));
+      |                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_sbr_reset.h:49:17: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+   49 |                 memset(hybrid->imag_history[row],0,12*sizeof(int32_t));
+      |                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:152:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  152 |         memset(state->high_history.pc19_extra,0,sizeof(state->high_history.pc19_extra));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:152:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  152 |         memset(state->high_history.pc19_extra,0,sizeof(state->high_history.pc19_extra));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:248:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  248 |         memset(relocated,0,sizeof(*relocated));relocated->detected=owner->inactive_ps;
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:248:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  248 |         memset(relocated,0,sizeof(*relocated));relocated->detected=owner->inactive_ps;
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:287:5: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  287 |     memset(state->high_history.pc19_extra,0,sizeof(state->high_history.pc19_extra));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:287:5: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  287 |     memset(state->high_history.pc19_extra,0,sizeof(state->high_history.pc19_extra));
+      |     ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:297:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  297 |         memset(owner,0,start);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:297:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  297 |         memset(owner,0,start);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:298:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  298 |         memset((uint8_t *)owner+end,0,offsetof(owner_t,initialize_ps)-end);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:298:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  298 |         memset((uint8_t *)owner+end,0,offsetof(owner_t,initialize_ps)-end);
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:300:9: warning: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  300 |         memset(owner,0,offsetof(owner_t,initialize_ps));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:300:9: note: Call to function 'memset' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memset_s' in case of C11
+  300 |         memset(owner,0,offsetof(owner_t,initialize_ps));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:304:9: warning: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11 [clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling]
+  304 |         memcpy(&channel->frame.header,compact5_defaultHeader,sizeof(channel->frame.header));
+      |         ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c:304:9: note: Call to function 'memcpy' is insecure as it does not provide security checks introduced in the C11 standard. Replace with analogous functions that support length arguments or provides boundary checks such as 'memcpy_s' in case of C11
+  304 |         memcpy(&channel->frame.header,compact5_defaultHeader,sizeof(channel->frame.header));
+      |         ^~~~~~
+96 warnings generated.
+Suppressed 41 warnings (41 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
