@@ -245,7 +245,7 @@ static esp_err_t settings_handler(httpd_req_t *request) {
                                            "Invalid settings query");
             size_t length = (size_t)(equals - field);
             for (unsigned i = 0; i < COUNT; ++i) {
-                if (strlen(keys[i]) != length || strncasecmp(field, keys[i], length)) continue;
+                if (strlen(keys[i]) != length || strncasecmp(field, keys[i], length) != 0) continue;
                 if (specified[i])
                     return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
                                                "Duplicate settings value");
