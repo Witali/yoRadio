@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "groups": 69,
+  "negative_controls": {
+    "mutant-plaintext-bypass": {
+      "expected_failure": true,
+      "exit_code": 6
+    },
+    "mutant-lost-tls-owner": {
+      "expected_failure": true,
+      "exit_code": 6
+    },
+    "mutant-unchecked-key-pair": {
+      "expected_failure": true,
+      "exit_code": 6
+    },
+    "mutant-renewed-write-budget": {
+      "expected_failure": true,
+      "exit_code": 6
+    },
+    "mutant-blocking-prepare-close": {
+      "expected_failure": true,
+      "exit_code": 6
+    }
+  },
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-native-web-transport.py": "311429198cbf563e2445f5ca030a7df29c07542d6a4bdd63ed9b3454e36ad548",
+    "idf/components/native_web_transport/native_web_transport.c": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf",
+    "idf/components/native_web_transport/include/native_web_transport.h": "c4122c3f2d960e8922ceaa1c179c415e15e3d74abdea86424e6fde4633e0a045",
+    "tests/native/native_web_transport/stubs.h": "33a709c44d21b23018870c72879be9cfd934a7779e78b0a97121816be879b5ea",
+    "tests/native/native_web_transport/faults.c": "98c193ca850cca21e4e8f0f575475b64923acb1b3dae1859e5bc7abb56d0e8fb"
+  },
+  "scope": "Actual production transport code with deterministic NVS, crypto, TLS, HTTPD, allocation, socket and clock seams. No real crypto/TLS handshake, NVS power-loss, board timing/RAM proof."
+}

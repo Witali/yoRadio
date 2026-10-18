@@ -16,6 +16,11 @@ DMA quietness, timing, power loss, heap and stack admission remain separate.
 | Shared form/HTTP and target adapters, initial | [report](http-initial/report.json): CYD243/C3183 groups, four/one executable mutants detected. Actual pinned SDK buffered receive, response send, context and request-cleanup functions. This C3 checkpoint deliberately rejects positive OTA until acknowledged audio maintenance is integrated. |
 | Multipart compatibility | [report](multipart-current/report.json): 896 header checks, five actual receiver variants, four historical receiver negatives and the current C3 OTA runner. |
 | CYD routes, startup and UI | [report](static-startup-cyd/report.json): actual static/startup functions under ASan/UBSan, every route failure and retained ownership after stop failure; all22 Node tests pass, including native ordered FormData/XHR and recovery behavior. |
+| Concurrent CYD audio maintenance | [report](maintenance-cyd/report.json): PDM27, continuous DAC27 and legacy DAC26 scenarios with all three production owner loops and the actual adaptive FIFO; eight executable mutants detected by specific semantic assertions. |
+| Existing CYD lifecycle | [report](maintenance-lifecycle/report.json): six vendor/Helix/minimp3 and adaptive/non-adaptive variants, including 2,000 concurrent Play/Stop commands per variant, stale callbacks, terminal drain and failure ownership. |
+| Final backend pause and PCM regression | [pause](output-pause-final/report.json): PDM11/DAC17/legacy10 cases and two DMA ownership assertions; [gain](output-gain/report.json): 375 output and 5,801,300 arithmetic cases per backend. |
+| Terminal transport preparation | [report](transport-prepare-close/report.json): 69 fault groups and five semantic mutants, including an incorrect socket shutdown before reserved reboot commit. Existing WebSocket shutdown behavior is preserved. |
+| Fresh actual pinned TLS | [CYD](tls-cyd/report.json), [C3](tls-c3/report.json): eight verified TLS1.2 cases per SDK on the new transport source, using 117 vendor crypto units, trusted CA/SAN-verified independent OpenSSL clients, WANT/partial/peek/pending, backpressure and close alerts. |
 
 Image tests cover incomplete and damaged images, wrong chip/project, exact
 application caps, spare-slot validation, read/map faults, trailing bytes and
@@ -38,14 +43,33 @@ The reboot tests preserve C3 first-request timing and CYD earliest-request
 timing while preventing an already reserved OTA transaction from losing its
 reboot service. A failed response after activation must still commit reboot.
 
+Maintenance tests hold real production owners at external codec/HTTP/driver
+and FIFO seams. They cover late encoded/PCM/control leases, blocked connect,
+headers/read/close/cleanup, output writes/disable failures, finite lock budgets,
+stale tokens, explicit Stop, queue failures, consecutive epochs and accepted
+resume followed immediately by another maintenance. The empty-receive race
+now requires the decoder's local generation to match before acknowledgement.
+Timeout and late cleanup remain visibly distinct in snapshots. Stream metadata
+and title clear while the station label, URL/codec and SmartStart intent persist.
+
+ASan/UBSan pass these matrices. ThreadSanitizer is **not qualified**: the first
+idle case ran, but subsequent startup failed with its unexpected-memory-mapping
+runtime error before the test's main marker. No runtime workaround was applied.
+
+The terminal HTTP path prepares a bounded TLS alert and marks the transport;
+it does not call synchronous lwIP socket shutdown before committing reboot.
+HTTPD retains final descriptor deletion. Pinned lwIP's TCP close can wait for
+FIN allocation even with a nonblocking descriptor; socket send timeout may
+reduce that wait but does not turn the API into a nonblocking operation.
+
 Source snapshots and raw logs retain their recorded bytes and SHA256 values.
 [archive-manifest.json](archive-manifest.json) inventories the campaign.
 Newline conversion is disabled by the campaign's `.gitattributes` rule.
 Executables, image fixtures, credentials and private data are not archived;
 source generators and the documented software crypto inputs permit replay.
 
-Remaining software gates: three concurrent audio owners and late cleanup,
-C3 maintenance integration, actual HTTPD/form/transport lifecycle over HTTP
+Remaining software gates: C3 maintenance integration,
+actual HTTPD/form/transport lifecycle over HTTP
 and verified TLS, final SDK compilation, lint, and all four
 production application exports. Physical OTA, data preservation, interrupted
 power and a separately established rollback bootloader remain pending.
