@@ -1,0 +1,26 @@
+{
+  "source_sha256": {
+    "tests/run-reboot-leases.py": "09c2095eaeef0dd32ad0a2dc3981b334d04324d779edc75610f7a3a849e67ffb",
+    "tests/native/reboot_lease_test.c": "d058ef6ca6a61633f0886fa587c4a6f77332e2f97866c19647afc381917d1f29",
+    "idf/esp32-cyd2usb-native/main/web_reboot.c": "399aaa9ca4a55528214e62d3b445abf8a43527443a824fa00177a553b805444e",
+    "idf/esp32-cyd2usb-native/main/web_reboot.h": "a224058b4cf48a49bd467ca50af7b8ed2acb8e9adfeb2cd2938e4d7e47479b76",
+    "idf/esp32c3-oled-native/main/websocket_service.c": "b82874640b2022851fa20e31db25c032810e50ff64478f224594613289225afd",
+    "idf/esp32c3-oled-native/main/websocket_service.h": "870786b4028900c2d14022f2316d05f3246254db35737af3d52d6e6a1b797a07"
+  },
+  "variants": {
+    "cyd": {
+      "passed": true,
+      "result": "PASS reboot leases: 208 scenarios; 200 real thread admission/request races, stale/duplicate tokens, pending rejection, deferred execution, commit allocation-free, tick wrap"
+    },
+    "c3": {
+      "passed": true,
+      "result": "PASS reboot leases: 208 scenarios; 200 real thread admission/request races, stale/duplicate tokens, pending rejection, deferred execution, commit allocation-free, tick wrap"
+    }
+  },
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "passed": true,
+  "scope": "Actual target reboot/lease functions, real pthread admission/request races and mutex critical sections; deterministic RTOS notification/clock/restart seams. No hardware scheduler or reboot durability claim."
+}

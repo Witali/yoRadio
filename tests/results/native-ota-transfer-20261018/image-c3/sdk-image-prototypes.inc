@@ -1,0 +1,26 @@
+typedef struct {
+    int segment;
+    intptr_t load_addr;
+    uint32_t data_addr;
+    uint32_t data_len;
+    bool do_load;
+    bool is_segment_start;
+    bootloader_sha256_handle_t sha_handle;
+    uint32_t *checksum;
+    esp_image_metadata_t *metadata;
+} process_segment_data_t;
+static bool is_bootloader(uint32_t offset);
+static bool should_map(uint32_t load_addr);
+static bool should_load(uint32_t load_addr);
+static esp_err_t verify_image_header(uint32_t src_addr, const esp_image_header_t *image, bool silent);
+static esp_err_t verify_segment_header(int index, const esp_image_segment_header_t *segment, uint32_t segment_data_offs, esp_image_metadata_t *metadata, bool silent);
+static esp_err_t process_image_header(esp_image_metadata_t *data, uint32_t part_offset, bootloader_sha256_handle_t *sha_handle, bool do_verify, bool silent);
+static esp_err_t process_segment_data(const process_segment_data_t *segment_data);
+static esp_err_t process_segment(int index, uint32_t flash_addr, esp_image_segment_header_t *header, bool silent, bool do_load, bootloader_sha256_handle_t sha_handle, uint32_t *checksum, esp_image_metadata_t *metadata);
+static esp_err_t process_segments(esp_image_metadata_t *data, bool silent, bool do_load, bootloader_sha256_handle_t sha_handle, uint32_t *checksum);
+static esp_err_t process_checksum(bootloader_sha256_handle_t sha_handle, uint32_t checksum_word, esp_image_metadata_t *data, bool silent, bool skip_check_checksum);
+static esp_err_t process_appended_hash_and_sig(esp_image_metadata_t *data, uint32_t part_offset, uint32_t part_len, bool do_verify, bool silent);
+static esp_err_t verify_simple_hash(bootloader_sha256_handle_t sha_handle, esp_image_metadata_t *data);
+static esp_err_t image_load(esp_image_load_mode_t mode, const esp_partition_pos_t *part, esp_image_metadata_t *data);
+esp_err_t esp_image_verify(esp_image_load_mode_t mode, const esp_partition_pos_t *part, esp_image_metadata_t *data);
+esp_err_t esp_image_get_metadata(const esp_partition_pos_t *part, esp_image_metadata_t *metadata);

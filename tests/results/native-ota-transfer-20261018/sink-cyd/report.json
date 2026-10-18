@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "sdk": "v6.0.2",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "source_sha256": {
+    "tests/run-native-ota.py": "2b416c094e79e51cd1a16c8d7d69e88039e25c3f73702a603599eafffd6e6462",
+    "tests/native/native_ota/host.h": "e9789c483ef5f60ec7111f754fbc59baeb91d241dd9f99c9fc601f443bbf55b7",
+    "tests/native/native_ota/sink_test.c": "e854b7cadac99b23e470826c644c10f61dc48300109ca6092965924f748c8e4d",
+    "idf/components/native_ota/native_ota_sink.c": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2",
+    "idf/components/native_ota/include/native_ota_sink.h": "4e27ffa36951b4fd2f459e094c4ef287bad5b163ce3bc9b74b05cd846a3d2dde",
+    "idf/components/native_ota/CMakeLists.txt": "79b7181c2b1c9b90ed5e2ffd6cf60a3bdd649015ea2b4bf0281c4bf8d76d4045",
+    "sdk/components/bootloader_support/include/esp_app_format.h": "475d7355341d8833f3ad54b2bab6491c4751d19a063e9887412829b56dd8bbf4",
+    "sdk/components/esp_app_format/include/esp_app_desc.h": "306047187ac9b445f8c4242f3cc6a958fc04c7963bc0a9cb32f9a59ba9e5a698",
+    "sdk/components/bootloader_support/include/esp_image_format.h": "f1c5b9585cd6fa7ab1c3e651bedb036fe527fe0718fc0df09c8ad4e22bf59acc"
+  },
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "fault_groups": 1529,
+  "negative_controls": {
+    "chip-policy": "DETECTED",
+    "maintenance-order": "DETECTED",
+    "ended-handle": "DETECTED",
+    "exact-length": "DETECTED",
+    "size-cap": "DETECTED"
+  },
+  "fault_scope": "Actual production sink and verbatim pinned SDK public image layouts; OTA flash/lifecycle and image verification fault seams. No device operations or target RAM/ABI claim."
+}

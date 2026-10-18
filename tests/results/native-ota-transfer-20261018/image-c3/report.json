@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "sdk": "v6.1-9a97f6c54ec6",
+  "chip": "esp32c3",
+  "source_sha256": {
+    "tests/run-native-ota-images.py": "6f4a2658cafec8dd1627cfe84527615dc6e7df4cca03949efb824b935594c069",
+    "tests/run-native-ota.py": "2b416c094e79e51cd1a16c8d7d69e88039e25c3f73702a603599eafffd6e6462",
+    "tests/run-native-web-tls.py": "f7ca992ce6848190c3f8454a6b9d85935f8feb316637431d9f1cb4c1214b5b97",
+    "tests/native/native_ota/host.h": "e9789c483ef5f60ec7111f754fbc59baeb91d241dd9f99c9fc601f443bbf55b7",
+    "tests/native/native_ota/image_host.c": "eb73d3727ad7cfb081fe8805d836fa06e11ec07dd084aa6de1c296142f5ed1d4",
+    "tests/native/native_ota/image_test.c": "49b41d99dfb840aedf6ff65378cee01958af4e8c4520bde5916662e97685faa7",
+    "idf/components/native_ota/native_ota_sink.c": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2",
+    "idf/components/native_ota/include/native_ota_sink.h": "4e27ffa36951b4fd2f459e094c4ef287bad5b163ce3bc9b74b05cd846a3d2dde",
+    "sdk/components/bootloader_support/include/esp_app_format.h": "a0c6686ae3395a89ad15661a1a486ddc175ab9d5fcd7715d57e9117cf81971d5",
+    "sdk/components/esp_app_format/include/esp_app_desc.h": "dec6c0666bfaf80e649ffd6299657860cf3a84fe77567a436dd62b81d06ae436",
+    "sdk/components/bootloader_support/include/esp_image_format.h": "f1c5b9585cd6fa7ab1c3e651bedb036fe527fe0718fc0df09c8ad4e22bf59acc",
+    "sdk/components/bootloader_support/src/esp_image_format.c": "ee59b60b3eda8700458dd540f92fd2db63c522dae9b4a2cb34f376b60377590b",
+    "sdk/components/soc/esp32c3/include/soc/soc.h": "f354713368a8a2924ef32bd1b13aa526e8e92765997c00ceddb9d962247b5ca2"
+  },
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "sdk_functions": [
+    "is_bootloader",
+    "should_map",
+    "should_load",
+    "verify_image_header",
+    "verify_segment_header",
+    "process_image_header",
+    "process_segment_data",
+    "process_segment",
+    "process_segments",
+    "process_checksum",
+    "process_appended_hash_and_sig",
+    "verify_simple_hash",
+    "image_load",
+    "esp_image_verify",
+    "esp_image_get_metadata"
+  ],
+  "groups": 11396,
+  "negative_controls": {
+    "checksum": "DETECTED",
+    "sha256": "DETECTED",
+    "exact-length": "DETECTED"
+  },
+  "independent_fixture_sha256": "Python hashlib agrees with appended PSA SHA256",
+  "crypto_archive_sha256": "72b9a557501ccca26a90a7ab409f4be2c093cfd2748b6e9c1f7645a3c9e8e60d",
+  "crypto_build_command": [
+    "python3",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/native-ota-images-611-probe/sources/tests/run-native-web-tls.py",
+    "--build-only",
+    "--output",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/native-ota-images-611-probe/crypto-build",
+    "--sdk-root",
+    "/mnt/c/Work/yoRadio/.idf/v6.1-9a97f6c54ec6",
+    "--crypto-cache",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/native-tls-crypto-v611",
+    "--jobs",
+    "6"
+  ],
+  "crypto_identity": {
+    "fingerprint": "c7144d562495feb19b5ad3f5e1fb054b888747ed09388ae4faea3b2d71c990f6",
+    "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "source_count": 117
+  },
+  "scope": "Actual production sink plus verbatim selected pinned application-mode image verifier/metadata/segment/checksum/hash functions, actual pinned PSA SHA256. Host partition/OTA ownership/memory flash/read/map/clock-reset/chip-eFuse/log seams; SDK SOC mapped-address constants. Unsigned profiles only: no hardware flash erase/cache/ABI/RAM, secure boot/signature, encryption, anti-rollback or revision qualification."
+}
