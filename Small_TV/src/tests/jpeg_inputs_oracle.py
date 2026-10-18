@@ -19,6 +19,7 @@ from control_oracle import verify_inputs
 from jpeg_oracle import JpegMachine, patterned_panel
 from jpeg_test_fixtures import gray_huffman_fixture
 from jpeg_dht_contract import rejection_checks
+from jpeg_header_contract import rejection_checks as header_rejections
 
 FIXTURES = Path(__file__).parent / 'fixtures/jpeg'
 BASE = 0x200000
@@ -188,7 +189,8 @@ def main():
     manifest = json.loads((FIXTURES / 'manifest.json').read_text(encoding='utf-8'))
     paths = [Path(__file__), *[Path(__file__).with_name(name) for name in
                              ('jpeg_oracle.py', 'machine_oracle.py', 'control_oracle.py', 'classic_oracle.py', 'jpeg_test_fixtures.py',
-                              'jpeg_dht_oracle.py', 'jpeg_dht_contract.py')],
+                              'jpeg_dht_oracle.py', 'jpeg_dht_contract.py', 'jpeg_header_oracle.py',
+                              'jpeg_header_fixtures.py', 'jpeg_header_contract.py')],
              FIXTURES / 'manifest.json', *[FIXTURES / row['file'] for row in manifest['cases']]]
     inputs = [{'file': path.relative_to(ROOT).as_posix(), 'sha256': digest(path)} for path in paths]
     factory = JpegMachine('factory', original, dependency_root=dependencies)
@@ -226,15 +228,22 @@ def main():
     dht_guards = []
     if completed.returncode == 0 and dht['passed']:
         dht_guards = rejection_checks(dht)
+    header_output = args.output.with_name(args.output.stem + '-headers-' + uuid.uuid4().hex[:12] + '.json')
+    header_completed = subprocess.run([sys.executable, str(Path(__file__).with_name('jpeg_header_oracle.py')),
+        '--dependency-root', str(dependencies), '--output', str(header_output)], timeout=180)
+    headers = json.loads(header_output.read_text())
+    header_guards = header_rejections(headers) if header_completed.returncode == 0 and headers['passed'] else []
     unchanged = app_sha == verify_inputs(ROOT, dependencies) and all(
         digest(ROOT / row['file']) == row['sha256'] for row in inputs)
     archive = json.loads((ROOT / 'firmware/development/small-tv-esp32c2-reconstructed/manifest.json').read_text(encoding='utf-8-sig'))
     report = {'passed': all(row['passed'] for row in valid + invalid) and huffman['passed'] and unchanged and not errors and
-                        completed.returncode == 0 and dht['passed'] and len(dht_guards) == 7 and all(row['passed'] for row in dht_guards),
+                        completed.returncode == 0 and dht['passed'] and len(dht_guards) == 7 and all(row['passed'] for row in dht_guards) and
+                        header_completed.returncode == 0 and headers['passed'] and len(header_guards) == 7 and all(row['passed'] for row in header_guards),
               'app_sha256': app_sha, 'source_sha256': archive['source_sha256'],
               'native_elf_sha256': native.source_sha, 'factory_elf_sha256': factory.source_sha,
               'test_inputs': inputs, 'inputs_unchanged': unchanged, 'valid': valid, 'invalid': invalid,
               'huffman': huffman, 'dht': dht, 'dht_rejection_checks': dht_guards,
+              'headers': headers, 'header_rejection_checks': header_guards,
               'scope': __doc__ + ' Only the SDK flash-read boundary supplies generated test bytes. Full panel guards, discard validation and native error cleanup are checked. This is not an image-upload HTTP or physical/concurrency test.'}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8', newline='\n')

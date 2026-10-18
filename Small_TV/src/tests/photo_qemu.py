@@ -21,6 +21,8 @@ import small_tv_vm as vm
 from small_tv_http_test import wait_http, wait_for, clean_uart
 import weather_qemu as weather
 from jpeg_test_fixtures import gray_huffman_fixture
+from jpeg_header_fixtures import cases as header_cases, flat_jpeg
+from jpeg_header_http_contract import NAMES as HEADER_CASES
 
 weather.vm = vm
 weather.wait_for = wait_for
@@ -45,9 +47,15 @@ dht_invalid = {
     'reserved-ac-zero': gray_huffman_fixture([1] + [0] * 15, [0], [1, 1] + [0] * 14, [0, 0x10]),
     'all-one-ac-word': gray_huffman_fixture([1] + [0] * 15, [0], [2] + [0] * 15, [0, 1]),
 }
+header_invalid = {name: data for name, valid, data in header_cases(width=240, height=240)
+                  if not valid and name in HEADER_CASES}
+if set(header_invalid) != HEADER_CASES:
+    raise ValueError('Missing JPEG header HTTP fixture')
+custom_component_ids = flat_jpeg(component_ids=(0, 17, 255), width=240, height=240)
 image = archive / 'app.bin'
 elf = args.yoradio / '.build/small-tv-esp32c2/small_tv_reconstructed.elf'
 paths = [Path(__file__), Path(__file__).with_name('jpeg_test_fixtures.py'),
+         Path(__file__).with_name('jpeg_header_fixtures.py'), Path(__file__).with_name('jpeg_header_http_contract.py'),
          Path(__file__).with_name('weather_qemu.py'), good_path]
 inputs = [{'file': path.relative_to(ROOT).as_posix(), 'sha256': vm.digest(path.read_bytes())} for path in paths]
 helpers = {name: vm.digest((args.qemu_root / 'tools' / name).read_bytes()) for name in
@@ -171,6 +179,17 @@ try:
             result['invalid_dht'][name] = dict(finish_status=status, metadata=metadata(), sha256=vm.digest(data))
         result['checks']['reserved_dht_rejected'] = all(row['finish_status'] == 400 and
             row['metadata'] == dict(exists=False, size=0) for row in result['invalid_dht'].values())
+        result['invalid_headers'] = {}
+        for name, data in header_invalid.items():
+            status = upload(data)
+            result['invalid_headers'][name] = dict(finish_status=status, metadata=metadata(), sha256=vm.digest(data))
+        result['checks']['header_fields_rejected'] = all(row['finish_status'] == 400 and
+            row['metadata'] == dict(exists=False, size=0) for row in result['invalid_headers'].values())
+        if upload(custom_component_ids) != 200:
+            raise AssertionError('Valid custom component IDs were rejected')
+        result['checks']['custom_component_ids_published'] = (
+            metadata() == dict(exists=True, size=len(custom_component_ids)) and
+            download(len(custom_component_ids)) == custom_component_ids)
         if upload(good, retry_checks=True) != 200:
             raise AssertionError('Valid JPEG was rejected')
         result['checks']['valid_published'] = metadata() == dict(exists=True, size=len(good))

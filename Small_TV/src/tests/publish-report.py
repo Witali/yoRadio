@@ -14,6 +14,8 @@ from wifi_fallback_contract import validate_wifi_fallback, validate_wifi_fallbac
 from netif_roles_contract import validate_netif_roles, rejection_checks as netif_role_rejections
 from ap_services_contract import validate_ap_services, rejection_checks as ap_service_rejections
 from jpeg_dht_contract import validate_dht, validate_photo_dht, rejection_checks as dht_rejections
+from jpeg_header_contract import validate_headers, rejection_checks as header_rejections
+from jpeg_header_http_contract import validate_photo_headers
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -78,6 +80,12 @@ def main():
     if (len(dht_guards) != 7 or not all(row['passed'] for row in dht_guards) or
             dht_guards != dht_rejections(jpeg_inputs['dht'])):
         raise ValueError('JPEG DHT evidence rejection controls did not pass')
+    validate_headers(jpeg_inputs['headers'], {key: jpeg_inputs[key] for key in
+        ('app_sha256', 'source_sha256', 'native_elf_sha256', 'factory_elf_sha256')})
+    header_guards = jpeg_inputs['header_rejection_checks']
+    if (len(header_guards) != 7 or not all(row['passed'] for row in header_guards) or
+            header_guards != header_rejections(jpeg_inputs['headers'])):
+        raise ValueError('JPEG header evidence rejection controls did not pass')
     for item in jpeg_inputs['test_inputs']:
         if hashlib.sha256((ROOT / item['file']).read_bytes()).hexdigest() != item['sha256']:
             raise ValueError('Additional JPEG fixture/adapter changed: ' + item['file'])
@@ -220,6 +228,7 @@ def main():
                 ('finish_response_to_stop_guest_seconds', 'start_response_to_stop_guest_seconds'))):
         raise ValueError('Real photo upload/download/cold-boot checks omitted a stage or accepted invalid data')
     validate_photo_dht(photo)
+    validate_photo_headers(photo)
     if not 0 <= startup['ready_wait_guest_seconds'] <= .5 or startup['different_colors'] < 2:
         raise ValueError('Ready clock still waits on startup or its first frame is blank')
     if (not held_weather['during']['request_state'] & held_weather['compiled_running_mask'] or

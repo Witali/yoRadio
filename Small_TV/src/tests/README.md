@@ -685,3 +685,7 @@ JavaScript в браузере также остаются отдельными 
 ## Независимые проверки после reset
 
 Проверки загрузки, сети и дисплея разделены; см. [RESET_SUBSYSTEMS.md](RESET_SUBSYSTEMS.md).
+
+## JPEG header acceptance
+
+[133 header cases and real upload checks](JPEG_HEADER_VALIDATION.md) complement the existing public JPEG/DHT gates.

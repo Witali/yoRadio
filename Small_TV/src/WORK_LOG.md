@@ -2989,3 +2989,32 @@ true. Это только начало нового прогона, не 24 ча
 - Новая ветка codex/small-tv-reset-display создана от bc9aff58. Live H10
   остаётся в small-tv-runtime-supervision с прежним frozen helper; новых
   QMP/RSP клиентов к нему нет. Полный новый прогон и CYD ещё не приняты.
+
+## 2026-10-18 — строгие JPEG DRI/SOS/DQT headers и component IDs
+
+- В новой sparse рабочей копии codex/small-tv-jpeg-headers подтверждены ошибки
+  factory header parser. 22 начальных RV32 пробы показали 15 принятых
+  повреждённых вариантов. Расширенный неизменный before/after harness: 133
+  случая, 14 корректных, 119 повреждённых; app0592 принимает 115 повреждённых.
+- T.81 Annex B задаёт DRI/SOS lengths, baseline scan fields, component identity
+  и ненулевые quantizers. create_qt_tbl/jd_prepare получили FIXED_FACTORY
+  comments с исходными адресами. Добавлен component_id[3] в хвост JDEC;
+  DWARF реальных ELF подтвердил прежние offsets, RV32 size 120 ->124.
+  IDCT/цвет/вывод не переписаны; изменены только два production source files.
+- Успешная production сборка сохранена в firmware/development: app F1ADA8B4,
+  ELF91E26EB2, source F849F5BF, DEBUG off/WARN. App1170032 bytes (+96),
+  свободно365968 в app partition. Автоматическая прошивка платы не запускалась.
+- Новый native gate: все 119 malformed reject до jd_decomp без рисования,
+  все14 valid совпадают с factory по всему panel, включая arbitrary IDs0/17/255.
+  Семь consumer rejection controls pass. Прежний JPEG inputs gate (41 +128DHT),
+  новый133, public107 +35errors +7placements, host5531 и artifact6 pass.
+- Один и тот же photo HTTP harness на том же D64: before0592 принимает шесть
+  новых invalid header inputs, afterF1 возвращает400/absent; custom RGB IDs
+ 0/17/255, byte-exact download, retries, cold boot и interrupted replacement pass.
+  В before false только header_fields_rejected; failed evidence сохраняется.
+- Gate включён в jpeg_inputs_oracle и оба publication consumers. Metadata
+  UPSTREAM.json и CORRECTION_MARKERS обновлены. Это targeted acceptance,
+  а не полный прогон новойF1, H10, CYD или физическая приёмка.
+- Исторический полный561 app0592/D64 и H10 остаются живы в своих frozen
+  деревьях; новыеQMP/RSP к H10 не добавлялись. После адресной валидации
+  требуется отдельный полный набор и длительный workload на точной новой паре.

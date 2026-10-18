@@ -2054,3 +2054,20 @@ input registries, чтобы публикация не принимала ста
 Native short: original +3 reconstructed pass. Требуются terminal полный suite,
 продолжающийся H10 (его sole QMP/RSP принадлежит workload) и расследование CYD.
 Следующие записи после freeze полного прогона вести только в qemu/parity.
+
+## Текущая ветка JPEG headers, 2026-10-18
+
+Активное изменение — codex/small-tv-jpeg-headers (sparse checkout Small_TV,
+archive variant, .agents). Старые frozen src и snapshots полных561/557/553/539
+и H10 не редактировать; их active identities см. в parity progress full561.
+Новая сборка F1ADA8B4/91E26EB2/sourceF849F5BF исправляет подтверждённые factory
+DRI/SOS/DQT/component-ID acceptance bugs. Изменены лишь tjpgd.c/tjpgd.h;
+существующие JDEC offsets сохранены, размерRV32 увеличен на4bytes.
+133native/107public/41oldInputs+128DHT/HTTP/host5531/artifact6 проходят;
+before133 и before HTTP сохранены как отрицательные. Это не full/H10 F1.
+
+Далее: сохранить exact evidence и focused commit, выполнить full наF1/D64,
+подготовить длительный workload той же версии. Old0592 H10 не объявлять
+доказательством новой версии. Наблюдать живые процессы, не делать повторный
+запуск только из-за timeout наблюдения. Не добавлятьQMP/RSP клиентов к H10.
+Отдельно остаётся classic ESP32 CYD PHY path0x60033c00; QEMU ветка не в main.

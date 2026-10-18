@@ -234,6 +234,9 @@ static JRESULT create_qt_tbl (  /* 0:OK, !0:Failed */
     size_t ndata            /* Size of input data */
 )
 {
+    /* Load supported 8-bit dequantizers in raster order.
+     * FIXED_FACTORY: 0x4201107c..0x4201109a accepts zero quantizers, forbidden
+     * by T.81 Table B.4. Reject them before entropy decoding or LCD output. */
     unsigned int i, zi;
     uint8_t d;
     int32_t *pb;
@@ -255,6 +258,9 @@ static JRESULT create_qt_tbl (  /* 0:OK, !0:Failed */
         }
         jd->qttbl[i] = pb;                      /* Register the table */
         for (i = 0; i < 64; i++) {              /* Load the table */
+            if (!*data) {
+                return JDR_FMT1;
+            }
             zi = Zig[i];                        /* Zigzag-order to raster-order conversion */
             pb[zi] = (int32_t)((uint32_t) * data++ * Ipsf[zi]); /* Apply scale factor of Arai algorithm to the de-quantizers */
         }
@@ -1145,7 +1151,11 @@ JRESULT jd_prepare (
     /* Read baseline headers and construct the decoder's tables and MCU state.
      * FIXED_FACTORY: 0x42011d5a..0x42011d8a ignores SOF sample precision and
      * component payload length. Require the supported 8-bit frame and its
-     * complete component list before reading or accepting those fields. */
+     * complete component list before reading or accepting those fields.
+     * FIXED_FACTORY: the DRI path at 0x42011da2 and SOS at 0x42011e7a read
+     * incomplete headers and ignore extra bytes, scan parameters and component
+     * selectors. Validate T.81 B.2.2/B.2.3/B.2.4.4 before accessing each field;
+     * retain arbitrary, distinct component IDs instead of assuming 1/2/3. */
     uint8_t *seg, b;
     uint16_t marker;
     unsigned int n, i, ofs;
@@ -1233,6 +1243,12 @@ JRESULT jd_prepare (
 
             /* Check each image component */
             for (i = 0; i < jd->ncomp; i++) {
+                jd->component_id[i] = seg[6 + 3 * i];
+                for (n = 0; n < i; n++) {
+                    if (jd->component_id[n] == jd->component_id[i]) {
+                        return JDR_FMT1;    /* Err: duplicate frame component */
+                    }
+                }
                 b = seg[7 + 3 * i];                         /* Get sampling factor */
                 if (i == 0) {   /* Y component */
                     if (b != 0x11 && b != 0x22 && b != 0x21) {  /* Check sampling factor */
@@ -1252,8 +1268,8 @@ JRESULT jd_prepare (
             break;
 
         case 0xDD:  /* DRI - Define Restart Interval */
-            if (len > JD_SZBUF) {
-                return JDR_MEM2;
+            if (len != 2) {
+                return JDR_FMT1;    /* Exactly one 16-bit restart interval */
             }
             if (jd->infunc(jd, seg, len) != len) {
                 return JDR_INP;    /* Load segment data */
@@ -1294,6 +1310,9 @@ JRESULT jd_prepare (
             if (len > JD_SZBUF) {
                 return JDR_MEM2;
             }
+            if (len != 4 + 2 * jd->ncomp) {
+                return JDR_FMT1;    /* Ns, selectors, Ss, Se and Ah/Al */
+            }
             if (jd->infunc(jd, seg, len) != len) {
                 return JDR_INP;    /* Load segment data */
             }
@@ -1304,9 +1323,15 @@ JRESULT jd_prepare (
             if (seg[0] != jd->ncomp) {
                 return JDR_FMT3;    /* Err: Wrong color components */
             }
+            if (seg[len - 3] != 0 || seg[len - 2] != 63 || seg[len - 1] != 0) {
+                return JDR_FMT3;    /* Baseline sequential DCT scan parameters */
+            }
 
             /* Check if all tables corresponding to each components have been loaded */
             for (i = 0; i < jd->ncomp; i++) {
+                if (seg[1 + 2 * i] != jd->component_id[i]) {
+                    return JDR_FMT1;    /* Scan must select frame components in order */
+                }
                 b = seg[2 + 2 * i]; /* Get huffman table ID */
                 if (b != 0x00 && b != 0x11) {
                     return JDR_FMT3;    /* Err: Different table number for DC/AC element */
