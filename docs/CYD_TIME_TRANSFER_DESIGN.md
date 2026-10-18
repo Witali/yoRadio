@@ -93,6 +93,31 @@ Stop снимает SNTP timers/PCB, но не доказывает отмену
 disconnect contract ниже сохраняет backend и его retry state; отдельный
 delayed-DNS тест обязателен при reconfigure/deinit и отказе последующего init.
 
+Два банка **сами по себе** не доказывают lifetime. Перед повторным использованием
+банка, в том числе при третьем apply, controller должен проверить в TCP/IP
+context, что **ни один** configured server slot не ссылается на этот банк.
+Смена числа серверов обязана очистить неиспользуемые slots: managed init
+записывает только `num_of_servers`, а deinit сам старые name pointers не
+обнуляет. Переключение считается завершённым после проверки всех привязок;
+при partial/failed apply ни один потенциально используемый банк не меняется.
+Новый desired config остаётся в отдельном bounded settings snapshot до retry.
+Это конечная политика: два пожизненных банка и проверяемая возможность их
+повторного использования, без неограниченного накопления поколений.
+
+Для данных pinned SDK отдельно установлено: `dns_enqueue():1632–1633` копирует
+hostname во внутреннюю DNS entry; `sntp_dns_found():602` игнорирует hostname/arg
+и использует глобальные `sntp_current_server`/PCB. Поэтому поздний resolver
+callback не удерживает старый service name buffer после завершения enqueue,
+но **может** подставить старый результат DNS в новый SNTP singleton, послать
+запрос через новый PCB или запланировать retry. Pointer-race и stale-result
+поведение — разные задачи. Managed deinit/reinit не предоставляет generation
+cancellation, и этот проект её не обещает. Sync snapshot означает наблюдение
+SNTP sync, а не доказательство, что ответ получен именно от сервера последней
+config revision. Нужна явная проверка второго/третьего apply с очень поздним
+DNS callback; если понадобится строгая отмена старых результатов, это отдельная
+SDK-supported возможность/изменение, которое сначала надо доказать, а не
+заменять бесконечным retention. Пока это documented limitation этапа.
+
 Для C3 это отдельный узкий commit: сохранить namespace/ключи/defaults,
 UI hour/minute contract, приоритет и stack worker; сериализовать apply и
 reconnect control одним владельцем/lock; заменить весь набор управляющих
@@ -213,6 +238,10 @@ retention, wakeup, погоды или deep-sleep hooks.
   сохранить старые bytes до подтверждения остановки; delayed DNS/callback
   и одновременный reconnect/reconfigure не получают освобождённые либо
   перезаписываемые строки. Historical implementation — negative control.
+- Второй/третий apply, смена двух серверов на один, partial rebind, failed init
+  и очень поздний DNS callback: проверять все slot pointers перед reuse банка.
+  Отдельно фиксировать stale DNS result через новый PCB; не засчитывать
+  отсутствие pointer-race как доказательство generation cancellation.
 - Проверить pinned public wrapper/managed backend semantics настоящими
   выбранными SDK функциями с очередью TCP/IP seam; не подменять async stop
   немедленным действием. Проверить ошибки init/start, постоянство адресов
