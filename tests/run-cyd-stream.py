@@ -23,6 +23,7 @@ def main():
 #include <stddef.h>
 #include <stdint.h>
 typedef void *SemaphoreHandle_t;
+typedef int BaseType_t;
 #define pdTRUE 1
 #define pdMS_TO_TICKS(x) (x)
 #define portMAX_DELAY UINT32_MAX
@@ -35,7 +36,9 @@ size_t strlcpy(char *, const char *, size_t);
     source=(MAIN/'audio_service.c').read_text()
     unit=source[source.index('#define STREAM_CHUNK_SIZE'):source.index('static esp_audio_simple_dec_type_t')]
     for name in ('codec_name','state_set_audio','stream_header_event','open_stream',
-                 'read_stream','send_encoded','send_stream_audio','stream_audio',
+                 'read_stream','send_encoded','stream_transport_reset',
+                 'stream_initial_pending','stream_confirmation_expired',
+                 'send_stream_audio','finish_stream_audio','stream_audio',
                  'stream_title','stream_task'):
         unit+=helpers.function(source,name)
     unit+=helpers.function((MAIN/'web_service.c').read_text(),'status_handler')

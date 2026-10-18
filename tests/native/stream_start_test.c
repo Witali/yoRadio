@@ -10,6 +10,10 @@ typedef struct {uint32_t generation;native_codec_t codec;uint16_t data_size;
                 uint8_t end_of_stream;uint8_t data[];} encoded_packet_t;
 static adaptive_input_t *s_encoded;
 static atomic_uint s_generation;
+#ifdef STREAM_TARGET_CYD
+static atomic_uint s_failed_generation;
+static bool s_encoded_control_attached;
+#endif
 static int64_t clock_offset;
 #define encoded_acquire adaptive_input_acquire
 static atomic_uint consumed_data_packets;
@@ -33,7 +37,12 @@ static int64_t esp_timer_get_time(void) {return (int64_t)xTaskGetTickCount()*100
 static void vTaskDelay(unsigned ticks) {struct timespec delay={ticks/1000,(ticks%1000)*1000000L};nanosleep(&delay,NULL);}
 static const char *codec_name(native_codec_t codec) {(void)codec;return "codec";}
 static void state_set_audio(unsigned generation,bool playing,const char *name) {
-    assert(generation==42 && playing && name);
+    assert(generation==42 && name);
+#ifdef STREAM_TARGET_CYD
+    assert(!playing);
+#else
+    assert(playing);
+#endif
     assert(!atomic_load(&decoder_metadata_published));
     ++provisional_updates;
 }
@@ -74,6 +83,11 @@ static void begin(void) {
     size_t capacity=sizeof(encoded_packet_t)+STREAM_CHUNK_SIZE;
     s_encoded=adaptive_input_create(4*capacity,4*capacity,capacity);assert(s_encoded);
     s_start_control_attached=false;stream_transport_reset();
+#ifdef STREAM_TARGET_CYD
+    atomic_store(&s_failed_generation,0);
+    assert(adaptive_input_attach_control(s_encoded,s_start_control,sizeof(s_start_control)));
+    s_encoded_control_attached=s_start_control_attached=true;
+#endif
     atomic_store(&fail_after,0);
 }
 static void finish(void) {
@@ -104,6 +118,15 @@ static void run_case(const uint8_t *input,size_t bytes,const uint8_t *expected,
 }
 int main(int argc,char **argv) {
     const size_t chunks[]={1,7,2048};
+#ifdef STREAM_TARGET_CYD
+    if (argc==1) {
+        begin();atomic_store(&s_failed_generation,42);
+        native_codec_t codec=NATIVE_CODEC_AUTO;bool first=true;stream_probe_t probe={0};
+        const uint8_t data[]={0xff,0xf1,0x4c,0x80,0x01,0x9f,0xfc,1,2,3,4,5};
+        assert(!send_stream_audio(42,&codec,data,sizeof(data),&first,&probe));
+        assert(!adaptive_input_stats(s_encoded).occupied);finish();
+    }
+#endif
     if(argc==3 || argc==4 || argc==5) {
         FILE *file=fopen(argv[1],"rb");assert(file);assert(!fseek(file,0,SEEK_END));
         long size=ftell(file);assert(size>0);rewind(file);uint8_t *data=malloc(size);assert(data);
@@ -217,7 +240,16 @@ int main(int argc,char **argv) {
             assert(!send_stream_audio(42,&codec,damaged+866,1,&first,&probe));
         }
         if(action==3) {atomic_store(&s_generation,43);assert(!send_stream_audio(42,&codec,damaged+866,1,&first,&probe));}
-        assert(send_encoded(42,codec,NULL,0,AUDIO_END_READ_FAILED));assert(!pthread_join(thread,NULL));
+#ifdef STREAM_TARGET_CYD
+        if(action==0 || action==3) {
+            // CYD rejects stale terminal sends even when acquisition would
+            // succeed immediately. End this capture worker with the new ID.
+            assert(!send_encoded(42,codec,NULL,0,AUDIO_END_READ_FAILED));
+            assert(send_encoded(43,codec,NULL,0,AUDIO_END_READ_FAILED));
+        } else
+#endif
+        assert(send_encoded(42,codec,NULL,0,AUDIO_END_READ_FAILED));
+        assert(!pthread_join(thread,NULL));
         assert(captured==834 && !memcmp(capture,recovered,834) && !drains);
         finish();
     }

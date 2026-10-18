@@ -30,6 +30,10 @@
 #include "native_audio_output.h"
 #include "stream_body.h"
 #include "stream_probe.h"
+#include "sdkconfig.h"
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+#include "adaptive_input.h"
+#endif
 
 #define STREAM_CHUNK_SIZE 2048
 #define DECODE_BUFFER_INITIAL 12288
@@ -66,7 +70,24 @@ typedef struct {
 static const char *const TAG = "audio";
 static native_state_t *s_state;
 static QueueHandle_t s_commands;
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+static adaptive_input_t *s_encoded;
+#define encoded_acquire adaptive_input_acquire
+static BaseType_t encoded_commit(adaptive_input_t *input, encoded_packet_t *packet) {
+    return adaptive_input_commit_size(input, packet, sizeof(*packet) + packet->data_size);
+}
+#define encoded_receive adaptive_input_receive
+#define encoded_return adaptive_input_return
+#else
 static RingbufHandle_t s_encoded;
+#define encoded_acquire xRingbufferSendAcquire
+#define encoded_commit xRingbufferSendComplete
+#define encoded_receive xRingbufferReceive
+#define encoded_return vRingbufferReturnItem
+#endif
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+static bool s_encoded_control_attached;
+#endif
 static RingbufHandle_t s_pcm;
 static atomic_uint s_generation;
 static atomic_uint s_decoder_released_generation;
@@ -192,40 +213,150 @@ static bool send_encoded(uint32_t generation, native_codec_t codec,
     for (;;) {
         if (atomic_load(&s_generation) != generation ||
             atomic_load(&s_failed_generation) == generation) return false;
-        if (xRingbufferSendAcquire(s_encoded, (void **)&packet, packet_size,
-                                   pdMS_TO_TICKS(50)) == pdTRUE) break;
+        BaseType_t acquired;
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+        if (eos && s_encoded_control_attached)
+            acquired = adaptive_input_acquire_control(s_encoded, (void **)&packet,
+                packet_size, pdMS_TO_TICKS(50));
+        else
+#endif
+            acquired = encoded_acquire(s_encoded, (void **)&packet, packet_size,
+                                         pdMS_TO_TICKS(50));
+        if (acquired == pdTRUE) break;
     }
     packet->generation = generation;
     packet->codec = codec;
     packet->data_size = (uint16_t)size;
     packet->end_of_stream = eos;
     if (size) memcpy(packet->data, data, size);
-    return xRingbufferSendComplete(s_encoded, packet) == pdTRUE;
+    return encoded_commit(s_encoded, packet) == pdTRUE;
+}
+
+#define STREAM_INPUT_ACTIVE(generation) (atomic_load(&s_generation) == (generation) && atomic_load(&s_failed_generation) != (generation))
+#define STREAM_PROVISIONAL_RUNNING false
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+#include "stream_encoded_router.h"
+#endif
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+#include "stream_start.h"
+#endif
+
+static inline void stream_transport_reset(void) {
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+    stream_start_abort();
+#endif
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+    stream_route_reset();
+#endif
+}
+
+static inline bool stream_initial_pending(native_codec_t codec, bool first) {
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+    return first && stream_start_eligible(codec);
+#else
+    (void)first;
+    return codec == NATIVE_CODEC_AUTO;
+#endif
+}
+
+static inline bool stream_confirmation_expired(void) {
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+    return s_stream_start.active && esp_timer_get_time()>=s_stream_start.deadline_us;
+#else
+    return false;
+#endif
 }
 
 static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
-        const uint8_t *data, size_t size, bool *first, stream_probe_t *probe) {
-    if (*first) {
-        if (*codec == NATIVE_CODEC_AUTO) {
+                              const uint8_t *data, size_t size,
+                              bool *first_chunk, stream_probe_t *probe) {
+    if (!size) return true;
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+    stream_route_context_t route = {.generation = generation, .codec = codec};
+#endif
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+        if (stream_start_eligible(*codec) && !s_frame_router.bypass) {
             size_t consumed;
+            stream_confirm_result_t result=stream_start_feed(&route,data,size,&consumed,false);
+            if (s_stream_start.published) *first_chunk=false;
+            // Already confirmed frames remain valid even if the following
+            // candidate exhausts its search budget. Never discard that prefix.
+            bool flushed=stream_route_flush(&route);
+            bool ok=result!=STREAM_CONFIRM_INVALID && flushed;
+            if (!ok) {
+                stream_route_cancel(&route);stream_start_abort();
+                probe->result=STREAM_PROBE_INVALID;return false;
+            }
+            if (result==STREAM_CONFIRM_MORE) return true;
+            stream_start_abort();
+            data+=consumed;size-=consumed;
+            *first_chunk = false; // stream_start_publish already set the provisional status.
+        }
+#endif
+    if (*first_chunk) {
+        if (*codec == NATIVE_CODEC_AUTO) {
+            size_t consumed = 0;
             switch (stream_probe_feed(probe, data, size, &consumed)) {
                 case STREAM_PROBE_MORE: return true;
-                case STREAM_PROBE_MP3: *codec=NATIVE_CODEC_MP3; break;
-                case STREAM_PROBE_AAC: *codec=NATIVE_CODEC_AAC; break;
-                case STREAM_PROBE_FLAC: *codec=NATIVE_CODEC_FLAC; break;
-                case STREAM_PROBE_OGG: *codec=NATIVE_CODEC_OGG; break;
+                case STREAM_PROBE_MP3: *codec = NATIVE_CODEC_MP3; break;
+                case STREAM_PROBE_AAC: *codec = NATIVE_CODEC_AAC; break;
+                case STREAM_PROBE_FLAC: *codec = NATIVE_CODEC_FLAC; break;
+                case STREAM_PROBE_OGG: *codec = NATIVE_CODEC_OGG; break;
                 default: return false;
             }
             state_set_audio(generation, false, codec_name(*codec));
-            if (!send_encoded(generation, *codec, probe->header, probe->used,
-                               AUDIO_CONTINUE)) return false;
-            data += consumed; size -= consumed;
-        } else {
-            state_set_audio(generation, false, codec_name(*codec));
+            // Replay the assembled header exactly once, before this read's tail.
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+            if (!stream_route_feed(&route, probe->header, probe->used))
+#else
+            if (!send_encoded(generation, *codec, probe->header, probe->used, false))
+#endif
+                return false;
+            *first_chunk = false;
+            data += consumed;
+            size -= consumed;
         }
-        *first = false;
+        if (*first_chunk) state_set_audio(generation, false, codec_name(*codec));
+        *first_chunk = false;
     }
-    return !size || send_encoded(generation, *codec, data, size, AUDIO_CONTINUE);
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+    return stream_route_feed(&route, data, size) && stream_route_flush(&route);
+#else
+    return !size || send_encoded(generation, *codec, data, size, false);
+#endif
+}
+
+static inline uint8_t finish_stream_audio(uint32_t generation, native_codec_t *codec,
+        bool *first_chunk, uint8_t reason) {
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+    if ((s_stream_start.active || (*first_chunk && stream_start_eligible(*codec))) &&
+        reason==AUDIO_END_EOF) {
+        // EOF rescan can discard the incomplete candidate. Preserve its
+        // presence before finalization so truncation is not reported as empty.
+        bool incomplete=s_stream_start.skip || s_stream_start.recovering ||
+            stream_staging_size(&s_stream_start.window);
+        size_t consumed;
+        stream_route_context_t route={.generation=generation,.codec=codec};
+        stream_confirm_result_t result=stream_start_feed(&route,NULL,0,&consumed,true);
+        bool flushed=stream_route_flush(&route);
+        if (result==STREAM_CONFIRM_READY && flushed) {
+            *first_chunk=false;
+        } else {
+            stream_route_cancel(&route);
+            reason=incomplete || s_stream_start.skip || stream_staging_size(&s_stream_start.window)
+                ? AUDIO_END_FRAME_TRUNCATED : AUDIO_END_FORMAT_UNKNOWN;
+        }
+    }
+    stream_start_abort();
+#else
+    (void)generation;(void)first_chunk;
+#endif
+    if (*codec==NATIVE_CODEC_AUTO &&
+        (reason==AUDIO_END_EOF || reason==AUDIO_END_BUFFER_STALLED)) reason=AUDIO_END_FORMAT_UNKNOWN;
+#ifdef CONFIG_YORADIO_FRAME_ROUTER
+    reason=stream_route_end(*codec,reason);
+#endif
+    return reason;
 }
 
 static bool stream_audio(void *context, const uint8_t *data, size_t size) {
@@ -257,6 +388,11 @@ static void stream_task(void *argument) {
             vTaskDelay(pdMS_TO_TICKS(1));
         }
         if (atomic_load(&s_generation) != command.generation) continue;
+        stream_transport_reset();
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+        // Between connections only; never alter published/leased storage.
+        adaptive_input_restore(s_encoded);
+#endif
         state_set_audio(command.generation, false, "connecting");
 
         stream_headers_t headers = {.valid=true};
@@ -309,8 +445,8 @@ static void stream_task(void *argument) {
         while (atomic_load(&s_generation) == command.generation &&
                atomic_load(&s_failed_generation) != command.generation) {
             if (read_failed) { end_reason=AUDIO_END_READ_FAILED; break; }
-            if (input.first && input.codec == NATIVE_CODEC_AUTO &&
-                esp_timer_get_time() >= probe_deadline) {
+            if ((stream_initial_pending(input.codec, input.first) &&
+                esp_timer_get_time() >= probe_deadline) || stream_confirmation_expired()) {
                 end_reason = AUDIO_END_FORMAT_UNKNOWN;
                 break;
             }
@@ -343,9 +479,8 @@ static void stream_task(void *argument) {
         if (end_reason == AUDIO_END_EOF && body.metadata_remaining) {
             end_reason = AUDIO_END_METADATA_TRUNCATED;
         }
-        if (end_reason == AUDIO_END_EOF && input.codec == NATIVE_CODEC_AUTO) {
-            end_reason = AUDIO_END_FORMAT_UNKNOWN;
-        }
+        end_reason = finish_stream_audio(command.generation, &input.codec,
+                                          &input.first, end_reason);
         send_encoded(command.generation, input.codec, NULL, 0, end_reason);
         esp_http_client_close(client);
         esp_http_client_cleanup(client);
@@ -474,13 +609,13 @@ static void decoder_task(void *argument) {
             atomic_store(&s_decoder_released_generation, generation);
         }
         size_t item_size = 0;
-        encoded_packet_t *packet = xRingbufferReceive(
+        encoded_packet_t *packet = encoded_receive(
             s_encoded, &item_size, pdMS_TO_TICKS(20));
         if (!packet) continue;
         if (packet->generation != atomic_load(&s_generation) ||
             packet->generation == failed_generation ||
             packet->generation == atomic_load(&s_failed_generation)) {
-            vRingbufferReturnItem(s_encoded, packet);
+            encoded_return(s_encoded, packet);
             continue;
         }
         uint8_t end_reason = packet->end_of_stream;
@@ -664,7 +799,7 @@ packet_done:
             }
             codec = NATIVE_CODEC_AUTO;
         }
-        vRingbufferReturnItem(s_encoded, packet);
+        encoded_return(s_encoded, packet);
     }
 }
 
@@ -755,9 +890,20 @@ esp_err_t audio_service_start(native_state_t *state) {
     atomic_init(&s_failed_generation, 0);
     s_control_lock = xSemaphoreCreateMutex();
     s_commands = xQueueCreate(1, sizeof(play_command_t));
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    s_encoded = adaptive_input_create(ENCODED_RING_SIZE,
+        4 * (sizeof(encoded_packet_t) + STREAM_CHUNK_SIZE),
+        sizeof(encoded_packet_t) + STREAM_CHUNK_SIZE);
+#else
     s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
+#endif
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
     if (!s_control_lock || !s_commands || !s_encoded || !s_pcm) return ESP_ERR_NO_MEM;
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+    if (!adaptive_input_attach_control(s_encoded, s_start_control, sizeof(s_start_control)))
+        return ESP_ERR_NO_MEM;
+    s_start_control_attached = s_encoded_control_attached = true;
+#endif
     if (xTaskCreatePinnedToCore(stream_task, "radio_stream",
                                 BOARD_TASK_STACK_RADIO_STREAM, NULL, 3,
                                 NULL, 0) != pdPASS ||

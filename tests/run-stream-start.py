@@ -17,30 +17,33 @@ queue_runner=importlib.util.module_from_spec(spec);spec.loader.exec_module(queue
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--target',choices=('c3','cyd'),default='c3')
     parser.add_argument('--corpus',type=Path)
     parser.add_argument('--tail-coalesce',action='store_true')
     parser.add_argument('--queued-consumer',action='store_true',
                         help='Allow queue backpressure instead of forcing immediate consumption after commit')
     args=parser.parse_args();out=args.output.resolve();out.mkdir(parents=True,exist_ok=False)
-    source=ROOT/'idf/esp32c3-oled-native/main'
+    source=ROOT/('idf/esp32c3-oled-native/main' if args.target=='c3' else 'idf/esp32-cyd2usb-native/main')
+    portable=ROOT/'idf/components/native_stream'
     platform=ROOT/'tests/native/adaptive_input_test.c';test=ROOT/'tests/native/stream_start_test.c'
     prelude=platform.read_text().split('#define MALLOC_CAP_INTERNAL')[0]
-    prelude=prelude.replace('/* PRODUCTION_HEADER */',queue_runner.body(source/'adaptive_input.h'))
-    prelude=prelude.replace('/* PRODUCTION_QUEUE */',queue_runner.body(source/'adaptive_input.c'))
+    prelude=prelude.replace('/* PRODUCTION_HEADER */',queue_runner.body(portable/'include/adaptive_input.h'))
+    prelude=prelude.replace('/* PRODUCTION_QUEUE */',queue_runner.body(portable/'adaptive_input.c'))
     # The queue API is already embedded with host RTOS typedefs.
     shim=out/'include';shim.mkdir()
     for name in ('stream_staging.h','stream_start.h'):
-        text=canonical(source/name).read_text().replace('#include "adaptive_input.h"','')
+        text=(portable/'include'/name).read_text().replace('#include "adaptive_input.h"','')
         (shim/name).write_text(text)
     send=(source/'audio_service.c').read_text()
-    send=send[send.index('static bool send_encoded('):send.index('static void stream_bitrate_add(')]
+    send=send[send.index('static bool send_encoded('):send.index('static void stream_bitrate_add(') if args.target=='c3' else send.index('static bool stream_audio(')]
     unit=out/'test.c';binary=out/'test'
     unit.write_text(prelude+test.read_text().replace('/* PRODUCTION_SEND */',send))
     (out/'build.log').write_bytes(run(['gcc','-std=c11','-O2','-g','-Wall','-Wextra','-Werror',
         *(['-DCONFIG_YORADIO_INPUT_TAIL_COALESCE=1'] if args.tail_coalesce else []),
         *(['-DTEST_QUEUED_CONSUMER=1'] if args.queued_consumer else []),
+        *(['-DSTREAM_TARGET_CYD=1'] if args.target=='cyd' else []),
         '-pthread','-fsanitize=address,undefined','-fno-pie','-no-pie','-I',host(shim),
-        '-I',host(source),host(unit),'-o',host(binary)]))
+        '-I',host(source),'-I',host(portable/'include'),host(unit),'-o',host(binary)]))
     try:
         log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                  'UBSAN_OPTIONS=halt_on_error=1','timeout','60',host(binary)])
@@ -97,8 +100,9 @@ def main():
         cases.append(dict(name='midstream-recovery',passed=True,chunks=[1,7,2048],drains=2,
             input_sha256=hashlib.sha256(damaged).hexdigest(),replayed_sha256=hashlib.sha256(expected).hexdigest(),
             replayed_bytes=len(expected),aac_repeats=repeats))
-    sources=[Path(__file__).resolve(),ROOT/'tests/run-adaptive-input.py',platform,test]+[source/name
-        for name in ('audio_service.c','Kconfig.projbuild','adaptive_input.h','adaptive_input.c',
+    sources=[Path(__file__).resolve(),ROOT/'tests/run-adaptive-input.py',platform,test,
+             source/'audio_service.c',source/'Kconfig.projbuild',portable/'adaptive_input.c']+[portable/'include'/name
+        for name in ('adaptive_input.h',
                      'stream_start.h','stream_staging.h','stream_encoded_router.h','stream_confirm.h',
                      'stream_probe.h','stream_frames.h','stream_tags.h','audio_completion.h')]
     hashes={}
@@ -107,7 +111,7 @@ def main():
         relative=path.relative_to(ROOT);target=out/'sources'/relative
         target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(path.read_bytes())
         hashes[relative.as_posix()]=hashlib.sha256(path.read_bytes()).hexdigest()
-    (out/'report.json').write_text(json.dumps(dict(passed=True,sources=hashes,scope=__doc__,
+    (out/'report.json').write_text(json.dumps(dict(passed=True,target=args.target,sources=hashes,scope=__doc__,
         corpus=cases,tail_coalesce=args.tail_coalesce,queued_consumer=args.queued_consumer,
         http_socket=False,physical_playback=False),indent=2)+'\n')
     print(log.decode(),end='');print('PASS startup corpus:',len(cases))

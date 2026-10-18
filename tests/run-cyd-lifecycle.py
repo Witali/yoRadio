@@ -34,6 +34,8 @@ def main():
 #include <pthread.h>
 #include <stdlib.h>
 typedef pthread_mutex_t *SemaphoreHandle_t;
+typedef int BaseType_t;
+typedef unsigned TickType_t;
 #define pdTRUE 1
 #define pdMS_TO_TICKS(x) (x)
 #define portMAX_DELAY UINT32_MAX
@@ -69,7 +71,7 @@ size_t strlcpy(char *, const char *, size_t);
     (OUT/'pdm-tail.inc').write_text(generated)
     results = {}
     try:
-        for name, defines in (
+        variants = (
             ('espressif', []),
             ('helix', ['-DYORADIO_CUSTOM_LEGACY_DECODER=1',
                        '-DCONFIG_YORADIO_AAC_DECODER_HELIX=1',
@@ -77,7 +79,10 @@ size_t strlcpy(char *, const char *, size_t);
             ('minimp3', ['-DYORADIO_CUSTOM_LEGACY_DECODER=1',
                          '-DCONFIG_YORADIO_MP3_DECODER_MINIMP3=1',
                          '-DCONFIG_YORADIO_AAC_DECODER_HELIX=1']),
-        ):
+        )
+        variants += tuple(('adaptive-'+name,defines+['-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1',
+            '-DCONFIG_YORADIO_STREAM_CONFIRM=1']) for name,defines in variants)
+        for name, defines in variants:
             binary = OUT/name
             build = run(['gcc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
                      '-pthread', *defines,

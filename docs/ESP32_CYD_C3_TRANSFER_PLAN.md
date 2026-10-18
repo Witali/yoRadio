@@ -38,8 +38,8 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-00 | Программная база готова | План, исходная сборка IDF 6.0.2 и исправные host-проверки донора. Первоначальный полный clang-tidy прогон CYD и C3 сохранён. Аппаратный baseline отдельно. |
 | CYD-C3-01 | Программная часть выполнена | Generation, decoder/PCM lifetime, ordered completion и output flush/reset проверены host-тестами. Финальные PDM/continuous/legacy images коммита `2df73834` собраны и сохранены; физическая приёмка отдельно. |
 | CYD-C3-02 | Программная часть выполнена | Общие probe/ID3/ICY/JSON helpers подключены к CYD, HTTP startup ограничен общим deadline и числом redirects; fatal TLS/partial bytes и raw EOF проверены на реальном HTTP-парсере обоих SDK. Host/санитайзеры проходят; физическая сеть отдельно. |
-| CYD-C3-03 | В работе | Frame/confirmation/router/startup код выделен в общий компонент без изменения C3 поведения; 34 corpus cases и точные boundaries проходят. Подключение CYD и decoder drain — следующий шаг. |
-| CYD-C3-04 | В работе | Общая очередь leases/control/tail выделена и проверена на 60000 конкурентных packets. Для continuous confirmation сначала нужна её интеграция CYD; ёмкости и prefill не копируются вслепую. |
+| CYD-C3-03 | Программная часть выполнена | CYD подключён к continuous MP3/ADTS confirmation, ID3 stripping/recovery и ordered codec drain. 34 corpus cases обеих целей, byte-exact переходы и шесть lifecycle вариантов проходят; production PDM собирается. Физическая приёмка отдельно. |
+| CYD-C3-04 | В работе | CYD использует общую SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 при нехватке памяти. Независимый control node и отсутствие per-packet malloc проверены. Ограниченный prefill — следующий шаг; значения C3 не становятся CYD defaults. |
 | CYD-C3-05 | Открыт | Health, heap/largest block, ошибки allocation/decode/write, DMA и стеки; CPU по обоим ядрам. Отдельно quiet и diagnostic сборки. |
 | CYD-C3-06 | Открыт | Общая модель radio/settings, CSV offset index и recovery, станции Next/Prev, корректный format/bitrate/title. Повторный boot и fault injection без потери файлов. |
 | CYD-C3-07 | Открыт | WebSocket snapshot/events, динамические страницы, capabilities, async static workers, bounded uploads. Две вкладки, медленный клиент, reconnect и rollback файлов. |
@@ -53,6 +53,9 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-15 | Открыт | Воспроизводимый production wrapper, экспорт firmware и единая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение для каждого backend. |
 
 ## Карта функций и мест в коде
+
+Замечания об отсутствующих функциях ниже описывают исходный CYD `42bc7bd4`.
+Текущее состояние переноса отражено в очереди и журнале выполнения.
 
 ### Аудиопоток и память
 
@@ -202,3 +205,15 @@ allocation и численные настройки C3 являются канд
   дефект, затем прошёл с исправлением: принудительное вытеснение перед mutex,
   20000 конкурентных обновлений, stale clear, bounds и wrap generation.
   [Отчёт и отрицательный контроль](../tests/results/c3-state-concurrency-20261018/README.md).
+- CYD-C3-03/04: общие frame/confirmation/staging/router и leased queue
+  подключены к CYD. Startup удерживает максимум четыре unpublished slots и
+  10 bytes lookahead; отдельный control node обеспечивает replay без пятого
+  slot и ordered EOF/drain. Queue budget — восемь slots, guaranteed floor —
+  четыре; C3 TLS reserve/reclaim policy на CYD пока не подключена.
+  Producer отменяется и по generation, и по output/decoder failure.
+  Provisional codec на CYD не означает audio_running до первого PCM.
+  [Отчёты](../tests/results/cyd-c3-frames-20261018/README.md): 34 corpus cases
+  каждой цели, false headers, max ADTS, 127 truncated ID3 tails, ordered
+  MP3/AAC/MP3 переходы, 60000 concurrent queue packets и 20000 random staging
+  operations проходят с ASan/UBSan. Lifecycle теперь проверяет шесть
+  комбинаций queue/codec API и отдельный drain без промежуточного PCM flush.

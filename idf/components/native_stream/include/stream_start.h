@@ -40,7 +40,7 @@ static bool stream_start_publish(stream_route_context_t *route,
     // Replay can block long enough for it to publish a more precise profile.
     if (!s_stream_start.published) {
         *route->codec=next;
-        state_set_audio(route->generation, true, codec_name(next));
+        state_set_audio(route->generation, STREAM_PROVISIONAL_RUNNING, codec_name(next));
         s_stream_start.published=true;
     }
     // Keep the old family until stream_route_begin emits its ordered drain.
@@ -87,7 +87,7 @@ static stream_confirm_result_t stream_start_feed(stream_route_context_t *route,
         s_stream_start.search_left=STREAM_PROBE_SEARCH_BYTES;
         s_stream_start.deadline_us=esp_timer_get_time()+(int64_t)STREAM_PROBE_TIMEOUT_MS*1000;
     }
-    while (atomic_load(&s_generation)==route->generation &&
+    while (STREAM_INPUT_ACTIVE(route->generation) &&
            esp_timer_get_time()<s_stream_start.deadline_us) {
         if (s_stream_start.skip) {
             size_t skip=size-*consumed;

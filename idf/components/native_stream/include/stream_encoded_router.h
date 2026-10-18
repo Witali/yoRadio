@@ -5,6 +5,13 @@
 // call; startup candidate leases are owned separately by stream_start.
 #include "stream_frames.h"
 
+#ifndef STREAM_INPUT_ACTIVE
+#define STREAM_INPUT_ACTIVE(generation) (atomic_load(&s_generation) == (generation))
+#endif
+#ifndef STREAM_PROVISIONAL_RUNNING
+#define STREAM_PROVISIONAL_RUNNING true
+#endif
+
 static struct {
     stream_frames_t frames;
     bool started;
@@ -45,7 +52,7 @@ static void stream_route_cancel(stream_route_context_t *ctx) {
 
 static bool stream_route_flush(stream_route_context_t *ctx) {
     if (!ctx->packet) return true;
-    if (atomic_load(&s_generation) != ctx->generation ||
+    if (!STREAM_INPUT_ACTIVE(ctx->generation) ||
         encoded_commit(s_encoded, ctx->packet) != pdTRUE) {
         stream_route_cancel(ctx);
         return false;
@@ -60,7 +67,7 @@ static bool stream_route_flush(stream_route_context_t *ctx) {
 static bool stream_route_acquire(stream_route_context_t *ctx) {
     if (ctx->packet) return true;
 #ifdef CONFIG_YORADIO_INPUT_TAIL_COALESCE
-    if (!ctx->control_payload_bytes && atomic_load(&s_generation) == ctx->generation) {
+    if (!ctx->control_payload_bytes && STREAM_INPUT_ACTIVE(ctx->generation)) {
         encoded_packet_t *tail = NULL;
         size_t used = 0;
         if (adaptive_input_reopen_tail(s_encoded, (void **)&tail, &used) == pdTRUE) {
@@ -78,14 +85,14 @@ static bool stream_route_acquire(stream_route_context_t *ctx) {
     }
 #endif
     size_t capacity = ctx->control_payload_bytes ? ctx->control_payload_bytes : STREAM_CHUNK_SIZE;
-    while (atomic_load(&s_generation) == ctx->generation) {
+    while (STREAM_INPUT_ACTIVE(ctx->generation)) {
         BaseType_t acquired = ctx->control_payload_bytes
             ? adaptive_input_acquire_control(s_encoded, (void **)&ctx->packet,
                 sizeof(encoded_packet_t) + capacity, pdMS_TO_TICKS(250))
             : encoded_acquire(s_encoded, (void **)&ctx->packet,
                 sizeof(encoded_packet_t) + capacity, pdMS_TO_TICKS(250));
         if (acquired != pdTRUE) continue;
-        if (atomic_load(&s_generation) != ctx->generation) {
+        if (!STREAM_INPUT_ACTIVE(ctx->generation)) {
             stream_route_cancel(ctx);
             return false;
         }
@@ -101,7 +108,7 @@ static bool stream_route_acquire(stream_route_context_t *ctx) {
 static bool stream_route_emit(void *opaque, const uint8_t *data, size_t size) {
     stream_route_context_t *ctx = opaque;
     while (size) {
-        if (atomic_load(&s_generation) != ctx->generation) return false;
+        if (!STREAM_INPUT_ACTIVE(ctx->generation)) return false;
         if (!stream_route_acquire(ctx)) return false;
         size_t capacity = ctx->control_payload_bytes ? ctx->control_payload_bytes : STREAM_CHUNK_SIZE;
         size_t count = capacity - ctx->packet->data_size;

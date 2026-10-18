@@ -92,10 +92,13 @@ the same `Fs x 16` rule. Each input sample is expanded on the fly into adjacent
 full oversampled stream is stored in RAM. The error accumulator is preserved
 between PCM samples and reset only when the input sample rate changes.
 
-The pipeline uses 16 KiB compressed and 8 KiB PCM rings and logs free heap
-after allocating them. Ring-buffer items
-are acquired in place instead of being allocated for every audio block, so
-continuous playback does not churn the general heap.
+The default pipeline uses an eight-slot compressed-input pool (a 16 KiB
+budget rounded up to whole packets) and an 8 KiB PCM ring. At least four input
+slots are required if startup allocation cannot fill the budget. Explicit
+leases and a cross-core lock protect unpublished, queued and decoder-owned
+storage; there is no per-packet heap allocation. A separate small control node
+shares the same FIFO and remains available when startup holds four data slots.
+The original compressed ring remains a build-time fallback.
 
 Play and Stop serialize their generation changes. The decoder releases its
 workspace on Stop even when no more input arrives, and acknowledges release
@@ -131,4 +134,20 @@ Content-Length and chunked completion boundaries are preserved.
 `tests/test-stream-http-reader.py --target cyd --idf <IDF-root> --output <dir>`
 also compiles the actual pinned SDK HTTP parser/read and ESP-TLS adapter under
 ASan/UBSan with scripted transport. This does not emulate TLS cryptography or
-qualify a physical connection. Adjacent-frame confirmation is a later stage.
+qualify a physical connection.
+
+The default frame path confirms MP3/ADTS candidates before decoder publication,
+removes bounded ID3 envelopes and recovers from false headers within a fixed
+search budget and deadline. A single complete frame is accepted at clean EOF;
+incomplete tails report truncation. Free-format MP3 and FLAC/Ogg preserve their
+decoder-owned framing. Confirmed MP3/AAC family changes drain the old decoder
+in FIFO order without ending the station or flushing the PDM software tail.
+Only the final completion ends playback. Short reads coalesce into a partial
+READY tail while READING, control and sole queued nodes remain protected.
+
+Run `tests/run-stream-start.py --target cyd --output <new-dir> --tail-coalesce
+--queued-consumer` for actual CYD send/finish integration with the real shared
+queue under ASan/UBSan. Generate its extended corpus with
+`tests/run-stream-confirm.py --output <corpus-dir>` and pass `--corpus <dir>`.
+The C3 target uses the same corpus and portable parsers. Codec arithmetic and
+physical DMA remain separate acceptance work.
