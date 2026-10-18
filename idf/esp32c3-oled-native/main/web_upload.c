@@ -8,6 +8,8 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "file_transaction.h"
 #include "network_service.h"
 #include "radio_control.h"
 #include "web_file_form.h"
@@ -18,6 +20,37 @@
 #define WEB_UPLOAD_WRITE_BYTES 2048U
 #define WEB_UPLOAD_TIMEOUT_US 120000000LL
 #define WEB_UPLOAD_IDLE_US 10000000LL
+
+static SemaphoreHandle_t s_storage_lock;
+
+esp_err_t web_upload_storage_init(void) {
+    if (!s_storage_lock) s_storage_lock = xSemaphoreCreateMutex();
+    return s_storage_lock ? ESP_OK : ESP_ERR_NO_MEM;
+}
+
+static bool backup_name(const char *live, char *backup, size_t capacity) {
+    if (!live || !*live) return false;
+    int length = snprintf(backup, capacity, "%s.bak", live);
+    return length > 0 && (size_t)length < capacity;
+}
+
+FILE *web_upload_open_file(const char *path) {
+    char backup[256];
+    if (!s_storage_lock || !backup_name(path, backup, sizeof(backup)) ||
+        xSemaphoreTake(s_storage_lock, pdMS_TO_TICKS(1000)) != pdTRUE) return NULL;
+    FILE *file = native_file_recover(path, backup) ? fopen(path, "rb") : NULL;
+    xSemaphoreGive(s_storage_lock);
+    return file;
+}
+
+bool web_upload_publish_file(const char *temporary, const char *live) {
+    char backup[256];
+    if (!s_storage_lock || !backup_name(live, backup, sizeof(backup)) ||
+        xSemaphoreTake(s_storage_lock, pdMS_TO_TICKS(1000)) != pdTRUE) return false;
+    bool replaced = native_file_replace(temporary, live, backup);
+    xSemaphoreGive(s_storage_lock);
+    return replaced;
+}
 
 // All three routes run synchronously in the same HTTP server task. Its stack
 // is reserved at startup. Staging uses flash, never request-sized heap memory.
@@ -118,13 +151,13 @@ static bool receive_form(httpd_req_t *request, web_file_form_t *form) {
 static bool publish_file(unsigned slot, const char *name, bool playlist) {
     char temporary[64], destination[128];
     temporary_path(slot, temporary, sizeof(temporary));
-    snprintf(destination, sizeof(destination), "/spiffs/%s/%s",
-             playlist ? "data" : "www", name);
-    // SPIFFS cannot rename over an existing name. As before, this is not a
-    // power-loss-atomic filesystem transaction. Only fully received forms
-    // reach here; rejected/truncated transfers never remove existing files.
-    remove(destination);
-    if (rename(temporary, destination) != 0) return false;
+    int length = snprintf(destination, sizeof(destination), "/spiffs/%s/%s",
+                          playlist ? "data" : "www", name);
+    if (length <= 0 || (size_t)length >= sizeof(destination)) return false;
+    if (!playlist && (length <= 3 || strcmp(destination + length - 3, ".gz") != 0)) return false;
+    // Retain the previous file until the validated replacement has its live
+    // name. Boot/read recovery can restore a retained backup after interruption.
+    if (!web_upload_publish_file(temporary, destination)) return false;
     if (!playlist) {
         destination[strlen(destination) - 3] = 0; // obsolete uncompressed copy
         remove(destination);

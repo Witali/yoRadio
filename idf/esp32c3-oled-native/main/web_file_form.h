@@ -89,7 +89,7 @@ static inline bool web_file_form_part(mp_event_t event, const uint8_t *data,
             }
         } else {
             if ((!is_playlist && !is_wifi) || u->files || u->wifi_seen) return false;
-            strcpy(name, is_playlist ? "playlist.csv" : "wifi.csv");
+            if (!web_form_name(is_playlist ? "playlist.csv" : "wifi.csv", name, sizeof(name))) return false;
         }
         if (is_wifi) {
             if (u->wifi_seen) return false;
@@ -101,7 +101,9 @@ static inline bool web_file_form_part(mp_event_t event, const uint8_t *data,
         for (unsigned i = 0; i < u->files; ++i)
             if (u->playlist[i] == is_playlist && !strcmp(u->names[i], name))
                 return false;
-        strcpy(u->names[u->files], name);
+        size_t name_bytes = strlen(name) + 1U;
+        if (name_bytes > sizeof(u->names[u->files])) return false;
+        memcpy(u->names[u->files], name, name_bytes);
         u->playlist[u->files] = is_playlist;
         u->playlist_seen |= is_playlist;
         u->part = WEB_PART_FILE;

@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +23,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/task.h"
+#include "lwip/sockets.h"
 #include "network_service.h"
 #include "native_audio_output.h"
 #include "audio_pipeline_probe.h"
@@ -44,7 +46,7 @@ static TaskHandle_t
     s_static_worker_tasks[CONFIG_YORADIO_WEB_STATIC_WORKERS];
 
 static FILE *open_nonempty_file(const char *path) {
-    FILE *file = fopen(path, "rb");
+    FILE *file = web_upload_open_file(path);
     if (!file) return NULL;
     // SPIFFS does not guarantee useful seek/tell results for every damaged
     // directory entry.  Prove that at least one byte can actually be read so
@@ -329,6 +331,38 @@ static esp_err_t finish_static_response(httpd_req_t *request,
     return result;
 }
 
+static bool embedded_script_size(const uint8_t *start, const uint8_t *end, ssize_t *length) {
+    uintptr_t first = (uintptr_t)start, last = (uintptr_t)end;
+    if (last < first || last - first > INT_MAX) return false;
+    *length = (ssize_t)(last - first);
+    return true;
+}
+
+static esp_err_t send_static_file(httpd_req_t *request, FILE *file) {
+    char chunk[CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES];
+    bool failed = false;
+    for (;;) {
+        size_t count = fread(chunk, 1, sizeof(chunk), file);
+        if (count && httpd_resp_send_chunk(request, chunk, (ssize_t)count) != ESP_OK) {
+            failed = true;
+            break;
+        }
+        // A positive short read can already set EOF or a read error. Do not
+        // issue another read while the stream position may be indeterminate.
+        if (ferror(file)) { failed = true; break; }
+        if (feof(file)) break;
+        if (count < sizeof(chunk)) { failed = true; break; }
+    }
+    if (fclose(file) != 0) failed = true;
+    if (failed) {
+        // The request still owns its fd here; avoid a successful zero chunk or
+        // a delayed fd-only close that could affect a later reused session.
+        (void)shutdown(httpd_req_to_sockfd(request), SHUT_RDWR);
+        return ESP_FAIL;
+    }
+    return finish_static_response(request, httpd_resp_send_chunk(request, NULL, 0));
+}
+
 static esp_err_t serve_static_request(httpd_req_t *request) {
     char uri[160];
     const char *query = strchr(request->uri, '?');
@@ -343,12 +377,15 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
     if (strcmp(uri, "/script.js") == 0 || strcmp(uri, "/script.js.gz") == 0) {
         extern const uint8_t script_start[] asm("_binary_native_script_js_gz_start");
         extern const uint8_t script_end[] asm("_binary_native_script_js_gz_end");
+        ssize_t script_bytes;
+        if (!embedded_script_size(script_start, script_end, &script_bytes))
+            return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "Invalid embedded script span");
         httpd_resp_set_type(request, "application/javascript; charset=utf-8");
         httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
         httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
         httpd_resp_set_hdr(request, "Connection", "close");
         return finish_static_response(request, httpd_resp_send(request,
-            (const char *)script_start, script_end - script_start));
+            (const char *)script_start, script_bytes));
     }
     if (strcmp(uri, "/") == 0 || strcmp(uri, "/index.html") == 0 ||
         strcmp(uri, "/settings.html") == 0 ||
@@ -410,22 +447,7 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
     httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
     httpd_resp_set_hdr(request, "Connection", "close");
     if (gzip) httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
-    // Private to this worker. Its entire stack is allocated at startup,
-    // before requests can arrive; no payload allocation occurs per download.
-    char chunk[CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES];
-    size_t count;
-    while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
-        if (httpd_resp_send_chunk(request, chunk, count) != ESP_OK) {
-            fclose(file);
-            httpd_resp_sendstr_chunk(request, NULL);
-            return ESP_FAIL;
-        }
-    }
-    bool read_failed = ferror(file) != 0;
-    fclose(file);
-    if (read_failed) return ESP_FAIL; // Do not terminate a truncated body as success.
-    return finish_static_response(
-        request, httpd_resp_send_chunk(request, NULL, 0));
+    return send_static_file(request, file);
 }
 
 static void static_worker_task(void *argument) {
@@ -532,6 +554,8 @@ static esp_err_t sleep_guarded_recovery_wifi_handler(httpd_req_t *request) {
 esp_err_t web_service_start(native_state_t *state) {
     s_state = state;
     esp_fill_random(&s_health_boot_id, sizeof(s_health_boot_id));
+    ESP_RETURN_ON_ERROR(web_upload_storage_init(), TAG,
+                        "initialize web file transactions");
     ESP_RETURN_ON_ERROR(start_static_workers(), TAG,
                         "start static content workers");
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();

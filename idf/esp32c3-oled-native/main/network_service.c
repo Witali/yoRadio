@@ -18,6 +18,8 @@
 #include "runtime_settings.h"
 #include "time_service.h"
 #include "web_tcp_probe.h"
+#include "web_upload.h"
+#include "file_transaction.h"
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
@@ -56,21 +58,43 @@ static void prepare_station_config(wifi_config_t *config) {
     config->sta.pmf_cfg.required = false;
 }
 
+static bool next_credential_row(FILE *file, char *line, size_t capacity) {
+    for (;;) {
+        size_t used = 0;
+        bool valid = capacity > 0, present = false;
+        int value;
+        while ((value = fgetc(file)) != EOF && value != '\n') {
+            present = true;
+            if (!value || used + 1U >= capacity) valid = false;
+            else if (valid) line[used++] = (char)value;
+        }
+        if (ferror(file) || (value == EOF && !present)) return false;
+        if (valid) {
+            if (used && line[used - 1U] == '\r') --used;
+            line[used] = '\0';
+            return true;
+        }
+        if (value == EOF) return false;
+        // Discard the entire physical row, including every oversized suffix.
+    }
+}
+
 static bool read_credentials(wifi_config_t *config) {
     memset(s_credentials, 0, sizeof(s_credentials));
     s_credential_count = 0;
     s_credential_index = 0;
+    if (!native_file_recover("/spiffs/data/wifi.csv", "/spiffs/data/wifi.csv.bak")) return false;
     FILE *file = fopen("/spiffs/data/wifi.csv", "r");
     if (!file) return false;
     char line[160];
     bool found = false;
-    while (fgets(line, sizeof(line), file)) {
+    while (next_credential_row(file, line, sizeof(line))) {
         char *tab = strchr(line, '\t');
         if (!tab) continue;
         *tab++ = '\0';
-        tab[strcspn(tab, "\r\n")] = '\0';
         if (!line[0] || strlen(line) >= sizeof(config->sta.ssid) ||
-            strlen(tab) >= sizeof(config->sta.password)) {
+            strlen(tab) >= sizeof(config->sta.password) || strchr(line, '\r') ||
+            strpbrk(tab, "\t\r")) {
             continue;
         }
         if (s_credential_count >= WIFI_MAX_CREDENTIALS) continue;
@@ -80,7 +104,9 @@ static bool read_credentials(wifi_config_t *config) {
                 sizeof(saved->sta.password));
         prepare_station_config(saved);
     }
+    bool read_ok = ferror(file) == 0;
     fclose(file);
+    if (!read_ok) s_credential_count = 0;
     found = s_credential_count > 0;
     if (found) {
         *config = s_credentials[0];
@@ -363,8 +389,7 @@ esp_err_t network_service_save_credentials_file(const uint8_t *data,
         remove(temporary_path);
         return ESP_FAIL;
     }
-    remove(path);
-    if (rename(temporary_path, path) != 0) {
+    if (!web_upload_publish_file(temporary_path, path)) {
         remove(temporary_path);
         return ESP_FAIL;
     }
