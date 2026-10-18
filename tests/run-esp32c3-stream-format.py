@@ -11,7 +11,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
 MAIN = ROOT / "idf/esp32c3-oled-native/main"
-SANITIZERS = (["-fsanitize=address,undefined", "-fno-omit-frame-pointer"]
+SANITIZERS = (["-fsanitize=address,undefined", "-fno-omit-frame-pointer", "-fno-pie", "-no-pie"]
               if os.environ.get("C3_MEMORY_SANITIZE") == "1" else [])
 
 
@@ -33,6 +33,7 @@ with tempfile.TemporaryDirectory(prefix="c3-stream-format-") as directory:
     (tmp / "freertos/FreeRTOS.h").write_text("""#pragma once
 #include <stddef.h>
 typedef void *SemaphoreHandle_t;
+typedef int BaseType_t;
 #define pdTRUE 1
 #define pdMS_TO_TICKS(x) (x)
 #define portMAX_DELAY 0xffffffffU

@@ -10,6 +10,7 @@
 #include "custom_flac_adapter.h"
 #include "custom_legacy_adapter.h"
 #include "pipeline_profile.h"
+#include "audio_pipeline_probe.h"
 
 #define CONFIG_YORADIO_FLAC_DECODER_CUSTOM 1
 #define YORADIO_CUSTOM_LEGACY_DECODER 1
