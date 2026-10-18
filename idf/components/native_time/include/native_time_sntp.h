@@ -32,6 +32,10 @@ void native_time_sntp_notify_network_ready(void);
 // No TCP/IP call occurs before the ready latch. Calls are serialized. Names
 // are copied into permanent storage. Equal running configurations are a no-op.
 // The caller must separately serialize obtaining and applying its settings.
+// This backend exclusively owns the singleton after binding. The first apply
+// rejects an enabled client or any preset name/nonzero IP without changing it.
+// External raw/managed SNTP reconfiguration must not run concurrently with or
+// after this backend; the initial state check is not an atomic external lease.
 esp_err_t native_time_sntp_apply(const native_time_sntp_config_t *config);
 esp_err_t native_time_sntp_restart(void);
 

@@ -38,10 +38,12 @@ static bool same_config(const native_time_sntp_config_t *left,
 esp_err_t native_time_sntp_context_unused(void *context) {
     (void)context;
     if (sntp_enabled()) return ESP_ERR_INVALID_STATE;
-    // This component owns the singleton. Do not silently take a foreign raw
-    // client's names; managed init independently rejects foreign storage.
+    // This component owns the singleton. A stopped raw client can retain
+    // names OR numeric addresses; managed init only rejects foreign storage.
     for (unsigned index = 0; index < SNTP_MAX_SERVERS; ++index) {
-        if (sntp_getservername((uint8_t)index)) return ESP_ERR_INVALID_STATE;
+        if (sntp_getservername((uint8_t)index) ||
+            !ip_addr_isany(sntp_getserver((uint8_t)index)))
+            return ESP_ERR_INVALID_STATE;
     }
     return ESP_OK;
 }

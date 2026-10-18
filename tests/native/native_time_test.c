@@ -15,6 +15,44 @@ static unsigned find_dns(const char *name){for(unsigned i=0;i<DNS_TABLE_SIZE;i++
 static void complete_dns(unsigned index,bool success,unsigned ip){assert(index<DNS_TABLE_SIZE&&dns_requests[index].found);dns_found_callback callback=dns_requests[index].found;void *arg=dns_requests[index].arg;dns_requests[index].found=NULL;dns_table[index].state=DNS_STATE_DONE;ip_addr_t address={ip};core_begin();callback(dns_table[index].name,success?&address:NULL,arg);core_end();}
 static void *apply_thread(void *p){assert(native_time_sntp_apply(p)==ESP_OK);return NULL;}
 
+static void foreign_ip_slot(unsigned index) {
+    assert(index < SNTP_MAX_SERVERS);
+    ready();
+    ip_addr_t foreign = {0x12345678U + index};
+    core_begin();
+    sntp_setserver((u8_t)index, &foreign);
+    assert(!sntp_enabled() && !sntp_getservername((u8_t)index));
+    assert(ip_addr_eq(sntp_getserver((u8_t)index), &foreign));
+    core_end();
+    unsigned allocations_before = allocations;
+    unsigned udp_before = udp_created, timers_before = timer_count();
+    native_time_sntp_config_t requested = config(1, 1);
+    esp_err_t result = native_time_sntp_apply(&requested);
+    if (result != ESP_ERR_INVALID_STATE)
+        fprintf(stderr, "unexpected takeover: result=%d managed=%d enabled=%u foreign_ip_preserved=%d\n",
+                result, s_managed, sntp_enabled(),
+                ip_addr_eq(sntp_getserver((u8_t)index), &foreign));
+    assert(result == ESP_ERR_INVALID_STATE);
+    assert(!s_managed && !s_storage && !s_bound);
+    assert(allocations == allocations_before && udp_created == udp_before);
+    assert(timer_count() == timers_before);
+    core_begin();
+    assert(!sntp_enabled());
+    for (unsigned slot = 0; slot < SNTP_MAX_SERVERS; ++slot) {
+        assert(!sntp_getservername((u8_t)slot));
+        if (slot == index)
+            assert(ip_addr_eq(sntp_getserver((u8_t)slot), &foreign));
+        else
+            assert(ip_addr_isany(sntp_getserver((u8_t)slot)));
+    }
+    // Only the foreign owner releases its configuration. Zero IP is unused,
+    // so the backend can subsequently acquire the still-disabled singleton.
+    sntp_setserver((u8_t)index, NULL);
+    core_end();
+    assert(native_time_sntp_apply(&requested) == ESP_OK);
+    assert(s_managed && s_bound && sntp_enabled());
+}
+
 int main(int argc,char **argv){assert(argc==2);const char *test=argv[1];native_time_sntp_config_t a=config(1,1),b=config(1,2),c=config(1,3);
  if(!strcmp(test,"readiness")){assert(native_time_sntp_apply(&a)==ESP_ERR_INVALID_STATE);assert(native_time_sntp_restart()==ESP_ERR_INVALID_STATE);assert(!ipc_calls);assert(native_time_sntp_init(on_sync,&callbacks)==ESP_OK);assert(!ipc_calls);assert(native_time_sntp_apply(&a)==ESP_ERR_INVALID_STATE);native_time_sntp_notify_network_ready();assert(native_time_sntp_apply(&a)==ESP_OK);}
  else if(!strcmp(test,"init")){ready();assert(native_time_sntp_init(on_sync,&callbacks)==ESP_OK);assert(native_time_sntp_init(NULL,NULL)==ESP_ERR_INVALID_STATE);assert(!ipc_calls);assert(native_time_sntp_restart()==ESP_ERR_INVALID_STATE);}
@@ -32,6 +70,7 @@ int main(int argc,char **argv){assert(argc==2);const char *test=argv[1];native_t
  else if(!strcmp(test,"managed_ipc")){ready();fail_ipc_at=2;assert(native_time_sntp_apply(&a)==ESP_FAIL);assert(!s_managed&&!s_storage&&!sntp_enabled()&&!sntp_getservername(0));fail_ipc_at=0;assert(native_time_sntp_apply(&b)==ESP_OK);}
  else if(!strcmp(test,"apply_ipc")){ready();assert(native_time_sntp_apply(&a)==ESP_OK);const char *old=sntp_getservername(0);unsigned count=udp_created;fail_ipc_at=ipc_calls+1;assert(native_time_sntp_apply(&b)==ESP_FAIL);assert(sntp_getservername(0)==old&&!strcmp(old,a.servers[0])&&udp_created==count);fail_ipc_at=0;assert(native_time_sntp_apply(&c)==ESP_OK);}
  else if(!strcmp(test,"foreign_client")){ready();core_begin();sntp_setservername(0,"foreign.example");core_end();assert(native_time_sntp_apply(&a)==ESP_ERR_INVALID_STATE);assert(!strcmp(sntp_getservername(0),"foreign.example")&&!s_managed);}
+ else if(!strncmp(test,"foreign_ip_",11)){assert(test[11]>='0'&&test[11]<='1'&&!test[12]);foreign_ip_slot((unsigned)(test[11]-'0'));}
  else if(!strcmp(test,"concurrent")){ready();assert(native_time_sntp_apply(&a)==ESP_OK);pthread_t t1,t2;assert(!pthread_create(&t1,NULL,apply_thread,&b));assert(!pthread_create(&t2,NULL,apply_thread,&c));assert(!pthread_join(t1,NULL)&&!pthread_join(t2,NULL));assert(udp_created==3&&udp_removed==2);assert(!strcmp(sntp_getservername(0),b.servers[0])||!strcmp(sntp_getservername(0),c.servers[0]));}
  else if(!strcmp(test,"sync_packet")){ready();assert(native_time_sntp_apply(&a)==ESP_OK);core_begin();struct pbuf *p=pbuf_alloc(PBUF_TRANSPORT,48,PBUF_RAM);uint8_t *bytes=p->payload;bytes[0]=0x24;bytes[1]=2;uint32_t stamp=htonl((uint32_t)(1704153600UL-2085978496UL));memcpy(bytes+40,&stamp,4);ip_addr_t address={0x1234};sntp_recv(NULL,sntp_pcb,p,&address,123);core_end();assert(callbacks==1&&wall_epoch==1704153600);assert(sntp_get_sync_status()==SNTP_SYNC_STATUS_COMPLETED);assert(sntp_get_sync_status()==SNTP_SYNC_STATUS_RESET);bool hourly=false;for(unsigned i=0;i<32;i++)if(timers[i].fn==sntp_request&&timers[i].delay==61U*60000U)hourly=true;assert(hourly);}
  else if(!strcmp(test,"pcb_oom")){ready();fail_udp=1;esp_err_t result=native_time_sntp_apply(&a);

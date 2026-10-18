@@ -63,7 +63,7 @@ def main():
                 code,log=execute(cmd,60);(pinout/('build-'+str(cap)+suffix+'.log')).write_bytes(log)
                 if code:raise RuntimeError(log.decode(errors='replace'))
                 return Path(str(pinout/('time-'+str(cap)))+suffix)
-            binary=build();cases=['readiness','init','mutex_oom','lock_timeout','validation','capacity','immutable','equal_no_restart','late_dns','late_dns_failure','managed_oom','managed_ipc','apply_ipc','foreign_client','concurrent','sync_packet']+(['all_slots','all_bank_refs'] if cap==2 else [])
+            binary=build();cases=['foreign_ip_'+str(index) for index in range(cap)]+['readiness','init','mutex_oom','lock_timeout','validation','capacity','immutable','equal_no_restart','late_dns','late_dns_failure','managed_oom','managed_ipc','apply_ipc','foreign_client','concurrent','sync_packet']+(['all_slots','all_bank_refs'] if cap==2 else [])
             results={}
             for case in cases:
                 code,log=execute(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1',host(binary),case]);(pinout/(str(cap)+'-'+case+'.log')).write_bytes(log)
@@ -95,6 +95,24 @@ def main():
                     assert b'ERROR: AddressSanitizer' not in log and b'runtime error:' not in log
                     report['negative_controls'][pin+'/'+name]={'case':case,'status':code,'expected_assertion':assertion,'rejected':True}
                 (pinout/'backend.inc').write_text(backend)
+            # Name-only ownership checking was the historical numeric-IP gap.
+            # Execute that exact former condition for EVERY configured slot,
+            # both capacities and both pinned SDK cores, not just slot zero.
+            old='if (sntp_getservername((uint8_t)index) ||\n            !ip_addr_isany(sntp_getserver((uint8_t)index)))'
+            new='if (sntp_getservername((uint8_t)index))'
+            assert backend.count(old)==1
+            (pinout/'backend.inc').write_text(backend.replace(old,new))
+            negative=build((),'-negative-foreign-ip')
+            for index in range(cap):
+                case='foreign_ip_'+str(index)
+                code,log=execute(['env','ASAN_OPTIONS=detect_leaks=0:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1',host(negative),case])
+                (pinout/('negative-'+str(cap)+'-'+case+'.log')).write_bytes(log)
+                assertion='result == ESP_ERR_INVALID_STATE'
+                assert code and assertion.encode() in log and b'Assertion' in log,(pin,cap,index,log)
+                assert b'result=0 managed=1 enabled=1 foreign_ip_preserved=0' in log
+                assert b'ERROR: AddressSanitizer' not in log and b'runtime error:' not in log
+                report['negative_controls'][pin+'/'+str(cap)+'/'+case]={'case':case,'status':code,'expected_assertion':assertion,'rejected':True}
+            (pinout/'backend.inc').write_text(backend)
         for f in selected:
             name='sdk/'+pin+'/'+f.relative_to(sdk).as_posix();target=out/'sources'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(f.read_bytes());report['source_sha256'][name]=hashlib.sha256(f.read_bytes()).hexdigest()
     for f in files:
