@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-c3-web-start.py": "03064e3236bc0fc64df76efde17388cc8d8d20a83b85e2c1dcb48eadb56e05a3",
+    "tests/native/c3_web_start_test.c": "66fcf677d579e6600d4071436c488159a380efe3da26f763ce65f5a21111fbcc",
+    "idf/esp32c3-oled-native/main/web_service.c": "ecd4d9572e36dfe1796a1cddcffacc0234fccf6ab07290651594f1f524c27220",
+    "tests/run-web-warning-regressions.py": "b74ce4aec3f2c8d658825065f66432779764b4a7e8e5a33c0c308b36233529a7"
+  },
+  "scope": "Actual startup/abort functions; explicit HTTPD, storage, TLS and worker API seams. Live C3 listener retained on route failure because its producer has no stop API; no physical timing or TLS cryptographic qualification."
+}

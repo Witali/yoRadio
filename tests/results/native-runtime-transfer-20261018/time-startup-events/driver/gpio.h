@@ -1,0 +1,1 @@
+/* GPIO declarations unused by this startup fixture. */

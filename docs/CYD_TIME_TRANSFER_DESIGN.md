@@ -321,3 +321,15 @@ retention, wakeup, погоды или deep-sleep hooks.
 actual SDK build + полный lint после заморозки исходников, физическая
 проверка ресурсов/сети. TFT clock widget, OLED/deep-sleep/RTC features
 в этот сервис не входят.
+
+Дополнительная проверка singleton ownership обнаружила disabled numeric-IP
+slot без имени: прежний guard считал его свободным, после чего actual apply
+стирал чужую config и запускал managed client. Commit `afb49254` проверяет
+name и `ip_addr_isany(sntp_getserver(index))` во всех slots до allocation.
+Финальный [backend report](../tests/results/native-runtime-transfer-20261018/time-backend-final/report.json)
+содержит **82 groups и 18 semantic controls**, включая каждый slot обоих
+SDK/capacity1/2 и успешный apply после явного освобождения чужим владельцем.
+[C3 lifetime regression](../tests/results/native-runtime-transfer-20261018/time-lifetime-final-c3/report.json)
+повторно проходит с новым exact backend; исторический queued-stop контроль
+по-прежнему обнаруживает ожидаемое повреждение. Sole-owner contract не
+обещает исключения от параллельного raw SNTP caller, игнорирующего этот API.

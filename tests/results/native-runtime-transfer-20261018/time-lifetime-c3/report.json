@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "scope": "Reproduce donor SNTP name corruption with actual pinned SDK async wrappers.\n\nRequires the qualified native_time campaign output, reusing its frozen SDK/DNS\ntranslation unit rather than a second implementation. TCPIP/DNS scheduling is\ncontrolled on the host; this does not qualify target scheduling or networking.\n",
+  "physical_hardware": false,
+  "historical_ref": "642ee17f",
+  "historical_git_blob_sha256": "90df465e507806a20f744b2b893c5a3b85be16382377fa3625d605c291240098",
+  "source_sha256": {
+    "tests/run-c3-time-lifetime.py": "ef53656875208942f7f23fadee324478c95ab1ac4b3995c4a858938d99ed969d",
+    "tests/native/c3_time_lifetime_test.c": "ee6f6495c5a852a2be045221435645c6207660dd7cd835c4b4f3164440e5938a",
+    "tests/native/native_time_platform.h": "b46d588b721edf2f74dd4e8acb6c5ebbfe7a5e6d8462b1a3d9dc88eef7a6b792",
+    "tests/run-native-time.py": "909941ccbf155f46f8635092ef7ed740887d34aead25de5559af610a6f190537",
+    "idf/esp32c3-oled-native/main/time_service.c": "320a2ee380a1929ec5282792d8f332469da81a65d36f03689f04f55262816b90",
+    "idf/esp32c3-oled-native/main/time_service.h": "d268f800e47e221db9ec2ef2a1ddf9bf02759a6a0b5a413cd1238cb67475fa24",
+    "idf/esp32c3-oled-native/main/runtime_settings.h": "187d045cc610944ebb2f4bac3bad4bf0669d8103aeae8dbda4c0f7e34bc1152d",
+    "idf/components/native_time/native_time_sntp.c": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508",
+    "idf/components/native_time/native_time_sntp_context.c": "702d36f9243db1731ce1e933de80480b8ee7a6eb31bf9516cdf6f8a4994bf555",
+    "idf/components/native_time/native_time_sntp_internal.h": "99f283380619863b9d988c9b59c5e712ab0f480dbab5affee6e585d751f22808",
+    "idf/components/native_time/include/native_time_sntp.h": "ed01fcafdc43681752e9be43cfbde306b3eadd1d18435323efba96130d5adebd"
+  },
+  "sdk_sha256": {
+    "components/lwip/lwip/src/apps/sntp/sntp.c": "865f8d9063d9acd872f40fa8d9414850c4bacc9efb78a66e8d671edcc991d965",
+    "components/lwip/lwip/src/core/dns.c": "8e31b2bf28d9746691e7510e3d6c88fa9cc1b8a135ea9dd101adba7d52f8027a",
+    "components/lwip/apps/sntp/sntp.c": "d783936fdc879b2200bf03ffae45da4c928847791da95bcdac65d0ca6c72b5a0",
+    "components/esp_netif/lwip/esp_netif_sntp.c": "240f0f4e2254be3f66e7dce831e80d8267a9c9da93d14dd4070de74e36a77746",
+    "components/lwip/lwip/src/include/lwip/apps/sntp.h": "c568abe5af32f6d91d5ea7f5fe50973f922eb826223550ea71a94cfce6c3db7d",
+    "components/lwip/lwip/src/include/lwip/apps/sntp_opts.h": "e52716249fb9104b9e86c59306519ec54c9e6f673e916ca5870b3f90e9dd56c4",
+    "components/lwip/include/apps/esp_sntp.h": "f73b30aa6897f0e573d52998760a25a232eb7de72110ac1c8bc713a69b25d180",
+    "components/esp_netif/include/esp_netif_sntp.h": "5ff4d3c79fbbaa38cb1790dafd0019731a0fd21af077368e4a1915c134ef9086",
+    "components/lwip/port/esp32xx/include/arch/cc.h": "cfc58a9895f7c250e254e2661759572e1d15ed3d08893750c3b443c7bc39f977"
+  },
+  "variants": {
+    "current": {
+      "status": 0,
+      "semantic_negative": false,
+      "output": "PASS C3 lifetime: actual adapter/shared backend + pinned SDK/DNS; paused pre-enqueue name remains immutable through checked rebind",
+      "command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-function",
+        "-Wno-unused-variable",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/c3-time-lifetime-qualified-final-03",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/native/c3_time_lifetime_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/c3-time-lifetime-qualified-final-03/current"
+      ]
+    },
+    "historical": {
+      "status": 1,
+      "semantic_negative": true,
+      "output": "NEGATIVE_CONTROL_FAIL: actual historical C3 apply overwrote borrowed DNS name before queued SDK stop ACK",
+      "command": [
+        "gcc",
+        "-DOLD_SOURCE=1",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-function",
+        "-Wno-unused-variable",
+        "-Wno-unused-parameter",
+        "-Wno-sign-compare",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/c3-time-lifetime-qualified-final-03",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/native/c3_time_lifetime_test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/c3-time-lifetime-qualified-final-03/historical"
+      ]
+    }
+  },
+  "foundation_report_sha256": "f16627ddb400c2b55b7ac5b0c37cc061b3ede08ab29fe323100717d42451cbed",
+  "generated_unit_sha256": {
+    "platform.inc": "96d70a2d40f617fd62521592966203089f1552377b7c2e90849964125f365e6f",
+    "pinned.inc": "a81958d455208b50023dfd6f621447e841ea93ca24f98c129af9322a76647891",
+    "backend.inc": "29bcb0f3b700a9d8f44269aadf3121963d1fe0d08f62c0f435fca21b161f2427",
+    "raw-wrappers.inc": "81594b53b10db2101962a5e6f23eee2035441a412c06ec2dc41a3c1de004ae27"
+  },
+  "source_files_still_match_snapshot": true
+}

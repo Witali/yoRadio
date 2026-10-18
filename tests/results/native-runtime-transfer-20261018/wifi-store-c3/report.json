@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "baseline_commit": "56af3052e8aeaa2416b0bd2836f4ae30971be9bc",
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-c3-wifi-persistence.py": "cc38993f1e43f8fc3ff2cd96ce92e6875c0c3bffd49033493cef1d8b8750781e",
+    "tests/native/c3_wifi_persistence_test.c": "300dc2880ac2744de3a7399cf03f0a39b39299fcd4fb14498a78c09c44ddb7b1",
+    "tests/run-web-warning-regressions.py": "b74ce4aec3f2c8d658825065f66432779764b4a7e8e5a33c0c308b36233529a7",
+    "idf/esp32c3-oled-native/main/network_service.c": "5c87d8c55213691a18f1a314625b402454910056bc24d3a1c627ca8ef45db0e2",
+    "idf/esp32c3-oled-native/main/network_service.h": "511056597bab5c3f1048b1295ffd9e7cd948e4bba07abbebbe120c59c3634f3e",
+    "idf/esp32c3-oled-native/main/web_upload.c": "93f8c69f12fd14b3a7e33a9d28fd2fc4d8a552f3be295fd7251163dda6a876ba",
+    "idf/esp32c3-oled-native/main/web_upload.h": "00a9d16e304d9b1097008f3200e9bfe888181afb87a5a06a1ef62bc60a9ea1ba",
+    "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+    "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b",
+    "idf/components/native_storage/include/credential_line.h": "4d09bb3fc82c7125b82f6940778757a1aaebe4cf76dd8b9a6aff9641b7863fa2",
+    "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+    "idf/components/native_wifi_store/native_wifi_file.c": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf",
+    "idf/components/native_wifi_store/include/native_wifi_file.h": "bf7e4a8e86383b74d477920b5a8b645afe4fe98e03ad0fd47180f1dd85b764fc",
+    "idf/components/native_wifi_store/include/native_wifi_json.h": "e043d651d35b3c25d8a5ed948ff374892310b4be18064cab1660b920fed1ffd0",
+    "idf/components/native_wifi_store/include/native_wifi_store.h": "23cc38e00d79465b0342ffb7f6d78f1d9f48df0520e75ea77f7c2573bd3fee65"
+  },
+  "results": {
+    "negative-interior-cr": "DETECTED",
+    "negative-postcommit-reload": "DETECTED",
+    "negative-active-cache-reload": "DETECTED",
+    "current": {
+      "passed": true,
+      "scenarios": 43
+    }
+  },
+  "physical_hardware": false,
+  "scope": "Actual C3 five-profile loader, private desired-store owner and actual shared core/file/transaction functions over mapped stdio with SPIFFS no-overwrite rename. Successful writes preserve active cache until boot/restart while metadata changes immediately; explicit delete-all cannot resurrect backup. Historical actual source detects interior-CR acceptance and destructive postcommit reload. No physical flash durability claim."
+}

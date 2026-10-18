@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "physical_flash_tested": false,
+  "fixture_groups": 46,
+  "source_sha256": {
+    "tests/run-cyd-wifi-storage.py": "02c342347d5f22da2e83ffa7c4bd8180a1a23ece1135ed237b490fa75fcdaa35",
+    "tests/native/cyd_wifi_storage_test.c": "8b629155480f8a0742536b957aca2bf3b9ae1a7bb1abf05317f6611f6eae9698",
+    "tests/native/cyd_wifi_warning_test.c": "52dd43edf7d7cf4c728eb0cd30cc21b0fef54b83272bf2490f46468a6e3702e8",
+    "tests/run-cyd-wifi-warning.py": "a112ba0d60615d148303856d0b8bbe83c4de0dc1c598d2bbbba62484031df474",
+    "tests/run-web-warning-regressions.py": "b74ce4aec3f2c8d658825065f66432779764b4a7e8e5a33c0c308b36233529a7",
+    "idf/esp32-cyd2usb-native/main/network_service.c": "9f21e2f378ba02fabe35ddc11c84b3a551ea587392d91d10d62e7f879fdaece1",
+    "idf/esp32-cyd2usb-native/main/network_service.h": "280fc6c1a5e90d40d5fe73126ad45f030653b5d5f933af2aabb65edbe0ec6fce",
+    "idf/esp32-cyd2usb-native/main/web_upload.c": "4781f8e3c3cf10e18ef506d0b6ca076bd4399a107fddc6d21a4d910964914193",
+    "idf/esp32-cyd2usb-native/main/web_upload.h": "c13fbe33f581520e2b92fd1cbbfe116d5e6f0036e77a2de9517300533b7df6b0",
+    "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+    "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b",
+    "idf/components/native_storage/include/credential_line.h": "4d09bb3fc82c7125b82f6940778757a1aaebe4cf76dd8b9a6aff9641b7863fa2",
+    "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+    "idf/components/native_wifi_store/native_wifi_file.c": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf",
+    "idf/components/native_wifi_store/include/native_wifi_store.h": "060dda87c1d72a884cfeb16559c772963dfc018c73adf78804dad69462d76110",
+    "idf/components/native_wifi_store/include/native_wifi_file.h": "bf7e4a8e86383b74d477920b5a8b645afe4fe98e03ad0fd47180f1dd85b764fc"
+  },
+  "negative_controls": {
+    "unpublished-edit": {
+      "detected": true,
+      "expected_assertion": "equals(live, \"duplicate\\tunique-secret-two\\nduplicate\\t\\n\")",
+      "exit_code": 6
+    },
+    "wrong-owner-lock": {
+      "detected": true,
+      "expected_assertion": "network_service_wifi_metadata(&unavailable) == NATIVE_WIFI_BUSY",
+      "exit_code": 6
+    }
+  },
+  "scope": "Actual bounded validation, save, first-valid reader and storage/transaction functions; mapped host filesystem with SPIFFS no-overwrite rename rules, explicit stdio/stat/rename/remove/OOM/timeout faults and pthread concurrent saves. No hardware flash durability, network reconnection, or reboot timing claim."
+}

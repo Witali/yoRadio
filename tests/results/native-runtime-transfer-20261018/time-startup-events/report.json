@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "scope": "Execute CYD startup and network time notifications with platform seams.\n\nThe production startup, network startup and event handler bodies run unchanged.\nSDK, RTOS, file loading, display and time service boundaries are deterministic\nhost seams; this does not qualify hardware scheduling or network timing.\n",
+  "physical_hardware": false,
+  "source_sha256": {
+    "tests/run-cyd-time-events.py": "1d74febec41e801987cd3a9eb95fd3228b50b52c452d80d78632bf745a1d5aaa",
+    "tests/native/cyd_time_events_test.c": "9f39560a319409a06f5a2781974ca6884273342d8679895cf99631c7b2036caa",
+    "tests/run-web-warning-regressions.py": "b74ce4aec3f2c8d658825065f66432779764b4a7e8e5a33c0c308b36233529a7",
+    "idf/esp32-cyd2usb-native/main/app_main.c": "a633513bdf11cbddcfed23eb0f1998cee1599c99f56c4bff886b217e9285e5b3",
+    "idf/esp32-cyd2usb-native/main/network_service.c": "9535499210c1a55351a60b3a20522e8d402b855c0fb1f34afea7ee456f58ebdf",
+    "idf/esp32-cyd2usb-native/main/board_config.h": "83707b2cbc66fedc565c7e94815e0dca82aabdfc627249e6458d03594cecb8d7",
+    "idf/esp32-cyd2usb-native/sdkconfig.defaults": "9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3",
+    "idf/esp32c3-oled-native/main/network_service.c": "7a38632ac391250131e280827f53e718cb42a2594e4009b2fed5ad7c740fc42d",
+    "tools/codec_benchmark/run_output_dma_host.py": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145"
+  },
+  "negative_controls": {
+    "missing_ready_notice": {
+      "detected": true,
+      "expected_assertion": "time_ready && time_notices == 1U",
+      "status": 134
+    },
+    "missing_loss_notice": {
+      "detected": true,
+      "expected_assertion": "!time_ready && time_notices == 2U",
+      "status": 134
+    },
+    "missing_loss_subscription": {
+      "detected": true,
+      "expected_assertion": "registered_ip_id == ESP_EVENT_ANY_ID",
+      "status": 134
+    },
+    "missing_time_start": {
+      "detected": true,
+      "expected_assertion": "time_step > display_step",
+      "status": 134
+    },
+    "stale_ip_after_loss": {
+      "detected": true,
+      "expected_assertion": "!time_ready && time_notices == 2U && !s_app_state.ip",
+      "status": 134
+    },
+    "changed_network_affinity": {
+      "detected": true,
+      "expected_assertion": "priority == 3U && core == 0",
+      "status": 134
+    },
+    "driver_flash_persistence": {
+      "detected": true,
+      "expected_assertion": "driver_ram",
+      "status": 134
+    },
+    "empty_file_uses_retained_driver_profile": {
+      "detected": true,
+      "expected_assertion": "!connect_calls",
+      "status": 134
+    },
+    "donor_empty_file_uses_retained_driver_profile": {
+      "detected": true,
+      "expected_assertion": "connect_calls == 0U",
+      "status": 134
+    }
+  },
+  "positive": "PASS CYD time/network startup: 32 groups; actual startup/events and SDK subscription, offline initialization, loss/reconnect/AP state, retained task affinity; platform seams only",
+  "command": [
+    "gcc",
+    "-std=c11",
+    "-O1",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-unused-function",
+    "-Wno-unused-variable",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-fno-pie",
+    "-no-pie",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-time-events-qualified-01",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-time-events-qualified-01/sources/idf/esp32-cyd2usb-native/main",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-time-events-qualified-01/sources/tests/native/cyd_time_events_test.c",
+    "-o",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-time-events-qualified-01/events"
+  ]
+}

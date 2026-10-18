@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "physical_hardware": false,
+  "sanitizer": "ASan/UBSan for actual static C functions; JavaScript executed in Node DOM/socket/fetch seams",
+  "source_sha256": {
+    "tests/run-cyd-web-static.py": "0611eecd0b0157f45acb5f96f598900454df585fb659755bc32d2ac6cb6a8cd0",
+    "tests/native/cyd_web_static_test.c": "a30213fe3c4df5098cd0697b45546b20bf6478d8a844f9f8fecba71240c393fd",
+    "tests/native/cyd_web_start_test.c": "0147dc9810428185b9ad3d33dfc84dcf7b98b5c57e5c25beb884cae734d939aa",
+    "tests/cyd-native-page.test.js": "2062d659fe7754b467efec8f7ec30fa31db280f1d9a02cbfda9d5444bd9e65e7",
+    "idf/esp32-cyd2usb-native/main/web_static.c": "2284e19bcf704d1671ac1a72c4b14aee6f73915ba604ec791f5cbd40793bc5a8",
+    "idf/esp32-cyd2usb-native/main/web_static.h": "71245617169ee6bb011981f98aa0296940a4e975242617c6ae363b707f221578",
+    "idf/esp32-cyd2usb-native/main/web_pages.cpp": "b52156d4e2304bdf39056ba1aee3fb59c2da9a5e5b0c6082a433d943ecdacfa6",
+    "idf/esp32-cyd2usb-native/main/web_pages.h": "43329d2e883f1c2441f42d0fe0bf2556d7690f6fb68a396b3a57227daa578960",
+    "idf/esp32-cyd2usb-native/main/web_service.c": "7f139222e9b33af0d5ebe5717a0a014610171300d2537d594b96a80995749151",
+    "idf/esp32-cyd2usb-native/main/web_upload.h": "c13fbe33f581520e2b92fd1cbbfe116d5e6f0036e77a2de9517300533b7df6b0",
+    "idf/esp32-cyd2usb-native/main/web_reboot.h": "a224058b4cf48a49bd467ca50af7b8ed2acb8e9adfeb2cd2938e4d7e47479b76",
+    "idf/esp32-cyd2usb-native/main/web_ota.h": "31eb71b6bd425311f17ceddba60c173666267cbfd2cf2ba689ebc302fdf1f409",
+    "idf/esp32-cyd2usb-native/main/web_wifi.h": "5ddaa1855ebe13e35015f016947b09c79cf1341c872b01d5c041a4c115ef0bca",
+    "idf/esp32-cyd2usb-native/main/web_time.h": "589ae0577cfd13f2eac4a72bb7b657f3415704307fe732476c68b6589412b612",
+    "tests/run-cyd-lifecycle.py": "b3d1fe0b0eaac99f5381176215cc6f2f4d8764d3f056712889263d207835e16d",
+    "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+    "idf/components/native_wifi_store/include/native_wifi_public.h": "d70766490ef13378d9a85c644f6b37ddf5f8920caaba377e3f373b5d10fc8dc0",
+    "tools/codec_benchmark/run_output_dma_host.py": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145"
+  },
+  "page_tested": true,
+  "negative_controls": {
+    "missing_admission_guard": {
+      "detected": true,
+      "expected_assertion": "web_static_handler(&r)==ESP_OK && r.status==404"
+    },
+    "missing_worker_guard": {
+      "detected": true,
+      "expected_assertion": "open_calls==opens"
+    },
+    "wrong_wifi_edit_route": {
+      "detected": true,
+      "expected_assertion": "route->handler==web_wifi_edit_handler"
+    },
+    "missing_wifi_activation": {
+      "detected": true,
+      "expected_assertion": "wifi_active && reboot_ready"
+    }
+  }
+}

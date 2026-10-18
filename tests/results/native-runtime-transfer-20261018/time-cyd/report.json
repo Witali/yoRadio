@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "scope": "Run actual CYD time settings/service with pthread RTOS, NVS and SNTP seams.\n\nThe production worker, explicit record codec, validation and snapshots execute\nunchanged. Fake wall/monotonic clocks and controlled worker notifications make\noffline/failure/concurrent publication cases deterministic. This does not\nqualify physical NVS, network timing, or the target's 2048-byte worker stack.\n",
+  "physical_hardware": false,
+  "cases": {
+    "defaults": "PASS defaults",
+    "validation": "PASS validation",
+    "record_roundtrip": "PASS record_roundtrip",
+    "invalid_record": "PASS invalid_record",
+    "read_errors": "PASS read_errors",
+    "wrong_type": "PASS wrong_type",
+    "save_errors": "PASS save_errors",
+    "settings_oom": "PASS settings_oom",
+    "concurrent_save": "PASS concurrent_save",
+    "offline": "PASS offline",
+    "first_ip": "PASS first_ip",
+    "flaps": "PASS flaps",
+    "apply_failure": "PASS apply_failure",
+    "offline_save": "PASS offline_save",
+    "save_during_apply": "PASS save_during_apply",
+    "sync_clock": "PASS sync_clock",
+    "timezone_overflow": "PASS timezone_overflow",
+    "snapshot_timeout": "PASS snapshot_timeout",
+    "task_oom": "PASS task_oom",
+    "start_mutex_oom": "PASS start_mutex_oom",
+    "state_mutex_oom": "PASS state_mutex_oom",
+    "backend_init_failure": "PASS backend_init_failure",
+    "sync_lock_retry": "PASS sync_lock_retry",
+    "saved_apply_failure": "PASS saved_apply_failure"
+  },
+  "negative_controls": {
+    "publish_after_failed_commit": {
+      "case": "save_errors",
+      "status": 134,
+      "expected_assertion": "rev==revision",
+      "rejected": true
+    },
+    "missing_network_gate": {
+      "case": "offline",
+      "status": 134,
+      "expected_assertion": "backend_notifies",
+      "rejected": true
+    },
+    "duplicate_reconnect": {
+      "case": "first_ip",
+      "status": 134,
+      "expected_assertion": "backend_applies==1&&!backend_restarts",
+      "rejected": true
+    },
+    "wall_clock_age": {
+      "case": "sync_clock",
+      "status": 134,
+      "expected_assertion": "s.last_sync_age_ms==2000",
+      "rejected": true
+    },
+    "false_applied_revision": {
+      "case": "save_during_apply",
+      "status": 134,
+      "expected_assertion": "s.applied_revision==1&&s.desired_revision==2",
+      "rejected": true
+    },
+    "wrong_offset_sign": {
+      "case": "timezone_overflow",
+      "status": 134,
+      "expected_assertion": "s.clock_valid&&s.local_time.tm_year==123",
+      "rejected": true
+    },
+    "hidden_record_tail": {
+      "case": "invalid_record",
+      "status": 134,
+      "expected_assertion": "!decode_record(record,&result)",
+      "rejected": true
+    }
+  },
+  "command": [
+    "gcc",
+    "-std=c11",
+    "-O1",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-unused-function",
+    "-Wno-unused-variable",
+    "-fno-pie",
+    "-no-pie",
+    "-pthread",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-time-qualified-02",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/native",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/native/cyd_time_test.c",
+    "-o",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-time-qualified-02/time"
+  ],
+  "source_sha256": {
+    "tests/run-cyd-time.py": "204420873a273817fcb5fe29a819015eacff3cd3699afe199034ddd2cad49c00",
+    "tests/native/cyd_time_test.c": "ad47f348440644d6b3f47ec3e457d565f4c16c178c63efe51adfa86713d5ed30",
+    "tests/native/cyd_time_platform.h": "afba83de0bb8dadf3feba10285cfda4008dbdf73c76fb5d0b6ab9f8b16a45ea3",
+    "tests/native/native_time_platform.h": "b46d588b721edf2f74dd4e8acb6c5ebbfe7a5e6d8462b1a3d9dc88eef7a6b792",
+    "idf/components/native_time/include/native_time_sntp.h": "ed01fcafdc43681752e9be43cfbde306b3eadd1d18435323efba96130d5adebd",
+    "idf/esp32-cyd2usb-native/main/time_settings.c": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c",
+    "idf/esp32-cyd2usb-native/main/time_settings.h": "c9649a330e44d86aaf866534f169a93220b0a4b4bfed6b9aed3763d247de8f12",
+    "idf/esp32-cyd2usb-native/main/time_service.c": "a44282e4fb29dc8bab2da2140318951d1bf0929f3ef47b4e33573314a3fcc7e0",
+    "idf/esp32-cyd2usb-native/main/time_service.h": "ec288898ac91a6295f1f28b7ee40127e2d984815bad0c3bff71a8c70d6dc0b4a"
+  }
+}

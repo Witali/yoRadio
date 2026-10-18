@@ -1,0 +1,29 @@
+#pragma once
+
+#include "driver/gpio.h"
+
+// ESP32-2432S028 CYD2USB, matching the proven HLV-codec board profile.
+#define BOARD_TFT_SCK GPIO_NUM_14
+#define BOARD_TFT_MOSI GPIO_NUM_13
+#define BOARD_TFT_MISO GPIO_NUM_12
+#define BOARD_TFT_CS GPIO_NUM_15
+#define BOARD_TFT_DC GPIO_NUM_2
+#define BOARD_TFT_BACKLIGHT GPIO_NUM_21
+
+#define BOARD_TOUCH_SCK GPIO_NUM_25
+#define BOARD_TOUCH_MOSI GPIO_NUM_32
+#define BOARD_TOUCH_MISO GPIO_NUM_39
+#define BOARD_TOUCH_CS GPIO_NUM_33
+
+#define BOARD_AUDIO_DATA GPIO_NUM_26
+#define BOARD_BOOT_BUTTON GPIO_NUM_0
+
+#define BOARD_DISPLAY_CLOCK_HZ 80000000
+
+// FreeRTOS stack sizes are expressed in bytes and belong to this board profile.
+#define BOARD_TASK_STACK_DISPLAY 3072
+#define BOARD_TASK_STACK_NETWORK 6144
+#define BOARD_TASK_STACK_RADIO_STREAM 6144
+#define BOARD_TASK_STACK_AUDIO_DECODER 16384
+#define BOARD_TASK_STACK_AUDIO_OUTPUT 4096
+

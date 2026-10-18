@@ -1,0 +1,66 @@
+{
+  "passed": true,
+  "scope": "Exercise actual C3 time adapter worker/controller and timezone WS serializer.\n\nRTOS tasks are real pthread owners; settings and shared SNTP APIs are explicit\nboundaries. Actual pinned SNTP/DNS lifetime is qualified by a separate runner.\n",
+  "source_sha256": {
+    "tests/run-c3-time-service.py": "ed299dd6f792a09962be736fc6bbb8e95152b4f38aeb491e51bc04ccf17ac9eb",
+    "idf/esp32c3-oled-native/main/time_service.c": "320a2ee380a1929ec5282792d8f332469da81a65d36f03689f04f55262816b90",
+    "idf/esp32c3-oled-native/main/time_service.h": "d268f800e47e221db9ec2ef2a1ddf9bf02759a6a0b5a413cd1238cb67475fa24",
+    "idf/esp32c3-oled-native/main/runtime_settings.h": "187d045cc610944ebb2f4bac3bad4bf0669d8103aeae8dbda4c0f7e34bc1152d",
+    "idf/esp32c3-oled-native/main/websocket_service.c": "a48c3e5d13223a136f87cee4a53a1ded93a22469fb6da959ea10cba45813d8a6",
+    "idf/esp32c3-oled-native/main/json_buffer.h": "f4b4fb8e7e8ae1c8dcdc6c25ffdb75410712f3bb2c0c4dff93499893a6015ad9",
+    "tests/native/c3_time_service_platform.h": "1b5f587c17b22b681197d12ce9bcc41867ebf0c7c46b1d84ab035b07b80f31f2",
+    "tests/native/c3_time_service_test.c": "f69ac41a9946c8088522e1d47d095c5286e6230fe9283d899b8889579cd6f4d4",
+    "tests/native/c3_time_ws_snapshot_test.c": "66e6c768fb23150ee5edf13471429ef9f6995e29262794eedcac322741c333fb",
+    "idf/components/native_time/include/native_time_sntp.h": "ed01fcafdc43681752e9be43cfbde306b3eadd1d18435323efba96130d5adebd",
+    "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30"
+  },
+  "cases": {
+    "offline": "PASS C3 time adapter offline; actual worker/control code, RTOS/settings/backend seams",
+    "early_ip": "PASS C3 time adapter early_ip; actual worker/control code, RTOS/settings/backend seams",
+    "snapshot_failure": "PASS C3 time adapter snapshot_failure; actual worker/control code, RTOS/settings/backend seams",
+    "init_failure": "PASS C3 time adapter init_failure; actual worker/control code, RTOS/settings/backend seams",
+    "setenv_failure": "PASS C3 time adapter setenv_failure; actual worker/control code, RTOS/settings/backend seams",
+    "apply_failure": "PASS C3 time adapter apply_failure; actual worker/control code, RTOS/settings/backend seams",
+    "restart_failure": "PASS C3 time adapter restart_failure; actual worker/control code, RTOS/settings/backend seams",
+    "task_failure": "PASS C3 time adapter task_failure; actual worker/control code, RTOS/settings/backend seams",
+    "mutex_oom": "PASS C3 time adapter mutex_oom; actual worker/control code, RTOS/settings/backend seams",
+    "concurrent_start": "PASS C3 time adapter concurrent_start; actual worker/control code, RTOS/settings/backend seams",
+    "serialized_order": "PASS C3 time adapter serialized_order; actual worker/control code, RTOS/settings/backend seams",
+    "reconnect_serialized": "PASS C3 time adapter reconnect_serialized; actual worker/control code, RTOS/settings/backend seams",
+    "timezone": "PASS C3 time adapter timezone; actual worker/control code, RTOS/settings/backend seams",
+    "timezone-ws": "PASS C3 timezone WS: actual serializer + shared JSON; one checked snapshot; no reply on timeout/invalid state"
+  },
+  "negative_controls": {
+    "lost_first_ip": {
+      "rejected": true,
+      "case": "early_ip",
+      "expected_assertion": "applies==1&&!s_apply_pending"
+    },
+    "ignored_snapshot_failure": {
+      "rejected": true,
+      "case": "snapshot_failure",
+      "expected_assertion": "time_service_apply()==ESP_ERR_TIMEOUT"
+    },
+    "timezone_sign": {
+      "rejected": true,
+      "case": "timezone",
+      "expected_assertion": "!strcmp(getenv(\"TZ\"),expected)"
+    },
+    "offline_ipc": {
+      "rejected": true,
+      "case": "offline",
+      "expected_assertion": "atomic_load(&backend_ready)"
+    },
+    "unlocked_apply": {
+      "rejected": true,
+      "case": "serialized_order",
+      "expected_assertion": "active==1"
+    },
+    "unlocked_reconnect": {
+      "rejected": true,
+      "case": "reconnect_serialized",
+      "expected_assertion": "active==1"
+    }
+  },
+  "source_files_still_match_snapshot": true
+}

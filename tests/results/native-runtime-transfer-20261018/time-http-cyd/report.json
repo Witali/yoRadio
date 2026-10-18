@@ -1,0 +1,82 @@
+{
+  "passed": true,
+  "scope": "Compile actual CYD time HTTP handlers and settings/NVS transaction code.\n\nHTTPD response/query/session cleanup and service snapshots are explicit seams.\nNo request-body receive seam is provided: these query-only routes must never\nread or let HTTPD purge a supplied body. Host seams do not qualify SDK timing.\n",
+  "physical_hardware": false,
+  "command": [
+    "gcc",
+    "-std=c11",
+    "-O1",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-unused-function",
+    "-Wno-unused-variable",
+    "-pthread",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-fno-pie",
+    "-no-pie",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-web-time-qualified-final",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/native",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/native/cyd_web_time_test.c"
+  ],
+  "source_sha256": {
+    "tests/run-cyd-web-time.py": "ce52850f87807af30e2d4c509f4612cb8f3ac9bd38b121d78adbda5ee3179cbb",
+    "tests/native/cyd_web_time_test.c": "5c008bf657d81e724aebe38bff66f84cb4add988421b7ecdd78c3add61f01dd2",
+    "tests/native/cyd_time_platform.h": "afba83de0bb8dadf3feba10285cfda4008dbdf73c76fb5d0b6ab9f8b16a45ea3",
+    "tests/native/native_time_platform.h": "b46d588b721edf2f74dd4e8acb6c5ebbfe7a5e6d8462b1a3d9dc88eef7a6b792",
+    "idf/components/native_time/include/native_time_sntp.h": "ed01fcafdc43681752e9be43cfbde306b3eadd1d18435323efba96130d5adebd",
+    "idf/esp32-cyd2usb-native/main/time_settings.c": "cfc82a15167e0b6bb0cee4912c5588335ab8e5f1556483cb00c61879d6e2f23c",
+    "idf/esp32-cyd2usb-native/main/time_settings.h": "c9649a330e44d86aaf866534f169a93220b0a4b4bfed6b9aed3763d247de8f12",
+    "idf/esp32-cyd2usb-native/main/time_service.h": "ec288898ac91a6295f1f28b7ee40127e2d984815bad0c3bff71a8c70d6dc0b4a",
+    "idf/esp32-cyd2usb-native/main/web_time.c": "3bd6e650826de8ccdcce884b353ece86f3ede5744aedc8b2277f2986c55c7757",
+    "idf/esp32-cyd2usb-native/main/web_time.h": "589ae0577cfd13f2eac4a72bb7b657f3415704307fe732476c68b6589412b612",
+    "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30"
+  },
+  "cases": {
+    "get": "JSON {\"utc_offset_minutes\":0,\"sync_interval_minutes\":60,\"server1\":\"pool.ntp.org\",\"server2\":\"time.nist.gov\",\"available\":true,\"network_ready\":false,\"clock_valid\":false,\"synchronized_this_boot\":false,\"desired_revision\":1,\"applied_revision\":0,\"last_apply_error\":0,\"utc_epoch\":null,\"local_time\":null,\"last_sync_epoch\":null,\"last_sync_age_ms\":null}\nJSON {\"utc_offset_minutes\":0,\"sync_interval_minutes\":60,\"server1\":\"pool.ntp.org\",\"server2\":\"time.nist.gov\",\"available\":true,\"network_ready\":true,\"clock_valid\":true,\"synchronized_this_boot\":true,\"desired_revision\":1,\"applied_revision\":1,\"last_apply_error\":263,\"utc_epoch\":1704067200,\"local_time\":\"2023-12-31T23:30:00\",\"last_sync_epoch\":1704067100,\"last_sync_age_ms\":1234567890123}\nPASS get: 3 checks",
+    "valid": "JSON {\"saved\":true,\"application_pending\":true}\nPASS valid: 5 checks",
+    "invalid": "PASS invalid: 36 checks",
+    "body": "PASS body: 4 checks",
+    "boundaries": "PASS boundaries: 7 checks",
+    "save_errors": "PASS save_errors: 9 checks",
+    "response_errors": "PASS response_errors: 5 checks"
+  },
+  "positive_checks": 69,
+  "json_responses": 3,
+  "negative_controls": {
+    "accept_duplicate": {
+      "rejected": true,
+      "case": "invalid",
+      "status": 134,
+      "expected_assertion": "!strcmp(status,\"400 Bad Request\")"
+    },
+    "accept_nul": {
+      "rejected": true,
+      "case": "invalid",
+      "status": 134,
+      "expected_assertion": "!strcmp(status,\"400 Bad Request\")"
+    },
+    "skip_persist_error": {
+      "rejected": true,
+      "case": "save_errors",
+      "status": 134,
+      "expected_assertion": "strcmp(status,\"200 OK\")"
+    },
+    "false_clock": {
+      "rejected": true,
+      "case": "get",
+      "status": 134,
+      "expected_assertion": "strstr(response, \"\\\"utc_epoch\\\":null\")"
+    },
+    "sdk_body_purge": {
+      "rejected": true,
+      "case": "body",
+      "status": 134,
+      "expected_assertion": "result == ESP_FAIL && close_calls == 1 && close_header && graceful"
+    }
+  },
+  "source_files_still_match_snapshot": true
+}

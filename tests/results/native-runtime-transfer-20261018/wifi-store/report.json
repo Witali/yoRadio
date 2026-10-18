@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "source_sha256": {
+    "tests/run-native-wifi-store.py": "ae004bc184acc34c7807ab9c9d6f0fc1cabfb7f4c9414d947775ac5e62159090",
+    "tests/native/native_wifi_store_test.c": "2ccf3f5234f975e92b38f0aee86ddfe5f0072c78383ccb57b86d10e84ddc94c6",
+    "idf/components/native_wifi_store/native_wifi_file.c": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf",
+    "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+    "idf/components/native_wifi_store/include/native_wifi_file.h": "bf7e4a8e86383b74d477920b5a8b645afe4fe98e03ad0fd47180f1dd85b764fc",
+    "idf/components/native_wifi_store/include/native_wifi_store.h": "23cc38e00d79465b0342ffb7f6d78f1d9f48df0520e75ea77f7c2573bd3fee65",
+    "idf/components/native_wifi_store/CMakeLists.txt": "d1ebede22a119242f7ce85ac289f099445cd1d09426631f9fa9aa509c2a4e999",
+    "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+    "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b"
+  },
+  "result": "2624 groups passed; 65 private workspaces erased; 320 real-thread edits (8 conflicts)",
+  "semantic_controls": {
+    "keep-wrong-duplicate-ssid": {
+      "rejected": true,
+      "semantic_assertion": "check_live"
+    },
+    "ignore-stale-revision": {
+      "rejected": true,
+      "semantic_assertion": "typed_cases"
+    },
+    "advance-revision-on-publish-failure": {
+      "rejected": true,
+      "semantic_assertion": "fault_cases"
+    },
+    "skip-secret-workspace-erase": {
+      "rejected": true,
+      "semantic_assertion": "__wrap_free"
+    },
+    "secret-in-public-metadata": {
+      "rejected": true,
+      "semantic_assertion": "typed_cases"
+    }
+  },
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "scope": "Actual portable production store/file helpers and file_transaction.c; real Linux temporary files and pthread owner locking; injected stdio/rename/allocation faults. Synthetic credentials only. Does not prove target filesystem power-loss durability, HTTP/UI privacy or target networking."
+}
