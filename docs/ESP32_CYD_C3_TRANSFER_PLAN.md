@@ -2,7 +2,8 @@
 
 Дата: 2026-10-18. Ветка: `codex/esp32-cyd-c3-review`.
 Worktree: `.worktree/esp32-cyd-c3-review`, исходная база `42bc7bd4`.
-Цель: нативный `idf/esp32-cyd2usb-native` для ESP32-2432S028 CYD2USB.
+Цель: общие программные улучшения нативного `idf/esp32-cyd2usb-native`
+для ESP32-2432S028 CYD2USB. Аппаратно-зависимые функции C3 исключены.
 Arduino CYD и `esp32-cyd2usb-minimal` остаются отдельными профилями.
 
 Наиболее полезный перенос начинается с жизненного цикла аудиопотока,
@@ -45,7 +46,7 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
 | CYD-C3-09 | Открыт | Wi-Fi profiles/reconnect/RSSI, power policy, timezone/SNTP и runtime settings. AP/client и поздняя потеря сети. |
 | CYD-C3-10 | Открыт | Общий normalizer, коэффициенты gain на блок, PCM layout, flush/reset ресемплера. Golden PCM и отдельные PDM/continuous/legacy сравнения. |
-| CYD-C3-11 | Открыт | TFT станция/песня/состояние, brightness, clock/blank, touch/BOOT/optional encoder через общий radio control. Проверить GPIO и нагрузку SPI. |
+| CYD-C3-11 | Исключён | Перенос дисплея, рендеринга, физических controls и других аппаратных функций C3 не входит в задачу по уточнению пользователя. |
 | CYD-C3-12 | Открыт | Portable custom FLAC и оптимизации hot loops против Espressif. PCM exactness, 8–24 bit/decorrelation/LPC/Rice, watchdog и физический A/B. |
 | CYD-C3-13 | Открыт | TLS/heap/IRAM/stack политика после измерений CYD. Full-record TLS, раннее освобождение старого codec, сохранение сетевого headroom. |
 | CYD-C3-14 | Открыт | Отдельный аудит Xtensa AAC/Vorbis ABI и только затем compact owners/repair. Archive hashes, layout, OOM и PCM сравнены на ESP32. |
@@ -83,8 +84,6 @@ allocation и численные настройки C3 являются канд
 | Firmware OTA, target/size validation, abort и maintenance | [web_ota.c](../idf/esp32c3-oled-native/main/web_ota.c), [ota_upload.c](../idf/esp32c3-oled-native/main/ota_upload.c) | CYD [partitions.csv](../idf/esp32-cyd2usb-native/partitions.csv), [CMakeLists.txt](../idf/esp32-cyd2usb-native/main/CMakeLists.txt); не менять partition table и bootloader автоматически. |
 | Wi-Fi profiles, RSSI, reconnect и активное/idle power policy | [network_service.c](../idf/esp32c3-oled-native/main/network_service.c) | CYD [network_service.c](../idf/esp32-cyd2usb-native/main/network_service.c). Проверить AP fallback и подключение после поздней потери сети. |
 | Timezone, SNTP retry и clock state | [time_service.c](../idf/esp32c3-oled-native/main/time_service.c) | CYD service task и TFT clock; не зависеть от OLED/deep sleep. |
-| BOOT gestures, rotary encoder, volume и wake | [app_main.c](../idf/esp32c3-oled-native/main/app_main.c), [encoder_input.c](../idf/esp32c3-oled-native/main/encoder_input.c) | CYD [board_config.h](../idf/esp32-cyd2usb-native/main/board_config.h): BOOT GPIO0; touch и encoder выбирать по свободным выводам. |
-| Brightness, clock/blank, scrolling и единый playback snapshot | [oled_display.c](../idf/esp32c3-oled-native/main/oled_display.c), [display_settings.c](../idf/esp32c3-oled-native/main/display_settings.c) | Перенос поведения в TFT [app_main.c](../idf/esp32-cyd2usb-native/main/app_main.c), сохранить [cyd_display.c](../idf/esp32-cyd2usb-native/main/cyd_display.c); OLED layout не переносится. |
 
 ### DSP и декодеры
 
@@ -111,6 +110,10 @@ allocation и численные настройки C3 являются канд
 
 ## Что не включать автоматически
 
+- По уточнению пользователя аппаратно-зависимые функции вообще не входят
+  в перенос: другой дисплей/рендеринг, GPIO, физические controls, native USB,
+  encoder/BOOT drivers, deep sleep/RTC. Общие команды и состояние радио
+  остаются частью программного переноса; железо CYD сохраняется.
 - RISC-V assembler, `aac_late_sbr_bridge.S`, C3 archive patch offsets,
   cycle-counter/cache/RTC TCP memory hooks — отдельные target implementations.
 - Двухлинейный stereo PDM GPIO10/GPIO3, fractional clock/FIR коэффициенты C3,
@@ -152,3 +155,5 @@ allocation и численные настройки C3 являются канд
   `finish_stream_audio`, добавлены текущие RTOS/probe stubs и запуск WSL на
   Windows. ASan/UBSan: PASS для delayed HE-AAC PCM, ordered EOF, error,
   empty stream, stale completion, cancellation и codec drain.
+- Уточнение пользователя: аппаратно-зависимые функции C3 исключены;
+  CYD-C3-11 снят с очереди, драйверы и схема CYD сохраняются.
