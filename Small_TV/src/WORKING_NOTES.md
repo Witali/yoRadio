@@ -7,6 +7,21 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## AP memory comparison — 2026-10-18
 
+Flash audit QEMU сохранён в codex/flash-write-audit, commit0860e568d4.
+Тестированная final RISC-V20B / Xtensa1845: общее NOR ядро исправляет WEL,
+page wrap, erase alignment/protection; C2 GD25Q32 имеет типовые virtual WIP
+timings и byte dummy/QE; C2/C3 cache refresh больше не читает старый backing.
+Все11QTest groups на ESP32/C2/C3, matrix17rows/476checks и modular peripherals
+pass. Подробный scope/raw evidence: QEMU docs/ESP_FLASH_WRITE.md и
+docs/validation/flash-write-validation-20261018.json.
+
+Важное оставшееся ограничение CYD: короткие25hostseconds не доказывают завершение
+boot. Длинный60s candidate и same-toolchain pre-change NOR control оба достигают
+assert esp_phy_enable phy_init.c:332; после reboot есть и cache errors. Полную
+CYD compatibility не принимать. Этот дефект воспроизведён с исходным NOR blob,
+его не скрывать успешными flash unit/module и C3 OLED checks. Старый installed
+Xtensa control дополнительно отказывает на QIE. Все UART/failed reports сохранены.
+
 Raw persistence observer исправлен отдельно: erased/partial field не вызывает
 ASCII exception, но остаётся pending до bounded timeout. Native проверяет ELF
 dirty flag до и после чтения raw key, чтобы холодный stop не прервал запись после

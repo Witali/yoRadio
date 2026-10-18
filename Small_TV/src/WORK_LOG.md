@@ -2810,3 +2810,16 @@ true. Это только начало нового прогона, не 24 ча
   Wi-Fi16factory/21native checks и station isolation. Разделение бинарников и
   ограничения evidence сохранены в flash-persistence-observer-validation-20261018.json
   с2rawgzip. Эти результаты не заменяют полный прогон или H10 текущего BC68.
+
+### 2026-10-18 — итог flash audit и ограничение CYD
+
+- QEMU0860e568d4, final binaries20B/1845:11NOR groups на3SoC,17rows/476checks
+  старой read-mode/capacity matrix и modular peripherals pass. Тот же final
+  harness на прежних бинарниках даёт24failures/2errors (отсутствующая timing
+  property). Исходники, положительные/отрицательные reports и scope сохранены
+  в QEMU docs/validation/flash-write-validation-20261018.json +15gzip.
+- Short CYD25s сначала pass, однако более длинные60s выявили esp_phy_enable
+  assertion phy_init.c:332. Сопоставимый same-toolchain control со старым NOR
+  blob воспроизводит тот же assertion. Старый installed control падает на QIE.
+  Это не полная CYD acceptance; console pixels/no-panic25s недостаточны.
+  C3 OLED и modular OLED checks pass. Firmware archives не менялись.
