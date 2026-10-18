@@ -7,6 +7,12 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## AP memory comparison — 2026-10-18
 
+За время flash audit завершился старый frozen full app6324/source53D3/B44:
+terminal_passed в12:10:15UTC,19groups pass, hardware/browser/soak not_run.
+Все273inputs повторно совпали; proof apsta-full-completed-20261018.json +4gzip.
+Это исторический результат, не full acceptance26C6/BC68/нового flash QEMU.
+Суточный26C6/B44 H10 остаётся pending: file-only diagnostic не открывал RSP/QMP.
+
 Flash audit QEMU сохранён в codex/flash-write-audit, commit0860e568d4.
 Тестированная final RISC-V20B / Xtensa1845: общее NOR ядро исправляет WEL,
 page wrap, erase alignment/protection; C2 GD25Q32 имеет типовые virtual WIP

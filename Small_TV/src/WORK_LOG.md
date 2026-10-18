@@ -2823,3 +2823,13 @@ true. Это только начало нового прогона, не 24 ча
   blob воспроизводит тот же assertion. Старый installed control падает на QIE.
   Это не полная CYD acceptance; console pixels/no-panic25s недостаточны.
   C3 OLED и modular OLED checks pass. Firmware archives не менялись.
+
+### 2026-10-18 — завершился исторический frozen full6324
+
+- Старый full app6324/source53D3/B44 terminal_passed12:10:15UTC:19passed groups,
+  hardware_browser_soak not_run. Все273frozen inputs повторно проверены; proof
+  apsta-full-completed-20261018.json +4rawgzip. Успех не перенесён на26C6/BC68
+  или новый flash QEMU; новые gates в этот старый прогон задним числом не входят.
+- H10 app26C6/B44 не прерывался, file-only diagnostic status pending,
+  h10_checks_passed=false. Чужие/длительные ВМ не останавливались; одноразовые
+  ВМ flash audit завершены. Полного acceptance для текущего appBC68 ещё нет.
