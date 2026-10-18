@@ -55,6 +55,13 @@ function Replace-Once {
 }
 
 $script = Read-GzipText $scriptPath
+if($script.Contains("BEGIN NATIVE WIFI EDITOR")) {
+    if(-not $script.Contains("SSID_WARNING_TEXT")) {
+        throw "Native Wi-Fi editor requires its maintained whitespace warning; rebuild with tools/update_native_wifi_web_assets.py"
+    }
+    Write-Host "Native Wi-Fi editor already preserves the whitespace warning; legacy replacement templates were not applied"
+    return
+}
 if(-not $script.Contains("SSID_WARNING_TEXT")) {
     $script = Replace-Once $script @'
 function submitWiFi(){
