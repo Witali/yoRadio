@@ -193,6 +193,7 @@ static atomic_uint s_flac_input_ready_generation;
 static atomic_uint s_aac_input_ready_generation;
 #endif
 static portMUX_TYPE s_generation_lock = portMUX_INITIALIZER_UNLOCKED;
+static SemaphoreHandle_t s_control_lock;
 static char s_last_url[sizeof(((play_command_t *)0)->url)];
 static native_codec_t s_last_codec;
 // Decoder callbacks run only in decoder_task. These fields rate-limit VBR
@@ -2021,6 +2022,7 @@ esp_err_t audio_service_start(native_state_t *state) {
     s_last_codec = NATIVE_CODEC_AUTO;
     size_t encoded_ring_size =
         (size_t)runtime_settings_get_audio_buffer_blocks() * 1600U;
+    s_control_lock = xSemaphoreCreateMutex();
     s_commands = xQueueCreate(1, sizeof(play_command_t));
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
     s_encoded = adaptive_input_create(encoded_ring_size,
@@ -2031,7 +2033,7 @@ esp_err_t audio_service_start(native_state_t *state) {
     s_encoded = xRingbufferCreate(encoded_ring_size, RINGBUF_TYPE_NOSPLIT);
 #endif
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
-    if (!s_commands || !s_encoded || !s_pcm) {
+    if (!s_control_lock || !s_commands || !s_encoded || !s_pcm) {
         return ESP_ERR_NO_MEM;
     }
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
@@ -2075,10 +2077,9 @@ esp_err_t audio_service_start(native_state_t *state) {
     return ESP_OK;
 }
 
-esp_err_t audio_service_play(const char *url, native_codec_t codec) {
-    if (!url || !url[0] || strlen(url) >= sizeof(((play_command_t *)0)->url)) {
-        return ESP_ERR_INVALID_ARG;
-    }
+// The complete control transaction, including queue publication, is serialized.
+// The generation spinlock alone cannot order calls that block on state/NVS.
+static esp_err_t play_locked(const char *url, native_codec_t codec) {
     // Power-save changes are best effort: a transient Wi-Fi driver error must
     // not reject an otherwise valid Play command.
     network_service_set_streaming(true);
@@ -2101,6 +2102,16 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     return ESP_FAIL;
 }
 
+esp_err_t audio_service_play(const char *url, native_codec_t codec) {
+    if (!url || !url[0] || strlen(url) >= sizeof(((play_command_t *)0)->url))
+        return ESP_ERR_INVALID_ARG;
+    if (!s_control_lock || !s_commands) return ESP_ERR_INVALID_STATE;
+    xSemaphoreTake(s_control_lock, portMAX_DELAY);
+    esp_err_t result = play_locked(url, codec);
+    xSemaphoreGive(s_control_lock);
+    return result;
+}
+
 #ifdef YORADIO_CODEC_BENCHMARK
 static esp_err_t audio_service_play_fixture(size_t size,
                                             native_codec_t codec) {
@@ -2111,6 +2122,8 @@ static esp_err_t audio_service_play_fixture(size_t size,
         size > partition->size - sizeof(codec_fixture_header_t)) {
         return ESP_ERR_INVALID_ARG;
     }
+    if (!s_control_lock || !s_commands) return ESP_ERR_INVALID_STATE;
+    xSemaphoreTake(s_control_lock, portMAX_DELAY);
     play_command_t command = {
         .generation = advance_generation(codec),
         .requested_codec = codec,
@@ -2120,8 +2133,9 @@ static esp_err_t audio_service_play_fixture(size_t size,
     s_last_codec = NATIVE_CODEC_AUTO;
     atomic_store(&s_measured_bitrate_ready, false);
     native_state_set_station(s_state, "flash:codec_test benchmark");
-    return xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK
-                                                            : ESP_FAIL;
+    esp_err_t result = xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK : ESP_FAIL;
+    xSemaphoreGive(s_control_lock);
+    return result;
 }
 
 static esp_err_t benchmark_autostart(void) {
@@ -2150,22 +2164,31 @@ static esp_err_t benchmark_autostart(void) {
 #endif
 
 esp_err_t audio_service_resume(void) {
-    if (!s_last_url[0]) return ESP_ERR_INVALID_STATE;
+    if (!s_control_lock || !s_commands) return ESP_ERR_INVALID_STATE;
+    xSemaphoreTake(s_control_lock, portMAX_DELAY);
+    if (!s_last_url[0]) {
+        xSemaphoreGive(s_control_lock);
+        return ESP_ERR_INVALID_STATE;
+    }
     char url[sizeof(s_last_url)];
     native_state_t state;
     native_state_snapshot(s_state, &state);
     strlcpy(url, s_last_url, sizeof(url));
-    esp_err_t result = audio_service_play(url, s_last_codec);
+    esp_err_t result = play_locked(url, s_last_codec);
     if (result == ESP_OK) native_state_set_station(s_state, state.station);
+    xSemaphoreGive(s_control_lock);
     return result;
 }
 
 void audio_service_stop(void) {
+    if (!s_control_lock) return;
+    xSemaphoreTake(s_control_lock, portMAX_DELAY);
     uint32_t generation = advance_generation(NATIVE_CODEC_AUTO);
     network_service_set_streaming(false);
     // advance_generation clears the title under the state mutex. A separate
     // unguarded clear here could erase metadata from a concurrent newer Play.
     state_set_audio(generation, false, "stopped");
+    xSemaphoreGive(s_control_lock);
 }
 
 uint8_t audio_service_buffer_fill_percent(void) {

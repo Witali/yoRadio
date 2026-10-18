@@ -217,3 +217,11 @@ allocation и численные настройки C3 являются канд
   MP3/AAC/MP3 переходы, 60000 concurrent queue packets и 20000 random staging
   operations проходят с ASan/UBSan. Lifecycle теперь проверяет шесть
   комбинаций queue/codec API и отдельный drain без промежуточного PCM flush.
+- Дополнительный аудит исходного C3 воспроизвёл потерю нового Play: один
+  caller повышал generation и блокировался на state mutex, второй публиковал
+  новую команду, затем первый перезаписывал очередь старой. Полный transaction
+  Play/Stop/Resume и benchmark fixture теперь сериализуется control mutex.
+  [Регрессионный тест](../tests/run-c3-command-concurrency.py) сначала упал
+  на старом коде, затем прошёл: принудительное вытеснение, 2000 конкурентных
+  команд, invalid arguments, queue failure и Resume recovery.
+  [Отчёты](../tests/results/c3-command-concurrency-20261018/README.md).

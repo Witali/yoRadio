@@ -948,7 +948,8 @@ test("native C3 disables modem sleep only while audio is active", () => {
   const audio = read("main", "audio_service.c");
 
   assert.match(network, /active \? WIFI_PS_NONE : WIFI_PS_MIN_MODEM/);
-  assert.match(audio, /audio_service_play[\s\S]*network_service_set_streaming\(true\)/);
+  assert.match(audio, /play_locked[\s\S]*network_service_set_streaming\(true\)/);
+  assert.match(audio, /audio_service_play[\s\S]*xSemaphoreTake\(s_control_lock, portMAX_DELAY\)[\s\S]*play_locked\(url, codec\)/);
   assert.match(audio, /audio_service_stop[\s\S]*network_service_set_streaming\(false\)/);
   assert.match(
     audio,
@@ -1005,7 +1006,7 @@ test("native WebUI publishes player changes promptly and uses buffer percent", (
 
   assert.match(
     audio,
-    /audio_service_play[\s\S]*state_set_audio\(command\.generation, false, "connecting"\)/,
+    /play_locked[\s\S]*state_set_audio\(command\.generation, false, "connecting"\)/,
   );
   assert.match(audio, /open_stream[\s\S]*state_set_audio\(command\.generation, true, "connected"\)/);
   assert.match(audio, /state_set_audio\(generation, true, codec_name\(\*codec\)\)/);
