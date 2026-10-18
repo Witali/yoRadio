@@ -2849,3 +2849,11 @@ true. Это только начало нового прогона, не 24 ча
 - Новый H10 BC68/20B запущен12:30:54UTC: supervisor23548/workload5036/
  guard22392/VM18128. CIM подтверждает все4идентичности и отсутствие4oldPID.
  Start record хранит31runtime и11frozenQEMU inputs; это start/pending, не H10 pass.
+
+### 2026-10-18 — совместимость start record с file-only analyzer
+
+- Первая проверка нового start record получила evidence_rejected: отсутствовал
+  top-level guard metadata, хотя его исходный SHA уже был в supervisor snapshot.
+  Добавлены guard/source_file+source_sha256 и canonical duration field86400.
+  Формат исходного ee896b31 сохранён в Git; добавлена явная reconciliation note.
+  Ни workload, ни его31runtime/11QEMU inputs не менялись и не перезапускались.
