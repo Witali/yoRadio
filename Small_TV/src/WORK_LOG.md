@@ -2666,3 +2666,14 @@ true. Это только начало нового прогона, не 24 ча
 - Scoped evidence сохранён в apsta-validation-20261018.json и семи raw gzip;
   exact build bytes и Git blob hashes QEMU записаны отдельно из-за Windows EOL.
   Это не полный regression, не DEBUG-off приёмка и не суточный результат.
+
+- 10:41:21 UTC: полный host/machine/QEMU regression начат на app6324 / ELF9E2C /
+  QEMU B44 из aab05d5de6. Controller PID2448 запущен проверенным detached helper;
+  реальное kernel job membership=false. В 10:42 UTC его creation/command совпали.
+  121 test + 152 дополнительных файла заморожены и после старта совпали (273).
+  Набор идёт без Skip; суточной/общей приёмки этим стартом не объявлять.
+- Для изолированной рабочей копии создан ignored SDK junction .idf на основной
+  SDK и скопированы oracle dependencies. При очистке не обходить junction.
+- В 10:42 UTC повторно совпали четыре личности H10 и 31 input hash. Префикс
+  103 цикла / 1737.66437 гостевой секунды, 832 HTTP и одно отключение внешнего AP.
+  H10 использует frozen A74, а новый full regression — B44; области не смешивать.

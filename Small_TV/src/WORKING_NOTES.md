@@ -5,6 +5,23 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
+## Полный APSTA regression запущен — 2026-10-18 10:41 UTC
+
+В `.build/small-tv-functional/apsta-integrated-full-20261018` идёт полный
+host/machine/QEMU набор без Skip. Изолированный controller PID 2448 создан
+10:41:21.7725480Z, вне Windows Job; после завершения launcher его PID/creation/
+command повторно совпали. Заморожены 121 test file и 152 extra inputs (273),
+после старта все хеши проверены. App6324/ELF9E2C/QEMU B44; source QEMU aab05d5de6,
+yoRadio355cf73e. Контроллер пишет controller.log и controller-exit.json; ждать
+именно этот процесс/его terminal record, не запускать новый из-за тишины stdout.
+Входы до terminal не менять. Start checkpoint — apsta-integrated-full-start-20261018.json.
+
+SDK доступен через ignored `.idf` junction на основной SDK: при будущей очистке
+удалять только запись junction, не обходить и не удалять его целевой каталог.
+Длительный H10 отдельно работает на frozen A74: проверены четыре личности и
+31 вход; префикс 103 цикла / 1737.66437 guest s, 832 HTTP / 1 outage. Суточной
+приёмки нет; этот префикс не подтверждает новую модель QEMU B44.
+
 ## APSTA investigation — 2026-10-18
 
 Раннее восстановление внешнего AP воспроизводимо блокирует factory setup HTTP
