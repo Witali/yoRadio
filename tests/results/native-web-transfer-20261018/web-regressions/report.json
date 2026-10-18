@@ -1,0 +1,42 @@
+{
+  "baseline_commit": "533ce63328fc06d1a91c0369679cc9a559ba891d",
+  "negative_controls": {
+    "negative-wifi-loss": "DETECTED",
+    "negative-wifi-row": "DETECTED",
+    "negative-asset-loss": "DETECTED",
+    "negative-stream-reread": "DETECTED",
+    "negative-small-name": "DETECTED host FORTIFY overflow"
+  },
+  "current": {
+    "storage": "PASS",
+    "static": "PASS",
+    "name-1": "PASS",
+    "name-8": "PASS",
+    "name-9": "PASS",
+    "name-12": "PASS",
+    "name-13": "PASS",
+    "name-32": "PASS",
+    "name-256": "PASS"
+  },
+  "physical_flash_tested": false,
+  "source_sha256": {
+    "tests/run-web-warning-regressions.py": "5e77db93a57cd0a4d2e70390e3dba02ee32f585da75b169b4bfa51c25a61ec5d",
+    "tests/run-esp32c3-web-memory.py": "959ad085c214102a94857e9d486757debb592497814cc0aa6dcd2b1c1827f304",
+    "tests/native/web_warning_storage_test.c": "56ab13ac62d0841aa14ff2c9a2effda65656b6fc68cda392b6b5bd858aea79c2",
+    "tests/native/web_warning_static_test.c": "6c1ed821a04024c6d019838f1c290985da8d0d13f29ffce405843c998861230d",
+    "tests/native/web_warning_names_test.c": "200d9bb58606216035ac8d5e5eb56838796e8f82e3e47ac6d91b416b6571df47",
+    "idf/esp32c3-oled-native/main/network_service.c": "99457517acc0adfc51ec16315c7b56d01b9b2a9580669c1740594de71928dd0e",
+    "idf/esp32c3-oled-native/main/web_upload.c": "93f8c69f12fd14b3a7e33a9d28fd2fc4d8a552f3be295fd7251163dda6a876ba",
+    "idf/esp32c3-oled-native/main/web_service.c": "e37799e8aed2883163ec18097ad29592430dc12c80706bf76ffcda09690a281c",
+    "idf/esp32c3-oled-native/main/web_file_form.h": "27c07d668725aa7f78b2435fb60f9139e7f51bb0a748258c75d149b84dbdfd58",
+    "idf/esp32c3-oled-native/main/web_upload.h": "00a9d16e304d9b1097008f3200e9bfe888181afb87a5a06a1ef62bc60a9ea1ba",
+    "idf/esp32c3-oled-native/main/web_multipart.h": "b6f8e751df4eb87260dc2ff651013040e372b5beaa73b806fc9016c51575f4de",
+    "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+    "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b",
+    "idf/components/native_storage/include/credential_line.h": "4d09bb3fc82c7125b82f6940778757a1aaebe4cf76dd8b9a6aff9641b7863fa2",
+    "idf/components/native_storage/include/web_file_form.h": "7a153796492ac086eb1fe4a34b0f8fb2d7a98b346198b1e71fa8dedb5d634153",
+    "idf/components/native_storage/include/web_multipart.h": "d2a752067abf02f60ceb5c26b283503125b8e98f049ba615925704064470000c"
+  },
+  "passed": true,
+  "scope": "Actual production functions and actual shared file transaction; mapped host filesystem with SPIFFS no-overwrite rename/error seams, pthread serialization, stdio EOF/error seams. No claim of multi-file CSV/index atomicity or physical flash durability."
+}

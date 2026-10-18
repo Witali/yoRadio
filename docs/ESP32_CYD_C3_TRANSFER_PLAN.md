@@ -67,9 +67,9 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-04 | Программная часть выполнена | Общая SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 и независимый control node подключены. Default-off bounded prefill проверен host-тестами и GCC/clang-tidy профилем 250 ms; image source `112c871f` сохранён. Физическая приёмка и выбор ёмкости/TLS reclaim — отдельно, этап 13. |
 | CYD-C3-05 | В работе | SMP-safe health подключён к pipeline и `/api/native/health`: heap/internal/DMA, input occupancy, ошибки, optional CPU/stack по двум ядрам. Host core/HTTP/lifecycle, SDK quiet/diagnostic и полный lint проходят; images `b7362172` сохранены. Backend DMA telemetry и физические измерения отдельно. |
 | CYD-C3-06 | В работе | Общий radio controller, index recovery, last station/SmartStart, Next/Prev/Toggle и HTTP API подключены к CYD. Pending-state, boot/NVS failure, stale cache и concurrency проверены. Возобновлённый format/bitrate и audio settings [программно квалифицированы](../tests/results/cyd-c3-format-dsp-20261018/README.md): 51 stream/80 settings запросов, обе startup/format цели, SDK и полный lint проходят. Дальнейшие WebUI/runtime settings относятся к этапам 07/09; физическая приёмка отдельно. |
-| CYD-C3-07 | В работе | [Host-квалификация](../tests/results/cyd-startup-pcm-web-20261018/HOST.md): WebSocket snapshots/events, native embedded UI/capabilities и два async static workers реализованы; 38 WS-групп, HTTP rollback и 5 UI-сценариев проходят. [Три SDK images](../tests/results/native-warning-fixes-20261018/SDK.md) сохранены. Bounded uploads/rollback файлов и физические две вкладки/медленный клиент остаются. |
-| CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
-| CYD-C3-09 | Открыт | Wi-Fi profiles/reconnect/RSSI, power policy, timezone/SNTP и runtime settings. AP/client и поздняя потеря сети. |
+| CYD-C3-07 | В работе | Native UI, snapshots/events, два async static workers, bounded multipart uploads, восстановление файлов, публикация CSV/index парой и Wi-Fi save/reboot реализованы. [Новые host-проверки](../tests/results/native-web-transfer-20261018/HOST.md), [матрица RFC 6455](WEBSOCKET_RFC6455_AUDIT.md) и [TLS/WSS](WEBSOCKET_TLS_PLAN.md): фрагменты, UTF-8, control/Close и строгий HTTPD overlay проверены на обеих версиях SDK; полный host TCP pipeline — по164 сценария, combined WSS — по14. Финальные SDK images и физические две вкладки/медленный клиент остаются gates. |
+| CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. [Проект реализации и входы кода](CYD_OTA_TRANSFER_DESIGN.md): подтверждение остановки трёх audio owners до flash, target/slot/backend совместимость, оборванная/медленная загрузка, NVS/SPIFFS. Автоматический rollback требует отдельного bootloader baseline. |
+| CYD-C3-09 | Открыт | Wi-Fi save для следующего boot перенесён и проверен; runtime profiles/reconnect/RSSI, power policy, timezone/SNTP и settings ещё предстоят. Вместе перенести приватный обмен Wi-Fi credentials и заменить публичное чтение `/data/wifi.csv`, сохранив UI/export/test compatibility. AP/client и поздняя потеря сети требуют отдельных проверок. |
 | CYD-C3-10 | В работе | Gain рассчитывается один раз на packet; [общий normalizer](../tests/results/cyd-normalizer-20261018/README.md) подключён ко всем трём backend через owner-only DSP без изменения input PCM. [Итоговая квалификация](../tests/results/cyd-c3-format-dsp-20261018/README.md): HTTP controls, golden PCM, reset/layout/EOF и полный lint проходят. [PCM 8/16/24/32 и resampler](../tests/results/cyd-startup-pcm-web-20261018/HOST.md) квалифицированы: до 1359 сценариев/backend, исправлены PDM rate-tail и DAC priming/short writes. [Новые SDK images](../tests/results/native-warning-fixes-20261018/SDK.md) сохранены; PDM DSP/layout symbols — 555 B DRAM, soft-limit LUT — 1170 B flash (без linker padding). Физическая приёмка остаётся. |
 | CYD-C3-11 | Исключён | Перенос дисплея, рендеринга, физических controls и других аппаратных функций C3 не входит в задачу по уточнению пользователя. |
 | CYD-C3-12 | Открыт | Portable custom FLAC и оптимизации hot loops против Espressif. PCM exactness, 8–24 bit/decorrelation/LPC/Rice, watchdog и физический A/B. |
@@ -106,8 +106,8 @@ allocation и численные настройки C3 являются канд
 | Станции, playlist offset index, выбор/Next/Prev, последнее состояние | [radio_control.c](../idf/esp32c3-oled-native/main/radio_control.c) | Новый общий radio core поверх CYD [audio_service.h](../idf/esp32-cyd2usb-native/main/audio_service.h); без загрузки всего CSV в RAM. |
 | Runtime settings и capabilities | [runtime_settings.c](../idf/esp32c3-oled-native/main/runtime_settings.c), [display_settings.c](../idf/esp32c3-oled-native/main/display_settings.c) | CYD [native_state.h](../idf/esp32-cyd2usb-native/main/native_state.h), [web_service.c](../idf/esp32-cyd2usb-native/main/web_service.c). Скрыть ещё не реализованные SD/EQ/touch поля. |
 | `/ws`, initial snapshot, heartbeat, event-driven status, metadata/bitrate/buffer | [websocket_service.c](../idf/esp32c3-oled-native/main/websocket_service.c) | CYD `web_service_start`, общий snapshot и bounded JSON escaping. Совместимость `/api/native/*` сохранить. |
-| Dynamic pages, recovery page и Arduino-free templates | [web_service.c](../idf/esp32c3-oled-native/main/web_service.c), [web_pages_bridge.cpp](../idf/esp32c3-oled-native/main/web_pages_bridge.cpp) | CYD сейчас только отдаёт SPIFFS assets; общие HTML сами по себе не реализуют API. |
-| Async static workers, gzip и socket budget | [web_service.c](../idf/esp32c3-oled-native/main/web_service.c), [проверки](../tests/esp32c3-web-static-workers.test.js) | CYD synchronous `static_handler`, сейчас 4 sockets; пересчитать бюджет вместе с WS/OTA. |
+| Dynamic pages, recovery page и Arduino-free templates | [web_service.c](../idf/esp32c3-oled-native/main/web_service.c), [web_pages_bridge.cpp](../idf/esp32c3-oled-native/main/web_pages_bridge.cpp) | CYD [embedded native page](../idf/esp32-cyd2usb-native/main/web_pages.cpp) обслуживает также `/webboard` и `/emergency`; controls/forms включаются по capabilities. |
+| Async static workers, gzip и socket budget | [web_service.c](../idf/esp32c3-oled-native/main/web_service.c), [проверки](../tests/esp32c3-web-static-workers.test.js) | CYD [web_static.c](../idf/esp32-cyd2usb-native/main/web_static.c): два workers и два queued requests. Пять HTTP clients, два WS; для HTTPS выбран отдельный бюджет три clients в одной server instance. Реальная RAM/latency ещё измеряется. |
 | Streaming multipart uploads, temp/backup, playlist index rollback | [web_upload.c](../idf/esp32c3-oled-native/main/web_upload.c), [web_file_form.h](../idf/esp32c3-oled-native/main/web_file_form.h), [web_multipart.h](../idf/esp32c3-oled-native/main/web_multipart.h) | CYD новые upload routes; ограничить RAM размером chunk, сохранить Wi-Fi/CSV/assets при ошибке. |
 | Firmware OTA, target/size validation, abort и maintenance | [web_ota.c](../idf/esp32c3-oled-native/main/web_ota.c), [ota_upload.c](../idf/esp32c3-oled-native/main/ota_upload.c) | CYD [partitions.csv](../idf/esp32-cyd2usb-native/partitions.csv), [CMakeLists.txt](../idf/esp32-cyd2usb-native/main/CMakeLists.txt); не менять partition table и bootloader автоматически. |
 | Wi-Fi profiles, RSSI, reconnect и активное/idle power policy | [network_service.c](../idf/esp32c3-oled-native/main/network_service.c) | CYD [network_service.c](../idf/esp32-cyd2usb-native/main/network_service.c). Проверить AP fallback и подключение после поздней потери сети. |
@@ -170,6 +170,44 @@ allocation и численные настройки C3 являются канд
    Host pass и build pass не отмечают этот пункт как выполненный.
 
 ## Журнал выполнения
+
+- Дополнительный аудит донора C3: wildcard `/data/*` в
+  [static_handler](../idf/esp32c3-oled-native/main/web_service.c) через
+  [recoverable open](../idf/esp32c3-oled-native/main/web_upload.c) выдаёт также
+  Wi-Fi CSV, `.bak` и временные имена. Текущий UI намеренно загружает этот файл:
+  [script.js.gz](../yoRadio/data/www/script.js.gz), `handleWiFiData/getWiFi`
+  (decompressed lines 583/595), settings/AP/export (760/801/840);
+  [OTA snapshot](../tools/esp32c3_tests/ota.py) и
+  [web-memory restore](../tools/esp32c3_tests/web_memory.py) тоже зависят от него.
+  Этап 09 должен менять контракт целиком: SSID-only metadata, write-only password
+  с явным «не изменять», отдельный приватный export/backup, затем allowlist
+  публичных playlist paths и тесты литеральных/backup/temp путей. Простое удаление
+  маршрута сейчас ломает эти потребители. TLS credentials хранятся в отдельном
+  NVS namespace и никогда не размещаются в SPIFFS.
+
+- Новый перенос WebUI проверяется по [зафиксированным исходникам и отчётам](../tests/results/native-web-transfer-20261018/HOST.md).
+  Общий message core поддерживает фрагменты и interleaved controls, строгий
+  HTTPD overlay проверяет обязательные заголовки/длины/маски и исправляет
+  folded headers, пустой Content-Length и отложенное закрытие повторно
+  использованной session. Общий transport через публичный ESP-TLS API проверен
+  реальными закреплёнными TLS библиотеками и независимым CA/SAN validating client:
+  по8 TLS сценариев и по14 combined HTTPD/application/WSS сценариев на SDK.
+  Обычный GET `/ws` получает HTTP400 до создания WS context. Это пока не отметка
+  полного соответствия: финальные images и аппаратные ресурсы ещё проверяются.
+  Допустимые ограничения документируются по RFC: полное text message до
+  96 байт на CYD и 255 на C3, сборка до пяти секунд; расширения и subprotocol
+  не согласовываются, binary radio commands закрываются с 1003.
+
+- Дополнение пользователя: WebSocket должен поддерживать базовый RFC 6455
+  полностью в части обязательных требований. Опциональные расширения допускается
+  не реализовывать; лимиты памяти/размера/времени должны соответствовать разрешениям
+  RFC. Этап 07 не считается завершённым по одному happy-path WebUI: нужны handshake,
+  framing/masking/lengths, UTF-8, фрагменты и control interleaving, Close и проверка
+  некорректных последовательностей на обеих версиях SDK. Найден реальный пробел
+  прежнего harness: SDK пропускает URI handler при upgrade, так что transport
+  overrides могли установиться только после первого кадра/periodic work. Новая
+  регрессия воспроизводит отсутствие callback на `d13706c2`; текущий host checkpoint
+  проходит 41 группу, но полная протокольная квалификация ещё впереди.
 
 - [SDK-квалификация startup/WebUI/PCM и warning fixes](../tests/results/native-warning-fixes-20261018/SDK.md)
   завершена из чистого `3b8e5d2f`: CYD PDM/continuous/legacy и C3 production

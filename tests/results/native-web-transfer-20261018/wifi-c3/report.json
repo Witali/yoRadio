@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "baseline_commit": "56af3052e8aeaa2416b0bd2836f4ae30971be9bc",
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-c3-wifi-persistence.py": "155331318855e334b1182934129ca86091796c6b15f335d4c84b2d2499cc6254",
+    "tests/native/c3_wifi_persistence_test.c": "a01a4d1a0f6be8346c1a3e286a47881bea56c64d447e5889adb831293d96e8b8",
+    "tests/run-web-warning-regressions.py": "5e77db93a57cd0a4d2e70390e3dba02ee32f585da75b169b4bfa51c25a61ec5d",
+    "idf/esp32c3-oled-native/main/network_service.c": "99457517acc0adfc51ec16315c7b56d01b9b2a9580669c1740594de71928dd0e",
+    "idf/esp32c3-oled-native/main/network_service.h": "d92d75642bf95ad2af43150a852afb75661f106e53b2eb23acfa04a920e97622",
+    "idf/esp32c3-oled-native/main/web_upload.c": "93f8c69f12fd14b3a7e33a9d28fd2fc4d8a552f3be295fd7251163dda6a876ba",
+    "idf/esp32c3-oled-native/main/web_upload.h": "00a9d16e304d9b1097008f3200e9bfe888181afb87a5a06a1ef62bc60a9ea1ba",
+    "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+    "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b",
+    "idf/components/native_storage/include/credential_line.h": "4d09bb3fc82c7125b82f6940778757a1aaebe4cf76dd8b9a6aff9641b7863fa2"
+  },
+  "results": {
+    "negative-interior-cr": "DETECTED",
+    "negative-postcommit-reload": "DETECTED",
+    "current": {
+      "passed": true,
+      "scenarios": 41
+    }
+  },
+  "physical_hardware": false,
+  "scope": "Actual C3 five-profile validator/save/boot-reader and actual storage/transaction functions over mapped stdio with SPIFFS no-overwrite rename, injected precommit IO/rollback and postcommit fopen OOM/read error. Historical actual source detects interior-CR acceptance and destructive postcommit reload. No network/event concurrency or physical flash durability claim."
+}

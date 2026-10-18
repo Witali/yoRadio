@@ -1,0 +1,86 @@
+{
+  "cyd": {
+    "baseline": "tests/results/native-lint-20261018/cyd-warning-fixes/report.json",
+    "baseline_units": 24,
+    "baseline_warnings": 8,
+    "own_units": 27,
+    "own_warnings": 21,
+    "overlay_units": 2,
+    "overlay_warnings": 21,
+    "new_own": [
+      {
+        "file": "idf/components/native_web_transport/native_web_transport.c",
+        "check": "bugprone-suspicious-string-compare",
+        "message": "function 'memcmp' is called without explicitly comparing result",
+        "count": 1
+      },
+      {
+        "file": "idf/components/native_storage/include/web_file_form.h",
+        "check": "bugprone-suspicious-string-compare",
+        "message": "function 'strcmp' is called without explicitly comparing result",
+        "count": 3
+      },
+      {
+        "file": "idf/components/native_storage/include/web_multipart.h",
+        "check": "bugprone-suspicious-string-compare",
+        "message": "function 'memcmp' is called without explicitly comparing result",
+        "count": 3
+      },
+      {
+        "file": "idf/components/native_storage/include/web_multipart.h",
+        "check": "bugprone-inc-dec-in-conditions",
+        "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+        "count": 5
+      },
+      {
+        "file": "idf/esp32-cyd2usb-native/main/web_upload.c",
+        "check": "bugprone-suspicious-string-compare",
+        "message": "function 'strcmp' is called without explicitly comparing result",
+        "count": 1
+      }
+    ],
+    "removed_own": 0
+  },
+  "c3": {
+    "baseline": "tests/results/native-lint-20261018/c3-warning-fixes-final/report.json",
+    "baseline_units": 50,
+    "baseline_warnings": 77,
+    "own_units": 51,
+    "own_warnings": 93,
+    "overlay_units": 2,
+    "overlay_warnings": 20,
+    "new_own": [
+      {
+        "file": "idf/components/native_web_transport/native_web_transport.c",
+        "check": "bugprone-suspicious-string-compare",
+        "message": "function 'memcmp' is called without explicitly comparing result",
+        "count": 1
+      },
+      {
+        "file": "idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+        "check": "bugprone-suspicious-string-compare",
+        "message": "function 'memcmp' is called without explicitly comparing result",
+        "count": 9
+      },
+      {
+        "file": "idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+        "check": "bugprone-inc-dec-in-conditions",
+        "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+        "count": 15
+      },
+      {
+        "file": "idf/esp32c3-oled-native/main/../../components/native_storage/include/web_file_form.h",
+        "check": "bugprone-suspicious-string-compare",
+        "message": "function 'strcmp' is called without explicitly comparing result",
+        "count": 3
+      },
+      {
+        "file": "idf/esp32c3-oled-native/main/web_upload.c",
+        "check": "bugprone-suspicious-string-compare",
+        "message": "function 'strcmp' is called without explicitly comparing result",
+        "count": 1
+      }
+    ],
+    "removed_own": 13
+  }
+}

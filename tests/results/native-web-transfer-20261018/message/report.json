@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "negative_controls": {
+    "mutant-unchecked-utf8": {
+      "expected_failure": true,
+      "exit_code": 6
+    },
+    "mutant-orphan-continuation": {
+      "expected_failure": true,
+      "exit_code": 6
+    },
+    "mutant-unchecked-close-code": {
+      "expected_failure": true,
+      "exit_code": 6
+    },
+    "mutant-renewed-message-deadline": {
+      "expected_failure": true,
+      "exit_code": 6
+    }
+  },
+  "counts": {
+    "passed": true,
+    "unicode_scalars": 1112064,
+    "scalar_splits": 5494656,
+    "utf8_oracles": 296608,
+    "protocol_cases": 1307,
+    "close_codes": 65536,
+    "limit_cases": 38404,
+    "timeout_cases": 27,
+    "state_bytes": 48
+  },
+  "source_sha256": {
+    "idf/components/native_stream/include/websocket_message.h": "02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+    "tests/native/ws_message_test.c": "368d1a2e393ac11ac21197a1fdd02e36598f994b4f5cc6d17d50b1d1cc5c293a",
+    "tests/run-websocket-message.py": "336ce3b15a4925e41c3d4896f30d3df5685942171c8746bd33fffd74d4492715"
+  },
+  "references": [
+    "https://www.rfc-editor.org/rfc/rfc6455.html#section-5.4",
+    "https://www.rfc-editor.org/rfc/rfc6455.html#section-5.5",
+    "https://www.rfc-editor.org/rfc/rfc6455.html#section-8.1",
+    "https://www.iana.org/assignments/websocket#close-code-number"
+  ],
+  "scope": "Production message/control helper only; no raw frame header/masking, HTTP upgrade, live TCP, SDK lifecycle or hardware timing proof."
+}

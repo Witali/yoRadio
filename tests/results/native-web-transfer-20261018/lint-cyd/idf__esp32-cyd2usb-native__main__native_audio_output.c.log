@@ -1,0 +1,20 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:203:15: warning: narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined [bugprone-narrowing-conversions]
+  203 |             ? pcm_sample_to_s16(frame + reader->sample_bytes, reader->sample_bytes)
+      |               ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:326:14: warning: performing an implicit widening conversion to type 'unsigned long long' of a multiplication performed in type 'unsigned int' [bugprone-implicit-widening-of-multiplication-result]
+  326 |             ((PDM_DMA_DESCRIPTORS + 1U) * PDM_DMA_SAMPLES * 1000ULL +
+      |              ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:326:14: note: make conversion explicit to silence this warning
+    6 |             ((PDM_DMA_DESCRIPTORS + 1U) * PDM_DMA_SAMPLES * 1000ULL +
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |              (unsigned long long)(                       )
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:326:14: note: perform multiplication in a wider type
+  326 |             ((PDM_DMA_DESCRIPTORS + 1U) * PDM_DMA_SAMPLES * 1000ULL +
+      |              ^
+      |               (unsigned long long)
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c:388:45: warning: narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined [bugprone-narrowing-conversions]
+  388 |                                           ? ramp_sample(index++, count, true)
+      |                                             ^
+9 warnings generated.
+Suppressed 6 warnings (6 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

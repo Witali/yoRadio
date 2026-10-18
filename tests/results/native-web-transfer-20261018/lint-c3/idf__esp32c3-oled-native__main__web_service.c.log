@@ -1,0 +1,12 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_service.c:456:51: warning: multilevel pointer conversion from 'httpd_req_t **' (aka 'struct httpd_req **') to 'void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  456 |         if (xQueueReceive(s_static_request_queue, &request, portMAX_DELAY) !=
+      |                                                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\web_service.c:509:9: warning: multilevel pointer conversion from 'httpd_req_t **' (aka 'struct httpd_req **') to 'const void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  509 |     if (xQueueSend(s_static_request_queue, &async_request, 0) != pdTRUE) {
+      |         ^
+C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/freertos/FreeRTOS-Kernel/include/freertos/queue.h:470:36: note: expanded from macro 'xQueueSend'
+  470 |     xQueueGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), queueSEND_TO_BACK )
+      |                                    ^
+23 warnings generated.
+Suppressed 21 warnings (21 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

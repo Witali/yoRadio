@@ -1,8 +1,8 @@
 # Аудит WebSocket RFC 6455: CYD и C3
 
 Дата проверки: 2026-10-18. Полное соответствие RFC **не подтверждено**.
-Этот документ фиксирует исходные SDK и покрытие project overlay; интеграция
-семантики сообщений и проверки всего сервера выполняются отдельно.
+Этот документ фиксирует исходные SDK, project overlay и интегрированную
+семантику сообщений. Host TCP/TLS проверки не заменяют испытания на платах.
 
 Нормативный источник: [RFC 6455](https://www.rfc-editor.org/rfc/rfc6455.html).
 Приведённая ниже матрица разделяет обязательные требования, рекомендации и
@@ -33,9 +33,9 @@
 | RFC | Уровень и требование | CYD SDK 6.0.2 без overlay | C3 SDK 6.1 strict без overlay | Overlay / оставшаяся работа |
 | --- | --- | --- | --- | --- |
 | 4.2.1 | MUST: GET, HTTP ≥1.1 | URI GET; parser допускает HTTP/1.0 | Отдельный HTTP/1.1 gate | GET и HTTP/1.1 gate до потери request-line; whole parser wire cases прошли |
-| 4.2.1 | MUST: Host, Upgrade, Connection | Host не проверяется; Upgrade сравнивается целиком | Host непустой; Upgrade сравнивается целиком | Host уникальный, authority проверяет SDK URL parser; Upgrade/Connection имеют проверяемый list grammar |
+| 4.2.1 | MUST: Host, Upgrade, Connection | Host не проверяется; Upgrade сравнивается целиком | Host непустой; Upgrade сравнивается целиком | Host уникальный, authority проверяет SDK URL parser; Upgrade/Connection имеют проверяемый list grammar. Обычный GET `/ws` без upgrade получает HTTP 400 до создания WS context |
 | 4.2.1, 11.3 | MUST: key/version, одиночность | Key только читается; версия `13` | Base64 nonce 16 проверяется; дубликаты не считаются | Уникальные Host/key/version; OWS/LWS; nonce 16; version syntax 0..255 без leading zeros; 426 с `Sec-WebSocket-Version: 13` для другой корректной версии |
-| 4.2.2 | MUST: корректный Accept | SHA-1 + Base64 | SHA-1 + Base64 | Нормализованное значение key; exact-send проверка. Host SHA seam проверяет вход и digest RFC-примера, сам SHA SDK не тестирует |
+| 4.2.2 | MUST: корректный Accept | SHA-1 + Base64 | SHA-1 + Base64 | Нормализованное значение key; exact-send проверка. Unit/plain TCP gate использует обозначенный SHA seam; WSS gate связывает реальные PSA SHA-1/Base64 закреплённой библиотеки |
 | HTTP framing | Сохранение Content-Length bounds | Narrowing к int при проверке sentinel | Есть uint32 bound | C3 guard сохранён, CYD получил тот же bound; пустое присутствующее поле в обоих SDK теперь даёт 400 |
 | 4.2.1, 4.3 | MUST: синтаксис subprotocol | `strtok_r`, фиксированные 50 байт | То же | Проверяется весь offer list, включая повторные headers, case-sensitive уникальность, token syntax; выбор остаётся `NULL` |
 | 9.1 | MUST: синтаксис extensions | Синтаксис предложений не проверяется | То же | Проверяются extension tokens/params, quoted-string unescaping в token, repeated headers и folded LWS; malformed offers дают HTTP 400 |
@@ -46,20 +46,22 @@
 | 5.2 | MUST: минимальная длина, MSB=0 | Нет; возможна потеря старших бит на 32-bit target | Strict проверки | CYD проверки до приведения к size_t; слишком большой размер 1009 |
 | 5.2 | MUST: минимальный исходящий размер | Для 65535 выбирается 64-bit encoding | Граница исправлена | CYD `<= UINT16_MAX`; host проверяет 125/126/65535/65536 |
 | 5.5 | MUST: FIN и ≤125 у control | FIN не проверяется, граница parser допускает 126 | Strict проверки | Добавлены CYD проверки |
-| 5.4 | MUST: fragments, последовательность | SDK отдаёт отдельные кадры; прежний WebUI отвергает `!final` | То же ограничение WebUI | Требуется общий semantic core и интеграция, включая control между fragments |
-| 5.5.2–3 | MUST/MAY: Pong и unsolicited Pong | SDK автоответ Ping; Pong передаёт handler | То же | Для общего core нужен `handle_ws_control_frames=true`, bounded control buffer, соответствующий payload |
-| 5.6, 8.1 | MUST: UTF-8 | SDK не проверяет текст | SDK strict тоже не проверяет | Semantic core: входной UTF-8 между fragments; отдельно проверить исходящие station/title JSON |
-| 5.5.1, 7.4 | MUST: Close payload/status | Автоматический пустой Close без проверки payload | То же | Semantic core: длина 0 или ≥2, код, UTF-8 reason; integration gate ещё нужен |
-| 5.5.1 | SHOULD: отражать Close status | SDK ответ теряет status/reason | То же | Общий core должен формировать ответ после проверки |
+| 5.4 | MUST: fragments, последовательность | SDK отдаёт отдельные кадры; прежний WebUI отвергает `!final` | То же ограничение WebUI | Общий core интегрирован в оба handlers: dispatch только полного сообщения, control между fragments сохраняет сборку |
+| 5.5.2–3 | MUST/MAY: Pong и unsolicited Pong | SDK автоответ Ping; Pong передаёт handler | То же | `handle_ws_control_frames=true`; bounded control buffer, Pong с тем же payload; unsolicited Pong принят без ответа |
+| 5.6, 8.1 | MUST: UTF-8 | SDK не проверяет текст | SDK strict тоже не проверяет | Проверяется входной UTF-8 между fragments; исходящие station/title JSON проходят общий sanitizer; исчерпывающие scalar/split и независимые oracle проверки |
+| 5.5.1, 7.4 | MUST: Close payload/status | Автоматический пустой Close без проверки payload | То же | Общий core проверяет длину 0 или ≥2, код и UTF-8 reason; оба handlers исполняют результат |
+| 5.5.1 | SHOULD: отражать Close status | SDK ответ теряет status/reason | То же | Отражается весь корректный Close payload; session context подтверждает владельца даже после SDK `ws_close` |
 | 5.5.1 | MUST: прекратить data после Close | Отдельного send gate нет | Strict блокирует non-Close | CYD send gate добавлен; сервис должен допустить принадлежащий ему Close до освобождения session |
 | 5.5.1, 7.1.1 | MUST: завершение TCP | Cleanup ставит callback с `sock_db*` в очередь | То же | Cleanup не ставит callback; `req_delete` возвращает ошибку в текущий owning loop для удаления той же session |
 | 7.1.7 | SHOULD/MAY: Close при ошибке | Обычно только обрыв | Strict 1002/1009 | CYD protocol Close; не продолжать разбор после ошибки; transport failure ограничен deadline |
 | 10.4, 7.4.1 | MAY: лимиты, 1009 | Лимит приложения 96 байт | Прежний лимит 255 байт | Лимиты допустимы; применять к полному сообщению, включая fragments, и документировать выбранные значения |
-| 10.6 | MUST/SHOULD: TLS support/use | Исходный WebUI использует plain WS | То же | WSS реализуется и квалифицируется отдельно, см. [TLS plan](WEBSOCKET_TLS_PLAN.md); TLS клиента радиостанций это требование не закрывает |
+| 10.6 | MUST/SHOULD: TLS support/use | Исходный WebUI использует plain WS | То же | Общий public ESP-TLS server transport реализован, реальные pinned TLS библиотеки проверены независимым CA/SAN validating client; см. [TLS qualification](WEBSOCKET_TLS_PLAN.md). Физическая WSS/audio квалификация открыта |
 
-Для строк с общей семантикой сообщения окончательным доказательством являются
-сами интегрированные C3/CYD handlers и их результаты. Этот audit не подменяет
-их будущими намерениями.
+Для строк с общей семантикой сообщения доказательства — сами интегрированные
+C3/CYD handlers и [зафиксированные результаты](../tests/results/native-web-transfer-20261018/HOST.md).
+Отдельные функции, целый HTTPD/TCP pipeline и реальная TLS библиотека имеют
+разные явно обозначенные seams; ни один host gate не доказывает target ABI,
+доступный heap/stack или RTOS timing.
 
 ## Архитектура overlay
 
@@ -162,17 +164,21 @@ primitive в host seam заменён обычным диапазонным вы
 `/ws` route остаются seams. Настоящие sockets, TCP timing, target ABI/stacks,
 SDK crypto SHA operation и TLS этим прогоном не проверяются.
 
-## Следующая квалификация
+## Текущее покрытие и следующая квалификация
 
-1. Скомпилировать оба actual HTTPD targets со сгенерированными файлами и matching
-   private headers. Проверить compile commands и manifests, чтобы старые C-файлы
-   не остались одновременно в target.
-2. Интегрировать общий semantic core в оба handlers с включённой передачей
-   control frames. Покрыть fragments, UTF-8, Close и входные лимиты. Сохранить
-   существующие привязки audio tasks CYD к ядрам.
-3. Повторить подтверждённую host HTTP handshake matrix на реальном HTTPD server:
-   сетевые receive boundaries, lifetime callbacks и поведение ошибок должны
-   совпасть с исполняемым SDK parser и корректным HTTP response.
+1. Оба actual HTTPD targets с matching private headers успешно компилируются
+   Clang; [команды и manifests](../tests/results/native-web-transfer-20261018/sdk-components/report.json)
+   сохранены. Полные GCC ELF/images и 32-bit ресурсы проверяются отдельно.
+2. Общий semantic core подключён к обоим handlers с передачей control frames.
+   Fragments, UTF-8, Close, входные лимиты и исходящий JSON проверены:
+   [C3](../tests/results/native-web-transfer-20261018/ws-c3-final/report.json),
+   [CYD](../tests/results/native-web-transfer-20261018/ws-cyd-final/report.json).
+   Привязки audio tasks CYD сохраняются.
+3. [Интегрированный localhost TCP gate](../tests/results/native-web-transfer-20261018/tcp-integrated/report.json)
+   выполняет настоящие SDK request/URI/session/parser/frame функции и production
+   handlers. Проверены receive boundaries, first frame вместе с handshake,
+   lifetime callbacks и fd reuse. RTOS main loop и формат HTTP error response
+   остаются host seams; это не физический HTTPD server.
 4. Создать host/target echo test endpoint, который вызывает **тот же** production
    protocol path, и прогнать независимый
    [Autobahn Testsuite](https://github.com/crossbario/autobahn-testsuite).

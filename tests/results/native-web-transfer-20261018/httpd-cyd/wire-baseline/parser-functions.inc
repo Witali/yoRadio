@@ -1,0 +1,672 @@
+typedef struct {
+    /* Parser settings for http_parser_execute() */
+    http_parser_settings settings;
+
+    /* Request being parsed */
+    struct httpd_req *req;
+
+    /* Status of the parser describes the part of the
+     * HTTP request packet being processed at any moment.
+     */
+    enum {
+        PARSING_IDLE = 0,
+        PARSING_URL,
+        PARSING_HDR_FIELD,
+        PARSING_HDR_VALUE,
+        PARSING_BODY,
+        PARSING_COMPLETE,
+        PARSING_FAILED
+    } status;
+
+    /* Response error code in case of PARSING_FAILED */
+    httpd_err_code_t error;
+
+    /* For storing last callback parameters */
+    struct {
+        const char *at;
+        size_t      length;
+    } last;
+
+    /* State variables */
+    bool   paused;          /*!< Parser is paused */
+    size_t pre_parsed;      /*!< Length of data to be skipped while parsing */
+    size_t raw_datalen;     /*!< Full length of the raw data in scratch buffer */
+} parser_data_t;
+
+static esp_err_t verify_url (http_parser *parser)
+{
+    parser_data_t *parser_data  = (parser_data_t *) parser->data;
+    struct httpd_req *r         = parser_data->req;
+    struct httpd_req_aux *ra    = r->aux;
+    struct http_parser_url *res = &ra->url_parse_res;
+
+    /* Get previous values of the parser callback arguments */
+    const char *at = parser_data->last.at;
+    size_t  length = parser_data->last.length;
+
+    r->method = parser->method;
+    if (r->method < 0) {
+        ESP_LOGW(TAG, LOG_FMT("HTTP method not supported (%d)"), r->method);
+        parser_data->error = HTTPD_501_METHOD_NOT_IMPLEMENTED;
+        return ESP_FAIL;
+    }
+
+    if (sizeof(r->uri) < (length + 1)) {
+        ESP_LOGW(TAG, LOG_FMT("URI length (%"NEWLIB_NANO_COMPAT_FORMAT") greater than supported (%"NEWLIB_NANO_COMPAT_FORMAT")"),
+                 NEWLIB_NANO_COMPAT_CAST(length), NEWLIB_NANO_COMPAT_CAST(sizeof(r->uri)));
+        parser_data->error = HTTPD_414_URI_TOO_LONG;
+        return ESP_FAIL;
+    }
+
+    /* Copy URI and append terminating null character. Note URI string pointed
+     * by 'at' is not NULL terminated, therefore use length provided by
+     * parser while copying the URI to buffer */
+    memcpy((char *)r->uri, at, length);
+    ((char *)r->uri)[length] = '\0';
+    ESP_LOGD(TAG, LOG_FMT("received URI = %s"), r->uri);
+
+    /* Make sure version is HTTP/1.1 or HTTP/1.0 (legacy compliance purpose) */
+    if (!((parser->http_major == 1) && ((parser->http_minor == 0) || (parser->http_minor == 1)))) {
+        ESP_LOGW(TAG, LOG_FMT("unsupported HTTP version = %d.%d"),
+                 parser->http_major, parser->http_minor);
+        parser_data->error = HTTPD_505_VERSION_NOT_SUPPORTED;
+        return ESP_FAIL;
+    }
+
+    /* Parse URL and keep result for later */
+    http_parser_url_init(res);
+    if (http_parser_parse_url(r->uri, length,
+                              r->method == HTTP_CONNECT, res)) {
+        ESP_LOGW(TAG, LOG_FMT("http_parser_parse_url failed with errno = %d"),
+                              parser->http_errno);
+        parser_data->error = HTTPD_400_BAD_REQUEST;
+        return ESP_FAIL;
+    }
+    return ESP_OK;
+}
+
+/* http_parser callback on finding url in HTTP request
+ * Will be invoked AT LEAST once every packet
+ */
+static esp_err_t cb_url(http_parser *parser,
+                        const char *at, size_t length)
+{
+    parser_data_t *parser_data = (parser_data_t *) parser->data;
+    httpd_req_t          *req   = parser_data->req;
+    struct httpd_req_aux *raux  = req->aux;
+
+    if (parser_data->status == PARSING_IDLE) {
+        ESP_LOGD(TAG, LOG_FMT("message begin"));
+
+        /* Store current values of the parser callback arguments */
+        parser_data->last.at     = at;
+        parser_data->last.length = 0;
+        parser_data->status      = PARSING_URL;
+    } else if (parser_data->status != PARSING_URL) {
+        ESP_LOGE(TAG, LOG_FMT("unexpected state transition"));
+        parser_data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+        parser_data->status = PARSING_FAILED;
+        return ESP_FAIL;
+    }
+
+    ESP_LOGD(TAG, LOG_FMT("processing url = %.*s"), (int)length, at);
+
+    /* Update length of URL string */
+    if ((parser_data->last.length += length) > raux->max_uri_len) {
+        ESP_LOGW(TAG, LOG_FMT("URI length (%"NEWLIB_NANO_COMPAT_FORMAT") greater than supported (%d)"),
+                 NEWLIB_NANO_COMPAT_CAST(parser_data->last.length), raux->max_uri_len);
+        parser_data->error = HTTPD_414_URI_TOO_LONG;
+        parser_data->status = PARSING_FAILED;
+        return ESP_FAIL;
+    }
+    return ESP_OK;
+}
+
+static esp_err_t pause_parsing(http_parser *parser, const char* at)
+{
+    parser_data_t *parser_data = (parser_data_t *) parser->data;
+    struct httpd_req *r        = parser_data->req;
+    struct httpd_req_aux *ra   = r->aux;
+
+    /* The length of data that was not parsed due to interruption
+     * and hence needs to be read again later for parsing */
+    ssize_t unparsed = parser_data->raw_datalen - (at - ra->scratch);
+    if (unparsed < 0) {
+        ESP_LOGE(TAG, LOG_FMT("parsing beyond valid data = %d"), (int)(-unparsed));
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    /* Push back the un-parsed data into pending buffer for
+     * receiving again with httpd_recv_with_opt() later when
+     * read_block() executes */
+    if (unparsed && (unparsed != httpd_unrecv(r, at, unparsed))) {
+        ESP_LOGE(TAG, LOG_FMT("data too large for un-recv = %d"), (int)unparsed);
+        return ESP_FAIL;
+    }
+
+    /* Signal http_parser to pause execution and save the maximum
+     * possible length, of the yet un-parsed data, that may get
+     * parsed before http_parser_execute() returns. This pre_parsed
+     * length will be updated then to reflect the actual length
+     * that got parsed, and must be skipped when parsing resumes */
+    parser_data->pre_parsed = unparsed;
+    http_parser_pause(parser, 1);
+    parser_data->paused = true;
+    ESP_LOGD(TAG, LOG_FMT("paused"));
+    return ESP_OK;
+}
+
+static size_t continue_parsing(http_parser *parser, size_t length)
+{
+    parser_data_t *data = (parser_data_t *) parser->data;
+
+    /* Part of the received data may have been parsed earlier
+     * so we must skip that before parsing resumes */
+    length = MIN(length, data->pre_parsed);
+    data->pre_parsed -= length;
+    ESP_LOGD(TAG, LOG_FMT("skip pre-parsed data of size = %"NEWLIB_NANO_COMPAT_FORMAT), NEWLIB_NANO_COMPAT_CAST(length));
+
+    http_parser_pause(parser, 0);
+    data->paused = false;
+    ESP_LOGD(TAG, LOG_FMT("un-paused"));
+    return length;
+}
+
+/* http_parser callback on header field in HTTP request
+ * May be invoked AT LEAST once every header field
+ */
+static esp_err_t cb_header_field(http_parser *parser, const char *at, size_t length)
+{
+    parser_data_t *parser_data = (parser_data_t *) parser->data;
+    struct httpd_req *r        = parser_data->req;
+    struct httpd_req_aux *ra   = r->aux;
+
+    /* Check previous status */
+    if (parser_data->status == PARSING_URL) {
+        if (verify_url(parser) != ESP_OK) {
+            /* verify_url would already have set the
+             * error field of parser data, so only setting
+             * status to failed */
+            parser_data->status = PARSING_FAILED;
+            return ESP_FAIL;
+        }
+
+        ESP_LOGD(TAG, LOG_FMT("headers begin"));
+        /* Last at is set to start of scratch where headers
+         * will be received next */
+        parser_data->last.at     = ra->scratch;
+        parser_data->last.length = 0;
+        parser_data->status      = PARSING_HDR_FIELD;
+        ra->scratch_size_limit   = ra->max_req_hdr_len;
+
+        /* Stop parsing for now and give control to process */
+        if (pause_parsing(parser, at) != ESP_OK) {
+            parser_data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+            parser_data->status = PARSING_FAILED;
+            return ESP_FAIL;
+        }
+    } else if (parser_data->status == PARSING_HDR_VALUE) {
+        /* Overwrite terminator (CRLFs) following last header
+         * (key: value) pair with null characters */
+        char *term_start = (char *)parser_data->last.at + parser_data->last.length;
+        memset(term_start, '\0', at - term_start);
+
+        /* Store current values of the parser callback arguments */
+        parser_data->last.at     = at;
+        parser_data->last.length = 0;
+        parser_data->status      = PARSING_HDR_FIELD;
+        ra->scratch_size_limit   = ra->max_req_hdr_len;
+
+        /* Increment header count */
+        ra->req_hdrs_count++;
+    } else if (parser_data->status != PARSING_HDR_FIELD) {
+        ESP_LOGE(TAG, LOG_FMT("unexpected state transition"));
+        parser_data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+        parser_data->status = PARSING_FAILED;
+        return ESP_FAIL;
+    }
+
+    ESP_LOGD(TAG, LOG_FMT("processing field = %.*s"), (int)length, at);
+
+    /* Update length of header string */
+    parser_data->last.length += length;
+    return ESP_OK;
+}
+
+/* http_parser callback on header value in HTTP request.
+ * May be invoked AT LEAST once every header value
+ */
+static esp_err_t cb_header_value(http_parser *parser, const char *at, size_t length)
+{
+    parser_data_t *parser_data = (parser_data_t *) parser->data;
+
+    /* Check previous status */
+    if (parser_data->status == PARSING_HDR_FIELD) {
+        /* Store current values of the parser callback arguments */
+        parser_data->last.at     = at;
+        parser_data->last.length = 0;
+        parser_data->status      = PARSING_HDR_VALUE;
+
+        if (length == 0) {
+            /* As per behavior of http_parser, when length > 0,
+             * `at` points to the start of CRLF. But, in the
+             * case when header value is empty (zero length),
+             * then `at` points to the position right after
+             * the CRLF. Since for our purpose we need `last.at`
+             * to point to exactly where the CRLF starts, it
+             * needs to be adjusted by the right offset */
+            char *at_adj = (char *)parser_data->last.at;
+            /* Find the end of header field string */
+            while (*(--at_adj) != ':');
+            /* Now skip leading spaces' */
+            while (*(++at_adj) == ' ');
+            /* Now we are at the right position */
+            parser_data->last.at = at_adj;
+        }
+    } else if (parser_data->status != PARSING_HDR_VALUE) {
+        ESP_LOGE(TAG, LOG_FMT("unexpected state transition"));
+        parser_data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+        parser_data->status = PARSING_FAILED;
+        return ESP_FAIL;
+    }
+
+    ESP_LOGD(TAG, LOG_FMT("processing value = %.*s"), (int)length, at);
+
+    /* Update length of header string */
+    parser_data->last.length += length;
+    return ESP_OK;
+}
+
+/* http_parser callback on completing headers in HTTP request.
+ * Will be invoked ONLY once every packet
+ */
+static esp_err_t cb_headers_complete(http_parser *parser)
+{
+    parser_data_t *parser_data = (parser_data_t *) parser->data;
+    struct httpd_req *r        = parser_data->req;
+    struct httpd_req_aux *ra   = r->aux;
+
+    /* Check previous status */
+    if (parser_data->status == PARSING_URL) {
+        ESP_LOGD(TAG, LOG_FMT("no headers"));
+        if (verify_url(parser) != ESP_OK) {
+            /* verify_url would already have set the
+             * error field of parser data, so only setting
+             * status to failed */
+            parser_data->status = PARSING_FAILED;
+            return ESP_FAIL;
+        }
+    } else if (parser_data->status == PARSING_HDR_VALUE) {
+        /* Locate end of last header */
+        char *at = (char *)parser_data->last.at + parser_data->last.length;
+
+        /* Check if there is data left to parse. This value should
+         * at least be equal to the number of line terminators, i.e. 2 */
+        ssize_t remaining_length = parser_data->raw_datalen - (at - ra->scratch);
+        if (remaining_length < 2) {
+            ESP_LOGE(TAG, LOG_FMT("invalid length of data remaining to be parsed"));
+            parser_data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+            parser_data->status = PARSING_FAILED;
+            return ESP_FAIL;
+        }
+
+        /* Locate end of headers section by skipping the remaining
+         * two line terminators. No assumption is made here about the
+         * termination sequence used apart from the necessity that it
+         * must end with an LF, because:
+         *      1) some clients may send non standard LFs instead of
+         *         CRLFs for indicating termination.
+         *      2) it is the responsibility of http_parser to check
+         *         that the termination is either CRLF or LF and
+         *         not any other sequence */
+        unsigned short remaining_terminators = 2;
+        while (remaining_length-- && remaining_terminators) {
+            if (*at == '\n') {
+                remaining_terminators--;
+            }
+            /* Overwrite termination characters with null */
+            *(at++) = '\0';
+        }
+        if (remaining_terminators) {
+            ESP_LOGE(TAG, LOG_FMT("incomplete termination of headers"));
+            parser_data->error = HTTPD_400_BAD_REQUEST;
+            parser_data->status = PARSING_FAILED;
+            return ESP_FAIL;
+        }
+
+        /* Place the parser ptr right after the end of headers section */
+        parser_data->last.at = at;
+
+        /* Increment header count */
+        ra->req_hdrs_count++;
+    } else {
+        ESP_LOGE(TAG, LOG_FMT("unexpected state transition"));
+        parser_data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+        parser_data->status = PARSING_FAILED;
+        return ESP_FAIL;
+    }
+
+    /* In absence of body/chunked encoding, http_parser sets content_len to -1 */
+    r->content_len = ((int)parser->content_length != -1 ?
+                      parser->content_length : 0);
+
+    ESP_LOGD(TAG, LOG_FMT("bytes read     = %" PRId32 ""),  parser->nread);
+    ESP_LOGD(TAG, LOG_FMT("content length = %"NEWLIB_NANO_COMPAT_FORMAT), NEWLIB_NANO_COMPAT_CAST(r->content_len));
+
+    /* Handle upgrade requests - only WebSocket is supported for now */
+    if (parser->upgrade) {
+#ifdef CONFIG_HTTPD_WS_SUPPORT
+        ESP_LOGD(TAG, LOG_FMT("Got an upgrade request"));
+
+        /* If there's no "Upgrade" header field, then it's not WebSocket. */
+        char ws_upgrade_hdr_val[] = "websocket";
+        if (httpd_req_get_hdr_value_str(r, "Upgrade", ws_upgrade_hdr_val, sizeof(ws_upgrade_hdr_val)) != ESP_OK) {
+            ESP_LOGW(TAG, LOG_FMT("Upgrade header does not match the length of \"websocket\""));
+            parser_data->error = HTTPD_400_BAD_REQUEST;
+            parser_data->status = PARSING_FAILED;
+            return ESP_FAIL;
+        }
+
+        /* If "Upgrade" field's key is not "websocket", then we should also forget about it. */
+        if (strcasecmp("websocket", ws_upgrade_hdr_val) != 0) {
+            ESP_LOGW(TAG, LOG_FMT("Upgrade header found but it's %s"), ws_upgrade_hdr_val);
+            parser_data->error = HTTPD_400_BAD_REQUEST;
+            parser_data->status = PARSING_FAILED;
+            return ESP_FAIL;
+        }
+
+        /* Now set handshake flag to true */
+        ra->ws_handshake_detect = true;
+#else
+        ESP_LOGD(TAG, LOG_FMT("WS functions has been disabled, Upgrade request is not supported."));
+        parser_data->error = HTTPD_400_BAD_REQUEST;
+        parser_data->status = PARSING_FAILED;
+        return ESP_FAIL;
+#endif
+    }
+
+    parser_data->status = PARSING_BODY;
+    ra->remaining_len = r->content_len;
+    struct httpd_data *hd = (struct httpd_data *) r->handle;
+    hd->http_server_state = HTTP_SERVER_EVENT_ON_HEADER;
+    esp_http_server_dispatch_event(HTTP_SERVER_EVENT_ON_HEADER, &(ra->sd->fd), sizeof(int));
+    return ESP_OK;
+}
+
+/* Last http_parser callback if body present in HTTP request.
+ * Will be invoked ONLY once every packet
+ */
+static esp_err_t cb_on_body(http_parser *parser, const char *at, size_t length)
+{
+    parser_data_t *parser_data = (parser_data_t *) parser->data;
+
+    /* Check previous status */
+    if (parser_data->status != PARSING_BODY) {
+        ESP_LOGE(TAG, LOG_FMT("unexpected state transition"));
+        parser_data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+        parser_data->status = PARSING_FAILED;
+        return ESP_FAIL;
+    }
+
+    /* Pause parsing so that if part of another packet
+     * is in queue then it doesn't get parsed, which
+     * may reset the parser state and cause current
+     * request packet to be lost */
+    if (pause_parsing(parser, at) != ESP_OK) {
+        parser_data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+        parser_data->status = PARSING_FAILED;
+        return ESP_FAIL;
+    }
+
+    parser_data->last.at     = 0;
+    parser_data->last.length = 0;
+    parser_data->status      = PARSING_COMPLETE;
+    ESP_LOGD(TAG, LOG_FMT("body begins"));
+    return ESP_OK;
+}
+
+/* Last http_parser callback if body absent in HTTP request.
+ * Will be invoked ONLY once every packet
+ */
+static esp_err_t cb_no_body(http_parser *parser)
+{
+    parser_data_t *parser_data = (parser_data_t *) parser->data;
+
+    /* Check previous status */
+    if (parser_data->status == PARSING_URL) {
+        ESP_LOGD(TAG, LOG_FMT("no headers"));
+        if (verify_url(parser) != ESP_OK) {
+            /* verify_url would already have set the
+             * error field of parser data, so only setting
+             * status to failed */
+            parser_data->status = PARSING_FAILED;
+            return ESP_FAIL;
+        }
+    } else if (parser_data->status != PARSING_BODY) {
+        ESP_LOGE(TAG, LOG_FMT("unexpected state transition"));
+        parser_data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+        parser_data->status = PARSING_FAILED;
+        return ESP_FAIL;
+    }
+
+    /* Pause parsing so that if part of another packet
+     * is in queue then it doesn't get parsed, which
+     * may reset the parser state and cause current
+     * request packet to be lost */
+    if (pause_parsing(parser, parser_data->last.at) != ESP_OK) {
+        parser_data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+        parser_data->status = PARSING_FAILED;
+        return ESP_FAIL;
+    }
+
+    parser_data->last.at     = 0;
+    parser_data->last.length = 0;
+    parser_data->status      = PARSING_COMPLETE;
+    ESP_LOGD(TAG, LOG_FMT("message complete"));
+    return ESP_OK;
+}
+
+static int read_block(httpd_req_t *req, http_parser *parser, size_t offset, size_t length)
+{
+    struct httpd_req_aux *raux  = req->aux;
+    parser_data_t *parser_data = (parser_data_t *) parser->data;
+
+    /* Limits the read to scratch buffer size */
+    ssize_t buf_len = MIN(length, (raux->scratch_size_limit - offset));
+    if (buf_len <= 0) {
+        return 0;
+    }
+    /* Calculate the offset of the current position from the start of the buffer,
+     * as after reallocating the buffer, the base address of the buffer may change.
+     */
+    size_t at_offset = parser_data->last.at - raux->scratch;
+    /* Allocate the buffer according to offset and buf_len. Offset is
+       from where the reading will start and buf_len is till what length
+       the buffer will be read.
+    */
+    char *new_scratch = (char *) realloc(raux->scratch, offset + buf_len);
+    if (new_scratch == NULL) {
+        free(raux->scratch);
+        raux->scratch = NULL;
+        /* Set last.at to NULL to avoid accidental dereference of dangling pointer */
+        parser_data->last.at = NULL;
+        ESP_LOGE(TAG, "Unable to allocate the scratch buffer");
+        return 0;
+    }
+    raux->scratch = new_scratch;
+    parser_data->last.at = raux->scratch + at_offset;
+    raux->scratch_cur_size = offset + buf_len;
+    ESP_LOGD(TAG, "scratch buf qsize = %d", raux->scratch_cur_size);
+    /* Receive data into buffer. If data is pending (from unrecv) then return
+     * immediately after receiving pending data, as pending data may just complete
+     * this request packet. */
+    int nbytes = httpd_recv_with_opt(req, raux->scratch + offset, buf_len, true);
+    if (nbytes < 0) {
+        ESP_LOGD(TAG, LOG_FMT("error in httpd_recv"));
+        /* If timeout occurred allow the
+         * situation to be handled */
+        if (nbytes == HTTPD_SOCK_ERR_TIMEOUT) {
+            /* Invoke error handler which may return ESP_OK
+             * to signal for retrying call to recv(), else it may
+             * return ESP_FAIL to signal for closure of socket */
+            return (httpd_req_handle_err(req, HTTPD_408_REQ_TIMEOUT) == ESP_OK) ?
+                    HTTPD_SOCK_ERR_TIMEOUT : HTTPD_SOCK_ERR_FAIL;
+        }
+        /* Some socket error occurred. Return failure
+         * to force closure of underlying socket.
+         * Error message is not sent as socket may not
+         * be valid anymore */
+        return HTTPD_SOCK_ERR_FAIL;
+    } else if (nbytes == 0) {
+        ESP_LOGD(TAG, LOG_FMT("connection closed"));
+        /* Connection closed by client so no
+         * need to send error response */
+        return HTTPD_SOCK_ERR_FAIL;
+    }
+
+    ESP_LOGD(TAG, LOG_FMT("received HTTP request block size = %d"), nbytes);
+    return nbytes;
+}
+
+static int parse_block(http_parser *parser, size_t offset, size_t length)
+{
+    parser_data_t        *data  = (parser_data_t *)(parser->data);
+    httpd_req_t          *req   = data->req;
+    struct httpd_req_aux *raux  = req->aux;
+    size_t nparsed = 0;
+
+    if (!length) {
+        /* Parsing is still happening but nothing to
+         * parse means no more space left on buffer,
+         * therefore it can be inferred that the
+         * request URI/header must be too long */
+        switch (data->status) {
+            case PARSING_URL:
+                ESP_LOGW(TAG, LOG_FMT("request URI too long"));
+                data->error = HTTPD_414_URI_TOO_LONG;
+                break;
+            case PARSING_HDR_FIELD:
+            case PARSING_HDR_VALUE:
+                ESP_LOGW(TAG, LOG_FMT("request header too long"));
+                data->error = HTTPD_431_REQ_HDR_FIELDS_TOO_LARGE;
+                break;
+            default:
+                ESP_LOGE(TAG, LOG_FMT("unexpected state"));
+                data->error = HTTPD_500_INTERNAL_SERVER_ERROR;
+                break;
+        }
+        data->status = PARSING_FAILED;
+        return -1;
+    }
+
+    /* Un-pause the parsing if paused */
+    if (data->paused) {
+        nparsed = continue_parsing(parser, length);
+        length -= nparsed;
+        offset += nparsed;
+        if (!length) {
+            return nparsed;
+        }
+    }
+
+    /* Execute http_parser */
+    nparsed = http_parser_execute(parser, &data->settings,
+                                  raux->scratch + offset, length);
+
+    /* Check state */
+    if (data->status == PARSING_FAILED) {
+        /* It is expected that the error field of
+         * parser data should have been set by now */
+        ESP_LOGW(TAG, LOG_FMT("parsing failed"));
+        return -1;
+    } else if (data->paused) {
+        /* Update the value of pre_parsed which was set when
+         * pause_parsing() was called. (length - nparsed) is
+         * the length of the data that will need to be parsed
+         * again later and hence must be deducted from the
+         * pre_parsed length */
+        data->pre_parsed -= (length - nparsed);
+        return 0;
+    } else if (nparsed != length) {
+        /* http_parser error */
+        data->error  = HTTPD_400_BAD_REQUEST;
+        data->status = PARSING_FAILED;
+        ESP_LOGW(TAG, LOG_FMT("incomplete (%"NEWLIB_NANO_COMPAT_FORMAT"/%"NEWLIB_NANO_COMPAT_FORMAT") with parser error = %d"),
+                 NEWLIB_NANO_COMPAT_CAST(nparsed), NEWLIB_NANO_COMPAT_CAST(length), parser->http_errno);
+        return -1;
+    }
+
+    /* Return with the total length of the request packet
+     * that has been parsed till now */
+    ESP_LOGD(TAG, LOG_FMT("parsed block size = %"NEWLIB_NANO_COMPAT_FORMAT), NEWLIB_NANO_COMPAT_CAST((offset + nparsed)));
+    return offset + nparsed;
+}
+
+static void parse_init(httpd_req_t *r, http_parser *parser, parser_data_t *data)
+{
+    /* Initialize parser data */
+    memset(data, 0, sizeof(parser_data_t));
+    data->req = r;
+
+    /* Initialize parser */
+    http_parser_init(parser, HTTP_REQUEST);
+    parser->data = (void *)data;
+
+    /* Initialize parser settings */
+    http_parser_settings_init(&data->settings);
+
+    /* Set parser callbacks */
+    data->settings.on_url              = cb_url;
+    data->settings.on_header_field     = cb_header_field;
+    data->settings.on_header_value     = cb_header_value;
+    data->settings.on_headers_complete = cb_headers_complete;
+    data->settings.on_body             = cb_on_body;
+    data->settings.on_message_complete = cb_no_body;
+}
+
+/* Function that receives TCP data and runs parser on it
+ */
+static esp_err_t httpd_parse_req(struct httpd_data *hd)
+{
+    httpd_req_t *r = &hd->hd_req;
+    int blk_len,  offset;
+    http_parser   parser = {};
+    parser_data_t parser_data = {};
+
+    /* Initialize parser */
+    parse_init(r, &parser, &parser_data);
+
+    /* Set offset to start of scratch buffer */
+    offset = 0;
+    do {
+        /* Read block into scratch buffer */
+        if ((blk_len = read_block(r, &parser, offset, PARSER_BLOCK_SIZE)) < 0) {
+            if (blk_len == HTTPD_SOCK_ERR_TIMEOUT) {
+                /* Retry read in case of non-fatal timeout error.
+                 * read_block() ensures that the timeout error is
+                 * handled properly so that this doesn't get stuck
+                 * in an infinite loop */
+                continue;
+            }
+            /* If not HTTPD_SOCK_ERR_TIMEOUT, returned error must
+             * be HTTPD_SOCK_ERR_FAIL which means we need to return
+             * failure and thereby close the underlying socket */
+            return ESP_FAIL;
+        }
+
+        /* This is used by the callbacks to track
+         * data usage of the buffer */
+        parser_data.raw_datalen = blk_len + offset;
+
+        /* Parse data block from buffer */
+        if ((offset = parse_block(&parser, offset, blk_len)) < 0) {
+            /* HTTP error occurred.
+             * Send error code as response status and
+             * invoke error handler */
+            return httpd_req_handle_err(r, parser_data.error);
+        }
+    } while (parser_data.status != PARSING_COMPLETE);
+
+    ESP_LOGD(TAG, LOG_FMT("parsing complete"));
+    return httpd_uri(hd);
+}

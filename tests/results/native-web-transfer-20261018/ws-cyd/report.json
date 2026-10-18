@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "maximum_json_bytes": 4828,
+  "source_ref": null,
+  "qualified_implementation_sha256": "946c9edf9dc0173e122a75c40868635ef9eca1f0be1212a08d4d90f7c85eb562",
+  "status_capacity": 5120,
+  "websocket_client_limit": 2,
+  "queued_status_work_limit": 1,
+  "application_send_frame_budget_us": 1000000,
+  "application_receive_handler_budget_us": 1000000,
+  "separate_budgets": "HTTPD opcode read before handler and SDK control reads use separate finite per-read fallback budgets; TCP/RTOS timing remains unverified.",
+  "source_sha256": {
+    "tests/run-cyd-websocket.py": "43abbdd6a7d350b7851b3d8b6924c4b4d226d56e9d505a7b7cf825c83831ba21",
+    "tests/native/cyd_websocket_test.c": "6c7e0fba52251d05870386e318faa919bc31ad518c9b4748cc47d47bf7a6d928",
+    "idf/esp32-cyd2usb-native/main/websocket_service.c": "946c9edf9dc0173e122a75c40868635ef9eca1f0be1212a08d4d90f7c85eb562",
+    "idf/esp32-cyd2usb-native/main/websocket_service.h": "56e48009d410a06b95d38f53a6ae7cecb9ac32ba37378876591ca3b726389083",
+    "idf/esp32-cyd2usb-native/main/native_state.h": "1a46bbe3fd0542792ecf045a99d21f0b24d22cc24179bb78593871f0f7d1ae69",
+    "idf/esp32-cyd2usb-native/main/audio_service.h": "cc8e32f9128502a2ef610d803a8c42c3e33b092067eba08fd730994037d68847",
+    "idf/esp32-cyd2usb-native/main/native_health.h": "bbe6d2b4aae2f0e17119b051245099a3105f8bb8707134bf7c576c8a0a023da0",
+    "idf/esp32-cyd2usb-native/main/native_audio_output.h": "ed00a79805de4095c8e3afb4f77b2524920cb799687afab441e0086331ec46a9",
+    "idf/components/native_audio_settings/native_audio_settings.h": "21d0492056a4f52a2d065918d975bc461db677fe82fb739eaacd6b3786ce19c7",
+    "idf/components/native_storage/include/radio_control.h": "53781046f01bb24c33e461f5e070a65a55d92d5109c14f27e92121332d1e6e74",
+    "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+    "idf/components/native_web_transport/include/native_web_transport.h": "dc160a3d9386fd6fc0c51c494a1171c534dec1bd7f98fb07d47e984d5fe003a1"
+  },
+  "scope": "Actual production WS core with deferred HTTPD callbacks, synchronous send completion seams and real concurrent polling producers; no IDF framing/TCP/hardware/stack timing proof."
+}

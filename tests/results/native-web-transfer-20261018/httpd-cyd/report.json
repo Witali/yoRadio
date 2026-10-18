@@ -1,0 +1,47 @@
+{
+  "sdk_profile": "6.0.2",
+  "sdk_source_sha256": {
+    "httpd_ws.c": "50bc91f7389b40828ab949bac11481d28545a4da2d87d0b1ee99ec0d04645fd3",
+    "httpd_parse.c": "5234fd5fc3b566532bf79a6c787664d5077d0aa03001a2d63c0999f063282e90"
+  },
+  "sdk_header_sha256": {
+    "src/esp_httpd_priv.h": "106a3bf927a885892f66514c6a4075c04e04db068fb64ca11dd8ca4b4253dfc8",
+    "include/esp_http_server.h": "3a40def13721f5cb0696308ddefd4c07d4cf986c00c915aef478715fec302124"
+  },
+  "generated_sha256": {
+    "httpd_ws.c": "2e6b0dbbf2ccb169a090ab168a7260e4ee95e99790989005295f58529e32a920",
+    "httpd_parse.c": "bd140961d2d83db05c6e2f0e068d8e6dcb8edd20621812251e220728a24dd942"
+  },
+  "function_variants": {
+    "host": "PASS generated SDK HTTPD: 623 header/frame/cleanup checks; no deferred close queued",
+    "target-size-cap": "PASS generated SDK HTTPD: 624 header/frame/cleanup checks; no deferred close queued"
+  },
+  "whole_http_parser": {
+    "baseline-extensions": "DETECTED original SDK accepted malformed offer",
+    "baseline-protocol": "DETECTED original SDK accepted malformed offer",
+    "baseline-fold": "DETECTED original SDK folded value truncation",
+    "baseline-empty-length": "DETECTED original SDK accepted empty Content-Length",
+    "current": "PASS whole SDK HTTP parser: 14332 receive split checks; handshake plus first frame and folded values preserved"
+  },
+  "close_ordering": {
+    "baseline": "DETECTED actual callback deleted reused session",
+    "current": "PASS"
+  },
+  "source_sha256": {
+    "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/apply.py": "f746d1e46e02960080ff79e4175e13db938175985c68e90e2fb264f39a184d5d",
+    "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h": "6153a79a85c4e159066510136630cf1a0b178a394b72c151841edc92aa12ea6e",
+    "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/test_host.c": "480c34c55d922036506d531e91ec5a5093183f7a0465caaeb0639a23ba3f5b8a",
+    "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/test_wire.c": "ef2699cb7eb1d5d853a8114007c54a9a6db28276ecd18f9032c4d2d224168c11",
+    "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/test_close.c": "d119a7090b6d85526648ef8233299405a2346272d8dba1f4eb40d927ba11fe34",
+    "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/test_host.py": "70035d5fbe9cd967e02c813fe06916cc3612b8f0a01a023731c4b7938d16bf4e",
+    "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/enable.cmake": "a67695ef709ac22161722b0cff24f922b401e154704c830f063874bf4125f06e"
+  },
+  "additional_sdk_sha256": {
+    "components/esp_http_server/src/httpd_txrx.c": "f11d9887a9f8c1c3e21416b82b3d43e050d60c5876aae06b2481cca389b4aef7",
+    "components/http_parser/http_parser.c": "bc5750d936bdb1ca6064f65ec31f66578c9fee2a691ac298081fbc73a668be34",
+    "components/http_parser/http_parser.h": "caa7e5e6571a9067008b1bcb999c46f84157121163df2abec537fc39eeb8ba4d"
+  },
+  "base64_sha256": "5a8eb4e03e548aa95e33e14b92b2d663347d93a5ea338d9ed74f67aee437a42a",
+  "scope": "Actual generated SDK WS and HTTPD parser/read/pause pipeline, actual SDK http_parser and recv/pending/unrecv C. Field-model HTTPD structs, byte-stream, one-route dispatch and SHA sample seams. Actual SDK Base64 C with constant-time primitive host seam. Separate target SIZE_MAX cap model; no target ABI, real TCP/TLS or full RFC pass claimed.",
+  "passed": true
+}

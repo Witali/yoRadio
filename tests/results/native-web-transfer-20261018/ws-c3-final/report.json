@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "cases": 5189,
+  "host_layout": {
+    "client_bytes": 328,
+    "all_clients_bytes": 3280,
+    "message_state_bytes": 48,
+    "command_capacity": 256
+  },
+  "results": {
+    "current/all": {
+      "exit_code": 0,
+      "expected_failure": false
+    },
+    "baseline/short-send": {
+      "exit_code": 1,
+      "expected_failure": true
+    },
+    "baseline/deadline": {
+      "exit_code": 1,
+      "expected_failure": true
+    },
+    "baseline/pong": {
+      "exit_code": 1,
+      "expected_failure": true
+    },
+    "baseline/fd-reuse": {
+      "exit_code": 1,
+      "expected_failure": true
+    }
+  },
+  "source_sha256": {
+    "idf/esp32c3-oled-native/main/websocket_service.c": "3d592c20e910f54a76c784d72906ed9fee2f39c172414b557a42a4aab05e2c38",
+    "idf/esp32c3-oled-native/main/websocket_service.h": "5c2eb7d817ce0078eabed792fdc8bf56415a00e76bb9b2d276fee378d5a72307",
+    "idf/esp32c3-oled-native/main/websocket_message.h": "7fdb3af8296270db4866a1c04688d4be4d6ba8d5850f9672fe6b4c10e11db85c",
+    "idf/esp32c3-oled-native/main/json_buffer.h": "f4b4fb8e7e8ae1c8dcdc6c25ffdb75410712f3bb2c0c4dff93499893a6015ad9",
+    "idf/components/native_stream/include/websocket_message.h": "02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+    "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+    "idf/components/native_web_transport/include/native_web_transport.h": "dc160a3d9386fd6fc0c51c494a1171c534dec1bd7f98fb07d47e984d5fe003a1",
+    "tests/run-c3-websocket-io.py": "3a2b400dbaed3ad2993beec64bedc4cdac82ed79e46c4fe08fce21a8e5a054d3",
+    "tests/native/c3_ws_io/stubs.h": "1eac6f9eca361102e3f2a3aba83f6c63105bca75b521a818c2fc5db1ffe7d642",
+    "tests/native/c3_ws_io/test.c": "5af1adf8251bbc7d8d982dd2c678a3c35c7aeeefad4324f0569564baa15ff3c4"
+  },
+  "baseline_ref": "d13706c2",
+  "baseline_sha256": "8bb8aa07732acdfa796f20300a3222ad3ec75c24088019fa4b2719ed6853bad6",
+  "sdk_sha256": {
+    "components/esp_http_server/src/httpd_ws.c": "744304f779c54064d6453d2af3dcabde36c3b255a7930cbd903c0e8e4225eb3a",
+    "components/esp_http_server/src/httpd_txrx.c": "db2e0165c4c6aaff43615f68357cd3adc4f2f3a0cea8fe988e72ff31f0735436"
+  },
+  "application_frame_send_budget_us": 1000000,
+  "application_receive_handler_budget_us": 1000000,
+  "fragmented_message_budget_us": 5000000,
+  "separate_fallback_budgets": "SDK opcode and SDK control operations before the application handler each have finite per-read/write budgets.",
+  "scope": "Actual production transport/session/broadcast/handler/register functions and unchanged pinned-IDF WS framing/receive functions; deterministic lwIP, clock, context and queue seams. Correct commands, reboot and status-task scheduling are preserved but not executed by this targeted test. No board RAM/stack/latency/TCP timing proof."
+}

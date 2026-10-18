@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "physical_flash_tested": false,
+  "fixture_groups": 44,
+  "source_sha256": {
+    "tests/run-cyd-wifi-storage.py": "f59f88bda338e0a5931bb6c93ad2e5574a64dca3160d58ff259beec29e936947",
+    "tests/native/cyd_wifi_storage_test.c": "762946e60930636520fa2c1edf5f23b3a97def16bf7627acfe17ee4947cb0cd5",
+    "tests/native/cyd_wifi_warning_test.c": "6425eaa553c87fc18276b0498e9169b9a4960c812d3bff456505379729b94e23",
+    "tests/run-cyd-wifi-warning.py": "d2a8e013c1894e19dfb0ce4dd463c1018b064c325fe7e23b0e8ea2d6be7c3c81",
+    "tests/run-web-warning-regressions.py": "5e77db93a57cd0a4d2e70390e3dba02ee32f585da75b169b4bfa51c25a61ec5d",
+    "idf/esp32-cyd2usb-native/main/network_service.c": "47905c61c246a4762d3e0f969ef96b6afdd8172d9b80b7ce2fd3ecfa81a6b971",
+    "idf/esp32-cyd2usb-native/main/network_service.h": "455b83a17c68e54e74a3387180c2da503348db9081a1a77cfa2469e1657cfa23",
+    "idf/esp32-cyd2usb-native/main/web_upload.c": "4781f8e3c3cf10e18ef506d0b6ca076bd4399a107fddc6d21a4d910964914193",
+    "idf/esp32-cyd2usb-native/main/web_upload.h": "c13fbe33f581520e2b92fd1cbbfe116d5e6f0036e77a2de9517300533b7df6b0",
+    "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+    "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b",
+    "idf/components/native_storage/include/credential_line.h": "4d09bb3fc82c7125b82f6940778757a1aaebe4cf76dd8b9a6aff9641b7863fa2"
+  },
+  "scope": "Actual bounded validation, save, first-valid reader and storage/transaction functions; mapped host filesystem with SPIFFS no-overwrite rename rules, explicit stdio/stat/rename/remove/OOM/timeout faults and pthread concurrent saves. No hardware flash durability, network reconnection, or reboot timing claim."
+}

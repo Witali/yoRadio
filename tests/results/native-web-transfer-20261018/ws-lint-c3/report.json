@@ -1,0 +1,75 @@
+{
+  "scope": "Supplemental focused clang-tidy after early HTTP 400 fallback fix; historical full reports preserved.",
+  "tool": "LLVM (http://llvm.org/):\n  LLVM version 21.1.3\n  Optimized build.",
+  "tool_path": "C:/Work/yoRadio/.idf/tools-v6.1/tools/esp-clang/esp-21.1.3_20260408/esp-clang/bin/clang-tidy.exe",
+  "command": [
+    "C:/Work/yoRadio/.idf/tools-v6.1/tools/esp-clang/esp-21.1.3_20260408/esp-clang/bin/clang-tidy.exe",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+    "-p",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer",
+    "--config-file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.clang-tidy",
+    "--header-filter=C:[/\\\\]Work[/\\\\]yoRadio[/\\\\]\\.worktree[/\\\\]esp32\\-cyd\\-c3\\-review[/\\\\]",
+    "--export-fixes=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\ws-lint-http-fallback-c3\\idf__esp32c3-oled-native__main__websocket_service.c.yaml"
+  ],
+  "command_line": "C:/Work/yoRadio/.idf/tools-v6.1/tools/esp-clang/esp-21.1.3_20260408/esp-clang/bin/clang-tidy.exe C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c -p C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer --config-file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.clang-tidy --header-filter=C:[/\\\\]Work[/\\\\]yoRadio[/\\\\]\\.worktree[/\\\\]esp32\\-cyd\\-c3\\-review[/\\\\] --export-fixes=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\ws-lint-http-fallback-c3\\idf__esp32c3-oled-native__main__websocket_service.c.yaml",
+  "cwd": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review",
+  "started_utc": "2026-10-18T15:39:10.404403+00:00",
+  "finished_utc": "2026-10-18T15:39:17.774533+00:00",
+  "build_dir": "idf/esp32c3-oled-native/build-lint-web-transfer",
+  "header_filter": "C:[/\\\\]Work[/\\\\]yoRadio[/\\\\]\\.worktree[/\\\\]esp32\\-cyd\\-c3\\-review[/\\\\]",
+  "config_sha256": "27b1de038a07a9476ab195865192e9eebc8b58d036b0f359a6689caf2b7aed64",
+  "compile_commands_sha256": "643c99eb8a412359d1b5623f7618b9f09af35a13c8d6a97c1f71fd89128b5a8f",
+  "runner_sha256": "470df5c3a1adf8d3622fa70f4a56d3447e3770407a141407410b90f91d563987",
+  "helper_sha256": "d9b177f9ea867e6a35bd4497da2ae10d4417c3a7e3b93dcee16e2921cac76322",
+  "source_sha256": "3d592c20e910f54a76c784d72906ed9fee2f39c172414b557a42a4aab05e2c38",
+  "source_and_configuration_unchanged_during_analysis": true,
+  "export_fixes_written": true,
+  "units": 1,
+  "complete": true,
+  "returncode": 0,
+  "warnings": 3,
+  "errors": 0,
+  "diagnostics": [
+    {
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+      "line": 610,
+      "column": 56,
+      "severity": "warning",
+      "message": "repeated branch body in conditional chain",
+      "check": "bugprone-branch-clone"
+    },
+    {
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+      "line": 927,
+      "column": 14,
+      "severity": "warning",
+      "message": "Value stored to 'tenths' during its initialization is never read",
+      "check": "clang-analyzer-deadcode.DeadStores"
+    },
+    {
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+      "line": 958,
+      "column": 24,
+      "severity": "warning",
+      "message": "comparing object representation of type 'webui_status_key_t' which does not have a unique object representation; consider comparing the members of the object manually",
+      "check": "bugprone-suspicious-memory-comparison"
+    }
+  ],
+  "warning_checks": {
+    "bugprone-branch-clone": 1,
+    "clang-analyzer-deadcode.DeadStores": 1,
+    "bugprone-suspicious-memory-comparison": 1
+  },
+  "raw_warning_summary": [
+    "24 warnings generated.",
+    "Suppressed 21 warnings (21 in non-user code)."
+  ],
+  "baseline_report": ".build\\lint-c3-web-transfer-full\\report.json",
+  "baseline_report_sha256": "f8e9f8d8f0426d6edd06a45cfe0056a8044df2e1faa6a62b597565735833230a",
+  "baseline_source_sha256": "2030b6851c050811ff4b3a06162df582a987423b258344368a8ba0d659607c6c",
+  "baseline_warnings": 3,
+  "baseline_errors": 0,
+  "new_diagnostics": [],
+  "resolved_diagnostics": [],
+  "comparison": "Diagnostic identity uses file/column/severity/message/check; line shifts alone do not count as new warnings."
+}
