@@ -2,6 +2,7 @@
 const fs=require('node:fs'),zlib=require('node:zlib'),path=require('node:path');
 const file=path.join(__dirname,'../yoRadio/data/www/script.js.gz');
 let source=zlib.gunzipSync(fs.readFileSync(file)).toString('utf8');
+const original=source;
 if(!source.includes('function websocketBootstrapEnabled(')) {
   const replace=(from,to)=>{if(source.split(from).length!==2)throw new Error('Ambiguous/missing anchor: '+from);source=source.replace(from,to);};
   replace('var websocket;',`var websocket;
@@ -38,5 +39,12 @@ function initWebSocket() {`);
   }
   try{`);
   replace("        websocket.send('getindex=1');\n        //generatePlaylist", "        initialPlayerStateReady();\n        //generatePlaylist");
-  fs.writeFileSync(file,zlib.gzipSync(Buffer.from(source),{level:9}));
 }
+const plain='  websocket = new WebSocket(`ws://${hostname}/ws${initial}`);';
+const secure="  const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';\n"+
+  '  websocket = new WebSocket(`${scheme}://${window.location.host || hostname}/ws${initial}`);';
+if(source.includes(plain)) {
+  if(source.split(plain).length!==2)throw new Error('Ambiguous WebSocket transport anchor');
+  source=source.replace(plain,secure);
+} else if(!source.includes(secure))throw new Error('Missing WebSocket transport anchor');
+if(source!==original)fs.writeFileSync(file,zlib.gzipSync(Buffer.from(source),{level:9}));

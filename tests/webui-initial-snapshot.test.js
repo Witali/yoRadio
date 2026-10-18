@@ -2,9 +2,9 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),zlib=require('node:zlib'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
 const script=zlib.gunzipSync(fs.readFileSync(path.join(root,'yoRadio/data/www/script.js.gz'))).toString();
-function context(enabled,pathname='/') {
+function context(enabled,pathname='/',protocol='http:',host='radio') {
   const received=[],sent=[],urls=[];
-  const c={window:{location:{pathname}},hostname:'radio',playerUiReady:false,
+  const c={window:{location:{pathname,protocol,host}},hostname:'radio',playerUiReady:false,
     initialPlayerMessages:[],initialPlayerOverflow:false,clearTimeout(){},wstimeout:null,
     console:{log(){}},websocket:{send:x=>sent.push(x)},onOpen(){},onClose(){},
     WebSocket:class {constructor(url){urls.push(url);}send(x){sent.push(x);}}};
@@ -35,6 +35,15 @@ test('late bootstrap, reconnect and bounded early-message overflow are handled',
   assert.equal(c.initialPlayerMessages.length,16);assert.equal(c.initialPlayerOverflow,true);
   c.initialPlayerStateReady();assert.deepEqual(sent,['getindex=1']);
   assert.equal(c.initialPlayerMessages.length,0);
+});
+
+test('HTTPS pages use WSS and preserve the serving origin port',()=>{
+  for(const [enabled,suffix] of [[true,'?initial=1'],[false,'']]) {
+    const {c,urls}=context(enabled,'/','https:','radio.local:8443');
+    c.initWebSocket();assert.equal(urls[0],'wss://radio.local:8443/ws'+suffix);
+  }
+  const {c,urls}=context(true,'/','http:','radio.local:8080');
+  c.initWebSocket();assert.equal(urls[0],'ws://radio.local:8080/ws?initial=1');
 });
 test('Arduino, other boards and settings retain the legacy request-driven protocol',()=>{
   for(const [enabled,pathname] of [[undefined,'/'],[false,'/'],[true,'/settings.html']]) {
