@@ -40,7 +40,7 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-02 | Программная часть выполнена | Общие probe/ID3/ICY/JSON helpers подключены к CYD, HTTP startup ограничен общим deadline и числом redirects; fatal TLS/partial bytes и raw EOF проверены на реальном HTTP-парсере обоих SDK. Host/санитайзеры проходят; физическая сеть отдельно. |
 | CYD-C3-03 | Программная часть выполнена | CYD подключён к continuous MP3/ADTS confirmation, ID3 stripping/recovery и ordered codec drain. 34 corpus cases обеих целей, byte-exact переходы и шесть lifecycle вариантов проходят. PDM/continuous/legacy CYD и C3 source `8bf1d73a` собраны и сохранены. Физическая приёмка отдельно. |
 | CYD-C3-04 | Программная часть выполнена | Общая SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 и независимый control node подключены. Default-off bounded prefill проверен host-тестами и GCC/clang-tidy профилем 250 ms; image source `112c871f` сохранён. Физическая приёмка и выбор ёмкости/TLS reclaim — отдельно, этап 13. |
-| CYD-C3-05 | Открыт | Health, heap/largest block, ошибки allocation/decode/write, DMA и стеки; CPU по обоим ядрам. Отдельно quiet и diagnostic сборки. |
+| CYD-C3-05 | В работе | Подготовлен SMP-safe health модуль, bounded JSON и optional CPU sampler для обоих ядер; 60000 concurrent events, 32/64-bit counters, task lifetime и JSON bounds проходят host-проверки. Подключение к pipeline/HTTP и SDK-сборки — следующие шаги. Backend DMA telemetry отдельно. |
 | CYD-C3-06 | Открыт | Общая модель radio/settings, CSV offset index и recovery, станции Next/Prev, корректный format/bitrate/title. Повторный boot и fault injection без потери файлов. |
 | CYD-C3-07 | Открыт | WebSocket snapshot/events, динамические страницы, capabilities, async static workers, bounded uploads. Две вкладки, медленный клиент, reconnect и rollback файлов. |
 | CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
@@ -234,3 +234,12 @@ allocation и численные настройки C3 являются канд
   Дополнительный CYD профиль 250 ms собран и сохранён; полный clang-tidy
   этого профиля завершён для 14 units: 11 warnings, 0 parse/tool errors.
   Физический A/B остаётся отдельной работой.
+- CYD-C3-05: [health module](../idf/esp32-cyd2usb-native/main/native_health.c)
+  использует DRAM portMUX для allocation callback и согласованных fault tuples,
+  а не C3 single-core IRQ masking. Diagnostic sampler учитывает оба IDLE,
+  отдельный denominator и lifetime task number; имена из SDK snapshot не
+  разыменовываются после возможного удаления задачи. [Host-тесты](../tests/run-cyd-health.py)
+  проходят для quiet/diagnostic32/diagnostic64: по 60000 событий каждого типа,
+  concurrent snapshots, wrap, handle reuse, отсутствие снимка/IPC, startup OOM,
+  worst-case JSON и все capacity bounds. Pipeline/HTTP wiring и реальная
+  SDK-проверка ещё впереди; это не измерение CPU физической CYD.
