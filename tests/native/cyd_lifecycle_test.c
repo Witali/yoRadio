@@ -47,6 +47,10 @@ static atomic_uint s_generation;
 static unsigned open_handles, opens, closes, writes, flushes, discards;
 static unsigned eos_frames;
 static bool fail_open, fail_realloc, fail_process, fail_write, fail_flush, fail_config, cancel_acquire, fail_queue;
+static bool oversized_frame;
+static int info_result;
+static uint32_t info_rate=48000, expected_rate=48000;
+static int64_t test_now_us;
 static unsigned health_decoder_faults,health_output_faults;
 static native_health_decoder_stage_t health_decoder_stage;
 static int32_t health_decoder_result;
@@ -61,11 +65,11 @@ static bool short_input_stats;
 #ifdef CONFIG_YORADIO_STREAM_CONFIRM
 static void *s_start_control;
 #endif
-static int64_t esp_timer_get_time(void) {return 0;}
+static int64_t esp_timer_get_time(void) {return test_now_us;}
 static void vTaskDelay(unsigned ticks) {(void)ticks;assert(false);}
 static void native_audio_output_discard_pcm(void) { ++discards; }
 static int native_audio_output_flush_pcm(void) { ++flushes; return fail_flush ? ESP_FAIL : ESP_OK; }
-static int native_audio_output_configure(uint32_t rate) { assert(rate == 48000); return fail_config ? ESP_FAIL : ESP_OK; }
+static int native_audio_output_configure(uint32_t rate) { assert(rate == expected_rate); return fail_config ? ESP_FAIL : ESP_OK; }
 static const char *native_audio_output_name(void) { return "test"; }
 static void native_audio_output_idle(void) {}
 static void audio_level_led_update_peak(int peak) { (void)peak; }
@@ -94,10 +98,11 @@ static int esp_audio_simple_dec_process(void *handle, esp_audio_simple_dec_raw_t
     raw->consumed = raw->len;
     out->decoded_size = raw->len ? 16 : eos_frames ? (--eos_frames, 8) : 0;
     memset(out->buffer, raw->len ? raw->buffer[0] : 0xee, out->decoded_size);
+    if (oversized_frame) out->decoded_size=out->len+4; // Declared size only; vendor writes stay inside its capacity.
     return ESP_OK;
 }
 static int esp_audio_simple_dec_get_info(void *handle, esp_audio_simple_dec_info_t *info) {
-    assert(handle); *info = (esp_audio_simple_dec_info_t){48000,128000,16,2}; return ESP_OK;
+    assert(handle); *info = (esp_audio_simple_dec_info_t){info_rate,128000,16,2}; return info_result;
 }
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
 typedef void custom_legacy_decoder_t;
@@ -205,6 +210,7 @@ static void begin(unsigned gen) {
     opens=closes=writes=flushes=discards=0;
     fail_open=fail_realloc=fail_process=fail_write=fail_flush=fail_config=cancel_acquire=false;
     health_decoder_faults=health_output_faults=0;
+    oversized_frame=false;info_result=ESP_OK;info_rate=expected_rate=48000;test_now_us=0;
     cancel_prefill=false;prefill_queries=0;
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
     short_input_stats=false;
@@ -252,6 +258,22 @@ static void *command_thread(void *arg) {
     return NULL;
 }
 
+static void *format_state_thread(void *arg) {
+    uint32_t generation=(uint32_t)(uintptr_t)arg;
+    native_stream_info_t info={.codec="MP3",.sample_rate_hz=44100,.channels=2,.bits_per_sample=16,
+        .pcm_sample_rate_hz=44100,.pcm_channels=2};
+    for(unsigned i=0;i<10000;++i) native_state_set_stream_info(&state,generation,&info);
+    return NULL;
+}
+
+static void *bitrate_state_thread(void *arg) {
+    uintptr_t role=(uintptr_t)arg;
+    native_bitrate_source_t source=role==0 ? NATIVE_BITRATE_ICY : role==1 ? NATIVE_BITRATE_DECODER : NATIVE_BITRATE_MEASURED;
+    uint32_t value=role==0 ? 64 : role==1 ? 128 : 192;
+    for(unsigned i=0;i<10000;++i) native_state_publish_bitrate(&state,active_generation,value,source);
+    return NULL;
+}
+
 #define PDM_DMA_SAMPLES 512
 static int16_t s_sample_buffer[PDM_DMA_SAMPLES];
 static size_t s_buffered_samples;
@@ -275,11 +297,14 @@ int main(void) {
     begin(1); input(1,AUDIO_CONTINUE,3); input(1,AUDIO_END_EOF,0);
     run_task(decoder_task);
     assert(opens==1 && closes==1 && !open_handles && state.audio_running);
+    assert(state.sample_rate_hz==48000 && state.pcm_sample_rate_hz==48000 && state.channels==2 && state.bits_per_sample==16);
+    assert(state.bitrate_kbps==128 && !strcmp(state.stream_format,"AAC PCM 48 kHz stereo"));
     assert(!health_decoder_faults);
     assert(pcm.used==4); // Initial PCM, two cached EOS packets, terminal marker.
     run_task(output_task);
     assert(writes==3 && last_sample==0xee && flushes==1 && !state.audio_running);
     assert(!strcmp(state.stream_format,"stream ended"));
+    assert(!state.sample_rate_hz && !state.codec[0] && !state.bitrate_kbps);
 
     begin(2); input(2,AUDIO_END_READ_FAILED,0); run_task(decoder_task);
     assert(!opens && pcm.used==1); run_task(output_task);
@@ -379,6 +404,60 @@ int main(void) {
     assert(!strcmp(state.stream_format,"stopped"));
 #endif
 
+#ifndef CONFIG_YORADIO_AAC_DECODER_HELIX
+    begin(80);info_rate=expected_rate=44100;input(80,AUDIO_CONTINUE,3);input(80,AUDIO_END_EOF,0);
+    run_task(decoder_task);assert(!strcmp(state.stream_format,"AAC PCM 44.1 kHz stereo"));
+    assert(state.sample_rate_hz==44100 && state.pcm_sample_rate_hz==44100 && state.bitrate_kbps==128);
+    run_task(output_task);assert(writes==3 && !health_decoder_faults);
+    begin(81);info_result=ESP_FAIL;input(81,AUDIO_CONTINUE,3);run_task(decoder_task);
+    assert(health_decoder_faults==1 && health_decoder_stage==NATIVE_HEALTH_INFO && health_decoder_result==ESP_FAIL);
+    assert(pcm.used==1 && !open_handles);run_task(output_task);assert(!writes);
+    begin(82);oversized_frame=true;input(82,AUDIO_CONTINUE,3);run_task(decoder_task);
+    assert(health_decoder_faults==1 && health_decoder_stage==NATIVE_HEALTH_PROCESS && health_decoder_result==ESP_FAIL);
+    assert(pcm.used==1 && !open_handles);run_task(output_task);assert(!writes);
+    begin(83);info_rate=0;input(83,AUDIO_CONTINUE,3);run_task(decoder_task);
+    assert(health_decoder_faults==1 && health_decoder_stage==NATIVE_HEALTH_INFO);run_task(output_task);assert(!writes);
+#endif
+    begin(84);
+    pthread_t publisher;assert(!pthread_create(&publisher,NULL,format_state_thread,(void *)(uintptr_t)84));
+    native_state_fail_audio(&state,84,"latched output error");assert(!pthread_join(publisher,NULL));
+    native_state_set_connecting(&state,84);native_state_set_audio(&state,84,true,"late PCM");
+    native_state_set_audio(&state,84,false,"late EOF");native_state_set_bitrate(&state,84,999);
+    assert(state.audio_failed && !state.audio_running && !state.audio_pending && !state.sample_rate_hz && !state.bitrate_kbps);
+    assert(!strcmp(state.stream_format,"latched output error"));
+    begin(85);assert(!state.audio_failed);
+    native_state_publish_bitrate(&state,85,96,NATIVE_BITRATE_ICY);assert(state.bitrate_kbps==96);
+    native_state_set_bitrate(&state,85,128);native_state_publish_bitrate(&state,85,64,NATIVE_BITRATE_ICY);
+    assert(state.bitrate_kbps==128 && state.bitrate_source==NATIVE_BITRATE_DECODER);
+    pthread_t bitrate_writers[3];
+    for(uintptr_t i=0;i<3;++i)assert(!pthread_create(&bitrate_writers[i],NULL,bitrate_state_thread,(void *)i));
+    for(unsigned i=0;i<3;++i)assert(!pthread_join(bitrate_writers[i],NULL));
+    assert(state.bitrate_kbps==192 && state.bitrate_source==NATIVE_BITRATE_MEASURED);
+    native_state_publish_bitrate(&state,84,999,NATIVE_BITRATE_MEASURED);assert(state.bitrate_kbps==192);
+    begin(86);state_set_decoder_bitrate(86,UINT32_MAX);assert(state.bitrate_kbps==4294967U);
+    begin(87);
+    native_stream_info_t fractional={.codec="MP3",.sample_rate_hz=11025,.channels=1,.bits_per_sample=16,
+        .pcm_sample_rate_hz=11025,.pcm_channels=1};
+    assert(native_state_set_stream_info(&state,87,&fractional) && !strcmp(state.stream_format,"MP3 11.025 kHz mono"));
+    native_state_set_bitrate(&state,87,96);char details[80];native_state_format_stream_details(&state,details,sizeof(details));
+    assert(!strcmp(details,"MP3 11.025 kHz mono 96 kbps"));
+    struct {char text[5];unsigned char guard;} tiny={.guard=0x5a};
+    native_state_format_stream_details(&state,tiny.text,sizeof(tiny.text));assert(tiny.text[4]==0 && tiny.guard==0x5a);
+    native_state_fail_audio(&state,86,"stale output error");assert(state.audio_running && !state.audio_failed);
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+    begin(90);
+    custom_legacy_output_context_t format_context={.generation=90,.codec=NATIVE_CODEC_AAC};
+    custom_legacy_info_t first_format={48000,128000,16,2}, second_format={44100,64000,16,1};
+    const uint8_t format_pcm[16]={0};
+    assert(custom_legacy_output(&format_context,&first_format,format_pcm,sizeof(format_pcm)));
+    test_now_us=2000000;
+    assert(custom_legacy_output(&format_context,&second_format,format_pcm,sizeof(format_pcm)));
+    pcm_packet_t *changed=pcm.items[1];
+    assert(changed->sample_rate==44100 && changed->channels==1 && changed->data_size==sizeof(format_pcm));
+    assert(!strcmp(state.stream_format,"AAC PCM 44.1 kHz mono") && state.bitrate_kbps==64);
+    assert(state.channels==1 && state.pcm_channels==1 && state.format_is_pcm);
+    free(pcm.items[0]);free(pcm.items[1]);
+#endif
     begin(100);
     pthread_t first, second;
     assert(!pthread_create(&first,NULL,command_thread,(void *)0));

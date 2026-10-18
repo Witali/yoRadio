@@ -36,11 +36,12 @@ static bool stream_start_publish(stream_route_context_t *route,
         case STREAM_PROBE_OGG: next=NATIVE_CODEC_OGG; break;
         default: return false;
     }
-    // Publish the provisional family before handing any bytes to the decoder.
-    // Replay can block long enough for it to publish a more precise profile.
+    // Targets that expose provisional running publish before decoder replay.
+    // Other targets retain pending/hints until actual PCM confirms a format.
     if (!s_stream_start.published) {
         *route->codec=next;
-        state_set_audio(route->generation, STREAM_PROVISIONAL_RUNNING, codec_name(next));
+        if (STREAM_PROVISIONAL_RUNNING)
+            state_set_audio(route->generation, STREAM_PROVISIONAL_RUNNING, codec_name(next));
         s_stream_start.published=true;
     }
     // Keep the old family until stream_route_begin emits its ordered drain.

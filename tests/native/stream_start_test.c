@@ -112,7 +112,13 @@ static void run_case(const uint8_t *input,size_t bytes,const uint8_t *expected,
         fprintf(stderr,"input=%zu chunk=%zu initial=%u terminal=%u expected=%u bytes=%zu expected_bytes=%zu\n",
                 bytes,chunk,initial,terminal,expected_end,captured,expected_bytes);
     assert(terminal==expected_end && captured==expected_bytes);
+#ifdef STREAM_TARGET_CYD
+    // CYD keeps connecting/ICY hints until confirmed decoder PCM. A family
+    // probe must not publish a stopped state that clears those fields.
+    assert(provisional_updates==0);
+#else
     assert(provisional_updates==(expected_bytes ? 1u : 0u));
+#endif
     if(expected_bytes)assert(!memcmp(capture,expected,expected_bytes));
     finish();
 }

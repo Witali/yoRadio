@@ -1,0 +1,81 @@
+menu "yoRadio native firmware"
+
+    config YORADIO_NATIVE_DIAGNOSTICS
+        bool "Diagnostic two-core CPU and stack sampler"
+        depends on !FREERTOS_UNICORE
+        select FREERTOS_GENERATE_RUN_TIME_STATS
+        default n
+        help
+            Add a 4096-byte sampler task, task snapshots and occasional IPC
+            every five seconds. Use the global ESP timer runtime clock.
+            Quiet builds retain only cumulative fault counters and on-demand
+            heap/input health. Diagnostic overhead needs board qualification.
+
+    config YORADIO_ADAPTIVE_INPUT_BUFFER
+        bool "Leased compressed input queue"
+        default y
+        help
+            Keep at least four packet slots with an eight-slot budget. Queue
+            leases and SMP locks protect published data from reclamation.
+
+    config YORADIO_FRAME_ROUTER
+        bool "MP3/ADTS frame routing and codec drain"
+        depends on YORADIO_ADAPTIVE_INPUT_BUFFER
+        default y
+
+    config YORADIO_STREAM_CONFIRM
+        bool "Continuous bounded frame confirmation"
+        depends on YORADIO_FRAME_ROUTER
+        default y
+        help
+            Confirm the next boundary before publishing a candidate frame.
+            Share startup storage with input slots and keep an independent
+            control node for replay/drain/completion without a fifth slot.
+
+    config YORADIO_INPUT_TAIL_COALESCE
+        bool "Coalesce short reads into a queued data tail"
+        depends on YORADIO_FRAME_ROUTER
+        default y
+        help
+            Only the producer reopens a partial READY tail. Never modify a
+            READING lease, the sole queued node, or a control packet.
+
+    config YORADIO_INPUT_PREFILL_MS
+        int "Maximum first-input prefill wait (ms)"
+        depends on YORADIO_ADAPTIVE_INPUT_BUFFER
+        range 0 2000
+        default 0
+        help
+            Wait until input storage is occupied or this deadline expires.
+            Stop/output failure cancels the wait. Independent startup control
+            replay bypasses it, and codec drain does not restart it. Zero keeps
+            this disabled until a CYD network/audio profile is measured.
+
+    choice YORADIO_NATIVE_AUDIO_OUTPUT
+        prompt "Default audio output"
+        default YORADIO_NATIVE_AUDIO_OUTPUT_PDM
+
+        config YORADIO_NATIVE_AUDIO_OUTPUT_PDM
+            bool "I2S hardware PCM-to-PDM on GPIO26"
+            help
+                Use the ESP32 I2S0 PCM-to-PDM converter. The hardware side
+                runs at 48 kHz with a 6.144 MHz PDM carrier; lower-rate input
+                streams are resampled to 48 kHz.
+
+        config YORADIO_NATIVE_AUDIO_OUTPUT_DAC
+            bool "Internal 8-bit DAC on GPIO26"
+            help
+                Use the ESP32 internal DAC continuous-mode driver.
+
+        config YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC
+            bool "Legacy ESP-IDF 5.5 I2S/DAC on GPIO26"
+            help
+                Compile Espressif's final legacy I2S built-in-DAC driver from
+                the pinned ESP-IDF v5.5.4 source tree. PCM is oversampled x16
+                and its fractional low byte is noise-shaped between adjacent
+                8-bit DAC codes. This is intended as a compatibility and
+                audio-quality comparison backend.
+
+    endchoice
+
+endmenu

@@ -56,7 +56,7 @@ static esp_err_t status_handler(httpd_req_t *request) {
     if (state.network_mode == NATIVE_NETWORK_ACCESS_POINT) mode = "ap";
     if (state.network_mode == NATIVE_NETWORK_ERROR) mode = "error";
     // Enough for the worst six-byte JSON escape of every bounded field.
-    char body[2304];
+    char body[2560];
     json_buffer_t output;
     json_buffer_init(&output, body, sizeof(body));
     json_buffer_raw(&output, "{\"firmware\":\"esp-idf-native\",\"arduino\":false,\"network\":");
@@ -68,6 +68,16 @@ static esp_err_t status_handler(httpd_req_t *request) {
     json_buffer_string(&output, state.stream_format);
     json_buffer_raw(&output, ",\"title\":");
     json_buffer_string(&output, state.title);
+    const char *bitrate_source = state.bitrate_source == NATIVE_BITRATE_ICY ? "icy" :
+        state.bitrate_source == NATIVE_BITRATE_DECODER ? "decoder" :
+        state.bitrate_source == NATIVE_BITRATE_MEASURED ? "measured" : "none";
+    char metadata[256];
+    snprintf(metadata,sizeof(metadata),",\"generation\":%lu,\"bitrate\":%lu,\"sample_rate_hz\":%lu,\"channels\":%u,\"bits_per_sample\":%u,\"pcm_sample_rate_hz\":%lu,\"pcm_channels\":%u,\"format_is_pcm\":%s,\"channels_are_core\":%s,\"codec\":",
+        (unsigned long)state.audio_generation,(unsigned long)state.bitrate_kbps,(unsigned long)state.sample_rate_hz,
+        state.channels,state.bits_per_sample,(unsigned long)state.pcm_sample_rate_hz,state.pcm_channels,
+        state.format_is_pcm ? "true" : "false",state.channels_are_core ? "true" : "false");
+    json_buffer_raw(&output,metadata);json_buffer_string(&output,state.codec);
+    json_buffer_raw(&output,",\"bitrate_source\":");json_buffer_string(&output,bitrate_source);
     char settings[64];
     snprintf(settings, sizeof(settings), ",\"connecting\":%s,\"volume\":%u,\"balance\":%d}",
              state.audio_pending ? "true" : "false",

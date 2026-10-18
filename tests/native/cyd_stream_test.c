@@ -51,6 +51,7 @@ static int statuses[8], open_error, header_error, redirect_error;
 static const uint8_t *body_data;
 static size_t body_size, body_offset;
 static const char *interval_text, *second_interval;
+static const char *bitrate_text,*redirect_bitrate;
 static bool cancel_read, fail_client, fail_buffer, stall_body, fatal_tls, retry_tls;
 static bool icy_first_response_only;
 static void *task_buffer;
@@ -185,6 +186,7 @@ static int64_t esp_http_client_fetch_headers(esp_http_client_handle_t c) {
     // ICY must not depend on the first eight saved SDK header slots.
     for(unsigned i=0;i<32;++i)header("X-Test","value");
     header("Content-Type","audio/mpeg"); // Deliberately wrong for AAC fixtures.
+    if(bitrate_text)header("icy-br",opens>1 && redirect_bitrate ? redirect_bitrate : bitrate_text);
     if(interval_text && (!icy_first_response_only || opens==1))header("IcY-MeTaInT",interval_text);
     if(second_interval)header("icy-metaint",second_interval);
     return (int64_t)body_size;
@@ -243,6 +245,7 @@ static int xRingbufferSendComplete(void *ring,void *data) {
         assert(encoded_bytes+p->data_size<=sizeof(captured));
         memcpy(captured+encoded_bytes,p->data,p->data_size);encoded_bytes+=p->data_size;
         assert(!state.audio_running); // Probe success is not decoded PCM progress.
+        assert(state.audio_pending); // Header/probe publication cannot end pending or erase bitrate hints.
         selected_codec=(unsigned)p->codec;
     }
     free(p);return pdTRUE;
@@ -256,6 +259,7 @@ static void setup(const uint8_t *data,size_t size,unsigned chunk) {
     open_error=header_error=redirect_error=tls_error=tls_code=0;
     for(unsigned i=0;i<8;++i)statuses[i]=200;
     interval_text=second_interval=NULL;
+    bitrate_text=redirect_bitrate=NULL;
     cancel_read=fail_client=fail_buffer=stall_body=fatal_tls=retry_tls=false;
     icy_first_response_only=false;
     body_data=data;body_size=size;body_offset=0;
@@ -324,6 +328,14 @@ int main(void) {
     for(unsigned i=0;i<4;++i){setup(aac,sizeof(aac),2048);interval_text=bad[i];play();assert(!reads && !packets && !strcmp(state.stream_format,"invalid ICY interval"));}
     setup(aac,sizeof(aac),2048);interval_text="5";second_interval="6";play();assert(!reads && !packets);
 
+    setup(aac,sizeof(aac),2048);bitrate_text=" 96 ";play();assert(state.bitrate_kbps==96 && state.bitrate_source==NATIVE_BITRATE_ICY);
+    setup(aac,sizeof(aac),2048);bitrate_text="192";redirect_bitrate="64";statuses[0]=302;play();
+    assert(state.bitrate_kbps==64 && state.bitrate_source==NATIVE_BITRATE_ICY);
+    const char *bad_bitrate[]={"-1","4294967296","64junk","x","0"};
+    for(unsigned i=0;i<sizeof(bad_bitrate)/sizeof(bad_bitrate[0]);++i) {
+        setup(aac,sizeof(aac),2048);bitrate_text=bad_bitrate[i];play();assert(!state.bitrate_kbps && state.bitrate_source==NATIVE_BITRATE_NONE);
+        exact(aac,sizeof(aac),NATIVE_CODEC_AAC,AUDIO_END_EOF);
+    }
     httpd_req_t request={0};native_state_begin_audio(&state,1000,"station \" \\","format\nline");
     native_state_set_audio(&state,1000,true,NULL);
     native_state_set_title(&state,1000,"title \" \\ Привет 🌍\n");
@@ -332,7 +344,12 @@ int main(void) {
     memset(state.station,1,sizeof(state.station)-1);state.station[sizeof(state.station)-1]=0;
     memset(state.title,1,sizeof(state.title)-1);state.title[sizeof(state.title)-1]=0;
     memset(state.stream_format,1,sizeof(state.stream_format)-1);state.stream_format[sizeof(state.stream_format)-1]=0;
+    memset(state.codec,1,sizeof(state.codec)-1);state.codec[sizeof(state.codec)-1]=0;
+    state.audio_generation=state.bitrate_kbps=state.sample_rate_hz=state.pcm_sample_rate_hz=UINT32_MAX;
+    state.channels=state.bits_per_sample=state.pcm_channels=UINT8_MAX;state.format_is_pcm=state.channels_are_core=true;
+    state.bitrate_source=NATIVE_BITRATE_MEASURED;
     assert(status_handler(&request)==ESP_OK && response_status==200);printf("MAX_STATUS=%s\n",response);
+    state.audio_generation=1000;
     char long_title[201];for(unsigned i=0;i<100;++i){long_title[i*2]=(char)0xd0;long_title[i*2+1]=(char)0xb0;}long_title[200]=0;
     native_state_set_title(&state,1000,long_title);
     assert(status_handler(&request)==ESP_OK && response_status==200);printf("UTF8_STATUS=%s\n",response);

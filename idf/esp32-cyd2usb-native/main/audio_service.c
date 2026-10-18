@@ -96,6 +96,7 @@ static SemaphoreHandle_t s_control_lock;
 
 typedef struct {
     uint32_t interval;
+    uint32_t bitrate_kbps;
     bool seen, valid;
 } stream_headers_t;
 
@@ -130,6 +131,42 @@ static const char *codec_name(native_codec_t codec) {
     }
 }
 
+static uint32_t s_decoder_bitrate_generation, s_decoder_bitrate_bps;
+static int64_t s_decoder_bitrate_updated_us;
+
+static void state_set_decoder_bitrate(uint32_t generation, uint32_t bitrate_bps) {
+    if (!bitrate_bps || generation != atomic_load(&s_generation)) return;
+    if (s_decoder_bitrate_generation != generation) {
+        s_decoder_bitrate_generation = generation;
+        s_decoder_bitrate_bps = 0;
+        s_decoder_bitrate_updated_us = 0;
+    }
+    if (bitrate_bps == s_decoder_bitrate_bps) return;
+    int64_t now = esp_timer_get_time();
+    if (s_decoder_bitrate_bps && now-s_decoder_bitrate_updated_us < 1000000LL) return;
+    s_decoder_bitrate_bps = bitrate_bps;
+    s_decoder_bitrate_updated_us = now;
+    native_state_set_bitrate(s_state,generation,(uint32_t)(((uint64_t)bitrate_bps+500U)/1000U));
+}
+
+static bool publish_stream_info(uint32_t generation, native_codec_t codec,
+                                 const esp_audio_simple_dec_info_t *info) {
+    if (generation != atomic_load(&s_generation) ||
+        generation == atomic_load(&s_failed_generation) || !info->sample_rate ||
+        !info->channel || !info->bits_per_sample || info->bits_per_sample % 8U) return false;
+    native_stream_info_t description = {
+        .codec=codec_name(codec), .sample_rate_hz=info->sample_rate,
+        .channels=info->channel, .bits_per_sample=info->bits_per_sample,
+        .pcm_sample_rate_hz=info->sample_rate, .pcm_channels=info->channel,
+        // The public AAC API confirms decoder PCM, not nominal HE/PS layout.
+        .format_is_pcm=codec==NATIVE_CODEC_AAC,
+    };
+    native_state_set_stream_info(s_state,generation,&description);
+    state_set_decoder_bitrate(generation,info->bitrate);
+    return generation == atomic_load(&s_generation) &&
+           generation != atomic_load(&s_failed_generation);
+}
+
 static void state_set_audio(uint32_t generation, bool running,
                              const char *format) {
     if (running && atomic_load(&s_failed_generation) == generation) return;
@@ -146,9 +183,15 @@ static void fail_generation(uint32_t generation) {
 
 static esp_err_t stream_header_event(esp_http_client_event_t *event) {
     if (event->event_id != HTTP_EVENT_ON_HEADER || !event->user_data ||
-        !event->header_key || !event->header_value ||
-        strcasecmp(event->header_key, "icy-metaint") != 0) return ESP_OK;
+        !event->header_key || !event->header_value) return ESP_OK;
     stream_headers_t *headers = event->user_data;
+    if (strcasecmp(event->header_key,"icy-br") == 0) {
+        uint32_t bitrate;
+        if (!headers->bitrate_kbps && stream_body_interval(event->header_value,&bitrate) && bitrate)
+            headers->bitrate_kbps = bitrate;
+        return ESP_OK; // Optional hint; malformed values never reject audio.
+    }
+    if (strcasecmp(event->header_key,"icy-metaint") != 0) return ESP_OK;
     uint32_t interval;
     if (!stream_body_interval(event->header_value, &interval) ||
         (headers->seen && headers->interval != interval)) {
@@ -304,7 +347,6 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
                 case STREAM_PROBE_OGG: *codec = NATIVE_CODEC_OGG; break;
                 default: return false;
             }
-            state_set_audio(generation, false, codec_name(*codec));
             // Replay the assembled header exactly once, before this read's tail.
 #ifdef CONFIG_YORADIO_FRAME_ROUTER
             if (!stream_route_feed(&route, probe->header, probe->used))
@@ -316,7 +358,6 @@ static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
             data += consumed;
             size -= consumed;
         }
-        if (*first_chunk) state_set_audio(generation, false, codec_name(*codec));
         *first_chunk = false;
     }
 #ifdef CONFIG_YORADIO_FRAME_ROUTER
@@ -435,6 +476,7 @@ static void stream_task(void *argument) {
             esp_http_client_cleanup(client);
             continue;
         }
+        native_state_publish_bitrate(s_state,command.generation,headers.bitrate_kbps,NATIVE_BITRATE_ICY);
         esp_http_client_set_timeout_ms(client, STREAM_READ_TIMEOUT_MS);
         // MIME is advisory. Automatic selection waits for actual body bytes.
         stream_input_t input = {.generation=command.generation,
@@ -541,28 +583,21 @@ static bool send_pcm_end(uint32_t generation, uint8_t reason) {
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
 typedef struct {
     uint32_t generation;
+    native_codec_t codec;
     esp_audio_simple_dec_info_t stream_info;
-    bool stream_info_ready;
 } custom_legacy_output_context_t;
 
 static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
                                  const uint8_t *pcm, size_t pcm_size) {
     custom_legacy_output_context_t *context = user;
     if (context->generation != atomic_load(&s_generation)) return false;
-    if (!context->stream_info_ready) {
-        context->stream_info = (esp_audio_simple_dec_info_t){
+    context->stream_info = (esp_audio_simple_dec_info_t){
             .sample_rate = info->sample_rate,
             .bits_per_sample = info->bits_per_sample,
             .channel = info->channels,
             .bitrate = info->bitrate,
-        };
-        context->stream_info_ready = true;
-        char format[48];
-        snprintf(format, sizeof(format), "%lu kHz %s",
-                 (unsigned long)(info->sample_rate / 1000),
-                 info->channels == 1 ? "mono" : "stereo");
-        state_set_audio(context->generation, true, format);
-    }
+    };
+    if (!publish_stream_info(context->generation,context->codec,&context->stream_info)) return false;
     return send_pcm(context->generation, &context->stream_info, pcm, pcm_size);
 }
 #endif
@@ -668,6 +703,7 @@ static void decoder_task(void *argument) {
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             legacy_context = (custom_legacy_output_context_t){
                 .generation = generation,
+                .codec = codec,
             };
             if (
 #ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
@@ -789,25 +825,28 @@ static void decoder_task(void *argument) {
                 end_reason = AUDIO_END_DECODE_FAILED;
                 break;
             }
+            if (frame.decoded_size > output_size) {
+                failure_result = ESP_FAIL;
+                end_reason = AUDIO_END_DECODE_FAILED;
+                break;
+            }
             raw.buffer += raw.consumed;
             raw.len -= raw.consumed;
             if (frame.decoded_size) {
                 esp_audio_simple_dec_info_t info = {0};
-                if (esp_audio_simple_dec_get_info(decoder, &info) ==
-                    ESP_AUDIO_ERR_OK) {
-                    char format[48];
-                    snprintf(format, sizeof(format), "%lu kHz %s",
-                             (unsigned long)(info.sample_rate / 1000),
-                             info.channel == 1 ? "mono" : "stereo");
-                    state_set_audio(generation, true, format);
-                    if (!send_pcm(generation, &info, output,
-                                  frame.decoded_size)) {
-                        failure_stage = NATIVE_HEALTH_PCM;
-                        failure_result = ESP_FAIL;
-                        ESP_LOGW(TAG, "PCM buffer stalled");
-                        end_reason = AUDIO_END_BUFFER_STALLED;
-                        break;
-                    }
+                esp_audio_err_t info_result = esp_audio_simple_dec_get_info(decoder, &info);
+                if (info_result != ESP_AUDIO_ERR_OK || !publish_stream_info(generation,codec,&info)) {
+                    failure_stage = NATIVE_HEALTH_INFO;
+                    failure_result = info_result == ESP_AUDIO_ERR_OK ? ESP_FAIL : (int32_t)info_result;
+                    end_reason = AUDIO_END_DECODE_FAILED;
+                    break;
+                }
+                if (!send_pcm(generation, &info, output,frame.decoded_size)) {
+                    failure_stage = NATIVE_HEALTH_PCM;
+                    failure_result = ESP_FAIL;
+                    ESP_LOGW(TAG, "PCM buffer stalled");
+                    end_reason = AUDIO_END_BUFFER_STALLED;
+                    break;
                 }
             }
             if (!raw.consumed && !frame.decoded_size && !raw.eos) {
@@ -880,7 +919,11 @@ static void output_task(void *argument) {
         }
         if (packet->end_of_stream) {
             esp_err_t result = native_audio_output_flush_pcm();
-            if (result != ESP_OK) native_health_output_failure(packet->generation, NATIVE_HEALTH_OUTPUT_FLUSH, result);
+            if (result != ESP_OK) {
+                native_health_output_failure(packet->generation, NATIVE_HEALTH_OUTPUT_FLUSH, result);
+                fail_generation(packet->generation);
+                native_state_fail_audio(s_state,packet->generation,audio_completion_status(AUDIO_END_OUTPUT_FAILED));
+            }
             state_set_audio(packet->generation, false,
                 result == ESP_OK ? audio_completion_status(packet->end_of_stream)
                                  : audio_completion_status(AUDIO_END_OUTPUT_FAILED));
@@ -899,7 +942,7 @@ static void output_task(void *argument) {
                 vRingbufferReturnItem(s_pcm, packet);
                 failed_generation = generation;
                 fail_generation(generation);
-                state_set_audio(generation, false, "audio output failed");
+                native_state_fail_audio(s_state,generation,"audio output failed");
                 continue;
             }
             sample_rate = packet->sample_rate;
@@ -920,7 +963,7 @@ static void output_task(void *argument) {
                      esp_err_to_name(result));
             failed_generation = generation;
             fail_generation(generation);
-            state_set_audio(generation, false, "audio output failed");
+            native_state_fail_audio(s_state,generation,"audio output failed");
         }
         vRingbufferReturnItem(s_pcm, packet);
     }

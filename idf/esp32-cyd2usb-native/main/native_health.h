@@ -16,6 +16,7 @@ typedef enum {
     NATIVE_HEALTH_OPEN = 1,
     NATIVE_HEALTH_PROCESS,
     NATIVE_HEALTH_PCM,
+    NATIVE_HEALTH_INFO,
 } native_health_decoder_stage_t;
 
 typedef enum {

@@ -71,6 +71,9 @@ size_t strlcpy(char *, const char *, size_t);
     assert row['volume']==123 and row['balance']==-4 and row['arduino'] is False
     maximum=rows['MAX_STATUS']
     assert maximum['station']=='\1'*95 and maximum['title']=='\1'*191 and maximum['format']=='\1'*47
+    assert maximum['codec']=='\1'*15 and maximum['bitrate_source']=='measured'
+    assert maximum['generation']==maximum['bitrate']==maximum['sample_rate_hz']==maximum['pcm_sample_rate_hz']==2**32-1
+    assert maximum['channels']==maximum['bits_per_sample']==maximum['pcm_channels']==255
     assert rows['UTF8_STATUS']['title']=='а'*95+'\ufffd'
     health=rows['HEALTH']
     assert health['boot_id']=='0123456789abcdef' and health['uptime_ms']==12345
