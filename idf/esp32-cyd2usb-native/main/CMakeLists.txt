@@ -12,7 +12,10 @@ set(NATIVE_SRCS
   "native_health.c"
   "native_health_json.c"
   "network_service.c"
-  "web_service.c")
+  "web_service.c"
+  "web_static.c"
+  "web_pages.cpp"
+  "websocket_service.c")
 
 if(CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC)
   if(NOT DEFINED ENV{YORADIO_LEGACY_IDF})

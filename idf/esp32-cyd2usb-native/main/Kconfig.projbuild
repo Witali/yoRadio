@@ -1,5 +1,29 @@
 menu "yoRadio native firmware"
 
+    config YORADIO_NATIVE_WEB
+        bool
+        default y
+        select HTTPD_WS_SUPPORT
+
+    config YORADIO_WEB_STATIC_WORKERS
+        int "Static content workers"
+        range 1 2
+        default 2
+
+    config YORADIO_WEB_FILE_CHUNK_BYTES
+        int "Static content chunk bytes"
+        range 512 2048
+        default 1024
+
+    config YORADIO_WEB_SEND_TIMEOUT_SECONDS
+        int "HTTP/WS send timeout seconds"
+        range 1 10
+        default 1
+        help
+            Bound time spent sending to a stalled WebSocket client. Static
+            downloads run in separate workers with the same socket timeout.
+
+
     config YORADIO_NATIVE_DIAGNOSTICS
         bool "Diagnostic two-core CPU and stack sampler"
         depends on !FREERTOS_UNICORE

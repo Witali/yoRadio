@@ -1,5 +1,6 @@
 #include "web_service.h"
 
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,6 +21,8 @@
 #include "network_service.h"
 #include "radio_control.h"
 #include "json_buffer.h"
+#include "web_static.h"
+#include "websocket_service.h"
 
 static const char *const TAG = "web";
 static native_state_t *s_state;
@@ -307,70 +310,44 @@ static esp_err_t settings_handler(httpd_req_t *request) {
     return httpd_resp_sendstr(request, body);
 }
 
-static const char *content_type(const char *path) {
-    if (strstr(path, ".html")) return "text/html; charset=utf-8";
-    if (strstr(path, ".css")) return "text/css; charset=utf-8";
-    if (strstr(path, ".js")) return "application/javascript; charset=utf-8";
-    if (strstr(path, ".svg")) return "image/svg+xml";
-    if (strstr(path, ".png")) return "image/png";
-    if (strstr(path, ".ico")) return "image/x-icon";
-    return "application/octet-stream";
+static esp_err_t capabilities_handler(httpd_req_t *request) {
+    char body[512];
+    json_buffer_t output;
+    json_buffer_init(&output, body, sizeof(body));
+    json_buffer_raw(&output, "{\"schema\":1,\"firmware\":\"esp32-cyd2usb-native\",\"audio_output\":");
+    json_buffer_string(&output, native_audio_output_name());
+    json_buffer_raw(&output, ",\"websocket\":true,\"websocket_clients\":2,\"radio\":true,\"smartstart\":true,\"normalization\":true,\"wifi_reconnect\":true,\"playlist_upload\":false,\"wifi_profiles\":false,\"ota\":false,\"equalizer\":false,\"sd\":false,\"display_controls\":false}");
+    if (output.failed) return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "Capabilities exhausted");
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    return httpd_resp_sendstr(request, body);
 }
 
-static esp_err_t static_handler(httpd_req_t *request) {
-    char uri[160];
-    const char *query = strchr(request->uri, '?');
-    size_t uri_len = query ? (size_t)(query - request->uri)
-                           : strlen(request->uri);
-    if (uri_len >= sizeof(uri) || strstr(request->uri, "..")) {
-        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
-                                   "Invalid path");
-    }
-    memcpy(uri, request->uri, uri_len);
-    uri[uri_len] = '\0';
-    if (strcmp(uri, "/") == 0) strcpy(uri, "/player.html");
-
-    char path[224];
-    snprintf(path, sizeof(path), "/spiffs/www%s", uri);
-    FILE *file = fopen(path, "rb");
-    bool gzip = false;
-    if (!file) {
-        strlcat(path, ".gz", sizeof(path));
-        file = fopen(path, "rb");
-        gzip = file != NULL;
-    }
-    if (!file) {
-        return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND,
-                                   "WebUI file not found");
-    }
-    httpd_resp_set_type(request, content_type(uri));
-    httpd_resp_set_hdr(request, "Cache-Control", "no-cache");
-    if (gzip) httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
-    char chunk[2048];
-    size_t count;
-    while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
-        if (httpd_resp_send_chunk(request, chunk, count) != ESP_OK) {
-            fclose(file);
-            httpd_resp_sendstr_chunk(request, NULL);
-            return ESP_FAIL;
-        }
-    }
-    fclose(file);
-    return httpd_resp_send_chunk(request, NULL, 0);
-}
+static atomic_bool s_started;
 
 esp_err_t web_service_start(native_state_t *state) {
+    if (!state || !state->lock) return ESP_ERR_INVALID_ARG;
+    bool expected = false;
+    if (!atomic_compare_exchange_strong(&s_started, &expected, true)) return ESP_ERR_INVALID_STATE;
+    esp_err_t result = web_static_start();
+    if (result != ESP_OK) {
+        atomic_store(&s_started, false);
+        return result;
+    }
     s_state = state;
     esp_fill_random(&s_health_boot_id,sizeof(s_health_boot_id));
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.stack_size = 6144;
-    config.max_open_sockets = 4;
+    // LWIP has ten descriptors: HTTPD uses three internal sockets, five
+    // clients leave two for the stream and network activity. WS admits two.
+    config.max_open_sockets = 5;
+    config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
     config.max_uri_handlers = 16;
     config.lru_purge_enable = true;
     config.uri_match_fn = httpd_uri_match_wildcard;
     httpd_handle_t server = NULL;
-    ESP_RETURN_ON_ERROR(httpd_start(&server, &config), TAG,
-                        "HTTP server start failed");
+    result = httpd_start(&server, &config);
+    if (result != ESP_OK) goto failed;
     httpd_uri_t status = {
         .uri = "/api/native/status",
         .method = HTTP_GET,
@@ -406,33 +383,43 @@ esp_err_t web_service_start(native_state_t *state) {
         .method = HTTP_POST,
         .handler = settings_handler,
     };
+    httpd_uri_t capabilities = {.uri="/api/native/capabilities", .method=HTTP_GET, .handler=capabilities_handler};
     httpd_uri_t files = {
         .uri = "/*",
         .method = HTTP_GET,
-        .handler = static_handler,
+        .handler = web_static_handler,
     };
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &status), TAG,
-                        "Status route registration failed");
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &health), TAG,
-                        "Health route registration failed");
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &radio_get), TAG,"Radio GET registration failed");
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &radio_post), TAG,"Radio POST registration failed");
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &reconnect), TAG,
-                        "Reconnect route registration failed");
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &play), TAG,
-                        "Play route registration failed");
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &stop), TAG,
-                        "Stop route registration failed");
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &settings_get), TAG,
-                        "Settings GET route registration failed");
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &settings_post), TAG,
-                        "Settings POST route registration failed");
-    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &files), TAG,
-                        "Static route registration failed");
+    const httpd_uri_t *routes[] = {&status, &health, &radio_get, &radio_post,
+        &reconnect, &play, &stop, &settings_get, &settings_post, &capabilities};
+    for (unsigned i = 0; i < sizeof(routes) / sizeof(routes[0]); ++i) {
+        result = httpd_register_uri_handler(server, routes[i]);
+        if (result != ESP_OK) goto failed;
+    }
+    result = websocket_service_register(server, state);
+    if (result != ESP_OK) goto failed;
+    result = httpd_register_uri_handler(server, &files);
+    if (result != ESP_OK) goto failed;
+    result = websocket_service_start();
+    if (result != ESP_OK) goto failed;
+    web_static_activate();
     if (state->lock && xSemaphoreTake(state->lock, pdMS_TO_TICKS(100))) {
         state->web_ready = true;
         xSemaphoreGive(state->lock);
     }
     ESP_LOGI(TAG, "Native HTTP server started");
     return ESP_OK;
+failed:
+    // Keep the server/session workspace alive if a producer has not exited.
+    // All ordinary startup failures happen before its task is created.
+    if (websocket_service_stop() != ESP_OK) {
+        ESP_LOGE(TAG, "WebSocket producer did not stop; retaining server resources");
+        return result;
+    }
+    if (server) {
+        httpd_stop(server);
+        websocket_service_server_stopped(server);
+    }
+    web_static_abort();
+    atomic_store(&s_started, false);
+    return result;
 }
