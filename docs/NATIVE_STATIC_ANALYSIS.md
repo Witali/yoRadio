@@ -170,3 +170,10 @@ After cache validation and atomic connecting follow-up, complete
 [C3](../tests/results/native-lint-20261018/c3-cache-pending/report.json) runs have
 18/50 units, 11/97 warnings and zero errors. Explicit bounds/signed arithmetic
 resolve the index seek conversion. Previous reports remain preserved.
+
+The CYD packet-gain checkpoint has another complete
+[18-unit PDM rerun](../tests/results/native-lint-20261018/cyd-output-gain/report.json):
+11 warnings, zero errors, clean source `e822d3c2`. Its file/check/message finding
+set is identical to the preceding complete CYD run. Production GCC builds and
+executable PCM-writer tests separately cover all three CYD output backends;
+the Clang report describes the PDM configuration.
