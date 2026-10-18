@@ -1,0 +1,92 @@
+{
+  "status": "intentional_replacement_pending_stop",
+  "passed": false,
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T16:40:29.151578+00:00",
+  "reason": "The archived production firmware now includes verified JPEG header corrections (F1). Continue the 24-hour workload on that exact final candidate instead of accepting obsolete 0592 results.",
+  "previous_app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+  "new_app_sha256": "f1ada8b4da4338df3248ffb26a39a79e36bf5cf0e365eb2972b75c8721f7ea7b",
+  "previous_complete_cycles": 179,
+  "new_complete_cycles_observed": 6,
+  "previous_input_registries": {
+    "runtime_inputs_sha256": 31,
+    "snapshot_inputs_sha256": 41,
+    "supervisor_sources_sha256": 6
+  },
+  "old_sources_unchanged": true,
+  "new_sources_unchanged": true,
+  "raw_prefix_files": [
+    {
+      "file": "h10-0592-replacement-prefix-20261018-raw/hostfwd-final-h10-20261018-events.jsonl.gz",
+      "sha256": "421ecd424be9acdf77e9ae45c4af010da2c3c6c53121c76ed652b8e84bb0685b",
+      "original_sha256": "d205c780acffcd898de3222cfd46b5f40a4e94a2dd8e52ef73da0fa9dd513c9b",
+      "bytes": 371718
+    },
+    {
+      "file": "h10-0592-replacement-prefix-20261018-raw/hostfwd-final-h10-20261018-report.json.gz",
+      "sha256": "8b6dbcf481d1c02a8c77f7efb7a8eee8b86a37134e003a5cf95d3287d8942af8",
+      "original_sha256": "5233b9f99159a58ddd196d66242292dea25e4d69177975033f727407caf4caa2",
+      "bytes": 91363
+    },
+    {
+      "file": "h10-0592-replacement-prefix-20261018-raw/hostfwd-final-h10-20261018-uptime-guard.json.gz",
+      "sha256": "033fd68d522118371314090c9ff352b8f856a74dd79819e8bac3311767de89e9",
+      "original_sha256": "712523581d02b379d7c9a6de5eb94f2aca7eda235aaa2baa28a8617c6dca20c2",
+      "bytes": 333
+    },
+    {
+      "file": "h10-0592-replacement-prefix-20261018-raw/hostfwd-final-h10-20261018-vm__prepared.json.gz",
+      "sha256": "e11725ce8d35bed77daf638d7953f4957fab95f421e93e10bf7e0c2aa7f9e241",
+      "original_sha256": "43548a906f3518c8ac4b2b807da14f7891e4b55b556aba525ffbab5313260e71",
+      "bytes": 2863
+    },
+    {
+      "file": "h10-0592-replacement-prefix-20261018-raw/hostfwd-final-h10-20261018-vm__qemu.log.gz",
+      "sha256": "6ffc9756bc6b7318c2a2563f21a581206e1bcfaef2002934b3f8baf513c42483",
+      "original_sha256": "4447ec85c0e44dd09c8c3e0df8111c5f3f4c763c5e9917236022986deb2e4ac6",
+      "bytes": 1467
+    },
+    {
+      "file": "h10-0592-replacement-prefix-20261018-raw/hostfwd-final-h10-20261018-vm__session.json.gz",
+      "sha256": "54828d25d41358826447a164bf4cc9a93cc506a933e361370f7680c1169f9a20",
+      "original_sha256": "cf65a6aeb8df1e97ecc78dd16fb95256c9aca61705e0bd82cea958969e0c59fc",
+      "bytes": 2186
+    },
+    {
+      "file": "h10-0592-replacement-prefix-20261018-raw/hostfwd-final-h10-20261018-vm__uart.log.gz",
+      "sha256": "3ae532606dc849e7ea2786bf8751e32e487f3757442e36e2b9f31feec139893d",
+      "original_sha256": "17dc7ad1ad98b2823ffb12e4a5525c27d4db1c5f1e3c23e91167b8f713f2f7a0",
+      "bytes": 993
+    },
+    {
+      "file": "h10-0592-replacement-prefix-20261018-raw/hostfwd-final-h10-20261018-supervisor-supervisor.json.gz",
+      "sha256": "9cbff27bb1d0ddb221a6884671aefc2ba5cd6ef75f64fc534d6dd21c3dd9132a",
+      "original_sha256": "dffa8f9a0643d1852b2e2ef2acac415ebe8714d0e201fb6771f932bdcdedb17d",
+      "bytes": 1784
+    }
+  ],
+  "old_processes": [
+    {
+      "pid": 13800,
+      "created_utc": "2026-10-18T15:30:49.8342280Z",
+      "role": "supervisor"
+    },
+    {
+      "pid": 31224,
+      "created_utc": "2026-10-18T15:30:50.2104210Z",
+      "role": "workload"
+    },
+    {
+      "pid": 27200,
+      "created_utc": "2026-10-18T15:31:22.5524240Z",
+      "role": "guard"
+    },
+    {
+      "pid": 19212,
+      "created_utc": "2026-10-18T15:30:54.3405010Z",
+      "role": "vm",
+      "name": "SmallTV-beea78179836"
+    }
+  ],
+  "scope": "Preserved live prefix and committed replacement intent. No old 24-hour success is claimed. Confirm exact OS process identities before stopping only the four owned old processes; no new QMP/RSP client."
+}
