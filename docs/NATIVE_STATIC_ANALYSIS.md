@@ -177,3 +177,13 @@ The CYD packet-gain checkpoint has another complete
 set is identical to the preceding complete CYD run. Production GCC builds and
 executable PCM-writer tests separately cover all three CYD output backends;
 the Clang report describes the PDM configuration.
+
+After format/bitrate, normalization and HTTP settings, the full
+[CYD rerun](../tests/results/native-lint-20261018/cyd-format-dsp/report.json)
+completes 20 units with 11 warnings and zero errors; the new C adapter and
+original `AudioNormalizer.cpp` have no findings. The
+[C3 rerun](../tests/results/native-lint-20261018/c3-format-bitrate/report.json)
+completes 50 units with 97 warnings and zero errors. Both file/check/message
+finding sets match the preceding full baselines. The new settings comparison
+is explicit; no diagnostic was disabled. Actual pinned SDK builds and saved
+images are linked in the [integration qualification](../tests/results/cyd-c3-format-dsp-20261018/README.md).

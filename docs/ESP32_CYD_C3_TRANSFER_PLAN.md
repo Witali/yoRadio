@@ -66,16 +66,16 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-03 | Программная часть выполнена | CYD подключён к continuous MP3/ADTS confirmation, ID3 stripping/recovery и ordered codec drain. 34 corpus cases обеих целей, byte-exact переходы и шесть lifecycle вариантов проходят. PDM/continuous/legacy CYD и C3 source `8bf1d73a` собраны и сохранены. Физическая приёмка отдельно. |
 | CYD-C3-04 | Программная часть выполнена | Общая SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 и независимый control node подключены. Default-off bounded prefill проверен host-тестами и GCC/clang-tidy профилем 250 ms; image source `112c871f` сохранён. Физическая приёмка и выбор ёмкости/TLS reclaim — отдельно, этап 13. |
 | CYD-C3-05 | В работе | SMP-safe health подключён к pipeline и `/api/native/health`: heap/internal/DMA, input occupancy, ошибки, optional CPU/stack по двум ядрам. Host core/HTTP/lifecycle, SDK quiet/diagnostic и полный lint проходят; images `b7362172` сохранены. Backend DMA telemetry и физические измерения отдельно. |
-| CYD-C3-06 | В работе | Общий radio controller, index recovery, last station/SmartStart, Next/Prev/Toggle и HTTP API подключены к CYD. Pending-state, NVS failure, boot restore и concurrency проверены на обеих целях. Stale CSV/index matching исправлен. По просьбе пользователя format/bitrate возобновлён: [51 HTTP-сценарий, lifecycle и startup обеих целей](../tests/results/cyd-stream-format-20261018/README.md) проходят; точный PCM format, ICY/decoder/measured bitrate и приоритет источников подключены. SDK/lint новых правок и полный settings ещё впереди. |
+| CYD-C3-06 | В работе | Общий radio controller, index recovery, last station/SmartStart, Next/Prev/Toggle и HTTP API подключены к CYD. Pending-state, boot/NVS failure, stale cache и concurrency проверены. Возобновлённый format/bitrate и audio settings [программно квалифицированы](../tests/results/cyd-c3-format-dsp-20261018/README.md): 51 stream/80 settings запросов, обе startup/format цели, SDK и полный lint проходят. Дальнейшие WebUI/runtime settings относятся к этапам 07/09; физическая приёмка отдельно. |
 | CYD-C3-07 | Открыт | WebSocket snapshot/events, динамические страницы, capabilities, async static workers, bounded uploads. Две вкладки, медленный клиент, reconnect и rollback файлов. |
 | CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
 | CYD-C3-09 | Открыт | Wi-Fi profiles/reconnect/RSSI, power policy, timezone/SNTP и runtime settings. AP/client и поздняя потеря сети. |
-| CYD-C3-10 | В работе | Gain рассчитывается один раз на packet; [общий normalizer](../tests/results/cyd-normalizer-20261018/README.md) подключён ко всем трём backend через owner-only DSP и 512-byte scratch без изменения input PCM. [HTTP-настройки](../tests/results/cyd-settings-20261018/README.md), golden PCM, disable/enable, rate/layout/EOF/discard и pipeline/radio host-регрессии проходят. SDK/lint новых правок, фактический footprint, расширение PCM layout и физическая приёмка впереди. |
+| CYD-C3-10 | В работе | Gain рассчитывается один раз на packet; [общий normalizer](../tests/results/cyd-normalizer-20261018/README.md) подключён ко всем трём backend через owner-only DSP без изменения input PCM. [Итоговая квалификация](../tests/results/cyd-c3-format-dsp-20261018/README.md): HTTP controls, golden PCM, reset/layout/EOF, три SDK images и полный lint проходят; DSP symbols занимают 554 B DRAM, LUT — 1170 B flash. Расширение PCM layout, дополнительные resampler проверки и физическая приёмка остаются. |
 | CYD-C3-11 | Исключён | Перенос дисплея, рендеринга, физических controls и других аппаратных функций C3 не входит в задачу по уточнению пользователя. |
 | CYD-C3-12 | Открыт | Portable custom FLAC и оптимизации hot loops против Espressif. PCM exactness, 8–24 bit/decorrelation/LPC/Rice, watchdog и физический A/B. |
 | CYD-C3-13 | Открыт | TLS/heap/IRAM/stack политика после измерений CYD. Full-record TLS, раннее освобождение старого codec, сохранение сетевого headroom. |
 | CYD-C3-14 | Открыт | Отдельный аудит Xtensa AAC/Vorbis ABI и только затем compact owners/repair. Archive hashes, layout, OOM и PCM сравнены на ESP32. |
-| CYD-C3-15 | В работе | [Production wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md) и верифицированный экспорт реализованы; [38 host tests проходят, 1 symlink case пропущен](../tests/results/cyd-production-wrapper-20261018/README.md). Проверка реальных сборок новой обёрткой и единая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение каждого backend впереди. |
+| CYD-C3-15 | В работе | [Production wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md) и верифицированный экспорт реализованы; 38 host tests проходят, 1 symlink case пропущен. [Все три реальные CYD сборки и экспорт](../tests/results/cyd-c3-format-dsp-20261018/README.md) проверены новой обёрткой; профили SDK сохранены. Единая физическая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение каждого backend ещё впереди. |
 
 ## Карта функций и мест в коде
 
@@ -170,6 +170,15 @@ allocation и численные настройки C3 являются канд
    Host pass и build pass не отмечают этот пункт как выполненный.
 
 ## Журнал выполнения
+
+- [Интегрированная квалификация format/bitrate/DSP](../tests/results/cyd-c3-format-dsp-20261018/README.md)
+  завершена для программного блока: CYD PDM/continuous/legacy `e1b1539a` и C3
+  `8c302697` собраны, сохранены с manifest/config и проверены полным lint.
+  Нормализованные SDK профили совпадают с предыдущими. Отложенный пункт успешно
+  возобновлён; историческая пометка о пропуске ниже сохранена. Платы не прошивались.
+  Дополнительный хвост раннего аудита остаётся открытым: проверить CYD
+  decoder registration errors и rollback/readiness при частичном startup failure;
+  текущие lifecycle тесты доказывают runtime ownership, а не все init failure paths.
 
 - Возобновлённый format/bitrate дополнен [исправлением донора C3](../tests/results/c3-bitrate-state-20261018/README.md):
   source priority и generation проверяются одним state transaction, убран общий

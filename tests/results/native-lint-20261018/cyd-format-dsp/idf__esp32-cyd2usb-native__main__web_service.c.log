@@ -1,0 +1,124 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:351:21: warning: File position of the stream might be 'indeterminate' after a failed operation. Can cause undefined behavior [clang-analyzer-unix.Stream]
+  351 |     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:323:22: note: Assuming 'query' is non-null
+  323 |     size_t uri_len = query ? (size_t)(query - request->uri)
+      |                      ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:323:22: note: '?' condition is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:325:9: note: Assuming the condition is false
+  325 |     if (uri_len >= sizeof(uri) || strstr(request->uri, "..")) {
+      |         ^~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:325:9: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:325:35: note: Assuming the condition is false
+  325 |     if (uri_len >= sizeof(uri) || strstr(request->uri, "..")) {
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:325:5: note: Taking false branch
+  325 |     if (uri_len >= sizeof(uri) || strstr(request->uri, "..")) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:331:9: note: Assuming the condition is false
+  331 |     if (strcmp(uri, "/") == 0) strcpy(uri, "/player.html");
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:331:5: note: Taking false branch
+  331 |     if (strcmp(uri, "/") == 0) strcpy(uri, "/player.html");
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:337:10: note: 'file' is non-null
+  337 |     if (!file) {
+      |          ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:337:5: note: Taking false branch
+  337 |     if (!file) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:342:10: note: 'file' is non-null
+  342 |     if (!file) {
+      |          ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:342:5: note: Taking false branch
+  342 |     if (!file) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:348:9: note: 'gzip' is false
+  348 |     if (gzip) httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
+      |         ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:348:5: note: Taking false branch
+  348 |     if (gzip) httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:351:21: note: Assuming this stream operation fails
+  351 |     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:351:12: note: Assuming the condition is true
+  351 |     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:351:5: note: Loop condition is true.  Entering loop body
+  351 |     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:352:13: note: Assuming the condition is false
+  352 |         if (httpd_resp_send_chunk(request, chunk, count) != ESP_OK) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:352:9: note: Taking false branch
+  352 |         if (httpd_resp_send_chunk(request, chunk, count) != ESP_OK) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:351:21: note: File position of the stream might be 'indeterminate' after a failed operation. Can cause undefined behavior
+  351 |     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:351:21: warning: Read function called when stream is in EOF state. Function has no effect [clang-analyzer-unix.Stream]
+  351 |     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:323:22: note: Assuming 'query' is non-null
+  323 |     size_t uri_len = query ? (size_t)(query - request->uri)
+      |                      ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:323:22: note: '?' condition is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:325:9: note: Assuming the condition is false
+  325 |     if (uri_len >= sizeof(uri) || strstr(request->uri, "..")) {
+      |         ^~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:325:9: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:325:35: note: Assuming the condition is false
+  325 |     if (uri_len >= sizeof(uri) || strstr(request->uri, "..")) {
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:325:5: note: Taking false branch
+  325 |     if (uri_len >= sizeof(uri) || strstr(request->uri, "..")) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:331:9: note: Assuming the condition is false
+  331 |     if (strcmp(uri, "/") == 0) strcpy(uri, "/player.html");
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:331:5: note: Taking false branch
+  331 |     if (strcmp(uri, "/") == 0) strcpy(uri, "/player.html");
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:337:10: note: 'file' is non-null
+  337 |     if (!file) {
+      |          ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:337:5: note: Taking false branch
+  337 |     if (!file) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:342:10: note: 'file' is non-null
+  342 |     if (!file) {
+      |          ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:342:5: note: Taking false branch
+  342 |     if (!file) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:348:9: note: 'gzip' is false
+  348 |     if (gzip) httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
+      |         ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:348:5: note: Taking false branch
+  348 |     if (gzip) httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:351:21: note: Assuming stream reaches end-of-file here
+  351 |     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:351:12: note: Assuming the condition is true
+  351 |     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:351:5: note: Loop condition is true.  Entering loop body
+  351 |     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:352:13: note: Assuming the condition is false
+  352 |         if (httpd_resp_send_chunk(request, chunk, count) != ESP_OK) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:352:9: note: Taking false branch
+  352 |         if (httpd_resp_send_chunk(request, chunk, count) != ESP_OK) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:351:21: note: Read function called when stream is in EOF state. Function has no effect
+  351 |     while ((count = fread(chunk, 1, sizeof(chunk), file)) > 0) {
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\web_service.c:352:51: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined [bugprone-narrowing-conversions]
+  352 |         if (httpd_resp_send_chunk(request, chunk, count) != ESP_OK) {
+      |                                                   ^
+9 warnings generated.
+Suppressed 6 warnings (6 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
