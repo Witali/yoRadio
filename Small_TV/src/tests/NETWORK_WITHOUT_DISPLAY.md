@@ -34,7 +34,8 @@ python -X utf8 -B Small_TV/src/tests/network_without_display_qemu.py `
 ```
 
 F1/ELF91E2/D64 прошёл оба firmware и обе фазы. Счётчики NTP1→2, четыре
-HTTP200; максимальное абсолютное расхождение SDK/wire timestamp0.191694s.
+контрольных ответа HTTP200 после readiness probes; максимальное абсолютное
+расхождение SDK/wire timestamp0.191694s.
 Native после reset: STA connected, AP false,10.0.2.15,time_synced true.
 Для обоих процессов по2ROM boot, panic нет; все59inputs совпали.
 Свидетельства: `../../qemu/parity/network-without-display-validation-20261018.json`.
