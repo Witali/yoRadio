@@ -15,6 +15,7 @@
 #include "credential_line.h"
 #include "web_upload.h"
 #include "native_wifi_file.h"
+#include "time_service.h"
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
@@ -129,12 +130,23 @@ static bool read_credentials(wifi_config_t *config) {
     return found;
 }
 
+static void station_lost_ip(void) {
+    time_service_notify_network(false);
+    xEventGroupClearBits(s_wifi_events, WIFI_CONNECTED_BIT);
+    wifi_mode_t mode = WIFI_MODE_NULL;
+    bool access_point = esp_wifi_get_mode(&mode) == ESP_OK &&
+                        (mode == WIFI_MODE_AP || mode == WIFI_MODE_APSTA);
+    native_state_set_network(s_state, access_point ? NATIVE_NETWORK_ACCESS_POINT
+                                                   : NATIVE_NETWORK_STARTING, 0);
+}
+
 static void event_handler(void *arg, esp_event_base_t base, int32_t id,
                           void *event_data) {
     (void)arg;
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
+        station_lost_ip();
         if (s_have_credentials && s_retries++ < WIFI_MAX_RETRIES) {
             ESP_LOGW(TAG, "Wi-Fi disconnected, retry %d/%d", s_retries,
                      WIFI_MAX_RETRIES);
@@ -147,8 +159,12 @@ static void event_handler(void *arg, esp_event_base_t base, int32_t id,
         s_retries = 0;
         native_state_set_network(s_state, NATIVE_NETWORK_CLIENT,
                                  event->ip_info.ip.addr);
+        time_service_notify_network(true);
+        xEventGroupClearBits(s_wifi_events, WIFI_FAILED_BIT);
         xEventGroupSetBits(s_wifi_events, WIFI_CONNECTED_BIT);
         ESP_LOGI(TAG, "Client address: " IPSTR, IP2STR(&event->ip_info.ip));
+    } else if (base == IP_EVENT && id == IP_EVENT_STA_LOST_IP) {
+        station_lost_ip();
     }
 }
 
@@ -194,7 +210,7 @@ esp_err_t network_service_start(native_state_t *state) {
                             WIFI_EVENT, ESP_EVENT_ANY_ID, event_handler, NULL),
                         TAG, "Wi-Fi event registration failed");
     ESP_RETURN_ON_ERROR(esp_event_handler_register(
-                            IP_EVENT, IP_EVENT_STA_GOT_IP, event_handler, NULL),
+                            IP_EVENT, ESP_EVENT_ANY_ID, event_handler, NULL),
                         TAG, "IP event registration failed");
 
     memset(&s_station_config, 0, sizeof(s_station_config));

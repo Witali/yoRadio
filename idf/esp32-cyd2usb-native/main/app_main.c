@@ -15,6 +15,7 @@
 #include "radio_control.h"
 #include "nvs_flash.h"
 #include "web_service.h"
+#include "time_service.h"
 
 static const char *const TAG = "yoradio_native";
 static native_state_t s_state;
@@ -111,6 +112,10 @@ void app_main(void) {
                  esp_err_to_name(result));
     }
     ESP_ERROR_CHECK(cyd_display_init(&s_display));
+    result = time_service_start();
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "Time service unavailable: %s", esp_err_to_name(result));
+    }
 
     xTaskCreatePinnedToCore(display_task, "display", BOARD_TASK_STACK_DISPLAY,
                             NULL, 1, NULL, 0);
