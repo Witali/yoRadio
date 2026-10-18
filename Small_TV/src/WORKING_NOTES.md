@@ -7,6 +7,18 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Независимость проверок подсистем — 2026-10-18
 
+Отдельная ветка `codex/small-tv-browser-controls-verify` продолжает F1 candidate
+без production/firmware изменений. Реальный Chrome155 прошёл281UI +5storage/source
+checks, включая обе ширины1280/390, все доступные настройки Clock/Advanced/Photo,
+96настоящих UI POST и новый cold process без POST. Все25входов совпали,2ROM
+boots по1напроцесс, console/page errors отсутствуют. См. tests/BROWSER_CONTROLS.md
+и browser-controls-validation-20261018.json. Это частьH03/H04, не RF/physical/LCD/H10.
+Full566 и новый H10 F1 живут в `small-tv-jpeg-headers`, их входы не редактировать.
+H10 supervisor23208/workload6908/guard15664/VM26708, SmallTV-c3536427c9be;
+не добавлять QMP/RSP clients. Старый0592 H10 сознательно остановлен, не принят.
+Его финальный journal содержит182complete cycles/16pending events; last report181,
+оба raw сохранены. Полные0592/full561 иF1/full566 пока проверяются отдельно.
+
 Проверять сеть и дисплей отдельно, с собственными результатами и ошибками.
 Wi-Fi association, DHCP, HTTP и SNTP относятся к сетевым проверкам; наличие
 содержимого, геометрия, пиксельное соответствие и анимация — к дисплейным.

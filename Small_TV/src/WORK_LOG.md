@@ -3019,3 +3019,30 @@ true. Это только начало нового прогона, не 24 ча
 - Исторический полный561 app0592/D64 и H10 остаются живы в своих frozen
   деревьях; новыеQMP/RSP к H10 не добавлялись. После адресной валидации
   требуется отдельный полный набор и длительный workload на точной новой паре.
+
+## 2026-10-18 — desktop/mobile настройки и холодное сохранение F1
+
+- В отдельной sparse рабочей копии `codex/small-tv-browser-controls-verify`
+  добавлены browser_controls_qemu.py и browser_controls_flow.mjs. Production C,
+  HTML/JS устройства и archived firmware не менялись: F1/ELF91E2/sourceF849/D64.
+  Собственный Chrome155.0.8059.80 получает настоящие страницы и API из отдельной
+  writable QEMU; внешние browser origins запрещены, все данные синтетические.
+- Пройден281UI check (236mutate/45cold),96настоящих UI POST и5storage/source
+  checks. Обе ширины1280×900/390×844, все4темы/5GIF/3даты, три флага,0/100/37%
+  day brightness,3RGB565 colors, night on/off/start18/23/stop12/5/brightness2/99,
+  фото interval3/60 и masks0/1/17/31. Город с trim и ключ проверены в raw ABI;
+  NTP со спецсимволами пережил submit/reload, после restore сохранён pool.ntp.org.
+- После настоящих reload DOM совпадает с отдельными GET API. Cold stage работает
+  в новом процессе ВМ/Chrome и не отправляет POST; все настройки сохраняются.
+  Dirty flag настоящего matching ELF проверяется до и после raw read, чтобы не
+  останавливать ВМ посреди записи. За пределами NVS/raw sector flash, включая
+  photo banks, побайтно прежняя. Все25наблюдаемых inputs совпали. По одному ROM
+  boot на каждый процесс, panic/console warnings/errors/page exceptions нет.
+- Снимки desktop и mobile просмотрены: поля читаемы, горизонтального выхода нет.
+  Новый тест описан в tests/BROWSER_CONTROLS.md; это отдельная частьH03/H04,
+  не замена network/SNTP, display pixels/PWM, crop/upload, physical или H10 gates.
+  В frozen full566/H10 F1 новый harness задним числом не добавляется.
+- Новый H10 F1 работает в small-tv-jpeg-headers. Прежний0592 H10 намеренно
+  остановлен после committed prefix/intent;182complete journal cycles и16pending
+  events сохранены, last periodic report181 не переписан. Полные0592/full561 и
+  F1/full566 продолжаются независимо; все их inputs сохраняются неизменными.
