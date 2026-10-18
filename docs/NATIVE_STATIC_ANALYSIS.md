@@ -136,3 +136,9 @@ After continuous frame routing, full runs cover
 The additional CYD warning is the existing frame-info zero initialization with
 an enum whose named values begin at one; keep it in the sentinel/type review
 queue. It is not evidence of an observed invalid frame or memory failure.
+
+The optional prefill path also has a separate Clang configuration with a real
+`CONFIG_YORADIO_INPUT_PREFILL_MS=250` sdkconfig value. Its
+[full report](../tests/results/native-lint-20261018/cyd-prefill250/report.json)
+completes all 14 units with the same 11 warnings and zero errors. This checks
+the enabled branch rather than relying on the default-off compilation.

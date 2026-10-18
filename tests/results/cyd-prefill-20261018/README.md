@@ -18,5 +18,17 @@ startup control replay bypasses the wait, and AAC-to-MP3 drain in one generation
 does not wait a second time. Codec and queue APIs are scripted here; the actual
 shared queue has independent [concurrent ownership coverage](../cyd-c3-frames-20261018/README.md).
 
-This is software coverage, not a measured CYD network-jitter or audio-quality
-improvement. SDK build/firmware evidence is recorded separately when complete.
+The GCC/ESP-IDF 6.0.2 PDM build with prefill set to 250 ms passes for source
+`112c871f`. Its 1,365,040-byte [application](../../../firmware/development/esp32-cyd2usb-native-prefill250-pdm/app.bin)
+and [manifest/config](../../../firmware/development/esp32-cyd2usb-native-prefill250-pdm/manifest.json)
+are saved as a separate experimental profile. The descriptor is clean and the
+embedded ELF hash matches the build ELF. All pre-existing baseline SDK values
+are preserved; the manifest records the added portable feature settings.
+
+A separate Clang configuration enables the same 250 ms branch. Its
+[complete full analysis](../native-lint-20261018/cyd-prefill250/report.json)
+covers 14 project-owned units, with 11 warnings and zero parse/tool errors.
+The private prefill helper introduces no diagnostics.
+
+This is software/build coverage, not a measured CYD network-jitter or
+audio-quality improvement. No image was installed on a board.
