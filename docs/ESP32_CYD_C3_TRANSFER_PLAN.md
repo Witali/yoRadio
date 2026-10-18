@@ -27,6 +27,31 @@ Arduino CYD и `esp32-cyd2usb-minimal` остаются отдельными п�
 | Q15 volume/balance и NVS audio settings | [native_audio_output.c](../idf/esp32-cyd2usb-native/main/native_audio_output.c), [native_audio_settings](../idf/components/native_audio_settings) | Сохранить существующие значения и миграцию. |
 | Нативный ST7789 SPI DMA | [cyd_display.c](../idf/esp32-cyd2usb-native/main/cyd_display.c) | Использовать этот драйвер для нового интерфейса. |
 
+## Совместимость аппаратных платформ
+
+Перед каждым переносом сверять ограничения SoC, схему конкретной платы и
+реальный build profile. Спецификация SoC не определяет свободный heap платы.
+Первичные источники: [ESP32 Series Datasheet](https://documentation.espressif.com/esp32_datasheet_en.html)
+и [ESP32-C3 Datasheet](https://documentation.espressif.com/esp32-c3_datasheet_en.html),
+сверены 2026-10-18. Распиновка и выбранные режимы ниже относятся к профилям
+репозитория, а не ко всем платам с этими SoC.
+
+| Область | Донор C3 | Цель CYD | Следствие для переноса |
+| --- | --- | --- | --- |
+| CPU/ABI | Одно ядро RISC-V, профиль 160 МГц | Два ядра Xtensa LX6, профиль 240 МГц | C/C++ алгоритмы пересобираются; assembler, private offsets, archive patches и результаты производительности требуют собственной проверки. |
+| Синхронизация | Single-core FreeRTOS | SMP FreeRTOS, stream на core 0, decode/output на core 1 | Локальное IRQ masking не защищает от второго ядра; ownership и snapshots проверяются с межъядерной синхронизацией. |
+| Память | 400 КиБ SRAM, часть используется cache | 520 КиБ SRAM с собственной раскладкой IRAM/DRAM | Это полные ресурсы SoC, не свободная RAM. Heap, DMA-capable largest block, TLS reserve и stacks выбираются по CYD измерениям с TFT и сетью. |
+| Аудио платы | Два PDM data GPIO10/GPIO3 | Mono GPIO26, PDM либо continuous/legacy DAC | Переносить DSP с сохранением CYD downmix, clocking, DMA и всех трёх backend; C3 stereo wiring/FIR/timing не копировать. ESP32 имеет два 8-bit DAC, C3 встроенного DAC не имеет. |
+| Дисплей/пины | OLED I2C GPIO5/6, BOOT GPIO9 | TFT SPI с DMA, BOOT GPIO0 | Эти аппаратные функции исключены из переноса; CYD pin map и display driver сохраняются. |
+| USB/reset | Native USB Serial/JTAG | Адаптер CH340 | C3 USB/reset/deep-sleep hooks не переносить. |
+| SDK/библиотеки | Закреплённый IDF 6.1, RISC-V archives | Закреплённый IDF 6.0.2, Xtensa archives | Публичный API проверять компиляцией CYD; private codec ABI — отдельный этап 14. |
+
+Конкретные настройки: [CYD board](../idf/esp32-cyd2usb-native/main/board_config.h),
+[C3 board](../idf/esp32c3-oled-native/main/board_config.h),
+[CYD SDK defaults](../idf/esp32-cyd2usb-native/sdkconfig.defaults),
+[C3 SDK defaults](../idf/esp32c3-oled-native/sdkconfig.defaults).
+Численное ускорение и экономию памяти отмечать только после измерения на CYD.
+
 ## Очередь реализации
 
 Все строки со статусом «Открыт» — предстоящая работа. Размер буфера, порядок
