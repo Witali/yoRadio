@@ -42,18 +42,16 @@ test("native C3 uses the Arduino-compatible playlist offset index", () => {
   assert.doesNotMatch(count, /fgets|fopen/);
 });
 
-test("native C3 rebuilds the playlist index after every upload path", () => {
-  const web = read(
+test("native C3 rebuilds the playlist index after a streamed playlist publication", () => {
+  const upload = read(
     "idf",
     "esp32c3-oled-native",
     "main",
-    "web_service.c",
+    "web_upload.c",
   );
-  const saveStart = web.indexOf("static esp_err_t save_playlist");
-  const wifiStart = web.indexOf("static esp_err_t save_wifi", saveStart);
-  assert.ok(saveStart >= 0 && wifiStart > saveStart);
-  const savePlaylist = web.slice(saveStart, wifiStart);
-  assert.match(savePlaylist, /radio_control_reindex_playlist\(\)/);
-  assert.match(web, /save_playlist\(data, size\)/);
-  assert.match(web, /save_playlist\(payload, payload_end - payload\)/);
+  assert.match(upload, /ok = publish_file\(i, form\.names\[i\], form\.playlist\[i\]\)/);
+  assert.match(upload, /if \(ok && form\.playlist\[i\]\) \{[\s\S]*?radio_control_reindex_playlist\(\)/);
+  for (const mode of ["UPLOAD", "BOARD", "CREDENTIALS"]) {
+    assert.match(upload, new RegExp(`return handle_upload\\(request, WEB_FORM_${mode}\\)`));
+  }
 });

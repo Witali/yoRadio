@@ -8,6 +8,7 @@
 #include "esp_check.h"
 #include "esp_log.h"
 #include "esp_timer.h"
+#include "file_transaction.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "nvs.h"
@@ -15,6 +16,7 @@
 #define PLAYLIST_PATH "/spiffs/data/playlist.csv"
 #define PLAYLIST_INDEX_PATH "/spiffs/data/index.dat"
 #define PLAYLIST_INDEX_TEMP_PATH "/spiffs/data/index.dat.tmp"
+#define PLAYLIST_INDEX_BACKUP_PATH "/spiffs/data/index.dat.bak"
 #define RADIO_NVS_NAMESPACE "radio"
 #define RADIO_NVS_LAST_STATION "last_station"
 #define RADIO_NVS_SMARTSTART "smartstart"
@@ -136,6 +138,7 @@ static bool parse_playlist_line(char *line, char **name, char **url) {
 }
 
 static esp_err_t load_playlist_index_locked(void) {
+    if (!native_file_recover(PLAYLIST_INDEX_PATH, PLAYLIST_INDEX_BACKUP_PATH)) return ESP_FAIL;
     FILE *playlist = fopen(PLAYLIST_PATH, "rb");
     if (!playlist) return ESP_ERR_NOT_FOUND;
     fclose(playlist);
@@ -166,8 +169,6 @@ static esp_err_t build_playlist_index_locked(void) {
     int64_t started_us = esp_timer_get_time();
     FILE *playlist = fopen(PLAYLIST_PATH, "rb");
     if (!playlist) {
-        remove(PLAYLIST_INDEX_PATH);
-        s_playlist_count = 0;
         return ESP_ERR_NOT_FOUND;
     }
     FILE *index = fopen(PLAYLIST_INDEX_TEMP_PATH, "wb");
@@ -184,6 +185,16 @@ static esp_err_t build_playlist_index_locked(void) {
             break;
         }
         if (!fgets(s_playlist_line, sizeof(s_playlist_line), playlist)) break;
+        size_t line_size = strlen(s_playlist_line);
+        if (line_size == sizeof(s_playlist_line)-1U && s_playlist_line[line_size-1U] != '\n') {
+            int next = fgetc(playlist);
+            if (next != EOF) {
+                // A continuation chunk is never a separate playlist row.
+                while (next != '\n' && next != EOF) next = fgetc(playlist);
+                continue;
+            }
+            if (ferror(playlist)) { result = ESP_FAIL; break; }
+        }
         char *name;
         char *url;
         if (!parse_playlist_line(s_playlist_line, &name, &url)) continue;
@@ -206,9 +217,8 @@ static esp_err_t build_playlist_index_locked(void) {
         remove(PLAYLIST_INDEX_TEMP_PATH);
         return result;
     }
-    remove(PLAYLIST_INDEX_PATH);
-    if (rename(PLAYLIST_INDEX_TEMP_PATH, PLAYLIST_INDEX_PATH) != 0) {
-        remove(PLAYLIST_INDEX_TEMP_PATH);
+    if (!native_file_replace(PLAYLIST_INDEX_TEMP_PATH, PLAYLIST_INDEX_PATH,
+                              PLAYLIST_INDEX_BACKUP_PATH)) {
         return ESP_FAIL;
     }
     s_playlist_count = count;

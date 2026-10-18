@@ -267,6 +267,7 @@ idf_component_register(
     spi_flash
     audio_level_led
     native_audio_settings
+    native_storage
     custom_flac
     custom_legacy_codecs
     esp_audio_codec)

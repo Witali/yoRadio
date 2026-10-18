@@ -146,6 +146,14 @@ allocation и численные настройки C3 являются канд
 
 ## Журнал выполнения
 
+- Начало CYD-C3-06: общий `native_storage` проверен 356 сценариями отказов /
+  rollback / прерываний между файловыми операциями. Аудит исходного C3
+  воспроизвёл потерю index.dat при ошибке rename и при чтении continuation
+  слишком длинной CSV-строки. [Исполняемые регрессии](../tests/results/playlist-index-20261018/README.md)
+  проверяют реальные parser/index/lookup и сохранение старого файла/count
+  при ошибках write/flush/close/rename. Номер станции и формат raw offset index
+  сохранены; whole CSV в RAM не загружается.
+
 - Дополнительная проверка донора C3 обнаружила borrowed `pcTaskName` после
   возобновления scheduler и повторное использование TaskHandle без task number.
   [Новые регрессии](../tests/results/c3-profiler-20261018/README.md) сначала
