@@ -1,5 +1,33 @@
 # Функциональные тесты Small TV ESP32-C2
 
+## Первоначальная настройка Wi-Fi в настоящем браузере
+
+`browser_wifi_qemu.py` запускает `browser_wifi_flow.mjs` в установленном Chrome
+с viewport390×844. Аргументы те же, что у photo gate ниже: абсолютные пути
+`--qemu-root`, `--dependency-root`, `--node`, `--playwright-modules`,
+`--browser-executable` и новый `--output`. Каждый сценарий имеет собственные
+raw flash и профиль; доступ браузера ограничен двумя loopback адресами этой ВМ.
+
+Проверяются реальный `/scan`, знаковый RSSI, обычный SSID и сеть с буквальным
+именем `manual`, ручной ввод после пустого сканирования, Cancel/пустой prompt,
+отказ при коротком пароле и успешная настройка открытой синтетической сети.
+Недопустимый ввод не должен менять raw record, режим AP или число ROM boot.
+При успехе JavaScript должен перейти в `about:blank`, станция получить DHCP,
+синхронизировать SDK UTC через UDP и загрузить переключатели из `/getsettings`.
+Затем новый процесс ВМ проверяет сохранённые credentials и режим STA.
+
+После программного restart сравнение времени использует SDK HRT offset,
+correction и systimer из matching ELF (`ntp_reply_observation`), а не сумму
+RTC base и времени жизни QEMU. У каждого процесса сохраняются ROM boot count,
+read-only SDK observations и UART. Исполняемый код, media banks и все flash
+области вне NVS/raw settings должны остаться прежними. WPA handshake,
+физический RF/captive portal, desktop UI и весь H03 этим gate не закрываются.
+Это самостоятельный тест: он не добавляется задним числом в live frozen full.
+Текущий BC68/20B прошёл93browser и18storage/role checks,25inputs неизменны:
+[browser-wifi-validation-20261018.json](../../qemu/parity/browser-wifi-validation-20261018.json).
+В отчёте сохранены также два неуспешных запуска при разработке наблюдателя;
+они не переименованы в успешные. Все шесть тестовых ВМ завершены.
+
 ## Настоящий браузер и фото в QEMU
 
 `browser_photo_qemu.py` управляет отдельной writable ВМ и двумя холодными

@@ -2874,3 +2874,31 @@ true. Это только начало нового прогона, не 24 ча
   Добавлены guard/source_file+source_sha256 и canonical duration field86400.
   Формат исходного ee896b31 сохранён в Git; добавлена явная reconciliation note.
   Ни workload, ни его31runtime/11QEMU inputs не менялись и не перезапускались.
+
+### 2026-10-18 — настоящий браузер initial Wi-Fi setup на BC68/20B
+
+- В собственной ветке codex/small-tv-browser-wifi добавлены browser_wifi_qemu.py
+  и browser_wifi_flow.mjs. Установленные Chrome155/Playwright через CLI, только
+ 390×844 и два loopback origin каждой disposable VM; внешняя сеть запрещена.
+- Три реальных scan/configure flow: обычная сеть, SSID `manual`, manual entry
+  после отключения external AP. Знаковый RSSI и различение служебного option
+  проверены браузером. Cancel/empty не отправляют POST. Короткий пароль400
+  не меняет444raw bytes, AP role или ROM boot count. Положительные fetch и
+  загрузка настроек не дают console/page errors; negative preflight содержит
+  ровно две ожидаемые console errors для400 и error alert.
+- Каждая настройка прошла программный restart→STA DHCP→UDP SNTP; actual SDK UTC
+  с matching ELF HRT/correction отличается от wire expected менее27ms. Новый
+  cold process сохраняет credentials/STA и вновь синхронизируется. По2ROM boot
+  для setup flow и по1для cold. Все защищённые code/media intervals неизменны.
+- Итог93browser+18storage/role checks pass;25inputs неизменны. Все6VM PID
+  отсутствуют по CIM, Chrome закрыт. Proof browser-wifi-validation-20261018.json,
+ 13rawgzip (включая cleanup и оба failed development runs) и2actual PNG.
+- Первый harness ошибочно ожидал photo loading overlay в settings; второй
+  использовал приблизительный RTC+lifetime UTC с неверной нижней границей.
+  Финальный тест проверяет реальные переключатели/API и SDK timer components.
+  Оба первоначальных failed report и точные исходники сохранены, не заменены pass.
+- Cherry-pick H10 metadata c0fc3cb3 завершён какb1bba736; конфликт только двух
+  добавленных разделов WORK_LOG разрешён сохранением обоих. Production/archive
+  не менялись, live full533 повторно совпали. Controller10836 и все4H10PID живы;
+  file-only prefix58cycles/31inputs, одинROM boot безpanic, пока pending.
+  Полный прогон прошёл photo_controls/reinit/settings; terminal result ещё нет.

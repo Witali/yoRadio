@@ -5,6 +5,28 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
+## Browser Wi-Fi setup — 2026-10-18
+
+Ветка codex/small-tv-browser-wifi продолжает browser-photo21943e31 и содержит
+перенесённый metadata fix H10 (b1bba736, original c0fc3cb3). Production/archive
+не менялись: BC68/4FDE/source5586/QEMU20B. Новый настоящий Chrome155 gate
+прошёл93browser+18storage/role checks;25inputs совпали. Три собственные пары ВМ
+проверяют discovered SSID, буквальное имя `manual` и manual entry после реального
+пустого scan с выключенным внешним AP. Cancel/empty prompt не отправляют POST;
+короткий пароль получает400, сохраняя444raw bytes/AP role/один ROM boot.
+Успех: about:blank, STA DHCP192.168.43.15, SNTP и новый cold process с теми же
+credentials. SDK UTC сравнивается с wire timestamp с учётом HRT offset/correction,
+расхождение всех шести наблюдений менее27ms. Это не точность реального кристалла.
+Переключатели страницы сверены с `/getsettings`;390×844 без горизонтального выхода.
+Proof browser-wifi-validation-20261018.json +13gzip+2PNG. Все6VM PID отсутствуют
+по CIM; по2ROM boot в setup+intentional restart, по1в cold, panic нет.
+Два failed harness runs сохранены: ожидание отсутствующего loading overlay;
+затем неверная жёсткая нижняя граница для приблизительной RTC/lifetime оценки.
+Ни один не объявлен firmware failure или passing acceptance. Этот standalone
+gate не закрывает весь H03, desktop/physical RF/WPA/captive portal или H10.
+Входы live full533 и H10 не менялись. File-only H10 prefix58cycles/31inputs
+остаётся pending; текущий полный прогон дошёл до photo_settings pass.
+
 ## AP memory comparison — 2026-10-18
 
 Browser/Canvas/photo gate добавлен в отдельной ветке codex/small-tv-browser-photo,
