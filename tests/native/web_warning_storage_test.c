@@ -9,6 +9,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "web_file_form.h"
 
 typedef int esp_err_t;
 #define ESP_OK 0

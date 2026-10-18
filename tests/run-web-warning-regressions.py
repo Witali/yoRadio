@@ -51,7 +51,13 @@ def main():
         binary=out/name
         command=common+(['-Wno-error'] if negative else [])+list(flags)+[
             '-I'+host(out),'-I'+host(MAIN),'-I'+host(STORAGE),'-I'+host(STORAGE/'include'),host(test),'-o',host(binary)]
-        (out/(name+'-build.log')).write_bytes(run(command))
+        try:
+            build_log=run(command)
+        except subprocess.CalledProcessError as error:
+            (out/(name+'-build.log')).write_bytes(error.output)
+            print(error.output.decode(errors='replace'),file=sys.stderr)
+            raise
+        (out/(name+'-build.log')).write_bytes(build_log)
         try:
             log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                      'UBSAN_OPTIONS=halt_on_error=1','timeout','30',host(binary),*arguments])
@@ -71,10 +77,11 @@ def main():
                            storage_source.index('// All three routes')]
     paths=function(storage_source,'temporary_path')
     wifi_names=['prepare_station_config','next_credential_row','read_credentials',
-                'network_service_validate_credentials_file','network_service_save_credentials_file']
+                'network_service_validate_credentials_file','load_validated_credentials','network_service_save_credentials_file']
 
     def storage_includes(wifi_source,publisher):
-        (out/'storage-production.inc').write_text(helpers+paths+function(publisher,'publish_file'))
+        destination = function(publisher,'upload_destination') if 'static bool upload_destination(' in publisher else ''
+        (out/'storage-production.inc').write_text(helpers+paths+destination+function(publisher,'publish_file'))
         (out/'wifi-production.inc').write_text('#include "credential_line.h"\n'+''.join(function(wifi_source,name) for name in wifi_names
                                                        if name+'(' in wifi_source))
 
@@ -105,12 +112,13 @@ def main():
     overflow=(out/'negative-small-name.log').read_bytes()
     assert b'AddressSanitizer' in overflow or b'buffer overflow detected' in overflow
     report['negative_controls']['negative-small-name']='DETECTED '+('ASan overflow' if b'AddressSanitizer' in overflow else 'host FORTIFY overflow')
-    (out/'form-production.h').write_text(current['web_file_form.h'])
+    (out/'form-production.h').write_bytes((STORAGE/'include/web_file_form.h').read_bytes())
     for capacity in [1,8,9,12,13,32,256]:
         execute(f'name-{capacity}',names_test,flags=[f'-DCONFIG_SPIFFS_OBJ_NAME_LEN={capacity}'])
     files=[Path(__file__),ROOT/'tests/run-esp32c3-web-memory.py',storage_test,static_test,names_test,
            *(MAIN/name for name in current),MAIN/'web_upload.h',MAIN/'web_multipart.h',
-           STORAGE/'file_transaction.c',STORAGE/'include/file_transaction.h',STORAGE/'include/credential_line.h']
+           STORAGE/'file_transaction.c',STORAGE/'include/file_transaction.h',STORAGE/'include/credential_line.h',
+           STORAGE/'include/web_file_form.h',STORAGE/'include/web_multipart.h']
     report['source_sha256']={path.relative_to(ROOT).as_posix():hashlib.sha256(path.read_bytes()).hexdigest() for path in files}
     for path in files:
         snapshot=out/'sources'/path.relative_to(ROOT)

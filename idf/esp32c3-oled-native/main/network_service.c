@@ -309,52 +309,81 @@ esp_err_t network_service_save_credentials(const char *ssid,
                                            const char *password) {
     ESP_RETURN_ON_FALSE(ssid && password, ESP_ERR_INVALID_ARG, TAG,
                         "Wi-Fi credentials are missing");
-    char line[160];
-    int length = snprintf(line, sizeof(line), "%s\t%s\n", ssid, password);
-    ESP_RETURN_ON_FALSE(length > 0 && (size_t)length < sizeof(line),
-                        ESP_ERR_INVALID_SIZE, TAG,
-                        "Wi-Fi credentials are too long");
-    return network_service_save_credentials_file((const uint8_t *)line,
-                                                 (size_t)length);
+    size_t ssid_size = strnlen(ssid, sizeof(s_station_config.sta.ssid));
+    size_t password_size = strnlen(password, sizeof(s_station_config.sta.password));
+    ESP_RETURN_ON_FALSE(ssid_size && ssid_size < sizeof(s_station_config.sta.ssid) &&
+                            password_size < sizeof(s_station_config.sta.password) &&
+                            !strpbrk(ssid, "\t\r\n") && !strpbrk(password, "\t\r\n"),
+                        ESP_ERR_INVALID_ARG, TAG, "Invalid Wi-Fi fields");
+    char line[sizeof(s_station_config.sta.ssid) +
+              sizeof(s_station_config.sta.password)];
+    memcpy(line, ssid, ssid_size);
+    line[ssid_size] = '\t';
+    memcpy(line + ssid_size + 1U, password, password_size);
+    size_t size = ssid_size + 1U + password_size;
+    line[size++] = '\n';
+    return network_service_save_credentials_file((const uint8_t *)line, size);
 }
 
 esp_err_t network_service_validate_credentials_file(const uint8_t *data,
                                                     size_t size) {
     ESP_RETURN_ON_FALSE(data && size && size < 800U, ESP_ERR_INVALID_SIZE, TAG,
                         "Wi-Fi file is empty or too large");
-    ESP_RETURN_ON_FALSE(!memchr(data, 0, size), ESP_ERR_INVALID_ARG, TAG,
-                        "Wi-Fi file contains a NUL byte");
-    char content[800];
-    memcpy(content, data, size);
-    content[size] = '\0';
     size_t count = 0;
-    char *cursor = content;
-    while (*cursor) {
-        char *line_end = strpbrk(cursor, "\r\n");
-        char line_break = line_end ? *line_end : '\0';
-        if (line_end) *line_end = '\0';
-        if (*cursor) {
-            char *tab = strchr(cursor, '\t');
-            ESP_RETURN_ON_FALSE(tab, ESP_ERR_INVALID_ARG, TAG,
-                                "Wi-Fi row has no tab separator");
-            *tab++ = '\0';
-            ESP_RETURN_ON_FALSE(
-                cursor[0] && strlen(cursor) < sizeof(s_station_config.sta.ssid) &&
-                    strlen(tab) < sizeof(s_station_config.sta.password) &&
-                    !strpbrk(cursor, "\t\r\n") && !strpbrk(tab, "\t\r\n"),
-                ESP_ERR_INVALID_ARG, TAG, "Invalid Wi-Fi row");
+    size_t offset = 0;
+    while (offset < size) {
+        size_t end = offset;
+        while (end < size && data[end] != '\n') ++end;
+        size_t row_end = end;
+        if (row_end > offset && data[row_end - 1U] == '\r') --row_end;
+        if (row_end > offset) {
+            size_t tab = offset;
+            while (tab < row_end && data[tab] != '\t') ++tab;
+            ESP_RETURN_ON_FALSE(tab > offset && tab < row_end &&
+                                    tab - offset < sizeof(s_station_config.sta.ssid) &&
+                                    row_end - tab - 1U < sizeof(s_station_config.sta.password),
+                                ESP_ERR_INVALID_ARG, TAG, "Invalid Wi-Fi row");
+            for (size_t index = offset; index < row_end; ++index) {
+                ESP_RETURN_ON_FALSE(data[index] && data[index] != '\r' &&
+                                        (data[index] != '\t' || index == tab),
+                                    ESP_ERR_INVALID_ARG, TAG, "Invalid Wi-Fi field");
+            }
             ESP_RETURN_ON_FALSE(++count <= WIFI_MAX_CREDENTIALS,
                                 ESP_ERR_INVALID_SIZE, TAG,
                                 "Too many Wi-Fi networks");
         }
-        if (!line_end) break;
-        cursor = line_end + 1;
-        if (*cursor == '\n' && line_break == '\r') ++cursor;
+        offset = end < size ? end + 1U : end;
     }
     ESP_RETURN_ON_FALSE(count > 0, ESP_ERR_INVALID_ARG, TAG,
                         "Wi-Fi file has no networks");
 
     return ESP_OK;
+}
+
+static void load_validated_credentials(const uint8_t *data, size_t size) {
+    // Validation has already proved the row count, field bounds and separators.
+    // Apply the committed request directly: a second filesystem read could
+    // fail after publication and destroy the running profile table.
+    memset(s_credentials, 0, sizeof(s_credentials));
+    s_credential_count = 0;
+    s_credential_index = 0;
+    for (size_t offset = 0; offset < size;) {
+        size_t end = offset;
+        while (end < size && data[end] != '\n') ++end;
+        size_t row_end = end;
+        if (row_end > offset && data[row_end - 1U] == '\r') --row_end;
+        if (row_end > offset) {
+            size_t tab = offset;
+            while (data[tab] != '\t') ++tab;
+            wifi_config_t *saved = &s_credentials[s_credential_count++];
+            memcpy(saved->sta.ssid, data + offset, tab - offset);
+            memcpy(saved->sta.password, data + tab + 1U, row_end - tab - 1U);
+            prepare_station_config(saved);
+        }
+        offset = end < size ? end + 1U : end;
+    }
+    s_station_config = s_credentials[0];
+    s_have_credentials = true;
 }
 
 esp_err_t network_service_save_credentials_file(const uint8_t *data,
@@ -377,10 +406,7 @@ esp_err_t network_service_save_credentials_file(const uint8_t *data,
         remove(temporary_path);
         return ESP_FAIL;
     }
-    memset(&s_station_config, 0, sizeof(s_station_config));
-    s_have_credentials = read_credentials(&s_station_config);
-    ESP_RETURN_ON_FALSE(s_have_credentials, ESP_FAIL, TAG,
-                        "Reload saved Wi-Fi networks");
+    load_validated_credentials(data, size);
     ESP_LOGI(TAG, "Saved %u Wi-Fi network(s)", (unsigned)s_credential_count);
     return ESP_OK;
 }
