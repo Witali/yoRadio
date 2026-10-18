@@ -4,6 +4,7 @@ get_filename_component(YORADIO_ROOT
 set(NATIVE_SRCS
   "app_main.c"
   "audio_service.c"
+  "radio_control.c"
   "cyd_display.c"
   "native_audio_output.c"
   "native_state.c"
@@ -51,6 +52,7 @@ idf_component_register(
     spiffs
     audio_level_led
     native_audio_settings
+    native_storage
     native_stream
     custom_legacy_codecs
     esp_audio_codec

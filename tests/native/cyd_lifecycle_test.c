@@ -46,7 +46,7 @@ static void (*receive_hook)(void);
 static atomic_uint s_generation;
 static unsigned open_handles, opens, closes, writes, flushes, discards;
 static unsigned eos_frames;
-static bool fail_open, fail_realloc, fail_process, fail_write, fail_flush, fail_config, cancel_acquire;
+static bool fail_open, fail_realloc, fail_process, fail_write, fail_flush, fail_config, cancel_acquire, fail_queue;
 static unsigned health_decoder_faults,health_output_faults;
 static native_health_decoder_stage_t health_decoder_stage;
 static int32_t health_decoder_result;
@@ -193,6 +193,7 @@ adaptive_input_stats_t adaptive_input_stats(adaptive_input_t *q) {
 static uint32_t queued_generation;
 static int xQueueOverwrite(void *q, const void *p) {
     assert(q && p);
+    if (fail_queue) return 0;
     const play_command_t *command=p;
     assert(command->generation>queued_generation);
     queued_generation=command->generation; return pdTRUE;
@@ -385,8 +386,15 @@ int main(void) {
     assert(!pthread_join(first,NULL) && !pthread_join(second,NULL));
     assert(atomic_load(&s_generation)==2100);
     audio_service_stop();
-    assert(state.audio_generation==2101 && !state.audio_running);
+    assert(state.audio_generation==2101 && !state.audio_running && !state.audio_pending);
     assert(!strcmp(state.stream_format,"stopped"));
+    assert(audio_service_play("http://pending.example/live",NATIVE_CODEC_AUTO)==ESP_OK);
+    assert(state.audio_pending && !state.audio_running);
+    native_state_set_pending(&state,state.audio_generation-1,false);assert(state.audio_pending);
+    audio_service_stop();assert(!state.audio_pending);
+    fail_queue=true;assert(audio_service_play("http://failed.example/live",NATIVE_CODEC_AUTO)==ESP_FAIL);
+    assert(!state.audio_pending && !state.audio_running && !strcmp(state.stream_format,"command failed"));
+    fail_queue=false;
     assert(!state.title[0]);
 
     native_input_health_t queue_health=audio_service_input_health();

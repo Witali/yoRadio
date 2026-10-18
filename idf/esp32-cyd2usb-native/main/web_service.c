@@ -17,6 +17,7 @@
 #include "native_health.h"
 #include "native_audio_output.h"
 #include "network_service.h"
+#include "radio_control.h"
 #include "json_buffer.h"
 
 static const char *const TAG = "web";
@@ -68,7 +69,8 @@ static esp_err_t status_handler(httpd_req_t *request) {
     json_buffer_raw(&output, ",\"title\":");
     json_buffer_string(&output, state.title);
     char settings[64];
-    snprintf(settings, sizeof(settings), ",\"volume\":%u,\"balance\":%d}",
+    snprintf(settings, sizeof(settings), ",\"connecting\":%s,\"volume\":%u,\"balance\":%d}",
+             state.audio_pending ? "true" : "false",
              native_audio_output_get_volume(), native_audio_output_get_balance());
     json_buffer_raw(&output, settings);
     if (output.failed) return httpd_resp_send_err(request,
@@ -76,6 +78,61 @@ static esp_err_t status_handler(httpd_req_t *request) {
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return httpd_resp_sendstr(request, body);
+}
+
+static bool parse_station_number(const char *text, uint16_t *station) {
+    if (!text || !*text) return false;
+    uint32_t value = 0;
+    for (; *text; ++text) {
+        if (*text < '0' || *text > '9') return false;
+        value = value * 10U + (unsigned)(*text - '0');
+        if (value > UINT16_MAX) return false;
+    }
+    if (!value) return false;
+    *station = (uint16_t)value;
+    return true;
+}
+
+static esp_err_t radio_handler(httpd_req_t *request) {
+    if (request->method == HTTP_POST) {
+        char query[96], action[24], value[16];
+        if (httpd_req_get_url_query_str(request,query,sizeof(query)) != ESP_OK ||
+            httpd_query_key_value(query,"action",action,sizeof(action)) != ESP_OK)
+            return httpd_resp_send_err(request,HTTPD_400_BAD_REQUEST,"Missing radio action");
+        esp_err_t result = ESP_ERR_INVALID_ARG;
+        if (!strcmp(action,"next")) result = radio_control_next();
+        else if (!strcmp(action,"previous")) result = radio_control_previous();
+        else if (!strcmp(action,"toggle")) result = radio_control_toggle();
+        else if (!strcmp(action,"stop")) result = radio_control_stop();
+        else if (!strcmp(action,"play")) {
+            uint16_t station;
+            if (httpd_query_key_value(query,"station",value,sizeof(value)) == ESP_OK &&
+                parse_station_number(value,&station)) result = radio_control_play(station);
+        } else if (!strcmp(action,"smartstart")) {
+            if (httpd_query_key_value(query,"enabled",value,sizeof(value)) == ESP_OK &&
+                (!strcmp(value,"0") || !strcmp(value,"1")))
+                result = radio_control_set_smartstart_enabled(value[0]=='1');
+        }
+        if (result != ESP_OK) return httpd_resp_send_err(request,
+            result == ESP_ERR_INVALID_ARG || result == ESP_ERR_NOT_FOUND ? HTTPD_400_BAD_REQUEST :
+            HTTPD_500_INTERNAL_SERVER_ERROR,"Radio action failed");
+    }
+    radio_control_snapshot_t radio;
+    if (!radio_control_snapshot(&radio))
+        return httpd_resp_send_err(request,HTTPD_500_INTERNAL_SERVER_ERROR,"Radio unavailable");
+    native_state_t state;
+    native_state_snapshot(s_state,&state);
+    char body[1024], prefix[160];
+    snprintf(prefix,sizeof(prefix),"{\"current\":%u,\"count\":%u,\"smartstart\":%s,\"playing\":%s,\"connecting\":%s,\"station\":",
+        radio.item,radio.count,radio.smartstart ? "true" : "false",
+        state.audio_running ? "true" : "false",state.audio_pending ? "true" : "false");
+    json_buffer_t output;
+    json_buffer_init(&output,body,sizeof(body));
+    json_buffer_raw(&output,prefix);json_buffer_string(&output,radio.name);json_buffer_raw(&output,"}");
+    if (output.failed) return httpd_resp_send_err(request,HTTPD_500_INTERNAL_SERVER_ERROR,"Radio buffer exhausted");
+    httpd_resp_set_type(request,"application/json; charset=utf-8");
+    httpd_resp_set_hdr(request,"Cache-Control","no-store");
+    return httpd_resp_sendstr(request,body);
 }
 
 static esp_err_t reconnect_handler(httpd_req_t *request) {
@@ -128,8 +185,8 @@ static esp_err_t play_handler(httpd_req_t *request) {
 }
 
 static esp_err_t stop_handler(httpd_req_t *request) {
-    audio_service_stop();
-    httpd_resp_set_type(request, "application/json");
+    if (radio_control_stop() != ESP_OK) audio_service_stop();
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
     return httpd_resp_sendstr(request, "{\"playing\":false}");
 }
 
@@ -220,6 +277,7 @@ esp_err_t web_service_start(native_state_t *state) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.stack_size = 6144;
     config.max_open_sockets = 4;
+    config.max_uri_handlers = 16;
     config.lru_purge_enable = true;
     config.uri_match_fn = httpd_uri_match_wildcard;
     httpd_handle_t server = NULL;
@@ -238,6 +296,8 @@ esp_err_t web_service_start(native_state_t *state) {
         .method = HTTP_POST,
         .handler = reconnect_handler,
     };
+    httpd_uri_t radio_get = {.uri="/api/native/radio",.method=HTTP_GET,.handler=radio_handler};
+    httpd_uri_t radio_post = {.uri="/api/native/radio",.method=HTTP_POST,.handler=radio_handler};
     httpd_uri_t play = {
         .uri = "/api/native/play*",
         .method = HTTP_POST,
@@ -267,6 +327,8 @@ esp_err_t web_service_start(native_state_t *state) {
                         "Status route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &health), TAG,
                         "Health route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &radio_get), TAG,"Radio GET registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &radio_post), TAG,"Radio POST registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &reconnect), TAG,
                         "Reconnect route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &play), TAG,

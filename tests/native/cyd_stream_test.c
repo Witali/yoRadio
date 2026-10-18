@@ -12,15 +12,17 @@
 #include "stream_body.h"
 #include "json_buffer.h"
 #include "native_health.h"
+#include "radio_control.h"
 
 typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC,
                NATIVE_CODEC_FLAC, NATIVE_CODEC_OGG } native_codec_t;
 typedef int esp_err_t;
 typedef void *QueueHandle_t, *RingbufHandle_t;
-typedef struct { int unused; } httpd_req_t;
+typedef struct { int method; const char *query; } httpd_req_t;
 enum { ESP_OK=0, ESP_FAIL=-1, ESP_ERR_TIMEOUT=0x107, ESP_ERR_HTTP_EAGAIN=0x7007,
        ESP_ERR_MBEDTLS_SSL_READ_FAILED=0x8000, HTTP_EVENT_ON_HEADER=1,
-       HTTPD_500_INTERNAL_SERVER_ERROR=500 };
+       HTTPD_500_INTERNAL_SERVER_ERROR=500, HTTPD_400_BAD_REQUEST=400,
+       ESP_ERR_INVALID_ARG=-2,ESP_ERR_NOT_FOUND=-3,HTTP_GET=0,HTTP_POST=1 };
 #define ESP_TLS_ERR_SSL_TIMEOUT (-0x6800)
 #define ESP_TLS_ERR_SSL_WANT_READ (-0x6900)
 #define ESP_TLS_ERR_SSL_WANT_WRITE (-0x6880)
@@ -62,6 +64,37 @@ static uint64_t s_health_boot_id=UINT64_C(0x0123456789abcdef);
 static native_health_snapshot_t health_snapshot;
 static unsigned health_track_calls;
 static bool fail_health_format;
+static unsigned radio_actions;
+static uint16_t radio_station;
+static bool radio_enabled,radio_unavailable;
+static int radio_result;
+static unsigned direct_stops;
+static void audio_service_stop(void) {++direct_stops;}
+bool radio_control_snapshot(radio_control_snapshot_t *out) {
+    if(radio_unavailable)return false;
+    memset(out,0,sizeof(*out));out->item=out->count=UINT16_MAX;out->smartstart=true;
+    memset(out->name,1,sizeof(out->name)-1);return true;
+}
+int radio_control_next(void) {++radio_actions;return radio_result;}
+int radio_control_previous(void) {++radio_actions;return radio_result;}
+int radio_control_toggle(void) {++radio_actions;return radio_result;}
+int radio_control_stop(void) {++radio_actions;return radio_result;}
+int radio_control_play(uint16_t item) {++radio_actions;radio_station=item;return radio_result;}
+int radio_control_set_smartstart_enabled(bool enabled) {++radio_actions;radio_enabled=enabled;return radio_result;}
+static int httpd_req_get_url_query_str(httpd_req_t *request,char *out,size_t capacity) {
+    if(!request->query || strlen(request->query)>=capacity)return ESP_FAIL;
+    strcpy(out,request->query);return ESP_OK;
+}
+static int httpd_query_key_value(const char *query,const char *key,char *out,size_t capacity) {
+    size_t length=strlen(key);
+    for (const char *p=query; p && *p; p=strchr(p,'&'),p=p ? p+1 : NULL) {
+        if(!strncmp(p,key,length) && p[length]=='=') {
+            p+=length+1;size_t size=strcspn(p,"&");if(size>=capacity)return ESP_FAIL;
+            memcpy(out,p,size);out[size]=0;return ESP_OK;
+        }
+    }
+    return ESP_FAIL;
+}
 #define configNUMBER_OF_CORES 2
 #define MALLOC_CAP_8BIT 1
 #define MALLOC_CAP_INTERNAL 2
@@ -311,6 +344,30 @@ int main(void) {
     fail_health_format=true;
     assert(health_handler(&request)==ESP_FAIL && response_status==500 && health_track_calls==2);
     assert(health_snapshot.faults.decoder_failures==2 && state.audio_generation==1001);
+    native_state_set_pending(&state,1001,true);
+    assert(radio_handler(&request)==ESP_OK && !radio_actions);printf("RADIO=%s\n",response);
+    request.method=HTTP_POST;
+    const char *actions[]={"action=next","action=previous","action=toggle","action=stop","action=play&station=65535",
+        "action=smartstart&enabled=1","action=smartstart&enabled=0"};
+    for(unsigned i=0;i<sizeof(actions)/sizeof(actions[0]);++i) {
+        request.query=actions[i];assert(radio_handler(&request)==ESP_OK && radio_actions==i+1);
+    }
+    assert(radio_station==65535 && !radio_enabled);
+    const char *bad_actions[]={NULL,"","action=","action=unknown","action=play","action=play&station=0",
+        "action=play&station=-1","action=play&station=+1","action=play&station=1junk","action=play&station=65536",
+        "action=play&station=99999999999999999999999","action=play&station= 1","action=smartstart",
+        "action=smartstart&enabled=2","action=smartstart&enabled=01"};
+    unsigned count=radio_actions;
+    for(unsigned i=0;i<sizeof(bad_actions)/sizeof(bad_actions[0]);++i) {
+        request.query=bad_actions[i];assert(radio_handler(&request)==ESP_FAIL && response_status==400 && radio_actions==count);
+    }
+    request.query="action=next";radio_result=ESP_FAIL;
+    assert(radio_handler(&request)==ESP_FAIL && response_status==500);
+    radio_result=ESP_OK;assert(stop_handler(&request)==ESP_OK && !direct_stops);
+    radio_result=ESP_FAIL;assert(stop_handler(&request)==ESP_OK && direct_stops==1);
+    radio_result=ESP_ERR_NOT_FOUND;assert(radio_handler(&request)==ESP_FAIL && response_status==400);
+    request.method=HTTP_GET;radio_unavailable=true;
+    assert(radio_handler(&request)==ESP_FAIL && response_status==500);
     printf("PASS CYD stream cases=%u: actual HTTP/ICY/probe task, MIME mismatch, redirects/status/deadline, retry/fatal TLS, cancellation/OOM, exact replay and status JSON\n",cases);
     return 0;
 }

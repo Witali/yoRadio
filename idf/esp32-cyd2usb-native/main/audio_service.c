@@ -985,8 +985,10 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     };
     strlcpy(command.url, url, sizeof(command.url));
     native_state_begin_audio(s_state, command.generation, url, "connecting");
+    native_state_set_pending(s_state, command.generation, true);
     esp_err_t result = xQueueOverwrite(s_commands, &command) == pdTRUE
                          ? ESP_OK : ESP_FAIL;
+    if (result != ESP_OK) native_state_set_audio(s_state, command.generation, false, "command failed");
     xSemaphoreGive(s_control_lock);
     return result;
 }

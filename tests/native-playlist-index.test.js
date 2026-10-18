@@ -5,20 +5,11 @@ const test = require("node:test");
 
 const root = path.resolve(__dirname, "..");
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), "utf8");
+const radio = (name) => read("idf", "components", "native_storage", "include", name);
 
 test("native C3 uses the Arduino-compatible playlist offset index", () => {
-  const source = read(
-    "idf",
-    "esp32c3-oled-native",
-    "main",
-    "radio_control.c",
-  );
-  const header = read(
-    "idf",
-    "esp32c3-oled-native",
-    "main",
-    "radio_control.h",
-  );
+  const source = radio("radio_control_impl.h");
+  const header = radio("radio_control.h");
 
   assert.match(source, /PLAYLIST_INDEX_PATH "\/spiffs\/data\/index\.dat"/);
   assert.match(source, /long position = ftell\(playlist\)/);

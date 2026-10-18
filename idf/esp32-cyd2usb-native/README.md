@@ -178,3 +178,24 @@ including the task number to reject reused handles. Diagnostic IPC accounts for
 the other core's cached runtime before sampling. This profile's sampling, stack
 survey and IPC overhead need separate hardware measurements; no C3 IRAM/ISR
 or DMA timing assumptions are used as CYD acceptance evidence.
+
+The shared station controller reads Arduino-compatible offset indexes for
+`/spiffs/data/playlist.csv`, keeps bounded line/candidate buffers and saves the
+last station/SmartStart in the existing `radio` NVS namespace. Index replacement
+retains a recoverable backup; write/flush/close/rename failure preserves the old
+index/count. Overlong CSV rows are skipped as complete rows. No display or
+physical C3 controls are included.
+
+`GET /api/native/radio` reports the selected station/count, name, SmartStart,
+playing and connecting state. Send `POST /api/native/radio?action=next`,
+`action=previous`, `action=toggle`, `action=stop`, `action=play&station=1`, or
+`action=smartstart&enabled=1` (`0` disables it). Invalid numbers/actions return
+HTTP 400. SmartStart is off by default. Existing direct-URL Play remains
+available; it does not replace the saved playlist selection. Existing Stop also
+updates playlist SmartStart and can cancel audio if radio control is unavailable.
+
+`audio_pending` tracks accepted Play until confirmed output or terminal state;
+Toggle cancels a connection in progress. Stale generations cannot change it,
+and queue publication failure clears it. Tests in `run-native-radio.py`,
+`run-playlist-index.py`, `run-cyd-stream.py` and both command/lifecycle harnesses
+exercise the shared implementation with each target's actual state functions.

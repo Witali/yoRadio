@@ -10,6 +10,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
 from run_output_dma_host import host,run
+from native_source import canonical,source_closure
 
 
 def main():
@@ -20,7 +21,7 @@ def main():
     out=ROOT/'.build'/('playlist-index-'+args.target);out.mkdir(parents=True,exist_ok=True)
     spec=importlib.util.spec_from_file_location('helpers',ROOT/'tests/run-cyd-lifecycle.py')
     helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
-    source=(main/'radio_control.c').read_text()
+    source=canonical(main/'radio_control.c').read_text()
     functions=['parse_playlist_line','load_playlist_index_locked','build_playlist_index_locked','playlist_station']
     (out/'production.inc').write_text('\n'.join(helper.function(source,name) for name in functions))
     binary=out/'test'
@@ -43,7 +44,7 @@ def main():
              ROOT/'idf/components/native_storage/include/file_transaction.h']
     (out/'report.json').write_text(json.dumps(dict(target=args.target,passed=True,
         scope='Actual index functions, real host stdio and rename/write failure seams; no SPIFFS timing or flash durability qualification.',
-        source_sha256={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}),indent=2)+'\n')
+        source_sha256={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in source_closure(sources)}),indent=2)+'\n')
     print(log.decode(),end='')
 
 

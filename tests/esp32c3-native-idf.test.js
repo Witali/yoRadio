@@ -6,8 +6,13 @@ const zlib = require("node:zlib");
 
 const root = path.resolve(__dirname, "..");
 const nativeRoot = path.join(root, "idf", "esp32c3-oled-native");
-const read = (...parts) =>
-  fs.readFileSync(path.join(nativeRoot, ...parts), "utf8");
+const read = (...parts) => {
+  const name = parts.join("/");
+  const shared = name === "main/radio_control.c" ? "radio_control_impl.h" :
+    name === "main/radio_control.h" ? "radio_control.h" : null;
+  return fs.readFileSync(shared ? path.join(root, "idf/components/native_storage/include", shared) :
+    path.join(nativeRoot, ...parts), "utf8");
+};
 
 test("repository default setup and build select native ESP-IDF firmware", () => {
   const setup = fs.readFileSync(path.join(root, "setup.ps1"), "utf8");

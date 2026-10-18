@@ -39,6 +39,7 @@ void native_state_begin_audio(native_state_t *state, uint32_t generation,
     if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
         state->audio_generation = generation;
         state->audio_running = false;
+        state->audio_pending = false;
         state->title[0] = '\0';
         if (station) strlcpy(state->station, station, sizeof(state->station));
         strlcpy(state->stream_format, format, sizeof(state->stream_format));
@@ -53,6 +54,7 @@ void native_state_set_audio(native_state_t *state, uint32_t generation,
         // Check under the mutex: Play/Stop may race an old decoder callback.
         if (state->audio_generation == generation) {
             state->audio_running = running;
+            state->audio_pending = false;
             if (format) strlcpy(state->stream_format, format,
                                 sizeof(state->stream_format));
         }
@@ -67,6 +69,22 @@ void native_state_set_title(native_state_t *state, uint32_t generation,
         if (state->audio_generation == generation) {
             strlcpy(state->title, title, sizeof(state->title));
         }
+        xSemaphoreGive(state->lock);
+    }
+}
+
+void native_state_set_station(native_state_t *state, const char *station) {
+    if (!state || !state->lock || !station) return;
+    if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
+        strlcpy(state->station, station, sizeof(state->station));
+        xSemaphoreGive(state->lock);
+    }
+}
+
+void native_state_set_pending(native_state_t *state, uint32_t generation, bool pending) {
+    if (!state || !state->lock) return;
+    if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
+        if (state->audio_generation == generation) state->audio_pending = pending;
         xSemaphoreGive(state->lock);
     }
 }

@@ -41,7 +41,7 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-03 | Программная часть выполнена | CYD подключён к continuous MP3/ADTS confirmation, ID3 stripping/recovery и ordered codec drain. 34 corpus cases обеих целей, byte-exact переходы и шесть lifecycle вариантов проходят. PDM/continuous/legacy CYD и C3 source `8bf1d73a` собраны и сохранены. Физическая приёмка отдельно. |
 | CYD-C3-04 | Программная часть выполнена | Общая SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 и независимый control node подключены. Default-off bounded prefill проверен host-тестами и GCC/clang-tidy профилем 250 ms; image source `112c871f` сохранён. Физическая приёмка и выбор ёмкости/TLS reclaim — отдельно, этап 13. |
 | CYD-C3-05 | В работе | SMP-safe health подключён к pipeline и `/api/native/health`: heap/internal/DMA, input occupancy, ошибки, optional CPU/stack по двум ядрам. Host core/HTTP/lifecycle, SDK quiet/diagnostic и полный lint проходят; images `b7362172` сохранены. Backend DMA telemetry и физические измерения отдельно. |
-| CYD-C3-06 | Открыт | Общая модель radio/settings, CSV offset index и recovery, станции Next/Prev, корректный format/bitrate/title. Повторный boot и fault injection без потери файлов. |
+| CYD-C3-06 | В работе | Общий radio controller, index recovery, last station/SmartStart, Next/Prev/Toggle и HTTP API подключены к CYD. Pending-state, NVS failure, boot restore и concurrency проверены на обеих целях. SDK/lint, stale CSV/index matching и полный format/settings — следующий шаг. |
 | CYD-C3-07 | Открыт | WebSocket snapshot/events, динамические страницы, capabilities, async static workers, bounded uploads. Две вкладки, медленный клиент, reconnect и rollback файлов. |
 | CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
 | CYD-C3-09 | Открыт | Wi-Fi profiles/reconnect/RSSI, power policy, timezone/SNTP и runtime settings. AP/client и поздняя потеря сети. |
@@ -148,11 +148,18 @@ allocation и численные настройки C3 являются канд
 
 - Начало CYD-C3-06: общий `native_storage` проверен 356 сценариями отказов /
   rollback / прерываний между файловыми операциями. Аудит исходного C3
-  воспроизвёл потерю index.dat при ошибке rename и при чтении continuation
+  воспроизвёл потерю index.dat при ошибке rename и лишнюю станцию из continuation
   слишком длинной CSV-строки. [Исполняемые регрессии](../tests/results/playlist-index-20261018/README.md)
   проверяют реальные parser/index/lookup и сохранение старого файла/count
   при ошибках write/flush/close/rename. Номер станции и формат raw offset index
   сохранены; whole CSV в RAM не загружается.
+- Radio core вынесен в [общую реализацию](../idf/components/native_storage/include/radio_control_impl.h),
+  CYD подключён через собственные state/audio interfaces. [Host-отчёты](../tests/results/cyd-c3-radio-20261018/README.md)
+  проверяют настоящий controller с обеими state implementations, boot/NVS,
+  500 concurrent commands, границы index и HTTP API, а также все шесть CYD
+  lifecycle ветвей и C3 Play/Stop/Resume. Новый pending-флаг позволяет Toggle
+  отменять подключение до PCM. Ошибка NVS SmartStart откатывает runtime setting;
+  до исправления отрицательный тест воспроизвёл несогласованное состояние.
 
 - Дополнительная проверка донора C3 обнаружила borrowed `pcTaskName` после
   возобновления scheduler и повторное использование TaskHandle без task number.

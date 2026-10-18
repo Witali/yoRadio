@@ -12,6 +12,7 @@
 #include "native_state.h"
 #include "native_health.h"
 #include "network_service.h"
+#include "radio_control.h"
 #include "nvs_flash.h"
 #include "web_service.h"
 
@@ -81,6 +82,9 @@ static void network_task(void *argument) {
     result = audio_service_start(&s_state);
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "Audio service failed: %s", esp_err_to_name(result));
+    } else {
+        result = radio_control_init(&s_state);
+        if (result != ESP_OK) ESP_LOGE(TAG, "Radio control failed: %s", esp_err_to_name(result));
     }
     result = web_service_start(&s_state);
     if (result != ESP_OK) {

@@ -52,6 +52,7 @@ void native_state_begin_stream(native_state_t *state, uint32_t generation) {
             state->audio_generation = generation;
             clear_stream_info(state);
             state->audio_running = false;
+            state->audio_pending = false;
             state->title[0] = '\0';
             strcpy(state->stream_format, "idle");
         }
@@ -65,10 +66,19 @@ void native_state_set_audio(native_state_t *state, uint32_t generation,
     if (xSemaphoreTake(state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
         if (state->audio_generation == generation) {
             state->audio_running = running;
+            state->audio_pending = false;
             if (!running) clear_stream_info(state);
             if (status) strlcpy(state->stream_format, status,
                                  sizeof(state->stream_format));
         }
+        xSemaphoreGive(state->lock);
+    }
+}
+
+void native_state_set_pending(native_state_t *state, uint32_t generation, bool pending) {
+    if (!state || !state->lock) return;
+    if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
+        if (state->audio_generation == generation) state->audio_pending = pending;
         xSemaphoreGive(state->lock);
     }
 }
@@ -121,6 +131,7 @@ bool native_state_set_stream_info(native_state_t *state, uint32_t generation,
                 state->channels_are_core = info->channels_are_core;
                 state->format_is_pcm = info->format_is_pcm;
                 state->audio_running = true;
+                state->audio_pending = false;
                 char rate[16], channels[20];
                 format_rate(info->sample_rate_hz, rate, sizeof(rate));
                 if (info->channels == 1) strcpy(channels, "mono");
