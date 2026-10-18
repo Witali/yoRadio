@@ -2734,3 +2734,14 @@ true. Это только начало нового прогона, не 24 ча
   В11:13 UTC совпали4process identities и31input;196cycles/3267.751527guest s,
   1573HTTP/3outage. Это неполный prefix; замена нужна для нового firmware/model.
   Следом требуется revalidate worker handle, supervisor cleanup и сохранение raw.
+
+- В11:13:48 UTC после committed intent и CIM revalidation остановлен прежний
+  workload23672. Supervisor выполнил cleanup exit0; raw failed/-1 outcome
+  сохранён. Независимый file-only audit подтвердил200полных циклов,
+  3292.590422guest s/1605HTTP/3outage,31inputs, одинROMboot безpanic.
+  Manifest network-roles-runtime-superseded-20261018.json +7rawgzip; неH10 pass.
+- Новая frozen26C6/FE9B/B44 H10 запущена11:14:24UTC, supervisor21928 внеJob,
+  workload20664/guard35272/VM7412. После запуска все4CIM identities совпали,
+  31runtime+11frozenQEMU hashes проверены; file-only diagnostic/start binding pass.
+  Start proof network-roles-runtime-start-20261018.json +2rawsnapshots. Никакой
+  24h/полной приёмки пока нет. Оба full controller2448/28968 также живы.

@@ -5,7 +5,24 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
-## H10 replacement подготовлен — 2026-10-18 11:13 UTC
+## H10 replacement запущен — 2026-10-18
+
+Intent был закоммичен f97d8739 до stop. В11:13:48 UTC через повторно проверенный
+handle остановлен только прежний workload23672; supervisor сам закрыл guard/VM,
+cleanup exit0. Исходный supervisor outcome failed/exit-1 сохранён без подмены.
+Файловый audit префикса:200полных циклов/3292.590422guest s/1605HTTP/3outage,
+31input совпал, UART2447bytes/одинROMboot/безpanic. Это не24h и не pass;
+4pending journal events сохранены. Raw7gzip и manifest:
+network-roles-runtime-superseded-20261018.json. Все4oldPID отсутствуют в CIM.
+
+Новая frozen26C6/FE9B/B44 ВМ запущена11:14:24UTC на86400guest s,interval15,
+outageEvery60. Supervisor21928, workload20664, guard35272, VM7412; проверены
+CIM PID/creation/command всех4,31runtime inputs,11frozen QEMU files и launcher
+hashes. Start proof network-roles-runtime-start-20261018.json; это running start,
+не passing H10. File-only analyzer подтверждает соответствие start record.
+Не подключать второй RSP/QMP observer к этой ВМ и не менять её frozen inputs.
+
+### Подготовка замены — историческая запись11:13UTC
 
 Создана frozen worktree .worktree/small-tv-h10-netif-roles, branch
 codex/small-tv-h10-netif-roles atf0375b14. В неё скопирован совпадающий ELFFE9B
@@ -16,12 +33,12 @@ codex/small-tv-h10-netif-roles atf0375b14. В неё скопирован сов
 До остановки старого H10 записан network-roles-runtime-supersede-intent-20261018.json.
 В11:13:01 UTC все4oldPID/creation/command и31input совпали;196cycles/
 3267.751527guest s/1573HTTP/3outage. Причина замены — новая production26C6 и
-QEMU B44; старый prefix не24h. Следующий шаг: ещё раз проверить и остановить
+QEMU B44; старый prefix не24h. На момент intent следующий шаг был: проверить и остановить
 только old workload23672 с creation10:06:56.5451710Z через удержанный handle;
 supervisor17788 должен сам закрыть guard28632 и VM35664. Сохранить его terminal
 failed outcome как intentional supersession, raw report/events/UART не переписывать.
 Затем запустить86400guest s/interval15/outageEvery60 из новой frozen worktree
-в .build/netif-roles-detached-24h-20261018. Пока исполнение stop ещё не записано.
+в .build/netif-roles-detached-24h-20261018. Исполнение и evidence записаны выше.
 Не менять ни одну frozen копию до terminal её workload/full run.
 
 ## Полный network roles regression — 2026-10-18 11:07 UTC
