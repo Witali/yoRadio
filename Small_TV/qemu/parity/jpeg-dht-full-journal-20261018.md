@@ -22,3 +22,22 @@ This record is pre-launch preparation, not proof of execution or a terminal pass
 Full suite completion, a fresh539-input audit, and separate browser/H10/hardware
 requirements remain outstanding. Source WORK_LOG/WORKING_NOTES are frozen;
 append current observations here until terminal audit permits source updates.
+
+## Verified launch
+
+The controller is live as PID20380, created2026-10-18T13:08:55.949427Z, executing
+this worktree's frozen wrapper. It advanced through report aggregation, native,
+platform, frontend, integrity and timezone source groups into the machine phase.
+The launcher's post-spawn job/liveness assertion failed; authoritative CIM
+re-observation found the actual controller still running after its launcher
+exited. It was not restarted, and out-of-job detachment is not claimed.
+`jpeg-dht-full-launch-20261018.json` preserves this diagnostic and exact identity.
+
+The previous full controller10836 and all four BC68 H10 identities also remain
+live. The old full has passed regional persistence for both variants and real
+NVSv1 migration/v2 fallback, then entered natural calendar cases. Those checks
+remain evidence for BC68/20B. Neither full run has a terminal result yet.
+
+Next requirements include a terminal539-input audit and full report publication,
+actual browser regressions on0592, then its own guarded runtime preflight/H10.
+The earlier browser and H10 evidence must not be relabelled as this candidate.
