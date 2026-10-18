@@ -3,6 +3,9 @@
 #define s_pending s_reboot_pending
 #define s_reserved_epoch s_reboot_reserved_epoch
 #define web_reboot_request websocket_service_request_reboot
+#define web_reboot_lease_t websocket_reboot_lease_t
+#define web_reboot_reserve websocket_service_reboot_reserve
+#define web_reboot_cancel websocket_service_reboot_cancel
 #endif
 static void text_file(const char *path,const char *text) {
     FILE *file=mapped_open(path,"wb");assert(file&&fwrite(text,1,strlen(text),file)==strlen(text)&&!fclose(file));
@@ -20,6 +23,7 @@ static void reset(void) {
     clock_us=1000000;receive_ready=send_ready=receive_step=publish_delay=0;
     receives=sends=wait_read=wait_write=close_prepares=activity=publications=0;
     async_begins=async_completes=queued_static=file_opens=0;
+    form_erases=chunk_erases=playlist_notifications=0;
     fail_workspace=fail_response=fail_store=store_busy=committed_file=fail_io_allocation=false;sleep_allowed=true;
     lookup_count=lookup_fault_mask=0;
     receive_wants_write=send_wants_read=false;receive_chunk=send_chunk=SIZE_MAX;
@@ -31,7 +35,7 @@ static void reset(void) {
 #ifdef TARGET_C3
     s_reboot_pending=false;s_reboot_reserved_epoch=0;s_reboot_next_epoch=0;atomic_store(&s_reboot_ready,true);
 #else
-    s_pending=false;s_reserved_epoch=0;s_next_epoch=0;assert(web_reboot_start()==ESP_OK);web_wifi_activate();
+    s_pending=false;s_reserved_epoch=0;s_next_epoch=0;assert(web_reboot_start()==ESP_OK);web_wifi_activate();web_upload_activate();
 #endif
 }
 static void body(const char *text) {
@@ -49,7 +53,65 @@ static void closed(void) {
     if(sd.recv_fn!=default_receive)assert(sd.recv_fn(&hd,7,(char *)source,1,0)==HTTPD_SOCK_ERR_FAIL);
     if(sd.send_fn!=default_send)assert(sd.send_fn(&hd,7,"x",1,0)==HTTPD_SOCK_ERR_FAIL);
     httpd_req_cleanup(&hd.hd_req);assert(!sd.ctx&&!sd.free_ctx);
-    assert(!strstr(response,"OLD_PRIVATE")&&!strstr(response,"NEW_REQUEST_CANARY"));
+    assert(!strstr(response,"OLD_PRIVATE")&&!strstr(response,"NEW_REQUEST_CANARY")&&!strstr(response,"IMPORT_REQUEST_CANARY"));
+}
+static void make_import(unsigned kind,bool asset,bool invalid) {
+    const char *csv=invalid?"invalid":" new \tIMPORT_REQUEST_CANARY\n";
+    int count;
+    if(kind==2)count=snprintf((char *)source,sizeof(source),
+        "--wifi\r\nContent-Disposition: form-data; name=\"ssid\"\r\n\r\n new \r\n"
+        "--wifi\r\nContent-Disposition: form-data; name=\"pass\"\r\n\r\nIMPORT_REQUEST_CANARY\r\n--wifi--\r\n");
+    else count=snprintf((char *)source,sizeof(source),
+        "%s--wifi\r\nContent-Disposition: form-data; name=\"%s\"; filename=\"wifi.csv\"\r\n\r\n%s\r\n--wifi--\r\n",
+        asset?"--wifi\r\nContent-Disposition: form-data; name=\"www\"; filename=\"theme.css.gz\"\r\n\r\nNEW\r\n":"",
+        kind==0?"wifile":"data",csv);
+    assert(count>0&&(size_t)count<sizeof(source));source_size=(size_t)count;
+    hd.hd_req.content_len=hd.hd_req_aux.remaining_len=source_size;type="multipart/form-data; boundary=wifi";
+}
+static esp_err_t import_handler(unsigned kind) {
+    return kind==0?web_upload_handler(&hd.hd_req):kind==1?web_board_upload_handler(&hd.hd_req):web_wifi_upload_handler(&hd.hd_req);
+}
+static void import_cases(void) {
+    for(unsigned kind=0;kind<3;++kind)for(unsigned mode=0;mode<6;++mode) {
+        reset();make_import(kind,false,false);receive_chunk=mode+1;send_chunk=7;
+        if(mode==0){assert(httpd_unrecv(&hd.hd_req,(char *)source,37)==37);source_offset=37;}
+        if(mode==1)fail_response=true;
+        if(mode==2){receive_ready=clock_us+2000000U;receive_wants_write=true;}
+        if(mode==3)publish_delay=130000000U;
+        if(mode==4){send_ready=clock_us+2000000U;send_wants_read=true;}
+        assert(import_handler(kind)==ESP_FAIL);closed();
+        assert(publications==1&&s_pending&&!s_reserved_epoch&&form_erases==1&&chunk_erases);
+        expect_file(" new \tIMPORT_REQUEST_CANARY\n");
+        if(!fail_response&&mode!=4)assert(strstr(response,kind?"303 See Other":"200 OK"));
+        if(mode==2)assert(wait_write);
+        if(mode==4)assert(wait_read);
+    }
+    for(unsigned mode=0;mode<9;++mode) {
+        reset();make_import(1,true,mode==2);text_file("/spiffs/www/theme.css.gz","OLD");
+        web_reboot_lease_t foreign={0};
+        if(mode==0)web_reboot_request(0);
+        if(mode==1)assert(web_reboot_reserve(&foreign)==ESP_OK);
+        if(mode==3)fail_store=true;
+        if(mode==4)receive_ready=clock_us+10000001U;
+        if(mode==5){receive_step=9000000;receive_chunk=1;}
+        if(mode==6)fail_io_allocation=true;
+        if(mode==7){type="multipart/form-data; x-boundary=wifi";}
+        if(mode==8){
+#ifdef TARGET_C3
+            atomic_store(&s_reboot_ready,false);
+#else
+            web_upload_deactivate();
+#endif
+        }
+        assert(import_handler(1)==ESP_FAIL);closed();
+        assert(!publications&&!activity);expect_file(" duplicate \tOLD_PRIVATE_A\n duplicate \tOLD_PRIVATE_B\n");
+        FILE *file=mapped_open("/spiffs/www/theme.css.gz","rb");char asset[4]={0};assert(file&&fread(asset,1,3,file)==3&&!fclose(file)&&!strcmp(asset,"OLD"));
+        if(mode<2)assert(strstr(response,"503 Service Unavailable"));
+        if(mode==0)assert(s_pending);else assert(!s_pending);
+        if(mode==1){assert(s_reserved_epoch==foreign.epoch);web_reboot_cancel(&foreign);}
+        assert(!s_reserved_epoch);
+        mapped_remove("/spiffs/www/theme.css.gz");mapped_remove("/spiffs/www/theme.css.gz.bak");
+    }
 }
 static void success_cases(void) {
     for(size_t chunk=1;chunk<=85;chunk+=7) {
@@ -190,7 +252,7 @@ static void actual_static_cases(void) {
 }
 #endif
 int main(void) {
-    assert(mkdtemp(directory));uri_cases();success_cases();rejection_cases();metadata_cases();foreign_owner_case();io_attachment_cases();inactive_info_cases();
+    assert(mkdtemp(directory));uri_cases();success_cases();rejection_cases();metadata_cases();foreign_owner_case();io_attachment_cases();inactive_info_cases();import_cases();
 #ifdef TARGET_C3
     actual_static_cases();
 #endif

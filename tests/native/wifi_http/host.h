@@ -1,6 +1,7 @@
 #pragma once
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <pthread.h>
@@ -42,6 +43,7 @@
 #define HTTP_GET 1
 #define HTTP_POST 3
 #define HTTP_HEAD 2
+#define CONFIG_SPIFFS_OBJ_NAME_LEN 32
 #define ESP_LOGD(...) ((void)0)
 #define ESP_LOGI(...) ((void)0)
 #define ESP_LOGE(...) ((void)0)
@@ -50,6 +52,8 @@
 #define ESP_RETURN_ON_ERROR(expression,...) do {int result_=(expression);if(result_!=ESP_OK)return result_;} while (0)
 #define MIN(a,b) ((a)<(b)?(a):(b))
 typedef int esp_err_t;
+typedef struct {struct {uint8_t ssid[32],password[64];}sta;} wifi_config_t;
+static wifi_config_t s_station_config;
 typedef void *httpd_handle_t;
 typedef void (*httpd_free_ctx_fn_t)(void *);
 typedef int (*httpd_send_func_t)(httpd_handle_t,int,const char *,size_t,int);
@@ -124,7 +128,14 @@ void xSemaphoreGive(SemaphoreHandle_t);
 uint32_t esp_random(void);
 void esp_fill_random(void *,size_t);
 esp_err_t web_upload_storage_init(void);
+esp_err_t network_service_validate_credentials_file(const uint8_t *,size_t);
+esp_err_t network_service_save_credentials_file(const uint8_t *,size_t);
+esp_err_t network_service_save_credentials(const char *,const char *);
+esp_err_t radio_control_publish_playlist(const char *,bool (*)(const char *,const char *));
+void websocket_service_notify_playlist_changed(void);
 FILE *mapped_open(const char *,const char *);
+int mapped_fd_open(const char *,int,int);
 int mapped_stat(const char *,struct stat *);
 int mapped_remove(const char *);
 int mapped_rename(const char *,const char *);
+void observed_upload_erase(void *,size_t);

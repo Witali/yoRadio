@@ -17,12 +17,15 @@ static bool fail_io_allocation;
 static char directory[]="/tmp/native-wifi-http-XXXXXX";
 static pthread_mutex_t owner_mutex=PTHREAD_MUTEX_INITIALIZER;
 static unsigned async_begins, async_completes, queued_static, file_opens;
+static unsigned form_erases, chunk_erases, playlist_notifications;
 static void event(char c) {assert(event_size+1<sizeof(events));events[event_size++]=c;events[event_size]=0;}
 static void mapped_path(const char *path,char *out,size_t size) {
-    assert(!strncmp(path,"/spiffs/data/",13));
-    int count=snprintf(out,size,"%s/%s",directory,path+13);assert(count>0&&(size_t)count<size);
+    bool data=!strncmp(path,"/spiffs/data/",13),www=!strncmp(path,"/spiffs/www/",12);
+    assert(data||www);
+    int count=snprintf(out,size,"%s/%s%s",directory,www?"www-":"",path+(data?13:12));assert(count>0&&(size_t)count<size);
 }
 FILE *mapped_open(const char *path,const char *mode) {++file_opens;char name[256];mapped_path(path,name,sizeof(name));return fopen(name,mode);}
+int mapped_fd_open(const char *path,int flags,int mode) {++file_opens;char name[256];mapped_path(path,name,sizeof(name));return open(name,flags,mode);}
 int mapped_stat(const char *path,struct stat *out) {char name[256];mapped_path(path,name,sizeof(name));return stat(name,out);}
 int mapped_remove(const char *path) {char name[256];mapped_path(path,name,sizeof(name));return remove(name);}
 int mapped_rename(const char *from,const char *to) {
@@ -38,7 +41,13 @@ int xSemaphoreTake(SemaphoreHandle_t lock,unsigned timeout) {assert(lock==&owner
 void xSemaphoreGive(SemaphoreHandle_t lock) {assert(lock==&owner_mutex&&!pthread_mutex_unlock(lock));}
 uint32_t esp_random(void) {return UINT32_C(0x12345678);}
 void esp_fill_random(void *out,size_t size) {memset(out,0x39,size);}
-esp_err_t web_upload_storage_init(void) {return ESP_OK;}
+esp_err_t radio_control_publish_playlist(const char *path,bool (*publish)(const char *,const char *)) {(void)path;(void)publish;return ESP_FAIL;}
+void websocket_service_notify_playlist_changed(void) {++playlist_notifications;}
+void observed_upload_erase(void *data,size_t size) {
+    if(size==sizeof(web_file_form_t))++form_erases;
+    if(size==WEB_UPLOAD_RECEIVE_BYTES)++chunk_erases;
+    native_wifi_erase(data,size);
+}
 int64_t esp_timer_get_time(void) {return (int64_t)clock_us;}
 void vTaskDelay(TickType_t delay) {clock_us+=(uint64_t)delay*1000U;}
 TickType_t xTaskGetTickCount(void) {if(committed_file){assert(close_prepares==1&&!http_workspace);event('C');}return (TickType_t)(clock_us/1000U);}

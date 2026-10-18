@@ -15,6 +15,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 MAIN = ROOT / 'idf/esp32-cyd2usb-native/main'
 SHARED = ROOT / 'idf/components/native_storage'
+WIFI = ROOT / 'idf/components/native_wifi_store'
 C3_MAIN = ROOT / 'idf/esp32c3-oled-native/main'
 sys.path.insert(0, str(ROOT / 'tools/codec_benchmark'))
 from run_output_dma_host import host, run
@@ -31,6 +32,8 @@ def main():
     files = [Path(__file__), ROOT/'tests/native/cyd_upload_test.c', ROOT/'tests/native/cyd_upload_reboot_test.c',
              ROOT/'tests/native/cyd_upload_pair_test.c',
              ROOT/'tests/run-web-warning-regressions.py',
+             WIFI/'native_wifi_store.c',WIFI/'native_wifi_file.c',
+             WIFI/'include/native_wifi_store.h',WIFI/'include/native_wifi_file.h',
              C3_MAIN/'web_upload.c', C3_MAIN/'web_upload.h',
              *(MAIN/name for name in ['web_upload.c','web_upload.h','web_reboot.c','web_reboot.h',
                                       'network_service.c','network_service.h']),
@@ -47,13 +50,16 @@ def main():
     frozen = out/'sources'
     main = frozen/MAIN.relative_to(ROOT)
     shared = frozen/SHARED.relative_to(ROOT)
+    wifi = frozen/WIFI.relative_to(ROOT)
     strip_includes = lambda source: re.sub(r'^#include[^\n]*\n', '', source, flags=re.M)
     (out/'cyd-upload-production.inc').write_text(strip_includes((main/'web_upload.c').read_text()))
     (out/'c3-upload-production.inc').write_text(strip_includes((frozen/C3_MAIN.relative_to(ROOT)/'web_upload.c').read_text()))
     (out/'cyd-reboot-production.inc').write_text(strip_includes((main/'web_reboot.c').read_text()))
     network = (main/'network_service.c').read_text()
-    (out/'cyd-wifi-production.inc').write_text(''.join(helpers.function(network,name) for name in
-        ['network_service_storage_init','read_credentials','network_service_validate_credentials_file',
+    start=network.index('static SemaphoreHandle_t s_wifi_save_lock;')
+    end=network.index('static bool read_credentials(',start)
+    (out/'cyd-wifi-production.inc').write_text(network[start:end]+''.join(helpers.function(network,name) for name in
+        ['read_credentials','network_service_validate_credentials_file',
          'network_service_save_credentials_file','network_service_save_credentials']))
     report = {'passed':False, 'physical_hardware':False, 'sanitizers':['ASan','UBSan'],
               'source_sha256':hashes, 'variants':{}}
@@ -62,7 +68,8 @@ def main():
         test = frozen/'tests/native'/('cyd_upload_test.c' if name.startswith('upload') else 'cyd_upload_'+name+'_test.c')
         command = ['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
                    '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie','-pthread',
-                   '-I'+host(out),'-I'+host(shared),'-I'+host(shared/'include'),host(test),'-o',host(binary)]
+                   '-I'+host(out),'-I'+host(shared),'-I'+host(shared/'include'),
+                   '-I'+host(wifi),'-I'+host(wifi/'include'),host(test),'-o',host(binary)]
         if name=='upload-c3': command.insert(1,'-DTEST_C3_UPLOAD=1')
         for stage,args in [('build',command),('test',['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
              'UBSAN_OPTIONS=halt_on_error=1','timeout','45',host(binary),host(out/'fs')])]:
@@ -79,7 +86,7 @@ def main():
     report['passed'] = True
     report['scope'] = ('Actual full CYD and C3 upload handlers and sink, shared multipart/form/transaction, actual CYD Wi-Fi persistence (also used as the explicit Wi-Fi API seam in the C3 upload leg); '
         'mapped host files with SPIFFS no-overwrite rename rule, HTTP fragmentation/errors/time budgets, bounded heap and IO faults. '
-        'Radio candidate index preparation and reboot readiness/request are explicit seams in the upload leg. Actual pair publication/rollback and interruption states and actual reboot task qualified separately. '
+        'Radio candidate index preparation, scoped HTTP I/O/context and reboot lease are explicit models in the upload leg; canonical Wi-Fi HTTP suite separately qualifies actual request I/O and SDK context functions. Actual pair publication/rollback and interruption states and actual reboot task qualified separately. '
         'No claim of multi-file publication atomicity, physical SPIFFS durability, Wi-Fi reconnection, or hardware timing.')
     (out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
 

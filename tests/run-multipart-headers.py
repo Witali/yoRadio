@@ -14,6 +14,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 MAIN = ROOT/'idf/esp32c3-oled-native/main'
 SHARED = ROOT/'idf/components/native_storage/include'
+WIFI = ROOT/'idf/components/native_wifi_store'
 sys.path.insert(0, str(ROOT/'tools/codec_benchmark'))
 from run_output_dma_host import host, run
 
@@ -39,7 +40,7 @@ def main():
 
     def compile_test(name, test, includes):
         binary = out/name
-        command = flags+[item for path in includes for item in ['-I', host(path)]]+[host(test), '-o', host(binary)]
+        command = flags+[item for path in [*includes,WIFI/'include'] for item in ['-I', host(path)]]+[host(test),host(WIFI/'native_wifi_store.c'), '-o', host(binary)]
         try:
             log = run(command)
         except subprocess.CalledProcessError as error:
@@ -92,6 +93,7 @@ def main():
              MAIN/'ota_upload.c', MAIN/'ota_upload.h',
              MAIN/'web_upload.c', MAIN/'web_multipart.h', MAIN/'web_file_form.h',
              SHARED/'web_multipart.h', SHARED/'web_file_form.h']
+    files.extend([WIFI/'native_wifi_store.c',WIFI/'include/native_wifi_store.h'])
     report['source_sha256'] = {path.relative_to(ROOT).as_posix():hashlib.sha256(path.read_bytes()).hexdigest() for path in files}
     for path in files:
         snapshot = out/'sources'/path.relative_to(ROOT)

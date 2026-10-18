@@ -2,6 +2,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "native_wifi_store.h"
+#include "native_wifi_request_io.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -135,26 +138,35 @@ static bool receive_form(httpd_req_t *request, web_file_form_t *form) {
         !mp_form_data_boundary(type, boundary, sizeof(boundary))) return false;
     web_multipart_t parser;
     if (!mp_init(&parser, boundary, web_file_form_part, form)) return false;
-    uint8_t chunk[WEB_UPLOAD_RECEIVE_BYTES];
+    uint8_t chunk[WEB_UPLOAD_RECEIVE_BYTES] = {0};
+    bool complete = false;
     size_t remaining = request->content_len;
     int64_t started = esp_timer_get_time(), last_data = started;
     while (remaining) {
         int64_t now = esp_timer_get_time();
         if (now - started >= WEB_UPLOAD_TIMEOUT_US || now - last_data >= WEB_UPLOAD_IDLE_US)
-            return false;
+            goto done;
         size_t count = remaining < sizeof(chunk) ? remaining : sizeof(chunk);
         int received = httpd_req_recv(request, (char *)chunk, count);
         if (received == HTTPD_SOCK_ERR_TIMEOUT) { vTaskDelay(1); continue; }
-        if (received <= 0 || (size_t)received > count) return false;
+        if (received <= 0 || (size_t)received > count) goto done;
         now = esp_timer_get_time();
         if (now - started >= WEB_UPLOAD_TIMEOUT_US || now - last_data >= WEB_UPLOAD_IDLE_US)
-            return false;
-        last_data = now;
-        if (!mp_feed(&parser, chunk, (size_t)received)) return false;
+            goto done;
+        if (!mp_feed(&parser, chunk, (size_t)received)) goto done;
+        // Staging may synchronously write/flush flash. Exclude that controlled
+        // work only from idle time; never extend the absolute receive budget.
+        last_data = esp_timer_get_time();
+        if (last_data - started >= WEB_UPLOAD_TIMEOUT_US ||
+            !native_wifi_request_io_progress(request)) goto done;
+        native_wifi_erase(chunk, sizeof(chunk));
         remaining -= (size_t)received;
         vTaskDelay(1);
     }
-    return mp_complete(&parser);
+    complete = mp_complete(&parser);
+done:
+    native_wifi_erase(chunk, sizeof(chunk));
+    return complete;
 }
 
 static bool upload_destination(const char *name, bool playlist,
@@ -200,11 +212,29 @@ static bool publish_file(unsigned slot, const char *name, bool playlist) {
     return replaced;
 }
 
+static bool credentials_valid(const web_file_form_t *form) {
+    if (!form->ssid_seen || !form->password_seen) return false;
+    size_t ssid = strnlen(form->ssid, sizeof(form->ssid));
+    size_t password = strnlen(form->password, sizeof(form->password));
+    return ssid && ssid < NATIVE_WIFI_SSID_BYTES && password < NATIVE_WIFI_PASSWORD_BYTES &&
+           !strpbrk(form->ssid, "\t\r\n") && !strpbrk(form->password, "\t\r\n");
+}
+
 static esp_err_t handle_upload(httpd_req_t *request, web_form_mode_t mode) {
     if (!atomic_load(&s_active) || !web_reboot_ready()) {
         httpd_resp_set_hdr(request, "Connection", "close");
         httpd_resp_set_status(request, "503 Service Unavailable");
-        httpd_resp_sendstr(request, "Upload service is starting");
+        esp_err_t sent = httpd_resp_sendstr(request, "Upload service is starting");
+        native_wifi_request_io_close(request, NULL, sent == ESP_OK, false);
+        return ESP_FAIL;
+    }
+    native_wifi_request_io_t *io = native_wifi_request_io_open(request,
+        WEB_UPLOAD_IDLE_US, WEB_UPLOAD_TIMEOUT_US, NULL, NULL);
+    if (!io) {
+        httpd_resp_set_hdr(request, "Connection", "close");
+        httpd_resp_set_status(request, "503 Service Unavailable");
+        esp_err_t sent = httpd_resp_sendstr(request, "Upload transport unavailable");
+        native_wifi_request_io_close(request, NULL, sent == ESP_OK, false);
         return ESP_FAIL;
     }
     upload_sink_t sink = {.fd = -1};
@@ -213,13 +243,12 @@ static esp_err_t handle_upload(httpd_req_t *request, web_form_mode_t mode) {
     };
     bool ok = receive_form(request, &form);
     if (sink.fd >= 0) close(sink.fd);
-    free(sink.buffer); // Rare file upload only; no permanent payload reserve.
-    bool wifi_saved = false, playlist_saved = false;
-    if (ok && mode == WEB_FORM_CREDENTIALS) {
-        ok = form.ssid_seen && form.password_seen && form.ssid[0] &&
-             network_service_save_credentials(form.ssid, form.password) == ESP_OK;
-        wifi_saved = ok;
-    } else if (ok) {
+    free(sink.buffer);
+    bool wifi_saved = false, playlist_saved = false, reboot_busy = false;
+    web_reboot_lease_t reboot = {0};
+    bool has_wifi = mode == WEB_FORM_CREDENTIALS || form.wifi_seen;
+    if (ok && mode == WEB_FORM_CREDENTIALS) ok = credentials_valid(&form);
+    else if (ok) {
         ok = form.files || form.wifi_seen;
         if (ok && form.wifi_seen)
             ok = network_service_validate_credentials_file(
@@ -229,47 +258,53 @@ static esp_err_t handle_upload(httpd_req_t *request, web_form_mode_t mode) {
             ok = upload_destination(form.names[i], form.playlist[i],
                                     destination, sizeof(destination));
         }
-        for (unsigned i = 0; ok && i < form.files; ++i) {
-            if (form.playlist[i]) {
-                char temporary[64];
-                temporary_path(i, temporary, sizeof(temporary));
-                ok = radio_control_publish_playlist(temporary,
-                        web_upload_publish_playlist) == ESP_OK;
-                playlist_saved = ok;
-            } else {
-                ok = publish_file(i, form.names[i], false);
-            }
-        }
-        if (ok && form.wifi_seen) {
-            ok = network_service_save_credentials_file(
-                (const uint8_t *)form.wifi, form.wifi_bytes) == ESP_OK;
-            wifi_saved = ok;
-        }
     }
-    // Includes the currently incomplete file, and stale files from an aborted
-    // previous boot. No private credentials are logged or retained in RAM.
+    // Temporary staging above is allowed before admission. No live asset,
+    // playlist or credential publication may precede this atomic reservation.
+    if (ok && has_wifi) {
+        ok = web_reboot_reserve(&reboot) == ESP_OK;
+        reboot_busy = !ok;
+    }
+    for (unsigned i = 0; ok && i < form.files; ++i) {
+        if (form.playlist[i]) {
+            char temporary[64];
+            temporary_path(i, temporary, sizeof(temporary));
+            ok = radio_control_publish_playlist(temporary,
+                    web_upload_publish_playlist) == ESP_OK;
+            playlist_saved = ok;
+        } else ok = publish_file(i, form.names[i], false);
+    }
+    if (ok && has_wifi) {
+        ok = mode == WEB_FORM_CREDENTIALS ?
+            network_service_save_credentials(form.ssid, form.password) == ESP_OK :
+            network_service_save_credentials_file((const uint8_t *)form.wifi, form.wifi_bytes) == ESP_OK;
+        wifi_saved = ok;
+    }
     for (unsigned i = 0; i < WEB_FILE_FORM_MAX_FILES; ++i) {
         char path[64];
         temporary_path(i, path, sizeof(path));
         remove(path);
     }
-    memset(form.wifi, 0, sizeof(form.wifi));
-    memset(form.ssid, 0, sizeof(form.ssid));
-    memset(form.password, 0, sizeof(form.password));
+    native_wifi_erase(&form, sizeof(form));
     if (playlist_saved) websocket_service_notify_playlist_changed();
     httpd_resp_set_type(request, "text/plain; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     httpd_resp_set_hdr(request, "Connection", "close");
-    if (!ok) httpd_resp_set_status(request, "400 Bad Request");
+    if (!ok) httpd_resp_set_status(request, reboot_busy ? "503 Service Unavailable" : "400 Bad Request");
     else if (mode != WEB_FORM_UPLOAD) {
         httpd_resp_set_status(request, "303 See Other");
         httpd_resp_set_hdr(request, "Location", "/");
     }
-    esp_err_t result = httpd_resp_sendstr(request, ok ? "OK" :
+    native_wifi_request_io_response(io);
+    esp_err_t response = httpd_resp_sendstr(request, ok ? "OK" :
+        reboot_busy ? "Reboot service is busy; no files were published" :
         "Upload failed: invalid, incomplete, oversized file or storage full");
-    if (wifi_saved) web_reboot_request(750);
-    // Close rejected requests: do not drain an arbitrarily large unread body.
-    return ok ? result : ESP_FAIL;
+    native_wifi_request_io_close(request, io, response == ESP_OK, !ok);
+    if (wifi_saved) (void)web_reboot_commit(&reboot, 750);
+    else if (reboot.epoch) (void)web_reboot_cancel(&reboot);
+    // Success remains HTTP 200/303. Every terminal upload closes via SDK
+    // deletion, never its unread-body purge or stale request overrides.
+    return ESP_FAIL;
 }
 
 esp_err_t web_upload_handler(httpd_req_t *request) {

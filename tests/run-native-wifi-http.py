@@ -53,10 +53,13 @@ def main():
              *COMPONENT.glob('*.c'), *COMPONENT.glob('include/*.h'), COMPONENT / 'CMakeLists.txt',
              ROOT / 'idf/components/native_storage/file_transaction.c',
              ROOT / 'idf/components/native_storage/include/file_transaction.h',
+             ROOT / 'idf/components/native_storage/include/web_file_form.h',
+             ROOT / 'idf/components/native_storage/include/web_multipart.h',
              cyd / 'web_wifi.c', cyd / 'web_wifi.h', cyd / 'web_reboot.c', cyd / 'web_reboot.h',
              cyd / 'network_service.c', cyd / 'network_service.h',
              c3 / 'web_wifi.c', c3 / 'web_wifi.h', c3 / 'network_service.c', c3 / 'network_service.h',
-             c3 / 'websocket_service.c', c3 / 'websocket_service.h', c3 / 'web_service.c']
+             c3 / 'websocket_service.c', c3 / 'websocket_service.h', c3 / 'web_service.c',
+             cyd / 'web_upload.c', cyd / 'web_upload.h', c3 / 'web_upload.c', c3 / 'web_upload.h']
     hashes = {}
     for path in files:
         relative = path.relative_to(ROOT)
@@ -110,8 +113,10 @@ def main():
         start = network.index('static SemaphoreHandle_t s_wifi_save_lock;')
         end = (network.index('// End desired next-boot credential owner.', start) if target == 'c3'
                else network.index('static bool read_credentials(', start))
-        (directory / 'network.inc').write_text(network[start:end])
+        (directory / 'network.inc').write_text(network[start:end] + extract.selected(network,
+            ['network_service_validate_credentials_file', 'network_service_save_credentials_file', 'network_service_save_credentials']))
         (directory / 'target.inc').write_text(extract.strip_includes((targetdir / 'web_wifi.c').read_text()))
+        (directory / 'upload.inc').write_text(extract.strip_includes((targetdir / 'web_upload.c').read_text()))
         if target == 'c3':
             (directory / 'static.inc').write_text('static void *s_static_request_queue=(void *)1;\n' +
                 extract.selected((targetdir / 'web_service.c').read_text(), ['static_handler']))
@@ -122,6 +127,7 @@ def main():
 #include "native_wifi_file.h"
 #include "native_wifi_json.h"
 #include "native_wifi_http.h"
+#include "web_file_form.h"
 #include "reboot.inc"
 #define stat(...) mapped_stat(__VA_ARGS__)
 #define remove(...) mapped_remove(__VA_ARGS__)
@@ -148,6 +154,15 @@ def main():
 #undef free
 #undef calloc
 #include "target.inc"
+#define fopen(...) mapped_open(__VA_ARGS__)
+#define open(...) mapped_fd_open(__VA_ARGS__)
+#define remove(...) mapped_remove(__VA_ARGS__)
+#define native_wifi_erase observed_upload_erase
+#include "upload.inc"
+#undef native_wifi_erase
+#undef remove
+#undef open
+#undef fopen
 #ifdef TARGET_C3
 #include "native_wifi_public.h"
 #include "static.inc"
@@ -185,10 +200,19 @@ def main():
             'expose-all-private-data-paths': ('include/native_wifi_public.h',
                 'return !data || (path == sizeof(playlist)',
                 'return data || !data || (path == sizeof(playlist)', 'uri_cases'),
+            'publish-import-without-reboot-lease': ('upload.inc',
+                'ok = '+('websocket_service_reboot_reserve' if target=='c3' else 'web_reboot_reserve')+'(&reboot) == ESP_OK;',
+                '(void)'+('websocket_service_reboot_reserve' if target=='c3' else 'web_reboot_reserve')+'(&reboot); ok = true;', 'import_cases'),
+            'cancel-import-after-response-oom': ('upload.inc',
+                'if (wifi_saved) (void)',
+                'if (wifi_saved && response == ESP_OK) (void)', 'import_cases'),
+            'skip-import-form-erase': ('upload.inc',
+                'native_wifi_erase(&form, sizeof(form));',
+                '/* mutant: form retained */', 'import_cases'),
         }
         controls = {}
         for name, (file, before, after, expected) in mutations.items():
-            original = (frozen / COMPONENT.relative_to(ROOT) / file).read_text()
+            original = ((directory / file) if file=='upload.inc' else (frozen / COMPONENT.relative_to(ROOT) / file)).read_text()
             if original.count(before) != 1:
                 raise RuntimeError('Nonunique mutation anchor: ' + name)
             control = directory / name
@@ -214,7 +238,7 @@ def main():
         report['variants'][target]['semantic_controls'] = controls
         print(target + ': ' + str(len(controls)) + ' semantic controls rejected')
     report['passed'] = True
-    report['scope'] = ('Actual target metadata/edit owner callbacks, common CSV/file/JSON/HTTP and target handlers/reboot reservation; '
+    report['scope'] = ('Actual target metadata/edit/import owner callbacks, common CSV/file/JSON/HTTP/request I/O and target handlers/reboot reservation; '
                        'actual pinned SDK pending receive/context/response/cleanup functions. Real synthetic Linux files with SPIFFS '
                        'no-overwrite rename; SDK field layouts, RTOS/clock/readiness and native transport are explicit host seams. '
                        'Abnormal session cleanup verifies whole HTTP secret workspace erasure. Does not prove actual wire/TLS or target flash durability.')

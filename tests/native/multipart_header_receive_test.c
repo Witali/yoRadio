@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "web_file_form.h"
+#include "native_wifi_store.h"
 
 typedef struct { size_t content_len, cursor; const char *body; } httpd_req_t;
 #define ESP_OK 0
@@ -22,6 +23,8 @@ static int httpd_req_recv(httpd_req_t *request, char *out, size_t size) {
 }
 static int64_t esp_timer_get_time(void) { static int64_t time; return time += 100; }
 static void vTaskDelay(unsigned ticks) { (void)ticks; }
+// Header/receiver-only seam; the canonical HTTP fixture owns context and TLS.
+#define native_wifi_request_io_progress(request) ((void)(request), true)
 #include "receive-production.inc"
 
 static bool parse(const char *type, const char *header, web_form_mode_t mode) {
