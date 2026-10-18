@@ -37,7 +37,7 @@ allocation и численные настройки C3 являются канд
 | --- | --- | --- |
 | CYD-C3-00 | Программная база готова | План, исходная сборка IDF 6.0.2 и исправные host-проверки донора. Первоначальный полный clang-tidy прогон CYD и C3 сохранён. Аппаратный baseline отдельно. |
 | CYD-C3-01 | Программная часть выполнена | Generation, decoder/PCM lifetime, ordered completion и output flush/reset проверены host-тестами. Финальные PDM/continuous/legacy images коммита `2df73834` собраны и сохранены; физическая приёмка отдельно. |
-| CYD-C3-02 | Открыт | HTTP/TLS read contract, redirects/status, timeout/retry, ICY metadata и fragmented signatures. Фрагментация 1/7/2048 байт, неверный MIME, ошибки и отмена. |
+| CYD-C3-02 | В работе | Portable probe/ID3/ICY parsers извлечены в общий `native_stream` компонент с сохранением C3 include/build paths. Подключение CYD HTTP/TLS/metadata и его тесты — следующий шаг. |
 | CYD-C3-03 | Открыт | Подтверждение MP3/ADTS кадров, ID3, форматные переходы и codec drain. Byte-exact replay, truncated EOF, ложные headers и ограниченный search budget. |
 | CYD-C3-04 | Открыт | Queue leases, независимый terminal/control slot, ограниченный рост, prefill и tail coalescing. Concurrent producer/consumer и OOM; выбрать ёмкости по CYD. |
 | CYD-C3-05 | Открыт | Health, heap/largest block, ошибки allocation/decode/write, DMA и стеки; CPU по обоим ядрам. Отдельно quiet и diagnostic сборки. |
@@ -177,3 +177,8 @@ allocation и численные настройки C3 являются канд
   PDM baseline и итоговый PDM имеют одинаковые нормализованные SDK настройки.
   Сборка, sanitizer tests и lint завершены; на физическую плату эти images
   в рамках этого этапа не устанавливались.
+- CYD-C3-02: [probe](../idf/components/native_stream/include/stream_probe.h),
+  [ID3](../idf/components/native_stream/include/stream_tags.h) и
+  [ICY](../idf/components/native_stream/icy_title.c) теперь имеют одну
+  переносимую реализацию. C3 wrappers сохраняют существующие пути сборки и
+  host-тестов. Probe/frame corpus и 47 C3/ICY проверок проходят после извлечения.

@@ -451,7 +451,10 @@ test("native radio requests and publishes ICY song metadata", () => {
 
   assert.match(audio, /Icy-MetaData", "1"/);
   assert.match(audio, /icy-metaint/);
-  assert.match(read("main", "icy_title.c"), /StreamTitle='/);
+  assert.match(
+    fs.readFileSync(path.join(root, "idf", "components", "native_stream", "icy_title.c"), "utf8"),
+    /StreamTitle='/,
+  );
   assert.match(audio, /native_state_set_title\(s_state, title\)/);
   assert.match(audio, /publish_icy_title\(uint32_t generation/);
   assert.match(audio, /icy_title_feed\(&s_icy_title, buffer \+ offset, chunk\)/);
