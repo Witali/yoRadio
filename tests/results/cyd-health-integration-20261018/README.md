@@ -19,7 +19,25 @@ The endpoint uses a 2,304-byte response buffer verified at maximum field values.
 Internal and DMA capabilities overlap. Stack absence and uncollected CPU values
 are `null`; retained encoded bytes are not a playback-duration guarantee.
 
-This stage has host evidence only until SDK firmware/analysis results are added.
+Both ESP-IDF 6.0.2/GCC 15.2 profiles built from clean `b7362172`:
+
+| Profile | Saved image | Bytes |
+| --- | --- | --- |
+| Quiet PDM | [manifest](../../../firmware/development/esp32-cyd2usb-native-health-pdm/manifest.json) | 1,369,920 |
+| Diagnostic PDM | [manifest](../../../firmware/development/esp32-cyd2usb-native-health-diagnostic-pdm/manifest.json) | 1,373,328 |
+
+Quiet preserves every existing baseline sdkconfig value. Diagnostic changes
+runtime stats/trace and uses the global ESP timer; the manifest enumerates the
+differences. Both keep prefill at zero and fit the 0x1b0000 application slot.
+ELF symbols place the failure callback in `.iram0.text` and its lock/snapshot
+in `.dram0.data`; [symbol evidence](iram-symbols.txt).
+
+Full clang-tidy/Clang Static Analyzer runs complete all 16 own translation units:
+[quiet](../native-lint-20261018/cyd-health-quiet/report.json) has 11 warnings,
+[diagnostic](../native-lint-20261018/cyd-health-diagnostic/report.json) has 13,
+both zero errors. The extra pair requests explicit pointer conversion for
+`memcpy` of a fixed pointer array; it is not a buffer/lifetime finding.
+
 Transport, codec and driver APIs are seams in pipeline tests; the fault/sampler
 core uses actual host mutexes. ISR latency, DMA and physical CPU/headroom remain
 separate acceptance work. C3 single-core IRQ masking was not copied to CYD.

@@ -142,3 +142,11 @@ The optional prefill path also has a separate Clang configuration with a real
 [full report](../tests/results/native-lint-20261018/cyd-prefill250/report.json)
 completes all 14 units with the same 11 warnings and zero errors. This checks
 the enabled branch rather than relying on the default-off compilation.
+
+Health integration adds two own C units. Full
+[quiet](../tests/results/native-lint-20261018/cyd-health-quiet/report.json) and
+[diagnostic](../tests/results/native-lint-20261018/cyd-health-diagnostic/report.json)
+runs complete all 16 with 11/13 warnings and zero errors. The diagnostic pair is
+`bugprone-multi-level-implicit-pointer-conversion` for `memcpy` of a fixed-size
+array of task handles; bounds and ownership are explicit. Sampler task lifetime,
+reuse, runtime wrap and both denominators have executable host coverage.
