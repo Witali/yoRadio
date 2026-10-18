@@ -13,6 +13,7 @@ from boot_state_contract import validate_boot_state, validate_boot_rejections
 from wifi_fallback_contract import validate_wifi_fallback, validate_wifi_fallback_guards
 from netif_roles_contract import validate_netif_roles, rejection_checks as netif_role_rejections
 from ap_services_contract import validate_ap_services, rejection_checks as ap_service_rejections
+from jpeg_dht_contract import validate_dht, validate_photo_dht, rejection_checks as dht_rejections
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -71,6 +72,12 @@ def main():
             any(not row['passed'] for row in huffman['valid'] + huffman['invalid']) or
             any(row['decoder_started'] for row in huffman['invalid'])):
         raise ValueError('Huffman gate omitted depth/boundary cases or accepted an impossible tree')
+    validate_dht(jpeg_inputs['dht'], {key: jpeg_inputs[key] for key in
+        ('app_sha256', 'source_sha256', 'native_elf_sha256', 'factory_elf_sha256')})
+    dht_guards = jpeg_inputs['dht_rejection_checks']
+    if (len(dht_guards) != 7 or not all(row['passed'] for row in dht_guards) or
+            dht_guards != dht_rejections(jpeg_inputs['dht'])):
+        raise ValueError('JPEG DHT evidence rejection controls did not pass')
     for item in jpeg_inputs['test_inputs']:
         if hashlib.sha256((ROOT / item['file']).read_bytes()).hexdigest() != item['sha256']:
             raise ValueError('Additional JPEG fixture/adapter changed: ' + item['file'])
@@ -199,7 +206,7 @@ def main():
             frames['normalized']['native_elf_sha256'] != frames['native_elf_sha256'] or
             frames['normalized']['factory_elf_sha256'] != frames['factory_elf_sha256']):
         raise ValueError('Photo frames or normalized scenes used different inputs')
-    photo_checks = {'valid_gray_published', 'malformed_huffman_rejected', 'busy_and_retry_policy',
+    photo_checks = {'valid_gray_published', 'malformed_huffman_rejected', 'reserved_dht_rejected', 'busy_and_retry_policy',
                     'valid_published', 'download_exact', 'first_boot_no_panic', 'owned_flash_changed',
                     'cold_boot_new_vm', 'cold_boot_metadata', 'cold_boot_download_exact', 'cold_boot_no_panic',
                     'immediate_finish_cut_bounded', 'immediate_finish_new_vm', 'immediate_finish_persisted',
@@ -212,6 +219,7 @@ def main():
             any(not 0 <= photo[key] < .5 for key in
                 ('finish_response_to_stop_guest_seconds', 'start_response_to_stop_guest_seconds'))):
         raise ValueError('Real photo upload/download/cold-boot checks omitted a stage or accepted invalid data')
+    validate_photo_dht(photo)
     if not 0 <= startup['ready_wait_guest_seconds'] <= .5 or startup['different_colors'] < 2:
         raise ValueError('Ready clock still waits on startup or its first frame is blank')
     if (not held_weather['during']['request_state'] & held_weather['compiled_running_mask'] or

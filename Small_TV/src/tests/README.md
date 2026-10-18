@@ -264,6 +264,15 @@ Pillow нужен только для воспроизведения закре�
 должны отклоняться до начала декомпрессии; буквальный factory acceptance
 записывается отдельно. [Huffman-проверки](../../qemu/parity/huffman-checks.md).
 
+`jpeg_dht_oracle.py` добавляет128случаев: четыре valid controls и124invalid
+unused branches (reserved AC symbols, DC boundaries и all-one words на разных
+глубинах). Malformed DHT должен отклоняться до entropy даже при корректном DC0/EOB.
+Полный panel guard и discard validation проверяются независимо. Этот child gate
+обязателен внутри `machine_jpeg_inputs`; общий `jpeg_dht_contract.py` проверяет
+доказательства в runner/publisher/verifier, включая семь rejection controls.
+`photo_qemu.py` дополнительно требует400/absent для трёх reserved-table JPEG
+через настоящую загрузку. [Спецификация, before/after и область проверки](../../qemu/parity/jpeg-dht-checks-20261018.md).
+
 Группа `machine_timezones` исполняет настоящий код преобразования времени и libc:
 36,404 сравнения для 109 исходных ключей стран, все записанные переходы ±1 секунду,
 будущие правила до выборок 2400 года, неизвестная страна и ошибки epoch/указателя.

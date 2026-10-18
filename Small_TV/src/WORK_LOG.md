@@ -2902,3 +2902,32 @@ true. Это только начало нового прогона, не 24 ча
   не менялись, live full533 повторно совпали. Controller10836 и все4H10PID живы;
   file-only prefix58cycles/31inputs, одинROM boot безpanic, пока pending.
   Полный прогон прошёл photo_controls/reinit/settings; terminal result ещё нет.
+
+### 2026-10-18 — резервированные JPEG DHT branches, factory correction
+
+- Непокрытый edge case найден после чтения существующего41-case JPEG gate.
+  T.81 AnnexC/F.1.2.2.1/TableF.2 запрещают all-one Huffman words и AC size>10
+  либо zero-size кромеEOB/ZRL. Фактический factory0x42011100/0x42011208 и старый
+  C принимают121неиспользуемую malformed ветвь, поскольку entropy использует
+  только DC0/EOB. Три запрещённыхDC controls уже отклонялись, четыре valid pass.
+- Добавлены jpeg_dht_oracle.py (128cases) и общий jpeg_dht_contract.py.
+  Полный panel guard и discard validation; native должен отказать до jd_decomp.
+  Все шесть test/helper SHA и128fixture SHA before/after совпали. Original dump,
+  ELF и CPU instructions не патчились; synthetic bytes подаются наSDK read boundary.
+- В tjpgd.c/create_huffman_tbl поменяны две проверки, FIXED_FACTORY comment
+  объясняет стандарт. Native before0x4201320c bltu заменён candidate0x4201320a
+  bgeu;0x420132aa добавляет AC size/EOB/ZRL. Три точных disassembly сохранены.
+- Успешная SDK6.1 build архивирована:0592b510/ELFaea10675/sourceD338a294,
+ 1169936bytes (+32), free366064, DEBUGoff.59production inputs, delta только1file.
+  Bootloader359de03d после новой сборки не объявляется алгоритмическим изменением.
+- Candidate:128DHT + прежние41inputs,107public JPEG/35errors/7placements,
+ 5531host C и6artifact checks pass. Семь evidence rejection controls pass;
+  новый child gate обязателен в machine_jpeg_inputs, обоих publication tools.
+- HTTP before/after выполнен с одним exact harness/QEMU20B. Все три362-byte
+  reserved-table upload раньше200/exists, теперь400/absent. Candidate22checks
+  pass, including valid files/retries/download/несколько холодных запусков и
+  восстановление после interrupted replacement. В before false только новый
+  reserved_dht_rejected; raw failure не переписан. JPEG proof +12gzip сохранены.
+- Root/active full533 и H10BC68 не редактировались/не останавливались, все пять
+  process identities перепроверены. Полное соответствие0592, его full/H10 и
+  физическая приёмка ещё не доказаны. Следующий шаг — изолированный полный прогон.

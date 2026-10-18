@@ -40,6 +40,11 @@ good_path = Path(__file__).parent / 'fixtures/jpeg/rgb-420.jpg'
 good = good_path.read_bytes()
 bad = gray_huffman_fixture([3] + [0] * 15, [0, 1, 2], [1] + [0] * 15, [0])
 safe_gray = gray_huffman_fixture([1] + [0] * 15, [0], [1] + [0] * 15, [0])
+dht_invalid = {
+    'reserved-ac-size': gray_huffman_fixture([1] + [0] * 15, [0], [1, 1] + [0] * 14, [0, 11]),
+    'reserved-ac-zero': gray_huffman_fixture([1] + [0] * 15, [0], [1, 1] + [0] * 14, [0, 0x10]),
+    'all-one-ac-word': gray_huffman_fixture([1] + [0] * 15, [0], [2] + [0] * 15, [0, 1]),
+}
 image = archive / 'app.bin'
 elf = args.yoradio / '.build/small-tv-esp32c2/small_tv_reconstructed.elf'
 paths = [Path(__file__), Path(__file__).with_name('jpeg_test_fixtures.py'),
@@ -158,6 +163,14 @@ try:
         result['checks']['malformed_huffman_rejected'] = invalid_status == 400 and invalid_metadata == dict(exists=False, size=0)
         if invalid_status not in (200, 400):
             raise AssertionError('Unexpected malformed upload status')
+        # Unused invalid branches can otherwise pass a complete entropy decode.
+        # Run the ordinary upload/finalize API with exactly the declared bytes.
+        result['invalid_dht'] = {}
+        for name, data in dht_invalid.items():
+            status = upload(data)
+            result['invalid_dht'][name] = dict(finish_status=status, metadata=metadata(), sha256=vm.digest(data))
+        result['checks']['reserved_dht_rejected'] = all(row['finish_status'] == 400 and
+            row['metadata'] == dict(exists=False, size=0) for row in result['invalid_dht'].values())
         if upload(good, retry_checks=True) != 200:
             raise AssertionError('Valid JPEG was rejected')
         result['checks']['valid_published'] = metadata() == dict(exists=True, size=len(good))

@@ -1,0 +1,152 @@
+{
+  "passed": true,
+  "all_functionality_verified": false,
+  "saved_utc": "2026-10-18T13:05:34.047625+00:00",
+  "scope": "Scoped JPEG table grammar correction: unchanged RV32 test bytes before/after; literal factory behavior; public JPEG pixels; C host tests; real multipart upload and cold persistence. Not full candidate regression, H10, physical RF/display or arbitrary JPEG compliance.",
+  "before": {
+    "app_sha256": "bc68d3460332878b26226a41b74b0cae16376fbf6f41c7d8a98198af5514c393",
+    "native_elf_sha256": "4fde010e5bf09466e6822687199313bd47221f99681db57964a8654b0b9fc2b8",
+    "source_sha256": "5586ef6103e4c2647c09ed342d0adadb166509991e024b7edca3dda60108bc25",
+    "status": "failed_expected_new_DHT_gate",
+    "accepted_new_malformed_cases": 121,
+    "http_statuses": {
+      "reserved-ac-size": 200,
+      "reserved-ac-zero": 200,
+      "all-one-ac-word": 200
+    }
+  },
+  "after": {
+    "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+    "native_elf_sha256": "aea10675caa2cb7c6f817eb4d517998e4b1023a2fa845e0d66badbfbc2dba6c6",
+    "source_sha256": "d338a294e3f95f911d1526b8cdf5986691f4e77fcc14d4765c0a3b938848a404",
+    "app_bytes": 1169936,
+    "app_partition_free_bytes": 366064,
+    "dht_valid_cases": 4,
+    "dht_invalid_cases": 124,
+    "dht_rejection_controls": [
+      {
+        "name": "missing-case",
+        "passed": true
+      },
+      {
+        "name": "different-elf",
+        "passed": true
+      },
+      {
+        "name": "changed-inputs",
+        "passed": true
+      },
+      {
+        "name": "accepted-invalid",
+        "passed": true
+      },
+      {
+        "name": "entropy-started",
+        "passed": true
+      },
+      {
+        "name": "validation-drew",
+        "passed": true
+      },
+      {
+        "name": "valid-guard-changed",
+        "passed": true
+      }
+    ],
+    "previous_valid_invalid_cases": 41,
+    "public_jpeg_cases": 107,
+    "public_errors": 35,
+    "public_placements": 7,
+    "http_checks": 22,
+    "http_statuses": {
+      "reserved-ac-size": 400,
+      "reserved-ac-zero": 400,
+      "all-one-ac-word": 400
+    }
+  },
+  "factory_elf_sha256": "8c9fd166a6536bc1bc236fc98018eb0daba9aad01ce8356511ad68eba03de882",
+  "qemu_sha256": "20b133d9078c05240bd6624c7ff91b997d176ae12e60f376b14eb2cb90e28f8e",
+  "production_input_count": 59,
+  "changed_production_files": [
+    "third_party/tjpgd/tjpgd.c"
+  ],
+  "identical_harness_helper_count": 6,
+  "fixture_hashes_identical": true,
+  "photo_harness_and_helper_hashes_identical": true,
+  "specification": {
+    "url": "https://www.w3.org/Graphics/JPEG/itu-t81.pdf",
+    "sections": [
+      "Annex C",
+      "F.1.2.2.1",
+      "Table F.2"
+    ]
+  },
+  "raw": [
+    {
+      "file": "jpeg-dht-machine-before-20261018.json.gz",
+      "sha256": "06651f29596cd3fdc77746fae9f6f5e877cdae872d547873c1d229d21b039a6d",
+      "uncompressed_sha256": "6ce91facc952561650c6d4f521c26b3dfd089367263145b7c1f37c09cdca7c4c"
+    },
+    {
+      "file": "jpeg-dht-machine-after-20261018.json.gz",
+      "sha256": "ecad2da04847154f3cb5368667e1eb636cbf9d4dfb883a57b9e55f25a82b3d14",
+      "uncompressed_sha256": "d7a7c5bcd4158a13f640f06714996b612301254a60ea2c044b101c0c4ae0ba9c"
+    },
+    {
+      "file": "jpeg-dht-public-after-20261018.json.gz",
+      "sha256": "c9f1994e9b9f3f0cfdd95e11435a53b591425d622066e757017f39557c1d93dc",
+      "uncompressed_sha256": "ecb79abdeceac25cf3f07a1360327a41ffd9e0b20ac99f48ee39ca1a8ac934a1"
+    },
+    {
+      "file": "jpeg-dht-native-after-20261018.json.gz",
+      "sha256": "6884cca0e7121e8d34ce4269b2064ab0cad5d3414779a8de4d82cbf0110105cd",
+      "uncompressed_sha256": "68275013c5cbb7e3340adac5885493292dd80e72f566131def5e4f80b6e06998"
+    },
+    {
+      "file": "jpeg-dht-artifacts-after-20261018.json.gz",
+      "sha256": "2cf9cdc62527142a4c27b64771017acba91ac0e5ed942ef478a8d8d761dc0239",
+      "uncompressed_sha256": "e9b2b8d33c54abb7517c7b70a88d02c417c2c726666aa2deb8116d11566c2e2c"
+    },
+    {
+      "file": "jpeg-dht-http-before-20261018.json.gz",
+      "sha256": "faecb35a35da375a9c17e0ef38a942ff2c6fdac3e8744aeb974a09275f7cc085",
+      "uncompressed_sha256": "9475aef621ab9f5bc55abdd944ee46695ee2ca95e06e03a9c69d50daeaec22f6"
+    },
+    {
+      "file": "jpeg-dht-http-after-20261018.json.gz",
+      "sha256": "b54944e76839a9ec43ec0c4029be8cd89899c453bba3d124d0f86ff34a1779e8",
+      "uncompressed_sha256": "ce222733a74c59963deaf70f5ebd99d18d2a0d8f9036df308ad1274f3c230475"
+    },
+    {
+      "file": "jpeg-dht-factory-20261018.asm.gz",
+      "sha256": "bd068208264e2ede73bbab0fc243f25c0b51ff3095e24cf3d28660832d6e65ec",
+      "uncompressed_sha256": "479baabb1450d605b09bdf14e61de06948b23c35cf22f29032a3f0fe7fe5cf01"
+    },
+    {
+      "file": "jpeg-dht-native-before-20261018.asm.gz",
+      "sha256": "b406d2a44f6a3e6069b5d2f879ca147d341938208ff5944b29efcaa50e39396a",
+      "uncompressed_sha256": "c72d667bea5ad0aa262fb5802ba6aec070d9490f4feb4c25a61439ddf5e0e5fc"
+    },
+    {
+      "file": "jpeg-dht-native-after-20261018.asm.gz",
+      "sha256": "575e69fb291d7688c1baa1c7e0ac1fab5b0b1b2f1a3c961115bfa298e7c2c9e5",
+      "uncompressed_sha256": "d4b3a3279f5e683e0e564ecca28afa4094406114009cf42ed72b01297e2ef274"
+    },
+    {
+      "file": "jpeg-dht-http-before-last-uart-20261018.log.gz",
+      "sha256": "6ffa6f88a18579f284a00b8d7e5b5e555a7c0342fcce17d3cb100a253a1b2fd6",
+      "uncompressed_sha256": "9e75f2e6904b83a53f96220db8a1f25121106b2b37beb17f78c89a84d891e5d6"
+    },
+    {
+      "file": "jpeg-dht-http-after-last-uart-20261018.log.gz",
+      "sha256": "6ffa6f88a18579f284a00b8d7e5b5e555a7c0342fcce17d3cb100a253a1b2fd6",
+      "uncompressed_sha256": "9e75f2e6904b83a53f96220db8a1f25121106b2b37beb17f78c89a84d891e5d6"
+    }
+  ],
+  "limitations": [
+    "Valid DHT controls consume only DC0/EOB; listing all162legal AC symbols is not exhaustive execution of all coefficient amplitudes.",
+    "Only the final UART of each four-process HTTP run is archived here; stage no-panic/new-VM checks are retained in the complete reports.",
+    "Live BC68/20B full533 and H10 inputs/processes were not modified or stopped, and cannot validate this different app0592.",
+    "Versioned releases were not changed; the compiled candidate is in firmware/development only."
+  ]
+}

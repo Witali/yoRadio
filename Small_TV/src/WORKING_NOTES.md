@@ -5,6 +5,28 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
+## JPEG DHT grammar — 2026-10-18
+
+Текущий candidate в codex/small-tv-jpeg-uploads: app0592b510/ELFaea10675/
+sourceD338a294. Из59production inputs изменён только tjpgd.c/create_huffman_tbl:
+резервируется all-one prefix и проверяется baseline AC symbol. Factory
+0x42011208 пропускает AC check; старый C принимал121malformed unused branches.
+Новые128RV32 cases:4valid/124invalid pass; прежние41case проходят отдельно.
+107public JPEG/35errors/7placements, native5531,
+artifact6 pass. App1169936bytes (+32), app free366064; DEBUGoff, development
+archive обновлён, releases не менялись. Specification — T.81 AnnexC/F.1.2.2.1.
+Тот же photo_qemu.py наBC68 сохраняет три362-byte malformed JPEG (200/exists),
+на0592 все400/absent. Все22candidate HTTP/storage checks pass, другие21checks
+также проходят наbefore. Кадры/validation guards не маскировались. Seven report
+mutation controls pass; DHT child обязательный внутри machine_jpeg_inputs,
+общий contract используется runner/publisher/verifier. Все128fixture и6test/helper
+hashes в before/after одинаковы, как и HTTP harness/helpers. Raw before failure,
+положительные отчёты и3disassembly сохранены12gzip + jpeg-dht-validation-20261018.json.
+Подробнее jpeg-dht-checks-20261018.md. Scope: table grammar, не arbitrary JPEG
+compliance, физическая плата, H10 или full acceptance новой сборки.
+Старые live full533/H10BC68 не менялись, подтверждены живыми. Их будущие
+terminal results не подтверждают0592; нужен новый полный прогон этого candidate.
+
 ## Browser Wi-Fi setup — 2026-10-18
 
 Ветка codex/small-tv-browser-wifi продолжает browser-photo21943e31 и содержит

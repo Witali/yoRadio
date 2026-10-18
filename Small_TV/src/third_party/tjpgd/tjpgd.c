@@ -279,7 +279,10 @@ static JRESULT create_huffman_tbl ( /* 0:OK, !0:Failed */
     /* Build canonical DC/AC tables from code-length counts and symbols.
      * FIXED_FACTORY: 0x42011100 accepts oversubscribed prefix trees. Count
      * available prefixes before constructing codewords, so unused impossible
-     * branches cannot pass validation merely because entropy avoids them. */
+     * branches cannot pass validation merely because entropy avoids them.
+     * FIXED_FACTORY: also reserve the all-one word (T.81 Annex C) and reject
+     * baseline AC symbols outside sizes 1..10 and the EOB/ZRL exceptions
+     * (F.1.2.2.1/Table F.2), including symbols never used by the entropy. */
     unsigned int i, j, b, cls, num;
     size_t np;
     uint8_t d, *pb, *pd;
@@ -308,7 +311,7 @@ static JRESULT create_huffman_tbl ( /* 0:OK, !0:Failed */
              * prefixes at length 16. Incomplete trees remain supported. */
             available_codes <<= 1;
             b = pb[i] = *data++;
-            if (b > available_codes) {
+            if (b >= available_codes) {
                 return JDR_FMT1;
             }
             available_codes -= b;
@@ -339,7 +342,8 @@ static JRESULT create_huffman_tbl ( /* 0:OK, !0:Failed */
         jd->huffdata[num][cls] = pd;
         for (i = 0; i < np; i++) {          /* Load decoded data corresponds to each code word */
             d = *data++;
-            if (!cls && d > 11) {
+            if ((!cls && d > 11) ||
+                (cls && ((d & 15) > 10 || (!(d & 15) && d != 0 && d != 0xF0)))) {
                 return JDR_FMT1;
             }
             pd[i] = d;
