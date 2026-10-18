@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "physical_hardware": false,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-cyd-uploads.py": "befd5166ddbf163f0b250e5f4d85c2aaf1dfc1206c6e8946eb406c43fbb72847",
+    "tests/native/cyd_upload_test.c": "6d496a910a979ab599d62d276816edd5f024fbd4f3edba18dcd65cc3b4f6b806",
+    "tests/native/cyd_upload_reboot_test.c": "7da76ead3c44d885848098b73b1be007fec3cd33b7ff7b9c05a4de7e27967c38",
+    "tests/native/cyd_upload_pair_test.c": "48a06b6dd86592eafd5f5184fce37fc132e18201b18ad011e55cd9c5167ef1e8",
+    "tests/run-web-warning-regressions.py": "5e77db93a57cd0a4d2e70390e3dba02ee32f585da75b169b4bfa51c25a61ec5d",
+    "idf/esp32c3-oled-native/main/web_upload.c": "93f8c69f12fd14b3a7e33a9d28fd2fc4d8a552f3be295fd7251163dda6a876ba",
+    "idf/esp32c3-oled-native/main/web_upload.h": "00a9d16e304d9b1097008f3200e9bfe888181afb87a5a06a1ef62bc60a9ea1ba",
+    "idf/esp32-cyd2usb-native/main/web_upload.c": "4781f8e3c3cf10e18ef506d0b6ca076bd4399a107fddc6d21a4d910964914193",
+    "idf/esp32-cyd2usb-native/main/web_upload.h": "c13fbe33f581520e2b92fd1cbbfe116d5e6f0036e77a2de9517300533b7df6b0",
+    "idf/esp32-cyd2usb-native/main/web_reboot.c": "6b4ae65ab203e67a89ad91b2b9510ababdd1263618b399a34180fcde908301e6",
+    "idf/esp32-cyd2usb-native/main/web_reboot.h": "600f5b9c29730510bf8e6ae5cf217d8aec341e6f650f78bc666e7ed09e91ae82",
+    "idf/esp32-cyd2usb-native/main/network_service.c": "47905c61c246a4762d3e0f969ef96b6afdd8172d9b80b7ce2fd3ecfa81a6b971",
+    "idf/esp32-cyd2usb-native/main/network_service.h": "455b83a17c68e54e74a3387180c2da503348db9081a1a77cfa2469e1657cfa23",
+    "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+    "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b",
+    "idf/components/native_storage/include/credential_line.h": "4d09bb3fc82c7125b82f6940778757a1aaebe4cf76dd8b9a6aff9641b7863fa2",
+    "idf/components/native_storage/include/web_file_form.h": "7a153796492ac086eb1fe4a34b0f8fb2d7a98b346198b1e71fa8dedb5d634153",
+    "idf/components/native_storage/include/web_multipart.h": "0a09a6302365c4e13f34f5f43744ca58ffd659258178a489461ae581b06f214c"
+  },
+  "variants": {
+    "upload": {
+      "passed": true,
+      "scenarios": 69
+    },
+    "upload-c3": {
+      "passed": true,
+      "scenarios": 68
+    },
+    "reboot": {
+      "passed": true,
+      "scenarios": 10
+    },
+    "pair": {
+      "passed": true,
+      "scenarios": 105
+    }
+  },
+  "scope": "Actual full CYD and C3 upload handlers and sink, shared multipart/form/transaction, actual CYD Wi-Fi persistence (also used as the explicit Wi-Fi API seam in the C3 upload leg); mapped host files with SPIFFS no-overwrite rename rule, HTTP fragmentation/errors/time budgets, bounded heap and IO faults. Radio candidate index preparation and reboot readiness/request are explicit seams in the upload leg. Actual pair publication/rollback and interruption states and actual reboot task qualified separately. No claim of multi-file publication atomicity, physical SPIFFS durability, Wi-Fi reconnection, or hardware timing."
+}

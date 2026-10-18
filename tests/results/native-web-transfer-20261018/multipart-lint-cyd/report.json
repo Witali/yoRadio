@@ -1,0 +1,150 @@
+{
+  "scope": "Supplemental focused clang-tidy after multipart disposition output initialization fix; historical full reports preserved.",
+  "tool": "LLVM (http://llvm.org/):\n  LLVM version 20.1.1\n  Optimized build.",
+  "tool_path": "C:/Work/yoRadio/.idf/tools-v6.0.2/tools/esp-clang/esp-20.1.1_20250829/esp-clang/bin/clang-tidy.exe",
+  "command": [
+    "C:/Work/yoRadio/.idf/tools-v6.0.2/tools/esp-clang/esp-20.1.1_20250829/esp-clang/bin/clang-tidy.exe",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_upload.c",
+    "-p",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-lint-health",
+    "--config-file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.clang-tidy",
+    "--header-filter=C:[/\\\\]Work[/\\\\]yoRadio[/\\\\]\\.worktree[/\\\\]esp32\\-cyd\\-c3\\-review[/\\\\]",
+    "--export-fixes=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\multipart-gcc-lint-cyd\\idf__esp32-cyd2usb-native__main__web_upload.c.yaml"
+  ],
+  "command_line": "C:/Work/yoRadio/.idf/tools-v6.0.2/tools/esp-clang/esp-20.1.1_20250829/esp-clang/bin/clang-tidy.exe C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_upload.c -p C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-lint-health --config-file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.clang-tidy --header-filter=C:[/\\\\]Work[/\\\\]yoRadio[/\\\\]\\.worktree[/\\\\]esp32\\-cyd\\-c3\\-review[/\\\\] --export-fixes=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\multipart-gcc-lint-cyd\\idf__esp32-cyd2usb-native__main__web_upload.c.yaml",
+  "cwd": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review",
+  "started_utc": "2026-10-18T15:51:55.495735+00:00",
+  "finished_utc": "2026-10-18T15:51:56.611179+00:00",
+  "build_dir": "idf/esp32-cyd2usb-native/build-lint-health",
+  "header_filter": "C:[/\\\\]Work[/\\\\]yoRadio[/\\\\]\\.worktree[/\\\\]esp32\\-cyd\\-c3\\-review[/\\\\]",
+  "config_sha256": "27b1de038a07a9476ab195865192e9eebc8b58d036b0f359a6689caf2b7aed64",
+  "compile_commands_sha256": "5caf1d0474d17e39f9bb957d99c1d775c25b882fee881257630026257d11faae",
+  "runner_sha256": "470df5c3a1adf8d3622fa70f4a56d3447e3770407a141407410b90f91d563987",
+  "helper_sha256": "304acdbf8fadb135600f48cb89d713dad2bb1d20a7522b21bfa0da93eefd450a",
+  "source_sha256": "4781f8e3c3cf10e18ef506d0b6ca076bd4399a107fddc6d21a4d910964914193",
+  "shared_header_sha256": {
+    "idf/components/native_storage/include/web_multipart.h": "0a09a6302365c4e13f34f5f43744ca58ffd659258178a489461ae581b06f214c",
+    "idf/components/native_storage/include/web_file_form.h": "7a153796492ac086eb1fe4a34b0f8fb2d7a98b346198b1e71fa8dedb5d634153"
+  },
+  "source_and_configuration_unchanged_during_analysis": true,
+  "export_fixes_written": true,
+  "units": 1,
+  "complete": true,
+  "returncode": 0,
+  "warnings": 12,
+  "errors": 0,
+  "diagnostics": [
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_file_form.h",
+      "line": 79,
+      "column": 17,
+      "severity": "warning",
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "check": "bugprone-suspicious-string-compare"
+    },
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_file_form.h",
+      "line": 87,
+      "column": 21,
+      "severity": "warning",
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "check": "bugprone-suspicious-string-compare"
+    },
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_file_form.h",
+      "line": 87,
+      "column": 55,
+      "severity": "warning",
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "check": "bugprone-suspicious-string-compare"
+    },
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+      "line": 48,
+      "column": 17,
+      "severity": "warning",
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "check": "bugprone-suspicious-string-compare"
+    },
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+      "line": 55,
+      "column": 20,
+      "severity": "warning",
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "check": "bugprone-suspicious-string-compare"
+    },
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+      "line": 86,
+      "column": 26,
+      "severity": "warning",
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "check": "bugprone-suspicious-string-compare"
+    },
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+      "line": 170,
+      "column": 23,
+      "severity": "warning",
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "check": "bugprone-inc-dec-in-conditions"
+    },
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+      "line": 271,
+      "column": 23,
+      "severity": "warning",
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "check": "bugprone-inc-dec-in-conditions"
+    },
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+      "line": 300,
+      "column": 38,
+      "severity": "warning",
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "check": "bugprone-inc-dec-in-conditions"
+    },
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+      "line": 308,
+      "column": 19,
+      "severity": "warning",
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "check": "bugprone-inc-dec-in-conditions"
+    },
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+      "line": 308,
+      "column": 47,
+      "severity": "warning",
+      "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+      "check": "bugprone-inc-dec-in-conditions"
+    },
+    {
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\web_upload.c",
+      "line": 164,
+      "column": 9,
+      "severity": "warning",
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "check": "bugprone-suspicious-string-compare"
+    }
+  ],
+  "warning_checks": {
+    "bugprone-suspicious-string-compare": 7,
+    "bugprone-inc-dec-in-conditions": 5
+  },
+  "raw_warning_summary": [
+    "30 warnings generated.",
+    "Suppressed 18 warnings (18 in non-user code)."
+  ],
+  "baseline_report": ".build\\lint-cyd-web-transfer-full\\report.json",
+  "baseline_report_sha256": "91ded4264b13ce768c8af9a29486c305b0741bfd8079427d200aaa2a6e26ff00",
+  "baseline_source_sha256": "4781f8e3c3cf10e18ef506d0b6ca076bd4399a107fddc6d21a4d910964914193",
+  "baseline_warnings": 12,
+  "baseline_errors": 0,
+  "new_diagnostics": [],
+  "resolved_diagnostics": [],
+  "comparison": "Diagnostic identity uses file/column/severity/message/check; line shifts alone do not count as new warnings."
+}

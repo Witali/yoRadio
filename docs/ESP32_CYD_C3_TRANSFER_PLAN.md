@@ -171,6 +171,13 @@ allocation и численные настройки C3 являются канд
 
 ## Журнал выполнения
 
+- Полная GCC15 сборка C3 обнаружила `maybe-uninitialized` в общем multipart
+  helper: успешный bool `found` не связывался анализатором с записанными output
+  ranges. Выходы теперь инициализируются явно, результат определяется самим
+  указателем. [Отдельная повторная квалификация](../tests/results/native-web-transfer-20261018/HOST_GCC.md):
+  actual GCC components, ASan/UBSan parser и полные upload handlers обеих плат
+  проходят; focused clang-tidy не добавил диагностик. Предупреждения не отключены.
+
 - Дополнительный аудит донора C3: wildcard `/data/*` в
   [static_handler](../idf/esp32c3-oled-native/main/web_service.c) через
   [recoverable open](../idf/esp32c3-oled-native/main/web_upload.c) выдаёт также
