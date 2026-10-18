@@ -1,0 +1,365 @@
+{
+  "passed": true,
+  "source_commit": "6db5651a74e791db5a09d428d886c3a62df1a18a",
+  "physical_tested": false,
+  "images": [
+    {
+      "label": "CYD PDM",
+      "variant": "esp32-cyd2usb-native-web-transfer-pdm",
+      "app_bytes": 1445296,
+      "ota_slot_bytes": 1769472,
+      "ota_free_bytes": 324176,
+      "app_sha256": "b47118e2489d403b4e1388d9132ea12b698400477fa3443e185a8587fcf6f7ae",
+      "elf_sha256": "3171cc0c4dee9b6cdf2fbf697109bcb5024e16088a47b9eb6197dd2d63b2ce1e",
+      "sdkconfig_changes": {
+        "HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT": {
+          "previous": false,
+          "current": true
+        },
+        "HTTPD_WS_PRE_HANDSHAKE_CB_SUPPORT": {
+          "previous": false,
+          "current": true
+        }
+      },
+      "compiler_warnings": [],
+      "manifest_sha256": "d6fd775b3d771d35e6abda08ec4c014ee924ad8db618e51ab1e7de7c63a7027a"
+    },
+    {
+      "label": "CYD continuous DAC",
+      "variant": "esp32-cyd2usb-native-web-transfer-continuous",
+      "app_bytes": 1439088,
+      "ota_slot_bytes": 1769472,
+      "ota_free_bytes": 330384,
+      "app_sha256": "ef1b089e31b3ac0ad04635260f720b3e31e3589b49189d491d63b0275951344c",
+      "elf_sha256": "3f9b60f9c232810215994f55601ec42a86b16b361130b96554c840d04924ad3e",
+      "sdkconfig_changes": {
+        "HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT": {
+          "previous": false,
+          "current": true
+        },
+        "HTTPD_WS_PRE_HANDSHAKE_CB_SUPPORT": {
+          "previous": false,
+          "current": true
+        }
+      },
+      "compiler_warnings": [],
+      "manifest_sha256": "b66d3efb28ebe42b932819324aae8d5f95f1ce73a9fbe3ce5effa1a11e388e89"
+    },
+    {
+      "label": "CYD legacy DAC",
+      "variant": "esp32-cyd2usb-native-web-transfer-legacy",
+      "app_bytes": 1445072,
+      "ota_slot_bytes": 1769472,
+      "ota_free_bytes": 324400,
+      "app_sha256": "00f0b129740288e1fd306d724e88ed0892c536f90a1922bd295ceb69db2c1cfb",
+      "elf_sha256": "612f3926ad6b2805b2e7e522ac4be4ebb88c815ba076842b079e241bcdc6ef5f",
+      "sdkconfig_changes": {
+        "HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT": {
+          "previous": false,
+          "current": true
+        },
+        "HTTPD_WS_PRE_HANDSHAKE_CB_SUPPORT": {
+          "previous": false,
+          "current": true
+        }
+      },
+      "compiler_warnings": [
+        "C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/i2s_legacy.c:719:9: warning: 'periph_rtc_apll_freq_set' is deprecated: Please use esp_clk_tree_src_set_freq_hz instead [-Wdeprecated-declarations]",
+        "C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/i2s_legacy.c:1506:9: warning: 'periph_rtc_apll_acquire' is deprecated: Please use esp_clk_tree_enable_src instead [-Wdeprecated-declarations]",
+        "C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/i2s_legacy.c:1643:9: warning: 'periph_rtc_apll_release' is deprecated: Please use esp_clk_tree_enable_src instead [-Wdeprecated-declarations]"
+      ],
+      "manifest_sha256": "6b3c6205363cc2d951a5bee090c29b786bcfc9f10d387e6183bbc0f7e8cc6657"
+    },
+    {
+      "label": "C3 stereo PDM",
+      "variant": "esp32c3-oled-native-web-transfer",
+      "app_bytes": 1510496,
+      "ota_slot_bytes": 1900544,
+      "ota_free_bytes": 390048,
+      "app_sha256": "ddd16314906ee5efa08aea9eee69bab8c77a20ca37fa91f7ff9b15fc958f37ec",
+      "elf_sha256": "a94a219a1f289739593a6e3afc470e1c722868e231b5ff66b7c431f6a5dddda9",
+      "sdkconfig_changes": {
+        "HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT": {
+          "previous": false,
+          "current": true
+        },
+        "HTTPD_WS_PRE_HANDSHAKE_CB_SUPPORT": {
+          "previous": false,
+          "current": true
+        },
+        "HTTPD_WS_STRICTER_RFC6455": {
+          "previous": false,
+          "current": true
+        },
+        "YORADIO_NATIVE_WEBSOCKET_TRANSPORT": {
+          "previous": null,
+          "current": true
+        }
+      },
+      "compiler_warnings": [],
+      "manifest_sha256": "4fded8cb207abc8b5652832514cd0b1362fe43d3813a66a7ad230f28d630f333"
+    }
+  ],
+  "target_object_symbols": {
+    "cyd": {
+      "ws": [
+        {
+          "name": "s_have_previous",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_running",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_task_alive",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_work_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_playlist_revision",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_server",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_state",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_status_revision",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "hex$0",
+          "kind": "r",
+          "bytes": 17
+        },
+        {
+          "name": "s_sockets",
+          "kind": "b",
+          "bytes": 40
+        },
+        {
+          "name": "s_clients",
+          "kind": "b",
+          "bytes": 384
+        },
+        {
+          "name": "s_current",
+          "kind": "b",
+          "bytes": 504
+        },
+        {
+          "name": "s_previous",
+          "kind": "b",
+          "bytes": 504
+        },
+        {
+          "name": "s_status",
+          "kind": "b",
+          "bytes": 5120
+        }
+      ],
+      "tls": [
+        {
+          "name": "s_prepared",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_secure",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_bundle",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_bundle_size",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_sessions",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_config",
+          "kind": "b",
+          "bytes": 64
+        }
+      ]
+    },
+    "c3": {
+      "ws": [
+        {
+          "name": "s_message_poll_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_playlist_changed_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_reboot_ready",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_completed_deliveries",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_current_send_pending",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_fragmented_clients",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_last_ws_clients",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_reboot_at",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_server",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_state",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_status_send_pending",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_current_work",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_playlist_work",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_status_work",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "hex.0",
+          "kind": "r",
+          "bytes": 17
+        },
+        {
+          "name": "s_broadcast_current",
+          "kind": "b",
+          "bytes": 48
+        },
+        {
+          "name": "s_current_status_key",
+          "kind": "b",
+          "bytes": 428
+        },
+        {
+          "name": "s_previous_status_key",
+          "kind": "b",
+          "bytes": 428
+        },
+        {
+          "name": "s_broadcast_status",
+          "kind": "b",
+          "bytes": 1280
+        },
+        {
+          "name": "s_clients",
+          "kind": "b",
+          "bytes": 3200
+        }
+      ],
+      "tls": [
+        {
+          "name": "s_prepared",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_secure",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_bundle",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_bundle_size",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_sessions",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_config",
+          "kind": "b",
+          "bytes": 68
+        }
+      ]
+    }
+  },
+  "cyd_pipeline_affinity": [
+    {
+      "task": "radio_stream",
+      "core": 0,
+      "priority": 3
+    },
+    {
+      "task": "audio_decode",
+      "core": 1,
+      "priority": 5
+    },
+    {
+      "task": "audio_output",
+      "core": 1,
+      "priority": 6
+    }
+  ],
+  "scope": "GCC final ELF/image/archive/config integrity and actual target object symbol sizes. No physical heap/stack/timing/audio admission or full RFC conformance claim."
+}
