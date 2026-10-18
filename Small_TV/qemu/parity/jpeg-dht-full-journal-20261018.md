@@ -41,3 +41,26 @@ remain evidence for BC68/20B. Neither full run has a terminal result yet.
 Next requirements include a terminal539-input audit and full report publication,
 actual browser regressions on0592, then its own guarded runtime preflight/H10.
 The earlier browser and H10 evidence must not be relabelled as this candidate.
+
+## Actual0592 browser checkpoint
+
+The same frozen browser photo harness passed23UI and6storage checks on0592,
+with26input hashes rechecked. Real pointer crop, Canvas/privacy, multipart,
+HTTP/raw photo equality and a new cold VM all pass.
+
+The Wi-Fi browser run is **failed**, not accepted: discovered flow passed, then
+literal-`manual` cold startup reported ERR_CONNECTION_REFUSED for
+`/GetTimeModeValue`. The four switches/API matched, but that does not prove
+every control loaded. The third manual-entry flow did not execute. All25input
+hashes still match. Source server.c sets max_open_sockets=6; the browser harness
+also uses a separate APIRequestContext probe before six browser connections.
+Connection pressure is an investigation lead, not a proven cause or permission
+to ignore the console failure. Diagnose with request/response/socket observations
+and a control without the extra persistent probe before selecting a repair.
+
+`jpeg-dht-browser-checkpoint-20261018.json` and11raw artifacts preserve the
+positive photo and negative Wi-Fi results, including the actual cold screenshot.
+Do not edit this tree's539frozen inputs while the full suite runs; any frontend,
+server or observer repair must use a separate worktree. Full controller20380 is
+still progressing through machine groups; BC68 controller10836 and its H10
+remain independent. Their results cannot close this browser failure.
