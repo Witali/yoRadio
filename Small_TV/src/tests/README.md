@@ -1,5 +1,13 @@
 # Функциональные тесты Small TV ESP32-C2
 
+## Холодные старты и полный кадр
+
+Независимый `display_cold_boot_qemu.py` повторяет20cold process starts на factory
+и native, сравнивая весь LCD с фактическим заводским setup frame. Boot и display
+имеют свои результаты; сеть не проверяется и host HTTP forwarding отключён.
+См. [DISPLAY_COLD_BOOT.md](DISPLAY_COLD_BOOT.md): происхождение эталона,
+12отрицательных/положительных unit controls, запуск и аппаратные ограничения.
+
 ## Desktop/mobile настройки и холодное сохранение
 
 `browser_controls_qemu.py` проверяет реальные страницы Clock/Advanced/Photos,
