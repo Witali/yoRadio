@@ -10,17 +10,31 @@
 typedef int esp_err_t;
 enum { ESP_OK, ESP_FAIL };
 #define pdMS_TO_TICKS(x) (x)
+#define portMAX_DELAY UINT32_MAX
 #define ESP_LOGW(...) ((void)0)
 #define ESP_LOGE(...) ((void)0)
 /* PRODUCTION_OUTPUT_HEADER */
 /* PRODUCTION_PACKET_TYPE */
+/* These boundary tests run ordinary playback. The actual phase predicate is
+ * compiled; entering a maintenance-only seam fails the fixture immediately.
+ * The separate concurrent owner harness qualifies that protocol. */
+/* PRODUCTION_MAINTENANCE_OFF */
+static bool maintenance_acked(unsigned bits) {(void)bits;assert(false);return false;}
+static void maintenance_publish_state(uint32_t generation,bool quiet,unsigned wait) {
+    (void)generation;(void)quiet;(void)wait;assert(false);
+}
+static void maintenance_ack(unsigned bit) {(void)bit;assert(false);}
+static void maintenance_park(uint32_t generation) {(void)generation;assert(false);}
+static void maintenance_output_error(esp_err_t error) {(void)error;assert(false);}
+static void vTaskDelay(unsigned wait) {(void)wait;assert(false);}
+esp_err_t native_audio_output_pause(void) {assert(false);return ESP_FAIL;}
 static atomic_uint s_generation;
 static void *s_pcm=(void *)1;
 static jmp_buf done;
 static char events[128];
 static size_t event_count;
 static unsigned returned[8], action_count, next_action, completed, cases;
-static bool change_on_write, change_on_flush;
+static bool change_on_write, change_on_flush, change_on_configure;
 static int flush_result, configure_result;
 static pcm_packet_t *packets[8];
 typedef struct { int packet; bool change; uint32_t generation; } action_t;
@@ -51,7 +65,11 @@ void native_audio_output_discard_pcm(void) {event('D');}
 esp_err_t native_audio_output_flush_pcm(void) {
     event('F');if(change_on_flush) atomic_fetch_add(&s_generation,1);return flush_result;
 }
-esp_err_t native_audio_output_configure(uint32_t rate) {assert(rate==44100 || rate==48000);event('C');return configure_result;}
+esp_err_t native_audio_output_configure(uint32_t rate) {
+    assert(rate==44100 || rate==48000);event('C');
+    if(change_on_configure) {change_on_configure=false;atomic_fetch_add(&s_generation,1);}
+    return configure_result;
+}
 void native_audio_output_idle(void) {event('I');}
 const char *native_audio_output_name(void) {return "test";}
 esp_err_t native_audio_output_write_pcm(uint8_t *data,size_t bytes,uint8_t bits,uint8_t channels) {
@@ -69,7 +87,7 @@ esp_err_t native_audio_output_submit_pcm(native_audio_pcm_lease_t *lease,uint8_t
 static void reset(uint32_t generation) {
     atomic_store(&s_generation,generation);event_count=action_count=next_action=completed=0;
     memset(events,0,sizeof(events));memset(returned,0,sizeof(returned));
-    change_on_write=change_on_flush=false;flush_result=configure_result=ESP_OK;
+    change_on_write=change_on_flush=change_on_configure=false;flush_result=configure_result=ESP_OK;
     for(unsigned i=0;i<8;++i) {free(packets[i]);packets[i]=NULL;}
 }
 static void packet(unsigned id,uint32_t gen,unsigned rate,bool eof) {
@@ -113,5 +131,8 @@ int main(void) {
 
     reset(7);packet(0,7,48000,false);configure_result=ESP_FAIL;
     enqueue(0,false,0);check("CR",0);
+
+    reset(7);packet(0,7,48000,false);change_on_configure=true;
+    enqueue(0,false,0);check("CRD",0);
     reset(0);printf("PASS actual output_task boundary cases=%u\n",cases);
 }

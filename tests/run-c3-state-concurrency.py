@@ -1,4 +1,5 @@
 """Compile actual C3 title publication/state with real host mutexes and sanitizers."""
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -8,7 +9,9 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 MAIN=ROOT/'idf/esp32c3-oled-native/main'
-OUT=ROOT/'.build/c3-state-concurrency'
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output',type=Path,default=ROOT/'.build/c3-state-concurrency')
+OUT=parser.parse_args().output
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
 from run_output_dma_host import host,run
 

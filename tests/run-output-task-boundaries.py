@@ -27,6 +27,10 @@ unit=args.output/'test.c'
 unit.write_text(harness.read_text().replace('/* PRODUCTION_OUTPUT_HEADER */',
     source(header).replace('#pragma once','') + source(probe_header).replace('#pragma once',''))
     .replace('/* PRODUCTION_PACKET_TYPE */',packet)
+    .replace('/* PRODUCTION_MAINTENANCE_OFF */',
+        text[text.index('enum { MAINTENANCE_OFF,'):text.index('static atomic_uint s_maintenance_acks;')]+
+        '\nstatic atomic_int s_maintenance_error;\n'+
+        text[text.index('static bool maintenance_active('):text.index('\n}',text.index('static bool maintenance_active('))+2])
     .replace('/* PRODUCTION_FINISH */',function('finish_pcm_stream'))
     .replace('/* PRODUCTION_RELEASE */','#ifdef CONFIG_YORADIO_DIRECT_DMA_PCM\n'+function('release_pcm_lease')+'\n#endif')
     .replace('/* PRODUCTION_OUTPUT_TASK */',function('output_task')))
@@ -47,6 +51,6 @@ for mode in ('staged','direct'):
     except subprocess.CalledProcessError as error:
         (args.output/(mode+'-failure.log')).write_bytes(error.output)
         print(error.output.decode(errors='replace'));raise
-    report['variants'][mode]=dict(result='PASS',cases=10,log=log.decode())
+    report['variants'][mode]=dict(result='PASS',cases=11,log=log.decode())
 (args.output/'report.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))

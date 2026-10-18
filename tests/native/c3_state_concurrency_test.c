@@ -73,12 +73,29 @@ int main(void) {
     native_state_set_stream_title(&state,2,long_title);
     assert(strlen(state.title)==sizeof(state.title)-1);
     native_state_set_stream_title(&state,2,"");assert(!state.title[0]);
+    native_state_set_station(&state,"station label");
+    native_stream_info_t info={.codec="AAC",.sample_rate_hz=44100,.channels=2,
+        .bits_per_sample=16,.pcm_sample_rate_hz=48000,.pcm_channels=2,
+        .channels_are_core=true,.format_is_pcm=true};
+    assert(native_state_set_stream_info(&state,2,&info));
+    native_state_publish_bitrate(&state,2,192,NATIVE_BITRATE_MEASURED);
+    native_state_set_stream_title(&state,2,"metadata");
+    assert(xSemaphoreTake(state.lock,0)==pdTRUE);
+    native_state_begin_stream_locked(&state,3);
+    assert(state.audio_generation==3 && !state.audio_running && !state.audio_pending);
+    assert(!state.bitrate_kbps && state.bitrate_source==NATIVE_BITRATE_NONE);
+    assert(!state.sample_rate_hz && !state.channels && !state.bits_per_sample);
+    assert(!state.pcm_sample_rate_hz && !state.pcm_channels && !state.channels_are_core && !state.format_is_pcm);
+    assert(!state.codec[0] && !state.title[0] && !strcmp(state.station,"station label"));
+    native_state_begin_stream_locked(&state,2);
+    assert(state.audio_generation==3);
+    xSemaphoreGive(state.lock);
     // The identity comparison is equality, including UINT32_MAX -> zero wrap.
     state.audio_generation=UINT32_MAX;atomic_store(&s_generation,0);
     native_state_begin_stream(&state,0);publish_icy_title(0,"wrapped");
     native_state_set_stream_title(&state,UINT32_MAX,"stale");
     assert(!strcmp(state.title,"wrapped"));
     pthread_mutex_destroy(state.lock);free(state.lock);
-    puts("PASS C3 title: preemption before state lock preserves newer metadata; stale clear rejected; 20000 contended updates, bounds and generation wrap; ASan/UBSan");
+    puts("PASS C3 state: 20000 contended metadata updates; bounds/wrap; locked begin clears metadata, preserves label and monotonic generation; ASan/UBSan");
     return 0;
 }

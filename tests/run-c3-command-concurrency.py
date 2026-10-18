@@ -1,4 +1,5 @@
 """Exercise actual C3 Play/Stop/Resume ordering with deterministic preemption."""
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -8,7 +9,9 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 MAIN=ROOT/'idf/esp32c3-oled-native/main'
-OUT=ROOT/'.build/c3-command-concurrency'
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output',type=Path,default=ROOT/'.build/c3-command-concurrency')
+OUT=parser.parse_args().output
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
 from run_output_dma_host import host,run
 
@@ -47,7 +50,10 @@ typedef int esp_err_t;
     start=source.index('typedef struct {\n    uint32_t generation;\n    native_codec_t requested_codec;')
     end=source.index('} play_command_t;',start)+len('} play_command_t;')
     generated=source[start:end]+'\n'
-    names=['advance_generation','state_set_audio']
+    start=source.index('enum { MAINTENANCE_OFF,')
+    end=source.index('static bool maintenance_active(',start)
+    generated+=source[start:end]+'\n'
+    names=['maintenance_active','advance_generation','state_set_audio']
     if 'static esp_err_t play_locked(' in source:names.append('play_locked')
     names+=['audio_service_play','audio_service_resume','audio_service_stop']
     generated+='\n'.join(helpers.function(source,name) for name in names)

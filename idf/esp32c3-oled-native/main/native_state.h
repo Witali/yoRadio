@@ -62,6 +62,9 @@ typedef struct {
 } native_stream_info_t;
 
 void native_state_begin_stream(native_state_t *state, uint32_t generation);
+// Caller owns state->lock. Same monotonic generation check and metadata reset
+// as begin_stream, without taking that mutex again.
+void native_state_begin_stream_locked(native_state_t *state, uint32_t generation);
 void native_state_set_audio(native_state_t *state, uint32_t generation,
                             bool running, const char *status);
 void native_state_set_bitrate(native_state_t *state, uint32_t generation,

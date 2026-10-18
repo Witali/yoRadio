@@ -111,6 +111,15 @@ int main(void) {
     fail_queue=true;assert(audio_service_play("http://retry.example/audio",NATIVE_CODEC_AUTO)==ESP_FAIL);
     assert(!atomic_load(&streaming) && !state.audio_pending);fail_queue=false;
     assert(audio_service_resume()==ESP_OK && atomic_load(&streaming));
+    unsigned held_generation=atomic_load(&s_generation);
+    atomic_store(&s_maintenance_phase,MAINTENANCE_HELD);
+    s_maintenance_resume=true;
+    assert(audio_service_play("http://busy.example/audio",NATIVE_CODEC_AUTO)==ESP_ERR_INVALID_STATE);
+    assert(audio_service_resume()==ESP_ERR_INVALID_STATE);
+    audio_service_stop();
+    assert(!s_maintenance_resume && held_generation==atomic_load(&s_generation));
+    assert(atomic_load(&s_maintenance_phase)==MAINTENANCE_HELD);
+    atomic_store(&s_maintenance_phase,MAINTENANCE_OFF);
     pthread_mutex_destroy(state.lock);free(state.lock);
     pthread_mutex_destroy(s_control_lock);free(s_control_lock);
     puts("PASS C3 commands: paused older Play cannot overwrite newer command/state; 2000 concurrent Play/Stop/Resume operations preserve ordering; ASan/UBSan");

@@ -43,20 +43,24 @@ static void clear_stream_info(native_state_t *state) {
     state->codec[0] = '\0';
 }
 
+void native_state_begin_stream_locked(native_state_t *state, uint32_t generation) {
+    if (!state) return;
+    // Never restore an older stream identity, including after uint32 wrap.
+    if ((int32_t)(generation - state->audio_generation) > 0) {
+        state->audio_generation = generation;
+        clear_stream_info(state);
+        state->audio_running = false;
+        state->audio_pending = false;
+        state->title[0] = '\0';
+        strcpy(state->stream_format, "idle");
+    }
+}
+
 void native_state_begin_stream(native_state_t *state, uint32_t generation) {
     if (!state || !state->lock) return;
     // Control commands must invalidate old callbacks even under contention.
     if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
-        // Two control tasks may acquire this mutex in a different order than
-        // the generation counter. Never restore the older stream's identity.
-        if ((int32_t)(generation - state->audio_generation) > 0) {
-            state->audio_generation = generation;
-            clear_stream_info(state);
-            state->audio_running = false;
-            state->audio_pending = false;
-            state->title[0] = '\0';
-            strcpy(state->stream_format, "idle");
-        }
+        native_state_begin_stream_locked(state, generation);
         xSemaphoreGive(state->lock);
     }
 }
