@@ -56,7 +56,7 @@ static const uint8_t *body_data;
 static size_t body_size, body_offset;
 static const char *interval_text, *second_interval;
 static const char *bitrate_text,*redirect_bitrate;
-static bool cancel_read, fail_client, fail_buffer, stall_body, fatal_tls, retry_tls;
+static bool cancel_read, fail_client, stall_body, fatal_tls, retry_tls;
 static bool icy_first_response_only;
 static void *task_buffer;
 static uint8_t captured[8192];
@@ -144,7 +144,6 @@ static void vTaskDelete(void *task) { assert(!task); ++deletes; }
 static int esp_crt_bundle_attach(void *p) { (void)p; return ESP_OK; }
 static const char *esp_err_to_name(int error) { (void)error; return "test"; }
 static void *buffer_malloc(size_t size) {
-    if (fail_buffer) return NULL;
     assert(!task_buffer); task_buffer=malloc(size); assert(task_buffer); return task_buffer;
 }
 static int xQueueReceive(void *,void *,unsigned);
@@ -292,9 +291,11 @@ static void setup(const uint8_t *data,size_t size,unsigned chunk) {
     for(unsigned i=0;i<8;++i)statuses[i]=200;
     interval_text=second_interval=NULL;
     bitrate_text=redirect_bitrate=NULL;
-    cancel_read=fail_client=fail_buffer=stall_body=fatal_tls=retry_tls=false;
+    cancel_read=fail_client=stall_body=fatal_tls=retry_tls=false;
     icy_first_response_only=false;
     body_data=data;body_size=size;body_offset=0;
+    s_stream_buffer=buffer_malloc(STREAM_CHUNK_SIZE);
+    atomic_store(&s_start_state,AUDIO_START_READY);
     s_state=&state;s_commands=(void *)2;s_encoded=(void *)1;
     atomic_store(&s_generation,cases);atomic_store(&s_decoder_released_generation,cases);
     atomic_store(&s_failed_generation,0);
@@ -430,7 +431,6 @@ int main(void) {
     setup(aac,sizeof(aac),2048);statuses[0]=302;redirect_error=ESP_FAIL;play();assert(!packets && opens==1 && cleanups==1);
     setup(aac,sizeof(aac),2048);open_delay_ms=5000;header_delay_ms=5001;play();assert(!packets && !reads && cleanups==1 && clock_us==10001000);
     setup(aac,sizeof(aac),2048);fail_client=true;play();assert(!opens && !cleanups && !strcmp(state.stream_format,"HTTP allocation failed"));
-    setup(aac,sizeof(aac),2048);fail_buffer=true;play();assert(deletes==1 && !queued && !opens);
     setup(aac,2,1);stall_body=true;play();assert(!encoded_bytes && terminal==AUDIO_END_FORMAT_UNKNOWN && clock_us>=10000000);
     setup(NULL,0,1);play();assert(!encoded_bytes && terminal==AUDIO_END_FORMAT_UNKNOWN);
     uint8_t junk[5000]={0};setup(junk,sizeof(junk),2048);play();assert(!encoded_bytes && terminal==AUDIO_END_FORMAT_UNKNOWN && reads<=3);

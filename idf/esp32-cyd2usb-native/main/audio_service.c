@@ -8,9 +8,8 @@
 #include "audio_level_led.h"
 #include "audio_completion.h"
 #include "board_config.h"
-#include "esp_audio_dec_default.h"
+#include "decoder_registration.h"
 #include "esp_audio_simple_dec.h"
-#include "esp_audio_simple_dec_default.h"
 #include "esp_check.h"
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
@@ -94,6 +93,12 @@ static atomic_uint s_generation;
 static atomic_uint s_decoder_released_generation;
 static atomic_uint s_failed_generation;
 static SemaphoreHandle_t s_control_lock;
+enum { AUDIO_START_OFF, AUDIO_STARTING, AUDIO_START_READY };
+static atomic_uint s_start_state;
+static uint8_t *s_stream_buffer;
+// Output/LED initialization has process lifetime. Retain successful setup
+// across pipeline-allocation retries instead of allocating driver buffers twice.
+static bool s_output_initialized, s_led_initialized;
 
 typedef struct {
     uint32_t interval;
@@ -419,12 +424,7 @@ static void stream_title(void *context, const char *title) {
 
 static void stream_task(void *argument) {
     (void)argument;
-    uint8_t *buffer = malloc(STREAM_CHUNK_SIZE);
-    if (!buffer) {
-        ESP_LOGE(TAG, "No memory for stream input buffer");
-        vTaskDelete(NULL);
-        return;
-    }
+    uint8_t *buffer = s_stream_buffer;
     while (true) {
         play_command_t command;
         xQueueReceive(s_commands, &command, portMAX_DELAY);
@@ -622,18 +622,6 @@ static void decoder_release(esp_audio_simple_dec_handle_t *decoder,
 
 static void decoder_task(void *argument) {
     (void)argument;
-    // Register only the selected Espressif codecs. The custom minimp3/Helix
-    // implementation is linked directly and does not use this registry.
-#ifdef CONFIG_YORADIO_MP3_DECODER_ESPRESSIF
-    esp_mp3_dec_register();
-#endif
-#ifdef CONFIG_YORADIO_AAC_DECODER_ESPRESSIF
-    esp_aac_dec_register();
-#endif
-    esp_flac_dec_register();
-    esp_vorbis_dec_register();
-    esp_opus_dec_register();
-    esp_audio_simple_dec_register_default();
     uint8_t *output = NULL;
     size_t output_size = 0;
     esp_audio_simple_dec_handle_t decoder = NULL;
@@ -974,17 +962,73 @@ static void output_task(void *argument) {
     }
 }
 
+typedef struct {
+    TaskFunction_t run;
+    const char *name;
+    uint32_t stack_size;
+    UBaseType_t priority;
+    BaseType_t core;
+} pipeline_task_t;
+
+static void gated_pipeline_task(void *argument) {
+    const pipeline_task_t *task = argument;
+    // A task may run immediately on either core after creation. Until notified
+    // it owns no pipeline resources, so failed startup can safely delete it.
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    task->run(NULL);
+    vTaskDelete(NULL);
+}
+
+static void discard_pipeline_startup(TaskHandle_t *tasks, bool codecs_registered) {
+    for (unsigned i = 0; i < 3; ++i) {
+        if (tasks[i]) vTaskDelete(tasks[i]);
+    }
+    if (s_pcm) vRingbufferDelete(s_pcm);
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    if (s_encoded) adaptive_input_destroy(s_encoded);
+#else
+    if (s_encoded) vRingbufferDelete(s_encoded);
+#endif
+    if (s_commands) vQueueDelete(s_commands);
+    if (s_control_lock) vSemaphoreDelete(s_control_lock);
+    free(s_stream_buffer);
+    s_pcm = NULL;
+    s_encoded = NULL;
+    s_commands = NULL;
+    s_control_lock = NULL;
+    s_stream_buffer = NULL;
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+    s_start_control_attached = s_encoded_control_attached = false;
+#endif
+    if (codecs_registered) decoder_unregister_codecs();
+    s_state = NULL;
+    // Last publication: readers seeing OFF cannot observe freed resources.
+    atomic_store(&s_start_state, AUDIO_START_OFF);
+}
+
 esp_err_t audio_service_start(native_state_t *state) {
+    if (!state || !state->lock) return ESP_ERR_INVALID_ARG;
+    unsigned expected = AUDIO_START_OFF;
+    if (!atomic_compare_exchange_strong(&s_start_state, &expected, AUDIO_STARTING))
+        return ESP_ERR_INVALID_STATE;
+    static const pipeline_task_t task_config[3] = {
+        {stream_task, "radio_stream", BOARD_TASK_STACK_RADIO_STREAM, 3, 0},
+        {decoder_task, "audio_decode", BOARD_TASK_STACK_AUDIO_DECODER, 5, 1},
+        {output_task, "audio_output", BOARD_TASK_STACK_AUDIO_OUTPUT, 6, 1},
+    };
+    TaskHandle_t tasks[3] = {NULL};
+    bool codecs_registered = false;
+    esp_err_t result = ESP_ERR_NO_MEM;
     s_state = state;
-    ESP_RETURN_ON_ERROR(native_audio_output_init(), TAG,
-                        "initialize audio output");
-    ESP_RETURN_ON_ERROR(audio_level_led_init(), TAG,
-                        "initialize audio level LED");
     atomic_init(&s_generation, 0);
     atomic_init(&s_decoder_released_generation, 0);
     atomic_init(&s_failed_generation, 0);
+    s_stream_buffer = malloc(STREAM_CHUNK_SIZE);
+    if (!s_stream_buffer) goto failed;
     s_control_lock = xSemaphoreCreateMutex();
+    if (!s_control_lock) goto failed;
     s_commands = xQueueCreate(1, sizeof(play_command_t));
+    if (!s_commands) goto failed;
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
     s_encoded = adaptive_input_create(ENCODED_RING_SIZE,
         4 * (sizeof(encoded_packet_t) + STREAM_CHUNK_SIZE),
@@ -992,40 +1036,56 @@ esp_err_t audio_service_start(native_state_t *state) {
 #else
     s_encoded = xRingbufferCreate(ENCODED_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
 #endif
+    if (!s_encoded) goto failed;
     s_pcm = xRingbufferCreate(PCM_RING_SIZE, RINGBUF_TYPE_NOSPLIT);
-    if (!s_control_lock || !s_commands || !s_encoded || !s_pcm) return ESP_ERR_NO_MEM;
+    if (!s_pcm) goto failed;
 #ifdef CONFIG_YORADIO_STREAM_CONFIRM
     if (!adaptive_input_attach_control(s_encoded, s_start_control, sizeof(s_start_control)))
-        return ESP_ERR_NO_MEM;
+        goto failed;
     s_start_control_attached = s_encoded_control_attached = true;
 #endif
-    TaskHandle_t stream_handle=NULL, decoder_handle=NULL, output_handle=NULL;
-    if (xTaskCreatePinnedToCore(stream_task, "radio_stream",
-                                BOARD_TASK_STACK_RADIO_STREAM, NULL, 3,
-                                &stream_handle, 0) != pdPASS ||
-        xTaskCreatePinnedToCore(decoder_task, "audio_decode",
-                                BOARD_TASK_STACK_AUDIO_DECODER, NULL, 5,
-                                &decoder_handle, 1) != pdPASS ||
-        xTaskCreatePinnedToCore(output_task, "audio_output",
-                                BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, 6,
-                                &output_handle, 1) != pdPASS) {
-        return ESP_ERR_NO_MEM;
+    esp_audio_err_t registration = decoder_register_codecs();
+    if (registration != ESP_AUDIO_ERR_OK) {
+        ESP_LOGE(TAG, "Decoder registration failed: %d", registration);
+        result = registration == ESP_AUDIO_ERR_MEM_LACK ? ESP_ERR_NO_MEM : ESP_FAIL;
+        goto failed;
     }
-    native_health_track_task(NATIVE_HEALTH_STREAM, stream_handle);
-    native_health_track_task(NATIVE_HEALTH_DECODE, decoder_handle);
-    native_health_track_task(NATIVE_HEALTH_OUTPUT, output_handle);
+    codecs_registered = true;
+    for (unsigned i = 0; i < 3; ++i) {
+        if (xTaskCreatePinnedToCore(gated_pipeline_task, task_config[i].name,
+                task_config[i].stack_size, (void *)&task_config[i], task_config[i].priority,
+                &tasks[i], task_config[i].core) != pdPASS) goto failed;
+    }
+    if (!s_output_initialized) {
+        result = native_audio_output_init();
+        if (result != ESP_OK) goto failed;
+        s_output_initialized = true;
+    }
+    if (!s_led_initialized) {
+        result = audio_level_led_init();
+        if (result != ESP_OK) goto failed;
+        s_led_initialized = true;
+    }
+    native_health_track_task(NATIVE_HEALTH_STREAM, tasks[0]);
+    native_health_track_task(NATIVE_HEALTH_DECODE, tasks[1]);
+    native_health_track_task(NATIVE_HEALTH_OUTPUT, tasks[2]);
+    atomic_store(&s_start_state, AUDIO_START_READY);
+    for (unsigned i = 0; i < 3; ++i) xTaskNotifyGive(tasks[i]);
     ESP_LOGI(TAG,
              "Pipeline ready: %s, 16 KiB compressed + 8 KiB PCM, free heap %u",
              native_audio_output_name(),
              (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
     return ESP_OK;
+failed:
+    discard_pipeline_startup(tasks, codecs_registered);
+    return result;
 }
 
 esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     if (!url || !url[0] || strlen(url) >= sizeof(((play_command_t *)0)->url)) {
         return ESP_ERR_INVALID_ARG;
     }
-    if (!s_control_lock || !s_commands) return ESP_ERR_INVALID_STATE;
+    if (atomic_load(&s_start_state) != AUDIO_START_READY) return ESP_ERR_INVALID_STATE;
     xSemaphoreTake(s_control_lock, portMAX_DELAY);
     play_command_t command = {
         .generation = atomic_fetch_add(&s_generation, 1) + 1,
@@ -1042,7 +1102,7 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
 }
 
 void audio_service_stop(void) {
-    if (!s_control_lock) return;
+    if (atomic_load(&s_start_state) != AUDIO_START_READY) return;
     xSemaphoreTake(s_control_lock, portMAX_DELAY);
     uint32_t generation = atomic_fetch_add(&s_generation, 1) + 1;
     native_state_begin_audio(s_state, generation, NULL, "stopped");
@@ -1051,6 +1111,7 @@ void audio_service_stop(void) {
 
 native_input_health_t audio_service_input_health(void) {
     native_input_health_t result = {0};
+    if (atomic_load(&s_start_state) != AUDIO_START_READY) return result;
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
     result.leased = true;
     if (s_encoded) {

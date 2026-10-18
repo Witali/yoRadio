@@ -216,6 +216,7 @@ static void begin(unsigned gen) {
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
     short_input_stats=false;
 #endif
+    atomic_store(&s_start_state,AUDIO_START_READY);
     s_state=&state; s_commands=(void *)3; s_encoded=(void *)&encoded; s_pcm=&pcm;
 #ifdef CONFIG_YORADIO_STREAM_CONFIRM
     s_encoded_control_attached=true;
