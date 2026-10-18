@@ -70,7 +70,7 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-07 | Открыт | WebSocket snapshot/events, динамические страницы, capabilities, async static workers, bounded uploads. Две вкладки, медленный клиент, reconnect и rollback файлов. |
 | CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
 | CYD-C3-09 | Открыт | Wi-Fi profiles/reconnect/RSSI, power policy, timezone/SNTP и runtime settings. AP/client и поздняя потеря сети. |
-| CYD-C3-10 | Открыт | Общий normalizer, коэффициенты gain на блок, PCM layout, flush/reset ресемплера. Golden PCM и отдельные PDM/continuous/legacy сравнения. |
+| CYD-C3-10 | В работе | Gain рассчитывается один раз на PCM packet для всех трёх CYD backend; [host-регрессия](../tests/results/cyd-output-gain-20261018/README.md) проверяет bit-exact mono downmix и DAC conversion. Общий normalizer, PCM layout и полная проверка flush/reset ещё впереди. |
 | CYD-C3-11 | Исключён | Перенос дисплея, рендеринга, физических controls и других аппаратных функций C3 не входит в задачу по уточнению пользователя. |
 | CYD-C3-12 | Открыт | Portable custom FLAC и оптимизации hot loops против Espressif. PCM exactness, 8–24 bit/decorrelation/LPC/Rice, watchdog и физический A/B. |
 | CYD-C3-13 | Открыт | TLS/heap/IRAM/stack политика после измерений CYD. Full-record TLS, раннее освобождение старого codec, сохранение сетевого headroom. |

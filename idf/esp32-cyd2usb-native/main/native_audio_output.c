@@ -38,25 +38,38 @@ static uint32_t channel_gain_q15(uint8_t volume, uint8_t balance_gain) {
     return (numerator * SAMPLE_GAIN_SCALE + denominator / 2U) / denominator;
 }
 
+typedef struct {
+    uint32_t left;
+    uint32_t right;
+} pcm_gains_t;
+
+static pcm_gains_t pcm_channel_gains(uint8_t channels, uint8_t volume,
+                                    int8_t balance) {
+    uint8_t left_balance =
+        channels > 1 && balance < 0
+            ? (uint8_t)((int)BALANCE_DENOMINATOR + balance)
+            : BALANCE_DENOMINATOR;
+    uint8_t right_balance =
+        balance > 0 ? (uint8_t)(BALANCE_DENOMINATOR - balance)
+                    : BALANCE_DENOMINATOR;
+    return (pcm_gains_t){
+        .left = channel_gain_q15(volume, left_balance),
+        .right = channels > 1 ? channel_gain_q15(volume, right_balance) : 0,
+    };
+}
+
 static int16_t pcm_mono_sample(const uint8_t *frame, uint8_t channels,
-                               uint8_t volume, int8_t balance) {
+                               const pcm_gains_t *gains) {
     int16_t left;
     memcpy(&left, frame, sizeof(left));
     if (channels < 2) {
-        return scale_sample_q15(
-            left, channel_gain_q15(volume, BALANCE_DENOMINATOR));
+        return scale_sample_q15(left, gains->left);
     }
 
     int16_t right;
     memcpy(&right, frame + sizeof(right), sizeof(right));
-    uint8_t left_balance =
-        balance < 0 ? (uint8_t)((int)BALANCE_DENOMINATOR + balance)
-                    : BALANCE_DENOMINATOR;
-    uint8_t right_balance =
-        balance > 0 ? (uint8_t)(BALANCE_DENOMINATOR - balance)
-                    : BALANCE_DENOMINATOR;
-    left = scale_sample_q15(left, channel_gain_q15(volume, left_balance));
-    right = scale_sample_q15(right, channel_gain_q15(volume, right_balance));
+    left = scale_sample_q15(left, gains->left);
+    right = scale_sample_q15(right, gains->right);
     return (int16_t)(((int32_t)left + (int32_t)right) / 2);
 }
 
@@ -311,10 +324,11 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t frames = size / frame_bytes;
     uint8_t volume = native_audio_settings_get_volume();
     int8_t balance = native_audio_settings_get_balance();
+    pcm_gains_t gains = pcm_channel_gains(channels, volume, balance);
     for (size_t frame = 0; frame < frames; ++frame) {
         ESP_RETURN_ON_ERROR(
             pdm_write_resampled(pcm_mono_sample(data + frame * frame_bytes,
-                                                channels, volume, balance)),
+                                                channels, &gains)),
             TAG, "write PDM PCM");
     }
     return ESP_OK;
@@ -388,10 +402,11 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t frames = size / frame_bytes;
     uint8_t volume = native_audio_settings_get_volume();
     int8_t balance = native_audio_settings_get_balance();
+    pcm_gains_t gains = pcm_channel_gains(channels, volume, balance);
     if (frames > OUTPUT_PACKET_BYTES) frames = OUTPUT_PACKET_BYTES;
     for (size_t frame = 0; frame < frames; ++frame) {
         int32_t value = (pcm_mono_sample(data + frame * frame_bytes, channels,
-                                         volume, balance) >> 8) + 128;
+                                         &gains) >> 8) + 128;
         if (value < 0) value = 0;
         if (value > 255) value = 255;
         s_dac_data[frame] = (uint8_t)value;
@@ -560,9 +575,10 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t buffered = 0;
     uint8_t volume = native_audio_settings_get_volume();
     int8_t balance = native_audio_settings_get_balance();
+    pcm_gains_t gains = pcm_channel_gains(channels, volume, balance);
     for (size_t frame = 0; frame < frames; ++frame) {
         int16_t pcm = pcm_mono_sample(data + frame * frame_bytes, channels,
-                                      volume, balance);
+                                      &gains);
         for (uint32_t phase = 0; phase < LEGACY_OVERSAMPLE_FACTOR; ++phase) {
             uint8_t code = legacy_fractional_dac_step(pcm);
             s_legacy_frames[buffered++] = legacy_pack_dac_code(code);
