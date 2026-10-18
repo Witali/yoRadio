@@ -9,6 +9,8 @@ set(EXTRA_COMPONENT_DIRS
   "${CMAKE_CURRENT_LIST_DIR}/../components/native_storage"
   "${CMAKE_CURRENT_LIST_DIR}/../components/native_web_transport"
   "${CMAKE_CURRENT_LIST_DIR}/../components/native_ota"
+  "${CMAKE_CURRENT_LIST_DIR}/../components/native_time"
+  "${CMAKE_CURRENT_LIST_DIR}/../components/native_wifi_store"
   "$ENV{YORADIO_AUDIO_CODEC_COMPONENT}"
   "${CMAKE_CURRENT_LIST_DIR}/../components/audio_level_led"
   "${CMAKE_CURRENT_LIST_DIR}/../components/native_audio_settings"

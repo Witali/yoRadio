@@ -12,6 +12,8 @@ set(NATIVE_SRCS
   "native_health.c"
   "native_health_json.c"
   "network_service.c"
+  "time_service.c"
+  "time_settings.c"
   "web_service.c"
   "web_static.c"
   "web_upload.c"
@@ -64,6 +66,8 @@ idf_component_register(
     native_stream
     native_web_transport
     native_ota
+    native_time
+    native_wifi_store
     custom_legacy_codecs
     esp_audio_codec
   PRIV_REQUIRES esp-tls)

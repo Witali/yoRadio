@@ -270,6 +270,8 @@ idf_component_register(
     native_storage
     native_web_transport
     native_ota
+    native_time
+    native_wifi_store
     custom_flac
     custom_legacy_codecs
     esp_audio_codec)
