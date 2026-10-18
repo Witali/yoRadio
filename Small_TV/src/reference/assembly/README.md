@@ -1,5 +1,13 @@
 # Factory instruction audit checkpoint
 
+AP service lifetime: `application_main_at_42008e56.asm`,
+`0x42009032..0x42009052`, checks the initialized AP flag and stays in the setup
+loop after AP initialization/display. Native `services_start` uses the actual
+initialized network role to keep weather cache access but defer station-only
+workers. Factory performs much of this work inline; this does not assert an
+identical factory task layout. BC68 scoped AP HTTP/frame and STA controls are
+recorded in `../../../qemu/parity/ap-services-validation-20261018.json`.
+
 `manifest.json` records addressed disassembly and hashes of executable bytes
 from the immutable factory dump. Exports end at the next known symbol and can
 include alignment bytes; `helper_at_420a74e6.asm` is an excerpt of the rounding

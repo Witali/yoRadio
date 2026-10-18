@@ -12,6 +12,7 @@ from concurrency_contract import contract_rejection_checks as concurrency_reject
 from boot_state_contract import validate_boot_state, rejection_checks as boot_rejections
 from wifi_fallback_contract import rejection_checks as wifi_wait_rejections
 from netif_roles_contract import rejection_checks as netif_role_rejections
+from ap_services_contract import rejection_checks as ap_service_rejections
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -74,7 +75,8 @@ def main():
             'observer_test_sha256': inputs['boot_observer_test_sha256']}
         validate_boot_state(report, expected_boot)
         report['boot_observer_contract_checks'] = boot_rejections(report, expected_boot)
-        for name, key in (('wifi_fallback', 'wifi_fallback_http'), ('netif_roles', 'netif_roles_http'), ('startup', 'startup_wait'), ('weather_wait', 'weather_wait'),
+        for name, key in (('wifi_fallback', 'wifi_fallback_http'), ('netif_roles', 'netif_roles_http'),
+                          ('ap_services', 'ap_services_http'), ('startup', 'startup_wait'), ('weather_wait', 'weather_wait'),
                           ('advanced', 'advanced_http'), ('http_body', 'body_http'), ('concurrency', 'concurrency_http'),
                           ('uri_targets', 'uri_targets_http'), ('photo', 'photo_http'), ('photo_frames', 'photo_frames'),
                           ('photo_brightness', 'photo_brightness'), ('photo_controls', 'photo_controls'),
@@ -87,13 +89,21 @@ def main():
                        '--qemu-root', str(args.qemu_root), '--output', str(folder)]
             if name in ('http_body', 'concurrency'):
                 command += ['--yoradio', str(ROOT), '--dependency-root', str(ROOT)]
-            elif name in ('wifi_fallback', 'netif_roles'):
+            elif name in ('wifi_fallback', 'netif_roles', 'ap_services'):
                 command += ['--dependency-root', str(ROOT)]
             process = subprocess.run(command)
             result = json.loads((folder / 'report.json').read_text(encoding='utf-8-sig'))
             report[key] = result
             check(process.returncode == 0 and result['passed'] and result['inputs_unchanged'],
                   name + ': actual guest regression failed')
+            if name == 'ap_services':
+                archive = ROOT / 'firmware/development/small-tv-esp32c2-reconstructed'
+                result['contract_checks'] = ap_service_rejections(result, {
+                    'app_sha256': hashlib.sha256((archive / 'app.bin').read_bytes()).hexdigest(),
+                    'source_sha256': json.loads((archive / 'manifest.json').read_text())['source_sha256'],
+                    'qemu_sha256': inputs['qemu_sha256'],
+                    'native_elf_sha256': hashlib.sha256((ROOT / '.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()).hexdigest(),
+                    'test_sha256': hashlib.sha256(Path(__file__).with_name('ap_services_qemu.py').read_bytes()).hexdigest()})
             if name == 'netif_roles':
                 archive = ROOT / 'firmware/development/small-tv-esp32c2-reconstructed'
                 manifest = json.loads((archive / 'manifest.json').read_text())

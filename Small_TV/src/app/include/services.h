@@ -17,6 +17,7 @@ typedef struct
 void services_start(void);
 bool services_time_synced(void);
 bool services_local_time(const char *country, time_t utc, struct tm *local);
+void weather_cache_init(void);
 void weather_start(void);
 void weather_request_update(void);
 void weather_snapshot(weather_snapshot_t *out);

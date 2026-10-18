@@ -98,8 +98,16 @@ static void time_sync_task(void *unused)
 
 void services_start(void)
 {
-    /* Initialize the weather cache before starting the time-sync task. */
+    /* Initialize the cache for every role and start station-only services.
+     * FIXED_RECONSTRUCTION: 0x42009032..0x42009052 returns from the factory AP
+     * branch without its weather/time updates. Use the initialized live role,
+     * including an empty-SSID fallback, rather than allocating idle workers. */
 
+    if (network_ap_active())
+    {
+        weather_cache_init();
+        return;
+    }
     weather_start(); /* Initialize the cache mutex before the time task reads it. */
     configASSERT(xTaskCreate(time_sync_task, "time_sync", 3072, NULL, 2, NULL) == pdPASS);
 }

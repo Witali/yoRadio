@@ -1,5 +1,15 @@
 # Функциональные тесты Small TV ESP32-C2
 
+`ap_services_qemu.py` сравнивает factory/native AP setup после6настоящих HTTP
+настроек: полные RGB кадры, cache, AP/STA/time state и task set. Native snapshots
+привязаны к ELF и ROM heap counters; в AP отсутствуют time_sync/weather_http.
+`ap_services_contract.py` общий для suite/publisher/verifier и содержит18
+отрицательных проверок evidence. Результат BC68/B44 сохранён в
+`../qemu/parity/ap-services-validation-20261018.json`; full и H10 для BC68
+ещё не принимались. Platform cases setup_services/empty_station_setup_services
+проверяют actual initialized AP role, включая mode1 без SSID; неизменный final
+harness падает на прежних двух service modules.
+
 Набор проверяет восстановленную прошивку и сохраняет результаты для конкретного
 SHA-256 приложения и исходников. Он включает все имеющиеся функции устройства:
 экраны, часы, сетевую настройку, погоду, подсветку, фотографии и веб-интерфейс.

@@ -178,12 +178,22 @@ static void weather_task(void *unused)
     }
 }
 
-void weather_start(void)
+void weather_cache_init(void)
 {
-    /* Initialize the cache mutex and start the weather worker. */
+    /* Initialize the cache before HTTP/display consumers can read it.
+     * FIXED_RECONSTRUCTION: the AP branch at 0x42009032..0x42009052 bypasses
+     * weather fetching. Keep its readable cache without a dormant 8192-byte
+     * worker stack. This initializer runs once, on the boot task. */
 
     weather_mutex = xSemaphoreCreateMutex();
     configASSERT(weather_mutex);
+}
+
+void weather_start(void)
+{
+    /* Initialize the cache and start requests for the selected station role. */
+
+    weather_cache_init();
     configASSERT(xTaskCreate(weather_task, "weather_http", 8192, NULL, 1, &weather_task_handle) ==
                  pdPASS);
 }

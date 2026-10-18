@@ -2775,3 +2775,24 @@ true. Это только начало нового прогона, не 24 ча
   service lifecycle и factory AP branch/HTTP/cache/time semantics, затем решать,
   можно ли избежать allocation. Production пока не менялся. Frozen full/H10
   не перезапускались и не получают новый netif gate задним числом.
+
+### 2026-10-18 — station-only service allocation и сохранение результата full
+
+- По factory AP branch0x42009032..0x42009052 разделены cache initialization
+  и workers. AP не выделяет time_sync/weather_http, STA с ожидающим DHCP
+  продолжает их создавать. Production delta — ровно3из59inputs; appBC68,
+  ELF4FDE, source5586, app1169904bytes, запас366096. Build успешно архивирован.
+- Platform50cases/1182393checks, native5531 и artifact6 pass. Исправлены три
+  старых fixture, которые неправомерно посылали station GOT_IP в AP режиме.
+  Оба новых AP tests с финальным harness падают на старых service modules.
+- Real factory/native AP6HTTP settings routes, ≥30/45guest seconds, реальные
+  tasks/cache/ROM counters и четыре полных RGB кадра прошли. Ready AP gain11508
+  bytes, tasks11→9; later-workload median не заявляется. Настройка AP→STA и
+  STA8cycles/64HTTP/4outages/9weather generations прошли на B44.
+- Сохранены ap-services-validation-20261018.json и8raw gzip; full BC68/H10
+  пока не запускались. Различие bootloader raw bytes не объявлялось изменением
+  алгоритма или доказанной нормализованной идентичностью кода.
+- Старый full26C6/B44: terminal_failed/exit1 в regional raw ASCII observer на
+  erased0xff. Повторно проверены273frozen inputs; исходный failure сохранён
+  в network-roles-full-failure-20261018.json и6gzip. Причина flash моделирования
+  рассматривается отдельно; отказ не превращён в успешный результат.

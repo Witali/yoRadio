@@ -7,6 +7,31 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## AP memory comparison — 2026-10-18
 
+Перед следующим полным прогоном: AP service candidate BC68/ELF4FDE уже собран и
+сохранён в development archive. Production меняет только services.h,
+time_sync.c и weather.c: при фактическом AP режиме создаётся weather cache/mutex,
+но не station-only time_sync/weather_http tasks. Factory AP branch
+0x42009032..0x42009052 остаётся в setup loop; штатный STA с ожидающим DHCP
+сохраняет оба worker. Перезагрузка при смене режима уже предусмотрена.
+
+Scoped gates прошли на прежнем B44: 50 platform cases/1 182 393 checks,
+native5531, artifact6; оба новых AP теста падают на прежних двух service
+модулях при неизменном финальном harness. Реальные AP настройки через6HTTP
+маршрутов не меняют cache/time state или setup frame; все четыре factory/native
+RGB кадра совпали. В AP ready heap86604→98112bytes (+11508), tasks11→9;
+сравнение относится только к ready, последующие workloads различаются.
+STA control: 8cycles/64HTTP/4outages/9weather generations; исходная настройка
+Wi-Fi и холодное сохранение также прошли. Proof и8gzip:
+ap-services-validation-20261018.json. Новый mandatory AP gate включён в suite,
+publisher и verifier, но полный прогон BC68 ещё не запускался.
+
+Старый frozen full app26C6/B44 завершился terminal_failed на raw observer:
+ASCII decode byte0xff при ожидании максимальной country/city записи. Все273
+входа повторно совпали. Ошибка и исходные отчёты сохранены как failed в
+network-roles-full-failure-20261018.json; успешным этот прогон не считать.
+Проверка самой flash модели QEMU идёт в отдельной ветке codex/flash-write-audit.
+Не менять входы продолжающихся старых full/H10 и не приписывать им BC68.
+
 Теперь измерен и AP режим на app6324 против26C6, один B44/SDK/settings:
 по4настоящих HTTP scan и4setup pages,9read-only snapshots на vTaskDelay.
 Оба workload pass,24input hashes каждого совпали; по36ROM counter crosschecks,
@@ -17,7 +42,7 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 Proof network-roles-ap-memory-20261018.json +2rawreports+2UART+one-off probe source gzip.
 Это короткое измерение ресурсов, не долгосрочная стабильность или H10.
 
-Следующий кандидат для изучения, без изменения production: services_start
+Историческая точка до этого изменения: services_start
 создаёт time_sync(3072stack) и weather_http(8192stack) также в AP. Они наблюдались
 в обоих task sets. Перед оптимизацией сравнить AP branch factory app_main,
 браузерное время/часовой пояс/cache init и доступные setup HTTP handlers;

@@ -22,6 +22,8 @@ from http_body_contract import validate_http_body, validate_http_body_guards
 from concurrency_contract import validate_concurrency, validate_concurrency_guards
 from boot_state_contract import validate_boot_state, validate_boot_rejections
 from wifi_fallback_contract import validate_wifi_fallback, validate_wifi_fallback_guards
+from netif_roles_contract import validate_netif_roles, rejection_checks as netif_role_rejections
+from ap_services_contract import validate_ap_services, rejection_checks as ap_service_rejections
 
 
 def read(path):
@@ -76,6 +78,26 @@ def main():
         'native_elf_sha256':hashlib.sha256((BUILD/'small_tv_reconstructed.elf').read_bytes()).hexdigest(),
         'test_sha256':hashlib.sha256((ROOT/'tests/wifi_fallback_qemu.py').read_bytes()).hexdigest()})
     validate_wifi_fallback_guards(wifi_wait)
+    # New role gates share the suite/publisher's validators; a green outer
+    # report must not authorize missing task, cache, scan or complete LCD data.
+    role_expected = {'app_sha256': app_sha, 'source_sha256': manifest['source_sha256'],
+        'qemu_sha256': groups['qemu']['qemu_sha256'],
+        'native_elf_sha256': hashlib.sha256((BUILD / 'small_tv_reconstructed.elf').read_bytes()).hexdigest()}
+    netif_roles = groups['qemu']['netif_roles_http']
+    netif_expected = {**role_expected, 'test_sha256': {
+        name: hashlib.sha256((ROOT / 'tests' / name).read_bytes()).hexdigest()
+        for name in ('netif_roles_qemu.py', 'netif_observer.py', 'wifi_fallback_qemu.py')}}
+    validate_netif_roles(netif_roles, netif_expected)
+    require(netif_roles['contract_checks'] == netif_role_rejections(netif_roles, netif_expected) and
+            groups['qemu']['netif_observer_unit'] == {'passed': True, 'tests': 7}, 'Missing netif evidence guards')
+    ap_services = groups['qemu']['ap_services_http']
+    ap_expected = {**role_expected, 'test_sha256': hashlib.sha256((ROOT / 'tests/ap_services_qemu.py').read_bytes()).hexdigest()}
+    validate_ap_services(ap_services, ap_expected)
+    require(ap_services['contract_checks'] == ap_service_rejections(ap_services, ap_expected), 'Missing AP service guards')
+    for gate in (netif_roles, ap_services):
+        for filename, expected in gate['inputs_sha256'].items():
+            require(hashlib.sha256(Path(filename).read_bytes()).hexdigest() == expected,
+                    'Role input changed after execution: ' + Path(filename).name)
     body_http = groups['qemu']['body_http']
     validate_http_body(body_http, {'app_sha256': app_sha, 'source_sha256': manifest['source_sha256'],
         'qemu_sha256': groups['qemu']['qemu_sha256'],

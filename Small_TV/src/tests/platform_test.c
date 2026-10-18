@@ -336,6 +336,7 @@ static void got_ip_at(unsigned last_octet)
 {
     /* Deliver the SDK event snapshot, independently of a later netif query. */
     assert(event_callback);
+    CHECK(station_netifs_created == 1 && !network_ap_active());
     ip_event_got_ip_t event={.esp_netif=&sta,.ip_changed=true};
     esp_netif_set_ip4_addr(&event.ip_info.ip,10,0,2,last_octet);
     event_callback(NULL, IP_EVENT, IP_EVENT_STA_GOT_IP, &event);
@@ -751,6 +752,43 @@ static void test_time_worker(void)
     services_start();
     CHECK(!strcmp(tasks[1].name, "weather_http") && !strcmp(tasks[2].name, "time_sync"));
     run_task("time_sync", time_scenario);
+}
+
+static void check_setup_services(void)
+{
+    /* Keep the AP cache readable without allocating station-only task stacks. */
+    CHECK(network_init() == ESP_OK && network_ap_active() && !network_connected());
+    services_start();
+    CHECK(task_count == 0);
+    weather_snapshot_t weather;
+    weather_snapshot(&weather);
+    CHECK(!weather.valid && weather.generation == 0 && !weather_request_active());
+    strcpy(preferences.city, "Changed AP city");
+    strcpy(preferences.country, "US-H");
+    strcpy(preferences.weather_key, "fixture-key");
+    weather_request_update();
+    CHECK(!weather_request_active() && notifications == 0 && http_calls == 0);
+    CHECK(!services_time_synced() && sntp_inits == 0 && timezone_updates == 0);
+    struct tm untouched = {.tm_year = 123, .tm_mon = 4, .tm_mday = 6};
+    CHECK(!services_local_time(preferences.country, fake_time, &untouched));
+    CHECK(untouched.tm_year == 123 && untouched.tm_mon == 4 && untouched.tm_mday == 6);
+    weather_snapshot(&weather);
+    CHECK(!weather.valid && weather.generation == 0);
+    CHECK(network_ap_active() && !network_connected() && connects == 0);
+}
+static void test_setup_services(void)
+{
+    /* Saved credentials in mode 2 must not enable the time/weather workers. */
+    preferences.wifi_mode = 2;
+    strcpy(preferences.ssid, "saved-but-offline");
+    check_setup_services();
+}
+static void test_empty_station_setup_services(void)
+{
+    /* Choose the actual initialized AP role when station mode has no SSID. */
+    preferences.wifi_mode = 1;
+    preferences.ssid[0] = 0;
+    check_setup_services();
 }
 
 static const struct {time_t epoch; const char *tz;} time_boundaries[] = {
@@ -1867,7 +1905,7 @@ static void test_clock_text_scroll(void)
               "\"weather\":[{\"icon\":\"02d\",\"main\":\"Thunderstorm\",\"description\":\"clear\"}]}";
     http_length=strlen(http_body);
     CHECK(clock_ui_timer_init() == ESP_OK);
-    CHECK(network_init() == ESP_OK);
+    station_start();
     got_ip();
     start_synced_clock_services();
     strcpy(preferences.weather_key,"fixture-key");
@@ -1915,7 +1953,7 @@ static void test_clock_calendar(unsigned theme)
                           .tm_wday=3,.tm_hour=18,.tm_min=14,.tm_sec=7};
     fake_time=_mkgmtime64(&fake_local)-8*3600; /* CN fixture and epoch must describe the same date. */
     CHECK(clock_ui_timer_init()==ESP_OK);
-    CHECK(network_init()==ESP_OK);
+    station_start();
     got_ip();
     start_synced_clock_services();
     strcpy(preferences.weather_key,"fixture-key");
@@ -1972,7 +2010,7 @@ static void test_clock_timezone(unsigned theme)
     strcpy(preferences.country,"GB");
     fake_time=1774745999;
     CHECK(clock_ui_timer_init()==ESP_OK);
-    CHECK(network_init()==ESP_OK);
+    station_start();
     got_ip();
     start_synced_clock_services();
     strcpy(preferences.weather_key,"fixture-key");
@@ -2244,7 +2282,9 @@ int main(int argc, char **argv)
     {
         const char *name;
         void (*run)(void);
-    } cases[] = {{"wifi_setup", test_wifi_setup},
+    } cases[] = {{"setup_services", test_setup_services},
+                 {"empty_station_setup_services", test_empty_station_setup_services},
+                 {"wifi_setup", test_wifi_setup},
                  {"wifi_reconnect_scan", test_wifi_reconnect},
                  {"wifi_open_station", test_wifi_open},
                  {"wifi_pending_dhcp", test_wifi_fallback},
