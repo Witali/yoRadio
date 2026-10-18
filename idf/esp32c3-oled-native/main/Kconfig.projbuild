@@ -1,5 +1,11 @@
 menu "yoRadio ESP32-C3 OLED"
 
+config YORADIO_NATIVE_WEBSOCKET_TRANSPORT
+    bool
+    default y
+    select HTTPD_WS_SUPPORT
+    select HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT
+
 config YORADIO_SHARED_DECODER_ARENA
     bool "Reserve one reusable heap for the decoder task (experimental)"
     default n
