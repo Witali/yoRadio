@@ -24,12 +24,26 @@
 #define RUNTIME_DEFAULT_SNTP1 "pool.ntp.org"
 #define RUNTIME_DEFAULT_SNTP2 "time.nist.gov"
 #define RUNTIME_DEFAULT_TIME_SYNC_INTERVAL_MIN 60U
+#define RUNTIME_SNTP_NAME_CAPACITY 35U
 #define RUNTIME_DEFAULT_VOLUME_STEPS 1U
 #define RUNTIME_MIN_ENCODER_ACCELERATION 0U
 #define RUNTIME_MAX_ENCODER_ACCELERATION 1000U
 #define RUNTIME_DEFAULT_ENCODER_ACCELERATION 200U
 
 esp_err_t runtime_settings_init(void);
+
+typedef struct {
+    int8_t timezone_hour;
+    uint8_t timezone_minute;
+    uint16_t sync_interval_min;
+    char servers[2][RUNTIME_SNTP_NAME_CAPACITY];
+} runtime_time_settings_t;
+
+// Checked coherent copy of the committed in-memory time settings. Call after
+// init; timeout is finite (zero means try-lock). Failure leaves *output intact.
+// Separate UI setting commands remain separate commits, not one NVS record.
+esp_err_t runtime_settings_get_time_snapshot(runtime_time_settings_t *output,
+                                            uint32_t timeout_ms);
 
 bool runtime_settings_get_audio_info(void);
 uint8_t runtime_settings_get_softap_delay_min(void);

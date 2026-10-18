@@ -25,7 +25,8 @@
 #define SETTINGS_NVS_ENCODER_ACCELERATION "encacc"
 
 #define MDNS_NAME_CAPACITY 24
-#define SNTP_NAME_CAPACITY 35
+#define SNTP_NAME_CAPACITY RUNTIME_SNTP_NAME_CAPACITY
+#define TIME_SETTINGS_LOCK_TIMEOUT_MS 100U
 
 static const char *const TAG = "runtime_settings";
 static atomic_bool s_audio_info = RUNTIME_DEFAULT_AUDIO_INFO;
@@ -59,6 +60,44 @@ static bool valid_host_text(const char *text, size_t capacity,
         }
     }
     return true;
+}
+
+static esp_err_t lock_time_settings(uint32_t timeout_ms) {
+    if (!s_string_lock) return ESP_ERR_INVALID_STATE;
+    uint64_t ticks = ((uint64_t)timeout_ms * configTICK_RATE_HZ + 999U) / 1000U;
+    if (ticks >= portMAX_DELAY) ticks = portMAX_DELAY - 1U;
+    return xSemaphoreTake(s_string_lock, (TickType_t)ticks) == pdTRUE
+               ? ESP_OK : ESP_ERR_TIMEOUT;
+}
+
+esp_err_t runtime_settings_get_time_snapshot(runtime_time_settings_t *output,
+                                            uint32_t timeout_ms) {
+    if (!output) return ESP_ERR_INVALID_ARG;
+    ESP_RETURN_ON_ERROR(lock_time_settings(timeout_ms), TAG,
+                        "Time settings snapshot lock");
+    runtime_time_settings_t candidate = {
+        .timezone_hour = atomic_load(&s_timezone_hour),
+        .timezone_minute = atomic_load(&s_timezone_minute),
+        .sync_interval_min = atomic_load(&s_time_sync_interval_min),
+    };
+    // Check termination before using the legacy host validator. A damaged
+    // setting must never produce a truncated or empty replacement server.
+    bool valid = candidate.timezone_hour >= -12 &&
+        candidate.timezone_hour <= 14 && candidate.timezone_minute <= 45U &&
+        candidate.timezone_minute % 15U == 0U &&
+        candidate.sync_interval_min >= 15U && candidate.sync_interval_min <= 1440U &&
+        memchr(s_sntp1, '\0', sizeof(s_sntp1)) &&
+        memchr(s_sntp2, '\0', sizeof(s_sntp2)) &&
+        valid_host_text(s_sntp1, sizeof(s_sntp1), false) &&
+        valid_host_text(s_sntp2, sizeof(s_sntp2), false);
+    if (valid) {
+        strlcpy(candidate.servers[0], s_sntp1, sizeof(candidate.servers[0]));
+        strlcpy(candidate.servers[1], s_sntp2, sizeof(candidate.servers[1]));
+    }
+    xSemaphoreGive(s_string_lock);
+    if (!valid) return ESP_ERR_INVALID_STATE;
+    *output = candidate;
+    return ESP_OK;
 }
 
 static esp_err_t save_u8(const char *key, uint8_t value) {
@@ -284,26 +323,32 @@ esp_err_t runtime_settings_set_station_timeout_sec(uint8_t seconds) {
 esp_err_t runtime_settings_set_timezone_hour(int8_t hour) {
     ESP_RETURN_ON_FALSE(hour >= -12 && hour <= 14, ESP_ERR_INVALID_ARG, TAG,
                         "Timezone hour range");
-    ESP_RETURN_ON_ERROR(save_i8(SETTINGS_NVS_TZ_HOUR, hour), TAG,
-                        "Save timezone hour");
-    atomic_store(&s_timezone_hour, hour);
-    return ESP_OK;
+    ESP_RETURN_ON_ERROR(lock_time_settings(TIME_SETTINGS_LOCK_TIMEOUT_MS), TAG,
+                        "Timezone hour lock");
+    esp_err_t result = save_i8(SETTINGS_NVS_TZ_HOUR, hour);
+    if (result == ESP_OK) atomic_store(&s_timezone_hour, hour);
+    xSemaphoreGive(s_string_lock);
+    return result;
 }
 esp_err_t runtime_settings_set_timezone_minute(uint8_t minute) {
     ESP_RETURN_ON_FALSE(minute <= 45U && minute % 15U == 0U,
                         ESP_ERR_INVALID_ARG, TAG, "Timezone minute range");
-    ESP_RETURN_ON_ERROR(save_u8(SETTINGS_NVS_TZ_MINUTE, minute), TAG,
-                        "Save timezone minute");
-    atomic_store(&s_timezone_minute, minute);
-    return ESP_OK;
+    ESP_RETURN_ON_ERROR(lock_time_settings(TIME_SETTINGS_LOCK_TIMEOUT_MS), TAG,
+                        "Timezone minute lock");
+    esp_err_t result = save_u8(SETTINGS_NVS_TZ_MINUTE, minute);
+    if (result == ESP_OK) atomic_store(&s_timezone_minute, minute);
+    xSemaphoreGive(s_string_lock);
+    return result;
 }
 esp_err_t runtime_settings_set_time_sync_interval_min(uint16_t minutes) {
     ESP_RETURN_ON_FALSE(minutes >= 15U && minutes <= 1440U,
                         ESP_ERR_INVALID_ARG, TAG, "Time sync interval range");
-    ESP_RETURN_ON_ERROR(save_u16(SETTINGS_NVS_TIME_INTERVAL, minutes), TAG,
-                        "Save time sync interval");
-    atomic_store(&s_time_sync_interval_min, minutes);
-    return ESP_OK;
+    ESP_RETURN_ON_ERROR(lock_time_settings(TIME_SETTINGS_LOCK_TIMEOUT_MS), TAG,
+                        "Time interval lock");
+    esp_err_t result = save_u16(SETTINGS_NVS_TIME_INTERVAL, minutes);
+    if (result == ESP_OK) atomic_store(&s_time_sync_interval_min, minutes);
+    xSemaphoreGive(s_string_lock);
+    return result;
 }
 esp_err_t runtime_settings_set_volume_steps(uint8_t steps) {
     ESP_RETURN_ON_FALSE(steps >= 1U && steps <= 10U, ESP_ERR_INVALID_ARG, TAG,
@@ -343,11 +388,24 @@ esp_err_t runtime_settings_set_mdns_name(const char *name) {
     return set_string(SETTINGS_NVS_MDNS_NAME, name, s_mdns_name,
                       sizeof(s_mdns_name), true);
 }
+
+static esp_err_t set_time_server(const char *key, const char *server,
+                                 char *target, size_t capacity) {
+    ESP_RETURN_ON_FALSE(valid_host_text(server, capacity, false),
+                        ESP_ERR_INVALID_ARG, TAG, "Invalid SNTP host setting");
+    // Do not commit NVS before securing publication: a lock timeout must
+    // leave both the saved value and the active in-memory value untouched.
+    ESP_RETURN_ON_ERROR(lock_time_settings(TIME_SETTINGS_LOCK_TIMEOUT_MS), TAG,
+                        "SNTP settings lock");
+    esp_err_t result = save_string(key, server);
+    if (result == ESP_OK) strlcpy(target, server, capacity);
+    xSemaphoreGive(s_string_lock);
+    return result;
+}
+
 esp_err_t runtime_settings_set_sntp1(const char *server) {
-    return set_string(SETTINGS_NVS_SNTP1, server, s_sntp1, sizeof(s_sntp1),
-                      false);
+    return set_time_server(SETTINGS_NVS_SNTP1, server, s_sntp1, sizeof(s_sntp1));
 }
 esp_err_t runtime_settings_set_sntp2(const char *server) {
-    return set_string(SETTINGS_NVS_SNTP2, server, s_sntp2, sizeof(s_sntp2),
-                      false);
+    return set_time_server(SETTINGS_NVS_SNTP2, server, s_sntp2, sizeof(s_sntp2));
 }
