@@ -2833,3 +2833,19 @@ true. Это только начало нового прогона, не 24 ча
 - H10 app26C6/B44 не прерывался, file-only diagnostic status pending,
   h10_checks_passed=false. Чужие/длительные ВМ не останавливались; одноразовые
   ВМ flash audit завершены. Полного acceptance для текущего appBC68 ещё нет.
+
+### 2026-10-18 — текущий full и замена H10 на BC68/20B
+
+- Full запущен отдельно в codex/small-tv-flash-full, controller10836 вне Job;
+ 533inputs frozen, startce6a1254. После host/machine групп перешёл в QEMU.
+- Новый guarded preflight8cycles/64HTTP/4outages/9weather generations pass,
+ 36ROM counter checks,31+11input hashes совпали, workload/guardexit0.
+ Raw proof ap-services-h10-preflight-20261018.json +6gzip.
+- До остановки старого workload записан и отправлен intent2f9f81e3. Проверен
+ retained handle старогоPID20664, creation time/полный command line; завершён
+ только этот workload12:30:54UTC. Старый supervisor сохранил failed/-1 и
+ очистил собственнуюVM/guard (cleanup0). Аудирован prefix214cycles/31inputs;
+ исходные report/events/UART/guard/supervisor/stop/analysis сохранены7gzip.
+- Новый H10 BC68/20B запущен12:30:54UTC: supervisor23548/workload5036/
+ guard22392/VM18128. CIM подтверждает все4идентичности и отсутствие4oldPID.
+ Start record хранит31runtime и11frozenQEMU inputs; это start/pending, не H10 pass.

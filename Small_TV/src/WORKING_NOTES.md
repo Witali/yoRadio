@@ -7,6 +7,22 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## AP memory comparison — 2026-10-18
 
+Текущий H10: appBC68/ELF4FDE/QEMU20B стартовал12:30:54UTC в независимой
+ветке codex/small-tv-h10-ap-services. Supervisor23548, workload5036, guard22392,
+VM18128/SmallTV-f65d8d848a9a. Все4идентичности подтверждены CIM;31runtime и11
+snapshot QEMU inputs совпали. Не открывать второй RSP/QMP к этой ВМ и не менять
+входы. Start proof ap-services-h10-start-20261018.json; полный H10 ещё pending.
+
+Перед этим 8-cycle supervised preflight BC68/20B прошёл:64HTTP/4outages,
+9valid weather generations,36ROM checks; workload/guard обаexit0 безpanic/boot reset.
+Проверенный старый26C6/B44 H10 намеренно заменён после committed intent2f9f81e3:
+prefix214cycles/31inputs сохранён, оригинальный supervisor failed/-1 и cleanup0
+не переписаны в pass. Все4oldPID отсутствуют. См. ap-services-h10-superseded-20261018.json.
+
+Полный BC68/20B suite отдельно идёт в codex/small-tv-flash-full (controller10836,
+startce6a1254), заморожены533inputs. Production/UI/ELF этих деревьев не менять.
+Контекст active full обновлять в его parity journal, который не входит в533.
+
 За время flash audit завершился старый frozen full app6324/source53D3/B44:
 terminal_passed в12:10:15UTC,19groups pass, hardware/browser/soak not_run.
 Все273inputs повторно совпали; proof apsta-full-completed-20261018.json +4gzip.
