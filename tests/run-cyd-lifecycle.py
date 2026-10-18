@@ -57,6 +57,7 @@ size_t strlcpy(char *, const char *, size_t);
     generated += re.search(r'^#define STREAM_INPUT_ACTIVE[^\n]+', source, re.M).group(0)+'\n'
     generated += source[source.index('static uint32_t s_decoder_bitrate_generation'):
                         source.index('static void state_set_decoder_bitrate')]
+    generated += function((MAIN/'native_audio_output.c').read_text(), 'native_audio_output_supports_pcm')
     for name in ('simple_decoder_type', 'codec_name', 'state_set_decoder_bitrate','publish_stream_info','state_set_audio',
                  'fail_generation', 'send_encoded', 'send_pcm', 'send_pcm_end',
                  'CUSTOM', 'decoder_release', 'decoder_task', 'output_task',

@@ -357,6 +357,22 @@ int main(void) {
     }
     pcm=(test_ring_t){0};
     atomic_store(&s_generation,12); assert(!send_pcm_end(11,AUDIO_END_EOF));
+    begin(12);
+    for (unsigned bits=0;bits<=40;++bits) {
+        layout=(esp_audio_simple_dec_info_t){48000,0,(uint8_t)bits,3};
+        bool supported=bits==8 || bits==16 || bits==24 || bits==32;
+        assert(publish_stream_info(12,NATIVE_CODEC_FLAC,&layout)==supported);
+        assert(send_pcm(12,&layout,bytes,(bits/8U)*6U)==supported);
+        if (supported) {
+            assert(pcm.used==1);
+            pcm_packet_t *packet=pcm.items[0];
+            assert(packet->bits_per_sample==bits && packet->channels==3);
+            assert(packet->data_size==(bits/8U)*6U);
+            free(packet);pcm=(test_ring_t){0};
+        } else assert(!pcm.used);
+    }
+    layout=(esp_audio_simple_dec_info_t){48000,0,16,0};
+    assert(!publish_stream_info(12,NATIVE_CODEC_FLAC,&layout) && !send_pcm(12,&layout,bytes,4));
 
     begin(15); input(15,AUDIO_CONTINUE,3); input(15,AUDIO_END_EOF,0);
     ((encoded_packet_t *)encoded.items[0])->codec=NATIVE_CODEC_MP3;

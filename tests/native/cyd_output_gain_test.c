@@ -188,7 +188,7 @@ int main(void) {
     gain_calls = volume_reads = balance_reads = 0;
     uint8_t data[8] = {0};
     assert(native_audio_output_write_pcm(NULL, 4, 16, 1) == ESP_ERR_NOT_SUPPORTED);
-    assert(native_audio_output_write_pcm(data, 4, 24, 1) == ESP_ERR_NOT_SUPPORTED);
+    assert(native_audio_output_write_pcm(data, 4, 20, 1) == ESP_ERR_NOT_SUPPORTED);
     assert(native_audio_output_write_pcm(data, 4, 16, 0) == ESP_ERR_NOT_SUPPORTED);
     assert(!gain_calls && !volume_reads && !balance_reads);
     printf("PASS PCM gain: %llu arithmetic cases, %u output cases, bounded coefficient evaluations\n",

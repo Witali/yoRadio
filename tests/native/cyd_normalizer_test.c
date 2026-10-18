@@ -299,7 +299,7 @@ int main(void) {
     setting_reads = 0;
     unsigned processes = normalizer_process_calls(); resets = normalizer_reset_calls();
     assert(native_audio_output_write_pcm(NULL, 8, 16, 1) == ESP_ERR_NOT_SUPPORTED);
-    assert(native_audio_output_write_pcm(data, 8, 24, 1) == ESP_ERR_NOT_SUPPORTED);
+    assert(native_audio_output_write_pcm(data, 8, 20, 1) == ESP_ERR_NOT_SUPPORTED);
     assert(native_audio_output_write_pcm(data, 8, 16, 0) == ESP_ERR_NOT_SUPPORTED);
     assert(!setting_reads && normalizer_process_calls() == processes &&
            normalizer_reset_calls() == resets);

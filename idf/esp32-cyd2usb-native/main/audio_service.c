@@ -160,7 +160,7 @@ static bool publish_stream_info(uint32_t generation, native_codec_t codec,
                                  const esp_audio_simple_dec_info_t *info) {
     if (generation != atomic_load(&s_generation) ||
         generation == atomic_load(&s_failed_generation) || !info->sample_rate ||
-        !info->channel || !info->bits_per_sample || info->bits_per_sample % 8U) return false;
+        !native_audio_output_supports_pcm(info->bits_per_sample, info->channel)) return false;
     native_stream_info_t description = {
         .codec=codec_name(codec), .sample_rate_hz=info->sample_rate,
         .channels=info->channel, .bits_per_sample=info->bits_per_sample,
@@ -544,7 +544,7 @@ static bool send_pcm(uint32_t generation,
                      const esp_audio_simple_dec_info_t *info,
                      const uint8_t *data, size_t size) {
     size_t frame_bytes = (size_t)info->channel * info->bits_per_sample / 8U;
-    if (!info->bits_per_sample || info->bits_per_sample % 8U ||
+    if (!native_audio_output_supports_pcm(info->bits_per_sample, info->channel) ||
         !frame_bytes || frame_bytes > PCM_PACKET_DATA_SIZE ||
         size % frame_bytes) return false;
     while (size) {
