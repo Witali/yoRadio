@@ -53,3 +53,31 @@ CYD compatibility по-прежнему не принята: modem DPORT clocks 
 но matching libphy register_chipv7_phy читает немоделируемый0x60033c00.
 Не маскировать это all-ones MMIO или принудительным PHY success. Физическая
 плата и H10 F1 также остаются непроверенными. Main не объединять.
+
+## Новый H10 и намеренная замена0592
+
+Новый F1/D64 H10 стартовал16:37:04UTC: supervisor23208
+(creation16:37:04.1096700Z), workload6908 (16:37:04.8768140Z),
+guard15664 (16:37:39.9558250Z), VM26708 (16:37:10.2562310Z),
+`SmallTV-c3536427c9be`. Launch outside Windows Job подтверждён, после границы
+tool call все4процесса повторно проверены CIM, префикс уже содержит рабочие циклы.
+Регистры frozen32runtime+47snapshot+8supervisor/launcher могут пересекаться.
+Не менять эти входы и566full inputs; не открывать дополнительных QMP/RSP clients.
+Output `.build/jpeg-header-h10-20261018`, соседний `-supervisor`.
+
+Прежний0592 H10 сознательно заменён новой production сборкой. До остановки
+сохранены179полных циклов,8raw gzip, все31+41+6старых входов совпали.
+Intent45fa4da3 закоммичен до остановки. В16:41:07UTC закрыты только4старых
+process handles после проверки PID, creation и command; старые PID отсутствуют,
+новые4PID живы. Дополнительных QMP/RSP clients0. Raw report не переписан в pass.
+Первый stop attempt не остановил процессов: ISO string автоматически стала
+DateTime при JSON parsing. Failure сохранён; DateKind String и read-only OS probe
+подтвердили точные строки, после чего отдельная попытка завершилась успешно.
+
+Файловый анализ полного старого journal — pending, не24h. Старый ad hoc freeze
+не соответствует consumer schema анализатора; его rejected attempt сохранён.
+Для нового H10 `jpeg-header-h10-audit-start-20261018.json` детерминированно
+проецирует неизменный pre-launch freeze27b3da92 в consumer schema. Все32expected
+hash, image/ELF/QEMU, duration и guard взяты из committed freeze до старта;
+оригинал сохранён побайтно. Анализ нового префикса pending/start identities
+прошёл, без изменения условий H10. Следующий анализ писать в новый файл.

@@ -1,0 +1,38 @@
+{
+  "status": "replacement_live_old_owned_processes_absent",
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T16:41:25.3374834Z",
+  "old_pids_absent": [
+    13800,
+    31224,
+    27200,
+    19212
+  ],
+  "new_processes": [
+    {
+      "pid": 23208,
+      "created_utc": "2026-10-18T16:37:04.1096700Z",
+      "name": "pwsh.exe",
+      "command_line": "\"C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" \"-NoProfile\" \"-NonInteractive\" \"-File\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\Small_TV\\src\\tools\\runtime_supervisor.ps1\" \"-YoradioRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\" \"-QemuRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018\" \"-DependencyRoot\" \"C:\\Work\\yoRadio\" \"-OutputDirectory\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\" \"-DurationSeconds\" \"86400\" \"-IntervalSeconds\" \"15\" \"-OutageEvery\" \"60\""
+    },
+    {
+      "pid": 6908,
+      "created_utc": "2026-10-18T16:37:04.8768140Z",
+      "name": "python.exe",
+      "command_line": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" -X utf8 -B C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\Small_TV\\src\\tests\\runtime_qemu.py --yoradio C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers --dependency-root C:\\Work\\yoRadio --qemu-root C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018 --output C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018 --interval-seconds 15 --outage-every 60 --outage-seconds 1 --duration-seconds 86400"
+    },
+    {
+      "pid": 26708,
+      "created_utc": "2026-10-18T16:37:10.2562310Z",
+      "name": "qemu-system-riscv32.exe",
+      "command_line": "C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018\\bin\\qemu-system-riscv32.exe -M esp32c2,default-peripherals=off -name SmallTV-c3536427c9be -L C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\\vm -drive file=C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\\vm\\flash.bin,if=mtd,format=raw -display none -serial file:C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\\vm\\uart.log -monitor none -icount shift=3,align=off,sleep=on -qmp tcp:127.0.0.1:60927,server=on,wait=off -device {\\\"driver\\\":\\\"esp-spi-module\\\",\\\"id\\\":\\\"lcd\\\",\\\"bus\\\":\\\"/spi2/spi\\\",\\\"gpio\\\":\\\"/machine/gpio\\\",\\\"spi-host\\\":2,\\\"cs\\\":0,\\\"model\\\":\\\"st7789\\\",\\\"sck\\\":4,\\\"mosi\\\":6,\\\"miso\\\":-1,\\\"cs-gpio\\\":-1,\\\"dc-gpio\\\":5,\\\"reset-gpio\\\":1,\\\"backlight-gpio\\\":18,\\\"backlight-active-low\\\":true,\\\"properties\\\":\\\"{\\\\\\\"visible-width\\\\\\\":240,\\\\\\\"controls\\\\\\\":false,\\\\\\\"panel-inverted\\\\\\\":true}\\\"} -global esp32c3-wifi.clock-services=on -global esp32c3-wifi.ntp-hosts=ntp1.aliyun.com;cn.pool.ntp.org;pool.ntp.org -global esp32c3-wifi.station-ssid=yoRadio-QEMU -nic user,model=esp32c3-wifi,restrict=on,hostfwd=tcp:127.0.0.1:18082-10.0.2.15:80,guestfwd=tcp:10.0.2.100:80-tcp:127.0.0.1:60925 -global esp32c3-wifi.service-hosts=api.openweathermap.org -snapshot -gdb tcp:127.0.0.1:60926 -S"
+    },
+    {
+      "pid": 15664,
+      "created_utc": "2026-10-18T16:37:39.9558250Z",
+      "name": "python.exe",
+      "command_line": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" -X utf8 -B C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\Small_TV\\src\\tools\\runtime_run_guard.py --run C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018 --qemu-tools C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018\\tools"
+    }
+  ],
+  "new_qmp_rsp_clients": 0
+}
