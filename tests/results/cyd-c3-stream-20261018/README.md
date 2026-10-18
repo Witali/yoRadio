@@ -27,3 +27,18 @@ Complete clang-tidy reports are retained in the
 does not mean every diagnostic has been resolved. Firmware manifests are saved
 separately after production GCC builds; no image from this campaign has been
 installed on a board.
+
+Production GCC builds pass for source commit `7b9e7f7e`; descriptors have no
+dirty suffix and embedded ELF hashes match the corresponding build ELFs.
+
+| Variant | Bytes | Saved image and manifest |
+| --- | ---: | --- |
+| CYD PDM | 1356080 | [app.bin](../../../firmware/development/esp32-cyd2usb-native-stream-pdm/app.bin), [manifest](../../../firmware/development/esp32-cyd2usb-native-stream-pdm/manifest.json) |
+| CYD continuous DAC | 1350064 | [app.bin](../../../firmware/development/esp32-cyd2usb-native-stream-dac/app.bin), [manifest](../../../firmware/development/esp32-cyd2usb-native-stream-dac/manifest.json) |
+| CYD legacy DAC | 1356144 | [app.bin](../../../firmware/development/esp32-cyd2usb-native-stream-legacy-dac/app.bin), [manifest](../../../firmware/development/esp32-cyd2usb-native-stream-legacy-dac/manifest.json) |
+| C3 tested-radio profile, shared parsers | 1474384 | [app.bin](../../../firmware/development/esp32c3-oled-native-shared-stream/app.bin), [manifest](../../../firmware/development/esp32c3-oled-native-shared-stream/manifest.json) |
+
+All CYD images fit the unchanged 0x1b0000 application slots. PDM sdkconfig is
+identical to the original baseline after JSON normalization; the image grew
+by 3,728 bytes relative to stage 01 (5,360 bytes relative to the original).
+Every variant includes its exact sdkconfig snapshot. Releases are untouched.
