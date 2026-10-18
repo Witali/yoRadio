@@ -44,15 +44,25 @@ progress{width:24rem;max-width:100%}
 <fieldset id="assets-fields" disabled><h3>Файлы веб-интерфейса</h3>
 <label>Файлы .gz <input id="asset-files" name="www" type="file" accept=".gz,application/gzip" multiple></label><br>
 <label id="asset-playlist-label">Плейлист CSV (необязательно) <input id="asset-playlist" name="data" type="file" accept=".csv"></label><br>
-<label id="asset-wifi-label">Wi-Fi CSV (необязательно) <input id="asset-wifi" name="data" type="file" accept=".csv"></label><br>
-<small>Выбранные CSV сохраняются как playlist.csv и wifi.csv. Wi-Fi CSV: имя сети и пароль через табуляцию.</small><br>
+<small>Выбранный CSV сохраняется как playlist.csv.</small><br>
 <button id="assets-submit" disabled>Сохранить файлы</button></fieldset></form>
-<form id="wifi-form" class="upload-form" action="/" method="post" enctype="multipart/form-data" hidden>
+<form id="wifi-form" class="upload-form" action="/api/native/wifi" method="post" hidden>
 <fieldset id="wifi-fields" disabled><h3>Подключение Wi-Fi</h3>
-<label>Имя сети (SSID) <input id="wifi-ssid" name="ssid" maxlength="31" autocomplete="off" required></label>
-<label>Пароль <input id="wifi-password" name="pass" type="password" maxlength="63" autocomplete="new-password"></label><br>
-<small id="wifi-limits"></small><br><button id="wifi-submit" disabled>Сохранить Wi-Fi</button>
-</fieldset></form></section>
+<label>Имя сети (SSID) <input id="wifi-ssid" maxlength="31" autocomplete="off" required></label>
+<label>Пароль <input id="wifi-password" type="password" maxlength="63" autocomplete="new-password"></label><br>
+<label><input id="wifi-open" type="checkbox">Открытая сеть — удалить пароль</label><br>
+<small id="wifi-limits"></small><p id="wifi-summary"></p>
+<button id="wifi-submit" disabled>Сохранить Wi-Fi</button></fieldset>
+<button id="wifi-refresh" type="button" disabled>Обновить список</button>
+</form></section>
+<section id="time-section" hidden><h2>Время</h2><p id="time-clock"></p><p id="time-status" role="status"></p>
+<form id="time-form"><fieldset id="time-fields" disabled>
+<label>Смещение UTC, мин <input id="time-offset" type="number" min="-720" max="840" step="15" required></label>
+<label>Синхронизация, мин <input id="time-interval" type="number" min="15" max="1440" required></label><br>
+<label>Сервер SNTP 1 <input id="time-server1" maxlength="34" autocomplete="off" required></label>
+<label>Сервер SNTP 2 <input id="time-server2" maxlength="34" autocomplete="off"></label><br>
+<small>Второй сервер можно оставить пустым. Настройки сохраняются без перезапуска.</small><br>
+<button id="time-submit" disabled>Сохранить время</button></fieldset></form></section>
 <section id="firmware" hidden><h2>Обновление прошивки</h2>
 <form id="firmware-form" action="/update" method="post" enctype="multipart/form-data">
 <fieldset id="firmware-fields" disabled><p id="firmware-limits"></p>
@@ -69,6 +79,8 @@ progress{width:24rem;max-width:100%}
 const el = id => document.getElementById(id);
 let socket, retryTimer, retryDelay = 1000, lastSeen = 0, ready = false, settingsDirty = false;
 let capabilities = {}, uploadBusy = false, firmwareBusy = false, awaitingRestart = false;
+let wifiMetadata = null, timeDirty = false, timeBusy = false, timeAvailable = false, pollBusy = false;
+let timeRequestEpoch = 0;
 const message = text => { el('message').textContent = text; };
 async function api(path, query, method = 'GET') {
   const suffix = query ? '?' + new URLSearchParams(query).toString() : '';
@@ -135,28 +147,40 @@ el('reconnect').addEventListener('click', () => action(async () => {
 }));
 const byteLength = text => new TextEncoder().encode(text).length;
 const uploadLimit = (name, fallback) => Number.isSafeInteger(capabilities[name]) && capabilities[name] > 0 ? capabilities[name] : fallback;
+const wifiSupported = () => capabilities.nativeWiFiApi === '/api/native/wifi' &&
+  capabilities.nativeWiFiMaxProfiles === 5 && capabilities.nativeWiFiPrivateExport === false;
+const timeSupported = () => capabilities.nativeTimeApi === '/api/native/time';
 function updateUploadControls() {
   const blocked = uploadBusy || awaitingRestart;
   let available = false;
-  for (const [name, capability] of [['playlist','playlist_upload'],['assets','asset_upload'],['wifi','wifi_upload']]) {
+  for (const [name, capability] of [['playlist','playlist_upload'],['assets','asset_upload']]) {
     const supported = capabilities[capability] === true;
     available ||= supported;
     el(name + '-form').hidden = !supported;
     el(name + '-fields').disabled = !ready || blocked || !supported;
     el(name + '-submit').disabled = !ready || blocked || !supported;
   }
+  const wifi = wifiSupported();
+  available ||= wifi;
+  el('wifi-form').hidden = !wifi;
+  el('wifi-fields').disabled = !ready || blocked || !wifi || !wifiMetadata;
+  el('wifi-submit').disabled = !ready || blocked || !wifi || !wifiMetadata;
+  el('wifi-refresh').disabled = !ready || blocked || !wifi;
   el('uploads').hidden = !available;
-  for (const [name, capability] of [['playlist','playlist_upload'],['wifi','wifi_upload']]) {
+  for (const [name, capability] of [['playlist','playlist_upload']]) {
     el('asset-' + name + '-label').hidden = capabilities[capability] !== true;
     el('asset-' + name).disabled = blocked || capabilities[capability] !== true;
   }
   el('upload-limits').textContent = 'До ' + uploadLimit('upload_max_bytes', 98304) +
     ' байт на запрос, включая оформление формы; до ' + uploadLimit('upload_max_files', 16) +
     ' файлов. Имена файлов .gz — до ' + uploadLimit('upload_name_max_bytes', 22) +
-    ' байт. Wi-Fi CSV — до ' + uploadLimit('wifi_file_max_bytes', 799) + ' байт.';
+    ' байт.';
   el('wifi-limits').textContent = 'SSID — до ' + uploadLimit('wifi_ssid_max_bytes', 31) +
     ' байт, пароль — до ' + uploadLimit('wifi_password_max_bytes', 63) +
-    ' байт. Пустой пароль — открытая сеть. После сохранения радио перезапустится.';
+    ' байт. Пустое поле сохраняет прежний пароль. Для открытой сети отметьте действие явно. После сохранения радио перезапустится.';
+  el('time-section').hidden = !timeSupported();
+  el('time-fields').disabled = !ready || blocked || timeBusy || !timeSupported() || !timeAvailable;
+  el('time-submit').disabled = el('time-fields').disabled;
   const firmware = capabilities.ota === true;
   el('firmware').hidden = !firmware;
   el('firmware-fields').disabled = !ready || blocked || !firmware;
@@ -172,14 +196,14 @@ function checkedFile(file, maximum) {
 }
 function uploadForm(kind) {
   const form = new FormData();
-  let wifi = false, playlist = false;
+  let playlist = false;
   const maximum = uploadLimit('upload_max_bytes', 98304);
   if (kind === 'playlist') {
     form.append('plfile', checkedFile(el('playlist-file').files[0], maximum));
     playlist = true;
   } else if (kind === 'assets') {
     const files = [...el('asset-files').files];
-    const csv = el('asset-playlist').files[0], credentials = el('asset-wifi').files[0];
+    const csv = el('asset-playlist').files[0];
     if (files.length + (csv ? 1 : 0) > uploadLimit('upload_max_files', 16))
       throw new Error('Выбрано слишком много файлов');
     if (new Set(files.map(file => file.name)).size !== files.length)
@@ -196,19 +220,9 @@ function uploadForm(kind) {
       if (capabilities.playlist_upload !== true) throw new Error('Загрузка плейлиста недоступна');
       form.append('data', checkedFile(csv, maximum), 'playlist.csv'); playlist = true;
     }
-    if (credentials) {
-      if (capabilities.wifi_upload !== true) throw new Error('Сохранение Wi-Fi недоступно');
-      form.append('data', checkedFile(credentials, uploadLimit('wifi_file_max_bytes', 799)), 'wifi.csv'); wifi = true;
-    }
-    if (!files.length && !csv && !credentials) throw new Error('Выберите файлы для сохранения');
-  } else {
-    const ssid = el('wifi-ssid').value, password = el('wifi-password').value;
-    if (!ssid || byteLength(ssid) > uploadLimit('wifi_ssid_max_bytes', 31) ||
-        byteLength(password) > uploadLimit('wifi_password_max_bytes', 63) || /[\t\r\n\0]/.test(ssid + password))
-      throw new Error('Проверьте имя сети и пароль: превышен размер или есть недопустимые символы');
-    form.append('ssid', ssid); form.append('pass', password); wifi = true;
+    if (!files.length && !csv) throw new Error('Выберите файлы для сохранения');
   }
-  return {form, wifi, playlist};
+  return {form, playlist};
 }
 async function sendUpload(kind, path, capability) {
   if (uploadBusy || awaitingRestart) { message('Дождитесь завершения текущей загрузки и перезапуска'); return; }
@@ -220,28 +234,108 @@ async function sendUpload(kind, path, capability) {
     // Let the browser create the multipart boundary and Content-Type. Check
     // the exact encoded body, including headers, before sending it to CYD.
     const request = new Request(new URL(path, location.href), {method:'POST', body:upload.form, cache:'no-store'});
-    const maximum = kind === 'wifi' ? uploadLimit('wifi_body_max_bytes', 4096) : uploadLimit('upload_max_bytes', 98304);
+    const maximum = uploadLimit('upload_max_bytes', 98304);
     if ((await request.clone().arrayBuffer()).byteLength > maximum)
       throw new Error('Размер запроса с оформлением формы превышает ' + maximum + ' байт');
     message('Загрузка файлов…');
     const response = await fetch(request);
     if (!response.ok) throw new Error(await response.text() || 'Ошибка загрузки HTTP ' + response.status);
     saved = true;
-    if (upload.wifi) {
-      el('wifi-password').value = '';
-      message('Wi-Fi сохранён. Радио перезапустится; подключитесь к выбранной сети и откройте его страницу снова.');
-    } else {
-      if (upload.playlist) { renderRadio(await api('radio')); renderStatus(await api('status')); }
-      message('Файлы сохранены');
-    }
+    if (upload.playlist) { renderRadio(await api('radio')); renderStatus(await api('status')); }
+    message('Файлы сохранены');
   } catch (error) {
     message(saved ? 'Файлы сохранены. Не удалось обновить состояние: ' + error.message : error.message);
   } finally {
     uploadBusy = false; updateUploadControls();
   }
 }
-for (const [kind, path, capability] of [['playlist','/upload','playlist_upload'],['assets','/webboard','asset_upload'],['wifi','/','wifi_upload']])
+for (const [kind, path, capability] of [['playlist','/upload','playlist_upload'],['assets','/webboard','asset_upload']])
   el(kind + '-form').addEventListener('submit', event => { event.preventDefault(); sendUpload(kind, path, capability); });
+async function loadWifi() {
+  const metadata = await api('wifi');
+  if (!metadata || !/^[0-9a-f]{16}-[0-9a-f]{16}$/.test(metadata.revision) ||
+      !Array.isArray(metadata.profiles) || metadata.profiles.length > 5 ||
+      metadata.profiles.some(row => !/^r[1-5]$/.test(row.id) || typeof row.ssid !== 'string' || typeof row.ssid_utf8 !== 'boolean') ||
+      new Set(metadata.profiles.map(row => row.id)).size !== metadata.profiles.length)
+    throw new Error('Не удалось прочитать список Wi-Fi');
+  wifiMetadata = metadata;
+  el('wifi-ssid').value = metadata.profiles[0]?.ssid || '';
+  el('wifi-password').value = ''; el('wifi-open').checked = false;
+  el('wifi-summary').textContent = 'Сохранено сетей: ' + metadata.profiles.length +
+    '. Редактируется первая сеть; остальные сохраняются без изменений.';
+}
+function wifiEdit() {
+  if (!wifiMetadata) throw new Error('Сначала обновите список Wi-Fi');
+  const ssid = el('wifi-ssid').value, password = el('wifi-password').value;
+  const changed = !wifiMetadata.profiles.length || ssid !== wifiMetadata.profiles[0].ssid;
+  if ((changed && (!ssid || byteLength(ssid) > 31 || /[\t\r\n\0]/.test(ssid))) ||
+      byteLength(password) > 63 || /[\t\r\n\0]/.test(password))
+    throw new Error('Проверьте имя сети и пароль: превышен размер или есть недопустимые символы');
+  const profiles = wifiMetadata.profiles.map(row => ({id:row.id,password_action:'keep'}));
+  const first = profiles[0] || {ssid,password_action:'set'};
+  if (changed) first.ssid = ssid;
+  if (el('wifi-open').checked) {
+    if (password) throw new Error('Для открытой сети очистите поле пароля');
+    first.password_action = 'set'; first.password = '';
+  } else if (password) { first.password_action = 'set'; first.password = password; }
+  else if (!profiles.length) throw new Error('Для новой сети укажите пароль или выберите открытую сеть');
+  if (!profiles.length) profiles.push(first);
+  return {revision:wifiMetadata.revision,profiles};
+}
+async function saveWifi() {
+  if (uploadBusy || awaitingRestart) { message('Дождитесь завершения текущей загрузки и перезапуска'); return; }
+  if (!ready || !wifiSupported()) { message('Настройка Wi-Fi недоступна'); return; }
+  let body;
+  try { body = JSON.stringify(wifiEdit()); } catch (error) { message(error.message); return; }
+  uploadBusy = true; updateUploadControls(); message('Сохранение Wi-Fi…');
+  try {
+    const response = await fetch('/api/native/wifi', {method:'POST',headers:{'Content-Type':'application/json'},body,cache:'no-store'});
+    if (!response.ok) throw new Error(await response.text() || 'Wi-Fi не сохранён');
+    const result = await response.json();
+    if (result.saved !== true || result.rebooting !== true) throw new Error('Проверьте результат сохранения Wi-Fi перед повторной попыткой');
+    el('wifi-password').value = ''; awaitingRestart = true;
+    message('Wi-Fi сохранён. Радио перезапускается; откройте его страницу снова.');
+  } catch (error) { message(error.message); }
+  finally { uploadBusy = false; updateFirmwareControls(); }
+}
+el('wifi-form').addEventListener('submit', event => { event.preventDefault(); saveWifi(); });
+el('wifi-open').addEventListener('change', () => { if (el('wifi-open').checked) el('wifi-password').value = ''; });
+el('wifi-refresh').addEventListener('click', () => action(async () => {
+  if (uploadBusy || !wifiSupported()) return;
+  uploadBusy = true; updateUploadControls();
+  try { await loadWifi(); message('Список Wi-Fi обновлён'); }
+  finally { uploadBusy = false; updateUploadControls(); }
+}));
+function renderTime(state, force = false) {
+  timeAvailable = state.available === true;
+  el('time-clock').textContent = state.clock_valid && state.local_time ? state.local_time : 'Часы ещё не установлены';
+  const application = state.desired_revision === state.applied_revision ? 'Настройки применены' : 'Применение настроек ожидается';
+  el('time-status').textContent = [state.network_ready ? 'Wi-Fi подключён' : 'Нет соединения с Wi-Fi',
+    application, state.synchronized_this_boot ? 'Время синхронизировано в этом запуске' : 'Синхронизация ещё не подтверждена',
+    state.last_apply_error ? 'Ошибка применения: ' + state.last_apply_error : ''].filter(Boolean).join(' · ');
+  if (force || !timeDirty) {
+    el('time-offset').value = state.utc_offset_minutes;
+    el('time-interval').value = state.sync_interval_minutes;
+    el('time-server1').value = state.server1; el('time-server2').value = state.server2;
+    timeDirty = false;
+  }
+  updateUploadControls();
+}
+el('time-form').addEventListener('input', () => { timeDirty = true; });
+el('time-form').addEventListener('submit', event => {
+  event.preventDefault();
+  if (!ready || uploadBusy || timeBusy || awaitingRestart || !timeSupported() || !timeAvailable) return;
+  action(async () => {
+    timeBusy = true; ++timeRequestEpoch; updateUploadControls();
+    try {
+      const saved = await api('time', {utc_offset_minutes:el('time-offset').value,
+        sync_interval_minutes:el('time-interval').value,server1:el('time-server1').value,server2:el('time-server2').value}, 'POST');
+      if (saved.saved !== true) throw new Error('Сохранение времени не подтверждено');
+      timeDirty = false; message('Настройки времени сохранены. Применение и синхронизация выполняются отдельно.');
+      try { renderTime(await api('time'), true); } catch (error) { el('time-status').textContent = 'Настройки сохранены; состояние пока недоступно'; }
+    } finally { timeBusy = false; updateUploadControls(); }
+  });
+});
 function updateFirmwareControls() {
   for (const button of document.querySelectorAll('button'))
     button.disabled = !ready || firmwareBusy || awaitingRestart;
@@ -334,11 +428,26 @@ function connect() {
     retryDelay = Math.min(retryDelay * 2, 10000);
   };
 }
-setInterval(() => {
-  if (!ready || uploadBusy || awaitingRestart) return;
+setInterval(async () => {
+  if (!ready || uploadBusy || awaitingRestart || pollBusy) return;
   if (socket && socket.readyState === WebSocket.OPEN && Date.now() - lastSeen > 6000) socket.close();
-  if (!socket || socket.readyState !== WebSocket.OPEN)
-    action(async () => { renderStatus(await api('status')); renderRadio(await api('radio')); });
+  pollBusy = true;
+  try {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      renderStatus(await api('status'));
+      if (uploadBusy || awaitingRestart) return;
+      renderRadio(await api('radio'));
+    }
+    if (!uploadBusy && !awaitingRestart && timeSupported() && !timeBusy) {
+      const epoch = timeRequestEpoch;
+      try {
+        const state = await api('time');
+        if (epoch === timeRequestEpoch) renderTime(state);
+      }
+      catch (error) { el('time-status').textContent = 'Состояние времени недоступно'; }
+    }
+  } catch (error) { message(error.message); }
+  finally { pollBusy = false; }
 }, 3000);
 (async () => {
   try {
@@ -349,6 +458,12 @@ setInterval(() => {
     const radio = await api('radio');
     const settings = await api('settings');
     renderStatus(status); renderRadio(radio); renderSettings(settings);
+    if (wifiSupported()) {
+      try { await loadWifi(); } catch (error) { message(error.message); }
+    }
+    if (timeSupported()) {
+      try { renderTime(await api('time'), true); } catch (error) { el('time-status').textContent = 'Сервис времени недоступен'; }
+    }
     el('backend').textContent = 'Аудиовыход: ' + caps.audio_output;
     for (const button of document.querySelectorAll('button')) button.disabled = false;
     el('smartstart').disabled = !caps.smartstart;
