@@ -47,7 +47,15 @@ read-only SDK observations и UART. Исполняемый код, media banks �
 области вне NVS/raw settings должны остаться прежними. WPA handshake,
 физический RF/captive portal, desktop UI и весь H03 этим gate не закрываются.
 Это самостоятельный тест: он не добавляется задним числом в live frozen full.
-Текущий BC68/20B прошёл93browser и18storage/role checks,25inputs неизменны:
+Текущий F1/ELF91E2/D64 также прошёл93browser и18storage/role checks,
+26inputs неизменны. Три пары процессов ВМ завершены; сырые отчёты, UART,
+снимки браузера и точные исходники сохранены в
+[browser-wifi-f1-validation-20261018.json](../../qemu/parity/browser-wifi-f1-validation-20261018.json).
+В каждом preflight есть ровно две ожидаемые записи console об HTTP400 при
+отказе короткого пароля; других console errors и JavaScript exceptions нет.
+Это сетевой/browser/storage результат, не проверка изображения на LCD.
+
+Исторический BC68/20B прошёл93browser и18storage/role checks,25inputs неизменны:
 [browser-wifi-validation-20261018.json](../../qemu/parity/browser-wifi-validation-20261018.json).
 В отчёте сохранены также два неуспешных запуска при разработке наблюдателя;
 они не переименованы в успешные. Все шесть тестовых ВМ завершены.
@@ -68,7 +76,12 @@ QMP подтверждает raw backing; HTTP-байты совпадают с 
 flash intervals и slots1–3 остаются прежними. Для каждого процесса сохраняется
 отдельный UART с одним ROM boot; все inputs проверяются после выполнения.
 
-Результат текущих BC68/20B: [browser-photo-validation-20261018.json](../../qemu/parity/browser-photo-validation-20261018.json).
+Текущий F1/ELF91E2/D64 прошёл23browser и6storage/source checks,27inputs
+неизменны. Оба процесса ВМ завершены; сырые JPEG с синтетическими metadata,
+результаты Canvas, снимки desktop/mobile и UART сохранены в
+[browser-photo-f1-validation-20261018.json](../../qemu/parity/browser-photo-f1-validation-20261018.json).
+Исторический результат BC68/20B:
+[browser-photo-validation-20261018.json](../../qemu/parity/browser-photo-validation-20261018.json).
 Это отдельная browser/Canvas/storage проверка: физический touchscreen, RF,
 полные LCD frames и H10 требуют своей evidence. Уже идущий frozen full suite
 этот новый standalone gate задним числом не получает.

@@ -3069,3 +3069,25 @@ true. Это только начало нового прогона, не 24 ча
   RF/WPA/PWM, доступность Internet, all-theme LCD или24h/H10 acceptance.
   Production/firmware и входы live full/H10 не менялись; новые тесты не внесены
   задним числом в frozen run. Сценарии и ограничения описаны отдельными MD.
+
+## 2026-10-18 — повторные F1 browser photo и первоначальная настройка сети
+
+- На той же F1/ELF91E2/D64 завершены два самостоятельных browser gates.
+  Photo:23UI+6storage/source checks,27inputs неизменны; desktop/mobile crop,
+  resize240×240, удаление синтетических metadata через Canvas,12multipart chunks,
+  byte-exact HTTP/raw readback и новый cold process. Оба снимка кадрирования
+  просмотрены; console errors/JavaScript exceptions отсутствуют.
+- Wi-Fi:93UI+18role/storage checks,26inputs неизменны; discovered/literal-manual/
+  manual-entry сценарии, отказ короткого пароля без изменения raw/AP/boot,
+  настоящий DHCP/SNTP и cold persistence. В preflight каждой ветки сохранены
+  ровно две ожидаемые console errors об HTTP400; исключений и прочих ошибок нет.
+  Первоначальная слишком строгая archival-проверка ожидала пустой console и
+  остановилась; после проверки фактических отрицательных сценариев правило
+  исправлено на точное сопоставление этих двух записей. Гостевые тесты не менялись.
+- Все восемь точных VM identities отсутствуют: один PID занят другим процессом,
+  который не останавливался. OS cleanup proof,22photo и45Wi-Fi gzip artifacts
+  сохранены отдельно; hashes оригинальных/распакованных/архивных bytes проверены.
+  Full flash images в публикацию не включены, прежние BC68 proofs не заменены.
+- Результаты проверяют browser/network/storage и не подтверждают LCD pixels,
+  физический RF/WPA/PWM, полный набор или24h/H10. Production/source archive и
+  все frozen full/H10 inputs остались прежними; новых клиентов к H10 нет.

@@ -7,6 +7,14 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Независимость проверок подсистем — 2026-10-18
 
+Отдельные F1/D64 browser gates повторены без изменения production/firmware:
+photo23UI+6storage/source,27inputs; Wi-Fi93UI+18role/storage,26inputs.
+Все inputs повторно совпали при публикации. Все восемь ВМ завершены;
+один PID уже переиспользован другим процессом и не трогался.
+Новые browser-*-f1-validation-20261018.json сохраняют собственный scope:
+загрузка/Canvas/raw persistence отдельно от Wi-Fi/DHCP/SNTP и от LCD pixels.
+Ожидаемый HTTP400/console при коротком пароле сохранён, не скрыт.
+
 В той же test-only ветке отдельно завершены cold LCD matrix и network-without-LCD.
 Cold matrix:20factory+20F1 процессов, все172800RGB bytes совпали с фактическим
 factory setup frameACC588AB; boot и source-integrity также прошли, network not_run.
