@@ -6,6 +6,7 @@
 #include <string.h>
 #include "native_state.h"
 #include "audio_completion.h"
+#include "audio_pipeline_probe.h"
 
 typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC } native_codec_t;
 typedef struct { uint32_t sample_rate; uint8_t bits_per_sample, channel; } esp_audio_simple_dec_info_t;

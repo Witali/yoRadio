@@ -3,10 +3,13 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 MAIN = ROOT / 'idf/esp32c3-oled-native/main'
+sys.path.insert(0, str(ROOT/'tools/codec_benchmark'))
+from run_output_dma_host import host, run
 
 
 def function(source, name):
@@ -33,6 +36,7 @@ static inline void *xSemaphoreCreateMutex(void) { return (void *)1; }
 static inline int xSemaphoreTake(void *p, unsigned t) { (void)t; return !!p; }
 static inline void xSemaphoreGive(void *p) { (void)p; }
 size_t strlcpy(char *, const char *, size_t);
+typedef int BaseType_t;
 ''')
     (tmp/'freertos/semphr.h').write_text('#include "FreeRTOS.h"\n')
     (tmp/'sdkconfig.h').write_text('')
@@ -43,10 +47,11 @@ size_t strlcpy(char *, const char *, size_t);
     generated = source[first:last]
     generated += '\n'.join(function(source, name) for name in (
         'state_set_audio', 'send_encoded', 'send_pcm', 'send_pcm_end',
-        'return_decoded_packet', 'finish_pcm_stream'))
+        'return_decoded_packet', 'finish_pcm_stream', 'finish_stream_audio'))
     # Include the actual producer termination and output marker branch, so a
     # regression that moves completion back to the network task is exercised.
-    first = source.index('        format_unknown = format_unknown || codec == NATIVE_CODEC_AUTO;')
+    first = source.index('        uint8_t end_reason = stream_unavailable ?',
+                         source.index('static void stream_task('))
     last = source.index('\n    }\n}', first)
     generated += '''
 static void finish_network(uint32_t generation, bool stream_read_failed) {
@@ -54,6 +59,7 @@ static void finish_network(uint32_t generation, bool stream_read_failed) {
     bool stream_stalled = false;
     bool stream_unavailable = false;
     bool format_unknown = false;
+    bool first_chunk = false;
     native_codec_t codec = NATIVE_CODEC_AAC;
     void *client = NULL;
 ''' + source[first:last] + '\n}\n'
@@ -73,9 +79,14 @@ static void check_segment_prefill(native_codec_t codec, encoded_packet_t *packet
 ''' + source[start:end] + '\n    } while (false);\n}\n'
     (tmp/'production.inc').write_text(generated)
     executable = tmp/'eof'
-    subprocess.run([os.environ.get('CC','cc'), '-std=c11', '-O2', '-Wall',
+    try:
+        compile_log = run([os.environ.get('CC','cc'), '-std=c11', '-O2', '-Wall',
                     '-Wextra', '-Werror', '-fsanitize=address,undefined',
-                    '-fno-pie', '-no-pie', '-I'+str(tmp), '-I'+str(MAIN),
-                    str(ROOT/'tests/native/esp32c3_eof_test.c'),
-                    str(MAIN/'native_state.c'), '-o', str(executable)], check=True)
-    subprocess.run([str(executable)], check=True)
+                    '-fno-pie', '-no-pie', '-I'+host(tmp), '-I'+host(MAIN),
+                    host(ROOT/'tests/native/esp32c3_eof_test.c'),
+                    host(MAIN/'native_state.c'), '-o', host(executable)])
+    except subprocess.CalledProcessError as error:
+        print(error.output.decode(errors='replace'), file=sys.stderr)
+        raise
+    print(compile_log.decode(), end='')
+    print(run([host(executable)]).decode(), end='')

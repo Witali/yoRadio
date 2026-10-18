@@ -148,4 +148,7 @@ allocation и численные настройки C3 являются канд
   его `corpus: 0` не означает повторную приёмку всего media corpus.
 - `run-esp32c3-eof.py` выявил устаревшее извлечение source-фрагмента
   (`substring not found`); это неисправность harness до компиляции,
-  а не наблюдённый сбой EOF firmware. Исправить перед использованием в CYD-C3-01.
+  а не наблюдённый сбой EOF firmware. Harness обновлён на реальный
+  `finish_stream_audio`, добавлены текущие RTOS/probe stubs и запуск WSL на
+  Windows. ASan/UBSan: PASS для delayed HE-AAC PCM, ordered EOF, error,
+  empty stream, stale completion, cancellation и codec drain.
