@@ -1345,12 +1345,15 @@ esp_err_t audio_service_maintenance_begin(uint32_t timeout_ms,
     atomic_store(&s_maintenance_acks, 0);
     atomic_store(&s_maintenance_error, ESP_OK);
     atomic_store(&s_maintenance_waiter, true);
-    native_audio_output_request_pause(true);
     atomic_store(&s_generation, generation + 1U);
     portENTER_CRITICAL(&s_maintenance_token_lock);
     uint64_t epoch = ++s_maintenance_epoch;
     atomic_store(&s_maintenance_phase, MAINTENANCE_REQUESTED);
     portEXIT_CRITICAL(&s_maintenance_token_lock);
+    // Cancellation can make an in-flight write fail immediately on core 1.
+    // Publish maintenance first so that failure is not reported as an output
+    // fault. The generation already invalidates old producer/decoder work.
+    native_audio_output_request_pause(true);
     maintenance_state_locked(generation + 1U, false);
     xSemaphoreGive(s_state->lock);
     play_command_t command = {.generation = generation + 1U, .maintenance = true};

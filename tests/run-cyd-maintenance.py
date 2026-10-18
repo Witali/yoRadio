@@ -49,7 +49,7 @@ def main():
     (out/'state.inc').write_text(stripped(main/'native_state.c'))
     defines=['-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1','-DCONFIG_YORADIO_FRAME_ROUTER=1',
              '-DCONFIG_YORADIO_STREAM_CONFIRM=1','-DCONFIG_YORADIO_INPUT_TAIL_COALESCE=1','-DCONFIG_YORADIO_INPUT_PREFILL_MS=250']
-    cases=['idle','resume','stop_cancels','end_no_resume','end_busy','state_lock','control_lock',
+    cases=['idle','pause_publish','resume','stop_cancels','end_no_resume','end_busy','state_lock','control_lock',
            'queue_failure','wide_epoch','timeout_read','timeout_open','timeout_headers','timeout_close','timeout_cleanup',
            'late_encoded','late_pcm','output_write','output_disable','control_reading','staging',
            'back_to_back','pause_failure','resume_queue_failure','empty_receive_epoch','stopped_no_resume','pending_resume']
@@ -73,6 +73,7 @@ def main():
             results[case]=log.decode().strip()
         report['variants'][backend]=results;print(backend+': '+str(len(results))+' PASS',flush=True)
     mutations={
+        'early_pause_publication':('atomic_store(&s_maintenance_waiter, true);','atomic_store(&s_maintenance_waiter, true); native_audio_output_request_pause(true);','pause_publish','maintenance_active()'),
         'decoder_early_ack':('maintenance_active() && maintenance_acked(MAINTENANCE_STREAM)','maintenance_active()','late_encoded','!maintenance_acked(MAINTENANCE_DECODER)'),
         'decoder_stale_epoch':('generation == atomic_load(&s_generation)) {\n                maintenance_ack(MAINTENANCE_DECODER);','true) {\n                maintenance_ack(MAINTENANCE_DECODER);','empty_receive_epoch','!begin_done && !maintenance_acked(MAINTENANCE_DECODER)'),
         'output_early_ack':('if (maintenance_acked(MAINTENANCE_DECODER) &&','if (true &&','late_pcm','!maintenance_acked(MAINTENANCE_OUTPUT)'),

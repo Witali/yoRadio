@@ -90,7 +90,19 @@ static BaseType_t tested_commit(adaptive_input_t *q,void *p,size_t n) {if(role==
 static void *tested_receive(adaptive_input_t *q,size_t *n,TickType_t t) {void *p=adaptive_input_receive(q,n,t);if(role==ROLE_DECODER&&!p)barrier_hit("decoder_empty");return p;}
 #define adaptive_input_commit_size tested_commit
 #define adaptive_input_receive tested_receive
+static bool maintenance_active(void);
+static void observe_pause_publication(bool requested) {
+    native_audio_output_request_pause(requested);
+    if (requested) {
+        // A canceled write must be recognized by the actual output owner as
+        // maintenance, rather than becoming a health/output failure.
+        assert(maintenance_active());
+        barrier_hit("pause_publish");
+    }
+}
+#define native_audio_output_request_pause observe_pause_publication
 #include "audio.inc"
+#undef native_audio_output_request_pause
 #undef adaptive_input_commit_size
 #undef adaptive_input_receive
 #include "state.inc"
@@ -140,6 +152,12 @@ int main(int argc,char **argv) {
     if(!strcmp(scenario,"wide_epoch"))s_maintenance_epoch=UINT32_MAX;
     native_state_init(&state);assert(audio_service_start(&state)==ESP_OK);
     if(!strcmp(scenario,"idle")){begin_ok();end_ok(false);}
+    else if(!strcmp(scenario,"pause_publish")) {
+        start_play(NATIVE_CODEC_FLAC);await_driver();arm("pause_publish");
+        unsigned faults=health_faults;begin_async(1500);await_barrier();
+        vTaskDelay(35);assert(!begin_done && health_faults==faults);
+        release_barrier();join_begin(ESP_OK);assert(health_faults==faults);
+    }
     else if(!strcmp(scenario,"empty_receive_epoch")) {
         start_play(NATIVE_CODEC_FLAC);await_driver();no_body=true;arm("decoder_empty");await_barrier();
         assert(decoder_handles==1);hold_codec_close=true;codec_close_entered=false;
