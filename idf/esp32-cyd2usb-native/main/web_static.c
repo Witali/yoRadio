@@ -62,14 +62,14 @@ static esp_err_t serve_static(httpd_req_t *request) {
         return httpd_resp_sendstr(request, web_native_page());
     }
     // Only the public playlist is downloadable from the data directory.
-    if (!strncmp(uri, "/data/", 6) && strcmp(uri, "/data/playlist.csv"))
+    if (!strncmp(uri, "/data/", 6) && strcmp(uri, "/data/playlist.csv") != 0)
         return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "File not found");
     char path[224];
     bool gzip = false;
     if (!strncmp(uri, "/data/", 6)) snprintf(path, sizeof(path), "/spiffs%s", uri);
     else snprintf(path, sizeof(path), "/spiffs/www%s", uri);
     FILE *file = open_nonempty(path);
-    if (!file && strncmp(uri, "/data/", 6)) {
+    if (!file && strncmp(uri, "/data/", 6) != 0) {
         size_t used = strlen(path);
         memcpy(path + used, ".gz", 4);
         file = open_nonempty(path);
@@ -111,7 +111,7 @@ static void static_worker(void *argument) {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     while (true) {
         httpd_req_t *request;
-        if (xQueueReceive(s_requests, &request, portMAX_DELAY) != pdTRUE) continue;
+        if (xQueueReceive(s_requests, (void *)&request, portMAX_DELAY) != pdTRUE) continue;
         serve_static(request);
         complete_static(request);
     }
@@ -159,7 +159,7 @@ esp_err_t web_static_handler(httpd_req_t *request) {
         httpd_resp_set_status(request, "503 Service Unavailable");
         return httpd_resp_sendstr(request, "Static worker unavailable");
     }
-    if (xQueueSend(s_requests, &async_request, 0) != pdTRUE) {
+    if (xQueueSend(s_requests, (const void *)&async_request, 0) != pdTRUE) {
         httpd_resp_set_status(async_request, "503 Service Unavailable");
         httpd_resp_sendstr(async_request, "Static queue full");
         complete_static(async_request);

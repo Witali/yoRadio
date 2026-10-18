@@ -45,11 +45,13 @@ static int xTaskCreate(void (*entry)(void *), const char *name, unsigned stack,
     *handle=(void *)(uintptr_t)(++tasks+1);return pdPASS;
 }
 static void vTaskDelete(void *task) { assert(task); deleted_tasks++; }
-static int xQueueSend(void *queue, httpd_req_t **req, unsigned wait) {
+static int xQueueSend(void *queue, const void *data, unsigned wait) {
+    httpd_req_t *const *req=data;
     assert(queue && !wait);if (queued==2) return 0;
     pending[queued++]=*req;return pdTRUE;
 }
-static int xQueueReceive(void *queue, httpd_req_t **req, unsigned wait) {
+static int xQueueReceive(void *queue, void *data, unsigned wait) {
+    httpd_req_t **req=data;
     assert(queue && wait==portMAX_DELAY);
     if (!queued) longjmp(worker_exit, 1);
     *req=pending[0];pending[0]=pending[1];queued--;return pdTRUE;

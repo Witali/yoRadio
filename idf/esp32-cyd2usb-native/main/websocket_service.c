@@ -209,7 +209,7 @@ static bool capture_status(ws_status_key_t *key) {
         if (!radio_control_snapshot(&after)) return false;
         native_state_snapshot(s_state, &latest);
         if (!same_radio(&before, &after) || state.audio_generation != latest.audio_generation ||
-            strcmp(state.station, latest.station)) continue;
+            strcmp(state.station, latest.station) != 0) continue;
         memset(key, 0, sizeof(*key));
         key->generation = state.audio_generation;
         key->bitrate = state.bitrate_kbps;
@@ -283,7 +283,7 @@ static bool format_status(const ws_status_key_t *key) {
 
 static bool prepare_status(void) {
     if (!capture_status(&s_current)) return false;
-    if (!s_have_previous || memcmp(&s_current, &s_previous, sizeof(s_current))) {
+    if (!s_have_previous || memcmp(&s_current, &s_previous, sizeof(s_current)) != 0) {
         if (!format_status(&s_current)) return false;
         ++s_status_revision;
         s_previous = s_current;
