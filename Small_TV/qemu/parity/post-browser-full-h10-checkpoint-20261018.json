@@ -1,0 +1,111 @@
+{
+  "status": "full_regressions_and_corrected_firmware_h10_running",
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T16:53:28.597311+00:00",
+  "full_inputs": [
+    {
+      "frozen_record": "jpeg-header-complete-full-start-20261018.json",
+      "input_count": 566,
+      "all_unchanged": true,
+      "app_sha256": "f1ada8b4da4338df3248ffb26a39a79e36bf5cf0e365eb2972b75c8721f7ea7b"
+    },
+    {
+      "frozen_record": "reset-display-complete-full-start-20261018.json",
+      "input_count": 561,
+      "all_unchanged": true,
+      "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec"
+    }
+  ],
+  "h10_inputs": {
+    "runtime_inputs_sha256": 32,
+    "qemu_snapshot_sha256": 47,
+    "supervisor_sources_sha256": 8
+  },
+  "h10_complete_cycles_reported": 39,
+  "h10_accepted": false,
+  "os": {
+    "captured_utc": "2026-10-18T16:53:26.2159612Z",
+    "processes": [
+      {
+        "pid": 30244,
+        "created_utc": "2026-10-18T16:04:24.3281330Z",
+        "name": "pwsh.exe",
+        "command_line": "\"C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" -NoProfile -NonInteractive -File \"C:\\Work\\yoRadio\\.worktree\\small-tv-reset-display\\.build\\run_reset_display_complete_full.ps1\""
+      },
+      {
+        "pid": 17200,
+        "created_utc": "2026-10-18T16:34:14.2973860Z",
+        "name": "pwsh.exe",
+        "command_line": "\"C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" -NoProfile -NonInteractive -File \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\run_jpeg_header_complete_full.ps1\""
+      },
+      {
+        "pid": 23208,
+        "created_utc": "2026-10-18T16:37:04.1096700Z",
+        "name": "pwsh.exe",
+        "command_line": "\"C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" \"-NoProfile\" \"-NonInteractive\" \"-File\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\Small_TV\\src\\tools\\runtime_supervisor.ps1\" \"-YoradioRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\" \"-QemuRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018\" \"-DependencyRoot\" \"C:\\Work\\yoRadio\" \"-OutputDirectory\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\" \"-DurationSeconds\" \"86400\" \"-IntervalSeconds\" \"15\" \"-OutageEvery\" \"60\""
+      },
+      {
+        "pid": 6908,
+        "created_utc": "2026-10-18T16:37:04.8768140Z",
+        "name": "python.exe",
+        "command_line": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" -X utf8 -B C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\Small_TV\\src\\tests\\runtime_qemu.py --yoradio C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers --dependency-root C:\\Work\\yoRadio --qemu-root C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018 --output C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018 --interval-seconds 15 --outage-every 60 --outage-seconds 1 --duration-seconds 86400"
+      },
+      {
+        "pid": 26708,
+        "created_utc": "2026-10-18T16:37:10.2562310Z",
+        "name": "qemu-system-riscv32.exe",
+        "command_line": "C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018\\bin\\qemu-system-riscv32.exe -M esp32c2,default-peripherals=off -name SmallTV-c3536427c9be -L C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\\vm -drive file=C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\\vm\\flash.bin,if=mtd,format=raw -display none -serial file:C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\\vm\\uart.log -monitor none -icount shift=3,align=off,sleep=on -qmp tcp:127.0.0.1:60927,server=on,wait=off -device {\\\"driver\\\":\\\"esp-spi-module\\\",\\\"id\\\":\\\"lcd\\\",\\\"bus\\\":\\\"/spi2/spi\\\",\\\"gpio\\\":\\\"/machine/gpio\\\",\\\"spi-host\\\":2,\\\"cs\\\":0,\\\"model\\\":\\\"st7789\\\",\\\"sck\\\":4,\\\"mosi\\\":6,\\\"miso\\\":-1,\\\"cs-gpio\\\":-1,\\\"dc-gpio\\\":5,\\\"reset-gpio\\\":1,\\\"backlight-gpio\\\":18,\\\"backlight-active-low\\\":true,\\\"properties\\\":\\\"{\\\\\\\"visible-width\\\\\\\":240,\\\\\\\"controls\\\\\\\":false,\\\\\\\"panel-inverted\\\\\\\":true}\\\"} -global esp32c3-wifi.clock-services=on -global esp32c3-wifi.ntp-hosts=ntp1.aliyun.com;cn.pool.ntp.org;pool.ntp.org -global esp32c3-wifi.station-ssid=yoRadio-QEMU -nic user,model=esp32c3-wifi,restrict=on,hostfwd=tcp:127.0.0.1:18082-10.0.2.15:80,guestfwd=tcp:10.0.2.100:80-tcp:127.0.0.1:60925 -global esp32c3-wifi.service-hosts=api.openweathermap.org -snapshot -gdb tcp:127.0.0.1:60926 -S"
+      },
+      {
+        "pid": 15664,
+        "created_utc": "2026-10-18T16:37:39.9558250Z",
+        "name": "python.exe",
+        "command_line": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" -X utf8 -B C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\Small_TV\\src\\tools\\runtime_run_guard.py --run C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018 --qemu-tools C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018\\tools"
+      }
+    ],
+    "new_qmp_rsp_clients": 0,
+    "all_functionality_verified": false
+  },
+  "evidence": [
+    {
+      "file": "post-browser-full-h10-checkpoint-20261018-raw/h10-report.json.gz",
+      "sha256": "625400c9e82c996cc06bd3572cb73b1d92d811e8c1bfb6547016732289a1915f",
+      "original_sha256": "a3770a2bad70c39bf14acc8430d2eccfaf4880ebb5658dc66ddd90d325cdd758"
+    },
+    {
+      "file": "post-browser-full-h10-checkpoint-20261018-raw/h10-events.jsonl.gz",
+      "sha256": "00e217400db4b33e8227d29cf9e2a2912c298c9b5aefb1e3e7de5457fa726a0f",
+      "original_sha256": "154d616b0c5e7da3a30d684159e11b4a3f67e9e717378840909d5bcf127f174d"
+    },
+    {
+      "file": "post-browser-full-h10-checkpoint-20261018-raw/h10-guard.json.gz",
+      "sha256": "af0072712331ba4ce2d6e85ba631b69da98c118a371367c8a111968ddcb64bc5",
+      "original_sha256": "26af7cd7ba3d349b04f4895eb7863529c3c19edd3bade4494059d06bd5c0a107"
+    },
+    {
+      "file": "post-browser-full-h10-checkpoint-20261018-raw/h10-uart.log.gz",
+      "sha256": "c6332152ba1a732df55a25cd28e9cc9bc9bd23ed7cded583fcb15f91d2b3c470",
+      "original_sha256": "0ab54dab6ed2f60f29ee1e788e99f8363bd5be0937523ef615bc03e62bc4c2ca"
+    },
+    {
+      "file": "post-browser-full-h10-checkpoint-20261018-raw/h10-supervisor.json.gz",
+      "sha256": "e4f230e0490255f4e1a8e93035060d1d52d2105e02e1714ee00c84ac048ca88b",
+      "original_sha256": "c00c10d160e7ac71ee1ab75554035df2226f13430c9e22ebbb3296c750c9fc69"
+    },
+    {
+      "file": "post-browser-full-h10-checkpoint-20261018-raw/os-processes.json.gz",
+      "sha256": "b016e8847eb067ff54bae0d7728fb76901c2fc27e73401c7f86b56dc27427062",
+      "original_sha256": "23cbf2799967a8cbbc15b39a9f9d8f68caa61094459e9cea21541a8cb2ddd052"
+    }
+  ],
+  "browser": {
+    "branch": "codex/small-tv-browser-controls-verify",
+    "commit": "b5e844c930f5ac6b6aeae1569e9552030861ff65",
+    "proof_file": "Small_TV/qemu/parity/browser-controls-validation-20261018.json",
+    "proof_sha256": "da894a0ccd4865e3421918aff40ebb896bde95914e97f352c9550ffcd9938926",
+    "ui_checks": 281,
+    "storage_source_checks": 5,
+    "app_sha256": "f1ada8b4da4338df3248ffb26a39a79e36bf5cf0e365eb2972b75c8721f7ea7b"
+  },
+  "scope": "Six exact OS process identities are live. Both full registries and all current H10 registries are unchanged after standalone browser tests. Raw live files were captured sequentially; they are a prefix, not an atomic terminal snapshot, 24-hour success or physical acceptance."
+}

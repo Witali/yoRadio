@@ -81,3 +81,25 @@ DateTime при JSON parsing. Failure сохранён; DateKind String и read-
 hash, image/ELF/QEMU, duration и guard взяты из committed freeze до старта;
 оригинал сохранён побайтно. Анализ нового префикса pending/start identities
 прошёл, без изменения условий H10. Следующий анализ писать в новый файл.
+
+## Desktop/mobile controls и проверка после работы в другой ветке
+
+В отдельной `codex/small-tv-browser-controls-verify` добавлены только тесты и
+документация, production F1/D64 не менялась. Коммиты346d97fc/b5e844c9 сохранены
+и отправлены:281UI checks (236mutate/45cold),96UI POST и5storage/source checks;
+Chrome155.0.8059.80,1280×900/390×844, все4темы/5GIF/3формата даты, флаги,
+цвета/яркость, ночной редактор и настройки фото. После reload DOM совпадает
+с GET API, новый cold process выполняет только чтение; raw ABI совпадает со
+всеми ожидаемыми значениями. Независимая свежая подготовка flash подтвердила
+байтовую неизменность областей внеNVS/raw, включая фото. Все25inputs совпали,
+по1ROM boot на процесс, console/page errors отсутствуют, обеVM PID закрыты.
+Proof `browser-controls-validation-20261018.json` +12gzip+12PNG в той ветке.
+Снимки desktop/mobile просмотрены. Это отдельная частьH03/H04, не LCD/RF/H10.
+
+После этого повторно проверены все566F1 и5610592 full inputs и32+47+8новых
+H10 registries: совпадают. Все6точных OS identities live; новый H10 сообщил39
+циклов, это только prefix. См. `post-browser-full-h10-checkpoint-20261018.json`
+и6raw gzip. Не добавлять новые браузерные тесты задним числом в frozen full
+и не объединять их src в эту ветку до terminal full/H10. Старый0592 journal
+окончательно сохранён:182complete cycles,16pending events, periodic report181;
+исходные running reports не превращались в terminal pass. H10 F1 продолжается.
