@@ -79,6 +79,8 @@ test('codec switching releases only an incompatible legacy arena', () => {
   const audio = read('idf', 'esp32c3-oled-native', 'main', 'audio_service.c');
   const adapter = read('idf', 'components', 'custom_legacy_codecs',
                        'custom_legacy_adapter.cpp');
+  const probe = read('idf', 'components', 'native_stream', 'include',
+                     'stream_probe.h');
 
   const destroyStart = adapter.indexOf(
     'extern "C" void custom_legacy_decoder_destroy(');
@@ -106,7 +108,18 @@ test('codec switching releases only an incompatible legacy arena', () => {
     release.indexOf('custom_legacy_decoder_discard_arena()') <
       release.indexOf('atomic_store(&s_decoder_released_generation'),
   );
-  assert.match(audio, /codec_from_signature[\s\S]*"fLaC"[\s\S]*"OggS"[\s\S]*"ID3"/);
+  assert.match(read('idf', 'esp32c3-oled-native', 'main', 'stream_probe.h'),
+               /components\/native_stream\/include\/stream_probe\.h/);
+  assert.match(audio, /#include "stream_probe\.h"/);
+  assert.match(audio, /switch \(stream_probe_feed\(probe, data, size, &consumed\)\)/);
+  for (const codec of ['MP3', 'AAC', 'FLAC', 'OGG']) {
+    assert.match(audio,
+      new RegExp(`case STREAM_PROBE_${codec}: \\*codec = NATIVE_CODEC_${codec}; break;`));
+    assert.match(probe, new RegExp(`return STREAM_PROBE_${codec}`));
+  }
+  assert.doesNotMatch(audio, /static\s+native_codec_t\s+codec_from_signature/);
+  // Header validation, split ID3/FLAC/Ogg/ADTS/MP3 detection and exact replay
+  // execute against this shared detector in run-esp32c3-stream-probe.py.
   assert.match(audio, /atomic_store\(&s_decoder_target_codec[\s\S]*atomic_store\(&s_generation/);
 
   const customStart = audio.indexOf('custom_legacy_decoder_create(');

@@ -13,6 +13,15 @@ const read = (...parts) => {
   return fs.readFileSync(shared ? path.join(root, "idf/components/native_storage/include", shared) :
     path.join(nativeRoot, ...parts), "utf8");
 };
+const shared = (component, ...parts) => fs.readFileSync(
+  path.join(root, "idf", "components", component, ...parts), "utf8",
+);
+const section = (source, first, next) => {
+  const start = source.indexOf(first);
+  const end = source.indexOf(next, start + first.length);
+  assert.ok(start >= 0 && end > start, `source section ${first} .. ${next}`);
+  return source.slice(start, end);
+};
 
 test("repository default setup and build select native ESP-IDF firmware", () => {
   const setup = fs.readFileSync(path.join(root, "setup.ps1"), "utf8");
@@ -252,33 +261,22 @@ test("stopped-radio screensaver draws a full-screen clock and wakes on BOOT", ()
   assert.match(options, /<option value="1">blank<\/option>/);
 });
 
-test("native SNTP owns server names and retries at low priority after reconnect", () => {
+test("native SNTP delegates name lifetime and applies checked settings after IP", () => {
   const board = read("main", "board_config.h");
   const timeService = read("main", "time_service.c");
   const timeHeader = read("main", "time_service.h");
   const network = read("main", "network_service.c");
 
-  assert.match(
-    timeService,
-    /static char s_sntp_server1\[SNTP_SERVER_NAME_CAPACITY\]/,
-  );
-  assert.match(
-    timeService,
-    /static char s_sntp_server2\[SNTP_SERVER_NAME_CAPACITY\]/,
-  );
-  assert.doesNotMatch(timeService, /char server[12]\[35\]/);
-  assert.match(
-    timeService,
-    /esp_sntp_stop\(\);[\s\S]*runtime_settings_get_sntp1\(s_sntp_server1/,
-  );
-  assert.match(
-    timeService,
-    /esp_sntp_setservername\(0, s_sntp_server1\)/,
-  );
-  assert.match(
-    timeService,
-    /esp_sntp_setservername\(1, s_sntp_server2\)/,
-  );
+  const context = shared("native_time", "native_time_sntp_context.c");
+  assert.match(read("main", "CMakeLists.txt"), /\bnative_time\b/);
+  assert.match(timeService, /#include "native_time_sntp\.h"/);
+  assert.match(timeService, /runtime_settings_get_time_snapshot\(/);
+  assert.match(timeService, /native_time_sntp_apply\(&config\)/);
+  assert.match(timeService, /native_time_sntp_restart\(\)/);
+  assert.doesNotMatch(timeService, /esp_sntp_(?:stop|init|restart|setservername)\(/);
+  assert.match(context, /native_time_sntp_config_t s_banks\[2\]/);
+  assert.match(context, /bank_referenced\(bank\)/);
+  assert.match(context, /sntp_setserver\(\(uint8_t\)index, NULL\)/);
   assert.match(board, /BOARD_TASK_STACK_TIME_SYNC 2048/);
   assert.match(timeService, /TIME_SYNC_TASK_PRIORITY 1/);
   assert.match(
@@ -287,7 +285,7 @@ test("native SNTP owns server names and retries at low priority after reconnect"
   );
   assert.match(
     timeService,
-    /time_service_notify_network_ready\(void\)[\s\S]*xTaskNotify\(s_time_sync_task, TIME_SYNC_EVENT_NETWORK_READY, eSetBits\)/,
+    /time_service_notify_network_ready\(void\)[\s\S]*native_time_sntp_notify_network_ready\(\)[\s\S]*atomic_store\(&s_network_ready_seen, true\)[\s\S]*xTaskNotify\(task, TIME_SYNC_EVENT_NETWORK_READY, eSetBits\)/,
   );
   assert.doesNotMatch(
     timeService,
@@ -295,7 +293,7 @@ test("native SNTP owns server names and retries at low priority after reconnect"
   );
   assert.match(
     timeService,
-    /time_sync_notification\(struct timeval \*synced_time\)[\s\S]*xTaskNotify\(s_time_sync_task, TIME_SYNC_EVENT_COMPLETED, eSetBits\)/,
+    /time_sync_notification\(void \*context,[\s\S]*const struct timeval \*synced_time\)[\s\S]*xTaskNotify\(task, TIME_SYNC_EVENT_COMPLETED, eSetBits\)/,
   );
   assert.match(
     timeService,
@@ -306,6 +304,9 @@ test("native SNTP owns server names and retries at low priority after reconnect"
     network,
     /IP_EVENT_STA_GOT_IP[\s\S]*time_service_notify_network_ready\(\)/,
   );
+  // Actual bank/DNS lifetime: run-native-time.py;
+  // actual controller/worker and coherent settings: run-c3-time-service.py,
+  // run-c3-time-settings.py. These checks retain the target wiring contract.
 });
 
 test("native OLED brightness uses the shared 0..100 setting and persists it", () => {
@@ -552,6 +553,7 @@ test("native WebUI publishes ICY or decoder bitrate instead of a constant zero",
   const stateHeader = read("main", "native_state.h");
   const stateSource = read("main", "native_state.c");
   const websocket = read("main", "websocket_service.c");
+  const meter = shared("native_stream", "include", "stream_bitrate.h");
 
   assert.match(stateHeader, /uint32_t bitrate_kbps/);
   assert.match(stateHeader, /native_state_set_bitrate/);
@@ -561,18 +563,16 @@ test("native WebUI publishes ICY or decoder bitrate instead of a constant zero",
   assert.match(audio, /state_set_decoder_bitrate\(context->generation, info->bitrate\)/);
   assert.match(audio, /state_set_decoder_bitrate\(generation, latest_info\.bitrate\)/);
   assert.match(audio, /BITRATE_UPDATE_INTERVAL_US 1000000LL/);
-  assert.match(audio, /STREAM_BITRATE_INTERVAL_US 5000000LL/);
-  assert.match(
-    audio,
-    /meter->audio_bytes \* 8000000ULL[\s\S]*elapsed_us/,
-  );
+  assert.match(audio, /#include "stream_bitrate\.h"/);
+  assert.match(meter, /STREAM_BITRATE_WINDOW_US INT64_C\(5000000\)/);
+  assert.match(audio, /stream_bitrate_meter_add\([\s\S]*meter, audio_bytes, esp_timer_get_time\(\)/);
   assert.match(audio, /stream_bitrate_add\(command\.generation, &bitrate_meter/);
-  assert.match(audio, /atomic_store\(&s_measured_bitrate_ready, true\)/);
-  assert.match(audio, /Measured stream bitrate: %llu bit\/s/);
-  assert.match(
-    audio,
-    /state_set_decoder_bitrate[\s\S]*atomic_load\(&s_measured_bitrate_ready\)[\s\S]*return/,
-  );
+  for (const source of ["ICY", "DECODER", "MEASURED"]) {
+    assert.match(audio, new RegExp(`native_state_publish_bitrate\\([\\s\\S]*NATIVE_BITRATE_${source}`));
+  }
+  const publication = section(stateSource, "void native_state_publish_bitrate(", "static void format_rate(");
+  assert.match(publication, /xSemaphoreTake\(state->lock,[\s\S]*state->audio_generation == generation[\s\S]*source >= state->bitrate_source/);
+  assert.match(publication, /state->bitrate_kbps = bitrate_kbps;[\s\S]*state->bitrate_source = source;/);
   assert.match(
     audio,
     /frame\.decoded_size[\s\S]*esp_audio_simple_dec_get_info\(decoder, &latest_info\)[\s\S]*state_set_decoder_bitrate\(generation, latest_info\.bitrate\)/,
@@ -585,6 +585,8 @@ test("native WebUI publishes ICY or decoder bitrate instead of a constant zero",
   assert.match(websocket, /\\"bitrate\\",\\"value\\":%lu/);
   assert.match(websocket, /state\.bitrate_kbps/);
   assert.doesNotMatch(websocket, /\\"bitrate\\",\\"value\\":0/);
+  // Exact meter arithmetic is executed by run-stream-bitrate.py; stale-stream
+  // and ICY/decoder/measured priority interleavings by run-c3-bitrate.py.
 });
 
 test("native BOOT gestures match the documented one-button controls", () => {
@@ -698,10 +700,17 @@ test("native decoder reports measured real-time headroom", () => {
 test("native audio pipeline batches PCM using the current decoded layout", () => {
   const audio = read("main", "audio_service.c");
   const output = read("main", "native_audio_output.c");
+  const component = read("main", "CMakeLists.txt");
 
   assert.match(audio, /runtime_settings_get_audio_buffer_blocks\(\) \* 1600U/);
   assert.match(audio,
                /xRingbufferCreate\(encoded_ring_size, RINGBUF_TYPE_NOSPLIT\)/);
+  assert.match(read("main", "Kconfig.projbuild"), /config YORADIO_ADAPTIVE_INPUT_BUFFER\b/);
+  assert.match(component,
+    /if\(CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER\)\s*target_sources\([^)]*"adaptive_input\.c"\)\s*endif\(\)/);
+  assert.match(read("main", "adaptive_input.c"), /components\/native_stream\/adaptive_input\.c/);
+  assert.match(audio, /adaptive_input_create\(encoded_ring_size,[\s\S]*sizeof\(encoded_packet_t\) \+ STREAM_CHUNK_SIZE\)/);
+  assert.match(audio, /tls_input_reserve_bind\(s_encoded\)/);
   assert.match(audio, /#define PCM_RING_SIZE \(8 \* 1024\)/);
   assert.match(audio, /#define PCM_PACKET_DATA_SIZE 3584/);
   assert.match(audio, /bool stream_info_ready = false/);
@@ -721,7 +730,9 @@ test("native audio pipeline batches PCM using the current decoded layout", () =>
     /native_audio_output_init\(void\)[\s\S]*pdm_begin\(\)/,
   );
   assert.match(output, /#define PDM_DMA_DESCRIPTORS 4U/);
-  assert.match(output, /if \(s_pdm\) return ESP_OK/);
+  const begin = section(output, "static esp_err_t pdm_begin(", "static int16_t interpolate_sample(");
+  assert.match(begin, /if \(s_pdm\)[\s\S]*if \(s_pdm_running\) return ESP_OK/);
+  assert.match(begin, /ESP_RETURN_ON_ERROR\(native_audio_output_pause\(\)/);
   assert.match(output, /native_audio_normalizer_process_block/);
   assert.match(output, /normalizer_config_cache_t/);
   assert.match(
@@ -733,6 +744,8 @@ test("native audio pipeline batches PCM using the current decoded layout", () =>
     /native_audio_output_write_pcm[\s\S]*sync_normalizer_configuration\(\)/,
   );
   assert.match(output, /PERF PCM:/);
+  // Queue ownership/capacity: run-adaptive-input.py. Full staged/direct output
+  // and checked pause/recreation: run-c3-output-pause.py and run-output-task-boundaries.py.
 });
 
 test("native FLAC reuses the optimized yoRadio decoder without Arduino Core", () => {
@@ -1029,6 +1042,8 @@ test("native WebUI publishes player changes promptly and uses buffer percent", (
     audio,
     /audio_service_buffer_fill_percent[\s\S]*used_size \* 100U/,
   );
+  assert.match(audio,
+    /audio_service_buffer_fill_percent[\s\S]*adaptive_input_stats\(s_encoded\)[\s\S]*stats\.occupied \* 100U \/ stats\.resident/);
   assert.match(websocket, /WS_STATUS_POLL_MS 100/);
   assert.match(websocket, /WS_STATUS_HEARTBEAT_MS 2000/);
   assert.match(websocket, /PERF WS:/);
@@ -1043,8 +1058,13 @@ test("native WebUI publishes player changes promptly and uses buffer percent", (
   assert.match(websocket, /static webui_status_key_t s_previous_status_key/);
   assert.match(
     websocket,
-    /station_changed[\s\S]*\\"current\\":%u[\s\S]*broadcast_text\([\s\S]*s_broadcast_current, &s_current_send_pending\)/,
+    /publish_current = station_changed &&[\s\S]*atomic_load\(&s_current_send_pending\) == 0U/,
   );
+  assert.match(websocket, /snprintf\(s_broadcast_current,[\s\S]*\\"current\\":%u/);
+  assert.match(websocket,
+    /current_queued = broadcast_text\(\s*s_broadcast_current, &s_current_send_pending, &s_current_work\)/);
+  assert.match(websocket,
+    /if \(status_queued && current_queued\)[\s\S]*s_previous_status_key = s_current_status_key/);
   assert.match(websocket, /audio_service_buffer_fill_percent\(\)/);
   assert.match(
     websocket,
@@ -1056,6 +1076,10 @@ test("native WebUI publishes player changes promptly and uses buffer percent", (
     /radio_control_init[\s\S]*playlist_station\(s_current_item/,
   );
   assert.match(controls, /native_state_set_station\(s_state, s_current_name\)/);
+  // Actual queue-failure/reused-session handling: run-c3-websocket-io.py;
+  // application/SDK framing over TCP and TLS: run-websocket-integration.py
+  // and run-websocket-tls-integration.py. Queue occupancy is executed by
+  // run-adaptive-input.py, rather than inferred from free heap.
 });
 
 test("native stream connection reports HTTP failures and follows redirects", () => {
@@ -1093,30 +1117,60 @@ test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", ()
   const websocket = read("main", "websocket_service.c");
 
   assert.match(component, /esp_http_server/);
+  assert.match(component, /\bnative_web_transport\b/);
+  assert.match(component, /\bnative_storage\b/);
   assert.match(component, /websocket_service\.c/);
   assert.match(config, /CONFIG_HTTPD_WS_SUPPORT=y/);
   assert.match(web, /websocket_service_register\(server, state\)/);
   assert.match(web, /#define WEB_MAX_OPEN_SOCKETS 7/);
   assert.match(web, /config\.max_open_sockets = WEB_MAX_OPEN_SOCKETS/);
   assert.match(web, /httpd_resp_set_hdr\(request, "Connection", "close"\)/);
-  assert.match(web, /httpd_sess_trigger_close\(request->handle/);
+  assert.match(web, /native_web_transport_prepare\(&config\)/);
+  assert.ok(web.indexOf("native_web_transport_prepare(&config)") <
+    web.indexOf("httpd_start(&server, &config)"));
+  const finish = section(web, "static esp_err_t finish_static_response(",
+                         "static bool embedded_script_size(");
+  assert.match(finish, /shutdown\(httpd_req_to_sockfd\(request\), SHUT_RDWR\)/);
+  assert.doesNotMatch(finish, /httpd_sess_trigger_close/);
+  const worker = section(web, "static void static_worker_task(",
+                         "static esp_err_t start_static_workers(");
+  assert.ok(worker.indexOf("serve_static_request(request)") <
+    worker.indexOf("httpd_req_async_handler_complete(request)"));
   assert.match(web, /strcmp\(uri, "\/variables\.js"\)/);
   assert.match(web, /equalizerEnabled=false/);
   assert.match(web, /\.uri = "\/upload"/);
   assert.match(web, /\.uri = "\/webboard"/);
   assert.match(web, /webboard_upload_handler/);
-  assert.match(read("main", "web_upload.c"), /mp_feed/);
+  const upload = read("main", "web_upload.c");
+  assert.match(read("main", "web_multipart.h"), /components\/native_storage\/include\/web_multipart\.h/);
+  assert.match(upload, /mp_form_data_boundary\(type, boundary, sizeof\(boundary\)\)/);
+  assert.match(upload, /mp_init\(&parser, boundary, web_file_form_part, form\)/);
+  assert.match(upload, /mp_feed\(&parser, chunk, \(size_t\)received\)/);
+  assert.match(upload, /return mp_complete\(&parser\)/);
   assert.match(websocket, /\.uri = "\/ws"/);
   assert.match(websocket, /\.is_websocket = true/);
   assert.match(websocket, /httpd_ws_recv_frame/);
   assert.match(websocket, /httpd_ws_send_frame/);
-  assert.match(websocket, /httpd_ws_send_data_async/);
+  assert.match(websocket, /httpd_ws_send_frame_async/);
+  assert.match(websocket, /httpd_queue_work\(s_server, broadcast_work, work\)/);
+  assert.match(websocket, /httpd_sess_set_send_override\(s_server, socket, ws_send_complete\)/);
+  assert.match(websocket, /httpd_sess_set_recv_override\(s_server, socket, ws_receive_complete\)/);
+  assert.match(section(websocket, "static int ws_send_complete(", "static int ws_receive_complete("),
+    /native_web_transport_send\([\s\S]*ws_wait\(socket, writable, deadline\)/);
+  assert.match(section(websocket, "static int ws_receive_complete(", "static void ws_finish_client("),
+    /native_web_transport_recv\([\s\S]*ws_wait\(socket, writable, deadline\)/);
   assert.doesNotMatch(websocket, /httpd_ws_send_data\(/);
   assert.match(websocket, /atomic_load\(&s_status_send_pending\) == 0U/);
-  assert.match(websocket, /ws_send_complete[\s\S]*httpd_sess_trigger_close/);
+  assert.match(section(websocket, "static void ws_finish_client(", "static void ws_fail_client("),
+    /ws_session\(s_server, client->socket\) != client[\s\S]*native_web_transport_shutdown\(s_server, client->socket, graceful\)/);
   assert.match(websocket, /strcmp\(command, "next"\)/);
   assert.match(websocket, /strcmp\(command, "prev"\)/);
   assert.doesNotMatch(web + websocket, /AsyncWebServer|AsyncWebSocket|Arduino/);
+  // Actual static async-session ordering: run-native-static-lifetime.py.
+  // Transport partial/WANT/deadline/session semantics: run-native-web-transport.py,
+  // run-c3-websocket-io.py and the TCP/TLS integration runners cited above.
+  // Shared multipart acceptance/rejection executes in run-multipart-headers.py
+  // and run-cyd-uploads.py (which also compiles the actual C3 upload handler).
 });
 
 test("native settings page is complete in client mode and Wi-Fi-only in AP mode", () => {
@@ -1167,6 +1221,8 @@ test("native WebUI reuses shared pages and recovers an empty filesystem", () => 
   const component = read("main", "CMakeLists.txt");
   const bridge = read("main", "web_pages_bridge.cpp");
   const web = read("main", "web_service.c");
+  const upload = read("main", "web_upload.c");
+  const form = shared("native_storage", "include", "web_file_form.h");
   const sharedPages = fs.readFileSync(
     path.join(root, "yoRadio", "src", "core", "netserver.h"),
     "utf8",
@@ -1181,12 +1237,20 @@ test("native WebUI reuses shared pages and recovers an empty filesystem", () => 
   assert.match(web, /yoradio_emptyfs_html\(\)/);
   assert.match(web, /yoradio_index_html\(\)/);
   assert.match(web, /open_nonempty_file/);
-  assert.match(read("main", "web_file_form.h"), /strcmp\(name \+ n - 3, "\.gz"\)/);
+  assert.match(read("main", "web_file_form.h"), /components\/native_storage\/include\/web_file_form\.h/);
+  assert.match(form, /strcmp\(name \+ n - 3, "\.gz"\)/);
+  assert.match(section(web, "static FILE *open_nonempty_file(", "static bool web_asset_available("),
+    /web_upload_open_file\(path\)[\s\S]*fgetc\(file\) == EOF[\s\S]*fseek\(file, 0, SEEK_SET\)/);
+  const open = section(upload, "FILE *web_upload_open_file(", "bool web_upload_publish_file(");
+  assert.match(open, /xSemaphoreTake\(s_storage_lock,[\s\S]*native_file_recover\(path, backup\)[\s\S]*fopen\(path, "rb"\)/);
   assert.match(web, /\/spiffs\/www\/%s\.gz/);
   assert.match(web, /Content-Encoding", "gzip"/);
-  assert.match(read("main", "web_file_form.h"), /strcmp\(field, "www"\)/);
-  assert.match(read("main", "web_file_form.h"), /strcmp\(field, "data"\)/);
+  assert.match(form, /strcmp\(field, "www"\)/);
+  assert.match(form, /strcmp\(field, "data"\)/);
   assert.match(web, /\.uri = "\/emergency"/);
+  // Real production nonempty/open/read/error/recovery paths are exercised by
+  // run-web-warning-regressions.py and run-native-static-lifetime.py; shared
+  // file transactions and C3 upload namespace rules by run-cyd-uploads.py.
 });
 
 test("native playlist reload event is emitted only after a successful upload", () => {
@@ -1210,8 +1274,17 @@ test("native playlist reload event is emitted only after a successful upload", (
     /websocket_service_notify_playlist_changed[\s\S]*?atomic_store\(&s_playlist_changed_pending, true\)/,
   );
   const upload = read("main", "web_upload.c");
-  assert.match(upload, /if \(ok && form\.playlist\[i\]\) \{[\s\S]*playlist_saved = true/);
+  assert.match(upload,
+    /for \(unsigned i = 0; ok && i < form\.files; \+\+i\)[\s\S]*if \(form\.playlist\[i\]\)[\s\S]*ok = radio_control_publish_playlist\(temporary,\s*web_upload_publish_playlist\) == ESP_OK;\s*playlist_saved = ok;/);
+  assert.match(section(upload, "bool web_upload_publish_playlist(", "// All three routes"),
+    /xSemaphoreTake\(s_storage_lock,[\s\S]*native_file_replace_pair\(/);
+  const catalog = read("main", "radio_control.c");
+  assert.match(section(catalog, "esp_err_t radio_control_publish_playlist(", "esp_err_t radio_control_play("),
+    /write_playlist_index_candidate_locked\(csv_temporary, &count\)[\s\S]*if \(result == ESP_OK\)[\s\S]*publisher\(csv_temporary, PLAYLIST_INDEX_TEMP_PATH\)/);
   assert.match(upload, /if \(playlist_saved\) websocket_service_notify_playlist_changed\(\)/);
+  // Actual complete-parser-before-publication, candidate-index failure,
+  // pair rollback, response failure and notifications: run-cyd-uploads.py;
+  // catalog preparation/validation: run-playlist-index.py.
 });
 
 test("native SPIFFS image contains the shared WebUI and repository playlist", () => {
