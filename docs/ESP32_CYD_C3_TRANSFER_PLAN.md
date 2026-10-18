@@ -39,7 +39,7 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-01 | Программная часть выполнена | Generation, decoder/PCM lifetime, ordered completion и output flush/reset проверены host-тестами. Финальные PDM/continuous/legacy images коммита `2df73834` собраны и сохранены; физическая приёмка отдельно. |
 | CYD-C3-02 | Программная часть выполнена | Общие probe/ID3/ICY/JSON helpers подключены к CYD, HTTP startup ограничен общим deadline и числом redirects; fatal TLS/partial bytes и raw EOF проверены на реальном HTTP-парсере обоих SDK. Host/санитайзеры проходят; физическая сеть отдельно. |
 | CYD-C3-03 | Программная часть выполнена | CYD подключён к continuous MP3/ADTS confirmation, ID3 stripping/recovery и ordered codec drain. 34 corpus cases обеих целей, byte-exact переходы и шесть lifecycle вариантов проходят. PDM/continuous/legacy CYD и C3 source `8bf1d73a` собраны и сохранены. Физическая приёмка отдельно. |
-| CYD-C3-04 | В работе | CYD использует общую SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 при нехватке памяти. Независимый control node и отсутствие per-packet malloc проверены. Ограниченный prefill — следующий шаг; значения C3 не становятся CYD defaults. |
+| CYD-C3-04 | В работе | Общая SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 и независимый control node подключены. Bounded prefill с default 0 проверен host-тестами, включая control bypass и drain; SDK-сборка профиля 250 ms — следующий шаг. TLS reclaim/расширения требуют измерений этапа 13. |
 | CYD-C3-05 | Открыт | Health, heap/largest block, ошибки allocation/decode/write, DMA и стеки; CPU по обоим ядрам. Отдельно quiet и diagnostic сборки. |
 | CYD-C3-06 | Открыт | Общая модель radio/settings, CSV offset index и recovery, станции Next/Prev, корректный format/bitrate/title. Повторный boot и fault injection без потери файлов. |
 | CYD-C3-07 | Открыт | WebSocket snapshot/events, динамические страницы, capabilities, async static workers, bounded uploads. Две вкладки, медленный клиент, reconnect и rollback файлов. |
@@ -225,3 +225,10 @@ allocation и численные настройки C3 являются канд
   на старом коде, затем прошёл: принудительное вытеснение, 2000 конкурентных
   команд, invalid arguments, queue failure и Resume recovery.
   [Отчёты](../tests/results/c3-command-concurrency-20261018/README.md).
+- CYD-C3-04: добавлен ограниченный first-input prefill, выключенный по
+  умолчанию. Он учитывает все data leases, отменяется при Stop/output failure,
+  не повторяется после codec drain и пропускается для startup control replay.
+  [Host-проверки](../tests/results/cyd-prefill-20261018/README.md) покрывают
+  deadline, coarse tick, 64-bit clock, возврат READING lease после отмены,
+  control bypass и шесть queue/codec ветвей. C3 timing-профиль не скопирован;
+  после сборки дополнительного CYD профиля потребуется физический A/B.

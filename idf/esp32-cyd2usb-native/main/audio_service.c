@@ -570,6 +570,10 @@ static void decoder_release(esp_audio_simple_dec_handle_t *decoder,
     *output_size = 0;
 }
 
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+#include "input_prefill.h"
+#endif
+
 static void decoder_task(void *argument) {
     (void)argument;
     // Register only the selected Espressif codecs. The custom minimp3/Helix
@@ -594,6 +598,9 @@ static void decoder_task(void *argument) {
     uint32_t generation = 0;
     native_codec_t codec = NATIVE_CODEC_AUTO;
     uint32_t failed_generation = 0;
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+    bool input_prefilled = false;
+#endif
 
     while (true) {
         uint32_t current_generation = atomic_load(&s_generation);
@@ -606,6 +613,9 @@ static void decoder_task(void *argument) {
 #endif
             generation = current_generation;
             codec = NATIVE_CODEC_AUTO;
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+            input_prefilled = false;
+#endif
             atomic_store(&s_decoder_released_generation, generation);
         }
         size_t item_size = 0;
@@ -619,6 +629,20 @@ static void decoder_task(void *argument) {
             continue;
         }
         uint8_t end_reason = packet->end_of_stream;
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+        if (packet->data_size && !input_prefilled) {
+            bool control_replay = false;
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+            control_replay = packet == (const void *)s_start_control;
+#endif
+            if (!control_replay && !prefill_encoded_input(packet->generation,
+                    CONFIG_YORADIO_INPUT_PREFILL_MS)) {
+                encoded_return(s_encoded, packet);
+                continue;
+            }
+            input_prefilled = true;
+        }
+#endif
         if (!packet->data_size && end_reason && !decoder
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             && !legacy_decoder

@@ -29,6 +29,17 @@ menu "yoRadio native firmware"
             Only the producer reopens a partial READY tail. Never modify a
             READING lease, the sole queued node, or a control packet.
 
+    config YORADIO_INPUT_PREFILL_MS
+        int "Maximum first-input prefill wait (ms)"
+        depends on YORADIO_ADAPTIVE_INPUT_BUFFER
+        range 0 2000
+        default 0
+        help
+            Wait until input storage is occupied or this deadline expires.
+            Stop/output failure cancels the wait. Independent startup control
+            replay bypasses it, and codec drain does not restart it. Zero keeps
+            this disabled until a CYD network/audio profile is measured.
+
     choice YORADIO_NATIVE_AUDIO_OUTPUT
         prompt "Default audio output"
         default YORADIO_NATIVE_AUDIO_OUTPUT_PDM

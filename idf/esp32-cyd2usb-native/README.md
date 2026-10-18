@@ -151,3 +151,11 @@ queue under ASan/UBSan. Generate its extended corpus with
 `tests/run-stream-confirm.py --output <corpus-dir>` and pass `--corpus <dir>`.
 The C3 target uses the same corpus and portable parsers. Codec arithmetic and
 physical DMA remain separate acceptance work.
+
+`YORADIO_INPUT_PREFILL_MS` is a bounded first-input experiment, disabled by
+default until CYD measurements justify a wait. It ends when all data slots
+are occupied or its deadline is reached, and cancels on generation/output
+failure. Startup control replay bypasses it to preserve producer progress;
+same-connection codec drain does not restart it. Tests in
+`tests/run-cyd-prefill.py` and the six lifecycle variants cover these paths,
+including coarse tick conversion and returning the retained input on Stop.

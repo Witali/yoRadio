@@ -54,6 +54,7 @@ size_t strlcpy(char *, const char *, size_t);
     first = source.index('#define STREAM_CHUNK_SIZE')
     last = source.index('static esp_audio_simple_dec_type_t')
     generated = source[first:last]
+    generated += re.search(r'^#define STREAM_INPUT_ACTIVE[^\n]+', source, re.M).group(0)+'\n'
     for name in ('simple_decoder_type', 'codec_name', 'state_set_audio',
                  'fail_generation', 'send_encoded', 'send_pcm', 'send_pcm_end',
                  'CUSTOM', 'decoder_release', 'decoder_task', 'output_task',
@@ -62,6 +63,8 @@ size_t strlcpy(char *, const char *, size_t);
             start = source.index('#ifdef YORADIO_CUSTOM_LEGACY_DECODER\ntypedef struct')
             generated += source[start:source.index('static void decoder_release(', start)]
         else:
+            if name == 'decoder_task':
+                generated += '#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0\n#include "input_prefill.h"\n#endif\n'
             generated += function(source, name)
     (OUT/'production.inc').write_text(generated)
     output = (MAIN/'native_audio_output.c').read_text()
@@ -81,7 +84,7 @@ size_t strlcpy(char *, const char *, size_t);
                          '-DCONFIG_YORADIO_AAC_DECODER_HELIX=1']),
         )
         variants += tuple(('adaptive-'+name,defines+['-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1',
-            '-DCONFIG_YORADIO_STREAM_CONFIRM=1']) for name,defines in variants)
+            '-DCONFIG_YORADIO_STREAM_CONFIRM=1','-DCONFIG_YORADIO_INPUT_PREFILL_MS=250']) for name,defines in variants)
         for name, defines in variants:
             binary = OUT/name
             build = run(['gcc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
@@ -107,6 +110,8 @@ size_t strlcpy(char *, const char *, size_t);
         'source_sha256': {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
             for p in [Path(__file__), ROOT/'tests/native/cyd_lifecycle_test.c',
                       ROOT/'idf/components/native_stream/include/audio_completion.h',
+                      ROOT/'idf/components/native_stream/include/adaptive_input.h',
+                      MAIN/'input_prefill.h',
                       *[MAIN/name for name in ('audio_service.c','native_state.c','native_state.h',
                                               'native_audio_output.c','native_audio_output.h')]]},
     }, indent=2)+'\n')

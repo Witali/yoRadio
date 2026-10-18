@@ -48,6 +48,13 @@ static unsigned eos_frames;
 static bool fail_open, fail_realloc, fail_process, fail_write, cancel_acquire;
 static uint32_t active_generation;
 static uint8_t last_sample;
+static unsigned prefill_queries;
+static bool cancel_prefill;
+#ifdef CONFIG_YORADIO_STREAM_CONFIRM
+static void *s_start_control;
+#endif
+static int64_t esp_timer_get_time(void) {return 0;}
+static void vTaskDelay(unsigned ticks) {(void)ticks;assert(false);}
 static void native_audio_output_discard_pcm(void) { ++discards; }
 static int native_audio_output_flush_pcm(void) { ++flushes; return ESP_OK; }
 static int native_audio_output_configure(uint32_t rate) { assert(rate == 48000); return ESP_OK; }
@@ -154,6 +161,11 @@ void *adaptive_input_receive(adaptive_input_t *q,size_t *n,TickType_t t) {
     return xRingbufferReceive(q,n,t);
 }
 bool adaptive_input_return(adaptive_input_t *q,void *p) {vRingbufferReturnItem(q,p);return true;}
+adaptive_input_stats_t adaptive_input_stats(adaptive_input_t *q) {
+    assert(q==s_encoded);++prefill_queries;
+    if (cancel_prefill) {cancel_prefill=false;audio_service_stop();}
+    return (adaptive_input_stats_t){.resident=8,.occupied=8};
+}
 #endif
 
 static uint32_t queued_generation;
@@ -169,9 +181,11 @@ static void begin(unsigned gen) {
     encoded=(test_ring_t){0}; pcm=(test_ring_t){0}; empty_hook=receive_hook=NULL;
     opens=closes=writes=flushes=discards=0;
     fail_open=fail_realloc=fail_process=fail_write=cancel_acquire=false;
+    cancel_prefill=false;prefill_queries=0;
     s_state=&state; s_commands=(void *)3; s_encoded=(void *)&encoded; s_pcm=&pcm;
 #ifdef CONFIG_YORADIO_STREAM_CONFIRM
     s_encoded_control_attached=true;
+    s_start_control=NULL;
 #endif
     if (!s_control_lock) s_control_lock=xSemaphoreCreateMutex();
     queued_generation=0;
@@ -305,7 +319,19 @@ int main(void) {
     ((encoded_packet_t *)encoded.items[3])->codec=NATIVE_CODEC_MP3;
     run_task(decoder_task);
     assert(opens==2 && closes==2 && !open_handles && pcm.used==7);
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+    assert(prefill_queries==1); // Same-connection codec drain must not prefill again.
+#endif
     run_task(output_task);assert(writes==6 && flushes==1 && !state.audio_running);
+
+#if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
+    begin(51);input(51,AUDIO_CONTINUE,3);s_start_control=encoded.items[0];
+    input(51,AUDIO_END_EOF,0);run_task(decoder_task);
+    assert(!prefill_queries && opens==1);run_task(output_task);
+    begin(52);input(52,AUDIO_CONTINUE,3);cancel_prefill=true;run_task(decoder_task);
+    assert(prefill_queries==1 && !opens && !pcm.used && encoded.next==encoded.used);
+    assert(!strcmp(state.stream_format,"stopped"));
+#endif
 
     begin(100);
     pthread_t first, second;
