@@ -117,3 +117,14 @@ it must not be presented as hundreds of firmware bugs fixed.
 
 Runtime fixes use separate focused commits and their own tests. Do not apply
 bulk `--fix` to private codec layouts, arithmetic or user settings.
+
+After the portable stream transfer, complete full reruns cover 13 CYD units
+(the shared ICY source and TLS adapter were added) and all 49 C3 units:
+[CYD stream final](../tests/results/native-lint-20261018/cyd-stream-final/report.json)
+has 10 warnings and [C3 shared stream final](../tests/results/native-lint-20261018/c3-shared-stream-final/report.json)
+has 98, both with zero parse/tool errors. CYD `audio_service.c`, the shared
+parser and both TLS adapters have no diagnostics. Earlier intermediate runs
+are retained: the CYD header-name comparison was made explicit; the C3 `.c`
+include is an intentional compatibility translation unit, documented locally
+with a single rule annotation after compiling it in both firmware and host
+tests. No general analyzer or memory-safety check was disabled.

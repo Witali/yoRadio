@@ -1,0 +1,22 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\app_main.c:53:38: warning: The value '-1' provided to the cast expression is not in the valid range of values for the enum [clang-analyzer-optin.core.EnumCastOutOfRange]
+   53 |     native_network_mode_t previous = (native_network_mode_t)-1;
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main/native_state.h:9:9: note: enum declared here
+    9 | typedef enum {
+      |         ^~~~~~
+   10 |     NATIVE_NETWORK_STARTING = 0,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   11 |     NATIVE_NETWORK_CLIENT,
+      |     ~~~~~~~~~~~~~~~~~~~~~~
+   12 |     NATIVE_NETWORK_ACCESS_POINT,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   13 |     NATIVE_NETWORK_ERROR,
+      |     ~~~~~~~~~~~~~~~~~~~~~
+   14 | } native_network_mode_t;
+      | ~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\app_main.c:53:38: note: The value '-1' provided to the cast expression is not in the valid range of values for the enum
+   53 |     native_network_mode_t previous = (native_network_mode_t)-1;
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~
+7 warnings generated.
+Suppressed 6 warnings (6 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
