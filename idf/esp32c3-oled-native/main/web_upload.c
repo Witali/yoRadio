@@ -52,6 +52,17 @@ bool web_upload_publish_file(const char *temporary, const char *live) {
     return replaced;
 }
 
+bool web_upload_publish_playlist(const char *csv_temporary,
+                                 const char *index_temporary) {
+    if (!s_storage_lock ||
+        xSemaphoreTake(s_storage_lock, pdMS_TO_TICKS(1000)) != pdTRUE) return false;
+    bool replaced = native_file_replace_pair(
+        csv_temporary, "/spiffs/data/playlist.csv", "/spiffs/data/playlist.csv.bak",
+        index_temporary, "/spiffs/data/index.dat", "/spiffs/data/index.dat.bak");
+    xSemaphoreGive(s_storage_lock);
+    return replaced;
+}
+
 // All three routes run synchronously in the same HTTP server task. Its stack
 // is reserved at startup. Staging uses flash, never request-sized heap memory.
 typedef struct {
@@ -140,29 +151,57 @@ static bool receive_form(httpd_req_t *request, web_file_form_t *form) {
     return mp_complete(&parser);
 }
 
+static bool upload_destination(const char *name, bool playlist,
+                               char *destination, size_t capacity) {
+    char checked[WEB_FILE_FORM_NAME_BYTES];
+    if (!name || !web_form_name(name, checked, sizeof(checked)) ||
+        strcmp(checked, name)) return false;
+    int length = snprintf(destination, capacity, "/spiffs/%s/%s",
+                          playlist ? "data" : "www", name);
+    if (length <= 0 || (size_t)length >= capacity) return false;
+    size_t backup_bytes = (size_t)length - strlen("/spiffs") + sizeof(".bak");
+    if (backup_bytes > WEB_FILE_FORM_NAME_BYTES) return false;
+    if (!playlist && (length <= 3 || strcmp(destination + length - 3, ".gz") != 0)) return false;
+    if (!playlist) {
+        size_t raw = strlen(name) - 3U;
+        if ((raw >= 3U && !memcmp(name + raw - 3U, ".gz", 3)) ||
+            (raw >= 4U && (!memcmp(name + raw - 4U, ".bak", 4) ||
+                           !memcmp(name + raw - 4U, ".tmp", 4)))) return false;
+    }
+    return !playlist || !strcmp(name, "playlist.csv");
+}
+
 static bool publish_file(unsigned slot, const char *name, bool playlist) {
     char temporary[64], destination[128];
     temporary_path(slot, temporary, sizeof(temporary));
-    int length = snprintf(destination, sizeof(destination), "/spiffs/%s/%s",
-                          playlist ? "data" : "www", name);
-    if (length <= 0 || (size_t)length >= sizeof(destination)) return false;
-    if (!playlist && (length <= 3 || strcmp(destination + length - 3, ".gz") != 0)) return false;
+    if (!upload_destination(name, playlist, destination, sizeof(destination))) return false;
     // Retain the previous file until the validated replacement has its live
     // name. Boot/read recovery can restore a retained backup after interruption.
-    if (!web_upload_publish_file(temporary, destination)) return false;
-    if (!playlist) {
-        destination[strlen(destination) - 3] = 0; // obsolete uncompressed copy
-        remove(destination);
+    if (playlist) return web_upload_publish_file(temporary, destination);
+    char backup[256];
+    if (!s_storage_lock || !backup_name(destination, backup, sizeof(backup)) ||
+        xSemaphoreTake(s_storage_lock, pdMS_TO_TICKS(1000)) != pdTRUE) return false;
+    bool replaced = native_file_replace(temporary, destination, backup);
+    if (replaced) {
+        destination[strlen(destination) - 3] = 0;
+        if (remove(destination) != 0 && errno != ENOENT) replaced = false;
     }
-    return true;
+    xSemaphoreGive(s_storage_lock);
+    return replaced;
 }
 
 static esp_err_t handle_upload(httpd_req_t *request, web_form_mode_t mode) {
+    if (!websocket_service_reboot_ready()) {
+        httpd_resp_set_hdr(request, "Connection", "close");
+        httpd_resp_set_status(request, "503 Service Unavailable");
+        httpd_resp_sendstr(request, "Upload service is starting");
+        return ESP_FAIL;
+    }
     upload_sink_t sink = {.fd = -1};
     web_file_form_t form = {
         .mode = mode, .sink = {begin_file, write_file, end_file, &sink},
     };
-    bool ok = websocket_service_reboot_ready() && receive_form(request, &form);
+    bool ok = receive_form(request, &form);
     if (sink.fd >= 0) close(sink.fd);
     free(sink.buffer); // Rare file upload only; no permanent payload reserve.
     bool wifi_saved = false, playlist_saved = false;
@@ -176,11 +215,18 @@ static esp_err_t handle_upload(httpd_req_t *request, web_form_mode_t mode) {
             ok = network_service_validate_credentials_file(
                 (const uint8_t *)form.wifi, form.wifi_bytes) == ESP_OK;
         for (unsigned i = 0; ok && i < form.files; ++i) {
-            ok = publish_file(i, form.names[i], form.playlist[i]);
-            if (ok && form.playlist[i]) {
-                playlist_saved = true;
-                ok = radio_control_reindex_playlist() == ESP_OK;
-            }
+            char destination[128];
+            ok = upload_destination(form.names[i], form.playlist[i],
+                                    destination, sizeof(destination));
+        }
+        for (unsigned i = 0; ok && i < form.files; ++i) {
+            if (form.playlist[i]) {
+                char temporary[64];
+                temporary_path(i, temporary, sizeof(temporary));
+                ok = radio_control_publish_playlist(temporary,
+                        web_upload_publish_playlist) == ESP_OK;
+                playlist_saved = ok;
+            } else ok = publish_file(i, form.names[i], false);
         }
         if (ok && form.wifi_seen) {
             ok = network_service_save_credentials_file(

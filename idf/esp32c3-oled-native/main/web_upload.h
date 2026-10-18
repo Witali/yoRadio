@@ -12,3 +12,5 @@ esp_err_t web_wifi_upload_handler(httpd_req_t *request);
 esp_err_t web_upload_storage_init(void);
 FILE *web_upload_open_file(const char *path);
 bool web_upload_publish_file(const char *temporary, const char *live);
+bool web_upload_publish_playlist(const char *csv_temporary,
+                                 const char *index_temporary);
