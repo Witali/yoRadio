@@ -1,6 +1,7 @@
 # Portable custom FLAC transfer to native CYD
 
-Status: **design and donor prerequisite only; CYD integration is not implemented**.
+Status: **shared component exposed and compiled for both targets; CYD runtime
+integration is not implemented**.
 This is stage CYD-C3-12 of the [transfer plan](ESP32_CYD_C3_TRANSFER_PLAN.md).
 The current native CYD continues using the Espressif FLAC backend. No display,
 board pins, core affinity, SDK version or audio backend changes belong to this
@@ -13,8 +14,8 @@ document's donor EOF fix.
 | Shared decoder, workspace allocation and cleanup | [flac_decoder.cpp](../yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp), `FLACDecoder_AllocateBuffers`, `FLACDecoder_FreeBuffers` |
 | Bounded bit reader, Rice, signed sample validation and PCM conversion | [flac_decoder.cpp](../yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp), `readUint`, `readRiceSignedInt`, `FLACDecode`, `decodeSubframe` |
 | Stereo decorrelation, wide LPC and segmented history | [flac_decoder.cpp](../yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp), `decodeSubframes`, `restoreLinearPrediction` |
-| C3 streaming adapter and API | [custom_flac_adapter.cpp](../idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.cpp), [custom_flac_adapter.h](../idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.h) |
-| Adapter build definitions | [custom_flac/CMakeLists.txt](../idf/esp32c3-oled-native/components/custom_flac/CMakeLists.txt): segmented workspace, 512 output frames, optional bytewise Rice |
+| Shared streaming adapter and API | [custom_flac_adapter.cpp](../idf/components/custom_flac/custom_flac_adapter.cpp), [custom_flac_adapter.h](../idf/components/custom_flac/custom_flac_adapter.h); historical C3 paths remain thin compatibility includes. |
+| Adapter build definitions | [custom_flac/CMakeLists.txt](../idf/components/custom_flac/CMakeLists.txt): segmented workspace, 512 output frames, optional bytewise Rice |
 | Platform compatibility headers | [custom_codec_support/Arduino.h](../idf/components/custom_codec_support/Arduino.h); native builds use internal heap, `psramFound()` is false |
 | C3 PCM16 versus source metadata example | [audio_service.c](../idf/esp32c3-oled-native/main/audio_service.c), `custom_flac_output` and the FLAC branch of `decoder_task` |
 | CYD decoder lifecycle, generation and maintenance | [audio_service.c](../idf/esp32-cyd2usb-native/main/audio_service.c), `decoder_task`, `packet_done`, `maintenance_ack` |
@@ -151,9 +152,11 @@ claim or default change.
 
 ## Remaining implementation plan
 
-1. **Not implemented:** expose one shared custom FLAC component to both native
-   projects without duplicating the core. Preserve C3 behavior and provide CYD
-   vendor/custom selection; do not alter core hot loops in this step.
+1. **Shared component complete:** one canonical adapter/API/build recipe is
+   exposed to both projects; the core and adapter algorithms retain their bytes.
+   [Fresh qualification](../tests/results/custom-flac-transfer-20261018/README.md)
+   repeats5387 EOF groups/720 PCM comparisons and compiles the actual component
+   on pinned RISC-V/Xtensa SDKs. CYD vendor/custom selection remains unimplemented.
 2. **Not implemented:** add the CYD callback with separate source and PCM16
    representations; integrate create/feed/destroy into every generation, error,
    EOF, Stop/Next and maintenance transition. Keep current task affinity.
@@ -161,8 +164,8 @@ claim or default change.
    adapter: every metadata cut/empty EOF, terminal error, blocked queue cancellation,
    stale generation, reopen, OOM, max/unknown frame windows and no workspace at
    maintenance ACK. Test both retained vendor and custom selection paths.
-4. **Not implemented:** fresh whole-file exact PCM and sanitizers for current
-   shared source, actual pinned Xtensa SDK compilation and a custom-path QEMU
+4. **Partially complete:** fresh host exact PCM/sanitizers and pinned Xtensa
+   component compilation pass. Application integration and a custom-path QEMU
    harness checking PCM/guards/lifecycle. Separate host platform seams and vendor
    prebuilt-library coverage from target execution evidence.
 5. **Not implemented:** production build/archive and physical CYD A/B with matched

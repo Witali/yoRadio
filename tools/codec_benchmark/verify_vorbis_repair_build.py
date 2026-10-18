@@ -88,8 +88,8 @@ def verify(build, objdump, output):
                'vorbis_repair_abi.h', 'decoder_registration.c', 'decoder_registration.h', 'decoder_resources.h')]
     sources += sorted((main/'vorbis_repair').glob('*'))
     sources += [ROOT/path for path in (
-        'idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.cpp',
-        'idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.h',
+        'idf/components/custom_flac/custom_flac_adapter.cpp',
+        'idf/components/custom_flac/custom_flac_adapter.h',
         'idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp',
         'idf/components/custom_legacy_codecs/custom_legacy_adapter.h',
         'yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp',

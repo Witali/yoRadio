@@ -737,8 +737,11 @@ test("native audio pipeline batches PCM using the current decoded layout", () =>
 
 test("native FLAC reuses the optimized yoRadio decoder without Arduino Core", () => {
   const audio = read("main", "audio_service.c");
-  const cmake = read("components", "custom_flac", "CMakeLists.txt");
-  const adapter = read("components", "custom_flac", "custom_flac_adapter.cpp");
+  const shim = read("components", "custom_flac", "CMakeLists.txt");
+  const shared = (...parts) => fs.readFileSync(path.join(root, "idf", "components", "custom_flac", ...parts), "utf8");
+  const cmake = shared("CMakeLists.txt");
+  const adapter = shared("custom_flac_adapter.cpp");
+  assert.match(shim, /include\(.*components\/custom_flac\/CMakeLists\.txt/);
   const decoder = fs.readFileSync(
     path.join(root, "yoRadio", "src", "audioI2S", "flac_decoder", "flac_decoder.cpp"), "utf8");
 

@@ -15,7 +15,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 CORE = 'yoRadio/src/audioI2S/flac_decoder'
-ADAPTER = 'idf/esp32c3-oled-native/components/custom_flac'
+ADAPTER = 'idf/components/custom_flac'
+LEGACY_ADAPTER = 'idf/esp32c3-oled-native/components/custom_flac'
 TEST = 'tests/native/flac_stream_eof'
 
 
@@ -98,9 +99,13 @@ def main():
         (out/'report.json').write_text(json.dumps(report, indent=2)+'\n')
         print(json.dumps(current)); return current['exit_code']
     assert args.baseline_revision, 'A real old adapter revision is required for qualification'
-    baseline = subprocess.check_output(['git', 'show', args.baseline_revision+':'+ADAPTER+'/custom_flac_adapter.cpp'], cwd=ROOT)
+    baseline_path = ADAPTER + '/custom_flac_adapter.cpp'
+    if subprocess.run(['git','cat-file','-e',args.baseline_revision+':'+baseline_path], cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+        baseline_path = LEGACY_ADAPTER + '/custom_flac_adapter.cpp'
+    baseline = subprocess.check_output(['git', 'show', args.baseline_revision+':'+baseline_path], cwd=ROOT)
     (out/'baseline-adapter.cpp').write_bytes(baseline)
     build('baseline', out/'baseline-adapter.cpp')
+    report['baseline_adapter_path'] = baseline_path
     report['baseline_revision'] = subprocess.check_output(['git','rev-parse',args.baseline_revision],cwd=ROOT,text=True).strip()
     report['baseline_adapter_sha256'] = hashlib.sha256(baseline).hexdigest()
     report['baseline'] = cut_run('baseline', 1)

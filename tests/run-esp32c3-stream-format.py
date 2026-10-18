@@ -104,7 +104,7 @@ static void run_espressif_frame(uint32_t generation, native_codec_t codec,
         os.environ.get("CC", "cc"), "-std=c11", "-O2", "-Wall", "-Wextra",
         "-Werror", *SANITIZERS, "-I" + str(tmp), "-I" + str(MAIN),
         "-I" + str(ROOT / "idf/components/custom_legacy_codecs"),
-        "-I" + str(ROOT / "idf/esp32c3-oled-native/components/custom_flac"),
+        "-I" + str(ROOT / "idf/components/custom_flac"),
         str(ROOT / "tests/native/esp32c3_stream_format_test.c"),
         str(MAIN / "native_state.c"), "-o", str(executable),
     ], check=True)

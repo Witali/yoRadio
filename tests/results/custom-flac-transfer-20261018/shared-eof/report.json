@@ -1,0 +1,4578 @@
+{
+  "passed": true,
+  "source_sha256": {
+    "tests/run-flac-stream-eof.py": "e53076ff378d0b811cd6e6a89ffefc3ce1d0715081ac99557bb23fd57d61c31c",
+    "tests/native/flac_stream_eof/main.cpp": "b1d0bfb09f7ae671d100c88c4523cb388ab462390cddc79b0b2baafd2b2ece0c",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.h": "d5c561cd2136a0c8390a67fb6640ec5f01d8c0f515341f4301104487bf636859",
+    "idf/components/custom_flac/custom_flac_adapter.cpp": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26",
+    "idf/components/custom_flac/custom_flac_adapter.h": "f500ddeadc2edf3ee256c3e3504e8e7b9ba475325f0f96747f17dd270ee6c519",
+    "tools/audio_test_server/generate_flac_depths.py": "6f15589438a6fd31fb937e95e7f840a3288ff083c5e3771b6e9b486cede9f4c1",
+    "tests/native/flac_bounds/Arduino.h": "628aa1fa77fc1f1f89201aca3c8b03b5ba7a09806ee4ef143929a42f3bc12713",
+    "tests/native/flac_depths/esp_log.h": "49aec4db379ab4897c025a85d6c7431c04b3634e61d84f8b899c7d48bd3ce0e3",
+    "tests/native/flac_depths/esp_timer.h": "2167a9e5540cc84aa19d0d620c0ea15d742bf54dfa8a822c89df60e92f83ed3d",
+    "tests/native/flac_depths/freertos/FreeRTOS.h": "648f54077655cc28cab1a906ba83b33c74fdf867ecb29b0e08cffe7c848ed5ea",
+    "tests/native/flac_depths/freertos/task.h": "8e45a8b6916d5f9bcb36977a0bd161f028cfe58ba507d518b242b32a6ee4aaab"
+  },
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "current": {
+    "exit_code": 0,
+    "groups": 5387,
+    "failures": 0,
+    "metadata_bytes": 1077
+  },
+  "commands": [
+    [
+      "g++",
+      "-std=c++14",
+      "-O2",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-DFLAC_SEGMENTED_WORKSPACE=1",
+      "-DFLAC_OUTPUT_FRAMES=512",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/tests/native/flac_bounds",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/tests/native/flac_depths",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/yoRadio/src/audioI2S/flac_decoder",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/idf/components/custom_flac",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/idf/components/custom_flac/custom_flac_adapter.cpp",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/tests/native/flac_stream_eof/main.cpp",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/current"
+    ],
+    [
+      "env",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1",
+      "timeout",
+      "90",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/current",
+      "cuts",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/metadata.flac",
+      "1077"
+    ],
+    [
+      "g++",
+      "-std=c++14",
+      "-O2",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-DFLAC_SEGMENTED_WORKSPACE=1",
+      "-DFLAC_OUTPUT_FRAMES=512",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/tests/native/flac_bounds",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/tests/native/flac_depths",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/yoRadio/src/audioI2S/flac_decoder",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/idf/components/custom_flac",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/baseline-adapter.cpp",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/sources/tests/native/flac_stream_eof/main.cpp",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/baseline"
+    ],
+    [
+      "env",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1",
+      "timeout",
+      "90",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/baseline",
+      "cuts",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/metadata.flac",
+      "1077"
+    ],
+    [
+      "env",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1",
+      "timeout",
+      "90",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/current",
+      "matrix",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/fixture-list.txt",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/fixtures",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/current-pcm"
+    ],
+    [
+      "env",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1",
+      "timeout",
+      "90",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/baseline",
+      "matrix",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/fixture-list.txt",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/fixtures",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/flac-shared-component-eof/baseline-pcm"
+    ]
+  ],
+  "scope": "Actual streaming FLAC metadata EOF regressions and unchanged exact PCM.\n\nPlatform seams are the existing timer/log/FreeRTOS/Arduino host headers. The\nproduction adapter and decoder compile unchanged, including every include.\nNo target scheduling, heap capacity, DMA or full FLAC conformance is claimed.\n",
+  "valid_pcm": [
+    {
+      "name": "flac-4bit-mono-constant",
+      "reference_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-mono-verbatim",
+      "reference_sha256": "ba7a2d943c55306bb2d2968e2d52438512037f0209dc954b6f27a5fada98afb6",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-mono-fixed4",
+      "reference_sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-mono-lpc32",
+      "reference_sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-stereo-constant",
+      "reference_sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-stereo-verbatim",
+      "reference_sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-stereo-fixed4",
+      "reference_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-stereo-lpc32",
+      "reference_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-left-constant",
+      "reference_sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-left-verbatim",
+      "reference_sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-left-fixed4",
+      "reference_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-left-lpc32",
+      "reference_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-right-constant",
+      "reference_sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-right-verbatim",
+      "reference_sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-right-fixed4",
+      "reference_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-right-lpc32",
+      "reference_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-mid-constant",
+      "reference_sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-mid-verbatim",
+      "reference_sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-mid-fixed4",
+      "reference_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-4bit-mid-lpc32",
+      "reference_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-mono-constant",
+      "reference_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-mono-verbatim",
+      "reference_sha256": "65dd4f4b2671be5ddf1b24043d299cde6c8a38d5a858a69d466f15382a048155",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-mono-fixed4",
+      "reference_sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-mono-lpc32",
+      "reference_sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-stereo-constant",
+      "reference_sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-stereo-verbatim",
+      "reference_sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-stereo-fixed4",
+      "reference_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-stereo-lpc32",
+      "reference_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-left-constant",
+      "reference_sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-left-verbatim",
+      "reference_sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-left-fixed4",
+      "reference_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-left-lpc32",
+      "reference_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-right-constant",
+      "reference_sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-right-verbatim",
+      "reference_sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-right-fixed4",
+      "reference_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-right-lpc32",
+      "reference_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-mid-constant",
+      "reference_sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-mid-verbatim",
+      "reference_sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-mid-fixed4",
+      "reference_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-8bit-mid-lpc32",
+      "reference_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-mono-constant",
+      "reference_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-mono-verbatim",
+      "reference_sha256": "37cf3de8559b0587689ad7ac0a26f8b351cf66af6c9508be2315308b987eb940",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-mono-fixed4",
+      "reference_sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-mono-lpc32",
+      "reference_sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-stereo-constant",
+      "reference_sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-stereo-verbatim",
+      "reference_sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-stereo-fixed4",
+      "reference_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-stereo-lpc32",
+      "reference_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-left-constant",
+      "reference_sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-left-verbatim",
+      "reference_sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-left-fixed4",
+      "reference_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-left-lpc32",
+      "reference_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-right-constant",
+      "reference_sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-right-verbatim",
+      "reference_sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-right-fixed4",
+      "reference_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-right-lpc32",
+      "reference_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-mid-constant",
+      "reference_sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-mid-verbatim",
+      "reference_sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-mid-fixed4",
+      "reference_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-12bit-mid-lpc32",
+      "reference_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-mono-constant",
+      "reference_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-mono-verbatim",
+      "reference_sha256": "2724fa7db96d549228780e81cbc95d7dc84be26f0e34598f8d73542b5e8b5e1a",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-mono-fixed4",
+      "reference_sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-mono-lpc32",
+      "reference_sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-stereo-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-stereo-verbatim",
+      "reference_sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-stereo-fixed4",
+      "reference_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-stereo-lpc32",
+      "reference_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-left-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-left-verbatim",
+      "reference_sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-left-fixed4",
+      "reference_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-left-lpc32",
+      "reference_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-right-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-right-verbatim",
+      "reference_sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-right-fixed4",
+      "reference_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-right-lpc32",
+      "reference_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-mid-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-mid-verbatim",
+      "reference_sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-mid-fixed4",
+      "reference_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-16bit-mid-lpc32",
+      "reference_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-mono-constant",
+      "reference_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-mono-verbatim",
+      "reference_sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-mono-fixed4",
+      "reference_sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-mono-lpc32",
+      "reference_sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-stereo-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-stereo-verbatim",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-stereo-fixed4",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-stereo-lpc32",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-left-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-left-verbatim",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-left-fixed4",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-left-lpc32",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-right-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-right-verbatim",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-right-fixed4",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-right-lpc32",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-mid-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-mid-verbatim",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-mid-fixed4",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-20bit-mid-lpc32",
+      "reference_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-mono-constant",
+      "reference_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-mono-verbatim",
+      "reference_sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-mono-fixed4",
+      "reference_sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-mono-lpc32",
+      "reference_sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649",
+      "bytes": 2048,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-stereo-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-stereo-verbatim",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-stereo-fixed4",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-stereo-lpc32",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-left-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-left-verbatim",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-left-fixed4",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-left-lpc32",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-right-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-right-verbatim",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-right-fixed4",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-right-lpc32",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-mid-constant",
+      "reference_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-mid-verbatim",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-mid-fixed4",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    },
+    {
+      "name": "flac-24bit-mid-lpc32",
+      "reference_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+      "bytes": 4096,
+      "runs": [
+        {
+          "variant": "current",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "current",
+          "mode": 2,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 0,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 1,
+          "identical": true
+        },
+        {
+          "variant": "baseline",
+          "mode": 2,
+          "identical": true
+        }
+      ]
+    }
+  ],
+  "metadata_sha256": "7b3bed343a0c1eef8ad5fa66595475281f669efdf5158333ca50b3f61425b3f9",
+  "metadata_pcm_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9",
+  "ffmpeg": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "baseline_adapter_path": "idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.cpp",
+  "baseline_revision": "fc89b4a965e8125149bdc0ca58ca1f9f9cd94dbc",
+  "baseline_adapter_sha256": "97e749d8ff30b143c58ba4646f8bb24ed88e182dbe168a5eeb1025f8c62f7299",
+  "baseline": {
+    "exit_code": 1,
+    "groups": 5387,
+    "failures": 4308,
+    "metadata_bytes": 1077
+  },
+  "valid_pcm_comparisons": 720
+}

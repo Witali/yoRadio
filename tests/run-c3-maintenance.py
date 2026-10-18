@@ -36,7 +36,7 @@ def main():
     files=[Path(__file__),*[ROOT/'tests/native'/n for n in ('c3_maintenance_platform.h','c3_maintenance_seams.h','c3_maintenance_test.c')],
            *[main/n for n in ('audio_service.c','native_state.c','stream_http_reader.c','deep_sleep_clock.c')],*main.glob('*.h'),
            shared/'adaptive_input.c',shared/'icy_title.c',*sorted((shared/'include').glob('*.h')),
-           ROOT/'idf/esp32c3-oled-native/components/custom_flac/custom_flac_adapter.h',
+           ROOT/'idf/components/custom_flac/custom_flac_adapter.h',
            ROOT/'idf/components/custom_legacy_codecs/custom_legacy_adapter.h']
     hashes={}
     for file in files:
@@ -79,7 +79,7 @@ def main():
         command=['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-Wno-unused-variable','-Wno-unused-function','-Wno-unused-parameter','-Wno-error=format-truncation',
                  '-pthread','-fno-omit-frame-pointer','-fno-pie','-no-pie','-fsanitize='+sanitizer,*defines,*opts,
                  '-I'+host(out),'-I'+host(test),'-I'+host(shared/'include'),'-I'+host(main),
-                 '-I'+host(frozen/'idf/esp32c3-oled-native/components/custom_flac'),
+                 '-I'+host(frozen/'idf/components/custom_flac'),
                  '-I'+host(frozen/'idf/components/custom_legacy_codecs'),
                  host(test/'c3_maintenance_test.c'),host(shared/'icy_title.c'),'-o',host(binary)]
         if sanitizer=='thread':command.insert(1,'-DTEST_TSAN=1')

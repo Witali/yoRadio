@@ -27,7 +27,9 @@ def main():
         manifest['fixtures']=[s for s in manifest['fixtures'] if s['name'] in args.case]
     (out/'fixture_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     decoder='yoRadio/src/audioI2S/flac_decoder/'
-    adapter='idf/esp32c3-oled-native/components/custom_flac/'
+    adapter='idf/components/custom_flac/'
+    if args.revision and subprocess.run(['git','cat-file','-e',args.revision+':'+adapter+'custom_flac_adapter.cpp'], cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+        adapter='idf/esp32c3-oled-native/components/custom_flac/'
     files=[decoder+'flac_decoder.cpp',decoder+'flac_decoder.h',adapter+'custom_flac_adapter.cpp',adapter+'custom_flac_adapter.h',
         'tests/native/flac_bounds/Arduino.h','tests/native/flac_bounds/main.cpp',
         'tools/audio_test_server/generate_flac_depths.py',Path(__file__).relative_to(ROOT).as_posix()]
