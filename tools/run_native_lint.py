@@ -23,6 +23,8 @@ def main():
     parser.add_argument('--clang-tidy', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--jobs', type=int, default=2)
+    parser.add_argument('--include-httpd-overlay', action='store_true',
+                        help='Also analyze the two generated, project-patched HTTPD units')
     args = parser.parse_args()
     build = args.build_dir.resolve()
     out = args.output.resolve()
@@ -37,7 +39,8 @@ def main():
         if path.suffix.lower() not in ('.c', '.cc', '.cpp', '.cxx') or not path.is_relative_to(ROOT):
             continue
         relative = path.relative_to(ROOT)
-        if any(part.startswith('build') or part.startswith('.') for part in relative.parts[:-1]):
+        generated_httpd = args.include_httpd_overlay and path.parent == build/'native-httpd-rfc6455' and path.name in ('httpd_ws.c','httpd_parse.c')
+        if not generated_httpd and any(part.startswith('build') or part.startswith('.') for part in relative.parts[:-1]):
             continue
         files.add(path)
     if not files:
@@ -49,7 +52,8 @@ def main():
 
     def check(path):
         relative = path.relative_to(ROOT).as_posix()
-        stem = relative.replace('/', '__')
+        stem = ('httpd_overlay__'+path.name if path.parent == build/'native-httpd-rfc6455'
+                else relative.replace('/', '__'))
         command = [str(args.clang_tidy), str(path), '-p', str(build),
                    '--config-file='+str(config), '--header-filter='+header_filter,
                    '--export-fixes='+str(out/(stem+'.yaml'))]
@@ -76,6 +80,7 @@ def main():
     with ThreadPoolExecutor(max_workers=max(1,args.jobs)) as pool:
         results = list(pool.map(check, sorted(files)))
     report = dict(tool=version.strip(), build_dir=build.relative_to(ROOT).as_posix(),
+                  include_httpd_overlay=args.include_httpd_overlay,
                   config_sha256=hashlib.sha256(config.read_bytes()).hexdigest(),
                   source_commit=subprocess.check_output(['git','rev-parse','HEAD'], cwd=ROOT, text=True).strip(),
                   dirty=bool(subprocess.check_output(['git','status','--porcelain','--untracked-files=no'], cwd=ROOT, text=True).strip()),
