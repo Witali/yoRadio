@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "board": "cyd",
+  "source_sha256": {
+    ".build/run-ota-audio-lint.py": "0ef915f66865e5cf8f392e53f0238b2fa16a967a4b401671169475f75605b35f",
+    "idf/esp32-cyd2usb-native/main/audio_service.c": "4f1d812ae5813f66e2f60771a46a64c9e9f126a7e96dabf81982f5b28e0ab0c7",
+    "idf/esp32-cyd2usb-native/main/audio_service.h": "2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+    "idf/esp32-cyd2usb-native/main/native_state.h": "727854b5d3639604c603fba1d11c4d0b3dd7f9f4cba386ff96ddae874ca7223d",
+    "idf/esp32-cyd2usb-native/main/native_audio_output.h": "41d0a458c6f2216e627a58062a0897835b1dd20f8a25475cc0e441acf4c931cd",
+    ".clang-tidy": "27b1de038a07a9476ab195865192e9eebc8b58d036b0f359a6689caf2b7aed64"
+  },
+  "source_stable_during_analysis": true,
+  "command": [
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\bin\\clang-tidy.exe",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c",
+    "-p",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-lint-health",
+    "--config-file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.clang-tidy",
+    "--header-filter=C:[/\\\\]Work[/\\\\]yoRadio[/\\\\]\\.worktree[/\\\\]esp32\\-cyd\\-c3\\-review[/\\\\]",
+    "--export-fixes=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\ota-audio-lint-cyd-publication\\diagnostics.yaml"
+  ],
+  "diagnostics": [
+    {
+      "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h",
+      "line": 47,
+      "column": 33,
+      "severity": "warning",
+      "message": "The value '0' provided to the cast expression is not in the valid range of values for the enum",
+      "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+    }
+  ],
+  "new_diagnostic_signatures": [],
+  "complete_report_sha256": "950eb2d9449d6c30a47a71aaa247b0eda045e17ee0b2f490dd4af766154f8e35",
+  "sdkconfig_sha256": "dbed2b94e9888923957b3463ac6a1494edc91d29da65ba2f496c7f625b895f15",
+  "scope": "Final changed audio unit after complete project/overlay analysis. Compilation database and target headers from the pinned Clang SDK profile; no production GCC or physical runtime claim."
+}

@@ -59,6 +59,12 @@ PDM, continuous DAC и legacy DAC сейчас имеют одинаковые c
 или заявления браузера недостаточно. Переименование project не должно
 незаметно оборвать совместимость OTA.
 
+Позитивная OTA C3 квалифицируется для физических staged/direct PDM backends.
+Experimental QEMU PCM sink не имеет подтверждённого drain/quiet контракта:
+его maintenance pause возвращает `ESP_ERR_NOT_SUPPORTED`. Такой запрос
+может оставить fail-closed cleanup gate до restart; виртуальные OTA и recovery
+не считаются поддержанными. Это не меняет три физических backend CYD.
+
 ## База до переноса и места подключения
 
 Описания отсутствующих функций в этой таблице относятся к исходной базе

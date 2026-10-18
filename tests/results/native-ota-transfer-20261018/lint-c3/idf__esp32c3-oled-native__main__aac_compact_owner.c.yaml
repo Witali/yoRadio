@@ -1,0 +1,233 @@
+---
+MainSourceFile:  'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+Diagnostics:
+  - DiagnosticName:  bugprone-casting-through-void
+    DiagnosticMessage:
+      Message:         'do not cast ''aac_high_channel_view_t *'' to ''aac_high_channel_t *'' through ''void *''; use reinterpret_cast instead'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h'
+      FileOffset:      7382
+      Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint-web-transfer'
+  - DiagnosticName:  clang-analyzer-security.ArrayBound
+    DiagnosticMessage:
+      Message:         'Out of bound access to memory preceding the field ''frame'''
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h'
+      FileOffset:      7400
+      Replacements:    []
+    Notes:
+      - Message:         'Assuming ''state'' is non-null'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+        FileOffset:      11420
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+            FileOffset:      11420
+            Length:          6
+      - Message:         Taking false branch
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+        FileOffset:      11417
+        Replacements:    []
+      - Message:         'Assuming ''owner'' is non-null'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+        FileOffset:      11633
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+            FileOffset:      11633
+            Length:          6
+      - Message:         Taking false branch
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+        FileOffset:      11630
+        Replacements:    []
+      - Message:         'Assuming ''owner'' is equal to field ''owner'''
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+        FileOffset:      11691
+        Replacements:    []
+        Ranges:
+          - FilePath:        ''
+            FileOffset:      0
+            Length:          0
+      - Message:         'expanded from macro ''assert'''
+        FilePath:        'C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include/assert.h'
+        FileOffset:      1369
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include/assert.h'
+            FileOffset:      1369
+            Length:          3
+      - Message:         'Left side of ''&&'' is true'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+        FileOffset:      11691
+        Replacements:    []
+      - Message:         'Assuming field ''inside_sbr'' is false'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+        FileOffset:      11714
+        Replacements:    []
+        Ranges:
+          - FilePath:        ''
+            FileOffset:      0
+            Length:          0
+      - Message:         'expanded from macro ''assert'''
+        FilePath:        'C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include/assert.h'
+        FileOffset:      1369
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include/assert.h'
+            FileOffset:      1369
+            Length:          3
+      - Message:         '''?'' condition is true'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+        FileOffset:      11684
+        Replacements:    []
+      - Message:         'expanded from macro ''assert'''
+        FilePath:        'C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/platform_include/assert.h'
+        FileOffset:      1349
+        Replacements:    []
+      - Message:         'Calling ''aac_high_reset_core'''
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+        FileOffset:      12082
+        Replacements:    []
+        Ranges:
+          - FilePath:        ''
+            FileOffset:      0
+            Length:          0
+      - Message:         'expanded from macro ''aac_sbr_reset_core'''
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\aac_compact_owner.c'
+        FileOffset:      1091
+        Replacements:    []
+      - Message:         Loop condition is true.  Entering loop body
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      284
+        Replacements:    []
+      - Message:         Loop condition is true.  Entering loop body
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      284
+        Replacements:    []
+      - Message:         Loop condition is false. Execution continues on line 9
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      284
+        Replacements:    []
+      - Message:         '''sbr'' is non-null'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      414
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+            FileOffset:      414
+            Length:          3
+      - Message:         'Left side of ''&&'' is true'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      414
+        Replacements:    []
+      - Message:         Assuming the condition is true
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      421
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+            FileOffset:      421
+            Length:          20
+      - Message:         'Left side of ''&&'' is true'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      414
+        Replacements:    []
+      - Message:         'Assuming field ''plus_enabled'' is not equal to 0'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      445
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+            FileOffset:      445
+            Length:          18
+      - Message:         Taking true branch
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      411
+        Replacements:    []
+      - Message:         Loop condition is true.  Entering loop body
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      509
+        Replacements:    []
+      - Message:         '''ch'' is 0'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      989
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+            FileOffset:      989
+            Length:          2
+      - Message:         'Left side of ''&&'' is false'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      992
+        Replacements:    []
+      - Message:         Loop condition is true.  Entering loop body
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      509
+        Replacements:    []
+      - Message:         '''ch'' is 1'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      989
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+            FileOffset:      989
+            Length:          2
+      - Message:         'Left side of ''&&'' is true'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      989
+        Replacements:    []
+      - Message:         'Assuming field ''ps_present'' is equal to 1'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      995
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+            FileOffset:      995
+            Length:          19
+      - Message:         'Left side of ''&&'' is true'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      989
+        Replacements:    []
+      - Message:         'Field ''ps_initialized'' is true'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      1023
+        Replacements:    []
+      - Message:         '''?'' condition is true'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      989
+        Replacements:    []
+      - Message:         'Calling ''aac_high_ps_synthesis'''
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+        FileOffset:      1056
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_reset.h'
+            FileOffset:      1056
+            Length:          36
+      - Message:         'Access of the field ''frame'' at negative byte offset -96'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h'
+        FileOffset:      7400
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h'
+            FileOffset:      7359
+            Length:          53
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint-web-transfer'
+  - DiagnosticName:  performance-no-int-to-ptr
+    DiagnosticMessage:
+      Message:         integer to pointer cast pessimizes optimization opportunities
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h'
+      FileOffset:      8277
+      Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint-web-transfer'
+  - DiagnosticName:  performance-no-int-to-ptr
+    DiagnosticMessage:
+      Message:         integer to pointer cast pessimizes optimization opportunities
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/aac_high_history_abi.h'
+      FileOffset:      8447
+      Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint-web-transfer'
+...

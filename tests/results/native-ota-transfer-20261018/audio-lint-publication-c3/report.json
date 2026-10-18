@@ -1,0 +1,60 @@
+{
+  "passed": true,
+  "board": "c3",
+  "source_sha256": {
+    ".build/run-ota-audio-lint.py": "0ef915f66865e5cf8f392e53f0238b2fa16a967a4b401671169475f75605b35f",
+    "idf/esp32c3-oled-native/main/audio_service.c": "c98f0ab7f4e07bd561c0b88b307ecabda5885ea9e8540987f98c58d049f5a674",
+    "idf/esp32c3-oled-native/main/audio_service.h": "21c0608c4529917d7befef61e37d53c1442300c6a752e94d5b0492c500c09d61",
+    "idf/esp32c3-oled-native/main/native_state.h": "9401dc2f6b6fc1dc91945908be840ac1db8cf4222e1e6bec4829c501f155e6ef",
+    "idf/esp32c3-oled-native/main/native_audio_output.h": "be6ec279f1a7f93f259f6cfcd2919f329ea589f1d5bcf187a25b46c6135f9815",
+    ".clang-tidy": "27b1de038a07a9476ab195865192e9eebc8b58d036b0f359a6689caf2b7aed64"
+  },
+  "source_stable_during_analysis": true,
+  "command": [
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\esp-clang\\esp-21.1.3_20260408\\esp-clang\\bin\\clang-tidy.exe",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c",
+    "-p",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-web-transfer",
+    "--config-file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.clang-tidy",
+    "--header-filter=C:[/\\\\]Work[/\\\\]yoRadio[/\\\\]\\.worktree[/\\\\]esp32\\-cyd\\-c3\\-review[/\\\\]",
+    "--export-fixes=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\ota-audio-lint-c3-publication\\diagnostics.yaml"
+  ],
+  "diagnostics": [
+    {
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_stream/include/stream_frames.h",
+      "line": 47,
+      "column": 33,
+      "severity": "warning",
+      "message": "The value '0' provided to the cast expression is not in the valid range of values for the enum",
+      "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+    },
+    {
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c",
+      "line": 450,
+      "column": 14,
+      "severity": "warning",
+      "message": "Value stored to 'load_tenths' during its initialization is never read",
+      "check": "clang-analyzer-deadcode.DeadStores"
+    },
+    {
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c",
+      "line": 454,
+      "column": 14,
+      "severity": "warning",
+      "message": "Value stored to 'speed_hundredths' during its initialization is never read",
+      "check": "clang-analyzer-deadcode.DeadStores"
+    },
+    {
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c",
+      "line": 2267,
+      "column": 5,
+      "severity": "warning",
+      "message": "Value stored to 'encoded_ring_size' is never read",
+      "check": "clang-analyzer-deadcode.DeadStores"
+    }
+  ],
+  "new_diagnostic_signatures": [],
+  "complete_report_sha256": "760c55365ea8d1ed6d6964914f0f53e532ae002f68a9f3b8fcfeb8c8934d1c29",
+  "sdkconfig_sha256": "4f9764fc4225c3d4ab2c110f517a832c7ec1813e0132bc68c7017212ddb3ed88",
+  "scope": "Final changed audio unit after complete project/overlay analysis. Compilation database and target headers from the pinned Clang SDK profile; no production GCC or physical runtime claim."
+}

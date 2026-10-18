@@ -1,0 +1,346 @@
+{
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-native-ota-integration.py": "b4c93a55418ad3a6843adfdb00ca545623ef9fbf3eca0baf4631758a099ddb39",
+    "tests/native/ota_integration/client.py": "62affbc6ba713d357f8c74beb04b3392d59b453036e9889dc3d3262a60b51924",
+    "tests/native/ota_integration/platform.c": "3c48b7bd2688350a6e6b6b196d95c363ac4b02ed1f4e04f1d77c99c7d94c3f76",
+    "tests/native/ota_integration/test.c": "4650e849691a1f2601ca437b5e692dd9e6b2660ecc97fd43f5ec57b04c409d9d"
+  },
+  "variants": {
+    "cyd-plain": {
+      "passed": true,
+      "result": "PASS OTA wire integration: 11 localhost HTTP cases; 11 actual SDK session deletions; whole parser/URI/handler/ESP_FAIL/no-purge and workspace singlefree",
+      "http_source_sha256": {
+        "tests/run-native-ota-http.py": "d037297acc35d78776e1e0f1289583e9d82fa0509139b8c19363c9fc3e2f2b5c",
+        "tests/native/ota_http/host.h": "6049366200288a3d3fc501c48c360cb12298b651b0f9e86b0295c0a6e5d8fc6f",
+        "tests/native/ota_http/platform.c": "91db129c32bb405f7d3ff109cfc80c23b6be13905b5f83aaccfbb000e5917ec5",
+        "tests/native/ota_http/test.c": "ebfa76f9d8d030810838d13f0c3849a0bb27d70bcec024063caca586b54d9287",
+        "idf/components/native_ota/native_ota_form.c": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f",
+        "idf/components/native_ota/native_ota_http.c": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8",
+        "idf/components/native_ota/native_ota_sink.c": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2",
+        "idf/components/native_ota/include/native_ota_form.h": "f3149208c358ef906a4bd9014f0f8b1961791992cc0d33f00168e3c1b22818a0",
+        "idf/components/native_ota/include/native_ota_http.h": "5f1ec06dcc00ea5ef006b4e4ff6019d7856f0739b03b9ca062650c55a518fee9",
+        "idf/components/native_ota/include/native_ota_sink.h": "4e27ffa36951b4fd2f459e094c4ef287bad5b163ce3bc9b74b05cd846a3d2dde",
+        "idf/components/native_storage/include/web_multipart.h": "0a09a6302365c4e13f34f5f43744ca58ffd659258178a489461ae581b06f214c",
+        "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+        "idf/esp32-cyd2usb-native/main/web_ota.c": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4",
+        "idf/esp32-cyd2usb-native/main/web_ota.h": "31eb71b6bd425311f17ceddba60c173666267cbfd2cf2ba689ebc302fdf1f409",
+        "idf/esp32-cyd2usb-native/main/web_reboot.c": "399aaa9ca4a55528214e62d3b445abf8a43527443a824fa00177a553b805444e",
+        "idf/esp32-cyd2usb-native/main/web_reboot.h": "a224058b4cf48a49bd467ca50af7b8ed2acb8e9adfeb2cd2938e4d7e47479b76",
+        "idf/esp32-cyd2usb-native/main/audio_service.h": "2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+        "idf/esp32c3-oled-native/main/web_ota.c": "67ac4bb57c8cca388d33ce76fe6e3be43e56c3fb04b297f25e35055af5b3736b",
+        "idf/esp32c3-oled-native/main/web_ota.h": "85f79981a20fc366af5fb6ebebef3c39f6edf466b83a9a85a0d5a3e158624d7d",
+        "idf/esp32c3-oled-native/main/ota_upload.c": "7d50473fa6b3dbed2e1603d0755cc3fb2faf25c6e650f7674cf9e2fc7488efaf",
+        "idf/esp32c3-oled-native/main/ota_upload.h": "32f70cbcd1970a2442a87dce27c72b0094b0a8878252e1b076566050837a86cc",
+        "idf/esp32c3-oled-native/main/websocket_service.c": "b82874640b2022851fa20e31db25c032810e50ff64478f224594613289225afd",
+        "idf/esp32c3-oled-native/main/websocket_service.h": "870786b4028900c2d14022f2316d05f3246254db35737af3d52d6e6a1b797a07",
+        "idf/esp32c3-oled-native/main/audio_service.h": "21c0608c4529917d7befef61e37d53c1442300c6a752e94d5b0492c500c09d61"
+      },
+      "sdk_overlay": {
+        "sdk_profile": "6.0.2",
+        "sdk_source_sha256": {
+          "httpd_ws.c": "50bc91f7389b40828ab949bac11481d28545a4da2d87d0b1ee99ec0d04645fd3",
+          "httpd_parse.c": "5234fd5fc3b566532bf79a6c787664d5077d0aa03001a2d63c0999f063282e90"
+        },
+        "sdk_header_sha256": {
+          "src/esp_httpd_priv.h": "106a3bf927a885892f66514c6a4075c04e04db068fb64ca11dd8ca4b4253dfc8",
+          "include/esp_http_server.h": "3a40def13721f5cb0696308ddefd4c07d4cf986c00c915aef478715fec302124"
+        },
+        "generated_sha256": {
+          "httpd_ws.c": "2e6b0dbbf2ccb169a090ab168a7260e4ee95e99790989005295f58529e32a920",
+          "httpd_parse.c": "bd140961d2d83db05c6e2f0e068d8e6dcb8edd20621812251e220728a24dd942"
+        }
+      },
+      "sdk_sha256": {
+        "components/esp_http_server/src/httpd_ws.c": "50bc91f7389b40828ab949bac11481d28545a4da2d87d0b1ee99ec0d04645fd3",
+        "components/esp_http_server/src/httpd_parse.c": "5234fd5fc3b566532bf79a6c787664d5077d0aa03001a2d63c0999f063282e90",
+        "components/esp_http_server/src/httpd_sess.c": "96fb619e14b097e2f485db8cf3372e8768117d68cfefc5f7ee036804caf2f904",
+        "components/esp_http_server/src/httpd_txrx.c": "f11d9887a9f8c1c3e21416b82b3d43e050d60c5876aae06b2481cca389b4aef7",
+        "components/esp_http_server/src/httpd_uri.c": "94317d636a672ca42456088291957a4b7bbc4028b7ff4160f024f8bdf7463811",
+        "components/esp_http_server/src/esp_httpd_priv.h": "106a3bf927a885892f66514c6a4075c04e04db068fb64ca11dd8ca4b4253dfc8",
+        "components/esp_http_server/include/esp_http_server.h": "3a40def13721f5cb0696308ddefd4c07d4cf986c00c915aef478715fec302124",
+        "components/http_parser/http_parser.c": "bc5750d936bdb1ca6064f65ec31f66578c9fee2a691ac298081fbc73a668be34",
+        "components/http_parser/http_parser.h": "caa7e5e6571a9067008b1bcb999c46f84157121163df2abec537fc39eeb8ba4d",
+        "components/mbedtls/mbedtls/tf-psa-crypto/utilities/base64.c": "5a8eb4e03e548aa95e33e14b92b2d663347d93a5ea338d9ed74f67aee437a42a"
+      },
+      "composed_sha256": {
+        "crypto.inc": "56cf9dce5918896e13b7fa78485458a071b73e0f787ce2b375fc42db328d4f95",
+        "reboot.inc": "4174358a18ec64eb1c940b97b5509418091e4be1b9c63cab5df83fed55a4d89f",
+        "sdk-base64.inc": "48491978ffd930cea3dc901e8ae792189cfa6e89dc8ba6c8b74bcfcd14b53b35",
+        "sdk-image-types.inc": "d851dfebd923abaafdd49a12a645afa0c5926572a6654c94d6bc87e5fc16eb2f",
+        "sdk-parse.inc": "65446ef1f0c9da7d801422d0727549d4bd2d1c3bc866b77ce7576b0d5a094d18",
+        "sdk-response.inc": "3714fbca096d8a641648c6d1fba3bd2f5aa551e364635fd5845abb7abc0dd833",
+        "sdk-sess.inc": "6aa7c0ba85628109fc1872490f1db21cd81925e1f235f8de0ffbba38f4c0494e",
+        "sdk-txrx.inc": "2aace20557fea8adf57ab88a333e2458bbcd4c9c947273b62b743f1b0a89e345",
+        "sdk-uri.inc": "e0e544afe0414218b3f8fd1a73d640ed6b86f8ee9967e96ac5e0182297d449c5",
+        "sdk-ws.inc": "0bf128e64c4a3629aa027c68e40f48855ea466a83b8c8bedaa809b6d3b51824d",
+        "target.inc": "fd2145a212175d82b3739b3a845bf3b8bee6f5a181bbf177df9c26aadef4e3d8"
+      },
+      "generated_model_sha256": "197c043ad1ec790c756d1cdb25bec766674adb3cf0e604f6ac8677ac6b911c61",
+      "negative_control": {
+        "terminal_return_ESP_OK": "DETECTED_BY_ACTUAL_SDK_BODY_PURGE",
+        "result": "NEGATIVE_CONTROL_FAIL: terminal ESP_OK entered actual SDK req_delete=1 body-purge-receives=4 after OTA rejection",
+        "exit_code": 1
+      }
+    },
+    "cyd-tls": {
+      "passed": true,
+      "result": "PASS OTA wire integration: 11 localhost HTTP cases; 11 actual SDK session deletions; whole parser/URI/handler/ESP_FAIL/no-purge and workspace singlefree",
+      "http_source_sha256": {
+        "tests/run-native-ota-http.py": "d037297acc35d78776e1e0f1289583e9d82fa0509139b8c19363c9fc3e2f2b5c",
+        "tests/native/ota_http/host.h": "6049366200288a3d3fc501c48c360cb12298b651b0f9e86b0295c0a6e5d8fc6f",
+        "tests/native/ota_http/platform.c": "91db129c32bb405f7d3ff109cfc80c23b6be13905b5f83aaccfbb000e5917ec5",
+        "tests/native/ota_http/test.c": "ebfa76f9d8d030810838d13f0c3849a0bb27d70bcec024063caca586b54d9287",
+        "idf/components/native_ota/native_ota_form.c": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f",
+        "idf/components/native_ota/native_ota_http.c": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8",
+        "idf/components/native_ota/native_ota_sink.c": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2",
+        "idf/components/native_ota/include/native_ota_form.h": "f3149208c358ef906a4bd9014f0f8b1961791992cc0d33f00168e3c1b22818a0",
+        "idf/components/native_ota/include/native_ota_http.h": "5f1ec06dcc00ea5ef006b4e4ff6019d7856f0739b03b9ca062650c55a518fee9",
+        "idf/components/native_ota/include/native_ota_sink.h": "4e27ffa36951b4fd2f459e094c4ef287bad5b163ce3bc9b74b05cd846a3d2dde",
+        "idf/components/native_storage/include/web_multipart.h": "0a09a6302365c4e13f34f5f43744ca58ffd659258178a489461ae581b06f214c",
+        "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+        "idf/esp32-cyd2usb-native/main/web_ota.c": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4",
+        "idf/esp32-cyd2usb-native/main/web_ota.h": "31eb71b6bd425311f17ceddba60c173666267cbfd2cf2ba689ebc302fdf1f409",
+        "idf/esp32-cyd2usb-native/main/web_reboot.c": "399aaa9ca4a55528214e62d3b445abf8a43527443a824fa00177a553b805444e",
+        "idf/esp32-cyd2usb-native/main/web_reboot.h": "a224058b4cf48a49bd467ca50af7b8ed2acb8e9adfeb2cd2938e4d7e47479b76",
+        "idf/esp32-cyd2usb-native/main/audio_service.h": "2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+        "idf/esp32c3-oled-native/main/web_ota.c": "67ac4bb57c8cca388d33ce76fe6e3be43e56c3fb04b297f25e35055af5b3736b",
+        "idf/esp32c3-oled-native/main/web_ota.h": "85f79981a20fc366af5fb6ebebef3c39f6edf466b83a9a85a0d5a3e158624d7d",
+        "idf/esp32c3-oled-native/main/ota_upload.c": "7d50473fa6b3dbed2e1603d0755cc3fb2faf25c6e650f7674cf9e2fc7488efaf",
+        "idf/esp32c3-oled-native/main/ota_upload.h": "32f70cbcd1970a2442a87dce27c72b0094b0a8878252e1b076566050837a86cc",
+        "idf/esp32c3-oled-native/main/websocket_service.c": "b82874640b2022851fa20e31db25c032810e50ff64478f224594613289225afd",
+        "idf/esp32c3-oled-native/main/websocket_service.h": "870786b4028900c2d14022f2316d05f3246254db35737af3d52d6e6a1b797a07",
+        "idf/esp32c3-oled-native/main/audio_service.h": "21c0608c4529917d7befef61e37d53c1442300c6a752e94d5b0492c500c09d61"
+      },
+      "sdk_overlay": {
+        "sdk_profile": "6.0.2",
+        "sdk_source_sha256": {
+          "httpd_ws.c": "50bc91f7389b40828ab949bac11481d28545a4da2d87d0b1ee99ec0d04645fd3",
+          "httpd_parse.c": "5234fd5fc3b566532bf79a6c787664d5077d0aa03001a2d63c0999f063282e90"
+        },
+        "sdk_header_sha256": {
+          "src/esp_httpd_priv.h": "106a3bf927a885892f66514c6a4075c04e04db068fb64ca11dd8ca4b4253dfc8",
+          "include/esp_http_server.h": "3a40def13721f5cb0696308ddefd4c07d4cf986c00c915aef478715fec302124"
+        },
+        "generated_sha256": {
+          "httpd_ws.c": "2e6b0dbbf2ccb169a090ab168a7260e4ee95e99790989005295f58529e32a920",
+          "httpd_parse.c": "bd140961d2d83db05c6e2f0e068d8e6dcb8edd20621812251e220728a24dd942"
+        }
+      },
+      "sdk_sha256": {
+        "components/esp_http_server/src/httpd_ws.c": "50bc91f7389b40828ab949bac11481d28545a4da2d87d0b1ee99ec0d04645fd3",
+        "components/esp_http_server/src/httpd_parse.c": "5234fd5fc3b566532bf79a6c787664d5077d0aa03001a2d63c0999f063282e90",
+        "components/esp_http_server/src/httpd_sess.c": "96fb619e14b097e2f485db8cf3372e8768117d68cfefc5f7ee036804caf2f904",
+        "components/esp_http_server/src/httpd_txrx.c": "f11d9887a9f8c1c3e21416b82b3d43e050d60c5876aae06b2481cca389b4aef7",
+        "components/esp_http_server/src/httpd_uri.c": "94317d636a672ca42456088291957a4b7bbc4028b7ff4160f024f8bdf7463811",
+        "components/esp_http_server/src/esp_httpd_priv.h": "106a3bf927a885892f66514c6a4075c04e04db068fb64ca11dd8ca4b4253dfc8",
+        "components/esp_http_server/include/esp_http_server.h": "3a40def13721f5cb0696308ddefd4c07d4cf986c00c915aef478715fec302124",
+        "components/http_parser/http_parser.c": "bc5750d936bdb1ca6064f65ec31f66578c9fee2a691ac298081fbc73a668be34",
+        "components/http_parser/http_parser.h": "caa7e5e6571a9067008b1bcb999c46f84157121163df2abec537fc39eeb8ba4d",
+        "components/mbedtls/mbedtls/tf-psa-crypto/utilities/base64.c": "5a8eb4e03e548aa95e33e14b92b2d663347d93a5ea338d9ed74f67aee437a42a"
+      },
+      "composed_sha256": {
+        "crypto.inc": "56cf9dce5918896e13b7fa78485458a071b73e0f787ce2b375fc42db328d4f95",
+        "reboot.inc": "4174358a18ec64eb1c940b97b5509418091e4be1b9c63cab5df83fed55a4d89f",
+        "sdk-base64.inc": "48491978ffd930cea3dc901e8ae792189cfa6e89dc8ba6c8b74bcfcd14b53b35",
+        "sdk-functions.inc": "e7d20b3ba27c9a6df3ce88ae4143a47a466fc855bd90aabb3caaf7fa1fc4b942",
+        "sdk-image-types.inc": "d851dfebd923abaafdd49a12a645afa0c5926572a6654c94d6bc87e5fc16eb2f",
+        "sdk-parse.inc": "65446ef1f0c9da7d801422d0727549d4bd2d1c3bc866b77ce7576b0d5a094d18",
+        "sdk-response.inc": "3714fbca096d8a641648c6d1fba3bd2f5aa551e364635fd5845abb7abc0dd833",
+        "sdk-sess.inc": "6aa7c0ba85628109fc1872490f1db21cd81925e1f235f8de0ffbba38f4c0494e",
+        "sdk-txrx.inc": "2aace20557fea8adf57ab88a333e2458bbcd4c9c947273b62b743f1b0a89e345",
+        "sdk-uri.inc": "e0e544afe0414218b3f8fd1a73d640ed6b86f8ee9967e96ac5e0182297d449c5",
+        "sdk-ws.inc": "0bf128e64c4a3629aa027c68e40f48855ea466a83b8c8bedaa809b6d3b51824d",
+        "target.inc": "fd2145a212175d82b3739b3a845bf3b8bee6f5a181bbf177df9c26aadef4e3d8",
+        "transport-production.inc": "a31e761e70c173ece5e4e1dff20c9df1f500f41cfcdc705dae2dd4d9a5a82b6a"
+      },
+      "generated_model_sha256": "197c043ad1ec790c756d1cdb25bec766674adb3cf0e604f6ac8677ac6b911c61",
+      "tls_report_sha256": "eb57c462966e48ae412fb8aea0f8d07fbf3300b21bb6fc1cc44a3894da44d5a8",
+      "crypto_archive_sha256": "1abf0539362bf5ec98d2d463618b19eee11b93e1a22ac1048f711d3b9bae673e",
+      "tls_source_sha256": {
+        "tests/run-native-web-tls.py": "f7ca992ce6848190c3f8454a6b9d85935f8feb316637431d9f1cb4c1214b5b97",
+        "tests/native/native_web_transport/esp_tls_host.c": "8d529fe6aca7fdd572adda6e9e4a4ec813b29943dd539c040a2c31583e0bfde8",
+        "tests/native/native_web_transport/tls_client.py": "e1a242917f3396845e0def67c250e080c175f500e63ac22b7656f9a2717a3325",
+        "idf/components/native_web_transport/native_web_transport.c": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf",
+        "idf/components/native_web_transport/include/native_web_transport.h": "c4122c3f2d960e8922ceaa1c179c415e15e3d74abdea86424e6fde4633e0a045",
+        "idf/components/native_web_transport/tools/pack_tls_bundle.py": "e9986a083e0e08de45662b3012b6e3c912f2ace75dce33676e012f749615e6f8",
+        "sdk/components/esp-tls/esp_tls.c": "1790a0c7de2b41f1f44caceae0fbc0a0fd366e3e6570750eeb4fa0a91fe2f93f",
+        "sdk/components/esp-tls/esp_tls_mbedtls.c": "72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7",
+        "sdk/components/esp-tls/esp_tls.h": "ce5b788664885025e509cc17fed24844b9fc4ed3a8cec8da5c87c199fd8e168d",
+        "sdk/components/esp-tls/esp_tls_errors.h": "5ec732e7dee5c82c4523cfa6a471f077ac7e88adbfe6d1855087865e3318dd2a",
+        "sdk/components/esp-tls/private_include/esp_tls_private.h": "132fed94eed0f33d480037f4c58944b98d2fefc5de64f11197a79ab9e0343dad",
+        "sdk/components/esp-tls/private_include/esp_tls_mbedtls.h": "58df4a52cbcfe6a5193bad9a06bddc0a28be83139e2736d8d4b4ec2bfb198762"
+      }
+    },
+    "c3-plain": {
+      "passed": true,
+      "result": "PASS OTA wire integration: 11 localhost HTTP cases; 11 actual SDK session deletions; whole parser/URI/handler/ESP_FAIL/no-purge and workspace singlefree",
+      "http_source_sha256": {
+        "tests/run-native-ota-http.py": "d037297acc35d78776e1e0f1289583e9d82fa0509139b8c19363c9fc3e2f2b5c",
+        "tests/native/ota_http/host.h": "6049366200288a3d3fc501c48c360cb12298b651b0f9e86b0295c0a6e5d8fc6f",
+        "tests/native/ota_http/platform.c": "91db129c32bb405f7d3ff109cfc80c23b6be13905b5f83aaccfbb000e5917ec5",
+        "tests/native/ota_http/test.c": "ebfa76f9d8d030810838d13f0c3849a0bb27d70bcec024063caca586b54d9287",
+        "idf/components/native_ota/native_ota_form.c": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f",
+        "idf/components/native_ota/native_ota_http.c": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8",
+        "idf/components/native_ota/native_ota_sink.c": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2",
+        "idf/components/native_ota/include/native_ota_form.h": "f3149208c358ef906a4bd9014f0f8b1961791992cc0d33f00168e3c1b22818a0",
+        "idf/components/native_ota/include/native_ota_http.h": "5f1ec06dcc00ea5ef006b4e4ff6019d7856f0739b03b9ca062650c55a518fee9",
+        "idf/components/native_ota/include/native_ota_sink.h": "4e27ffa36951b4fd2f459e094c4ef287bad5b163ce3bc9b74b05cd846a3d2dde",
+        "idf/components/native_storage/include/web_multipart.h": "0a09a6302365c4e13f34f5f43744ca58ffd659258178a489461ae581b06f214c",
+        "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+        "idf/esp32-cyd2usb-native/main/web_ota.c": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4",
+        "idf/esp32-cyd2usb-native/main/web_ota.h": "31eb71b6bd425311f17ceddba60c173666267cbfd2cf2ba689ebc302fdf1f409",
+        "idf/esp32-cyd2usb-native/main/web_reboot.c": "399aaa9ca4a55528214e62d3b445abf8a43527443a824fa00177a553b805444e",
+        "idf/esp32-cyd2usb-native/main/web_reboot.h": "a224058b4cf48a49bd467ca50af7b8ed2acb8e9adfeb2cd2938e4d7e47479b76",
+        "idf/esp32-cyd2usb-native/main/audio_service.h": "2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+        "idf/esp32c3-oled-native/main/web_ota.c": "67ac4bb57c8cca388d33ce76fe6e3be43e56c3fb04b297f25e35055af5b3736b",
+        "idf/esp32c3-oled-native/main/web_ota.h": "85f79981a20fc366af5fb6ebebef3c39f6edf466b83a9a85a0d5a3e158624d7d",
+        "idf/esp32c3-oled-native/main/ota_upload.c": "7d50473fa6b3dbed2e1603d0755cc3fb2faf25c6e650f7674cf9e2fc7488efaf",
+        "idf/esp32c3-oled-native/main/ota_upload.h": "32f70cbcd1970a2442a87dce27c72b0094b0a8878252e1b076566050837a86cc",
+        "idf/esp32c3-oled-native/main/websocket_service.c": "b82874640b2022851fa20e31db25c032810e50ff64478f224594613289225afd",
+        "idf/esp32c3-oled-native/main/websocket_service.h": "870786b4028900c2d14022f2316d05f3246254db35737af3d52d6e6a1b797a07",
+        "idf/esp32c3-oled-native/main/audio_service.h": "21c0608c4529917d7befef61e37d53c1442300c6a752e94d5b0492c500c09d61"
+      },
+      "sdk_overlay": {
+        "sdk_profile": "6.1",
+        "sdk_source_sha256": {
+          "httpd_ws.c": "744304f779c54064d6453d2af3dcabde36c3b255a7930cbd903c0e8e4225eb3a",
+          "httpd_parse.c": "e32809f8f0bf820382759756b7fc3bb73fb4cf6ff3410d3fc26f27fc6e6cd280"
+        },
+        "sdk_header_sha256": {
+          "src/esp_httpd_priv.h": "e7032f9425979c2063548360249f58da2d945c86ed3bb6fafd3e5cf6101a708a",
+          "include/esp_http_server.h": "70cc75089d4a6a443e88d01cdbc8dff829c952d03bdece657da66d266294d8c7"
+        },
+        "generated_sha256": {
+          "httpd_ws.c": "33fad3dbb01815db3d20cfb4efbe450135cec03e57b0e5e34bcb90ae811ff946",
+          "httpd_parse.c": "1dff87c03c8abcf13ab5d0aacac088c685a8953b737bae674fde245d791ff396"
+        }
+      },
+      "sdk_sha256": {
+        "components/esp_http_server/src/httpd_ws.c": "744304f779c54064d6453d2af3dcabde36c3b255a7930cbd903c0e8e4225eb3a",
+        "components/esp_http_server/src/httpd_parse.c": "e32809f8f0bf820382759756b7fc3bb73fb4cf6ff3410d3fc26f27fc6e6cd280",
+        "components/esp_http_server/src/httpd_sess.c": "96fb619e14b097e2f485db8cf3372e8768117d68cfefc5f7ee036804caf2f904",
+        "components/esp_http_server/src/httpd_txrx.c": "db2e0165c4c6aaff43615f68357cd3adc4f2f3a0cea8fe988e72ff31f0735436",
+        "components/esp_http_server/src/httpd_uri.c": "c26d04fd77cd3a5bb9836588718b9e4fc69ba145b9654f56aed7ac51468f43d1",
+        "components/esp_http_server/src/esp_httpd_priv.h": "e7032f9425979c2063548360249f58da2d945c86ed3bb6fafd3e5cf6101a708a",
+        "components/esp_http_server/include/esp_http_server.h": "70cc75089d4a6a443e88d01cdbc8dff829c952d03bdece657da66d266294d8c7",
+        "components/http_parser/http_parser.c": "bc5750d936bdb1ca6064f65ec31f66578c9fee2a691ac298081fbc73a668be34",
+        "components/http_parser/http_parser.h": "caa7e5e6571a9067008b1bcb999c46f84157121163df2abec537fc39eeb8ba4d",
+        "components/mbedtls/mbedtls/tf-psa-crypto/utilities/base64.c": "5a8eb4e03e548aa95e33e14b92b2d663347d93a5ea338d9ed74f67aee437a42a"
+      },
+      "composed_sha256": {
+        "crypto.inc": "56cf9dce5918896e13b7fa78485458a071b73e0f787ce2b375fc42db328d4f95",
+        "reboot.inc": "2f4009be0b590d1c1d6972056e1a868fcbc38f62cb6e02687a3b7a52b3bdb4b5",
+        "sdk-base64.inc": "48491978ffd930cea3dc901e8ae792189cfa6e89dc8ba6c8b74bcfcd14b53b35",
+        "sdk-image-types.inc": "d851dfebd923abaafdd49a12a645afa0c5926572a6654c94d6bc87e5fc16eb2f",
+        "sdk-parse.inc": "b304767e9d84740d493c45322d6e0a5136927a78c47d25e804841a650174db9e",
+        "sdk-response.inc": "3714fbca096d8a641648c6d1fba3bd2f5aa551e364635fd5845abb7abc0dd833",
+        "sdk-sess.inc": "6aa7c0ba85628109fc1872490f1db21cd81925e1f235f8de0ffbba38f4c0494e",
+        "sdk-txrx.inc": "2aace20557fea8adf57ab88a333e2458bbcd4c9c947273b62b743f1b0a89e345",
+        "sdk-uri.inc": "ae27199027dd072ac149255c061934787b4f25ee1995a9c2554c6254dc34532c",
+        "sdk-ws.inc": "234a9491c790111b5cf0cbbaf30469b8aa70b761aa590cd16c8c67e6e11eab01",
+        "target.inc": "b3bcec97049e9d51aa9bace2ddf07cc3df27549d038736acaee9ef028891b613"
+      },
+      "generated_model_sha256": "197c043ad1ec790c756d1cdb25bec766674adb3cf0e604f6ac8677ac6b911c61"
+    },
+    "c3-tls": {
+      "passed": true,
+      "result": "PASS OTA wire integration: 11 localhost HTTP cases; 11 actual SDK session deletions; whole parser/URI/handler/ESP_FAIL/no-purge and workspace singlefree",
+      "http_source_sha256": {
+        "tests/run-native-ota-http.py": "d037297acc35d78776e1e0f1289583e9d82fa0509139b8c19363c9fc3e2f2b5c",
+        "tests/native/ota_http/host.h": "6049366200288a3d3fc501c48c360cb12298b651b0f9e86b0295c0a6e5d8fc6f",
+        "tests/native/ota_http/platform.c": "91db129c32bb405f7d3ff109cfc80c23b6be13905b5f83aaccfbb000e5917ec5",
+        "tests/native/ota_http/test.c": "ebfa76f9d8d030810838d13f0c3849a0bb27d70bcec024063caca586b54d9287",
+        "idf/components/native_ota/native_ota_form.c": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f",
+        "idf/components/native_ota/native_ota_http.c": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8",
+        "idf/components/native_ota/native_ota_sink.c": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2",
+        "idf/components/native_ota/include/native_ota_form.h": "f3149208c358ef906a4bd9014f0f8b1961791992cc0d33f00168e3c1b22818a0",
+        "idf/components/native_ota/include/native_ota_http.h": "5f1ec06dcc00ea5ef006b4e4ff6019d7856f0739b03b9ca062650c55a518fee9",
+        "idf/components/native_ota/include/native_ota_sink.h": "4e27ffa36951b4fd2f459e094c4ef287bad5b163ce3bc9b74b05cd846a3d2dde",
+        "idf/components/native_storage/include/web_multipart.h": "0a09a6302365c4e13f34f5f43744ca58ffd659258178a489461ae581b06f214c",
+        "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+        "idf/esp32-cyd2usb-native/main/web_ota.c": "0c626ff28fce10c0907fd1ad628c3eedb3e9b9a425750aa32f3bb32f0baeacd4",
+        "idf/esp32-cyd2usb-native/main/web_ota.h": "31eb71b6bd425311f17ceddba60c173666267cbfd2cf2ba689ebc302fdf1f409",
+        "idf/esp32-cyd2usb-native/main/web_reboot.c": "399aaa9ca4a55528214e62d3b445abf8a43527443a824fa00177a553b805444e",
+        "idf/esp32-cyd2usb-native/main/web_reboot.h": "a224058b4cf48a49bd467ca50af7b8ed2acb8e9adfeb2cd2938e4d7e47479b76",
+        "idf/esp32-cyd2usb-native/main/audio_service.h": "2ec37c788d923e8ffab54579f35c84dfefb12a0852b8954f9f688f013e72b689",
+        "idf/esp32c3-oled-native/main/web_ota.c": "67ac4bb57c8cca388d33ce76fe6e3be43e56c3fb04b297f25e35055af5b3736b",
+        "idf/esp32c3-oled-native/main/web_ota.h": "85f79981a20fc366af5fb6ebebef3c39f6edf466b83a9a85a0d5a3e158624d7d",
+        "idf/esp32c3-oled-native/main/ota_upload.c": "7d50473fa6b3dbed2e1603d0755cc3fb2faf25c6e650f7674cf9e2fc7488efaf",
+        "idf/esp32c3-oled-native/main/ota_upload.h": "32f70cbcd1970a2442a87dce27c72b0094b0a8878252e1b076566050837a86cc",
+        "idf/esp32c3-oled-native/main/websocket_service.c": "b82874640b2022851fa20e31db25c032810e50ff64478f224594613289225afd",
+        "idf/esp32c3-oled-native/main/websocket_service.h": "870786b4028900c2d14022f2316d05f3246254db35737af3d52d6e6a1b797a07",
+        "idf/esp32c3-oled-native/main/audio_service.h": "21c0608c4529917d7befef61e37d53c1442300c6a752e94d5b0492c500c09d61"
+      },
+      "sdk_overlay": {
+        "sdk_profile": "6.1",
+        "sdk_source_sha256": {
+          "httpd_ws.c": "744304f779c54064d6453d2af3dcabde36c3b255a7930cbd903c0e8e4225eb3a",
+          "httpd_parse.c": "e32809f8f0bf820382759756b7fc3bb73fb4cf6ff3410d3fc26f27fc6e6cd280"
+        },
+        "sdk_header_sha256": {
+          "src/esp_httpd_priv.h": "e7032f9425979c2063548360249f58da2d945c86ed3bb6fafd3e5cf6101a708a",
+          "include/esp_http_server.h": "70cc75089d4a6a443e88d01cdbc8dff829c952d03bdece657da66d266294d8c7"
+        },
+        "generated_sha256": {
+          "httpd_ws.c": "33fad3dbb01815db3d20cfb4efbe450135cec03e57b0e5e34bcb90ae811ff946",
+          "httpd_parse.c": "1dff87c03c8abcf13ab5d0aacac088c685a8953b737bae674fde245d791ff396"
+        }
+      },
+      "sdk_sha256": {
+        "components/esp_http_server/src/httpd_ws.c": "744304f779c54064d6453d2af3dcabde36c3b255a7930cbd903c0e8e4225eb3a",
+        "components/esp_http_server/src/httpd_parse.c": "e32809f8f0bf820382759756b7fc3bb73fb4cf6ff3410d3fc26f27fc6e6cd280",
+        "components/esp_http_server/src/httpd_sess.c": "96fb619e14b097e2f485db8cf3372e8768117d68cfefc5f7ee036804caf2f904",
+        "components/esp_http_server/src/httpd_txrx.c": "db2e0165c4c6aaff43615f68357cd3adc4f2f3a0cea8fe988e72ff31f0735436",
+        "components/esp_http_server/src/httpd_uri.c": "c26d04fd77cd3a5bb9836588718b9e4fc69ba145b9654f56aed7ac51468f43d1",
+        "components/esp_http_server/src/esp_httpd_priv.h": "e7032f9425979c2063548360249f58da2d945c86ed3bb6fafd3e5cf6101a708a",
+        "components/esp_http_server/include/esp_http_server.h": "70cc75089d4a6a443e88d01cdbc8dff829c952d03bdece657da66d266294d8c7",
+        "components/http_parser/http_parser.c": "bc5750d936bdb1ca6064f65ec31f66578c9fee2a691ac298081fbc73a668be34",
+        "components/http_parser/http_parser.h": "caa7e5e6571a9067008b1bcb999c46f84157121163df2abec537fc39eeb8ba4d",
+        "components/mbedtls/mbedtls/tf-psa-crypto/utilities/base64.c": "5a8eb4e03e548aa95e33e14b92b2d663347d93a5ea338d9ed74f67aee437a42a"
+      },
+      "composed_sha256": {
+        "crypto.inc": "56cf9dce5918896e13b7fa78485458a071b73e0f787ce2b375fc42db328d4f95",
+        "reboot.inc": "2f4009be0b590d1c1d6972056e1a868fcbc38f62cb6e02687a3b7a52b3bdb4b5",
+        "sdk-base64.inc": "48491978ffd930cea3dc901e8ae792189cfa6e89dc8ba6c8b74bcfcd14b53b35",
+        "sdk-functions.inc": "fbc52d77ef17bfa55d45c4063bed304e293f95086df2adb2162de376796e70b0",
+        "sdk-image-types.inc": "d851dfebd923abaafdd49a12a645afa0c5926572a6654c94d6bc87e5fc16eb2f",
+        "sdk-parse.inc": "b304767e9d84740d493c45322d6e0a5136927a78c47d25e804841a650174db9e",
+        "sdk-response.inc": "3714fbca096d8a641648c6d1fba3bd2f5aa551e364635fd5845abb7abc0dd833",
+        "sdk-sess.inc": "6aa7c0ba85628109fc1872490f1db21cd81925e1f235f8de0ffbba38f4c0494e",
+        "sdk-txrx.inc": "2aace20557fea8adf57ab88a333e2458bbcd4c9c947273b62b743f1b0a89e345",
+        "sdk-uri.inc": "ae27199027dd072ac149255c061934787b4f25ee1995a9c2554c6254dc34532c",
+        "sdk-ws.inc": "234a9491c790111b5cf0cbbaf30469b8aa70b761aa590cd16c8c67e6e11eab01",
+        "target.inc": "b3bcec97049e9d51aa9bace2ddf07cc3df27549d038736acaee9ef028891b613",
+        "transport-production.inc": "a31e761e70c173ece5e4e1dff20c9df1f500f41cfcdc705dae2dd4d9a5a82b6a"
+      },
+      "generated_model_sha256": "197c043ad1ec790c756d1cdb25bec766674adb3cf0e604f6ac8677ac6b911c61",
+      "tls_report_sha256": "68da9d2f0e27117a5682876fc4aa34732643e626d3fa5668bc5294896ca9ae58",
+      "crypto_archive_sha256": "72b9a557501ccca26a90a7ab409f4be2c093cfd2748b6e9c1f7645a3c9e8e60d",
+      "tls_source_sha256": {
+        "tests/run-native-web-tls.py": "f7ca992ce6848190c3f8454a6b9d85935f8feb316637431d9f1cb4c1214b5b97",
+        "tests/native/native_web_transport/esp_tls_host.c": "8d529fe6aca7fdd572adda6e9e4a4ec813b29943dd539c040a2c31583e0bfde8",
+        "tests/native/native_web_transport/tls_client.py": "e1a242917f3396845e0def67c250e080c175f500e63ac22b7656f9a2717a3325",
+        "idf/components/native_web_transport/native_web_transport.c": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf",
+        "idf/components/native_web_transport/include/native_web_transport.h": "c4122c3f2d960e8922ceaa1c179c415e15e3d74abdea86424e6fde4633e0a045",
+        "idf/components/native_web_transport/tools/pack_tls_bundle.py": "e9986a083e0e08de45662b3012b6e3c912f2ace75dce33676e012f749615e6f8",
+        "sdk/components/esp-tls/esp_tls.c": "5b575c188acedd581d8438e2b4125f74170237dce6da876c7b3912d0291d59f2",
+        "sdk/components/esp-tls/esp_tls_mbedtls.c": "cacc35f509cfda8779d058ff7ed6e01ce2218967443079f90281dc8718510055",
+        "sdk/components/esp-tls/esp_tls.h": "c000a387e2babf2138c06ae29733dfec51cab3316638fd1333e145f2aed34a50",
+        "sdk/components/esp-tls/esp_tls_errors.h": "5ec732e7dee5c82c4523cfa6a471f077ac7e88adbfe6d1855087865e3318dd2a",
+        "sdk/components/esp-tls/private_include/esp_tls_private.h": "0e1d6a28215231594aec1d6ed500458872ee764a07563746eaaa41e3f06476e5",
+        "sdk/components/esp-tls/private_include/esp_tls_mbedtls.h": "58df4a52cbcfe6a5193bad9a06bddc0a28be83139e2736d8d4b4ec2bfb198762",
+        "sdk/components/esp_security/include/esp_key_config.h": "0d599045f12c91b4e6e730ed2630a61b22c6805669e7828e910a8b2bf41146c9"
+      }
+    }
+  },
+  "input_report_sha256": {
+    "http": "cde578085ae304bbf04ea29146fff31c1c70478c6efd7c6c624a0e506bae7a0c",
+    "ws": "781efdbeb0cabac9d197d0bf2a6fe196258613b8f70ebb0006613960689f3cec"
+  },
+  "passed": true,
+  "scope": "Real localhost TCP HTTP and independent CA/hostname-verified OpenSSL TLS1.2 client; actual pinned/generated HTTPD parser, URI, buffered request body, response and session lifecycle; actual shared OTA sink/form/HTTP and target handler/reboot code; actual native transport, selected pinned ESP-TLS server code and pinned software MbedTLS for TLS profiles. Field-model SDK structs, foreground sess_process scheduling, acknowledged audio, flash/image-verifier and NVS are explicit seams. Audio-owner implementation is qualified separately; this gate validates its handler ACK/lease contract. No physical flash, target ABI/RAM/timing, whole FreeRTOS HTTPD main loop or power-loss durability claim."
+}

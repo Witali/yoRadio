@@ -1,0 +1,157 @@
+{
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "variants": {
+    "cyd": {
+      "passed": true,
+      "result": "PASS integrated WSS: 14 trusted localhost TLS1.2 cases; 14 actual HTTPD/TLS session deletions; actual PSA WS accept",
+      "crypto_archive_sha256": "1abf0539362bf5ec98d2d463618b19eee11b93e1a22ac1048f711d3b9bae673e",
+      "tls_report_sha256": "eb57c462966e48ae412fb8aea0f8d07fbf3300b21bb6fc1cc44a3894da44d5a8",
+      "crypto_fingerprint": "368ca86ba3c72c4ffa6f4d7391c6a2eb2750450eeb97f22e5fa3540cbae313c8",
+      "production_source_sha256": {
+        "tests/run-websocket-integration.py": "8fb9a88c7fb747dd4607746e2ed2d34a959f6a4933c288da23cb483a6b5523bb",
+        "tests/native/ws_integration/platform.c": "47f5d617164b503d1e618fff1e1b848ac3fb8ca8b989a23c6deb4cb8551fdfbd",
+        "tests/native/ws_integration/platform.h": "15b9c570c442a6760a3205394aaa6adf67047b84b417ddd149e8927739162efa",
+        "tests/native/ws_integration/README.md": "0f7b9d538c4a94095ed5594cfc40ef1acf36a090147e6d7481175823e18096e6",
+        "tests/native/ws_integration/test.c": "627a5509387b548e2078c8e1d9843c9ec8462e6488afb6f285f0373afb7f3ed0",
+        "tests/native/ws_integration/tls_backend.c": "20c736b917a0522b0714d342ba46d352ac928353843ccbba321647bbf25beb44",
+        "tests/native/ws_integration/tls_client.py": "fbc272b491acdac8d6b7f0fe896f4350e33dc45485a8390c9605765efcfb0d24",
+        "tests/native/ws_integration/tls_test.c": "ac52fba94d4fba4c5d9f3323b65d4c745d1e139e0a196e7e00e32b1779137b80",
+        "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/apply.py": "f746d1e46e02960080ff79e4175e13db938175985c68e90e2fb264f39a184d5d",
+        "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h": "6153a79a85c4e159066510136630cf1a0b178a394b72c151841edc92aa12ea6e",
+        "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/test_host.c": "480c34c55d922036506d531e91ec5a5093183f7a0465caaeb0639a23ba3f5b8a",
+        "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/test_host.py": "70035d5fbe9cd967e02c813fe06916cc3612b8f0a01a023731c4b7938d16bf4e",
+        "idf/esp32-cyd2usb-native/main/websocket_service.c": "7bf58819cf28626ec29a08d47befb85a6259ee81f10755be6cc89b53de64afd1",
+        "idf/esp32c3-oled-native/main/websocket_service.c": "3d592c20e910f54a76c784d72906ed9fee2f39c172414b557a42a4aab05e2c38",
+        "idf/components/native_stream/include/websocket_message.h": "02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+        "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+        "idf/components/native_web_transport/include/native_web_transport.h": "dc160a3d9386fd6fc0c51c494a1171c534dec1bd7f98fb07d47e984d5fe003a1"
+      },
+      "tls_source_sha256": {
+        "tests/run-native-web-tls.py": "f7ca992ce6848190c3f8454a6b9d85935f8feb316637431d9f1cb4c1214b5b97",
+        "tests/native/native_web_transport/esp_tls_host.c": "8d529fe6aca7fdd572adda6e9e4a4ec813b29943dd539c040a2c31583e0bfde8",
+        "tests/native/native_web_transport/tls_client.py": "e1a242917f3396845e0def67c250e080c175f500e63ac22b7656f9a2717a3325",
+        "idf/components/native_web_transport/native_web_transport.c": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf",
+        "idf/components/native_web_transport/include/native_web_transport.h": "c4122c3f2d960e8922ceaa1c179c415e15e3d74abdea86424e6fde4633e0a045",
+        "idf/components/native_web_transport/tools/pack_tls_bundle.py": "e9986a083e0e08de45662b3012b6e3c912f2ace75dce33676e012f749615e6f8",
+        "sdk/components/esp-tls/esp_tls.c": "1790a0c7de2b41f1f44caceae0fbc0a0fd366e3e6570750eeb4fa0a91fe2f93f",
+        "sdk/components/esp-tls/esp_tls_mbedtls.c": "72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7",
+        "sdk/components/esp-tls/esp_tls.h": "ce5b788664885025e509cc17fed24844b9fc4ed3a8cec8da5c87c199fd8e168d",
+        "sdk/components/esp-tls/esp_tls_errors.h": "5ec732e7dee5c82c4523cfa6a471f077ac7e88adbfe6d1855087865e3318dd2a",
+        "sdk/components/esp-tls/private_include/esp_tls_private.h": "132fed94eed0f33d480037f4c58944b98d2fefc5de64f11197a79ab9e0343dad",
+        "sdk/components/esp-tls/private_include/esp_tls_mbedtls.h": "58df4a52cbcfe6a5193bad9a06bddc0a28be83139e2736d8d4b4ec2bfb198762"
+      },
+      "generated_overlay": {
+        "sdk_profile": "6.0.2",
+        "sdk_source_sha256": {
+          "httpd_ws.c": "50bc91f7389b40828ab949bac11481d28545a4da2d87d0b1ee99ec0d04645fd3",
+          "httpd_parse.c": "5234fd5fc3b566532bf79a6c787664d5077d0aa03001a2d63c0999f063282e90"
+        },
+        "sdk_header_sha256": {
+          "src/esp_httpd_priv.h": "106a3bf927a885892f66514c6a4075c04e04db068fb64ca11dd8ca4b4253dfc8",
+          "include/esp_http_server.h": "3a40def13721f5cb0696308ddefd4c07d4cf986c00c915aef478715fec302124"
+        },
+        "generated_sha256": {
+          "httpd_ws.c": "2e6b0dbbf2ccb169a090ab168a7260e4ee95e99790989005295f58529e32a920",
+          "httpd_parse.c": "bd140961d2d83db05c6e2f0e068d8e6dcb8edd20621812251e220728a24dd942"
+        }
+      },
+      "composed_inputs_sha256": {
+        "application.inc": "6997b0788257c3e798f1c2b60cb39dd62e8ad28443d6731c142f7ef2989e6755",
+        "crypto.inc": "56cf9dce5918896e13b7fa78485458a071b73e0f787ce2b375fc42db328d4f95",
+        "sdk-base64.inc": "48491978ffd930cea3dc901e8ae792189cfa6e89dc8ba6c8b74bcfcd14b53b35",
+        "sdk-functions.inc": "e7d20b3ba27c9a6df3ce88ae4143a47a466fc855bd90aabb3caaf7fa1fc4b942",
+        "sdk-parse.inc": "65446ef1f0c9da7d801422d0727549d4bd2d1c3bc866b77ce7576b0d5a094d18",
+        "sdk-sess.inc": "6aa7c0ba85628109fc1872490f1db21cd81925e1f235f8de0ffbba38f4c0494e",
+        "sdk-txrx.inc": "2aace20557fea8adf57ab88a333e2458bbcd4c9c947273b62b743f1b0a89e345",
+        "sdk-uri.inc": "e0e544afe0414218b3f8fd1a73d640ed6b86f8ee9967e96ac5e0182297d449c5",
+        "sdk-ws.inc": "0bf128e64c4a3629aa027c68e40f48855ea466a83b8c8bedaa809b6d3b51824d",
+        "transport-production.inc": "a31e761e70c173ece5e4e1dff20c9df1f500f41cfcdc705dae2dd4d9a5a82b6a"
+      }
+    },
+    "c3": {
+      "passed": true,
+      "result": "PASS integrated WSS: 14 trusted localhost TLS1.2 cases; 14 actual HTTPD/TLS session deletions; actual PSA WS accept",
+      "crypto_archive_sha256": "72b9a557501ccca26a90a7ab409f4be2c093cfd2748b6e9c1f7645a3c9e8e60d",
+      "tls_report_sha256": "68da9d2f0e27117a5682876fc4aa34732643e626d3fa5668bc5294896ca9ae58",
+      "crypto_fingerprint": "c7144d562495feb19b5ad3f5e1fb054b888747ed09388ae4faea3b2d71c990f6",
+      "production_source_sha256": {
+        "tests/run-websocket-integration.py": "8fb9a88c7fb747dd4607746e2ed2d34a959f6a4933c288da23cb483a6b5523bb",
+        "tests/native/ws_integration/platform.c": "47f5d617164b503d1e618fff1e1b848ac3fb8ca8b989a23c6deb4cb8551fdfbd",
+        "tests/native/ws_integration/platform.h": "15b9c570c442a6760a3205394aaa6adf67047b84b417ddd149e8927739162efa",
+        "tests/native/ws_integration/README.md": "0f7b9d538c4a94095ed5594cfc40ef1acf36a090147e6d7481175823e18096e6",
+        "tests/native/ws_integration/test.c": "627a5509387b548e2078c8e1d9843c9ec8462e6488afb6f285f0373afb7f3ed0",
+        "tests/native/ws_integration/tls_backend.c": "20c736b917a0522b0714d342ba46d352ac928353843ccbba321647bbf25beb44",
+        "tests/native/ws_integration/tls_client.py": "fbc272b491acdac8d6b7f0fe896f4350e33dc45485a8390c9605765efcfb0d24",
+        "tests/native/ws_integration/tls_test.c": "ac52fba94d4fba4c5d9f3323b65d4c745d1e139e0a196e7e00e32b1779137b80",
+        "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/apply.py": "f746d1e46e02960080ff79e4175e13db938175985c68e90e2fb264f39a184d5d",
+        "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h": "6153a79a85c4e159066510136630cf1a0b178a394b72c151841edc92aa12ea6e",
+        "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/test_host.c": "480c34c55d922036506d531e91ec5a5093183f7a0465caaeb0639a23ba3f5b8a",
+        "idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/test_host.py": "70035d5fbe9cd967e02c813fe06916cc3612b8f0a01a023731c4b7938d16bf4e",
+        "idf/esp32-cyd2usb-native/main/websocket_service.c": "7bf58819cf28626ec29a08d47befb85a6259ee81f10755be6cc89b53de64afd1",
+        "idf/esp32c3-oled-native/main/websocket_service.c": "3d592c20e910f54a76c784d72906ed9fee2f39c172414b557a42a4aab05e2c38",
+        "idf/components/native_stream/include/websocket_message.h": "02d182bde95296c483ffc783e6852b60a83faa004e72a4f1b60fd9fdffd5851d",
+        "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30",
+        "idf/components/native_web_transport/include/native_web_transport.h": "dc160a3d9386fd6fc0c51c494a1171c534dec1bd7f98fb07d47e984d5fe003a1"
+      },
+      "tls_source_sha256": {
+        "tests/run-native-web-tls.py": "f7ca992ce6848190c3f8454a6b9d85935f8feb316637431d9f1cb4c1214b5b97",
+        "tests/native/native_web_transport/esp_tls_host.c": "8d529fe6aca7fdd572adda6e9e4a4ec813b29943dd539c040a2c31583e0bfde8",
+        "tests/native/native_web_transport/tls_client.py": "e1a242917f3396845e0def67c250e080c175f500e63ac22b7656f9a2717a3325",
+        "idf/components/native_web_transport/native_web_transport.c": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf",
+        "idf/components/native_web_transport/include/native_web_transport.h": "c4122c3f2d960e8922ceaa1c179c415e15e3d74abdea86424e6fde4633e0a045",
+        "idf/components/native_web_transport/tools/pack_tls_bundle.py": "e9986a083e0e08de45662b3012b6e3c912f2ace75dce33676e012f749615e6f8",
+        "sdk/components/esp-tls/esp_tls.c": "5b575c188acedd581d8438e2b4125f74170237dce6da876c7b3912d0291d59f2",
+        "sdk/components/esp-tls/esp_tls_mbedtls.c": "cacc35f509cfda8779d058ff7ed6e01ce2218967443079f90281dc8718510055",
+        "sdk/components/esp-tls/esp_tls.h": "c000a387e2babf2138c06ae29733dfec51cab3316638fd1333e145f2aed34a50",
+        "sdk/components/esp-tls/esp_tls_errors.h": "5ec732e7dee5c82c4523cfa6a471f077ac7e88adbfe6d1855087865e3318dd2a",
+        "sdk/components/esp-tls/private_include/esp_tls_private.h": "0e1d6a28215231594aec1d6ed500458872ee764a07563746eaaa41e3f06476e5",
+        "sdk/components/esp-tls/private_include/esp_tls_mbedtls.h": "58df4a52cbcfe6a5193bad9a06bddc0a28be83139e2736d8d4b4ec2bfb198762",
+        "sdk/components/esp_security/include/esp_key_config.h": "0d599045f12c91b4e6e730ed2630a61b22c6805669e7828e910a8b2bf41146c9"
+      },
+      "generated_overlay": {
+        "sdk_profile": "6.1",
+        "sdk_source_sha256": {
+          "httpd_ws.c": "744304f779c54064d6453d2af3dcabde36c3b255a7930cbd903c0e8e4225eb3a",
+          "httpd_parse.c": "e32809f8f0bf820382759756b7fc3bb73fb4cf6ff3410d3fc26f27fc6e6cd280"
+        },
+        "sdk_header_sha256": {
+          "src/esp_httpd_priv.h": "e7032f9425979c2063548360249f58da2d945c86ed3bb6fafd3e5cf6101a708a",
+          "include/esp_http_server.h": "70cc75089d4a6a443e88d01cdbc8dff829c952d03bdece657da66d266294d8c7"
+        },
+        "generated_sha256": {
+          "httpd_ws.c": "33fad3dbb01815db3d20cfb4efbe450135cec03e57b0e5e34bcb90ae811ff946",
+          "httpd_parse.c": "1dff87c03c8abcf13ab5d0aacac088c685a8953b737bae674fde245d791ff396"
+        }
+      },
+      "composed_inputs_sha256": {
+        "application.inc": "213268871c78687ae1f79f0b49a556f5dad01102b80a075b7ab2937223208c6f",
+        "crypto.inc": "56cf9dce5918896e13b7fa78485458a071b73e0f787ce2b375fc42db328d4f95",
+        "sdk-base64.inc": "48491978ffd930cea3dc901e8ae792189cfa6e89dc8ba6c8b74bcfcd14b53b35",
+        "sdk-functions.inc": "fbc52d77ef17bfa55d45c4063bed304e293f95086df2adb2162de376796e70b0",
+        "sdk-parse.inc": "b304767e9d84740d493c45322d6e0a5136927a78c47d25e804841a650174db9e",
+        "sdk-sess.inc": "6aa7c0ba85628109fc1872490f1db21cd81925e1f235f8de0ffbba38f4c0494e",
+        "sdk-txrx.inc": "2aace20557fea8adf57ab88a333e2458bbcd4c9c947273b62b743f1b0a89e345",
+        "sdk-uri.inc": "ae27199027dd072ac149255c061934787b4f25ee1995a9c2554c6254dc34532c",
+        "sdk-ws.inc": "234a9491c790111b5cf0cbbaf30469b8aa70b761aa590cd16c8c67e6e11eab01",
+        "transport-production.inc": "a31e761e70c173ece5e4e1dff20c9df1f500f41cfcdc705dae2dd4d9a5a82b6a"
+      }
+    }
+  },
+  "physical_hardware": false,
+  "integration_report_sha256": "781efdbeb0cabac9d197d0bf2a6fe196258613b8f70ebb0006613960689f3cec",
+  "source_sha256": {
+    "tests/run-websocket-tls-integration.py": "ef95c52584b119785eb1c271c520eba3f66b2eb1c0e858da99ccbdf341ea3648",
+    "tests/native/ws_integration/platform.c": "47f5d617164b503d1e618fff1e1b848ac3fb8ca8b989a23c6deb4cb8551fdfbd",
+    "tests/native/ws_integration/platform.h": "15b9c570c442a6760a3205394aaa6adf67047b84b417ddd149e8927739162efa",
+    "tests/native/ws_integration/README.md": "0f7b9d538c4a94095ed5594cfc40ef1acf36a090147e6d7481175823e18096e6",
+    "tests/native/ws_integration/test.c": "627a5509387b548e2078c8e1d9843c9ec8462e6488afb6f285f0373afb7f3ed0",
+    "tests/native/ws_integration/tls_backend.c": "20c736b917a0522b0714d342ba46d352ac928353843ccbba321647bbf25beb44",
+    "tests/native/ws_integration/tls_client.py": "fbc272b491acdac8d6b7f0fe896f4350e33dc45485a8390c9605765efcfb0d24",
+    "tests/native/ws_integration/tls_test.c": "ac52fba94d4fba4c5d9f3323b65d4c745d1e139e0a196e7e00e32b1779137b80"
+  },
+  "passed": true,
+  "scope": "Actual generated HTTPD parser/lifecycle/URI/framing and actual application receive/control/transport/session/register code; actual native_web_transport and selected pinned ESP-TLS server/public functions linked with qualified pinned software MbedTLS archive; trusted CA and hostname-verified independent OpenSSL client over real TCP/TLS1.2. Actual PSA SHA-1/Base64 accept, no SHA sample stub. Host HTTPD/ESP-TLS field models, FreeRTOS scheduling, error-response formatting, radio command dispatch/status and NVS are explicit seams. No hardware ABI/RAM/timing, whole FreeRTOS HTTPD main loop, TLS1.3 or full RFC conformance claim."
+}
