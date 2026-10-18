@@ -277,13 +277,17 @@ static void close_alert(tls_session_t *context) {
     }
 }
 
-void native_web_transport_shutdown(httpd_handle_t server, int socket, bool graceful) {
+void native_web_transport_prepare_close(httpd_handle_t server, int socket, bool graceful) {
     tls_session_t *context = session(server, socket);
     if (context) {
         if (graceful) close_alert(context);
         else context->aborted = true;
         context->shutdown_requested = true;
     }
+}
+
+void native_web_transport_shutdown(httpd_handle_t server, int socket, bool graceful) {
+    native_web_transport_prepare_close(server, socket, graceful);
     (void)shutdown(socket, SHUT_RDWR);
 }
 

@@ -37,6 +37,12 @@ ssize_t native_web_transport_send(httpd_handle_t server, int socket,
 ssize_t native_web_transport_recv(httpd_handle_t server, int socket,
     void *data, size_t size, int flags, bool *wait_write);
 
+// Terminal HTTP handler path: bounded TLS close_notify/mark only, without a
+// socket shutdown or close. Caller must return failure so HTTPD deletes the
+// session. This permits committing a reserved reboot before SDK TCP cleanup,
+// whose synchronous FIN allocation can wait even on a nonblocking socket.
+void native_web_transport_prepare_close(httpd_handle_t server, int socket, bool graceful);
+
 // HTTPD owns final close/free. Clean protocol Close attempts bounded TLS
 // close_notify before shutdown; fatal transport errors use graceful=false.
 void native_web_transport_shutdown(httpd_handle_t server, int socket, bool graceful);

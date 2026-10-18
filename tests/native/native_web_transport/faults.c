@@ -154,6 +154,33 @@ static void io(void) {
     native_web_transport_shutdown((void *)1,3,true);assert(now_us<=200100 && sockets[3].shutdown==1);++cases;
     reset();bool direction;assert(native_web_transport_send((void *)1,3,"plain",5,0,&direction)==5 && raw_writes==1);++cases;
 }
+static void prepare_close_without_socket_cleanup(void) {
+    reset();
+    native_web_transport_prepare_close((void *)1,3,true);
+    assert(!sockets[3].shutdown && !sockets[3].closed && !close_alerts);++cases;
+
+    reset();ready();close_script[0]=ESP_TLS_ERR_SSL_WANT_WRITE;close_script[1]=0;close_count=2;
+    native_web_transport_prepare_close((void *)1,3,true);
+    assert(!sockets[3].shutdown && !sockets[3].closed);
+    assert(close_alerts==2 && tls_live==1 && !tls_deleted);
+    unsigned alerts=close_alerts;
+    native_web_transport_prepare_close((void *)1,3,true);
+    assert(close_alerts==alerts && !sockets[3].shutdown);
+    bool writable;char byte;
+    assert(native_web_transport_send((void *)1,3,"x",1,0,&writable)==-1 && errno==EIO);
+    assert(native_web_transport_recv((void *)1,3,&byte,1,0,&writable)==-1 && errno==EIO);
+    close_socket(3);assert(sockets[3].closed==1 && close_alerts==alerts && tls_deleted==1);++cases;
+
+    reset();ready();native_web_transport_prepare_close((void *)1,3,false);
+    assert(!sockets[3].shutdown && !sockets[3].closed && !close_alerts && tls_live==1);
+    close_socket(3);assert(sockets[3].closed==1 && !close_alerts && tls_deleted==1);++cases;
+
+    reset();ready();close_script[0]=ESP_TLS_ERR_SSL_WANT_READ;close_count=1;select_script[0]=0;select_count=1;
+    native_web_transport_prepare_close((void *)1,3,true);
+    assert(now_us<=200100 && !sockets[3].shutdown && !sockets[3].closed && tls_live==1);
+    alerts=close_alerts;close_socket(3);
+    assert(sockets[3].closed==1 && close_alerts==alerts && tls_deleted==1);++cases;
+}
 static void boundaries_and_failures(void) {
     reset();httpd_config_t cfg=config();assert(native_web_transport_prepare(&cfg)==ESP_OK);
     httpd_config_t second=config();assert(native_web_transport_prepare(&second)==ESP_ERR_INVALID_STATE);++cases;
@@ -189,4 +216,4 @@ static void boundaries_and_failures(void) {
     reset();ready();close_socket(3);assert(sockets[3].closed==1 && close_alerts==1 && tls_deleted==1);
     assert(httpd_open_tls((void *)1,3)==ESP_OK);assert(!session((void *)1,4));++cases;
 }
-int main(void) { credentials();open_failures();io();boundaries_and_failures();reset();printf("PASS: %u native TLS transport credential/ownership/IO fault groups\n",cases);return 0; }
+int main(void) { credentials();open_failures();io();prepare_close_without_socket_cleanup();boundaries_and_failures();reset();printf("PASS: %u native TLS transport credential/ownership/IO fault groups\n",cases);return 0; }

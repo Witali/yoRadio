@@ -31,7 +31,9 @@ def main():
         'mutant-plaintext-bypass':source.replace('if (!atomic_load(&s_secure)) return lwip_send(', 'if (true) return lwip_send('),
         'mutant-lost-tls-owner':source.replace('if (context->tls) esp_tls_server_session_delete(context->tls);','if (false) esp_tls_server_session_delete(context->tls);'),
         'mutant-unchecked-key-pair':source.replace('if (!result) result = mbedtls_pk_check_pair(&chain.pk, &private_key);','/* incorrect: pair unchecked */'),
-        'mutant-renewed-write-budget':source.replace('while (written < size) {','while (written < size) { started = (uint64_t)esp_timer_get_time();')}
+        'mutant-renewed-write-budget':source.replace('while (written < size) {','while (written < size) { started = (uint64_t)esp_timer_get_time();'),
+        'mutant-blocking-prepare-close':source.replace('context->shutdown_requested = true;\n    }\n}',
+            'context->shutdown_requested = true;\n    }\n    (void)shutdown(socket, SHUT_RDWR);\n}')}
     negative={}
     for name,contents in variants.items():
         if name!='production':assert contents!=source
