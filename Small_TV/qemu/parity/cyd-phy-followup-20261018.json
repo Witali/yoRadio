@@ -1,0 +1,65 @@
+{
+  "status": "dport_fixed_phy_path_still_open",
+  "all_functionality_verified": false,
+  "cyd_accepted": false,
+  "qemu_evidence_commit": "c4d285f486",
+  "summary_url": "https://github.com/Witali/QEMU-ESP32/blob/c4d285f486/tests/results/esp32-phy-clock-20261018/summary.json",
+  "summary_git_lf_sha256": "847aaf61bfa562ffdf424da55797c542a2bba5716a12537750f630421ec4f3dc",
+  "clock_implementation_commit": "b3619c8b4b",
+  "mmio": {
+    "control": {
+      "passed": false,
+      "failed_tests": 4,
+      "errors": 0
+    },
+    "fixed": {
+      "passed": true,
+      "tests": 4
+    },
+    "same_final_test": true
+  },
+  "binaries": {
+    "riscv_unchanged": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+    "xtensa_fixed": "2099ed932f39589f703645708a411547cd0e9697002c658c40a316bbbba60412",
+    "xtensa_control": "cd1163c34b8591ca5a2769703aadc317d724237abe9ca70e7700ba658c415ba3"
+  },
+  "next_fault": {
+    "scope": "Exact first-read identification only; not a complete PHY emulation or algorithm equivalence proof.",
+    "app_sha256": "22feeb1abb79eaf66ea3e36b3030242c0c8dbd0502ae8caeb628268ad3082f13",
+    "full_flash_sha256": "42322762fabf61e84833418e4ff51e02bbb8ab6d9deb29328508c1e7db4c30c0",
+    "library_sha256": "c2521071695734afa8f6f1ca3d3b604a1d08dd63fe52060449a11cfe8bac5740",
+    "library_member": "phy_chip_v7.o",
+    "member_sha256": "26a28cb047f7eaae5d77ea5083b684d2e072c0e118b1abe171509c500ce6578b",
+    "versions": [
+      "lib-builder: master 14a0af9",
+      "esp-idf: v5.5.4 735507283d",
+      "arduino: idf-v5.5.4 c6428be92"
+    ],
+    "versions_sha256": "1b15adcda374a653a9794512315b554d4f78682341888a8ac9155b7f569e5cd9",
+    "objdump_sha256": "fc0096c4c8106da247498c4c97c126360d47d3dd701e73c6daa06da854c73a6a",
+    "function": "register_chipv7_phy",
+    "linked_entry": "0x401b9914",
+    "fault_pc": "0x401b9920",
+    "fault_instruction": "l32i.n a5, a5, 0",
+    "fault_address": "0x60033c00",
+    "library_entry_offset": "0xa8",
+    "library_function_size": 691,
+    "entry_match": {
+      "linked": "3601025120f6404074c020005805",
+      "library": "36010251d6ff404074c020005805",
+      "ignored_offsets": [
+        4,
+        5
+      ],
+      "reason": "l32r literal relocation"
+    },
+    "apb_alias": "0x3ff73c00",
+    "alias_basis": "Existing esp32_soc_add_peripheral mapping: 0x60000000 corresponds to 0x3ff40000.",
+    "next_step": "Classic ESP32 board has OpenETH but no Wi-Fi MAC/PHY device at this address. Restore a specified PHY/MAC path rather than interpreting the failure as a host-forward regression.",
+    "evidence": {
+      "linked-register-chipv7-phy.asm": "42514ae00f9142bf6ac319f60d57b85bc2a2f018a94711f85bf6263f24222dbc",
+      "sdk-register-chipv7-phy.asm": "886e4018efe05eaa007a3bcf9e8a1b272fd6fe6077a7e00a999b5ba36b5d5ff7"
+    }
+  },
+  "scope": "DPORT clock/reset MMIO and actual first PHY read identification; not complete CYD boot or Wi-Fi acceptance."
+}

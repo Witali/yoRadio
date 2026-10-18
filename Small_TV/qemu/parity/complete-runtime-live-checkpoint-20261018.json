@@ -1,0 +1,93 @@
+{
+  "status": "full561_and_h10_running",
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T16:06:13.452585+00:00",
+  "process_identities": [
+    {
+      "ProcessId": 13800,
+      "ParentProcessId": 26768,
+      "created_utc": "2026-10-18T15:30:49.8342280Z",
+      "Name": "pwsh.exe",
+      "CommandLine": "\"%USERPROFILE%\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" \"-NoProfile\" \"-NonInteractive\" \"-File\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\Small_TV\\src\\tools\\runtime_supervisor.ps1\" \"-YoradioRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\" \"-QemuRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\runtime-qemu-d64-frozen-20261018\" \"-DependencyRoot\" \"C:\\Work\\yoRadio\" \"-OutputDirectory\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018\" \"-DurationSeconds\" \"86400\" \"-IntervalSeconds\" \"15\" \"-OutageEvery\" \"60\""
+    },
+    {
+      "ProcessId": 31224,
+      "ParentProcessId": 13800,
+      "created_utc": "2026-10-18T15:30:50.2104210Z",
+      "Name": "python.exe",
+      "CommandLine": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" -X utf8 -B C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\Small_TV\\src\\tests\\runtime_qemu.py --yoradio C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision --dependency-root C:\\Work\\yoRadio --qemu-root C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\runtime-qemu-d64-frozen-20261018 --output C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018 --interval-seconds 15 --outage-every 60 --outage-seconds 1 --duration-seconds 86400"
+    },
+    {
+      "ProcessId": 19212,
+      "ParentProcessId": 4648,
+      "created_utc": "2026-10-18T15:30:54.3405010Z",
+      "Name": "qemu-system-riscv32.exe",
+      "CommandLine": "C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\runtime-qemu-d64-frozen-20261018\\bin\\qemu-system-riscv32.exe -M esp32c2,default-peripherals=off -name SmallTV-beea78179836 -L C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018\\vm -drive file=C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018\\vm\\flash.bin,if=mtd,format=raw -display none -serial file:C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018\\vm\\uart.log -monitor none -icount shift=3,align=off,sleep=on -qmp tcp:127.0.0.1:58582,server=on,wait=off -device {\\\"driver\\\":\\\"esp-spi-module\\\",\\\"id\\\":\\\"lcd\\\",\\\"bus\\\":\\\"/spi2/spi\\\",\\\"gpio\\\":\\\"/machine/gpio\\\",\\\"spi-host\\\":2,\\\"cs\\\":0,\\\"model\\\":\\\"st7789\\\",\\\"sck\\\":4,\\\"mosi\\\":6,\\\"miso\\\":-1,\\\"cs-gpio\\\":-1,\\\"dc-gpio\\\":5,\\\"reset-gpio\\\":1,\\\"backlight-gpio\\\":18,\\\"backlight-active-low\\\":true,\\\"properties\\\":\\\"{\\\\\\\"visible-width\\\\\\\":240,\\\\\\\"controls\\\\\\\":false,\\\\\\\"panel-inverted\\\\\\\":true}\\\"} -global esp32c3-wifi.clock-services=on -global esp32c3-wifi.ntp-hosts=ntp1.aliyun.com;cn.pool.ntp.org;pool.ntp.org -global esp32c3-wifi.station-ssid=yoRadio-QEMU -nic user,model=esp32c3-wifi,restrict=on,hostfwd=tcp:127.0.0.1:18080-10.0.2.15:80,guestfwd=tcp:10.0.2.100:80-tcp:127.0.0.1:58574 -global esp32c3-wifi.service-hosts=api.openweathermap.org -snapshot -gdb tcp:127.0.0.1:58575 -S"
+    },
+    {
+      "ProcessId": 27200,
+      "ParentProcessId": 13800,
+      "created_utc": "2026-10-18T15:31:22.5524240Z",
+      "Name": "python.exe",
+      "CommandLine": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" -X utf8 -B C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\Small_TV\\src\\tools\\runtime_run_guard.py --run C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\hostfwd-final-h10-20261018 --qemu-tools C:\\Work\\yoRadio\\.worktree\\small-tv-runtime-supervision\\.build\\runtime-qemu-d64-frozen-20261018\\tools"
+    },
+    {
+      "ProcessId": 30244,
+      "ParentProcessId": 25668,
+      "created_utc": "2026-10-18T16:04:24.3281330Z",
+      "Name": "pwsh.exe",
+      "CommandLine": "\"%USERPROFILE%\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" -NoProfile -NonInteractive -File \"C:\\Work\\yoRadio\\.worktree\\small-tv-reset-display\\.build\\run_reset_display_complete_full.ps1\""
+    }
+  ],
+  "full": {
+    "pid": 30244,
+    "created_utc": "2026-10-18T16:04:24.3281330Z",
+    "initial_detachment_verified": true,
+    "input_audits": {
+      "reset-display-full-start-20261018.json": {
+        "count": 557,
+        "mismatches": []
+      },
+      "reset-display-complete-full-start-20261018.json": {
+        "count": 561,
+        "mismatches": []
+      }
+    },
+    "terminal": false
+  },
+  "h10": {
+    "completed_cycles": 92,
+    "observed_at_utc": "2026-10-18T16:06:13.2867285Z",
+    "registries": {
+      "runtime_inputs_sha256": {
+        "count": 31,
+        "mismatches": []
+      },
+      "snapshot_inputs_sha256": {
+        "count": 41,
+        "mismatches": []
+      },
+      "supervisor_sources_sha256": {
+        "count": 6,
+        "mismatches": []
+      }
+    },
+    "guard": {
+      "scope": "Independent UART boot/panic guard; not a memory trend or 24-hour pass.",
+      "status": "running",
+      "passed": false,
+      "polls": 418,
+      "vm_name": "SmallTV-beea78179836",
+      "source_file": "vm/uart.log",
+      "last_observation": {
+        "passed": true,
+        "bytes": 665,
+        "rom_boots": 1,
+        "errors": []
+      }
+    },
+    "qmp_rsp_clients_added": 0,
+    "accepted": false
+  },
+  "next_steps": "Observe the existing full561 process/terminal result. Keep H10 sources and its sole workload QMP/RSP unchanged. Continue the specified classic ESP32 PHY model investigation."
+}
