@@ -22,7 +22,7 @@ def main():
     spec=importlib.util.spec_from_file_location('helpers',ROOT/'tests/run-cyd-lifecycle.py')
     helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
     source=canonical(main/'radio_control.c').read_text()
-    functions=['parse_playlist_line','load_playlist_index_locked','build_playlist_index_locked','playlist_station']
+    functions=['parse_playlist_line','next_playlist_row','load_playlist_index_locked','build_playlist_index_locked','playlist_station']
     (out/'production.inc').write_text('\n'.join(helper.function(source,name) for name in functions))
     binary=out/'test'
     try:

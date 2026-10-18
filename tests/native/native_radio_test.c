@@ -13,7 +13,7 @@
 #include "native_state.h"
 #include "file_transaction.h"
 
-static bool lock_timeout,fail_play,fail_commit;
+static bool lock_timeout,fail_play,fail_commit,fail_index;
 static unsigned plays,stops,resets;
 static uint32_t generation;
 static native_state_t state;
@@ -24,6 +24,7 @@ static const char *mapped(const char *path) {
 static FILE *test_fopen(const char *path,const char *mode) {return fopen(mapped(path),mode);}
 static int test_remove(const char *path) {return remove(mapped(path));}
 static int test_rename(const char *from,const char *to) {
+    if(fail_index && strstr(from,"index.dat.tmp")) {errno=EIO;return -1;}
     if (!access(mapped(to),F_OK)) {errno=EEXIST;return -1;}
     return rename(mapped(from),mapped(to));
 }
@@ -104,6 +105,18 @@ int main(void) {
     FILE *csv=fopen("playlist.csv","wb");assert(csv);
     assert(fputs("One\thttp://one.example/live\t128\nTwo\thttps://two.example/live\t64\nThree\thttp://three.example/live\t64\n",csv)>=0);assert(!fclose(csv));
     assert(radio_control_reindex_playlist()==ESP_OK && radio_control_playlist_count()==3);
+    fail_index=true;
+    assert(radio_control_reindex_playlist()==ESP_FAIL && radio_control_playlist_count()==3);
+    csv=fopen("playlist.csv","wb");assert(csv);
+    assert(fputs("Changed first station\thttp://changed.example/live\t128\nTwo\thttps://two.example/live\t64\n",csv)>=0);assert(!fclose(csv));
+    assert(radio_control_reindex_playlist()==ESP_FAIL && !radio_control_playlist_count());
+    assert(radio_control_play(2)==ESP_ERR_NOT_FOUND && !plays);
+    fail_index=false;saved_station=2;saved_smartstart=SMARTSTART_PLAYING;
+    boot();assert(radio_control_playlist_count()==2 && !strcmp(state.station,"Two"));
+    csv=fopen("playlist.csv","wb");assert(csv);
+    assert(fputs("One\thttp://one.example/live\t128\nTwo\thttps://two.example/live\t64\nThree\thttp://three.example/live\t64\n",csv)>=0);assert(!fclose(csv));
+    assert(radio_control_reindex_playlist()==ESP_OK);saved_smartstart=SMARTSTART_DISABLED;
+    boot();plays=stops=0;
     assert(radio_control_play(2)==ESP_OK && plays==1 && state.audio_pending && !state.audio_running);
     assert(!strcmp(state.station,"Two") && saved_station==2);
     assert(radio_control_toggle()==ESP_OK && stops==1 && !state.audio_pending && !state.audio_running);

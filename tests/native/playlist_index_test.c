@@ -21,6 +21,7 @@ typedef int esp_err_t;
 #define PLAYLIST_INDEX_BACKUP_PATH "index.dat.bak"
 static uint16_t s_playlist_count;
 static char s_playlist_line[768];
+static char s_candidate_url[512];
 static bool fail_publish,fail_write,fail_flush,fail_close;
 static int64_t esp_timer_get_time(void) {return 0;}
 static size_t strlcpy(char *out,const char *in,size_t size) {
@@ -90,12 +91,40 @@ int main(void) {
     assert(build_playlist_index_locked()==ESP_OK && s_playlist_count==1);
     char name[144],url[512];assert(playlist_station(1,name,sizeof(name),url,sizeof(url)));
     assert(!strcmp(name,"Real"));
+    normal();
+    contents(PLAYLIST_PATH,"Changed station name\thttp://different.example/live\t128\nTwo\thttps://two.example/live\t64\n");
+    assert(load_playlist_index_locked()==ESP_ERR_INVALID_SIZE && s_playlist_count==2);
+    assert(build_playlist_index_locked()==ESP_OK && load_playlist_index_locked()==ESP_OK);
+    assert(playlist_station(2,name,sizeof(name),url,sizeof(url)) && !strcmp(name,"Two"));
+    // Same offsets with different station contents still form a valid cache.
+    normal();contents(PLAYLIST_PATH,"Uno\thttp://uno.example/live\t128\nDos\thttps://dos.example/live\t64\n");
+    assert(load_playlist_index_locked()==ESP_OK);
+    assert(playlist_station(2,name,sizeof(name),url,sizeof(url)) && !strcmp(name,"Dos"));
+    assert(!playlist_station(1,name,sizeof(name),url,8));
+    FILE *index=fopen(PLAYLIST_INDEX_PATH,"wb");assert(index);uint32_t invalid_offset=1;
+    assert(fwrite(&invalid_offset,sizeof(invalid_offset),1,index)==1);assert(!fclose(index));
+    assert(!playlist_station(1,name,sizeof(name),url,sizeof(url)));
+    index=fopen(PLAYLIST_INDEX_PATH,"wb");assert(index);invalid_offset=UINT32_MAX;
+    assert(fwrite(&invalid_offset,sizeof(invalid_offset),1,index)==1);assert(!fclose(index));
+    assert(!playlist_station(1,name,sizeof(name),url,sizeof(url)));
+    // Embedded NUL and an unsupported URL length cannot become valid rows.
+    csv=fopen(PLAYLIST_PATH,"wb");assert(csv);
+    const char nul_row[]="Bad\thttp://bad\0.example/live\t64\n";
+    assert(fwrite(nul_row,1,sizeof(nul_row)-1,csv)==sizeof(nul_row)-1);
+    assert(fputs("Long\thttp://",csv)>=0);for(unsigned i=0;i<512;++i)assert(fputc('a',csv)!=EOF);
+    assert(fputs("\t64\nGood\thttp://good.example/live\t64\n",csv)>=0);assert(!fclose(csv));
+    assert(build_playlist_index_locked()==ESP_OK && s_playlist_count==1 && load_playlist_index_locked()==ESP_OK);
+    assert(playlist_station(1,name,sizeof(name),url,sizeof(url)) && !strcmp(name,"Good"));
     // Zero stations and a final line without a newline are valid inputs.
     contents(PLAYLIST_PATH,"invalid\nNoTabs\n");assert(build_playlist_index_locked()==ESP_OK && !s_playlist_count);
     contents(PLAYLIST_PATH,"Last\thttp://last.example/live\t64");assert(build_playlist_index_locked()==ESP_OK && s_playlist_count==1);
     // Corrupt raw index size is rejected without publishing a new count.
     contents(PLAYLIST_INDEX_PATH,"x");assert(load_playlist_index_locked()==ESP_ERR_INVALID_SIZE);
     assert(s_playlist_count==1);
+    // An index cannot silently wrap its uint16 station count.
+    csv=fopen(PLAYLIST_PATH,"wb");assert(csv);
+    for(unsigned i=0;i<=UINT16_MAX;++i) assert(fputs("A\thttp://a\t1\n",csv)>=0);
+    assert(!fclose(csv));assert(build_playlist_index_locked()==ESP_ERR_INVALID_SIZE && s_playlist_count==1);
     remove(PLAYLIST_PATH);remove(PLAYLIST_INDEX_PATH);remove(PLAYLIST_INDEX_TEMP_PATH);remove(PLAYLIST_INDEX_BACKUP_PATH);
     assert(!chdir("/"));assert(!rmdir(directory));
     puts("PASS playlist index: exact offsets/lookup; rename/write failure retains old index/count; missing CSV; overlong row fragments; final line/empty/corrupt index; ASan/UBSan");
