@@ -20,7 +20,8 @@ static void reset(void) {
     clock_us=1000000;receive_ready=send_ready=receive_step=publish_delay=0;
     receives=sends=wait_read=wait_write=close_prepares=activity=publications=0;
     async_begins=async_completes=queued_static=file_opens=0;
-    fail_workspace=fail_response=fail_store=store_busy=committed_file=false;sleep_allowed=true;
+    fail_workspace=fail_response=fail_store=store_busy=committed_file=fail_io_allocation=false;sleep_allowed=true;
+    lookup_count=lookup_fault_mask=0;
     receive_wants_write=send_wants_read=false;receive_chunk=send_chunk=SIZE_MAX;
     source_size=source_offset=response_size=event_size=0;response[0]=events[0]=0;
     type="application/json";
@@ -77,7 +78,7 @@ static void success_cases(void) {
     }
 }
 static void rejection_cases(void) {
-    for(unsigned mode=0;mode<15;++mode) {
+    for(unsigned mode=0;mode<16;++mode) {
         reset();make_edit();
         switch(mode) {
         case 0:body("{\"password\":\"NEW_REQUEST_CANARY\"}");break;
@@ -101,6 +102,7 @@ static void rejection_cases(void) {
 #endif
             break;
         case 14:hd.config.max_resp_headers=1;break;
+        case 15:fail_io_allocation=true;break;
         }
         assert(web_wifi_edit_handler(&hd.hd_req)==ESP_FAIL);closed();
         assert(!publications&&!s_reserved_epoch&&!activity);
@@ -121,9 +123,10 @@ static void metadata_cases(void) {
     reset();hd.hd_req.method=HTTP_GET;hd.hd_req.content_len=hd.hd_req_aux.remaining_len=1000000;
     assert(web_wifi_info_handler(&hd.hd_req)==ESP_FAIL&&close_prepares==1&&!activity&&!receives&&!publications&&strstr(response,"400 Bad Request"));
     httpd_req_cleanup(&hd.hd_req);
-    reset();wifi_http_io_t *io=workspace_calloc(1,sizeof(*io));
-    strcpy((char *)io->body,"ABNORMAL_PRIVATE_CANARY");strcpy(io->edit.profiles[0].password,"ABNORMAL_PRIVATE_CANARY");
-    httpd_sess_set_ctx(&hd,7,io,wifi_http_free);assert(hd.hd_req.sess_ctx==io);
+    reset();wifi_http_payload_t *payload=workspace_calloc(1,sizeof(*payload));
+    strcpy((char *)payload->body,"ABNORMAL_PRIVATE_CANARY");strcpy(payload->edit.profiles[0].password,"ABNORMAL_PRIVATE_CANARY");
+    native_wifi_request_io_t *io=native_wifi_request_io_open(&hd.hd_req,10000000,30000000,payload,wifi_http_free);
+    assert(io&&hd.hd_req.sess_ctx==io);
     httpd_req_cleanup(&hd.hd_req);assert(sd.ctx==io);
     httpd_sess_free_ctx(&sd.ctx,sd.free_ctx);assert(!sd.ctx&&!http_workspace);
 }
@@ -136,6 +139,35 @@ static void foreign_owner_case(void) {
     assert(hd.hd_req.sess_ctx==foreign&&!foreign_frees&&strstr(response,"503 Service Unavailable"));
     httpd_req_cleanup(&hd.hd_req);assert(sd.ctx==foreign&&!foreign_frees);
     httpd_sess_free_ctx(&sd.ctx,sd.free_ctx);assert(!sd.ctx&&foreign_frees==1);
+}
+static void inactive_info_cases(void) {
+    for(unsigned mode=0;mode<3;++mode) {
+        reset();hd.hd_req.method=HTTP_GET;
+#ifdef TARGET_C3
+        sleep_allowed=false;
+#else
+        web_wifi_deactivate();
+#endif
+        if(mode)hd.hd_req.content_len=hd.hd_req_aux.remaining_len=1000000;
+        void *foreign=NULL;unsigned freed=foreign_frees;
+        if(mode==2){foreign=malloc(32);assert(foreign);httpd_sess_set_ctx(&hd,7,foreign,foreign_free);}
+        assert(web_wifi_info_handler(&hd.hd_req)==ESP_FAIL&&close_prepares==1&&!receives&&!activity&&!publications);
+        assert(strstr(response,"503 Service Unavailable")&&strstr(response,"Connection: close")&&hd.hd_req.sess_ctx==foreign);
+        httpd_req_cleanup(&hd.hd_req);
+        if(foreign){assert(sd.ctx==foreign&&foreign_frees==freed);httpd_sess_free_ctx(&sd.ctx,sd.free_ctx);assert(foreign_frees==freed+1);}
+    }
+}
+static void io_attachment_cases(void) {
+    for(unsigned lookup=1;lookup<=3;++lookup) {
+        reset();make_edit();lookup_fault_mask=1U<<lookup;
+        assert(web_wifi_edit_handler(&hd.hd_req)==ESP_FAIL);closed();
+        assert(!publications&&!s_reserved_epoch&&!activity&&strstr(response,"503 Service Unavailable"));
+    }
+    reset();make_edit();lookup_fault_mask=(1U<<3)|(1U<<4); // Override failure AND failed API detach.
+    assert(web_wifi_edit_handler(&hd.hd_req)==ESP_FAIL&&close_prepares==1&&!publications&&!s_reserved_epoch&&!activity);
+    assert(hd.hd_req.sess_ctx&&http_workspace); // SDK still owns both blocks; no manual double free.
+    httpd_req_cleanup(&hd.hd_req);assert(sd.ctx&&http_workspace);
+    httpd_sess_free_ctx(&sd.ctx,sd.free_ctx);assert(!sd.ctx&&!http_workspace);
 }
 static void uri_cases(void) {
     const char *bad[]={"/data/wifi.csv","/data/wifi.csv.bak","/data/wifi.csv.tmp","/data/playlist.csv.bak","/data/index.dat","/data","/DATA/wifi.csv","/DaTa/playlist.csv","/data/%77ifi.csv","/%64ata/wifi.csv","/data//playlist.csv","/./data/playlist.csv","/www/../data/wifi.csv","/data\\wifi.csv","//data/playlist.csv","/data/wifi.csv?download=1","/data/playlist.csv#x","/data/playlist.csv x","relative"};
@@ -158,7 +190,7 @@ static void actual_static_cases(void) {
 }
 #endif
 int main(void) {
-    assert(mkdtemp(directory));uri_cases();success_cases();rejection_cases();metadata_cases();foreign_owner_case();
+    assert(mkdtemp(directory));uri_cases();success_cases();rejection_cases();metadata_cases();foreign_owner_case();io_attachment_cases();inactive_info_cases();
 #ifdef TARGET_C3
     actual_static_cases();
 #endif

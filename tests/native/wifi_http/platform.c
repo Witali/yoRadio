@@ -11,7 +11,9 @@ static char response[5000], events[128];
 static size_t event_size;
 static const char *type;
 static void *http_workspace;
-static size_t http_workspace_size;
+static struct {void *pointer;size_t size;} workspace_blocks[4];
+static unsigned lookup_count, lookup_fault_mask;
+static bool fail_io_allocation;
 static char directory[]="/tmp/native-wifi-http-XXXXXX";
 static pthread_mutex_t owner_mutex=PTHREAD_MUTEX_INITIALIZER;
 static unsigned async_begins, async_completes, queued_static, file_opens;
@@ -52,16 +54,26 @@ void deep_sleep_clock_end_activity(void) {assert(activity);--activity;}
 void display_settings_note_activity(void) {assert(activity);}
 void *response_malloc(size_t size) {event('R');return fail_response?NULL:malloc(size);}
 void *workspace_calloc(size_t a,size_t b) {
-    if(fail_workspace)return NULL;
-    assert(!http_workspace);http_workspace=calloc(a,b);http_workspace_size=a*b;
-    assert(http_workspace);++workspace_allocations;return http_workspace;
+    if(fail_workspace||(fail_io_allocation&&a*b==sizeof(native_wifi_request_io_t)))return NULL;
+    void *p=calloc(a,b);assert(p);
+    for(size_t i=0;i<4;++i)if(!workspace_blocks[i].pointer){workspace_blocks[i].pointer=p;workspace_blocks[i].size=a*b;
+        if(!http_workspace)http_workspace=p;
+        ++workspace_allocations;return p;}
+    assert(!"Too many HTTP workspace blocks");return NULL;
 }
 void workspace_free(void *p) {
-    assert(p&&p==http_workspace);
-    const uint8_t *bytes=p;for(size_t i=0;i<http_workspace_size;++i)assert(!bytes[i]);
-    ++workspace_frees;http_workspace=NULL;event('F');free(p);
+    assert(p);size_t found=4;
+    for(size_t i=0;i<4;++i)if(workspace_blocks[i].pointer==p){found=i;break;}
+    assert(found<4);
+    const uint8_t *bytes=p;for(size_t i=0;i<workspace_blocks[found].size;++i)assert(!bytes[i]);
+    workspace_blocks[found].pointer=NULL;++workspace_frees;
+    http_workspace=NULL;for(size_t i=0;i<4;++i)if(workspace_blocks[i].pointer)http_workspace=workspace_blocks[i].pointer;
+    event('F');free(p);
 }
-struct sock_db *httpd_sess_get(httpd_handle_t server,int socket) {assert(server==&hd&&socket==7);return &sd;}
+struct sock_db *httpd_sess_get(httpd_handle_t server,int socket) {
+    assert(server==&hd&&socket==7);++lookup_count;
+    return lookup_count<32&&(lookup_fault_mask&(1U<<lookup_count))?NULL:&sd;
+}
 bool httpd_valid_req(httpd_req_t *request) {return request==&hd.hd_req;}
 void esp_http_server_dispatch_event(int id,void *data,size_t size) {(void)id;(void)data;(void)size;}
 int httpd_req_to_sockfd(httpd_req_t *request) {assert(request==&hd.hd_req);return 7;}

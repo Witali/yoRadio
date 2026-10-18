@@ -143,6 +143,7 @@ def main():
 #include "sdk-cleanup.inc"
 #define calloc workspace_calloc
 #define free workspace_free
+#include "native_wifi_request_io.c"
 #include "native_wifi_http.c"
 #undef free
 #undef calloc
@@ -174,13 +175,13 @@ def main():
                 'config->finish(config->context, committed && response == ESP_OK);', 'success_cases'),
             'cancel-durable-after-deadline': ('native_wifi_http.c',
                 'if (result == NATIVE_WIFI_OK) { committed = true; goto done; }',
-                'if (result == NATIVE_WIFI_OK) { committed = now_us() < deadline(io); goto done; }', 'success_cases'),
+                'if (result == NATIVE_WIFI_OK) { committed = !native_wifi_request_io_expired(io); goto done; }', 'success_cases'),
             'skip-http-workspace-erase': ('native_wifi_http.c',
-                'native_wifi_erase(opaque, sizeof(wifi_http_io_t));',
+                'native_wifi_erase(opaque, sizeof(wifi_http_payload_t));',
                 '/* mutant: no erase */', 'workspace_free'),
             'bypass-sdk-pending-body': ('native_wifi_http.c',
-                'httpd_req_recv(request, (char *)io->body + offset, request->content_len - offset)',
-                'wifi_receive(request->handle, socket, (char *)io->body + offset, request->content_len - offset, 0)', 'success_cases'),
+                'httpd_req_recv(request, (char *)payload->body + offset, request->content_len - offset)',
+                'io_receive(request->handle, httpd_req_to_sockfd(request), (char *)payload->body + offset, request->content_len - offset, 0)', 'success_cases'),
             'expose-all-private-data-paths': ('include/native_wifi_public.h',
                 'return !data || (path == sizeof(playlist)',
                 'return data || !data || (path == sizeof(playlist)', 'uri_cases'),

@@ -2,6 +2,7 @@
 
 #include <stdatomic.h>
 #include "native_wifi_http.h"
+#include "native_wifi_request_io.h"
 #include "network_service.h"
 #include "web_reboot.h"
 
@@ -33,8 +34,11 @@ esp_err_t web_wifi_edit_handler(httpd_req_t *request) {
 esp_err_t web_wifi_info_handler(httpd_req_t *request) {
     if (!atomic_load(&s_wifi_active)) {
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        httpd_resp_set_hdr(request, "Connection", "close");
         httpd_resp_set_status(request, "503 Service Unavailable");
-        return httpd_resp_sendstr(request, "Wi-Fi service unavailable");
+        esp_err_t sent = httpd_resp_sendstr(request, "Wi-Fi service unavailable");
+        native_wifi_request_io_close(request, NULL, sent == ESP_OK, false);
+        return ESP_FAIL;
     }
     return native_wifi_http_info(request, network_service_wifi_metadata);
 }

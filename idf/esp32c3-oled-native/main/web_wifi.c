@@ -3,6 +3,7 @@
 #include "deep_sleep_clock.h"
 #include "display_settings.h"
 #include "native_wifi_http.h"
+#include "native_wifi_request_io.h"
 #include "network_service.h"
 #include "websocket_service.h"
 
@@ -39,8 +40,11 @@ esp_err_t web_wifi_edit_handler(httpd_req_t *request) {
 esp_err_t web_wifi_info_handler(httpd_req_t *request) {
     if (!deep_sleep_clock_begin_activity()) {
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        httpd_resp_set_hdr(request, "Connection", "close");
         httpd_resp_set_status(request, "503 Service Unavailable");
-        return httpd_resp_sendstr(request, "Clock is entering sleep");
+        esp_err_t sent = httpd_resp_sendstr(request, "Clock is entering sleep");
+        native_wifi_request_io_close(request, NULL, sent == ESP_OK, false);
+        return ESP_FAIL;
     }
     display_settings_note_activity();
     esp_err_t result = native_wifi_http_info(request, network_service_wifi_metadata);
