@@ -14,7 +14,9 @@
  *
  */
 #pragma once
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC optimize ("Ofast")
+#endif
 
 #include "Arduino.h"
 
