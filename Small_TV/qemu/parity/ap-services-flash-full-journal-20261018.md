@@ -78,3 +78,19 @@ A file-only diagnostic audited 63 complete cycles, 512 HTTP requests and one
 external AP outage over 1070.210754 observed guest seconds. All 31 runtime
 inputs and start record match; UART has one ROM boot and no panic. Status is
 explicitly **pending**: this prefix is not a completed 86400-second H10 run.
+
+## Separate JPEG table correction
+
+Branch `codex/small-tv-jpeg-uploads` committed/pushed21633207 fixes reserved
+all-one Huffman words and invalid unused AC symbols. The literal factory and
+BC68 accept121new malformed cases; candidate0592 rejects them during preparation.
+The exact same DHT harness/fixtures, public JPEG checks and real HTTP before/after
+support the correction. The new candidate changes onlytjpgd.c among59production
+inputs and adds32app bytes. Its scoped evidence is in
+`jpeg-dht-validation-20261018.json` in that separate branch.
+
+Its own full regression freezes539inputs and was revalidated live as controller
+20380, creation2026-10-18T13:08:55.949427Z. This BC68 run and its533inputs were
+not changed; all533were rehashed unchanged after that correction was committed.
+BC68 regional persistence/NVS migration have passed and natural calendar cases
+are now running. A terminal pass here still cannot validate candidate0592.
