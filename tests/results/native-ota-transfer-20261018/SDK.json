@@ -1,0 +1,336 @@
+{
+  "passed": true,
+  "source_commit": "ab1e4c6e699667280418e659b429f84f4b8578f9",
+  "physical_tested": false,
+  "images": [
+    {
+      "label": "CYD PDM",
+      "variant": "esp32-cyd2usb-native-ota-transfer-pdm",
+      "app_bytes": 1476672,
+      "ota_slot_bytes": 1769472,
+      "ota_free_bytes": 292800,
+      "app_sha256": "69f3736b0c09ff7e54f55268b6ee83f516e328cb846cd88275211ca24c625bf9",
+      "elf_sha256": "8ae1bb4dcd4eb60e90eda7653193598cb57d845a93df0b9e8b94d339ff34091c",
+      "sdkconfig_changes": {},
+      "compiler_warnings": [],
+      "manifest_sha256": "199cad3cc5731e1b68d05eeb99a26eb2540b2dd00a01b06363baed97c50d11cc"
+    },
+    {
+      "label": "CYD continuous DAC",
+      "variant": "esp32-cyd2usb-native-ota-transfer-continuous",
+      "app_bytes": 1470672,
+      "ota_slot_bytes": 1769472,
+      "ota_free_bytes": 298800,
+      "app_sha256": "5e9705b31531bfdd0535818550f288b4867a230195fa9d0fe651e0034535d6dc",
+      "elf_sha256": "7ce540ca499154176d58460fb93ea06a5cb8fbe06a936f3562fc75331daab88f",
+      "sdkconfig_changes": {},
+      "compiler_warnings": [],
+      "manifest_sha256": "0e011d57c3715c68c4966f57135721774bc25131d54e6027987921883ff37fd6"
+    },
+    {
+      "label": "CYD legacy DAC",
+      "variant": "esp32-cyd2usb-native-ota-transfer-legacy",
+      "app_bytes": 1476672,
+      "ota_slot_bytes": 1769472,
+      "ota_free_bytes": 292800,
+      "app_sha256": "9451ce6726b3b6285920a8796e47dc4cd3ea3a0c124aabd4fdc4b24d12a15141",
+      "elf_sha256": "86461a0c64f6cb3e75f14309dce0ad1d73709429df9e39371895c19dabee2e83",
+      "sdkconfig_changes": {},
+      "compiler_warnings": [
+        "C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/i2s_legacy.c:719:9: warning: 'periph_rtc_apll_freq_set' is deprecated: Please use esp_clk_tree_src_set_freq_hz instead [-Wdeprecated-declarations]",
+        "C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/i2s_legacy.c:1506:9: warning: 'periph_rtc_apll_acquire' is deprecated: Please use esp_clk_tree_enable_src instead [-Wdeprecated-declarations]",
+        "C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/i2s_legacy.c:1643:9: warning: 'periph_rtc_apll_release' is deprecated: Please use esp_clk_tree_enable_src instead [-Wdeprecated-declarations]"
+      ],
+      "manifest_sha256": "462fcdadd806acb06fc02f2d41dcfe188f8a03afc6e7884f8cdbe881cb61c43d"
+    },
+    {
+      "label": "C3 stereo PDM",
+      "variant": "esp32c3-oled-native-ota-transfer",
+      "app_bytes": 1520448,
+      "ota_slot_bytes": 1900544,
+      "ota_free_bytes": 380096,
+      "app_sha256": "df1d4b2b244179d622b624cdc8809b56eaaffbf1ec681c2c9dd29d1a1a0368d4",
+      "elf_sha256": "eb121c25a7925720ae370601f43c906ecaf063738f4fbb068a60f51876c155cb",
+      "sdkconfig_changes": {},
+      "compiler_warnings": [],
+      "manifest_sha256": "4895339ac70e74fda84109dec4d83c4b9d083c4275b188ea08665ce77fa1f2e0"
+    }
+  ],
+  "target_object_symbols": {
+    "cyd": {
+      "ws": [
+        {
+          "name": "s_have_previous",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_running",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_task_alive",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_work_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_playlist_revision",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_server",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_state",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_status_revision",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "hex$0",
+          "kind": "r",
+          "bytes": 17
+        },
+        {
+          "name": "s_sockets",
+          "kind": "b",
+          "bytes": 40
+        },
+        {
+          "name": "s_clients",
+          "kind": "b",
+          "bytes": 384
+        },
+        {
+          "name": "s_current",
+          "kind": "b",
+          "bytes": 504
+        },
+        {
+          "name": "s_previous",
+          "kind": "b",
+          "bytes": 504
+        },
+        {
+          "name": "s_status",
+          "kind": "b",
+          "bytes": 5120
+        }
+      ],
+      "tls": [
+        {
+          "name": "s_prepared",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_secure",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_bundle",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_bundle_size",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_sessions",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_config",
+          "kind": "b",
+          "bytes": 64
+        }
+      ]
+    },
+    "c3": {
+      "ws": [
+        {
+          "name": "s_message_poll_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_playlist_changed_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_reboot_pending",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_reboot_ready",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_completed_deliveries",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_current_send_pending",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_fragmented_clients",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_last_ws_clients",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_reboot_at",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_server",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_state",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_status_send_pending",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_reboot_next_epoch",
+          "kind": "b",
+          "bytes": 8
+        },
+        {
+          "name": "s_reboot_reserved_epoch",
+          "kind": "b",
+          "bytes": 8
+        },
+        {
+          "name": "s_current_work",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_playlist_work",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_status_work",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "hex.0",
+          "kind": "r",
+          "bytes": 17
+        },
+        {
+          "name": "s_broadcast_current",
+          "kind": "b",
+          "bytes": 48
+        },
+        {
+          "name": "s_current_status_key",
+          "kind": "b",
+          "bytes": 428
+        },
+        {
+          "name": "s_previous_status_key",
+          "kind": "b",
+          "bytes": 428
+        },
+        {
+          "name": "s_broadcast_status",
+          "kind": "b",
+          "bytes": 1280
+        },
+        {
+          "name": "s_clients",
+          "kind": "b",
+          "bytes": 3200
+        }
+      ],
+      "tls": [
+        {
+          "name": "s_prepared",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_secure",
+          "kind": "b",
+          "bytes": 1
+        },
+        {
+          "name": "s_bundle",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_bundle_size",
+          "kind": "b",
+          "bytes": 4
+        },
+        {
+          "name": "s_sessions",
+          "kind": "b",
+          "bytes": 12
+        },
+        {
+          "name": "s_config",
+          "kind": "b",
+          "bytes": 68
+        }
+      ]
+    }
+  },
+  "cyd_pipeline_affinity": [
+    {
+      "task": "radio_stream",
+      "core": 0,
+      "priority": 3
+    },
+    {
+      "task": "audio_decode",
+      "core": 1,
+      "priority": 5
+    },
+    {
+      "task": "audio_output",
+      "core": 1,
+      "priority": 6
+    }
+  ],
+  "scope": "GCC final ELF/image/archive/config integrity and actual target object symbol sizes. No physical OTA/flash, power-loss, heap/stack/timing or audio admission claim."
+}
