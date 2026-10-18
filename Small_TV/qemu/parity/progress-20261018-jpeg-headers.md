@@ -103,3 +103,35 @@ H10 registries: совпадают. Все6точных OS identities live; но
 и не объединять их src в эту ветку до terminal full/H10. Старый0592 journal
 окончательно сохранён:182complete cycles,16pending events, periodic report181;
 исходные running reports не превращались в terminal pass. H10 F1 продолжается.
+
+## Независимые cold LCD и network-without-LCD
+
+В test-only ветке добавлены5ebe5184/fffcba9b/8e55f70d и результаты46791f27/
+d37d691b, отправлены в origin. Production F1/D64 не менялась.
+
+- Display gate:20factory+20native новых процессов QEMU, все40полных RGB кадров
+  побайтно совпали с фактическим factory setup frameACC588AB. Boot и protected
+  flash проверяются отдельно, network везде not_run и HTTP forwarding выключен.
+  12unit cases отвергают wrong/black/partial/stale/truncated frames, deadlines
+  и stalled counter. Все62inputs совпали. Максимум factory5.496407guest/
+  9.547host s, native0.460610guest/1.391host s после начала наблюдения; не hardware
+  benchmark. Offline fresh preparation также подтвердила protected flash/media.
+  Proof display-cold-20-validation-20261018.json +86gzip в той ветке.
+- Network gate: собственный copied profile devices=[], default-peripherals=off,
+  QOM lcd absent. Factory/native HTTP и свежий processed SNTP проходят до/после
+  reset, без captures/ожидания дисплея. NTP1→2,4контрольныхHTTP200 после probes,
+  SDK/wire maxdelta0.191694s, native STA/DHCP10.0.2.15/time_synced подтверждены
+  matching ELF. По2ROM boots, no panic, все59inputs совпали. Display not_run.
+  Proof network-without-display-validation-20261018.json +12gzip в той ветке.
+- Все44временные VM identities (40matrix,2preflight,2network) закрыты по CIM;
+  2PID уже переиспользованы другими identities, эти процессы не затрагивались.
+
+После работы вновь совпали566/561full inputs и32+47+8H10 registries; все6точных
+OS identities live. File-only canonical H10 audit:104complete cycles/1outage,
+start_record_matches=true, statuspending;24h ещё не приняты. Checkpoint
+post-independent-gates-checkpoint-20261018.json +7gzip. Его live raw files
+копировались последовательно после анализа, а не атомарно; analyzed prefix hash
+сохранён отдельно. Новых QMP/RSP clients к H10 нет. Ближайший шаг — продолжить
+ожидание существующих full/H10 и проверить terminal отчёты. Standalone тесты не
+внесены задним числом в frozen full. Current browser/control/cold/network source
+в ветке small-tv-browser-controls-verify; src этой frozen F1 ветки не редактировать.
