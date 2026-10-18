@@ -290,9 +290,9 @@ static inline bool mp_form_data_boundary(const char *type, char *out,
 static inline bool mp_disposition_parameters(const char *headers,
                                              const char **start,
                                              const char **finish) {
+    *start = *finish = NULL;
     const char *end;
     if (!mp_bounded_end(headers, &end)) return false;
-    bool found = false;
     for (const char *p = headers; p < end;) {
         const char *name = p;
         while (p < end && mp_token((unsigned char)*p)) ++p;
@@ -308,8 +308,7 @@ static inline bool mp_disposition_parameters(const char *headers,
             if (*p++ != '\r' || p == end || *p++ != '\n') return false;
         }
         if (!mp_equal(name, length, "Content-Disposition", 19)) continue;
-        if (found) return false;
-        found = true;
+        if (*start) return false;
         mp_skip_space(&value, value_end);
         const char *token = value;
         while (value < value_end && mp_token((unsigned char)*value)) ++value;
@@ -323,7 +322,7 @@ static inline bool mp_disposition_parameters(const char *headers,
         *start = value;
         *finish = value_end;
     }
-    return found;
+    return *start != NULL;
 }
 
 /* Compatibility entry point. Parameters are read only from one exact
