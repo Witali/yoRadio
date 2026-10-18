@@ -1120,6 +1120,7 @@ test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", ()
   assert.match(component, /\bnative_web_transport\b/);
   assert.match(component, /\bnative_storage\b/);
   assert.match(component, /websocket_service\.c/);
+  assert.match(component, /"web_wifi\.c"/);
   assert.match(config, /CONFIG_HTTPD_WS_SUPPORT=y/);
   assert.match(web, /websocket_service_register\(server, state\)/);
   assert.match(web, /#define WEB_MAX_OPEN_SOCKETS 7/);
@@ -1146,7 +1147,9 @@ test("native WebUI uses only the standard ESP-IDF HTTP and WebSocket server", ()
   assert.match(upload, /mp_form_data_boundary\(type, boundary, sizeof\(boundary\)\)/);
   assert.match(upload, /mp_init\(&parser, boundary, web_file_form_part, form\)/);
   assert.match(upload, /mp_feed\(&parser, chunk, \(size_t\)received\)/);
-  assert.match(upload, /return mp_complete\(&parser\)/);
+  const receiver = section(upload, "static bool receive_form(", "static bool upload_destination(");
+  assert.match(receiver, /complete = mp_complete\(&parser\)/);
+  assert.match(receiver, /done:[\s\S]*native_wifi_erase\(chunk, sizeof\(chunk\)\);[\s\S]*return complete;/);
   assert.match(websocket, /\.uri = "\/ws"/);
   assert.match(websocket, /\.is_websocket = true/);
   assert.match(websocket, /httpd_ws_recv_frame/);
