@@ -16,6 +16,7 @@ typedef int esp_err_t;
 #define ESP_ERR_INVALID_SIZE -3
 #define ESP_LOGI(...) ((void)0)
 #define PLAYLIST_PATH "playlist.csv"
+#define PLAYLIST_BACKUP_PATH "playlist.csv.bak"
 #define PLAYLIST_INDEX_PATH "index.dat"
 #define PLAYLIST_INDEX_TEMP_PATH "index.dat.tmp"
 #define PLAYLIST_INDEX_BACKUP_PATH "index.dat.bak"
@@ -41,6 +42,7 @@ static int test_fclose(FILE *file) {int result=fclose(file);return fail_close ? 
 #define rename(...) test_rename(__VA_ARGS__)
 #define native_file_replace tested_file_replace
 #define native_file_recover tested_file_recover
+#define native_file_replace_pair tested_file_replace_pair
 #include "file_transaction.c"
 #define fwrite(...) test_fwrite(__VA_ARGS__)
 #define fflush(...) test_fflush(__VA_ARGS__)

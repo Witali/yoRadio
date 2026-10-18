@@ -16,13 +16,14 @@ from native_source import canonical,source_closure
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--target',choices=['c3','cyd'],default='c3')
+    parser.add_argument('--output',type=Path)
     args=parser.parse_args()
     main=ROOT/'idf'/('esp32c3-oled-native' if args.target=='c3' else 'esp32-cyd2usb-native')/'main'
-    out=ROOT/'.build'/('playlist-index-'+args.target);out.mkdir(parents=True,exist_ok=True)
+    out=(args.output or ROOT/'.build'/('playlist-index-'+args.target)).resolve();out.mkdir(parents=True,exist_ok=True)
     spec=importlib.util.spec_from_file_location('helpers',ROOT/'tests/run-cyd-lifecycle.py')
     helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
     source=canonical(main/'radio_control.c').read_text()
-    functions=['parse_playlist_line','next_playlist_row','load_playlist_index_locked','build_playlist_index_locked','playlist_station']
+    functions=['parse_playlist_line','next_playlist_row','load_playlist_index_locked','write_playlist_index_candidate_locked','build_playlist_index_locked','playlist_station']
     (out/'production.inc').write_text('\n'.join(helper.function(source,name) for name in functions))
     binary=out/'test'
     try:

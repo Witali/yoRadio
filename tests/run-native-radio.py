@@ -1,4 +1,5 @@
 """Execute the shared radio controller with each target's actual state code."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -13,6 +14,10 @@ from run_output_dma_host import host,run
 
 
 def main():
+    global OUT
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output',type=Path,default=OUT)
+    OUT=parser.parse_args().output.resolve()
     OUT.mkdir(parents=True,exist_ok=True);(OUT/'freertos').mkdir(exist_ok=True)
     stubs={
         'sdkconfig.h':'#pragma once\n',

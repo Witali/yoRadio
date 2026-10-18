@@ -9,6 +9,13 @@
 
 esp_err_t radio_control_init(native_state_t *state);
 esp_err_t radio_control_reindex_playlist(void);
+// Validate a staged CSV and build its staged index while holding radio control.
+// Publisher serializes filesystem readers and commits or rolls back both files.
+// No new CSV is published on invalid input, lock timeout or index-write failure.
+typedef bool (*radio_playlist_publisher_t)(const char *csv_temporary,
+                                           const char *index_temporary);
+esp_err_t radio_control_publish_playlist(const char *csv_temporary,
+                                         radio_playlist_publisher_t publisher);
 esp_err_t radio_control_play(uint16_t item);
 esp_err_t radio_control_stop(void);
 esp_err_t radio_control_toggle(void);

@@ -13,7 +13,8 @@
 #include "native_state.h"
 #include "file_transaction.h"
 
-static bool lock_timeout,fail_play,fail_commit,fail_index;
+static bool lock_timeout,fail_play,fail_commit,fail_index,fail_csv_restore;
+static unsigned pair_publish_calls;
 static unsigned plays,stops,resets;
 static uint32_t generation;
 static native_state_t state;
@@ -25,6 +26,7 @@ static FILE *test_fopen(const char *path,const char *mode) {return fopen(mapped(
 static int test_remove(const char *path) {return remove(mapped(path));}
 static int test_rename(const char *from,const char *to) {
     if(fail_index && strstr(from,"index.dat.tmp")) {errno=EIO;return -1;}
+    if(fail_csv_restore && strstr(from,"playlist.csv.bak")) {errno=EIO;return -1;}
     if (!access(mapped(to),F_OK)) {errno=EEXIST;return -1;}
     return rename(mapped(from),mapped(to));
 }
@@ -97,6 +99,19 @@ static void *stress(void *arg) {
     }
     return NULL;
 }
+static void staged_csv(const char *contents) {
+    FILE *file=fopen("staged.csv","wb");assert(file);
+    assert(fputs(contents,file)>=0 && !fclose(file));
+}
+static bool publish_pair(const char *csv,const char *index) {
+    ++pair_publish_calls;
+    assert(pthread_mutex_trylock(s_lock)==EBUSY); // Held before changing CSV.
+    assert(!strcmp(csv,"/spiffs/data/staged.csv") && !strcmp(index,PLAYLIST_INDEX_TEMP_PATH));
+    FILE *candidate=fopen(mapped(index),"rb");assert(candidate);
+    uint32_t first=UINT32_MAX;assert(fread(&first,sizeof(first),1,candidate)==1 && !first && !fclose(candidate));
+    return native_file_replace_pair(csv,PLAYLIST_PATH,PLAYLIST_BACKUP_PATH,
+        index,PLAYLIST_INDEX_PATH,PLAYLIST_INDEX_BACKUP_PATH);
+}
 int main(void) {
     char directory[]="/tmp/yoradio-radio-XXXXXX";assert(mkdtemp(directory));assert(!chdir(directory));
     native_state_init(&state);
@@ -148,11 +163,30 @@ int main(void) {
     assert(!radio_control_snapshot(NULL));
     memset(&snapshot,1,sizeof(snapshot));lock_timeout=true;assert(!radio_control_snapshot(&snapshot));lock_timeout=false;
     assert(!snapshot.item && !snapshot.name[0]);
+    const char *staged="New\thttp://new.example/live\t128\nNext\thttps://next.example/live\t64\n";
+    assert(radio_control_publish_playlist(NULL,publish_pair)==ESP_ERR_INVALID_ARG);
+    assert(radio_control_publish_playlist(PLAYLIST_INDEX_TEMP_PATH,publish_pair)==ESP_ERR_INVALID_ARG);
+    staged_csv(staged);lock_timeout=true;
+    assert(radio_control_publish_playlist("/spiffs/data/staged.csv",publish_pair)==ESP_ERR_TIMEOUT && !pair_publish_calls);
+    lock_timeout=false;assert(radio_control_playlist_count()==3);
+    staged_csv("invalid\nno tabs\n");
+    assert(radio_control_publish_playlist("/spiffs/data/staged.csv",publish_pair)==ESP_ERR_INVALID_ARG && !pair_publish_calls);
+    assert(radio_control_playlist_count()==3);
+    staged_csv(staged);fail_index=true;
+    assert(radio_control_publish_playlist("/spiffs/data/staged.csv",publish_pair)==ESP_FAIL && pair_publish_calls==1);
+    fail_index=false;assert(radio_control_playlist_count()==3 && load_playlist_index_locked()==ESP_OK);
+    staged_csv(staged);fail_index=fail_csv_restore=true;
+    assert(radio_control_publish_playlist("/spiffs/data/staged.csv",publish_pair)==ESP_FAIL && !s_playlist_count);
+    assert(!access("playlist.csv.bak",F_OK));
+    fail_index=fail_csv_restore=false;boot();assert(radio_control_playlist_count()==3);
+    staged_csv(staged);
+    assert(radio_control_publish_playlist("/spiffs/data/staged.csv",publish_pair)==ESP_OK && radio_control_playlist_count()==2);
+    assert(radio_control_play(1)==ESP_OK && !strcmp(state.station,"New"));
     assert(resets);
     assert(!pthread_mutex_destroy(s_lock));free(s_lock);
     assert(!pthread_mutex_destroy(state.lock));free(state.lock);
-    remove("playlist.csv");remove("index.dat");remove("index.dat.tmp");remove("index.dat.bak");
+    remove("playlist.csv");remove("playlist.csv.bak");remove("staged.csv");remove("index.dat");remove("index.dat.tmp");remove("index.dat.bak");
     assert(!chdir("/"));assert(!rmdir(directory));
-    puts("PASS shared radio: pending Toggle/PCM/EOF/stale callbacks; indexed Play/Next/Prev/wrap; boot restore/SmartStart; NVS failure; 500 concurrent commands; ASan/UBSan");
+    puts("PASS shared radio: pending Toggle/PCM/EOF/stale callbacks; indexed Play/Next/Prev/wrap; boot restore/SmartStart; NVS failure; 500 concurrent commands; locked staged CSV/index publication, invalid/timeout no mutation, rollback/recovery; ASan/UBSan");
     return 0;
 }

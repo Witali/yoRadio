@@ -16,6 +16,7 @@
 #include "nvs.h"
 
 #define PLAYLIST_PATH "/spiffs/data/playlist.csv"
+#define PLAYLIST_BACKUP_PATH "/spiffs/data/playlist.csv.bak"
 #define PLAYLIST_INDEX_PATH "/spiffs/data/index.dat"
 #define PLAYLIST_INDEX_TEMP_PATH "/spiffs/data/index.dat.tmp"
 #define PLAYLIST_INDEX_BACKUP_PATH "/spiffs/data/index.dat.bak"
@@ -171,6 +172,7 @@ static int next_playlist_row(FILE *playlist, uint32_t *offset) {
 }
 
 static esp_err_t load_playlist_index_locked(void) {
+    if (!native_file_recover(PLAYLIST_PATH, PLAYLIST_BACKUP_PATH)) return ESP_FAIL;
     if (!native_file_recover(PLAYLIST_INDEX_PATH, PLAYLIST_INDEX_BACKUP_PATH)) return ESP_FAIL;
     FILE *playlist = fopen(PLAYLIST_PATH, "rb");
     if (!playlist) return ESP_ERR_NOT_FOUND;
@@ -201,9 +203,9 @@ static esp_err_t load_playlist_index_locked(void) {
     return result;
 }
 
-static esp_err_t build_playlist_index_locked(void) {
-    int64_t started_us = esp_timer_get_time();
-    FILE *playlist = fopen(PLAYLIST_PATH, "rb");
+static esp_err_t write_playlist_index_candidate_locked(const char *csv,
+                                                        uint16_t *count_out) {
+    FILE *playlist = fopen(csv, "rb");
     if (!playlist) {
         return ESP_ERR_NOT_FOUND;
     }
@@ -232,11 +234,20 @@ static esp_err_t build_playlist_index_locked(void) {
     if (ferror(playlist) && result == ESP_OK) result = ESP_FAIL;
     if (fflush(index) != 0 && result == ESP_OK) result = ESP_FAIL;
     if (fclose(index) != 0 && result == ESP_OK) result = ESP_FAIL;
-    fclose(playlist);
+    if (fclose(playlist) != 0 && result == ESP_OK) result = ESP_FAIL;
     if (result != ESP_OK) {
         remove(PLAYLIST_INDEX_TEMP_PATH);
         return result;
     }
+    *count_out = count;
+    return ESP_OK;
+}
+
+static esp_err_t build_playlist_index_locked(void) {
+    int64_t started_us = esp_timer_get_time();
+    uint16_t count;
+    esp_err_t result = write_playlist_index_candidate_locked(PLAYLIST_PATH, &count);
+    if (result != ESP_OK) return result;
     if (!native_file_replace(PLAYLIST_INDEX_TEMP_PATH, PLAYLIST_INDEX_PATH,
                               PLAYLIST_INDEX_BACKUP_PATH)) {
         return ESP_FAIL;
@@ -361,6 +372,15 @@ esp_err_t radio_control_init(native_state_t *state) {
     return ESP_OK;
 }
 
+static void clamp_current_station_locked(void) {
+    if (s_playlist_count && s_current_item > s_playlist_count) {
+        s_current_item = 1;
+        esp_err_t result = save_last_station(s_current_item);
+        if (result != ESP_OK)
+            ESP_LOGW(TAG, "Could not clamp saved station: %s", esp_err_to_name(result));
+    }
+}
+
 esp_err_t radio_control_reindex_playlist(void) {
     ESP_RETURN_ON_FALSE(s_state && s_lock, ESP_ERR_INVALID_STATE, TAG,
                         "radio is not ready");
@@ -372,15 +392,38 @@ esp_err_t radio_control_reindex_playlist(void) {
         // CSV after an interrupted/failed playlist publication.
         s_playlist_count = 0;
     }
-    if (result == ESP_OK && s_playlist_count &&
-        s_current_item > s_playlist_count) {
-        s_current_item = 1;
-        esp_err_t save_result = save_last_station(s_current_item);
-        if (save_result != ESP_OK) {
-            ESP_LOGW(TAG, "Could not clamp saved station: %s",
-                     esp_err_to_name(save_result));
+    if (result == ESP_OK) clamp_current_station_locked();
+    xSemaphoreGive(s_lock);
+    return result;
+}
+
+esp_err_t radio_control_publish_playlist(const char *csv_temporary,
+                                         radio_playlist_publisher_t publisher) {
+    if (!csv_temporary || !*csv_temporary || !publisher ||
+        !strcmp(csv_temporary, PLAYLIST_PATH) ||
+        !strcmp(csv_temporary, PLAYLIST_BACKUP_PATH) ||
+        !strcmp(csv_temporary, PLAYLIST_INDEX_PATH) ||
+        !strcmp(csv_temporary, PLAYLIST_INDEX_TEMP_PATH) ||
+        !strcmp(csv_temporary, PLAYLIST_INDEX_BACKUP_PATH)) return ESP_ERR_INVALID_ARG;
+    if (!s_state || !s_lock) return ESP_ERR_INVALID_STATE;
+    if (xSemaphoreTake(s_lock, pdMS_TO_TICKS(1000)) != pdTRUE) return ESP_ERR_TIMEOUT;
+    // Hold the catalog lock through preparation and pair publication. Readers
+    // can never select an old offset from a newly published CSV in between.
+    uint16_t count = 0;
+    esp_err_t result = write_playlist_index_candidate_locked(csv_temporary, &count);
+    if (result == ESP_OK && !count) result = ESP_ERR_INVALID_ARG;
+    if (result == ESP_OK) {
+        if (publisher(csv_temporary, PLAYLIST_INDEX_TEMP_PATH)) {
+            s_playlist_count = count;
+            clamp_current_station_locked();
+        } else {
+            result = ESP_FAIL;
+            // Rollback can itself fail. Advertise only a verified live pair;
+            // keep backups for recovery instead of guessing its generation.
+            if (load_playlist_index_locked() != ESP_OK) s_playlist_count = 0;
         }
     }
+    (void)remove(PLAYLIST_INDEX_TEMP_PATH);
     xSemaphoreGive(s_lock);
     return result;
 }
