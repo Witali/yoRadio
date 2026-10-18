@@ -1,0 +1,101 @@
+Activating ESP-IDF 6.1
+Setting IDF_PATH to 'C:\Work\yoRadio\.idf\v6.1-9a97f6c54ec6'.
+* Checking python version ... 3.12.10
+* Checking python dependencies ... OK
+* Deactivating the current ESP-IDF environment (if any) ... OK
+* Establishing a new ESP-IDF environment ... OK
+* Identifying shell ... pwsh.exe
+* Detecting outdated tools in system ... Found tools that are not used by active ESP-IDF version.
+For removing old versions of esp-rom-elfs, openocd-esp32 use command 'python.exe C:\Work\yoRadio\.idf\v6.1-9a97f6c54ec6\tools\idf_tools.py uninstall'
+To free up even more space, remove installation packages of those tools.
+Use option python.exe C:\Work\yoRadio\.idf\v6.1-9a97f6c54ec6\tools\idf_tools.py uninstall --remove-archives.
+"idf_component.yml" file was found for components:
+	C:/Work/yoRadio/.idf/esp-adf-libs/esp_audio_codec
+However, the component manager is not enabled.
+NOTE: C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bt/sdkconfig.rename.esp32c3:4: duplicate rename mapping for CONFIG_BT_NIMBLE_COEX_PHY_CODED_TX_RX_TLIM_EN: previous target CONFIG_BT_LE_COEX_PHY_CODED_TX_RX_TLIM_EN, new target CONFIG_BT_CTRL_COEX_PHY_CODED_TX_RX_TLIM_EN - last mapping is used
+NOTE: C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bt/sdkconfig.rename.esp32c3:5: duplicate rename mapping for CONFIG_BT_NIMBLE_COEX_PHY_CODED_TX_RX_TLIM_DIS: previous target CONFIG_BT_LE_COEX_PHY_CODED_TX_RX_TLIM_DIS, new target CONFIG_BT_CTRL_COEX_PHY_CODED_TX_RX_TLIM_DIS - last mapping is used
+Loading defaults file C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/sdkconfig.defaults...
+Loading defaults file C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/sdkconfig.production.defaults...
+Loading defaults file C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/sdkconfig.radio-tested.defaults...
+NOTE: Kconfig parser version: 1
+NOTE: Kconfig defaults policy: use sdkconfig
+NOTE: Status: Finished with notifications
+NOTE: C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_driver_spi/Kconfig:22: SPI_MASTER_ISR_IN_IRAM has user-set value n from C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-c3-transfer/sdkconfig but is not visible (disabled dependency)
+NOTE: C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_libc/Kconfig:107: LIBC_NEWLIB_NANO_FORMAT has user-set value y from C:\Users\rudol\AppData\Local\Temp\kconfgen_tmprhuwg4t9 but is not visible (disabled dependency)
+NOTE: C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_wifi/Kconfig:317: ESP_WIFI_ENABLE_SAE_PK has user-set value n from C:\Users\rudol\AppData\Local\Temp\kconfgen_tmprhuwg4t9 but is not visible (disabled dependency)
+NOTE: C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/bt/Kconfig:9: BT_HOST has all choice symbols disabled in sdkconfig; the choice is not visible. Source: (unknown)
+CMake Warning at C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/tools/cmake/component_validation.cmake:106 (message):
+  Private include directory
+  'C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_wifi/wifi_apps/roaming_app/include'
+  belongs to component esp_wifi but is being used by component
+  wpa_supplicant.  It is recommended to define the component dependency for
+  wpa_supplicant on the component esp_wifi, i.e.  'idf_component_register(...
+  PRIV_REQUIRES esp_wifi)' in the CMakeLists.txt of wpa_supplicant, and
+  specify the included directory as idf_component_register(...
+  PRIV_INCLUDE_DIRS <dir relative to component>) in the CMakeLists.txt of
+  component esp_wifi.
+Call Stack (most recent call first):
+  C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/tools/cmake/component_validation.cmake:130 (__component_validation_check_include_dirs)
+  C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/CMakeLists.txt:356 (__component_validation_run_checks)
+
+
+CMake Warning at C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/tools/cmake/component_validation.cmake:106 (message):
+  Private include directory
+  'C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_wifi/wifi_apps/roaming_app/src'
+  belongs to component esp_wifi but is being used by component
+  wpa_supplicant.  It is recommended to define the component dependency for
+  wpa_supplicant on the component esp_wifi, i.e.  'idf_component_register(...
+  PRIV_REQUIRES esp_wifi)' in the CMakeLists.txt of wpa_supplicant, and
+  specify the included directory as idf_component_register(...
+  PRIV_INCLUDE_DIRS <dir relative to component>) in the CMakeLists.txt of
+  component esp_wifi.
+Call Stack (most recent call first):
+  C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/tools/cmake/component_validation.cmake:130 (__component_validation_check_include_dirs)
+  C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/CMakeLists.txt:356 (__component_validation_run_checks)
+
+
+CMake Warning at C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/tools/cmake/component_validation.cmake:106 (message):
+  Private include directory
+  'C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/esp_wifi/wifi_apps/include/apps_private'
+  belongs to component esp_wifi but is being used by component
+  wpa_supplicant.  It is recommended to define the component dependency for
+  wpa_supplicant on the component esp_wifi, i.e.  'idf_component_register(...
+  PRIV_REQUIRES esp_wifi)' in the CMakeLists.txt of wpa_supplicant, and
+  specify the included directory as idf_component_register(...
+  PRIV_INCLUDE_DIRS <dir relative to component>) in the CMakeLists.txt of
+  component esp_wifi.
+Call Stack (most recent call first):
+  C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/tools/cmake/component_validation.cmake:130 (__component_validation_check_include_dirs)
+  C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/CMakeLists.txt:356 (__component_validation_run_checks)
+
+
+CMake Warning at C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/tools/cmake/component_validation.cmake:106 (message):
+  Private include directory
+  'C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/wpa_supplicant/src'
+  belongs to component wpa_supplicant but is being used by component
+  esp_wifi.  It is recommended to define the component dependency for
+  esp_wifi on the component wpa_supplicant, i.e.  'idf_component_register(...
+  PRIV_REQUIRES wpa_supplicant)' in the CMakeLists.txt of esp_wifi, and
+  specify the included directory as idf_component_register(...
+  PRIV_INCLUDE_DIRS <dir relative to component>) in the CMakeLists.txt of
+  component wpa_supplicant.
+Call Stack (most recent call first):
+  C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/tools/cmake/component_validation.cmake:130 (__component_validation_check_include_dirs)
+  C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/CMakeLists.txt:356 (__component_validation_run_checks)
+
+
+CMake Warning at C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/tools/cmake/component_validation.cmake:106 (message):
+  Private include directory
+  'C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/wpa_supplicant/esp_supplicant/src'
+  belongs to component wpa_supplicant but is being used by component
+  esp_wifi.  It is recommended to define the component dependency for
+  esp_wifi on the component wpa_supplicant, i.e.  'idf_component_register(...
+  PRIV_REQUIRES wpa_supplicant)' in the CMakeLists.txt of esp_wifi, and
+  specify the included directory as idf_component_register(...
+  PRIV_INCLUDE_DIRS <dir relative to component>) in the CMakeLists.txt of
+  component wpa_supplicant.
+Call Stack (most recent call first):
+  C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/tools/cmake/component_validation.cmake:130 (__component_validation_check_include_dirs)
+  C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/CMakeLists.txt:356 (__component_validation_run_checks)
+
+
