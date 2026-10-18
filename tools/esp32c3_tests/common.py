@@ -97,12 +97,12 @@ class Board:
     def __init__(self, origin):
         self.origin = origin.rstrip('/')
 
-    def request(self, path, data=None, timeout=5):
-        with urlopen(Request(self.origin + path, data=data), timeout=timeout) as r:
+    def request(self, path, data=None, timeout=5, *, headers=None):
+        with urlopen(Request(self.origin + path, data=data, headers=headers or {}), timeout=timeout) as r:
             return r.read()
 
-    def json(self, path, data=None, timeout=5):
-        return json.loads(self.request(path, data, timeout))
+    def json(self, path, data=None, timeout=5, *, headers=None):
+        return json.loads(self.request(path, data, timeout, headers=headers))
 
     def status(self):
         value = self.json('/api/native/status')

@@ -26,6 +26,18 @@ def check_decoder_faults(case, *, required=False):
     return dict(checked=checked, missing=missing)
 
 
+def check_preservation(restored):
+    if restored.get('wifi_verification') == 'public-metadata-and-reconnection':
+        keys = ('wifi_metadata_unchanged', 'wifi_reconnected', 'playlist_unchanged', 'settings_unchanged')
+    else:
+        # Historical immutable reports used an in-memory raw credential snapshot.
+        # Retain their audit semantics without making a new private-file request.
+        require('wifi_verification' not in restored and 'wifi_metadata_unchanged' not in restored and
+                'wifi_reconnected' not in restored, 'Unknown Wi-Fi verification scope')
+        keys = ('wifi_unchanged', 'playlist_unchanged', 'settings_unchanged')
+    require(all(restored.get(key) is True for key in keys), 'Settings preservation verification missing or failed')
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--results',type=Path,required=True)
@@ -41,8 +53,7 @@ def main():
     restored=r['restoration']
     require(restored['image']['app_elf_sha256']==r['initial']['app_elf_sha256'],'Original image not restored')
     require(not restored['status']['audio'],'Board not stopped after restoration')
-    require(all(restored[k] is True for k in ('wifi_unchanged','playlist_unchanged','settings_unchanged')),
-            'Private settings verification missing or failed')
+    check_preservation(restored)
     sources=validate_schedule(r,args.expected_cases)
     available=fixtures();rows=[]
     negative={'unknown':'unknown audio format','partial':'unknown audio format',
@@ -105,9 +116,10 @@ def main():
             completion_drops_whole_case=after['output']['completion_queue_drops']-before['output']['completion_queue_drops'],
             tls_versions=sorted({e['tls_version'] for e in events if e.get('tls_version')})))
     result=dict(passed=True,transport=r['transport'],cases=rows,restored=True,
+        wifi_verification=restored.get('wifi_verification', 'historical-private-snapshot'),
         scope='Finite streams and sampled active output/heap counters. No acoustic, long-run or lifetime-zero-drop claim.')
     args.output.write_text(json.dumps(result,indent=2)+'\n')
-    print('PASS offline audit:',len(rows),'cases;',r['transport'],'; firmware and private settings restored')
+    print('PASS offline audit:',len(rows),'cases;',r['transport'],'; firmware and recorded preservation checks verified')
 
 
 if __name__=='__main__':main()

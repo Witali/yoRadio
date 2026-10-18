@@ -7,14 +7,16 @@ the saved station. Physical power-cut recovery is a separate manual test.
 import argparse
 import http.client
 import json
+import re
 from pathlib import Path
 import socket
 import struct
 import sys
 import time
+from urllib.error import HTTPError
 from urllib.parse import urlsplit
 
-from common import Board, Failure, Report, fixtures, matches, require, sha
+from common import Board, Blocked, Failure, Report, fixtures, matches, require, sha
 
 
 BOUNDARY = 'yoradio-c3-acceptance-20260930'
@@ -92,16 +94,57 @@ def wait_image(board, digest, partition, timeout=45):
     raise Failure('Booted app hash/partition did not match the uploaded image')
 
 
+def wifi_metadata(board):
+    """Public names/row IDs only. Unsupported firmware never triggers CSV fallback."""
+    try:
+        value = board.json('/api/native/wifi', timeout=30)
+    except HTTPError as error:
+        if error.code in (404, 405, 501):
+            raise Blocked('Firmware does not provide private Wi-Fi metadata editing') from None
+        raise
+    require(isinstance(value, dict) and set(value) == {'revision', 'profiles'} and
+            isinstance(value['revision'], str) and re.fullmatch(r'[0-9a-f]{16}-[0-9a-f]{16}', value['revision']) and
+            isinstance(value['profiles'], list) and len(value['profiles']) <= 5,
+            'Unsupported Wi-Fi metadata schema')
+    ids = set()
+    for row in value['profiles']:
+        require(isinstance(row, dict) and set(row) == {'id', 'ssid', 'ssid_utf8'} and
+                isinstance(row['id'], str) and row['id'] in ('r1','r2','r3','r4','r5') and
+                row['id'] not in ids and isinstance(row['ssid'], str) and row['ssid'] and
+                type(row['ssid_utf8']) is bool, 'Unsupported Wi-Fi profile metadata')
+        require(len(row['ssid'].encode('utf-8')) <= (31 if row['ssid_utf8'] else 93),
+                'Wi-Fi profile metadata exceeds its byte limit')
+        ids.add(row['id'])
+    return value
+
+
+def keep_wifi_profiles(board):
+    """Exercise a reserved save/reboot without obtaining or reconstructing keys."""
+    value = wifi_metadata(board)
+    if not value['profiles']:
+        raise Blocked('No saved Wi-Fi profile is available for a keep update')
+    edit = dict(revision=value['revision'], profiles=[
+        dict(id=row['id'], password_action='keep') for row in value['profiles']])
+    result = board.json('/api/native/wifi', json.dumps(edit).encode('utf-8'), timeout=40,
+                        headers={'Content-Type': 'application/json'})
+    require(result == {'saved': True, 'rebooting': True}, 'Wi-Fi keep update was not confirmed')
+
+
 def snapshot(board):
-    # In-memory only, no raw files or credential hashes in reports.
-    return dict(wifi=board.request('/data/wifi.csv',timeout=30),
+    # In-memory settings and public metadata; never read saved keys or backups.
+    value = wifi_metadata(board)
+    names = [dict(ssid=row['ssid'], ssid_utf8=row['ssid_utf8']) for row in value['profiles']]
+    return dict(wifi_metadata=names,
                 playlist=board.request('/data/playlist.csv',timeout=30), settings=board.settings())
 
 
 def verify_snapshot(board, before):
     after = snapshot(board)
-    require(before == after, 'OTA changed Wi-Fi, playlist or exposed settings')
-    return dict(wifi_unchanged=True, playlist_unchanged=True, settings_unchanged=True)
+    require(before == after, 'OTA changed Wi-Fi metadata, playlist or exposed settings')
+    require(board.status().get('network') == 'client', 'Wi-Fi client did not reconnect')
+    return dict(wifi_metadata_unchanged=True, wifi_reconnected=True,
+                wifi_verification='public-metadata-and-reconnection',
+                playlist_unchanged=True, settings_unchanged=True)
 
 
 def wait_playback(board, spec=None, timeout=12):

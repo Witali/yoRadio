@@ -1,6 +1,6 @@
 """Compare bounded WebUI IO on a physical C3; restore app and files in finally.
 
-Private files/settings are held only in RAM, never serialized or hashed in logs.
+Settings and public Wi-Fi metadata stay in RAM; saved passwords are never read.
 App-only OTA: no erase, bootloader, NVS or SPIFFS image writes.
 """
 import argparse
@@ -12,7 +12,7 @@ import time
 from urllib.parse import urlsplit
 
 from common import Board, Failure, sha, exception_details, fixtures, matches, require
-from ota import image_info, multipart, snapshot, upload, verify_snapshot, wait_image
+from ota import image_info, keep_wifi_profiles, multipart, snapshot, upload, verify_snapshot, wait_image
 from production_health import read_health
 from audio_test_server.server import Server
 
@@ -33,7 +33,8 @@ def form(parts, closed=True):
 
 def post(board, path, body, *, declared=None, disconnect=False):
     address = urlsplit(board.origin)
-    conn = http.client.HTTPConnection(address.hostname, address.port, timeout=40)
+    connection = http.client.HTTPSConnection if address.scheme == 'https' else http.client.HTTPConnection
+    conn = connection(address.hostname, address.port, timeout=40)
     try:
         conn.putrequest('POST', path)
         conn.putheader('Content-Type', f'multipart/form-data; boundary={BOUNDARY}')
@@ -169,8 +170,7 @@ def main():
 
     def wifi_upload():
         previous = read_health(board)['boot_id']
-        require(post(board,'/upload',form([('wifile','wifi.csv',private['wifi'])])) == 200,
-                'Wi-Fi file upload failed')
+        keep_wifi_profiles(board)
         wait_reboot(previous)
         return verify_snapshot(board,private)
 
@@ -202,7 +202,7 @@ def main():
                 case('candidate:duplicate-asset', lambda:rejected('/webboard',form([('www','style.css.gz',b'bad'),('www','style.css.gz',b'bad')])) )
                 case('candidate:invalid-wifi-form', lambda:rejected('/',form([('ssid','',b'x'*33),('pass','',b'')])) )
                 case('candidate:board-multipart', board_upload)
-                case('candidate:wifi-upload-reboot', wifi_upload)
+                case('candidate:wifi-keep-update-reboot', wifi_upload)
                 previous = read_health(board)['boot_id']
                 def reboot():
                     board.reboot(); wait_reboot(previous)
