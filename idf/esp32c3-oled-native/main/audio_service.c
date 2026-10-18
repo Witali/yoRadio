@@ -1727,6 +1727,15 @@ static void decoder_task(void *argument) {
                 failed_generation = generation;
                 break;
             }
+            if (frame.decoded_size > output_size) {
+                cpu_profiler_decoder_failure(codec, DECODER_FAILURE_PROCESS,
+                    ESP_AUDIO_ERR_FAIL, packet->end_of_stream, raw.len);
+                ESP_LOGE(TAG, "%s decoder exceeded PCM capacity %lu/%lu",
+                         codec_name(codec),(unsigned long)frame.decoded_size,(unsigned long)output_size);
+                state_set_audio(generation, false, "decoder output error");
+                failed_generation = generation;
+                break;
+            }
             stats.input_bytes += (uint32_t)raw.consumed;
             raw.buffer += raw.consumed;
             raw.len -= raw.consumed;

@@ -11,15 +11,18 @@
 #include "custom_legacy_adapter.h"
 #include "pipeline_profile.h"
 #include "audio_pipeline_probe.h"
+#include "cpu_profiler.h"
 
 #define CONFIG_YORADIO_FLAC_DECODER_CUSTOM 1
 #define YORADIO_CUSTOM_LEGACY_DECODER 1
 #define PCM_PACKET_DATA_SIZE 3584
 #define ESP_AUDIO_ERR_OK 0
+#define ESP_AUDIO_ERR_FAIL (-1)
 #ifndef NATIVE_AAC_PLUS_ENABLED
 #define NATIVE_AAC_PLUS_ENABLED true
 #endif
 #define ESP_LOGW(...) ((void)0)
+#define ESP_LOGE(...) ((void)0)
 typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC,
                NATIVE_CODEC_FLAC, NATIVE_CODEC_OGG } native_codec_t;
 typedef struct {
@@ -35,6 +38,13 @@ static void *s_pcm;
 static uint32_t packet_rate;
 static unsigned packet_channels, packet_bits, packets, packet_bytes;
 static bool fail_get_info;
+static size_t test_decoded_size=4096;
+static unsigned decoder_faults;
+void cpu_profiler_decoder_failure(uint32_t codec,decoder_failure_stage_t stage,int32_t result,
+                                  uint32_t completion,uint32_t input) {
+    assert(codec==NATIVE_CODEC_MP3 && stage==DECODER_FAILURE_PROCESS && result==ESP_AUDIO_ERR_FAIL);
+    assert(!completion && input==4);++decoder_faults;
+}
 static esp_audio_simple_dec_info_t next_info;
 static const char *next_aac_label="AAC";
 static unsigned next_aac_channels;
@@ -225,6 +235,11 @@ int main(void) {
     run_espressif_frame(1, NATIVE_CODEC_MP3, &cached);
     assert(packets == sent);
 
+    next_info=(esp_audio_simple_dec_info_t){48000,16,2,128000};
+    test_decoded_size=4100;run_espressif_frame(1,NATIVE_CODEC_MP3,&cached);
+    assert(packets==sent && decoder_faults==1 && !state.audio_running);
+    assert(!strcmp(state.stream_format,"decoder output error"));
+    test_decoded_size=4096;
     begin(2);
     native_state_set_audio(s_state, 2, false, "stopped");
     native_state_begin_stream(s_state, 1); // A delayed earlier Play command.

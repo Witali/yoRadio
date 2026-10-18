@@ -1,0 +1,63 @@
+=================================================================
+==414==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7d761dd110e0 at pc 0x7d76206fb42e bp 0x7ffedec468f0 sp 0x7ffedec46098
+READ of size 516 at 0x7d761dd110e0 thread T0
+    #0 0x7d76206fb42d in memcpy ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors_memintrinsics.inc:115
+    #1 0x406632 in send_pcm.isra.0 (/tmp/c3-stream-format-1jgpqnmm/stream-format+0x406632) (BuildId: 6c962d3814643f17e477aa5dabccbdb7caaf8d88)
+    #2 0x408cba in run_espressif_frame.constprop.0 (/tmp/c3-stream-format-1jgpqnmm/stream-format+0x408cba) (BuildId: 6c962d3814643f17e477aa5dabccbdb7caaf8d88)
+    #3 0x403fa7 in main (/tmp/c3-stream-format-1jgpqnmm/stream-format+0x403fa7) (BuildId: 6c962d3814643f17e477aa5dabccbdb7caaf8d88)
+    #4 0x7d761fa2a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: a4a7992a8e66555c8141ab2a08a8465ff6e0ea65)
+    #5 0x7d761fa2a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: a4a7992a8e66555c8141ab2a08a8465ff6e0ea65)
+    #6 0x404c24 in _start (/tmp/c3-stream-format-1jgpqnmm/stream-format+0x404c24) (BuildId: 6c962d3814643f17e477aa5dabccbdb7caaf8d88)
+
+Address 0x7d761dd110e0 is located in stack of thread T0 at offset 4320 in frame
+    #0 0x40856f in run_espressif_frame.constprop.0 (/tmp/c3-stream-format-1jgpqnmm/stream-format+0x40856f) (BuildId: 6c962d3814643f17e477aa5dabccbdb7caaf8d88)
+
+  This frame has 7 object(s):
+    [32, 33) 'stream_info_ready' (line 321)
+    [48, 49) 'format_is_pcm' (line 339)
+    [64, 68) 'packet_value' (line 330)
+    [80, 92) 'stream_info' (line 320)
+    [112, 124) 'latest_info' (line 334)
+    [144, 192) 'stats' (line 331)
+    [224, 4320) 'output' (line 326) <== Memory access at offset 4320 overflows this variable
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors_memintrinsics.inc:115 in memcpy
+Shadow bytes around the buggy address:
+  0x7d761dd10e00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d761dd10e80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d761dd10f00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d761dd10f80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d761dd11000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x7d761dd11080: 00 00 00 00 00 00 00 00 00 00 00 00[f3]f3 f3 f3
+  0x7d761dd11100: f3 f3 f3 f3 f3 f3 f3 f3 f3 f3 f3 f3 00 00 00 00
+  0x7d761dd11180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d761dd11200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d761dd11280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7d761dd11300: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==414==ABORTING
+Traceback (most recent call last):
+  File "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/run-esp32c3-stream-format.py", line 111, in <module>
+    subprocess.run([str(executable)], check=True)
+  File "/usr/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/tmp/c3-stream-format-1jgpqnmm/stream-format']' returned non-zero exit status 1.

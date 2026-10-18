@@ -45,6 +45,7 @@ size_t strlcpy(char *, const char *, size_t);
     (tmp / "freertos/semphr.h").write_text('#include "FreeRTOS.h"\n')
     (tmp / "freertos/ringbuf.h").write_text('#include "FreeRTOS.h"\n')
     (tmp / "sdkconfig.h").write_text("")
+    (tmp / "esp_err.h").write_text('#pragma once\ntypedef int esp_err_t;\n')
     audio = (MAIN / "audio_service.c").read_text()
     web = (MAIN / "websocket_service.c").read_text()
     app = (MAIN / "app_main.c").read_text()
@@ -53,9 +54,19 @@ size_t strlcpy(char *, const char *, size_t);
     callbacks = audio[audio.index("static bool update_stream_info("):
                       audio.index("static void decoder_task(")]
     ws_key = web[web.index("typedef struct {"):web.index("} webui_status_key_t;") + len("} webui_status_key_t;")]
+    guard = ""
+    marker = "            if (frame.decoded_size > output_size) {"
+    if marker in audio:
+        start = audio.index(marker)
+        end = audio.index("{",start)+1
+        depth=1
+        while depth:
+            depth+=(audio[end]=="{")-(audio[end]=="}");end+=1
+        guard=audio[start:end]+"\n"
     generated = types + ws_key + "\n" + "\n".join(
         function(audio, name) for name in ("codec_name", "decode_stats_add_audio", "send_pcm")
     ) + callbacks
+    if guard: generated += function(audio,"state_set_audio")
     generated += "\n".join(function(web, name) for name in (
         "json_escape", "format_status", "capture_status_key"))
     generated += function(app, "format_stream_details")
@@ -73,12 +84,17 @@ static void run_espressif_frame(uint32_t generation, native_codec_t codec,
     bool first_frame_memory_logged = true;
     void *decoder = NULL;
     void *aac_decoder = codec == NATIVE_CODEC_AAC ? saved : NULL;
-    struct { size_t decoded_size; } frame = {4096};
+    struct { size_t decoded_size; } frame = {test_decoded_size};
     uint8_t output[4096] = {0};
+    size_t output_size=sizeof(output);
+    uint32_t failed_generation=0;
+    struct { uint32_t len; } raw={4};
+    struct { uint32_t end_of_stream; } packet_value={0}, *packet=&packet_value;
     decode_stats_t stats = {0};
     do {
-""" + audio[start:end] + """
+""" + guard + audio[start:end] + """
     } while (false);
+    (void)output_size;(void)failed_generation;(void)raw;(void)packet;
     *saved = stream_info;
 }
 """
