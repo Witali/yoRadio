@@ -7,6 +7,24 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Текущее состояние — 2026-10-18
 
+- По запросу пользователя применён git-repo-cleanup. Удалены 12 завершённых
+  worktree Small_TV, их текущие коммиты включены в origin/main. Все ignored
+  файлы сохранены и побайтово проверены в `.build/worktree-retention/20261018`;
+  локальные ветки оставлены. Прежний amended observer `4d2e9555` закреплён в
+  `codex/recover-runtime-observer-pre-amend` и incremental bundle. Отчёт —
+  `worktree-cleanup-20261018.json`. Старые абсолютные пути удалённых worktree
+  теперь отсутствуют: для воспроизведения исторического run потребуется архив.
+  Сохранены H10 Wi-Fi и runtime-launch; остальные семь worktree с работой
+  ESP8266/C3 и SDK не трогались, staged diff каждого совпал с исходным аудитом.
+- В QEMU удалена только дополнительная `.worktree/small-tv-wifi-link`;
+  установленный RISC-V/Xtensa executable побайтово прежний, main 2a593f8d.
+  Локальные артефакты и Git bundle двух Meson-зависимостей сохранены в его
+  `.build/worktree-retention/20261018`. Старый amended `158b65e28a` оставлен
+  в `codex/recover-wifi-link-pre-amend` и incremental bundle. Его отличие от
+  принятой версии — устаревший QOM path в двух строках README; не сливать его.
+  Приватный retention-каталог исключён точным правилом в local info/exclude;
+  исходники и tracked ignore rules QEMU не менялись.
+
 - Полный прогон session 92602/PID 22772 завершился неуспешно в 09:51:51 UTC.
   Все 18 host/machine/profile групп прошли; QEMU прошёл boot/reset/SNTP обеих
   прошивок и оба delayed-DHCP сценария, затем factory missing-AP case не дождался
