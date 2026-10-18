@@ -14,6 +14,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 MAIN=ROOT/'idf/esp32-cyd2usb-native/main'
 SHARED=ROOT/'idf/components/native_storage/include/credential_line.h'
+WIFI=ROOT/'idf/components/native_wifi_store'
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
 from run_output_dma_host import host,run
 spec=importlib.util.spec_from_file_location('web_warning_helpers',ROOT/'tests/run-web-warning-regressions.py')
@@ -31,13 +32,25 @@ def main():
     (out/'baseline-network_service.c').write_text(old)
     current=source.read_text()
     test=ROOT/'tests/native/cyd_wifi_warning_test.c'
+    files=[Path(__file__),test,source,SHARED,ROOT/'tests/run-web-warning-regressions.py',
+           WIFI/'native_wifi_store.c',WIFI/'include/native_wifi_store.h']
     report={'baseline_commit':baseline,'sanitizers':['ASan','UBSan'],'physical_tested':False,'variants':{}}
+    report['source_sha256']={}
+    for path in files:
+        data=path.read_bytes()
+        report['source_sha256'][path.relative_to(ROOT).as_posix()]=hashlib.sha256(data).hexdigest()
+        snapshot=out/'sources'/path.relative_to(ROOT);snapshot.parent.mkdir(parents=True,exist_ok=True);snapshot.write_bytes(data)
+    frozen=out/'sources'
+    current=(frozen/source.relative_to(ROOT)).read_text()
     for name,contents,negative in [('negative-old-source',old,True),('shared-reader',current,False)]:
         (out/'cyd-wifi-production.inc').write_text(helpers.function(contents,'read_credentials'))
         binary=out/name
         (out/(name+'-build.log')).write_bytes(run(['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
             '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
-            '-I'+host(out),'-I'+host(SHARED.parent),host(test),'-o',host(binary)]))
+            '-I'+host(out),'-I'+host(frozen/SHARED.parent.relative_to(ROOT)),
+            '-I'+host(frozen/WIFI.relative_to(ROOT)/'include'),
+            host(frozen/test.relative_to(ROOT)),host(frozen/WIFI.relative_to(ROOT)/'native_wifi_store.c'),
+            '-o',host(binary)]))
         try:
             log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1',
                      'timeout','30',host(binary),host(out/(name+'.csv'))]);passed=True
@@ -46,10 +59,6 @@ def main():
         if negative:assert not passed,'Historical CYD reader unexpectedly accepted the rejection regression'
         else:assert passed,log.decode(errors='replace');print(log.decode(),end='')
         report['variants'][name]='DETECTED' if negative else 'PASS'
-    files=[Path(__file__),test,source,SHARED,ROOT/'tests/run-web-warning-regressions.py']
-    report['source_sha256']={path.relative_to(ROOT).as_posix():hashlib.sha256(path.read_bytes()).hexdigest() for path in files}
-    for path in files:
-        snapshot=out/'sources'/path.relative_to(ROOT);snapshot.parent.mkdir(parents=True,exist_ok=True);snapshot.write_bytes(path.read_bytes())
     report['passed']=True
     report['scope']='Actual CYD first-valid credential reader and exact shared bounded row helper; mapped stdio/cookie IO seams, no Wi-Fi hardware or profile/reconnect/timing/power changes.'
     (out/'report.json').write_text(json.dumps(report,indent=2)+'\n')

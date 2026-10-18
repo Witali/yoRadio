@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "native_wifi_store.h"
 static unsigned getc_calls;
 static int traced_getc(FILE *file) {++getc_calls;return fgetc(file);}
 #define fgetc traced_getc

@@ -8,17 +8,17 @@
 #include "esp_log.h"
 #include "esp_mac.h"
 #include "esp_netif.h"
+#include "esp_random.h"
 #include "esp_wifi.h"
 #include "freertos/event_groups.h"
 #include "freertos/semphr.h"
 #include "credential_line.h"
 #include "web_upload.h"
+#include "native_wifi_file.h"
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
 #define WIFI_MAX_RETRIES 8
-#define WIFI_MAX_FILE_BYTES 800U
-#define WIFI_MAX_FILE_NETWORKS 5U
 
 static const char *const TAG = "network";
 static EventGroupHandle_t s_wifi_events;
@@ -29,6 +29,47 @@ static wifi_config_t s_station_config;
 static int s_retries;
 static bool s_have_credentials;
 static SemaphoreHandle_t s_wifi_save_lock;
+static native_wifi_store_t s_wifi_store;
+static const native_wifi_file_t s_wifi_paths = {
+    .live = "/spiffs/data/wifi.csv",
+    .temporary = "/spiffs/data/wifi.csv.tmp",
+    .backup = "/spiffs/data/wifi.csv.bak",
+};
+
+static native_wifi_result_t wifi_store_lock(void *context) {
+    (void)context;
+    return xSemaphoreTake(s_wifi_save_lock, pdMS_TO_TICKS(1000)) == pdTRUE
+        ? NATIVE_WIFI_OK : NATIVE_WIFI_BUSY;
+}
+
+static void wifi_store_unlock(void *context) {
+    (void)context;
+    xSemaphoreGive(s_wifi_save_lock);
+}
+
+static native_wifi_result_t wifi_store_read(void *context, uint8_t *data,
+                                            size_t capacity, size_t *size) {
+    (void)context;
+    return native_wifi_file_read(&s_wifi_paths, data, capacity, size);
+}
+
+static native_wifi_result_t wifi_store_publish(void *context,
+                                               const uint8_t *data, size_t size) {
+    (void)context;
+    return native_wifi_file_publish(&s_wifi_paths, data, size);
+}
+
+static esp_err_t wifi_store_error(native_wifi_result_t result) {
+    switch (result) {
+        case NATIVE_WIFI_OK: return ESP_OK;
+        case NATIVE_WIFI_INVALID: return ESP_ERR_INVALID_ARG;
+        case NATIVE_WIFI_BUSY: return ESP_ERR_TIMEOUT;
+        case NATIVE_WIFI_NO_MEMORY: return ESP_ERR_NO_MEM;
+        case NATIVE_WIFI_NOT_READY:
+        case NATIVE_WIFI_EXHAUSTED: return ESP_ERR_INVALID_STATE;
+        default: return ESP_FAIL;
+    }
+}
 
 esp_err_t network_service_storage_init(void) {
     ESP_RETURN_ON_ERROR(web_upload_storage_init(), TAG,
@@ -36,7 +77,28 @@ esp_err_t network_service_storage_init(void) {
     if (!s_wifi_save_lock) s_wifi_save_lock = xSemaphoreCreateMutex();
     ESP_RETURN_ON_FALSE(s_wifi_save_lock, ESP_ERR_NO_MEM, TAG,
                         "Wi-Fi save lock allocation failed");
+    if (!s_wifi_store.ready) {
+        uint64_t boot_epoch = 0;
+        esp_fill_random(&boot_epoch, sizeof(boot_epoch));
+        const native_wifi_store_ops_t ops = {
+            .lock = wifi_store_lock,
+            .unlock = wifi_store_unlock,
+            .read_live = wifi_store_read,
+            .publish_csv = wifi_store_publish,
+        };
+        ESP_RETURN_ON_FALSE(native_wifi_store_init(&s_wifi_store, &ops, NULL,
+                                                    boot_epoch),
+                            ESP_FAIL, TAG, "Wi-Fi store initialization failed");
+    }
     return ESP_OK;
+}
+
+native_wifi_result_t network_service_wifi_metadata(native_wifi_metadata_t *out) {
+    return native_wifi_store_metadata(&s_wifi_store, out);
+}
+
+native_wifi_result_t network_service_wifi_edit(const native_wifi_edit_t *edit) {
+    return native_wifi_store_edit(&s_wifi_store, edit);
 }
 
 static bool read_credentials(wifi_config_t *config) {
@@ -62,6 +124,8 @@ static bool read_credentials(wifi_config_t *config) {
     }
     if (fclose(file) != 0) found = false;
     if (found) *config = selected;
+    native_wifi_erase(line, sizeof(line));
+    native_wifi_erase(&selected, sizeof(selected));
     return found;
 }
 
@@ -174,65 +238,16 @@ esp_err_t network_service_retry_client(void) {
 
 esp_err_t network_service_validate_credentials_file(const uint8_t *data,
                                                     size_t size) {
-    ESP_RETURN_ON_FALSE(data && size && size < WIFI_MAX_FILE_BYTES,
-                        ESP_ERR_INVALID_SIZE, TAG,
-                        "Wi-Fi file is empty or too large");
-    size_t count = 0;
-    size_t offset = 0;
-    while (offset < size) {
-        size_t end = offset;
-        while (end < size && data[end] != '\n') ++end;
-        size_t row_end = end;
-        if (row_end > offset && data[row_end - 1U] == '\r') --row_end;
-        if (row_end > offset) {
-            size_t tab = offset;
-            while (tab < row_end && data[tab] != '\t') ++tab;
-            ESP_RETURN_ON_FALSE(tab > offset && tab < row_end &&
-                                    tab - offset < sizeof(s_station_config.sta.ssid) &&
-                                    row_end - tab - 1U < sizeof(s_station_config.sta.password),
-                                ESP_ERR_INVALID_ARG, TAG, "Invalid Wi-Fi row");
-            for (size_t index = offset; index < row_end; ++index) {
-                ESP_RETURN_ON_FALSE(data[index] && data[index] != '\r' &&
-                                        (data[index] != '\t' || index == tab),
-                                    ESP_ERR_INVALID_ARG, TAG,
-                                    "Invalid Wi-Fi field");
-            }
-            ESP_RETURN_ON_FALSE(++count <= WIFI_MAX_FILE_NETWORKS,
-                                ESP_ERR_INVALID_SIZE, TAG,
-                                "Too many Wi-Fi networks");
-        }
-        offset = end < size ? end + 1U : end;
-    }
-    ESP_RETURN_ON_FALSE(count, ESP_ERR_INVALID_ARG, TAG,
-                        "Wi-Fi file has no networks");
-    return ESP_OK;
+    if (!data || !size || size >= NATIVE_WIFI_FILE_BYTES)
+        return ESP_ERR_INVALID_SIZE;
+    return wifi_store_error(native_wifi_validate_csv(data, size));
 }
 
 esp_err_t network_service_save_credentials_file(const uint8_t *data,
                                                 size_t size) {
     ESP_RETURN_ON_ERROR(network_service_validate_credentials_file(data, size),
                         TAG, "Invalid Wi-Fi file");
-    ESP_RETURN_ON_FALSE(s_wifi_save_lock, ESP_ERR_INVALID_STATE, TAG,
-                        "Wi-Fi storage is not initialized");
-    ESP_RETURN_ON_FALSE(xSemaphoreTake(s_wifi_save_lock, pdMS_TO_TICKS(1000)) == pdTRUE,
-                        ESP_ERR_TIMEOUT, TAG, "Wi-Fi save is busy");
-    const char *path = "/spiffs/data/wifi.csv";
-    const char *temporary_path = "/spiffs/data/wifi.csv.tmp";
-    FILE *file = fopen(temporary_path, "wb");
-    esp_err_t result = ESP_FAIL;
-    if (file) {
-        bool written = fwrite(data, 1, size, file) == size;
-        bool flushed = fflush(file) == 0;
-        bool closed = fclose(file) == 0;
-        if (written && flushed && closed &&
-            web_upload_publish_file(temporary_path, path)) {
-            result = ESP_OK;
-        } else {
-            (void)remove(temporary_path);
-        }
-    }
-    xSemaphoreGive(s_wifi_save_lock);
-    return result;
+    return wifi_store_error(native_wifi_store_import(&s_wifi_store, data, size));
 }
 
 esp_err_t network_service_save_credentials(const char *ssid,
@@ -253,5 +268,7 @@ esp_err_t network_service_save_credentials(const char *ssid,
     memcpy(line + ssid_size + 1U, password, password_size);
     size_t size = ssid_size + 1U + password_size;
     line[size++] = '\n';
-    return network_service_save_credentials_file((const uint8_t *)line, size);
+    esp_err_t result = network_service_save_credentials_file((const uint8_t *)line, size);
+    native_wifi_erase(line, sizeof(line));
+    return result;
 }

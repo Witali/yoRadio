@@ -9,6 +9,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "native_wifi_file.h"
 
 typedef int esp_err_t;
 #define ESP_OK 0
@@ -35,6 +36,12 @@ static bool pause_writer, writer_paused, release_writer;
 static unsigned concurrent_save_attempts;
 static pthread_mutex_t pause_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t pause_cond = PTHREAD_COND_INITIALIZER;
+static bool random_zero;
+static unsigned random_calls;
+static void esp_fill_random(void *data, size_t size) {
+    ++random_calls;
+    memset(data, random_zero ? 0 : 0x39, size);
+}
 static SemaphoreHandle_t xSemaphoreCreateMutex(void) {
     if (++create_calls == fail_create_at) return NULL;
     assert(created_mutexes < sizeof(mutexes) / sizeof(mutexes[0]));
@@ -138,6 +145,8 @@ static size_t strlcpy(char *out, const char *text, size_t cap) {
 #define fwrite(...) mapped_write(__VA_ARGS__)
 #define fflush(...) mapped_flush(__VA_ARGS__)
 #define fclose(...) mapped_close(__VA_ARGS__)
+#include "native_wifi_store.c"
+#include "native_wifi_file.c"
 #include "cyd-storage-production.inc"
 #include "cyd-wifi-production.inc"
 #undef fclose
@@ -196,15 +205,104 @@ static void *save_thread(void *argument) {
     return NULL;
 }
 
+static native_wifi_edit_t keep_profiles(const native_wifi_metadata_t *metadata) {
+    native_wifi_edit_t edit = {0};
+    memcpy(edit.revision, metadata->revision, sizeof(edit.revision));
+    edit.count = metadata->count;
+    for (size_t i = 0; i < edit.count; ++i)
+        memcpy(edit.profiles[i].id, metadata->profiles[i].id, sizeof(edit.profiles[i].id));
+    return edit;
+}
+
+static void metadata_cleared(const native_wifi_metadata_t *metadata) {
+    const uint8_t zero[sizeof(*metadata)] = {0};
+    assert(!memcmp(metadata, zero, sizeof(*metadata)));
+}
+
+static void private_metadata_cases(void) {
+    clear();
+    native_wifi_metadata_t metadata;
+    assert(network_service_wifi_metadata(&metadata) == NATIVE_WIFI_OK && !metadata.count);
+    const char *duplicates = "duplicate\tunique-secret-one\nduplicate\tunique-secret-two\n";
+    assert(network_service_save_credentials_file((const uint8_t *)duplicates, strlen(duplicates)) == ESP_OK);
+    wifi_config_t active = s_station_config;
+    assert(network_service_wifi_metadata(&metadata) == NATIVE_WIFI_OK && metadata.count == 2);
+    assert(!strcmp(metadata.profiles[0].ssid, "duplicate") && metadata.profiles[0].ssid_utf8);
+    assert(strcmp(metadata.profiles[0].id, metadata.profiles[1].id));
+    assert(!memmem(&metadata, sizeof(metadata), "unique-secret", strlen("unique-secret")));
+    native_wifi_edit_t stale = keep_profiles(&metadata), edit = stale;
+    edit.profiles[0] = stale.profiles[1];
+    edit.profiles[1] = stale.profiles[0];
+    edit.profiles[1].password_action = NATIVE_WIFI_PASSWORD_SET;
+    edit.profiles[1].password_present = true; // Explicit empty means open.
+    assert(network_service_wifi_edit(&edit) == NATIVE_WIFI_OK);
+    assert(equals(live, "duplicate\tunique-secret-two\nduplicate\t\n"));
+    assert(!memcmp(&active, &s_station_config, sizeof(active)));
+    assert(network_service_wifi_edit(&stale) == NATIVE_WIFI_CONFLICT);
+    assert(network_service_wifi_metadata(&metadata) == NATIVE_WIFI_OK);
+    edit = keep_profiles(&metadata);
+    edit.profiles[0].id[0] = 0; // A new row cannot KEEP a stored password.
+    assert(network_service_wifi_edit(&edit) == NATIVE_WIFI_INVALID);
+    edit = keep_profiles(&metadata);
+    native_wifi_metadata_t before = metadata;
+    fault = CLOSE_FILE;
+    assert(network_service_wifi_metadata(&metadata) == NATIVE_WIFI_IO);
+    metadata_cleared(&metadata);
+    fault = NONE; timeout_lock = s_wifi_save_lock;
+    assert(network_service_wifi_metadata(&metadata) == NATIVE_WIFI_BUSY);
+    assert(network_service_wifi_edit(&edit) == NATIVE_WIFI_BUSY);
+    metadata_cleared(&metadata);
+    timeout_lock = NULL;
+    edit.profiles[0].password_action = NATIVE_WIFI_PASSWORD_SET;
+    edit.profiles[0].password_present = true;
+    strcpy(edit.profiles[0].password, "new-request-key");
+    fault = RENAME_TEMP;
+    assert(network_service_wifi_edit(&edit) == NATIVE_WIFI_IO);
+    fault = NONE;
+    assert(network_service_wifi_metadata(&metadata) == NATIVE_WIFI_OK);
+    assert(!strcmp(metadata.revision, before.revision));
+    edit = keep_profiles(&metadata); edit.count = 0;
+    fault = CLEANUP_BACKUP;
+    assert(network_service_wifi_edit(&edit) == NATIVE_WIFI_OK);
+    assert(equals(live, "") && exists(backup));
+    fault = NONE;
+    assert(network_service_wifi_metadata(&metadata) == NATIVE_WIFI_OK && !metadata.count);
+    expect_read(false, NULL, NULL);
+    assert(equals(live, "")); // Recovery must not resurrect the retained backup.
+    clear(); text(live, "corrupt private file");
+    assert(network_service_wifi_metadata(&metadata) == NATIVE_WIFI_INVALID_STORAGE);
+    metadata_cleared(&metadata);
+    const char legacy[] = "b\xff\tlegacy-key\n";
+    assert(network_service_save_credentials_file((const uint8_t *)legacy, sizeof(legacy) - 1U) == ESP_OK);
+    assert(network_service_wifi_metadata(&metadata) == NATIVE_WIFI_OK && metadata.count == 1 && !metadata.profiles[0].ssid_utf8);
+    edit = keep_profiles(&metadata);
+    assert(network_service_wifi_edit(&edit) == NATIVE_WIFI_OK && equals(live, legacy));
+    native_wifi_erase(&edit, sizeof(edit));
+    native_wifi_erase(&stale, sizeof(stale));
+}
+
 int main(int argc, char **argv) {
     assert(argc == 2); assert(strlen(argv[1]) < sizeof(root)); strcpy(root, argv[1]);
     char directory[1024]; snprintf(directory, sizeof(directory), "%s/data", root); assert(!mkdir(directory, 0700) || errno == EEXIST);
     memset(&s_station_config, 0x5a, sizeof(s_station_config));
+    native_wifi_metadata_t unavailable;
+    memset(&unavailable, 0xa6, sizeof(unavailable));
+    assert(network_service_wifi_metadata(&unavailable) == NATIVE_WIFI_NOT_READY);
+    metadata_cleared(&unavailable);
     assert(network_service_save_credentials_file((const uint8_t *)new_wifi, strlen(new_wifi)) == ESP_ERR_INVALID_STATE);
     fail_create_at = 1; assert(network_service_storage_init() == ESP_ERR_NO_MEM && !s_wifi_save_lock);
     fail_create_at = 3; assert(network_service_storage_init() == ESP_ERR_NO_MEM && !s_wifi_save_lock);
-    fail_create_at = 0; assert(network_service_storage_init() == ESP_OK && s_wifi_save_lock);
+    fail_create_at = 0; random_zero = true;
+    assert(network_service_storage_init() == ESP_FAIL && s_wifi_save_lock && !s_wifi_store.ready);
+    random_zero = false; assert(network_service_storage_init() == ESP_OK && s_wifi_save_lock);
     unsigned allocated = create_calls; assert(network_service_storage_init() == ESP_OK && create_calls == allocated);
+    assert(random_calls == 2);
+    unsigned before_lock_open = open_calls;
+    timeout_lock = s_wifi_save_lock;
+    assert(network_service_wifi_metadata(&unavailable) == NATIVE_WIFI_BUSY);
+    metadata_cleared(&unavailable);
+    assert(open_calls == before_lock_open);
+    timeout_lock = NULL;
     ++cases;
 
     accept(" allowed \t pass \r\nsecond\tsecond\n", " allowed ", " pass ");
@@ -251,7 +349,9 @@ int main(int argc, char **argv) {
     clear(); text(live, old_wifi); timeout_lock = s_wifi_save_lock;
     assert(network_service_save_credentials_file((const uint8_t *)new_wifi, strlen(new_wifi)) == ESP_ERR_TIMEOUT && equals(live, old_wifi));
     timeout_lock = s_storage_lock;
-    assert(network_service_save_credentials_file((const uint8_t *)new_wifi, strlen(new_wifi)) == ESP_FAIL && equals(live, old_wifi));
+    // Credential names now have their own owner; unrelated static/public file
+    // contention cannot admit an interleaved credential transaction.
+    assert(network_service_save_credentials_file((const uint8_t *)new_wifi, strlen(new_wifi)) == ESP_OK && equals(live, new_wifi));
     timeout_lock = NULL;
 
     clear(); text(live, old_wifi); fault = BOTH_RENAMES;
@@ -283,6 +383,7 @@ int main(int argc, char **argv) {
     assert(!pthread_join(first, NULL) && !pthread_join(second, NULL));
     assert(equals(live, "second-fixture\tsecond-fixture\n") && !exists(backup) && !exists(temporary));
     assert(write_calls && flush_calls && close_calls);
+    private_metadata_cases();
     printf("PASS CYD Wi-Fi storage: %u fixture groups; bounded full-file/field validation, first-valid/whitespace, preserved active config, OOM/locks, stdio/rename/rollback/recovery faults, serialized concurrent saves\n", cases);
     return 0;
 }
