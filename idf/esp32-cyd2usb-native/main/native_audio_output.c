@@ -333,12 +333,12 @@ static esp_err_t pdm_release(bool ramp_down) {
     s_buffered_samples = 0;
     if (s_pdm && s_pdm_running) {
         esp_err_t result = i2s_channel_disable(s_pdm);
-        if (first_error == ESP_OK && result != ESP_OK) first_error = result;
+        if (result != ESP_OK) return first_error == ESP_OK ? result : first_error;
         s_pdm_running = false;
     }
     if (s_pdm) {
         esp_err_t result = i2s_del_channel(s_pdm);
-        if (first_error == ESP_OK && result != ESP_OK) first_error = result;
+        if (result != ESP_OK) return first_error == ESP_OK ? result : first_error;
         s_pdm = NULL;
     }
     s_input_sample_rate = 0;
@@ -348,7 +348,10 @@ static esp_err_t pdm_release(bool ramp_down) {
 }
 
 static esp_err_t pdm_begin(void) {
-    if (s_pdm) return ESP_OK;
+    if (s_pdm) {
+        if (s_pdm_running) return ESP_OK;
+        ESP_RETURN_ON_ERROR(pdm_release(false), TAG, "release old PDM channel");
+    }
     i2s_chan_config_t channel_config =
         I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
     channel_config.dma_desc_num = PDM_DMA_DESCRIPTORS;
@@ -512,6 +515,12 @@ esp_err_t native_audio_output_flush_pcm(void) {
     return result;
 }
 
+esp_err_t native_audio_output_pause(void) {
+    // Maintenance cancels the old stream; its partial PCM must not be played.
+    native_audio_output_discard_pcm();
+    return pdm_release(false);
+}
+
 const char *native_audio_output_name(void) {
     return "I2S PDM";
 }
@@ -521,6 +530,7 @@ const char *native_audio_output_name(void) {
 #include "driver/dac_continuous.h"
 
 static dac_continuous_handle_t s_dac;
+static bool s_dac_enabled;
 static uint32_t s_dac_sample_rate;
 static uint8_t *s_dac_data;
 
@@ -530,12 +540,10 @@ esp_err_t native_audio_output_init(void) {
 }
 
 esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
-    if (s_dac && s_dac_sample_rate &&
+    if (s_dac && s_dac_enabled && s_dac_sample_rate &&
         input_sample_rate == s_dac_sample_rate) return ESP_OK;
     if (s_dac) {
-        dac_continuous_disable(s_dac);
-        dac_continuous_del_channels(s_dac);
-        s_dac = NULL;
+        ESP_RETURN_ON_ERROR(native_audio_output_pause(), TAG, "release old DAC");
     }
     // A channel is ready only after its first write succeeds. A failed prime
     // must not make a same-rate retry skip initialization or retain old DSP.
@@ -552,6 +560,7 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
     ESP_RETURN_ON_ERROR(dac_continuous_new_channels(&config, &s_dac), TAG,
                         "allocate DAC channel");
     ESP_RETURN_ON_ERROR(dac_continuous_enable(s_dac), TAG, "enable DAC");
+    s_dac_enabled = true;
     memset(s_dac_data, 0x80, 1024);
     size_t written = 0;
     esp_err_t result = dac_continuous_write(s_dac, s_dac_data, 1024, &written, 1000);
@@ -613,6 +622,21 @@ void native_audio_output_discard_pcm(void) {
 
 esp_err_t native_audio_output_flush_pcm(void) {
     reset_pcm_normalizer();
+    return ESP_OK;
+}
+
+esp_err_t native_audio_output_pause(void) {
+    native_audio_output_discard_pcm();
+    if (s_dac && s_dac_enabled) {
+        ESP_RETURN_ON_ERROR(dac_continuous_disable(s_dac), TAG, "disable DAC");
+        s_dac_enabled = false;
+        s_dac_sample_rate = 0;
+    }
+    if (s_dac) {
+        ESP_RETURN_ON_ERROR(dac_continuous_del_channels(s_dac), TAG, "delete DAC");
+        s_dac = NULL;
+    }
+    s_dac_sample_rate = 0;
     return ESP_OK;
 }
 
@@ -796,6 +820,17 @@ esp_err_t native_audio_output_flush_pcm(void) {
     // Each legacy write submits its complete on-the-fly conversion.
     s_legacy_fractional_error = 0;
     reset_pcm_normalizer();
+    return ESP_OK;
+}
+
+esp_err_t native_audio_output_pause(void) {
+    native_audio_output_discard_pcm();
+    if (s_legacy_installed) {
+        ESP_RETURN_ON_ERROR(idf6_dac_output_end(), TAG, "release legacy DAC");
+        s_legacy_installed = false;
+    }
+    s_legacy_sample_rate = 0;
+    s_legacy_output_sample_rate = 0;
     return ESP_OK;
 }
 

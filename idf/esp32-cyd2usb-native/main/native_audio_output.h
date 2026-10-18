@@ -26,4 +26,8 @@ void native_audio_output_idle(void);
 // Only the output task may discard history or submit the final partial block.
 void native_audio_output_discard_pcm(void);
 esp_err_t native_audio_output_flush_pcm(void);
+// Output owner only, after it has returned its current PCM lease. Success
+// means DMA is stopped and the backend released; configure starts it again.
+// Failure retains ownership so the owner can retry without freeing live DMA.
+esp_err_t native_audio_output_pause(void);
 const char *native_audio_output_name(void);
