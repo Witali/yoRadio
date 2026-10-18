@@ -7,6 +7,16 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Текущее состояние — 2026-10-18
 
+- Полный прогон session 92602/PID 22772 завершился неуспешно в 09:51:51 UTC.
+  Все 18 host/machine/profile групп прошли; QEMU прошёл boot/reset/SNTP обеих
+  прошивок и оба delayed-DHCP сценария, затем factory missing-AP case не дождался
+  setup HTTP. До ожидания заводская прошивка уже имела mode=2 в RAM/flash,
+  AP active, boot=2; исполняемые области не изменились. Это ещё не установленная
+  причина ошибки и не доказанное расхождение нашей прошивки. Все 195 входных
+  хешей повторно совпали. Отчёт — `wifi-integrated-full-failed-20261018.json`
+  и четыре исходных отчёта в gzip. Старую публикацию этим run не заменять;
+  после чистки исследовать HTTP-готовность заводского AP и повторить этот case.
+
 - Ветка `codex/small-tv-runtime-launch` добавляет независимый Windows launcher:
   `tools/start_runtime.ps1` и `runtime_process.psm1`. CIM запускает скрытый
   supervisor с CREATE_BREAKAWAY_FROM_JOB; реальная проверка ядра подтверждает
