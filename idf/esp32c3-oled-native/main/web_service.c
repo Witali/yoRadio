@@ -321,13 +321,10 @@ static const char *content_type(const char *path) {
 
 static esp_err_t finish_static_response(httpd_req_t *request,
                                         esp_err_t result) {
-    if (result == ESP_OK) {
-        // The WebSocket is the only connection the UI needs to keep open.
-        // Reclaim each short-lived asset socket as soon as its response has
-        // been queued, leaving descriptors available to the audio client.
-        httpd_sess_trigger_close(request->handle,
-                                 httpd_req_to_sockfd(request));
-    }
+    // The async request still owns its session. A queued session close may run
+    // before async_handler_complete and recycle that slot underneath the worker.
+    // Shutdown wakes HTTPD; it reaps the socket after completion releases it.
+    (void)shutdown(httpd_req_to_sockfd(request), SHUT_RDWR);
     return result;
 }
 

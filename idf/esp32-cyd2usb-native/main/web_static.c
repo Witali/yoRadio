@@ -84,13 +84,19 @@ static esp_err_t serve_static(httpd_req_t *request) {
     if (gzip) httpd_resp_set_hdr(request, "Content-Encoding", "gzip");
     char chunk[CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES];
     esp_err_t result = ESP_OK;
-    size_t count;
-    while ((count = fread(chunk, 1, sizeof(chunk), file)) != 0) {
-        result = httpd_resp_send_chunk(request, chunk, (ssize_t)count);
-        if (result != ESP_OK) break;
+    for (;;) {
+        size_t count = fread(chunk, 1, sizeof(chunk), file);
+        if (count) {
+            result = httpd_resp_send_chunk(request, chunk, (ssize_t)count);
+            if (result != ESP_OK) break;
+        }
+        // A positive short read may already have set EOF or an error. Its
+        // position can be indeterminate after error; never read it again.
+        if (ferror(file)) { result = ESP_FAIL; break; }
+        if (feof(file)) break;
+        if (count < sizeof(chunk)) { result = ESP_FAIL; break; }
     }
-    if (ferror(file)) result = ESP_FAIL;
-    fclose(file);
+    if (fclose(file) != 0) result = ESP_FAIL;
     // Never terminate a failed/truncated response as a successful body.
     if (result == ESP_OK) result = httpd_resp_send_chunk(request, NULL, 0);
     return result;

@@ -25,6 +25,7 @@ static unsigned task_attempts, fail_task, terminal_chunks, send_count, fail_send
 static bool fail_queue, fail_begin, fail_read, fail_complete;
 static char body[20000], type[80], encoding[32], cache[32], fixture_root[512];
 static size_t body_size;
+static unsigned read_calls, invalid_reads;
 static jmp_buf worker_exit;
 static unsigned notifications;
 static unsigned ulTaskNotifyTake(int clear, unsigned wait) {
@@ -97,15 +98,23 @@ static FILE *test_fopen(const char *path, const char *mode) {
     snprintf(actual,sizeof(actual),"%s/%s",fixture_root,path+8);return fopen(actual,mode);
 }
 static int test_ferror(FILE *file) { return fail_read || ferror(file); }
+static size_t test_fread(void *data, size_t size, size_t count, FILE *file) {
+    if (ferror(file) || feof(file) || (fail_read && read_calls)) ++invalid_reads;
+    ++read_calls;
+    return fread(data, size, count, file);
+}
 #define fopen test_fopen
 #define ferror test_ferror
+#define fread test_fread
 #define shutdown test_shutdown
 #include "production.inc"
 #undef fopen
 #undef ferror
+#undef fread
 
 static void reset_response(void) {
     body[0]=type[0]=encoding[0]=cache[0]=0;body_size=terminal_chunks=send_count=fail_send=0;fail_read=false;
+    read_calls=invalid_reads=0;
 }
 static httpd_req_t request(const char *uri) { httpd_req_t r={.fd=7};snprintf(r.uri,sizeof(r.uri),"%s",uri);return r; }
 static void serve(const char *uri, int status) {
@@ -136,7 +145,8 @@ int main(int argc, char **argv) {
     serve("/large.css",0);assert(body_size==5100 && terminal_chunks==1 && send_count==6);
     reset_response();r=request("/large.css");fail_send=2;
     assert(serve_static(&r)==ESP_FAIL && body_size==1024 && !terminal_chunks);
-    reset_response();fail_read=true;assert(serve_static(&r)==ESP_FAIL && !terminal_chunks);
+    reset_response();fail_read=true;assert(serve_static(&r)==ESP_FAIL && !terminal_chunks && read_calls==1 && !invalid_reads);
+    serve("/theme.css",0);assert(read_calls==1 && !invalid_reads);
     reset_response();web_static_activate();
     fail_begin=true;r=request("/");assert(web_static_handler(&r)==ESP_OK && r.status==503 && !queued);fail_begin=false;
     r=request("/theme.css");assert(web_static_handler(&r)==ESP_OK && queued==1 && !send_count);
