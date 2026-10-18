@@ -7,6 +7,7 @@
 #include <string.h>
 #include "native_state.h"
 #include "audio_completion.h"
+#include "stream_probe.h"
 
 typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC,
                NATIVE_CODEC_FLAC, NATIVE_CODEC_OGG } native_codec_t;
@@ -181,6 +182,7 @@ static void *command_thread(void *arg) {
         if ((i+(uintptr_t)arg)%2) audio_service_stop();
         else assert(audio_service_play("http://test.example/audio",NATIVE_CODEC_AAC)==ESP_OK);
         native_state_set_audio(&state,1,true,"stale callback");
+        native_state_set_title(&state,1,"stale title");
     }
     return NULL;
 }
@@ -223,6 +225,7 @@ int main(void) {
     run_task(output_task); assert(!writes && !strcmp(state.stream_format,"stopped"));
     native_state_set_audio(&state,3,true,"stale");
     assert(!state.audio_running && !strcmp(state.stream_format,"stopped"));
+    native_state_set_title(&state,3,"old title");assert(!state.title[0]);
 
     begin(5); input(5,AUDIO_CONTINUE,3); empty_hook=fail_next_decode;
     run_task(decoder_task); assert(!open_handles && pcm.used==2 && state.audio_running);
@@ -279,6 +282,7 @@ int main(void) {
     audio_service_stop();
     assert(state.audio_generation==2101 && !state.audio_running);
     assert(!strcmp(state.stream_format,"stopped"));
+    assert(!state.title[0]);
 
     s_buffered_samples=3; s_sample_buffer[0]=s_sample_buffer[1]=s_sample_buffer[2]=123;
     s_resampler_has_previous=true; s_resampler_previous=456; s_resampler_next_phase=789;

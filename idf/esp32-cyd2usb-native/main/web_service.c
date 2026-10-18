@@ -11,6 +11,7 @@
 #include "esp_netif.h"
 #include "native_audio_output.h"
 #include "network_service.h"
+#include "json_buffer.h"
 
 static const char *const TAG = "web";
 static native_state_t *s_state;
@@ -22,14 +23,25 @@ static esp_err_t status_handler(httpd_req_t *request) {
     if (state.network_mode == NATIVE_NETWORK_CLIENT) mode = "client";
     if (state.network_mode == NATIVE_NETWORK_ACCESS_POINT) mode = "ap";
     if (state.network_mode == NATIVE_NETWORK_ERROR) mode = "error";
-    char body[384];
-    snprintf(body, sizeof(body),
-             "{\"firmware\":\"esp-idf-native\",\"arduino\":false,"
-             "\"network\":\"%s\",\"audio\":%s,\"station\":\"%s\","
-             "\"format\":\"%s\",\"volume\":%u,\"balance\":%d}",
-             mode, state.audio_running ? "true" : "false", state.station,
-             state.stream_format, native_audio_output_get_volume(),
-             native_audio_output_get_balance());
+    // Enough for the worst six-byte JSON escape of every bounded field.
+    char body[2304];
+    json_buffer_t output;
+    json_buffer_init(&output, body, sizeof(body));
+    json_buffer_raw(&output, "{\"firmware\":\"esp-idf-native\",\"arduino\":false,\"network\":");
+    json_buffer_string(&output, mode);
+    json_buffer_raw(&output, state.audio_running ? ",\"audio\":true,\"station\":"
+                                               : ",\"audio\":false,\"station\":");
+    json_buffer_string(&output, state.station);
+    json_buffer_raw(&output, ",\"format\":");
+    json_buffer_string(&output, state.stream_format);
+    json_buffer_raw(&output, ",\"title\":");
+    json_buffer_string(&output, state.title);
+    char settings[64];
+    snprintf(settings, sizeof(settings), ",\"volume\":%u,\"balance\":%d}",
+             native_audio_output_get_volume(), native_audio_output_get_balance());
+    json_buffer_raw(&output, settings);
+    if (output.failed) return httpd_resp_send_err(request,
+        HTTPD_500_INTERNAL_SERVER_ERROR, "Status buffer exhausted");
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return httpd_resp_sendstr(request, body);

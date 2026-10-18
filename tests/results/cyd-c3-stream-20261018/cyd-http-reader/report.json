@@ -1,0 +1,23 @@
+{
+  "result": "PASS",
+  "diagnostic": false,
+  "target": "cyd",
+  "idf": "C:\\Work\\yoRadio\\.idf\\v6.0.2",
+  "sdk_source_sha256": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+  "extracted_function_sha256": "b03190255a8c0519de11d8f876e9c96413cc0049be426a0c621b6bf77b151f58",
+  "sources_sha256": {
+    "tests\\native\\stream_http_reader_test.c": "68d6bf6b29eada6a53cb776e7b03a3c0b2b8d9a26b09be240b2fffb2d92b6bb3",
+    "idf\\esp32c3-oled-native\\main\\audio_pipeline_probe.h": "8e909fb367ad20084ff6decf26e8639f688f110390fcd44117f5a44199585de3",
+    "idf\\esp32-cyd2usb-native\\main\\tls_stream_eof.c": "9907ddac525e724176ee532d324740fcfd00fd585ce8f0633922d6f4729a40ee",
+    "idf\\components\\native_stream\\include\\tls_stream_result.h": "8c914e50d552f40710386defd25b418e53afefb5c1b0db3628d8f8a0be788639",
+    "tests\\test-stream-http-reader.py": "3f4124be3e794e39d6a3e0ad8feaaf2500b0ada8c787f2e80e63151869a323c5",
+    "idf\\esp32-cyd2usb-native\\main\\audio_service.c": "5a9f2d7fee5b48d8c8aeac5d9a172ce469f6442e4fd95ead4a3e505618b6487b"
+  },
+  "tls_adapter_sha256": "ea9b60e4913f109eb50a5ee1d75bc2f21e1edfea700ce4e16596c03338f9308f",
+  "parser_sha256": "bc5750d936bdb1ca6064f65ec31f66578c9fee2a691ac298081fbc73a668be34",
+  "body_callbacks_sha256": "edad5ee9114d896ac22dfbc1c32616484f0b2c39c942e4ade454c8328e1eb283",
+  "completion_function_sha256": "67a83bf993dc8f665f4e76ed63e9f6ffbc4bdcd4c2236fabd99e4d959682af90",
+  "scope": "Real SDK HTTP read/completion functions, body callbacks and HTTP parser; scripted transport and header bookkeeping; actual radio guard under ASan/UBSan. TLS cryptography, TLS close alerts and hardware are not emulated.",
+  "output": "READ_SIZE_PASS fixed_and_chunked; prefix_512_wait_ms=0; prefix_2048_wait_ms=250; total_wait_equal; exact_body_and_EOF=true\nPARTIAL_TIMEOUT_PASS fixed_and_chunked; scripted_wait_ms=25/250; exact_body_and_EOF=true\nHTTP_FRAMING_PASS content_length chunked extensions trailers truncated malformed fragmented close_delimited\nUNMODIFIED_SDK_LIMITATION close_notify_and_bare_TLS_EOF_are_indistinguishable_at_HTTP_API\nTLS_ADAPTER_PASS close_alert_and_raw_EOF_collapse_to_zero; timeout_records_read_failed; WANT_codes_not_recorded\nTLS_EOF_FIX_PASS raw_EOF_fails_unframed_body; close_notify_completes; explicit_framing_preserved; no_extra_allocation\nSTREAM_HTTP_READER_PASS cases=93 partial_bytes_preserved=true fatal_retry=false temporary_retry=true sdk_control_retries=true\n",
+  "returncode": 0
+}

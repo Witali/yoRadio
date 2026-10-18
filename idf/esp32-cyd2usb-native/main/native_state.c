@@ -39,6 +39,7 @@ void native_state_begin_audio(native_state_t *state, uint32_t generation,
     if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
         state->audio_generation = generation;
         state->audio_running = false;
+        state->title[0] = '\0';
         if (station) strlcpy(state->station, station, sizeof(state->station));
         strlcpy(state->stream_format, format, sizeof(state->stream_format));
         xSemaphoreGive(state->lock);
@@ -54,6 +55,17 @@ void native_state_set_audio(native_state_t *state, uint32_t generation,
             state->audio_running = running;
             if (format) strlcpy(state->stream_format, format,
                                 sizeof(state->stream_format));
+        }
+        xSemaphoreGive(state->lock);
+    }
+}
+
+void native_state_set_title(native_state_t *state, uint32_t generation,
+                            const char *title) {
+    if (!state || !state->lock || !title) return;
+    if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
+        if (state->audio_generation == generation) {
+            strlcpy(state->title, title, sizeof(state->title));
         }
         xSemaphoreGive(state->lock);
     }

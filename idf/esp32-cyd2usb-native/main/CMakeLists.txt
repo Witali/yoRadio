@@ -50,9 +50,19 @@ idf_component_register(
     native_audio_settings
     native_stream
     custom_legacy_codecs
-    esp_audio_codec)
+    esp_audio_codec
+  PRIV_REQUIRES esp-tls)
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP_IDF_NATIVE=1)
+
+if(CONFIG_ESP_TLS_USING_MBEDTLS)
+  target_sources(${COMPONENT_LIB} PRIVATE "tls_stream_eof.c")
+  idf_component_get_property(tls_dir esp-tls COMPONENT_DIR)
+  idf_component_get_property(tls_lib esp-tls COMPONENT_LIB)
+  set_property(SOURCE "${tls_dir}/esp_tls_mbedtls.c" TARGET_DIRECTORY ${tls_lib}
+    APPEND PROPERTY COMPILE_DEFINITIONS "mbedtls_ssl_read=yoradio_mbedtls_ssl_read")
+  target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--undefined=yoradio_mbedtls_ssl_read")
+endif()
 
 if(CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC)
   target_include_directories(${COMPONENT_LIB} BEFORE PRIVATE

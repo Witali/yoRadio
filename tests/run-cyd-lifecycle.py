@@ -50,7 +50,7 @@ size_t strlcpy(char *, const char *, size_t);
     (OUT/'freertos/semphr.h').write_text('#include "FreeRTOS.h"\n')
     source = (MAIN/'audio_service.c').read_text()
     first = source.index('#define STREAM_CHUNK_SIZE')
-    last = source.index('static native_codec_t codec_from_content_type')
+    last = source.index('static esp_audio_simple_dec_type_t')
     generated = source[first:last]
     for name in ('simple_decoder_type', 'codec_name', 'state_set_audio',
                  'fail_generation', 'send_encoded', 'send_pcm', 'send_pcm_end',

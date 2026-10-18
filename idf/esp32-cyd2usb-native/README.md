@@ -112,3 +112,23 @@ codec/driver APIs, real host mutexes, queue-wait cancellation and concurrent
 commands. They do not qualify the vendor decoder PCM or physical DMA timing.
 See the [transfer plan](../../docs/ESP32_CYD_C3_TRANSFER_PLAN.md) and
 [static analysis procedure](../../docs/NATIVE_STATIC_ANALYSIS.md).
+
+Automatic codec detection retains fragmented signatures and ID3 prefixes in a
+bounded probe; unknown input is rejected instead of being sent to MP3. Explicit
+codec selection remains available. ICY framing removes metadata before audio
+decoding and publishes bounded stream titles in `/api/native/status`. Status
+strings are escaped as JSON and invalid UTF-8 is replaced.
+
+HTTP startup accepts successful status codes and at most five redirects within
+one ten-second deadline. Body reads use a 250 ms timeout, retry temporary TLS
+conditions, preserve authenticated partial bytes and close fatal connections
+before another read. The source-scoped ESP-TLS adapter distinguishes raw TLS EOF
+from `close_notify` without replacing the SDK dynamic-buffer wrapper. Existing
+Content-Length and chunked completion boundaries are preserved.
+
+`tests/run-cyd-stream.py`, `tests/run-native-stream-body.py` and
+`tests/run-esp32c3-stream-probe.py --target cyd` cover these production paths.
+`tests/test-stream-http-reader.py --target cyd --idf <IDF-root> --output <dir>`
+also compiles the actual pinned SDK HTTP parser/read and ESP-TLS adapter under
+ASan/UBSan with scripted transport. This does not emulate TLS cryptography or
+qualify a physical connection. Adjacent-frame confirmation is a later stage.

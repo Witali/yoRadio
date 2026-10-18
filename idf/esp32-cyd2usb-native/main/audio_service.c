@@ -3,6 +3,7 @@
 #include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 #include "audio_level_led.h"
 #include "audio_completion.h"
@@ -15,6 +16,8 @@
 #include "esp_http_client.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include "esp_timer.h"
+#include "esp_tls_errors.h"
 #include "freertos/queue.h"
 #include "freertos/ringbuf.h"
 #include "freertos/task.h"
@@ -25,12 +28,16 @@
 #include "custom_legacy_adapter.h"
 #endif
 #include "native_audio_output.h"
+#include "stream_body.h"
+#include "stream_probe.h"
 
 #define STREAM_CHUNK_SIZE 2048
 #define DECODE_BUFFER_INITIAL 12288
 #define ENCODED_RING_SIZE (16 * 1024)
 #define PCM_RING_SIZE (8 * 1024)
 #define PCM_PACKET_DATA_SIZE 3072
+#define MAX_HTTP_REDIRECTS 5
+#define STREAM_READ_TIMEOUT_MS 250
 
 typedef struct {
     uint32_t generation;
@@ -66,33 +73,17 @@ static atomic_uint s_decoder_released_generation;
 static atomic_uint s_failed_generation;
 static SemaphoreHandle_t s_control_lock;
 
-static native_codec_t codec_from_content_type(const char *content_type) {
-    if (!content_type) return NATIVE_CODEC_AUTO;
-    if (strstr(content_type, "mpeg") || strstr(content_type, "mp3")) {
-        return NATIVE_CODEC_MP3;
-    }
-    if (strstr(content_type, "aac") || strstr(content_type, "aacp")) {
-        return NATIVE_CODEC_AAC;
-    }
-    if (strstr(content_type, "flac")) return NATIVE_CODEC_FLAC;
-    if (strstr(content_type, "ogg") || strstr(content_type, "opus")) {
-        return NATIVE_CODEC_OGG;
-    }
-    return NATIVE_CODEC_AUTO;
-}
+typedef struct {
+    uint32_t interval;
+    bool seen, valid;
+} stream_headers_t;
 
-static native_codec_t codec_from_signature(const uint8_t *data, size_t size) {
-    if (size >= 4 && memcmp(data, "fLaC", 4) == 0) return NATIVE_CODEC_FLAC;
-    if (size >= 4 && memcmp(data, "OggS", 4) == 0) return NATIVE_CODEC_OGG;
-    if (size >= 3 && memcmp(data, "ID3", 3) == 0) return NATIVE_CODEC_MP3;
-    if (size >= 2 && data[0] == 0xff && (data[1] & 0xf6) == 0xf0) {
-        return NATIVE_CODEC_AAC;
-    }
-    if (size >= 2 && data[0] == 0xff && (data[1] & 0xe0) == 0xe0) {
-        return NATIVE_CODEC_MP3;
-    }
-    return NATIVE_CODEC_MP3;
-}
+typedef struct {
+    uint32_t generation;
+    native_codec_t codec;
+    bool first;
+    stream_probe_t probe;
+} stream_input_t;
 
 static esp_audio_simple_dec_type_t simple_decoder_type(native_codec_t codec) {
     switch (codec) {
@@ -132,6 +123,68 @@ static void fail_generation(uint32_t generation) {
     xSemaphoreGive(s_control_lock);
 }
 
+static esp_err_t stream_header_event(esp_http_client_event_t *event) {
+    if (event->event_id != HTTP_EVENT_ON_HEADER || !event->user_data ||
+        !event->header_key || !event->header_value ||
+        strcasecmp(event->header_key, "icy-metaint") != 0) return ESP_OK;
+    stream_headers_t *headers = event->user_data;
+    uint32_t interval;
+    if (!stream_body_interval(event->header_value, &interval) ||
+        (headers->seen && headers->interval != interval)) {
+        headers->valid = false;
+    } else {
+        headers->interval = interval;
+        headers->seen = true;
+    }
+    return ESP_OK;
+}
+
+static esp_err_t open_stream(esp_http_client_handle_t client,
+                             stream_headers_t *headers, int64_t deadline) {
+    for (unsigned redirect=0; redirect<=MAX_HTTP_REDIRECTS; ++redirect) {
+        *headers = (stream_headers_t){.valid=true};
+        int64_t remaining = deadline - esp_timer_get_time();
+        if (remaining <= 0) return ESP_ERR_TIMEOUT;
+        esp_http_client_set_timeout_ms(client, (int)((remaining + 999) / 1000));
+        esp_err_t result = esp_http_client_open(client, 0);
+        if (result != ESP_OK) return result;
+        remaining = deadline - esp_timer_get_time();
+        if (remaining <= 0) return ESP_ERR_TIMEOUT;
+        esp_http_client_set_timeout_ms(client, (int)((remaining + 999) / 1000));
+        int64_t length = esp_http_client_fetch_headers(client);
+        if (esp_timer_get_time() >= deadline) return ESP_ERR_TIMEOUT;
+        if (length < 0) return ESP_FAIL;
+        int status = esp_http_client_get_status_code(client);
+        if (status >= 200 && status < 300) return ESP_OK;
+        bool redirected = status == 301 || status == 302 || status == 303 ||
+                          status == 307 || status == 308;
+        if (!redirected || redirect == MAX_HTTP_REDIRECTS) return ESP_FAIL;
+        result = esp_http_client_set_redirection(client);
+        esp_http_client_close(client);
+        if (result != ESP_OK) return result;
+    }
+    return ESP_FAIL;
+}
+
+static int read_stream(esp_http_client_handle_t client, char *buffer,
+                        int size, bool *failed) {
+    if (*failed) return ESP_FAIL;
+    int received = esp_http_client_read(client, buffer, size);
+    int tls_code = 0;
+    esp_err_t error = esp_http_client_get_and_clear_last_tls_error(client, &tls_code, NULL);
+    bool retryable = tls_code == -ESP_TLS_ERR_SSL_TIMEOUT ||
+                     tls_code == -ESP_TLS_ERR_SSL_WANT_READ ||
+                     tls_code == -ESP_TLS_ERR_SSL_WANT_WRITE;
+    if ((error == ESP_ERR_MBEDTLS_SSL_READ_FAILED && !retryable) ||
+        (received < 0 && received != -ESP_ERR_HTTP_EAGAIN)) {
+        *failed = true;
+        esp_http_client_close(client);
+        // Authenticated partial bytes remain valid. Never enter failed TLS again.
+        if (received <= 0) return ESP_FAIL;
+    }
+    return received;
+}
+
 static bool send_encoded(uint32_t generation, native_codec_t codec,
                          const uint8_t *data, size_t size, uint8_t eos) {
     size_t packet_size = sizeof(encoded_packet_t) + size;
@@ -148,6 +201,43 @@ static bool send_encoded(uint32_t generation, native_codec_t codec,
     packet->end_of_stream = eos;
     if (size) memcpy(packet->data, data, size);
     return xRingbufferSendComplete(s_encoded, packet) == pdTRUE;
+}
+
+static bool send_stream_audio(uint32_t generation, native_codec_t *codec,
+        const uint8_t *data, size_t size, bool *first, stream_probe_t *probe) {
+    if (*first) {
+        if (*codec == NATIVE_CODEC_AUTO) {
+            size_t consumed;
+            switch (stream_probe_feed(probe, data, size, &consumed)) {
+                case STREAM_PROBE_MORE: return true;
+                case STREAM_PROBE_MP3: *codec=NATIVE_CODEC_MP3; break;
+                case STREAM_PROBE_AAC: *codec=NATIVE_CODEC_AAC; break;
+                case STREAM_PROBE_FLAC: *codec=NATIVE_CODEC_FLAC; break;
+                case STREAM_PROBE_OGG: *codec=NATIVE_CODEC_OGG; break;
+                default: return false;
+            }
+            state_set_audio(generation, false, codec_name(*codec));
+            if (!send_encoded(generation, *codec, probe->header, probe->used,
+                               AUDIO_CONTINUE)) return false;
+            data += consumed; size -= consumed;
+        } else {
+            state_set_audio(generation, false, codec_name(*codec));
+        }
+        *first = false;
+    }
+    return !size || send_encoded(generation, *codec, data, size, AUDIO_CONTINUE);
+}
+
+static bool stream_audio(void *context, const uint8_t *data, size_t size) {
+    stream_input_t *input = context;
+    if (input->generation != atomic_load(&s_generation)) return false;
+    return send_stream_audio(input->generation, &input->codec, data, size,
+                              &input->first, &input->probe);
+}
+
+static void stream_title(void *context, const char *title) {
+    stream_input_t *input = context;
+    native_state_set_title(s_state, input->generation, title);
 }
 
 static void stream_task(void *argument) {
@@ -169,45 +259,69 @@ static void stream_task(void *argument) {
         if (atomic_load(&s_generation) != command.generation) continue;
         state_set_audio(command.generation, false, "connecting");
 
+        stream_headers_t headers = {.valid=true};
         esp_http_client_config_t config = {
             .url = command.url,
             .timeout_ms = 10000,
             .buffer_size = STREAM_CHUNK_SIZE,
             .buffer_size_tx = 4096,
             .crt_bundle_attach = esp_crt_bundle_attach,
-            .disable_auto_redirect = false,
-            .max_redirection_count = 5,
+            .disable_auto_redirect = true,
+            .max_redirection_count = MAX_HTTP_REDIRECTS,
             .keep_alive_enable = true,
             .user_agent = "yoRadio-native/1",
+            .event_handler = stream_header_event,
+            .user_data = &headers,
         };
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (!client) {
             state_set_audio(command.generation, false, "HTTP allocation failed");
             continue;
         }
-        esp_http_client_set_header(client, "Icy-MetaData", "0");
-        esp_err_t result = esp_http_client_open(client, 0);
+        esp_http_client_set_header(client, "Icy-MetaData", "1");
+        esp_err_t result = open_stream(client, &headers,
+            esp_timer_get_time() + INT64_C(10000000));
+        if (atomic_load(&s_generation) != command.generation) {
+            esp_http_client_cleanup(client);
+            continue;
+        }
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Stream open failed: %s", esp_err_to_name(result));
             state_set_audio(command.generation, false, "connection failed");
             esp_http_client_cleanup(client);
             continue;
         }
-        esp_http_client_fetch_headers(client);
-        native_codec_t codec = command.requested_codec;
-        if (codec == NATIVE_CODEC_AUTO) {
-            char *content_type = NULL;
-            if (esp_http_client_get_response_header(
-                    client, "Content-Type", &content_type) == ESP_OK) {
-                codec = codec_from_content_type(content_type);
-            }
+        if (!headers.valid) {
+            state_set_audio(command.generation, false, "invalid ICY interval");
+            esp_http_client_cleanup(client);
+            continue;
         }
-        bool first_chunk = true;
+        esp_http_client_set_timeout_ms(client, STREAM_READ_TIMEOUT_MS);
+        // MIME is advisory. Automatic selection waits for actual body bytes.
+        stream_input_t input = {.generation=command.generation,
+            .codec=command.requested_codec, .first=true};
+        stream_body_t body;
+        stream_body_init(&body, headers.interval);
+        int64_t probe_deadline = esp_timer_get_time() +
+            (int64_t)STREAM_PROBE_TIMEOUT_MS * 1000;
+        bool read_failed = false;
         uint8_t end_reason = AUDIO_END_EOF;
         while (atomic_load(&s_generation) == command.generation &&
                atomic_load(&s_failed_generation) != command.generation) {
-            int received = esp_http_client_read(client, (char *)buffer,
-                                                STREAM_CHUNK_SIZE);
+            if (read_failed) { end_reason=AUDIO_END_READ_FAILED; break; }
+            if (input.first && input.codec == NATIVE_CODEC_AUTO &&
+                esp_timer_get_time() >= probe_deadline) {
+                end_reason = AUDIO_END_FORMAT_UNKNOWN;
+                break;
+            }
+            int received = read_stream(client, (char *)buffer,
+                                       STREAM_CHUNK_SIZE, &read_failed);
+            // Stop may occur during the blocking read. Drop its old bytes.
+            if (atomic_load(&s_generation) != command.generation) break;
+            if (received == -ESP_ERR_HTTP_EAGAIN) {
+                vTaskDelay(pdMS_TO_TICKS(1));
+                continue;
+            }
             if (received < 0) {
                 ESP_LOGW(TAG, "Stream read failed");
                 end_reason = AUDIO_END_READ_FAILED;
@@ -218,21 +332,21 @@ static void stream_task(void *argument) {
                 vTaskDelay(pdMS_TO_TICKS(10));
                 continue;
             }
-            if (first_chunk) {
-                first_chunk = false;
-                if (codec == NATIVE_CODEC_AUTO) {
-                    codec = codec_from_signature(buffer, received);
-                }
-                state_set_audio(command.generation, false, codec_name(codec));
-            }
-            if (!send_encoded(command.generation, codec, buffer, received,
-                              false)) {
+            if (!stream_body_feed(&body, buffer, (size_t)received,
+                                   stream_audio, stream_title, &input)) {
                 ESP_LOGW(TAG, "Compressed audio buffer stalled");
-                end_reason = AUDIO_END_BUFFER_STALLED;
+                end_reason = input.probe.result == STREAM_PROBE_INVALID
+                               ? AUDIO_END_FORMAT_UNKNOWN : AUDIO_END_BUFFER_STALLED;
                 break;
             }
         }
-        send_encoded(command.generation, codec, NULL, 0, end_reason);
+        if (end_reason == AUDIO_END_EOF && body.metadata_remaining) {
+            end_reason = AUDIO_END_METADATA_TRUNCATED;
+        }
+        if (end_reason == AUDIO_END_EOF && input.codec == NATIVE_CODEC_AUTO) {
+            end_reason = AUDIO_END_FORMAT_UNKNOWN;
+        }
+        send_encoded(command.generation, input.codec, NULL, 0, end_reason);
         esp_http_client_close(client);
         esp_http_client_cleanup(client);
     }

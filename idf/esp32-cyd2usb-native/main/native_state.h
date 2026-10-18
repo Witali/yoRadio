@@ -23,6 +23,7 @@ typedef struct {
     uint32_t ipv4;
     char station[96];
     char stream_format[48];
+    char title[192];
 } native_state_t;
 
 void native_state_init(native_state_t *state);
@@ -34,4 +35,6 @@ void native_state_begin_audio(native_state_t *state, uint32_t generation,
                               const char *station, const char *format);
 void native_state_set_audio(native_state_t *state, uint32_t generation,
                             bool running, const char *format);
+void native_state_set_title(native_state_t *state, uint32_t generation,
+                            const char *title);
 

@@ -37,7 +37,7 @@ allocation и численные настройки C3 являются канд
 | --- | --- | --- |
 | CYD-C3-00 | Программная база готова | План, исходная сборка IDF 6.0.2 и исправные host-проверки донора. Первоначальный полный clang-tidy прогон CYD и C3 сохранён. Аппаратный baseline отдельно. |
 | CYD-C3-01 | Программная часть выполнена | Generation, decoder/PCM lifetime, ordered completion и output flush/reset проверены host-тестами. Финальные PDM/continuous/legacy images коммита `2df73834` собраны и сохранены; физическая приёмка отдельно. |
-| CYD-C3-02 | В работе | Portable probe/ID3/ICY parsers извлечены в общий `native_stream` компонент с сохранением C3 include/build paths. Подключение CYD HTTP/TLS/metadata и его тесты — следующий шаг. |
+| CYD-C3-02 | Программная часть выполнена | Общие probe/ID3/ICY/JSON helpers подключены к CYD, HTTP startup ограничен общим deadline и числом redirects; fatal TLS/partial bytes и raw EOF проверены на реальном HTTP-парсере обоих SDK. Host/санитайзеры проходят; физическая сеть отдельно. |
 | CYD-C3-03 | Открыт | Подтверждение MP3/ADTS кадров, ID3, форматные переходы и codec drain. Byte-exact replay, truncated EOF, ложные headers и ограниченный search budget. |
 | CYD-C3-04 | Открыт | Queue leases, независимый terminal/control slot, ограниченный рост, prefill и tail coalescing. Concurrent producer/consumer и OOM; выбрать ёмкости по CYD. |
 | CYD-C3-05 | Открыт | Health, heap/largest block, ошибки allocation/decode/write, DMA и стеки; CPU по обоим ядрам. Отдельно quiet и diagnostic сборки. |
@@ -182,3 +182,14 @@ allocation и численные настройки C3 являются канд
   [ICY](../idf/components/native_stream/icy_title.c) теперь имеют одну
   переносимую реализацию. C3 wrappers сохраняют существующие пути сборки и
   host-тестов. Probe/frame corpus и 47 C3/ICY проверок проходят после извлечения.
+- CYD-C3-02: CYD использует общий fragmented probe без MIME/MP3 fallback,
+  удаляет ICY до decode и публикует generation-safe title. Общий JSON writer
+  экранирует control bytes и заменяет повреждённый UTF-8. HTTP status/redirects
+  ограничены одним 10-секундным startup deadline, body timeout — 250 ms.
+  Fatal TLS закрывается после сохранения partial bytes; scoped adapter сохраняет
+  отличие raw TLS EOF от close_notify, не меняя dynamic-buffer SDK wrapper.
+  [42 сценария stream task](../tests/run-cyd-stream.py),
+  [ICY/JSON bounds/fuzz](../tests/run-native-stream-body.py), corpus обеих целей,
+  lifecycle и по 93 сценария реального SDK HTTP/TLS reader на C3/CYD проходят
+  с ASan/UBSan. [Отчёты](../tests/results/cyd-c3-stream-20261018/README.md)
+  сохраняют границы эмуляции. Подтверждение соседних кадров относится к этапу 03.

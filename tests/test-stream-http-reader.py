@@ -7,7 +7,10 @@ p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--idf',type=Path,required=True)
 p.add_argument('--output',type=Path,required=True)
 p.add_argument('--diagnostic', action='store_true')
+p.add_argument('--target', choices=('c3','cyd'), default='c3')
 args=p.parse_args()
+if args.target == 'cyd' and args.diagnostic:
+    p.error('--diagnostic is a C3-only instrumentation option')
 args.output.mkdir(parents=True,exist_ok=True)
 (args.output/'sdkconfig.h').write_text('#pragma once\n' +
     ('#define CONFIG_YORADIO_PIPELINE_HEALTH_DIAGNOSTIC 1\n' if args.diagnostic else ''))
@@ -83,12 +86,38 @@ int yoradio_mbedtls_ssl_read(mbedtls_ssl_context *, unsigned char *, size_t);
 def linux(path):
     path=path.resolve()
     return '/mnt/'+path.drive[0].lower()+path.as_posix()[2:]
-main=ROOT/'idf/esp32c3-oled-native/main'
+main=ROOT/('idf/esp32c3-oled-native/main' if args.target == 'c3' else 'idf/esp32-cyd2usb-native/main')
+probe_main=ROOT/'idf/esp32c3-oled-native/main'
+common=ROOT/'idf/components/native_stream/include'
+reader_source=main/'stream_http_reader.c'
+tested_sources=[harness,probe_main/'audio_pipeline_probe.h',main/'tls_stream_eof.c',common/'tls_stream_result.h',Path(__file__)]
+if args.target == 'c3':
+    tested_sources.extend((reader_source,main/'stream_http_reader.h'))
+else:
+    # Compile the production CYD helper with only its SDK seams replaced. The
+    # adapter preserves the existing harness interface without copying logic.
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('lifecycle',ROOT/'tests/run-cyd-lifecycle.py')
+    lifecycle=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(lifecycle)
+    audio_source=main/'audio_service.c'
+    reader_source=args.output/'cyd_reader.c'
+    reader_source.write_text('#include <stdbool.h>\n#include "stream_http_reader.h"\n#include "esp_tls_errors.h"\n'+
+        lifecycle.function(audio_source.read_text(),'read_stream')+
+        '\nint stream_http_read(stream_http_reader_t *reader,esp_http_client_handle_t client,char *buffer,int size) {\n'
+        '    return read_stream(client,buffer,size,&reader->failed);\n}\n')
+    (args.output/'stream_http_reader.h').write_text('''#pragma once
+#include <stdbool.h>
+#include "esp_http_client.h"
+typedef struct { bool failed; } stream_http_reader_t;
+int stream_http_read(stream_http_reader_t *,esp_http_client_handle_t,char *,int);
+''')
+    tested_sources.append(audio_source)
 binary=args.output/'test'
 command=['wsl.exe','--exec','gcc','-std=c11','-Wall','-Wextra','-Werror','-g','-O1',
     '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
-    '-I',linux(args.output),'-I',linux(main),'-I',linux(parser),linux(args.output/'test.c'),
-    linux(main/'stream_http_reader.c'),linux(main/'tls_stream_eof.c'),linux(parser/'http_parser.c'),
+    '-I',linux(args.output),'-I',linux(main),'-I',linux(common),'-I',linux(probe_main),'-I',linux(parser),linux(args.output/'test.c'),
+    linux(reader_source),linux(main/'tls_stream_eof.c'),linux(parser/'http_parser.c'),
     '-o',linux(binary)]
 build=subprocess.run(command,capture_output=True,text=True,timeout=120)
 (args.output/'build.log').write_text(build.stdout+build.stderr)
@@ -96,11 +125,11 @@ if build.returncode:raise SystemExit(build.returncode)
 run=subprocess.run(['wsl.exe','--exec',linux(binary)],capture_output=True,text=True,timeout=30)
 (args.output/'run.log').write_text(run.stdout+run.stderr)
 report=dict(result='PASS' if run.returncode==0 and 'STREAM_HTTP_READER_PASS' in run.stdout else 'FAIL',
-    diagnostic=args.diagnostic,
+    diagnostic=args.diagnostic,target=args.target,
     idf=str(args.idf), sdk_source_sha256=hashlib.sha256(sdk.read_bytes()).hexdigest(),
     extracted_function_sha256=hashlib.sha256(function.encode()).hexdigest(),
     sources_sha256={str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest()
-        for path in (harness,main/'stream_http_reader.c',main/'stream_http_reader.h',main/'audio_pipeline_probe.h',main/'tls_stream_eof.c',Path(__file__))},
+        for path in tested_sources},
     tls_adapter_sha256=hashlib.sha256(tls_read.encode()).hexdigest(),
     parser_sha256=hashlib.sha256((parser/'http_parser.c').read_bytes()).hexdigest(),
     body_callbacks_sha256=hashlib.sha256(body.encode()).hexdigest(),

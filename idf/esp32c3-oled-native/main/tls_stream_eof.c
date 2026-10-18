@@ -1,6 +1,7 @@
 #include "mbedtls/ssl.h"
 #include <stdbool.h>
 #include "tls_path_profile.h"
+#include "../../components/native_stream/include/tls_stream_result.h"
 
 int yoradio_mbedtls_ssl_read(mbedtls_ssl_context *ssl, unsigned char *buffer,
                              size_t length) {
@@ -23,5 +24,5 @@ int yoradio_mbedtls_ssl_read(mbedtls_ssl_context *ssl, unsigned char *buffer,
     // to be complete (RFC 9112 section 9.8). Explicit HTTP framing still ends
     // at its boundary without an additional TLS read. Keep zero-length calls
     // unchanged, and pass through data, alerts and retryable/error codes.
-    return result == 0 && length != 0 ? MBEDTLS_ERR_SSL_CONN_EOF : result;
+    return tls_stream_result(result, length);
 }
