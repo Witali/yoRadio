@@ -98,12 +98,12 @@ test("classic ESP32 native HTTP API reports and changes persisted gain", () => {
   );
 
   assert.match(web, /"\/api\/native\/settings"/);
-  assert.match(web, /native_audio_output_set_volume/);
-  assert.match(web, /native_audio_output_set_balance/);
+  assert.match(web, /native_audio_settings_set_volume/);
+  assert.match(web, /native_audio_settings_set_balance/);
   assert.match(web, /native_audio_output_get_volume/);
   assert.match(web, /native_audio_output_get_balance/);
   assert.match(output, /channel_gain_q15/);
-  assert.match(output, /pcm_mono_sample[\s\S]*volume, balance/);
+  assert.match(output, /pcm_reader_begin[\s\S]*native_audio_settings_get_volume[\s\S]*native_audio_settings_get_balance/);
 });
 
 test("C3 persists, reports, and applies WebUI normalization settings", () => {

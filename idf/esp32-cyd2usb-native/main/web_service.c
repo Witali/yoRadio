@@ -16,6 +16,7 @@
 #include "freertos/task.h"
 #include "native_health.h"
 #include "native_audio_output.h"
+#include "native_audio_settings.h"
 #include "network_service.h"
 #include "radio_control.h"
 #include "json_buffer.h"
@@ -200,30 +201,107 @@ static esp_err_t stop_handler(httpd_req_t *request) {
     return httpd_resp_sendstr(request, "{\"playing\":false}");
 }
 
+static bool parse_setting_integer(const char *text, bool signed_value,
+                                   int64_t *value) {
+    if (!text || !*text) return false;
+    bool negative = signed_value && *text == '-';
+    if (negative && !*++text) return false;
+    uint32_t limit = signed_value ? (uint32_t)INT32_MAX + (negative ? 1U : 0U)
+                                  : UINT32_MAX;
+    uint32_t number = 0;
+    for (; *text; ++text) {
+        if (*text < '0' || *text > '9') return false;
+        uint32_t digit = (uint32_t)(*text - '0');
+        if (number > (limit - digit) / 10U) return false;
+        number = number * 10U + digit;
+    }
+    *value = negative ? -(int64_t)number : (int64_t)number;
+    return true;
+}
+
 static esp_err_t settings_handler(httpd_req_t *request) {
     if (request->method == HTTP_POST) {
-        char query[80];
+        char query[192];
         char value[16];
         if (httpd_req_get_url_query_str(request, query, sizeof(query)) != ESP_OK) {
             return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
                                        "Missing settings query");
         }
-        if (httpd_query_key_value(query, "volume", value, sizeof(value)) == ESP_OK) {
-            unsigned long volume = strtoul(value, NULL, 10);
-            if (volume > 254U) volume = 254U;
-            native_audio_output_set_volume((uint8_t)volume);
+        enum { VOLUME, BALANCE, NORMALIZATION, NORMGAIN, NORMTARGET, NORMTIME, COUNT };
+        static const char *const keys[COUNT] = {
+            "volume", "balance", "normalization", "normgain", "normtarget", "normtime",
+        };
+        int64_t values[COUNT] = {0};
+        bool present[COUNT] = {false};
+        bool specified[COUNT] = {false};
+        // The SDK returns the first matching key. Reject repeated controls
+        // and malformed fields so a later bad value cannot be hidden.
+        for (const char *field = query; *field;) {
+            const char *end = strchr(field, '&');
+            if (!end) end = field + strlen(field);
+            const char *equals = memchr(field, '=', (size_t)(end - field));
+            if (!equals || equals == field || (*end && !end[1]))
+                return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
+                                           "Invalid settings query");
+            size_t length = (size_t)(equals - field);
+            for (unsigned i = 0; i < COUNT; ++i) {
+                if (strlen(keys[i]) != length || strncasecmp(field, keys[i], length)) continue;
+                if (specified[i])
+                    return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
+                                               "Duplicate settings value");
+                specified[i] = true;
+            }
+            field = *end ? end + 1 : end;
         }
-        if (httpd_query_key_value(query, "balance", value, sizeof(value)) == ESP_OK) {
-            long balance = strtol(value, NULL, 10);
-            if (balance < -16) balance = -16;
-            if (balance > 16) balance = 16;
-            native_audio_output_set_balance((int8_t)balance);
+        // Validate the complete update before changing any runtime setting.
+        // A truncated optional field is an error, not a missing field.
+        for (unsigned i = 0; i < COUNT; ++i) {
+            esp_err_t result = httpd_query_key_value(query, keys[i], value, sizeof(value));
+            if (result == ESP_ERR_NOT_FOUND && !specified[i]) continue;
+            if (result != ESP_OK ||
+                !parse_setting_integer(value, i == BALANCE || i == NORMTARGET, &values[i]))
+                return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
+                                           "Invalid settings value");
+            present[i] = true;
+        }
+        if ((present[NORMALIZATION] && values[NORMALIZATION] > 1) ||
+            (present[NORMGAIN] && values[NORMGAIN] > 20) ||
+            (present[NORMTARGET] && (values[NORMTARGET] < -20 || values[NORMTARGET] > 0)) ||
+            (present[NORMTIME] && (values[NORMTIME] < 100 || values[NORMTIME] > 10000)))
+            return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
+                                       "Settings value out of range");
+        if (values[VOLUME] > 254) values[VOLUME] = 254;
+        if (values[BALANCE] < -16) values[BALANCE] = -16;
+        if (values[BALANCE] > 16) values[BALANCE] = 16;
+        // Each setter reports its own persistence result. Multiple settings
+        // are applied in order; this is not an NVS transaction or rollback.
+        for (unsigned i = 0; i < COUNT; ++i) {
+            if (!present[i]) continue;
+            esp_err_t result;
+            switch (i) {
+                case VOLUME: result = native_audio_settings_set_volume((uint8_t)values[i]); break;
+                case BALANCE: result = native_audio_settings_set_balance((int8_t)values[i]); break;
+                case NORMALIZATION: result = native_audio_settings_set_normalization(values[i] != 0); break;
+                case NORMGAIN: result = native_audio_settings_set_normalization_gain_db((uint8_t)values[i]); break;
+                case NORMTARGET: result = native_audio_settings_set_normalization_target_dbfs((int8_t)values[i]); break;
+                default: result = native_audio_settings_set_normalization_time_ms((uint16_t)values[i]); break;
+            }
+            if (result != ESP_OK) {
+                httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,
+                                    "Settings update failed");
+                return result;
+            }
         }
     }
 
-    char body[64];
-    snprintf(body, sizeof(body), "{\"volume\":%u,\"balance\":%d}",
-             native_audio_output_get_volume(), native_audio_output_get_balance());
+    char body[160];
+    snprintf(body, sizeof(body),
+             "{\"volume\":%u,\"balance\":%d,\"normalization\":%s,\"normgain\":%u,\"normtarget\":%d,\"normtime\":%u}",
+             native_audio_output_get_volume(), native_audio_output_get_balance(),
+             native_audio_settings_get_normalization() ? "true" : "false",
+             native_audio_settings_get_normalization_gain_db(),
+             native_audio_settings_get_normalization_target_dbfs(),
+             native_audio_settings_get_normalization_time_ms());
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
     return httpd_resp_sendstr(request, body);

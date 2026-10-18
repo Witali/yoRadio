@@ -14,6 +14,7 @@
 #include "json_buffer.h"
 #include "native_health.h"
 #include "radio_control.h"
+#include "native_audio_settings.h"
 
 typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC,
                NATIVE_CODEC_FLAC, NATIVE_CODEC_OGG } native_codec_t;
@@ -23,7 +24,8 @@ typedef struct { int method; const char *query; } httpd_req_t;
 enum { ESP_OK=0, ESP_FAIL=-1, ESP_ERR_TIMEOUT=0x107, ESP_ERR_HTTP_EAGAIN=0x7007,
        ESP_ERR_MBEDTLS_SSL_READ_FAILED=0x8000, HTTP_EVENT_ON_HEADER=1,
        HTTPD_500_INTERNAL_SERVER_ERROR=500, HTTPD_400_BAD_REQUEST=400,
-       ESP_ERR_INVALID_ARG=-2,ESP_ERR_NOT_FOUND=-3,HTTP_GET=0,HTTP_POST=1 };
+       ESP_ERR_INVALID_ARG=-2,ESP_ERR_NOT_FOUND=-3,ESP_ERR_HTTPD_RESULT_TRUNC=-4,
+       HTTP_GET=0,HTTP_POST=1 };
 #define ESP_TLS_ERR_SSL_TIMEOUT (-0x6800)
 #define ESP_TLS_ERR_SSL_WANT_READ (-0x6900)
 #define ESP_TLS_ERR_SSL_WANT_WRITE (-0x6880)
@@ -72,6 +74,8 @@ static uint16_t radio_station;
 static bool radio_enabled,radio_unavailable;
 static int radio_result;
 static unsigned direct_stops;
+static const char *query_error_key;
+static int query_error_result,query_read_result;
 static void audio_service_stop(void) {++direct_stops;}
 bool radio_control_snapshot(radio_control_snapshot_t *out) {
     if(radio_unavailable)return false;
@@ -85,18 +89,21 @@ int radio_control_stop(void) {++radio_actions;return radio_result;}
 int radio_control_play(uint16_t item) {++radio_actions;radio_station=item;return radio_result;}
 int radio_control_set_smartstart_enabled(bool enabled) {++radio_actions;radio_enabled=enabled;return radio_result;}
 static int httpd_req_get_url_query_str(httpd_req_t *request,char *out,size_t capacity) {
-    if(!request->query || strlen(request->query)>=capacity)return ESP_FAIL;
+    if(query_read_result)return query_read_result;
+    if(!request->query || !*request->query)return ESP_ERR_NOT_FOUND;
+    if(strlen(request->query)>=capacity)return ESP_ERR_HTTPD_RESULT_TRUNC;
     strcpy(out,request->query);return ESP_OK;
 }
 static int httpd_query_key_value(const char *query,const char *key,char *out,size_t capacity) {
+    if(query_error_key && !strcmp(key,query_error_key))return query_error_result;
     size_t length=strlen(key);
     for (const char *p=query; p && *p; p=strchr(p,'&'),p=p ? p+1 : NULL) {
-        if(!strncmp(p,key,length) && p[length]=='=') {
-            p+=length+1;size_t size=strcspn(p,"&");if(size>=capacity)return ESP_FAIL;
+        if(!strncasecmp(p,key,length) && p[length]=='=') {
+            p+=length+1;size_t size=strcspn(p,"&");if(size>=capacity)return ESP_ERR_HTTPD_RESULT_TRUNC;
             memcpy(out,p,size);out[size]=0;return ESP_OK;
         }
     }
-    return ESP_FAIL;
+    return ESP_ERR_NOT_FOUND;
 }
 #define configNUMBER_OF_CORES 2
 #define MALLOC_CAP_8BIT 1
@@ -145,8 +152,30 @@ static int xRingbufferSendAcquire(void *ring,void **p,size_t size,unsigned wait)
     (void)wait; assert(ring==(void *)1); *p=malloc(size); assert(*p); return pdTRUE;
 }
 static int xRingbufferSendComplete(void *,void *);
-static int native_audio_output_get_volume(void) { return 123; }
-static int native_audio_output_get_balance(void) { return -4; }
+static int settings_volume=123,settings_balance=-4;
+static bool settings_normalization;
+static uint8_t settings_gain=20;
+static int8_t settings_target=-3;
+static uint16_t settings_time=5000;
+static unsigned settings_setters,settings_requests,settings_order[6];
+static int settings_failure_index=-1;
+static const int settings_failure_result=0x1105;
+static int settings_setter(unsigned index) {
+    assert(settings_setters<6);settings_order[settings_setters++]=index;
+    return settings_failure_index==(int)index ? settings_failure_result : ESP_OK;
+}
+esp_err_t native_audio_settings_set_volume(uint8_t value) {settings_volume=value;return settings_setter(0);}
+esp_err_t native_audio_settings_set_balance(int8_t value) {settings_balance=value;return settings_setter(1);}
+esp_err_t native_audio_settings_set_normalization(bool value) {settings_normalization=value;return settings_setter(2);}
+esp_err_t native_audio_settings_set_normalization_gain_db(uint8_t value) {settings_gain=value;return settings_setter(3);}
+esp_err_t native_audio_settings_set_normalization_target_dbfs(int8_t value) {settings_target=value;return settings_setter(4);}
+esp_err_t native_audio_settings_set_normalization_time_ms(uint16_t value) {settings_time=value;return settings_setter(5);}
+bool native_audio_settings_get_normalization(void) {return settings_normalization;}
+uint8_t native_audio_settings_get_normalization_gain_db(void) {return settings_gain;}
+int8_t native_audio_settings_get_normalization_target_dbfs(void) {return settings_target;}
+uint16_t native_audio_settings_get_normalization_time_ms(void) {return settings_time;}
+static int native_audio_output_get_volume(void) {return settings_volume;}
+static int native_audio_output_get_balance(void) {return settings_balance;}
 static int httpd_resp_set_type(httpd_req_t *r,const char *type) {
     (void)r; assert(!strcmp(type,"application/json; charset=utf-8")); return ESP_OK;
 }
@@ -280,6 +309,93 @@ static void exact(const uint8_t *expected,size_t size,unsigned codec,unsigned re
     assert(selected_codec==codec && terminal==reason && cleanups==1 && !client.open);
 }
 
+static int call_settings(int method,const char *query) {
+    httpd_req_t request={.method=method,.query=query};++settings_requests;
+    response[0]=0;response_status=0;
+    return settings_handler(&request);
+}
+static void exercise_settings(void) {
+    assert(call_settings(HTTP_GET,NULL)==ESP_OK && response_status==200 && !settings_setters);
+    printf("SETTINGS=%s\n",response);
+    assert(call_settings(HTTP_POST,
+        "volume=4294967295&balance=2147483647&normalization=1&normgain=20&normtarget=0&normtime=10000")==ESP_OK);
+    assert(response_status==200 && settings_setters==6);
+    assert(settings_volume==254 && settings_balance==16 && settings_normalization &&
+        settings_gain==20 && settings_target==0 && settings_time==10000);
+    for(unsigned i=0;i<6;++i)assert(settings_order[i]==i);
+    printf("SETTINGS_MAX=%s\n",response);settings_setters=0;
+    assert(call_settings(HTTP_POST,
+        "volume=0&balance=-2147483648&normalization=0&normgain=0&normtarget=-20&normtime=100")==ESP_OK);
+    assert(settings_setters==6 && settings_volume==0 && settings_balance==-16 &&
+        !settings_normalization && settings_gain==0 && settings_target==-20 && settings_time==100);
+    printf("SETTINGS_MIN=%s\n",response);settings_setters=0;
+    assert(call_settings(HTTP_POST,
+        "volume=212&balance=-4&normalization=1&normgain=12&normtarget=-6&normtime=6000")==ESP_OK);
+    assert(settings_setters==6 && settings_volume==212 && settings_balance==-4 &&
+        settings_normalization && settings_gain==12 && settings_target==-6 && settings_time==6000);
+    char saved[sizeof(response)];strcpy(saved,response);settings_setters=0;
+    assert(call_settings(HTTP_GET,NULL)==ESP_OK && !strcmp(saved,response) && !settings_setters);
+    // All fields are optional. SDK keys are case insensitive, matching the
+    // actual httpd_query_key_value contract; integer values are plain decimal.
+    assert(call_settings(HTTP_POST,"NORMGAIN=007")==ESP_OK && settings_setters==1 && settings_gain==7);
+    settings_setters=0;
+    assert(call_settings(HTTP_POST,"volume=255&balance=17")==ESP_OK && settings_setters==2);
+    assert(settings_volume==254 && settings_balance==16);settings_setters=0;
+    assert(call_settings(HTTP_POST,"balance=-17")==ESP_OK && settings_setters==1 && settings_balance==-16);
+    settings_setters=0;
+    const char *bad[]={NULL,"","volume=","volume=abc","volume=1x","volume= 1","volume=1 ",
+        "volume=+1","volume=-1","volume=-0","volume=0x10","volume=4294967296",
+        "volume=99999999999999999999999999","balance=","balance=+1","balance=--1",
+        "balance=2147483648","balance=-2147483649","balance=-3x","balance=- 3",
+        "normalization=","normalization=-1","normalization=+1","normalization=2","normalization=true",
+        "normalization=1junk","normgain=-1","normgain=+1","normgain=21","normgain=1e1","normgain=1.5",
+        "normtarget=-21","normtarget=1","normtarget=+0","normtarget=--3","normtarget=-3x",
+        "normtime=0","normtime=99","normtime=10001","normtime=65536","normtime=4294967295",
+        "normtime=4294967296","normtime=+100","normtime=-100","normtime= 100",
+        // A valid earlier setting must not be applied when a later one fails.
+        "volume=12&balance=+1","volume=12&normalization=2","volume=12&normgain=21",
+        "volume=12&normtarget=-21","volume=12&normtime=99",
+        "volume=12&normtime=0000000000000000100",
+        "volume=12&normtime","volume=12&normgain=2&normgain=bad",
+        "volume=12&normgain=2&NORMGAIN=3","volume=12&volume=13",
+        "volume=12&","volume=12&&normtime=100","&volume=12","volume=12&=1"};
+    for(unsigned i=0;i<sizeof(bad)/sizeof(bad[0]);++i) {
+        assert(call_settings(HTTP_POST,bad[i])==ESP_FAIL && response_status==400 && !settings_setters);
+        assert(settings_volume==254 && settings_balance==-16 && settings_gain==7);
+    }
+    char too_long[256];memset(too_long,'1',sizeof(too_long)-1);too_long[sizeof(too_long)-1]=0;
+    memcpy(too_long,"volume=12&x=",12);
+    assert(call_settings(HTTP_POST,too_long)==ESP_FAIL && response_status==400 && !settings_setters);
+    // Missing is the only optional-field error that may be ignored. A bad
+    // request/key API result must not silently turn a partial update into 200.
+    const int query_errors[]={ESP_ERR_HTTPD_RESULT_TRUNC,ESP_ERR_INVALID_ARG,ESP_FAIL};
+    for(unsigned i=0;i<sizeof(query_errors)/sizeof(query_errors[0]);++i) {
+        query_error_key="normtime";query_error_result=query_errors[i];
+        assert(call_settings(HTTP_POST,"volume=12")==ESP_FAIL && response_status==400 && !settings_setters);
+    }
+    query_error_key=NULL;query_read_result=ESP_ERR_INVALID_ARG;
+    assert(call_settings(HTTP_POST,"volume=12")==ESP_FAIL && response_status==400 && !settings_setters);
+    query_read_result=0;
+    const char *single[]={"volume=101","balance=-2","normalization=0","normgain=8","normtarget=-9","normtime=9000"};
+    for(unsigned i=0;i<6;++i) {
+        settings_failure_index=(int)i;
+        assert(call_settings(HTTP_POST,single[i])==settings_failure_result && response_status==500);
+        assert(settings_setters==1 && settings_order[0]==i);settings_setters=0;
+    }
+    // Actual settings setters update runtime before persistence, including a
+    // failed save. The handler reports 500 and makes no rollback promise.
+    assert(settings_volume==101 && settings_balance==-2 && !settings_normalization &&
+        settings_gain==8 && settings_target==-9 && settings_time==9000);
+    settings_failure_index=2;
+    assert(call_settings(HTTP_POST,
+        "volume=6&balance=-3&normalization=1&normgain=13&normtarget=-8&normtime=7000")==settings_failure_result);
+    assert(response_status==500 && settings_setters==3 && settings_volume==6 && settings_balance==-3 &&
+        settings_normalization && settings_gain==8 && settings_target==-9 && settings_time==9000);
+    settings_setters=0;settings_failure_index=-1;
+    assert(call_settings(HTTP_GET,NULL)==ESP_OK && response_status==200 && !settings_setters);
+    printf("PASS CYD settings requests=%u: actual parser/handler, ranges/readback/clamping, full-token validation, missing/truncated SDK results, no malformed partial updates, persistence errors\n",settings_requests);
+}
+
 int main(void) {
     native_state_init(&state);
     const uint8_t aac[]={0xff,0xf1,0x4c,0x80,0x01,0x9f,0xfc,1,2,3,4,5};
@@ -403,6 +519,7 @@ int main(void) {
     radio_result=ESP_ERR_NOT_FOUND;assert(radio_handler(&request)==ESP_FAIL && response_status==400);
     request.method=HTTP_GET;radio_unavailable=true;
     assert(radio_handler(&request)==ESP_FAIL && response_status==500);
+    exercise_settings();
     printf("PASS CYD stream cases=%u: actual HTTP/ICY/probe task, MIME mismatch, redirects/status/deadline, retry/fatal TLS, cancellation/OOM, exact replay and status JSON\n",cases);
     return 0;
 }

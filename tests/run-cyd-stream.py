@@ -1,4 +1,5 @@
-"""Exercise actual CYD stream task/HTTP helpers/status with deterministic I/O."""
+"""Exercise actual CYD stream task/HTTP helpers/status/settings with deterministic I/O."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -18,6 +19,10 @@ helpers=module_from_spec(spec);spec.loader.exec_module(helpers)
 
 
 def main():
+    global OUT
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output',type=Path,default=OUT)
+    OUT=parser.parse_args().output.resolve()
     OUT.mkdir(parents=True,exist_ok=True);(OUT/'freertos').mkdir(exist_ok=True)
     (OUT/'freertos/FreeRTOS.h').write_text('''#pragma once
 #include <stddef.h>
@@ -48,6 +53,8 @@ size_t strlcpy(char *, const char *, size_t);
     unit+=helpers.function((MAIN/'web_service.c').read_text(),'parse_station_number')
     unit+=helpers.function((MAIN/'web_service.c').read_text(),'radio_handler')
     unit+=helpers.function((MAIN/'web_service.c').read_text(),'stop_handler')
+    unit+=helpers.function((MAIN/'web_service.c').read_text(),'parse_setting_integer')
+    unit+=helpers.function((MAIN/'web_service.c').read_text(),'settings_handler')
     (OUT/'production.inc').write_text(unit)
     binary=OUT/'test'
     try:
@@ -55,6 +62,7 @@ size_t strlcpy(char *, const char *, size_t);
             '-Wno-unused-variable','-Wno-unused-function','-fsanitize=address,undefined',
             '-fno-omit-frame-pointer','-fno-pie','-no-pie','-I'+host(OUT),
             '-I'+host(MAIN),'-I'+host(SHARED/'include'),
+            '-I'+host(ROOT/'idf/components/native_audio_settings'),
             host(ROOT/'tests/native/cyd_stream_test.c'),host(MAIN/'native_state.c'),
             host(MAIN/'native_health_json.c'),host(SHARED/'icy_title.c'),'-o',host(binary)])
         log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
@@ -63,7 +71,8 @@ size_t strlcpy(char *, const char *, size_t);
         print(error.output.decode(errors='replace'),file=sys.stderr);raise
     rows={}
     for line in log.decode().splitlines():
-        if line.startswith(('STATUS=','MAX_STATUS=','UTF8_STATUS=','HEALTH=','RADIO=')):
+        if line.startswith(('STATUS=','MAX_STATUS=','UTF8_STATUS=','HEALTH=','RADIO=',
+                            'SETTINGS=','SETTINGS_MIN=','SETTINGS_MAX=')):
             key,value=line.split('=',1);rows[key]=json.loads(value)
     row=rows['STATUS']
     assert row['station']=='station " \\' and row['format']=='format\nline'
@@ -85,13 +94,18 @@ size_t strlcpy(char *, const char *, size_t);
     radio=rows['RADIO']
     assert radio['current']==65535 and radio['count']==65535 and radio['smartstart'] is True
     assert radio['station']=='\1'*143 and radio['connecting'] is True and radio['playing'] is False
+    assert rows['SETTINGS']==dict(volume=123,balance=-4,normalization=False,normgain=20,normtarget=-3,normtime=5000)
+    assert rows['SETTINGS_MIN']==dict(volume=0,balance=-16,normalization=False,normgain=0,normtarget=-20,normtime=100)
+    assert rows['SETTINGS_MAX']==dict(volume=254,balance=16,normalization=True,normgain=20,normtarget=0,normtime=10000)
     (OUT/'build.log').write_bytes(build);(OUT/'test.log').write_bytes(log)
     sources=[Path(__file__),ROOT/'tests/native/cyd_stream_test.c',ROOT/'tests/run-cyd-lifecycle.py',
         *[MAIN/name for name in ('audio_service.c','web_service.c','native_state.c','native_state.h','native_health.h','native_health_json.c')],
         SHARED/'icy_title.c',*[SHARED/'include'/name for name in
         ('audio_completion.h','icy_title.h','stream_body.h','stream_bitrate.h','stream_probe.h','stream_tags.h','json_buffer.h')]]
     sources += [MAIN/'radio_control.h',ROOT/'idf/components/native_storage/include/radio_control.h']
+    sources += [ROOT/'idf/components/native_audio_settings/native_audio_settings.h']
     (OUT/'report.json').write_text(json.dumps(dict(passed=True,physical_hardware=False,
+        scope='Actual HTTP/ICY/probe stream task, status/radio/health/settings handlers and strict settings parser. SDK I/O and audio-settings persistence APIs are host seams; no NVS transaction or hardware timing claim.',
         source_sha256={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}),indent=2)+'\n')
     print('\n'.join(line for line in log.decode().splitlines() if line.startswith('PASS')))
 
