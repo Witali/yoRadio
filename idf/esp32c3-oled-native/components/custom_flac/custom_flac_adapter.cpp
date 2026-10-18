@@ -296,6 +296,11 @@ extern "C" int custom_flac_decoder_feed(
         if (!decoder->header_ready) {
             result = parse_header(decoder);
             if (result < 0) return result;
+            // A partial marker, metadata header or payload can wait only while
+            // more bytes may arrive. Check the final internal chunk, including
+            // a separate zero-byte EOF, without rejecting a split valid header.
+            if (result > 0 && eos && offset == size)
+                return ERR_FLAC_TRUNCATED_INPUT;
         }
         if (decoder->header_ready) {
             result = decode_available(decoder, eos && offset == size,
