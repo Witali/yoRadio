@@ -30,4 +30,7 @@ esp_err_t native_audio_output_flush_pcm(void);
 // means DMA is stopped and the backend released; configure starts it again.
 // Failure retains ownership so the owner can retry without freeing live DMA.
 esp_err_t native_audio_output_pause(void);
+// Control task may request cancellation between driver blocks. It never
+// disables a driver; only the output owner may call pause after its write.
+void native_audio_output_request_pause(bool requested);
 const char *native_audio_output_name(void);

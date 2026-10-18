@@ -10,6 +10,7 @@ typedef int esp_err_t;
 #define ESP_OK 0
 #define ESP_FAIL -1
 #define ESP_ERR_NOT_SUPPORTED -2
+#define ESP_ERR_INVALID_STATE -3
 #define pdMS_TO_TICKS(t) (t)
 #define ESP_RETURN_ON_ERROR(call, tag, message) do { \
     esp_err_t result_ = (call); if (result_ != ESP_OK) return result_; \

@@ -68,7 +68,10 @@ def main():
                 run(['env', 'ASAN_OPTIONS=detect_leaks=0:halt_on_error=1', host(work/'negative')])
             except subprocess.CalledProcessError as e:
                 (work/'negative.log').write_bytes(e.output)
-                negative[name] = 'rejected at runtime'
+                expected = b"release: Assertion `h==&driver && driver.allocated && !driver.running' failed."
+                if expected not in e.output or b'ERROR: AddressSanitizer' in e.output or b'runtime error:' in e.output:
+                    raise AssertionError('unexpected negative failure: '+e.output.decode(errors='replace')) from e
+                negative[name] = 'rejected by ownership assertion before deleting running DMA'
             else:
                 raise AssertionError('negative control survived: '+name)
             (work/'production.inc').write_text(source)

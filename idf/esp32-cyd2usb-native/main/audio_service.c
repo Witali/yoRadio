@@ -46,6 +46,8 @@
 typedef struct {
     uint32_t generation;
     native_codec_t requested_codec;
+    bool maintenance;
+    bool restore;
     char url[512];
 } play_command_t;
 
@@ -99,6 +101,133 @@ static uint8_t *s_stream_buffer;
 // Output/LED initialization has process lifetime. Retain successful setup
 // across pipeline-allocation retries instead of allocating driver buffers twice.
 static bool s_output_initialized, s_led_initialized;
+
+enum { MAINTENANCE_OFF, MAINTENANCE_REQUESTED, MAINTENANCE_HELD,
+       MAINTENANCE_ABORTING, MAINTENANCE_END_RESUME, MAINTENANCE_END_STOP };
+enum { MAINTENANCE_STREAM = 1U, MAINTENANCE_DECODER = 2U,
+       MAINTENANCE_OUTPUT = 4U, MAINTENANCE_ALL = 7U };
+static atomic_uint s_maintenance_phase;
+static atomic_uint s_maintenance_acks;
+static atomic_int s_maintenance_error;
+static atomic_bool s_maintenance_waiter;
+static portMUX_TYPE s_maintenance_token_lock = portMUX_INITIALIZER_UNLOCKED;
+// Control lock owns intent/token data. Owners only inspect the atomic phase
+// and acknowledgements; they never retain the HTTP caller's token/storage.
+static uint64_t s_maintenance_epoch;
+static play_command_t s_last_command;
+static bool s_last_command_valid, s_maintenance_resume;
+
+static bool maintenance_active(void) {
+    return atomic_load(&s_maintenance_phase) != MAINTENANCE_OFF;
+}
+
+static bool maintenance_acked(unsigned bits) {
+    return (atomic_load(&s_maintenance_acks) & bits) == bits;
+}
+
+// State lock is held. The caller has validated this maintenance generation.
+static void maintenance_state_locked(uint32_t generation, bool quiet) {
+    esp_err_t error = atomic_load(&s_maintenance_error);
+    const char *status = error == ESP_ERR_TIMEOUT
+        ? (quiet ? "maintenance timeout; cleanup complete" : "maintenance timeout; cleanup pending")
+        : error != ESP_OK
+        ? (quiet ? "maintenance failed; cleanup complete" : "maintenance failed; cleanup pending")
+        : (quiet ? "maintenance paused" : "maintenance cleanup pending");
+    native_state_begin_audio_locked(s_state, generation, NULL, status);
+    s_state->audio_pending = !quiet;
+    s_state->audio_failed = error != ESP_OK;
+}
+
+static void maintenance_publish_state(uint32_t generation, bool quiet,
+                                       TickType_t timeout) {
+    portENTER_CRITICAL(&s_maintenance_token_lock);
+    uint64_t epoch = s_maintenance_epoch;
+    portEXIT_CRITICAL(&s_maintenance_token_lock);
+    if (!maintenance_active() || generation != atomic_load(&s_generation) ||
+        xSemaphoreTake(s_state->lock, timeout) != pdTRUE) return;
+    portENTER_CRITICAL(&s_maintenance_token_lock);
+    bool current = epoch == s_maintenance_epoch && maintenance_active() &&
+                   generation == atomic_load(&s_generation);
+    portEXIT_CRITICAL(&s_maintenance_token_lock);
+    // OFF publication also takes the state lock, so it cannot race this
+    // recheck/write and leave a late cleanup status over resumed playback.
+    if (current) maintenance_state_locked(generation, quiet);
+    xSemaphoreGive(s_state->lock);
+}
+
+// All owners are quiescent before this runs, so the queued restore cannot be
+// consumed until OFF is published. No blocking state/NVS/driver calls here.
+static esp_err_t maintenance_finish_locked(bool resume) {
+    if (xSemaphoreTake(s_state->lock, 0) != pdTRUE) return ESP_ERR_TIMEOUT;
+    if (resume && s_maintenance_resume && s_last_command_valid) {
+        play_command_t command = s_last_command;
+        command.generation = atomic_load(&s_generation) + 1U;
+        command.maintenance = false;
+        command.restore = true;
+        if (xQueueOverwrite(s_commands, &command) != pdTRUE) {
+            xSemaphoreGive(s_state->lock);
+            return ESP_FAIL;
+        }
+        maintenance_state_locked(atomic_load(&s_generation), true);
+        // This is an accepted pending Play even before the stream owner
+        // consumes it. A second maintenance must retain that resume intent.
+        s_state->audio_generation = command.generation;
+        s_state->audio_pending = true;
+        s_state->audio_failed = false;
+        const char *status = atomic_load(&s_maintenance_error) == ESP_ERR_TIMEOUT
+            ? "maintenance timeout; resume pending"
+            : atomic_load(&s_maintenance_error) != ESP_OK
+            ? "maintenance failed; resume pending" : "maintenance resume pending";
+        strlcpy(s_state->stream_format, status, sizeof(s_state->stream_format));
+        atomic_store(&s_generation, command.generation);
+        s_last_command = command;
+    } else {
+        maintenance_state_locked(atomic_load(&s_generation), true);
+        if (atomic_load(&s_maintenance_error) == ESP_OK)
+            strlcpy(s_state->stream_format, "stopped", sizeof(s_state->stream_format));
+    }
+    native_audio_output_request_pause(false);
+    portENTER_CRITICAL(&s_maintenance_token_lock);
+    atomic_store(&s_maintenance_phase, MAINTENANCE_OFF);
+    portEXIT_CRITICAL(&s_maintenance_token_lock);
+    xSemaphoreGive(s_state->lock);
+    return ESP_OK;
+}
+
+static void maintenance_try_abort(void) {
+    unsigned phase = atomic_load(&s_maintenance_phase);
+    if ((phase != MAINTENANCE_ABORTING && phase != MAINTENANCE_END_RESUME &&
+         phase != MAINTENANCE_END_STOP) ||
+        atomic_load(&s_maintenance_waiter) || !maintenance_acked(MAINTENANCE_ALL) ||
+        xSemaphoreTake(s_control_lock, 0) != pdTRUE) return;
+    phase = atomic_load(&s_maintenance_phase);
+    if ((phase == MAINTENANCE_ABORTING || phase == MAINTENANCE_END_RESUME ||
+         phase == MAINTENANCE_END_STOP) && !atomic_load(&s_maintenance_waiter) &&
+        maintenance_acked(MAINTENANCE_ALL))
+        (void)maintenance_finish_locked(phase != MAINTENANCE_END_STOP);
+    xSemaphoreGive(s_control_lock);
+}
+
+static void maintenance_ack(unsigned bit) {
+    atomic_fetch_or(&s_maintenance_acks, bit);
+    maintenance_try_abort();
+}
+
+static void maintenance_park(uint32_t generation) {
+    // A subsequent maintenance can start before a parked owner observes OFF.
+    // The new generation must make that owner leave and acknowledge anew.
+    while (maintenance_active() && atomic_load(&s_generation) == generation) {
+        maintenance_try_abort();
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+}
+
+static void maintenance_output_error(esp_err_t result) {
+    int expected = ESP_OK;
+    atomic_compare_exchange_strong(&s_maintenance_error, &expected, result);
+    unsigned phase = MAINTENANCE_REQUESTED;
+    atomic_compare_exchange_strong(&s_maintenance_phase, &phase, MAINTENANCE_ABORTING);
+}
 
 typedef struct {
     uint32_t interval;
@@ -426,8 +555,19 @@ static void stream_task(void *argument) {
     (void)argument;
     uint8_t *buffer = s_stream_buffer;
     while (true) {
+        if (maintenance_active()) {
+            // Only this owner can cancel producer staging. HTTP cleanup on
+            // every exit below has completed before the stream ack.
+            uint32_t parked_generation = atomic_load(&s_generation);
+            stream_transport_reset();
+            maintenance_ack(MAINTENANCE_STREAM);
+            maintenance_park(parked_generation);
+            continue;
+        }
         play_command_t command;
-        xQueueReceive(s_commands, &command, portMAX_DELAY);
+        if (xQueueReceive(s_commands, &command, pdMS_TO_TICKS(50)) != pdTRUE)
+            continue;
+        if (command.maintenance || maintenance_active()) continue;
         // Release the old decoder/PCM workspace before the next TLS peak.
         while (atomic_load(&s_generation) == command.generation &&
                atomic_load(&s_decoder_released_generation) != command.generation) {
@@ -439,6 +579,8 @@ static void stream_task(void *argument) {
         // Between connections only; never alter published/leased storage.
         adaptive_input_restore(s_encoded);
 #endif
+        if (command.restore)
+            native_state_begin_audio(s_state, command.generation, NULL, "connecting");
         native_state_set_connecting(s_state, command.generation);
 
         stream_headers_t headers = {.valid=true};
@@ -655,7 +797,16 @@ static void decoder_task(void *argument) {
         size_t item_size = 0;
         encoded_packet_t *packet = encoded_receive(
             s_encoded, &item_size, pdMS_TO_TICKS(20));
-        if (!packet) continue;
+        if (!packet) {
+            // Stream ack is the producer barrier: after it, an empty FIFO
+            // cannot be followed by an old late commit or a control packet.
+            if (maintenance_active() && maintenance_acked(MAINTENANCE_STREAM) &&
+                generation == atomic_load(&s_generation)) {
+                maintenance_ack(MAINTENANCE_DECODER);
+                maintenance_park(generation);
+            }
+            continue;
+        }
         if (packet->generation != atomic_load(&s_generation) ||
             packet->generation == failed_generation ||
             packet->generation == atomic_load(&s_failed_generation)) {
@@ -884,8 +1035,17 @@ static void output_task(void *argument) {
     uint32_t sample_rate = 0;
     uint32_t generation = atomic_load(&s_generation);
     uint32_t failed_generation = 0;
+    uint32_t status_generation = 0;
+    esp_err_t maintenance_status = ESP_OK;
     while (true) {
         uint32_t current_generation = atomic_load(&s_generation);
+        esp_err_t error = atomic_load(&s_maintenance_error);
+        if (maintenance_active() && (status_generation != current_generation ||
+                                     maintenance_status != error)) {
+            maintenance_publish_state(current_generation, false, portMAX_DELAY);
+            status_generation = current_generation;
+            maintenance_status = error;
+        }
         if (generation != current_generation) {
             native_audio_output_discard_pcm();
             generation = current_generation;
@@ -896,6 +1056,23 @@ static void output_task(void *argument) {
                                                   pdMS_TO_TICKS(5));
         if (!packet) {
             audio_level_led_update_peak(0);
+            if (maintenance_active()) {
+                if (maintenance_acked(MAINTENANCE_DECODER) &&
+                    generation == atomic_load(&s_generation)) {
+                    esp_err_t result = native_audio_output_pause();
+                    if (result != ESP_OK) {
+                        maintenance_output_error(result);
+                        vTaskDelay(pdMS_TO_TICKS(20));
+                        continue;
+                    }
+                    sample_rate = 0;
+                    maintenance_publish_state(generation, true, portMAX_DELAY);
+                    if (generation != atomic_load(&s_generation)) continue;
+                    maintenance_ack(MAINTENANCE_OUTPUT);
+                    maintenance_park(generation);
+                }
+                continue;
+            }
             native_audio_output_idle();
             continue;
         }
@@ -912,7 +1089,7 @@ static void output_task(void *argument) {
         }
         if (packet->end_of_stream) {
             esp_err_t result = native_audio_output_flush_pcm();
-            if (result != ESP_OK) {
+            if (result != ESP_OK && !maintenance_active()) {
                 native_health_output_failure(packet->generation, NATIVE_HEALTH_OUTPUT_FLUSH, result);
                 fail_generation(packet->generation);
                 native_state_fail_audio(s_state,packet->generation,audio_completion_status(AUDIO_END_OUTPUT_FAILED));
@@ -927,6 +1104,10 @@ static void output_task(void *argument) {
             esp_err_t result =
                 native_audio_output_configure(packet->sample_rate);
             if (result != ESP_OK) {
+                if (maintenance_active()) {
+                    vRingbufferReturnItem(s_pcm, packet);
+                    continue;
+                }
                 native_health_output_failure(generation, NATIVE_HEALTH_OUTPUT_CONFIGURE, result);
                 ESP_LOGE(TAG, "%s %lu Hz setup failed: %s",
                          native_audio_output_name(),
@@ -950,7 +1131,7 @@ static void output_task(void *argument) {
         esp_err_t result = native_audio_output_write_pcm(
             packet->data, packet->data_size, packet->bits_per_sample,
             packet->channels);
-        if (result != ESP_OK) {
+        if (result != ESP_OK && !maintenance_active()) {
             native_health_output_failure(generation, NATIVE_HEALTH_OUTPUT_WRITE, result);
             ESP_LOGW(TAG, "%s write failed: %s", native_audio_output_name(),
                      esp_err_to_name(result));
@@ -1087,6 +1268,10 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     }
     if (atomic_load(&s_start_state) != AUDIO_START_READY) return ESP_ERR_INVALID_STATE;
     xSemaphoreTake(s_control_lock, portMAX_DELAY);
+    if (maintenance_active()) {
+        xSemaphoreGive(s_control_lock);
+        return ESP_ERR_INVALID_STATE;
+    }
     play_command_t command = {
         .generation = atomic_fetch_add(&s_generation, 1) + 1,
         .requested_codec = codec,
@@ -1096,6 +1281,8 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
     native_state_set_connecting(s_state, command.generation);
     esp_err_t result = xQueueOverwrite(s_commands, &command) == pdTRUE
                          ? ESP_OK : ESP_FAIL;
+    s_last_command_valid = result == ESP_OK;
+    if (s_last_command_valid) s_last_command = command;
     if (result != ESP_OK) native_state_set_audio(s_state, command.generation, false, "command failed");
     xSemaphoreGive(s_control_lock);
     return result;
@@ -1104,9 +1291,119 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
 void audio_service_stop(void) {
     if (atomic_load(&s_start_state) != AUDIO_START_READY) return;
     xSemaphoreTake(s_control_lock, portMAX_DELAY);
+    if (maintenance_active()) {
+        s_maintenance_resume = false;
+        xSemaphoreGive(s_control_lock);
+        return;
+    }
     uint32_t generation = atomic_fetch_add(&s_generation, 1) + 1;
     native_state_begin_audio(s_state, generation, NULL, "stopped");
     xSemaphoreGive(s_control_lock);
+}
+
+static TickType_t maintenance_remaining_ticks(int64_t deadline) {
+    int64_t remaining = deadline - esp_timer_get_time();
+    if (remaining <= 0) return 0;
+    uint64_t ms = ((uint64_t)remaining + 999U) / 1000U;
+    uint64_t ticks = (ms * configTICK_RATE_HZ + 999U) / 1000U;
+    // portMAX_DELAY is never an allowed maintenance API wait.
+    if (ticks >= portMAX_DELAY) ticks = portMAX_DELAY - 1U;
+    return (TickType_t)ticks;
+}
+
+esp_err_t audio_service_maintenance_begin(uint32_t timeout_ms,
+                                         audio_maintenance_token_t *token) {
+    if (!token) return ESP_ERR_INVALID_ARG;
+    token->epoch = 0;
+    if (!timeout_ms) return ESP_ERR_INVALID_ARG;
+    if (atomic_load(&s_start_state) != AUDIO_START_READY)
+        return ESP_ERR_INVALID_STATE;
+    int64_t deadline = esp_timer_get_time() + (int64_t)timeout_ms * 1000;
+    if (xSemaphoreTake(s_control_lock, maintenance_remaining_ticks(deadline)) != pdTRUE)
+        return ESP_ERR_TIMEOUT;
+    if (maintenance_active() || s_maintenance_epoch == UINT64_MAX) {
+        xSemaphoreGive(s_control_lock);
+        return ESP_ERR_INVALID_STATE;
+    }
+    // A failed snapshot must be distinguishable from a stopped stream. Do
+    // not use native_state_snapshot's silent zero-on-timeout result here.
+    if (!s_state->lock || xSemaphoreTake(s_state->lock,
+            maintenance_remaining_ticks(deadline)) != pdTRUE) {
+        xSemaphoreGive(s_control_lock);
+        return ESP_ERR_TIMEOUT;
+    }
+    uint32_t generation = atomic_load(&s_generation);
+    bool resume = s_last_command_valid && s_last_command.generation == generation &&
+        s_state->audio_generation == generation && !s_state->audio_failed &&
+        (s_state->audio_running || s_state->audio_pending);
+    if (esp_timer_get_time() >= deadline) {
+        xSemaphoreGive(s_state->lock);
+        xSemaphoreGive(s_control_lock);
+        return ESP_ERR_TIMEOUT;
+    }
+    s_maintenance_resume = resume;
+    atomic_store(&s_maintenance_acks, 0);
+    atomic_store(&s_maintenance_error, ESP_OK);
+    atomic_store(&s_maintenance_waiter, true);
+    native_audio_output_request_pause(true);
+    atomic_store(&s_generation, generation + 1U);
+    portENTER_CRITICAL(&s_maintenance_token_lock);
+    uint64_t epoch = ++s_maintenance_epoch;
+    atomic_store(&s_maintenance_phase, MAINTENANCE_REQUESTED);
+    portEXIT_CRITICAL(&s_maintenance_token_lock);
+    maintenance_state_locked(generation + 1U, false);
+    xSemaphoreGive(s_state->lock);
+    play_command_t command = {.generation = generation + 1U, .maintenance = true};
+    esp_err_t result = xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK : ESP_FAIL;
+    xSemaphoreGive(s_control_lock);
+
+    while (result == ESP_OK) {
+        result = atomic_load(&s_maintenance_error);
+        if (result != ESP_OK) break;
+        if (esp_timer_get_time() >= deadline) { result = ESP_ERR_TIMEOUT; break; }
+        if (maintenance_acked(MAINTENANCE_ALL) &&
+            xSemaphoreTake(s_control_lock, maintenance_remaining_ticks(deadline)) == pdTRUE) {
+            if (esp_timer_get_time() < deadline &&
+                atomic_load(&s_maintenance_phase) == MAINTENANCE_REQUESTED &&
+                atomic_load(&s_maintenance_error) == ESP_OK) {
+                portENTER_CRITICAL(&s_maintenance_token_lock);
+                atomic_store(&s_maintenance_phase, MAINTENANCE_HELD);
+                token->epoch = epoch;
+                portEXIT_CRITICAL(&s_maintenance_token_lock);
+                atomic_store(&s_maintenance_waiter, false);
+                xSemaphoreGive(s_control_lock);
+                return ESP_OK;
+            }
+            xSemaphoreGive(s_control_lock);
+        }
+        vTaskDelay(1);
+    }
+    int no_error = ESP_OK;
+    atomic_compare_exchange_strong(&s_maintenance_error, &no_error, result);
+    maintenance_publish_state(generation + 1U, maintenance_acked(MAINTENANCE_OUTPUT), 0);
+    unsigned phase = MAINTENANCE_REQUESTED;
+    atomic_compare_exchange_strong(&s_maintenance_phase, &phase, MAINTENANCE_ABORTING);
+    atomic_store(&s_maintenance_waiter, false);
+    maintenance_try_abort();
+    return result;
+}
+
+esp_err_t audio_service_maintenance_end(audio_maintenance_token_t *token,
+                                       bool resume_previous) {
+    if (!token || !token->epoch) return ESP_ERR_INVALID_ARG;
+    esp_err_t result = ESP_ERR_INVALID_STATE;
+    // Guaranteed handoff: even if control is busy the request lives in audio
+    // state, and parked owners retry it. Nothing here can retain HTTP storage.
+    portENTER_CRITICAL(&s_maintenance_token_lock);
+    if (token->epoch == s_maintenance_epoch &&
+        atomic_load(&s_maintenance_phase) == MAINTENANCE_HELD) {
+        atomic_store(&s_maintenance_phase, resume_previous
+            ? MAINTENANCE_END_RESUME : MAINTENANCE_END_STOP);
+        token->epoch = 0;
+        result = ESP_OK;
+    }
+    portEXIT_CRITICAL(&s_maintenance_token_lock);
+    return result;
 }
 
 native_input_health_t audio_service_input_health(void) {

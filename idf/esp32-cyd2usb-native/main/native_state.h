@@ -48,6 +48,10 @@ void native_state_set_network(native_state_t *state,
 void native_state_snapshot(native_state_t *state, native_state_t *snapshot);
 void native_state_begin_audio(native_state_t *state, uint32_t generation,
                               const char *station, const char *format);
+// Caller already owns state->lock. Performs the same metadata/title reset
+// as begin_audio without taking the mutex again; NULL station preserves label.
+void native_state_begin_audio_locked(native_state_t *state, uint32_t generation,
+                                     const char *station, const char *format);
 void native_state_set_audio(native_state_t *state, uint32_t generation,
                             bool running, const char *format);
 void native_state_set_title(native_state_t *state, uint32_t generation,

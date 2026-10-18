@@ -11,14 +11,19 @@
 
 typedef int esp_err_t;
 enum { ESP_OK, ESP_FAIL, ESP_ERR_INVALID_ARG, ESP_ERR_INVALID_STATE,
-       ESP_ERR_NOT_SUPPORTED, ESP_ERR_NO_MEM };
+       ESP_ERR_NOT_SUPPORTED, ESP_ERR_NO_MEM, ESP_ERR_TIMEOUT };
 #define ESP_RETURN_ON_ERROR(expr, ...) do { int e=(expr); if(e) return e; } while(0)
 #define ESP_LOGI(...) ((void)0)
 #define ESP_LOGW(...) ((void)0)
 #define BOARD_AUDIO_DATA 26
 #define GPIO_MODE_OUTPUT 1
 #define pdMS_TO_TICKS(x) (x)
+#ifndef CYD_MAINTENANCE_HOST
 static void vTaskDelay(unsigned t) {(void)t;}
+#endif
+#ifndef MAINTENANCE_DRIVER_HOOK
+#define MAINTENANCE_DRIVER_HOOK(name) ((void)0)
+#endif
 static unsigned pins_low;
 static void gpio_reset_pin(int p) {(void)p;}
 static void gpio_set_direction(int p,int d) {(void)p;(void)d;}
@@ -35,16 +40,17 @@ static void native_audio_normalizer_configure(bool e,uint8_t g,int8_t t,uint16_t
 static void native_audio_normalizer_reset(void) {}
 static void native_audio_normalizer_process_block(int16_t *p,size_t n,uint8_t c) {(void)p;(void)n;(void)c;}
 
-typedef struct { bool allocated,running; } driver_t;
+typedef struct { atomic_bool allocated,running; } driver_t;
 static driver_t driver;
-static unsigned allocations,disables,deletes,writes;
-static bool fail_disable,fail_delete,fail_enable,fail_prime;
+static atomic_uint allocations,disables,deletes,writes;
+static atomic_bool fail_disable,fail_delete,fail_enable,fail_prime;
 static int allocate(void **out) {assert(!driver.allocated);driver=(driver_t){true,false};*out=&driver;++allocations;return ESP_OK;}
 static int enable(void *h) {assert(h==&driver && driver.allocated);if(fail_enable)return ESP_FAIL;driver.running=true;return ESP_OK;}
-static int disable(void *h) {assert(h==&driver && driver.allocated && driver.running);++disables;if(fail_disable)return ESP_FAIL;driver.running=false;return ESP_OK;}
+static int disable(void *h) {assert(h==&driver && driver.allocated && driver.running);MAINTENANCE_DRIVER_HOOK("disable");++disables;if(fail_disable)return ESP_FAIL;driver.running=false;return ESP_OK;}
 static int release(void *h) {assert(h==&driver && driver.allocated && !driver.running);++deletes;if(fail_delete)return ESP_FAIL;driver.allocated=false;return ESP_OK;}
 static int write_driver(void *h,const void *p,size_t n,size_t *done,unsigned timeout) {
     assert(h==&driver && driver.allocated && driver.running && p && timeout);
+    MAINTENANCE_DRIVER_HOOK("write");
     ++writes;*done=fail_prime ? 0:n;return fail_prime ? ESP_FAIL:ESP_OK;
 }
 typedef void *i2s_chan_handle_t;
@@ -81,11 +87,18 @@ static int idf6_dac_output_write(const void *p,size_t n,size_t *done,unsigned t)
 esp_err_t native_audio_output_pause(void);
 #include "production.inc"
 
+#ifndef CYD_MAINTENANCE_HOST
 int main(void) {
     unsigned cases=0;
     assert(native_audio_output_init()==ESP_OK);
     assert(native_audio_output_pause()==ESP_OK);++cases;
     assert(native_audio_output_configure(16000)==ESP_OK);assert(driver.running);++cases;
+    unsigned before_cancel=writes;
+    native_audio_output_request_pause(true);
+    const uint8_t cancelled[64]={0};
+    assert(native_audio_output_write_pcm(cancelled,sizeof(cancelled),16,1)==ESP_ERR_INVALID_STATE);
+    native_audio_output_idle();assert(writes==before_cancel);++cases;
+    native_audio_output_request_pause(false);
     unsigned old_allocations=allocations,old_pins=pins_low;
     fail_disable=true;
     assert(native_audio_output_pause()!=ESP_OK);
@@ -141,3 +154,4 @@ int main(void) {
     printf("PASS %u cases; real production pause/ownership; driver DMA barrier seam\n",cases);
     return 0;
 }
+#endif

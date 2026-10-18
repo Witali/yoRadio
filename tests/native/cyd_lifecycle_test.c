@@ -35,6 +35,7 @@ typedef void *QueueHandle_t, *RingbufHandle_t;
 #define ESP_FAIL -1
 #define ESP_ERR_INVALID_ARG -2
 #define ESP_ERR_INVALID_STATE -3
+#define ESP_ERR_TIMEOUT -4
 #define ESP_LOGE(...) ((void)0)
 #define ESP_LOGW(...) ((void)0)
 
@@ -73,6 +74,8 @@ static int native_audio_output_flush_pcm(void) { ++flushes; return fail_flush ? 
 static int native_audio_output_configure(uint32_t rate) { assert(rate == expected_rate); return fail_config ? ESP_FAIL : ESP_OK; }
 static const char *native_audio_output_name(void) { return "test"; }
 static void native_audio_output_idle(void) {}
+static int native_audio_output_pause(void) { return ESP_OK; }
+static void native_audio_output_request_pause(bool requested) { (void)requested; }
 static void audio_level_led_update_peak(int peak) { (void)peak; }
 static void audio_level_led_update_pcm(const uint8_t *p, size_t n, uint8_t b, uint8_t c) {
     (void)p; (void)n; (void)b; (void)c;

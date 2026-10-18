@@ -1,5 +1,6 @@
 """Exercise actual CYD decoder/output tasks, state and PDM tails under sanitizers."""
 from pathlib import Path
+import argparse
 import hashlib
 import json
 import re
@@ -25,6 +26,10 @@ def function(source, name):
 
 
 def main():
+    global OUT
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, default=OUT)
+    OUT = parser.parse_args().output.resolve()
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT/'freertos').mkdir(exist_ok=True)
     (OUT/'freertos/FreeRTOS.h').write_text('''#pragma once
@@ -36,6 +41,10 @@ def main():
 typedef pthread_mutex_t *SemaphoreHandle_t;
 typedef int BaseType_t;
 typedef unsigned TickType_t;
+typedef pthread_mutex_t portMUX_TYPE;
+#define portMUX_INITIALIZER_UNLOCKED PTHREAD_MUTEX_INITIALIZER
+#define portENTER_CRITICAL(p) assert(!pthread_mutex_lock(p))
+#define portEXIT_CRITICAL(p) assert(!pthread_mutex_unlock(p))
 #define pdTRUE 1
 #define pdMS_TO_TICKS(x) (x)
 #define portMAX_DELAY UINT32_MAX

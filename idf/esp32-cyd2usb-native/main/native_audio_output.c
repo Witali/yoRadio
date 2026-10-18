@@ -112,6 +112,7 @@ typedef struct {
 // getters are atomic; the controller can only publish a pending reset request.
 static normalizer_config_cache_t s_normalizer_config;
 static atomic_bool s_normalizer_reset_pending;
+static atomic_bool s_pause_requested;
 static uint32_t s_pcm_sample_rate = 16000U;
 static uint8_t s_pcm_channels;
 static uint8_t s_pcm_bits;
@@ -161,6 +162,10 @@ static bool sync_normalizer_configuration(uint8_t channels, uint8_t bits) {
 
 void native_audio_output_request_normalizer_reset(void) {
     atomic_store(&s_normalizer_reset_pending, true);
+}
+
+void native_audio_output_request_pause(bool requested) {
+    atomic_store(&s_pause_requested, requested);
 }
 
 typedef struct {
@@ -278,6 +283,7 @@ static int16_t ramp_sample(uint32_t index, uint32_t count, bool ramp_up) {
 }
 
 static esp_err_t pdm_write_block(const int16_t *samples, size_t count) {
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     if (!s_pdm || !s_pdm_running) return ESP_ERR_INVALID_STATE;
     size_t written = 0;
     size_t bytes = count * sizeof(*samples);
@@ -483,6 +489,7 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
 esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
                                         uint8_t bits_per_sample,
                                         uint8_t channels) {
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     if (!data || !native_audio_output_supports_pcm(bits_per_sample, channels)) {
         return ESP_ERR_NOT_SUPPORTED;
     }
@@ -575,6 +582,7 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
 esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
                                         uint8_t bits_per_sample,
                                         uint8_t channels) {
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     if (!data || !native_audio_output_supports_pcm(bits_per_sample, channels)) {
         return ESP_ERR_NOT_SUPPORTED;
     }
@@ -588,6 +596,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
         if (value > 255) value = 255;
         s_dac_data[buffered++] = (uint8_t)value;
         if (buffered == OUTPUT_PACKET_BYTES) {
+            if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
             size_t written = 0;
             esp_err_t result = dac_continuous_write(s_dac, s_dac_data, buffered,
                                                     &written, 1000);
@@ -597,6 +606,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
         }
     }
     if (!buffered) return ESP_OK;
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     size_t written = 0;
     esp_err_t result = dac_continuous_write(s_dac, s_dac_data, buffered,
                                             &written, 1000);
@@ -605,7 +615,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
 }
 
 void native_audio_output_idle(void) {
-    if (!s_dac) return;
+    if (!s_dac || atomic_load(&s_pause_requested)) return;
     memset(s_dac_data, 0x80, 256);
     size_t written = 0;
     dac_continuous_write(s_dac, s_dac_data, 256, &written, 100);
@@ -684,6 +694,7 @@ static uint8_t legacy_fractional_dac_step(int16_t pcm) {
 }
 
 static esp_err_t legacy_write_frames(size_t frames) {
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     if (!frames) return ESP_OK;
     size_t written = 0;
     esp_err_t result = idf6_dac_output_write(
@@ -775,6 +786,7 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
 esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
                                         uint8_t bits_per_sample,
                                         uint8_t channels) {
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     if (!data || !s_legacy_installed ||
         !native_audio_output_supports_pcm(bits_per_sample, channels)) {
         return ESP_ERR_NOT_SUPPORTED;
@@ -800,7 +812,7 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
 }
 
 void native_audio_output_idle(void) {
-    if (!s_legacy_installed) return;
+    if (!s_legacy_installed || atomic_load(&s_pause_requested)) return;
     // output_task wakes after 5 ms without PCM. Supply the corresponding
     // amount of midpoint data at the oversampled DAC clock.
     size_t frames = (s_legacy_output_sample_rate + 199U) / 200U;
