@@ -58,7 +58,7 @@ test("native balance direction matches Arduino on both ESP32 targets", () => {
     const output = read("idf", board, "main", "native_audio_output.c");
     assert.match(
       output,
-      /left_balance\s*=\s*balance < 0 \?[^;]+BALANCE_DENOMINATOR \+ balance/s,
+      /left_balance\s*=\s*(?:channels > 1 &&\s*)?balance < 0\s*\?[^;]+BALANCE_DENOMINATOR \+ balance/s,
     );
     assert.match(
       output,
@@ -68,7 +68,7 @@ test("native balance direction matches Arduino on both ESP32 targets", () => {
 });
 
 test("C3 persists Arduino three-state Smart Start and exposes it to WebUI", () => {
-  const radio = read("idf", "esp32c3-oled-native", "main", "radio_control.c");
+  const radio = read("idf", "components", "native_storage", "include", "radio_control_impl.h");
   const websocket = read(
     "idf",
     "esp32c3-oled-native",
