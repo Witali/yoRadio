@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "status": "scoped_pass",
+  "scope": "Independent APSTA peers in QEMU and real factory/native delayed DHCP plus unavailable-AP recovery; no production firmware change.",
+  "qemu_source_commit": "aab05d5de6fc9c6b0a784221d6629581a887679b",
+  "qemu_sha256": "b44d1a054fe65443b050e0feed86dcda3029d33c76faea9bb7e69a988feb0160",
+  "qemu_debug_logging": true,
+  "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+  "native_elf_sha256": "9e2c7719b25c44764eedc586a74b83febeb5e0925a47f376178888fb3967f299",
+  "source_sha256": "53d382237ae3a8795fd5b74d70d1761214e1001faa265c5fdd0124ae0f5efa48",
+  "production_firmware_changed": false,
+  "checks": {
+    "model_c2_c3_subcases": 10,
+    "same_test_before_failures": 10,
+    "existing_network_tests": 12,
+    "firmware_flows": 4,
+    "evidence_rejection_controls": 26,
+    "modular_spi_i2c_passed": true,
+    "unchanged_cyd_c3_boots_passed": true,
+    "all_wifi_inputs_unchanged": true
+  },
+  "raw_reports": {
+    "model_before": {
+      "file": "apsta-validation-20261018-model_before.json.gz",
+      "uncompressed_sha256": "e924041cdbdef9eb1903a7820f4d41709cb46a9059c96262adefe03769361b02"
+    },
+    "model_after": {
+      "file": "apsta-validation-20261018-model_after.json.gz",
+      "uncompressed_sha256": "3e1d14caa2be52372019a9d7de050bcf07e9eecb9de26f6900da5c19f22ea8f2"
+    },
+    "services": {
+      "file": "apsta-validation-20261018-services.json.gz",
+      "uncompressed_sha256": "ad7dfc9cb856feeebba054f2c5b3aef402f72698b25eb2c22b1c39dc9e2bd7a6"
+    },
+    "modular": {
+      "file": "apsta-validation-20261018-modular.json.gz",
+      "uncompressed_sha256": "16d2f72c1a078928a3e5911988b79a29f8d6d396e06dc693840f6345b55fa9c7"
+    },
+    "legacy": {
+      "file": "apsta-validation-20261018-legacy.json.gz",
+      "uncompressed_sha256": "3d42333194c082f90921e430ea572f02ff4fc462b1599f9fde172d64527fc7fd"
+    },
+    "wifi": {
+      "file": "apsta-validation-20261018-wifi.json.gz",
+      "uncompressed_sha256": "fe10b1fa0738fd20108f8c40fcfea78ca4c47ed23b09575b8aac00cc81b5758e"
+    },
+    "guards": {
+      "file": "apsta-validation-20261018-guards.json.gz",
+      "uncompressed_sha256": "4c507fe1757804cb8af6dc14768c3abfc69dc6ce09023b5422ae2552850e7638"
+    }
+  },
+  "factory_after_early_restore": {
+    "guest_seconds": 19.537402,
+    "rom_boots": 2,
+    "mode_ram": 2,
+    "mode_raw": 2,
+    "connected": false,
+    "ap_active": true,
+    "factory_station_state": 5,
+    "factory_apsta_got_ip_event": false
+  },
+  "reconstructed_after_early_restore": {
+    "guest_seconds": 16.377291,
+    "rom_boots": 2,
+    "mode_ram": 2,
+    "mode_raw": 2,
+    "connected": false,
+    "ap_active": true,
+    "factory_station_state": null,
+    "factory_apsta_got_ip_event": null
+  },
+  "qemu_inputs_sha256": {
+    "include/hw/net/esp32c3_wifi.h": "e7abc2611b25d02031cacd3903eb1affb8d9b04deab35171d5556d4a65a6105d",
+    "hw/net/esp32c3_wifi.c": "d7f024ff580734b3e6f46a6e7e12d559421c4a534819b3f4bc7713dfbad8ebc0",
+    "hw/net/esp32c3_wifi_ap.c": "f11ee8a03d858f08227456e0d42af5d42e1a5cabad306d57b930e4b105ed2713",
+    "hw/net/esp32c3_wifi_frame.c": "0a04a88f7170f90592fa15e875e8c932e04f701e626e5f1e3e9f4725bbac5cee",
+    "hw/net/esp32c3_wifi_80211.h": "496a4d443fcae1615c1f4ad5a3ffb584c0c0d98112c440a5cf31d24ca34155d4",
+    "hw/net/esp32c3_wifi_interface.c": "7a6305161ef2f6c419b41887955eca0d43c2190cab3c2071659e48d39c4dd2c8",
+    "hw/net/esp32c3_wifi_interface.h": "f895c6574820ab602a898b3592b1a82c817409923fbde37b4a3dba636562e79b",
+    "hw/net/esp32c2_clock.c": "fb0895a2bb4edd257da42e8b74cfe628c8886bead83e9dc887b86843def1d39f",
+    "hw/net/meson.build": "c676bd77eed61995dffc4f27efe9e1d73600ba18f932f8905772363d9735009f",
+    "tests/esp32_wifi_apsta_test.py": "97c112e52babd28e4c073e94c43b934a0436d702e5ee2641d07a298fccb51927",
+    "tests/esp32_wifi_services_test.py": "f31ccdcd4847b67ff93e18ab36ae6ec3caee06f3c6e1654954414d8551987abc",
+    "tools/test_esp_modules.py": "ac6bf67b53508a84a930717103007f5112d784db6a989ff1fd57b14593f17657",
+    "tools/test_esp_legacy.py": "9d0c9e7b731d630d2186efd3396544a2b16ae7946d79f09c889e596305d9babb"
+  },
+  "qemu_git_blob_sha256": {
+    "include/hw/net/esp32c3_wifi.h": "b7b12597e884afdd9a8d2eed3c629086adf679b11893338905ba04639a19c7db",
+    "hw/net/esp32c3_wifi.c": "20221c5247b148b6fe7d641c25a0be0f1d47f61e330ac23533f9807082269c75",
+    "hw/net/esp32c3_wifi_ap.c": "f11ee8a03d858f08227456e0d42af5d42e1a5cabad306d57b930e4b105ed2713",
+    "hw/net/esp32c3_wifi_frame.c": "3936138dc0d3cb8423a91592bef43c72118caa74c9e7137c59dc21e5b5125cb6",
+    "hw/net/esp32c3_wifi_80211.h": "e04ea890ae72877d3372430eaea7524a29efb1cd2ea6a823194c72250f5c03bb",
+    "hw/net/esp32c3_wifi_interface.c": "7a6305161ef2f6c419b41887955eca0d43c2190cab3c2071659e48d39c4dd2c8",
+    "hw/net/esp32c3_wifi_interface.h": "f895c6574820ab602a898b3592b1a82c817409923fbde37b4a3dba636562e79b",
+    "hw/net/esp32c2_clock.c": "45f9692813c4ffcabc1fd7f8c4ae3e34265e95aa584bff33b0bb69be4e11602c",
+    "hw/net/meson.build": "3503b1877a9c73d4bed106f96fa008f62daf625ee56091172eac20795c9114a9",
+    "tests/esp32_wifi_apsta_test.py": "97c112e52babd28e4c073e94c43b934a0436d702e5ee2641d07a298fccb51927",
+    "tests/esp32_wifi_services_test.py": "f31ccdcd4847b67ff93e18ab36ae6ec3caee06f3c6e1654954414d8551987abc",
+    "tools/test_esp_modules.py": "a103c98ebc75f31edc5060c8184ae6f7561c9f0ae3fa0fc4f6f76a82d0cee399",
+    "tools/test_esp_legacy.py": "a3b74c7981e6dd31d436e9e145226cf1632cebcacc67aac49b4ebe8127321c08"
+  },
+  "observer_inputs_sha256": {
+    "wifi_fallback_qemu.py": "bf9b95462fd7ba0153fee4b3785148494a258d4469e929b17e7cb2242d9d1007",
+    "wifi_fallback_contract.py": "70831d29101d1df0db0d55c2fde0ab0276d38b672216923b67109be02b887a0a"
+  },
+  "limitations": [
+    "Not a complete Small TV firmware regression or 24-hour acceptance.",
+    "QTest uses scratch DMA/RAM with no guest instructions; real firmware flows do not patch code, registers or RAM.",
+    "Factory state 5 proves completed AP initialization; setup HTTP is checked independently.",
+    "No APSTA GOT_IP was latched in this synthetic missing-AP case. Retained configured driver credentials need a separate characterization.",
+    "CYD boot checks console/panic; LCD/SD transactions are covered by QTest. No radio playback, physical RF or physical board claim.",
+    "DEBUG-off was not rebuilt for this change; active H10 continues on its frozen preceding executable.",
+    "QEMU source inputs record actual build bytes and committed Git blob bytes separately to expose Windows newline conversion."
+  ]
+}

@@ -11,7 +11,12 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 на прежнем QEMU A74. Факторный контроль отделил возврат сети от времени HTTP.
 Подключённая STA подавляет AP beacon в общей peer state модели; начатый AP
 портит последующую STA/DNS. Это воспроизведено через DMA на C2 и C3 (4 subcase).
-Исправление готовится в QEMU `.worktree/small-tv-apsta`, отдельная сборка.
+Исправлено в QEMU `.worktree/small-tv-apsta`, коммит aab05d5de6, отдельный
+executable B44D1A05. Пять тестов / 10 C2/C3 subcase прошли; те же входы дают
+10 ошибок на прежнем A74. Прошли 12 прежних network tests, модульные SPI/I2C
+и запуск неизменённых CYD/C3 OLED. Оба delayed-DHCP и оба missing-AP сценария
+настоящих прошивок прошли с неизменными входами; 26 rejection controls прошли.
+Scoped report — apsta-validation-20261018.json, семь исходных отчётов в gzip.
 
 Прежнее `ap_active=mode!=1 && boots>=2` было эвристикой и не доказывало AP init.
 Реальный маркер окончания init — factory byte 5 после сканирования. AP handler
@@ -20,7 +25,12 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 В отдельном сбойном probe оба HTTP недоступны и event bits=0, так что успешную
 STA тоже не утверждать. Подробности и следующие проверки — tests/APSTA_INVESTIGATION.md.
 Отрицательные raw отчёты сохранены в apsta-before-20261018.json и четырёх gzip.
-Исходная прошивка и текущий app6324 не изменялись. Full regression остаётся failed.
+Observer теперь отличает mode/restart от конца AP init (state 5) и читает
+отдельный APSTA GOT_IP event; false byte 2 больше не единственное свидетельство
+этого missing-AP case. Раннее восстановление сети в тесте сохранено. Исходная
+прошивка и app6324 не изменялись. Старый full regression остаётся failed;
+следующий шаг — полный неизменный прогон с новой QEMU моделью. DEBUG-off отдельно
+не проверялся на aab05d5de6; H10 продолжает использовать прежний frozen A74.
 
 ## Текущее состояние — 2026-10-18
 

@@ -2651,3 +2651,18 @@ true. Это только начало нового прогона, не 24 ча
   QEMU fix ещё не принят; новый scoped passing gate и полный regression впереди.
 - В 10:22 UTC проверены PID/creation/command всех четырёх процессов H10: совпали.
   Префикс дошёл до 44 циклов / 765.066695 guest s. Это не суточная приёмка.
+
+- Исправление QEMU завершено и сохранено как aab05d5de6: независимые AP/STA peer
+  state в отдельном модуле, общий radio/DMA, разделение входящих IP/ARP и очереди
+  при отключении внешнего AP. После коммита сборка повторена: executable B44D1A05
+  побайтово прежний и marker соответствует aab05d5de6.
+- Пять QTest / 10 C2/C3 subcase проходят. Те же test/harness SHA дают 10 ошибок
+  на прежнем A74. Прошли 12 прежних сетевых тестов, модульные LCD/SD/SPI/I2C
+  и неизменённые CYD/C3 OLED boot проверки на окончательном B44.
+- Обе настоящие прошивки прошли delayed-DHCP и missing-AP при раннем возврате
+  сети: четыре потока. Observer ждёт state 5 после HTTP и читает отдельный
+  APSTA GOT_IP event; в factory missing-AP checkpoint он false. Все 26 мутаций
+  недостоверного evidence отклонены. App6324/source53D3 не менялись.
+- Scoped evidence сохранён в apsta-validation-20261018.json и семи raw gzip;
+  exact build bytes и Git blob hashes QEMU записаны отдельно из-за Windows EOL.
+  Это не полный regression, не DEBUG-off приёмка и не суточный результат.
