@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <stdatomic.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -28,6 +29,20 @@ static uint32_t *s_legacy_frames = legacy_storage;
 static uint16_t s_legacy_fractional_error;
 static uint8_t native_audio_settings_get_volume(void) { ++volume_reads; return volume; }
 static int8_t native_audio_settings_get_balance(void) { ++balance_reads; return balance; }
+static bool native_audio_settings_get_normalization(void) { return false; }
+static uint8_t native_audio_settings_get_normalization_gain_db(void) { return 20; }
+static int8_t native_audio_settings_get_normalization_target_dbfs(void) { return -3; }
+static uint16_t native_audio_settings_get_normalization_time_ms(void) { return 5000; }
+static void native_audio_normalizer_configure(bool enabled, uint8_t gain,
+    int8_t target, uint16_t time, uint32_t rate) {
+    (void)gain; (void)target; (void)time; (void)rate; assert(!enabled);
+}
+static void native_audio_normalizer_reset(void) {}
+static void native_audio_normalizer_process_block(int16_t *pcm, size_t frames,
+                                                   uint8_t channels) {
+    (void)pcm; (void)frames; (void)channels;
+    assert(!"disabled normalization must not process or copy PCM");
+}
 
 static int capture(const void *data, size_t size) {
     assert(size <= sizeof(captured) - captured_size);

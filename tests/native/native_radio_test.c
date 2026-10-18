@@ -148,11 +148,7 @@ int main(void) {
     assert(!radio_control_snapshot(NULL));
     memset(&snapshot,1,sizeof(snapshot));lock_timeout=true;assert(!radio_control_snapshot(&snapshot));lock_timeout=false;
     assert(!snapshot.item && !snapshot.name[0]);
-#ifdef TEST_CYD
-    assert(!resets);
-#else
     assert(resets);
-#endif
     assert(!pthread_mutex_destroy(s_lock));free(s_lock);
     assert(!pthread_mutex_destroy(state.lock));free(state.lock);
     remove("playlist.csv");remove("index.dat");remove("index.dat.tmp");remove("index.dat.bak");

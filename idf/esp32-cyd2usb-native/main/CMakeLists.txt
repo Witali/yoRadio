@@ -51,6 +51,7 @@ idf_component_register(
     nvs_flash
     spiffs
     audio_level_led
+    native_audio_normalizer
     native_audio_settings
     native_storage
     native_stream

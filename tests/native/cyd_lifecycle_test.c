@@ -281,7 +281,8 @@ static size_t s_buffered_samples;
 static bool s_resampler_has_previous;
 static int16_t s_resampler_previous;
 static uint32_t s_resampler_next_phase;
-static unsigned pdm_blocks;
+static unsigned pdm_blocks,pdm_normalizer_resets;
+static void reset_pcm_normalizer(void) { ++pdm_normalizer_resets; }
 static int pdm_write_block(const int16_t *samples, size_t count) {
     assert(count==PDM_DMA_SAMPLES && samples[0]==123);
     for (size_t i=3;i<count;++i) assert(samples[i]==0);
@@ -492,11 +493,11 @@ int main(void) {
 
     s_buffered_samples=3; s_sample_buffer[0]=s_sample_buffer[1]=s_sample_buffer[2]=123;
     s_resampler_has_previous=true; s_resampler_previous=456; s_resampler_next_phase=789;
-    assert(tested_pdm_flush()==ESP_OK && pdm_blocks==1 && !s_buffered_samples);
+    assert(tested_pdm_flush()==ESP_OK && pdm_blocks==1 && !s_buffered_samples && pdm_normalizer_resets==1);
     assert(!s_resampler_has_previous && !s_resampler_previous && !s_resampler_next_phase);
-    assert(tested_pdm_flush()==ESP_OK && pdm_blocks==1);
+    assert(tested_pdm_flush()==ESP_OK && pdm_blocks==1 && pdm_normalizer_resets==2);
     s_buffered_samples=2; s_resampler_has_previous=true; tested_pdm_discard();
-    assert(!s_buffered_samples && !s_resampler_has_previous && pdm_blocks==1);
+    assert(!s_buffered_samples && !s_resampler_has_previous && pdm_blocks==1 && pdm_normalizer_resets==3);
     puts("PASS CYD: delayed PCM precedes EOF/error; decoder/PCM freed on EOF, Stop, OOM and failure");
     puts("PASS CYD: stale generations cannot decode/play/publish; output failure is preserved; PCM frame alignment");
     puts("PASS CYD PDM: flush final tail once with zero padding; discard/reset without replay; ASan/UBSan");

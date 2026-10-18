@@ -14,6 +14,8 @@ void native_audio_output_set_volume(uint8_t volume);
 uint8_t native_audio_output_get_volume(void);
 void native_audio_output_set_balance(int8_t balance);
 int8_t native_audio_output_get_balance(void);
+// Safe from control tasks: the output owner consumes this request before PCM.
+void native_audio_output_request_normalizer_reset(void);
 void native_audio_output_idle(void);
 // Only the output task may discard history or submit the final partial block.
 void native_audio_output_discard_pcm(void);

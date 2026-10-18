@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "variants": {
+    "pdm": "PASS normalizer: 239 packets, mono/stereo/wider layouts, immutable unaligned PCM, split identity, cached settings, owner-only reset, rate/layout/discard/EOF, scratch=512 bytes",
+    "dac": "PASS normalizer: 240 packets, mono/stereo/wider layouts, immutable unaligned PCM, split identity, cached settings, owner-only reset, rate/layout/discard/EOF, scratch=512 bytes",
+    "legacy": "PASS normalizer: 239 packets, mono/stereo/wider layouts, immutable unaligned PCM, split identity, cached settings, owner-only reset, rate/layout/discard/EOF, scratch=512 bytes"
+  },
+  "sources": {
+    "idf/esp32-cyd2usb-native/main/native_audio_output.c": "437eb652ac34b2050873aa8601a4437bf40e9df65fc3ad813c9d9dc05d8d149e",
+    "tests/native/cyd_normalizer_test.c": "9271db2aac21cf2662d8b614ba8f5a81ee649d953cecb029ff0588153e4c94c3",
+    "tests/native/cyd_normalizer_reference.cpp": "58a7ae31c48c3680e8c52f595fbcd155b67c8845f64749689553ad6076f4b395",
+    "tests/run-cyd-normalizer.py": "924e504cae5f78143b62c5cfe7212982404007a235c4d0d013418fe761775c7f",
+    "tests/run-cyd-output-gain.py": "01d5dd70a8fb4306ef0e3f1112aa0061f24ceda1fa8933c58a495466581b1c4f",
+    "idf/components/native_audio_normalizer/native_audio_normalizer.cpp": "cfa9f64eaf21707578097c144c8c8f5b6a4e165dd3139c42ce3201a300b76272",
+    "idf/components/native_audio_normalizer/native_audio_normalizer.h": "c31413d86f7cd00005a15c669aabb6e6b5862294dee2935c93a7374191d07b61",
+    "idf/components/native_audio_normalizer/CMakeLists.txt": "6acabd50971910e8e9667fe432c4be39cbede4344b1b259ef363f29b976514a8",
+    "yoRadio/src/audioI2S/AudioNormalizer.cpp": "6f63381940380c24a667cfdc6b984ea761bf87a21efcf6c9029a6fb2c52cb67e",
+    "yoRadio/src/audioI2S/AudioNormalizer.h": "56cedb155a270a8914fc87ff33126b1b57e82fbda4389743c45fe49f323f7515",
+    "idf/esp32-cyd2usb-native/CMakeLists.txt": "4c64b30264aa04f92d066e378ff691d6923f126283ff68d445e4e7f9a943f15b",
+    "idf/esp32-cyd2usb-native/main/CMakeLists.txt": "f61297f7355005df01e714eab48a5e086e07fd5e97ad246c6fdb8fb78560693d",
+    "idf/esp32-cyd2usb-native/main/native_audio_output.h": "1d8ebd89fa7b5de86bf414b085fe8ed523da7ed222f7a0a588259c4499a59e1c",
+    "idf/esp32-cyd2usb-native/main/radio_control_platform.h": "c1e8658c113bd1995fd94707acce9e743b4dc299e67eed1ed79bb4fb04632c9b"
+  },
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "scope": "Exercise actual CYD PCM producers and the shared normalizer with guarded host seams.\n\nRuns all three backend producers using immutable, unaligned PCM. The reference\nfeeds the original C3 AudioNormalizer one stereo frame at a time; production\nuses its block API through the shared C adapter and bounded scratch storage.\nDriver calls are capture seams, not physical CYD DMA or timing measurements.\n",
+  "physical_hardware": false
+}

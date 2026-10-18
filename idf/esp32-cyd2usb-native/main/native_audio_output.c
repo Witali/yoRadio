@@ -2,6 +2,7 @@
 
 #include <limits.h>
 #include <stdbool.h>
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -12,12 +13,14 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "native_audio_settings.h"
+#include "native_audio_normalizer.h"
 #include "sdkconfig.h"
 
 #define OUTPUT_PACKET_BYTES 3072
 #define SAMPLE_GAIN_SCALE 32768U
 #define VOLUME_DENOMINATOR 254U
 #define BALANCE_DENOMINATOR 16U
+#define NORMALIZER_CHUNK_FRAMES 128U
 
 static const char *const TAG = "audio_output";
 
@@ -71,6 +74,122 @@ static int16_t pcm_mono_sample(const uint8_t *frame, uint8_t channels,
     left = scale_sample_q15(left, gains->left);
     right = scale_sample_q15(right, gains->right);
     return (int16_t)(((int32_t)left + (int32_t)right) / 2);
+}
+
+typedef struct {
+    bool valid;
+    bool enabled;
+    uint8_t max_gain_db;
+    int8_t target_dbfs;
+    uint16_t time_ms;
+    uint32_t sample_rate;
+} normalizer_config_cache_t;
+
+// Only the output owner touches the cache, DSP instance and scratch. Settings
+// getters are atomic; the controller can only publish a pending reset request.
+static normalizer_config_cache_t s_normalizer_config;
+static atomic_bool s_normalizer_reset_pending;
+static uint32_t s_pcm_sample_rate = 16000U;
+static uint8_t s_pcm_channels;
+static int16_t s_normalizer_scratch[NORMALIZER_CHUNK_FRAMES * 2U];
+
+static void reset_pcm_normalizer(void) {
+    native_audio_normalizer_reset();
+    s_pcm_channels = 0;
+}
+
+static void pcm_normalizer_set_sample_rate(uint32_t sample_rate) {
+    if (sample_rate != s_pcm_sample_rate) {
+        s_pcm_sample_rate = sample_rate;
+        reset_pcm_normalizer();
+    }
+}
+
+static bool sync_normalizer_configuration(uint8_t channels) {
+    normalizer_config_cache_t next = {
+        .valid = true,
+        .enabled = native_audio_settings_get_normalization(),
+        .max_gain_db = native_audio_settings_get_normalization_gain_db(),
+        .target_dbfs = native_audio_settings_get_normalization_target_dbfs(),
+        .time_ms = native_audio_settings_get_normalization_time_ms(),
+        .sample_rate = s_pcm_sample_rate,
+    };
+    if (!s_normalizer_config.valid ||
+        next.enabled != s_normalizer_config.enabled ||
+        next.max_gain_db != s_normalizer_config.max_gain_db ||
+        next.target_dbfs != s_normalizer_config.target_dbfs ||
+        next.time_ms != s_normalizer_config.time_ms ||
+        next.sample_rate != s_normalizer_config.sample_rate) {
+        native_audio_normalizer_configure(
+            next.enabled, next.max_gain_db, next.target_dbfs, next.time_ms,
+            next.sample_rate);
+        s_normalizer_config = next;
+    }
+    bool requested = atomic_exchange(&s_normalizer_reset_pending, false);
+    if (requested || s_pcm_channels != channels) {
+        native_audio_normalizer_reset();
+    }
+    s_pcm_channels = channels;
+    return next.enabled;
+}
+
+void native_audio_output_request_normalizer_reset(void) {
+    atomic_store(&s_normalizer_reset_pending, true);
+}
+
+typedef struct {
+    const uint8_t *data;
+    size_t frame_bytes;
+    size_t frames;
+    size_t position;
+    size_t buffered_frames;
+    size_t buffered_index;
+    pcm_gains_t gains;
+    uint8_t channels;
+    bool normalize;
+} pcm_reader_t;
+
+static pcm_reader_t pcm_reader_begin(const uint8_t *data, size_t frames,
+                                      uint8_t channels) {
+    return (pcm_reader_t){
+        .data = data,
+        .frame_bytes = (size_t)channels * sizeof(int16_t),
+        .frames = frames,
+        .gains = pcm_channel_gains(channels,
+            native_audio_settings_get_volume(),
+            native_audio_settings_get_balance()),
+        .channels = channels,
+        .normalize = sync_normalizer_configuration(channels),
+    };
+}
+
+static int16_t pcm_reader_next(pcm_reader_t *reader) {
+    if (!reader->normalize) {
+        const uint8_t *frame =
+            reader->data + reader->position++ * reader->frame_bytes;
+        return pcm_mono_sample(frame, reader->channels, &reader->gains);
+    }
+
+    uint8_t normalized_channels = reader->channels > 1 ? 2 : 1;
+    if (reader->buffered_index == reader->buffered_frames) {
+        size_t chunk = reader->frames - reader->position;
+        if (chunk > NORMALIZER_CHUNK_FRAMES) chunk = NORMALIZER_CHUNK_FRAMES;
+        // Keep the decoder's PCM read-only and tolerate unaligned input.
+        // CYD's mono mixer consumes the first two channels of wider layouts.
+        for (size_t frame = 0; frame < chunk; ++frame) {
+            memcpy(s_normalizer_scratch + frame * normalized_channels,
+                   reader->data + (reader->position + frame) * reader->frame_bytes,
+                   normalized_channels * sizeof(int16_t));
+        }
+        native_audio_normalizer_process_block(
+            s_normalizer_scratch, chunk, normalized_channels);
+        reader->buffered_frames = chunk;
+        reader->buffered_index = 0;
+    }
+    const uint8_t *frame = (const uint8_t *)(s_normalizer_scratch +
+        reader->buffered_index++ * normalized_channels);
+    ++reader->position;
+    return pcm_mono_sample(frame, normalized_channels, &reader->gains);
 }
 
 #if CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_PDM
@@ -311,6 +430,7 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
         ESP_LOGI(TAG, "PDM resampler input changed to %lu Hz",
                  (unsigned long)input_sample_rate);
     }
+    pcm_normalizer_set_sample_rate(input_sample_rate);
     return ESP_OK;
 }
 
@@ -322,13 +442,10 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     }
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
-    uint8_t volume = native_audio_settings_get_volume();
-    int8_t balance = native_audio_settings_get_balance();
-    pcm_gains_t gains = pcm_channel_gains(channels, volume, balance);
+    pcm_reader_t reader = pcm_reader_begin(data, frames, channels);
     for (size_t frame = 0; frame < frames; ++frame) {
         ESP_RETURN_ON_ERROR(
-            pdm_write_resampled(pcm_mono_sample(data + frame * frame_bytes,
-                                                channels, &gains)),
+            pdm_write_resampled(pcm_reader_next(&reader)),
             TAG, "write PDM PCM");
     }
     return ESP_OK;
@@ -342,11 +459,13 @@ void native_audio_output_idle(void) {
 void native_audio_output_discard_pcm(void) {
     s_buffered_samples = 0;
     reset_resampler();
+    reset_pcm_normalizer();
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
     esp_err_t result = pdm_flush();
     reset_resampler();
+    reset_pcm_normalizer();
     return result;
 }
 
@@ -368,12 +487,16 @@ esp_err_t native_audio_output_init(void) {
 }
 
 esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
-    if (s_dac && input_sample_rate == s_dac_sample_rate) return ESP_OK;
+    if (s_dac && s_dac_sample_rate &&
+        input_sample_rate == s_dac_sample_rate) return ESP_OK;
     if (s_dac) {
         dac_continuous_disable(s_dac);
         dac_continuous_del_channels(s_dac);
         s_dac = NULL;
     }
+    // A channel is ready only after its first write succeeds. A failed prime
+    // must not make a same-rate retry skip initialization or retain old DSP.
+    s_dac_sample_rate = 0;
     dac_continuous_config_t config = {
         .chan_mask = DAC_CHANNEL_MASK_CH1,
         .desc_num = 6,
@@ -386,10 +509,14 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
     ESP_RETURN_ON_ERROR(dac_continuous_new_channels(&config, &s_dac), TAG,
                         "allocate DAC channel");
     ESP_RETURN_ON_ERROR(dac_continuous_enable(s_dac), TAG, "enable DAC");
-    s_dac_sample_rate = input_sample_rate;
     memset(s_dac_data, 0x80, 1024);
     size_t written = 0;
-    return dac_continuous_write(s_dac, s_dac_data, 1024, &written, 1000);
+    esp_err_t result = dac_continuous_write(s_dac, s_dac_data, 1024, &written, 1000);
+    if (result == ESP_OK) {
+        s_dac_sample_rate = input_sample_rate;
+        pcm_normalizer_set_sample_rate(input_sample_rate);
+    }
+    return result;
 }
 
 esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
@@ -400,13 +527,10 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     }
     size_t frame_bytes = (size_t)channels * sizeof(int16_t);
     size_t frames = size / frame_bytes;
-    uint8_t volume = native_audio_settings_get_volume();
-    int8_t balance = native_audio_settings_get_balance();
-    pcm_gains_t gains = pcm_channel_gains(channels, volume, balance);
     if (frames > OUTPUT_PACKET_BYTES) frames = OUTPUT_PACKET_BYTES;
+    pcm_reader_t reader = pcm_reader_begin(data, frames, channels);
     for (size_t frame = 0; frame < frames; ++frame) {
-        int32_t value = (pcm_mono_sample(data + frame * frame_bytes, channels,
-                                         &gains) >> 8) + 128;
+        int32_t value = (pcm_reader_next(&reader) >> 8) + 128;
         if (value < 0) value = 0;
         if (value > 255) value = 255;
         s_dac_data[frame] = (uint8_t)value;
@@ -428,9 +552,11 @@ const char *native_audio_output_name(void) {
 
 void native_audio_output_discard_pcm(void) {
     // Continuous DAC has no software PCM tail or resampler history.
+    reset_pcm_normalizer();
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
+    reset_pcm_normalizer();
     return ESP_OK;
 }
 
@@ -526,6 +652,7 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
         ESP_LOGI(TAG, "Legacy DAC input %lu Hz, x%u output %lu Hz",
                  (unsigned long)input_sample_rate, LEGACY_OVERSAMPLE_FACTOR,
                  (unsigned long)output_sample_rate);
+        pcm_normalizer_set_sample_rate(input_sample_rate);
         return ESP_OK;
     }
 
@@ -559,6 +686,7 @@ esp_err_t native_audio_output_configure(uint32_t input_sample_rate) {
              "on GPIO26",
              (unsigned long)input_sample_rate, LEGACY_OVERSAMPLE_FACTOR,
              (unsigned long)output_sample_rate);
+    pcm_normalizer_set_sample_rate(input_sample_rate);
     return ESP_OK;
 }
 
@@ -573,12 +701,9 @@ esp_err_t native_audio_output_write_pcm(const uint8_t *data, size_t size,
     size_t frames = size / frame_bytes;
     size_t capacity = LEGACY_OUTPUT_BYTES / sizeof(uint32_t);
     size_t buffered = 0;
-    uint8_t volume = native_audio_settings_get_volume();
-    int8_t balance = native_audio_settings_get_balance();
-    pcm_gains_t gains = pcm_channel_gains(channels, volume, balance);
+    pcm_reader_t reader = pcm_reader_begin(data, frames, channels);
     for (size_t frame = 0; frame < frames; ++frame) {
-        int16_t pcm = pcm_mono_sample(data + frame * frame_bytes, channels,
-                                      &gains);
+        int16_t pcm = pcm_reader_next(&reader);
         for (uint32_t phase = 0; phase < LEGACY_OVERSAMPLE_FACTOR; ++phase) {
             uint8_t code = legacy_fractional_dac_step(pcm);
             s_legacy_frames[buffered++] = legacy_pack_dac_code(code);
@@ -606,11 +731,13 @@ const char *native_audio_output_name(void) {
 
 void native_audio_output_discard_pcm(void) {
     s_legacy_fractional_error = 0;
+    reset_pcm_normalizer();
 }
 
 esp_err_t native_audio_output_flush_pcm(void) {
     // Each legacy write submits its complete on-the-fly conversion.
     s_legacy_fractional_error = 0;
+    reset_pcm_normalizer();
     return ESP_OK;
 }
 

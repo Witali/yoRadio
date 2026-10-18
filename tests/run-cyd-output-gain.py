@@ -48,7 +48,8 @@ static uint32_t channel_gain_q15(uint8_t volume, uint8_t balance) {
 static pcm_gains_t pcm_channel_gains(''', 1)
     constants = ''
     for name in ('OUTPUT_PACKET_BYTES', 'SAMPLE_GAIN_SCALE', 'VOLUME_DENOMINATOR',
-                 'BALANCE_DENOMINATOR', 'LEGACY_OUTPUT_BYTES', 'LEGACY_OVERSAMPLE_FACTOR'):
+                 'BALANCE_DENOMINATOR', 'NORMALIZER_CHUNK_FRAMES',
+                 'LEGACY_OUTPUT_BYTES', 'LEGACY_OVERSAMPLE_FACTOR'):
         constants += re.search(r'^#define ' + name + r'[^\n]+', source, re.M).group(0) + '\n'
     branches = {
         'pdm': source.split('#if CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_PDM', 1)[1]
