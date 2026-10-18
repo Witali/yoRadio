@@ -2849,3 +2849,20 @@ true. Это только начало нового прогона, не 24 ча
 - Новый H10 BC68/20B запущен12:30:54UTC: supervisor23548/workload5036/
  guard22392/VM18128. CIM подтверждает все4идентичности и отсутствие4oldPID.
  Start record хранит31runtime и11frozenQEMU inputs; это start/pending, не H10 pass.
+
+### 2026-10-18 — воспроизводимый browser/Canvas/raw photo gate
+
+- Browser Use и Node REPL не инициализировались (kernel assets os error3).
+  Реальная проверка выполнена установленным Chrome155/Playwright через CLI
+  на собственной disposable BC68/20B ВМ с raw backing, без внешней сети.
+- Оба Chrome/VM процесса подтвердили точный generated photo HTML.23browser
+  checks и6storage checks pass: pointer shrink/grow, выбранные blue/yellow RGB,
+  240×240baselineJPEG безAPP/COM, source synthetic metadata, Cancel/Escape,
+  mobileviewport390×844,47773bytes noise/12chunks, cold exact JPEG readback.
+- QMP подтвердил writable raw backing, slots1–3 и executable/static flash
+  области неизменны. По одному ROMboot на каждый новый VM identity, panic нет;
+ 26inputs совпали, console warnings/errors=[]; Chrome/VM закрыты.
+- Созданы browser_photo_qemu.py и browser_photo_flow.mjs; final proof
+  browser-photo-validation-20261018.json +5rawgzip+2PNG. Первый development
+  run также pass; final добавляет source tags и explicit ROM/VM identities.
+  Production не менялся, frozen full533 и active H10 не редактировались.

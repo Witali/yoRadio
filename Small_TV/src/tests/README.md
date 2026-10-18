@@ -1,5 +1,26 @@
 # Функциональные тесты Small TV ESP32-C2
 
+## Настоящий браузер и фото в QEMU
+
+`browser_photo_qemu.py` управляет отдельной writable ВМ и двумя холодными
+процессами Chrome через `browser_photo_flow.mjs`. Передавайте абсолютные пути
+`--qemu-root`, `--dependency-root`, `--node`, `--playwright-modules` (каталог
+node_modules с установленным Playwright), `--browser-executable` и новый
+`--output`. Используются только существующие локальные зависимости и
+синтетические цветные/шумовые изображения с фиктивными EXIF/APP/COM tags.
+
+Проверяются реальные mouse pointer events уменьшения/растягивания рамки,
+ползунки и выбранные RGB pixels, JPEG240×240 без metadata, Cancel/Escape,
+390×844 viewport, настоящие12multipart chunks и два cold process readback.
+QMP подтверждает raw backing; HTTP-байты совпадают с photo banks. Защищённые
+flash intervals и slots1–3 остаются прежними. Для каждого процесса сохраняется
+отдельный UART с одним ROM boot; все inputs проверяются после выполнения.
+
+Результат текущих BC68/20B: [browser-photo-validation-20261018.json](../../qemu/parity/browser-photo-validation-20261018.json).
+Это отдельная browser/Canvas/storage проверка: физический touchscreen, RF,
+полные LCD frames и H10 требуют своей evidence. Уже идущий frozen full suite
+этот новый standalone gate задним числом не получает.
+
 `raw_flash_observer_test.py` содержит5проверок чтения raw настроек: erased/partial
 ASCII остаётся pending, точный максимальный key читается полностью, неверный key
 не проходит, native dirty flag должен быть нулём до и после чтения файла. Внешний

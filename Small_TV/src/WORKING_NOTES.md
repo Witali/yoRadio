@@ -7,6 +7,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## AP memory comparison — 2026-10-18
 
+Browser/Canvas/photo gate добавлен в отдельной ветке codex/small-tv-browser-photo,
+production C и development firmware неизменны (BC68/4FDE/source5586, QEMU20B).
+Настоящий Chrome155 прошёл23browser+6storage checks: рамка мышью shrink/grow,
+RGB выбранных blue/yellow областей,240×240безAPP/COM, Cancel/Escape,390×844,
+noise47773bytes/12actual multipart chunks, HTTP/raw bank equality и новый cold
+процесс с точными обоими JPEG. По одному ROM boot на процесс; console/errors=[],
+26inputs unchanged. Proof browser-photo-validation-20261018.json +5gzip+2PNG.
+Это standalone gate, не часть уже замороженного full533 и не H10/physical test.
+Браузерные REPL инструменты дали kernel-assets os error3; использованы уже
+установленные headlessChrome/Playwright через CLI, без сторонних загрузок.
+
 Текущий H10: appBC68/ELF4FDE/QEMU20B стартовал12:30:54UTC в независимой
 ветке codex/small-tv-h10-ap-services. Supervisor23548, workload5036, guard22392,
 VM18128/SmallTV-f65d8d848a9a. Все4идентичности подтверждены CIM;31runtime и11
