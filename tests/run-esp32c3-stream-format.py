@@ -50,7 +50,7 @@ size_t strlcpy(char *, const char *, size_t);
     web = (MAIN / "websocket_service.c").read_text()
     app = (MAIN / "app_main.c").read_text()
     types = audio[audio.index("typedef struct {\n    uint32_t generation;\n    uint32_t sample_rate;"):
-                  audio.index("typedef struct {\n    int64_t started_us;")]
+                  audio.index("#ifdef YORADIO_CODEC_BENCHMARK", audio.index("} decode_stats_t;"))]
     callbacks = audio[audio.index("static bool update_stream_info("):
                       audio.index("static void decoder_task(")]
     ws_key = web[web.index("typedef struct {"):web.index("} webui_status_key_t;") + len("} webui_status_key_t;")]

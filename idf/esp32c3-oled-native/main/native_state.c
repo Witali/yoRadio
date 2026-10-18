@@ -32,6 +32,7 @@ void native_state_set_wifi_rssi(native_state_t *state, int8_t rssi) {
 
 static void clear_stream_info(native_state_t *state) {
     state->bitrate_kbps = 0;
+    state->bitrate_source = NATIVE_BITRATE_NONE;
     state->sample_rate_hz = 0;
     state->channels = 0;
     state->bits_per_sample = 0;
@@ -98,10 +99,23 @@ void native_state_set_connecting(native_state_t *state, uint32_t generation) {
 
 void native_state_set_bitrate(native_state_t *state, uint32_t generation,
                               uint32_t bitrate_kbps) {
-    if (!state || !state->lock) return;
-    if (xSemaphoreTake(state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
-        if (state->audio_generation == generation)
+    native_state_publish_bitrate(state, generation, bitrate_kbps,
+                                 NATIVE_BITRATE_DECODER);
+}
+
+void native_state_publish_bitrate(native_state_t *state, uint32_t generation,
+                                  uint32_t bitrate_kbps,
+                                  native_bitrate_source_t source) {
+    if (!state || !state->lock || !bitrate_kbps ||
+        source < NATIVE_BITRATE_ICY || source > NATIVE_BITRATE_MEASURED) return;
+    // Source priority and stream identity form one publication transaction.
+    // A delayed decoder or old stream must not invalidate a measured result.
+    if (xSemaphoreTake(state->lock, portMAX_DELAY) == pdTRUE) {
+        if (state->audio_generation == generation &&
+            source >= state->bitrate_source) {
             state->bitrate_kbps = bitrate_kbps;
+            state->bitrate_source = source;
+        }
         xSemaphoreGive(state->lock);
     }
 }

@@ -22,6 +22,7 @@
 #include "esp_http_client.h"
 #include "stream_http_reader.h"
 #include "stream_probe.h"
+#include "stream_bitrate.h"
 #ifdef CONFIG_YORADIO_HTTP_RELEASE_REQUEST_BUFFER
 #include "http_request_buffer.h"
 #endif
@@ -74,7 +75,6 @@ _Static_assert(STREAM_READ_SIZE > 0 && STREAM_READ_SIZE <= STREAM_CHUNK_SIZE,
 #define MAX_HTTP_REDIRECTS 5
 #define DECODE_STATS_INTERVAL_US 5000000LL
 #define BITRATE_UPDATE_INTERVAL_US 1000000LL
-#define STREAM_BITRATE_INTERVAL_US 5000000LL
 #define STREAM_RETRY_INITIAL_MS 1000U
 #define STREAM_RETRY_MAX_MS 30000U
 #define STREAM_RETRY_POLL_MS 100U
@@ -147,11 +147,6 @@ typedef struct {
 #endif
 } decode_stats_t;
 
-typedef struct {
-    int64_t started_us;
-    uint64_t audio_bytes;
-} stream_bitrate_meter_t;
-
 #ifdef YORADIO_CODEC_BENCHMARK
 typedef struct {
     uint32_t magic;
@@ -199,8 +194,9 @@ static native_codec_t s_last_codec;
 // Decoder callbacks run only in decoder_task. These fields rate-limit VBR
 // updates without requiring another lock on the single-core C3.
 static uint32_t s_published_bitrate_bps;
+static uint32_t s_published_bitrate_generation;
 static int64_t s_bitrate_updated_us;
-static atomic_bool s_measured_bitrate_ready;
+static bool s_bitrate_published;
 // One stream task owns the bounded incremental metadata parser.
 static icy_title_parser_t s_icy_title;
 _Static_assert(ICY_TITLE_CAPACITY == sizeof(((native_state_t *)0)->title),
@@ -587,43 +583,38 @@ static inline uint8_t finish_stream_audio(uint32_t generation, native_codec_t *c
 static void stream_bitrate_add(uint32_t generation,
                                stream_bitrate_meter_t *meter,
                                size_t audio_bytes) {
-    if (!meter || !audio_bytes) return;
-    int64_t now_us = esp_timer_get_time();
-    if (!meter->started_us) meter->started_us = now_us;
-    meter->audio_bytes += audio_bytes;
-    int64_t elapsed_us = now_us - meter->started_us;
-    if (elapsed_us < STREAM_BITRATE_INTERVAL_US) return;
-
-    uint64_t bitrate = meter->audio_bytes * 8000000ULL /
-                       (uint64_t)elapsed_us;
-    if (bitrate && bitrate <= UINT32_MAX &&
-        generation == atomic_load(&s_generation)) {
-        atomic_store(&s_measured_bitrate_ready, true);
-        native_state_set_bitrate(s_state, generation,
-                                 ((uint32_t)bitrate + 500U) / 1000U);
-        ESP_LOGI(TAG, "Measured stream bitrate: %llu bit/s",
-                 (unsigned long long)bitrate);
+    uint32_t bitrate_kbps = stream_bitrate_meter_add(
+        meter, audio_bytes, esp_timer_get_time());
+    if (bitrate_kbps) {
+        native_state_publish_bitrate(s_state, generation, bitrate_kbps,
+                                     NATIVE_BITRATE_MEASURED);
+        ESP_LOGI(TAG, "Measured stream bitrate: %lu kbit/s",
+                 (unsigned long)bitrate_kbps);
     }
-    meter->started_us = now_us;
-    meter->audio_bytes = 0;
 }
 
 static void reset_decoder_bitrate_tracking(void) {
     s_published_bitrate_bps = 0;
+    s_published_bitrate_generation = 0;
     s_bitrate_updated_us = 0;
+    s_bitrate_published = false;
 }
 
 static void state_set_decoder_bitrate(uint32_t generation, uint32_t bitrate_bps) {
-    if (!bitrate_bps || atomic_load(&s_measured_bitrate_ready)) return;
-    if (bitrate_bps == s_published_bitrate_bps) return;
+    if (!bitrate_bps || generation != atomic_load(&s_generation)) return;
     int64_t now_us = esp_timer_get_time();
-    if (s_bitrate_updated_us &&
-        now_us - s_bitrate_updated_us < BITRATE_UPDATE_INTERVAL_US) {
-        return;
+    if (s_bitrate_published && generation == s_published_bitrate_generation) {
+        if (bitrate_bps == s_published_bitrate_bps) return;
+        if (now_us >= s_bitrate_updated_us &&
+            now_us - s_bitrate_updated_us < BITRATE_UPDATE_INTERVAL_US) return;
     }
     s_published_bitrate_bps = bitrate_bps;
+    s_published_bitrate_generation = generation;
     s_bitrate_updated_us = now_us;
-    native_state_set_bitrate(s_state, generation, (bitrate_bps + 500U) / 1000U);
+    s_bitrate_published = true;
+    native_state_publish_bitrate(s_state, generation,
+        (uint32_t)(((uint64_t)bitrate_bps + 500U) / 1000U),
+        NATIVE_BITRATE_DECODER);
     ESP_LOGI(TAG, "Decoder bitrate: %lu bit/s",
              (unsigned long)bitrate_bps);
 }
@@ -883,7 +874,8 @@ static void stream_task(void *argument) {
             unsigned long icy_bitrate =
                 strtoul(icy_bitrate_text, NULL, 10);
             if (icy_bitrate > 0 && icy_bitrate <= UINT32_MAX) {
-                native_state_set_bitrate(s_state, command.generation, (uint32_t)icy_bitrate);
+                native_state_publish_bitrate(s_state, command.generation,
+                    (uint32_t)icy_bitrate, NATIVE_BITRATE_ICY);
                 ESP_LOGI(TAG, "ICY bitrate: %lu kbit/s", icy_bitrate);
             }
         }
@@ -899,9 +891,7 @@ static void stream_task(void *argument) {
         bool stream_read_failed = false;
         bool stream_unavailable = false;
         int64_t last_stream_data_us = esp_timer_get_time();
-        stream_bitrate_meter_t bitrate_meter = {
-            .started_us = esp_timer_get_time(),
-        };
+        stream_bitrate_meter_t bitrate_meter = {0};
         stream_http_reader_t reader = {0};
 #ifdef YORADIO_INPUT_EXPANSION_ENABLED
         bool input_growth_attempted = false;
@@ -2026,7 +2016,6 @@ esp_err_t audio_service_start(native_state_t *state) {
 #if CONFIG_YORADIO_AAC_INPUT_EXTRA_SLOTS > 0
     atomic_init(&s_aac_input_ready_generation, 0);
 #endif
-    atomic_init(&s_measured_bitrate_ready, false);
     s_last_url[0] = '\0';
     s_last_codec = NATIVE_CODEC_AUTO;
     size_t encoded_ring_size =
@@ -2099,7 +2088,6 @@ static esp_err_t play_locked(const char *url, native_codec_t codec) {
     strlcpy(command.url, url, sizeof(command.url));
     strlcpy(s_last_url, url, sizeof(s_last_url));
     s_last_codec = codec;
-    atomic_store(&s_measured_bitrate_ready, false);
     native_state_set_station(s_state, url);
     // Clear a previous station's playing state before the command is queued.
     // The stream task switches it back after open_stream() succeeds.
@@ -2141,7 +2129,6 @@ static esp_err_t audio_service_play_fixture(size_t size,
     };
     s_last_url[0] = '\0';
     s_last_codec = NATIVE_CODEC_AUTO;
-    atomic_store(&s_measured_bitrate_ready, false);
     native_state_set_station(s_state, "flash:codec_test benchmark");
     esp_err_t result = xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK : ESP_FAIL;
     xSemaphoreGive(s_control_lock);

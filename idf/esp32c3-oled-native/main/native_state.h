@@ -14,6 +14,13 @@ typedef enum {
     NATIVE_NETWORK_ERROR,
 } native_network_mode_t;
 
+typedef enum {
+    NATIVE_BITRATE_NONE = 0,
+    NATIVE_BITRATE_ICY,
+    NATIVE_BITRATE_DECODER,
+    NATIVE_BITRATE_MEASURED,
+} native_bitrate_source_t;
+
 typedef struct {
     SemaphoreHandle_t lock;
     native_network_mode_t network_mode;
@@ -23,6 +30,7 @@ typedef struct {
     int8_t wifi_rssi;
     uint32_t ipv4;
     uint32_t bitrate_kbps;
+    native_bitrate_source_t bitrate_source;
     uint32_t sample_rate_hz;
     uint8_t channels;
     uint8_t bits_per_sample;
@@ -58,6 +66,9 @@ void native_state_set_audio(native_state_t *state, uint32_t generation,
                             bool running, const char *status);
 void native_state_set_bitrate(native_state_t *state, uint32_t generation,
                               uint32_t bitrate_kbps);
+void native_state_publish_bitrate(native_state_t *state, uint32_t generation,
+                                  uint32_t bitrate_kbps,
+                                  native_bitrate_source_t source);
 void native_state_set_pending(native_state_t *state, uint32_t generation, bool pending);
 void native_state_set_connecting(native_state_t *state, uint32_t generation);
 // Returns true only when the current generation's confirmed format changes.
