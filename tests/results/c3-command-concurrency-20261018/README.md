@@ -21,3 +21,9 @@ Existing source/settings contracts pass; the previously found title-race test
 also passes. The changed C3 audio module completes targeted clang-tidy with the
 same reviewed profile; complete project baselines remain in the
 [analysis campaign](../native-lint-20261018/).
+
+The tested-radio production build of source `112c871f` passes. The saved
+1,474,480-byte [application](../../../firmware/development/esp32c3-oled-native-command-fix/app.bin)
+and [manifest/config](../../../firmware/development/esp32c3-oled-native-command-fix/manifest.json)
+have a clean application descriptor and a verified embedded ELF hash.
+No flashing or physical acceptance was performed.
