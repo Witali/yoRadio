@@ -164,3 +164,9 @@ Shared radio/storage integration is checked by full
 file transaction implementation has no findings. The copied donor index seek
 expression needs an explicit bounded signed calculation; diagnostic-only timing
 used by quiet logs remains a dead-store triage item.
+
+After cache validation and atomic connecting follow-up, complete
+[CYD](../tests/results/native-lint-20261018/cyd-cache-pending/report.json) and
+[C3](../tests/results/native-lint-20261018/c3-cache-pending/report.json) runs have
+18/50 units, 11/97 warnings and zero errors. Explicit bounds/signed arithmetic
+resolve the index seek conversion. Previous reports remain preserved.

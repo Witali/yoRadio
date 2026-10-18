@@ -21,3 +21,16 @@ paths continue to clear pending.
 
 All campaigns use ASan/UBSan with documented platform seams. This corrects the
 software state contract; physical connection timing has not been measured.
+
+Both pinned SDK/GCC builds from clean `beb28939` pass:
+[CYD PDM](../../../firmware/development/esp32-cyd2usb-native-pending-fix-pdm/manifest.json)
+1,378,208 bytes; [C3 tested radio](../../../firmware/development/esp32c3-oled-native-pending-fix/manifest.json)
+1,475,568 bytes. Manifest hashes match each image and its embedded ELF digest.
+These images include the preceding cache validator; existing SDK values remain
+unchanged. They supersede the earlier radio/cache checkpoints for pending tests.
+
+Full [CYD](../native-lint-20261018/cyd-cache-pending/report.json) and
+[C3](../native-lint-20261018/c3-cache-pending/report.json) static reruns complete
+18/50 own units with 11/97 warnings and zero errors. The bounded signed index
+seek expression removes the prior conservative conversion warning. Remaining
+findings retain their review queue; no analyzer checks were disabled.
