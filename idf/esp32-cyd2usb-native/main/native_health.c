@@ -49,10 +49,14 @@ void native_health_stream_failure(uint32_t generation, uint32_t completion, int3
     portEXIT_CRITICAL(&s_health_lock);
 }
 
-void native_health_output_failure(uint32_t generation, int32_t result) {
+void native_health_output_failure(uint32_t generation, native_health_output_stage_t stage, int32_t result) {
     portENTER_CRITICAL(&s_health_lock);
     ++s_health.faults.output_failures;
     s_health.faults.output_generation = generation;
+    s_health.faults.output_stage = (uint32_t)stage;
+    if (stage==NATIVE_HEALTH_OUTPUT_WRITE) ++s_health.faults.output_write_errors;
+    if (stage==NATIVE_HEALTH_OUTPUT_CONFIGURE) ++s_health.faults.output_configure_errors;
+    if (stage==NATIVE_HEALTH_OUTPUT_FLUSH) ++s_health.faults.output_flush_errors;
     s_health.faults.output_result = result;
     portEXIT_CRITICAL(&s_health_lock);
 }

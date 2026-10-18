@@ -7,6 +7,8 @@ set(NATIVE_SRCS
   "cyd_display.c"
   "native_audio_output.c"
   "native_state.c"
+  "native_health.c"
+  "native_health_json.c"
   "network_service.c"
   "web_service.c")
 
@@ -41,6 +43,7 @@ idf_component_register(
     esp_lcd
     esp_netif
     esp_timer
+    esp_system
     esp_wifi
     esp_ringbuf
     mbedtls

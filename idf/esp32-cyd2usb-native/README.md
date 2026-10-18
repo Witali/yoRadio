@@ -56,6 +56,7 @@ The first native port exposes small endpoints independently of the legacy
 Arduino WebSocket protocol:
 
 - `GET /api/native/status`
+- `GET /api/native/health`
 - `POST /api/native/reconnect`
 - `POST /api/native/play?codec=auto` with the stream URL as request body
 - `POST /api/native/stop`
@@ -159,3 +160,21 @@ failure. Startup control replay bypasses it to preserve producer progress;
 same-connection codec drain does not restart it. Tests in
 `tests/run-cyd-prefill.py` and the six lifecycle variants cover these paths,
 including coarse tick conversion and returning the retained input on Stop.
+
+The health endpoint reports a boot/session ID, uptime/reset reason, free/minimum
+heap and largest blocks, internal/DMA capability views, cumulative allocation,
+stream, decoder and output faults, and leased input occupancy. Capability views
+overlap and must not be added. Encoded payload-byte counts exclude packet
+headers and startup/control storage; retained input is not a duration estimate.
+Output configuration, PCM write and final flush errors have separate counters.
+Quiet mode allocates no health sampler task and returns `null` for CPU/stack
+measurements that were not collected.
+
+`YORADIO_NATIVE_DIAGNOSTICS` enables a 4 KiB sampler task and FreeRTOS runtime
+statistics with the global ESP timer. Per-core CPU comes from both idle tasks;
+overall CPU averages the cores, while task percentages use one core's capacity.
+Only registered handles and SDK-copied numbers are read after a task snapshot,
+including the task number to reject reused handles. Diagnostic IPC accounts for
+the other core's cached runtime before sampling. This profile's sampling, stack
+survey and IPC overhead need separate hardware measurements; no C3 IRAM/ISR
+or DMA timing assumptions are used as CYD acceptance evidence.

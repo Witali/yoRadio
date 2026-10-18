@@ -18,6 +18,12 @@ typedef enum {
     NATIVE_HEALTH_PCM,
 } native_health_decoder_stage_t;
 
+typedef enum {
+    NATIVE_HEALTH_OUTPUT_CONFIGURE = 1,
+    NATIVE_HEALTH_OUTPUT_WRITE,
+    NATIVE_HEALTH_OUTPUT_FLUSH,
+} native_health_output_stage_t;
+
 typedef struct {
     uint32_t allocation_failures, allocation_size, allocation_caps;
     uint32_t decoder_failures, decoder_generation, decoder_codec, decoder_stage;
@@ -25,7 +31,8 @@ typedef struct {
     uint32_t decoder_completion, decoder_input_bytes, decoder_allocation_sequence;
     uint32_t stream_failures, stream_generation, stream_completion;
     int32_t stream_result;
-    uint32_t output_failures, output_generation;
+    uint32_t output_failures, output_generation, output_stage;
+    uint32_t output_write_errors, output_configure_errors, output_flush_errors;
     int32_t output_result;
 } native_health_faults_t;
 
@@ -58,6 +65,7 @@ typedef struct {
 typedef struct {
     uint64_t boot_id, uptime_ms;
     uint32_t reset_reason, heap_free, heap_largest, heap_minimum, tasks, cores;
+    uint32_t internal_free, internal_largest, dma_free, dma_largest;
     native_input_health_t input;
 } native_health_runtime_t;
 
@@ -72,5 +80,5 @@ void native_health_decoder_failure(uint32_t generation, uint32_t codec,
     native_health_decoder_stage_t stage, int32_t result, uint32_t completion,
     uint32_t input_bytes);
 void native_health_stream_failure(uint32_t generation, uint32_t completion, int32_t result);
-void native_health_output_failure(uint32_t generation, int32_t result);
+void native_health_output_failure(uint32_t generation, native_health_output_stage_t stage, int32_t result);
 native_health_snapshot_t native_health_snapshot(void);

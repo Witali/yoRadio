@@ -1,5 +1,16 @@
 menu "yoRadio native firmware"
 
+    config YORADIO_NATIVE_DIAGNOSTICS
+        bool "Diagnostic two-core CPU and stack sampler"
+        depends on !FREERTOS_UNICORE
+        select FREERTOS_GENERATE_RUN_TIME_STATS
+        default n
+        help
+            Add a 4096-byte sampler task, task snapshots and occasional IPC
+            every five seconds. Use the global ESP timer runtime clock.
+            Quiet builds retain only cumulative fault counters and on-demand
+            heap/input health. Diagnostic overhead needs board qualification.
+
     config YORADIO_ADAPTIVE_INPUT_BUFFER
         bool "Leased compressed input queue"
         default y

@@ -40,7 +40,7 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-02 | Программная часть выполнена | Общие probe/ID3/ICY/JSON helpers подключены к CYD, HTTP startup ограничен общим deadline и числом redirects; fatal TLS/partial bytes и raw EOF проверены на реальном HTTP-парсере обоих SDK. Host/санитайзеры проходят; физическая сеть отдельно. |
 | CYD-C3-03 | Программная часть выполнена | CYD подключён к continuous MP3/ADTS confirmation, ID3 stripping/recovery и ordered codec drain. 34 corpus cases обеих целей, byte-exact переходы и шесть lifecycle вариантов проходят. PDM/continuous/legacy CYD и C3 source `8bf1d73a` собраны и сохранены. Физическая приёмка отдельно. |
 | CYD-C3-04 | Программная часть выполнена | Общая SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 и независимый control node подключены. Default-off bounded prefill проверен host-тестами и GCC/clang-tidy профилем 250 ms; image source `112c871f` сохранён. Физическая приёмка и выбор ёмкости/TLS reclaim — отдельно, этап 13. |
-| CYD-C3-05 | В работе | Подготовлен SMP-safe health модуль, bounded JSON и optional CPU sampler для обоих ядер; 60000 concurrent events, 32/64-bit counters, task lifetime и JSON bounds проходят host-проверки. Подключение к pipeline/HTTP и SDK-сборки — следующие шаги. Backend DMA telemetry отдельно. |
+| CYD-C3-05 | В работе | SMP-safe health подключён к pipeline и `/api/native/health`: heap/internal/DMA, input occupancy, ошибки, optional CPU/stack по двум ядрам. Host core/HTTP/lifecycle проверки проходят. SDK quiet/diagnostic сборки и lint — следующий шаг; backend DMA telemetry и физические измерения отдельно. |
 | CYD-C3-06 | Открыт | Общая модель radio/settings, CSV offset index и recovery, станции Next/Prev, корректный format/bitrate/title. Повторный boot и fault injection без потери файлов. |
 | CYD-C3-07 | Открыт | WebSocket snapshot/events, динамические страницы, capabilities, async static workers, bounded uploads. Две вкладки, медленный клиент, reconnect и rollback файлов. |
 | CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
@@ -243,3 +243,9 @@ allocation и численные настройки C3 являются канд
   concurrent snapshots, wrap, handle reuse, отсутствие снимка/IPC, startup OOM,
   worst-case JSON и все capacity bounds. Pipeline/HTTP wiring и реальная
   SDK-проверка ещё впереди; это не измерение CPU физической CYD.
+- Health wiring: ошибки decoder записываются до cleanup, output configure /
+  write / final flush имеют отдельные counters. GET не сбрасывает faults и не
+  меняет state; input payload bytes исключают packet headers и control leases.
+  Internal/DMA heap views пересекаются. Optional CPU/stack остаются `null` в
+  quiet build; профилирование не добавляет задачу по умолчанию.
+  [Интеграционные host-отчёты](../tests/results/cyd-health-integration-20261018/README.md).

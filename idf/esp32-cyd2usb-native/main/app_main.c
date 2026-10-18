@@ -10,6 +10,7 @@
 #include "freertos/task.h"
 #include "native_audio_settings.h"
 #include "native_state.h"
+#include "native_health.h"
 #include "network_service.h"
 #include "nvs_flash.h"
 #include "web_service.h"
@@ -90,6 +91,7 @@ static void network_task(void *argument) {
 
 void app_main(void) {
     ESP_LOGI(TAG, "Starting pure ESP-IDF yoRadio (Arduino-free)");
+    if (!native_health_start()) ESP_LOGW(TAG, "Health sampler initialization failed");
     native_state_init(&s_state);
 
     esp_err_t result = nvs_flash_init();

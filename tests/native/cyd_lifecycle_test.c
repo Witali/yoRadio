@@ -8,6 +8,7 @@
 #include "native_state.h"
 #include "audio_completion.h"
 #include "stream_probe.h"
+#include "native_health.h"
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
 #include "adaptive_input.h"
 #endif
@@ -45,19 +46,26 @@ static void (*receive_hook)(void);
 static atomic_uint s_generation;
 static unsigned open_handles, opens, closes, writes, flushes, discards;
 static unsigned eos_frames;
-static bool fail_open, fail_realloc, fail_process, fail_write, cancel_acquire;
+static bool fail_open, fail_realloc, fail_process, fail_write, fail_flush, fail_config, cancel_acquire;
+static unsigned health_decoder_faults,health_output_faults;
+static native_health_decoder_stage_t health_decoder_stage;
+static int32_t health_decoder_result;
+static native_health_output_stage_t health_output_stage;
 static uint32_t active_generation;
 static uint8_t last_sample;
 static unsigned prefill_queries;
 static bool cancel_prefill;
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+static bool short_input_stats;
+#endif
 #ifdef CONFIG_YORADIO_STREAM_CONFIRM
 static void *s_start_control;
 #endif
 static int64_t esp_timer_get_time(void) {return 0;}
 static void vTaskDelay(unsigned ticks) {(void)ticks;assert(false);}
 static void native_audio_output_discard_pcm(void) { ++discards; }
-static int native_audio_output_flush_pcm(void) { ++flushes; return ESP_OK; }
-static int native_audio_output_configure(uint32_t rate) { assert(rate == 48000); return ESP_OK; }
+static int native_audio_output_flush_pcm(void) { ++flushes; return fail_flush ? ESP_FAIL : ESP_OK; }
+static int native_audio_output_configure(uint32_t rate) { assert(rate == 48000); return fail_config ? ESP_FAIL : ESP_OK; }
 static const char *native_audio_output_name(void) { return "test"; }
 static void native_audio_output_idle(void) {}
 static void audio_level_led_update_peak(int peak) { (void)peak; }
@@ -138,6 +146,17 @@ static void *xRingbufferReceive(void *ring, size_t *size, unsigned wait) {
 static void vRingbufferReturnItem(void *ring, void *p) { (void)ring; free(p); }
 static int xQueueOverwrite(void *q, const void *p);
 
+void native_health_decoder_failure(uint32_t gen,uint32_t codec,native_health_decoder_stage_t stage,
+                                   int32_t result,uint32_t reason,uint32_t bytes) {
+    assert(gen==atomic_load(&s_generation) && codec && reason && bytes<=3);
+    if(stage==NATIVE_HEALTH_PROCESS)assert(open_handles==1); // Record before decoder cleanup.
+    ++health_decoder_faults;health_decoder_stage=stage;health_decoder_result=result;
+}
+void native_health_output_failure(uint32_t gen,native_health_output_stage_t stage,int32_t result) {
+    assert(gen==atomic_load(&s_generation) && result==ESP_FAIL);++health_output_faults;
+    health_output_stage=stage;
+}
+
 size_t strlcpy(char *to, const char *from, size_t capacity) {
     size_t n=strlen(from); if (capacity) { size_t copy=n<capacity-1?n:capacity-1; memcpy(to,from,copy); to[copy]=0; } return n;
 }
@@ -164,7 +183,10 @@ bool adaptive_input_return(adaptive_input_t *q,void *p) {vRingbufferReturnItem(q
 adaptive_input_stats_t adaptive_input_stats(adaptive_input_t *q) {
     assert(q==s_encoded);++prefill_queries;
     if (cancel_prefill) {cancel_prefill=false;audio_service_stop();}
-    return (adaptive_input_stats_t){.resident=8,.occupied=8};
+    return (adaptive_input_stats_t){.resident=8,.minimum=4,.target=8,.limit=8,.occupied=8,
+        .ready=2,.reading=1,.writing=5,
+        .ready_bytes=short_input_stats ? 1 : 2*sizeof(encoded_packet_t)+96,
+        .reading_bytes=short_input_stats ? 0 : sizeof(encoded_packet_t)+24};
 }
 #endif
 
@@ -180,8 +202,12 @@ static void begin(unsigned gen) {
     assert(!open_handles);
     encoded=(test_ring_t){0}; pcm=(test_ring_t){0}; empty_hook=receive_hook=NULL;
     opens=closes=writes=flushes=discards=0;
-    fail_open=fail_realloc=fail_process=fail_write=cancel_acquire=false;
+    fail_open=fail_realloc=fail_process=fail_write=fail_flush=fail_config=cancel_acquire=false;
+    health_decoder_faults=health_output_faults=0;
     cancel_prefill=false;prefill_queries=0;
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    short_input_stats=false;
+#endif
     s_state=&state; s_commands=(void *)3; s_encoded=(void *)&encoded; s_pcm=&pcm;
 #ifdef CONFIG_YORADIO_STREAM_CONFIRM
     s_encoded_control_attached=true;
@@ -248,6 +274,7 @@ int main(void) {
     begin(1); input(1,AUDIO_CONTINUE,3); input(1,AUDIO_END_EOF,0);
     run_task(decoder_task);
     assert(opens==1 && closes==1 && !open_handles && state.audio_running);
+    assert(!health_decoder_faults);
     assert(pcm.used==4); // Initial PCM, two cached EOS packets, terminal marker.
     run_task(output_task);
     assert(writes==3 && last_sample==0xee && flushes==1 && !state.audio_running);
@@ -267,11 +294,18 @@ int main(void) {
 
     begin(5); input(5,AUDIO_CONTINUE,3); empty_hook=fail_next_decode;
     run_task(decoder_task); assert(!open_handles && pcm.used==2 && state.audio_running);
+    assert(health_decoder_faults==1 && health_decoder_stage==NATIVE_HEALTH_PROCESS && health_decoder_result==ESP_FAIL);
     run_task(output_task); assert(writes==1 && !strcmp(state.stream_format,"decode failed"));
 
     begin(6); fail_open=true; input(6,AUDIO_CONTINUE,3); run_task(decoder_task);
     assert(!open_handles && pcm.used==1); run_task(output_task);
     assert(!strcmp(state.stream_format,"decoder allocation failed"));
+    assert(health_decoder_faults==1 && health_decoder_stage==NATIVE_HEALTH_OPEN);
+#ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
+    assert(health_decoder_result==0); // Opaque legacy factory returns NULL, no numeric error.
+#else
+    assert(health_decoder_result==ESP_FAIL);
+#endif
     begin(7); fail_realloc=true; input(7,AUDIO_CONTINUE,3);
     ((encoded_packet_t *)encoded.items[0])->codec=NATIVE_CODEC_FLAC;
     run_task(decoder_task);
@@ -280,6 +314,7 @@ int main(void) {
     begin(8); input(8,AUDIO_CONTINUE,3); input(8,AUDIO_END_EOF,0);
     run_task(decoder_task); fail_write=true; run_task(output_task);
     assert(writes==1 && !flushes && !strcmp(state.stream_format,"audio output failed"));
+    assert(health_output_faults==1 && health_output_stage==NATIVE_HEALTH_OUTPUT_WRITE);
 
     begin(9); atomic_store(&s_generation,10); input(9,AUDIO_CONTINUE,3); run_task(decoder_task);
     assert(!opens && !pcm.used);
@@ -323,6 +358,16 @@ int main(void) {
     assert(prefill_queries==1); // Same-connection codec drain must not prefill again.
 #endif
     run_task(output_task);assert(writes==6 && flushes==1 && !state.audio_running);
+    assert(!health_decoder_faults && !health_output_faults);
+
+    begin(54);input(54,AUDIO_CONTINUE,3);input(54,AUDIO_END_EOF,0);run_task(decoder_task);
+    fail_flush=true;run_task(output_task);assert(health_output_faults==1 && writes==3 && flushes==1);
+    assert(health_output_stage==NATIVE_HEALTH_OUTPUT_FLUSH);
+    assert(!strcmp(state.stream_format,"audio output failed"));
+    begin(55);input(55,AUDIO_CONTINUE,3);input(55,AUDIO_END_EOF,0);run_task(decoder_task);
+    fail_config=true;run_task(output_task);assert(health_output_faults==1 && !writes && !flushes);
+    assert(health_output_stage==NATIVE_HEALTH_OUTPUT_CONFIGURE);
+    assert(!strcmp(state.stream_format,"audio output failed"));
 
 #if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
     begin(51);input(51,AUDIO_CONTINUE,3);s_start_control=encoded.items[0];
@@ -343,6 +388,19 @@ int main(void) {
     assert(state.audio_generation==2101 && !state.audio_running);
     assert(!strcmp(state.stream_format,"stopped"));
     assert(!state.title[0]);
+
+    native_input_health_t queue_health=audio_service_input_health();
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    assert(queue_health.available && queue_health.leased && queue_health.resident==8 && queue_health.minimum==4);
+    assert(queue_health.ready==2 && queue_health.reading==1 && queue_health.writing==5);
+    assert(queue_health.ready_payload_bytes==96 && queue_health.reading_payload_bytes==24);
+    short_input_stats=true;queue_health=audio_service_input_health();
+    assert(!queue_health.ready_payload_bytes && !queue_health.reading_payload_bytes);
+    adaptive_input_t *saved_input=s_encoded;s_encoded=NULL;queue_health=audio_service_input_health();
+    assert(queue_health.leased && !queue_health.available);s_encoded=saved_input;
+#else
+    assert(!queue_health.available && !queue_health.leased);
+#endif
 
     s_buffered_samples=3; s_sample_buffer[0]=s_sample_buffer[1]=s_sample_buffer[2]=123;
     s_resampler_has_previous=true; s_resampler_previous=456; s_resampler_next_phase=789;

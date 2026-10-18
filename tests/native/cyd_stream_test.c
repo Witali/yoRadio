@@ -11,6 +11,7 @@
 #include "stream_probe.h"
 #include "stream_body.h"
 #include "json_buffer.h"
+#include "native_health.h"
 
 typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC,
                NATIVE_CODEC_FLAC, NATIVE_CODEC_OGG } native_codec_t;
@@ -57,6 +58,42 @@ static int response_status;
 static unsigned last_timeout;
 static int tls_error, tls_code;
 static atomic_uint s_generation;
+static uint64_t s_health_boot_id=UINT64_C(0x0123456789abcdef);
+static native_health_snapshot_t health_snapshot;
+static unsigned health_track_calls;
+static bool fail_health_format;
+#define configNUMBER_OF_CORES 2
+#define MALLOC_CAP_8BIT 1
+#define MALLOC_CAP_INTERNAL 2
+#define MALLOC_CAP_DMA 4
+typedef struct { size_t total_free_bytes,largest_free_block,minimum_free_bytes; } multi_heap_info_t;
+static void *xTaskGetCurrentTaskHandle(void) {return (void *)1234;}
+static unsigned uxTaskGetNumberOfTasks(void) {return 7;}
+static unsigned esp_reset_reason(void) {return 1;}
+static void heap_caps_get_info(multi_heap_info_t *info,unsigned caps) {
+    assert(caps==MALLOC_CAP_8BIT);*info=(multi_heap_info_t){10000,9000,8000};
+}
+static size_t heap_caps_get_free_size(unsigned caps) {
+    if(caps==MALLOC_CAP_DMA)return 4000;
+    assert(caps==(MALLOC_CAP_8BIT|MALLOC_CAP_INTERNAL));return 8000;
+}
+static size_t heap_caps_get_largest_free_block(unsigned caps) {
+    if(caps==MALLOC_CAP_DMA)return 3000;
+    assert(caps==(MALLOC_CAP_8BIT|MALLOC_CAP_INTERNAL));return 7000;
+}
+void native_health_track_task(native_health_task_t role,void *task) {
+    assert(role==NATIVE_HEALTH_HTTP && task==(void *)1234);++health_track_calls;
+}
+native_health_snapshot_t native_health_snapshot(void) {return health_snapshot;}
+static bool format_health_for_test(char *body,size_t capacity,const native_health_snapshot_t *health,
+                                   const native_health_runtime_t *runtime) {
+    return !fail_health_format && native_health_format_json(body,capacity,health,runtime);
+}
+static unsigned health_stream_failures;
+void native_health_stream_failure(uint32_t generation,uint32_t completion,int32_t result) {
+    (void)result;assert(generation==atomic_load(&s_generation) && completion!=AUDIO_END_EOF);
+    ++health_stream_failures;
+}
 
 static int64_t esp_timer_get_time(void) { return (int64_t)clock_us; }
 static void vTaskDelay(unsigned ticks) { clock_us+=(uint64_t)ticks*1000; }
@@ -151,7 +188,9 @@ size_t strlcpy(char *to,const char *from,size_t capacity) {
     size_t n=strlen(from);if(capacity){size_t copy=n<capacity-1?n:capacity-1;memcpy(to,from,copy);to[copy]=0;}return n;
 }
 #define malloc buffer_malloc
+#define native_health_format_json format_health_for_test
 #include "production.inc"
+#undef native_health_format_json
 #undef malloc
 
 static int xQueueReceive(void *queue,void *destination,unsigned wait) {
@@ -178,6 +217,7 @@ static void setup(const uint8_t *data,size_t size,unsigned chunk) {
     assert(!task_buffer);++cases;memset(&client,0,sizeof(client));
     clock_us=0;queued=opens=fetches=redirects=reads=cleanups=closes=deletes=0;
     encoded_bytes=terminal=packets=0;selected_codec=NATIVE_CODEC_AUTO;
+    health_stream_failures=0;
     eagain=open_delay_ms=header_delay_ms=0;chunk_size=chunk;
     open_error=header_error=redirect_error=tls_error=tls_code=0;
     for(unsigned i=0;i<8;++i)statuses[i]=200;
@@ -213,9 +253,10 @@ int main(void) {
     setup(aac,sizeof(aac),2048);eagain=2;retry_tls=true;play();exact(aac,sizeof(aac),NATIVE_CODEC_AAC,AUDIO_END_EOF);
     assert(reads==4 && clock_us>=500000);
     setup(aac,sizeof(aac),2048);fatal_tls=true;play();exact(aac,sizeof(aac),NATIVE_CODEC_AAC,AUDIO_END_READ_FAILED);
-    assert(reads==1 && closes==1);
+    assert(reads==1 && closes==1 && health_stream_failures==1);
     setup(aac,sizeof(aac),2048);cancel_read=true;play();
     assert(!encoded_bytes && !terminal && cleanups==1 && !strcmp(state.stream_format,"stopped"));
+    assert(!health_stream_failures);
     setup(aac,sizeof(aac),2048);statuses[0]=302;statuses[1]=200;play();
     exact(aac,sizeof(aac),NATIVE_CODEC_AAC,AUDIO_END_EOF);assert(opens==2 && redirects==1);
     const char *redirect_icy[]={"5","-1"};
@@ -263,6 +304,13 @@ int main(void) {
     assert(status_handler(&request)==ESP_OK && response_status==200);printf("UTF8_STATUS=%s\n",response);
     native_state_begin_audio(&state,1001,NULL,"connecting");native_state_set_title(&state,1000,"obsolete");
     assert(!state.title[0]);
+    clock_us=12345000;
+    health_snapshot=(native_health_snapshot_t){.faults={.allocation_failures=3,.decoder_failures=2}};
+    assert(health_handler(&request)==ESP_OK && response_status==200);printf("HEALTH=%s\n",response);
+    assert(health_track_calls==1 && health_snapshot.faults.allocation_failures==3);
+    fail_health_format=true;
+    assert(health_handler(&request)==ESP_FAIL && response_status==500 && health_track_calls==2);
+    assert(health_snapshot.faults.decoder_failures==2 && state.audio_generation==1001);
     printf("PASS CYD stream cases=%u: actual HTTP/ICY/probe task, MIME mismatch, redirects/status/deadline, retry/fatal TLS, cancellation/OOM, exact replay and status JSON\n",cases);
     return 0;
 }

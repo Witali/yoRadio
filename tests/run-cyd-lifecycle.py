@@ -58,7 +58,7 @@ size_t strlcpy(char *, const char *, size_t);
     for name in ('simple_decoder_type', 'codec_name', 'state_set_audio',
                  'fail_generation', 'send_encoded', 'send_pcm', 'send_pcm_end',
                  'CUSTOM', 'decoder_release', 'decoder_task', 'output_task',
-                 'audio_service_play', 'audio_service_stop'):
+                 'audio_service_play', 'audio_service_stop', 'audio_service_input_health'):
         if name == 'CUSTOM':
             start = source.index('#ifdef YORADIO_CUSTOM_LEGACY_DECODER\ntypedef struct')
             generated += source[start:source.index('static void decoder_release(', start)]
@@ -112,6 +112,7 @@ size_t strlcpy(char *, const char *, size_t);
                       ROOT/'idf/components/native_stream/include/audio_completion.h',
                       ROOT/'idf/components/native_stream/include/adaptive_input.h',
                       MAIN/'input_prefill.h',
+                      MAIN/'native_health.h',
                       *[MAIN/name for name in ('audio_service.c','native_state.c','native_state.h',
                                               'native_audio_output.c','native_audio_output.h')]]},
     }, indent=2)+'\n')

@@ -2,6 +2,7 @@
 
 #include "esp_err.h"
 #include "native_state.h"
+#include "native_health.h"
 
 typedef enum {
     NATIVE_CODEC_AUTO = 0,
@@ -14,4 +15,5 @@ typedef enum {
 esp_err_t audio_service_start(native_state_t *state);
 esp_err_t audio_service_play(const char *url, native_codec_t codec);
 void audio_service_stop(void);
+native_input_health_t audio_service_input_health(void);
 

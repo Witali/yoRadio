@@ -42,6 +42,8 @@ size_t strlcpy(char *, const char *, size_t);
                  'stream_title','stream_task'):
         unit+=helpers.function(source,name)
     unit+=helpers.function((MAIN/'web_service.c').read_text(),'status_handler')
+    unit+=helpers.function(source,'audio_service_input_health')
+    unit+=helpers.function((MAIN/'web_service.c').read_text(),'health_handler')
     (OUT/'production.inc').write_text(unit)
     binary=OUT/'test'
     try:
@@ -50,14 +52,14 @@ size_t strlcpy(char *, const char *, size_t);
             '-fno-omit-frame-pointer','-fno-pie','-no-pie','-I'+host(OUT),
             '-I'+host(MAIN),'-I'+host(SHARED/'include'),
             host(ROOT/'tests/native/cyd_stream_test.c'),host(MAIN/'native_state.c'),
-            host(SHARED/'icy_title.c'),'-o',host(binary)])
+            host(MAIN/'native_health_json.c'),host(SHARED/'icy_title.c'),'-o',host(binary)])
         log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                  'UBSAN_OPTIONS=halt_on_error=1',host(binary)])
     except subprocess.CalledProcessError as error:
         print(error.output.decode(errors='replace'),file=sys.stderr);raise
     rows={}
     for line in log.decode().splitlines():
-        if line.startswith(('STATUS=','MAX_STATUS=','UTF8_STATUS=')):
+        if line.startswith(('STATUS=','MAX_STATUS=','UTF8_STATUS=','HEALTH=')):
             key,value=line.split('=',1);rows[key]=json.loads(value)
     row=rows['STATUS']
     assert row['station']=='station " \\' and row['format']=='format\nline'
@@ -66,9 +68,16 @@ size_t strlcpy(char *, const char *, size_t);
     maximum=rows['MAX_STATUS']
     assert maximum['station']=='\1'*95 and maximum['title']=='\1'*191 and maximum['format']=='\1'*47
     assert rows['UTF8_STATUS']['title']=='а'*95+'\ufffd'
+    health=rows['HEALTH']
+    assert health['boot_id']=='0123456789abcdef' and health['uptime_ms']==12345
+    assert (health['heap'],health['largest'],health['minimum_heap'],health['tasks'],health['cores'])==(10000,9000,8000,7,2)
+    assert health['memory']==dict(internal_free=8000,internal_largest=7000,dma_free=4000,dma_largest=3000)
+    assert health['allocation_failures']==3 and health['decoder_failure']['sequence']==2
+    assert health['cpu']['overall_percent'] is None and health['cpu']['tasks']['decode']['stack_free_min'] is None
+    assert not health['input']['available'] and not health['input']['leased']
     (OUT/'build.log').write_bytes(build);(OUT/'test.log').write_bytes(log)
     sources=[Path(__file__),ROOT/'tests/native/cyd_stream_test.c',ROOT/'tests/run-cyd-lifecycle.py',
-        *[MAIN/name for name in ('audio_service.c','web_service.c','native_state.c','native_state.h')],
+        *[MAIN/name for name in ('audio_service.c','web_service.c','native_state.c','native_state.h','native_health.h','native_health_json.c')],
         SHARED/'icy_title.c',*[SHARED/'include'/name for name in
         ('audio_completion.h','icy_title.h','stream_body.h','stream_probe.h','stream_tags.h','json_buffer.h')]]
     (OUT/'report.json').write_text(json.dumps(dict(passed=True,physical_hardware=False,

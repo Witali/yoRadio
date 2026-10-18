@@ -9,12 +9,43 @@
 #include "esp_http_server.h"
 #include "esp_log.h"
 #include "esp_netif.h"
+#include "esp_heap_caps.h"
+#include "esp_random.h"
+#include "esp_system.h"
+#include "esp_timer.h"
+#include "freertos/task.h"
+#include "native_health.h"
 #include "native_audio_output.h"
 #include "network_service.h"
 #include "json_buffer.h"
 
 static const char *const TAG = "web";
 static native_state_t *s_state;
+static uint64_t s_health_boot_id;
+
+static esp_err_t health_handler(httpd_req_t *request) {
+    native_health_track_task(NATIVE_HEALTH_HTTP, xTaskGetCurrentTaskHandle());
+    native_health_snapshot_t health = native_health_snapshot();
+    multi_heap_info_t heap;
+    heap_caps_get_info(&heap, MALLOC_CAP_8BIT);
+    native_health_runtime_t runtime = {
+        .boot_id=s_health_boot_id, .uptime_ms=(uint64_t)(esp_timer_get_time()/1000),
+        .reset_reason=(uint32_t)esp_reset_reason(), .heap_free=(uint32_t)heap.total_free_bytes,
+        .heap_largest=(uint32_t)heap.largest_free_block, .heap_minimum=(uint32_t)heap.minimum_free_bytes,
+        .tasks=(uint32_t)uxTaskGetNumberOfTasks(), .cores=configNUMBER_OF_CORES,
+        .internal_free=(uint32_t)heap_caps_get_free_size(MALLOC_CAP_INTERNAL|MALLOC_CAP_8BIT),
+        .internal_largest=(uint32_t)heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL|MALLOC_CAP_8BIT),
+        .dma_free=(uint32_t)heap_caps_get_free_size(MALLOC_CAP_DMA),
+        .dma_largest=(uint32_t)heap_caps_get_largest_free_block(MALLOC_CAP_DMA),
+        .input=audio_service_input_health(),
+    };
+    char body[2304];
+    if (!native_health_format_json(body,sizeof(body),&health,&runtime))
+        return httpd_resp_send_err(request,HTTPD_500_INTERNAL_SERVER_ERROR,"Health buffer exhausted");
+    httpd_resp_set_type(request,"application/json; charset=utf-8");
+    httpd_resp_set_hdr(request,"Cache-Control","no-store");
+    return httpd_resp_sendstr(request,body);
+}
 
 static esp_err_t status_handler(httpd_req_t *request) {
     native_state_t state;
@@ -185,6 +216,7 @@ static esp_err_t static_handler(httpd_req_t *request) {
 
 esp_err_t web_service_start(native_state_t *state) {
     s_state = state;
+    esp_fill_random(&s_health_boot_id,sizeof(s_health_boot_id));
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.stack_size = 6144;
     config.max_open_sockets = 4;
@@ -197,6 +229,9 @@ esp_err_t web_service_start(native_state_t *state) {
         .uri = "/api/native/status",
         .method = HTTP_GET,
         .handler = status_handler,
+    };
+    httpd_uri_t health = {
+        .uri = "/api/native/health", .method = HTTP_GET, .handler = health_handler,
     };
     httpd_uri_t reconnect = {
         .uri = "/api/native/reconnect",
@@ -230,6 +265,8 @@ esp_err_t web_service_start(native_state_t *state) {
     };
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &status), TAG,
                         "Status route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &health), TAG,
+                        "Health route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &reconnect), TAG,
                         "Reconnect route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &play), TAG,

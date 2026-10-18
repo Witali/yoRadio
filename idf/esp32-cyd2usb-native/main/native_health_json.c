@@ -37,6 +37,9 @@ bool native_health_format_json(char *body, size_t capacity,
     append_numbers(&out,",\"heap\":%" PRIu32 ",\"largest\":%" PRIu32 ",\"minimum_heap\":%" PRIu32
         ",\"tasks\":%" PRIu32 ",\"allocation_failures\":%" PRIu32,
         runtime->heap_free,runtime->heap_largest,runtime->heap_minimum,runtime->tasks,f->allocation_failures);
+    append_numbers(&out,",\"memory\":{\"internal_free\":%" PRIu32 ",\"internal_largest\":%" PRIu32
+        ",\"dma_free\":%" PRIu32 ",\"dma_largest\":%" PRIu32 "}",
+        runtime->internal_free,runtime->internal_largest,runtime->dma_free,runtime->dma_largest);
     append_numbers(&out,",\"last_allocation_failure\":{\"size\":%" PRIu32 ",\"caps\":%" PRIu32 "}",
         f->allocation_size,f->allocation_caps);
     append_numbers(&out,",\"decoder_failure\":{\"sequence\":%" PRIu32 ",\"generation\":%" PRIu32
@@ -48,8 +51,11 @@ bool native_health_format_json(char *body, size_t capacity,
     append_numbers(&out,",\"stream_failure\":{\"sequence\":%" PRIu32 ",\"generation\":%" PRIu32
         ",\"completion\":%" PRIu32 ",\"result\":%" PRId32 "}",
         f->stream_failures,f->stream_generation,f->stream_completion,f->stream_result);
-    append_numbers(&out,",\"output\":{\"write_errors\":%" PRIu32 ",\"generation\":%" PRIu32
-        ",\"result\":%" PRId32 "}",f->output_failures,f->output_generation,f->output_result);
+    append_numbers(&out,",\"output\":{\"failures\":%" PRIu32 ",\"write_errors\":%" PRIu32
+        ",\"configure_errors\":%" PRIu32 ",\"flush_errors\":%" PRIu32,
+        f->output_failures,f->output_write_errors,f->output_configure_errors,f->output_flush_errors);
+    append_numbers(&out,",\"generation\":%" PRIu32 ",\"stage\":%" PRIu32 ",\"result\":%" PRId32 "}",
+        f->output_generation,f->output_stage,f->output_result);
     append_numbers(&out,",\"input\":{\"available\":%s,\"leased\":%s,\"resident\":%" PRIu32
         ",\"minimum\":%" PRIu32 ",\"target\":%" PRIu32 ",\"limit\":%" PRIu32,
         input->available?"true":"false",input->leased?"true":"false",

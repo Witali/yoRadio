@@ -412,6 +412,7 @@ static void stream_task(void *argument) {
         esp_http_client_handle_t client = esp_http_client_init(&config);
         if (!client) {
             state_set_audio(command.generation, false, "HTTP allocation failed");
+            native_health_stream_failure(command.generation, AUDIO_END_ALLOCATION_FAILED, 0);
             continue;
         }
         esp_http_client_set_header(client, "Icy-MetaData", "1");
@@ -423,11 +424,13 @@ static void stream_task(void *argument) {
         }
         if (result != ESP_OK) {
             ESP_LOGE(TAG, "Stream open failed: %s", esp_err_to_name(result));
+            native_health_stream_failure(command.generation, AUDIO_END_UNAVAILABLE, result);
             state_set_audio(command.generation, false, "connection failed");
             esp_http_client_cleanup(client);
             continue;
         }
         if (!headers.valid) {
+            native_health_stream_failure(command.generation, AUDIO_END_FORMAT_UNKNOWN, 0);
             state_set_audio(command.generation, false, "invalid ICY interval");
             esp_http_client_cleanup(client);
             continue;
@@ -481,7 +484,10 @@ static void stream_task(void *argument) {
         }
         end_reason = finish_stream_audio(command.generation, &input.codec,
                                           &input.first, end_reason);
-        send_encoded(command.generation, input.codec, NULL, 0, end_reason);
+        if (send_encoded(command.generation, input.codec, NULL, 0, end_reason) &&
+            end_reason != AUDIO_END_EOF)
+            native_health_stream_failure(command.generation, end_reason,
+                end_reason == AUDIO_END_READ_FAILED ? ESP_FAIL : 0);
         esp_http_client_close(client);
         esp_http_client_cleanup(client);
     }
@@ -629,6 +635,8 @@ static void decoder_task(void *argument) {
             continue;
         }
         uint8_t end_reason = packet->end_of_stream;
+        native_health_decoder_stage_t failure_stage = NATIVE_HEALTH_OPEN;
+        int32_t failure_result = 0;
 #if CONFIG_YORADIO_INPUT_PREFILL_MS > 0
         if (packet->data_size && !input_prefilled) {
             bool control_replay = false;
@@ -701,6 +709,7 @@ static void decoder_task(void *argument) {
                 esp_audio_err_t open_result =
                     esp_audio_simple_dec_open(&cfg, &decoder);
                 if (open_result != ESP_AUDIO_ERR_OK) {
+                    failure_result = (int32_t)open_result;
                     ESP_LOGE(TAG, "%s decoder open failed: %d",
                              codec_name(codec), open_result);
                     end_reason = AUDIO_END_ALLOCATION_FAILED;
@@ -724,6 +733,8 @@ static void decoder_task(void *argument) {
                     &legacy_context, &feed_stats);
                 if (result < 0 &&
                     generation == atomic_load(&s_generation)) {
+                    failure_stage = NATIVE_HEALTH_PROCESS;
+                    failure_result = result;
                     ESP_LOGW(TAG, "Custom %s decode error: %d",
                              codec_name(codec), result);
                     end_reason = AUDIO_END_DECODE_FAILED;
@@ -749,6 +760,8 @@ static void decoder_task(void *argument) {
             raw.consumed = 0;
             esp_audio_err_t result =
                 esp_audio_simple_dec_process(decoder, &raw, &frame);
+            failure_stage = NATIVE_HEALTH_PROCESS;
+            failure_result = (int32_t)result;
             if (result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
                 if (frame.needed_size <= output_size) {
                     end_reason = AUDIO_END_DECODE_FAILED;
@@ -789,6 +802,8 @@ static void decoder_task(void *argument) {
                     state_set_audio(generation, true, format);
                     if (!send_pcm(generation, &info, output,
                                   frame.decoded_size)) {
+                        failure_stage = NATIVE_HEALTH_PCM;
+                        failure_result = ESP_FAIL;
                         ESP_LOGW(TAG, "PCM buffer stalled");
                         end_reason = AUDIO_END_BUFFER_STALLED;
                         break;
@@ -806,6 +821,11 @@ static void decoder_task(void *argument) {
         }
 packet_done:
         if (end_reason) {
+            if (audio_completion_is_terminal(end_reason) &&
+                end_reason != packet->end_of_stream &&
+                packet->generation == atomic_load(&s_generation))
+                native_health_decoder_failure(packet->generation, (uint32_t)packet->codec,
+                    failure_stage, failure_result, end_reason, packet->data_size);
             decoder_release(&decoder, &output, &output_size);
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
@@ -860,6 +880,7 @@ static void output_task(void *argument) {
         }
         if (packet->end_of_stream) {
             esp_err_t result = native_audio_output_flush_pcm();
+            if (result != ESP_OK) native_health_output_failure(packet->generation, NATIVE_HEALTH_OUTPUT_FLUSH, result);
             state_set_audio(packet->generation, false,
                 result == ESP_OK ? audio_completion_status(packet->end_of_stream)
                                  : audio_completion_status(AUDIO_END_OUTPUT_FAILED));
@@ -870,6 +891,7 @@ static void output_task(void *argument) {
             esp_err_t result =
                 native_audio_output_configure(packet->sample_rate);
             if (result != ESP_OK) {
+                native_health_output_failure(generation, NATIVE_HEALTH_OUTPUT_CONFIGURE, result);
                 ESP_LOGE(TAG, "%s %lu Hz setup failed: %s",
                          native_audio_output_name(),
                          (unsigned long)packet->sample_rate,
@@ -893,6 +915,7 @@ static void output_task(void *argument) {
             packet->data, packet->data_size, packet->bits_per_sample,
             packet->channels);
         if (result != ESP_OK) {
+            native_health_output_failure(generation, NATIVE_HEALTH_OUTPUT_WRITE, result);
             ESP_LOGW(TAG, "%s write failed: %s", native_audio_output_name(),
                      esp_err_to_name(result));
             failed_generation = generation;
@@ -928,17 +951,21 @@ esp_err_t audio_service_start(native_state_t *state) {
         return ESP_ERR_NO_MEM;
     s_start_control_attached = s_encoded_control_attached = true;
 #endif
+    TaskHandle_t stream_handle=NULL, decoder_handle=NULL, output_handle=NULL;
     if (xTaskCreatePinnedToCore(stream_task, "radio_stream",
                                 BOARD_TASK_STACK_RADIO_STREAM, NULL, 3,
-                                NULL, 0) != pdPASS ||
+                                &stream_handle, 0) != pdPASS ||
         xTaskCreatePinnedToCore(decoder_task, "audio_decode",
                                 BOARD_TASK_STACK_AUDIO_DECODER, NULL, 5,
-                                NULL, 1) != pdPASS ||
+                                &decoder_handle, 1) != pdPASS ||
         xTaskCreatePinnedToCore(output_task, "audio_output",
                                 BOARD_TASK_STACK_AUDIO_OUTPUT, NULL, 6,
-                                NULL, 1) != pdPASS) {
+                                &output_handle, 1) != pdPASS) {
         return ESP_ERR_NO_MEM;
     }
+    native_health_track_task(NATIVE_HEALTH_STREAM, stream_handle);
+    native_health_track_task(NATIVE_HEALTH_DECODE, decoder_handle);
+    native_health_track_task(NATIVE_HEALTH_OUTPUT, output_handle);
     ESP_LOGI(TAG,
              "Pipeline ready: %s, 16 KiB compressed + 8 KiB PCM, free heap %u",
              native_audio_output_name(),
@@ -970,4 +997,26 @@ void audio_service_stop(void) {
     uint32_t generation = atomic_fetch_add(&s_generation, 1) + 1;
     native_state_begin_audio(s_state, generation, NULL, "stopped");
     xSemaphoreGive(s_control_lock);
+}
+
+native_input_health_t audio_service_input_health(void) {
+    native_input_health_t result = {0};
+#ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
+    result.leased = true;
+    if (s_encoded) {
+        adaptive_input_stats_t stats = adaptive_input_stats(s_encoded);
+        result.available = true;
+        result.resident=stats.resident; result.minimum=stats.minimum;
+        result.target=stats.target; result.limit=stats.limit;
+        result.ready=stats.ready; result.reading=stats.reading;
+        result.writing=stats.writing; result.released=stats.released;
+        size_t ready_headers=(size_t)stats.ready*sizeof(encoded_packet_t);
+        size_t reading_headers=(size_t)stats.reading*sizeof(encoded_packet_t);
+        result.ready_payload_bytes=(uint32_t)(stats.ready_bytes>=ready_headers
+            ? stats.ready_bytes-ready_headers : 0);
+        result.reading_payload_bytes=(uint32_t)(stats.reading_bytes>=reading_headers
+            ? stats.reading_bytes-reading_headers : 0);
+    }
+#endif
+    return result;
 }

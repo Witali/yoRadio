@@ -47,7 +47,7 @@ static void *fault_writer(void *arg) {
     for (unsigned i=0;i<30000;++i) {
         allocation_callback(64+id,256+id,"ignored");
         native_health_decoder_failure(id,id,NATIVE_HEALTH_PROCESS,-(int32_t)id,100+id,200+id);
-        native_health_output_failure(id,-(int32_t)id);
+        native_health_output_failure(id,NATIVE_HEALTH_OUTPUT_WRITE,-(int32_t)id);
         native_health_stream_failure(id,100+id,-(int32_t)id);
         native_health_faults_t f=native_health_snapshot().faults;
         assert(f.decoder_generation==f.decoder_codec && f.decoder_result==-(int32_t)f.decoder_codec);
@@ -80,6 +80,9 @@ static void profile_step(configRUN_TIME_COUNTER_TYPE elapsed,
 static void test_cpu(void) {
     assert(!health_interval_supported(0) && !health_interval_supported(UINT64_MAX));
     profile_begin(1000);native_health_sample();assert(!native_health_snapshot().cpu.available);
+    assert(native_health_snapshot().cpu.task[NATIVE_HEALTH_DECODE].present);
+    assert(!native_health_snapshot().cpu.task[NATIVE_HEALTH_DECODE].available);
+    assert(native_health_snapshot().cpu.task[NATIVE_HEALTH_DECODE].stack_free_min==1003);
     profile_step(1000,1000,0,600);
     native_health_cpu_t cpu=native_health_snapshot().cpu;
     assert(cpu.enabled && cpu.available && cpu.core_tenths[0]==0 && cpu.core_tenths[1]==1000);
@@ -121,7 +124,8 @@ static void test_json(void) {
         .decoder_stage=UINT32_MAX,.decoder_result=INT32_MIN,.decoder_completion=UINT32_MAX,
         .decoder_input_bytes=UINT32_MAX,.decoder_allocation_sequence=UINT32_MAX,
         .stream_failures=UINT32_MAX,.stream_generation=UINT32_MAX,.stream_completion=UINT32_MAX,.stream_result=INT32_MIN,
-        .output_failures=UINT32_MAX,.output_generation=UINT32_MAX,.output_result=INT32_MIN},
+        .output_failures=UINT32_MAX,.output_generation=UINT32_MAX,.output_result=INT32_MIN,
+        .output_stage=UINT32_MAX,.output_write_errors=UINT32_MAX,.output_configure_errors=UINT32_MAX,.output_flush_errors=UINT32_MAX},
         .cpu={.enabled=true,.available=true,.sampled_us=UINT64_MAX,.snapshot_failures=UINT32_MAX,
               .overall_tenths=500,.core_tenths={0,1000}}};
     for(unsigned role=0;role<NATIVE_HEALTH_TASKS;++role)
@@ -129,6 +133,7 @@ static void test_json(void) {
             .percent_tenths=600,.stack_free_min=UINT32_MAX};
     native_health_runtime_t runtime={.boot_id=UINT64_MAX,.uptime_ms=UINT64_MAX,.reset_reason=UINT32_MAX,
         .heap_free=UINT32_MAX,.heap_largest=UINT32_MAX,.heap_minimum=UINT32_MAX,.tasks=UINT32_MAX,.cores=2,
+        .internal_free=UINT32_MAX,.internal_largest=UINT32_MAX,.dma_free=UINT32_MAX,.dma_largest=UINT32_MAX,
         .input={.available=true,.leased=true,.resident=UINT32_MAX,.minimum=UINT32_MAX,.target=UINT32_MAX,
             .limit=UINT32_MAX,.ready=UINT32_MAX,.reading=UINT32_MAX,.writing=UINT32_MAX,.released=UINT32_MAX,
             .ready_payload_bytes=UINT32_MAX,.reading_payload_bytes=UINT32_MAX}};
@@ -167,6 +172,12 @@ int main(void) {
     assert(!pthread_join(first,NULL) && !pthread_join(second,NULL));
     native_health_faults_t f=native_health_snapshot().faults;
     assert(f.allocation_failures==60000 && f.decoder_failures==60000 && f.output_failures==60000 && f.stream_failures==60000);
+    assert(f.output_write_errors==60000 && !f.output_configure_errors && !f.output_flush_errors);
+    native_health_output_failure(1,NATIVE_HEALTH_OUTPUT_CONFIGURE,-1);
+    native_health_output_failure(2,NATIVE_HEALTH_OUTPUT_FLUSH,-2);
+    f=native_health_snapshot().faults;
+    assert(f.output_failures==60002 && f.output_write_errors==60000 && f.output_configure_errors==1 && f.output_flush_errors==1);
+    assert(f.output_stage==NATIVE_HEALTH_OUTPUT_FLUSH && f.output_generation==2 && f.output_result==-2);
 #ifdef TEST_DIAGNOSTIC
     assert(create_calls==1);test_cpu();
 #else
