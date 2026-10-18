@@ -22,3 +22,11 @@ stack survey, TCB reuse, runtime wrap, zero interval and unavailable snapshot.
 The host deletion/scheduler seams do not qualify actual kernel timing, interrupt
 latency or physical playback. No on-board crash is claimed. Quiet C3 builds do
 not compile the diagnostic sampler.
+
+Pinned IDF `9a97f6c5`/GCC 15.2 builds clean source `ca69e1f9` with runtime stats
+enabled and the tested radio profile. The saved [image manifest](../../../firmware/development/esp32c3-oled-native-profiler-fix/manifest.json)
+records 1,477,808 bytes and its ELF/image hashes. Production logging stays off;
+this image proves compilation of the sampler branch, not collected CPU data.
+The [full Clang report](../native-lint-20261018/c3-profiler/report.json) completes
+all 49 own units, 106 warnings, zero errors. Eight additional dead-store warnings
+are the diagnostic percentages consumed only by logs compiled out in this profile.

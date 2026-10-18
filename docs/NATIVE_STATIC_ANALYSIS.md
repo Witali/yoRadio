@@ -150,3 +150,9 @@ runs complete all 16 with 11/13 warnings and zero errors. The diagnostic pair is
 `bugprone-multi-level-implicit-pointer-conversion` for `memcpy` of a fixed-size
 array of task handles; bounds and ownership are explicit. Sampler task lifetime,
 reuse, runtime wrap and both denominators have executable host coverage.
+
+The [C3 sampler-enabled rerun](../tests/results/native-lint-20261018/c3-profiler/report.json)
+completes all 49 units with 106 warnings and zero errors. Eight warnings relative
+to the quiet baseline are percentages used only by disabled production logs;
+they do not represent eight new memory errors. Task-name lifetime and TCB reuse
+are covered by the dedicated negative controls and ASan/UBSan regressions.
