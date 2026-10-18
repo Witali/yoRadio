@@ -1,0 +1,325 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:47:33: warning: The value '0' provided to the cast expression is not in the valid range of values for the enum [clang-analyzer-optin.core.EnumCastOutOfRange]
+   47 |     stream_frame_info_t info = {0};
+      |                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:22:9: note: enum declared here
+   22 | typedef enum { STREAM_FRAME_MP3 = 1, STREAM_FRAME_ADTS } stream_frame_codec_t;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:748:9: note: Assuming 'buffer' is non-null
+  748 |     if (!buffer) {
+      |         ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:748:5: note: Taking false branch
+  748 |     if (!buffer) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:754:5: note: Loop condition is true.  Entering loop body
+  754 |     while (true) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:766:16: note: Assuming the condition is false
+  766 |         while (atomic_load(&s_generation) == command.generation &&
+      |                ^
+C:\Work\yoRadio\.idf\tools-v6.1\tools\esp-clang\esp-21.1.3_20260408\esp-clang\bin/../lib/clang-runtimes/riscv32-esp-unknown-elf/rv32imc-zicsr-zifencei_ilp32/include/stdatomic.h:376:2: note: expanded from macro 'atomic_load'
+  376 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.1\tools\esp-clang\esp-21.1.3_20260408\esp-clang\bin/../lib/clang-runtimes/riscv32-esp-unknown-elf/rv32imc-zicsr-zifencei_ilp32/include/stdatomic.h:269:2: note: expanded from macro 'atomic_load_explicit'
+  269 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:766:65: note: Left side of '&&' is false
+  766 |         while (atomic_load(&s_generation) == command.generation &&
+      |                                                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:772:13: note: Assuming the condition is false
+  772 |         if (atomic_load(&s_generation) != command.generation) continue;
+      |             ^
+C:\Work\yoRadio\.idf\tools-v6.1\tools\esp-clang\esp-21.1.3_20260408\esp-clang\bin/../lib/clang-runtimes/riscv32-esp-unknown-elf/rv32imc-zicsr-zifencei_ilp32/include/stdatomic.h:376:2: note: expanded from macro 'atomic_load'
+  376 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.1\tools\esp-clang\esp-21.1.3_20260408\esp-clang\bin/../lib/clang-runtimes/riscv32-esp-unknown-elf/rv32imc-zicsr-zifencei_ilp32/include/stdatomic.h:269:2: note: expanded from macro 'atomic_load_explicit'
+  269 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:772:9: note: Taking false branch
+  772 |         if (atomic_load(&s_generation) != command.generation) continue;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:773:13: note: Assuming the condition is false
+  773 |         if (!connection_remaining_ms(retry.deadline_us)) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:773:9: note: Taking false branch
+  773 |         if (!connection_remaining_ms(retry.deadline_us)) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:803:13: note: Assuming 'client' is non-null
+  803 |         if (!client) {
+      |             ^~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:803:9: note: Taking false branch
+  803 |         if (!client) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:817:13: note: Assuming 'result' is equal to ESP_OK
+  817 |         if (result != ESP_OK) {
+      |             ^~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:817:9: note: Taking false branch
+  817 |         if (result != ESP_OK) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:834:13: note: Assuming 'released' is equal to ESP_OK
+  834 |         if (released != ESP_OK) {
+      |             ^~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:834:9: note: Taking false branch
+  834 |         if (released != ESP_OK) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:839:13: note: Assuming the condition is false
+  839 |         if (strncmp(command.url, "https://", 8) == 0) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:839:9: note: Taking false branch
+  839 |         if (strncmp(command.url, "https://", 8) == 0) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:846:13: note: Assuming the condition is false
+  846 |         if (atomic_load(&s_generation) != command.generation) {
+      |             ^
+C:\Work\yoRadio\.idf\tools-v6.1\tools\esp-clang\esp-21.1.3_20260408\esp-clang\bin/../lib/clang-runtimes/riscv32-esp-unknown-elf/rv32imc-zicsr-zifencei_ilp32/include/stdatomic.h:376:2: note: expanded from macro 'atomic_load'
+  376 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.1\tools\esp-clang\esp-21.1.3_20260408\esp-clang\bin/../lib/clang-runtimes/riscv32-esp-unknown-elf/rv32imc-zicsr-zifencei_ilp32/include/stdatomic.h:269:2: note: expanded from macro 'atomic_load_explicit'
+  269 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:846:9: note: Taking false branch
+  846 |         if (atomic_load(&s_generation) != command.generation) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:854:13: note: Assuming 'codec' is not equal to NATIVE_CODEC_AUTO
+  854 |         if (codec == NATIVE_CODEC_AUTO) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:854:9: note: Taking false branch
+  854 |         if (codec == NATIVE_CODEC_AUTO) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:863:13: note: Assuming the condition is false
+  863 |         if (esp_http_client_get_response_header(
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  864 |                 client, "icy-metaint", &metadata_interval_text) == ESP_OK &&
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:864:75: note: Left side of '&&' is false
+  864 |                 client, "icy-metaint", &metadata_interval_text) == ESP_OK &&
+      |                                                                           ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:871:13: note: Assuming the condition is false
+  871 |         if (esp_http_client_get_response_header(
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  872 |                 client, "icy-br", &icy_bitrate_text) == ESP_OK &&
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:872:64: note: Left side of '&&' is false
+  872 |                 client, "icy-br", &icy_bitrate_text) == ESP_OK &&
+      |                                                                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:899:9: note: Loop condition is true.  Entering loop body
+  899 |         while (atomic_load(&s_generation) == command.generation) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:900:18: note: Left side of '&&' is true
+  900 |             if ((stream_initial_pending(codec, first_chunk) && esp_timer_get_time() >= probe_deadline_us) ||
+      |                  ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:900:64: note: Assuming the condition is false
+  900 |             if ((stream_initial_pending(codec, first_chunk) && esp_timer_get_time() >= probe_deadline_us) ||
+      |                                                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:900:17: note: Left side of '||' is false
+  900 |             if ((stream_initial_pending(codec, first_chunk) && esp_timer_get_time() >= probe_deadline_us) ||
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:900:13: note: Taking false branch
+  900 |             if ((stream_initial_pending(codec, first_chunk) && esp_timer_get_time() >= probe_deadline_us) ||
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:906:18: note: 'input_growth_attempted' is false
+  906 |             if (!input_growth_attempted && codec == NATIVE_CODEC_FLAC &&
+      |                  ^~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:906:17: note: Left side of '&&' is true
+  906 |             if (!input_growth_attempted && codec == NATIVE_CODEC_FLAC &&
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:906:44: note: 'codec' is not equal to NATIVE_CODEC_FLAC
+  906 |             if (!input_growth_attempted && codec == NATIVE_CODEC_FLAC &&
+      |                                            ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:906:71: note: Left side of '&&' is false
+  906 |             if (!input_growth_attempted && codec == NATIVE_CODEC_FLAC &&
+      |                                                                       ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:923:17: note: Assuming 'received' is > 0
+  923 |             if (received > 0) AUDIO_PROBE_STAMP(network_us);
+      |                 ^~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:923:13: note: Taking true branch
+  923 |             if (received > 0) AUDIO_PROBE_STAMP(network_us);
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:926:17: note: Assuming the condition is false
+  926 |             if (atomic_load(&s_generation) != command.generation) break;
+      |                 ^
+C:\Work\yoRadio\.idf\tools-v6.1\tools\esp-clang\esp-21.1.3_20260408\esp-clang\bin/../lib/clang-runtimes/riscv32-esp-unknown-elf/rv32imc-zicsr-zifencei_ilp32/include/stdatomic.h:376:2: note: expanded from macro 'atomic_load'
+  376 |         atomic_load_explicit(object, memory_order_seq_cst)
+      |         ^
+C:\Work\yoRadio\.idf\tools-v6.1\tools\esp-clang\esp-21.1.3_20260408\esp-clang\bin/../lib/clang-runtimes/riscv32-esp-unknown-elf/rv32imc-zicsr-zifencei_ilp32/include/stdatomic.h:269:2: note: expanded from macro 'atomic_load_explicit'
+  269 |         __c11_atomic_load(object, order)
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:926:13: note: Taking false branch
+  926 |             if (atomic_load(&s_generation) != command.generation) break;
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:927:13: note: Taking false branch
+  927 |             if (received == -ESP_ERR_HTTP_EAGAIN) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:936:17: note: 'received' is >= 0
+  936 |             if (received < 0) {
+      |                 ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:936:13: note: Taking false branch
+  936 |             if (received < 0) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:942:17: note: 'received' is not equal to 0
+  942 |             if (received == 0) {
+      |                 ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:942:13: note: Taking false branch
+  942 |             if (received == 0) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:956:20: note: 'offset' is < 'received'
+  956 |             while (offset < (size_t)received) {
+      |                    ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:956:13: note: Loop condition is true.  Entering loop body
+  956 |             while (offset < (size_t)received) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:957:22: note: 'metadata_interval' is 0
+  957 |                 if (!metadata_interval) {
+      |                      ^~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:957:17: note: Taking true branch
+  957 |                 if (!metadata_interval) {
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:958:26: note: Calling 'send_stream_audio'
+  958 |                     if (!send_stream_audio(command.generation, &codec,
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  959 |                                            buffer + offset,
+      |                                            ~~~~~~~~~~~~~~~~
+  960 |                                            (size_t)received - offset,
+      |                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  961 |                                            &first_chunk, &probe)) {
+      |                                            ~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:494:10: note: 'size' is not equal to 0
+  494 |     if (!size) return true;
+      |          ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:494:5: note: Taking false branch
+  494 |     if (!size) return true;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:499:13: note: Left side of '&&' is true
+  499 |         if (stream_start_eligible(*codec) && !s_frame_router.bypass) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:499:46: note: Assuming field 'bypass' is true
+  499 |         if (stream_start_eligible(*codec) && !s_frame_router.bypass) {
+      |                                              ^~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:499:9: note: Taking false branch
+  499 |         if (stream_start_eligible(*codec) && !s_frame_router.bypass) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:517:5: note: Taking true branch
+  517 |     if (*first_chunk) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:518:9: note: Taking false branch
+  518 |         if (*codec == NATIVE_CODEC_AUTO) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:540:9: note: Taking true branch
+  540 |         if (*first_chunk) state_set_audio(generation, true, codec_name(*codec));
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:544:12: note: Calling 'stream_route_feed'
+  544 |     return stream_route_feed(&route, data, size) && stream_route_flush(&route);
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:145:9: note: Left side of '&&' is true
+  145 |     if (*ctx->codec != NATIVE_CODEC_MP3 && *ctx->codec != NATIVE_CODEC_AAC) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:145:5: note: Taking false branch
+  145 |     if (*ctx->codec != NATIVE_CODEC_MP3 && *ctx->codec != NATIVE_CODEC_AAC) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:158:9: note: Assuming field 'bypass' is false
+  158 |     if (s_frame_router.bypass) {
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:158:5: note: Taking false branch
+  158 |     if (s_frame_router.bypass) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:162:40: note: Calling 'stream_frames_feed'
+  162 |         stream_frame_result_t result = stream_frames_feed(&s_frame_router.frames,
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  163 |             data, size, &consumed, stream_route_begin, stream_route_emit, ctx);
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:124:9: note: Assuming field 'result' is not equal to STREAM_FRAME_MORE
+  124 |     if (s->result != STREAM_FRAME_MORE) return s->result;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:124:5: note: Taking true branch
+  124 |     if (s->result != STREAM_FRAME_MORE) return s->result;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:124:41: note: Returning without writing to 's->used', which participates in a condition later
+  124 |     if (s->result != STREAM_FRAME_MORE) return s->result;
+      |                                         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:162:40: note: Returning from 'stream_frames_feed'
+  162 |         stream_frame_result_t result = stream_frames_feed(&s_frame_router.frames,
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  163 |             data, size, &consumed, stream_route_begin, stream_route_emit, ctx);
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:164:13: note: 'result' is not equal to STREAM_FRAME_MORE
+  164 |         if (result == STREAM_FRAME_MORE) return true;
+      |             ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:164:9: note: Taking false branch
+  164 |         if (result == STREAM_FRAME_MORE) return true;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:165:13: note: Assuming 'result' is equal to STREAM_FRAME_FREE_FORMAT
+  165 |         if (result == STREAM_FRAME_FREE_FORMAT) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:165:9: note: Taking true branch
+  165 |         if (result == STREAM_FRAME_FREE_FORMAT) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_encoded_router.h:170:17: note: Calling 'stream_frame_header'
+  170 |             if (stream_frame_header(s_frame_router.frames.header,
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  171 |                     s_frame_router.frames.used, &info) == STREAM_FRAME_FREE_FORMAT &&
+      |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:44:9: note: Assuming 'size' is not equal to 0
+   44 |     if (!size) return STREAM_FRAME_MORE;
+      |         ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:44:5: note: Taking false branch
+   44 |     if (!size) return STREAM_FRAME_MORE;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:45:9: note: Assuming the condition is false
+   45 |     if (p[0] != 0xff) return STREAM_FRAME_INVALID;
+      |         ^~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:45:5: note: Taking false branch
+   45 |     if (p[0] != 0xff) return STREAM_FRAME_INVALID;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:46:9: note: Assuming 'size' is >= 2
+   46 |     if (size < 2) return STREAM_FRAME_MORE;
+      |         ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:46:5: note: Taking false branch
+   46 |     if (size < 2) return STREAM_FRAME_MORE;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/../../components/native_stream/include/stream_frames.h:47:33: note: The value '0' provided to the cast expression is not in the valid range of values for the enum
+   47 |     stream_frame_info_t info = {0};
+      |                                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:317:14: warning: Value stored to 'load_tenths' during its initialization is never read [clang-analyzer-deadcode.DeadStores]
+  317 |     uint32_t load_tenths = stats->audio_us
+      |              ^~~~~~~~~~~   ~~~~~~~~~~~~~~~
+  318 |                                ? (uint32_t)(stats->decode_us * 1000ULL /
+      |                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  319 |                                             stats->audio_us)
+      |                                             ~~~~~~~~~~~~~~~~
+  320 |                                : 0;
+      |                                ~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:317:14: note: Value stored to 'load_tenths' during its initialization is never read
+  317 |     uint32_t load_tenths = stats->audio_us
+      |              ^~~~~~~~~~~   ~~~~~~~~~~~~~~~
+  318 |                                ? (uint32_t)(stats->decode_us * 1000ULL /
+      |                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  319 |                                             stats->audio_us)
+      |                                             ~~~~~~~~~~~~~~~~
+  320 |                                : 0;
+      |                                ~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:321:14: warning: Value stored to 'speed_hundredths' during its initialization is never read [clang-analyzer-deadcode.DeadStores]
+  321 |     uint32_t speed_hundredths = stats->decode_us
+      |              ^~~~~~~~~~~~~~~~   ~~~~~~~~~~~~~~~~
+  322 |                                     ? (uint32_t)(stats->audio_us * 100ULL /
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  323 |                                                  stats->decode_us)
+      |                                                  ~~~~~~~~~~~~~~~~~
+  324 |                                     : 0;
+      |                                     ~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:321:14: note: Value stored to 'speed_hundredths' during its initialization is never read
+  321 |     uint32_t speed_hundredths = stats->decode_us
+      |              ^~~~~~~~~~~~~~~~   ~~~~~~~~~~~~~~~~
+  322 |                                     ? (uint32_t)(stats->audio_us * 100ULL /
+      |                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  323 |                                                  stats->decode_us)
+      |                                                  ~~~~~~~~~~~~~~~~~
+  324 |                                     : 0;
+      |                                     ~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:2039:5: warning: Value stored to 'encoded_ring_size' is never read [clang-analyzer-deadcode.DeadStores]
+ 2039 |     encoded_ring_size = input_stats.resident * input_stats.packet_capacity;
+      |     ^                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\audio_service.c:2039:5: note: Value stored to 'encoded_ring_size' is never read
+ 2039 |     encoded_ring_size = input_stats.resident * input_stats.packet_capacity;
+      |     ^                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+25 warnings generated.
+Suppressed 21 warnings (21 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

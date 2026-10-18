@@ -171,6 +171,21 @@ allocation и численные настройки C3 являются канд
 
 ## Журнал выполнения
 
+- По запросу пользователя разобраны наиболее опасные предупреждения обеих целей.
+  [Отчёт с исходными сбоями и регрессиями](../tests/results/native-warning-fixes-20261018/HOST.md):
+  исправлены деление на ноль/отрицательный сдвиг Vorbis, потеря Wi-Fi/upload
+  файлов при rename failure, переполнение малого filename buffer и lifetime
+  async HTTP session донора C3. Чтение полных Wi-Fi строк и обработка read error
+  проверены также в CYD; signed PCM/FLAC arithmetic сделана явной. Полный lint:
+  C3 50 units/77 warnings/0 errors (20 устранено, новых нет), CYD 24/8/0.
+  Добавлены отрицательные контроли, ASan/UBSan и 360 exact FLAC PCM сравнений.
+  AAC owner-view warning остаётся открытым: автоматическая проверка содержимого
+  остановила саб-агента до завершения тестов; непроверенный diff сохранён
+  [отдельно](../tests/results/native-warning-fixes-20261018/deferred/README.md)
+  и не включён в firmware. Повторять после 32-bit layout/reset и PCM проверок;
+  private RV32 offsets в CYD не переносить. SDK новых исправлений и физическая
+  приёмка отмечаются отдельно.
+
 - [Новый блок startup/PCM/WebUI](../tests/results/cyd-startup-pcm-web-20261018/HOST.md)
   прошёл host/ASan/UBSan: проверенная регистрация decoder, готовность/gate трёх
   задач и rollback/retry закрывают init-failure хвост этапа 01 (228 сценариев).

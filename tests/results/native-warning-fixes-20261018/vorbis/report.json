@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "physical_hardware": false,
+  "vendor_dsp_executed": false,
+  "scope": "Qualify actual C3 Vorbis setup parsing with exact input bounds and fault injection.\n\nASan/UBSan uses native pointer/long widths: RV32 ABI size/offset assertions are\nremoved only from generated header copies. The bitreader seam preserves signed\n32-bit return values and production rejects packet lengths above INT32_MAX.\nVendor DSP, target ABI layout and physical PCM are not executed by this suite.\n",
+  "results": {
+    "vorbis_native_width_sanitized": "PASS Vorbis actual setup: malformed=3928 OOM=187 retry, signed-span rejection before allocation/read; native-pointer ASan/UBSan, vendor DSP excluded"
+  },
+  "source_sha256": {
+    "tests/run-codec-warning-host.py": "ab689fa8fe2db582da4c8714887c980212a07790ab8576070d15981f6cd8537a",
+    "idf/esp32c3-oled-native/main/vorbis_repair_abi.h": "dd26a294cf3887853e12174f3958ea9cccdaa9425ff6a7b21d46faa350bde61c",
+    "idf/esp32c3-oled-native/main/vorbis_repair/setup.c": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+    "tests/native/codec_warning_vorbis_test.c": "1523b90a132144f89dd56c727a4cfaf7372df403f556a65bb9de38a02fe872fd",
+    "tests/fixtures/esp32c3_calibration/vorbis-q10.ogg": "09d6cfa599f2c4a25f5745e5c8a605b5a1583a42d7990b9e5242b8990adff12f"
+  }
+}

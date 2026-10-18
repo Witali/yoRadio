@@ -1,0 +1,21 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:47:17: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   47 |             if (memcmp(p->buffer, p->marker + 2, n) ||
+      |                 ^
+      |                                                     != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:54:20: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   54 |                    memcmp(p->buffer + n, "\r\n\r\n", 4)) ++n;
+      |                    ^                                   
+      |                                                         != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main/web_multipart.h:85:26: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   85 |             if (!last && memcmp(p->buffer, "\r\n", 2)) return false;
+      |                          ^                           
+      |                                                       != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\ota_upload.c:50:17: warning: function 'strcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   50 |             if (strcmp(name, "update") || u->image_seen || !u->target_seen)
+      |                 ^
+      |                                        != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\ota_upload.c:52:17: warning: function 'strcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   52 |             if (strcmp(u->target, "fw") && strcmp(u->target, "firmware"))
+      |                 ^
+      |                                         != 0
+5 warnings generated.

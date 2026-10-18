@@ -187,3 +187,20 @@ completes 50 units with 97 warnings and zero errors. Both file/check/message
 finding sets match the preceding full baselines. The new settings comparison
 is explicit; no diagnostic was disabled. Actual pinned SDK builds and saved
 images are linked in the [integration qualification](../tests/results/cyd-c3-format-dsp-20261018/README.md).
+
+The subsequent startup/WebUI checkpoint completes 24 CYD units with eight
+warnings and 50 C3 units with 97 warnings. The user's priority warning review
+then completes [all 50 C3 units with 77 warnings and zero errors](../tests/results/native-lint-20261018/c3-warning-fixes-final/report.json)
+and [all 24 CYD units with eight warnings and zero errors](../tests/results/native-lint-20261018/cyd-warning-fixes/report.json).
+The C3 file/check/message multiset removes 20 instances and adds none; the CYD
+multiset is unchanged. A subsequent small shared credential-reader extraction
+has a [focused recheck of both network units](../tests/results/native-lint-20261018/shared-credential-focused-final/report.json).
+
+[Risk triage and executable evidence](../tests/results/native-warning-fixes-20261018/HOST.md)
+distinguish confirmed failures from portability changes: malformed Vorbis,
+failed file publication, small filename buffers, static stream errors and
+async session ownership have reproductions. The FLAC field tests pass on the
+original too; its changes make signed arithmetic/range guarantees explicit.
+Remaining findings are retained without disabling checks. The AAC owner-view
+warning remains open; an automatic content check interrupted its assistant
+task before qualification. The unverified diff is archived and not applied.

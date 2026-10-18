@@ -1,0 +1,75 @@
+{
+  "revision": null,
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "physical_timing": false,
+  "sources": {
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14",
+    "yoRadio/src/audioI2S/flac_decoder/flac_decoder.h": "17d21ad00a3b057fd6ae73c3e24d0f9910d82101de8f0d57656b25c5bc23c2be",
+    "tests/native/flac_bounds/Arduino.h": "628aa1fa77fc1f1f89201aca3c8b03b5ba7a09806ee4ef143929a42f3bc12713",
+    "tests/native/flac_bounds/warnings.cpp": "d847439f8cbee313859aa95591f883d9c2c8397cf2b99a873f6d7d43f18580c2",
+    "tools/codec_benchmark/run_flac_warnings.py": "8333249af07e8a9f7bc133cc72069041082edc187f07e90512d9799a080f1105"
+  },
+  "variants": {
+    "contiguous-scalar": {
+      "signed": {
+        "passed": true,
+        "output": "PASS signed_fields=323584 wasted_cases=0 malformed_errors=35"
+      },
+      "wasted": {
+        "passed": true,
+        "output": "PASS signed_fields=0 wasted_cases=3900 malformed_errors=54"
+      },
+      "errors": {
+        "passed": true,
+        "output": "PASS signed_fields=0 wasted_cases=0 malformed_errors=6"
+      }
+    },
+    "contiguous-bytewise": {
+      "signed": {
+        "passed": true,
+        "output": "PASS signed_fields=323584 wasted_cases=0 malformed_errors=35"
+      },
+      "wasted": {
+        "passed": true,
+        "output": "PASS signed_fields=0 wasted_cases=3900 malformed_errors=54"
+      },
+      "errors": {
+        "passed": true,
+        "output": "PASS signed_fields=0 wasted_cases=0 malformed_errors=6"
+      }
+    },
+    "segmented-scalar": {
+      "signed": {
+        "passed": true,
+        "output": "PASS signed_fields=323584 wasted_cases=0 malformed_errors=35"
+      },
+      "wasted": {
+        "passed": true,
+        "output": "PASS signed_fields=0 wasted_cases=3900 malformed_errors=54"
+      },
+      "errors": {
+        "passed": true,
+        "output": "PASS signed_fields=0 wasted_cases=0 malformed_errors=6"
+      }
+    },
+    "segmented-bytewise": {
+      "signed": {
+        "passed": true,
+        "output": "PASS signed_fields=323584 wasted_cases=0 malformed_errors=35"
+      },
+      "wasted": {
+        "passed": true,
+        "output": "PASS signed_fields=0 wasted_cases=3900 malformed_errors=54"
+      },
+      "errors": {
+        "passed": true,
+        "output": "PASS signed_fields=0 wasted_cases=0 malformed_errors=6"
+      }
+    }
+  },
+  "passed": true,
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+}

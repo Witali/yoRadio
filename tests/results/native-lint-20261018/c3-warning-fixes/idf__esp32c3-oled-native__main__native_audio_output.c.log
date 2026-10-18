@@ -1,0 +1,27 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:202:31: warning: narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined [bugprone-narrowing-conversions]
+  202 |                             ? ramp_sample(first + frame, count, ramp_up)
+      |                               ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:203:31: warning: narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined [bugprone-narrowing-conversions]
+  203 |                             : (ramp_up ? 0 : INT16_MIN);
+      |                               ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:499:18: warning: Value stored to 'tenths' during its initialization is never read [clang-analyzer-deadcode.DeadStores]
+  499 |         uint64_t tenths = s_stats_audio_us
+      |                  ^~~~~~   ~~~~~~~~~~~~~~~~
+  500 |                               ? s_stats_normalize_us * 1000ULL /
+      |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  501 |                                     s_stats_audio_us
+      |                                     ~~~~~~~~~~~~~~~~
+  502 |                               : 0;
+      |                               ~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\native_audio_output.c:499:18: note: Value stored to 'tenths' during its initialization is never read
+  499 |         uint64_t tenths = s_stats_audio_us
+      |                  ^~~~~~   ~~~~~~~~~~~~~~~~
+  500 |                               ? s_stats_normalize_us * 1000ULL /
+      |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  501 |                                     s_stats_audio_us
+      |                                     ~~~~~~~~~~~~~~~~
+  502 |                               : 0;
+      |                               ~~~
+12 warnings generated.
+Suppressed 9 warnings (9 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

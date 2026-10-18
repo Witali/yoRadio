@@ -1,0 +1,284 @@
+7 warnings generated.
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:17:25: warning: Read function called when stream is in EOF state. Function has no effect [clang-analyzer-unix.Stream]
+   17 |         while ((value = fgetc(file)) != EOF && value != '\n') {
+      |                         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:101:5: note: Assuming 's_wifi_events' is non-null
+  101 |     ESP_RETURN_ON_FALSE(s_wifi_events, ESP_ERR_NO_MEM, TAG,
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:374:22: note: expanded from macro 'ESP_RETURN_ON_FALSE'
+  374 |         if (unlikely(!(a))) {                                                                   \
+      |             ~~~~~~~~~^~~~~
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_compiler.h:24:44: note: expanded from macro 'unlikely'
+   24 | #define unlikely(x)    __builtin_expect(!!(x), 0)
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:101:5: note: Taking false branch
+  101 |     ESP_RETURN_ON_FALSE(s_wifi_events, ESP_ERR_NO_MEM, TAG,
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:374:9: note: expanded from macro 'ESP_RETURN_ON_FALSE'
+  374 |         if (unlikely(!(a))) {                                                                   \
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:101:5: note: Loop condition is false.  Exiting loop
+  101 |     ESP_RETURN_ON_FALSE(s_wifi_events, ESP_ERR_NO_MEM, TAG,
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:373:64: note: expanded from macro 'ESP_RETURN_ON_FALSE'
+  373 | #define ESP_RETURN_ON_FALSE(a, err_code, log_tag, format, ...) do {                             \
+      |                                                                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:103:5: note: Assuming 'err_rc_' is equal to 0
+  103 |     ESP_RETURN_ON_ERROR(esp_netif_init(), TAG, "TCP/IP stack failed");
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:304:22: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  304 |         if (unlikely(err_rc_ != ESP_OK)) {                                                      \
+      |             ~~~~~~~~~^~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_compiler.h:24:44: note: expanded from macro 'unlikely'
+   24 | #define unlikely(x)    __builtin_expect(!!(x), 0)
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:103:5: note: Taking false branch
+  103 |     ESP_RETURN_ON_ERROR(esp_netif_init(), TAG, "TCP/IP stack failed");
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:304:9: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  304 |         if (unlikely(err_rc_ != ESP_OK)) {                                                      \
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:103:5: note: Loop condition is false.  Exiting loop
+  103 |     ESP_RETURN_ON_ERROR(esp_netif_init(), TAG, "TCP/IP stack failed");
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:302:54: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  302 | #define ESP_RETURN_ON_ERROR(x, log_tag, format, ...) do {                                       \
+      |                                                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:104:5: note: Assuming 'err_rc_' is equal to 0
+  104 |     ESP_RETURN_ON_ERROR(esp_event_loop_create_default(), TAG,
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:304:22: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  304 |         if (unlikely(err_rc_ != ESP_OK)) {                                                      \
+      |             ~~~~~~~~~^~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_compiler.h:24:44: note: expanded from macro 'unlikely'
+   24 | #define unlikely(x)    __builtin_expect(!!(x), 0)
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:104:5: note: Taking false branch
+  104 |     ESP_RETURN_ON_ERROR(esp_event_loop_create_default(), TAG,
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:304:9: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  304 |         if (unlikely(err_rc_ != ESP_OK)) {                                                      \
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:104:5: note: Loop condition is false.  Exiting loop
+  104 |     ESP_RETURN_ON_ERROR(esp_event_loop_create_default(), TAG,
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:302:54: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  302 | #define ESP_RETURN_ON_ERROR(x, log_tag, format, ...) do {                                       \
+      |                                                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:107:5: note: Assuming 's_station_netif' is non-null
+  107 |     ESP_RETURN_ON_FALSE(s_station_netif, ESP_ERR_NO_MEM, TAG,
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:374:22: note: expanded from macro 'ESP_RETURN_ON_FALSE'
+  374 |         if (unlikely(!(a))) {                                                                   \
+      |             ~~~~~~~~~^~~~~
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_compiler.h:24:44: note: expanded from macro 'unlikely'
+   24 | #define unlikely(x)    __builtin_expect(!!(x), 0)
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:107:5: note: Taking false branch
+  107 |     ESP_RETURN_ON_FALSE(s_station_netif, ESP_ERR_NO_MEM, TAG,
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:374:9: note: expanded from macro 'ESP_RETURN_ON_FALSE'
+  374 |         if (unlikely(!(a))) {                                                                   \
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:107:5: note: Loop condition is false.  Exiting loop
+  107 |     ESP_RETURN_ON_FALSE(s_station_netif, ESP_ERR_NO_MEM, TAG,
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:373:64: note: expanded from macro 'ESP_RETURN_ON_FALSE'
+  373 | #define ESP_RETURN_ON_FALSE(a, err_code, log_tag, format, ...) do {                             \
+      |                                                                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:110:5: note: Assuming 'err_rc_' is equal to 0
+  110 |     ESP_RETURN_ON_ERROR(esp_wifi_init(&init), TAG, "Wi-Fi init failed");
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:304:22: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  304 |         if (unlikely(err_rc_ != ESP_OK)) {                                                      \
+      |             ~~~~~~~~~^~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_compiler.h:24:44: note: expanded from macro 'unlikely'
+   24 | #define unlikely(x)    __builtin_expect(!!(x), 0)
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:110:5: note: Taking false branch
+  110 |     ESP_RETURN_ON_ERROR(esp_wifi_init(&init), TAG, "Wi-Fi init failed");
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:304:9: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  304 |         if (unlikely(err_rc_ != ESP_OK)) {                                                      \
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:110:5: note: Loop condition is false.  Exiting loop
+  110 |     ESP_RETURN_ON_ERROR(esp_wifi_init(&init), TAG, "Wi-Fi init failed");
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:302:54: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  302 | #define ESP_RETURN_ON_ERROR(x, log_tag, format, ...) do {                                       \
+      |                                                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:111:5: note: Assuming 'err_rc_' is equal to 0
+  111 |     ESP_RETURN_ON_ERROR(esp_event_handler_register(
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:304:22: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  304 |         if (unlikely(err_rc_ != ESP_OK)) {                                                      \
+      |             ~~~~~~~~~^~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_compiler.h:24:44: note: expanded from macro 'unlikely'
+   24 | #define unlikely(x)    __builtin_expect(!!(x), 0)
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:111:5: note: Taking false branch
+  111 |     ESP_RETURN_ON_ERROR(esp_event_handler_register(
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:304:9: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  304 |         if (unlikely(err_rc_ != ESP_OK)) {                                                      \
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:111:5: note: Loop condition is false.  Exiting loop
+  111 |     ESP_RETURN_ON_ERROR(esp_event_handler_register(
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:302:54: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  302 | #define ESP_RETURN_ON_ERROR(x, log_tag, format, ...) do {                                       \
+      |                                                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:114:5: note: Assuming 'err_rc_' is equal to 0
+  114 |     ESP_RETURN_ON_ERROR(esp_event_handler_register(
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:304:22: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  304 |         if (unlikely(err_rc_ != ESP_OK)) {                                                      \
+      |             ~~~~~~~~~^~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_compiler.h:24:44: note: expanded from macro 'unlikely'
+   24 | #define unlikely(x)    __builtin_expect(!!(x), 0)
+      |                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:114:5: note: Taking false branch
+  114 |     ESP_RETURN_ON_ERROR(esp_event_handler_register(
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:304:9: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  304 |         if (unlikely(err_rc_ != ESP_OK)) {                                                      \
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:114:5: note: Loop condition is false.  Exiting loop
+  114 |     ESP_RETURN_ON_ERROR(esp_event_handler_register(
+      |     ^
+C:/Work/yoRadio/.idf/v6.0.2/components/esp_common/include/esp_check.h:302:54: note: expanded from macro 'ESP_RETURN_ON_ERROR'
+  302 | #define ESP_RETURN_ON_ERROR(x, log_tag, format, ...) do {                                       \
+      |                                                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:119:26: note: Calling 'read_credentials'
+  119 |     s_have_credentials = read_credentials(&s_station_config);
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:30:10: note: 'file' is non-null
+   30 |     if (!file) return false;
+      |          ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:30:5: note: Taking false branch
+   30 |     if (!file) return false;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:33:12: note: Calling 'native_credential_next_row'
+   33 |     while (native_credential_next_row(file, line, sizeof(line))) {
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:10: note: 'file' is non-null
+   12 |     if (!file || !line || !capacity) return false;
+      |          ^~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:9: note: Left side of '||' is false
+   12 |     if (!file || !line || !capacity) return false;
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:19: note: 'line' is non-null
+   12 |     if (!file || !line || !capacity) return false;
+      |                   ^~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:9: note: Left side of '||' is false
+   12 |     if (!file || !line || !capacity) return false;
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:28: note: 'capacity' is 160
+   12 |     if (!file || !line || !capacity) return false;
+      |                            ^~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:5: note: Taking false branch
+   12 |     if (!file || !line || !capacity) return false;
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:13:5: note: Loop condition is true.  Entering loop body
+   13 |     for (;;) {
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:17:16: note: Left side of '&&' is true
+   17 |         while ((value = fgetc(file)) != EOF && value != '\n') {
+      |                ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:17:48: note: Assuming the condition is true
+   17 |         while ((value = fgetc(file)) != EOF && value != '\n') {
+      |                                                ^~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:17:9: note: Loop condition is true.  Entering loop body
+   17 |         while ((value = fgetc(file)) != EOF && value != '\n') {
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:19:17: note: Assuming 'value' is not equal to 0
+   19 |             if (!value || used + 1U >= capacity) valid = false;
+      |                 ^~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:19:17: note: Left side of '||' is false
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:19:13: note: Taking false branch
+   19 |             if (!value || used + 1U >= capacity) valid = false;
+      |             ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:20:22: note: 'valid' is true
+   20 |             else if (valid) line[used++] = (char)value;
+      |                      ^~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:20:18: note: Taking true branch
+   20 |             else if (valid) line[used++] = (char)value;
+      |                  ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:17:25: note: Assuming stream reaches end-of-file here
+   17 |         while ((value = fgetc(file)) != EOF && value != '\n') {
+      |                         ^~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:17:45: note: Left side of '&&' is false
+   17 |         while ((value = fgetc(file)) != EOF && value != '\n') {
+      |                                             ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:22:13: note: Left side of '||' is false
+   22 |         if (ferror(file) || (value == EOF && !present)) return false;
+      |             ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:22:30: note: Left side of '&&' is true
+   22 |         if (ferror(file) || (value == EOF && !present)) return false;
+      |                              ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:22:47: note: 'present' is true
+   22 |         if (ferror(file) || (value == EOF && !present)) return false;
+      |                                               ^~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:22:9: note: Taking false branch
+   22 |         if (ferror(file) || (value == EOF && !present)) return false;
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:23:13: note: 'valid' is true
+   23 |         if (valid) {
+      |             ^~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:23:9: note: Taking true branch
+   23 |         if (valid) {
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:24:17: note: 'used' is 1
+   24 |             if (used && line[used - 1U] == '\r') --used;
+      |                 ^~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:24:17: note: Left side of '&&' is true
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:24:25: note: Assuming the condition is false
+   24 |             if (used && line[used - 1U] == '\r') --used;
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:24:13: note: Taking false branch
+   24 |             if (used && line[used - 1U] == '\r') --used;
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:33:12: note: Returning from 'native_credential_next_row'
+   33 |     while (native_credential_next_row(file, line, sizeof(line))) {
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:33:5: note: Loop condition is true.  Entering loop body
+   33 |     while (native_credential_next_row(file, line, sizeof(line))) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:35:13: note: Assuming 'tab' is null
+   35 |         if (!tab) continue;
+      |             ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:35:9: note: Taking true branch
+   35 |         if (!tab) continue;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:35:19: note:  Execution continues on line 33
+   35 |         if (!tab) continue;
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\network_service.c:33:12: note: Calling 'native_credential_next_row'
+   33 |     while (native_credential_next_row(file, line, sizeof(line))) {
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:10: note: 'file' is non-null
+   12 |     if (!file || !line || !capacity) return false;
+      |          ^~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:9: note: Left side of '||' is false
+   12 |     if (!file || !line || !capacity) return false;
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:19: note: 'line' is non-null
+   12 |     if (!file || !line || !capacity) return false;
+      |                   ^~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:9: note: Left side of '||' is false
+   12 |     if (!file || !line || !capacity) return false;
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:28: note: 'capacity' is 160
+   12 |     if (!file || !line || !capacity) return false;
+      |                            ^~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:12:5: note: Taking false branch
+   12 |     if (!file || !line || !capacity) return false;
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:13:5: note: Loop condition is true.  Entering loop body
+   13 |     for (;;) {
+      |     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/credential_line.h:17:25: note: Read function called when stream is in EOF state. Function has no effect
+   17 |         while ((value = fgetc(file)) != EOF && value != '\n') {
+      |                         ^~~~~~~~~~~
+Suppressed 6 warnings (6 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

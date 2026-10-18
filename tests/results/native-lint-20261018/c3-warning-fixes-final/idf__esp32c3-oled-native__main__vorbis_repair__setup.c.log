@@ -1,0 +1,40 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:33:3: warning: switching on non-enum value without default case may not cover all cases [bugprone-switch-missing-default-case]
+   33 |   switch(b->dec_type){
+      |   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:137:12: warning: narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  137 |           int bit=(entry>>(length-j-1))&1;
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:148:10: warning: narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'long' is implementation-defined [bugprone-narrowing-conversions]
+  148 |           chase=r[chase*2+bit];
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:151:12: warning: narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  151 |           int bit=(entry>>(length-j-1))&1;
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:220:5: warning: switching on non-enum value without default case may not cover all cases [bugprone-switch-missing-default-case]
+  220 |     switch(s->dec_nodeb){
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:703:11: warning: Although the value stored to 'k' is used in the enclosing expression, the value is never actually read from 'k' [clang-analyzer-deadcode.DeadStores]
+  703 |   for(j=0,k=0;j<info->partitions;j++)
+      |           ^ ~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:703:11: note: Although the value stored to 'k' is used in the enclosing expression, the value is never actually read from 'k'
+  703 |   for(j=0,k=0;j<info->partitions;j++)
+      |           ^ ~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:914:22: warning: multilevel pointer conversion from 'vorbis_info_floor **' (aka 'void **') to 'void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  914 |       media_lib_free(ci->floor_param);
+      |                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:980:20: warning: multilevel pointer conversion from 'int32_t **' (aka 'int **') to 'void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  980 |     media_lib_free(dsp->work);
+      |                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:981:20: warning: multilevel pointer conversion from 'int32_t **' (aka 'int **') to 'void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  981 |     media_lib_free(dsp->mdctright);
+      |                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:989:17: warning: multilevel pointer conversion from 'void *' to 'int32_t **' (aka 'int **'), please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  989 |     dsp->work = repair_calloc(info->channels, sizeof(*dsp->work));
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:990:22: warning: multilevel pointer conversion from 'void *' to 'int32_t **' (aka 'int **'), please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  990 |     dsp->mdctright = repair_calloc(info->channels, sizeof(*dsp->mdctright));
+      |                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:1082:19: warning: multilevel pointer conversion from 'void *' to 'vorbis_info_floor **' (aka 'void **'), please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+ 1082 |   ci->floor_param=repair_alloc(sizeof(*ci->floor_param)*ci->floors);
+      |                   ^
+12 warnings generated.

@@ -1,0 +1,96 @@
+diff --git a/idf/esp32c3-oled-native/main/aac_compact_owner.c b/idf/esp32c3-oled-native/main/aac_compact_owner.c
+index 70974748..bfe243a0 100644
+--- a/idf/esp32c3-oled-native/main/aac_compact_owner.c
++++ b/idf/esp32c3-oled-native/main/aac_compact_owner.c
+@@ -269,6 +269,9 @@ void __wrap_PVMP4AudioDecoderResetBuffer(void *opaque) {
+         .frame={(void *)&OWNER_CHANNEL(owner,0)->frame,(void *)&OWNER_CHANNEL(owner,1)->frame},
+         .sync={&OWNER_CHANNEL(owner,0)->sync_state,&OWNER_CHANNEL(owner,1)->sync_state},
+         .initialize_ps=&owner->initialize_ps,.ps=owner->ps,
++#ifdef CONFIG_YORADIO_AAC_HIGH_HISTORY
++        .right_ps_synthesis=aac_high_ps_synthesis(aac_high_owner_right(owner)),
++#endif
+         .ps_initialized=state->ps_initialized};
+     aac_sbr_reset_core(core,&view);
+ #ifdef CONFIG_YORADIO_QEMU_AAC_POINTER_AUDIT
+diff --git a/idf/esp32c3-oled-native/main/aac_high_history_abi.h b/idf/esp32c3-oled-native/main/aac_high_history_abi.h
+index 8b671e33..0e53bb46 100644
+--- a/idf/esp32c3-oled-native/main/aac_high_history_abi.h
++++ b/idf/esp32c3-oled-native/main/aac_high_history_abi.h
+@@ -174,9 +174,9 @@ _Static_assert(offsetof(aac_high_channel_t,smoothing)>=sizeof(aac_sbr_ps_overlay
+ _Static_assert(offsetof(aac_high_owner_t,inactive_ps)==offsetof(aac_high_full_owner_t,embedded_ps),
+                "Inactive PS detection word must match the native tail cursor");
+ 
+-static inline int16_t *aac_high_ps_synthesis(aac_high_channel_view_t *channel) {
++static inline int16_t *aac_high_ps_synthesis(aac_high_channel_t *channel) {
+ #ifdef AAC_LOW_WORKSPACE
+-    return ((aac_high_channel_t *)(void *)channel)->ps_synthesis;
++    return channel->ps_synthesis;
+ #else
+     return channel->frame.synthesis;
+ #endif
+diff --git a/idf/esp32c3-oled-native/main/aac_high_reset.h b/idf/esp32c3-oled-native/main/aac_high_reset.h
+index 9c7c7cff..6c7e5fde 100644
+--- a/idf/esp32c3-oled-native/main/aac_high_reset.h
++++ b/idf/esp32c3-oled-native/main/aac_high_reset.h
+@@ -13,9 +13,9 @@ static inline void aac_high_reset_core(aac_core_abi_t *core,
+             memset(channel->ltp_history,0,288*sizeof(channel->ltp_history[0]));
+             memset(channel->ltp_history+1312,0,288*sizeof(channel->ltp_history[0]));
+             aac_high_frame_t *frame=(void *)sbr->frame[ch];
+-            aac_high_channel_view_t *owner_channel=(void *)((uint8_t *)frame-offsetof(aac_high_channel_t,frame));
+             int16_t *synthesis=ch && core->ps_present==1 && sbr->ps_initialized ?
+-                aac_high_ps_synthesis(owner_channel):frame->synthesis;
++                sbr->right_ps_synthesis:frame->synthesis;
++            assert(synthesis);
+             memset(synthesis,0,sizeof(frame->synthesis));
+             memset(frame->previous_noise,0,sizeof(frame->previous_noise));
+         }
+diff --git a/idf/esp32c3-oled-native/main/aac_pointer_audit.c b/idf/esp32c3-oled-native/main/aac_pointer_audit.c
+index 691ce36e..0cfcfff4 100644
+--- a/idf/esp32c3-oled-native/main/aac_pointer_audit.c
++++ b/idf/esp32c3-oled-native/main/aac_pointer_audit.c
+@@ -369,7 +369,7 @@ static bool ps_addresses(aac_high_owner_t *owner,aac_ps_abi_t *ps,
+     EXACT(ps,&overlay->relocated_ps);
+     EXACT(ps->peak,overlay->peak);EXACT(ps->previous_energy,overlay->previous_energy);
+     EXACT(ps->previous_peak_difference,overlay->previous_peak_difference);
+-    EXACT(ps->right_synthesis,aac_high_ps_synthesis(aac_high_owner_channel(owner,1)));
++    EXACT(ps->right_synthesis,aac_high_ps_synthesis(aac_high_owner_right(owner)));
+     hybrid_storage_t *h=(void *)overlay->hybrid_and_long_delays;
+     EXACT(ps->hybrid,&h->hybrid);
+     REQUIRE(h->hybrid.bands==HYBRID_BANDS && h->hybrid.history_length==HYBRID_HISTORY);
+@@ -539,7 +539,7 @@ static bool workspace_span(const void *p,size_t bytes,aac_analysis_core_t *core,
+         {frame->high_real,QMF_HIGH_WORDS*sizeof(int32_t),_Alignof(int32_t)},
+         {frame->high_imag,QMF_HIGH_WORDS*sizeof(int32_t),_Alignof(int32_t)},
+         {frame->synthesis,sizeof(frame->synthesis),_Alignof(int16_t)},
+-        {aac_high_ps_synthesis(aac_high_owner_channel(owner,1)),sizeof(aac_high_owner_channel(owner,1)->frame.synthesis),_Alignof(int16_t)},
++        {aac_high_ps_synthesis(aac_high_owner_right(owner)),sizeof(aac_high_owner_channel(owner,1)->frame.synthesis),_Alignof(int16_t)},
+         {core->workspace,sizeof(*core->workspace),_Alignof(int32_t)},
+     };
+     for(unsigned i=0;i<sizeof(regions)/sizeof(regions[0]);++i)
+diff --git a/idf/esp32c3-oled-native/main/aac_sbr_reset.h b/idf/esp32c3-oled-native/main/aac_sbr_reset.h
+index a13c7e11..c3054ea3 100644
+--- a/idf/esp32c3-oled-native/main/aac_sbr_reset.h
++++ b/idf/esp32c3-oled-native/main/aac_sbr_reset.h
+@@ -10,6 +10,9 @@ typedef struct {
+     int32_t *sync[AAC_SBR_CHANNELS], *initialize_ps;
+     aac_ps_abi_t *ps;
+     bool ps_initialized;
++    // Optional compact high-history destination. This temporary pointer is
++    // supplied from the typed right owner; it is not part of the vendor ABI.
++    int16_t *right_ps_synthesis;
+ } aac_sbr_reset_view_t;
+ 
+ // Source repair of the pinned vendor reset, including its out-of-core PS
+diff --git a/idf/esp32c3-oled-native/main/qemu_aac_reset.c b/idf/esp32c3-oled-native/main/qemu_aac_reset.c
+index 8903af4d..d8ad442e 100644
+--- a/idf/esp32c3-oled-native/main/qemu_aac_reset.c
++++ b/idf/esp32c3-oled-native/main/qemu_aac_reset.c
+@@ -68,6 +68,9 @@ static void repaired_reset(aac_core_abi_t *core) {
+         .frame={(void *)&owner->channel[0].frame,(void *)&owner->channel[1].frame},
+         .sync={&owner->channel[0].sync_state,&owner->channel[1].sync_state},
+         .initialize_ps=&owner->initialize_ps,.ps=owner->ps,
++#ifdef CONFIG_YORADIO_QEMU_AAC_HIGH_HISTORY_TEST
++        .right_ps_synthesis=aac_high_ps_synthesis(aac_high_owner_right(owner)),
++#endif
+         .ps_initialized=owner->ps!=(void *)&owner->inactive_ps};
+     aac_sbr_reset_core(core,&view);
+ }
