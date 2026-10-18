@@ -192,6 +192,7 @@ static int wifi_mode;
 static wifi_config_t sta_config, ap_config;
 static esp_netif_ip_info_t ap_ip;
 static unsigned dhcp_phase, scan_clears;
+static unsigned station_netifs_created, ap_netifs_created, station_configs_set, ap_configs_set;
 esp_err_t esp_event_loop_create_default(void)
 {
     return ESP_OK;
@@ -211,11 +212,13 @@ esp_err_t esp_netif_init(void)
 }
 esp_netif_t *esp_netif_create_default_wifi_sta(void)
 {
+    ++station_netifs_created;
     return allocation_failure ? NULL : &sta;
 }
 esp_netif_t *esp_netif_create_default_wifi_ap(void)
 {
-    return &ap;
+    ++ap_netifs_created;
+    return allocation_failure ? NULL : &ap;
 }
 void esp_netif_set_ip4_addr(esp_ip4_addr_t *ip, unsigned a, unsigned b, unsigned c, unsigned d)
 {
@@ -280,10 +283,14 @@ esp_err_t esp_wifi_set_mode(int mode)
 esp_err_t esp_wifi_set_config(int interface, const wifi_config_t *config)
 {
     if (interface == WIFI_IF_STA)
+    {
+        ++station_configs_set;
         sta_config = *config;
+    }
     else
     {
         assert(interface == WIFI_IF_AP);
+        ++ap_configs_set;
         ap_config = *config;
     }
     return ESP_OK;
@@ -365,6 +372,8 @@ static void test_wifi_setup(void)
     preferences.wifi_mode = 2;
     strcpy(preferences.ssid, "saved-but-offline");
     CHECK(network_init() == ESP_OK);
+    CHECK(station_netifs_created == 0 && ap_netifs_created == 1);
+    CHECK(station_configs_set == 0 && ap_configs_set == 1);
     CHECK(network_ap_active() && !network_connected() && wifi_mode == WIFI_MODE_APSTA);
     CHECK(connects == 0 && !sta_config.sta.ssid[0]);
     CHECK(ap_config.ap.authmode == WIFI_AUTH_OPEN && ap_config.ap.channel == 1 &&
@@ -375,14 +384,22 @@ static void test_wifi_setup(void)
     char address[20];
     network_address(address, sizeof(address));
     CHECK(!strcmp(address, "192.168.43.1") && dns_started == 1);
-    stop_after = 22;
-    run_task("wifi_fallback", stop_at_delay);
-    CHECK(task_count == 1 && restarts == 0 && preferences.wifi_mode == 2);
+    /* The real factory AP path has no STA TCP/IP netif. Scan still uses the
+     * driver's idle STA role; its events must not start station retries. */
+    event_callback(NULL, WIFI_EVENT, WIFI_EVENT_STA_START, NULL);
+    scan_disconnect = true;
+    wifi_ap_record_t records[2];
+    uint16_t count = 2;
+    CHECK(network_scan(records, &count) == ESP_OK && count == 1);
+    CHECK(!strcmp((char *)records[0].ssid, "synthetic") && records[0].rssi == -35);
+    CHECK(task_count == 0 && restarts == 0 && connects == 0 && preferences.wifi_mode == 2);
 }
 static void test_wifi_reconnect(void)
 {
     /* Four station retries, readiness after DHCP, retry reset and scan-event suppression. */
     station_start();
+    CHECK(station_netifs_created == 1 && ap_netifs_created == 0);
+    CHECK(station_configs_set == 1 && ap_configs_set == 0 && dns_started == 0 && dhcp_phase == 0);
     CHECK(wifi_mode == WIFI_MODE_STA && !network_ap_active() && connects == 1);
     CHECK(!memcmp(sta_config.sta.ssid, "fixture", 7) &&
           sta_config.sta.threshold.authmode == WIFI_AUTH_WPA2_PSK);
@@ -426,6 +443,7 @@ static void test_wifi_open(void)
     preferences.password[0] = 0;
     CHECK(network_init() == ESP_OK);
     CHECK(sta_config.sta.threshold.authmode == WIFI_AUTH_OPEN && !sta_config.sta.password[0]);
+    CHECK(station_netifs_created == 1 && ap_netifs_created == 0 && dns_started == 0);
 }
 static void test_wifi_fallback(void)
 {
@@ -480,11 +498,25 @@ static void test_restart_failure(void)
 }
 static void test_wifi_allocation_failure(void)
 {
+    /* Setup must fail on its own AP allocation, without allocating STA first. */
     allocation_failure = true;
     CHECK(network_init() == ESP_ERR_NO_MEM && task_count == 0);
+    CHECK(station_netifs_created == 0 && ap_netifs_created == 1 && dns_started == 0);
+}
+static void test_wifi_station_allocation_failure(void)
+{
+    /* Station allocation failure must not initialize an unrelated AP or DNS. */
+    preferences.wifi_mode = 1;
+    strcpy(preferences.ssid, "fixture");
+    allocation_failure = true;
+    CHECK(network_init() == ESP_ERR_NO_MEM && task_count == 0);
+    CHECK(station_netifs_created == 1 && ap_netifs_created == 0 && dns_started == 0);
 }
 static void test_wifi_task_failure(void)
 {
+    /* The retry supervisor belongs to the station role. */
+    preferences.wifi_mode = 1;
+    strcpy(preferences.ssid, "fixture");
     task_result = 0;
     CHECK(network_init() == ESP_ERR_NO_MEM);
 }
@@ -2220,6 +2252,7 @@ int main(int argc, char **argv)
                  {"wifi_failed_retries", test_wifi_failed_retries},
                  {"restart_persistence_failure", test_restart_failure},
                  {"wifi_allocation_failure", test_wifi_allocation_failure},
+                 {"wifi_station_allocation_failure", test_wifi_station_allocation_failure},
                  {"wifi_task_failure", test_wifi_task_failure},
                  {"weather_worker", test_weather_worker},
                  {"time_worker", test_time_worker},

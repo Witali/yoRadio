@@ -2690,3 +2690,33 @@ true. Это только начало нового прогона, не 24 ча
   Scratch netif probe нужно перенести в reusable test после terminal full run.
   Кандидат оптимизации — лишние native netif/DNS в другом режиме; пока код и
   производственный app не менялись, затраты памяти и wire behavior не измерены.
+
+## 18 октября 2026 — network role allocation, в работе
+
+- Создана отдельная sparse worktree codex/small-tv-netif-roles от9c8a6747, чтобы
+  сохранить 273 frozen входа текущего full run в другой копии.
+- Изменён только network/wifi.c и его platform coverage: по одному netif на
+  выбранную роль, AP-only DHCP/DNS и STA-only retry task. APSTA scan остаётся.
+- Negative control прежнего C упал на лишнем STA netif в setup. Исправленный C
+  прошёл 48 cases /1 182 327 checks. SDK/QEMU behavior и RAM gain ещё не измерены.
+- Production compile session58887 запущен с общим pinned SDK; это не flash.
+  После завершения проверить development archive перед реальными VM проверками.
+
+- Compile session58887 завершён exit0; app26C6 / ELFFE9B / sourceD628 сохранены
+  в development archive ветки. Размер1 169 872 bytes /366 128 свободно; DEBUG off.
+  Ни success SDK/QEMU, ни RAM gain одним размером/компиляцией не заявляются.
+- Запущены actual setup/AP scan/reboot->STA (17901), четыре Wi-Fi policy cases
+  (53919) и отдельный memory baseline8cycles old6324 на B44 (20063). Старый H10
+  остаётся на A74; его prefix не используется вместо before/after memory control.
+
+- Actual setup scan/configure/reboot->STA/cold relaunch/reset новой26C6 прошёл
+  (21 check). Четыре Wi-Fi DHCP/failure потока factory/native и26 evidence guards
+  прошли с неизменными образами и исходными input SHA.
+- Честный runtime before/after на B44: по8циклов /64HTTP /4outage /69events.
+  Оба pass; task set отличается только отсутствием captive_dns в STA (12->11).
+  Ready free heap87876->92036; медианный gain9samples4160bytes. Это короткий
+  STA workload, не суточная приёмка и не измерение AP. Исходные отчёты сохранены.
+- Проверены59 production inputs: изменён только network/wifi.c; sdkconfig один.
+  Bootloader checksum/SHA валидны, исполняемый образ идентичен кроме SDK даты
+  компиляции и integrity bytes. Поэтому смена bootloader hash не скрыта как
+  «тот же binary». Scoped proof network-roles-validation-20261018.json +5gzip.

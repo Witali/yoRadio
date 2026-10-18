@@ -5,6 +5,57 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
+## Текущая ветка network roles — 2026-10-18
+
+Работа идёт в `.worktree/small-tv-netif-roles`, ветка codex/small-tv-netif-roles,
+base9c8a6747. Текущий full APSTA regression в другой рабочей копии остаётся
+замороженным; его 273 входа и H10 app6324 не менять.
+
+По factory netif observation новая C-инициализация создаёт только STA или AP,
+конфигурирует только выбранный Wi-Fi interface, captive DNS запускает только
+для AP, wifi_fallback task — только для STA. APSTA driver scan сохраняется
+без STA TCP/IP netif. Вынесена configure_access_point_netif; network_init получил
+FIXED_RECONSTRUCTION. Это один network module, прочие категории не менялись.
+
+Новый host negative control на прежнем C упал в wifi_setup: создавались оба
+netif. После изменения прошли 48 платформенных cases / 1 182 327 проверок,
+включая AP scan без station retries, отдельные ошибки AP/STA allocation и
+station retry supervisor failure. Логи .build/netif-roles-platform-{before,after}-20261018.log
+в основном репозитории. Пока это не доказательство реальной экономии RAM или
+SDK/QEMU корректности; обязательны реальные AP scan/configure/reboot->STA,
+DHCP waiting/failure, idle heap/tasks before/after и полный regression.
+
+Production build session58887 завершён exit0; development archive сохранён.
+App26c6ca74940dbfa5f27b67a308515a2901bcdab2968e2a45954055b59cbe1234;
+ELFfe9be9577dd82294b86710e61e25f5d1f54f92d4bf78dce8b3d578e9fc34adc9;
+source d62847d868de1b6cc806fbc8f0ff6426405a55200d3f7d0578d9db508bbce734.
+App1 169 872 bytes, free366 128; DEBUG off. Это новая VM test build, физические
+платы не прошивались. Старый полный run и H10 по-прежнему app6324.
+
+Независимые короткие проверки завершены exit0: actual AP scan/configure/reboot->
+STA/persistent relaunch/reset (21 проверка), четыре delayed-DHCP/missing-AP
+сценария factory+новая C и 26 rejection controls. До/после runtime по8 циклов,
+64 HTTP,4 outage,69events на одном B44 и одинаковом sdkconfig прошли.
+В STA после изменения нет captive_dns task (11 задач вместо12); free heap
+при ready87876 ->92036, медианный gain9 snapshots4160 bytes. Это не H10 и
+не AP RAM measurement. Все31 runtime inputs каждого workload повторно совпали.
+
+Production inputs59, изменён ровно app/network/wifi.c. Bootloader BIN hash
+поменялся из-за SDK compile date/time; весь остальной образ совпал после
+проверки checksum/SHA и маскирования только24байт date_time и33байт integrity.
+Raw bootloader hashes не выдавать за одинаковые. Scoped report и5rawgzip —
+network-roles-validation-20261018.json. Полный regression новой26C6 ещё нужен;
+старый full и H10 на6324 не переписывать как его приёмку.
+
+Factory netif scratch prototype .build/probe_factory_netifs_20261018.py нужно
+перенести в reusable role test здесь: собственная public STA boot создаёт NVS,
+её flash-копия с mode=2 должна содержать только AP netif. Native netif layout
+брать из текущего ELF/DWARF, factory offsets привязаны к dump5321. Runtime heap
+снимать существующим read-only Observer на vTaskDelay, а не в случайном allocator
+critical section. Для baseline использовать неизменный app6324/ELF9E2C в
+.worktree/small-tv-ap-http-ready; QEMU B44 общий. Старый H10 не трогать до
+подтверждённой необходимости его заменить проверенной новой сборкой.
+
 ## Заводские netif в APSTA — уточнено 2026-10-18
 
 Read-only проверка списка SDK netif в двух настоящих factory VM прошла.

@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "status": "scoped_pass",
+  "scope": "Selected-role network allocation, real AP scan/configure/reboot->STA, four DHCP/failure flows and matched short native memory workloads. No physical flashing.",
+  "app_sha256": "26c6ca74940dbfa5f27b67a308515a2901bcdab2968e2a45954055b59cbe1234",
+  "native_elf_sha256": "fe9be9577dd82294b86710e61e25f5d1f54f92d4bf78dce8b3d578e9fc34adc9",
+  "source_sha256": "d62847d868de1b6cc806fbc8f0ff6426405a55200d3f7d0578d9db508bbce734",
+  "qemu_sha256": "b44d1a054fe65443b050e0feed86dcda3029d33c76faea9bb7e69a988feb0160",
+  "production_inputs": 59,
+  "changed_production_inputs": [
+    "app/network/wifi.c"
+  ],
+  "app_bytes": 1169872,
+  "app_partition_free_bytes": 366128,
+  "platform_cases": 48,
+  "platform_checks": 1182327,
+  "wifi_contract_checks": [
+    {
+      "name": "failed",
+      "passed": true
+    },
+    {
+      "name": "changed-inputs",
+      "passed": true
+    },
+    {
+      "name": "wrong-app",
+      "passed": true
+    },
+    {
+      "name": "wrong-elf",
+      "passed": true
+    },
+    {
+      "name": "wrong-qemu",
+      "passed": true
+    },
+    {
+      "name": "wrong-test",
+      "passed": true
+    },
+    {
+      "name": "missing-factory",
+      "passed": true
+    },
+    {
+      "name": "wrong-source",
+      "passed": true
+    },
+    {
+      "name": "early-setup",
+      "passed": true
+    },
+    {
+      "name": "early-reset",
+      "passed": true
+    },
+    {
+      "name": "early-ip",
+      "passed": true
+    },
+    {
+      "name": "short-delay",
+      "passed": true
+    },
+    {
+      "name": "filter-off",
+      "passed": true
+    },
+    {
+      "name": "filter-flushed",
+      "passed": true
+    },
+    {
+      "name": "no-recovery",
+      "passed": true
+    },
+    {
+      "name": "no-http",
+      "passed": true
+    },
+    {
+      "name": "panic",
+      "passed": true
+    },
+    {
+      "name": "changed-media",
+      "passed": true
+    },
+    {
+      "name": "missing-failure-case",
+      "passed": true
+    },
+    {
+      "name": "ap-not-offline",
+      "passed": true
+    },
+    {
+      "name": "failure-not-saved",
+      "passed": true
+    },
+    {
+      "name": "restart-loop",
+      "passed": true
+    },
+    {
+      "name": "missing-setup-http",
+      "passed": true
+    },
+    {
+      "name": "early-factory-ap",
+      "passed": true
+    },
+    {
+      "name": "factory-apsta-got-ip",
+      "passed": true
+    },
+    {
+      "name": "factory-apsta-unobserved",
+      "passed": true
+    }
+  ],
+  "setup_checks": {
+    "consecutive_separate_loopback_ports": true,
+    "initial_credentials_empty_setup_mode": true,
+    "real_setup_html": true,
+    "real_wifi_scan": true,
+    "invalid_credentials_rejected": true,
+    "invalid_credentials_do_not_restart": true,
+    "foreign_origin_rejected": true,
+    "ordinary_json_whitespace_accepted": true,
+    "settings_saved_via_real_http": true,
+    "configure_post_accepted": true,
+    "station_web_interface_after_reboot": true,
+    "named_time_server_dns_reply": true,
+    "station_clock_set": true,
+    "credentials_persisted_in_guest_flash": true,
+    "real_dhcp_station_address": true,
+    "no_panic_after_initial_configure": true,
+    "persistent_cold_boot_skips_setup": true,
+    "no_panic_after_persistent_cold_boot": true,
+    "reset_preserves_http_settings": true,
+    "no_panic_or_watchdog": true,
+    "immutable_source_artifacts_unchanged": true
+  },
+  "memory": {
+    "same_workload": {
+      "cycles": 8,
+      "http_requests": 64,
+      "outages": 4,
+      "events": 69
+    },
+    "before_app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+    "before_ready_heap": 87876,
+    "after_ready_heap": 92036,
+    "free_heap_gain_bytes_by_snapshot": {
+      "ready": 4160,
+      "cycle-0": 4152,
+      "cycle-1": 4140,
+      "cycle-2": 4168,
+      "cycle-3": 4152,
+      "cycle-4": 4164,
+      "cycle-5": 4160,
+      "cycle-6": 4172,
+      "cycle-7": 4156
+    },
+    "median_free_heap_gain_bytes": 4160,
+    "before_tasks": [
+      "IDLE",
+      "captive_dns",
+      "clock_display",
+      "esp_timer",
+      "httpd",
+      "settings",
+      "sys_evt",
+      "tcpip",
+      "time_sync",
+      "weather_http",
+      "wifi",
+      "wifi_fallback"
+    ],
+    "after_tasks": [
+      "IDLE",
+      "clock_display",
+      "esp_timer",
+      "httpd",
+      "settings",
+      "sys_evt",
+      "tcpip",
+      "time_sync",
+      "weather_http",
+      "wifi",
+      "wifi_fallback"
+    ],
+    "bootloader_instructions_identical": true,
+    "bootloader_difference": "SDK compile date/time and image checksum/SHA only",
+    "sdkconfig_identical": true,
+    "bootloader_comparison": {
+      "before_sha256": "a0472393b92e6c5972c7a368b333b80afeb31da865810d3db57f31d02caa382f",
+      "after_sha256": "d23feb1ea30ff5cae25764c40ae8d2ad9c09ae6e8ac13a21ca3ada4618b5415d",
+      "normalized_sha256": "ba2855b728b3c306b63be1d832d74414ae078563ed98fad992eee45416cb4a76",
+      "compile_time_range": [
+        72,
+        96
+      ],
+      "integrity_range": [
+        16895,
+        16928
+      ],
+      "descriptor_header": "components/esp_bootloader_format/include/esp_bootloader_desc.h",
+      "descriptor_header_sha256": "920ad502125f7d262f4ce5a97fcca2a48db4b3d94c80747dc4dfa0a40f42a955"
+    }
+  },
+  "raw_reports": {
+    "platform": {
+      "file": "network-roles-validation-20261018-platform.json.gz",
+      "uncompressed_sha256": "83a96db5587a923b272b8cddd986bf1f4bcf1b50a97a09262e4b022c760b9ef0"
+    },
+    "setup": {
+      "file": "network-roles-validation-20261018-setup.json.gz",
+      "uncompressed_sha256": "ec2e2b3c98bb538bf7afe8f0d4b6bc01ec080580c1d87aac3110d484b6d6eef9"
+    },
+    "wifi": {
+      "file": "network-roles-validation-20261018-wifi.json.gz",
+      "uncompressed_sha256": "0a4e8ee790c004d6d987b9d54d6a22facfc6df3c9b5faea4189f59aa7eeb2988"
+    },
+    "memory_before": {
+      "file": "network-roles-validation-20261018-memory_before.json.gz",
+      "uncompressed_sha256": "6e5c8f58b06439c790e90589501ec67326339de11cb5758a6eb4d6b7df0bf376"
+    },
+    "memory_after": {
+      "file": "network-roles-validation-20261018-memory_after.json.gz",
+      "uncompressed_sha256": "12d01a4d94eef8aac4e94201176d378efa5b9573dc939b80b2d737c9ec84c32a"
+    }
+  },
+  "limitations": [
+    "Not a complete new-image regression, physical board result or 24-hour H10.",
+    "Memory comparison is native STA workload only; AP RAM gain was not measured.",
+    "Nine snapshots over eight cycles do not establish an absence of long-term leakage.",
+    "The baseline full regression/H10 remain on app6324; their results do not validate app26C6."
+  ]
+}
