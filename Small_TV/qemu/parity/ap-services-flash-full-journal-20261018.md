@@ -50,3 +50,31 @@ storage controls on the exact BC68/20B candidate: pointer crop resize, selected
 RGB pixels, synthetic metadata removal, mobile viewport,12multipart chunks,
 cancel/Escape and exact new-process cold readback. This does not retroactively
 add a group to the frozen suite or close physical/phone/H10 acceptance.
+
+## Browser setup and continuing integration
+
+The separate `codex/small-tv-browser-wifi` branch is committed/pushed as
+`2c28b998`. Its exact-current BC68/20B real Chrome gate passed 93 browser and
+18 raw-persistence/role checks over three independent setup/cold VM pairs:
+normal discovered SSID, literal `manual`, and manual entry after a real empty
+scan with the external AP offline. Invalid/cancelled input preserves the raw
+record, AP role and boot count; successful setup reaches STA DHCP/SNTP and
+cold persistence. The proof retains two failed harness-development attempts,
+all 25 input hashes, 13 raw gzip artifacts and two actual screenshots.
+All six browser VM PIDs were verified absent. This remains standalone evidence,
+with no retroactive addition to this frozen full suite.
+
+The full controller remains alive with its original process identity. QEMU
+photo controls, active-photo reinitialization and all six setting-during-fade
+cases passed for both firmware variants. Real initial Wi-Fi setup/persistence
+and parsed weather HTTP have also passed for both. No terminal full result
+exists yet. All 533 frozen inputs were rehashed after the browser work and
+still match exactly.
+
+The current H10 supervisor/workload/guard/VM identities were again verified
+live. Its corrected start metadata is preserved in `c0fc3cb3` (also cherry-picked
+as `b1bba736` in the browser branch); no runtime input or process was replaced.
+A file-only diagnostic audited 63 complete cycles, 512 HTTP requests and one
+external AP outage over 1070.210754 observed guest seconds. All 31 runtime
+inputs and start record match; UART has one ROM boot and no panic. Status is
+explicitly **pending**: this prefix is not a completed 86400-second H10 run.
