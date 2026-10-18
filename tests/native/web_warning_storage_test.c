@@ -17,6 +17,9 @@ typedef int esp_err_t;
 #define ESP_ERR_NO_MEM 0x101
 #define ESP_ERR_INVALID_ARG 0x102
 #define ESP_ERR_INVALID_SIZE 0x104
+#define ESP_ERR_INVALID_STATE 0x103
+#define ESP_ERR_TIMEOUT 0x107
+#define esp_random() UINT32_C(12345)
 #define pdTRUE 1
 #define pdMS_TO_TICKS(x) (x)
 #define ESP_LOGI(...) ((void)0)
@@ -92,6 +95,9 @@ int main(int argc,char **argv) {
     no_memory=true;assert(web_upload_storage_init()==ESP_ERR_NO_MEM);
     assert(!web_upload_publish_file("/spiffs/tmp","/spiffs/live")&&!web_upload_open_file("/spiffs/live"));
     no_memory=false;assert(web_upload_storage_init()==ESP_OK);
+#ifdef CURRENT_PRIVATE_STORE
+    assert(network_service_storage_init()==ESP_OK);
+#endif
 #ifdef ROWS_ONLY
     clear();char row[256];memset(row,'x',159);strcpy(row+159,"phantom\tfixture\nallowed\tfixture\n");
     text("/spiffs/data/wifi.csv",row);assert(read_credentials(&s_station_config));

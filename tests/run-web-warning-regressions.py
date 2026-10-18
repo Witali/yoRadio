@@ -15,6 +15,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 MAIN=ROOT/'idf/esp32c3-oled-native/main'
 STORAGE=ROOT/'idf/components/native_storage'
+WIFI=ROOT/'idf/components/native_wifi_store'
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
 from run_output_dma_host import host,run
 
@@ -29,6 +30,18 @@ def function(source,name):
         count+=(source[position]=='{')-(source[position]=='}')
         position+=1
     return source[start:position]+'\n'
+
+
+def wifi_store_section(source):
+    """Actual owner callbacks plus shared core, only for the new desired store."""
+    marker = '// Desired next-boot credential owner.'
+    if marker not in source:
+        return ''
+    start = source.index(marker)
+    end = source.index('// End desired next-boot credential owner.', start)
+    return ('#define CURRENT_PRIVATE_STORE 1\n#include "native_wifi_store.h"\n'
+            '#include "native_wifi_file.h"\n#include "native_wifi_store.c"\n'
+            '#include "native_wifi_file.c"\n' + source[start:end])
 
 
 def main():
@@ -50,7 +63,8 @@ def main():
     def execute(name,test,flags=(),arguments=(),negative=False):
         binary=out/name
         command=common+(['-Wno-error'] if negative else [])+list(flags)+[
-            '-I'+host(out),'-I'+host(MAIN),'-I'+host(STORAGE),'-I'+host(STORAGE/'include'),host(test),'-o',host(binary)]
+            '-I'+host(out),'-I'+host(MAIN),'-I'+host(STORAGE),'-I'+host(STORAGE/'include'),
+            '-I'+host(WIFI),'-I'+host(WIFI/'include'),host(test),'-o',host(binary)]
         try:
             build_log=run(command)
         except subprocess.CalledProcessError as error:
@@ -82,7 +96,7 @@ def main():
     def storage_includes(wifi_source,publisher):
         destination = function(publisher,'upload_destination') if 'static bool upload_destination(' in publisher else ''
         (out/'storage-production.inc').write_text(helpers+paths+destination+function(publisher,'publish_file'))
-        (out/'wifi-production.inc').write_text('#include "credential_line.h"\n'+''.join(function(wifi_source,name) for name in wifi_names
+        (out/'wifi-production.inc').write_text('#include "credential_line.h"\n'+wifi_store_section(wifi_source)+''.join(function(wifi_source,name) for name in wifi_names
                                                        if name+'(' in wifi_source))
 
     storage_test=ROOT/'tests/native/web_warning_storage_test.c'
@@ -118,7 +132,8 @@ def main():
     files=[Path(__file__),ROOT/'tests/run-esp32c3-web-memory.py',storage_test,static_test,names_test,
            *(MAIN/name for name in current),MAIN/'web_upload.h',MAIN/'web_multipart.h',
            STORAGE/'file_transaction.c',STORAGE/'include/file_transaction.h',STORAGE/'include/credential_line.h',
-           STORAGE/'include/web_file_form.h',STORAGE/'include/web_multipart.h']
+           STORAGE/'include/web_file_form.h',STORAGE/'include/web_multipart.h',
+           WIFI/'native_wifi_store.c',WIFI/'native_wifi_file.c',*WIFI.glob('include/*.h')]
     report['source_sha256']={path.relative_to(ROOT).as_posix():hashlib.sha256(path.read_bytes()).hexdigest() for path in files}
     for path in files:
         snapshot=out/'sources'/path.relative_to(ROOT)
