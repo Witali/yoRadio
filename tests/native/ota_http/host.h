@@ -104,7 +104,7 @@ esp_err_t httpd_resp_send(httpd_req_t *,const char *,ssize_t);
 esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
 ssize_t native_web_transport_send(httpd_handle_t,int,const void *,size_t,int,bool *);
 ssize_t native_web_transport_recv(httpd_handle_t,int,void *,size_t,int,bool *);
-void native_web_transport_shutdown(httpd_handle_t,int,bool);
+void native_web_transport_prepare_close(httpd_handle_t,int,bool);
 int64_t esp_timer_get_time(void);
 int lwip_select(int,fd_set *,fd_set *,fd_set *,struct timeval *);
 typedef uint32_t TickType_t;

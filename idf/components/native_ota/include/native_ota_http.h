@@ -11,7 +11,8 @@ typedef struct {
     // Reserve reboot/activity before receiving the body. The image policy's
     // before_flash callback must acquire synchronous audio maintenance.
     esp_err_t (*admit)(void *context, uint64_t absolute_deadline_us);
-    // Once, after response attempt and shutdown. Activation requires a
+    // Once, after response attempt and bounded transport close preparation.
+    // Final socket shutdown/close belongs to SDK session deletion. Activation requires a
     // preallocated reboot commit even if the response could not be sent.
     void (*finish)(void *context, bool activated);
     void *context;

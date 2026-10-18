@@ -18,7 +18,7 @@ static esp_app_desc_t current_app;
 static void event(char c) {assert(event_size+1<sizeof(events));events[event_size++]=c;events[event_size]=0;}
 int64_t esp_timer_get_time(void) {return (int64_t)now_us;}
 void vTaskDelay(TickType_t delay) {now_us+=(uint64_t)delay*1000U;}
-TickType_t xTaskGetTickCount(void) {return (TickType_t)(now_us/1000U);}
+TickType_t xTaskGetTickCount(void) {if(selected){assert(shutdowns==1);event('C');}return (TickType_t)(now_us/1000U);}
 int xTaskCreate(void (*fn)(void *),const char *name,unsigned stack,void *arg,unsigned priority,TaskHandle_t *task) {
     (void)fn;assert(!strcmp(name,"web_reboot")&&stack==2048&&!arg&&priority==2);++allocations;*task=(void *)1;return pdPASS;
 }
@@ -39,6 +39,9 @@ esp_err_t audio_service_maintenance_begin(uint32_t timeout,audio_maintenance_tok
 #ifndef TARGET_C3
     assert(s_reserved_epoch);
     if(reboot_during_maintenance)web_reboot_request(0);
+#else
+    assert(s_reboot_reserved_epoch);
+    if(reboot_during_maintenance)websocket_service_request_reboot(0);
 #endif
     return ESP_OK;
 }
@@ -52,6 +55,8 @@ esp_err_t esp_ota_begin(const esp_partition_t *partition,size_t size,esp_ota_han
     assert(partition==&spare_partition&&size==OTA_WITH_SEQUENTIAL_WRITES&&maintenance&&!owned);
 #ifndef TARGET_C3
     assert(direct_form||s_reserved_epoch);
+#else
+    assert(direct_form||s_reboot_reserved_epoch);
 #endif
     ++begins;event('B');if(fail_begin)return ESP_FAIL;owned=true;*handle=42;return ESP_OK;
 }
@@ -107,7 +112,7 @@ ssize_t native_web_transport_send(httpd_handle_t server,int socket,const void *d
     size_t count=size<send_chunk?size:send_chunk;assert(response_size+count<sizeof(wire_response));
     memcpy(wire_response+response_size,data,count);response_size+=count;wire_response[response_size]=0;return (ssize_t)count;
 }
-void native_web_transport_shutdown(httpd_handle_t server,int socket,bool graceful) {assert(server==&hd&&socket==7&&!shutdowns);++shutdowns;graceful_shutdown=graceful;event('S');}
+void native_web_transport_prepare_close(httpd_handle_t server,int socket,bool graceful) {assert(server==&hd&&socket==7&&!shutdowns);++shutdowns;graceful_shutdown=graceful;event('S');}
 int lwip_select(int nfds,fd_set *readset,fd_set *writeset,fd_set *errors,struct timeval *timeout) {
     assert(nfds==8&&!errors&&!!readset!=!!writeset);uint64_t budget=(uint64_t)timeout->tv_sec*1000000U+(unsigned)timeout->tv_usec;
     if(readset){assert(FD_ISSET(7,readset));++wait_read;}else {assert(FD_ISSET(7,writeset));++wait_write;}

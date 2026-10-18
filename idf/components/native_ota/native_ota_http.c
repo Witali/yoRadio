@@ -165,7 +165,7 @@ done:
     esp_err_t response = httpd_resp_sendstr(request, activated ? "OK" : error);
     bool graceful = response == ESP_OK && (!io || !io->fatal);
     if (!activated && graceful) drain_rejection(request);
-    native_web_transport_shutdown(request->handle, socket, graceful);
+    native_web_transport_prepare_close(request->handle, socket, graceful);
     if (attached) httpd_sess_set_ctx(request->handle, socket, NULL, NULL); // SDK frees the request workspace
     else free(io);
     config->finish(config->context, activated);
