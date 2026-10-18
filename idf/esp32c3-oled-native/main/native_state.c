@@ -168,6 +168,16 @@ void native_state_set_title(native_state_t *state, const char *title) {
     }
 }
 
+void native_state_set_stream_title(native_state_t *state, uint32_t generation,
+                                    const char *title) {
+    if (!state || !state->lock || !title) return;
+    if (xSemaphoreTake(state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
+        if (state->audio_generation == generation)
+            strlcpy(state->title, title, sizeof(state->title));
+        xSemaphoreGive(state->lock);
+    }
+}
+
 void native_state_snapshot(native_state_t *state, native_state_t *snapshot) {
     if (!state || !snapshot) return;
     memset(snapshot, 0, sizeof(*snapshot));

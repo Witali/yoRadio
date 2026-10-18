@@ -193,3 +193,12 @@ allocation и численные настройки C3 являются канд
   lifecycle и по 93 сценария реального SDK HTTP/TLS reader на C3/CYD проходят
   с ASan/UBSan. [Отчёты](../tests/results/cyd-c3-stream-20261018/README.md)
   сохраняют границы эмуляции. Подтверждение соседних кадров относится к этапу 03.
+- Проверка исходного C3 выявила гонку ICY title: переключение после проверки
+  generation, но до state mutex позволяло старому callback записать title,
+  затем стереть уже новое название повторной проверкой. Проверка generation
+  перенесена под mutex; отдельная очистка после Stop удалена, поскольку её
+  уже выполняет `native_state_begin_stream`. Новый
+  [исполняемый тест](../tests/run-c3-state-concurrency.py) сначала воспроизвёл
+  дефект, затем прошёл с исправлением: принудительное вытеснение перед mutex,
+  20000 конкурентных обновлений, stale clear, bounds и wrap generation.
+  [Отчёт и отрицательный контроль](../tests/results/c3-state-concurrency-20261018/README.md).

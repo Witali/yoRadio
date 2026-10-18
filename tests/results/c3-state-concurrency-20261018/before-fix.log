@@ -1,0 +1,18 @@
+test: /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/native/c3_state_concurrency_test.c:65: main: Assertion `state.audio_generation==2 && !strcmp(state.title,"current title")' failed.
+
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\run-c3-state-concurrency.py", line 56, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\run-c3-state-concurrency.py", line 43, in main
+    log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tools\codec_benchmark\run_output_dma_host.py", line 23, in run
+    return subprocess.check_output((['wsl.exe','--exec'] if sys.platform=='win32' else [])+args,stderr=subprocess.STDOUT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.idf\python-3.12.10\tools\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['wsl.exe', '--exec', 'env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1', 'UBSAN_OPTIONS=halt_on_error=1', '/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/c3-state-concurrency/test']' returned non-zero exit status 134.

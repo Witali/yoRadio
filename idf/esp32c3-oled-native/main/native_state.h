@@ -64,5 +64,8 @@ void native_state_format_stream_details(const native_state_t *state,
                                         char *output, size_t output_size);
 void native_state_set_station(native_state_t *state, const char *station);
 void native_state_set_title(native_state_t *state, const char *title);
+// Metadata callbacks must check the stream identity under the state mutex.
+void native_state_set_stream_title(native_state_t *state, uint32_t generation,
+                                    const char *title);
 void native_state_snapshot(native_state_t *state, native_state_t *snapshot);
 

@@ -455,17 +455,17 @@ test("native radio requests and publishes ICY song metadata", () => {
     fs.readFileSync(path.join(root, "idf", "components", "native_stream", "icy_title.c"), "utf8"),
     /StreamTitle='/,
   );
-  assert.match(audio, /native_state_set_title\(s_state, title\)/);
+  assert.match(audio, /native_state_set_stream_title\(s_state, generation, title\)/);
   assert.match(audio, /publish_icy_title\(uint32_t generation/);
   assert.match(audio, /icy_title_feed\(&s_icy_title, buffer \+ offset, chunk\)/);
   assert.match(audio, /publish_icy_title\(command.generation,\s*icy_title_finish\(&s_icy_title\)\)/);
   assert.match(
-    audio,
-    /generation != atomic_load\(&s_generation\)[\s\S]*native_state_set_title\(s_state, ""\)/,
+    read("main", "native_state.c"),
+    /native_state_set_stream_title[\s\S]*audio_generation == generation[\s\S]*strlcpy\(state->title/,
   );
   assert.match(
     audio,
-    /audio_service_stop[\s\S]*advance_generation\(NATIVE_CODEC_AUTO\)[\s\S]*native_state_set_title\(s_state, ""\)/,
+    /audio_service_stop[\s\S]*advance_generation\(NATIVE_CODEC_AUTO\)/,
   );
   assert.match(
     audio,

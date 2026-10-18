@@ -630,13 +630,7 @@ static void state_set_decoder_bitrate(uint32_t generation, uint32_t bitrate_bps)
 static void publish_icy_title(uint32_t generation, const char *title) {
     if (!title) return;
     if (generation != atomic_load(&s_generation)) return;
-    native_state_set_title(s_state, title);
-    // A stop or station change can race the title publication between the
-    // generation check and the state lock. Remove that last stale update too.
-    if (generation != atomic_load(&s_generation)) {
-        native_state_set_title(s_state, "");
-        return;
-    }
+    native_state_set_stream_title(s_state, generation, title);
     ESP_LOGI(TAG, "Stream title: %s", title);
 }
 
@@ -2169,7 +2163,8 @@ esp_err_t audio_service_resume(void) {
 void audio_service_stop(void) {
     uint32_t generation = advance_generation(NATIVE_CODEC_AUTO);
     network_service_set_streaming(false);
-    native_state_set_title(s_state, "");
+    // advance_generation clears the title under the state mutex. A separate
+    // unguarded clear here could erase metadata from a concurrent newer Play.
     state_set_audio(generation, false, "stopped");
 }
 
