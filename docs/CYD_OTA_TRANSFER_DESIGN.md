@@ -1,9 +1,24 @@
 # Проект переноса OTA на ESP32 CYD
 
-Дата: 2026-10-18. Этап: **CYD-C3-08**, статус: **проект, реализация не начата**.
-Документ дополняет [общий план](ESP32_CYD_C3_TRANSFER_PLAN.md), не меняя его
-статусы. Текущий Web/RFC batch, production-код, firmware и evidence этим
-документом не изменяются. Реализацию начинать после архивации этого batch.
+Дата: 2026-10-18. Этап: **CYD-C3-08**, статус: **реализация и квалификация**.
+Документ дополняет [общий план](ESP32_CYD_C3_TRANSFER_PLAN.md). Web/RFC batch
+сохранён в четырёх production images из `6db5651a`; его архив — `1cf1f20c`.
+Общий image sink, backend pause, reboot reservation и native UI уже имеют
+собственные проверки. Сквозной OTA и physical gates не считаются завершёнными.
+
+Текущие новые входы: [image sink](../idf/components/native_ota/include/native_ota_sink.h),
+[audio maintenance API](../idf/esp32-cyd2usb-native/main/audio_service.h),
+[checked backend pause](../idf/esp32-cyd2usb-native/main/native_audio_output.h),
+[reboot reservation](../idf/esp32-cyd2usb-native/main/web_reboot.h),
+[native UI](../idf/esp32-cyd2usb-native/main/web_pages.cpp).
+
+`begin` разрешает flash только после cascade stream→decoder→output ACK. Его
+отказ возвращает нулевой token; audio-owned ABORTING сохраняет gate до позднего
+cleanup и безопасного восстановления. Успешный `end` принимает запрос завершения
+в audio-owned static state и потребляет token; handler может освободить workspace,
+а владельцы завершают resume асинхронно. Никаких указателей на HTTP stack token
+в owners нет. Конечное ожидание может отказать при blocked connect/trickle;
+это запрещает erase, а не доказывает мгновенную отмену сетевого SDK вызова.
 
 ## Результат этапа
 
