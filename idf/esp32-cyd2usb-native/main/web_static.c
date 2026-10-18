@@ -11,6 +11,7 @@
 #include "lwip/sockets.h"
 #include "web_pages.h"
 #include "web_upload.h"
+#include "native_wifi_public.h"
 
 #define STATIC_QUEUE_DEPTH 2
 #define STATIC_STACK_BYTES (3072 + CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES)
@@ -41,6 +42,8 @@ static FILE *open_nonempty(const char *path) {
 }
 
 static esp_err_t serve_static(httpd_req_t *request) {
+    if (!native_wifi_public_static_uri(request->uri, request->method == HTTP_GET))
+        return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "File not found");
     char uri[160];
     size_t length = strcspn(request->uri, "?");
     if (!length || length >= sizeof(uri))
@@ -56,6 +59,19 @@ static esp_err_t serve_static(httpd_req_t *request) {
             return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "Invalid path");
     }
     httpd_resp_set_hdr(request, "Connection", "close");
+    if (!strcmp(uri, "/variables.js")) {
+        httpd_resp_set_type(request, "application/javascript; charset=utf-8");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        return httpd_resp_sendstr(request,
+            "var webUiRevision='native06-wifi';\n"
+            "var nativeFirmwareOnly=true;\n"
+            "var nativeFirmwareName='ESP32 CYD native';\n"
+            "var nativeFirmwareInfo='/api/native/ota';\n"
+            "var nativeWiFiApi='/api/native/wifi';\n"
+            "var nativeWiFiMaxProfiles=5;\n"
+            "var nativeWiFiPrivateExport=false;\n"
+            "var nativeTimeApi='/api/native/time';\n");
+    }
     if (!strcmp(uri, "/") || !strcmp(uri, "/index.html") ||
         !strcmp(uri, "/settings.html") || !strcmp(uri, "/webboard") ||
         !strcmp(uri, "/emergency")) {
@@ -158,6 +174,8 @@ void web_static_activate(void) {
 
 esp_err_t web_static_handler(httpd_req_t *request) {
     httpd_resp_set_hdr(request, "Connection", "close");
+    if (!native_wifi_public_static_uri(request->uri, request->method == HTTP_GET))
+        return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "File not found");
     if (!atomic_load(&s_active)) {
         httpd_resp_set_status(request, "503 Service Unavailable");
         return httpd_resp_sendstr(request, "Web service is starting");

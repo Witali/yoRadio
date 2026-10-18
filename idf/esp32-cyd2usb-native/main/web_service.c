@@ -25,6 +25,8 @@
 #include "web_upload.h"
 #include "web_reboot.h"
 #include "web_ota.h"
+#include "web_wifi.h"
+#include "web_time.h"
 #include "native_web_transport.h"
 #include "websocket_service.h"
 
@@ -315,7 +317,7 @@ static esp_err_t settings_handler(httpd_req_t *request) {
 }
 
 static esp_err_t capabilities_handler(httpd_req_t *request) {
-    char body[896];
+    char body[1152];
     json_buffer_t output;
     json_buffer_init(&output, body, sizeof(body));
     json_buffer_raw(&output, "{\"schema\":1,\"firmware\":\"esp32-cyd2usb-native\",\"audio_output\":");
@@ -325,6 +327,7 @@ static esp_err_t capabilities_handler(httpd_req_t *request) {
     snprintf(ota_limits, sizeof(ota_limits), ",\"ota_max_bytes\":%u,\"ota_body_max_bytes\":%u",
              (unsigned)WEB_OTA_MAX_IMAGE_BYTES, (unsigned)WEB_OTA_MAX_BODY_BYTES);
     json_buffer_raw(&output, ota_limits);
+    json_buffer_raw(&output, ",\"nativeWiFiApi\":\"/api/native/wifi\",\"nativeWiFiMaxProfiles\":5,\"nativeWiFiPrivateExport\":false,\"nativeTimeApi\":\"/api/native/time\"");
     json_buffer_raw(&output, ",\"equalizer\":false,\"sd\":false,\"display_controls\":false}");
     if (output.failed) return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "Capabilities exhausted");
     httpd_resp_set_type(request, "application/json; charset=utf-8");
@@ -364,7 +367,7 @@ esp_err_t web_service_start(native_state_t *state) {
     // clients leave two for the stream and network activity. WS admits two.
     config.max_open_sockets = 5;
     config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
-    config.max_uri_handlers = 18; // 16 explicit routes plus the WebSocket route.
+    config.max_uri_handlers = 22; // 20 HTTP routes and the WebSocket route.
     config.lru_purge_enable = true;
     config.uri_match_fn = httpd_uri_match_wildcard;
     httpd_handle_t server = NULL;
@@ -413,6 +416,10 @@ esp_err_t web_service_start(native_state_t *state) {
     httpd_uri_t wifi = {.uri="/", .method=HTTP_POST, .handler=web_wifi_upload_handler};
     httpd_uri_t ota = {.uri="/update", .method=HTTP_POST, .handler=web_ota_handler};
     httpd_uri_t ota_info = {.uri="/api/native/ota", .method=HTTP_GET, .handler=web_ota_info_handler};
+    httpd_uri_t wifi_info = {.uri="/api/native/wifi", .method=HTTP_GET, .handler=web_wifi_info_handler};
+    httpd_uri_t wifi_edit = {.uri="/api/native/wifi", .method=HTTP_POST, .handler=web_wifi_edit_handler};
+    httpd_uri_t time_info = {.uri="/api/native/time", .method=HTTP_GET, .handler=web_time_info_handler};
+    httpd_uri_t time_edit = {.uri="/api/native/time", .method=HTTP_POST, .handler=web_time_edit_handler};
     httpd_uri_t files = {
         .uri = "/*",
         .method = HTTP_GET,
@@ -420,7 +427,8 @@ esp_err_t web_service_start(native_state_t *state) {
     };
     const httpd_uri_t *routes[] = {&status, &health, &radio_get, &radio_post,
         &reconnect, &play, &stop, &settings_get, &settings_post, &capabilities,
-        &upload, &board, &wifi, &ota, &ota_info};
+        &upload, &board, &wifi, &ota, &ota_info,
+        &wifi_info, &wifi_edit, &time_info, &time_edit};
     for (unsigned i = 0; i < sizeof(routes) / sizeof(routes[0]); ++i) {
         result = httpd_register_uri_handler(server, routes[i]);
         if (result != ESP_OK) goto failed;
@@ -433,6 +441,7 @@ esp_err_t web_service_start(native_state_t *state) {
     if (result != ESP_OK) goto failed;
     web_upload_activate();
     web_ota_activate();
+    web_wifi_activate();
     web_static_activate();
     if (state->lock && xSemaphoreTake(state->lock, pdMS_TO_TICKS(100))) {
         state->web_ready = true;
@@ -441,6 +450,7 @@ esp_err_t web_service_start(native_state_t *state) {
     ESP_LOGI(TAG, "Native %s server started", native_web_transport_secure() ? "HTTPS" : "HTTP");
     return ESP_OK;
 failed:
+    web_wifi_deactivate();
     web_ota_deactivate();
     web_upload_deactivate();
     // Keep the server/session workspace alive if a producer has not exited.

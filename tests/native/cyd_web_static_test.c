@@ -9,12 +9,13 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include "native_wifi_public.h"
 
 typedef int esp_err_t;
 typedef void *QueueHandle_t, *TaskHandle_t;
-typedef struct { char uri[256]; int fd, status; bool async, closed; } httpd_req_t;
+typedef struct { char uri[600]; int fd, status, method; bool async, closed; } httpd_req_t;
 enum { ESP_OK=0, ESP_FAIL=-1, ESP_ERR_INVALID_STATE=-2, ESP_ERR_NO_MEM=-3,
-       HTTPD_400_BAD_REQUEST=400, HTTPD_404_NOT_FOUND=404, pdTRUE=1, pdPASS=1 };
+       HTTPD_400_BAD_REQUEST=400, HTTPD_404_NOT_FOUND=404, pdTRUE=1, pdPASS=1, HTTP_GET=0, HTTP_HEAD=2 };
 #define CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES 1024
 #define CONFIG_YORADIO_WEB_STATIC_WORKERS 2
 #define portMAX_DELAY UINT32_MAX
@@ -25,7 +26,7 @@ static unsigned task_attempts, fail_task, terminal_chunks, send_count, fail_send
 static bool fail_queue, fail_begin, fail_read, fail_complete;
 static char body[20000], type[80], encoding[32], cache[32], fixture_root[512];
 static size_t body_size;
-static unsigned read_calls, invalid_reads;
+static unsigned read_calls, invalid_reads, open_calls, async_begins;
 static jmp_buf worker_exit;
 static unsigned notifications;
 static unsigned ulTaskNotifyTake(int clear, unsigned wait) {
@@ -62,6 +63,7 @@ static int test_shutdown(int fd, int how) {
     assert(fd>=0 && how==SHUT_RDWR);shutdown_count++;return 0;
 }
 static int httpd_req_async_handler_begin(httpd_req_t *req, httpd_req_t **out) {
+    async_begins++;
     if (fail_begin) return ESP_ERR_NO_MEM;
     *out=malloc(sizeof(**out));assert(*out);**out=*req;(*out)->async=true;return ESP_OK;
 }
@@ -94,6 +96,7 @@ static int httpd_resp_send_err(httpd_req_t *r, int status, const char *text) {
 }
 static const char *web_native_page(void) { return "embedded native page"; }
 static FILE *test_fopen(const char *path, const char *mode) {
+    open_calls++;
     assert(!strncmp(path,"/spiffs/",8));char actual[1024];
     snprintf(actual,sizeof(actual),"%s/%s",fixture_root,path+8);return fopen(actual,mode);
 }
@@ -139,19 +142,40 @@ int main(int argc, char **argv) {
     serve("/settings.html?test=1",0);assert(!strcmp(body,"embedded native page"));
     serve("/webboard",0);assert(!strcmp(body,"embedded native page"));
     serve("/emergency?recover=1",0);assert(!strcmp(body,"embedded native page"));
+    serve("/variables.js",0);assert(!strcmp(cache,"no-store") && strstr(type,"javascript"));
+    assert(strstr(body,"nativeWiFiApi='/api/native/wifi'") && strstr(body,"nativeWiFiPrivateExport=false"));
+    assert(strstr(body,"nativeWiFiMaxProfiles=5") && strstr(body,"nativeTimeApi='/api/native/time'"));
     serve("/theme.css",0);assert(!strcmp(body,"raw css") && !strcmp(type,"text/css; charset=utf-8") && !*encoding);
     serve("/empty.js",0);assert(!strcmp(body,"compressed") && !strcmp(encoding,"gzip"));
     serve("/empty.js.gz",0);assert(!strcmp(type,"application/javascript; charset=utf-8") && !strcmp(encoding,"gzip"));
     serve("/data/playlist.csv",0);assert(!strcmp(body,"station\thttps://example.test/audio\n") && !*encoding);
     serve("/data/wifi.csv",404);serve("/not-found",404);
+    const char *private_paths[]={"/data","/DATA/wifi.csv","/Data/playlist.csv","/data/wifi.csv?raw=1",
+        "/data/wifi.csv.bak","/data/wifi.csv.tmp","/data/WIFI.CSV","/data/playlist.csv/",
+        "/data/playlist.csv.gz","/data//playlist.csv","/%64ata/playlist.csv","/data/./playlist.csv"};
+    for(unsigned i=0;i<sizeof(private_paths)/sizeof(private_paths[0]);++i) {
+        unsigned opens=open_calls,begins=async_begins;
+        serve(private_paths[i],404);assert(open_calls==opens);
+        r=request(private_paths[i]);assert(web_static_handler(&r)==ESP_OK && r.status==404);
+        assert(open_calls==opens && async_begins==begins && !queued);
+    }
     const char *bad[]={"/../wifi.csv","/%2e%2e/wifi.csv","/foo\\bar","//foo","/foo\nbar","/bad name","relative"};
-    for (unsigned i=0;i<sizeof(bad)/sizeof(bad[0]);++i) serve(bad[i],400);
+    for (unsigned i=0;i<sizeof(bad)/sizeof(bad[0]);++i) serve(bad[i],404);
+    r=request("/data/playlist.csv");r.method=HTTP_HEAD;
+    unsigned opens=open_calls,begins=async_begins;
+    assert(serve_static(&r)==ESP_OK && r.status==404 && open_calls==opens);
+    assert(web_static_handler(&r)==ESP_OK && r.status==404 && async_begins==begins);
+    serve("/data/playlist.csv?download=1",0);assert(strstr(body,"station"));
     serve("/large.css",0);assert(body_size==5100 && terminal_chunks==1 && send_count==6);
     reset_response();r=request("/large.css");fail_send=2;
     assert(serve_static(&r)==ESP_FAIL && body_size==1024 && !terminal_chunks);
     reset_response();fail_read=true;assert(serve_static(&r)==ESP_FAIL && !terminal_chunks && read_calls==1 && !invalid_reads);
     serve("/theme.css",0);assert(read_calls==1 && !invalid_reads);
     reset_response();web_static_activate();
+    for(unsigned i=0;i<sizeof(private_paths)/sizeof(private_paths[0]);++i) {
+        r=request(private_paths[i]);unsigned begins=async_begins;
+        assert(web_static_handler(&r)==ESP_OK && r.status==404 && async_begins==begins && !queued);
+    }
     fail_begin=true;r=request("/");assert(web_static_handler(&r)==ESP_OK && r.status==503 && !queued);fail_begin=false;
     r=request("/theme.css");assert(web_static_handler(&r)==ESP_OK && queued==1 && !send_count);
     r=request("/empty.js");assert(web_static_handler(&r)==ESP_OK && queued==2 && !send_count);
