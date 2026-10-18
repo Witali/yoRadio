@@ -7,6 +7,16 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## AP memory comparison — 2026-10-18
 
+Raw persistence observer исправлен отдельно: erased/partial field не вызывает
+ASCII exception, но остаётся pending до bounded timeout. Native проверяет ELF
+dirty flag до и после чтения raw key, чтобы холодный stop не прервал запись после
+первой страницы. Все5unit controls обязательны для suite/publisher/verifier.
+15factory+15native regional keys, максимальные city64/country19, cold boot и
+NVS v1→v2 migration прошли на промежуточном QEMU9DA. Окончательный20B прошёл
+initial setup16factory/21native checks и отдельную station isolation.
+Различие QEMU версий указано в flash-persistence-observer-validation-20261018.json;
+это scoped proof, не full/H10 acceptance BC68. Firmware C при этом не менялся.
+
 Перед следующим полным прогоном: AP service candidate BC68/ELF4FDE уже собран и
 сохранён в development archive. Production меняет только services.h,
 time_sync.c и weather.c: при фактическом AP режиме создаётся weather cache/mutex,

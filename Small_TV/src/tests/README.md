@@ -1,11 +1,21 @@
 # Функциональные тесты Small TV ESP32-C2
 
+`raw_flash_observer_test.py` содержит5проверок чтения raw настроек: erased/partial
+ASCII остаётся pending, точный максимальный key читается полностью, неверный key
+не проходит, native dirty flag должен быть нулём до и после чтения файла. Внешний
+wait_for сохраняет прежний timeout: постоянная ошибка записи продолжает падать.
+Флаг взят из единственного1-byte symbol dirty в текущем ELF; его адрес и ELF hash
+записаны в regional report. Factory использует прежнюю проверку точного raw key,
+поскольку эквивалентный factory completion flag не доказан. Это обязательный
+unit gate suite/publisher/verifier. Scoped real proof:
+`../../qemu/parity/flash-persistence-observer-validation-20261018.json`.
+
 `ap_services_qemu.py` сравнивает factory/native AP setup после6настоящих HTTP
 настроек: полные RGB кадры, cache, AP/STA/time state и task set. Native snapshots
 привязаны к ELF и ROM heap counters; в AP отсутствуют time_sync/weather_http.
 `ap_services_contract.py` общий для suite/publisher/verifier и содержит18
 отрицательных проверок evidence. Результат BC68/B44 сохранён в
-`../qemu/parity/ap-services-validation-20261018.json`; full и H10 для BC68
+`../../qemu/parity/ap-services-validation-20261018.json`; full и H10 для BC68
 ещё не принимались. Platform cases setup_services/empty_station_setup_services
 проверяют actual initialized AP role, включая mode1 без SSID; неизменный final
 harness падает на прежних двух service modules.

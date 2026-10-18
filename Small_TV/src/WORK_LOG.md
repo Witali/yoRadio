@@ -2796,3 +2796,17 @@ true. Это только начало нового прогона, не 24 ча
   erased0xff. Повторно проверены273frozen inputs; исходный failure сохранён
   в network-roles-full-failure-20261018.json и6gzip. Причина flash моделирования
   рассматривается отдельно; отказ не превращён в успешный результат.
+
+### 2026-10-18 — raw observer между erase и программированием
+
+- Проверка на byte0xff больше не падает в decode: erased/partial data pending,
+  неизменный bounded timeout сохраняет отказ при постоянной порче. Native dirty
+  symbol1byte из matching ELF должен быть0до/после host read. Проверка factory
+  completion flag не выдумывалась; factory читает точный сохранённый key.
+- 5unit controls pass и добавлены как mandatory suite/publisher/verifier gate.
+  На scoped QEMU9DA прошли15+15regionalkeys, maxcity64/country19, invalidinputs,
+  raw immutable media, холодный boot и SDK NVS v1 migration/v2 fallback.
+- Окончательный QEMU20B с дополнительным исправлением C2dummy/QE прошёл настройку
+  Wi-Fi16factory/21native checks и station isolation. Разделение бинарников и
+  ограничения evidence сохранены в flash-persistence-observer-validation-20261018.json
+  с2rawgzip. Эти результаты не заменяют полный прогон или H10 текущего BC68.

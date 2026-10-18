@@ -90,6 +90,8 @@ def main():
     validate_netif_roles(netif_roles, netif_expected)
     require(netif_roles['contract_checks'] == netif_role_rejections(netif_roles, netif_expected) and
             groups['qemu']['netif_observer_unit'] == {'passed': True, 'tests': 7}, 'Missing netif evidence guards')
+    require(groups['qemu']['raw_flash_observer_unit'] == {'passed': True, 'tests': 5},
+            'Missing raw erase/program persistence observer controls')
     ap_services = groups['qemu']['ap_services_http']
     ap_expected = {**role_expected, 'test_sha256': hashlib.sha256((ROOT / 'tests/ap_services_qemu.py').read_bytes()).hexdigest()}
     validate_ap_services(ap_services, ap_expected)

@@ -59,6 +59,9 @@ def main():
         from netif_observer_test import run_tests as netif_observer_tests
         report['netif_observer_unit'] = netif_observer_tests()
         check(report['netif_observer_unit']['passed'], 'Netif pointer/role observation tests failed')
+        from raw_flash_observer_test import run_tests as raw_flash_tests
+        report['raw_flash_observer_unit'] = raw_flash_tests()
+        check(report['raw_flash_observer_unit']['passed'], 'Raw flash persistence observation tests failed')
         unit_path = args.output / 'boot-observer-unit.json'
         subprocess.run([sys.executable, str(args.qemu_root / 'tests/esp_elf_test.py'),
                         '--output', str(unit_path), '--temp-root', str(args.output / 'boot-observer-unit-temp')], check=True)

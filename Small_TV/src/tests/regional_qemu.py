@@ -22,6 +22,7 @@ import time_qemu as clock
 import weather_qemu as weather
 from weather_qemu import ROOT, ELFFile, read_bytes
 from machine_oracle import layout
+from raw_flash_observer import read_stored_key, persistence_complete
 
 RAW = 0x3e7000
 COUNTRY = 0xc7
@@ -43,11 +44,16 @@ def settings_layout():
     path = ROOT/'.build/small-tv-esp32c2/small_tv_reconstructed.elf'
     with path.open('rb') as stream:
         elf = ELFFile(stream)
-        symbol = next(s for s in elf.get_section_by_name('.symtab').iter_symbols() if s.name == 'current_settings')
+        symbols = list(elf.get_section_by_name('.symtab').iter_symbols())
+        symbol = next(s for s in symbols if s.name == 'current_settings')
+        dirty_symbols = [s for s in symbols if s.name == 'dirty' and s['st_size'] == 1]
+        if len(dirty_symbols) != 1:
+            raise AssertionError('Missing or ambiguous compiled settings dirty flag')
         size, fields = layout('tv_settings_t')
         if size != symbol['st_size']:
             raise AssertionError('Compiled settings symbol/type disagree')
         return {'address': symbol['st_value'], 'size': size, 'fields': fields,
+                'dirty_address': dirty_symbols[0]['st_value'],
                 'elf_sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
 
 
@@ -59,9 +65,16 @@ def current_key(qmp, variant, settings):
 
 def stored_key(folder):
     """Read the public synthetic key from the disposable VM's original raw sector."""
-    with (folder/'flash.bin').open('rb') as stream:
-        stream.seek(RAW+COUNTRY)
-        return stream.read(20).split(b'\0')[0].decode('ascii')
+    return read_stored_key(folder/'flash.bin',RAW+COUNTRY)
+
+
+def stored_key_complete(qmp, folder, variant, settings, key):
+    """Do not cold-stop a native VM between erase and its final page program."""
+    return persistence_complete(
+        lambda: stored_key(folder), key,
+        (lambda: read_bytes(qmp,settings['dirty_address'],1))
+        if variant == 'reconstructed' else None)
+
 
 
 def calendar_observation(qmp, folder, variant, clocks, key):
@@ -173,7 +186,7 @@ def exercise(options, folder, settings, clocks, cache):
                     wait_for(lambda: read_bytes(qmp,cache['address']+offset,20).split(b'\0')[0] == key.encode(),
                              'Weather cache lost regional suffix')
                     row['weather_key_preserved'] = True
-                wait_for(lambda:stored_key(folder)==key,'Raw persistence lost regional suffix')
+                wait_for(lambda:stored_key_complete(qmp,folder,variant,settings,key),'Raw persistence lost regional suffix')
                 row['raw_persistence'] = True
                 result['cases'].append(row)
                 print('PASS regional key:',variant,key,flush=True)
@@ -186,7 +199,7 @@ def exercise(options, folder, settings, clocks, cache):
                 if status != 200:
                     raise AssertionError('Maximum-length regional HTTP input rejected')
                 result['maximum_input'] = observe(qmp,folder,variant,clocks,settings,key)
-                wait_for(lambda:stored_key(folder)==key,'Maximum-length key was not persisted')
+                wait_for(lambda:stored_key_complete(qmp,folder,variant,settings,key),'Maximum-length key was not persisted')
                 with flash.open('rb') as stream:
                     stream.seek(RAW+0xdb)
                     if stream.read(65) != city.encode()+b'\0':
@@ -200,7 +213,7 @@ def exercise(options, folder, settings, clocks, cache):
                 if status != 200:
                     raise AssertionError('Region restoration before cold boot failed')
                 observe(qmp,folder,variant,clocks,settings,'US-H')
-                wait_for(lambda:stored_key(folder)=='US-H','Cold-boot key was not persisted')
+                wait_for(lambda:stored_key_complete(qmp,folder,variant,settings,'US-H'),'Cold-boot key was not persisted')
         vm.control(folder,'stop')
         vm.ensure_stopped(folder)
         session,_ = vm.launch(options,folder)
@@ -298,7 +311,7 @@ def legacy_nvs(options, folder, settings):
                     raise AssertionError('NVS migration changed fields: '+str(actual))
                 result['stages'][stage] = {'all_fields_equal':True,'settings_version':actual['version']}
                 if stage == 'migrate_v1':
-                    wait_for(lambda:stored_key(folder)=='GB','Migrated settings were not persisted')
+                    wait_for(lambda:stored_key_complete(qmp,folder,'reconstructed',settings,'GB'),'Migrated settings were not persisted')
                 else:
                     # A repeated v1 migration would dirty settings and recreate
                     # this raw sector. A clean v2 read leaves erased bytes intact.

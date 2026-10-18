@@ -109,6 +109,8 @@ def main():
     if (netif_roles['contract_checks'] != netif_role_rejections(netif_roles, netif_expected) or
             qemu['netif_observer_unit'] != {'passed': True, 'tests': 7}):
         raise ValueError('Missing netif observer/evidence rejection checks')
+    if qemu['raw_flash_observer_unit'] != {'passed': True, 'tests': 5}:
+        raise ValueError('Missing erase/program persistence observer controls')
     for filename, expected in netif_roles['inputs_sha256'].items():
         if hashlib.sha256(Path(filename).read_bytes()).hexdigest() != expected:
             raise ValueError('Netif input changed after execution: ' + Path(filename).name)
@@ -435,6 +437,7 @@ def main():
                        'wifi_fallback_http': wifi_wait,
                        'netif_roles_http': netif_roles,
                        'netif_observer_unit': qemu['netif_observer_unit'],
+                       'raw_flash_observer_unit': qemu['raw_flash_observer_unit'],
                        'ap_services_http': ap_services,
                        'weather_wait': held_weather,
                        'photo_http': photo,
