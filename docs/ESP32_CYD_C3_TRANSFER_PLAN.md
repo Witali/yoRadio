@@ -36,7 +36,7 @@ allocation и численные настройки C3 являются канд
 | Этап | Статус | Результат и критерий завершения |
 | --- | --- | --- |
 | CYD-C3-00 | Программная база готова | План, исходная сборка IDF 6.0.2 и исправные host-проверки донора. Первоначальный полный clang-tidy прогон CYD и C3 сохранён. Аппаратный baseline отдельно. |
-| CYD-C3-01 | Код и host проверки готовы | Generation на всех стадиях, освобождение decoder/PCM на Stop/EOF/error, terminal marker после последнего PCM, reset/flush output. Первые сборки трёх backends проходят; финальные images после фиксации кода и физическая приёмка учитываются отдельно. |
+| CYD-C3-01 | Программная часть выполнена | Generation, decoder/PCM lifetime, ordered completion и output flush/reset проверены host-тестами. Финальные PDM/continuous/legacy images коммита `2df73834` собраны и сохранены; физическая приёмка отдельно. |
 | CYD-C3-02 | Открыт | HTTP/TLS read contract, redirects/status, timeout/retry, ICY metadata и fragmented signatures. Фрагментация 1/7/2048 байт, неверный MIME, ошибки и отмена. |
 | CYD-C3-03 | Открыт | Подтверждение MP3/ADTS кадров, ID3, форматные переходы и codec drain. Byte-exact replay, truncated EOF, ложные headers и ограниченный search budget. |
 | CYD-C3-04 | Открыт | Queue leases, независимый terminal/control slot, ограниченный рост, prefill и tail coalescing. Concurrent producer/consumer и OOM; выбрать ёмкости по CYD. |
@@ -172,3 +172,8 @@ allocation и численные настройки C3 являются канд
 - По уточнению пользователя непокрытые случаи дополняются исполняемыми
   регрессионными тестами. Уже добавлены отдельные конкурентные и cancellation
   случаи; существующие 57 source/WebUI/settings проверок проходят.
+- Финальные images CYD-C3-01 и базовый PDM сохранены с manifest/sdkconfig:
+  [результаты и ссылки на firmware](../tests/results/cyd-c3-lifecycle-20261018/README.md).
+  PDM baseline и итоговый PDM имеют одинаковые нормализованные SDK настройки.
+  Сборка, sanitizer tests и lint завершены; на физическую плату эти images
+  в рамках этого этапа не устанавливались.
