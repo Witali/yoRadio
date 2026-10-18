@@ -29,3 +29,19 @@ The 128-byte control payload handles replay while all four candidate slots
 are retained. Terminal markers use the same independent FIFO node. The C3
 TLS reclamation policy and its prefill duration are not copied as CYD defaults.
 Full analysis reports are retained in the [lint campaign](../native-lint-20261018/).
+
+All production GCC builds below pass from source `8bf1d73a`, with clean
+application descriptors and verified embedded ELF hashes. Saved config
+snapshots accompany every image. No physical flashing was performed.
+
+| Variant | Bytes | Application and manifest |
+| --- | ---: | --- |
+| CYD PDM | 1364800 | [app.bin](../../../firmware/development/esp32-cyd2usb-native-frames-pdm/app.bin), [manifest](../../../firmware/development/esp32-cyd2usb-native-frames-pdm/manifest.json) |
+| CYD continuous DAC | 1358752 | [app.bin](../../../firmware/development/esp32-cyd2usb-native-frames-dac/app.bin), [manifest](../../../firmware/development/esp32-cyd2usb-native-frames-dac/manifest.json) |
+| CYD legacy DAC | 1364816 | [app.bin](../../../firmware/development/esp32-cyd2usb-native-frames-legacy-dac/app.bin), [manifest](../../../firmware/development/esp32-cyd2usb-native-frames-legacy-dac/manifest.json) |
+| C3 tested-radio profile | 1474336 | [app.bin](../../../firmware/development/esp32c3-oled-native-shared-frames/app.bin), [manifest](../../../firmware/development/esp32c3-oled-native-shared-frames/manifest.json) |
+
+CYD images fit the unchanged 0x1b0000 application slots. PDM preserves every
+pre-existing SDK configuration value; the four added settings enable the
+portable queue/router/confirmation/tail features. Size grew by 8,720 bytes
+relative to stage 02, or 14,080 bytes relative to the original baseline.
