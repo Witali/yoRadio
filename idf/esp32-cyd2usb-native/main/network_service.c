@@ -10,6 +10,7 @@
 #include "esp_netif.h"
 #include "esp_wifi.h"
 #include "freertos/event_groups.h"
+#include "credential_line.h"
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
@@ -29,13 +30,13 @@ static bool read_credentials(wifi_config_t *config) {
     if (!file) return false;
     char line[160];
     bool found = false;
-    while (fgets(line, sizeof(line), file)) {
+    while (native_credential_next_row(file, line, sizeof(line))) {
         char *tab = strchr(line, '\t');
         if (!tab) continue;
         *tab++ = '\0';
-        tab[strcspn(tab, "\r\n")] = '\0';
         if (!line[0] || strlen(line) >= sizeof(config->sta.ssid) ||
-            strlen(tab) >= sizeof(config->sta.password)) {
+            strlen(tab) >= sizeof(config->sta.password) || strchr(line, '\r') ||
+            strpbrk(tab, "\t\r")) {
             continue;
         }
         strlcpy((char *)config->sta.ssid, line, sizeof(config->sta.ssid));

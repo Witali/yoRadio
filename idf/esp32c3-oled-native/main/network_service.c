@@ -20,6 +20,7 @@
 #include "web_tcp_probe.h"
 #include "web_upload.h"
 #include "file_transaction.h"
+#include "credential_line.h"
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
@@ -59,24 +60,7 @@ static void prepare_station_config(wifi_config_t *config) {
 }
 
 static bool next_credential_row(FILE *file, char *line, size_t capacity) {
-    for (;;) {
-        size_t used = 0;
-        bool valid = capacity > 0, present = false;
-        int value;
-        while ((value = fgetc(file)) != EOF && value != '\n') {
-            present = true;
-            if (!value || used + 1U >= capacity) valid = false;
-            else if (valid) line[used++] = (char)value;
-        }
-        if (ferror(file) || (value == EOF && !present)) return false;
-        if (valid) {
-            if (used && line[used - 1U] == '\r') --used;
-            line[used] = '\0';
-            return true;
-        }
-        if (value == EOF) return false;
-        // Discard the entire physical row, including every oversized suffix.
-    }
+    return native_credential_next_row(file, line, capacity);
 }
 
 static bool read_credentials(wifi_config_t *config) {

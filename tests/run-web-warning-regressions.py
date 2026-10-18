@@ -75,7 +75,7 @@ def main():
 
     def storage_includes(wifi_source,publisher):
         (out/'storage-production.inc').write_text(helpers+paths+function(publisher,'publish_file'))
-        (out/'wifi-production.inc').write_text(''.join(function(wifi_source,name) for name in wifi_names
+        (out/'wifi-production.inc').write_text('#include "credential_line.h"\n'+''.join(function(wifi_source,name) for name in wifi_names
                                                        if name+'(' in wifi_source))
 
     storage_test=ROOT/'tests/native/web_warning_storage_test.c'
@@ -110,7 +110,7 @@ def main():
         execute(f'name-{capacity}',names_test,flags=[f'-DCONFIG_SPIFFS_OBJ_NAME_LEN={capacity}'])
     files=[Path(__file__),ROOT/'tests/run-esp32c3-web-memory.py',storage_test,static_test,names_test,
            *(MAIN/name for name in current),MAIN/'web_upload.h',MAIN/'web_multipart.h',
-           STORAGE/'file_transaction.c',STORAGE/'include/file_transaction.h']
+           STORAGE/'file_transaction.c',STORAGE/'include/file_transaction.h',STORAGE/'include/credential_line.h']
     report['source_sha256']={path.relative_to(ROOT).as_posix():hashlib.sha256(path.read_bytes()).hexdigest() for path in files}
     for path in files:
         snapshot=out/'sources'/path.relative_to(ROOT)
