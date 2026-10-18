@@ -1,0 +1,45 @@
+{
+  "status": "independent_subsystem_unit_checks_passed",
+  "passed": true,
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T16:32:24.961750+00:00",
+  "network_checks": 19,
+  "display_checks": 9,
+  "isolation_checks": 3,
+  "source_hashes": {
+    "network": {
+      "passed": true,
+      "tests": 19,
+      "failures": [],
+      "errors": [],
+      "source_sha256": "1059c941231b4df2f59cc8a6f11c686d72ebb4671ceaf303942ba345c38cfbb8",
+      "converter_sha256": "121e9aff5818b0fbbd7bfeb8f0aef22ab6ec25756d622011903331d23784852f",
+      "vm_helper_sha256": "73425dd919f93fa1ca29536990f9e500acaaebbde6158393c3a7f29b80590cd1"
+    },
+    "display": {
+      "passed": true,
+      "tests": 12,
+      "display_tests": 9,
+      "isolation_tests": 3,
+      "failures": [],
+      "errors": [],
+      "source_sha256": "4144b5a59fe67af05744a5eeafbb07f57411265610c85943ffc4c9f1775dc2a3",
+      "display_helper_sha256": "8e06f89e7545185f0763f16f05c93b9297a8037568e012bf069d8e3c177ebb02",
+      "vm_helper_sha256": "73425dd919f93fa1ca29536990f9e500acaaebbde6158393c3a7f29b80590cd1"
+    }
+  },
+  "evidence": [
+    {
+      "file": "subsystem-network-unit-20261018.json.gz",
+      "sha256": "9d4f48c6434b7f1a9fcdb696e41acdce775202a1e0822cbda88802cbfa73330c",
+      "original_sha256": "8a95bb0b5b5beda6e2a35b76103c01af658f5ddb5f3e6ef1706176e4800aeeb0"
+    },
+    {
+      "file": "subsystem-display-unit-20261018.json.gz",
+      "sha256": "eee6ad59d6ef0925cc01796588680f95fc6d17ff74921b18bdaae20d15defa22",
+      "original_sha256": "345e21b05a507b3e13c0189e49ceddbba51655f507adc591e0ee8f9d6d5101d5"
+    }
+  ],
+  "scope": "Repeated host unit checks for network/ELF/SDK state, panel observation and subsystem failure isolation. No new live-guest, full-suite or H10 acceptance is claimed.",
+  "setup_failure": "The first network unit attempt could not create temporary files in the QEMU worktree outside the writable workspace. Repeating with --temp-root inside yoRadio passed; no test condition was changed."
+}
