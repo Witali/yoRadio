@@ -1,4 +1,6 @@
 #pragma once
+#ifndef NATIVE_OTA_TEST_HOST_H
+#define NATIVE_OTA_TEST_HOST_H
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -46,3 +48,4 @@ esp_err_t esp_ota_end(esp_ota_handle_t);
 esp_err_t esp_ota_abort(esp_ota_handle_t);
 esp_err_t esp_ota_set_boot_partition(const esp_partition_t *);
 esp_err_t esp_image_verify(esp_image_load_mode_t,const esp_partition_pos_t *,esp_image_metadata_t *);
+#endif
