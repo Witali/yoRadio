@@ -82,15 +82,13 @@ def main():
     current = compile_test('receiver', test, [out, MAIN])
     for case in range(5):
         execute(current, f'receiver-{case}', [str(case)])
-    # OTA uses the same compatibility mp_parameter entry point. Its existing
-    # actual stream/ownership suite must continue to accept browser firmware.
-    for name in ['esp_ota_ops.h', 'esp_app_format.h', 'esp_image_format.h']:
-        (out/name).write_text('#include "esp32c3_ota_mock.h"\n')
-    ota_test = ROOT/'tests/native/esp32c3_ota_test.c'
-    ota = compile_test('ota-core', ota_test, [out, ROOT/'tests/native', MAIN])
-    execute(ota, 'ota-core')
+    # OTA now shares its bounded form/image/HTTP code with CYD. Exercise the
+    # current production C3 wrapper/handler rather than the retired flash model.
+    ota_runner = ROOT/'tests/run-native-ota-http.py'
+    subprocess.run([sys.executable,str(ota_runner),'--target','c3','--output',str(out/'ota-current')],check=True)
+    report['ota_current'] = json.loads((out/'ota-current/report.json').read_text())
     files = [Path(__file__), ROOT/'tests/native/multipart_header_test.c', test,
-             ota_test, ROOT/'tests/native/esp32c3_ota_mock.h',
+             ota_runner,
              MAIN/'ota_upload.c', MAIN/'ota_upload.h',
              MAIN/'web_upload.c', MAIN/'web_multipart.h', MAIN/'web_file_form.h',
              SHARED/'web_multipart.h', SHARED/'web_file_form.h']
