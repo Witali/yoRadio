@@ -276,6 +276,31 @@ static void *producer(void *argument) {
 }
 
 int main(void) {
+    // Actual IDF dispatch consumes upgrade GET itself, calls the post-handshake
+    // hook, then reads the first opcode before ever invoking the URI handler.
+    // Do not run the periodic producer or invoke the URI handler as HTTP_GET.
+    reset(); start(); open_socket(7, true);
+    assert(registered_route.ws_post_handshake_cb);
+    httpd_req_t upgrade = {.socket = 7, .method = HTTP_GET};
+    assert(!sockets[7].send_override && !sockets[7].recv_override);
+    assert(registered_route.ws_post_handshake_cb(&upgrade) == ESP_OK);
+    assert(sockets[7].send_override && sockets[7].recv_override && !delivery_count);
+    wire[0] = 0x81; wire_size = 1;
+    receive_script[0] = -EAGAIN; receive_script[1] = 1; receive_length = 2;
+    select_script[0] = 1; select_length = 1;
+    char opcode;
+    assert(sockets[7].recv_override(s_server, 7, &opcode, 1, 0) == 1 && opcode == (char)0x81);
+    assert(transport_command("volume=3") == ESP_OK && volume == 3);
+
+    reset(); start(); open_socket(7, true); open_socket(8, true); open_socket(9, true);
+    upgrade.socket = 7; assert(registered_route.ws_post_handshake_cb(&upgrade) == ESP_OK);
+    upgrade.socket = 8; assert(registered_route.ws_post_handshake_cb(&upgrade) == ESP_OK);
+    upgrade.socket = 9; assert(registered_route.ws_post_handshake_cb(&upgrade) == ESP_ERR_NO_MEM && !sockets[9].context);
+
+    reset(); assert(websocket_service_register((void *)1, &state) == ESP_OK);
+    open_socket(7, true); upgrade.socket = 7;
+    assert(registered_route.ws_post_handshake_cb(&upgrade) == ESP_ERR_INVALID_STATE && !sockets[7].context);
+
     reset();
     assert(websocket_service_register(NULL, &state) == ESP_ERR_INVALID_ARG);
     assert(websocket_service_start() == ESP_ERR_INVALID_STATE);

@@ -4,7 +4,8 @@
 #include "esp_http_server.h"
 #include "native_state.h"
 
-// Requires CONFIG_HTTPD_WS_SUPPORT=y, HTTPD_QUEUE_WORK_BLOCKING=n and finite
+// Requires CONFIG_HTTPD_WS_SUPPORT=y, HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT=y,
+// HTTPD_QUEUE_WORK_BLOCKING=n and finite
 // HTTPD send_wait_timeout. Two WS clients share one coalesced HTTPD work item.
 // A WS-only send override completes short writes with a one-second application
 // frame deadline, using lwip_select without enabling VFS select. A slow client

@@ -18,6 +18,9 @@
 #if !CONFIG_HTTPD_WS_SUPPORT
 #error "CYD WebSocket service requires CONFIG_HTTPD_WS_SUPPORT=y"
 #endif
+#if !CONFIG_HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT
+#error "CYD WebSocket transport requires the public post-handshake callback"
+#endif
 #if CONFIG_HTTPD_QUEUE_WORK_BLOCKING
 #error "CYD WebSocket producer requires CONFIG_HTTPD_QUEUE_WORK_BLOCKING=n"
 #endif
@@ -465,11 +468,19 @@ void websocket_service_notify_playlist_changed(void) {
     atomic_fetch_add(&s_playlist_revision, 1U);
 }
 
+static esp_err_t websocket_post_handshake(httpd_req_t *request) {
+    if (!atomic_load(&s_running)) return ESP_ERR_INVALID_STATE;
+    // IDF consumes the upgrade GET without invoking websocket_handler. Install
+    // both overrides before SDK reads any opcode/control bytes on this session.
+    return find_client(httpd_req_to_sockfd(request)) ? ESP_OK : ESP_ERR_NO_MEM;
+}
+
 esp_err_t websocket_service_register(httpd_handle_t server, native_state_t *state) {
     if (!server || !state) return ESP_ERR_INVALID_ARG;
     if (s_server) return ESP_ERR_INVALID_STATE;
     httpd_uri_t route = {.uri = "/ws", .method = HTTP_GET, .handler = websocket_handler,
-        .is_websocket = true, .handle_ws_control_frames = false};
+        .is_websocket = true, .handle_ws_control_frames = false,
+        .ws_post_handshake_cb = websocket_post_handshake};
     esp_err_t result = httpd_register_uri_handler(server, &route);
     if (result == ESP_OK) { s_server = server; s_state = state; }
     return result;
