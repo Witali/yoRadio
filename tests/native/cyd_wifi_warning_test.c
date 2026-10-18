@@ -36,9 +36,11 @@ static FILE *mapped_open(const char *path,const char *mode) {
     cookie_position=0;cookie_io_functions_t functions={.read=cookie_read};return fopencookie(NULL,"r",functions);
 }
 static size_t strlcpy(char *target,const char *source,size_t capacity){size_t length=strlen(source);if(capacity){size_t count=length<capacity-1?length:capacity-1;memcpy(target,source,count);target[count]=0;}return length;}
+#define web_upload_open_file(path) mapped_open(path,"r")
 #define fopen(...) mapped_open(__VA_ARGS__)
 #include "cyd-wifi-production.inc"
 #undef fopen
+#undef web_upload_open_file
 
 static void put(const void *data,size_t size) {
     FILE *file=fopen(fixture,"wb");assert(file);assert(fwrite(data,1,size,file)==size);assert(!fclose(file));
