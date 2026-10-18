@@ -24,6 +24,7 @@
 #include "web_static.h"
 #include "web_upload.h"
 #include "web_reboot.h"
+#include "web_ota.h"
 #include "native_web_transport.h"
 #include "websocket_service.h"
 
@@ -319,7 +320,12 @@ static esp_err_t capabilities_handler(httpd_req_t *request) {
     json_buffer_init(&output, body, sizeof(body));
     json_buffer_raw(&output, "{\"schema\":1,\"firmware\":\"esp32-cyd2usb-native\",\"audio_output\":");
     json_buffer_string(&output, native_audio_output_name());
-    json_buffer_raw(&output, ",\"websocket\":true,\"websocket_clients\":2,\"radio\":true,\"smartstart\":true,\"normalization\":true,\"wifi_reconnect\":true,\"playlist_upload\":true,\"asset_upload\":true,\"wifi_upload\":true,\"upload_max_bytes\":98304,\"upload_max_files\":16,\"upload_name_max_bytes\":22,\"wifi_file_max_bytes\":799,\"wifi_body_max_bytes\":4096,\"wifi_ssid_max_bytes\":31,\"wifi_password_max_bytes\":63,\"wifi_profiles\":false,\"ota\":false,\"equalizer\":false,\"sd\":false,\"display_controls\":false}");
+    json_buffer_raw(&output, ",\"websocket\":true,\"websocket_clients\":2,\"radio\":true,\"smartstart\":true,\"normalization\":true,\"wifi_reconnect\":true,\"playlist_upload\":true,\"asset_upload\":true,\"wifi_upload\":true,\"upload_max_bytes\":98304,\"upload_max_files\":16,\"upload_name_max_bytes\":22,\"wifi_file_max_bytes\":799,\"wifi_body_max_bytes\":4096,\"wifi_ssid_max_bytes\":31,\"wifi_password_max_bytes\":63,\"wifi_profiles\":false,\"ota\":true");
+    char ota_limits[80];
+    snprintf(ota_limits, sizeof(ota_limits), ",\"ota_max_bytes\":%u,\"ota_body_max_bytes\":%u",
+             (unsigned)WEB_OTA_MAX_IMAGE_BYTES, (unsigned)WEB_OTA_MAX_BODY_BYTES);
+    json_buffer_raw(&output, ota_limits);
+    json_buffer_raw(&output, ",\"equalizer\":false,\"sd\":false,\"display_controls\":false}");
     if (output.failed) return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "Capabilities exhausted");
     httpd_resp_set_type(request, "application/json; charset=utf-8");
     httpd_resp_set_hdr(request, "Cache-Control", "no-store");
@@ -358,7 +364,7 @@ esp_err_t web_service_start(native_state_t *state) {
     // clients leave two for the stream and network activity. WS admits two.
     config.max_open_sockets = 5;
     config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
-    config.max_uri_handlers = 16;
+    config.max_uri_handlers = 18; // 16 explicit routes plus the WebSocket route.
     config.lru_purge_enable = true;
     config.uri_match_fn = httpd_uri_match_wildcard;
     httpd_handle_t server = NULL;
@@ -405,6 +411,8 @@ esp_err_t web_service_start(native_state_t *state) {
     httpd_uri_t upload = {.uri="/upload", .method=HTTP_POST, .handler=web_upload_handler};
     httpd_uri_t board = {.uri="/webboard", .method=HTTP_POST, .handler=web_board_upload_handler};
     httpd_uri_t wifi = {.uri="/", .method=HTTP_POST, .handler=web_wifi_upload_handler};
+    httpd_uri_t ota = {.uri="/update", .method=HTTP_POST, .handler=web_ota_handler};
+    httpd_uri_t ota_info = {.uri="/api/native/ota", .method=HTTP_GET, .handler=web_ota_info_handler};
     httpd_uri_t files = {
         .uri = "/*",
         .method = HTTP_GET,
@@ -412,7 +420,7 @@ esp_err_t web_service_start(native_state_t *state) {
     };
     const httpd_uri_t *routes[] = {&status, &health, &radio_get, &radio_post,
         &reconnect, &play, &stop, &settings_get, &settings_post, &capabilities,
-        &upload, &board, &wifi};
+        &upload, &board, &wifi, &ota, &ota_info};
     for (unsigned i = 0; i < sizeof(routes) / sizeof(routes[0]); ++i) {
         result = httpd_register_uri_handler(server, routes[i]);
         if (result != ESP_OK) goto failed;
@@ -424,6 +432,7 @@ esp_err_t web_service_start(native_state_t *state) {
     result = websocket_service_start();
     if (result != ESP_OK) goto failed;
     web_upload_activate();
+    web_ota_activate();
     web_static_activate();
     if (state->lock && xSemaphoreTake(state->lock, pdMS_TO_TICKS(100))) {
         state->web_ready = true;
@@ -432,6 +441,7 @@ esp_err_t web_service_start(native_state_t *state) {
     ESP_LOGI(TAG, "Native %s server started", native_web_transport_secure() ? "HTTPS" : "HTTP");
     return ESP_OK;
 failed:
+    web_ota_deactivate();
     web_upload_deactivate();
     // Keep the server/session workspace alive if a producer has not exited.
     // All ordinary startup failures happen before its task is created.

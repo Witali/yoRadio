@@ -16,6 +16,7 @@ set(NATIVE_SRCS
   "web_static.c"
   "web_upload.c"
   "web_reboot.c"
+  "web_ota.c"
   "web_pages.cpp"
   "websocket_service.c")
 
