@@ -494,11 +494,9 @@ VM из собственного session.json. Состояние и stdout/stde
 Для фонового запуска:
 
 ```powershell
-Start-Process -FilePath (Get-Command pwsh).Source -WindowStyle Hidden -PassThru `
-  -ArgumentList @('-NoProfile', '-File',
-    'C:/Work/yoRadio/Small_TV/src/tools/runtime_supervisor.ps1',
-    '-YoradioRoot', 'C:/Work/yoRadio', '-QemuRoot', 'C:/Work/QEMU-ESP32',
-    '-OutputDirectory', 'C:/Work/yoRadio/.build/small-tv-parity/new-runtime-24h')
+& Small_TV/src/tools/start_runtime.ps1 `
+  -YoradioRoot C:/Work/yoRadio -QemuRoot C:/Work/QEMU-ESP32 `
+  -OutputDirectory C:/Work/yoRadio/.build/small-tv-parity/new-runtime-24h
 ```
 
 Выберите новый каталог. По умолчанию — 86 400 гостевых секунд, интервал 15 с,
@@ -508,6 +506,24 @@ Start-Process -FilePath (Get-Command pwsh).Source -WindowStyle Hidden -PassThru 
 и command line через системный process audit. Проверка выживания через границу
 assistant turn остаётся отдельным наблюдением. Terminal supervisor pass также
 не заменяет полный journal/trend audit и не подтверждает аппаратную приёмку.
+
+`start_runtime.ps1` запускает скрытый supervisor через службу Windows с
+`CREATE_BREAKAWAY_FROM_JOB` и проверяет через ядро, что процесс находится вне
+Job родительского инструмента. Аргументы передаются без shell. Запись
+`<run>-launch.json` сохраняет PID, реальное время создания, команду и хеши
+launcher/supervisor. Имя резервируется до запуска: повторный вызов не создаёт
+вторую VM и не перезаписывает старые данные. Этот способ переживает выход
+родителя; выключение Windows и явная остановка процесса всё равно прервут тест.
+Наличие записи запуска не доказывает, что тест продолжает работать.
+
+Реальная проверка процесса, точности argv, завершения после выхода родителя,
+ошибок запуска и сохранности уже зарезервированного имени:
+
+```powershell
+python Small_TV/src/tests/runtime_process_test.py `
+  --output .build/runtime-process-new --yoradio-root C:/Work/yoRadio `
+  --qemu-root C:/Work/QEMU-ESP32 --dependency-root C:/Work/yoRadio
+```
 
 ```powershell
 python Small_TV/src/tools/analyze_runtime.py `
