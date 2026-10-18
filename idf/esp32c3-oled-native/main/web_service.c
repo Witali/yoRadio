@@ -32,6 +32,8 @@
 #include "web_pages_bridge.h"
 #include "web_ota.h"
 #include "web_upload.h"
+#include "web_wifi.h"
+#include "native_wifi_public.h"
 #include "native_web_transport.h"
 #include "websocket_service.h"
 
@@ -363,6 +365,8 @@ static esp_err_t send_static_file(httpd_req_t *request, FILE *file) {
 }
 
 static esp_err_t serve_static_request(httpd_req_t *request) {
+    if (!native_wifi_public_static_uri(request->uri, request->method == HTTP_GET))
+        return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "Public file not found");
     char uri[160];
     const char *query = strchr(request->uri, '?');
     size_t uri_len = query ? (size_t)(query - request->uri)
@@ -404,13 +408,16 @@ static esp_err_t serve_static_request(httpd_req_t *request) {
         char variables[512];
         snprintf(variables, sizeof(variables),
                  "var yoVersion='idf-%s';\n"
-                 "var webUiRevision='native05-ota';\n"
+                 "var webUiRevision='native06-wifi';\n"
                  "var formAction='%s';\n"
                  "var playMode='%s';\n"
                  "var equalizerEnabled=false;\n"
                  "var nativeFirmwareOnly=true;\n"
                  "var nativeFirmwareName='ESP32-C3 OLED native';\n"
-                 "var nativeFirmwareInfo='/api/native/ota';\n",
+                 "var nativeFirmwareInfo='/api/native/ota';\n"
+                 "var nativeWiFiApi='/api/native/wifi';\n"
+                 "var nativeWiFiMaxProfiles=5;\n"
+                 "var nativeWiFiPrivateExport=false;\n",
                  esp_get_idf_version(),
                  state.network_mode == NATIVE_NETWORK_CLIENT &&
                          web_ui_available()
@@ -498,6 +505,8 @@ static esp_err_t start_static_workers(void) {
 }
 
 static esp_err_t static_handler(httpd_req_t *request) {
+    if (!native_wifi_public_static_uri(request->uri, request->method == HTTP_GET))
+        return httpd_resp_send_err(request, HTTPD_404_NOT_FOUND, "Public file not found");
     httpd_req_t *async_request = NULL;
     esp_err_t result =
         httpd_req_async_handler_begin(request, &async_request);
@@ -568,7 +577,7 @@ esp_err_t web_service_start(native_state_t *state) {
     if (!atomic_compare_exchange_strong(&s_started, &expected, true)) return ESP_ERR_INVALID_STATE;
     s_state = state;
     esp_fill_random(&s_health_boot_id, sizeof(s_health_boot_id));
-    esp_err_t result = web_upload_storage_init();
+    esp_err_t result = network_service_storage_init();
     if (result != ESP_OK) goto unprepared;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.stack_size = 8192; // Upload payload is a bounded, temporary heap buffer.
@@ -576,7 +585,7 @@ esp_err_t web_service_start(native_state_t *state) {
     // plus the persistent WebSocket alive; with four sockets the LRU purge
     // closed /ws during page startup and the shared UI spinner never stopped.
     config.max_open_sockets = WEB_MAX_OPEN_SOCKETS;
-    config.max_uri_handlers = 15; // Includes WebSocket, memory probe and final wildcard.
+    config.max_uri_handlers = 17; // Includes Wi-Fi GET/POST, WS, probe and wildcard.
     config.lru_purge_enable = true;
     config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
     config.uri_match_fn = httpd_uri_match_wildcard;
@@ -607,6 +616,14 @@ esp_err_t web_service_start(native_state_t *state) {
     httpd_uri_t ota_info = {
         .uri = "/api/native/ota", .method = HTTP_GET,
         .handler = web_ota_info_handler,
+    };
+    httpd_uri_t wifi_info = {
+        .uri = "/api/native/wifi", .method = HTTP_GET,
+        .handler = web_wifi_info_handler,
+    };
+    httpd_uri_t wifi_edit = {
+        .uri = "/api/native/wifi", .method = HTTP_POST,
+        .handler = web_wifi_edit_handler,
     };
     httpd_uri_t reconnect = {
         .uri = "/api/native/reconnect",
@@ -661,6 +678,10 @@ esp_err_t web_service_start(native_state_t *state) {
                         "OTA route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &ota_info), TAG,
                         "OTA info route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &wifi_info), TAG,
+                        "Wi-Fi metadata route registration failed");
+    ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &wifi_edit), TAG,
+                        "Wi-Fi edit route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &reconnect), TAG,
                         "Reconnect route registration failed");
     ESP_RETURN_ON_ERROR(httpd_register_uri_handler(server, &play), TAG,

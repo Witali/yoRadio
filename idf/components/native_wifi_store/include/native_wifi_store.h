@@ -99,6 +99,8 @@ bool native_wifi_store_init(native_wifi_store_t *store,
                             const native_wifi_store_ops_t *ops,
                             void *context, uint64_t boot_epoch);
 native_wifi_result_t native_wifi_validate_csv(const uint8_t *data, size_t size);
+// Clears the complete output at entry, including NOT_READY/BUSY/IO/invalid-store
+// failure. Only OK provides a coherent usable revision and metadata snapshot.
 native_wifi_result_t native_wifi_store_metadata(native_wifi_store_t *store,
                                                native_wifi_metadata_t *out);
 native_wifi_result_t native_wifi_store_edit(native_wifi_store_t *store,

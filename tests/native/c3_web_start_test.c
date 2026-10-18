@@ -29,7 +29,7 @@ static unsigned storage_calls,prepare_calls,worker_starts,deleted_workers,delete
 static bool server_live,prepared,secure;
 static int fail_storage,fail_prepare,fail_workers,fail_server,fail_release,fail_route,fail_ws;
 static void esp_fill_random(void *out,size_t size){memset(out,0x5a,size);}
-static int web_upload_storage_init(void){storage_calls++;return fail_storage;}
+static int network_service_storage_init(void){storage_calls++;return fail_storage;}
 static int native_web_transport_prepare(httpd_config_t *config){
     prepare_calls++;if(fail_prepare)return fail_prepare;prepared=true;
     assert(config->stack_size==8192 && config->max_open_sockets==7);
@@ -42,7 +42,7 @@ static int start_static_workers(void){assert(prepared);worker_starts++;if(fail_w
 static void vTaskDelete(void *task){assert(task);deleted_workers++;}
 static void vQueueDelete(void *queue){assert(queue);deleted_queues++;}
 static int httpd_start(void **server,const httpd_config_t *config){
-    assert(prepared && config->task_priority==5 && config->core_id==-1 && config->max_uri_handlers==15);
+    assert(prepared && config->task_priority==5 && config->core_id==-1 && config->max_uri_handlers==17);
     assert(config->stack_size==(secure?10240U:8192U) && config->max_open_sockets==(secure?3U:7U));
     assert(config->server_port==(secure?443U:80U) && config->lru_purge_enable && config->uri_match_fn);
     if(fail_server)return fail_server;*server=(void *)1;server_live=true;return ESP_OK;
@@ -55,6 +55,7 @@ static int xSemaphoreTake(void *lock,unsigned ticks){assert(lock && ticks==100);
 static void xSemaphoreGive(void *lock){assert(lock);}
 #define HANDLER(name) static int name(httpd_req_t *req){(void)req;return ESP_OK;}
 HANDLER(status_handler) HANDLER(health_handler) HANDLER(web_ota_handler) HANDLER(web_ota_info_handler)
+HANDLER(web_wifi_info_handler) HANDLER(web_wifi_edit_handler)
 HANDLER(sleep_guarded_reconnect_handler) HANDLER(sleep_guarded_play_handler) HANDLER(sleep_guarded_stop_handler)
 HANDLER(sleep_guarded_upload_handler) HANDLER(webboard_page_handler) HANDLER(sleep_guarded_webboard_upload_handler)
 HANDLER(sleep_guarded_emergency_handler) HANDLER(sleep_guarded_recovery_wifi_handler) HANDLER(web_memory_handler) HANDLER(static_handler)
@@ -76,14 +77,14 @@ int main(void){
     reset();fail_server=ESP_FAIL;assert(web_service_start(&state)==ESP_FAIL && !atomic_load(&s_started) && !prepared);
     assert(deleted_workers==2 && deleted_queues==1 && !s_static_request_queue && !s_static_worker_tasks[0] && !s_static_worker_tasks[1]);
     reset();fail_server=fail_release=ESP_FAIL;assert(web_service_start(&state)==ESP_FAIL && atomic_load(&s_started) && prepared && !server_live);
-    for(int route=1;route<=14;route++){
+    for(int route=1;route<=16;route++){
         reset();fail_route=route;assert(web_service_start(&state)==ESP_FAIL && atomic_load(&s_started) && server_live && prepared && !state.web_ready);
         assert(!deleted_workers && !deleted_queues && !release_calls);
         assert(web_service_start(&state)==ESP_ERR_INVALID_STATE && worker_starts==1 && storage_calls==1);
     }
     reset();fail_ws=ESP_FAIL;assert(web_service_start(&state)==ESP_FAIL && server_live && prepared && atomic_load(&s_started));
     for(unsigned mode=0;mode<2;mode++){
-        reset();secure=mode;assert(web_service_start(&state)==ESP_OK && state.web_ready && route_calls==14);
+        reset();secure=mode;assert(web_service_start(&state)==ESP_OK && state.web_ready && route_calls==16);
         assert(web_service_start(&state)==ESP_ERR_INVALID_STATE && storage_calls==1 && prepare_calls==1 && worker_starts==1);
     }
     puts("PASS C3 web startup: pre-listener failure rollback, TLS/plain configuration, every route failure retains live ownership, duplicate-start gate, priority/core preserved");
