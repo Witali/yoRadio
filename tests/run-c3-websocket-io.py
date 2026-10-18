@@ -20,8 +20,7 @@ from run_output_dma_host import host, run
 
 
 def select_production(text, old=False):
-    return (text[text.index('#define WS_STATUS_POLL_MS'):text.index('static void json_escape')]
-            + text[text.index('static esp_err_t ws_send_request'):text.index('static void format_status')]
+    return (text[text.index('#define WS_STATUS_POLL_MS'):text.index('static void format_status')]
             + text[text.index('static esp_err_t websocket_handler_awake'):text.index('typedef struct {\n    int64_t started_us;')]
             + ('' if old else text[text.index('esp_err_t websocket_service_register'):]))
 
@@ -44,7 +43,10 @@ def main():
     receive = rx_text[rx_text.index('static size_t httpd_recv_pending'):rx_text.index('int httpd_recv(httpd_req_t')]
     baseline = subprocess.check_output(['git', 'show', f'{args.baseline_ref}:{MAIN.relative_to(ROOT).as_posix()}'], cwd=ROOT).decode()
     (out / 'baseline.c').write_text(baseline)
-    files = [MAIN, MAIN.with_suffix('.h'), Path(__file__), TEST/'stubs.h', TEST/'test.c']
+    message_header = ROOT/'idf/components/native_stream/include/websocket_message.h'
+    files = [MAIN, MAIN.with_suffix('.h'), MAIN.with_name('websocket_message.h'), MAIN.with_name('json_buffer.h'),
+             message_header, message_header.with_name('json_buffer.h'),
+             ROOT/'idf/components/native_web_transport/include/native_web_transport.h', Path(__file__), TEST/'stubs.h', TEST/'test.c']
     hashes = {}
     for path in files:
         key = path.relative_to(ROOT).as_posix()
@@ -68,7 +70,7 @@ def main():
         cmd = ['gcc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
                '-Wno-unused-function', '-Wno-unused-variable', '-Wno-sign-compare',
                '-fsanitize=address,undefined', '-fno-omit-frame-pointer', '-fno-pie', '-no-pie',
-               '-I'+host(TEST), host(unit), '-o', host(binary)]
+               '-I'+host(TEST), '-I'+host(MAIN.parent), '-I'+host(message_header.parent), host(unit), '-o', host(binary)]
         try:
             (out / f'{name}-build.log').write_bytes(run(cmd))
             for mode in (['all'] if not old else ['short-send', 'deadline', 'pong', 'fd-reuse']):
@@ -86,18 +88,21 @@ def main():
                     assert b'NEGATIVE_CONTROL_FAIL:' in log and b'Sanitizer' not in log
                 else:
                     cases = int(re.search(rb'PASS: (\d+) C3 WebSocket', log)[1])
+                    layout = json.loads(re.search(rb'WS_LAYOUT=(.+)',log)[1])
+                    assert json.loads(re.search(rb'JSON_SAMPLE=(.+)',log)[1]) == '\ufffd'*66
                 results[f'{name}/{mode}'] = {'exit_code': code, 'expected_failure': old}
         except subprocess.CalledProcessError as error:
             (out / 'failure.log').write_bytes(error.output)
             print(error.output.decode(errors='replace'), file=sys.stderr)
             raise
-    report = {'passed': True, 'sanitizers': ['ASan', 'UBSan'], 'cases': cases, 'results': results,
+    report = {'passed': True, 'sanitizers': ['ASan', 'UBSan'], 'cases': cases, 'host_layout': layout, 'results': results,
               'source_sha256': hashes, 'baseline_ref': args.baseline_ref,
               'baseline_sha256': hashlib.sha256(baseline.encode()).hexdigest(),
               'sdk_sha256': {p.relative_to(args.sdk).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                              for p in [sdk_ws, sdk_rx]},
               'application_frame_send_budget_us': 1000000,
               'application_receive_handler_budget_us': 1000000,
+              'fragmented_message_budget_us': 5000000,
               'separate_fallback_budgets': 'SDK opcode and SDK control operations before the application handler each have finite per-read/write budgets.',
               'scope': 'Actual production transport/session/broadcast/handler/register functions and unchanged pinned-IDF WS framing/receive functions; deterministic lwIP, clock, context and queue seams. Correct commands, reboot and status-task scheduling are preserved but not executed by this targeted test. No board RAM/stack/latency/TCP timing proof.'}
     (out / 'report.json').write_text(json.dumps(report, indent=2)+'\n')

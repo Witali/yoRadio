@@ -268,6 +268,7 @@ idf_component_register(
     audio_level_led
     native_audio_settings
     native_storage
+    native_web_transport
     custom_flac
     custom_legacy_codecs
     esp_audio_codec)

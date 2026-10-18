@@ -24,7 +24,7 @@ def main():
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     stubs = {
-        'sdkconfig.h': '#define CONFIG_HTTPD_WS_SUPPORT 1\n#define CONFIG_HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT 1\n#define CONFIG_HTTPD_QUEUE_WORK_BLOCKING 0\n#define CONFIG_LWIP_MAX_SOCKETS 10\n',
+        'sdkconfig.h': '#define CONFIG_HTTPD_WS_SUPPORT 1\n#define CONFIG_HTTPD_WS_PRE_HANDSHAKE_CB_SUPPORT 1\n#define CONFIG_HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT 1\n#define CONFIG_HTTPD_QUEUE_WORK_BLOCKING 0\n#define CONFIG_LWIP_MAX_SOCKETS 10\n',
         'esp_err.h': '''#pragma once
 typedef int esp_err_t;
 #define ESP_OK 0
@@ -48,6 +48,13 @@ void vTaskDelay(unsigned);
 void vTaskDelete(void *);
 ''',
         'esp_timer.h': '#pragma once\n#include <stdint.h>\nint64_t esp_timer_get_time(void);\n',
+        'native_web_transport.h': '''#pragma once
+#include "esp_http_server.h"
+#include <sys/types.h>
+ssize_t native_web_transport_send(httpd_handle_t,int,const void *,size_t,int,bool *);
+ssize_t native_web_transport_recv(httpd_handle_t,int,void *,size_t,int,bool *);
+void native_web_transport_shutdown(httpd_handle_t,int,bool);
+''',
         'lwip/sockets.h': '''#pragma once
 #include <sys/types.h>
 #include <sys/select.h>
@@ -65,14 +72,15 @@ int lwip_select(int,fd_set *,fd_set *,fd_set *,struct timeval *);
 #include <stdint.h>
 #include "esp_err.h"
 typedef void *httpd_handle_t;
+#define HTTPD_400_BAD_REQUEST 400
 typedef void (*httpd_free_ctx_fn_t)(void *);
 typedef void (*httpd_work_fn_t)(void *);
 typedef enum { HTTP_DELETE=0, HTTP_GET=1, HTTP_POST=3 } httpd_method_t;
-typedef enum { HTTPD_WS_TYPE_TEXT=1,HTTPD_WS_TYPE_BINARY=2,HTTPD_WS_TYPE_PONG=10 } httpd_ws_type_t;
+typedef enum { HTTPD_WS_TYPE_CONTINUE=0,HTTPD_WS_TYPE_TEXT=1,HTTPD_WS_TYPE_BINARY=2,HTTPD_WS_TYPE_CLOSE=8,HTTPD_WS_TYPE_PING=9,HTTPD_WS_TYPE_PONG=10 } httpd_ws_type_t;
 typedef enum { HTTPD_WS_CLIENT_INVALID,HTTPD_WS_CLIENT_HTTP,HTTPD_WS_CLIENT_WEBSOCKET } httpd_ws_client_info_t;
 typedef struct { bool final,fragmented;httpd_ws_type_t type;uint8_t *payload;size_t len; } httpd_ws_frame_t;
 typedef struct { int socket;httpd_method_t method;const char *payload;size_t length;httpd_ws_type_t type;bool final,fragmented,receive_error,transport_reads; } httpd_req_t;
-typedef struct { const char *uri;httpd_method_t method;esp_err_t (*handler)(httpd_req_t *);bool is_websocket,handle_ws_control_frames;esp_err_t (*ws_post_handshake_cb)(httpd_req_t *); } httpd_uri_t;
+typedef struct { const char *uri;httpd_method_t method;esp_err_t (*handler)(httpd_req_t *);bool is_websocket,handle_ws_control_frames;esp_err_t (*ws_post_handshake_cb)(httpd_req_t *);esp_err_t (*ws_pre_handshake_cb)(httpd_req_t *); } httpd_uri_t;
 typedef int (*httpd_send_func_t)(httpd_handle_t,int,const char *,size_t,int);
 typedef int (*httpd_recv_func_t)(httpd_handle_t,int,char *,size_t,int);
 #define HTTPD_SOCK_ERR_FAIL (-1)
@@ -88,6 +96,7 @@ esp_err_t httpd_queue_work(httpd_handle_t,httpd_work_fn_t,void *);
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t,int,httpd_ws_frame_t *);
 int httpd_req_to_sockfd(httpd_req_t *);
 esp_err_t httpd_ws_recv_frame(httpd_req_t *,httpd_ws_frame_t *,size_t);
+esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
 ''',
         'compat.h': '#include <stddef.h>\nsize_t strlcpy(char *,const char *,size_t);\n',
     }
@@ -142,7 +151,8 @@ esp_err_t httpd_ws_recv_frame(httpd_req_t *,httpd_ws_frame_t *,size_t);
                MAIN / 'native_state.h', MAIN / 'audio_service.h', MAIN / 'native_health.h', MAIN / 'native_audio_output.h',
                ROOT / 'idf/components/native_audio_settings/native_audio_settings.h',
                ROOT / 'idf/components/native_storage/include/radio_control.h',
-               ROOT / 'idf/components/native_stream/include/json_buffer.h']
+               ROOT / 'idf/components/native_stream/include/json_buffer.h',
+               ROOT / 'idf/components/native_web_transport/include/native_web_transport.h']
     report = {'passed': True, 'sanitizers': ['ASan', 'UBSan'], 'maximum_json_bytes': maximum_bytes,
               'source_ref': args.source_ref, 'qualified_implementation_sha256': hashlib.sha256(source).hexdigest(),
               'status_capacity': 5120, 'websocket_client_limit': 2, 'queued_status_work_limit': 1,

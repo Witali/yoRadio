@@ -12,6 +12,10 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#ifndef OLD_BASELINE
+#include "websocket_message.h"
+#include "json_buffer.h"
+#endif
 
 typedef int esp_err_t;
 typedef void *httpd_handle_t;
@@ -25,8 +29,10 @@ typedef struct { int unused; } native_state_t;
 #define HTTPD_SOCK_ERR_FAIL (-1)
 #define HTTPD_SOCK_ERR_TIMEOUT (-3)
 #define HTTP_GET 1
+#define HTTPD_400_BAD_REQUEST 400
 #define CONFIG_LWIP_MAX_SOCKETS 10
 #define CONFIG_HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT 1
+#define CONFIG_HTTPD_WS_PRE_HANDSHAKE_CB_SUPPORT 1
 #define CONFIG_HTTPD_QUEUE_WORK_BLOCKING 0
 #define CONFIG_HTTPD_WS_STRICTER_RFC6455 0
 #define BOARD_TASK_STACK_WEBSOCKET_STATUS 3072
@@ -70,6 +76,7 @@ struct httpd_req_aux { struct sock_db *sd; bool ws_final; httpd_ws_type_t ws_typ
 typedef struct { int method; httpd_handle_t handle; struct httpd_req_aux *aux; } httpd_req_t;
 typedef struct { const char *uri; int method; esp_err_t (*handler)(httpd_req_t *);
     bool is_websocket, handle_ws_control_frames;
+    esp_err_t (*ws_pre_handshake_cb)(httpd_req_t *);
     esp_err_t (*ws_post_handshake_cb)(httpd_req_t *); } httpd_uri_t;
 
 int64_t esp_timer_get_time(void);
@@ -79,6 +86,9 @@ int shutdown(int,int);
 ssize_t lwip_send(int,const void *,size_t,int);
 ssize_t lwip_recv(int,void *,size_t,int);
 int lwip_select(int,fd_set *,fd_set *,fd_set *,struct timeval *);
+ssize_t native_web_transport_send(httpd_handle_t,int,const void *,size_t,int,bool *);
+ssize_t native_web_transport_recv(httpd_handle_t,int,void *,size_t,int,bool *);
+void native_web_transport_shutdown(httpd_handle_t,int,bool);
 void *httpd_sess_get_ctx(httpd_handle_t,int);
 void httpd_sess_set_ctx(httpd_handle_t,int,void *,httpd_free_ctx_fn_t);
 esp_err_t httpd_sess_set_send_override(httpd_handle_t,int,httpd_send_func_t);
@@ -94,6 +104,7 @@ esp_err_t httpd_ws_send_frame(httpd_req_t *,httpd_ws_frame_t *);
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t,int,httpd_ws_frame_t *);
 esp_err_t httpd_ws_send_data_async(httpd_handle_t,int,httpd_ws_frame_t *,transfer_complete_cb,void *);
 esp_err_t httpd_ws_recv_frame(httpd_req_t *,httpd_ws_frame_t *,size_t);
+esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
 bool deep_sleep_clock_begin_activity(void);
 void deep_sleep_clock_end_activity(void);
 static void handle_command(httpd_req_t *,char *);

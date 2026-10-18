@@ -4,7 +4,7 @@
 #include "esp_http_server.h"
 #include "native_state.h"
 
-// Requires CONFIG_HTTPD_WS_SUPPORT=y, HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT=y,
+// Requires CONFIG_HTTPD_WS_SUPPORT=y, both HTTPD_WS_*_HANDSHAKE_CB_SUPPORT=y,
 // HTTPD_QUEUE_WORK_BLOCKING=n and finite
 // HTTPD send_wait_timeout. Two WS clients share one coalesced HTTPD work item.
 // A WS-only send override completes short writes with a one-second application
@@ -13,6 +13,8 @@
 // Its recv override gives handler header/mask/payload reads one shared second.
 // HTTPD reads the opcode before dispatch; that read and SDK control reads each
 // receive a finite fallback budget. These are separate from the handler budget.
+// A text message may span frames, with interleaved control frames. Its total
+// payload is bounded to 96 bytes and its assembly deadline to five seconds.
 // Register /ws before a matching wildcard route. No worker exists until start.
 esp_err_t websocket_service_register(httpd_handle_t server, native_state_t *state);
 esp_err_t websocket_service_start(void);

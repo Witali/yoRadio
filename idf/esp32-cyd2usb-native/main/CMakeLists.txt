@@ -59,6 +59,7 @@ idf_component_register(
     native_audio_settings
     native_storage
     native_stream
+    native_web_transport
     custom_legacy_codecs
     esp_audio_codec
   PRIV_REQUIRES esp-tls)

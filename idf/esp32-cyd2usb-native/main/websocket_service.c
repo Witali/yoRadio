@@ -14,12 +14,17 @@
 #include "native_audio_output.h"
 #include "native_audio_settings.h"
 #include "radio_control.h"
+#include "websocket_message.h"
+#include "native_web_transport.h"
 
 #if !CONFIG_HTTPD_WS_SUPPORT
 #error "CYD WebSocket service requires CONFIG_HTTPD_WS_SUPPORT=y"
 #endif
 #if !CONFIG_HTTPD_WS_POST_HANDSHAKE_CB_SUPPORT
 #error "CYD WebSocket transport requires the public post-handshake callback"
+#endif
+#if !CONFIG_HTTPD_WS_PRE_HANDSHAKE_CB_SUPPORT
+#error "CYD WebSocket service requires the pre-handshake callback"
 #endif
 #if CONFIG_HTTPD_QUEUE_WORK_BLOCKING
 #error "CYD WebSocket producer requires CONFIG_HTTPD_QUEUE_WORK_BLOCKING=n"
@@ -32,6 +37,7 @@
 #define WS_HEARTBEAT_US 2000000LL
 #define WS_TASK_STACK 2048U
 #define WS_FRAME_BUDGET_US 1000000LL
+#define WS_MESSAGE_BUDGET_US 5000000ULL
 
 typedef struct {
     bool used, closing, initialized;
@@ -41,6 +47,8 @@ typedef struct {
     int64_t sent_us;
     int64_t frame_deadline_us;
     int64_t receive_deadline_us;
+    websocket_message_t message;
+    uint8_t command[WS_COMMAND_LIMIT + 1U];
 } ws_client_t;
 
 typedef struct {
@@ -80,8 +88,7 @@ static void session_free(void *context) {
 
 static bool current_client(const ws_client_t *client) {
     return client && client->used && !client->closing &&
-        httpd_sess_get_ctx(s_server, client->socket) == client &&
-        httpd_ws_get_fd_info(s_server, client->socket) == HTTPD_WS_CLIENT_WEBSOCKET;
+        httpd_sess_get_ctx(s_server, client->socket) == client;
 }
 
 static int send_complete_frame_bytes(httpd_handle_t server, int socket, const char *data, size_t size, int flags) {
@@ -97,7 +104,9 @@ static int send_complete_frame_bytes(httpd_handle_t server, int socket, const ch
     while (written < size) {
         if (!atomic_load(&s_running)) return HTTPD_SOCK_ERR_FAIL;
         if (esp_timer_get_time() >= deadline) return HTTPD_SOCK_ERR_TIMEOUT;
-        ssize_t sent = lwip_send(socket, data + written, size - written, flags | MSG_DONTWAIT);
+        bool writable;
+        ssize_t sent = native_web_transport_send(server, socket,
+            data + written, size - written, flags | MSG_DONTWAIT, &writable);
         if (sent > 0) {
             if ((size_t)sent > size - written) return HTTPD_SOCK_ERR_FAIL;
             written += (size_t)sent;
@@ -107,10 +116,11 @@ static int send_complete_frame_bytes(httpd_handle_t server, int socket, const ch
         int64_t remaining = deadline - esp_timer_get_time();
         if (remaining <= 0) return HTTPD_SOCK_ERR_TIMEOUT;
         struct timeval wait = {.tv_sec = (long)(remaining / 1000000LL), .tv_usec = (long)(remaining % 1000000LL)};
-        fd_set writable;
-        FD_ZERO(&writable); FD_SET(socket, &writable);
+        fd_set writable_set;
+        FD_ZERO(&writable_set); FD_SET(socket, &writable_set);
         // Use lwIP directly: CYD intentionally has CONFIG_VFS_SUPPORT_SELECT=n.
-        int ready = lwip_select(socket + 1, NULL, &writable, NULL, &wait);
+        int ready = lwip_select(socket + 1, writable ? NULL : &writable_set,
+                               writable ? &writable_set : NULL, NULL, &wait);
         if (!ready) return HTTPD_SOCK_ERR_TIMEOUT;
         if (ready < 0 && errno != EINTR) return HTTPD_SOCK_ERR_FAIL;
         // Yield after no progress, including spurious readiness/EINTR, so a slow
@@ -131,7 +141,9 @@ static int receive_complete_frame_bytes(httpd_handle_t server, int socket, char 
     while (received < size) {
         if (!atomic_load(&s_running)) return HTTPD_SOCK_ERR_FAIL;
         if (esp_timer_get_time() >= deadline) return HTTPD_SOCK_ERR_TIMEOUT;
-        ssize_t count = lwip_recv(socket, data + received, size - received, flags | MSG_DONTWAIT);
+        bool writable;
+        ssize_t count = native_web_transport_recv(server, socket,
+            data + received, size - received, flags | MSG_DONTWAIT, &writable);
         if (count > 0) {
             if ((size_t)count > size - received) return HTTPD_SOCK_ERR_FAIL;
             received += (size_t)count;
@@ -147,7 +159,8 @@ static int receive_complete_frame_bytes(httpd_handle_t server, int socket, char 
         struct timeval wait = {.tv_sec = (long)(remaining / 1000000LL), .tv_usec = (long)(remaining % 1000000LL)};
         fd_set readable;
         FD_ZERO(&readable); FD_SET(socket, &readable);
-        int ready = lwip_select(socket + 1, &readable, NULL, NULL, &wait);
+        int ready = lwip_select(socket + 1, writable ? NULL : &readable,
+                               writable ? &readable : NULL, NULL, &wait);
         if (!ready) return HTTPD_SOCK_ERR_TIMEOUT;
         if (ready < 0 && errno != EINTR) return HTTPD_SOCK_ERR_FAIL;
         vTaskDelay(1);
@@ -160,7 +173,7 @@ static void fail_client(ws_client_t *client) {
     client->closing = true;
     // HTTPD owns close(). Immediate shutdown wakes its receive loop without a
     // queued fd/session-pointer close that could hit a subsequently reused fd.
-    (void)shutdown(client->socket, SHUT_RDWR);
+    native_web_transport_shutdown(s_server, client->socket, false);
 }
 
 static ws_client_t *find_client(int socket) {
@@ -173,6 +186,8 @@ static ws_client_t *find_client(int socket) {
         if (!s_clients[i].used) {
             s_clients[i] = (ws_client_t){.used = true, .socket = socket,
                 .playlist_revision = atomic_load(&s_playlist_revision)};
+            websocket_message_init(&s_clients[i].message, s_clients[i].command,
+                sizeof(s_clients[i].command), WS_MESSAGE_BUDGET_US);
             httpd_sess_set_ctx(s_server, socket, &s_clients[i], session_free);
             if (httpd_sess_get_ctx(s_server, socket) == &s_clients[i]) {
                 if (httpd_sess_set_send_override(s_server, socket, send_complete_frame_bytes) == ESP_OK &&
@@ -188,7 +203,8 @@ static ws_client_t *find_client(int socket) {
 }
 
 static esp_err_t send_text(ws_client_t *client, const char *text) {
-    if (!current_client(client)) return ESP_ERR_INVALID_STATE;
+    if (!current_client(client) || client->message.close_sent ||
+        client->message.close_received) return ESP_ERR_INVALID_STATE;
     httpd_ws_frame_t frame = {.final = true, .type = HTTPD_WS_TYPE_TEXT,
         .payload = (uint8_t *)text, .len = strlen(text)};
     client->frame_deadline_us = esp_timer_get_time() + WS_FRAME_BUDGET_US;
@@ -196,6 +212,30 @@ static esp_err_t send_text(ws_client_t *client, const char *text) {
     client->frame_deadline_us = 0;
     if (result != ESP_OK) fail_client(client);
     return result;
+}
+
+static esp_err_t send_control(ws_client_t *client, httpd_ws_type_t type,
+                               const uint8_t *payload, size_t size) {
+    if (!current_client(client)) return ESP_ERR_INVALID_STATE;
+    // A received Close is already marked ws_close by SDK. Its session context
+    // still owns this fd; ws_get_fd_info is therefore not an ownership test.
+    httpd_ws_frame_t frame = {.final = true, .type = type,
+        .payload = (uint8_t *)payload, .len = size};
+    client->frame_deadline_us = esp_timer_get_time() + WS_FRAME_BUDGET_US;
+    esp_err_t result = httpd_ws_send_frame_async(s_server, client->socket, &frame);
+    client->frame_deadline_us = 0;
+    if (result == ESP_OK && type == HTTPD_WS_TYPE_CLOSE)
+        websocket_message_mark_close_sent(&client->message);
+    if (result != ESP_OK) fail_client(client);
+    return result;
+}
+
+static esp_err_t close_with_code(ws_client_t *client, uint16_t code) {
+    uint8_t payload[2] = {(uint8_t)(code >> 8U), (uint8_t)code};
+    if (!client->message.close_sent)
+        (void)send_control(client, HTTPD_WS_TYPE_CLOSE, payload, sizeof(payload));
+    fail_client(client);
+    return ESP_FAIL;
 }
 
 static bool same_radio(const radio_control_snapshot_t *left, const radio_control_snapshot_t *right) {
@@ -339,7 +379,13 @@ static void status_work(void *argument) {
                     prepared = true;
                 }
                 ws_client_t *client = find_client(s_sockets[i]);
-                if (client) (void)send_status(client, false);
+                if (client) {
+                    websocket_message_result_t expired = websocket_message_expire(
+                        &client->message, (uint64_t)esp_timer_get_time());
+                    if (expired.event == WEBSOCKET_MESSAGE_ERROR)
+                        (void)close_with_code(client, expired.close_code);
+                    else (void)send_status(client, false);
+                }
                 else (void)shutdown(s_sockets[i], SHUT_RDWR);
             }
         }
@@ -427,35 +473,48 @@ static esp_err_t receive_and_handle(httpd_req_t *request, ws_client_t *client) {
     httpd_ws_frame_t frame = {0};
     esp_err_t result = httpd_ws_recv_frame(request, &frame, 0);
     if (result != ESP_OK) return result;
-    if (frame.type == HTTPD_WS_TYPE_PONG) {
-        if (!frame.final || frame.len > 125U) return ESP_ERR_INVALID_ARG;
-        if (!frame.len) return ESP_OK;
-        uint8_t pong[125];
-        frame.payload = pong;
-        return httpd_ws_recv_frame(request, &frame, sizeof(pong));
+    bool control = (unsigned)frame.type >= 8U;
+    if (frame.len > (control ? 125U : WS_COMMAND_LIMIT))
+        return close_with_code(client, control ? 1002U : 1009U);
+    uint8_t payload[125];
+    if (frame.len) {
+        frame.payload = payload;
+        result = httpd_ws_recv_frame(request, &frame, sizeof(payload));
+        if (result != ESP_OK) return result;
     }
-    if (frame.type != HTTPD_WS_TYPE_TEXT || !frame.final || frame.fragmented || frame.len > WS_COMMAND_LIMIT)
-        return ESP_ERR_INVALID_ARG; // Close without retaining an unread/unbounded frame.
-    if (!frame.len) return send_text(client, "{\"commandError\":\"Empty command\"}");
-    char payload[WS_COMMAND_LIMIT + 1U];
-    frame.payload = (uint8_t *)payload;
-    result = httpd_ws_recv_frame(request, &frame, WS_COMMAND_LIMIT);
-    if (result != ESP_OK) return result;
-    if (memchr(payload, '\0', frame.len)) return ESP_ERR_INVALID_ARG;
-    payload[frame.len] = '\0';
-    return handle_command(client, payload);
+    websocket_message_result_t message = websocket_message_feed(&client->message,
+        (uint8_t)frame.type, frame.final, payload, frame.len,
+        (uint64_t)esp_timer_get_time());
+    switch (message.event) {
+    case WEBSOCKET_MESSAGE_ERROR: return close_with_code(client, message.close_code);
+    case WEBSOCKET_MESSAGE_NONE:
+    case WEBSOCKET_MESSAGE_PONG: return ESP_OK;
+    case WEBSOCKET_MESSAGE_PING:
+        return send_control(client, HTTPD_WS_TYPE_PONG, message.data, message.size);
+    case WEBSOCKET_MESSAGE_CLOSE:
+        if (client->message.close_sent) return ESP_OK;
+        return send_control(client, HTTPD_WS_TYPE_CLOSE, message.data, message.size);
+    case WEBSOCKET_MESSAGE_BINARY:
+        // Radio commands use text; RFC 6455 permits closing unsupported data.
+        return close_with_code(client, 1003U);
+    case WEBSOCKET_MESSAGE_TEXT:
+        if (!message.size) return send_text(client, "{\"commandError\":\"Empty command\"}");
+        if (memchr(message.data, 0, message.size))
+            return send_text(client, "{\"commandError\":\"Invalid command\"}");
+        return handle_command(client, (char *)client->command);
+    }
+    return ESP_FAIL;
 }
 
 static esp_err_t websocket_handler(httpd_req_t *request) {
+    // Pinned HTTPD consumes valid upgrades itself. An ordinary GET reached
+    // this handler without an upgrade and must remain an HTTP error response.
+    if (request->method == HTTP_GET)
+        return httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST,
+                                   "WebSocket upgrade required");
     if (!atomic_load(&s_running)) return ESP_ERR_INVALID_STATE;
     ws_client_t *client = find_client(httpd_req_to_sockfd(request));
     if (!client) return ESP_ERR_NO_MEM;
-    // IDF 6.0.2 normally consumes upgrade GET itself; this branch also makes
-    // direct handler invocations and older compatible dispatchers consistent.
-    if (request->method == HTTP_GET) {
-        if (!prepare_status()) return ESP_FAIL;
-        return send_status(client, true);
-    }
     // The first opcode byte was read by HTTPD before dispatch. Header length,
     // mask and payload reads made by the handler share this single deadline.
     client->receive_deadline_us = esp_timer_get_time() + WS_FRAME_BUDGET_US;
@@ -468,7 +527,7 @@ void websocket_service_notify_playlist_changed(void) {
     atomic_fetch_add(&s_playlist_revision, 1U);
 }
 
-static esp_err_t websocket_post_handshake(httpd_req_t *request) {
+static esp_err_t websocket_handshake_transport(httpd_req_t *request) {
     if (!atomic_load(&s_running)) return ESP_ERR_INVALID_STATE;
     // IDF consumes the upgrade GET without invoking websocket_handler. Install
     // both overrides before SDK reads any opcode/control bytes on this session.
@@ -479,8 +538,9 @@ esp_err_t websocket_service_register(httpd_handle_t server, native_state_t *stat
     if (!server || !state) return ESP_ERR_INVALID_ARG;
     if (s_server) return ESP_ERR_INVALID_STATE;
     httpd_uri_t route = {.uri = "/ws", .method = HTTP_GET, .handler = websocket_handler,
-        .is_websocket = true, .handle_ws_control_frames = false,
-        .ws_post_handshake_cb = websocket_post_handshake};
+        .is_websocket = true, .handle_ws_control_frames = true,
+        .ws_pre_handshake_cb = websocket_handshake_transport,
+        .ws_post_handshake_cb = websocket_handshake_transport};
     esp_err_t result = httpd_register_uri_handler(server, &route);
     if (result == ESP_OK) { s_server = server; s_state = state; }
     return result;

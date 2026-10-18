@@ -2,7 +2,7 @@
 typedef struct { httpd_work_fn_t function; void *argument; } queued_t;
 static struct sock_db sessions[32];
 static queued_t queue[32];
-static unsigned queue_count, shutdown_count, command_count, activity_count;
+static unsigned queue_count, shutdown_count, command_count, activity_count, http_errors;
 static unsigned send_calls, recv_calls, select_calls, yields, cases;
 static unsigned send_chunk, recv_chunk, send_advance, recv_advance;
 static int send_script[32], recv_script[32], wait_script[32];
@@ -13,6 +13,8 @@ static size_t received_size, received_at, transmitted_size;
 static int64_t now_us;
 static bool queue_failure, context_failure, send_override_failure, recv_override_failure;
 static bool registration_failure, task_failure, awake = true;
+static bool transport_write_needs_read, transport_read_needs_write;
+static bool last_wait_writable, last_shutdown_graceful;
 static httpd_uri_t route;
 static unsigned delivery_incarnation[32], delivery_count;
 static char command_text[256];
@@ -72,6 +74,12 @@ httpd_ws_client_info_t httpd_ws_get_fd_info(httpd_handle_t server,int socket) {
     return session->ws_handshake_done && !session->ws_close ? HTTPD_WS_CLIENT_WEBSOCKET : HTTPD_WS_CLIENT_HTTP;
 }
 int httpd_req_to_sockfd(httpd_req_t *request) { return request->aux->sd->fd; }
+esp_err_t httpd_resp_send_err(httpd_req_t *request, int status, const char *message) {
+    assert(status == HTTPD_400_BAD_REQUEST && strstr(message, "upgrade"));
+    assert(!sessions[httpd_req_to_sockfd(request)].context && !activity_count);
+    ++http_errors;
+    return ESP_OK;
+}
 esp_err_t httpd_register_uri_handler(httpd_handle_t server, const httpd_uri_t *registered) {
     assert(server == s_server); if (registration_failure) return ESP_FAIL;
     route = *registered; return ESP_OK;
@@ -103,6 +111,15 @@ static void run_queue(void) {
 int shutdown(int socket,int how) {
     assert(how == SHUT_RDWR && socket >= 0 && socket < 32 && sessions[socket].live);
     ++shutdown_count; return 0;
+}
+ssize_t native_web_transport_send(httpd_handle_t server,int socket,const void *data,size_t size,int flags,bool *writable) {
+    assert(server==s_server);*writable=!transport_write_needs_read;return lwip_send(socket,data,size,flags);
+}
+ssize_t native_web_transport_recv(httpd_handle_t server,int socket,void *data,size_t size,int flags,bool *writable) {
+    assert(server==s_server);*writable=transport_read_needs_write;return lwip_recv(socket,data,size,flags);
+}
+void native_web_transport_shutdown(httpd_handle_t server,int socket,bool graceful) {
+    assert(server==s_server);last_shutdown_graceful=graceful;(void)shutdown(socket,SHUT_RDWR);
 }
 static int next_action(int *script,size_t length,size_t *at) {
     return *at < length ? script[(*at)++] : INT_MAX;
@@ -144,6 +161,7 @@ ssize_t lwip_recv(int socket,void *data,size_t size,int flags) {
 int lwip_select(int nfds,fd_set *readable,fd_set *writable,fd_set *exception,struct timeval *wait) {
     assert(nfds>0 && (readable || writable) && !exception && wait);
     ++select_calls;
+    last_wait_writable=writable!=NULL;
     int result=next_action(wait_script,wait_script_len,&wait_script_at);
     if (result<0) { errno=-result; return -1; }
     if (!result) { now_us += wait->tv_sec*1000000LL+wait->tv_usec; return 0; }
@@ -159,24 +177,31 @@ static void open_session(int socket,bool websocket) {
     unsigned incarnation=sessions[socket].incarnation+1;
     sessions[socket]=(struct sock_db){.fd=socket,.handle=s_server,.live=true,.ws_handshake_done=websocket,
         .incarnation=incarnation,.send_fn=default_send,.recv_fn=default_receive};
+#ifndef OLD_BASELINE
+    sessions[socket].ws_control_frames=true;
+#endif
 }
 static httpd_req_t request_for(int socket,struct httpd_req_aux *aux) {
     *aux=(struct httpd_req_aux){.sd=&sessions[socket]};
     return (httpd_req_t){.method=3,.handle=s_server,.aux=aux};
 }
 static void ready_session(int socket) {
-    open_session(socket,true);
+    open_session(socket,false);
 #ifndef OLD_BASELINE
     struct httpd_req_aux aux;
     httpd_req_t req=request_for(socket,&aux);
+    assert(websocket_pre_handshake(&req)==ESP_OK);
+    sessions[socket].ws_handshake_done=true;
     assert(websocket_post_handshake(&req)==ESP_OK);
+#else
+    sessions[socket].ws_handshake_done=true;
 #endif
 }
 static void reset(void) {
     run_queue();
     for (int i=0;i<32;++i) close_session(i);
     s_server=(void *)1;
-    now_us=100; queue_count=shutdown_count=command_count=activity_count=0;
+    now_us=100; queue_count=shutdown_count=command_count=activity_count=http_errors=0;
     send_calls=recv_calls=select_calls=yields=0;
     send_chunk=recv_chunk=send_advance=recv_advance=0;
     send_script_len=recv_script_len=wait_script_len=0;
@@ -184,12 +209,14 @@ static void reset(void) {
     received_size=received_at=transmitted_size=0;
     queue_failure=context_failure=send_override_failure=recv_override_failure=false;
     task_failure=registration_failure=false; awake=true; delivery_count=0;
+    transport_write_needs_read=transport_read_needs_write=last_wait_writable=last_shutdown_graceful=false;
     memset(command_text,0,sizeof(command_text));
     atomic_store(&s_status_send_pending,0); atomic_store(&s_current_send_pending,0);
 #ifndef OLD_BASELINE
     memset(s_clients,0,sizeof(s_clients));
     memset(&s_status_work,0,sizeof(s_status_work)); memset(&s_current_work,0,sizeof(s_current_work)); memset(&s_playlist_work,0,sizeof(s_playlist_work));
     atomic_store(&s_completed_deliveries,0);
+    atomic_store(&s_fragmented_clients,0); atomic_store(&s_message_poll_pending,false);
 #endif
 }
 static size_t frame_header(uint8_t *target,size_t size,httpd_ws_type_t type,bool masked,bool final,int encoding) {
@@ -217,7 +244,7 @@ static esp_err_t incoming(httpd_req_t *request) {
     esp_err_t result=httpd_ws_get_frame_type(request);
     if(result!=ESP_OK) return result;
     if(request->aux->ws_type==HTTPD_WS_TYPE_CLOSE) sessions[httpd_req_to_sockfd(request)].ws_close=true;
-    if(request->aux->ws_type<HTTPD_WS_TYPE_CLOSE || request->aux->ws_type==HTTPD_WS_TYPE_PONG)
+    if(request->aux->ws_type<HTTPD_WS_TYPE_CLOSE || request->aux->ws_type==HTTPD_WS_TYPE_PONG || request->aux->sd->ws_control_frames)
         return websocket_handler(request);
     return ESP_OK;
 }
@@ -226,28 +253,31 @@ static esp_err_t incoming(httpd_req_t *request) {
 static void test_registration(void) {
     reset(); native_state_t state={0};
     assert(websocket_service_register(s_server,&state)==ESP_OK);
-    assert(route.is_websocket && !route.handle_ws_control_frames && route.handler==websocket_handler);
+    assert(route.is_websocket && route.handle_ws_control_frames && route.handler==websocket_handler);
     assert(route.ws_post_handshake_cb==websocket_post_handshake && atomic_load(&s_reboot_ready));
+    assert(route.ws_pre_handshake_cb==websocket_pre_handshake);
     open_session(3,true); struct httpd_req_aux aux; httpd_req_t req=request_for(3,&aux);
+    assert(route.ws_post_handshake_cb(&req)!=ESP_OK);
+    assert(route.ws_pre_handshake_cb(&req)==ESP_OK);
     assert(route.ws_post_handshake_cb(&req)==ESP_OK);
     assert(sessions[3].send_fn==ws_send_complete && sessions[3].recv_fn==ws_receive_complete);
-    assert(route.ws_post_handshake_cb(&req)==ESP_FAIL); ++cases;
+    assert(route.ws_pre_handshake_cb(&req)==ESP_FAIL); ++cases;
     for(int mode=0;mode<4;++mode) {
         reset(); open_session(3,true); req=request_for(3,&aux);
         if(mode==0) { sessions[3].context=&foreign_context; }
         else if(mode==1) context_failure=true;
         else if(mode==2) send_override_failure=true;
         else recv_override_failure=true;
-        assert(websocket_post_handshake(&req)!=ESP_OK);
+        assert(websocket_pre_handshake(&req)!=ESP_OK);
         assert(shutdown_count==(unsigned)(mode>=2));
         if(!mode) assert(sessions[3].context==&foreign_context);
         close_session(3); for(size_t i=0;i<CONFIG_LWIP_MAX_SOCKETS;++i) assert(!s_clients[i].used);
         ++cases;
     }
     reset(); for(int i=0;i<10;++i) ready_session(i);
-    open_session(11,true); req=request_for(11,&aux); assert(websocket_post_handshake(&req)==ESP_ERR_NO_MEM);
+    open_session(11,true); req=request_for(11,&aux); assert(websocket_pre_handshake(&req)==ESP_ERR_NO_MEM);
     assert(ws_session(s_server,-1)==NULL && ws_session(s_server,FD_SETSIZE)==NULL);
-    close_session(4); assert(websocket_post_handshake(&req)==ESP_OK); ++cases;
+    close_session(4); assert(websocket_pre_handshake(&req)==ESP_OK); ++cases;
 }
 static void test_send_splits(void) {
     static const size_t lengths[]={0,1,7,125,126,255,1280,65536};
@@ -294,11 +324,12 @@ static void test_control_and_alignment(void) {
         assert(incoming(&req)==ESP_OK && same_output(payload,sizeof(payload),HTTPD_WS_TYPE_PONG));
         assert(!command_count && received_at==received_size); ++cases;
         reset(); ready_session(3); send_chunk=recv_chunk=chunk;
-        append_input(payload,2,HTTPD_WS_TYPE_CLOSE,true,0); req=request_for(3,&aux);
-        assert(incoming(&req)==ESP_OK && same_output(payload,0,HTTPD_WS_TYPE_CLOSE));
+        const uint8_t close_payload[]={3,0xe8};
+        append_input(close_payload,2,HTTPD_WS_TYPE_CLOSE,true,0); req=request_for(3,&aux);
+        assert(incoming(&req)==ESP_OK && same_output(close_payload,2,HTTPD_WS_TYPE_CLOSE));
         assert(received_at==received_size); ++cases;
     }
-    for(unsigned type=2;type<=10;type+=8) for(size_t n=0;n<=sizeof(payload);++n) {
+    for(unsigned type=10;type<=10;++type) for(size_t n=0;n<=sizeof(payload);++n) {
         reset(); ready_session(3); recv_chunk=1;
         append_input(payload,n,(httpd_ws_type_t)type,true,0);
         append_input((const uint8_t *)"ping",4,HTTPD_WS_TYPE_TEXT,true,0);
@@ -309,7 +340,7 @@ static void test_control_and_alignment(void) {
     }
     for(int mode=0;mode<3;++mode) {
         reset(); ready_session(3); uint8_t payload256[256]; memset(payload256,'q',256);
-        append_input(payload256,mode==0?256:4,HTTPD_WS_TYPE_TEXT,mode==0,0);
+        append_input(payload256,mode==0?256:4,mode==1?HTTPD_WS_TYPE_CONTINUE:HTTPD_WS_TYPE_TEXT,true,0);
         struct httpd_req_aux aux; httpd_req_t req=request_for(3,&aux);
         if(mode==2) awake=false;
         assert(incoming(&req)!=ESP_OK && !command_count && !activity_count);
@@ -406,6 +437,147 @@ static void test_broadcast_lifetime(void) {
     assert(queue_count==3 && atomic_load(&s_status_send_pending)==2); run_queue();
     assert(atomic_load(&s_completed_deliveries)==6 && !atomic_load(&s_status_send_pending) && !atomic_load(&s_current_send_pending)); ++cases;
 }
+
+static uint16_t close_code_output(void) {
+    assert(transmitted_size>=4 && transmitted_wire[0]==0x88 && transmitted_wire[1]==2);
+    return (uint16_t)((uint16_t)transmitted_wire[2]*256+transmitted_wire[3]);
+}
+
+static void test_fragmented_commands(void) {
+    static const size_t lengths[]={0,1,7,125,126,255};
+    uint8_t text[256]; memset(text,'a',sizeof(text));
+    for(size_t n=0;n<sizeof(lengths)/sizeof(*lengths);++n) for(size_t split=0;split<=lengths[n];++split) {
+        reset(); ready_session(3); send_chunk=recv_chunk=(unsigned)(split%7)+1;
+        append_input(text,split,HTTPD_WS_TYPE_TEXT,false,0);
+        append_input((const uint8_t *)"ping",4,HTTPD_WS_TYPE_PING,true,0);
+        append_input((const uint8_t *)"pong",4,HTTPD_WS_TYPE_PONG,true,0);
+        append_input(text+split,lengths[n]-split,HTTPD_WS_TYPE_CONTINUE,true,0);
+        struct httpd_req_aux aux; httpd_req_t req=request_for(3,&aux);
+        assert(incoming(&req)==ESP_OK && !command_count && atomic_load(&s_fragmented_clients)==1);
+        req=request_for(3,&aux); assert(incoming(&req)==ESP_OK && !command_count && atomic_load(&s_fragmented_clients)==1);
+        assert(same_output((const uint8_t *)"ping",4,HTTPD_WS_TYPE_PONG));
+        req=request_for(3,&aux); assert(incoming(&req)==ESP_OK && !command_count && atomic_load(&s_fragmented_clients)==1);
+        req=request_for(3,&aux); assert(incoming(&req)==ESP_OK && atomic_load(&s_fragmented_clients)==0);
+        assert(command_count==(unsigned)(lengths[n]>0) && received_at==received_size);
+        assert(!memcmp(command_text,text,lengths[n])); ++cases;
+    }
+    const uint8_t utf8[]={0xd0,0xbf,0xd0,0xb8,0xd0,0xbd,0xd0,0xb3};
+    for(size_t split=0;split<=sizeof(utf8);++split) {
+        reset(); ready_session(3); recv_chunk=1;
+        append_input(utf8,split,HTTPD_WS_TYPE_TEXT,false,0);
+        append_input(utf8+split,sizeof(utf8)-split,HTTPD_WS_TYPE_CONTINUE,true,0);
+        struct httpd_req_aux aux; httpd_req_t req=request_for(3,&aux);
+        assert(incoming(&req)==ESP_OK && !command_count); req=request_for(3,&aux);
+        assert(incoming(&req)==ESP_OK && command_count==1 && !memcmp(command_text,utf8,sizeof(utf8))); ++cases;
+    }
+    for(int mode=0;mode<5;++mode) {
+        reset(); ready_session(3);
+        const uint8_t invalid[]={0xc0,0xaf};
+        append_input(mode==0?invalid:(const uint8_t *)"a",mode==0?2:1,HTTPD_WS_TYPE_TEXT,false,0);
+        append_input((const uint8_t *)"b",1,mode==1?HTTPD_WS_TYPE_TEXT:(mode==2?HTTPD_WS_TYPE_BINARY:HTTPD_WS_TYPE_CONTINUE),true,0);
+        struct httpd_req_aux aux; httpd_req_t req=request_for(3,&aux);
+        esp_err_t initial=incoming(&req);
+        if(mode==0) {
+            assert(initial!=ESP_OK && close_code_output()==1007 && !command_count && !atomic_load(&s_fragmented_clients));
+            ++cases; continue;
+        }
+        assert(initial==ESP_OK && atomic_load(&s_fragmented_clients)==1);
+        if(mode==3) now_us+=WS_MESSAGE_BUDGET_US;
+        if(mode==4) { close_session(3); assert(!atomic_load(&s_fragmented_clients)); ++cases; continue; }
+        req=request_for(3,&aux); assert(incoming(&req)!=ESP_OK && !command_count && !atomic_load(&s_fragmented_clients));
+        assert(close_code_output()==(mode==0?1007:(mode==3?1008:1002))); ++cases;
+    }
+    reset(); ready_session(3); uint8_t huge[256]; memset(huge,'a',sizeof(huge));
+    append_input(huge,255,HTTPD_WS_TYPE_TEXT,false,0); append_input(huge,1,HTTPD_WS_TYPE_CONTINUE,true,0);
+    struct httpd_req_aux aux; httpd_req_t req=request_for(3,&aux);
+    assert(incoming(&req)==ESP_OK); req=request_for(3,&aux);
+    assert(incoming(&req)!=ESP_OK && close_code_output()==1009 && !atomic_load(&s_fragmented_clients)); ++cases;
+    reset(); ready_session(3); append_input((const uint8_t *)"binary",6,HTTPD_WS_TYPE_BINARY,true,0); req=request_for(3,&aux);
+    assert(incoming(&req)!=ESP_OK && close_code_output()==1003 && !command_count); ++cases;
+    reset(); ready_session(3); const uint8_t nul_text[]={'r','e','b','o','o','t',0,'x'};
+    append_input(nul_text,sizeof(nul_text),HTTPD_WS_TYPE_TEXT,true,0); req=request_for(3,&aux);
+    assert(incoming(&req)==ESP_OK && !command_count && !shutdown_count);
+    assert(same_output((const uint8_t *)"{\"commandError\":\"Command contains NUL\"}",39,HTTPD_WS_TYPE_TEXT)); ++cases;
+}
+
+static void test_fragment_deadline_poll(void) {
+    reset(); ready_session(3); poll_message_deadlines(); assert(!queue_count);
+    append_input((const uint8_t *)"unfinished",10,HTTPD_WS_TYPE_TEXT,false,0);
+    struct httpd_req_aux aux; httpd_req_t req=request_for(3,&aux);
+    assert(incoming(&req)==ESP_OK && atomic_load(&s_fragmented_clients)==1);
+    poll_message_deadlines(); poll_message_deadlines(); assert(queue_count==1);
+    run_queue(); assert(!shutdown_count && atomic_load(&s_fragmented_clients)==1);
+    now_us+=WS_MESSAGE_BUDGET_US;
+    queue_failure=true; poll_message_deadlines(); assert(!queue_count && !atomic_load(&s_message_poll_pending));
+    queue_failure=false; poll_message_deadlines(); run_queue();
+    assert(shutdown_count==1 && !atomic_load(&s_fragmented_clients) && close_code_output()==1008 && !command_count); ++cases;
+    close_session(3); open_session(3,false); poll_message_deadlines(); run_queue(); assert(shutdown_count==1); ++cases;
+    reset(); ready_session(3); append_input((const uint8_t *)"a",1,HTTPD_WS_TYPE_TEXT,false,0); req=request_for(3,&aux);
+    assert(incoming(&req)==ESP_OK); poll_message_deadlines(); close_session(3); open_session(3,false);
+    now_us+=WS_MESSAGE_BUDGET_US; run_queue(); assert(!shutdown_count && !atomic_load(&s_fragmented_clients)); ++cases;
+}
+
+static void test_pre_upgrade_transport(void) {
+    reset(); open_session(3,false); struct httpd_req_aux aux; httpd_req_t req=request_for(3,&aux);
+    assert(websocket_pre_handshake(&req)==ESP_OK && !sessions[3].ws_handshake_done);
+    send_chunk=1;
+    const char upgrade[]="HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n\r\n";
+    assert(sessions[3].send_fn(s_server,3,upgrade,sizeof(upgrade)-1,0)==(int)sizeof(upgrade)-1);
+    assert(transmitted_size==sizeof(upgrade)-1 && !memcmp(transmitted_wire,upgrade,sizeof(upgrade)-1));
+    // Simulate a rejected/incomplete upgrade: HTTPD session free releases the
+    // caller-owned protocol state before the descriptor can become HTTP again.
+    close_session(3); open_session(3,false); assert(!ws_session(s_server,3)); ++cases;
+}
+
+static void test_outbound_utf8_and_close_validation(void) {
+    const uint8_t close_payloads[][6]={{1},{3,0xe7},{3,0xec},{3,0xed},{3,0xee},{3,0xf7},{0x13,0x88},{3,0xe8,0xc0,0xaf},{3,0xe8,'o','k'}};
+    const size_t lengths[]={1,2,2,2,2,2,2,4,4};
+    for(size_t i=0;i<sizeof(lengths)/sizeof(*lengths);++i) {
+        reset();ready_session(3);recv_chunk=send_chunk=1;
+        append_input(close_payloads[i],lengths[i],HTTPD_WS_TYPE_CLOSE,true,0);
+        struct httpd_req_aux aux;httpd_req_t req=request_for(3,&aux);
+        esp_err_t result=incoming(&req);
+        if(i+1==sizeof(lengths)/sizeof(*lengths)) {
+            assert(result==ESP_OK && same_output(close_payloads[i],lengths[i],HTTPD_WS_TYPE_CLOSE));
+        } else assert(result!=ESP_OK && close_code_output()==(i==7?1007:1002));
+        assert(!command_count && shutdown_count==1 && ws_send_request(&req,"late")!=ESP_OK);
+        size_t sent=transmitted_size;assert(broadcast_text("late",&s_status_send_pending,&s_status_work));run_queue();assert(transmitted_size==sent);++cases;
+    }
+    for(unsigned type=9;type<=10;++type) for(unsigned mode=0;mode<2;++mode) {
+        reset();ready_session(3);uint8_t payload[126];memset(payload,'x',sizeof(payload));
+        append_input(payload,mode?126:1,(httpd_ws_type_t)type,mode!=0,0);
+        struct httpd_req_aux aux;httpd_req_t req=request_for(3,&aux);
+        assert(incoming(&req)!=ESP_OK && close_code_output()==1002 && !command_count);++cases;
+    }
+    for(unsigned value=1;value<256;++value) for(size_t capacity=0;capacity<=16;++capacity) {
+        char source[2]={(char)value,0}, escaped[32];memset(escaped,0xa5,sizeof(escaped));
+        json_escape(source,escaped+4,capacity);
+        for(unsigned i=0;i<4;++i)assert((unsigned char)escaped[i]==0xa5);
+        for(size_t i=4+capacity;i<sizeof(escaped);++i)assert((unsigned char)escaped[i]==0xa5);
+        if(capacity)assert(websocket_message_utf8_valid((const uint8_t *)escaped+4,strlen(escaped+4)));
+        ++cases;
+    }
+    char raw[192], escaped[400];memset(raw,0xff,sizeof(raw)-1);raw[sizeof(raw)-1]=0;
+    json_escape(raw,escaped,sizeof(escaped)); assert(strlen(escaped)==396);
+    printf("JSON_SAMPLE=\"%s\"\n",escaped); ++cases;
+    reset();ready_session(3);struct httpd_req_aux aux;httpd_req_t req=request_for(3,&aux);
+    const char invalid[]={(char)0xff,0};assert(ws_send_request(&req,invalid)!=ESP_OK && close_code_output()==1011);++cases;
+    reset();ready_session(3);assert(broadcast_text(invalid,&s_status_send_pending,&s_status_work));run_queue();assert(close_code_output()==1011 && !atomic_load(&s_completed_deliveries));++cases;
+}
+
+static void test_tls_transport_delegation(void) {
+    reset();ready_session(3);transport_write_needs_read=true;
+    send_script[0]=-EAGAIN;send_script_len=1;
+    struct httpd_req_aux aux;httpd_req_t req=request_for(3,&aux);
+    assert(ws_send_request(&req,"ping")==ESP_OK && select_calls==1 && !last_wait_writable);++cases;
+    reset();ready_session(3);transport_read_needs_write=true;
+    append_input((const uint8_t *)"ping",4,HTTPD_WS_TYPE_TEXT,true,0);
+    recv_script[0]=-EAGAIN;recv_script_len=1;req=request_for(3,&aux);
+    assert(incoming(&req)==ESP_OK && select_calls==1 && last_wait_writable && command_count==1);++cases;
+    reset();ready_session(3);const uint8_t close_payload[]={3,0xe8};
+    append_input(close_payload,2,HTTPD_WS_TYPE_CLOSE,true,0);req=request_for(3,&aux);
+    assert(incoming(&req)==ESP_OK && last_shutdown_graceful);++cases;
+}
 #endif
 
 int main(int argc,char **argv) {
@@ -430,8 +602,20 @@ int main(int argc,char **argv) {
     return passed?0:1;
 #else
     assert(!strcmp(argv[1],"all"));
+    {
+        reset(); open_session(3,false);
+        struct httpd_req_aux aux; httpd_req_t req=request_for(3,&aux);
+        req.method=HTTP_GET;
+        assert(websocket_handler(&req)==ESP_OK && http_errors==1);
+        assert(!sessions[3].context && !activity_count && !command_count && !send_calls);
+        ++cases;
+    }
     test_registration(); test_send_splits(); test_receive_splits();
     test_control_and_alignment(); test_retries_and_failures(); test_deadlines(); test_broadcast_lifetime();
-    reset(); printf("PASS: %u C3 WebSocket IO/session/framing cases; four historic negative controls required\n",cases); return 0;
+    test_fragmented_commands(); test_fragment_deadline_poll(); test_pre_upgrade_transport();
+    test_outbound_utf8_and_close_validation();
+    test_tls_transport_delegation();
+    reset(); printf("PASS: %u C3 WebSocket IO/session/framing cases; four historic negative controls required\n",cases);
+    printf("WS_LAYOUT={\"client_bytes\":%zu,\"all_clients_bytes\":%zu,\"message_state_bytes\":%zu,\"command_capacity\":256}\n",sizeof(ws_client_t),sizeof(s_clients),sizeof(websocket_message_t)); return 0;
 #endif
 }

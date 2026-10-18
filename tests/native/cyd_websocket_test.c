@@ -7,10 +7,11 @@
 #include "../../idf/esp32-cyd2usb-native/main/websocket_service.c"
 
 typedef struct { bool live, websocket; unsigned incarnation; void *context; httpd_free_ctx_fn_t free_context; httpd_send_func_t send_override; httpd_recv_func_t recv_override; } socket_t;
-typedef struct { int socket; unsigned incarnation; char text[WS_STATUS_BYTES]; } delivery_t;
+typedef struct { int socket; unsigned incarnation; httpd_ws_type_t type; size_t size; char text[WS_STATUS_BYTES]; } delivery_t;
 static socket_t sockets[16];
 static delivery_t deliveries[256];
 static unsigned delivery_count, shutdown_count, queue_calls, capture_calls, command_calls, recv_calls;
+static unsigned http_errors;
 static int failed_socket = -1;
 static bool queue_failure, registration_failure, task_failure, radio_unavailable, setting_failure, slow_send;
 static bool context_failure;
@@ -141,6 +142,18 @@ ssize_t lwip_send(int socket, const void *data, size_t size, int flags) {
     }
     return (ssize_t)size;
 }
+ssize_t native_web_transport_send(httpd_handle_t server, int socket, const void *data, size_t size, int flags, bool *writable) {
+    assert(server == s_server); *writable = true;
+    return lwip_send(socket, data, size, flags);
+}
+ssize_t native_web_transport_recv(httpd_handle_t server, int socket, void *data, size_t size, int flags, bool *writable) {
+    assert(server == s_server); *writable = false;
+    return lwip_recv(socket, data, size, flags);
+}
+void native_web_transport_shutdown(httpd_handle_t server, int socket, bool graceful) {
+    assert(server == s_server); (void)graceful;
+    (void)shutdown(socket, SHUT_RDWR);
+}
 int lwip_select(int highest, fd_set *readable, fd_set *writable, fd_set *exception, struct timeval *wait) {
     assert(highest > 0 && (!!readable != !!writable) && !exception && wait);
     ++select_calls;
@@ -160,9 +173,10 @@ int shutdown(int socket, int how) {
     return 0;
 }
 esp_err_t httpd_ws_send_frame_async(httpd_handle_t server, int socket, httpd_ws_frame_t *frame) {
-    assert(server == s_server && sockets[socket].live && sockets[socket].websocket);
-    assert(frame->type == HTTPD_WS_TYPE_TEXT && frame->final && !frame->fragmented);
-    assert(frame->len < WS_STATUS_BYTES && frame->payload[frame->len] == 0);
+    assert(server == s_server && sockets[socket].live && sockets[socket].context);
+    assert(frame->final && !frame->fragmented);
+    assert(frame->len < WS_STATUS_BYTES);
+    if (frame->type == HTTPD_WS_TYPE_TEXT) assert(frame->payload[frame->len] == 0);
     if (slow_send) {
         slow_send = false;
         char copy[WS_STATUS_BYTES]; strcpy(copy, (char *)frame->payload);
@@ -180,10 +194,18 @@ esp_err_t httpd_ws_send_frame_async(httpd_handle_t server, int socket, httpd_ws_
         sockets[socket].send_override(server, socket, (char *)frame->payload, frame->len, 0) < 0) return ESP_FAIL;
     assert(delivery_count < 256);
     delivery_t *out = &deliveries[delivery_count++]; out->socket = socket; out->incarnation = sockets[socket].incarnation;
-    memcpy(out->text, frame->payload, frame->len + 1);
+    out->type = frame->type; out->size = frame->len;
+    if (frame->len) memcpy(out->text, frame->payload, frame->len);
+    out->text[frame->len] = 0;
     return ESP_OK;
 }
 int httpd_req_to_sockfd(httpd_req_t *request) { return request->socket; }
+esp_err_t httpd_resp_send_err(httpd_req_t *request, int status, const char *message) {
+    assert(status == HTTPD_400_BAD_REQUEST && strstr(message, "upgrade"));
+    assert(!sockets[request->socket].context);
+    ++http_errors;
+    return ESP_OK;
+}
 esp_err_t httpd_ws_recv_frame(httpd_req_t *request, httpd_ws_frame_t *frame, size_t maximum) {
     ++recv_calls; if (request->receive_error) return ESP_FAIL;
     if (!maximum) {
@@ -237,7 +259,7 @@ static void reset(void) {
     assert(websocket_service_server_stopped(s_server) == ESP_OK);
     memset(sockets, 0, sizeof(sockets)); memset(deliveries, 0, sizeof(deliveries)); memset(&state, 0, sizeof(state));
     memset(&radio, 0, sizeof(radio)); memset(&input, 0, sizeof(input));
-    delivery_count = shutdown_count = queue_calls = capture_calls = command_calls = recv_calls = 0;
+    delivery_count = shutdown_count = queue_calls = capture_calls = command_calls = recv_calls = http_errors = 0;
     queue_failure = registration_failure = task_failure = radio_unavailable = setting_failure = slow_send = change_radio_during_capture = context_failure = send_override_failure = recv_override_failure = false;
     io_length = io_position = select_length = select_position = 0; raw_send_calls = select_calls = transport_yields = 0; io_advance_us = 0;
     radio_aba_phase=0; suspend_task_exit=stop_task_after_delay=false;
@@ -250,12 +272,18 @@ static void reset(void) {
 }
 static void start(void) {
     assert(websocket_service_register((void *)1, &state) == ESP_OK);
-    assert(!strcmp(registered_route.uri, "/ws") && registered_route.is_websocket && !registered_route.handle_ws_control_frames);
+    assert(!strcmp(registered_route.uri, "/ws") && registered_route.is_websocket && registered_route.handle_ws_control_frames);
     assert(websocket_service_start() == ESP_OK);
 }
 static esp_err_t command_bytes(int socket, const char *text, size_t length) {
     httpd_req_t request = {.socket = socket, .method = HTTP_POST, .payload = text, .length = length,
         .type = HTTPD_WS_TYPE_TEXT, .final = true};
+    return registered_route.handler(&request);
+}
+static esp_err_t frame_bytes(int socket, httpd_ws_type_t type, bool final,
+                              const void *payload, size_t length) {
+    httpd_req_t request = {.socket=socket, .method=HTTP_POST,
+        .payload=payload, .length=length, .type=type, .final=final};
     return registered_route.handler(&request);
 }
 static void command(const char *text) { assert(command_bytes(7, text, strlen(text)) == ESP_OK); }
@@ -276,6 +304,11 @@ static void *producer(void *argument) {
 }
 
 int main(void) {
+    reset(); start(); open_socket(7, false);
+    httpd_req_t ordinary_get = {.socket = 7, .method = HTTP_GET};
+    assert(registered_route.handler(&ordinary_get) == ESP_OK && http_errors == 1);
+    assert(!sockets[7].context && !delivery_count && !command_calls);
+
     // Actual IDF dispatch consumes upgrade GET itself, calls the post-handshake
     // hook, then reads the first opcode before ever invoking the URI handler.
     // Do not run the periodic producer or invoke the URI handler as HTTP_GET.
@@ -300,6 +333,81 @@ int main(void) {
     reset(); assert(websocket_service_register((void *)1, &state) == ESP_OK);
     open_socket(7, true); upgrade.socket = 7;
     assert(registered_route.ws_post_handshake_cb(&upgrade) == ESP_ERR_INVALID_STATE && !sockets[7].context);
+
+    reset(); start(); open_socket(7, false);
+    upgrade.socket = 7;
+    assert(registered_route.ws_pre_handshake_cb);
+    assert(registered_route.ws_pre_handshake_cb(&upgrade) == ESP_OK);
+    io_script[0] = 1; io_length = 1;
+    assert(sockets[7].send_override(s_server, 7, "HTTP/1.1 101", 12, 0) == 12 && raw_send_calls == 2);
+    sockets[7].websocket = true;
+    assert(registered_route.ws_post_handshake_cb(&upgrade) == ESP_OK);
+
+    reset(); start(); open_socket(7, true); cycle();
+    unsigned commands_before = command_calls;
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, false, "volume=", 7) == ESP_OK && command_calls == commands_before);
+    const uint8_t ping_data[] = {0, 0x81, 0xff};
+    assert(frame_bytes(7, HTTPD_WS_TYPE_PING, true, ping_data, sizeof(ping_data)) == ESP_OK);
+    assert(deliveries[delivery_count-1].type == HTTPD_WS_TYPE_PONG && deliveries[delivery_count-1].size == sizeof(ping_data));
+    assert(!memcmp(deliveries[delivery_count-1].text, ping_data, sizeof(ping_data)));
+    assert(frame_bytes(7, HTTPD_WS_TYPE_CONTINUE, true, "3", 1) == ESP_OK && volume == 3 && command_calls == commands_before+1);
+
+    reset(); start(); open_socket(7, true); cycle();
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, false, "\xf0\x9f", 2) == ESP_OK);
+    assert(frame_bytes(7, HTTPD_WS_TYPE_CONTINUE, true, "\x98\x80", 2) == ESP_OK && !s_clients[0].closing);
+
+    reset(); start(); open_socket(7, true); cycle();
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, true, "\xc0\xaf", 2) == ESP_FAIL);
+    assert(deliveries[delivery_count-1].type == HTTPD_WS_TYPE_CLOSE && (uint8_t)deliveries[delivery_count-1].text[1] == 0xef); // 1007
+
+    reset(); start(); open_socket(7, true); cycle();
+    // An invalid prefix cannot become valid by adding continuation bytes.
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, false, "\xf5", 1) == ESP_FAIL);
+    assert((uint8_t)deliveries[delivery_count-1].text[1] == 0xef);
+
+    reset(); start(); open_socket(7, true); cycle();
+    char bounded[WS_COMMAND_LIMIT]; memset(bounded, 'x', sizeof(bounded));
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, false, bounded, 48) == ESP_OK);
+    assert(frame_bytes(7, HTTPD_WS_TYPE_CONTINUE, true, bounded, 48) == ESP_OK);
+    assert(!s_clients[0].closing && strstr(last_text(), "commandError"));
+
+    reset(); start(); open_socket(7, true); cycle();
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, false, bounded, sizeof(bounded)) == ESP_OK);
+    assert(frame_bytes(7, HTTPD_WS_TYPE_CONTINUE, true, "x", 1) == ESP_FAIL);
+    assert((uint8_t)deliveries[delivery_count-1].text[1] == 0xf1); // 1009
+
+    reset(); start(); open_socket(7, true); cycle();
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, false, "volume=", 7) == ESP_OK);
+    close_socket(7); open_socket(7, true); cycle();
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, true, "ping", 4) == ESP_OK);
+    assert(!command_calls && !strcmp(last_text(), "{\"pong\":1}"));
+
+    reset(); start(); open_socket(7, true); cycle();
+    assert(frame_bytes(7, HTTPD_WS_TYPE_CONTINUE, true, "ping", 4) == ESP_FAIL);
+    assert((uint8_t)deliveries[delivery_count-1].text[1] == 0xea); // 1002
+
+    reset(); start(); open_socket(7, true); cycle();
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, false, "pi", 2) == ESP_OK);
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, true, "ping", 4) == ESP_FAIL);
+
+    reset(); start(); open_socket(7, true); cycle();
+    const uint8_t close_data[] = {3, 0xe8, 'o', 'k'};
+    sockets[7].websocket = false; // SDK marks Close before dispatching handler.
+    assert(frame_bytes(7, HTTPD_WS_TYPE_CLOSE, true, close_data, sizeof(close_data)) == ESP_OK);
+    assert(deliveries[delivery_count-1].type == HTTPD_WS_TYPE_CLOSE && !memcmp(deliveries[delivery_count-1].text, close_data, sizeof(close_data)));
+    assert(send_text(&s_clients[0], "after Close") == ESP_ERR_INVALID_STATE);
+
+    reset(); start(); open_socket(7, true); cycle();
+    assert(frame_bytes(7, HTTPD_WS_TYPE_CLOSE, true, "x", 1) == ESP_FAIL);
+
+    reset(); start(); open_socket(7, true); cycle();
+    assert(frame_bytes(7, HTTPD_WS_TYPE_BINARY, true, "binary", 6) == ESP_FAIL);
+    assert((uint8_t)deliveries[delivery_count-1].text[1] == 0xeb); // 1003, text-only radio application
+
+    reset(); start(); open_socket(7, true); cycle();
+    assert(frame_bytes(7, HTTPD_WS_TYPE_TEXT, false, "pi", 2) == ESP_OK);
+    now_us = WS_MESSAGE_BUDGET_US; cycle();
+    assert(s_clients[0].closing && deliveries[delivery_count-1].type == HTTPD_WS_TYPE_CLOSE && (uint8_t)deliveries[delivery_count-1].text[1] == 0xf0); // 1008
 
     reset();
     assert(websocket_service_register(NULL, &state) == ESP_ERR_INVALID_ARG);
@@ -403,12 +511,17 @@ int main(void) {
     command("volume=5"); assert(strstr(last_text(), "Operation failed") && volume == 5);
     command("balance=7"); assert(strstr(last_text(), "Operation failed") && balance == 7);
     unsigned received = recv_calls; command(""); assert(recv_calls == received + 1);
-    assert(command_bytes(7, "ping\0volume=0", 13) == ESP_ERR_INVALID_ARG);
+    operations = command_calls;
+    assert(command_bytes(7, "ping\0volume=0", 13) == ESP_OK);
+    assert(strstr(last_text(), "commandError") && command_calls == operations);
     char oversized[WS_COMMAND_LIMIT + 1]; memset(oversized, 'x', sizeof(oversized));
-    assert(command_bytes(7, oversized, sizeof(oversized)) == ESP_ERR_INVALID_ARG);
+    assert(command_bytes(7, oversized, sizeof(oversized)) == ESP_FAIL);
+    assert(deliveries[delivery_count-1].type == HTTPD_WS_TYPE_CLOSE);
+    reset(); start(); open_socket(7, true); cycle();
     httpd_req_t fragmented = {.socket=7,.method=HTTP_POST,.payload="ping",.length=4,.type=HTTPD_WS_TYPE_TEXT,.final=false};
-    assert(registered_route.handler(&fragmented) == ESP_ERR_INVALID_ARG);
-    fragmented.final=true; fragmented.type=HTTPD_WS_TYPE_BINARY; assert(registered_route.handler(&fragmented) == ESP_ERR_INVALID_ARG);
+    assert(registered_route.handler(&fragmented) == ESP_OK);
+    fragmented.final=true; fragmented.type=HTTPD_WS_TYPE_CONTINUE;
+    assert(registered_route.handler(&fragmented) == ESP_OK); // Completed "pingping" is an unknown command.
     fragmented.type=HTTPD_WS_TYPE_PONG;
     unsigned pong_recv = recv_calls; assert(registered_route.handler(&fragmented) == ESP_OK && recv_calls == pong_recv + 2);
     fragmented.length = 0; pong_recv = recv_calls;
