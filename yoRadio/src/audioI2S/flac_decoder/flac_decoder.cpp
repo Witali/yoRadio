@@ -179,9 +179,14 @@ int32_t readSignedInt(int nBits){
     // A residual escape width of zero encodes zero without consuming bits.
     if(nBits == 0) return 0;
     if(nBits < 0 || nBits > 32) { m_readError = ERR_FLAC_INVALID_DATA; return 0; }
-    int32_t temp = readUint(nBits) << (32 - nBits);
-    temp = temp >> (32 - nBits); // The C++ compiler uses the sign bit to fill vacated bit positions
-    return temp;
+    const uint32_t value = readUint(static_cast<uint8_t>(nBits));
+    const uint32_t sign = UINT32_C(1) << (nBits - 1);
+    const uint32_t magnitudeMask = sign - 1U;
+    // Both casts stay in INT32_MAX. Reconstruct negative values arithmetically
+    // instead of converting an out-of-range unsigned word and shifting it.
+    return value & sign
+        ? -1 - static_cast<int32_t>((~value) & magnitudeMask)
+        : static_cast<int32_t>(value & magnitudeMask);
 }
 
 int64_t readRiceSignedInt(uint8_t param){
@@ -442,7 +447,7 @@ int8_t FLACDecode(uint8_t *inbuf, int *bytesLeft, short *outbuf){
     if(m_status == DECODE_SUBFRAMES){
 
         // Decode each channel's subframe, then skip footer
-        int ret = decodeSubframes();
+        const int8_t ret = decodeSubframes();
         if(ret != 0) return ret;
         if(m_readError) return m_readError;
         // Invalid decorrelated channels must not wrap during s16 conversion.
@@ -592,8 +597,8 @@ int8_t decodeSubframe(uint8_t sampleDepth, uint8_t ch) {
     int8_t ret = 0;
     readUint(1);
     uint8_t type = readUint(6);
-    int shift = readUint(1);
-    if (shift == 1) {
+    unsigned shift = readUint(1) ? 1U : 0U;
+    if (shift) {
         while (readUint(1) == 0) {
             if(m_readError) return m_readError;
             if(++shift >= sampleDepth) return ERR_FLAC_INVALID_DATA;
@@ -601,24 +606,26 @@ int8_t decodeSubframe(uint8_t sampleDepth, uint8_t ch) {
     }
     if(m_readError) return m_readError;
     if(shift >= sampleDepth) return ERR_FLAC_INVALID_DATA;
-    sampleDepth -= shift;
+    const unsigned reducedDepth = sampleDepth - shift;
+    if(reducedDepth < 1 || reducedDepth > FLAC_MAX_BITS_PER_SAMPLE + 1U)
+        return ERR_FLAC_INVALID_DATA;
 
     if(type == 0){  // Constant coding
-        int32_t s= readSignedInt(sampleDepth);
+        int32_t s= readSignedInt(static_cast<int>(reducedDepth));
         for(int i=0; i < m_blockSize; i++){
             samplesBuffer[ch][i] = s;
         }
     }
     else if (type == 1) {  // Verbatim coding
         for (int i = 0; i < m_blockSize; i++)
-            samplesBuffer[ch][i] = readSignedInt(sampleDepth);
+            samplesBuffer[ch][i] = readSignedInt(static_cast<int>(reducedDepth));
     }
     else if (8 <= type && type <= 12){
-        ret = decodeFixedPredictionSubframe(type - 8, sampleDepth, ch);
+        ret = decodeFixedPredictionSubframe(type - 8, reducedDepth, ch);
         if(ret) return ret;
     }
     else if (32 <= type && type <= 63){
-        ret = decodeLinearPredictiveCodingSubframe(type - 31, sampleDepth, ch);
+        ret = decodeLinearPredictiveCodingSubframe(type - 31, reducedDepth, ch);
         if(ret) return ret;
     }
     else{
@@ -627,18 +634,22 @@ int8_t decodeSubframe(uint8_t sampleDepth, uint8_t ch) {
     if(m_readError) return m_readError;
     // Check the reduced-depth samples before restoring wasted bits. A valid
     // 24-bit stereo side sample can require 25 bits.
-    const int32_t sampleLimit = INT32_C(1) << (sampleDepth - 1);
+    const int32_t sampleLimit = INT32_C(1) << (reducedDepth - 1U);
+    const int32_t restoreFactor = INT32_C(1) << shift;
     for (int i = 0; i < m_blockSize; i++){
         const int32_t value = samplesBuffer[ch][i];
         if(value < -sampleLimit || value >= sampleLimit) return ERR_FLAC_INVALID_DATA;
-        samplesBuffer[ch][i] = static_cast<int32_t>(static_cast<uint32_t>(value) << shift);
+        // reducedDepth + shift is the validated original depth (at most 25).
+        // Restoring the signed sample therefore fits without unsigned wrap or
+        // an implementation-defined conversion back to signed32.
+        samplesBuffer[ch][i] = value * restoreFactor;
     }
     return ERR_FLAC_NONE;
 }
 //----------------------------------------------------------------------------------------------------------------------
 int8_t decodeFixedPredictionSubframe(uint8_t predOrder, uint8_t sampleDepth, uint8_t ch) {
     if(predOrder > 4 || predOrder >= m_blockSize) return ERR_FLAC_PREORDER_TOO_BIG;
-    uint8_t ret = 0;
+    int8_t ret = 0;
     for(uint8_t i = 0; i < predOrder; i++)
         samplesBuffer[ch][i] = readSignedInt(sampleDepth);
     ret = decodeResiduals(predOrder, ch);
