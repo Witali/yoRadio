@@ -469,7 +469,11 @@ test("native radio requests and publishes ICY song metadata", () => {
     /audio_service_stop[\s\S]*advance_generation\(NATIVE_CODEC_AUTO\)[\s\S]*state_set_audio\(generation, false, "stopped"\)/,
   );
   assert.doesNotMatch(audio, /close_active_http_stream/);
-  assert.match(audio, /#define STREAM_READ_TIMEOUT_MS 250/);
+  assert.match(audio, /#define STREAM_READ_TIMEOUT_MS CONFIG_YORADIO_STREAM_READ_TIMEOUT_MS/);
+  assert.match(
+    read("main", "Kconfig.projbuild"),
+    /config YORADIO_STREAM_READ_TIMEOUT_MS[\s\S]*?default 250/,
+  );
   assert.match(
     audio,
     /open_stream\(client, command\.url, retry\.deadline_us,[\s\S]*esp_http_client_set_timeout_ms\(client, STREAM_READ_TIMEOUT_MS\)/,
