@@ -144,7 +144,7 @@ static void event_handler(void *arg, esp_event_base_t base, int32_t id,
                           void *event_data) {
     (void)arg;
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
-        esp_wifi_connect();
+        if (s_have_credentials) esp_wifi_connect();
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
         station_lost_ip();
         if (s_have_credentials && s_retries++ < WIFI_MAX_RETRIES) {
@@ -206,6 +206,9 @@ esp_err_t network_service_start(native_state_t *state) {
                         "Station network interface allocation failed");
     wifi_init_config_t init = WIFI_INIT_CONFIG_DEFAULT();
     ESP_RETURN_ON_ERROR(esp_wifi_init(&init), TAG, "Wi-Fi init failed");
+    // The desired file owns persistence; never create another driver NVS copy.
+    ESP_RETURN_ON_ERROR(esp_wifi_set_storage(WIFI_STORAGE_RAM), TAG,
+                        "Wi-Fi RAM storage selection failed");
     ESP_RETURN_ON_ERROR(esp_event_handler_register(
                             WIFI_EVENT, ESP_EVENT_ANY_ID, event_handler, NULL),
                         TAG, "Wi-Fi event registration failed");

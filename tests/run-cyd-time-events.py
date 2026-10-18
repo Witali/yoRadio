@@ -35,6 +35,7 @@ def main():
     files = [Path(__file__).resolve(), test, helper, main_dir / 'app_main.c',
              main_dir / 'network_service.c', main_dir / 'board_config.h',
              ROOT / 'idf/esp32-cyd2usb-native/sdkconfig.defaults',
+             ROOT / 'idf/esp32c3-oled-native/main/network_service.c',
              ROOT / 'tools/codec_benchmark/run_output_dma_host.py']
     report = {'passed': False, 'scope': __doc__, 'physical_hardware': False,
               'source_sha256': {}, 'negative_controls': {}}
@@ -54,6 +55,7 @@ def main():
     network_unit = ''.join(helpers.function(network, name) for name in
                            ['station_lost_ip', 'event_handler', 'network_service_start'])
     startup_unit = ''.join(helpers.function(startup, name) for name in ['mount_spiffs', 'app_main'])
+    c3_unit = helpers.function((frozen/'idf/esp32c3-oled-native/main/network_service.c').read_text(), 'event_handler')
     assert 'CONFIG_LWIP_SNTP_MAX_SERVERS=2' in (frozen / 'idf/esp32-cyd2usb-native/sdkconfig.defaults').read_text()
     (out / 'driver').mkdir()
     (out / 'driver/gpio.h').write_text('/* GPIO declarations unused by this startup fixture. */\n')
@@ -63,9 +65,10 @@ def main():
                '-I' + host(out), '-I' + host(frozen / main_dir.relative_to(ROOT)),
                host(frozen / test.relative_to(ROOT)), '-o', host(out / 'events')]
 
-    def run_case(name, net, app, assertion=None):
+    def run_case(name, net, app, assertion=None, c3=c3_unit):
         (out / 'network.inc').write_text(net)
         (out / 'startup.inc').write_text(app)
+        (out / 'c3-events.inc').write_text(c3)
         code, log = execute(command)
         (out / (name + '-build.log')).write_bytes(log)
         assert code == 0, log.decode(errors='replace')
@@ -96,6 +99,10 @@ def main():
          ': NATIVE_NETWORK_STARTING, UINT32_MAX);', '!time_ready && time_notices == 2U && !s_app_state.ip'),
         ('changed_network_affinity', 'startup', 'NULL, 3, NULL, 0);',
          'NULL, 3, NULL, 1);', 'priority == 3U && core == 0'),
+        ('driver_flash_persistence', 'network', 'esp_wifi_set_storage(WIFI_STORAGE_RAM)',
+         'ESP_OK', 'driver_ram'),
+        ('empty_file_uses_retained_driver_profile', 'network',
+         'if (s_have_credentials) esp_wifi_connect();', 'esp_wifi_connect();', '!connect_calls'),
     ]
     for name, unit, old, new, assertion in mutations:
         contents = network_unit if unit == 'network' else startup_unit
@@ -103,12 +110,17 @@ def main():
         changed = contents.replace(old, new, 1)
         run_case(name, changed if unit == 'network' else network_unit,
                  changed if unit == 'startup' else startup_unit, assertion)
+    old='if (s_have_credentials) esp_wifi_connect();'
+    assert c3_unit.count(old)==1
+    run_case('donor_empty_file_uses_retained_driver_profile', network_unit, startup_unit,
+             'connect_calls == 0U', c3_unit.replace(old,'esp_wifi_connect();',1))
     (out / 'network.inc').write_text(network_unit)
     (out / 'startup.inc').write_text(startup_unit)
+    (out / 'c3-events.inc').write_text(c3_unit)
     report['command'] = command
     report['passed'] = True
     (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
-    print('PASS', len(mutations), 'targeted semantic controls')
+    print('PASS', len(mutations)+1, 'targeted semantic controls')
 
 
 if __name__ == '__main__':

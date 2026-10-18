@@ -190,7 +190,7 @@ static void event_handler(void *arg, esp_event_base_t base, int32_t id,
     (void)arg;
     if (atomic_load(&s_stopping_for_sleep)) return;
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
-        esp_wifi_connect();
+        if (s_have_credentials) esp_wifi_connect();
 #ifdef CONFIG_YORADIO_WEB_TCP_PROBE
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_CONNECTED) {
         web_tcp_probe_record_wifi(WEB_TCP_WIFI_CONNECTED, 0);
