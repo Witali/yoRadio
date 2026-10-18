@@ -2677,3 +2677,16 @@ true. Это только начало нового прогона, не 24 ча
 - В 10:42 UTC повторно совпали четыре личности H10 и 31 input hash. Префикс
   103 цикла / 1737.66437 гостевой секунды, 832 HTTP и одно отключение внешнего AP.
   H10 использует frozen A74, а новый full regression — B44; области не смешивать.
+
+- Продолжено исследование APSTA без изменения 273 frozen full inputs. По цепочке
+  SDK get_handle_from_ifkey найден список 0x3fcc3c0c; getter 0x42036f98 читает
+  if_key по +92. Два настоящих factory boot дали ровно STA_DEF в station и
+  AP_DEF в setup, обе страницы HTTP200; code/media/UART guards прошли.
+- Setup VM использует сохранённые реальным SDK синтетические credentials.
+  Официальный NVS parser v5.5.4 подтвердил nvs.net80211/sta.ssid и sta.apinfo
+  с верными CRC. GOT_IP event=false при отсутствии STA netif: это не потеря SSID.
+  Исходные APSTA connect-вызовы сами по себе не доказывают рабочий STA IP путь.
+- Characterization report и raw gzip сохранены отдельно от passing full gate.
+  Scratch netif probe нужно перенести в reusable test после terminal full run.
+  Кандидат оптимизации — лишние native netif/DNS в другом режиме; пока код и
+  производственный app не менялись, затраты памяти и wire behavior не измерены.

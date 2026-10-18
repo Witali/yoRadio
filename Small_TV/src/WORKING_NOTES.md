@@ -5,6 +5,29 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
+## Заводские netif в APSTA — уточнено 2026-10-18
+
+Read-only проверка списка SDK netif в двух настоящих factory VM прошла.
+STA mode=1: ровно WIFI_STA_DEF и HTTP200 clock page. Setup mode=2: ровно
+WIFI_AP_DEF и HTTP200 configure page, GOT_IP event=false. Для второго запуска
+сохранён настоящим драйвером синтетический SSID: namespace nvs.net80211,
+keys sta.ssid/sta.apinfo, CRC header/data совпадают. Отсутствие STA IP здесь
+не объясняется потерей сохранённого SSID.
+
+SDK netif list 0x3fcc3c0c и if_key+92 подтверждены инструкциями 0x42036770 ->
+0x420352ee -> 0x42034e32 -> 0x42036f98 и ESP-IDF v5.5.4 primary sources.
+AP init вызывает create_default_wifi_ap (0x420459d6), STA init — отдельную
+create_default_wifi_sta (0x42045a7a). Factory APSTA connect остаётся L2-вызовом
+без STA netif/DHCP пути. Нынешняя idle STA нашей настройки не теряет показанный
+factory STA-IP функционал. Полную идентичность SDK внутренних состояний не заявлять.
+
+Отчёт factory-netif-observation-20261018.json и raw gzip; scratch prototype
+.build/probe_factory_netifs_20261018.py перенести в воспроизводимый тест после
+terminal текущего full run. Сейчас не менять 273 frozen inputs. Есть кандидат
+оптимизации: C network_init создаёт оба netif и captive DNS во всех режимах;
+фабричный код создаёт только нужный netif. Проверить wire behavior и память
+перед отдельным изменением, не называть это доказанной ошибкой прошивки.
+
 ## Полный APSTA regression запущен — 2026-10-18 10:41 UTC
 
 В `.build/small-tv-functional/apsta-integrated-full-20261018` идёт полный
