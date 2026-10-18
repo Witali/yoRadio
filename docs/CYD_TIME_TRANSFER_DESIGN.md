@@ -1,11 +1,12 @@
 # Перенос timezone, SNTP и состояния часов на CYD
 
-Дата: 2026-10-18. Этап **CYD-C3-09**. Статус: проект, реализации и
-аппаратной проверки ещё нет. Документ дополняет
-[общий план](ESP32_CYD_C3_TRANSFER_PLAN.md#L114). OTA source/SDK batch завершается
-независимо; этот документ не меняет time sources, CMake, audio, сеть или WebUI.
+Дата: 2026-10-18. Этап **CYD-C3-09**. Общий SNTP backend и отдельные
+CYD settings/service реализованы и проверены на host; интеграция startup/Wi-Fi,
+C3 adapter, SDK builds/lint и аппаратная квалификация ведутся отдельно.
+Документ дополняет [общий план](ESP32_CYD_C3_TRANSFER_PLAN.md#L114).
+Существующие audio/display core bindings, OLED, deep sleep и RTC не меняются.
 
-## Проверенные входы и различия
+## Проверенные входы и различия до time batch
 
 | Область | Текущий исходник | Вывод для переноса |
 | --- | --- | --- |
@@ -18,7 +19,7 @@
 | CYD display | [display_task:53](../idf/esp32-cyd2usb-native/main/app_main.c#L53), [cyd_display.c](../idf/esp32-cyd2usb-native/main/cyd_display.c) | Сейчас task рисует цветные полосы состояния сети; cyd_display — SPI/DMA driver, готового TFT clock renderer нет. Перенос сервиса не означает готовый виджет часов. |
 | CYD задачи | [app_main.c:115](../idf/esp32-cyd2usb-native/main/app_main.c#L115), [board_config.h](../idf/esp32-cyd2usb-native/main/board_config.h) | Сохранить существующие core bindings. Новый worker priority 1 можно создавать unpinned; 2048 байт донора — начальный бюджет, требующий target stack qualification. |
 
-В native CYD нет `TZ`, timezone или настроенного приложением SNTP. Поэтому
+До time batch в native CYD не было `TZ`, timezone или настроенного приложением SNTP. Поэтому
 не следует приписывать ему C3/Arduino defaults. Текущий CYD SDK профиль:
 `CONFIG_LWIP_SNTP_MAX_SERVERS=1`, `CONFIG_LWIP_SNTP_UPDATE_DELAY=3600000`,
 startup jitter включён, максимум 5000 ms. Без `TZ` libc использует UTC.
@@ -44,7 +45,7 @@ SDK upgrade, DHCP NTP, country/DST database и внешнее RTC сюда не 
 `tcpip_callback(do_stop, NULL)`: возврат функции не подтверждает остановку.
 Public `esp_sntp_setservername()` выполняет TCP/IP API call, но сам lwIP
 `sntp_setservername()` сохраняет указатель (`sntp_servers[idx].name = server`),
-не копию строки. C3 [apply:80–84](../idf/esp32c3-oled-native/main/time_service.c#L80)
+не копию строки. Исторический C3 apply (frozen source hash ниже, lines 80–84)
 ставит stop в очередь и сразу перезаписывает эти строки. TCP/IP worker ещё
 может читать старое имя в момент записи. Пожизненный static buffer защищает
 от освобождения памяти, но не от этой конкурентной перезаписи.
@@ -71,38 +72,52 @@ Public `esp_sntp_setservername()` выполняет TCP/IP API call, но са�
   непосредственно, если уже находится в TCP/IP context. Это подтверждает
   отличие managed stop от постановки raw stop в очередь.
 
-Безопасный путь для CYD и отдельного C3 исправления: один владелец SNTP
-управляет жизненным циклом через **managed public esp_netif SNTP API**.
-Не смешивать этот путь с отложенными raw `esp_sntp_restart/init/stop`.
-Сначала подготовить и проверить новую конфигурацию, затем подтвердить stop
-старого экземпляра через managed deinit и только после завершения TCP/IP
-операции менять привязки. Использовать два service-owned static банка имён:
-новый кандидат заполняется в неактивном банке; банк, на который сейчас
-ссылается lwIP, не перезаписывается. После checked TCP/IP переключения pointers
-старый банк становится неактивным. DNS enqueue копирует hostname во внутреннее
-хранилище (`lwip/src/core/dns.c`, `dns_enqueue`); память текущего указателя
-должна быть неизменной на протяжении всего синхронного DNS enqueue. Static
-банки не освобождаются. Init/start ошибки учитываются; успешное сохранение
-настроек не выдаётся за успешное применение SNTP.
-Public deinit возвращает void; перед переключением привязок controller
-дополнительно проверяет disabled state внутри checked `esp_netif_tcpip_exec`. При отказе
-барьера/проверки старые buffers остаются неизменными и публикуется ошибка.
-Stop снимает SNTP timers/PCB, но не доказывает отмену уже отправленного DNS:
-`sntp_dns_found():602` может прийти позднее. Поэтому нельзя считать stop
-универсальным cancellation ACK либо освобождать DNS-related state. Минимальный
-disconnect contract ниже сохраняет backend и его retry state; отдельный
-delayed-DNS тест обязателен при reconfigure/deinit и отказе последующего init.
+Реализованный общий путь — [native_time](../idf/components/native_time/CMakeLists.txt),
+[public API](../idf/components/native_time/include/native_time_sntp.h),
+[lifecycle controller](../idf/components/native_time/native_time_sntp.c) и
+[TCP/IP callbacks](../idf/components/native_time/native_time_sntp_context.c).
+Controller создаёт checked mutex без обращения к TCP/IP; atomic ever-GOT_IP
+latch разрешает сетевые операции только после подтверждённой готовности стека.
+Offline/startup failure не вызывает IPC в неинициализированный TCP/IP. Текущая
+доступность сети хранится отдельно от этого пожизненного readiness latch.
 
-Два банка **сами по себе** не доказывают lifetime. Перед повторным использованием
-банка, в том числе при третьем apply, controller должен проверить в TCP/IP
-context, что **ни один** configured server slot не ссылается на этот банк.
-Смена числа серверов обязана очистить неиспользуемые slots: managed init
-записывает только `num_of_servers`, а deinit сам старые name pointers не
-обнуляет. Переключение считается завершённым после проверки всех привязок;
-при partial/failed apply ни один потенциально используемый банк не меняется.
-Новый desired config остаётся в отдельном bounded settings snapshot до retry.
-Это конечная политика: два пожизненных банка и проверяемая возможность их
-повторного использования, без неограниченного накопления поколений.
+Managed `esp_netif_sntp_init` вызывается **один раз** с нулём начальных серверов,
+`start=false`, `wait_for_sync=false`, `renew_servers_after_new_IP=false`.
+Оба pinned SDK допускают `num_of_servers=0`: init проверяет только верхнюю
+границу, устанавливает callback/mode, не создаёт UDP PCB и не выдаёт указатели
+банков. Это разделяет failure ownership managed allocation и публикации имён.
+После успешного init managed storage/callback/context остаются до reboot;
+runtime deinit/reinit отсутствует. Нет sync semaphore, strdup серверов или
+повторной регистрации IP handlers со стороны managed клиента.
+
+Каждый apply/restart выполняет raw **public** lwIP операции исключительно
+внутри checked `esp_netif_tcpip_exec` callback. Controller TU включает
+public managed/ESP headers; отдельный context TU — только raw lwIP header.
+Это исключает конфликт legacy inline wrappers без SDK-private component macros.
+Отложенные `esp_sntp_init/stop/restart` не используются. Mutex wait ограничен
+100 ms; сам public TCP/IP executor синхронный и не предоставляет bounded deadline.
+
+Кандидат проверяется до сетевых изменений. Два пожизненных банка выбираются
+по фактическим slot pointers **всех** `SNTP_MAX_SERVERS`, включая неактивный
+slot после 2→1 и третий apply. Проверка отсутствия ссылок, заполнение выбранного
+банка и смена привязок происходят в одном TCP/IP callback; DNS callback между
+этими шагами не исполняется. Если оба банка ещё используются, apply возвращает
+ошибку без перезаписи. Неограниченного retention поколений нет.
+
+После stop callback проверяет disabled state, очищает **все** slots через
+`sntp_setserver(i, NULL)`, устанавливает interval/mode, привязывает новые имена
+и запускает клиента. `sntp_setservername(i,NULL)` недостаточен: он оставляет
+старый resolved IP, который `sntp_try_next_server` считает доступным сервером.
+`setserver(NULL)` в обоих pins обнуляет и имя, и адрес. Равная работающая
+конфигурация — no-op, поэтому смена только timezone не сбрасывает backoff.
+После binding банк считается заимствованным даже при неуспешном start.
+
+SDK `sntp_init` возвращает void. Проверка `sntp_enabled()` обнаруживает отказ
+UDP allocation только в no-assert профиле. Текущие C3/CYD конфигурации включают
+`CONFIG_LWIP_ESP_LWIP_ASSERT=1` и compiler assertions: `sntp_init():688`
+при отсутствии PCB вызывает assertion/abort **до** этой проверки. Actual SDK
+child test подтверждает abort; recoverable target OOM здесь не обещается.
+Managed `.start=false` устраняет эту allocation только на стадии managed init.
 
 Для данных pinned SDK отдельно установлено: `dns_enqueue():1632–1633` копирует
 hostname во внутреннюю DNS entry; `sntp_dns_found():602` игнорирует hostname/arg
@@ -129,8 +144,9 @@ C3 time source до исправления имеет SHA-256
 
 ## Минимальный сервис и API
 
-Предлагаемые новые CYD файлы: `time_service.c/.h`, `time_settings.c/.h` и
-собственные host tests/runners. Это предложение интерфейса, ещё не frozen API:
+Реализованы [time_settings.c/.h](../idf/esp32-cyd2usb-native/main/time_settings.h),
+[time_service.c/.h](../idf/esp32-cyd2usb-native/main/time_service.h) и отдельные
+host suites. Public interface:
 
 ```c
 typedef struct {
@@ -153,13 +169,14 @@ Timezone хранить одним signed количеством минут: д�
 Донор проверяет hour/minute отдельно: там возможны +14:45/−12:45, и −00:30
 непредставим. Новый CYD формат не требует менять существующие C3 настройки.
 
-NVS: отдельный namespace `native_time`, один versioned bounded record `cfg`.
+NVS: отдельный namespace `native_time`, один 82-byte versioned bounded record `cfg`.
 Кодировать поля явно, без raw C struct padding; при чтении проверять точную
 длину, version, reserved, числовые диапазоны, количество серверов и завершение
 строк. Хосты 1–34 байта, без whitespace/control/NUL внутри, URL/порта и
 разделителей; допустимые DNS labels/IPv4 валидировать полностью. Интервал
 15–1440 минут. Invalid/missing record использует defaults без erase NVS;
-ошибки чтения отличать от отсутствия ключа.
+ошибки чтения отличать от отсутствия ключа. Wrong NVS type использует defaults;
+прочие IO errors возвращаются без публикации и перезаписи NVS.
 
 `save_settings` проверяет весь кандидат и сериализует запись. Ошибка NVS
 не публикует новый active snapshot. Успех означает **сохранён desired config**;
@@ -184,8 +201,8 @@ timezone environment или DST. До сложения проверять диа
 2. GOT_IP и disconnect/lost-IP только записывают актуальное состояние и
    уведомляют worker; никаких DNS, NVS, SNTP control, libc formatting или
    display operations внутри Wi-Fi/lwIP callback. AP-only не запускает SNTP.
-3. Worker использует `esp_netif_sntp_init` с `wait_for_sync=false`,
-   `smooth_sync=false`, managed start по сети и permanent server storage.
+3. Worker использует общий init-once backend с `wait_for_sync=false`,
+   immediate sync, checked start по сети и permanent server storage.
    Не блокирует startup через sync_wait и не начинает второй singleton SNTP.
 4. Повторный GOT_IP без изменения состояния не перезапускает клиент.
    На disconnect отметить отсутствие сети, сохранить backend/backoff, ход
@@ -209,7 +226,8 @@ timezone environment или DST. До сложения проверять диа
    успешной конвертации; plausible clock и SNTP этого boot — разные признаки.
    После disconnect валидное время не обнуляется. Cold boot без времени
    отдаёт `clock_valid=false`, чтобы UI показывал placeholder, а не 1970.
-7. Копирование config/state — короткая защищённая операция, без NVS, SNTP,
+7. Settings snapshot копируется в короткой portMUX critical section, service
+   snapshot — под checked mutex. Копирование без NVS, SNTP,
    логирования или libc formatting под snapshot lock. Записи настроек имеют
    отдельную сериализацию; их успешная публикация после commit не требует
    новой allocation. Не вкладывать native_state/audio/display locks в time
@@ -254,8 +272,32 @@ retention, wakeup, погоды или deep-sleep hooks.
   reconnect, stack high-water/heap и отображение invalid/valid clock.
   Host mocks не доказывают реальную SNTP сеть, время ответа или target RAM.
 
-Последовательность реализации после OTA export: изолированные settings/core
-и tests → CYD worker/backend и tests → узкий C3 lifetime fix/regression →
-parent-owned Wi-Fi/startup wiring → отдельные UI/snapshot integration и
-target checks. До назначения ownership новых файлов этот документ остаётся
-планом; существующие time sources здесь не менялись.
+## Выполненная host квалификация
+
+- Shared backend commit `d1c33cd4`, [runner](../tests/run-native-time.py):
+  `.build/native-time-qualified-01/report.json`, **76 positive groups и 12
+  semantic mutants** (оба SDK × capacity 1/2), ASan/UBSan clean. Компилируются
+  actual pinned full SNTP core, managed lifecycle, ESP sync/status/interval
+  functions и точный `dns_enqueue` с его entry/request structures. RTOS,
+  TCP/IP executor scheduling, UDP/pbuf/timers, DNS network completion и wall
+  clock — явные seams. Проверены borrowed lifetime, третий apply, all-slot
+  references, очистка IP+name при 2→1, equal-config backoff, managed alloc/IPC
+  failures, реальный SNTP packet→clock/callback/hourly timer. Assertion-enabled
+  PCB OOM подтверждён отдельным child abort; no-assert OOM/error + поздний DNS
+  фиксируются отдельно. Cancelled DNS и physical network/RAM не заявлены.
+- CYD commit `cd3bb69b`, [runner](../tests/run-cyd-time.py):
+  `.build/cyd-time-qualified-02/report.json`, **24 actual cases и 7 semantic
+  mutants**, ASan/UBSan clean. Actual settings codec/save/load и worker/state
+  проверены с NVS/RTOS/SNTP seams: границы, canonical record/hidden tail/type,
+  open/get/set/commit errors, concurrent saves + snapshot во время commit,
+  startup allocation/task/backend failures, early/duplicate IP, coalesced
+  flaps/cooldown, offline desired config, save-during-apply, persisted/apply
+  failure, sync notice retry, monotonic age, timezone signs/overflow и timeout.
+  Эти seams не доказывают физических flash transactions или target stack.
+
+Следующие independent ownership блоки: donor C3 checked snapshot/thin adapter
+и historical queued-stop reproducer; parent-owned CYD startup/Wi-Fi/CMake и
+`CONFIG_LWIP_SNTP_MAX_SERVERS=2`; public WebUI/status integration; actual SDK
+build + focused lint и аппаратная проверка ресурсов/сети. TFT clock widget,
+OLED/deep-sleep/RTC features в этот сервис не входят. После parent integration
+обновить общий transfer plan и архив evidence по фактическим source hashes.
