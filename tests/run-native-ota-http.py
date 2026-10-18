@@ -61,7 +61,7 @@ def main():
     files=[Path(__file__),*FIXTURE.glob('*.*'),*COMPONENT.glob('native_ota_*.c'),*COMPONENT.glob('include/*.h'),
         ROOT/'idf/components/native_storage/include/web_multipart.h',ROOT/'idf/components/native_stream/include/json_buffer.h',
         cyd/'web_ota.c',cyd/'web_ota.h',cyd/'web_reboot.c',cyd/'web_reboot.h',cyd/'audio_service.h',
-        c3/'web_ota.c',c3/'web_ota.h',c3/'ota_upload.c',c3/'ota_upload.h',c3/'websocket_service.c',c3/'websocket_service.h']
+        c3/'web_ota.c',c3/'web_ota.h',c3/'ota_upload.c',c3/'ota_upload.h',c3/'websocket_service.c',c3/'websocket_service.h',c3/'audio_service.h']
     hashes={}
     for file in files:
         relative=file.relative_to(ROOT);raw=file.read_bytes();destination=out/'sources'/relative
@@ -133,7 +133,7 @@ def main():
         mutations={
             'target-policy':('native_ota_form.c','if (strcmp(form->target, "fw") && strcmp(form->target, "firmware"))','if (false)'),
         }
-        if target=='cyd':mutations.update({
+        mutations.update({
             'late-maintenance-ack':('target.inc','return result == ESP_OK && (uint64_t)esp_timer_get_time() >= context->deadline','return false'),
             'response-cancels-boot':('native_ota_http.c','config->finish(config->context, activated);','config->finish(config->context, activated && response == ESP_OK);'),
             'idle-clock-not-reset':('native_ota_http.c','io->last_data = ota_now();\n        if (io->last_data >= deadline)','/* lost controlled-processing idle reset */\n        if (ota_now() >= deadline)'),
@@ -149,7 +149,7 @@ def main():
             execute(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1','UBSAN_OPTIONS=halt_on_error=1','timeout','60',str(mutant_binary)],directory/(name+'.log'),negative=True)
             negative[name]='DETECTED'
         report['variants'][target]['negative_controls']=negative
-    report['scope']='Actual shared form/sink/HTTP and target handler/reboot code, verbatim pinned SDK public image layouts and buffered request-receive/response-send/session-context functions. Field-model SDK structs, deterministic readiness/time/scheduler and acknowledged audio, flash and image-verifier fault seams. C3 positive OTA deliberately refuses 503 until an acknowledged maintenance API exists. No full HTTP parser/main-loop, real TLS, physical flash or target ABI claim.'
+    report['scope']='Actual shared form/sink/HTTP and target handler/reboot code, verbatim pinned SDK public image layouts and buffered request-receive/response-send/session-context functions. Field-model SDK structs, deterministic readiness/time/scheduler and acknowledged audio, flash and image-verifier fault seams. Audio-owner implementation is qualified separately; this fixture validates the handler ACK/lease contract. No full HTTP parser/main-loop, real TLS, physical flash or target ABI claim.'
     report['passed']=True;(out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
 
 if __name__=='__main__':main()

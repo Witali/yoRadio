@@ -1,6 +1,11 @@
 #include "native_ota_form.h"
 #ifdef TARGET_C3
 #include "ota_upload.h"
+#define s_pending s_reboot_pending
+#define s_reserved_epoch s_reboot_reserved_epoch
+#define web_reboot_request websocket_service_request_reboot
+#define WEB_OTA_MAX_BODY_BYTES (0x1B0000U+4096U)
+static void web_ota_deactivate(void) {atomic_store(&s_reboot_ready,false);}
 #endif
 static void reset(void) {
     assert(!owned&&(!hd.hd_req.handle||!hd.hd_req.sess_ctx));++groups;
@@ -106,13 +111,7 @@ static void assert_closed(void) {
 static unsigned foreign_frees;
 static void foreign_free(void *context) {assert(context);++foreign_frees;free(context);}
 static void test_target(void) {
-#ifdef TARGET_C3
-    reset();make_body("fw","app.bin","\r\n--ota-boundary--\r\n");
-    assert(web_ota_handler(&hd.hd_req)==ESP_FAIL);assert_closed();
-    assert(strstr(wire_response,"503 Service Unavailable")&&!begins&&!maintenance_begins&&!selected&&!s_reboot_pending);
-    assert(hd.hd_req_aux.remaining_len==source_size); // safe refusal before request-body consumption
-#else
-    // Actual CYD adapter, shared form/image/HTTP, SDK buffered receive and send.
+    // Actual target adapter, shared form/image/HTTP, SDK buffered receive/send.
     for(size_t chunk=1;chunk<=73;chunk+=3){
         reset();make_body("fw","app.bin","\r\n--ota-boundary--\r\n");receive_chunk=chunk;send_chunk=7;
         assert(httpd_unrecv(&hd.hd_req,(const char *)source,37)==37);source_offset=37;
@@ -121,6 +120,9 @@ static void test_target(void) {
         assert(strstr(wire_response,"200 OK")&&strstr(wire_response,"Connection: close")&&response_size>=2&&!strcmp(wire_response+response_size-2,"OK"));
         assert(!hd.hd_req_aux.remaining_len&&flash_size==sizeof(image)&&!memcmp(image,flash,sizeof(image)));
         assert(strstr(events,"FVAR")&&strstr(events,"SC"));
+#ifdef TARGET_C3
+        assert(activity==1); // Activity stays held through the scheduled reboot.
+#endif
     }
     for(unsigned fault=0;fault<28;++fault){
         reset();make_body("fw","app.bin","\r\n--ota-boundary--\r\n");
@@ -156,6 +158,7 @@ static void test_target(void) {
         }
         assert(web_ota_handler(&hd.hd_req)==ESP_FAIL);assert_closed();
         assert(!selected&&!s_reserved_epoch&&!maintenance);
+        assert(!activity);
         if(fault<=9||(fault>=15&&fault<=22)||fault>=25)assert(!begins);
         if(fault==11)assert(aborts==1&&!ends);
         if(fault==12||fault==13)assert(ends==1&&!aborts);
@@ -184,6 +187,9 @@ static void test_target(void) {
     }
     reset();make_body("fw","app.bin","\r\n--ota-boundary--\r\n");content_type="MuLtIpArT/FoRm-DaTa; BOUNDARY=\"ota-boundary\"";
     assert(web_ota_handler(&hd.hd_req)==ESP_FAIL);assert_closed();assert(selected);
+#ifdef TARGET_C3
+    reset();make_body("fw","app.bin","\r\n--ota-boundary--\r\n");sleep_allowed=false;
+    assert(web_ota_handler(&hd.hd_req)==ESP_FAIL);assert_closed();assert(!selected&&!activity&&!s_reserved_epoch&&strstr(wire_response,"503 Service Unavailable"));
 #endif
     reset();make_body("fw","app.bin","\r\n--ota-boundary--\r\n");
     void *foreign=malloc(1);assert(foreign);foreign_frees=0;

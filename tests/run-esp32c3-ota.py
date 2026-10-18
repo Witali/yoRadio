@@ -1,7 +1,7 @@
 """Compatibility entry point for the current shared/C3 OTA qualification.
 
 The canonical runner includes the actual current C3 handler and shared image
-sink/form/HTTP layer. C3 upload safely refuses 503 until maintenance is supported.
+sink/form/HTTP layer, with explicit acknowledged-audio and flash fault seams.
 """
 import argparse
 from pathlib import Path
