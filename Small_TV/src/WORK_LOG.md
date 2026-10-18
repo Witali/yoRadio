@@ -3046,3 +3046,26 @@ true. Это только начало нового прогона, не 24 ча
   остановлен после committed prefix/intent;182complete journal cycles и16pending
   events сохранены, last periodic report181 не переписан. Полные0592/full561 и
   F1/full566 продолжаются независимо; все их inputs сохраняются неизменными.
+
+## 2026-10-18 — независимые cold LCD и network-without-LCD gates
+
+- Новый display_boot_observer.py сравнивает весь RGB с реальным factory setup
+  frame, не использует HTTP/SDK role flags/UART для готовности изображения.
+  12unit cases отвергают black/white/wrong-color/partial/stale/truncated кадры,
+  stalled clock и readiness на deadline; source hashes включены в unit report.
+- Эталон из actual immutable factory5321/D64 AP services subtest, visually checked,
+  RGB SHAACC588AB; compressed PPM2207bytes и provenance сохранены в fixtures/display.
+  Весь parent full этим не принимался. Preliminary1+1cold VM pass, затем тот же
+  harness выполнил20+20процессов: все40boot/display/source results pass,62inputs
+  неизменны. Network явно not_run; host HTTP forwarding отключён.
+- Network_without_display_qemu.py создаёт собственный профиль devices=[] с той
+  же сетью и не меняет обычный профиль. Обе неизменённые прошивки прошли настоящий
+  GET и новый SNTP до/после reset при полном отсутствии LCD. QOM подтверждает
+  отсутствие устройства; screenshots/PNG/PPM отсутствуют. NTP1→2,4HTTP200,
+  SDK UTC/wire maxdelta0.191694s; native connected/DHCP10.0.2.15/time_synced и
+  AP false получены из matching ELF. По2ROM boot, no panic,59inputs совпали.
+- Boot/display/network/source integrity остаются отдельными результатами.
+  Это новые самостоятельные software gates частиH01/H02, не physical power,
+  RF/WPA/PWM, доступность Internet, all-theme LCD или24h/H10 acceptance.
+  Production/firmware и входы live full/H10 не менялись; новые тесты не внесены
+  задним числом в frozen run. Сценарии и ограничения описаны отдельными MD.

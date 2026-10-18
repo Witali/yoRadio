@@ -55,3 +55,10 @@ python -X utf8 -B Small_TV/src/tests/display_cold_boot_qemu.py `
 archived app; физическая плата не используется. Сравнение всех тем, динамических
 сцен, GPIO/PWM, RF, HTTP, software reset и H10 остаётся в отдельных проверках.
 20циклов не добавляются задним числом в frozen full/H10.
+
+Полный самостоятельный прогон20+20 завершён успешно: все40отдельных процессов
+нарисовали побайтно точный эталон, boot/source-integrity также прошли в каждой
+итерации. Все62inputs совпали; сетевой результат везде not_run. Максимальное
+время после начала наблюдения: factory5.496407guest/9.547host seconds,
+native0.460610guest/1.391host seconds. Это не сравнение физической скорости.
+Proof: `../../qemu/parity/display-cold-20-validation-20261018.json`.

@@ -7,6 +7,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Независимость проверок подсистем — 2026-10-18
 
+В той же test-only ветке отдельно завершены cold LCD matrix и network-without-LCD.
+Cold matrix:20factory+20F1 процессов, все172800RGB bytes совпали с фактическим
+factory setup frameACC588AB; boot и source-integrity также прошли, network not_run.
+Все62inputs совпали;12unit cases exact-frame observer проходят и pin source SHA.
+Сеть: LCD полностью убран из копии профиля, VM machine default-peripherals=off,
+QOM lcd absent; обе прошивки прошли HTTP/SNTP до/после reset без captures.
+NTP1→2,4HTTP200, SDK/wire maxdelta0.191694s; native DHCP10.0.2.15/STA/SNTP flags
+подтверждены в matching ELF. По2ROM boots, panic нет,59inputs совпали.
+См. tests/DISPLAY_COLD_BOOT.md и NETWORK_WITHOUT_DISPLAY.md. Это самостоятельные
+QEMU gates, не physical power/RF/PWM или24h/H10; в live full/H10 их не добавлять.
+
 Отдельная ветка `codex/small-tv-browser-controls-verify` продолжает F1 candidate
 без production/firmware изменений. Реальный Chrome155 прошёл281UI +5storage/source
 checks, включая обе ширины1280/390, все доступные настройки Clock/Advanced/Photo,
