@@ -5,6 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 import sys
+from native_source import canonical,source_closure
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
@@ -29,7 +30,7 @@ def main():
     # The queue API is already embedded with host RTOS typedefs.
     shim=out/'include';shim.mkdir()
     for name in ('stream_staging.h','stream_start.h'):
-        text=(source/name).read_text().replace('#include "adaptive_input.h"','')
+        text=canonical(source/name).read_text().replace('#include "adaptive_input.h"','')
         (shim/name).write_text(text)
     send=(source/'audio_service.c').read_text()
     send=send[send.index('static bool send_encoded('):send.index('static void stream_bitrate_add(')]
@@ -101,6 +102,7 @@ def main():
                      'stream_start.h','stream_staging.h','stream_encoded_router.h','stream_confirm.h',
                      'stream_probe.h','stream_frames.h','stream_tags.h','audio_completion.h')]
     hashes={}
+    sources=source_closure(sources)
     for path in sources:
         relative=path.relative_to(ROOT);target=out/'sources'/relative
         target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(path.read_bytes())

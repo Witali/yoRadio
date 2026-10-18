@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import re
 import sys
+from native_source import canonical,source_closure
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools/codec_benchmark'))
@@ -12,7 +13,7 @@ from run_output_dma_host import host, run
 
 
 def body(path):
-    return re.sub(r'^#(?:include|pragma once)[^\n]*\n', '', path.read_text(), flags=re.M)
+    return re.sub(r'^#(?:include|pragma once)[^\n]*\n', '', canonical(path).read_text(), flags=re.M)
 
 
 def main():
@@ -27,6 +28,7 @@ def main():
               'tls_input_reserve.c', 'tls_large_reserve.h', 'tls_large_reserve.c',
               'tls_input_reserve.h')]
     inputs += [support, harness, Path(__file__).resolve()]
+    inputs = source_closure(inputs)
     for source in inputs:
         target = args.output / 'sources' / source.relative_to(ROOT)
         target.parent.mkdir(parents=True, exist_ok=True)

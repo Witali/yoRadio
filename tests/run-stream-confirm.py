@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+from native_source import source_closure
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
@@ -80,6 +81,7 @@ def main():
             codec=codec,discard=offset,frame_bytes=frame,chunk_results=rows,generation_command=cmd,passed=True))
         print(name,'PASS',rows,flush=True)
     sources=[test,Path(__file__).resolve(),*[main/x for x in ('stream_confirm.h','stream_frames.h','stream_probe.h','stream_tags.h')]]
+    sources=source_closure(sources)
     report['source_sha256']={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     report['passed']=True
     for p in sources:

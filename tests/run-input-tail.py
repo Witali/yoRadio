@@ -5,6 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 import sys
+from native_source import source_closure
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
@@ -37,6 +38,7 @@ def main():
         for name in ('adaptive_input.h','adaptive_input.c','stream_encoded_router.h','stream_frames.h',
                      'stream_tags.h','audio_completion.h')]
     hashes={}
+    sources=source_closure(sources)
     for path in sources:
         relative=path.relative_to(ROOT);target=out/'sources'/relative
         target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(path.read_bytes())

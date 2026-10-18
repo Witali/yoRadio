@@ -3,6 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+from native_source import source_closure
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools/codec_benchmark'))
@@ -57,6 +58,7 @@ for variant, payload in (
                           replay_sha256=hashlib.sha256(expected).hexdigest()))
 sources=[source,harness,Path(__file__).resolve()]+[main/name for name in
     ('stream_encoded_router.h','stream_frames.h','stream_tags.h','stream_probe.h','audio_completion.h')]
+sources=source_closure(sources)
 (out/'report.json').write_text(json.dumps(dict(passed=True,corpus=cases,
     scope='Actual send path and router; synthetic and real MP3/AAC-LC/HE/HEv2 bytes with bounded lease stubs, no decoder or hardware',
     source_sha256={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}),indent=2)+'\n')

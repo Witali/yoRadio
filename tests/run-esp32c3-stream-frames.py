@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+from native_source import canonical
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / '.build/c3-stream-frames'
@@ -32,7 +33,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     binary = OUT / 'test'
     source = ROOT / 'tests/native/esp32c3_stream_frames_test.c'
-    header = ROOT / 'idf/esp32c3-oled-native/main/stream_frames.h'
+    header = canonical(ROOT / 'idf/esp32c3-oled-native/main/stream_frames.h')
     linux(['gcc', '-std=c11', '-O2', '-g', '-Wall', '-Wextra', '-Werror',
            '-fsanitize=address,undefined', '-fno-omit-frame-pointer',
            '-I', native(header.parent), native(source), '-o', native(binary)])

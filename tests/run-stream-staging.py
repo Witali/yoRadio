@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+from native_source import source_closure
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools/codec_benchmark'))
@@ -63,6 +64,7 @@ def main():
         for name in ('adaptive_input.h', 'adaptive_input.c', 'stream_staging.h', 'stream_confirm.h',
                      'stream_probe.h', 'stream_frames.h', 'stream_tags.h')]
     hashes = {}
+    sources = source_closure(sources)
     for path in sources:
         relative = path.relative_to(ROOT)
         target = out/'sources'/relative
