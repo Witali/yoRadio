@@ -625,7 +625,7 @@ int8_t decodeSubframe(uint8_t sampleDepth, uint8_t ch) {
         if(ret) return ret;
     }
     else if (32 <= type && type <= 63){
-        ret = decodeLinearPredictiveCodingSubframe(type - 31, reducedDepth, ch);
+        ret = decodeLinearPredictiveCodingSubframe(type - 31, static_cast<int>(reducedDepth), ch);
         if(ret) return ret;
     }
     else{
