@@ -146,6 +146,13 @@ allocation и численные настройки C3 являются канд
 
 ## Журнал выполнения
 
+- Дополнительная проверка донора C3 обнаружила borrowed `pcTaskName` после
+  возобновления scheduler и повторное использование TaskHandle без task number.
+  [Новые регрессии](../tests/results/c3-profiler-20261018/README.md) сначала
+  воспроизводят UAF/неверный CPU, затем проходят с ASan/UBSan для counters 32/64.
+  Имена копируются при остановленном scheduler только на single-core C3;
+  SMP-стратегия CYD использует handles/numbers без borrowed имён.
+
 - 2026-10-18: создан отдельный worktree, выполнено сравнение исходников.
   Donor host tests `run-esp32c3-stream-probe.py`,
   `run-esp32c3-stream-frames.py`, `run-stream-start.py` с tail coalescing и

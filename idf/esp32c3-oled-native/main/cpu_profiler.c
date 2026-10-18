@@ -121,16 +121,21 @@ static void allocation_failed(size_t size, uint32_t caps, const char *function) 
 
 typedef struct {
     TaskHandle_t handle;
+    UBaseType_t number;
     configRUN_TIME_COUNTER_TYPE counter;
 } task_sample_t;
 
 static task_sample_t s_previous[CPU_PROFILE_MAX_TASKS];
 static UBaseType_t s_previous_count;
 static configRUN_TIME_COUNTER_TYPE s_previous_total;
+// The diagnostic sampler has exactly one caller (its task or HTTP task).
+// C3 scheduler suspension protects TCB lifetime only on this single core.
+_Static_assert(configNUMBER_OF_CORES == 1, "C3 task-name snapshot requires one core");
+static char s_task_names[CPU_PROFILE_MAX_TASKS][configMAX_TASK_NAME_LEN];
 
-static configRUN_TIME_COUNTER_TYPE previous_counter(TaskHandle_t handle) {
+static configRUN_TIME_COUNTER_TYPE previous_counter(TaskHandle_t handle, UBaseType_t number) {
     for (UBaseType_t i = 0; i < s_previous_count; ++i) {
-        if (s_previous[i].handle == handle) {
+        if (s_previous[i].handle == handle && s_previous[i].number == number) {
             return s_previous[i].counter;
         }
     }
@@ -160,8 +165,21 @@ static void cpu_profiler_sample(void) {
     static unsigned stack_interval = 0;
 
     configRUN_TIME_COUNTER_TYPE total = 0;
+    vTaskSuspendAll();
     UBaseType_t count = uxTaskGetSystemState(
         current, CPU_PROFILE_MAX_TASKS, &total);
+    if (count <= CPU_PROFILE_MAX_TASKS) {
+        for (UBaseType_t i=0; i<count; ++i) {
+            // pcTaskName belongs to the TCB, which may be deleted as soon as
+            // the scheduler resumes. Copy while pinned; never log here.
+            s_task_names[i][0] = '\0';
+            if (current[i].pcTaskName)
+                memcpy(s_task_names[i], current[i].pcTaskName, configMAX_TASK_NAME_LEN-1U);
+            s_task_names[i][configMAX_TASK_NAME_LEN-1U] = '\0';
+            current[i].pcTaskName = s_task_names[i];
+        }
+    }
+    xTaskResumeAll();
     if (count == 0 || count > CPU_PROFILE_MAX_TASKS) {
         ESP_LOGW(TAG, "Task snapshot unavailable (tasks=%u)",
                  (unsigned)count);
@@ -191,7 +209,7 @@ static void cpu_profiler_sample(void) {
 
     for (UBaseType_t i = 0; i < count; ++i) {
         configRUN_TIME_COUNTER_TYPE delta =
-            current[i].ulRunTimeCounter - previous_counter(current[i].xHandle);
+            current[i].ulRunTimeCounter - previous_counter(current[i].xHandle, current[i].xTaskNumber);
         const char *name = current[i].pcTaskName;
         if (name != NULL && strncmp(name, "IDLE", 4) == 0) {
             idle += delta;
@@ -211,6 +229,7 @@ static void cpu_profiler_sample(void) {
             web += delta;
         }
         next[i].handle = current[i].xHandle;
+        next[i].number = current[i].xTaskNumber;
         next[i].counter = current[i].ulRunTimeCounter;
     }
     memcpy(s_previous, next, count * sizeof(next[0]));
