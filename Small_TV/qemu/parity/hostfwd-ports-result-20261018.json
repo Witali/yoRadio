@@ -1,0 +1,48 @@
+{
+  "status": "narrow_network_and_flash_regressions_passed_with_board_and_h10_limits",
+  "all_functionality_verified": false,
+  "app_sha256": "0592b51036117b81b98d7b7f615bbc7cce7e52e88635627c9f2c48afbed422ec",
+  "qemu_sha256": "d64f3013739f22b986e07aed39395b25bde474f52ef813b8ffaeedb0991edecc",
+  "qemu_implementation_commit": "b068387b7a6a959b1ad2922fb140006a8f5deb48",
+  "qemu_evidence_commit": "79badcba2bf3840c78fccf1b5232ceff0a605e64",
+  "qemu_repository": "Witali/QEMU-ESP32",
+  "qemu_branch": "codex/hostfwd-backlog",
+  "evidence_file": "tests/results/hostfwd-ports-20261018/summary.json",
+  "evidence_git_lf_sha256": "7330629a24e1b087fa0b60403caa58e1d9a57eb06e8a4c6f1890fae01c1ab798",
+  "checks": {
+    "browser_loads": 60,
+    "wifi_flows": 3,
+    "wifi_ui": 93,
+    "wifi_storage_roles": 18,
+    "native_port_tests": 10,
+    "fresh_wrap_tests": 10,
+    "packet_tests": 12,
+    "nor_groups": 11,
+    "nor_socs": [
+      "esp32c2",
+      "esp32c3",
+      "esp32"
+    ],
+    "c3_profiles": 2
+  },
+  "full_firmware_result": {
+    "commit": "428a580f57a8890eadef993d0502ac561646ee73",
+    "qemu": "20b133d9078c05240bd6624c7ff91b997d176ae12e60f376b14eb2cb90e28f8e",
+    "groups": 19,
+    "inputs": 539
+  },
+  "limits": [
+    "CYD PHY/cache failures in both same-configuration control and final; original 20B passes this bounded comparison.",
+    "BC68/20B H10 lost workload/supervisor after 336 cycles; no terminal acceptance.",
+    "The 0592 full suite ran on original 20B, not this new QEMU.",
+    "Old same-toolchain listener controls have different generated configuration bytes from the latest causal pair.",
+    "Thin archive byte hashes alone do not identify compiled object contents; final and fresh library reports pin referenced objects.",
+    "Stale restore was detected before acceptance; its duplicate disabled binaries were removed only after hash comparison."
+  ],
+  "h10_interruption_commit": "9696e43386b6d8b9bd5f60fa4774ad76c125c049",
+  "next_steps": [
+    "Investigate CYD PHY/cache difference before merging new QEMU into main.",
+    "Make supervisor cleanup resilient to host log/state write failures in an unfrozen worktree, with a fault regression.",
+    "Run the complete suite and H10 on the final firmware/emulator pair; keep 539 and 31+11 historical inputs unchanged."
+  ]
+}
