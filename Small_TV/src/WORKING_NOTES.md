@@ -7,6 +7,20 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Текущее состояние — 2026-10-18
 
+- После чистки запущен НОВЫЙ detached H10 текущей 6324/9E2C/53D3:
+  `.worktree/small-tv-h10-wifi/.build/wifi-detached-24h-20261018`, с 10:06:56 UTC,
+  86400 гостевых секунд, интервал 15, AP outage каждые 60 циклов. Запись —
+  `wifi-detached-24h-start-20261018.json`, все 31 входной хеш совпали;
+  начальный file-only аудит pending/start_record_matches=true. CIM identities:
+  supervisor 17788, workload 23672, guard 28632, VM 35664 (SmallTV-8d278f099216).
+  Все четыре повторно сверены по времени создания и команде. Supervisor
+  запущен вне Windows Job через проверенный launcher. Между turn нужно снова
+  сверить реальные процессы и prefix; только status=running не доказательство.
+  Не менять frozen H10 checkout/bundle, supervisor/guard и launcher-модули.
+  Суточной приёмки пока нет. Полный regression остаётся terminal_failed на
+  factory setup HTTP; после чистки исследовать это отдельно, не повышать timeout
+  без понимания причины и не подменять проверку ответа страницы флагом AP.
+
 - По запросу пользователя применён git-repo-cleanup. Удалены 12 завершённых
   worktree Small_TV, их текущие коммиты включены в origin/main. Все ignored
   файлы сохранены и побайтово проверены в `.build/worktree-retention/20261018`;
