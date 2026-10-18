@@ -2763,3 +2763,15 @@ true. Это только начало нового прогона, не 24 ча
 - 7offline observer tests и17evidence mutations pass. Новый gate обязателен
   в suite/publisher;27inputs runtime reports совпали. Старые frozen full runs
   остаются в прежнем объёме, никакой полный pass новой test revision не заявлен.
+
+- Завершено дополнительное AP before/after измерение: одинаковые4scan+4HTTP,
+  9heap/task snapshots каждого app6324/26C6 на одном B44. Оба pass,24input SHA
+  каждого неизменны, по36ROM counter crosschecks, одинROMboot безpanic.
+  Задач12->11 (только wifi_fallback); ready free83928->86604, gain2676bytes.
+  Медиана парных фаз2672, range2332..4596: transient HTTP buffers оставлены
+  видимыми, не маскируются. Raw reports/UART и one-off probe сохранены gzip
+  с network-roles-ap-memory-20261018.json; это не H10/latency/leak acceptance.
+- Замечены time_sync и weather_http tasks также в AP. Следующий шаг — сравнить
+  service lifecycle и factory AP branch/HTTP/cache/time semantics, затем решать,
+  можно ли избежать allocation. Production пока не менялся. Frozen full/H10
+  не перезапускались и не получают новый netif gate задним числом.

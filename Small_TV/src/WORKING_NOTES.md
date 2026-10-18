@@ -5,6 +5,24 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
+## AP memory comparison — 2026-10-18
+
+Теперь измерен и AP режим на app6324 против26C6, один B44/SDK/settings:
+по4настоящих HTTP scan и4setup pages,9read-only snapshots на vTaskDelay.
+Оба workload pass,24input hashes каждого совпали; по36ROM counter crosschecks,
+одинROMboot безpanic. Задач12->11, исчезла только wifi_fallback. Ready free heap
+83928->86604bytes, gain2676; медиана парных phase gains2672, range2332..4596.
+Медианы отдельных free series отличаются на2660. После HTTP временные buffers
+могут ещё жить: эти числа не заявляют идентичную allocator instruction phase.
+Proof network-roles-ap-memory-20261018.json +2rawreports+2UART+one-off probe source gzip.
+Это короткое измерение ресурсов, не долгосрочная стабильность или H10.
+
+Следующий кандидат для изучения, без изменения production: services_start
+создаёт time_sync(3072stack) и weather_http(8192stack) также в AP. Они наблюдались
+в обоих task sets. Перед оптимизацией сравнить AP branch factory app_main,
+браузерное время/часовой пояс/cache init и доступные setup HTTP handlers;
+по одному отсутствию STA нельзя объявлять эти задачи ненужными или удалять их.
+
 ## Повторяемый netif gate — 2026-10-18
 
 Активная новая ветка codex/small-tv-netif-observer в одноимённой .worktree,
@@ -123,14 +141,12 @@ Raw bootloader hashes не выдавать за одинаковые. Scoped re
 network-roles-validation-20261018.json. Полный regression новой26C6 ещё нужен;
 старый full и H10 на6324 не переписывать как его приёмку.
 
-Factory netif scratch prototype .build/probe_factory_netifs_20261018.py нужно
-перенести в reusable role test здесь: собственная public STA boot создаёт NVS,
-её flash-копия с mode=2 должна содержать только AP netif. Native netif layout
-брать из текущего ELF/DWARF, factory offsets привязаны к dump5321. Runtime heap
-снимать существующим read-only Observer на vTaskDelay, а не в случайном allocator
-critical section. Для baseline использовать неизменный app6324/ELF9E2C в
-.worktree/small-tv-ap-http-ready; QEMU B44 общий. Старый H10 не трогать до
-подтверждённой необходимости его заменить проверенной новой сборкой.
+Factory netif scratch prototype заменён reusable netif_roles_qemu.py в ветке
+codex/small-tv-netif-observer; проверенные flows и ограничения описаны выше.
+Native layout берётся из ELF/DWARF, factory offsets привязаны к dump5321.
+Runtime heap снимать read-only Observer на vTaskDelay, а не в случайном allocator
+critical section. Baseline app6324/ELF9E2C сохраняется в .worktree/small-tv-ap-http-ready;
+QEMU B44 общий. История замены H10 и его исходный prefix сохранены отдельно.
 
 ## Заводские netif в APSTA — уточнено 2026-10-18
 
