@@ -24,3 +24,11 @@ Cache load now reads the CSV once in bounded memory instead of trusting only
 index length; it avoids an unnecessary flash rewrite when the index matches.
 Boot latency and physical SPIFFS durability require separate board measurement.
 CSV/index upload transaction locking is subsequent stage 07 work.
+
+Pinned SDK/GCC builds from clean `f75e7845` passed and were saved with matching
+image/ELF/source/config hashes:
+[CYD PDM](../../../firmware/development/esp32-cyd2usb-native-playlist-cache-pdm/manifest.json)
+1,378,176 bytes; [C3](../../../firmware/development/esp32c3-oled-native-playlist-cache/manifest.json)
+1,475,536 bytes. No physical test was performed. A subsequent pending-state
+follow-up extends the HTTP startup regression; use its later image for testing
+that complete connection-state behavior.
