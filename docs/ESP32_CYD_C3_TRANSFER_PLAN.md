@@ -67,15 +67,15 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-04 | Программная часть выполнена | Общая SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 и независимый control node подключены. Default-off bounded prefill проверен host-тестами и GCC/clang-tidy профилем 250 ms; image source `112c871f` сохранён. Физическая приёмка и выбор ёмкости/TLS reclaim — отдельно, этап 13. |
 | CYD-C3-05 | В работе | SMP-safe health подключён к pipeline и `/api/native/health`: heap/internal/DMA, input occupancy, ошибки, optional CPU/stack по двум ядрам. Host core/HTTP/lifecycle, SDK quiet/diagnostic и полный lint проходят; images `b7362172` сохранены. Backend DMA telemetry и физические измерения отдельно. |
 | CYD-C3-06 | В работе | Общий radio controller, index recovery, last station/SmartStart, Next/Prev/Toggle и HTTP API подключены к CYD. Pending-state, boot/NVS failure, stale cache и concurrency проверены. Возобновлённый format/bitrate и audio settings [программно квалифицированы](../tests/results/cyd-c3-format-dsp-20261018/README.md): 51 stream/80 settings запросов, обе startup/format цели, SDK и полный lint проходят. Дальнейшие WebUI/runtime settings относятся к этапам 07/09; физическая приёмка отдельно. |
-| CYD-C3-07 | В работе | [Host-квалификация](../tests/results/cyd-startup-pcm-web-20261018/HOST.md): WebSocket snapshots/events, native embedded UI/capabilities и два async static workers реализованы; 38 WS-групп, HTTP rollback и 5 UI-сценариев проходят. Bounded uploads/rollback файлов, интеграция SDK и физические две вкладки/медленный клиент остаются. |
+| CYD-C3-07 | В работе | [Host-квалификация](../tests/results/cyd-startup-pcm-web-20261018/HOST.md): WebSocket snapshots/events, native embedded UI/capabilities и два async static workers реализованы; 38 WS-групп, HTTP rollback и 5 UI-сценариев проходят. [Три SDK images](../tests/results/native-warning-fixes-20261018/SDK.md) сохранены. Bounded uploads/rollback файлов и физические две вкладки/медленный клиент остаются. |
 | CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
 | CYD-C3-09 | Открыт | Wi-Fi profiles/reconnect/RSSI, power policy, timezone/SNTP и runtime settings. AP/client и поздняя потеря сети. |
-| CYD-C3-10 | В работе | Gain рассчитывается один раз на packet; [общий normalizer](../tests/results/cyd-normalizer-20261018/README.md) подключён ко всем трём backend через owner-only DSP без изменения input PCM. [Итоговая квалификация](../tests/results/cyd-c3-format-dsp-20261018/README.md): HTTP controls, golden PCM, reset/layout/EOF, три SDK images и полный lint проходят; DSP symbols занимают 554 B DRAM, LUT — 1170 B flash. [PCM 8/16/24/32 и resampler](../tests/results/cyd-startup-pcm-web-20261018/HOST.md) квалифицированы: до 1359 сценариев/backend, исправлены PDM rate-tail и DAC priming/short writes. SDK новых правок и физическая приёмка остаются. |
+| CYD-C3-10 | В работе | Gain рассчитывается один раз на packet; [общий normalizer](../tests/results/cyd-normalizer-20261018/README.md) подключён ко всем трём backend через owner-only DSP без изменения input PCM. [Итоговая квалификация](../tests/results/cyd-c3-format-dsp-20261018/README.md): HTTP controls, golden PCM, reset/layout/EOF и полный lint проходят. [PCM 8/16/24/32 и resampler](../tests/results/cyd-startup-pcm-web-20261018/HOST.md) квалифицированы: до 1359 сценариев/backend, исправлены PDM rate-tail и DAC priming/short writes. [Новые SDK images](../tests/results/native-warning-fixes-20261018/SDK.md) сохранены; PDM DSP/layout symbols — 555 B DRAM, soft-limit LUT — 1170 B flash (без linker padding). Физическая приёмка остаётся. |
 | CYD-C3-11 | Исключён | Перенос дисплея, рендеринга, физических controls и других аппаратных функций C3 не входит в задачу по уточнению пользователя. |
 | CYD-C3-12 | Открыт | Portable custom FLAC и оптимизации hot loops против Espressif. PCM exactness, 8–24 bit/decorrelation/LPC/Rice, watchdog и физический A/B. |
 | CYD-C3-13 | Открыт | TLS/heap/IRAM/stack политика после измерений CYD. Full-record TLS, раннее освобождение старого codec, сохранение сетевого headroom. |
 | CYD-C3-14 | Открыт | Отдельный аудит Xtensa AAC/Vorbis ABI и только затем compact owners/repair. Archive hashes, layout, OOM и PCM сравнены на ESP32. |
-| CYD-C3-15 | В работе | [Production wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md) и верифицированный экспорт реализованы; 38 host tests проходят, 1 symlink case пропущен. [Все три реальные CYD сборки и экспорт](../tests/results/cyd-c3-format-dsp-20261018/README.md) проверены новой обёрткой; профили SDK сохранены. Единая физическая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение каждого backend ещё впереди. |
+| CYD-C3-15 | В работе | [Production wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md) и верифицированный экспорт реализованы; 38 host tests проходят, 1 symlink case пропущен. [Три CYD сборки после startup/WebUI/PCM и аудита warnings](../tests/results/native-warning-fixes-20261018/SDK.md) проверены обёрткой; конфигурации, image/ELF hashes и запас OTA сохранены. Единая физическая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение каждого backend ещё впереди. |
 
 ## Карта функций и мест в коде
 
@@ -170,6 +170,16 @@ allocation и численные настройки C3 являются канд
    Host pass и build pass не отмечают этот пункт как выполненный.
 
 ## Журнал выполнения
+
+- [SDK-квалификация startup/WebUI/PCM и warning fixes](../tests/results/native-warning-fixes-20261018/SDK.md)
+  завершена из чистого `3b8e5d2f`: CYD PDM/continuous/legacy и C3 production
+  images сохранены с manifest/config/logs; app/ELF SHA и OTA capacity проверены.
+  C3 tested profile идентичен предыдущему; CYD меняет только WebUI/WS настройки.
+  Прежние affinity/priority сохранены и проверены: radio_stream core 0/priority 3,
+  audio_decode core 1/priority 5, audio_output core 1/priority 6.
+  GCC не выдаёт предупреждений для C3/PDM/continuous; три legacy notices относятся
+  к deprecated APLL API исходного драйвера IDF 5.5.4, при `use_apll=false`.
+  SDK не патчился; физическая приёмка и оставшиеся этапы переноса открыты.
 
 - По запросу пользователя разобраны наиболее опасные предупреждения обеих целей.
   [Отчёт с исходными сбоями и регрессиями](../tests/results/native-warning-fixes-20261018/HOST.md):

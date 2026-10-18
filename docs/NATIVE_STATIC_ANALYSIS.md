@@ -204,3 +204,10 @@ original too; its changes make signed arithmetic/range guarantees explicit.
 Remaining findings are retained without disabling checks. The AAC owner-view
 warning remains open; an automatic content check interrupted its assistant
 task before qualification. The unverified diff is archived and not applied.
+
+[Production SDK qualification](../tests/results/native-warning-fixes-20261018/SDK.md)
+also passes for all three CYD output backends and the tested C3 profile from
+clean source `3b8e5d2f`. GCC emits zero warnings for C3/PDM/continuous. The three
+legacy warnings are deprecated APLL API calls in the pinned IDF 5.5.4 driver;
+the existing CYD configuration disables those APLL branches. They remain
+visible, with their origin and qualification limits recorded in the report.
