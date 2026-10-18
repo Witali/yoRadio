@@ -5,6 +5,24 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
+## Полный network roles regression — 2026-10-18 11:07 UTC
+
+Новая app26C6 / ELFFE9B / sourceD628 сохранена и опубликована в16c277ed.
+Полный набор без Skip идёт в .build/small-tv-functional/netif-roles-integrated-full-20261018.
+Controller PID28968, creation11:07:17.1947460Z, вне Windows Job; после выхода
+launcher PID/creation/command совпали. Заморожены121tests+152extra inputs=273,
+после старта все хеши совпали. Не менять входы до terminal! Controller пишет
+controller.log/controller-exit.json. Start proof network-roles-full-start-20261018.json.
+SDK доступен через ignored .idf junction к основному SDK: при cleanup удалять
+только запись junction, не целевой каталог. История коротких проверок ниже.
+
+Прежний full app6324 PID2448 ещё работает, дошёл до реальных weather/field HTTP.
+Его273 inputs неизменны. H10 app6324 на A74 тоже жив:4 личности и31input совпали,
+prefix180cycles/3005.344746guest s/1445HTTP/3outage. Это не новые26C6 acceptance
+и не24h. Для новой26C6 нужен собственный frozen H10; до его запуска сохранить
+явный intent и prefix прежнего H10, не терять его evidence и не останавливать
+процессы без проверки PID/creation/command. Текущие результаты — scoped only.
+
 ## Текущая ветка network roles — 2026-10-18
 
 Работа идёт в `.worktree/small-tv-netif-roles`, ветка codex/small-tv-netif-roles,

@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "status": "started_not_completed",
+  "all_functionality_verified": false,
+  "scope": "Detached full host/machine/QEMU regression of app26C6; no terminal or 24-hour acceptance.",
+  "captured_utc": "2026-10-18T11:07:50.1157978Z",
+  "run_directory": "C:\\Work\\yoRadio\\.build\\small-tv-functional\\netif-roles-integrated-full-20261018",
+  "input_manifest": {
+    "file": "network-roles-full-inputs-20261018.json.gz",
+    "uncompressed_sha256": "b14835bcf5da93ffd9a891ca67dd816bccc5d47d408af8fd1a40b7db60eab8c5",
+    "tests": 121,
+    "extra_inputs": 152,
+    "all_inputs_verified_after_start": true
+  },
+  "controller": {
+    "role": "full_roles",
+    "pid": 28968,
+    "created_utc": "2026-10-18T11:07:17.1947460Z",
+    "live": true,
+    "creation_matches": true,
+    "command_matches": true,
+    "command_sha256": "0ae7f5ab6b0ec421f54c1c65abf432e0fa77c31cecbf0a68b1215f0fa498c00a"
+  },
+  "controller_outside_job_at_launch": true,
+  "yoradio_commit_at_start": "16c277edf8be9fbbef117f6a7a404510438e4dd1",
+  "qemu_source_commit": "aab05d5de6fc9c6b0a784221d6629581a887679b",
+  "app_sha256": "26c6ca74940dbfa5f27b67a308515a2901bcdab2968e2a45954055b59cbe1234",
+  "native_elf_sha256": "fe9be9577dd82294b86710e61e25f5d1f54f92d4bf78dce8b3d578e9fc34adc9",
+  "qemu_sha256": "b44d1a054fe65443b050e0feed86dcda3029d33c76faea9bb7e69a988feb0160",
+  "prior_full": {
+    "controller": {
+      "role": "full_apsta",
+      "pid": 2448,
+      "created_utc": "2026-10-18T10:41:21.7725480Z",
+      "live": true,
+      "creation_matches": true,
+      "command_matches": true,
+      "command_sha256": "df2ed58bf91701a89b31e1f553a6f2e4a7d8b00a53068d5e135759880318b846"
+    },
+    "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+    "inputs_verified": 273,
+    "status": "running_not_completed"
+  },
+  "prior_h10": {
+    "processes": [
+      {
+        "role": "h10_guard",
+        "pid": 28632,
+        "created_utc": "2026-10-18T10:07:27.9800280Z",
+        "live": true,
+        "creation_matches": true,
+        "command_matches": true,
+        "command_sha256": "d45d587e73aad2192c3d7110e229c27d26c966f3ce60b355f681c85d3015ae08"
+      },
+      {
+        "role": "h10_vm",
+        "pid": 35664,
+        "created_utc": "2026-10-18T10:07:00.6431760Z",
+        "live": true,
+        "creation_matches": true,
+        "command_matches": true,
+        "command_sha256": "68b369cfdddd5bfb4d7fd126e5941f217f424d04c380f037798e9607684329d5"
+      },
+      {
+        "role": "h10_workload",
+        "pid": 23672,
+        "created_utc": "2026-10-18T10:06:56.5451710Z",
+        "live": true,
+        "creation_matches": true,
+        "command_matches": true,
+        "command_sha256": "bf5aa4d36abd830126320099f36eb1a3891aefb1837e10787128bdf15ebe16fd"
+      },
+      {
+        "role": "h10_supervisor",
+        "pid": 17788,
+        "created_utc": "2026-10-18T10:06:56.1659290Z",
+        "live": true,
+        "creation_matches": true,
+        "command_matches": true,
+        "command_sha256": "3eb1e30a9bfeab4cd568dfaea12b4f7032fd82f058df5b498e7515052408f00d"
+      }
+    ],
+    "app_sha256": "6324c55a79151e2f2f5e39ddbc79fa1bca5ab51a2c468250cb8564a996226afe",
+    "qemu_sha256": "a74f3324430b306618aa88a52649dbb93c32eac6d0b87926d335754346abbf0b",
+    "inputs_verified": 31,
+    "completed_cycles": 180,
+    "last_guest_seconds": 3005.344746,
+    "http_requests": 1445,
+    "outages": 3,
+    "status": "running_not_completed"
+  },
+  "sdk_junction": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\small-tv-netif-roles\\.idf",
+    "target": "C:\\Work\\yoRadio\\.idf",
+    "cleanup": "Remove only the junction entry after use; never recurse into shared SDK."
+  },
+  "limitations": [
+    "Prior full/H10 app6324 cannot validate app26C6. A new-image H10 has not yet started.",
+    "No frozen input may change before terminal; SDK junction must not be recursively traversed during cleanup."
+  ]
+}

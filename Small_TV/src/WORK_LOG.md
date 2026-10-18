@@ -2720,3 +2720,10 @@ true. Это только начало нового прогона, не 24 ча
   Bootloader checksum/SHA валидны, исполняемый образ идентичен кроме SDK даты
   компиляции и integrity bytes. Поэтому смена bootloader hash не скрыта как
   «тот же binary». Scoped proof network-roles-validation-20261018.json +5gzip.
+
+- 11:07:17 UTC полный app26C6 run запущен independently через проверенный CIM
+  launcher, PID28968, job=false. После запуска все273inputSHA и личность совпали.
+  Полный SDK/machine/QEMU набор без Skip; start не является passing report.
+- В11:07:50 UTC прежний full app6324 PID2448 жив, все273inputs прежние. H10
+  app6324/A74:4process identities и31input совпали;180cycles/3005.344746guest s,
+  1445HTTP/3outage. Новой26C6 H10 ещё нет; области приёмки явно разделены.
