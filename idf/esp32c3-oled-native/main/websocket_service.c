@@ -504,20 +504,18 @@ static esp_err_t send_screen_settings(httpd_req_t *request) {
 }
 
 static esp_err_t send_timezone_settings(httpd_req_t *request) {
-    char sntp1[35];
-    char sntp2[35];
+    runtime_time_settings_t current;
+    esp_err_t result = runtime_settings_get_time_snapshot(&current, 100);
+    if (result != ESP_OK) return result;
     char escaped1[208], escaped2[208];
     char settings[640];
-    runtime_settings_get_sntp1(sntp1, sizeof(sntp1));
-    runtime_settings_get_sntp2(sntp2, sizeof(sntp2));
-    json_escape(sntp1, escaped1, sizeof(escaped1));
-    json_escape(sntp2, escaped2, sizeof(escaped2));
+    json_escape(current.servers[0], escaped1, sizeof(escaped1));
+    json_escape(current.servers[1], escaped2, sizeof(escaped2));
     snprintf(settings, sizeof(settings),
              "{\"tzh\":%d,\"tzm\":%u,\"sntp1\":\"%s\","
              "\"sntp2\":\"%s\",\"timeint\":%u,\"timeintrtc\":24}",
-             runtime_settings_get_timezone_hour(),
-             runtime_settings_get_timezone_minute(), escaped1, escaped2,
-             runtime_settings_get_time_sync_interval_min());
+             current.timezone_hour, current.timezone_minute, escaped1, escaped2,
+             current.sync_interval_min);
     return ws_send_request(request, settings);
 }
 
