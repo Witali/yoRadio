@@ -1,5 +1,12 @@
 # Функциональные тесты Small TV ESP32-C2
 
+## Сеть без дисплея
+
+`network_without_display_qemu.py` запускает обе прошивки в ВМ без LCD. Свежий
+SNTP и HTTP проверяются до/после reset без framebuffer/готовности дисплея.
+Реальный F1/D64 прогон прошёл; boot и display/not_run отражаются отдельно.
+См. [NETWORK_WITHOUT_DISPLAY.md](NETWORK_WITHOUT_DISPLAY.md).
+
 ## Холодные старты и полный кадр
 
 Независимый `display_cold_boot_qemu.py` повторяет20cold process starts на factory
