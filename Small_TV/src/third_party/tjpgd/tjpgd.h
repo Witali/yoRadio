@@ -80,6 +80,7 @@ struct JDEC {
     size_t (*infunc)(JDEC *, uint8_t *, size_t); /* Pointer to jpeg stream input function */
     void *device;               /* Pointer to I/O device identifier for the session */
     uint8_t component_id[3];    /* Frame IDs, retained for independent SOS validation */
+    uint8_t huffman_selector[3]; /* Packed SOS DC/AC destinations for each component */
 };
 
 

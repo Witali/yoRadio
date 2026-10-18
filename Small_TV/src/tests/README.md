@@ -1,5 +1,12 @@
 # Функциональные тесты Small TV ESP32-C2
 
+## JPEG Huffman selectors
+
+Отдельный `jpeg_selector_oracle.py` проверяет136valid/32invalid входа с
+независимыми DC/AC destinations каждого компонента. HTTP upload проверяется
+своим этапом `photo_qemu.py`. Это проверки формата/хранения, их результаты
+не подменяют network или display readiness. См. [JPEG_SELECTORS.md](JPEG_SELECTORS.md).
+
 ## Сеть без дисплея
 
 `network_without_display_qemu.py` запускает обе прошивки в ВМ без LCD. Свежий

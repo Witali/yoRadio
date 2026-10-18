@@ -3091,3 +3091,43 @@ true. Это только начало нового прогона, не 24 ча
 - Результаты проверяют browser/network/storage и не подтверждают LCD pixels,
   физический RF/WPA/PWM, полный набор или24h/H10. Production/source archive и
   все frozen full/H10 inputs остались прежними; новых клиентов к H10 нет.
+
+## 2026-10-18 — JPEG DC/AC selectors по каждому компоненту
+
+- В новой sparse рабочей копии `codex/small-tv-jpeg-selectors` от409f4333
+  подтверждена ошибка factory иF1. Factory SOS0x42011eae..0x42011efa разрешает
+  лишь00/11, mcu_load0x42011a9a выводит table ID из component class через snez.
+  T.81 B.2.3/Table B.3 задают независимые DC/AC selectors0/1; mixed/shared/swapped
+  таблицы допустимы. Восстановленный C повторял заводскую ошибку.
+- Новый неизменный before/after RV32 harness:136valid и32invalid. Все136valid
+  fixtures независимо декодированы Pillow12.3.0, каждый RGB pixel128/128/128;
+  три отдельных240×240upload fixtures также проверены Pillow. Before F1 прошла
+  только34/168:4valid и30invalid; два отсутствующих table1 доходили до entropy
+  и очистки LCD. After B50D проходит168/168, validation не рисует, все guards
+  вне8×8 сохранены;8negative evidence controls отвергаются.
+- В jd_prepare/mcu_load стоят FIXED_FACTORY comments с адресами и спецификацией.
+  Packed selectors занимают3tail bytes JDEC,124→128bytes по actual DWARF,
+  offset123 использует бывший padding; все прежние member offsets сохранены.
+  Native mcu_load встроен в jd_decomp: сохранён настоящий before/after листинг;
+  пустая попытка standalone objdump отмечена как отсутствие symbol.
+- Production сборка B50D15A1/ELF85FCCF00/sourceFC337C9B сохранена в development.
+  App1170048bytes (+16), free365952, DEBUGoff/WARN. Из59compiled inputs изменены
+  только tjpgd.c/.h; IDCT/color/output прежние. После уточнения комментария
+  source manifest обновлён повторной incremental сборкой до запуска final gates;
+  первоначальный manifest сохранён отдельно, stale archive не принимался.
+- Прежние107public JPEG/35errors/7placements,41additional inputs/128DHT/133headers,
+  host5531 и6artifact checks pass. Selector child обязателен в parent JPEG inputs,
+  publisher и verifier. В строгом photo schema этих двух consumers также учтены
+  прежние header_fields_rejected/custom_component_ids_published: старый список
+  требовал22ключа, хотя header gate уже выдавал24. Теперь требуются26 с selectors.
+- Один HTTP harness/helpers/D64: F1 отвергает три допустимых selector JPEG400,
+  B50D публикует их200 с точным скачиванием и отвергает оба missing tables400.
+  Все26after checks, cold/immediate-finish/interrupted persistence pass;
+  пять отрицательных мутаций HTTP evidence отвергаются. Before позднее получил
+  отдельный cold-stage start_upload timeout с WSAEventSelect warning QEMU:
+  failure сохранён, причинная связь с JPEG не заявляется.
+- Proof jpeg-selector-correction-20261018.json +42raw gzip, exact synthetic fixture
+  bytes, исходники и logs сохранены. Все собственные HTTP ВМ завершены по OS
+  run paths/identities. Старые F1 full/H10 пять exact identities живы17:59:39UTC;
+  их inputs не менялись, новыхQMP/RSP кH10 нет. Новый полныйB50D и24h/H10
+  ещё обязательны; physical RF/LCD/PWM, CYD и общая приёмка не объявляются pass.

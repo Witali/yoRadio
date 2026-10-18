@@ -16,6 +16,7 @@ from ap_services_contract import validate_ap_services, rejection_checks as ap_se
 from jpeg_dht_contract import validate_dht, validate_photo_dht, rejection_checks as dht_rejections
 from jpeg_header_contract import validate_headers, rejection_checks as header_rejections
 from jpeg_header_http_contract import validate_photo_headers
+from jpeg_selector_contract import validate_selector_evidence, validate_photo_selectors
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -86,6 +87,8 @@ def main():
     if (len(header_guards) != 7 or not all(row['passed'] for row in header_guards) or
             header_guards != header_rejections(jpeg_inputs['headers'])):
         raise ValueError('JPEG header evidence rejection controls did not pass')
+    validate_selector_evidence(jpeg_inputs['selectors'], {key: jpeg_inputs[key] for key in
+        ('app_sha256', 'source_sha256', 'native_elf_sha256', 'factory_elf_sha256')}, jpeg_inputs['selector_rejection_checks'])
     for item in jpeg_inputs['test_inputs']:
         if hashlib.sha256((ROOT / item['file']).read_bytes()).hexdigest() != item['sha256']:
             raise ValueError('Additional JPEG fixture/adapter changed: ' + item['file'])
@@ -220,7 +223,8 @@ def main():
                     'immediate_finish_cut_bounded', 'immediate_finish_new_vm', 'immediate_finish_persisted',
                     'interrupted_slot_unpublished', 'interrupted_start_cut_bounded', 'immediate_finish_no_panic',
                     'interrupted_boot_new_vm', 'interrupted_photo_hidden', 'new_upload_after_interruption',
-                    'interrupted_boot_no_panic'}
+                    'interrupted_boot_no_panic', 'header_fields_rejected', 'custom_component_ids_published',
+                    'selector_uploads_valid', 'selector_missing_rejected'}
     if (photo['profile_sha256'] != qemu['profile_sha256'] or set(photo['checks']) != photo_checks or
             not all(photo['checks'].values()) or photo['invalid']['finish_status'] != 400 or
             photo['invalid']['metadata'] != {'exists': False, 'size': 0} or
@@ -229,6 +233,7 @@ def main():
         raise ValueError('Real photo upload/download/cold-boot checks omitted a stage or accepted invalid data')
     validate_photo_dht(photo)
     validate_photo_headers(photo)
+    validate_photo_selectors(photo)
     if not 0 <= startup['ready_wait_guest_seconds'] <= .5 or startup['different_colors'] < 2:
         raise ValueError('Ready clock still waits on startup or its first frame is blank')
     if (not held_weather['during']['request_state'] & held_weather['compiled_running_mask'] or

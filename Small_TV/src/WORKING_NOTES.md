@@ -7,6 +7,27 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Независимость проверок подсистем — 2026-10-18
 
+Новая отдельная ветка `codex/small-tv-jpeg-selectors` продолжает409f4333.
+Candidate: appB50D15A1 / ELF85FCCF00 / sourceFC337C9B / тот жеQEMUD64.
+Из59production inputs изменены только tjpgd.c/.h. SOS сохраняет отдельные
+DC/AC destinations каждого компонента; все136valid+32invalid RV32 cases проходят
+вместо34/168 наF1. Pillow12.3.0 независимо проверил136малых и3upload fixtures.
+JDEC124→128bytes, tail selector offset123, прежние member offsets неизменны.
+App1170048bytes (+16 кF1), partition free365952; DEBUGoff/WARN.
+Прежние107JPEG/35errors/7placements, inputs/DHT/header gates,5531host и6artifact
+checks pass. Тот же HTTP harness прошёл26checks наB50D, включая3valid selectors,
+2missing-table rejection, byte-exact downloads, cold/interrupted persistence.
+Before F1 отверг все3valid и позже получил отдельный cold-stage timeout с
+WSAEventSelect warning QEMU; этот failure сохранён. Новый full/H10 ещё не принят.
+Proof: jpeg-selector-correction-20261018.json +42raw gzip;8decoder и5HTTP
+consumer rejection controls pass. Все собственные HTTP ВМ завершены; старые
+F1 full/H10 exact identities сохранены на17:59:39UTC, новых debug clients нет.
+См. tests/JPEG_SELECTORS.md. Изменения помечены FIXED_FACTORY; IDCT/color не менялись.
+Текущие F1 full/H10 находятся в прежнем frozen tree: не менять их inputs и не
+добавлять QMP/RSP clients. Их результат не переносится наB50D candidate.
+Исторический0592/full561 завершён:19automatic groups pass,561inputs неизменны,
+published/verifier pass; proof в ветке codex/small-tv-reset-display,6d8816d9.
+
 Отдельные F1/D64 browser gates повторены без изменения production/firmware:
 photo23UI+6storage/source,27inputs; Wi-Fi93UI+18role/storage,26inputs.
 Все inputs повторно совпали при публикации. Все восемь ВМ завершены;

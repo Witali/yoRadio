@@ -870,7 +870,10 @@ static JRESULT mcu_load (
             for (i = 0; i < 64; bp[i++] = 128) ;
 
         } else {                            /* Load Y/C blocks from input stream */
-            id = cmp ? 1 : 0;                       /* Huffman table ID of this component */
+            /* FIXED_FACTORY: SOS chooses DC and AC independently per component
+             * (T.81 B.2.3/Table B.3). Factory 0x42011a9a uses component class;
+             * retain each selector so shared/swapped tables decode correctly. */
+            id = jd->huffman_selector[cmp] >> 4;     /* Selected DC table */
 
             /* Extract a DC element from input stream */
             d = huffext(jd, id, 0);                 /* Extract a huffman coded data (bit length) */
@@ -896,6 +899,7 @@ static JRESULT mcu_load (
 
             /* Extract following 63 AC elements from input stream */
             memset(&tmp[1], 0, 63 * sizeof (int32_t));  /* Initialize all AC elements */
+            id = jd->huffman_selector[cmp] & 15;    /* Selected AC table can differ from DC */
             z = 1;      /* Top of the AC elements (in zigzag-order) */
             do {
                 d = huffext(jd, id, 1);             /* Extract a huffman coded value (zero runs and bit length) */
@@ -1332,16 +1336,19 @@ JRESULT jd_prepare (
                 if (seg[1 + 2 * i] != jd->component_id[i]) {
                     return JDR_FMT1;    /* Scan must select frame components in order */
                 }
-                b = seg[2 + 2 * i]; /* Get huffman table ID */
-                if (b != 0x00 && b != 0x11) {
-                    return JDR_FMT3;    /* Err: Different table number for DC/AC element */
+                /* FIXED_FACTORY: factory 0x42011eae..0x42011efa accepts only
+                 * 00/11 and checks tables by component class. Baseline permits
+                 * both destinations 0/1 independently; require the actual pair. */
+                b = seg[2 + 2 * i]; /* Packed DC/AC Huffman destinations */
+                if ((b >> 4) > 1 || (b & 15) > 1) {
+                    return JDR_FMT3;    /* Err: Unsupported baseline table destination */
                 }
-                n = i ? 1 : 0;                          /* Component class */
-                if (!jd->huffbits[n][0] || !jd->huffbits[n][1]) {   /* Check huffman table for this component */
+                jd->huffman_selector[i] = b;
+                if (!jd->huffbits[b >> 4][0] || !jd->huffbits[b & 15][1]) {
 #if JD_DEFAULT_HUFFMAN
                     jd_load_default_huffman(jd); // Always returns OK
 #else
-                    return JDR_FMT1;                    /* Err: Nnot loaded */
+                    return JDR_FMT1;                    /* Err: Selected Huffman table not loaded */
 #endif
                 }
                 if (!jd->qttbl[jd->qtid[i]]) {          /* Check dequantizer table for this component */

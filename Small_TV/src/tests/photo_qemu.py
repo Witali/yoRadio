@@ -23,6 +23,7 @@ import weather_qemu as weather
 from jpeg_test_fixtures import gray_huffman_fixture
 from jpeg_header_fixtures import cases as header_cases, flat_jpeg
 from jpeg_header_http_contract import NAMES as HEADER_CASES
+from jpeg_selector_fixtures import upload_cases
 
 weather.vm = vm
 weather.wait_for = wait_for
@@ -56,6 +57,7 @@ image = archive / 'app.bin'
 elf = args.yoradio / '.build/small-tv-esp32c2/small_tv_reconstructed.elf'
 paths = [Path(__file__), Path(__file__).with_name('jpeg_test_fixtures.py'),
          Path(__file__).with_name('jpeg_header_fixtures.py'), Path(__file__).with_name('jpeg_header_http_contract.py'),
+         Path(__file__).with_name('jpeg_selector_fixtures.py'),
          Path(__file__).with_name('weather_qemu.py'), good_path]
 inputs = [{'file': path.relative_to(ROOT).as_posix(), 'sha256': vm.digest(path.read_bytes())} for path in paths]
 helpers = {name: vm.digest((args.qemu_root / 'tools' / name).read_bytes()) for name in
@@ -190,6 +192,18 @@ try:
         result['checks']['custom_component_ids_published'] = (
             metadata() == dict(exists=True, size=len(custom_component_ids)) and
             download(len(custom_component_ids)) == custom_component_ids)
+        result['selector_uploads'] = {}
+        for name, valid, data in upload_cases():
+            status = upload(data)
+            observed = metadata()
+            exact = valid and status == 200 and download(len(data)) == data
+            passed = (status == 200 and observed == dict(exists=True, size=len(data)) and exact) if valid else (
+                status == 400 and observed == dict(exists=False, size=0))
+            result['selector_uploads'][name] = dict(expected_valid=valid, finish_status=status,
+                metadata=observed, exact_download=bool(exact), fixture_bytes=len(data),
+                fixture_sha256=vm.digest(data), passed=passed)
+        result['checks']['selector_uploads_valid'] = all(row['passed'] for row in result['selector_uploads'].values() if row['expected_valid'])
+        result['checks']['selector_missing_rejected'] = all(row['passed'] for row in result['selector_uploads'].values() if not row['expected_valid'])
         if upload(good, retry_checks=True) != 200:
             raise AssertionError('Valid JPEG was rejected')
         result['checks']['valid_published'] = metadata() == dict(exists=True, size=len(good))

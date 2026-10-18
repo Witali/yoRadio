@@ -63,6 +63,7 @@
 | `fetch_weather` | Отклонение ответа с ошибочным HTTP-статусом вместо публикации его JSON как погоды |
 | `timezone_utc_offset`, `time_sync_task`, `factory_local_time` | Явные переходы IANA вместо неявных американских DST-правил; обновление смещения при переходе и безопасная обработка ошибки календаря |
 | `jpeg_decode_unlocked` | Восстановление byte-clipped IDCT оригинала; очистка только области изображения после ошибки декодирования JPEG, без изменения экрана при проверке и ошибке подготовки |
+| `jd_prepare`, `mcu_load` | `FIXED_FACTORY`: независимые DC/AC Huffman selectors из SOS для каждого компонента; ранний отказ при отсутствии выбранной таблицы, shared/swapped destinations0/1 разрешены по T.81 |
 | `create_qt_tbl`, `jd_prepare` | Некорректный DQT ID не маскируется до 0…3; SOF0 проверяет 8-битную точность, длину component payload и уникальность произвольных ID. DQT отклоняет нулевые коэффициенты; DRI/SOS требуют точную длину, baseline-параметры и соответствие компонент SOF/SOS. Подтверждённые factory acceptance bugs исправлены, IDCT/цвет не менялись |
 | `create_huffman_tbl` | Переполненные prefix trees отклоняются до декомпрессии, даже если entropy не использует невозможные ветви. 32-битный счётчик сохраняет поддержку разреженных 16-битных таблиц |
 | `photo_upload_active_unlocked`, `photo_upload_start`, `photo_upload_chunk`, `photo_upload_finish`, `photo_headers_safe` | Завершённость, границы и порядок загрузки, тайм-аут и требования к приватности фотографии |
