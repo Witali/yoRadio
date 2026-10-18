@@ -3008,8 +3008,9 @@ true. Это только начало нового прогона, не 24 ча
   все14 valid совпадают с factory по всему panel, включая arbitrary IDs0/17/255.
   Семь consumer rejection controls pass. Прежний JPEG inputs gate (41 +128DHT),
   новый133, public107 +35errors +7placements, host5531 и artifact6 pass.
-- Один и тот же photo HTTP harness на том же D64: before0592 принимает шесть
-  новых invalid header inputs, afterF1 возвращает400/absent; custom RGB IDs
+- Один и тот же photo HTTP harness на том же D64: before0592 принимает пять
+  из шести новых invalid header inputs (короткий DRI уже получает400),
+  afterF1 возвращает400/absent для всех шести; custom RGB IDs
  0/17/255, byte-exact download, retries, cold boot и interrupted replacement pass.
   В before false только header_fields_rejected; failed evidence сохраняется.
 - Gate включён в jpeg_inputs_oracle и оба publication consumers. Metadata
