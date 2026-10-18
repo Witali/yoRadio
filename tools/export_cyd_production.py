@@ -244,6 +244,9 @@ def qualify(root, build, dependencies, backend, snapshot, expected_config=None):
     require(config.get(BACKENDS[backend]) is True and
             all(config.get(key) is not True for name, key in BACKENDS.items() if name != backend),
             f'sdkconfig selected another audio backend; requested {backend}.')
+    require(type(config.get('LWIP_SNTP_MAX_SERVERS')) is int and
+            config['LWIP_SNTP_MAX_SERVERS'] >= 2,
+            'CYD time settings require CONFIG_LWIP_SNTP_MAX_SERVERS >= 2.')
     flash = re.fullmatch(r'(\d+)MB', str(config.get('ESPTOOLPY_FLASHSIZE', '')))
     require(flash is not None, 'Missing configured flash size.')
     flash_bytes = int(flash[1]) * 1024 * 1024
@@ -421,6 +424,41 @@ def seed_configuration(root, config, backend):
     return dict(result, mode='copied-cyd-full-config', source_path=str(seed), source_sha256=sha256(contents))
 
 
+def apply_time_capacity(config):
+    """Upgrade only an isolated build config to support both desired servers."""
+    if not config.is_file():
+        return {'minimum_servers': 2, 'mode': 'cyd-defaults', 'changed': False}
+    original = config.read_bytes()
+    text = original.decode('utf-8')
+    current = parse_sdkconfig(text.split('# Deprecated options for backward compatibility', 1)[0]).get('LWIP_SNTP_MAX_SERVERS')
+    require(current is None or (type(current) is int and current >= 1),
+            'Invalid CONFIG_LWIP_SNTP_MAX_SERVERS in isolated build configuration.')
+    result = {'minimum_servers': 2, 'previous': current, 'changed': current is None or current < 2}
+    if not result['changed']:
+        return result
+    newline = '\r\n' if b'\r\n' in original else '\n'
+    pattern = r'(?m)^(?:CONFIG_LWIP_SNTP_MAX_SERVERS=[^\r\n]*|# CONFIG_LWIP_SNTP_MAX_SERVERS is not set)\r?$'
+    replacement = 'CONFIG_LWIP_SNTP_MAX_SERVERS=2'
+    if re.search(pattern, text):
+        text = re.sub(pattern, replacement + ('\r' if newline == '\r\n' else ''), text)
+    else:
+        # Put a new current option before IDF's compatibility-only tail.
+        marker = '# Deprecated options for backward compatibility'
+        at = text.find(marker)
+        prefix, tail = (text[:at], text[at:]) if at >= 0 else (text, '')
+        text = prefix + ('' if not prefix or prefix.endswith('\n') else newline) + replacement + newline + tail
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='wb', dir=config.parent, prefix='.time-config-', delete=False) as output:
+            temporary = Path(output.name)
+            output.write(text.encode('utf-8'))
+        os.replace(temporary, config)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+    return result
+
+
 def build_production(root, dependencies, build, config, backend, variant, out, powershell, *,
                      allow_dirty=False, evidence=()):
     preflight(dependencies, backend)
@@ -442,6 +480,7 @@ def build_production(root, dependencies, build, config, backend, variant, out, p
     write_json(log_dir / 'source.json', snapshot)
     write_json(log_dir / 'command.json', command)
     config_seed = seed_configuration(root, config, backend)
+    config_seed['time_capacity'] = apply_time_capacity(config)
     write_json(log_dir / 'sdkconfig-seed.json', config_seed)
     stdout_path, stderr_path = log_dir / 'stdout.log', log_dir / 'stderr.log'
     environment = os.environ.copy()

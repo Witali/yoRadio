@@ -71,7 +71,8 @@ class Fixture:
             'idf_path': str(self.dependencies / 'v6.0.2'), 'c_compiler': str(self.compiler),
             'config_file': str(self.config), 'app_bin': self.image_path.name, 'app_elf': self.elf_path.name,
         }
-        self.settings = {'IDF_TARGET': 'esp32', 'IDF_TARGET_ARCH': 'xtensa', 'ESPTOOLPY_FLASHSIZE': '4MB'}
+        self.settings = {'IDF_TARGET': 'esp32', 'IDF_TARGET_ARCH': 'xtensa', 'ESPTOOLPY_FLASHSIZE': '4MB',
+                         'LWIP_SNTP_MAX_SERVERS': 2}
         self.backend('pdm')
         (self.project / 'sdkconfig.defaults').write_bytes(self.config.read_bytes())
         (self.project / 'sdkconfig.dac.defaults').write_text('CONFIG_YORADIO_NATIVE_AUDIO_OUTPUT_DAC=y\n')
@@ -482,6 +483,53 @@ class ProductionTests(unittest.TestCase):
         result = production.seed_configuration(self.fixture.root, self.fixture.config, 'pdm')
         self.assertEqual(result['mode'], 'existing-isolated-config')
         self.assertEqual(self.fixture.config.read_bytes(), original)
+
+    def test_time_capacity_upgrade_preserves_other_tuning_and_is_idempotent(self):
+        self.fixture.settings['LWIP_SNTP_MAX_SERVERS'] = 1
+        self.fixture.write_config()
+        original = self.fixture.config.read_bytes()
+        seed = self.fixture.project / 'sdkconfig'
+        seed.write_bytes(original)
+        result = production.apply_time_capacity(self.fixture.config)
+        expected = original.replace(b'CONFIG_LWIP_SNTP_MAX_SERVERS=1', b'CONFIG_LWIP_SNTP_MAX_SERVERS=2')
+        self.assertTrue(result['changed'])
+        self.assertEqual(result['previous'], 1)
+        self.assertEqual(self.fixture.config.read_bytes(), expected)
+        self.assertEqual(seed.read_bytes(), original)
+        self.assertFalse(production.apply_time_capacity(self.fixture.config)['changed'])
+        self.assertEqual(self.fixture.config.read_bytes(), expected)
+
+    def test_time_capacity_missing_option_and_larger_existing_budget(self):
+        self.fixture.settings.pop('LWIP_SNTP_MAX_SERVERS')
+        self.fixture.write_config()
+        result = production.apply_time_capacity(self.fixture.config)
+        self.assertTrue(result['changed'])
+        config = self.fixture.config.read_text()
+        self.assertLess(config.index('CONFIG_LWIP_SNTP_MAX_SERVERS=2'),
+                        config.index('# Deprecated options for backward compatibility'))
+        self.fixture.settings['LWIP_SNTP_MAX_SERVERS'] = 3
+        self.fixture.write_config()
+        original = self.fixture.config.read_bytes()
+        self.assertFalse(production.apply_time_capacity(self.fixture.config)['changed'])
+        self.assertEqual(self.fixture.config.read_bytes(), original)
+        self.fixture.config.unlink()
+        self.assertEqual(production.apply_time_capacity(self.fixture.config)['mode'], 'cyd-defaults')
+        self.assertFalse(self.fixture.config.exists())
+
+    def test_export_rejects_time_configuration_that_cannot_apply_default_servers(self):
+        self.fixture.settings['LWIP_SNTP_MAX_SERVERS'] = 1
+        self.fixture.write_config()
+        self.reject('SNTP_MAX_SERVERS >= 2')
+
+    def test_time_capacity_failed_replacement_keeps_previous_config(self):
+        self.fixture.settings['LWIP_SNTP_MAX_SERVERS'] = 1
+        self.fixture.write_config()
+        original = self.fixture.config.read_bytes()
+        with patch.object(production.os, 'replace', side_effect=OSError('fixture replace failure')):
+            with self.assertRaisesRegex(OSError, 'fixture replace failure'):
+                production.apply_time_capacity(self.fixture.config)
+        self.assertEqual(self.fixture.config.read_bytes(), original)
+        self.assertEqual(list(self.fixture.config.parent.glob('.time-config-*')), [])
 
     def test_clean_clone_without_full_config_uses_only_cyd_backend_defaults(self):
         self.fixture.config.unlink()

@@ -15,7 +15,11 @@ Use `continuous` for the native DAC continuous driver, or `legacy` for the
 ESP-IDF 5.5 legacy I2S/DAC driver embedded in the pinned CYD project. Each
 backend defaults to its own `build-production-<backend>/sdkconfig` and preserves
 the corresponding CYD defaults selected by the existing `build.ps1`.
-An existing isolated config is never overwritten. When it is missing, the
+An existing isolated config is never replaced by another profile. The wrapper
+raises `CONFIG_LWIP_SNTP_MAX_SERVERS` to at least two so the new default time
+settings can actually be applied, and records this change in the manifest.
+All other tuning remains intact. Export rejects an image configured for fewer
+than two servers. When the isolated config is missing, the
 wrapper seeds it from the corresponding CYD `sdkconfig`, `sdkconfig.dac`, or
 `sdkconfig.legacy-dac` full profile if available. A clean clone without those
 generated full configs uses CYD defaults and the backend overlay. The seed path,
