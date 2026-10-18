@@ -97,6 +97,8 @@ static FILE *test_fopen(const char *path, const char *mode) {
     assert(!strncmp(path,"/spiffs/",8));char actual[1024];
     snprintf(actual,sizeof(actual),"%s/%s",fixture_root,path+8);return fopen(actual,mode);
 }
+// The storage publication/open mutex is exercised in the upload suite.
+static FILE *web_upload_open_file(const char *path) { return test_fopen(path,"rb"); }
 static int test_ferror(FILE *file) { return fail_read || ferror(file); }
 static size_t test_fread(void *data, size_t size, size_t count, FILE *file) {
     if (ferror(file) || feof(file) || (fail_read && read_calls)) ++invalid_reads;
@@ -135,6 +137,8 @@ int main(int argc, char **argv) {
     assert(web_static_start()==ESP_ERR_INVALID_STATE);
     serve("/",0);assert(!strcmp(body,"embedded native page") && !strcmp(cache,"no-store"));
     serve("/settings.html?test=1",0);assert(!strcmp(body,"embedded native page"));
+    serve("/webboard",0);assert(!strcmp(body,"embedded native page"));
+    serve("/emergency?recover=1",0);assert(!strcmp(body,"embedded native page"));
     serve("/theme.css",0);assert(!strcmp(body,"raw css") && !strcmp(type,"text/css; charset=utf-8") && !*encoding);
     serve("/empty.js",0);assert(!strcmp(body,"compressed") && !strcmp(encoding,"gzip"));
     serve("/empty.js.gz",0);assert(!strcmp(type,"application/javascript; charset=utf-8") && !strcmp(encoding,"gzip"));

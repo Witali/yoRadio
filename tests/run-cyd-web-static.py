@@ -24,7 +24,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     files = [Path(__file__), ROOT/'tests/native/cyd_web_static_test.c', ROOT/'tests/native/cyd_web_start_test.c',
              ROOT/'tests/cyd-native-page.test.js', MAIN/'web_static.c', MAIN/'web_static.h',
-             MAIN/'web_pages.cpp', MAIN/'web_pages.h', MAIN/'web_service.c',
+             MAIN/'web_pages.cpp', MAIN/'web_pages.h', MAIN/'web_service.c', MAIN/'web_upload.h', MAIN/'web_reboot.h',
              ROOT/'tests/run-cyd-lifecycle.py', ROOT/'idf/components/native_stream/include/json_buffer.h']
     hashes = {}
     for path in files:
@@ -65,7 +65,11 @@ def main():
         (out/'start.log').write_bytes(start_log)
         caps = json.loads(next(line.split('=',1)[1] for line in start_log.decode().splitlines() if line.startswith('CAPABILITIES=')))
         assert caps['audio_output'] == 'PDM "test"' and caps['websocket_clients'] == 2
-        assert all(caps[name] is False for name in ('ota','equalizer','sd','display_controls','wifi_profiles','playlist_upload'))
+        assert all(caps[name] is False for name in ('ota','equalizer','sd','display_controls','wifi_profiles'))
+        assert all(caps[name] is True for name in ('playlist_upload','asset_upload','wifi_upload'))
+        assert caps['upload_max_bytes'] == 98304 and caps['upload_max_files'] == 16
+        assert caps['upload_name_max_bytes'] == 22 and caps['wifi_file_max_bytes'] == 799
+        assert caps['wifi_body_max_bytes'] == 4096 and caps['wifi_ssid_max_bytes'] == 31 and caps['wifi_password_max_bytes'] == 63
         page = subprocess.check_output(['node','--test',str(ROOT/'tests/cyd-native-page.test.js')], stderr=subprocess.STDOUT)
         (out/'page.log').write_bytes(page)
     except subprocess.CalledProcessError as error:

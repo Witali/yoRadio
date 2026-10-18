@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,6 +32,7 @@
 #include "web_pages_bridge.h"
 #include "web_ota.h"
 #include "web_upload.h"
+#include "native_web_transport.h"
 #include "websocket_service.h"
 
 #define WEB_MAX_OPEN_SOCKETS 7
@@ -548,13 +550,26 @@ static esp_err_t sleep_guarded_recovery_wifi_handler(httpd_req_t *request) {
     return with_awake_request(request, web_wifi_upload_handler);
 }
 
+static atomic_bool s_started;
+
+static void abort_static_startup(void) {
+    // No HTTP listener existed, so workers cannot own requests yet.
+    for (size_t i = 0; i < CONFIG_YORADIO_WEB_STATIC_WORKERS; ++i) {
+        if (s_static_worker_tasks[i]) vTaskDelete(s_static_worker_tasks[i]);
+        s_static_worker_tasks[i] = NULL;
+    }
+    if (s_static_request_queue) vQueueDelete(s_static_request_queue);
+    s_static_request_queue = NULL;
+}
+
 esp_err_t web_service_start(native_state_t *state) {
+    if (!state || !state->lock) return ESP_ERR_INVALID_ARG;
+    bool expected = false;
+    if (!atomic_compare_exchange_strong(&s_started, &expected, true)) return ESP_ERR_INVALID_STATE;
     s_state = state;
     esp_fill_random(&s_health_boot_id, sizeof(s_health_boot_id));
-    ESP_RETURN_ON_ERROR(web_upload_storage_init(), TAG,
-                        "initialize web file transactions");
-    ESP_RETURN_ON_ERROR(start_static_workers(), TAG,
-                        "start static content workers");
+    esp_err_t result = web_upload_storage_init();
+    if (result != ESP_OK) goto unprepared;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.stack_size = 8192; // Upload payload is a bounded, temporary heap buffer.
     // Browsers commonly fetch six assets in parallel. Keep those connections
@@ -566,8 +581,17 @@ esp_err_t web_service_start(native_state_t *state) {
     config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
     config.uri_match_fn = httpd_uri_match_wildcard;
     httpd_handle_t server = NULL;
-    ESP_RETURN_ON_ERROR(httpd_start(&server, &config), TAG,
-                        "HTTP server start failed");
+    result = native_web_transport_prepare(&config);
+    if (result != ESP_OK) goto unprepared;
+    result = start_static_workers();
+    if (result != ESP_OK) goto release_transport;
+    result = httpd_start(&server, &config);
+    if (result != ESP_OK) {
+        abort_static_startup();
+        goto release_transport;
+    }
+    // Once HTTPD is live, retain its workers/transport on a route failure.
+    // C3's producer lifetime has no stop API; prevent a second partial start.
     httpd_uri_t status = {
         .uri = "/api/native/status",
         .method = HTTP_GET,
@@ -670,6 +694,11 @@ esp_err_t web_service_start(native_state_t *state) {
         state->web_ready = true;
         xSemaphoreGive(state->lock);
     }
-    ESP_LOGI(TAG, "Native HTTP server started");
+    ESP_LOGI(TAG, "Native %s server started", native_web_transport_secure() ? "HTTPS" : "HTTP");
     return ESP_OK;
+release_transport:
+    if (native_web_transport_release() != ESP_OK) return result;
+unprepared:
+    atomic_store(&s_started, false);
+    return result;
 }

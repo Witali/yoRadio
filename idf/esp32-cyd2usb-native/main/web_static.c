@@ -10,6 +10,7 @@
 #include "freertos/task.h"
 #include "lwip/sockets.h"
 #include "web_pages.h"
+#include "web_upload.h"
 
 #define STATIC_QUEUE_DEPTH 2
 #define STATIC_STACK_BYTES (3072 + CONFIG_YORADIO_WEB_FILE_CHUNK_BYTES)
@@ -31,7 +32,7 @@ static const char *content_type(const char *path) {
 }
 
 static FILE *open_nonempty(const char *path) {
-    FILE *file = fopen(path, "rb");
+    FILE *file = web_upload_open_file(path);
     if (file && (fgetc(file) == EOF || fseek(file, 0, SEEK_SET))) {
         fclose(file);
         file = NULL;
@@ -56,7 +57,8 @@ static esp_err_t serve_static(httpd_req_t *request) {
     }
     httpd_resp_set_hdr(request, "Connection", "close");
     if (!strcmp(uri, "/") || !strcmp(uri, "/index.html") ||
-        !strcmp(uri, "/settings.html")) {
+        !strcmp(uri, "/settings.html") || !strcmp(uri, "/webboard") ||
+        !strcmp(uri, "/emergency")) {
         httpd_resp_set_type(request, "text/html; charset=utf-8");
         httpd_resp_set_hdr(request, "Cache-Control", "no-store");
         return httpd_resp_sendstr(request, web_native_page());

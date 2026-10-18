@@ -22,7 +22,12 @@ enum { ESP_OK=0,ESP_ERR_INVALID_ARG=-1,ESP_ERR_INVALID_STATE=-2,ESP_FAIL=-3,
 static void *httpd_uri_match_wildcard=(void *)1;
 static unsigned allocations, aborted, activated, server_live, route_calls, fail_route;
 static unsigned ws_registered,ws_running,stop_calls,server_stopped,server_resets;
-static int fail_static,fail_server,fail_ws_register,fail_ws_start,fail_ws_stop;
+static int fail_static,fail_server,fail_ws_register,fail_ws_start,fail_ws_stop,fail_server_stop;
+static int fail_storage,fail_reboot,fail_reboot_abort;
+static bool storage_ready,reboot_ready,upload_active;
+static unsigned reboot_aborted;
+static int fail_transport,fail_transport_release;
+static bool transport_prepared;
 static native_state_t *s_state;
 static uint64_t s_health_boot_id;
 static char body[1024];
@@ -34,7 +39,15 @@ static int httpd_resp_set_type(httpd_req_t *r,const char *v) { (void)r;assert(st
 static int httpd_resp_set_hdr(httpd_req_t *r,const char *k,const char *v) { (void)r;assert(!strcmp(k,"Cache-Control") && !strcmp(v,"no-store"));return 0; }
 static int httpd_resp_sendstr(httpd_req_t *r,const char *v) { (void)r;snprintf(body,sizeof(body),"%s",v);return 0; }
 static int httpd_resp_send_err(httpd_req_t *r,int code,const char *v) { (void)r;(void)code;(void)v;return -1; }
-static int web_static_start(void) { if(fail_static)return fail_static;allocations++;return 0; }
+static int network_service_storage_init(void) { if(fail_storage)return fail_storage;storage_ready=true;return 0; }
+static int web_reboot_start(void) { assert(storage_ready);if(fail_reboot)return fail_reboot;reboot_ready=true;return 0; }
+static int web_reboot_abort(void) { assert(!upload_active);if(fail_reboot_abort)return fail_reboot_abort;reboot_ready=false;reboot_aborted++;return 0; }
+static void web_upload_activate(void) { assert(reboot_ready && server_live && ws_running && route_calls==14);upload_active=true; }
+static void web_upload_deactivate(void) { upload_active=false; }
+static int native_web_transport_prepare(httpd_config_t *config) { assert(config->max_open_sockets==5 && reboot_ready);if(fail_transport)return ESP_FAIL;transport_prepared=true;return 0; }
+bool native_web_transport_secure(void) { return false; }
+static int native_web_transport_release(void) { assert(!server_live);if(fail_transport_release)return ESP_FAIL;transport_prepared=false;return 0; }
+static int web_static_start(void) { assert(storage_ready && reboot_ready);if(fail_static)return fail_static;allocations++;return 0; }
 static void web_static_abort(void) { assert(!activated && !server_live);aborted++;allocations--; }
 static void web_static_activate(void) { assert(server_live && ws_running);activated++; }
 static int httpd_start(void **server,const httpd_config_t *config) {
@@ -43,7 +56,7 @@ static int httpd_start(void **server,const httpd_config_t *config) {
     if(fail_server)return fail_server;
     server_live++;*server=(void *)1;return 0;
 }
-static int httpd_stop(void *server) { assert(server && server_live && !ws_running);server_live--;server_stopped++;return 0; }
+static int httpd_stop(void *server) { assert(server && server_live && !ws_running);if(fail_server_stop)return ESP_FAIL;server_live--;server_stopped++;return 0; }
 static int httpd_register_uri_handler(void *server,const httpd_uri_t *route) {
     assert(server && route->handler && route->uri);
     if(!strcmp(route->uri,"/*"))assert(ws_registered);
@@ -61,6 +74,7 @@ static int websocket_service_server_stopped(void *server) { assert(server && !se
 HANDLER(status_handler) HANDLER(health_handler) HANDLER(reconnect_handler)
 HANDLER(radio_handler) HANDLER(play_handler) HANDLER(stop_handler) HANDLER(settings_handler)
 HANDLER(web_static_handler)
+HANDLER(web_upload_handler) HANDLER(web_board_upload_handler) HANDLER(web_wifi_upload_handler)
 #include "web-start.inc"
 
 static native_state_t state={.lock=(void *)1};
@@ -69,27 +83,44 @@ static void reset(void) {
     allocations=aborted=activated=server_live=route_calls=ws_registered=ws_running=0;
     stop_calls=server_stopped=server_resets=fail_route=0;
     fail_static=fail_server=fail_ws_register=fail_ws_start=fail_ws_stop=0;
+    fail_server_stop=0;
+    fail_storage=fail_reboot=fail_reboot_abort=0;
+    storage_ready=reboot_ready=upload_active=false;reboot_aborted=0;
+    fail_transport=fail_transport_release=0;transport_prepared=false;
 }
 static void assert_failure(void) {
     assert(web_service_start(&state)==ESP_FAIL);
-    assert(!atomic_load(&s_started) && !state.web_ready && !server_live && !allocations && !activated && !ws_running);
+    assert(!atomic_load(&s_started) && !state.web_ready && !server_live && !allocations && !activated && !ws_running && !upload_active && !reboot_ready && !transport_prepared);
     assert(aborted==1);
 }
 int main(void) {
     assert(web_service_start(NULL)==ESP_ERR_INVALID_ARG);
     native_state_t invalid={0};assert(web_service_start(&invalid)==ESP_ERR_INVALID_ARG);
-    reset();fail_static=ESP_FAIL;assert(web_service_start(&state)==ESP_FAIL && !allocations && !aborted);
+    reset();fail_storage=ESP_FAIL;assert(web_service_start(&state)==ESP_FAIL && !allocations && !reboot_ready && !atomic_load(&s_started));
+    reset();fail_reboot=ESP_FAIL;assert(web_service_start(&state)==ESP_FAIL && !allocations && !aborted && !atomic_load(&s_started));
+    reset();fail_static=ESP_FAIL;assert(web_service_start(&state)==ESP_FAIL && !allocations && !aborted && !reboot_ready && reboot_aborted==1);
     reset();fail_server=ESP_FAIL;assert_failure();assert(!server_stopped && !server_resets);
-    for(unsigned i=1;i<=11;++i) { reset();fail_route=i;assert_failure();assert(server_stopped==1 && server_resets==1); }
+    reset();fail_transport=ESP_FAIL;assert_failure();assert(!server_live);
+    for(unsigned i=1;i<=14;++i) { reset();fail_route=i;assert_failure();assert(server_stopped==1 && server_resets==1); }
     reset();fail_ws_register=ESP_FAIL;assert_failure();assert(server_resets==1);
     reset();fail_ws_start=ESP_FAIL;assert_failure();
     reset();assert(web_service_start(&state)==ESP_OK);
-    assert(atomic_load(&s_started) && state.web_ready && allocations==1 && server_live==1 && activated==1 && route_calls==11);
+    assert(atomic_load(&s_started) && state.web_ready && allocations==1 && server_live==1 && activated==1 && route_calls==14 && upload_active && reboot_ready);
     assert(web_service_start(&state)==ESP_ERR_INVALID_STATE);
     httpd_req_t request={0};assert(capabilities_handler(&request)==ESP_OK);printf("CAPABILITIES=%s\n",body);
     reset();fail_ws_start=ESP_FAIL;fail_ws_stop=ESP_FAIL;
     assert(web_service_start(&state)==ESP_FAIL && server_live && allocations && !activated);
     assert(atomic_load(&s_started) && !server_stopped && !server_resets && !aborted);
+    assert(reboot_ready && !upload_active);
+    reset();fail_route=2;fail_server_stop=ESP_FAIL;
+    assert(web_service_start(&state)==ESP_FAIL && server_live && allocations && reboot_ready && atomic_load(&s_started));
+    assert(!upload_active && !server_stopped && !server_resets && !aborted && !reboot_aborted);
+    assert(transport_prepared);
+    reset();fail_route=2;fail_transport_release=ESP_FAIL;
+    assert(web_service_start(&state)==ESP_FAIL && !server_live && allocations && reboot_ready && atomic_load(&s_started));
+    assert(server_resets==1 && !aborted && !reboot_aborted && transport_prepared);
+    reset();fail_server=ESP_FAIL;fail_reboot_abort=ESP_FAIL;
+    assert(web_service_start(&state)==ESP_FAIL && !server_live && !allocations && reboot_ready && atomic_load(&s_started));
     puts("PASS HTTP startup: invalid state, every route failure, WS/worker/server rollback, duplicate start, retained resources on stop timeout");
     return 0;
 }
