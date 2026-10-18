@@ -2745,3 +2745,21 @@ true. Это только начало нового прогона, не 24 ча
   31runtime+11frozenQEMU hashes проверены; file-only diagnostic/start binding pass.
   Start proof network-roles-runtime-start-20261018.json +2rawsnapshots. Никакой
   24h/полной приёмки пока нет. Оба full controller2448/28968 также живы.
+
+## 18 октября 2026 — повторяемая проверка SDK netif
+
+- В отдельной codex/small-tv-netif-observer отfe592a8b создан read-only observer:
+  factory addresses связаны с dump5321; native layout читается из совпадающего
+  ELF/DWARF. Ограничены pointer/key reads, list size; ошибки не подменяются пустым
+  успешным результатом. Production C и build26C6 не менялись.
+- Первый probe отверг NVS blob_index, второй ошибочно требовал SDK FLASH SSID
+  и от native WIFI_STORAGE_RAM. Неуспешные отчёты сохранены. Уточнена фикстура:
+  factory STA сам записывает public driver NVS, обе setup VM получают эту
+  проверенную NVS partition; далее меняется только raw mode=2. Код/RAM не патчатся.
+- Финальный v3 прошёл четыре потока: factory/native STA и setup, HTTP страницы,
+  retained SSID+AP-info CRC, APSTA `/scan`, netif до/после, неизменные code/media,
+  clean UART. Прежняя native6324 с теми же observer bytes/B44 упала на двух
+  интерфейсах в STA, что подтверждает обнаружение исправляемого расхождения.
+- 7offline observer tests и17evidence mutations pass. Новый gate обязателен
+  в suite/publisher;27inputs runtime reports совпали. Старые frozen full runs
+  остаются в прежнем объёме, никакой полный pass новой test revision не заявлен.

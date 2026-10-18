@@ -435,6 +435,32 @@ python Small_TV/src/tests/startup_qemu.py --dependency-root C:/Work/yoRadio `
 событий/регистров/RAM; code/media остаются прежними. Общий contract23negative
 controls используется suite/publisher/verifier. Это проверка QEMU, не физического RF.
 
+`netif_roles_qemu.py` входит в `qemu_suite.py` и проверяет реальные списки
+ESP-NETIF: ровно `WIFI_STA_DEF` в станции и `WIFI_AP_DEF` в setup, в том числе
+после HTTP `/scan`. Сначала заводской SDK создаёт синтетические credentials
+`yoRadio-QEMU` при настоящем подключении. Его NVS используется в обеих setup
+фикстурах; остальные байты станции сохраняются, затем меняется только raw mode.
+В native драйвере используется RAM storage, поэтому собственные дубли SSID в
+SDK NVS не требуются. Парсер ESP-IDF5.5.4 из `--dependency-root/.idf/v5.5.4`
+подтверждает namespace/SSID/AP-info и CRC; пользовательский NVS не используется.
+
+Заводские адреса связаны с SHA полного dump и assembly в
+`src/reference/assembly/netif-20261018`; native символы/смещения берутся из
+DWARF ELF, связанного с `app.bin`. `netif_observer.py` ограничивает чтение
+RAM/DROM, обнаруживает циклы, плохие указатели/ключи и лишние интерфейсы.
+Семь offline tests и17 evidence rejection controls обязательны в suite/publisher.
+Самостоятельный запуск из репозитория с нужным SDK/ELF:
+
+```powershell
+python -X utf8 Small_TV/src/tests/netif_roles_qemu.py `
+  --qemu-root C:/Work/QEMU-ESP32 --dependency-root C:/Work/yoRadio `
+  --output .build/netif-roles-new
+```
+
+Проверено на B44: четыре реальных потока прошли; прежний app6324 тем же
+наблюдателем отвергнут за AP+STA в станции. Это ограниченная role/scan проверка,
+не полная приёмка и не длительный memory trend.
+
 В интегрированном [исправлении offline clock](../../qemu/parity/offline-clock-checks.md)
 устранены остановка активной темы и подмена IP при потере Wi-Fi.
 `clock_offline_dst_*` и `clock_offline_photo` проходят с production C и SDK

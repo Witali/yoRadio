@@ -11,6 +11,7 @@ from http_body_contract import contract_rejection_checks
 from concurrency_contract import contract_rejection_checks as concurrency_rejections
 from boot_state_contract import validate_boot_state, rejection_checks as boot_rejections
 from wifi_fallback_contract import rejection_checks as wifi_wait_rejections
+from netif_roles_contract import rejection_checks as netif_role_rejections
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -54,6 +55,9 @@ def main():
         from time_capture_test import run_tests as calendar_observation_tests
         report['date_capture_unit'] = calendar_observation_tests()
         check(report['date_capture_unit']['passed'], 'Calendar observation deadline tests failed')
+        from netif_observer_test import run_tests as netif_observer_tests
+        report['netif_observer_unit'] = netif_observer_tests()
+        check(report['netif_observer_unit']['passed'], 'Netif pointer/role observation tests failed')
         unit_path = args.output / 'boot-observer-unit.json'
         subprocess.run([sys.executable, str(args.qemu_root / 'tests/esp_elf_test.py'),
                         '--output', str(unit_path), '--temp-root', str(args.output / 'boot-observer-unit-temp')], check=True)
@@ -70,7 +74,7 @@ def main():
             'observer_test_sha256': inputs['boot_observer_test_sha256']}
         validate_boot_state(report, expected_boot)
         report['boot_observer_contract_checks'] = boot_rejections(report, expected_boot)
-        for name, key in (('wifi_fallback', 'wifi_fallback_http'), ('startup', 'startup_wait'), ('weather_wait', 'weather_wait'),
+        for name, key in (('wifi_fallback', 'wifi_fallback_http'), ('netif_roles', 'netif_roles_http'), ('startup', 'startup_wait'), ('weather_wait', 'weather_wait'),
                           ('advanced', 'advanced_http'), ('http_body', 'body_http'), ('concurrency', 'concurrency_http'),
                           ('uri_targets', 'uri_targets_http'), ('photo', 'photo_http'), ('photo_frames', 'photo_frames'),
                           ('photo_brightness', 'photo_brightness'), ('photo_controls', 'photo_controls'),
@@ -83,13 +87,22 @@ def main():
                        '--qemu-root', str(args.qemu_root), '--output', str(folder)]
             if name in ('http_body', 'concurrency'):
                 command += ['--yoradio', str(ROOT), '--dependency-root', str(ROOT)]
-            elif name == 'wifi_fallback':
+            elif name in ('wifi_fallback', 'netif_roles'):
                 command += ['--dependency-root', str(ROOT)]
             process = subprocess.run(command)
             result = json.loads((folder / 'report.json').read_text(encoding='utf-8-sig'))
             report[key] = result
             check(process.returncode == 0 and result['passed'] and result['inputs_unchanged'],
                   name + ': actual guest regression failed')
+            if name == 'netif_roles':
+                archive = ROOT / 'firmware/development/small-tv-esp32c2-reconstructed'
+                manifest = json.loads((archive / 'manifest.json').read_text())
+                result['contract_checks'] = netif_role_rejections(result, {
+                    'app_sha256': hashlib.sha256((archive / 'app.bin').read_bytes()).hexdigest(),
+                    'source_sha256': manifest['source_sha256'], 'qemu_sha256': inputs['qemu_sha256'],
+                    'native_elf_sha256': hashlib.sha256((ROOT / '.build/small-tv-esp32c2/small_tv_reconstructed.elf').read_bytes()).hexdigest(),
+                    'test_sha256': {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
+                                    for name in ('netif_roles_qemu.py', 'netif_observer.py', 'wifi_fallback_qemu.py')}})
             if name == 'wifi_fallback':
                 archive = ROOT / 'firmware/development/small-tv-esp32c2-reconstructed'
                 manifest = json.loads((archive / 'manifest.json').read_text())

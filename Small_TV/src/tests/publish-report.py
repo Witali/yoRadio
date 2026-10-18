@@ -11,6 +11,7 @@ from http_body_contract import validate_http_body, validate_http_body_guards
 from concurrency_contract import validate_concurrency, validate_concurrency_guards
 from boot_state_contract import validate_boot_state, validate_boot_rejections
 from wifi_fallback_contract import validate_wifi_fallback, validate_wifi_fallback_guards
+from netif_roles_contract import validate_netif_roles, rejection_checks as netif_role_rejections
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -98,6 +99,18 @@ def main():
         'native_elf_sha256':text['native_elf_sha256'],
         'test_sha256':hashlib.sha256((ROOT/'Small_TV/src/tests/wifi_fallback_qemu.py').read_bytes()).hexdigest()})
     validate_wifi_fallback_guards(wifi_wait)
+    netif_roles = qemu['netif_roles_http']
+    netif_expected = {'app_sha256': report['app_sha256'], 'source_sha256': report['source_sha256'],
+        'qemu_sha256': qemu['qemu_sha256'], 'native_elf_sha256': text['native_elf_sha256'],
+        'test_sha256': {name: hashlib.sha256((ROOT / 'Small_TV/src/tests' / name).read_bytes()).hexdigest()
+                        for name in ('netif_roles_qemu.py', 'netif_observer.py', 'wifi_fallback_qemu.py')}}
+    validate_netif_roles(netif_roles, netif_expected)
+    if (netif_roles['contract_checks'] != netif_role_rejections(netif_roles, netif_expected) or
+            qemu['netif_observer_unit'] != {'passed': True, 'tests': 7}):
+        raise ValueError('Missing netif observer/evidence rejection checks')
+    for filename, expected in netif_roles['inputs_sha256'].items():
+        if hashlib.sha256(Path(filename).read_bytes()).hexdigest() != expected:
+            raise ValueError('Netif input changed after execution: ' + Path(filename).name)
     profile = groups['qemu_profile']['result']
     for row in profile['inputs']:
         if hashlib.sha256((ROOT / row['file']).read_bytes()).hexdigest() != row['sha256']:
@@ -338,6 +351,7 @@ def main():
     qemu_sources.append(reinit_http['flows']['reconstructed']['sources'])
     qemu_sources.extend(flow['sources'] for flow in photo_settings['flows']['reconstructed'].values())
     qemu_sources.append(advanced['sources'])
+    qemu_sources.extend(netif_roles['flows']['reconstructed-' + role]['sources'] for role in ('station', 'setup'))
     for sources in qemu_sources:
         app_image = next(row for row in sources['images'] if row['file'] == 'app.bin')
         if app_image['sha256'] != report['app_sha256'] or sources['source_sha256'] != report['source_sha256']:
@@ -407,6 +421,8 @@ def main():
                        'inputs_unchanged': qemu['inputs_unchanged'],
                        'startup_wait': startup,
                        'wifi_fallback_http': wifi_wait,
+                       'netif_roles_http': netif_roles,
+                       'netif_observer_unit': qemu['netif_observer_unit'],
                        'weather_wait': held_weather,
                        'photo_http': photo,
                        'photo_frames': frames,

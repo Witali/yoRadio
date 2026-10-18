@@ -5,6 +5,28 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
+## Повторяемый netif gate — 2026-10-18
+
+Активная новая ветка codex/small-tv-netif-observer в одноимённой .worktree,
+basefe592a8b. Production C и development archive26C6 не менялись. Добавлены
+netif_observer.py, netif_roles_qemu.py и общий evidence contract; suite/publisher
+теперь требуют этот gate. Native head/node/if_key/settings берутся из DWARF
+текущего ELF, factory addresses привязаны к dump5321 и прежним assembly exports.
+
+Реальные factory/native STA+setup-with-retained-credentials потоки прошли,
+setup HTTP scan сохраняет единственный AP netif. Factory STA создаёт собственные
+публичные credentials; его NVS скопирован в обе setup fixtures. Native использует
+WIFI_STORAGE_RAM и сам не пишет sta.ssid/sta.apinfo, поэтому требование одинаковых
+SDK write side effects было ошибочным для этой ограниченной netif проверки.
+Raw failed v1/v2 probes сохранены в .build, успешный v3 отдельно. NVS-парсер5.5.4
+проверяет CRC header/data и два публичных payload; никакой owner NVS не копируется.
+
+Negative app6324 на том же B44 и byte-identical observer воспроизвёл AP+STA в
+station. Исправленная26C6 имеет ровно STA или AP;27inputs каждого report неизменны.
+7offline observer tests и17evidence rejections прошли. Интеграция в общий suite
+добавлена здесь; два уже идущих frozen full run не получают новый gate задним
+числом. Их входы и H10 не менять; полный автоматический acceptance пока pending.
+
 ## H10 replacement запущен — 2026-10-18
 
 Intent был закоммичен f97d8739 до stop. В11:13:48 UTC через повторно проверенный
