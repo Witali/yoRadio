@@ -8,6 +8,7 @@
 #include "native_state.h"
 #include "audio_completion.h"
 #include "stream_probe.h"
+#include "stream_bitrate.h"
 #include "native_health.h"
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
 #include "adaptive_input.h"

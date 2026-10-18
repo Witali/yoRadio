@@ -6,7 +6,9 @@ in the existing status API. The public AAC API establishes PCM layout, so its
 description explicitly says `AAC PCM`; it does not claim nominal HE/PS layout.
 Custom legacy callbacks refresh layout on every callback instead of retaining
 the first rate/channel count. ICY hints never outrank decoder or measured data.
-Actual measured-rate collection is a subsequent part of the same plan item.
+The common bounded meter now collects delivered audio throughput over five
+seconds. CYD invokes it after ICY stripping and accepted audio routing; measured
+updates take precedence under the same generation/state mutex.
 
 Output failure is latched under the generation/state mutex, keeping a late
 decoder callback from restoring playback. Decoder errors still drain already
@@ -28,3 +30,12 @@ about a failure observed on a physical board or inside a vendor decoder.
 The campaigns execute actual production functions with host SDK/RTOS seams and
 ASan/UBSan. Source snapshots and hashes are preserved. Pinned SDK builds and
 physical audio acceptance remain separate gates.
+
+The [portable meter tests](meter/report.json) cover a zero clock epoch, exact
+window boundary, independent transport instances, clock reversal, rounding,
+widest accepted bitrate and counter bounds. The expanded
+[HTTP suite](measured-http/report.json) passes 51 stream scenarios. Its two
+timed cases produce identical encoded audio and 2 kbps estimates with and
+without heavy ICY metadata; counting all wire bytes would yield 6 kbps in the
+metadata case. These deterministic rates qualify accounting, not a live station
+measurement or nominal codec bitrate.

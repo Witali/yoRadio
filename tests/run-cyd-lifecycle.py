@@ -113,6 +113,7 @@ size_t strlcpy(char *, const char *, size_t);
             for p in [Path(__file__), ROOT/'tests/native/cyd_lifecycle_test.c',
                       ROOT/'idf/components/native_stream/include/audio_completion.h',
                       ROOT/'idf/components/native_stream/include/adaptive_input.h',
+                      ROOT/'idf/components/native_stream/include/stream_bitrate.h',
                       MAIN/'input_prefill.h',
                       MAIN/'native_health.h',
                       *[MAIN/name for name in ('audio_service.c','native_state.c','native_state.h',

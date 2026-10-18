@@ -66,7 +66,7 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-03 | Программная часть выполнена | CYD подключён к continuous MP3/ADTS confirmation, ID3 stripping/recovery и ordered codec drain. 34 corpus cases обеих целей, byte-exact переходы и шесть lifecycle вариантов проходят. PDM/continuous/legacy CYD и C3 source `8bf1d73a` собраны и сохранены. Физическая приёмка отдельно. |
 | CYD-C3-04 | Программная часть выполнена | Общая SMP-очередь leases/control/tail, бюджет 8 slots, минимум 4 и независимый control node подключены. Default-off bounded prefill проверен host-тестами и GCC/clang-tidy профилем 250 ms; image source `112c871f` сохранён. Физическая приёмка и выбор ёмкости/TLS reclaim — отдельно, этап 13. |
 | CYD-C3-05 | В работе | SMP-safe health подключён к pipeline и `/api/native/health`: heap/internal/DMA, input occupancy, ошибки, optional CPU/stack по двум ядрам. Host core/HTTP/lifecycle, SDK quiet/diagnostic и полный lint проходят; images `b7362172` сохранены. Backend DMA telemetry и физические измерения отдельно. |
-| CYD-C3-06 | В работе; format/bitrate отложен | Общий radio controller, index recovery, last station/SmartStart, Next/Prev/Toggle и HTTP API подключены к CYD. Pending-state, NVS failure, boot restore и concurrency проверены на обеих целях. SDK и полный lint проходят, images `ae24d9c3` сохранены. Stale CSV/index matching исправлен с host-регрессиями. Незавершённый format/bitrate пропущен по просьбе пользователя, вернуться позже; полный settings остаётся открытым. |
+| CYD-C3-06 | В работе | Общий radio controller, index recovery, last station/SmartStart, Next/Prev/Toggle и HTTP API подключены к CYD. Pending-state, NVS failure, boot restore и concurrency проверены на обеих целях. Stale CSV/index matching исправлен. По просьбе пользователя format/bitrate возобновлён: [51 HTTP-сценарий, lifecycle и startup обеих целей](../tests/results/cyd-stream-format-20261018/README.md) проходят; точный PCM format, ICY/decoder/measured bitrate и приоритет источников подключены. SDK/lint новых правок и полный settings ещё впереди. |
 | CYD-C3-07 | Открыт | WebSocket snapshot/events, динамические страницы, capabilities, async static workers, bounded uploads. Две вкладки, медленный клиент, reconnect и rollback файлов. |
 | CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
 | CYD-C3-09 | Открыт | Wi-Fi profiles/reconnect/RSSI, power policy, timezone/SNTP и runtime settings. AP/client и поздняя потеря сети. |
@@ -171,14 +171,19 @@ allocation и численные настройки C3 являются канд
 
 ## Журнал выполнения
 
-- По просьбе пользователя незавершённое расширение format/bitrate и его
+- По повторной просьбе пользователя восстановлен блок format/bitrate.
+  [Исполняемые регрессии](../tests/results/cyd-stream-format-20261018/README.md)
+  проверяют точный PCM format, изменения layout, 51 HTTP-сценарий, bounded
+  измеритель аудиобитрейта после ICY и одновременные state publications.
+  SDK/lint новых правок и физическая приёмка пока не завершены.
+
+- Ранее по просьбе пользователя незавершённое расширение format/bitrate и его
   дополнительные проверки отложены после остановки выполнения проверкой
-  безопасности. Эти изменения не считаются завершёнными и не входят в текущую
-  прошивку. Все десять изменённых файлов сохранены в Git stash
+  безопасности. Все десять изменённых файлов были сохранены в Git stash
   `a4bdcf84e2d396d860a5e676ae2f9f4cdf50b155`
   (`Deferred CYD format and bitrate work per user request`); исходная база —
-  `ce1ae2e0`. Следующая независимая работа — CYD-C3-10: расчёт gain на блок
-  PCM и перенос общего нормализатора. Остальные открытые этапы сохраняются.
+  `ce1ae2e0`. Это историческая отметка о пропуске; текущий статус возобновления
+  указан выше. Остальные открытые этапы сохраняются.
 
 - [Дополнительная pending-регрессия](../tests/results/radio-pending-20261018/README.md)
   расширена до фактической stream task и выявила сброс нового флага перед

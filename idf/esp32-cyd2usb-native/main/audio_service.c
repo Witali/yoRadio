@@ -29,6 +29,7 @@
 #endif
 #include "native_audio_output.h"
 #include "stream_body.h"
+#include "stream_bitrate.h"
 #include "stream_probe.h"
 #include "sdkconfig.h"
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
@@ -105,6 +106,7 @@ typedef struct {
     native_codec_t codec;
     bool first;
     stream_probe_t probe;
+    stream_bitrate_meter_t bitrate;
 } stream_input_t;
 
 static esp_audio_simple_dec_type_t simple_decoder_type(native_codec_t codec) {
@@ -403,8 +405,11 @@ static inline uint8_t finish_stream_audio(uint32_t generation, native_codec_t *c
 static bool stream_audio(void *context, const uint8_t *data, size_t size) {
     stream_input_t *input = context;
     if (input->generation != atomic_load(&s_generation)) return false;
-    return send_stream_audio(input->generation, &input->codec, data, size,
-                              &input->first, &input->probe);
+    if (!send_stream_audio(input->generation, &input->codec, data, size,
+                             &input->first, &input->probe)) return false;
+    uint32_t kbps = stream_bitrate_meter_add(&input->bitrate, size, esp_timer_get_time());
+    if (kbps) native_state_publish_bitrate(s_state,input->generation,kbps,NATIVE_BITRATE_MEASURED);
+    return true;
 }
 
 static void stream_title(void *context, const char *title) {

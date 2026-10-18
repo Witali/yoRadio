@@ -10,6 +10,7 @@
 #include "audio_completion.h"
 #include "stream_probe.h"
 #include "stream_body.h"
+#include "stream_bitrate.h"
 #include "json_buffer.h"
 #include "native_health.h"
 #include "radio_control.h"
@@ -44,6 +45,7 @@ static native_state_t state;
 static test_client_t client;
 static jmp_buf task_exit;
 static uint64_t clock_us;
+static uint32_t read_advance_us;
 static unsigned queued, opens, fetches, redirects, reads, cleanups, closes, deletes;
 static unsigned encoded_bytes, terminal, packets, selected_codec, cases;
 static unsigned eagain, chunk_size, open_delay_ms, header_delay_ms;
@@ -209,6 +211,7 @@ static int esp_http_client_read(esp_http_client_handle_t c,char *buffer,int size
     if(cancel_read){cancel_read=false;unsigned gen=atomic_fetch_add(&s_generation,1)+1;native_state_begin_audio(&state,gen,NULL,"stopped");}
     size_t left=body_size-body_offset;
     if(!left){if(stall_body)clock_us+=250000;return 0;}
+    clock_us+=read_advance_us;
     size_t n=left<chunk_size?left:chunk_size;if(n>(size_t)size)n=(size_t)size;
     memcpy(buffer,body_data+body_offset,n);body_offset+=n;
     if(fatal_tls||retry_tls){tls_error=ESP_ERR_MBEDTLS_SSL_READ_FAILED;tls_code=fatal_tls?12345:-ESP_TLS_ERR_SSL_WANT_READ;fatal_tls=retry_tls=false;}
@@ -252,7 +255,7 @@ static int xRingbufferSendComplete(void *ring,void *data) {
 }
 static void setup(const uint8_t *data,size_t size,unsigned chunk) {
     assert(!task_buffer);++cases;memset(&client,0,sizeof(client));
-    clock_us=0;queued=opens=fetches=redirects=reads=cleanups=closes=deletes=0;
+    clock_us=0;read_advance_us=0;queued=opens=fetches=redirects=reads=cleanups=closes=deletes=0;
     encoded_bytes=terminal=packets=0;selected_codec=NATIVE_CODEC_AUTO;
     health_stream_failures=0;
     eagain=open_delay_ms=header_delay_ms=0;chunk_size=chunk;
@@ -336,6 +339,20 @@ int main(void) {
         setup(aac,sizeof(aac),2048);bitrate_text=bad_bitrate[i];play();assert(!state.bitrate_kbps && state.bitrate_source==NATIVE_BITRATE_NONE);
         exact(aac,sizeof(aac),NATIVE_CODEC_AAC,AUDIO_END_EOF);
     }
+    uint8_t long_audio[1200],long_wire[12*357];
+    for(size_t i=0;i<sizeof(long_audio);i+=sizeof(aac)) memcpy(long_audio+i,aac,sizeof(aac));
+    setup(long_audio,sizeof(long_audio),100);read_advance_us=500000;bitrate_text="96";play();
+    exact(long_audio,sizeof(long_audio),NATIVE_CODEC_AAC,AUDIO_END_EOF);
+    assert(state.bitrate_kbps==2 && state.bitrate_source==NATIVE_BITRATE_MEASURED);
+    for(unsigned block=0;block<12;++block) {
+        uint8_t *p=long_wire+block*357;
+        memcpy(p,long_audio+block*100,100);p[100]=16;
+        memset(p+101,0,256);memcpy(p+101,"StreamTitle='';",15);
+    }
+    setup(long_wire,sizeof(long_wire),357);read_advance_us=500000;interval_text="100";bitrate_text="96";play();
+    exact(long_audio,sizeof(long_audio),NATIVE_CODEC_AAC,AUDIO_END_EOF);
+    // Counting all wire bytes would yield 6 kbps in this scripted window.
+    assert(state.bitrate_kbps==2 && state.bitrate_source==NATIVE_BITRATE_MEASURED);
     httpd_req_t request={0};native_state_begin_audio(&state,1000,"station \" \\","format\nline");
     native_state_set_audio(&state,1000,true,NULL);
     native_state_set_title(&state,1000,"title \" \\ Привет 🌍\n");

@@ -89,7 +89,7 @@ size_t strlcpy(char *, const char *, size_t);
     sources=[Path(__file__),ROOT/'tests/native/cyd_stream_test.c',ROOT/'tests/run-cyd-lifecycle.py',
         *[MAIN/name for name in ('audio_service.c','web_service.c','native_state.c','native_state.h','native_health.h','native_health_json.c')],
         SHARED/'icy_title.c',*[SHARED/'include'/name for name in
-        ('audio_completion.h','icy_title.h','stream_body.h','stream_probe.h','stream_tags.h','json_buffer.h')]]
+        ('audio_completion.h','icy_title.h','stream_body.h','stream_bitrate.h','stream_probe.h','stream_tags.h','json_buffer.h')]]
     sources += [MAIN/'radio_control.h',ROOT/'idf/components/native_storage/include/radio_control.h']
     (OUT/'report.json').write_text(json.dumps(dict(passed=True,physical_hardware=False,
         source_sha256={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}),indent=2)+'\n')
