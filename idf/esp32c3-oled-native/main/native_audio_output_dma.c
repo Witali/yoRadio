@@ -42,6 +42,7 @@
 static const char *const TAG = "audio_output";
 static i2s_chan_handle_t s_pdm;
 static bool s_pdm_running;
+static atomic_bool s_pause_requested;
 static uint32_t s_input_sample_rate;
 static bool s_resampler_has_previous;
 static int16_t s_previous_left;
@@ -158,6 +159,7 @@ static void fill_ramp(void *context, int16_t *dma, size_t frames) {
 
 static esp_err_t pdm_generate(size_t frames, native_i2s_fill_t fill,
                                void *context, bool preload) {
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     if (!s_pdm || (!preload && !s_pdm_running)) return ESP_ERR_INVALID_STATE;
     size_t written = 0;
     esp_err_t result = native_i2s_write_generated(s_pdm, frames, fill, context,
@@ -167,7 +169,10 @@ static esp_err_t pdm_generate(size_t frames, native_i2s_fill_t fill,
 }
 
 static esp_err_t pdm_begin(void) {
-    if (s_pdm) return ESP_OK;
+    if (s_pdm) {
+        if (s_pdm_running) return ESP_OK;
+        ESP_RETURN_ON_ERROR(native_audio_output_pause(), TAG, "release old PDM");
+    }
     i2s_chan_config_t channel_config =
         I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
     channel_config.dma_desc_num = PDM_DMA_DESCRIPTORS;
@@ -200,9 +205,7 @@ static esp_err_t pdm_begin(void) {
     }
 #endif
     if (result != ESP_OK) {
-        i2s_del_channel(s_pdm);
-        s_pdm = NULL;
-        hold_pdm_low();
+        (void)native_audio_output_pause();
         return result;
     }
 
@@ -213,18 +216,14 @@ static esp_err_t pdm_begin(void) {
          ++descriptor) {
         result = pdm_generate(PDM_DMA_FRAMES, fill_ramp, &ramp, true);
         if (result != ESP_OK) {
-            i2s_del_channel(s_pdm);
-            s_pdm = NULL;
-            hold_pdm_low();
+            (void)native_audio_output_pause();
             return result == ESP_OK ? ESP_FAIL : result;
         }
     }
 
     result = i2s_channel_enable(s_pdm);
     if (result != ESP_OK) {
-        i2s_del_channel(s_pdm);
-        s_pdm = NULL;
-        hold_pdm_low();
+        (void)native_audio_output_pause();
         return result;
     }
     s_pdm_running = true;
@@ -485,6 +484,7 @@ static esp_err_t drain_pending(bool force_start) {
     }
     esp_err_t result = ESP_OK;
     while (s_pending_frames >= PDM_DMA_FRAMES) {
+        if (atomic_load(&s_pause_requested)) { result=ESP_ERR_INVALID_STATE; break; }
         result = native_i2s_write_full_block(s_pdm, fill_pending, NULL);
         if (result != ESP_OK) break;
     }
@@ -524,6 +524,7 @@ esp_err_t native_audio_output_submit_pcm(pcm_context_t *item, uint8_t *data,
     size_t size, uint8_t bits_per_sample, uint8_t channels,
     void (*release)(native_audio_pcm_lease_t *)) {
     if (!item || !release) return ESP_ERR_INVALID_ARG;
+    if (atomic_load(&s_pause_requested)) { release(item); return ESP_ERR_INVALID_STATE; }
     esp_err_t result = prepare_pcm(item, data, size, bits_per_sample, channels);
     if (result != ESP_OK) { release(item); return result; }
     item->release = release;
@@ -541,6 +542,7 @@ esp_err_t native_audio_output_submit_pcm(pcm_context_t *item, uint8_t *data,
 // uses submit_pcm, because a borrowed caller buffer cannot outlive this call.
 esp_err_t native_audio_output_write_pcm(uint8_t *data, size_t size,
                                         uint8_t bits_per_sample, uint8_t channels) {
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     ESP_RETURN_ON_ERROR(native_audio_output_flush_pcm(), TAG, "flush leased PCM");
     pcm_context_t pcm;
     ESP_RETURN_ON_ERROR(prepare_pcm(&pcm, data, size, bits_per_sample, channels),
@@ -580,7 +582,7 @@ void native_audio_output_idle(void) {
     // A short file, tiny packets or source backpressure must not deadlock
     // startup while waiting for three blocks. EOF flushes immediately; a
     // temporarily empty source queue can start after one 32 ms reserve period.
-    if (!s_stream_started && s_pending_frames &&
+    if (!atomic_load(&s_pause_requested) && !s_stream_started && s_pending_frames &&
         esp_timer_get_time() - s_prefill_started_us >= PDM_START_MAX_WAIT_US) {
         esp_err_t result = drain_pending(true);
         if (result != ESP_OK) ESP_LOGW(TAG, "PCM prefill failed: %s", esp_err_to_name(result));
@@ -612,6 +614,25 @@ esp_err_t native_audio_output_suspend(void) {
     s_pdm = NULL;
     hold_pdm_low();
     return ESP_OK;
+}
+
+esp_err_t native_audio_output_pause(void) {
+    native_audio_output_discard_pcm();
+    if (s_pdm && s_pdm_running) {
+        ESP_RETURN_ON_ERROR(i2s_channel_disable(s_pdm), TAG, "pause PDM");
+        s_pdm_running = false;
+    }
+    if (s_pdm) {
+        ESP_RETURN_ON_ERROR(i2s_del_channel(s_pdm), TAG, "release paused PDM");
+        s_pdm = NULL;
+    }
+    s_input_sample_rate = 0;
+    hold_pdm_low();
+    return ESP_OK;
+}
+
+void native_audio_output_request_pause(bool requested) {
+    atomic_store(&s_pause_requested, requested);
 }
 
 const char *native_audio_output_name(void) {

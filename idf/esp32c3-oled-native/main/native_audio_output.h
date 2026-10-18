@@ -63,4 +63,9 @@ int8_t native_audio_output_get_balance(void);
 void native_audio_output_request_normalizer_reset(void);
 void native_audio_output_idle(void);
 esp_err_t native_audio_output_suspend(void);
+// Output-owner maintenance barrier. Cancels software/retained PCM, then
+// checked disable/delete. Failure retains the driver handle for owner retry.
+esp_err_t native_audio_output_pause(void);
+// Control only requests cancellation; it never touches the I2S driver.
+void native_audio_output_request_pause(bool requested);
 const char *native_audio_output_name(void);

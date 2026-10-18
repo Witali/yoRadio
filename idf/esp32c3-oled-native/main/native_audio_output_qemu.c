@@ -37,6 +37,7 @@ static int16_t s_previous_left;
 static int16_t s_previous_right;
 static uint32_t s_resampler_next_phase;
 static atomic_bool s_normalizer_reset_pending = ATOMIC_VAR_INIT(false);
+static atomic_bool s_pause_requested;
 
 typedef struct {
     bool valid;
@@ -84,6 +85,7 @@ static void reset_resampler(void) {
 }
 
 static esp_err_t qemu_queue_frame(int16_t left, int16_t right) {
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     unsigned waits = 0;
     while (QEMU_PCM_FREE_REG == 0) {
         if (++waits > 2000U) return ESP_ERR_TIMEOUT;
@@ -262,4 +264,15 @@ void native_audio_output_idle(void) {
 
 const char *native_audio_output_name(void) {
     return "QEMU 48 kHz stereo PCM";
+}
+
+void native_audio_output_request_pause(bool requested) {
+    atomic_store(&s_pause_requested, requested);
+}
+
+esp_err_t native_audio_output_pause(void) {
+    native_audio_output_discard_pcm();
+    // The experimental virtual sink has no qualified drain/quiet contract.
+    // Keep OTA closed rather than reporting the physical DMA barrier.
+    return ESP_ERR_NOT_SUPPORTED;
 }

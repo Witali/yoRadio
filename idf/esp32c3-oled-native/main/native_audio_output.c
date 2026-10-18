@@ -62,6 +62,7 @@ static pcm_fir_state_t s_pcm_fir;
 static const char *const TAG = "audio_output";
 static i2s_chan_handle_t s_pdm;
 static bool s_pdm_running;
+static atomic_bool s_pause_requested;
 static uint32_t s_input_sample_rate;
 static size_t s_buffered_frames;
 static int16_t s_frame_buffer[PDM_DMA_FRAMES * 2];
@@ -207,6 +208,7 @@ static void fill_ramp(size_t frames, uint32_t first, uint32_t count,
 }
 
 static esp_err_t pdm_write_block(const int16_t *samples, size_t frames) {
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     if (!s_pdm || !s_pdm_running) return ESP_ERR_INVALID_STATE;
     size_t written = 0;
     size_t bytes = frames * 2U * sizeof(*samples);
@@ -241,7 +243,10 @@ static esp_err_t pdm_queue_frame(int16_t left, int16_t right) {
 }
 
 static esp_err_t pdm_begin(void) {
-    if (s_pdm) return ESP_OK;
+    if (s_pdm) {
+        if (s_pdm_running) return ESP_OK;
+        ESP_RETURN_ON_ERROR(native_audio_output_pause(), TAG, "release old PDM");
+    }
     i2s_chan_config_t channel_config =
         I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
     channel_config.dma_desc_num = PDM_DMA_DESCRIPTORS;
@@ -272,9 +277,7 @@ static esp_err_t pdm_begin(void) {
         result = i2s_channel_register_event_callback(s_pdm, &callbacks, NULL);
     }
     if (result != ESP_OK) {
-        i2s_del_channel(s_pdm);
-        s_pdm = NULL;
-        hold_pdm_low();
+        (void)native_audio_output_pause();
         return result;
     }
 
@@ -294,18 +297,14 @@ static esp_err_t pdm_begin(void) {
         result = i2s_channel_preload_data(s_pdm, s_frame_buffer, bytes,
                                           &loaded);
         if (result != ESP_OK || loaded != bytes) {
-            i2s_del_channel(s_pdm);
-            s_pdm = NULL;
-            hold_pdm_low();
+            (void)native_audio_output_pause();
             return result == ESP_OK ? ESP_FAIL : result;
         }
     }
 
     result = i2s_channel_enable(s_pdm);
     if (result != ESP_OK) {
-        i2s_del_channel(s_pdm);
-        s_pdm = NULL;
-        hold_pdm_low();
+        (void)native_audio_output_pause();
         return result;
     }
     s_pdm_running = true;
@@ -449,6 +448,7 @@ void native_audio_output_request_normalizer_reset(void) {
 esp_err_t native_audio_output_write_pcm(uint8_t *data, size_t size,
                                         uint8_t bits_per_sample,
                                         uint8_t channels) {
+    if (atomic_load(&s_pause_requested)) return ESP_ERR_INVALID_STATE;
     if (!data || bits_per_sample != 16 || channels == 0) {
         return ESP_ERR_NOT_SUPPORTED;
     }
@@ -609,6 +609,25 @@ esp_err_t native_audio_output_suspend(void) {
     s_pdm = NULL;
     hold_pdm_low();
     return ESP_OK;
+}
+
+esp_err_t native_audio_output_pause(void) {
+    native_audio_output_discard_pcm();
+    if (s_pdm && s_pdm_running) {
+        ESP_RETURN_ON_ERROR(i2s_channel_disable(s_pdm), TAG, "pause PDM");
+        s_pdm_running = false;
+    }
+    if (s_pdm) {
+        ESP_RETURN_ON_ERROR(i2s_del_channel(s_pdm), TAG, "release paused PDM");
+        s_pdm = NULL;
+    }
+    s_input_sample_rate = 0;
+    hold_pdm_low();
+    return ESP_OK;
+}
+
+void native_audio_output_request_pause(bool requested) {
+    atomic_store(&s_pause_requested, requested);
 }
 
 const char *native_audio_output_name(void) {
