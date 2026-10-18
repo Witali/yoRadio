@@ -92,6 +92,15 @@ Other bounds, use-after-free, null, stream and arithmetic checks remain enabled.
 The original broad reports remain intact, so future counts must be compared
 with their recorded configuration hashes.
 
+After the lifecycle change, complete runs with the working configuration cover
+the same 11 CYD and 49 C3 units:
+[CYD lifecycle](../tests/results/native-lint-20261018/cyd-lifecycle/report.json)
+has 10 warning instances; [C3 reviewed profile](../tests/results/native-lint-20261018/c3-reviewed-profile/report.json)
+has 98 instances at 79 unique diagnostic locations. Both have zero parse/tool
+errors. CYD `audio_service.c` has no remaining diagnostics in this run.
+Most of the numerical reduction comes from the two documented rule exclusions;
+it must not be presented as hundreds of firmware bugs fixed.
+
 ## Review queue
 
 | Finding | Review and next action |
