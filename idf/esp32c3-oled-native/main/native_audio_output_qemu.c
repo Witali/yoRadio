@@ -97,8 +97,10 @@ static int16_t interpolate_sample(int16_t previous, int16_t current,
                                   uint32_t fraction) {
     int32_t delta = (int32_t)current - previous;
     int32_t scaled = delta * (int32_t)fraction;
-    scaled += scaled >= 0 ? RESAMPLER_SCALE / 2U
-                          : -(int32_t)(RESAMPLER_SCALE / 2U);
+    // Keep rounding signed: a mixed signed/unsigned conditional would convert
+    // the negative half-scale to UINT32_MAX-relative arithmetic.
+    const int32_t half_scale = (int32_t)(RESAMPLER_SCALE / 2U);
+    scaled += scaled >= 0 ? half_scale : -half_scale;
     return (int16_t)((int32_t)previous +
                      scaled / (int32_t)RESAMPLER_SCALE);
 }
