@@ -79,10 +79,13 @@ format conversion. Existing private CSV storage and recovery can remain.
 
 C3 currently has five-profile selection/fallback and uses 31/63-byte writable
 SSID/password limits. Preserve those established limits during this change.
-CYD currently advertises `wifi_profiles:false`; reuse suitable storage and API
-helpers without claiming C3 profile fallback or enabling a five-row editor on
-CYD. Advertise actual runtime capabilities and keep existing explicit
-write-only/import behavior where the profile editor is unsupported.
+CYD currently advertises `wifi_profiles:false`, because runtime selection still
+uses the first valid saved row. Its desired store can preserve five rows for
+the next boot without claiming C3 profile fallback. The compact CYD editor
+edits the first row and preserves the remaining metadata rows with typed
+`keep` actions; it does not offer runtime profile selection. The shared native
+editor can expose all five desired rows under a separate metadata/edit API
+capability. Keep runtime selection and desired-storage capabilities distinct.
 
 ## Static route allowlist
 
@@ -162,3 +165,41 @@ Before enabling the new API, qualify:
 
 These are implementation gates, not claims of completed runtime privacy or
 authentication support.
+
+## Implemented software blocks
+
+- [Shared store](../idf/components/native_wifi_store/include/native_wifi_store.h)
+  owns ordered desired rows, optimistic revisions and private read/publication
+  under one mutex. `keep` resolves the old key inside that owner. Both target
+  adapters change the durable desired file only; the active station cache is
+  changed by the next boot. Empty desired storage is a real empty live file,
+  so an old backup cannot resurrect deleted profiles. Synthetic fixture
+  campaigns exercise the real store/file code, failures, concurrent edits and
+  secret-workspace erasure.
+- [Shared JSON endpoint](../idf/components/native_wifi_store/include/native_wifi_http.h)
+  and target `web_wifi.c` adapters expose metadata and bounded typed edits.
+  Request/session ownership, stale revision conflicts, timeouts, transport
+  pending bytes and foreign session contexts have executable SDK-backed tests.
+  HTTP/TLS socket qualification and the explicit CSV import cutover remain
+  separate gates while their common request I/O helper is being integrated.
+- [Public path boundary](../idf/components/native_wifi_store/include/native_wifi_public.h)
+  runs before target asynchronous admission and again before the worker opens
+  or recovers a file. Only exact `/data/playlist.csv` is public. CYD startup
+  checks cover all 20 HTTP route registrations and rollback before activation;
+  static tests check method/path aliases without file-opening side effects.
+- [Maintained shared editor](../tools/web/native_wifi_editor.js), embedded in
+  the tracked gzip asset, uses relative metadata/JSON requests and explicit
+  keep/set/open actions. Metadata failure disables saving. The explicit
+  Arduino/ESP8266 compatibility branch remains. Native export contains SSIDs
+  only. Default OTA/web-memory tools now report `wifi_metadata_unchanged` and
+  `wifi_reconnected`; those fields do not assert password-byte equality.
+- CYD now selects `WIFI_STORAGE_RAM` before driver configuration. Both targets
+  call `esp_wifi_connect()` on `STA_START` only when the boot reader selected
+  credentials. These prevent a second driver-persistent source and use of a
+  retained driver profile when the desired file is empty or unavailable,
+  without erasing existing NVS. The startup/event regression executes actual
+  handlers and detects removal of each guard.
+
+The shared editor/API capabilities are `nativeWiFiApi`,
+`nativeWiFiMaxProfiles=5` and `nativeWiFiPrivateExport=false`. Physical
+reconnection, power loss and heap/stack qualification are still pending.

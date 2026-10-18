@@ -295,9 +295,29 @@ retention, wakeup, погоды или deep-sleep hooks.
   failure, sync notice retry, monotonic age, timezone signs/overflow и timeout.
   Эти seams не доказывают физических flash transactions или target stack.
 
-Следующие independent ownership блоки: donor C3 checked snapshot/thin adapter
-и historical queued-stop reproducer; parent-owned CYD startup/Wi-Fi/CMake и
-`CONFIG_LWIP_SNTP_MAX_SERVERS=2`; public WebUI/status integration; actual SDK
-build + focused lint и аппаратная проверка ресурсов/сети. TFT clock widget,
-OLED/deep-sleep/RTC features в этот сервис не входят. После parent integration
-обновить общий transfer plan и архив evidence по фактическим source hashes.
+Дополнительно выполнены:
+
+- C3 commits `642ee17f`/`7fd417a6`: coherent time snapshot и сериализация пяти
+  setters с commit-before-publication; actual time worker и managed backend.
+  Host campaigns: 69 settings checks +3 mutants; 14 service groups +6 mutants;
+  historical queued-stop reproducer обнаруживает перезапись borrowed имени
+  старым production кодом, текущий backend сохраняет bytes до SDK ACK.
+- [CYD startup/events](../tests/run-cyd-time-events.py): actual `app_main`,
+  `network_service_start`, `station_lost_ip` и `event_handler` выполняются с
+  SDK seams. Финальные 32 groups +9 semantic controls включают сохранение
+  прежних core-0 display/network bindings, AP-only startup, delayed GOT_IP,
+  disconnect/LOST_IP, обнуление старого адреса, RAM storage и отсутствие
+  подключения retained profile при пустом CSV на CYD/C3. CYD defaults теперь
+  задаёт `CONFIG_LWIP_SNTP_MAX_SERVERS=2`; старые build sdkconfig требуют
+  явного применения этой настройки при новой квалификации.
+- [CYD HTTP handlers](../idf/esp32-cyd2usb-native/main/web_time.c): GET
+  показывает desired/applied revisions и valid/invalid clock отдельно от
+  сохранённых настроек. POST принимает ровно четыре query fields, валидирует
+  всё до NVS commit и сообщает pending apply. Нежелательный request body
+  закрывается без HTTPD purge. 69 checks/7 groups +5 semantic controls проходят
+  с ASan/UBSan; три actual response body разобраны JSON parser.
+
+Далее: завершение compact WebUI integration и общего evidence archive,
+actual SDK build + полный lint после заморозки исходников, физическая
+проверка ресурсов/сети. TFT clock widget, OLED/deep-sleep/RTC features
+в этот сервис не входят.
