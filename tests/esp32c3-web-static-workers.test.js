@@ -51,7 +51,7 @@ test("static files run asynchronously without blocking the WebSocket server", ()
   assert.doesNotMatch(dispatcher, /serve_static_request\(/);
 });
 
-test("HTTP send timeout is applied without changing WebSocket scheduling", () => {
+test("HTTP send timeout and bounded WebSocket work keep their own scheduling", () => {
   const web = read("main", "web_service.c");
   const websocket = read("main", "websocket_service.c");
 
@@ -59,8 +59,13 @@ test("HTTP send timeout is applied without changing WebSocket scheduling", () =>
     web,
     /config\.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS/,
   );
-  assert.match(websocket, /httpd_ws_send_data_async/);
-  assert.doesNotMatch(websocket, /httpd_ws_send_data\(/);
+  // Native RFC6455 framing now runs in the HTTPD task under a per-frame
+  // deadline. Actual admission/backpressure/retry/deadline behavior is
+  // executed by tests/run-c3-websocket-status.py and the TCP/TLS suites.
+  assert.match(websocket, /httpd_queue_work\(s_server, broadcast_work, work\)/);
+  assert.match(websocket, /send_deadline_us = esp_timer_get_time\(\) \+ WS_FRAME_BUDGET_US/);
+  assert.match(websocket, /httpd_ws_send_frame_async\(s_server, sockets\[index\], &frame\)/);
+  assert.doesNotMatch(websocket, /httpd_ws_send_data(?:_async)?\(/);
 });
 
 test("registered HTTP routes fit the handler table including WebSocket", () => {
