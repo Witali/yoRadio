@@ -17,11 +17,13 @@ typedef pthread_mutex_t portMUX_TYPE;
 #define portEXIT_CRITICAL(lock) assert(!pthread_mutex_unlock(lock))
 #define ESP_OK 0
 #define ESP_ERR_NO_MEM 0x101
+#define ESP_ERR_INVALID_ARG 0x102
 #define ESP_ERR_INVALID_STATE 0x103
 #define pdPASS 1
 #define pdTRUE 1
 #define pdMS_TO_TICKS(ms) (ms)
 #define portMAX_DELAY UINT32_MAX
+typedef struct { uint64_t epoch; } web_reboot_lease_t;
 static uint32_t ticks;
 static unsigned creates, deletes, notifications, waits, restarts, scenarios;
 static bool fail_create;
