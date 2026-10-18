@@ -2727,3 +2727,10 @@ true. Это только начало нового прогона, не 24 ча
 - В11:07:50 UTC прежний full app6324 PID2448 жив, все273inputs прежние. H10
   app6324/A74:4process identities и31input совпали;180cycles/3005.344746guest s,
   1445HTTP/3outage. Новой26C6 H10 ещё нет; области приёмки явно разделены.
+
+- Frozen H10 copy app26C6/ELFFE9B/B44 создана atf0375b14. Detached4cycle preflight
+  завершился pass, workload/guard exit0,32HTTP/2outage/31unchangedinputs.
+- До любых stop действий записан replacement intent старого app6324/A74 H10.
+  В11:13 UTC совпали4process identities и31input;196cycles/3267.751527guest s,
+  1573HTTP/3outage. Это неполный prefix; замена нужна для нового firmware/model.
+  Следом требуется revalidate worker handle, supervisor cleanup и сохранение raw.

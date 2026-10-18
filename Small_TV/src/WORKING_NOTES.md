@@ -5,6 +5,25 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 сохраняется отдельно в [рабочем журнале](WORK_LOG.md). Обновлять этот контекст после
 завершённых исправлений; при продолжении читать оба файла и проверять Git-статус.
 
+## H10 replacement подготовлен — 2026-10-18 11:13 UTC
+
+Создана frozen worktree .worktree/small-tv-h10-netif-roles, branch
+codex/small-tv-h10-netif-roles atf0375b14. В неё скопирован совпадающий ELFFE9B
+и11файлов QEMU B44 (aab05d5de6) в .build/runtime-qemu-b44-frozen-20261018.
+Её detached preflight завершён: supervisor/workload/guard pass, exit0,4cycles,
+32HTTP,2outage,31unchangedinputs. Proof network-roles-runtime-preflight-20261018.json.
+
+До остановки старого H10 записан network-roles-runtime-supersede-intent-20261018.json.
+В11:13:01 UTC все4oldPID/creation/command и31input совпали;196cycles/
+3267.751527guest s/1573HTTP/3outage. Причина замены — новая production26C6 и
+QEMU B44; старый prefix не24h. Следующий шаг: ещё раз проверить и остановить
+только old workload23672 с creation10:06:56.5451710Z через удержанный handle;
+supervisor17788 должен сам закрыть guard28632 и VM35664. Сохранить его terminal
+failed outcome как intentional supersession, raw report/events/UART не переписывать.
+Затем запустить86400guest s/interval15/outageEvery60 из новой frozen worktree
+в .build/netif-roles-detached-24h-20261018. Пока исполнение stop ещё не записано.
+Не менять ни одну frozen копию до terminal её workload/full run.
+
 ## Полный network roles regression — 2026-10-18 11:07 UTC
 
 Новая app26C6 / ELFFE9B / sourceD628 сохранена и опубликована в16c277ed.
