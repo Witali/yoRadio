@@ -11,6 +11,7 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT/'.build/c3-web-memory/host'
 MAIN = ROOT/'idf/esp32c3-oled-native/main'
+SHARED = ROOT/'idf/components/native_storage/include'
 
 
 def native(path):
@@ -51,8 +52,14 @@ def main():
              '-fno-pie','-no-pie',
              '-I',native(MAIN),'-I',native(OUT),native(source_path),'-o',native(binary)])
         results[name] = run([native(binary)])
-    results['source_sha256'] = {name:hashlib.sha256((MAIN/name).read_bytes()).hexdigest()
-        for name in ('web_multipart.h','web_file_form.h','web_upload.c')}
+    files = [*(MAIN/name for name in ('web_multipart.h','web_file_form.h','web_upload.c')),
+             SHARED/'web_multipart.h', SHARED/'web_file_form.h']
+    results['source_sha256'] = {path.relative_to(ROOT).as_posix():hashlib.sha256(path.read_bytes()).hexdigest()
+                               for path in files}
+    for path in files:
+        snapshot = OUT/'sources'/path.relative_to(ROOT)
+        snapshot.parent.mkdir(parents=True,exist_ok=True)
+        snapshot.write_bytes(path.read_bytes())
     (OUT/'results.json').write_text(json.dumps(results,indent=2)+'\n')
 
 

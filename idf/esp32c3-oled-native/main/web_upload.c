@@ -111,19 +111,11 @@ static bool end_file(void *context) {
 }
 
 static bool receive_form(httpd_req_t *request, web_file_form_t *form) {
-    char type[192];
+    char type[192], boundary[71];
     size_t limit = form->mode == WEB_FORM_CREDENTIALS ? 4096U : WEB_UPLOAD_MAX;
     if (!request->content_len || request->content_len > limit ||
         httpd_req_get_hdr_value_str(request, "Content-Type", type, sizeof(type)) != ESP_OK ||
-        strncmp(type, "multipart/form-data;", 20)) return false;
-    char *boundary = strstr(type + 20, "boundary=");
-    if (!boundary) return false;
-    boundary += 9;
-    bool quoted = *boundary == '"';
-    if (quoted) ++boundary;
-    char *end = quoted ? strchr(boundary, '"') : strpbrk(boundary, "; \t");
-    if (quoted && !end) return false;
-    if (end) *end = 0;
+        !mp_form_data_boundary(type, boundary, sizeof(boundary))) return false;
     web_multipart_t parser;
     if (!mp_init(&parser, boundary, web_file_form_part, form)) return false;
     uint8_t chunk[WEB_UPLOAD_RECEIVE_BYTES];
@@ -136,7 +128,7 @@ static bool receive_form(httpd_req_t *request, web_file_form_t *form) {
         size_t count = remaining < sizeof(chunk) ? remaining : sizeof(chunk);
         int received = httpd_req_recv(request, (char *)chunk, count);
         if (received == HTTPD_SOCK_ERR_TIMEOUT) { vTaskDelay(1); continue; }
-        if (received <= 0) return false;
+        if (received <= 0 || (size_t)received > count) return false;
         now = esp_timer_get_time();
         if (now - started >= WEB_UPLOAD_TIMEOUT_US || now - last_data >= WEB_UPLOAD_IDLE_US)
             return false;
