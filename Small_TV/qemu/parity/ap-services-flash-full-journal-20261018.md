@@ -94,3 +94,23 @@ Its own full regression freezes539inputs and was revalidated live as controller
 not changed; all533were rehashed unchanged after that correction was committed.
 BC68 regional persistence/NVS migration have passed and natural calendar cases
 are now running. A terminal pass here still cannot validate candidate0592.
+
+
+## Terminal full result, BC68 / 20B
+
+Controller10836 exited successfully at2026-10-18T13:56:12.8327835Z and is absent
+from the authoritative process table. All19required automatic groups passed.
+All533exact start inputs were freshly rehashed and still match. The standard
+publisher and artifact verifier accepted the report; six artifact checks pass.
+The new terminal record, full/QEMU raw reports, publication and archive metadata
+are in `ap-services-flash-full-terminal-20261018.json` and its referenced files.
+
+This is appBC68/source5586/ELF4FDE on QEMU20B. It does not validate JPEG candidate
+0592 or experimental Windows listener candidate2a3f. No test/source/archive here
+was edited for publication: output stays in this parity directory. The source
+WORK_LOG/WORKING_NOTES and all533frozen inputs remain unchanged for later audit.
+
+The separate0592full539and BC68H10remain active; their terminal acceptance is
+not implied. Windows browser work also retains failed strict page-load controls
+and a newly deterministic host-peer-port/TIME_WAIT collision. See the0592tree's
+`hostfwd-investigation-20261018.json` for those independent image/runtime scopes.
