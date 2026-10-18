@@ -26,4 +26,14 @@ the HTTP request/query APIs are seams; no codec arithmetic, kernel scheduling,
 flash power-loss durability or physical playback result is claimed here.
 The initial SmartStart setting is disabled. Hardware-specific C3 controls,
 display and output driver changes are excluded. SDK firmware/static analysis
-follow this host checkpoint. Stale CSV/index pairing remains stage 06 work.
+complete for clean source `ae24d9c3`:
+
+| Target/profile | Saved image | Bytes | Full Clang analysis |
+| --- | --- | --- | --- |
+| CYD PDM | [manifest](../../../firmware/development/esp32-cyd2usb-native-shared-radio-pdm/manifest.json) | 1,377,888 | [18 units, 12 warnings, 0 errors](../native-lint-20261018/cyd-shared-radio/report.json) |
+| C3 tested radio | [manifest](../../../firmware/development/esp32c3-oled-native-shared-radio/manifest.json) | 1,475,152 | [50 units, 98 warnings, 0 errors](../native-lint-20261018/c3-shared-radio/report.json) |
+
+Both preserve prior SDK settings. The shared filesystem helper has no static
+diagnostics; the index seek-position expression retains the donor's conservative
+unsigned-to-long conversion warning for focused bounds review. Physical acceptance
+and stale CSV/index pairing remain separate stage 06 work.

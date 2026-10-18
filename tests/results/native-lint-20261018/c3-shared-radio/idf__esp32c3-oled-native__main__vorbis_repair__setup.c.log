@@ -1,0 +1,57 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:33:3: warning: switching on non-enum value without default case may not cover all cases [bugprone-switch-missing-default-case]
+   33 |   switch(b->dec_type){
+      |   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:73:15: warning: narrowing conversion from 'unsigned long' to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+   73 |   int    sign=val&0x80000000;
+      |               ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:137:12: warning: narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  137 |           int bit=(entry>>(length-j-1))&1;
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:148:10: warning: narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'long' is implementation-defined [bugprone-narrowing-conversions]
+  148 |           chase=r[chase*2+bit];
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:151:12: warning: narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  151 |           int bit=(entry>>(length-j-1))&1;
+      |                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:220:5: warning: switching on non-enum value without default case may not cover all cases [bugprone-switch-missing-default-case]
+  220 |     switch(s->dec_nodeb){
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:428:14: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  428 |   if((maptype=tremor_oggpack_read(opb,4))>0){
+      |       ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:428:14: note: if it should be an assignment, move it out of the 'if' condition
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:428:14: note: if it is meant to be an equality check, change '=' to '=='
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:694:11: warning: Although the value stored to 'k' is used in the enclosing expression, the value is never actually read from 'k' [clang-analyzer-deadcode.DeadStores]
+  694 |   for(j=0,k=0;j<info->partitions;j++)
+      |           ^ ~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:694:11: note: Although the value stored to 'k' is used in the enclosing expression, the value is never actually read from 'k'
+  694 |   for(j=0,k=0;j<info->partitions;j++)
+      |           ^ ~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:900:22: warning: multilevel pointer conversion from 'vorbis_info_floor **' (aka 'void **') to 'void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  900 |       media_lib_free(ci->floor_param);
+      |                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:966:20: warning: multilevel pointer conversion from 'int32_t **' (aka 'int **') to 'void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  966 |     media_lib_free(dsp->work);
+      |                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:967:20: warning: multilevel pointer conversion from 'int32_t **' (aka 'int **') to 'void *', please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  967 |     media_lib_free(dsp->mdctright);
+      |                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:975:17: warning: multilevel pointer conversion from 'void *' to 'int32_t **' (aka 'int **'), please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  975 |     dsp->work = repair_calloc(info->channels, sizeof(*dsp->work));
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:976:22: warning: multilevel pointer conversion from 'void *' to 'int32_t **' (aka 'int **'), please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+  976 |     dsp->mdctright = repair_calloc(info->channels, sizeof(*dsp->mdctright));
+      |                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:994:48: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'long' is implementation-defined [bugprone-narrowing-conversions]
+  994 |     ogg_buffer buffer = {.data = data, .size = size};
+      |                                                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:995:61: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'long' is implementation-defined [bugprone-narrowing-conversions]
+  995 |     ogg_reference reference = {.buffer = &buffer, .length = size};
+      |                                                             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:996:56: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'long' is implementation-defined [bugprone-narrowing-conversions]
+  996 |     oggpack_buffer bits = {.headptr = data, .headend = size, .head = &reference};
+      |                                                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\vorbis_repair\setup.c:1063:19: warning: multilevel pointer conversion from 'void *' to 'vorbis_info_floor **' (aka 'void **'), please use explicit cast [bugprone-multi-level-implicit-pointer-conversion]
+ 1063 |   ci->floor_param=repair_alloc(sizeof(*ci->floor_param)*ci->floors);
+      |                   ^
+20 warnings generated.

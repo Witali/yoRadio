@@ -156,3 +156,11 @@ completes all 49 units with 106 warnings and zero errors. Eight warnings relativ
 to the quiet baseline are percentages used only by disabled production logs;
 they do not represent eight new memory errors. Task-name lifetime and TCB reuse
 are covered by the dedicated negative controls and ASan/UBSan regressions.
+
+Shared radio/storage integration is checked by full
+[CYD](../tests/results/native-lint-20261018/cyd-shared-radio/report.json) and
+[C3](../tests/results/native-lint-20261018/c3-shared-radio/report.json) reruns:
+18 units/12 warnings and 50 units/98 warnings, both zero errors. The portable
+file transaction implementation has no findings. The copied donor index seek
+expression needs an explicit bounded signed calculation; diagnostic-only timing
+used by quiet logs remains a dead-store triage item.
