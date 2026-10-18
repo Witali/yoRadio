@@ -23,4 +23,7 @@ Existing [Play/Stop/Resume](commands/report.json) and
 concurrent commands and 20,000 contended title updates. The full format runner's
 packet/stats extraction boundary follows the current source after the local
 meter type was replaced by the shared header. SDK and full lint qualification
-are performed after integration with the other completed changes.
+are performed after integration with the other completed changes. The complete
+[seven-group format suite](format-suite.json) also passes ([output](format-suite.log));
+its C host commands use ASan/UBSan, while the real Helix C++ command remains an
+ordinary codec test.

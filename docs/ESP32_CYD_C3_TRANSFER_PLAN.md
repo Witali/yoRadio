@@ -70,12 +70,12 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-07 | Открыт | WebSocket snapshot/events, динамические страницы, capabilities, async static workers, bounded uploads. Две вкладки, медленный клиент, reconnect и rollback файлов. |
 | CYD-C3-08 | Открыт | App-only OTA, maintenance и recovery UI. Неверный target/image, оборванная/медленная загрузка и сохранение NVS/SPIFFS. |
 | CYD-C3-09 | Открыт | Wi-Fi profiles/reconnect/RSSI, power policy, timezone/SNTP и runtime settings. AP/client и поздняя потеря сети. |
-| CYD-C3-10 | В работе | Gain рассчитывается один раз на PCM packet для всех трёх CYD backend; [host-регрессия, SDK builds и lint](../tests/results/cyd-output-gain-20261018/README.md) проверяют bit-exact mono downmix и DAC conversion. Три images `e822d3c2` сохранены. Общий normalizer, PCM layout и полная проверка flush/reset ещё впереди. |
+| CYD-C3-10 | В работе | Gain рассчитывается один раз на packet; [общий normalizer](../tests/results/cyd-normalizer-20261018/README.md) подключён ко всем трём backend через owner-only DSP и 512-byte scratch без изменения input PCM. [HTTP-настройки](../tests/results/cyd-settings-20261018/README.md), golden PCM, disable/enable, rate/layout/EOF/discard и pipeline/radio host-регрессии проходят. SDK/lint новых правок, фактический footprint, расширение PCM layout и физическая приёмка впереди. |
 | CYD-C3-11 | Исключён | Перенос дисплея, рендеринга, физических controls и других аппаратных функций C3 не входит в задачу по уточнению пользователя. |
 | CYD-C3-12 | Открыт | Portable custom FLAC и оптимизации hot loops против Espressif. PCM exactness, 8–24 bit/decorrelation/LPC/Rice, watchdog и физический A/B. |
 | CYD-C3-13 | Открыт | TLS/heap/IRAM/stack политика после измерений CYD. Full-record TLS, раннее освобождение старого codec, сохранение сетевого headroom. |
 | CYD-C3-14 | Открыт | Отдельный аудит Xtensa AAC/Vorbis ABI и только затем compact owners/repair. Archive hashes, layout, OOM и PCM сравнены на ESP32. |
-| CYD-C3-15 | Открыт | Воспроизводимый production wrapper, экспорт firmware и единая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение для каждого backend. |
+| CYD-C3-15 | В работе | [Production wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md) и верифицированный экспорт реализованы; [38 host tests проходят, 1 symlink case пропущен](../tests/results/cyd-production-wrapper-20261018/README.md). Проверка реальных сборок новой обёрткой и единая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение каждого backend впереди. |
 
 ## Карта функций и мест в коде
 
@@ -170,6 +170,13 @@ allocation и численные настройки C3 являются канд
    Host pass и build pass не отмечают этот пункт как выполненный.
 
 ## Журнал выполнения
+
+- Возобновлённый format/bitrate дополнен [исправлением донора C3](../tests/results/c3-bitrate-state-20261018/README.md):
+  source priority и generation проверяются одним state transaction, убран общий
+  readiness bool, исправлены zero-epoch windows и округление. Восемь групп и
+  существующие state/command/полная format suite проходят. Параллельные независимые
+  изменения перенесли normalizer/HTTP settings и production wrapper; каждое
+  зафиксировано отдельно. Общая SDK/lint квалификация новых правок — следующий шаг.
 
 - По повторной просьбе пользователя восстановлен блок format/bitrate.
   [Исполняемые регрессии](../tests/results/cyd-stream-format-20261018/README.md)
