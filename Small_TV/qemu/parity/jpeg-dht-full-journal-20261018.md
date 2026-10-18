@@ -140,3 +140,20 @@ artifact checks succeeded. Its separate terminal record is in the
 acceptance, a completed H10 or physical hardware. The0592controller20380 and H10
 identities23548/5036/22392/18128 remain independent live workloads. Their source
 WORK_LOG/WORKING_NOTES and every frozen input remain untouched.
+
+## 2026-10-18 14:45 UTC — полный прогон 0592 завершён
+
+Контроллер 20380 завершился с exit 0, terminal_passed. Все 19 обязательных групп
+успешны; перед публикацией повторно проверены все 539 замороженных входов.
+Штатный publish-report.py принял результат, verify_artifacts.py проверил
+прошивку и источники; все 6 проверок артефактов успешны. JSON публикации
+приведены к LF до вычисления ссылочных хешей.
+
+Приложение 0592b510… / исходники d338a294… / ELF aea10675… проверены на
+исходном QEMU 20b133d9… . Это полный автоматический набор этой пары,
+не полный прогон нового QEMU, не H10 и не физическая проверка. Размер
+приложения 1169936 байт; в разделе остаётся 366064 байта. Исходный flash-дамп,
+архив прошивки, тестовые исходники, WORK_LOG.md и WORKING_NOTES.md не менялись.
+
+См. jpeg-dht-full-terminal-20261018.json, jpeg-dht-full-published-20261018.json,
+jpeg-dht-full-artifacts-20261018.json и пять архивов исходных результатов.
