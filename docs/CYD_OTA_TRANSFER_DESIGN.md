@@ -5,6 +5,8 @@
 сохранён в четырёх production images из `6db5651a`; его архив — `1cf1f20c`.
 Общий image sink, backend pause, reboot reservation и native UI уже имеют
 собственные проверки. Сквозной OTA и physical gates не считаются завершёнными.
+Проверенные image/reboot snapshots сохранены в
+[отчёте OTA](../tests/results/native-ota-transfer-20261018/HOST.md).
 
 Текущие новые входы: [image sink](../idf/components/native_ota/include/native_ota_sink.h),
 [audio maintenance API](../idf/esp32-cyd2usb-native/main/audio_service.h),
@@ -57,7 +59,10 @@ PDM, continuous DAC и legacy DAC сейчас имеют одинаковые c
 или заявления браузера недостаточно. Переименование project не должно
 незаметно оборвать совместимость OTA.
 
-## Входы существующего кода
+## База до переноса и места подключения
+
+Описания отсутствующих функций в этой таблице относятся к исходной базе
+этапа. Текущие API и проверенные результаты перечислены в начале документа.
 
 | Назначение | Вход и что сохранить / изменить |
 | --- | --- |
@@ -75,20 +80,21 @@ PDM, continuous DAC и legacy DAC сейчас имеют одинаковые c
 | Plain/TLS I/O | [native_web_transport.h](../idf/components/native_web_transport/include/native_web_transport.h): сохранять HTTPD session ownership, TLS WANT direction и конечные deadlines |
 | Первичный boot | CYD [app_main.c:75](../idf/esp32-cyd2usb-native/main/app_main.c#L75): NVS/SPIFFS/audio/web startup; сейчас нет подтверждения pending OTA image |
 
-Донорские [host sink tests](../tests/native/esp32c3_ota_test.c),
-[HTTP tests](../tests/native/esp32c3_ota_http_test.c) и
-[runner](../tests/run-esp32c3-ota.py) дают начальную матрицу. Они не проверяют
-CYD audio acknowledgement, его DMA, размер слота или аппаратный rollback.
-Runner сейчас собирает с host mocks без ASan/UBSan; новая матрица должна
-добавить санитайзеры, snapshots/hashes и executable negative controls.
+Новая матрица исполняет [production sink](../tests/run-native-ota.py),
+[настоящий SDK image verifier](../tests/run-native-ota-images.py) и
+[общий HTTP handler](../tests/run-native-ota-http.py) с ASan/UBSan,
+snapshots/hashes и executable negative controls. Старый
+[donor runner](../tests/run-esp32c3-ota.py) сохраняется как вход проверки C3;
+host seams не заменяют физические DMA/flash/rollback проверки.
 
-## Предлагаемый контракт реализации
+## Контракт maintenance
 
-Имена ниже — проект новых API, **сейчас их в production нет**.
+API CYD реализуется в audio service; до финальной квалификации и SDK export
+его проверенные гарантии ограничены сохранёнными host snapshots.
 
 ```c
-esp_err_t audio_service_maintenance_begin(audio_maintenance_token_t *token,
-                                        uint32_t timeout_ms);
+esp_err_t audio_service_maintenance_begin(uint32_t timeout_ms,
+                                        audio_maintenance_token_t *token);
 esp_err_t audio_service_maintenance_end(audio_maintenance_token_t *token,
                                       bool resume_previous);
 ```
@@ -155,7 +161,8 @@ resume token. Ошибка восстановления показывается
    делал эти пределы фиктивными.
 7. Завершить multipart и `esp_ota_end`. В IDF6.0.2 эта функция потребляет handle
    также при ошибке; после неё нельзя повторно вызывать abort того же handle.
-   Проверить `esp_image_get_metadata` и точное равенство image length числу
+   Вызвать `esp_image_verify` с размером принятых данных и проверить точное
+   равенство возвращённого image length числу
    принятых image bytes: это отсекает merged/trailing bytes и старый flash tail.
 8. Повторно проверить readiness reboot service, выбрать проверенный раздел
    через `esp_ota_set_boot_partition`, зафиксировать состояние committed.
@@ -299,7 +306,7 @@ bootloader baseline, partition table и фактически выполненн�
 | `app_update/esp_ota_ops.c:143`, `esp_ota_begin` | Проверяет APP/OTA partition, running conflict и pending-verify при enabled rollback; поддерживает sequential erase |
 | Тот же файл:566, `esp_ota_end` | Проверяет образ и потребляет handle также при ошибке |
 | Тот же файл:763, `esp_ota_set_boot_partition` | Проверяет образ перед изменением boot selection |
-| `bootloader_support/src/esp_image_format.c:365`, `esp_image_get_metadata` | Публичный источник image length после SDK validation |
+| `bootloader_support/src/esp_image_format.c`, `esp_image_verify` | Публичная проверка содержимого и источник image length; sink дополнительно требует точного равенства принятой длине |
 | `bootloader_support/include/esp_app_format.h:20` | `ESP_CHIP_ID_ESP32 = 0`, C3 имеет отдельный ID |
 | `app_update/include/esp_ota_ops.h` | Публичные state/mark-valid/rollback API; наличие функций не означает enabled rollback в установленном bootloader |
 
@@ -307,5 +314,6 @@ SHA256 inspected SDK units: `esp_ota_ops.c`
 `afe45475f68c5952bfaea73e8dc200e963df4b9036e67ec17418cc4ea2986290`,
 `esp_image_format.c`
 `193717dffff9a13063e88b30d100dc8d82a4eaab089f1271b389df43056a730d`.
-Это fingerprints аудита, не доказательство SDK integration новой OTA:
-production-реализации CYD на момент составления документа ещё нет.
+Это fingerprints аудита. Проверка тех же исходников в host image matrix
+сохранена в отчёте OTA; SDK integration всего handler/pipeline и физические
+flash операции остаются отдельными gates.

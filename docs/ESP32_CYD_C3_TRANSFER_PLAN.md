@@ -111,7 +111,7 @@ allocation и численные настройки C3 являются канд
 | Streaming multipart uploads, temp/backup, playlist index rollback | [web_upload.c](../idf/esp32c3-oled-native/main/web_upload.c), [web_file_form.h](../idf/esp32c3-oled-native/main/web_file_form.h), [web_multipart.h](../idf/esp32c3-oled-native/main/web_multipart.h) | CYD новые upload routes; ограничить RAM размером chunk, сохранить Wi-Fi/CSV/assets при ошибке. |
 | Firmware OTA, target/size validation, abort и maintenance | [web_ota.c](../idf/esp32c3-oled-native/main/web_ota.c), [ota_upload.c](../idf/esp32c3-oled-native/main/ota_upload.c) | Новый общий [native_ota_sink](../idf/components/native_ota/native_ota_sink.c), CYD [audio_service.h](../idf/esp32-cyd2usb-native/main/audio_service.h), [web_reboot.h](../idf/esp32-cyd2usb-native/main/web_reboot.h), [partitions.csv](../idf/esp32-cyd2usb-native/partitions.csv). ESP32 chip0 и slot0x1B0000; не менять partition table и bootloader автоматически. |
 | Wi-Fi profiles, RSSI, reconnect и активное/idle power policy | [network_service.c](../idf/esp32c3-oled-native/main/network_service.c) | CYD [network_service.c](../idf/esp32-cyd2usb-native/main/network_service.c). Проверить AP fallback и подключение после поздней потери сети. |
-| Timezone, SNTP retry и clock state | [time_service.c](../idf/esp32c3-oled-native/main/time_service.c) | CYD service task и TFT clock; не зависеть от OLED/deep sleep. |
+| Timezone, SNTP retry и clock state | [time_service.c](../idf/esp32c3-oled-native/main/time_service.c) | [Проект переноса](CYD_TIME_TRANSFER_DESIGN.md): два SNTP сервера, persisted fixed offset, clock/sync state и безопасная lifetime строк; исправить выявленную donor stop/write гонку. Не зависеть от OLED/deep sleep. |
 
 ### DSP и декодеры
 
