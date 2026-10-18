@@ -591,6 +591,8 @@ API-ключи и фото с личными метаданными в отчё�
 только последние 32 снимка `report.json`:
 
 Для длительного Windows-прогона используйте `tools/runtime_supervisor.ps1`.
+Ошибки host-записи и очистка процессов проверяются отдельно:
+[RUNTIME_SUPERVISION.md](RUNTIME_SUPERVISION.md).
 Он держит точные Process handles workload и UART guard; исчезновение любого
 дочернего процесса не становится успешным тестом. При ошибке закрывается только
 VM из собственного session.json. Состояние и stdout/stderr сохраняются отдельно

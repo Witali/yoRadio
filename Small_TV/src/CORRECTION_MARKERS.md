@@ -70,11 +70,12 @@
 | `uploadImageInChunks` в `local_site/photo_upload.js` | Запрошенное удаление программной паузы после успешной синхронной flash write и после последней неудачной попытки; порядок блоков и backoff между повторами сохранены |
 | `date_capture` в `tests/time_qemu.py` | Раздельные пределы гостевого и хостового ожидания; точное сравнение всех пикселей даты сохранено, остановившаяся ВМ по-прежнему отклоняется |
 | `exercise` в `tests/photo_frames_qemu.py` | Ночной сценарий сохраняет начальные кадры и при необходимости продолжает полные fade-циклы до настоящей SNTP-синхронизации, максимум шесть; пиксели, PWM и порядок фото проверяются во всех циклах |
+| `Save-State`, очистка в `tools/runtime_supervisor.ps1`, функции `runtime_cleanup.psm1` и `runtime_state_io.psm1` | `FIXED_TEST`: ошибка записи лога не прерывает остановку остальных детей и своей ВМ; sharing conflict откладывает только heartbeat, финальная ошибка не становится pass |
 
 Найти все отметки из корня репозитория:
 
 ```powershell
-rg -n 'FIXED_FACTORY|FIXED_RECONSTRUCTION|FIXED_TEST|REQUESTED_CHANGE' Small_TV/src/app Small_TV/src/third_party/tjpgd Small_TV/src/tests
+rg -n 'FIXED_FACTORY|FIXED_RECONSTRUCTION|FIXED_TEST|REQUESTED_CHANGE' Small_TV/src/app Small_TV/src/third_party/tjpgd Small_TV/src/tests Small_TV/src/tools
 ```
 
 Метка не заменяет тест. Исправления оригинала сохраняются в отчётах как намеренные
