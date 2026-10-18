@@ -14,3 +14,10 @@ state transition's title clear instead of clearing a potentially newer title.
 covers forced preemption at the original race, stale and empty old titles,
 20,000 contended updates with actual pthread mutexes, truncation and generation
 wrap. ASan/UBSan pass. RTOS scheduling and physical board timing are not modeled.
+
+The C3 tested-radio production build of `793e26c5` passes. Its 1,474,336-byte
+[application](../../../firmware/development/esp32c3-oled-native-state-fix/app.bin)
+and [manifest/config](../../../firmware/development/esp32c3-oled-native-state-fix/manifest.json)
+are saved separately from the previous shared-parser image. The embedded ELF
+hash matches the build ELF and its application descriptor has no dirty suffix.
+No flashing or physical acceptance was performed.
