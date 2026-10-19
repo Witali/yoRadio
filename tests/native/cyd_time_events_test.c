@@ -5,120 +5,106 @@
 #include <stdio.h>
 #include <string.h>
 #include "board_config.h"
-
 typedef int esp_err_t;
 #define ESP_OK 0
 #define ESP_FAIL (-1)
 #define ESP_ERR_NO_MEM 0x101
-#define ESP_RETURN_ON_ERROR(expr, ...) do { int e_ = (expr); if (e_) return e_; } while (0)
-#define ESP_RETURN_ON_FALSE(expr, err, ...) do { if (!(expr)) return (err); } while (0)
-#define ESP_ERROR_CHECK(expr) assert((expr) == ESP_OK)
-static void log_message(const char *tag, const char *format, ...) {(void)tag; (void)format;}
+#define ESP_ERR_INVALID_ARG 0x102
+#define ESP_ERR_INVALID_STATE 0x103
+#define ESP_ERR_TIMEOUT 0x107
+#define ESP_ERR_WIFI_NOT_STARTED 0x301
+#define ESP_RETURN_ON_ERROR(expr, ...) do {int e_=(expr);if(e_)return e_;}while(0)
+#define ESP_RETURN_ON_FALSE(expr,err,...) do {if(!(expr))return(err);}while(0)
+#define ESP_ERROR_CHECK(expr) assert((expr)==ESP_OK)
+static void log_message(const char *tag,const char *format,...) {(void)tag;(void)format;}
 #define ESP_LOGI(...) log_message(__VA_ARGS__)
 #define ESP_LOGW(...) log_message(__VA_ARGS__)
 #define ESP_LOGE(...) log_message(__VA_ARGS__)
-static const char *const TAG = "fixture";
-static const char *esp_err_to_name(int error) {(void)error; return "fixture";}
-
-typedef enum {NATIVE_NETWORK_STARTING, NATIVE_NETWORK_CLIENT,
-              NATIVE_NETWORK_ACCESS_POINT, NATIVE_NETWORK_ERROR} native_network_mode_t;
-typedef struct {native_network_mode_t mode; uint32_t ip;} native_state_t;
-static native_state_t s_app_state, *s_network_state;
+static const char *const TAG="fixture";
+static const char *esp_err_to_name(int error){(void)error;return "fixture";}
+#include "network_profiles.h"
+#include "network_netif.h"
+struct esp_netif {unsigned marker;};
+static struct esp_netif station;
+typedef enum {NATIVE_NETWORK_STARTING,NATIVE_NETWORK_CLIENT,NATIVE_NETWORK_ACCESS_POINT,NATIVE_NETWORK_ERROR} native_network_mode_t;
+typedef struct {void *lock;native_network_mode_t mode;uint32_t ip;} native_state_t;
+static native_state_t s_app_state;
 static int s_display;
-static void native_state_init(native_state_t *state) {memset(state, 0, sizeof(*state));}
-static void native_state_set_network(native_state_t *state, native_network_mode_t mode, uint32_t ip) {
-    state->mode = mode; state->ip = ip;
+static void native_state_init(native_state_t *state){memset(state,0,sizeof(*state));state->lock=&s_display;}
+static void native_state_set_network(native_state_t *state,native_network_mode_t mode,uint32_t ip){state->mode=mode;state->ip=ip;}
+typedef struct {int unused;} wifi_init_config_t;
+#define WIFI_INIT_CONFIG_DEFAULT() ((wifi_init_config_t){0})
+#define WIFI_STORAGE_RAM 1
+#define WIFI_MODE_STA 1
+#define pdTRUE 1
+#define pdFALSE 0
+#define pdMS_TO_TICKS(ms) (ms)
+static unsigned sdk_calls,fail_sdk_at,groups;
+static unsigned stops,deinits,releases,loop_deletes,runtime_stops,runtime_starts,waits,profile_wipes;
+static bool driver_ram,shared_loop,empty_profiles;
+static int profile_result,wait_result,stop_result,runtime_stop_result,deinit_result,release_result;
+static const network_profiles_t *borrowed_profiles;
+static int sdk_result(void){return ++sdk_calls==fail_sdk_at?ESP_FAIL:ESP_OK;}
+static int network_service_storage_init(void){return sdk_result();}
+static int esp_netif_init(void){return sdk_result();}
+static int esp_event_loop_create_default(void){int result=sdk_result();return result?result:shared_loop?ESP_ERR_INVALID_STATE:ESP_OK;}
+static void esp_event_loop_delete_default(void){++loop_deletes;}
+int network_netif_create(network_netif_t *out,bool ap){assert(!ap&&!out->handle);int result=sdk_result();if(!result)out->handle=&station;return result;}
+int network_netif_release(network_netif_t *owner){++releases;if(!release_result)owner->handle=NULL;return release_result;}
+static int esp_wifi_init(const wifi_init_config_t *init){assert(init);return sdk_result();}
+static int esp_wifi_set_storage(int storage){assert(storage==WIFI_STORAGE_RAM);int result=sdk_result();driver_ram=!result;return result;}
+static int esp_wifi_set_mode(int mode){assert(mode==WIFI_MODE_STA);return sdk_result();}
+int network_profiles_load(network_profiles_t *out){memset(out,0,sizeof(*out));out->count=empty_profiles?0:2;strcpy(out->rows[0].ssid,"fixture-one");strcpy(out->rows[0].password,"fixture-private");return profile_result;}
+static void native_wifi_erase(void *pointer,size_t size){memset(pointer,0,size);if(pointer==borrowed_profiles){const network_profiles_t zero={0};assert(size==sizeof(zero)&&!memcmp(pointer,&zero,size));++profile_wipes;}}
+static int network_runtime_start(native_state_t *state,esp_netif_t *netif,const network_profiles_t *profiles){
+    assert(state==&s_app_state&&state->lock&&netif==&station&&driver_ram);
+    borrowed_profiles=profiles;++runtime_starts;
+    if(profile_result!=ESP_OK){const network_profiles_t zero={0};assert(!memcmp(profiles,&zero,sizeof(zero)));}
+    else {assert(profiles->count==(empty_profiles?0:2));if(!empty_profiles)assert(!strcmp(profiles->rows[0].ssid,"fixture-one"));}
+    return sdk_result();
 }
+static int esp_wifi_start(void){assert(driver_ram&&profile_wipes);return sdk_result();}
+static int esp_wifi_stop(void){++stops;return stop_result;}
+static int esp_wifi_deinit(void){assert(runtime_stops);++deinits;return deinit_result;}
+static int network_runtime_stop(uint32_t timeout){assert(timeout==2000);++runtime_stops;return runtime_stop_result;}
+static int network_runtime_wait_initial(uint32_t timeout){assert(timeout==20000);++waits;return wait_result;}
+#define s_state s_network_state
+#include "network.inc"
+#undef s_state
+
+// The actual C3 handler is retained here only for its credential/sleep guarded
+// STA_START. Current CYD GOT/loss/time notifications execute in the owner suite.
 typedef const char *esp_event_base_t;
-static const char wifi_base[] = "wifi", ip_base[] = "ip";
+static const char wifi_base[]="wifi",ip_base[]="ip";
 #define WIFI_EVENT wifi_base
 #define IP_EVENT ip_base
 #define WIFI_EVENT_STA_START 1
 #define WIFI_EVENT_STA_DISCONNECTED 2
 #define IP_EVENT_STA_GOT_IP 3
 #define IP_EVENT_STA_LOST_IP 4
-#define ESP_EVENT_ANY_ID (-1)
-typedef enum {WIFI_MODE_NULL, WIFI_MODE_STA, WIFI_MODE_AP, WIFI_MODE_APSTA} wifi_mode_t;
-#define WIFI_IF_STA 0
-#define WIFI_AUTH_OPEN 0
-#define WIFI_STORAGE_RAM 1
+#define WIFI_RETRIES_PER_CREDENTIAL 2
+#define WIFI_CONNECTED_BIT 1U
+#define WIFI_FAILED_BIT 2U
 #define IPSTR "%u"
 #define IP2STR(ip) ((unsigned)(ip)->addr)
 typedef struct {struct {struct {uint32_t addr;} ip;} ip_info;} ip_event_got_ip_t;
-typedef struct {struct {uint8_t ssid[32], password[64];
-    struct {int authmode;} threshold; struct {bool capable, required;} pmf_cfg;} sta;} wifi_config_t;
-typedef struct {int unused;} wifi_init_config_t;
-#define WIFI_INIT_CONFIG_DEFAULT() ((wifi_init_config_t){0})
-static wifi_config_t s_station_config;
-static void *s_station_netif;
-static bool s_have_credentials, configured_credentials;
-static int s_retries;
-#define WIFI_MAX_RETRIES 8
-#define WIFI_CONNECTED_BIT 1U
-#define WIFI_FAILED_BIT 2U
-#define pdTRUE 1
-#define pdFALSE 0
-#define pdMS_TO_TICKS(ms) (ms)
-typedef uint32_t EventBits_t;
-static unsigned s_wifi_events, event_bits, startup_wait_bits;
-static int sdk_calls, fail_sdk_at, registered_ip_id;
-static unsigned connect_calls, ap_calls, time_notices, groups;
-static bool time_ready, mode_error, driver_ram;
-static wifi_mode_t mode;
-static void event_handler(void *, esp_event_base_t, int32_t, void *);
-static int sdk_result(void) {return ++sdk_calls == fail_sdk_at ? ESP_FAIL : ESP_OK;}
-static int network_service_storage_init(void) {return sdk_result();}
-static unsigned xEventGroupCreate(void) {return sdk_result() == ESP_OK ? 1U : 0U;}
-static unsigned xEventGroupSetBits(unsigned handle, unsigned bits) {assert(handle == 1U); event_bits |= bits; return event_bits;}
-static unsigned xEventGroupClearBits(unsigned handle, unsigned bits) {assert(handle == 1U); event_bits &= ~bits; return event_bits;}
-static unsigned xEventGroupWaitBits(unsigned handle, unsigned bits, int clear, int all, unsigned timeout) {
-    assert(handle == 1U && bits == 3U && clear == pdTRUE && all == pdFALSE && timeout == 20000U);
-    return startup_wait_bits;
-}
-static int esp_netif_init(void) {return sdk_result();}
-static int esp_event_loop_create_default(void) {return sdk_result();}
-static void *esp_netif_create_default_wifi_sta(void) {return sdk_result() == ESP_OK ? &s_display : NULL;}
-static int esp_wifi_init(const wifi_init_config_t *init) {assert(init); return sdk_result();}
-static int esp_wifi_set_storage(int storage) {
-    assert(storage == WIFI_STORAGE_RAM);int result=sdk_result();
-    driver_ram=result==ESP_OK;return result;
-}
-static int esp_event_handler_register(esp_event_base_t base, int32_t id,
-                                      void (*handler)(void *, esp_event_base_t, int32_t, void *), void *context) {
-    assert(handler == event_handler && !context);
-    if (base == IP_EVENT) registered_ip_id = id;
-    else assert(base == WIFI_EVENT && id == ESP_EVENT_ANY_ID);
-    return sdk_result();
-}
-static bool read_credentials(wifi_config_t *config) {memset(config, 0, sizeof(*config)); return configured_credentials;}
-static int esp_wifi_set_mode(wifi_mode_t desired) {mode = desired; return sdk_result();}
-static int esp_wifi_get_mode(wifi_mode_t *out) {*out = mode; return mode_error ? ESP_FAIL : ESP_OK;}
-static int esp_wifi_set_config(int interface, const wifi_config_t *config) {assert(interface == WIFI_IF_STA && config && driver_ram); return sdk_result();}
-static int esp_wifi_start(void) {assert(driver_ram);return sdk_result();}
-static int esp_wifi_connect(void) {++connect_calls; return ESP_OK;}
-static int start_access_point(void) {++ap_calls; mode = WIFI_MODE_APSTA; return ESP_OK;}
-static void time_service_notify_network(bool available) {time_ready = available; ++time_notices;}
-
-#define s_state s_network_state
-#include "network.inc"
-#undef s_state
-
-// The donor's complete event handler is compiled unchanged. Only its STA_START
-// path is exercised here; profile rotation and sleep lifecycle have other suites.
-#define WIFI_RETRIES_PER_CREDENTIAL 2
-static atomic_bool s_stopping_for_sleep;
-static size_t s_credential_index, s_credential_count;
 typedef struct {int rssi;} wifi_ap_record_t;
-static int select_credential(size_t index) {(void)index;return ESP_OK;}
-static int esp_wifi_sta_get_ap_info(wifi_ap_record_t *ap) {(void)ap;return ESP_FAIL;}
-static void native_state_set_wifi_rssi(native_state_t *state, int rssi) {(void)state;(void)rssi;}
-static void time_service_notify_network_ready(void) {time_service_notify_network(true);}
+static bool s_have_credentials;
+static atomic_bool s_stopping_for_sleep;
+static size_t s_credential_index,s_credential_count;
+static int s_retries;
+static unsigned s_wifi_events,event_bits,connect_calls,time_notices;
+static unsigned xEventGroupSetBits(unsigned handle,unsigned bits){assert(handle==1);event_bits|=bits;return event_bits;}
+static int esp_wifi_connect(void){++connect_calls;return ESP_OK;}
+static int select_credential(size_t index){(void)index;return ESP_OK;}
+static int esp_wifi_sta_get_ap_info(wifi_ap_record_t *ap){(void)ap;return ESP_FAIL;}
+static void native_state_set_wifi_rssi(native_state_t *state,int rssi){(void)state;(void)rssi;}
+static void time_service_notify_network_ready(void){++time_notices;}
 #define s_state s_network_state
 #define event_handler c3_event_handler
 #include "c3-events.inc"
 #undef event_handler
 #undef s_state
-
 static unsigned startup_step, display_step, time_step, pinned_step[2], pinned_count;
 static int time_start_error, nvs_error, spiffs_error;
 static bool health_ok;
@@ -150,73 +136,59 @@ static int xTaskCreatePinnedToCore(void (*task)(void *), const char *name,
 #include "startup.inc"
 #undef s_state
 
-static void reset(void) {
-    sdk_calls = fail_sdk_at = s_retries = 0; registered_ip_id = 999;
-    s_wifi_events = 1U; event_bits = startup_wait_bits = 0;
-    connect_calls = ap_calls = time_notices = 0; time_ready = false;
-    s_have_credentials = configured_credentials = mode_error = driver_ram = false; mode = WIFI_MODE_STA;
-    s_network_state = &s_app_state; native_state_init(&s_app_state);
-    startup_step = display_step = time_step = pinned_count = 0;
-    time_start_error = nvs_error = spiffs_error = 0; health_ok = true;
-}
 
-int main(void) {
-    reset();
-    assert(network_service_start(&s_app_state) == ESP_OK && ap_calls == 1U);
-    assert(registered_ip_id == ESP_EVENT_ANY_ID && !time_notices && driver_ram);
-    event_handler(NULL, WIFI_EVENT, WIFI_EVENT_STA_START, NULL);
-    assert(!connect_calls); ++groups;
-    reset(); configured_credentials = true; startup_wait_bits = WIFI_CONNECTED_BIT;
-    assert(network_service_start(&s_app_state) == ESP_OK && !ap_calls && !time_notices);
-    assert(registered_ip_id == ESP_EVENT_ANY_ID); ++groups;
-    reset(); configured_credentials = true; startup_wait_bits = WIFI_FAILED_BIT;
-    assert(network_service_start(&s_app_state) == ESP_OK && ap_calls == 1U && !time_notices); ++groups;
-    for (int failure = 1; failure <= 12; ++failure) {
-        reset(); configured_credentials = true; fail_sdk_at = failure;
-        assert(network_service_start(&s_app_state) != ESP_OK && !time_notices); ++groups;
+static void reset(void){
+    sdk_calls=fail_sdk_at=stops=deinits=releases=loop_deletes=runtime_stops=runtime_starts=waits=profile_wipes=0;
+    driver_ram=shared_loop=empty_profiles=false;
+    profile_result=wait_result=stop_result=runtime_stop_result=deinit_result=release_result=ESP_OK;
+    borrowed_profiles=NULL;s_station_netif=(network_netif_t){0};s_network_state=NULL;
+    atomic_store(&s_network_start,NETWORK_OFF);native_state_init(&s_app_state);
+    s_wifi_events=1;event_bits=connect_calls=time_notices=0;s_have_credentials=false;
+    atomic_store(&s_stopping_for_sleep,false);s_credential_count=s_credential_index=s_retries=0;
+    startup_step=display_step=time_step=pinned_count=0;
+    time_start_error=nvs_error=spiffs_error=0;health_ok=true;
+}
+int main(void){
+    reset();assert(network_service_start(NULL)==ESP_ERR_INVALID_ARG&&!sdk_calls);
+    s_app_state.lock=NULL;assert(network_service_start(&s_app_state)==ESP_ERR_INVALID_ARG&&!sdk_calls);++groups;
+    reset();assert(network_service_start(&s_app_state)==ESP_OK&&driver_ram&&runtime_starts==1&&waits==1&&profile_wipes==1);
+    unsigned before=sdk_calls;assert(network_service_start(&s_app_state)==ESP_OK&&sdk_calls==before);
+    native_state_t other={.lock=&s_display};assert(network_service_start(&other)==ESP_ERR_INVALID_STATE&&sdk_calls==before);++groups;
+    reset();empty_profiles=true;assert(network_service_start(&s_app_state)==ESP_OK&&runtime_starts==1);++groups;
+    reset();profile_result=ESP_FAIL;assert(network_service_start(&s_app_state)==ESP_OK&&runtime_starts==1&&profile_wipes==1);++groups;
+    reset();shared_loop=true;assert(network_service_start(&s_app_state)==ESP_OK&&!loop_deletes);++groups;
+    reset();wait_result=ESP_ERR_TIMEOUT;assert(network_service_start(&s_app_state)==ESP_OK&&atomic_load(&s_network_start)==NETWORK_READY);++groups;
+    reset();wait_result=ESP_FAIL;assert(network_service_start(&s_app_state)==ESP_FAIL&&atomic_load(&s_network_start)==NETWORK_READY&&!runtime_stops);++groups;
+    for(unsigned failure=1;failure<=9;++failure){
+        reset();fail_sdk_at=failure;
+        assert(network_service_start(&s_app_state)==ESP_FAIL&&atomic_load(&s_network_start)==NETWORK_OFF);
+        assert(runtime_stops==1&&releases==1&&!s_station_netif.handle);
+        assert(loop_deletes==(failure>=4));assert(stops==(failure>=6)&&deinits==(failure>=6));
+        assert(!waits);++groups;
     }
-    const wifi_mode_t modes[] = {WIFI_MODE_STA, WIFI_MODE_AP, WIFI_MODE_APSTA, WIFI_MODE_NULL};
-    for (unsigned i = 0; i < sizeof(modes) / sizeof(modes[0]); ++i) {
-        reset(); mode = modes[i]; event_bits = WIFI_FAILED_BIT;
-        ip_event_got_ip_t event = {.ip_info.ip.addr = UINT32_C(0x01020304)};
-        event_handler(NULL, IP_EVENT, IP_EVENT_STA_GOT_IP, &event);
-        assert(time_ready && time_notices == 1U && s_app_state.ip == event.ip_info.ip.addr);
-        assert(s_app_state.mode == NATIVE_NETWORK_CLIENT && event_bits == WIFI_CONNECTED_BIT);
-        event_handler(NULL, WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, NULL);
-        assert(!time_ready && time_notices == 2U && !s_app_state.ip);
-        assert(!(event_bits & WIFI_CONNECTED_BIT));
-        assert(s_app_state.mode == ((mode == WIFI_MODE_AP || mode == WIFI_MODE_APSTA)
-                                   ? NATIVE_NETWORK_ACCESS_POINT : NATIVE_NETWORK_STARTING)); ++groups;
-        event_handler(NULL, IP_EVENT, IP_EVENT_STA_GOT_IP, &event);
-        event_handler(NULL, IP_EVENT, IP_EVENT_STA_LOST_IP, NULL);
-        assert(!time_ready && !s_app_state.ip && !(event_bits & WIFI_CONNECTED_BIT)); ++groups;
+    reset();shared_loop=true;fail_sdk_at=9;assert(network_service_start(&s_app_state)==ESP_FAIL&&!loop_deletes);++groups;
+    reset();fail_sdk_at=9;stop_result=ESP_ERR_WIFI_NOT_STARTED;assert(network_service_start(&s_app_state)==ESP_FAIL&&atomic_load(&s_network_start)==NETWORK_OFF&&runtime_stops==1);++groups;
+    for(unsigned failure=0;failure<4;++failure){
+        reset();fail_sdk_at=9;
+        if(failure==0)stop_result=ESP_FAIL;
+        if(failure==1)runtime_stop_result=ESP_FAIL;
+        if(failure==2)deinit_result=ESP_FAIL;
+        if(failure==3)release_result=ESP_FAIL;
+        assert(network_service_start(&s_app_state)==ESP_FAIL&&atomic_load(&s_network_start)==NETWORK_RETAINED);
+        assert(s_station_netif.handle&&!loop_deletes);
+        if(failure==0)assert(!runtime_stops&&!deinits&&!releases);
+        if(failure==1)assert(!deinits&&!releases);
+        if(failure==2)assert(!releases);
+        before=sdk_calls;assert(network_service_start(&s_app_state)==ESP_ERR_INVALID_STATE&&sdk_calls==before);++groups;
     }
-    reset(); mode_error = true; s_app_state.ip = UINT32_MAX;
-    event_handler(NULL, IP_EVENT, IP_EVENT_STA_LOST_IP, NULL);
-    assert(!time_ready && !s_app_state.ip && s_app_state.mode == NATIVE_NETWORK_STARTING); ++groups;
-    reset(); s_have_credentials = true;
-    event_handler(NULL, WIFI_EVENT, WIFI_EVENT_STA_START, NULL);
-    for (unsigned i = 0; i < 9U; ++i) event_handler(NULL, WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, NULL);
-    assert(connect_calls == 9U && event_bits == WIFI_FAILED_BIT && !time_ready); ++groups;
-    reset(); event_handler(NULL, IP_EVENT, 999, NULL);
-    assert(!time_notices && !connect_calls && !event_bits); ++groups;
-    reset();
-    c3_event_handler(NULL, WIFI_EVENT, WIFI_EVENT_STA_START, NULL);
-    assert(connect_calls == 0U);
-    s_have_credentials=true;
-    c3_event_handler(NULL, WIFI_EVENT, WIFI_EVENT_STA_START, NULL);
-    assert(connect_calls == 1U);
-    atomic_store(&s_stopping_for_sleep,true);
-    c3_event_handler(NULL, WIFI_EVENT, WIFI_EVENT_STA_START, NULL);
-    assert(connect_calls == 1U); ++groups;
-    for (unsigned failure = 0; failure < 5U; ++failure) {
-        reset(); time_start_error = failure == 1U ? ESP_ERR_NO_MEM : 0;
-        nvs_error = failure == 2U ? ESP_FAIL : 0; spiffs_error = failure == 3U ? ESP_FAIL : 0;
-        health_ok = failure != 4U;
-        app_main();
-        assert(pinned_count == 2U && time_step > display_step && time_step < pinned_step[0]);
-        assert(pinned_step[0] < pinned_step[1] && !time_notices); ++groups;
+    reset();c3_event_handler(NULL,WIFI_EVENT,WIFI_EVENT_STA_START,NULL);assert(connect_calls==0U);
+    s_have_credentials=true;c3_event_handler(NULL,WIFI_EVENT,WIFI_EVENT_STA_START,NULL);assert(connect_calls==1U);
+    atomic_store(&s_stopping_for_sleep,true);c3_event_handler(NULL,WIFI_EVENT,WIFI_EVENT_STA_START,NULL);assert(connect_calls==1U);++groups;
+    for(unsigned failure=0;failure<5;++failure){
+        reset();time_start_error=failure==1?ESP_ERR_NO_MEM:0;nvs_error=failure==2?ESP_FAIL:0;spiffs_error=failure==3?ESP_FAIL:0;health_ok=failure!=4;
+        app_main();assert(pinned_count==2U&&time_step>display_step&&time_step<pinned_step[0]);
+        assert(pinned_step[0]<pinned_step[1]&&!time_notices);++groups;
     }
-    printf("PASS CYD time/network startup: %u groups; actual startup/events and SDK subscription, offline initialization, loss/reconnect/AP state, retained task affinity; platform seams only\n", groups);
+    printf("PASS CYD startup facade: %u groups; actual app/time ordering, task affinity, SDK bootstrap failure rollback, retained resources, default-loop ownership, atomic active-profile handoff; C3 guarded STA_START; platform seams only\n",groups);
     return 0;
 }

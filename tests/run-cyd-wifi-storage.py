@@ -34,6 +34,7 @@ def main():
     files = [Path(__file__), test, ROOT / 'tests/native/cyd_wifi_warning_test.c',
              ROOT / 'tests/run-cyd-wifi-warning.py', ROOT / 'tests/run-web-warning-regressions.py',
              MAIN / 'network_service.c', MAIN / 'network_service.h', MAIN / 'web_upload.c', MAIN / 'web_upload.h',
+             MAIN / 'network_profiles.c', MAIN / 'network_profiles.h',
              SHARED / 'file_transaction.c', SHARED / 'include/file_transaction.h', SHARED / 'include/credential_line.h',
              WIFI / 'native_wifi_store.c', WIFI / 'native_wifi_file.c',
              WIFI / 'include/native_wifi_store.h', WIFI / 'include/native_wifi_file.h']
@@ -53,7 +54,7 @@ def main():
     network_names = ['wifi_store_lock', 'wifi_store_unlock', 'wifi_store_read',
                      'wifi_store_publish', 'wifi_store_error',
                      'network_service_storage_init', 'network_service_wifi_metadata',
-                     'network_service_wifi_edit', 'read_credentials',
+                     'network_service_wifi_edit',
                      'network_service_validate_credentials_file',
                      'network_service_save_credentials_file', 'network_service_save_credentials']
     storage_names = ['web_upload_storage_init', 'backup_name', 'web_upload_open_file',
@@ -61,7 +62,10 @@ def main():
     globals_start = network.index('static native_wifi_store_t s_wifi_store;')
     globals_end = network.index('\n};', globals_start) + len('\n};')
     (out / 'cyd-wifi-production.inc').write_text(network[globals_start:globals_end] + '\n' +
-        ''.join(helpers.function(network, name) for name in network_names))
+        ''.join(helpers.function(network, name) for name in network_names) +
+        helpers.function((source_root / MAIN.relative_to(ROOT) / 'network_profiles.c').read_text(),
+                         'network_profiles_load'))
+    (out / 'esp_err.h').write_text('#pragma once\ntypedef int esp_err_t;\n')
     (out / 'cyd-storage-production.inc').write_text('static SemaphoreHandle_t s_storage_lock;\n' +
         ''.join(helpers.function(storage, name) for name in storage_names))
     binary = out / 'cyd-wifi-storage'
@@ -69,6 +73,7 @@ def main():
     command = ['gcc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
         '-fsanitize=address,undefined', '-fno-omit-frame-pointer', '-fno-pie', '-no-pie', '-pthread',
         '-I' + host(out), '-I' + host(frozen_shared), '-I' + host(frozen_shared / 'include'),
+        '-I' + host(source_root / MAIN.relative_to(ROOT)),
         '-I' + host(source_root / WIFI.relative_to(ROOT)),
         '-I' + host(source_root / WIFI.relative_to(ROOT) / 'include'),
         host(source_root / test.relative_to(ROOT)), '-o', host(binary)]
@@ -131,7 +136,7 @@ def main():
               'fixture_groups': int(re.search(rb': (\d+) fixture groups;', log)[1]),
               'source_sha256': hashes,
               'negative_controls': negatives,
-              'scope': 'Actual bounded validation, save, first-valid reader and storage/transaction functions; mapped host filesystem with SPIFFS no-overwrite rename rules, explicit stdio/stat/rename/remove/OOM/timeout faults and pthread concurrent saves. No hardware flash durability, network reconnection, or reboot timing claim.'}
+              'scope': 'Actual bounded validation, desired save, atomic boot-profile loader and storage/transaction functions; mapped host filesystem with SPIFFS no-overwrite rename rules, explicit stdio/stat/rename/remove/OOM/timeout faults and pthread concurrent saves. No hardware flash durability, network reconnection, or reboot timing claim.'}
     (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
 
 

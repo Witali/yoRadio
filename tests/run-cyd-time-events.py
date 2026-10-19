@@ -1,8 +1,9 @@
-"""Execute CYD startup and network time notifications with platform seams.
+"""Execute current CYD bootstrap facade and app/time ordering with platform seams.
 
-The production startup, network startup and event handler bodies run unchanged.
-SDK, RTOS, file loading, display and time service boundaries are deterministic
-host seams; this does not qualify hardware scheduling or network timing.
+Production app startup and current network facade bodies run unchanged. SDK,
+RTOS, profile loading, display and time boundaries are deterministic host seams.
+Current CYD GOT/loss/time notifications execute in run-cyd-network-runtime.py;
+the old CYD event handler is not represented as current production here.
 """
 import argparse
 import hashlib
@@ -34,6 +35,8 @@ def main():
     helper = ROOT / 'tests/run-web-warning-regressions.py'
     files = [Path(__file__).resolve(), test, helper, main_dir / 'app_main.c',
              main_dir / 'network_service.c', main_dir / 'board_config.h',
+             main_dir / 'network_profiles.h', main_dir / 'network_netif.h',
+             main_dir / 'network_runtime.h',
              ROOT / 'idf/esp32-cyd2usb-native/sdkconfig.defaults',
              ROOT / 'idf/esp32c3-oled-native/main/network_service.c',
              ROOT / 'tools/codec_benchmark/run_output_dma_host.py']
@@ -52,13 +55,16 @@ def main():
     spec.loader.exec_module(helpers)
     network = (frozen / main_dir.relative_to(ROOT) / 'network_service.c').read_text()
     startup = (frozen / main_dir.relative_to(ROOT) / 'app_main.c').read_text()
-    network_unit = ''.join(helpers.function(network, name) for name in
-                           ['station_lost_ip', 'event_handler', 'network_service_start'])
+    globals_start=network.index('static network_netif_t s_station_netif;')
+    globals_end=network.index('static SemaphoreHandle_t',globals_start)
+    network_unit=network[globals_start:globals_end]+helpers.function(network,'network_service_start')
     startup_unit = ''.join(helpers.function(startup, name) for name in ['mount_spiffs', 'app_main'])
     c3_unit = helpers.function((frozen/'idf/esp32c3-oled-native/main/network_service.c').read_text(), 'event_handler')
     assert 'CONFIG_LWIP_SNTP_MAX_SERVERS=2' in (frozen / 'idf/esp32-cyd2usb-native/sdkconfig.defaults').read_text()
     (out / 'driver').mkdir()
     (out / 'driver/gpio.h').write_text('/* GPIO declarations unused by this startup fixture. */\n')
+    (out / 'esp_err.h').write_text('#pragma once\ntypedef int esp_err_t;\n')
+    (out / 'esp_netif.h').write_text('#pragma once\ntypedef struct esp_netif esp_netif_t;\n')
     command = ['gcc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
                '-Wno-unused-function', '-Wno-unused-variable',
                '-fsanitize=address,undefined', '-fno-omit-frame-pointer', '-fno-pie', '-no-pie',
@@ -87,22 +93,20 @@ def main():
 
     run_case('positive', network_unit, startup_unit)
     mutations = [
-        ('missing_ready_notice', 'network', '        time_service_notify_network(true);',
-         '        /* no ready notice */', 'time_ready && time_notices == 1U'),
-        ('missing_loss_notice', 'network', '    time_service_notify_network(false);',
-         '    /* no loss notice */', '!time_ready && time_notices == 2U'),
-        ('missing_loss_subscription', 'network', 'IP_EVENT, ESP_EVENT_ANY_ID, event_handler, NULL)',
-         'IP_EVENT, IP_EVENT_STA_GOT_IP, event_handler, NULL)', 'registered_ip_id == ESP_EVENT_ANY_ID'),
         ('missing_time_start', 'startup', 'result = time_service_start();',
-         'result = ESP_OK;', 'time_step > display_step'),
-        ('stale_ip_after_loss', 'network', ': NATIVE_NETWORK_STARTING, 0);',
-         ': NATIVE_NETWORK_STARTING, UINT32_MAX);', '!time_ready && time_notices == 2U && !s_app_state.ip'),
+         'result = ESP_OK;', 'time_step>display_step'),
         ('changed_network_affinity', 'startup', 'NULL, 3, NULL, 0);',
          'NULL, 3, NULL, 1);', 'priority == 3U && core == 0'),
         ('driver_flash_persistence', 'network', 'esp_wifi_set_storage(WIFI_STORAGE_RAM)',
          'ESP_OK', 'driver_ram'),
-        ('empty_file_uses_retained_driver_profile', 'network',
-         'if (s_have_credentials) esp_wifi_connect();', 'esp_wifi_connect();', '!connect_calls'),
+        ('missing_profile_load','network','esp_err_t loaded = network_profiles_load(&profiles);',
+         'esp_err_t loaded = ESP_OK;','profiles->count==(empty_profiles?0:2)'),
+        ('partial_profile_failure_handoff','network','        native_wifi_erase(&profiles, sizeof(profiles));',
+         '        /* negative: publish partial table */','!memcmp(profiles,&zero,sizeof(zero))'),
+        ('destroy_after_stop_failure','network','stopped != ESP_OK && stopped != ESP_ERR_WIFI_NOT_STARTED',
+         'false','atomic_load(&s_network_start)==NETWORK_RETAINED'),
+        ('missing_runtime_rollback','network','network_runtime_stop(2000)',
+         'ESP_OK','runtime_stops==1&&releases==1&&!s_station_netif.handle'),
     ]
     for name, unit, old, new, assertion in mutations:
         contents = network_unit if unit == 'network' else startup_unit
@@ -113,7 +117,7 @@ def main():
     old='if (s_have_credentials) esp_wifi_connect();'
     assert c3_unit.count(old)==1
     run_case('donor_empty_file_uses_retained_driver_profile', network_unit, startup_unit,
-             'connect_calls == 0U', c3_unit.replace(old,'esp_wifi_connect();',1))
+             'connect_calls==0U', c3_unit.replace(old,'esp_wifi_connect();',1))
     (out / 'network.inc').write_text(network_unit)
     (out / 'startup.inc').write_text(startup_unit)
     (out / 'c3-events.inc').write_text(c3_unit)

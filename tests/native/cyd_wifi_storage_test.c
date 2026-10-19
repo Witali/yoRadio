@@ -18,7 +18,9 @@ typedef int esp_err_t;
 #define ESP_ERR_INVALID_ARG 0x102
 #define ESP_ERR_INVALID_STATE 0x103
 #define ESP_ERR_INVALID_SIZE 0x104
+#define ESP_ERR_NOT_FOUND 0x105
 #define ESP_ERR_TIMEOUT 0x107
+#include "network_profiles.h"
 #define ESP_RETURN_ON_FALSE(condition,error,...) do {if (!(condition)) return (error);} while (0)
 #define ESP_RETURN_ON_ERROR(expression,...) do {int result_ = (expression); if (result_ != ESP_OK) return result_;} while (0)
 #define pdTRUE 1
@@ -130,12 +132,6 @@ static int mapped_rename(const char *from, const char *to) {
     if (access(target, F_OK) == 0) {errno = EEXIST; return -1;} // Real SPIFFS rename rule.
     return rename(source, target);
 }
-static size_t strlcpy(char *out, const char *text, size_t cap) {
-    size_t size = strlen(text);
-    if (cap) {size_t count = size < cap - 1U ? size : cap - 1U; memcpy(out, text, count); out[count] = 0;}
-    return size;
-}
-
 #include "credential_line.h"
 #define stat(...) mapped_stat(__VA_ARGS__)
 #define remove(...) mapped_remove(__VA_ARGS__)
@@ -178,13 +174,15 @@ static void clear(void) {
     ++cases;
 }
 static void expect_read(bool accepted, const char *ssid, const char *password) {
-    struct {uint64_t before; wifi_config_t config; uint64_t after;} guarded = {
+    struct {uint64_t before; network_profiles_t profiles; uint64_t after;} guarded = {
         .before = UINT64_C(0x123456789abcdef0), .after = UINT64_C(0xfedcba9876543210)};
-    memset(&guarded.config, 0xa5, sizeof(guarded.config)); wifi_config_t initial = guarded.config;
-    assert(read_credentials(&guarded.config) == accepted);
+    memset(&guarded.profiles, 0xa5, sizeof(guarded.profiles)); network_profiles_t initial = guarded.profiles;
+    esp_err_t result = network_profiles_load(&guarded.profiles);
+    assert((result == ESP_OK && guarded.profiles.count > 0) == accepted);
     assert(guarded.before == UINT64_C(0x123456789abcdef0) && guarded.after == UINT64_C(0xfedcba9876543210));
-    if (accepted) assert(!strcmp((char *)guarded.config.sta.ssid, ssid) && !strcmp((char *)guarded.config.sta.password, password));
-    else assert(!memcmp(&guarded.config, &initial, sizeof(initial)));
+    if (accepted) assert(!strcmp(guarded.profiles.rows[0].ssid, ssid) && !strcmp(guarded.profiles.rows[0].password, password));
+    else if (result != ESP_OK) assert(!memcmp(&guarded.profiles, &initial, sizeof(initial)));
+    else {const network_profiles_t empty = {0}; assert(!memcmp(&guarded.profiles, &empty, sizeof(empty)));}
 }
 static void reject(const void *data, size_t size) {
     clear(); text(live, old_wifi); unsigned before_open = open_calls, before_write = write_calls;
@@ -384,6 +382,6 @@ int main(int argc, char **argv) {
     assert(equals(live, "second-fixture\tsecond-fixture\n") && !exists(backup) && !exists(temporary));
     assert(write_calls && flush_calls && close_calls);
     private_metadata_cases();
-    printf("PASS CYD Wi-Fi storage: %u fixture groups; bounded full-file/field validation, first-valid/whitespace, preserved active config, OOM/locks, stdio/rename/rollback/recovery faults, serialized concurrent saves\n", cases);
+    printf("PASS CYD Wi-Fi storage: %u fixture groups; bounded full-file/field validation, atomic profile load/whitespace, preserved active config, OOM/locks, stdio/rename/rollback/recovery faults, serialized concurrent saves\n", cases);
     return 0;
 }

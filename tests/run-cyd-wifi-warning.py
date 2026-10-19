@@ -26,13 +26,14 @@ def main():
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--baseline',default='4d5d8e1812a2e7f04a04144e27aeb472b2446ebf')
     args=parser.parse_args();out=args.output.resolve();out.mkdir(parents=True,exist_ok=False)
-    source=MAIN/'network_service.c'
+    historical=MAIN/'network_service.c'
+    source=MAIN/'network_profiles.c'
     baseline=subprocess.check_output(['git','rev-parse',args.baseline],cwd=ROOT,text=True).strip()
-    old=subprocess.check_output(['git','show',baseline+':'+source.relative_to(ROOT).as_posix()],cwd=ROOT).decode()
+    old=subprocess.check_output(['git','show',baseline+':'+historical.relative_to(ROOT).as_posix()],cwd=ROOT).decode()
     (out/'baseline-network_service.c').write_text(old)
     current=source.read_text()
     test=ROOT/'tests/native/cyd_wifi_warning_test.c'
-    files=[Path(__file__),test,source,SHARED,ROOT/'tests/run-web-warning-regressions.py',
+    files=[Path(__file__),test,source,MAIN/'network_profiles.h',SHARED,ROOT/'tests/run-web-warning-regressions.py',
            WIFI/'native_wifi_store.c',WIFI/'include/native_wifi_store.h']
     report={'baseline_commit':baseline,'sanitizers':['ASan','UBSan'],'physical_tested':False,'variants':{}}
     report['source_sha256']={}
@@ -43,11 +44,13 @@ def main():
     frozen=out/'sources'
     current=(frozen/source.relative_to(ROOT)).read_text()
     for name,contents,negative in [('negative-old-source',old,True),('shared-reader',current,False)]:
-        (out/'cyd-wifi-production.inc').write_text(helpers.function(contents,'read_credentials'))
+        (out/'cyd-wifi-production.inc').write_text(helpers.function(contents,'read_credentials' if negative else 'network_profiles_load'))
+        (out/'esp_err.h').write_text('#pragma once\ntypedef int esp_err_t;\n')
         binary=out/name
         (out/(name+'-build.log')).write_bytes(run(['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
             '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
-            '-I'+host(out),'-I'+host(frozen/SHARED.parent.relative_to(ROOT)),
+            *(['-DCYD_WIFI_READER_HISTORICAL=1'] if negative else []),
+            '-I'+host(out),'-I'+host(frozen/MAIN.relative_to(ROOT)),'-I'+host(frozen/SHARED.parent.relative_to(ROOT)),
             '-I'+host(frozen/WIFI.relative_to(ROOT)/'include'),
             host(frozen/test.relative_to(ROOT)),host(frozen/WIFI.relative_to(ROOT)/'native_wifi_store.c'),
             '-o',host(binary)]))
@@ -56,11 +59,13 @@ def main():
                      'timeout','30',host(binary),host(out/(name+'.csv'))]);passed=True
         except subprocess.CalledProcessError as error:log=error.output;passed=False
         (out/(name+'.log')).write_bytes(log)
-        if negative:assert not passed,'Historical CYD reader unexpectedly accepted the rejection regression'
+        if negative:
+            assert not passed and b'Assertion' in log and b'!strcmp' in log,'Historical CYD reader did not reproduce the oversized physical-row assertion'
+            assert b'AddressSanitizer' not in log and b'runtime error:' not in log
         else:assert passed,log.decode(errors='replace');print(log.decode(),end='')
         report['variants'][name]='DETECTED' if negative else 'PASS'
     report['passed']=True
-    report['scope']='Actual CYD first-valid credential reader and exact shared bounded row helper; mapped stdio/cookie IO seams, no Wi-Fi hardware or profile/reconnect/timing/power changes.'
+    report['scope']='Actual current CYD atomic boot-profile loader and exact shared bounded row helper; the old first-valid reader executes only as a labelled historical oversized-row negative control. Mapped stdio/cookie IO seams, no Wi-Fi hardware or reconnect/timing/power claims.'
     (out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
 
 

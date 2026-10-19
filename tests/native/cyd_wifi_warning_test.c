@@ -7,6 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "native_wifi_store.h"
+typedef int esp_err_t;
+#define ESP_OK 0
+#define ESP_FAIL (-1)
+#define ESP_ERR_INVALID_ARG 0x102
+#define ESP_ERR_NOT_FOUND 0x105
+#include "network_profiles.h"
 static unsigned getc_calls;
 static int traced_getc(FILE *file) {++getc_calls;return fgetc(file);}
 #define fgetc traced_getc
@@ -17,7 +23,7 @@ typedef struct {struct {uint8_t ssid[32],password[64];}sta;} wifi_config_t;
 static const char *fixture;
 static const uint8_t *cookie_data;
 static size_t cookie_size,cookie_position,cookie_fragment,cookie_error_at;
-static bool use_cookie,missing;
+static bool use_cookie,missing,close_error;
 static unsigned cases;
 static unsigned cookie_read_calls;
 static ssize_t cookie_read(void *context,char *buffer,size_t capacity) {
@@ -30,13 +36,16 @@ static ssize_t cookie_read(void *context,char *buffer,size_t capacity) {
     if(count>cookie_error_at-cookie_position)count=cookie_error_at-cookie_position;
     memcpy(buffer,cookie_data+cookie_position,count);cookie_position+=count;return (ssize_t)count;
 }
+static int cookie_close(void *context) {(void)context;if(close_error){errno=EIO;return -1;}return 0;}
 static FILE *mapped_open(const char *path,const char *mode) {
     assert(!strcmp(path,"/spiffs/data/wifi.csv")&&!strcmp(mode,"r"));
     if(missing){errno=ENOENT;return NULL;}
     if(!use_cookie)return fopen(fixture,"rb");
-    cookie_position=0;cookie_io_functions_t functions={.read=cookie_read};return fopencookie(NULL,"r",functions);
+    cookie_position=0;cookie_io_functions_t functions={.read=cookie_read,.close=cookie_close};return fopencookie(NULL,"r",functions);
 }
+#ifdef CYD_WIFI_READER_HISTORICAL
 static size_t strlcpy(char *target,const char *source,size_t capacity){size_t length=strlen(source);if(capacity){size_t count=length<capacity-1?length:capacity-1;memcpy(target,source,count);target[count]=0;}return length;}
+#endif
 #define web_upload_open_file(path) mapped_open(path,"r")
 #define fopen(...) mapped_open(__VA_ARGS__)
 #include "cyd-wifi-production.inc"
@@ -45,9 +54,10 @@ static size_t strlcpy(char *target,const char *source,size_t capacity){size_t le
 
 static void put(const void *data,size_t size) {
     FILE *file=fopen(fixture,"wb");assert(file);assert(fwrite(data,1,size,file)==size);assert(!fclose(file));
-    use_cookie=missing=false;cookie_error_at=SIZE_MAX;cookie_fragment=SIZE_MAX;++cases;
+    use_cookie=missing=close_error=false;cookie_error_at=SIZE_MAX;cookie_fragment=SIZE_MAX;++cases;
 }
 static bool expect(bool accepted,const char *ssid,const char *password) {
+#ifdef CYD_WIFI_READER_HISTORICAL
     struct {uint64_t before;wifi_config_t config;uint64_t after;} guarded={.before=UINT64_C(0x123456789abcdef0),.after=UINT64_C(0xfedcba9876543210)};
     memset(&guarded.config,0xa5,sizeof(guarded.config));wifi_config_t initial=guarded.config;
     bool result=read_credentials(&guarded.config);assert(result==accepted);
@@ -55,6 +65,18 @@ static bool expect(bool accepted,const char *ssid,const char *password) {
     if(result){assert(!strcmp((char *)guarded.config.sta.ssid,ssid)&&!strcmp((char *)guarded.config.sta.password,password));}
     else assert(!memcmp(&guarded.config,&initial,sizeof(initial)));
     return result;
+#else
+    struct {uint64_t before;network_profiles_t profiles;uint64_t after;} guarded={.before=UINT64_C(0x123456789abcdef0),.after=UINT64_C(0xfedcba9876543210)};
+    memset(&guarded.profiles,0xa5,sizeof(guarded.profiles));network_profiles_t initial=guarded.profiles;
+    esp_err_t status=network_profiles_load(&guarded.profiles);
+    bool result=status==ESP_OK&&guarded.profiles.count>0;
+    assert(result==accepted);
+    assert(guarded.before==UINT64_C(0x123456789abcdef0)&&guarded.after==UINT64_C(0xfedcba9876543210));
+    if(result)assert(!strcmp(guarded.profiles.rows[0].ssid,ssid)&&!strcmp(guarded.profiles.rows[0].password,password));
+    else if(status!=ESP_OK)assert(!memcmp(&guarded.profiles,&initial,sizeof(initial)));
+    else {const network_profiles_t empty={0};assert(!memcmp(&guarded.profiles,&empty,sizeof(empty)));}
+    return result;
+#endif
 }
 static void text(const char *data){put(data,strlen(data));}
 
@@ -89,7 +111,8 @@ int main(int argc,char **argv) {
     ++cases;cookie_error_at=0;expect(false,NULL,NULL);
     ++cases;cookie_error_at=cookie_size;expect(false,NULL,NULL); // Error replaces EOF after a partial final row.
     text("allowed\tfixture\nsecond\tfixture\n");use_cookie=true;cookie_data=(const uint8_t *)"allowed\tfixture\nsecond\tfixture\n";cookie_size=strlen((const char *)cookie_data);
-    cookie_fragment=1;cookie_error_at=strlen("allowed\tfixture\n");expect(true,"allowed","fixture"); // Preserve first-valid CYD policy.
+    cookie_fragment=1;cookie_error_at=strlen("allowed\tfixture\n");expect(false,NULL,NULL); // Any later read failure rejects the complete boot snapshot.
+    ++cases;cookie_error_at=SIZE_MAX;close_error=true;expect(false,NULL,NULL);close_error=false;
     FILE *file=tmpfile();assert(file);fputs("invalid suffix to discard\nvalid\n",file);rewind(file);
     struct {char line[8];uint64_t canary;} bounded={.canary=UINT64_C(0x123456789abcdef0)};
     assert(native_credential_next_row(file,bounded.line,sizeof(bounded.line))&&!strcmp(bounded.line,"valid"));
@@ -109,6 +132,6 @@ int main(int argc,char **argv) {
     before_getc=getc_calls;before_cookie=cookie_read_calls;
     for(unsigned repeat=0;repeat<3;++repeat)assert(!native_credential_next_row(file,final_line,sizeof(final_line)));
     assert(getc_calls==before_getc&&cookie_read_calls==before_cookie);fclose(file);++cases;
-    printf("PASS CYD credentials: %u fixtures, physical rows/read splits, 32/64 bounds, NUL/CR/tabs, first-valid/whitespace, EOF/read errors; no credentials logged\n",cases);
+    printf("PASS CYD credentials: %u fixtures, physical rows/read splits, 32/64 bounds, NUL/CR/tabs, ordered atomic profiles/whitespace, EOF/read/close errors; no credentials logged\n",cases);
     return 0;
 }
