@@ -36,6 +36,22 @@ JPEGXL и WebP. Не включать их внедрение в текущую 
    формат в публикуемый список поддержки. Для будущих форматов не обещать
    совместимость только по наличию библиотеки или browser preview.
 
+Текущий обычный JPEG — отдельная ветка `codex/small-tv-jpeg-library` от7f26262e.
+Host-кандидат libjpeg-turbo3.2.0, pinned c85e6b905bf237038faa936dab160ebfc5da0344;
+production B50D не изменён. Проверены25resource/924lossless/16invalid/4optional/
+18budget cases и18неплоских JPEG с независимым Pillow. Патч сохраняет pixels:
+не создаёт unused range table для direct lossless и уменьшает progressive
+window только при явно выключенном smoothing у non-buffered клиента.
+LosslessRGB16 pool755907→29980bytes; progressiveCMYK8 —45885pool+460800backing,
+но2764800logical write bytes/decode. Это host temporary file, не готовый NOR
+backend. 64KiB — только library pools, не весь RAM. 12-bit lossy всё ещё не
+помещается:176345/347927bytes без лимита. Далее RV32 size/общий RAM/stack,
+12-bit fixed tables, NOR-aware scratch, RGB565 converter/factory pixels,
+I/O faults/reuse и отдельные HTTP/LCD/полный regression для новой сборки.
+Документация/воспроизведение: tests/jpeg_library_probe/README.md. Proof:
+../qemu/parity/jpeg-library-host-qualification-20261019.json,13raw artifacts,
+983реальных fixtures. Полный T.81 и fit наC2 этим не объявляются.
+
 Обновление2026-10-19: исторический F1 full завершился успешно,19automatic
 groups и566frozen inputs совпали. Его старый publisher отдельно отвергает
 24HTTP checks из-за прежнего списка22; исправление списка уже входит в56010f00.

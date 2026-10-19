@@ -3164,3 +3164,39 @@ true. Это только начало нового прогона, не 24 ча
   измерения ресурсов, codec module, independent fixtures/reference pixels,
   privacy/error handling, HTTP/storage и отдельный display test. WebP alpha и
   animation имеют отдельные критерии. В текущую реализацию они не добавляются.
+
+## 2026-10-19 — квалификация памяти новой JPEG библиотеки
+
+- В отдельной ветке `codex/small-tv-jpeg-library` от7f26262e подготовлен
+  воспроизводимый host-стенд для libjpeg-turbo3.2.0/c85e6b90. Upstream tree
+  остаётся неизменным; build.py экспортирует точный commit и применяет отдельный
+  patch к копии. Сохранены исходные LICENSE.md/README.ijg, SHA и происхождение.
+- Найдены две устранимые затраты: range-limit table не используется в прямом
+  lossless без quantization/buffered mode; progressive резервирует пять iMCU
+  строк даже при явно отключённом smoothing. Патч оставляет прежний путь для
+  quantized/buffered клиентов. В test allocator используются минимальные
+  virtual windows и hard cap фактических allocations; 5% headroom сам по себе
+  проблему пяти строк не исправил.
+- Итоговый MSVC/Release стенд использует общий static CRT `/MT` для probe и
+  library, поскольку между ними передаются FILE pointers. Сборка не запускает
+  upstream regression. Сохранены и не объявляются успехом промежуточные ошибки:
+  PDB/compiler configuration, недопустимый restart13 для lossless row31 и
+  недостаточный Pillow encoder MAXBLOCK. Исправлены Release try-compile,
+  MCU-row restart62 и host encoder buffer1MiB соответственно.
+- Итоговые25resource cases,924lossless cases (2–16bits,7predictors,point
+  transforms),16truncated inputs,4optional controls и18budget cases прошли.
+  Все successful bytes совпали с upstream; lossless — также с независимой
+  integer sample formula. Ещё18non-flat baseline/progressive RGB/L/CMYK JPEG
+  совпали по каждому byte с Pillow12.3.0/libjpeg-turbo3.1.4.1. Cleanup проверен
+  и на четырёх budget failures после открытия1/3backing files.
+- RGB16 lossless pool755907→29980bytes; color progressive8 укладывается в64KiB
+  pools с host backing. Worst CMYK capacity460800bytes, logical writes2764800,
+  поэтому обычная перезапись tempfile не моделирует NOR erase/wear. 12-bit
+  lossy176345/347927bytes ещё требует адаптации. Общий RAM/stack/RV32 flash,
+  RGB565/factory pixel parity, NOR backend, I/O faults/reuse и production
+  HTTP/display/full/H10 остаются открытыми; текущая прошивка не заменена.
+- Proof `jpeg-library-host-qualification-20261019.json`:13raw artifacts и
+  983fixtures, build/source/executable hashes и полные результаты. Production
+  B50D/85FC, его ресурсы и frozen full/H10 inputs не менялись. На14:33UTC
+  исходные full controller38780 и H10 supervisor22868/workload29172/VM30196/
+  guard40272 подтверждены через ОС; H10 на67циклах, acceptance ещё нет.

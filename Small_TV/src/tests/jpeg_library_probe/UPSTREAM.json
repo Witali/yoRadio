@@ -1,0 +1,32 @@
+{
+  "library": "libjpeg-turbo",
+  "version": "3.2.0",
+  "commit": "c85e6b905bf237038faa936dab160ebfc5da0344",
+  "source": "https://github.com/libjpeg-turbo/libjpeg-turbo/tree/3.2.0",
+  "release": "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/tag/3.2.0",
+  "source_archive_sha256": "a778d84dcc6174be769da284877cf8ee56f99376b587e3c3cf5e9bac4ef90b07",
+  "patch": "libjpeg-turbo-3.2.0-bounded.patch",
+  "patch_sha256": "431c9cf3c83be38a1ad661bc6986dc182e22d3fb3f6c1d339e3346a82e6a0024",
+  "license_files": {
+    "licenses/LICENSE.md": "ba6bceebcba0fdd35488477c2cca8c4632ce82c74dbfbc87d886ce6fc4433579",
+    "licenses/README.ijg": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6"
+  },
+  "modifications": [
+    "Skip unused lossless range table for non-quantized non-buffered output.",
+    "Keep one iMCU window when progressive smoothing is explicitly disabled by a non-buffered client."
+  ],
+  "integration_status": "host-only qualification; not linked into firmware",
+  "explicitly_unsupported_upstream": [
+    "Hierarchical JPEG",
+    "DNL marker",
+    "Nonintegral subsampling ratios",
+    "Lossless arithmetic JPEG",
+    "12-bit arithmetic JPEG"
+  ],
+  "deferred_formats": [
+    "JPEG-LS",
+    "JPEG 2000",
+    "JPEG XL",
+    "WebP"
+  ]
+}
