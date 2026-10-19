@@ -7,6 +7,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 
 ## Независимость проверок подсистем — 2026-10-18
 
+Обновление2026-10-19: исторический F1 full завершился успешно,19automatic
+groups и566frozen inputs совпали. Его старый publisher отдельно отвергает
+24HTTP checks из-за прежнего списка22; исправление списка уже входит в56010f00.
+У F1 H10 нет terminal footer/guard: все четыре исходные process identities
+отсутствуют, два PID заняты другими процессами и не трогались. Periodic report639,
+полный journal640циклов+4pending events,10855.93guest seconds. Cause unknown;
+не считать это24h pass или доказанным firmware failure/отсутствием утечек.
+Raw72gzip и отдельные OS/analysis/publication records сохранены в
+f1-terminal-and-interrupted-20261019.json. Следующий прогон — exact B50D/85FC;
+до него сохранять эти артефакты, старый F1 run не переименовывать и не продолжать.
+
 Новая отдельная ветка `codex/small-tv-jpeg-selectors` продолжает409f4333.
 Candidate: appB50D15A1 / ELF85FCCF00 / sourceFC337C9B / тот жеQEMUD64.
 Из59production inputs изменены только tjpgd.c/.h. SOS сохраняет отдельные

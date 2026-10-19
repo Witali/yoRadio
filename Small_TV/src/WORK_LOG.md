@@ -3131,3 +3131,24 @@ true. Это только начало нового прогона, не 24 ча
   run paths/identities. Старые F1 full/H10 пять exact identities живы17:59:39UTC;
   их inputs не менялись, новыхQMP/RSP кH10 нет. Новый полныйB50D и24h/H10
   ещё обязательны; physical RF/LCD/PWM, CYD и общая приёмка не объявляются pass.
+
+## 2026-10-19 — terminal F1 full и прерванный H10 перед B50D
+
+- Full F1 завершён18октября18:10:03UTC сexit0:19automatic groups pass,
+  hardware_browser_soak not_run. Все566входов повторно совпали. Выполнен
+  неизменённый publisher той же F1: он отвергает24успешных photo checks по
+  старому требованию22. Сохранены failure/exit1, runtime success отдельно;
+  эта ошибка schema уже исправлена в56010f00, новой публикации F1 не заявляем.
+- H10 остановился без terminal footer: supervisor/VM исходные PID отсутствуют,
+  workload/guard PID переиспользованы чужими процессами. По точным creation
+  timestamps подтверждено отсутствие всех четырёх original identities;
+  чужие процессы не остановлены, новыхQMP/RSP клиентов не создавалось.
+- File-only analyzer проверил32inputs и canonical start record:640complete
+  journal cycles,4pending events,10855.929945guest seconds; periodic report639.
+  Start matches, но24h/terminal guard/steady windows не подтверждены. Отсутствие
+  trend flags при insufficient data не означает отсутствия утечки. Причина
+  прерывания неизвестна; stale running JSON сохранены как были.
+- Сохранены72raw gzip, full/subreports/UART/QEMU logs, событийный journal,
+  original freezes/launch/supervisor/guard и отдельные analysis/OS proof.
+  Предыдущий goal turn дал новые доказательства, определяющие следующий шаг:
+  запускать exact последнюю B50D сборку, а не считать старые прогоны её приёмкой.
