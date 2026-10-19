@@ -52,6 +52,17 @@ I/O faults/reuse и отдельные HTTP/LCD/полный regression для �
 ../qemu/parity/jpeg-library-host-qualification-20261019.json,13raw artifacts,
 983реальных fixtures. Полный T.81 и fit наC2 этим не объявляются.
 
+RV32 измерение2026-10-19: codec154306bytes (144626text+9680rodata), ET_REL,
+RV32IMC/ilp32/soft-float, GCC15.2.0, все8/12/16 scanline и arithmetic/progressive/
+lossless roots сохранены, encoder удалён section GC. Это ещё не app flash delta:
+libc/libgcc и adapter остаются unresolved. Stack diagnostics привязаны к object+
+function через linker map; palette `fill_inverse_cmap`12 имеет24928byte frame,
+обычный RGB565 output palette не требует. Не считать это runtime stack overflow
+или доказанным запасом стека: output policy/config и call-chain/high-water tests
+ещё нужны. Далее оценить12-bit fixed lookup tables45056+65536bytes в flash либо
+вычисления с exact upstream pixels, затем полноценный link/RAM/stack/storage.
+См. tests/JPEG_RV32_FOOTPRINT.md и jpeg-library-rv32-footprint-20261019.json.
+
 Обновление2026-10-19: исторический F1 full завершился успешно,19automatic
 groups и566frozen inputs совпали. Его старый publisher отдельно отвергает
 24HTTP checks из-за прежнего списка22; исправление списка уже входит в56010f00.

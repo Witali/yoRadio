@@ -3200,3 +3200,31 @@ true. Это только начало нового прогона, не 24 ча
   B50D/85FC, его ресурсы и frozen full/H10 inputs не менялись. На14:33UTC
   исходные full controller38780 и H10 supervisor22868/workload29172/VM30196/
   guard40272 подтверждены через ОС; H10 на67циклах, acceptance ещё нет.
+
+## 2026-10-19 — размер и стек JPEG-кандидата на настоящем RV32 toolchain
+
+- Добавлен отдельный link-only стенд `rv32_footprint.py`/`footprint.c`.
+  Экспортируется точный libjpeg-turbo3.2.0/c85e6b90 и bounded patch из b7bfb69c,
+  SDK/production/frozen baseline не меняются. Compiler GCC15.2.0_20251204,
+  RV32IMC/ilp32/soft-float/esp-base/Os, picolibc headers, SIMDoff.
+- После static build и relocatable section GC:144626bytes executable sections,
+  9680allocated read-only,0data/0bss. Независимый binutils size подтверждает
+  сумму154306. Оставлены8/12/16 scanline APIs, arithmetic, progressive и lossless
+  roots, header/start/finish/error paths; jpeg_CreateCompress отсутствует.
+  Список unresolved libc/libgcc symbols сохранён без fake stubs. Это не
+  production firmware size/heap acceptance и не bootable binary.
+- Исправлена атрибуция `.su`: статические одноимённые функции сопоставляются
+  по паре object/function в retained linker map. Quantizer12 fill_inverse_cmap
+  имеет24928byte frame; jpeg_make_d_derived_tbl1376, IDCT16×16 656. Палитровый
+  вывод не нужен RGB565 adapter, но compile profile/call chain/runtime stack
+  пока не проверены; большой linked frame не объявляется реальным переполнением.
+- Подтверждены источники расхода12-bit lossy RAM: range-limit45056bytes,
+  YCC conversion tables65536bytes +pool overhead. Следующий вариант — точные
+  immutable flash lookup tables либо эквивалентные вычисления; оценка должна
+  учитывать полный firmware link и не исключать12-bit из пользовательской задачи.
+- Исходный запуск GCC внутри sandbox получил DLL relocation error; установленный
+  toolchain нормально работает вне этого ограничения. Повторение измерения
+  оправдано уточнением stack attribution и добавлением независимой size-сверки;
+  оба результата/логи сохраняются. Production/frozen full/H10 не перезапускались.
+  На14:49UTC H10 supervisor сообщает112циклов без cleanup errors; это всё ещё
+  running, не24h pass. Полный regression продолжает HTTP-сценарии.
