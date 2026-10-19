@@ -75,7 +75,10 @@ def main():
     mutations={
         'early_pause_publication':('atomic_store(&s_maintenance_waiter, true);','atomic_store(&s_maintenance_waiter, true); native_audio_output_request_pause(true);','pause_publish','maintenance_active()'),
         'decoder_early_ack':('maintenance_active() && maintenance_acked(MAINTENANCE_STREAM)','maintenance_active()','late_encoded','!maintenance_acked(MAINTENANCE_DECODER)'),
-        'decoder_stale_epoch':('generation == atomic_load(&s_generation)) {\n                maintenance_ack(MAINTENANCE_DECODER);','true) {\n                maintenance_ack(MAINTENANCE_DECODER);','empty_receive_epoch','!begin_done && !maintenance_acked(MAINTENANCE_DECODER)'),
+        # Cleanup in the ACK branch now independently protects stale epochs.
+        # Remove both protections to reproduce the original premature ACK;
+        # deleting the epoch check alone is no longer a semantic failure.
+        'decoder_stale_epoch_without_cleanup':('generation == atomic_load(&s_generation)) {\n                decoder_release(&decoder, &output, &output_size);','true) {\n                /* negative: omit redundant same-block cleanup */','empty_receive_epoch','!begin_done && !maintenance_acked(MAINTENANCE_DECODER)'),
         'output_early_ack':('if (maintenance_acked(MAINTENANCE_DECODER) &&','if (true &&','late_pcm','!maintenance_acked(MAINTENANCE_OUTPUT)'),
         'ignored_dma_pause':('esp_err_t result = native_audio_output_pause();','esp_err_t result = ESP_OK;','output_write','!http_clients&&!decoder_handles&&!driver.allocated'),
         'lost_resume':('maintenance_finish_locked(phase != MAINTENANCE_END_STOP)','maintenance_finish_locked(false)','resume','esp_timer_get_time()<end'),

@@ -17,6 +17,7 @@ output core, task priority or task stack budget is changed by this integration.
 | Semantic negative controls | Source depth used as queue depth, retained terminal workspace, ACK before cleanup: each detected by an assertion; sanitizer failures/timeouts do not count |
 | Registry and rollback | Actual registry function under vendor/custom selections, every enabled registration failure |
 | Retained vendor/legacy task paths | [Six lifecycle variants](vendor-regression/report.json), ASan/UBSan; codec and RTOS calls remain host doubles |
+| Concurrent maintenance after the cleanup change | [Actual three owner loops and FIFO](maintenance-regression/report.json): PDM 28, continuous DAC 28 and legacy DAC 27 cases, plus nine semantic controls, ASan/UBSan |
 | Pinned ESP-IDF v6.0.2, Xtensa GCC | [Custom](sdk/custom/integration-compile.json) audio/registry/adapter/core compilation and [untouched-default vendor](sdk/vendor/integration-compile.json) audio/registry compilation |
 | Actual selected ownership | Undefined object symbols contain custom feed only in custom audio; vendor FLAC registration only in vendor registry |
 
@@ -43,6 +44,13 @@ The custom FLAC adapter/core is real. These results do not execute vendor codec
 archives, the FreeRTOS scheduler or Xtensa PCM decoding. SDK configuration emits
 existing dependency/Kconfig notices, retained in its logs; the selected C/C++
 integration and custom component compilations have no compiler diagnostics.
+
+The concurrent maintenance stale-epoch control removes both the epoch condition
+and the new cleanup inside that ACK branch. Either protection now independently
+prevents the original premature ACK; removing the epoch condition alone is no
+longer a valid negative control. The compound control remains explicitly named
+`decoder_stale_epoch_without_cleanup` and must fail the unchanged pending-close
+assertion. This is separate from the real custom-adapter ACK-before-cleanup mutant.
 
 Complete application exports, custom-path QEMU execution and physical CYD A/B
 with both output profiles remain open gates. Hardware heap fragmentation, minimum
