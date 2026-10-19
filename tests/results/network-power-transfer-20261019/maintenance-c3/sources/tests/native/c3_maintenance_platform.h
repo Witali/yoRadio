@@ -1,0 +1,83 @@
+#pragma once
+#define _POSIX_C_SOURCE 200809L
+#include <assert.h>
+#include <errno.h>
+#include <pthread.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdatomic.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <time.h>
+
+typedef int BaseType_t;
+typedef unsigned UBaseType_t;
+typedef uint32_t TickType_t;
+typedef pthread_mutex_t portMUX_TYPE;
+#define portMUX_INITIALIZER_UNLOCKED PTHREAD_MUTEX_INITIALIZER
+#define portENTER_CRITICAL(p) assert(!pthread_mutex_lock(p))
+#define portEXIT_CRITICAL(p) assert(!pthread_mutex_unlock(p))
+#define pdTRUE 1
+#define pdFALSE 0
+#define pdPASS 1
+#define portMAX_DELAY UINT32_MAX
+#define pdMS_TO_TICKS(x) (x)
+#define configTICK_RATE_HZ 1000U
+enum { ROLE_CALLER, ROLE_STREAM, ROLE_DECODER, ROLE_OUTPUT };
+static _Thread_local unsigned role;
+static _Thread_local bool budget_call;
+static atomic_bool stop_threads;
+static void barrier_hit(const char *name);
+static int64_t esp_timer_get_time(void) {struct timespec t;assert(!clock_gettime(CLOCK_MONOTONIC,&t));return (int64_t)t.tv_sec*1000000+t.tv_nsec/1000;}
+static TickType_t xTaskGetTickCount(void) {return (TickType_t)(esp_timer_get_time()/1000);}
+static struct timespec until_ms(unsigned t) {struct timespec n;assert(!clock_gettime(CLOCK_REALTIME,&n));n.tv_sec+=t/1000;n.tv_nsec+=(t%1000)*1000000L;if(n.tv_nsec>=1000000000L){++n.tv_sec;n.tv_nsec-=1000000000L;}return n;}
+static void vTaskDelay(unsigned t) {if(atomic_load(&stop_threads) && role)pthread_exit(NULL);if(t==10&&role==ROLE_DECODER)barrier_hit("park");if(t==10&&role==ROLE_STREAM)barrier_hit("stream_park");struct timespec n={t/1000,(long)(t%1000)*1000000};nanosleep(&n,NULL);}
+typedef struct test_sem {pthread_mutex_t mutex;pthread_cond_t cond;bool ready;} *SemaphoreHandle_t;
+static SemaphoreHandle_t xSemaphoreCreateBinary(void) {SemaphoreHandle_t s=calloc(1,sizeof(*s));assert(s);assert(!pthread_mutex_init(&s->mutex,NULL));assert(!pthread_cond_init(&s->cond,NULL));return s;}
+static SemaphoreHandle_t xSemaphoreCreateMutex(void) {SemaphoreHandle_t s=xSemaphoreCreateBinary();s->ready=true;return s;}
+static BaseType_t xSemaphoreTake(SemaphoreHandle_t s,TickType_t t) {assert(s);if(budget_call)assert(t!=portMAX_DELAY);struct timespec end=until_ms(t);assert(!pthread_mutex_lock(&s->mutex));int e=0;while(!s->ready&&!e)e=t==portMAX_DELAY?pthread_cond_wait(&s->cond,&s->mutex):pthread_cond_timedwait(&s->cond,&s->mutex,&end);assert(!e||e==ETIMEDOUT);bool ready=s->ready;if(ready)s->ready=false;assert(!pthread_mutex_unlock(&s->mutex));return ready;}
+static BaseType_t xSemaphoreGive(SemaphoreHandle_t s) {assert(!pthread_mutex_lock(&s->mutex));s->ready=true;assert(!pthread_cond_broadcast(&s->cond));assert(!pthread_mutex_unlock(&s->mutex));return pdTRUE;}
+static void vSemaphoreDelete(SemaphoreHandle_t s) {assert(!pthread_cond_destroy(&s->cond));assert(!pthread_mutex_destroy(&s->mutex));free(s);}
+
+typedef struct {pthread_mutex_t mutex;pthread_cond_t cond;size_t item_size;bool ready;void *data;} *QueueHandle_t;
+static atomic_bool reject_queue;
+static QueueHandle_t xQueueCreate(unsigned length,size_t size) {assert(length==1);QueueHandle_t q=calloc(1,sizeof(*q));assert(q);pthread_mutex_init(&q->mutex,NULL);pthread_cond_init(&q->cond,NULL);q->item_size=size;q->data=malloc(size);assert(q->data);return q;}
+static int xQueueOverwrite(QueueHandle_t q,const void *p) {if(atomic_exchange(&reject_queue,false))return pdFALSE;pthread_mutex_lock(&q->mutex);memcpy(q->data,p,q->item_size);q->ready=true;pthread_cond_signal(&q->cond);pthread_mutex_unlock(&q->mutex);return pdTRUE;}
+static int xQueueReceive(QueueHandle_t q,void *p,unsigned timeout) {assert(timeout!=portMAX_DELAY);struct timespec end=until_ms(timeout);pthread_mutex_lock(&q->mutex);int e=0;while(!q->ready&&!e)e=pthread_cond_timedwait(&q->cond,&q->mutex,&end);bool ok=q->ready;if(ok){memcpy(p,q->data,q->item_size);q->ready=false;}pthread_mutex_unlock(&q->mutex);if(atomic_load(&stop_threads)&&role)pthread_exit(NULL);return ok;}
+static void vQueueDelete(QueueHandle_t q) {pthread_cond_destroy(&q->cond);pthread_mutex_destroy(&q->mutex);free(q->data);free(q);}
+
+static void barrier_hit(const char *name);
+typedef struct ring_item {struct ring_item *next;size_t size;unsigned state;_Alignas(max_align_t) char data[];} ring_item_t;
+typedef struct {pthread_mutex_t mutex;pthread_cond_t cond;ring_item_t *head,*tail;size_t used,capacity;unsigned writing,ready,reading;} *RingbufHandle_t;
+#define RINGBUF_TYPE_NOSPLIT 0
+static RingbufHandle_t xRingbufferCreate(size_t capacity,int mode) {(void)mode;RingbufHandle_t q=calloc(1,sizeof(*q));assert(q);pthread_mutex_init(&q->mutex,NULL);pthread_cond_init(&q->cond,NULL);q->capacity=capacity;return q;}
+static ring_item_t *ring_item(void *p) {return (ring_item_t *)((char *)p - offsetof(ring_item_t,data));}
+static int xRingbufferSendAcquire(RingbufHandle_t q,void **out,size_t n,unsigned timeout) {struct timespec end=until_ms(timeout);pthread_mutex_lock(&q->mutex);int e=0;while(q->used+n>q->capacity&&!e)e=pthread_cond_timedwait(&q->cond,&q->mutex,&end);if(e){pthread_mutex_unlock(&q->mutex);return pdFALSE;}ring_item_t *i=calloc(1,sizeof(*i)+n);assert(i);i->size=n;q->used+=n;++q->writing;pthread_mutex_unlock(&q->mutex);*out=i->data;barrier_hit("pcm_acquire");return pdTRUE;}
+static int xRingbufferSendComplete(RingbufHandle_t q,void *p) {ring_item_t *i=ring_item(p);pthread_mutex_lock(&q->mutex);assert(!i->state&&q->writing);i->state=1;--q->writing;++q->ready;if(q->tail)q->tail->next=i;else q->head=i;q->tail=i;pthread_cond_signal(&q->cond);pthread_mutex_unlock(&q->mutex);return pdTRUE;}
+static void *xRingbufferReceive(RingbufHandle_t q,size_t *size,unsigned timeout) {struct timespec end=until_ms(timeout);pthread_mutex_lock(&q->mutex);int e=0;while(!q->head&&!e)e=pthread_cond_timedwait(&q->cond,&q->mutex,&end);ring_item_t *i=q->head;if(i){q->head=i->next;if(!q->head)q->tail=NULL;assert(i->state==1&&q->ready);i->state=2;--q->ready;++q->reading;*size=i->size;}pthread_mutex_unlock(&q->mutex);if(atomic_load(&stop_threads)&&role)pthread_exit(NULL);return i?i->data:NULL;}
+static void vRingbufferReturnItem(RingbufHandle_t q,void *p) {ring_item_t *i=ring_item(p);pthread_mutex_lock(&q->mutex);assert(i->state==2&&q->reading);--q->reading;q->used-=i->size;pthread_cond_broadcast(&q->cond);pthread_mutex_unlock(&q->mutex);free(i);}
+static void vRingbufferDelete(RingbufHandle_t q) {assert(!q->used&&!q->writing&&!q->reading&&!q->ready);pthread_cond_destroy(&q->cond);pthread_mutex_destroy(&q->mutex);free(q);}
+
+typedef void (*TaskFunction_t)(void *);
+typedef struct test_task {pthread_t thread;SemaphoreHandle_t notify;TaskFunction_t run;void *arg;unsigned role;} *TaskHandle_t;
+static TaskHandle_t test_tasks[3];
+static _Thread_local TaskHandle_t this_task;
+static void *task_entry(void *p) {this_task=p;role=this_task->role;this_task->run(this_task->arg);return NULL;}
+static int xTaskCreate(TaskFunction_t fn,const char *name,unsigned stack,void *arg,unsigned priority,TaskHandle_t *out) {static unsigned next;assert(next<3);assert(stack);assert(priority==(next==0?5:next==1?7:8));(void)name;TaskHandle_t t=calloc(1,sizeof(*t));assert(t);t->run=fn;t->arg=arg;t->notify=xSemaphoreCreateBinary();t->role=next+1;test_tasks[next++]=t;if(out)*out=t;assert(!pthread_create(&t->thread,NULL,task_entry,t));return pdPASS;}
+static unsigned ulTaskNotifyTake(int clear,unsigned timeout) {(void)clear;return xSemaphoreTake(this_task->notify,timeout);}
+static void xTaskNotifyGive(TaskHandle_t t) {xSemaphoreGive(t->notify);}
+static void vTaskDelete(TaskHandle_t t) {assert(!t);pthread_exit(NULL);}
+static TaskHandle_t xTaskGetCurrentTaskHandle(void) {return this_task;}
+static unsigned uxTaskGetStackHighWaterMark(TaskHandle_t t) {(void)t;return 4096;}
+// Requests match the production board profile; pthread does not model stack RAM.
+#define BOARD_TASK_STACK_RADIO_STREAM 6144
+#define BOARD_TASK_STACK_AUDIO_DECODER 16384
+#define BOARD_TASK_STACK_AUDIO_OUTPUT 4096
+#define MALLOC_CAP_8BIT 1
+static size_t heap_caps_get_free_size(unsigned caps) {(void)caps;return 100000;}
+static size_t heap_caps_get_largest_free_block(unsigned caps) {(void)caps;return 100000;}
+static size_t heap_caps_get_minimum_free_size(unsigned caps) {(void)caps;return 100000;}
+static size_t strlcpy(char *to,const char *from,size_t capacity) {size_t n=strlen(from);if(capacity){size_t copy=n<capacity-1?n:capacity-1;memcpy(to,from,copy);to[copy]=0;}return n;}

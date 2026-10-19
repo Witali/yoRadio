@@ -1,0 +1,21 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:658:56: warning: repeated branch body in conditional chain [bugprone-branch-clone]
+  658 |     } else if (strcmp(command, "submitplaylist") == 0) {
+      |                                                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:661:6: note: end of the original
+  661 |     } else if (strcmp(command, "submitplaylistdone") == 0) {
+      |      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:661:60: note: clone 1 starts here
+  661 |     } else if (strcmp(command, "submitplaylistdone") == 0) {
+      |                                                            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:975:14: warning: Value stored to 'tenths' during its initialization is never read [clang-analyzer-deadcode.DeadStores]
+  975 |     uint64_t tenths = profile->active_us * 1000ULL / window_us;
+      |              ^~~~~~   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:975:14: note: Value stored to 'tenths' during its initialization is never read
+  975 |     uint64_t tenths = profile->active_us * 1000ULL / window_us;
+      |              ^~~~~~   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\main\websocket_service.c:1006:24: warning: comparing object representation of type 'webui_status_key_t' which does not have a unique object representation; consider comparing the members of the object manually [bugprone-suspicious-memory-comparison]
+ 1006 |                        memcmp(&s_current_status_key, &s_previous_status_key,
+      |                        ^
+24 warnings generated.
+Suppressed 21 warnings (21 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

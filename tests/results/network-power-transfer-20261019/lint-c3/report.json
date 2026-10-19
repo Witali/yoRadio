@@ -1,0 +1,1540 @@
+{
+  "tool": "LLVM (http://llvm.org/):\n  LLVM version 21.1.3\n  Optimized build.",
+  "build_dir": "idf/esp32c3-oled-native/build-lint-network-power-final02",
+  "include_httpd_overlay": true,
+  "config_sha256": "27b1de038a07a9476ab195865192e9eebc8b58d036b0f359a6689caf2b7aed64",
+  "source_commit": "37205bfd57c49a484a0ce50abf030f13b3a10f14",
+  "dirty": true,
+  "units": 65,
+  "complete": true,
+  "results": [
+    {
+      "file": "idf/components/audio_level_led/audio_level_led.c",
+      "source_sha256": "b68a436d1b38a6f3e0a67de2899a581eb89ca543ce9a2239af3aa7b84b186646",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/custom_flac/custom_flac_adapter.cpp",
+      "source_sha256": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/custom_legacy_codecs/custom_legacy_adapter.cpp",
+      "source_sha256": "36399608bca272b4e37424d459e7c397333351b3de26fc8419b53c9e4ac4a1e3",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_legacy_codecs/custom_legacy_adapter.h",
+          "line": 11,
+          "column": 9,
+          "severity": "warning",
+          "message": "enum 'custom_legacy_kind_t' uses a larger base type ('unsigned int', size: 4 bytes) than necessary for its value set, consider using 'std::uint8_t' (1 byte) as the base type to reduce its size",
+          "check": "performance-enum-size"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_legacy_codecs\\custom_legacy_adapter.cpp",
+          "line": 276,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_legacy_codecs\\custom_legacy_adapter.cpp",
+          "line": 305,
+          "column": 5,
+          "severity": "warning",
+          "message": "if with identical then and else branches",
+          "check": "bugprone-branch-clone"
+        }
+      ]
+    },
+    {
+      "file": "idf/components/native_audio_settings/native_audio_settings.c",
+      "source_sha256": "dc1401126dd5a5e69ceccaf5f901b8175b0892dba0a9e5f17152bf584647c536",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_network_power/native_network_power.c",
+      "source_sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_ota/native_ota_form.c",
+      "source_sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 48,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 55,
+          "column": 20,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 86,
+          "column": 26,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 170,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 271,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 300,
+          "column": 38,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 19,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 47,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\native_ota_form.c",
+          "line": 20,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\native_ota_form.c",
+          "line": 23,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ]
+    },
+    {
+      "file": "idf/components/native_ota/native_ota_http.c",
+      "source_sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 48,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 55,
+          "column": 20,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 86,
+          "column": 26,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 170,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 271,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 300,
+          "column": 38,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 19,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 47,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        }
+      ]
+    },
+    {
+      "file": "idf/components/native_ota/native_ota_sink.c",
+      "source_sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_storage/file_transaction.c",
+      "source_sha256": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_time/native_time_sntp.c",
+      "source_sha256": "468b79ea6815efde3422cf59a73b7b12cc1aecdde96e428e0f68d4b2df8a0508",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_time/native_time_sntp_context.c",
+      "source_sha256": "7d8183a86e86dbc5c7c089ed38a825dafb3bcb82777dff4cbcf35ff54db535e6",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_web_transport/native_web_transport.c",
+      "source_sha256": "38bfe8a0c33f42c653b7b96525b4dd70fb22d823710b014fd64468aed13552cf",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_web_transport\\native_web_transport.c",
+          "line": 59,
+          "column": 48,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ]
+    },
+    {
+      "file": "idf/components/native_wifi_store/native_wifi_file.c",
+      "source_sha256": "8efbd18aec255855f86adc3495fddacb81518b9c57d4523968e49e2205c71edf",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_file.c",
+          "line": 12,
+          "column": 12,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_file.c",
+          "line": 13,
+          "column": 12,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_file.c",
+          "line": 14,
+          "column": 12,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ]
+    },
+    {
+      "file": "idf/components/native_wifi_store/native_wifi_http.c",
+      "source_sha256": "a8079176e68840aa3828e4e6946f35de42a79770094efb674aca488de973e751",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_http.c",
+          "line": 42,
+          "column": 9,
+          "severity": "warning",
+          "message": "function 'strcasecmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ]
+    },
+    {
+      "file": "idf/components/native_wifi_store/native_wifi_json.c",
+      "source_sha256": "273e38e076f2bd9fda63a958d7217427aa2c627f94ccea04cb25e18277707541",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_json.c",
+          "line": 61,
+          "column": 5,
+          "severity": "warning",
+          "message": "Out of bound access to memory after the end of 'action'",
+          "check": "clang-analyzer-security.ArrayBound"
+        }
+      ]
+    },
+    {
+      "file": "idf/components/native_wifi_store/native_wifi_request_io.c",
+      "source_sha256": "6928ef23832d8bec0c65fc38f05fe8e0a33465f015eb21eb6e7c6afa424ba493",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/components/native_wifi_store/native_wifi_store.c",
+      "source_sha256": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_store.c",
+          "line": 199,
+          "column": 9,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_wifi_store\\native_wifi_store.c",
+          "line": 200,
+          "column": 26,
+          "severity": "warning",
+          "message": "an assignment within an 'if' condition is bug-prone",
+          "check": "bugprone-assignment-in-if-condition"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/build-lint-network-power-final02/native-httpd-rfc6455/httpd_parse.c",
+      "source_sha256": "1dff87c03c8abcf13ab5d0aacac088c685a8953b737bae674fde245d791ff396",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 163,
+          "column": 13,
+          "severity": "warning",
+          "message": "Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result'",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 219,
+          "column": 56,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 274,
+          "column": 9,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 142,
+          "column": 35,
+          "severity": "warning",
+          "message": "an assignment within an 'if' condition is bug-prone",
+          "check": "bugprone-assignment-in-if-condition"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 160,
+          "column": 24,
+          "severity": "warning",
+          "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 333,
+          "column": 36,
+          "severity": "warning",
+          "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 609,
+          "column": 20,
+          "severity": "warning",
+          "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 643,
+          "column": 12,
+          "severity": "warning",
+          "message": "narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 684,
+          "column": 22,
+          "severity": "warning",
+          "message": "an assignment within an 'if' condition is bug-prone",
+          "check": "bugprone-assignment-in-if-condition"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 703,
+          "column": 21,
+          "severity": "warning",
+          "message": "an assignment within an 'if' condition is bug-prone",
+          "check": "bugprone-assignment-in-if-condition"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 753,
+          "column": 51,
+          "severity": "warning",
+          "message": "Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd')",
+          "check": "clang-analyzer-core.NullDereference"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 761,
+          "column": 17,
+          "severity": "warning",
+          "message": "Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd')",
+          "check": "clang-analyzer-core.NullDereference"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 940,
+          "column": 14,
+          "severity": "warning",
+          "message": "function 'strncasecmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_parse.c",
+          "line": 1111,
+          "column": 13,
+          "severity": "warning",
+          "message": "function 'strncasecmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/build-lint-network-power-final02/native-httpd-rfc6455/httpd_ws.c",
+      "source_sha256": "33fad3dbb01815db3d20cfb4efbe450135cec03e57b0e5e34bcb90ae811ff946",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 163,
+          "column": 13,
+          "severity": "warning",
+          "message": "Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result'",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 219,
+          "column": 56,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h",
+          "line": 274,
+          "column": 9,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_ws.c",
+          "line": 100,
+          "column": 37,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_ws.c",
+          "line": 154,
+          "column": 5,
+          "severity": "warning",
+          "message": "Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119",
+          "check": "clang-analyzer-security.insecureAPI.strcpy"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02\\native-httpd-rfc6455\\httpd_ws.c",
+          "line": 155,
+          "column": 5,
+          "severity": "warning",
+          "message": "Call to function 'strcat' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcat'. CWE-119",
+          "check": "clang-analyzer-security.insecureAPI.strcpy"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_compact_owner.c",
+      "source_sha256": "63bfbf7faa9277acf72a6ef586eda171cd112295aef496cd079ad16a8dc166bf",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 35,
+          "severity": "warning",
+          "message": "do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead",
+          "check": "bugprone-casting-through-void"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 53,
+          "severity": "warning",
+          "message": "Out of bound access to memory preceding the field 'frame'",
+          "check": "clang-analyzer-security.ArrayBound"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 200,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 203,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_fill_parser.c",
+      "source_sha256": "3f629e2b1df7dc7bd742df5f55970902eb9db38eb8b797a1e33debe5258b0766",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\aac_fill_parser.c",
+          "line": 67,
+          "column": 37,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int32_t' (aka 'int') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\aac_fill_parser.c",
+          "line": 68,
+          "column": 36,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int32_t' (aka 'int') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_fill_wrappers.c",
+      "source_sha256": "9dbefde9e5ac320a815edbf1e12c3d86a26d4074864a488fcced668c8606bb3f",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_high_history.c",
+      "source_sha256": "e3ddc3ada1409b6cf08d992704a71dc73f0716276fac642ce674a75f868d725f",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 35,
+          "severity": "warning",
+          "message": "do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead",
+          "check": "bugprone-casting-through-void"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 200,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 203,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_profile.c",
+      "source_sha256": "192e2128ea9a637508a20b42e5e1a0d02b1c2d961e3c1b438891a0735eeddbad",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 35,
+          "severity": "warning",
+          "message": "do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead",
+          "check": "bugprone-casting-through-void"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 200,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 203,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_sbr_reserve.c",
+      "source_sha256": "0ee26dde52102178114e84f236b03417361f509bd3bfd3dca6f3a25372c9f699",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_scratch_reserve.c",
+      "source_sha256": "422a60601f5746247678cadb38cdcb173f6e77bf716b1239db1db48a43397e8a",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/aac_smoothing_history.c",
+      "source_sha256": "c5b5da4a71048c030ea832ea47e104b8ae56e495e7f47827a558a7a6bcab3035",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 35,
+          "severity": "warning",
+          "message": "do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead",
+          "check": "bugprone-casting-through-void"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 200,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 203,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/adaptive_input.c",
+      "source_sha256": "dd8ae2f4030205d949a362165e49558ac4baeb92daa3c9df8240180baae7a239",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/app_main.c",
+      "source_sha256": "1ec056470034e4c1ec9f06e9d0fdb21b044c25f10b12ab921997eb565c4bf0cc",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\app_main.c",
+          "line": 564,
+          "column": 29,
+          "severity": "warning",
+          "message": "The value '-1' provided to the cast expression is not in the valid range of values for the enum",
+          "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\app_main.c",
+          "line": 640,
+          "column": 37,
+          "severity": "warning",
+          "message": "The value '-1' provided to the cast expression is not in the valid range of values for the enum",
+          "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/audio_service.c",
+      "source_sha256": "2c20f62f092b19ae3f45a27b003ef2a406a373a729d9cfe229c29e75461ab838",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_stream/include/stream_frames.h",
+          "line": 47,
+          "column": 33,
+          "severity": "warning",
+          "message": "The value '0' provided to the cast expression is not in the valid range of values for the enum",
+          "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c",
+          "line": 451,
+          "column": 14,
+          "severity": "warning",
+          "message": "Value stored to 'load_tenths' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c",
+          "line": 455,
+          "column": 14,
+          "severity": "warning",
+          "message": "Value stored to 'speed_hundredths' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c",
+          "line": 2268,
+          "column": 5,
+          "severity": "warning",
+          "message": "Value stored to 'encoded_ring_size' is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/codec_memory_trace.c",
+      "source_sha256": "ddc3a44711a76a5cb5cae60055c0427998314254f2cbd420ff07c7348e4394a8",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/cpu_profiler.c",
+      "source_sha256": "f06ff4fe60b2fd95311309485e7a4da22b6a910bbfc948ccf6ad53b81369ea8f",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/decoder_registration.c",
+      "source_sha256": "5381c1fb82755086c9a5922041212434417da8c531122d5512a7d2f35f573a1b",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/deep_sleep_clock.c",
+      "source_sha256": "e0f78c6bb5a8bac07f358acdb517eb0c4d17939b0e51739fc5a368957b46646c",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/display_settings.c",
+      "source_sha256": "c8303799f7884febb60dba10544976fed2a29e9a2f266ac0d0d925bcf38fbb99",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/encoder_input.c",
+      "source_sha256": "19799302ab9af83182370ab00134b0a749f370ef0d749c4020bc37ab3aec408d",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/icy_title.c",
+      "source_sha256": "f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/native_aac_decoder.c",
+      "source_sha256": "3564dd39668b191ce1c8485436afd35f41049e2be9fda8997b2f8962fc149f6a",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 179,
+          "column": 35,
+          "severity": "warning",
+          "message": "do not cast 'aac_high_channel_view_t *' to 'aac_high_channel_t *' through 'void *'; use reinterpret_cast instead",
+          "check": "bugprone-casting-through-void"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 200,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/aac_high_history_abi.h",
+          "line": 203,
+          "column": 12,
+          "severity": "warning",
+          "message": "integer to pointer cast pessimizes optimization opportunities",
+          "check": "performance-no-int-to-ptr"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/native_audio_normalizer.cpp",
+      "source_sha256": "58702deb2e6c58b7298e57d3622b893054365ac980aa17451846bcbab228807f",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/native_audio_output.c",
+      "source_sha256": "b62f3a5e698ceb1beb89d2049b718949b6774700ba3c3c39249955d6155c5e93",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\native_audio_output.c",
+          "line": 203,
+          "column": 31,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\native_audio_output.c",
+          "line": 204,
+          "column": 31,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int' to signed type 'int16_t' (aka 'short') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\native_audio_output.c",
+          "line": 499,
+          "column": 18,
+          "severity": "warning",
+          "message": "Value stored to 'tenths' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/native_state.c",
+      "source_sha256": "1a0810c82a0593656313fccad8cd10b5afb9098d765e531bcd3196e0f1135425",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/network_service.c",
+      "source_sha256": "5c0596774a5bb063d3184a559cd0da7b14e6981402d8827412ec4eca4af35e21",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/oled_display.c",
+      "source_sha256": "5f61ab4ae6db0b602c961f854a798b4196d94da58769855d8073d387db078926",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\oled_display.c",
+          "line": 437,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\oled_display.c",
+          "line": 438,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\oled_display.c",
+          "line": 439,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\oled_display.c",
+          "line": 440,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/ota_upload.c",
+      "source_sha256": "7d50473fa6b3dbed2e1603d0755cc3fb2faf25c6e650f7674cf9e2fc7488efaf",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 48,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 55,
+          "column": 20,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 86,
+          "column": 26,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 170,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 271,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 300,
+          "column": 38,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 19,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 47,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/radio_control.c",
+      "source_sha256": "d1f05d6640cd34c67989af41c392f9926f54890c4f35a04f2532c864e7788e87",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/radio_control_impl.h",
+          "line": 256,
+          "column": 14,
+          "severity": "warning",
+          "message": "Value stored to 'elapsed_ms' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/rtc_wake_stub_clock.c",
+      "source_sha256": "e9482268337a41d76b7c34d459d8e602dfcfac7427261b071a6a7c62cc4ef120",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/runtime_settings.c",
+      "source_sha256": "5a7d5d6f55169ee810953a317ebcaeba3d68bdaf95b5594ffab96fe79393eba1",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/stream_http_reader.c",
+      "source_sha256": "3e6d5bb1d9eb487d16de96eb763f23bdcd7a73a94a572bb251a05bae29420dfe",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/tcp_pcb_pool.c",
+      "source_sha256": "971e826b6753db9ee21e8031f6550c0eaf3ed8f0992621b3e048440550a72e87",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/time_service.c",
+      "source_sha256": "320a2ee380a1929ec5282792d8f332469da81a65d36f03689f04f55262816b90",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\time_service.c",
+          "line": 98,
+          "column": 16,
+          "severity": "warning",
+          "message": "'signed char' to 'int' conversion; consider casting to 'unsigned char' first.",
+          "check": "bugprone-signed-char-misuse,cert-str34-c"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/tls_input_reserve.c",
+      "source_sha256": "5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_input_reserve.c",
+          "line": 77,
+          "column": 5,
+          "severity": "warning",
+          "message": "Value stored to 'stats' is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_input_reserve.c",
+          "line": 165,
+          "column": 28,
+          "severity": "warning",
+          "message": "Value stored to 'stats' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/tls_large_reserve.c",
+      "source_sha256": "3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/tls_stream_eof.c",
+      "source_sha256": "0a89386376e576398c3d6edb7e8cf3beb4017439ebf8fb7c733e7ee9698786e8",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/vorbis_repair/output.c",
+      "source_sha256": "7e7a49a1ba68b2417514ab4b0adb37c9ed31e2d1b65032fa06dbf4b2830c25e2",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/vorbis_repair/setup.c",
+      "source_sha256": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 33,
+          "column": 3,
+          "severity": "warning",
+          "message": "switching on non-enum value without default case may not cover all cases",
+          "check": "bugprone-switch-missing-default-case"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 137,
+          "column": 12,
+          "severity": "warning",
+          "message": "narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 148,
+          "column": 10,
+          "severity": "warning",
+          "message": "narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'long' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 151,
+          "column": 12,
+          "severity": "warning",
+          "message": "narrowing conversion from 'ogg_uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 220,
+          "column": 5,
+          "severity": "warning",
+          "message": "switching on non-enum value without default case may not cover all cases",
+          "check": "bugprone-switch-missing-default-case"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 703,
+          "column": 11,
+          "severity": "warning",
+          "message": "Although the value stored to 'k' is used in the enclosing expression, the value is never actually read from 'k'",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 914,
+          "column": 22,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'vorbis_info_floor **' (aka 'void **') to 'void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 980,
+          "column": 20,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'int32_t **' (aka 'int **') to 'void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 981,
+          "column": 20,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'int32_t **' (aka 'int **') to 'void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 989,
+          "column": 17,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'void *' to 'int32_t **' (aka 'int **'), please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 990,
+          "column": 22,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'void *' to 'int32_t **' (aka 'int **'), please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\vorbis_repair\\setup.c",
+          "line": 1082,
+          "column": 19,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'void *' to 'vorbis_info_floor **' (aka 'void **'), please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/vorbis_repair/simple.c",
+      "source_sha256": "4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/web_ota.c",
+      "source_sha256": "67ac4bb57c8cca388d33ce76fe6e3be43e56c3fb04b297f25e35055af5b3736b",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/web_pages_bridge.cpp",
+      "source_sha256": "e735d11e8832c36a198b020bdc6d9ce5f77932e479313dda9d42de787457ac15",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/web_service.c",
+      "source_sha256": "ecd4d9572e36dfe1796a1cddcffacc0234fccf6ab07290651594f1f524c27220",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\web_service.c",
+          "line": 463,
+          "column": 51,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'httpd_req_t **' (aka 'struct httpd_req **') to 'void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\web_service.c",
+          "line": 518,
+          "column": 9,
+          "severity": "warning",
+          "message": "multilevel pointer conversion from 'httpd_req_t **' (aka 'struct httpd_req **') to 'const void *', please use explicit cast",
+          "check": "bugprone-multi-level-implicit-pointer-conversion"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/web_upload.c",
+      "source_sha256": "ed9675ef52483d9cc2f8c9756f3dba3ecb21025876ee498efe9f6446f3b044ce",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_file_form.h",
+          "line": 79,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_file_form.h",
+          "line": 87,
+          "column": 21,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_file_form.h",
+          "line": 87,
+          "column": 55,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 48,
+          "column": 17,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 55,
+          "column": 20,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 86,
+          "column": 26,
+          "severity": "warning",
+          "message": "function 'memcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 170,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 271,
+          "column": 23,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 300,
+          "column": 38,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 19,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main/../../components/native_storage/include/web_multipart.h",
+          "line": 308,
+          "column": 47,
+          "severity": "warning",
+          "message": "incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings",
+          "check": "bugprone-inc-dec-in-conditions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\web_upload.c",
+          "line": 170,
+          "column": 9,
+          "severity": "warning",
+          "message": "function 'strcmp' is called without explicitly comparing result",
+          "check": "bugprone-suspicious-string-compare"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/web_wifi.c",
+      "source_sha256": "376f16a46b01b6b6b9141020711dcab0617c5bcd6a5f11cb1fd66d49fa27d172",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "idf/esp32c3-oled-native/main/websocket_service.c",
+      "source_sha256": "a48c3e5d13223a136f87cee4a53a1ded93a22469fb6da959ea10cba45813d8a6",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+          "line": 658,
+          "column": 56,
+          "severity": "warning",
+          "message": "repeated branch body in conditional chain",
+          "check": "bugprone-branch-clone"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+          "line": 975,
+          "column": 14,
+          "severity": "warning",
+          "message": "Value stored to 'tenths' during its initialization is never read",
+          "check": "clang-analyzer-deadcode.DeadStores"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\websocket_service.c",
+          "line": 1006,
+          "column": 24,
+          "severity": "warning",
+          "message": "comparing object representation of type 'webui_status_key_t' which does not have a unique object representation; consider comparing the members of the object manually",
+          "check": "bugprone-suspicious-memory-comparison"
+        }
+      ]
+    },
+    {
+      "file": "yoRadio/src/audioI2S/AudioNormalizer.cpp",
+      "source_sha256": "6f63381940380c24a667cfdc6b984ea761bf87a21efcf6c9029a6fb2c52cb67e",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "yoRadio/src/audioI2S/CodecMemoryArena.cpp",
+      "source_sha256": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    },
+    {
+      "file": "yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp",
+      "source_sha256": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 673,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 688,
+          "column": 18,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 693,
+          "column": 26,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 705,
+          "column": 21,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 708,
+          "column": 40,
+          "severity": "warning",
+          "message": "narrowing conversion from 'int64_t' (aka 'long long') to signed type 'int32_t' (aka 'int') is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        },
+        {
+          "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp",
+          "line": 712,
+          "column": 27,
+          "severity": "warning",
+          "message": "narrowing conversion from 'uint32_t' (aka 'unsigned int') to signed type 'int' is implementation-defined",
+          "check": "bugprone-narrowing-conversions"
+        }
+      ]
+    }
+  ],
+  "warnings": 127,
+  "errors": 0,
+  "board": "c3",
+  "scope": "All project translation units and generated project-patched HTTPD units in the actual SDK Clang database; complete Clang -M dependency union including SDK/vendor/toolchain headers, all project headers and relevant build/configuration inputs frozen before clang-tidy. Analysis uses that original SDK compiler database; every captured source/header/build input is checked afterward. No SDK/RTOS behavior is executed and no optimized Clang firmware code generation is claimed.",
+  "source_manifest": "source-manifest.json",
+  "source_manifest_sha256": "cde519f8cc106e73222e3f3b7d3c07b9c7db1d764c2d1d47b864b4f8103a2e67",
+  "captured_input_count": 758,
+  "pre_analysis_snapshot": true,
+  "all_inputs_unchanged_after_analysis": true,
+  "raw_report": "analysis/report.json",
+  "raw_report_sha256": "90d3c059507437e664461624176928750ddb899606309c9cf6e1a90437570017",
+  "analysis_command": [
+    "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\run_native_lint.py",
+    "--build-dir",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\build-lint-network-power-final02",
+    "--clang-tidy",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\esp-clang\\esp-21.1.3_20260408\\esp-clang\\bin\\clang-tidy.exe",
+    "--output",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\lint-c3-network-power-final\\analysis",
+    "--jobs",
+    "2",
+    "--include-httpd-overlay"
+  ],
+  "analysis_exit": 0
+}

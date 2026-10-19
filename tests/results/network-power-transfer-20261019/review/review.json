@@ -1,0 +1,98 @@
+{
+  "scope": "Read-only review of shared power policy and both platform integration paths. This review adds no executable qualification and makes no target scheduler/RF/power claim. Parent-owned host/SDK checks are independent.",
+  "review_utc": "2026-10-19T14:42:19.090926+00:00",
+  "actionable_findings": [],
+  "observations": [
+    "Only accepted audio control commands establish a new generation; receive/finish use exact equality. Unsigned wrap does not rely on ordering comparisons.",
+    "Command hooks do not allocate, call Wi-Fi or wait. Policy copies use one short portMUX region; the SDK callback runs outside it. Existing task core bindings remain untouched.",
+    "Stale successful driver calls update applied mode while preserving the latest desired retry budget; the next poll reconciles newer intent. Driver lifetime revision invalidates an older callback result.",
+    "Each desired revision has at most three failed attempts separated by at least 250 ms; int64 deadline saturation is explicit. A known correct applied mode does not issue another call.",
+    "CYD owner_step is the sole CYD poll caller after started. C3 permanent RSSI task is the sole C3 poll caller, every 100 ms, with RSSI retaining its 2-second cadence and sleep admission guard.",
+    "Wi-Fi power SDK errors remain independent of Play admission. EOF restores idle intent when receive ends, allowing buffered PCM to drain as the donor contract states.",
+    "C3 prepare_sleep guard cannot cancel an already entered driver call; SDK stop/set_ps serialization remains an SDK boundary. No new driver lifetime teardown is added and this is not a reproduced defect."
+  ],
+  "inputs": {
+    "idf/components/native_network_power/native_network_power.c": {
+      "sha256": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e",
+      "snapshot": "sources/idf/components/native_network_power/native_network_power.c"
+    },
+    "idf/components/native_network_power/include/native_network_power.h": {
+      "sha256": "9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4",
+      "snapshot": "sources/idf/components/native_network_power/include/native_network_power.h"
+    },
+    "idf/components/native_network_power/CMakeLists.txt": {
+      "sha256": "0f3ae00641340d79ff0fde6bffd5e21e03743154264101328c57fb034fa35f4d",
+      "snapshot": "sources/idf/components/native_network_power/CMakeLists.txt"
+    },
+    "idf/esp32-cyd2usb-native/CMakeLists.txt": {
+      "sha256": "771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977",
+      "snapshot": "sources/idf/esp32-cyd2usb-native/CMakeLists.txt"
+    },
+    "idf/esp32c3-oled-native/CMakeLists.txt": {
+      "sha256": "ce7814a37fb03ce7890300065171662a51b94c1da9be018ee8e41451ff715e4f",
+      "snapshot": "sources/idf/esp32c3-oled-native/CMakeLists.txt"
+    },
+    "idf/esp32-cyd2usb-native/main/audio_service.c": {
+      "sha256": "a7cc267f91a2a8172cdd2ac0591efbf37b4e9092b12f77f68a74b2938b1f6545",
+      "snapshot": "sources/idf/esp32-cyd2usb-native/main/audio_service.c"
+    },
+    "idf/esp32-cyd2usb-native/main/network_service.c": {
+      "sha256": "bf87070343eb734fa2a3c128bc8afbd9b61973614408af1ef16bf2579a95336f",
+      "snapshot": "sources/idf/esp32-cyd2usb-native/main/network_service.c"
+    },
+    "idf/esp32-cyd2usb-native/main/network_service.h": {
+      "sha256": "ea2b158159975a6bd13963eb461bbb39269f91e9910388d9d8a0916b162e5b2d",
+      "snapshot": "sources/idf/esp32-cyd2usb-native/main/network_service.h"
+    },
+    "idf/esp32-cyd2usb-native/main/CMakeLists.txt": {
+      "sha256": "7ada1be1060a3dc3c0d89633e3591850668d37e7c49143375cf27ca600849f80",
+      "snapshot": "sources/idf/esp32-cyd2usb-native/main/CMakeLists.txt"
+    },
+    "idf/esp32c3-oled-native/main/audio_service.c": {
+      "sha256": "2c20f62f092b19ae3f45a27b003ef2a406a373a729d9cfe229c29e75461ab838",
+      "snapshot": "sources/idf/esp32c3-oled-native/main/audio_service.c"
+    },
+    "idf/esp32c3-oled-native/main/network_service.c": {
+      "sha256": "5c0596774a5bb063d3184a559cd0da7b14e6981402d8827412ec4eca4af35e21",
+      "snapshot": "sources/idf/esp32c3-oled-native/main/network_service.c"
+    },
+    "idf/esp32c3-oled-native/main/network_service.h": {
+      "sha256": "ec254ac5fcf0741b0ce1cdb83787a3250082dbf24a194e05156abc06e47de43a",
+      "snapshot": "sources/idf/esp32c3-oled-native/main/network_service.h"
+    },
+    "idf/esp32c3-oled-native/main/CMakeLists.txt": {
+      "sha256": "d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19",
+      "snapshot": "sources/idf/esp32c3-oled-native/main/CMakeLists.txt"
+    },
+    "idf/esp32-cyd2usb-native/main/network_runtime.c": {
+      "sha256": "cfa7936e561a6ea3b7a9d297ccd215d2840a15126416650feb2c9fdf3ce777ce",
+      "snapshot": "sources/idf/esp32-cyd2usb-native/main/network_runtime.c"
+    },
+    "idf/esp32-cyd2usb-native/main/network_status.h": {
+      "sha256": "8b4df7ee6080ede9761c0f51b5c098c376439dd148b9e6ea982b53dfb5226bc8",
+      "snapshot": "sources/idf/esp32-cyd2usb-native/main/network_status.h"
+    },
+    "docs/CYD_NETWORK_RUNTIME_TRANSFER_DESIGN.md": {
+      "sha256": "a09cfdb2a60e403076bfccd81065c52227c5a4e1c5abd16e999d7632b966a570",
+      "snapshot": "sources/docs/CYD_NETWORK_RUNTIME_TRANSFER_DESIGN.md"
+    }
+  },
+  "inputs_unchanged_after_review": {
+    "idf/components/native_network_power/native_network_power.c": true,
+    "idf/components/native_network_power/include/native_network_power.h": true,
+    "idf/components/native_network_power/CMakeLists.txt": true,
+    "idf/esp32-cyd2usb-native/CMakeLists.txt": true,
+    "idf/esp32c3-oled-native/CMakeLists.txt": true,
+    "idf/esp32-cyd2usb-native/main/audio_service.c": true,
+    "idf/esp32-cyd2usb-native/main/network_service.c": true,
+    "idf/esp32-cyd2usb-native/main/network_service.h": true,
+    "idf/esp32-cyd2usb-native/main/CMakeLists.txt": true,
+    "idf/esp32c3-oled-native/main/audio_service.c": true,
+    "idf/esp32c3-oled-native/main/network_service.c": true,
+    "idf/esp32c3-oled-native/main/network_service.h": true,
+    "idf/esp32c3-oled-native/main/CMakeLists.txt": true,
+    "idf/esp32-cyd2usb-native/main/network_runtime.c": true,
+    "idf/esp32-cyd2usb-native/main/network_status.h": true,
+    "docs/CYD_NETWORK_RUNTIME_TRANSFER_DESIGN.md": true
+  }
+}

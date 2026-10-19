@@ -1,0 +1,100 @@
+---
+MainSourceFile:  'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-network-power-final02\native-httpd-rfc6455\httpd_ws.c'
+Diagnostics:
+  - DiagnosticName:  clang-analyzer-deadcode.DeadStores
+    DiagnosticMessage:
+      Message:         'Although the value stored to ''result'' is used in the enclosing expression, the value is never actually read from ''result'''
+      FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+      FileOffset:      6660
+      Replacements:    []
+      Ranges:
+        - FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+          FileOffset:      6669
+          Length:          41
+    Notes:
+      - Message:         'Although the value stored to ''result'' is used in the enclosing expression, the value is never actually read from ''result'''
+        FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+        FileOffset:      6660
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+            FileOffset:      6669
+            Length:          41
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint-network-power-final02'
+  - DiagnosticName:  bugprone-inc-dec-in-conditions
+    DiagnosticMessage:
+      Message:         'incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++''s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings'
+      FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+      FileOffset:      9438
+      Replacements:    []
+    Notes:
+      - Message:         variable is referenced here
+        FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+        FileOffset:      9419
+        Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint-network-power-final02'
+  - DiagnosticName:  bugprone-suspicious-string-compare
+    DiagnosticMessage:
+      Message:         'function ''strcmp'' is called without explicitly comparing result'
+      FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+      FileOffset:      11966
+      Replacements:
+        - FilePath:        'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h'
+          Offset:          11987
+          Length:          0
+          ReplacementText: ' != 0'
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint-network-power-final02'
+  - DiagnosticName:  bugprone-narrowing-conversions
+    DiagnosticMessage:
+      Message:         'narrowing conversion from ''unsigned int'' to signed type ''int'' is implementation-defined'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-network-power-final02\native-httpd-rfc6455\httpd_ws.c'
+      FileOffset:      3001
+      Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint-network-power-final02'
+  - DiagnosticName:  clang-analyzer-security.insecureAPI.strcpy
+    DiagnosticMessage:
+      Message:         'Call to function ''strcpy'' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as ''strlcpy''. CWE-119'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-network-power-final02\native-httpd-rfc6455\httpd_ws.c'
+      FileOffset:      4997
+      Replacements:    []
+      Ranges:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-network-power-final02\native-httpd-rfc6455\httpd_ws.c'
+          FileOffset:      4997
+          Length:          6
+    Notes:
+      - Message:         'Call to function ''strcpy'' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as ''strlcpy''. CWE-119'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-network-power-final02\native-httpd-rfc6455\httpd_ws.c'
+        FileOffset:      4997
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-network-power-final02\native-httpd-rfc6455\httpd_ws.c'
+            FileOffset:      4997
+            Length:          6
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint-network-power-final02'
+  - DiagnosticName:  clang-analyzer-security.insecureAPI.strcpy
+    DiagnosticMessage:
+      Message:         'Call to function ''strcat'' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as ''strlcat''. CWE-119'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-network-power-final02\native-httpd-rfc6455\httpd_ws.c'
+      FileOffset:      5043
+      Replacements:    []
+      Ranges:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-network-power-final02\native-httpd-rfc6455\httpd_ws.c'
+          FileOffset:      5043
+          Length:          6
+    Notes:
+      - Message:         'Call to function ''strcat'' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as ''strlcat''. CWE-119'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-network-power-final02\native-httpd-rfc6455\httpd_ws.c'
+        FileOffset:      5043
+        Replacements:    []
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-network-power-final02\native-httpd-rfc6455\httpd_ws.c'
+            FileOffset:      5043
+            Length:          6
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/build-lint-network-power-final02'
+...

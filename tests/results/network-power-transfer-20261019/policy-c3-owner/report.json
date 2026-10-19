@@ -1,0 +1,246 @@
+{
+  "passed": true,
+  "scope": "Execute shared power policy and actual C3 permanent task integration.\n\nThe complete shared production translation unit runs with a pthread portMUX.\nActual frozen C3 apply/RSSI/intent/sleep bodies run in integration cases. Driver,\nRSSI/state and clock/delay boundaries are field-model host seams. No target ABI,\nWi-Fi power savings, hardware timing, real RTOS or SMP-safety claim is made.\n",
+  "complete_matrix": true,
+  "source_sha256": {
+    "tests/run-network-power.py": "0fe2fee083cd63cecc02801eb15eaebeb94e1892d0df94092b3aacf7c240512c",
+    "tests/native/network_power/platform.h": "7295884e236a81b3b5c737c59f178dc223605ba35eb2c2bcf628263c4d057466",
+    "tests/native/network_power/test.c": "ef7f8cc2aa2c027cfdea02ec1fef6c898df86e7acd0edb51c9fb4f296bee4430",
+    "tests/native/network_power/README.md": "fda069bf8d3653018b6dd32b024522a2c160f24c0c80c262de80fbd1b1e7ec40",
+    "idf/components/native_network_power/native_network_power.c": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e",
+    "idf/components/native_network_power/include/native_network_power.h": "9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4",
+    "idf/esp32c3-oled-native/main/network_service.c": "5c0596774a5bb063d3184a559cd0da7b14e6981402d8827412ec4eca4af35e21",
+    "idf/esp32c3-oled-native/main/network_service.h": "ec254ac5fcf0741b0ce1cdb83787a3250082dbf24a194e05156abc06e47de43a"
+  },
+  "cases": {
+    "idle-known": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:idle-known"
+    },
+    "generation-equality": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:generation-equality"
+    },
+    "generation-wrap": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:generation-wrap"
+    },
+    "same-generation-retry": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:same-generation-retry"
+    },
+    "failure-budget": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:failure-budget"
+    },
+    "blocked-success": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:blocked-success"
+    },
+    "blocked-error": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:blocked-error"
+    },
+    "stale-error-budget": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:stale-error-budget"
+    },
+    "invalidate-success": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:invalidate-success"
+    },
+    "invalidate-error": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:invalidate-error"
+    },
+    "clock-limit": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:clock-limit"
+    },
+    "invalid-poll": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:invalid-poll"
+    },
+    "concurrent": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:concurrent"
+    },
+    "c3-periods": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:c3-periods"
+    },
+    "c3-sleep-error": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:c3-sleep-error"
+    },
+    "c3-blocked": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:c3-blocked"
+    }
+  },
+  "negative_controls": {
+    "stale_generation_updates_intent": {
+      "detected": true,
+      "status": 80,
+      "expected_marker": "stale_finish_ignored",
+      "case": "generation-equality",
+      "sha256": "30236e0a84a6e6bf3c9b5784ab442554965eb92922fa65685e5fb448737fdb4b"
+    },
+    "stale_success_not_recorded": {
+      "detected": true,
+      "status": 80,
+      "expected_marker": "stale_success_recorded_for_repair",
+      "case": "blocked-success",
+      "sha256": "ae7e28b221d8d1820001eb5147d91b38c57771754f31c9a5d45482ddbf7ef8b5"
+    },
+    "stale_error_spends_new_budget": {
+      "detected": true,
+      "status": 80,
+      "expected_marker": "stale_error_preserves_new_budget",
+      "case": "stale-error-budget",
+      "sha256": "ca96fa6d888115f3805aebb7ee083415c20892ebd6c2668537d88a36d390aa75"
+    },
+    "invalidated_result_recorded": {
+      "detected": true,
+      "status": 80,
+      "expected_marker": "invalidated_driver_result_ignored",
+      "case": "invalidate-success",
+      "sha256": "82db1aa317f0a7e6bdbcfd9f77b0bbd8efe506a17abaf9bc0137f6cc0e24eef2"
+    }
+  },
+  "actual_c3_functions": {
+    "apply_power": "635965eafff97495fd97cb3d435b4a936cf304274035688cf8567a6573a9d974",
+    "rssi_task": "2ec092088b4f8ece242db53cf42d1ef3efba54331f50b481fdf0ba61a35c9b96",
+    "network_service_audio_accept": "9e0892403d16bef63029dcd1b30c1df334ccb26c813393e566ae854d09286bce",
+    "network_service_audio_receive": "6cde3985a78f041270ecb8702bae887d58c2831b438e06f2cc2396969e23146f",
+    "network_service_audio_finish": "b9e2010e9ec8c76d16fea7f0c66bf6401f94d1a8cebc0a21d7b8ef4aac8fa211",
+    "network_service_prepare_sleep": "1db6cb83a70245ec158482ce45145bcc3c8adeb975ec7a1e12d22bf3e1035286"
+  },
+  "generated_sha256": {
+    "c3-power.inc": "62ce2b9f71b124f95c38c3a21a6df3be62365fe02e548b13f42465cd2d647c05"
+  },
+  "commands": [
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/tests/native/network_power",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/tests/native/network_power/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/power"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/tests/native/network_power",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/mutants/stale_generation_updates_intent/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/tests/native/network_power/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/mutants/stale_generation_updates_intent/stale_generation_updates_intent"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/tests/native/network_power",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/mutants/stale_success_not_recorded/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/tests/native/network_power/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/mutants/stale_success_not_recorded/stale_success_not_recorded"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/tests/native/network_power",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/mutants/stale_error_spends_new_budget/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/tests/native/network_power/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/mutants/stale_error_spends_new_budget/stale_error_spends_new_budget"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/tests/native/network_power",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/mutants/invalidated_result_recorded/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/sources/tests/native/network_power/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-power-qualified-01/mutants/invalidated_result_recorded/invalidated_result_recorded"
+    ]
+  ],
+  "mutants_enabled": true
+}

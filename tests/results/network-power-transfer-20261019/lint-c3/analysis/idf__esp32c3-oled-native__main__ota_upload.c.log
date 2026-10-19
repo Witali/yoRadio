@@ -1,0 +1,43 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:48:17: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   48 |             if (memcmp(p->buffer, p->marker + 2, n) ||
+      |                 ^
+      |                                                     != 0
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:55:20: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   55 |                    memcmp(p->buffer + n, "\r\n\r\n", 4)) ++n;
+      |                    ^                                   
+      |                                                         != 0
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:86:26: warning: function 'memcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+   86 |             if (!last && memcmp(p->buffer, "\r\n", 2)) return false;
+      |                          ^                           
+      |                                                       != 0
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:170:23: warning: incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings [bugprone-inc-dec-in-conditions]
+  170 |     if (p == end || *p++ != '=') return -1;
+      |                       ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:170:9: note: variable is referenced here
+  170 |     if (p == end || *p++ != '=') return -1;
+      |         ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:271:23: warning: incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings [bugprone-inc-dec-in-conditions]
+  271 |         p == end || *p++ != '/') return false;
+      |                       ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:270:35: note: variable is referenced here
+  270 |     if (!mp_equal(token, (size_t)(p - token), "multipart", 9) ||
+      |                                   ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:300:38: warning: incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings [bugprone-inc-dec-in-conditions]
+  300 |         if (!length || p == end || *p++ != ':') return false;
+      |                                      ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:300:24: note: variable is referenced here
+  300 |         if (!length || p == end || *p++ != ':') return false;
+      |                        ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:308:19: warning: incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings [bugprone-inc-dec-in-conditions]
+  308 |             if (*p++ != '\r' || p == end || *p++ != '\n') return false;
+      |                   ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:308:33: note: variable is referenced here
+  308 |             if (*p++ != '\r' || p == end || *p++ != '\n') return false;
+      |                                 ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:308:47: warning: incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings [bugprone-inc-dec-in-conditions]
+  308 |             if (*p++ != '\r' || p == end || *p++ != '\n') return false;
+      |                                               ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/../../components/native_storage/include/web_multipart.h:308:18: note: variable is referenced here
+  308 |             if (*p++ != '\r' || p == end || *p++ != '\n') return false;
+      |                  ^
+8 warnings generated.

@@ -1,9 +1,9 @@
 # Runtime Wi-Fi: перенос профилей, reconnect, RSSI и power policy на CYD
 
 Обновлено: 2026-10-19. Остаток этапа **CYD-C3-09** из
-[общего плана](ESP32_CYD_C3_TRANSFER_PLAN.md#L72). Блоки N0–N3 реализованы
-и программно проверены; N4 power policy и N5 hostname/AP timeout остаются
-открыты. Приватный редактор desired credentials и
+[общего плана](ESP32_CYD_C3_TRANSFER_PLAN.md#L72). Блоки N0–N4 реализованы
+и программно проверены. Для N5 готово checked хранилище; подключение
+hostname/AP timeout к runtime/WebUI остаётся открытым. Приватный редактор desired credentials и
 [time service](CYD_TIME_TRANSFER_DESIGN.md) выполняются отдельно.
 
 ## Реализованный runtime и входы
@@ -40,6 +40,45 @@ loader/netif/rollback/API/WS/UI проверки с ASan/UBSan. TSAN недос�
 compile проходит; полные production exports, RF, heap/stack и физическая
 SMP/audio приёмка остаются открыты. Таблицы ниже сохраняют исходные точки
 сравнения до замены runtime; source-level дефекты относятся к historical baseline.
+
+### N4: generation-aware power реализован
+
+[Общий компонент](../idf/components/native_network_power/native_network_power.c)
+принимает `accept(generation, active)` только из сериализованного audio control.
+`receive(generation)` и `finish(generation)` меняют intent лишь при равенстве
+поколения. C3 [audio integration](../idf/esp32c3-oled-native/main/audio_service.c)
+исправлена вместе с [CYD](../idf/esp32-cyd2usb-native/main/audio_service.c):
+Play принимает active intent до публикации queue, Stop/maintenance задают новое
+idle поколение, resume устанавливает active до снятия maintenance. Backoff
+завершает receive intent, следующая попытка того же поколения включает его
+снова. EOF заканчивает network receive, buffered PCM может ещё проигрываться.
+
+`esp_wifi_set_ps` вызывается только сетевым owner: на CYD — существующим
+runtime, на C3 — прежней RSSI task. Её stack/priority сохранены; policy tick
+100 ms, RSSI cadence 2 s. Короткая critical section защищает intent, SDK call
+выполняется вне неё. Новая команда во время SDK call сохраняется, следующий
+poll согласует latest desired mode. На одну revision — максимум три попытки
+с 250 ms между неудачами. Ошибка не отклоняет Play. Поле `power` ответа
+`GET /api/native/network` показывает desired и последнюю успешно подтверждённую SDK policy, validity,
+revisions, attempts/error; это не измерение физического энергопотребления.
+
+[N4 qualification](../tests/results/network-power-transfer-20261019/README.md)
+воспроизводит обе гонки на старом C3 коде и проверяет shared policy, actual
+C3/CYD audio owners, retry/maintenance, CYD network owner и HTTP/WS. Полный
+clang-tidy: CYD 50/C3 65 units, 0 новых warnings, 0 errors; GCC component
+compiles обеих платформ проходят. Production exports и hardware gates
+учитываются отдельно.
+
+### N5: только persisted precursor
+
+[network_settings.c](../idf/esp32-cyd2usb-native/main/network_settings.c) хранит
+маленькую versioned NVS record, публикует coherent desired snapshot/revision
+после commit. Defaults: `yoradio`, timeout 0. Новый CYD hostname contract —
+одна ASCII label 1–23 bytes с внутренними hyphens; C3 legacy validation шире.
+[12 случаев и 7 controls](../tests/results/network-power-transfer-20261019/settings-precursor/report.json)
+проверяют полный source с NVS/RTOS seams. Этот модуль пока не подключён к
+CMake/runtime/routes: сохранение/AP timer/hostname application через UI ещё
+не реализованы и не считаются завершёнными.
 
 ## Входы и переносимые возможности
 

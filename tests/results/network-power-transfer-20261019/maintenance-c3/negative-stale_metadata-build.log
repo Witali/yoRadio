@@ -1,0 +1,20 @@
+In file included from /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/audio-power-c3-maintenance-qualified-01/sources/tests/native/c3_maintenance_test.c:33:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/audio-power-c3-maintenance-qualified-01/state.inc: In function ‘native_state_set_stream_info’:
+/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/audio-power-c3-maintenance-qualified-01/state.inc:170:41: warning: ‘%s’ directive output may be truncated writing up to 19 bytes into a region of size between 3 and 42 [-Wformat-truncation=]
+  170 |                          "%s%s %s kHz %s%s", state->codec,
+      |                                         ^~
+  171 |                          info->format_is_pcm ? " PCM" : "", rate,
+  172 |                          info->channels_are_core ? "core " : "", channels);
+      |                                                                  ~~~~~~~~
+In file included from /usr/include/stdio.h:980,
+                 from /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/audio-power-c3-maintenance-qualified-01/sources/tests/native/c3_maintenance_platform.h:10,
+                 from /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/audio-power-c3-maintenance-qualified-01/sources/tests/native/c3_maintenance_test.c:3:
+In function ‘snprintf’,
+    inlined from ‘native_state_set_stream_info’ at /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/audio-power-c3-maintenance-qualified-01/state.inc:169:17:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:54:10: note: ‘__builtin___snprintf_chk’ output between 7 and 65 bytes into a destination of size 48
+   54 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   55 |                                    __glibc_objsize (__s), __fmt,
+      |                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   56 |                                    __va_arg_pack ());
+      |                                    ~~~~~~~~~~~~~~~~~
