@@ -16,6 +16,7 @@
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 #include "native_wifi_store.h"
+#include "native_network_power.h"
 #include "network_netif.h"
 #include "time_service.h"
 
@@ -380,6 +381,11 @@ static void publish(network_owner_t *owner, int64_t now, uint32_t observed_versi
         fresh && owner->view.rssi_valid, fresh ? owner->view.rssi : 0)) owner->projection_dirty = false;
 }
 
+static esp_err_t apply_power(void *context, bool active) {
+    (void)context;
+    return esp_wifi_set_ps(active ? WIFI_PS_NONE : WIFI_PS_MIN_MODEM);
+}
+
 static void owner_step(network_owner_t *owner, int64_t now) {
     uint32_t version = atomic_load_explicit(&s_link_version, memory_order_acquire);
     network_notice_t notice;
@@ -416,6 +422,7 @@ static void owner_step(network_owner_t *owner, int64_t now) {
         if (owner->profiles.count) begin_cycle(owner, 0, now);
     }
     if (owner->started) {
+        native_network_power_poll(now, apply_power, NULL);
         if (!owner->view.online && (now >= owner->boot_deadline || !owner->profiles.count))
             enable_portal(owner, now);
         if (owner->cycle_active && now >= owner->cycle_deadline) {
@@ -526,6 +533,7 @@ esp_err_t network_runtime_start(native_state_t *state, esp_netif_t *station,
     atomic_store(&s_stop, false); atomic_store(&s_exited, false);
     atomic_store(&s_retry, false); atomic_store(&s_manual_admitted, false);
     atomic_store(&s_resync, false); atomic_store(&s_overflows, 0);
+    native_network_power_invalidate();
     if (xTaskCreatePinnedToCore(owner_task, "wifi_runtime", BOARD_TASK_STACK_WIFI_RUNTIME,
             owner, 2, &owner->task, 0) != pdPASS) { result = ESP_ERR_NO_MEM; goto failed; }
     atomic_store_explicit(&s_gate, 0, memory_order_release);
@@ -576,6 +584,7 @@ esp_err_t network_runtime_snapshot(network_snapshot_t *out, uint32_t timeout_ms)
     int64_t now = esp_timer_get_time();
     snapshot.rssi_age_ms = snapshot.rssi_valid && now >= 0 &&
         (uint64_t)now >= snapshot.rssi_updated_us ? ((uint64_t)now - snapshot.rssi_updated_us) / 1000 : 0;
+    native_network_power_snapshot(&snapshot.power);
     *out = snapshot;
     leave();
     return ESP_OK;

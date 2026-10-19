@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +21,7 @@ def main():
                         help='Verify input-memory preparation follows previous TLS cleanup')
     parser.add_argument('--flac-input-growth', action='store_true',
                         help='Verify FLAC-only growth after the current decoder is ready')
+    parser.add_argument('--network-power',action='store_true',help='Link real shared policy and check receive/backoff/EOF intent')
     parser.add_argument('--read-timeout-ms', type=int, default=250,
                         help='HTTP body timeout to validate independently of connection deadlines (10..1000)')
     parser.add_argument('--read-size', type=int, default=2048,
@@ -32,6 +34,9 @@ def main():
     if args.flac_input_growth:
         args.adaptive_input = True
     args.output.mkdir(parents=True, exist_ok=False)
+    (args.output/'freertos').mkdir()
+    (args.output/'freertos/FreeRTOS.h').write_text('#pragma once\n#include <pthread.h>\ntypedef pthread_mutex_t portMUX_TYPE;\n#define portMUX_INITIALIZER_UNLOCKED PTHREAD_MUTEX_INITIALIZER\n#define portENTER_CRITICAL(p) assert(!pthread_mutex_lock(p))\n#define portEXIT_CRITICAL(p) assert(!pthread_mutex_unlock(p))\n')
+    (args.output/'esp_err.h').write_text('#pragma once\n')
     source = ROOT/'idf/esp32c3-oled-native/main/audio_service.c'
     reader = source.with_name('stream_http_reader.c')
     reader_header = source.with_name('stream_http_reader.h')
@@ -69,7 +74,9 @@ def main():
         .replace('/* PRODUCTION_OPEN_STREAM */', open_code)
         .replace('/* PRODUCTION_STREAM_TASK */', task_code))
     unit.write_text(unit.read_text().replace('/* PRODUCTION_STREAM_HELPERS */', helpers))
-    inputs = (source, reader, reader_header, profile_header, probe_header, tags_header, icy, icy_header, harness, Path(__file__).resolve())
+    inputs = (source, reader, reader_header, profile_header, probe_header, tags_header, icy, icy_header, harness, ROOT/'tests/native/audio_power_seam.h', Path(__file__).resolve())
+    power=ROOT/'idf/components/native_network_power'
+    if args.network_power:inputs += (power/'native_network_power.c',power/'include/native_network_power.h')
     for path in inputs:
         saved = args.output/'sources'/path.relative_to(ROOT)
         saved.parent.mkdir(parents=True, exist_ok=True)
@@ -82,7 +89,8 @@ def main():
         *(['-DCONFIG_YORADIO_TLS_RETAIN_RX_BUFFER=1'] if args.tls_retain_rx else []),
         *(['-DCONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER=1'] if args.adaptive_input else []),
         *(['-DCONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS=4'] if args.flac_input_growth else []),
-        '-I', host(source.parent), host(unit), host(icy), '-o', host(binary)]))
+        *(['-DAUDIO_POWER_INTEGRATION=1','-I'+host(args.output),'-I'+host(power),'-I'+host(power/'include'),'-pthread'] if args.network_power else []),
+        '-I', host(source.parent), '-I',host(ROOT/'tests/native'), host(unit), host(icy), '-o', host(binary)]))
     result = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
                   'UBSAN_OPTIONS=halt_on_error=1', host(binary)])
     (args.output/'run.log').write_bytes(result)
@@ -102,4 +110,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:main()
+    except subprocess.CalledProcessError as error:
+        print(error.output.decode(errors='replace'),file=sys.stderr)
+        raise

@@ -44,7 +44,9 @@ int main(void) {
     httpd_req_t request = {0};
     for (unsigned phase = NETWORK_WAIT_START; phase <= NETWORK_AP_IDLE; ++phase) {
         reset(); view = (network_snapshot_t){.phase=phase,.profile_index=NETWORK_NO_PROFILE,
-            .target_profile=NETWORK_NO_PROFILE,.rssi_valid=false};
+            .target_profile=NETWORK_NO_PROFILE,.rssi_valid=false,
+            .power={.generation=phase,.desired_active=phase % 2 != 0,
+                .applied_active=phase % 2 == 0,.applied_valid=true,.last_error=ESP_FAIL}};
         assert(network_handler(&request) == ESP_OK && status == 200 && no_store && json_type);
         assert(snapshot_calls == 1 && !retry_calls && strstr(response, "\"rssi_valid\":false"));
         assert(!strstr(response,"password") && !strstr(response,"ssid"));
@@ -55,8 +57,12 @@ int main(void) {
         .profile_index=UINT8_MAX,.target_profile=UINT8_MAX,.attempt=UINT8_MAX,
         .profiles_tried=UINT8_MAX,.online=true,.ap_enabled=true,.rssi_valid=true,
         .reconciling=true,.rssi=INT8_MIN,.disconnect_reason=UINT16_MAX,.ipv4=UINT32_MAX,
-        .last_error=INT_MIN,.rssi_age_ms=UINT64_MAX};
+        .last_error=INT_MIN,.rssi_age_ms=UINT64_MAX,
+        .power={.generation=UINT32_MAX,.desired_revision=UINT32_MAX,.applied_revision=UINT32_MAX,
+            .desired_active=false,.applied_active=false,.applied_valid=false,.attempts=UINT8_MAX,.last_error=INT_MIN}};
     assert(network_handler(&request) == ESP_OK && status == 200 && no_store && json_type);
+    assert(strstr(response,"\"power\":{") && strstr(response,"\"attempts\":255") &&
+        strstr(response,"\"desired_revision\":4294967295") && strstr(response,"\"applied_valid\":false"));
     assert(strstr(response,"\"phase\":\"unknown\"")); printf("JSON_MAX=%s\n",response);
     reset(); snapshot_result=ESP_ERR_TIMEOUT;
     assert(network_handler(&request)==ESP_OK && status==503 && no_store && snapshot_calls==1);

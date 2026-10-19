@@ -29,6 +29,7 @@ static pthread_mutex_t boundary = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t boundary_changed = PTHREAD_COND_INITIALIZER;
 static bool block_query, query_blocked, query_release, block_send, send_blocked, send_release;
 static bool block_unregister, unregister_blocked, unregister_release;
+static bool block_power, power_blocked, power_release;
 const char fixture_wifi_base[] = "wifi", fixture_ip_base[] = "ip";
 
 static struct timespec until_ms(unsigned ms) {
@@ -305,6 +306,22 @@ esp_err_t esp_wifi_disconnect(void) {
     if (!result && !hold_disconnect) { stats.associated = stats.netif_up = false; observed_ip = 0; }
     pthread_mutex_unlock(&driver_lock); return result ? result : connected ? ESP_OK : ESP_ERR_WIFI_NOT_CONNECT;
 }
+esp_err_t esp_wifi_set_ps(wifi_ps_type_t mode) {
+    CHECK(owner_thread, "power_driver_called_only_by_owner");
+    CHECK(mode == WIFI_PS_NONE || mode == WIFI_PS_MIN_MODEM, "supported_power_mode");
+    pthread_mutex_lock(&driver_lock); esp_err_t result = api_result_locked(API_POWER);
+    pthread_mutex_unlock(&driver_lock);
+    pthread_mutex_lock(&boundary);
+    if (block_power) {
+        block_power = false; power_blocked = true; pthread_cond_broadcast(&boundary_changed);
+        while (!power_release) wait_changed(&boundary_changed, &boundary);
+        power_blocked = false;
+    }
+    pthread_mutex_unlock(&boundary);
+    pthread_mutex_lock(&driver_lock);
+    if (result == ESP_OK) stats.power_active = mode == WIFI_PS_NONE;
+    pthread_mutex_unlock(&driver_lock); return result;
+}
 esp_err_t esp_wifi_sta_get_ap_info(wifi_ap_record_t *ap) {
     pthread_mutex_lock(&driver_lock); esp_err_t result = api_result_locked(API_AP_INFO);
     if (!result && !stats.associated) result = ESP_ERR_WIFI_NOT_CONNECT;
@@ -376,6 +393,9 @@ size_t strlcpy(char *out, const char *in, size_t capacity) {
 void fixture_block_ap_info(void) { pthread_mutex_lock(&boundary); block_query = true; query_blocked = query_release = false; pthread_mutex_unlock(&boundary); }
 void fixture_wait_ap_info(void) { pthread_mutex_lock(&boundary); while (!query_blocked) wait_changed(&boundary_changed, &boundary); pthread_mutex_unlock(&boundary); }
 void fixture_release_ap_info(void) { pthread_mutex_lock(&boundary); query_release = true; pthread_cond_broadcast(&boundary_changed); pthread_mutex_unlock(&boundary); }
+void fixture_block_power(void) { pthread_mutex_lock(&boundary); block_power = true; power_blocked = power_release = false; pthread_mutex_unlock(&boundary); }
+void fixture_wait_power(void) { pthread_mutex_lock(&boundary); while (!power_blocked) wait_changed(&boundary_changed, &boundary); pthread_mutex_unlock(&boundary); }
+void fixture_release_power(void) { pthread_mutex_lock(&boundary); power_release = true; pthread_cond_broadcast(&boundary_changed); pthread_mutex_unlock(&boundary); }
 void fixture_block_send(void) { pthread_mutex_lock(&boundary); block_send = true; send_blocked = send_release = false; pthread_mutex_unlock(&boundary); }
 void fixture_wait_send(void) { pthread_mutex_lock(&boundary); while (!send_blocked) wait_changed(&boundary_changed, &boundary); pthread_mutex_unlock(&boundary); }
 void fixture_release_send(void) { pthread_mutex_lock(&boundary); send_release = true; pthread_cond_broadcast(&boundary_changed); pthread_mutex_unlock(&boundary); }

@@ -27,6 +27,7 @@
 #include "custom_legacy_adapter.h"
 #endif
 #include "native_audio_output.h"
+#include "network_service.h"
 #include "stream_body.h"
 #include "stream_bitrate.h"
 #include "stream_probe.h"
@@ -184,6 +185,7 @@ static esp_err_t maintenance_finish_locked(bool resume) {
         strlcpy(s_state->stream_format, status, sizeof(s_state->stream_format));
         atomic_store(&s_generation, command.generation);
         s_last_command = command;
+        network_service_audio_accept(command.generation, true);
     } else {
         maintenance_state_locked(atomic_load(&s_generation), true);
         if (atomic_load(&s_maintenance_error) == ESP_OK)
@@ -576,7 +578,11 @@ static void stream_task(void *argument) {
                atomic_load(&s_decoder_released_generation) != command.generation) {
             vTaskDelay(pdMS_TO_TICKS(1));
         }
-        if (atomic_load(&s_generation) != command.generation) continue;
+        if (atomic_load(&s_generation) != command.generation) {
+            network_service_audio_finish(command.generation);
+            continue;
+        }
+        network_service_audio_receive(command.generation);
         stream_transport_reset();
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
         // Between connections only; never alter published/leased storage.
@@ -604,6 +610,7 @@ static void stream_task(void *argument) {
         if (!client) {
             state_set_audio(command.generation, false, "HTTP allocation failed");
             native_health_stream_failure(command.generation, AUDIO_END_ALLOCATION_FAILED, 0);
+            network_service_audio_finish(command.generation);
             continue;
         }
         esp_http_client_set_header(client, "Icy-MetaData", "1");
@@ -611,6 +618,7 @@ static void stream_task(void *argument) {
             esp_timer_get_time() + INT64_C(10000000));
         if (atomic_load(&s_generation) != command.generation) {
             esp_http_client_cleanup(client);
+            network_service_audio_finish(command.generation);
             continue;
         }
         if (result != ESP_OK) {
@@ -618,12 +626,14 @@ static void stream_task(void *argument) {
             native_health_stream_failure(command.generation, AUDIO_END_UNAVAILABLE, result);
             state_set_audio(command.generation, false, "connection failed");
             esp_http_client_cleanup(client);
+            network_service_audio_finish(command.generation);
             continue;
         }
         if (!headers.valid) {
             native_health_stream_failure(command.generation, AUDIO_END_FORMAT_UNKNOWN, 0);
             state_set_audio(command.generation, false, "invalid ICY interval");
             esp_http_client_cleanup(client);
+            network_service_audio_finish(command.generation);
             continue;
         }
         native_state_publish_bitrate(s_state,command.generation,headers.bitrate_kbps,NATIVE_BITRATE_ICY);
@@ -682,6 +692,7 @@ static void stream_task(void *argument) {
                 end_reason == AUDIO_END_READ_FAILED ? ESP_FAIL : 0);
         esp_http_client_close(client);
         esp_http_client_cleanup(client);
+        network_service_audio_finish(command.generation);
     }
 }
 
@@ -1369,6 +1380,7 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
         .generation = atomic_fetch_add(&s_generation, 1) + 1,
         .requested_codec = codec,
     };
+    network_service_audio_accept(command.generation, true);
     strlcpy(command.url, url, sizeof(command.url));
     native_state_begin_audio(s_state, command.generation, url, "connecting");
     native_state_set_connecting(s_state, command.generation);
@@ -1376,7 +1388,10 @@ esp_err_t audio_service_play(const char *url, native_codec_t codec) {
                          ? ESP_OK : ESP_FAIL;
     s_last_command_valid = result == ESP_OK;
     if (s_last_command_valid) s_last_command = command;
-    if (result != ESP_OK) native_state_set_audio(s_state, command.generation, false, "command failed");
+    if (result != ESP_OK) {
+        native_state_set_audio(s_state, command.generation, false, "command failed");
+        network_service_audio_finish(command.generation);
+    }
     xSemaphoreGive(s_control_lock);
     return result;
 }
@@ -1390,6 +1405,7 @@ void audio_service_stop(void) {
         return;
     }
     uint32_t generation = atomic_fetch_add(&s_generation, 1) + 1;
+    network_service_audio_accept(generation, false);
     native_state_begin_audio(s_state, generation, NULL, "stopped");
     xSemaphoreGive(s_control_lock);
 }
@@ -1443,6 +1459,7 @@ esp_err_t audio_service_maintenance_begin(uint32_t timeout_ms,
     uint64_t epoch = ++s_maintenance_epoch;
     atomic_store(&s_maintenance_phase, MAINTENANCE_REQUESTED);
     portEXIT_CRITICAL(&s_maintenance_token_lock);
+    network_service_audio_accept(generation + 1U, false);
     // Cancellation can make an in-flight write fail immediately on core 1.
     // Publish maintenance first so that failure is not reported as an output
     // fault. The generation already invalidates old producer/decoder work.

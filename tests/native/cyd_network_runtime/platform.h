@@ -25,6 +25,10 @@
 #define ESP_ERR_WIFI_NOT_CONNECT 0x300f
 #define ESP_ERR_WIFI_STATE 0x3006
 typedef int esp_err_t;
+typedef pthread_mutex_t portMUX_TYPE;
+#define portMUX_INITIALIZER_UNLOCKED PTHREAD_MUTEX_INITIALIZER
+#define portENTER_CRITICAL(lock) CHECK(pthread_mutex_lock(lock) == 0, "critical_enter")
+#define portEXIT_CRITICAL(lock) CHECK(pthread_mutex_unlock(lock) == 0, "critical_exit")
 typedef int BaseType_t;
 typedef unsigned UBaseType_t;
 typedef uint32_t TickType_t;
@@ -80,6 +84,7 @@ typedef struct { esp_netif_t *esp_netif; esp_netif_ip_info_t ip_info; } ip_event
 typedef struct { uint16_t reason; } wifi_event_sta_disconnected_t;
 typedef struct { uint8_t ssid[33], bssid[6]; int8_t rssi; } wifi_ap_record_t;
 typedef enum { WIFI_MODE_NULL, WIFI_MODE_STA, WIFI_MODE_AP, WIFI_MODE_APSTA } wifi_mode_t;
+typedef enum { WIFI_PS_NONE, WIFI_PS_MIN_MODEM } wifi_ps_type_t;
 #define WIFI_IF_STA 0
 #define WIFI_IF_AP 1
 #define WIFI_AUTH_OPEN 0
@@ -103,6 +108,7 @@ esp_err_t esp_wifi_clear_default_wifi_driver_and_handlers(esp_netif_t *netif);
 bool esp_netif_is_netif_up(esp_netif_t *netif);
 esp_err_t esp_netif_get_ip_info(esp_netif_t *netif, esp_netif_ip_info_t *info);
 esp_err_t esp_wifi_set_mode(wifi_mode_t mode);
+esp_err_t esp_wifi_set_ps(wifi_ps_type_t mode);
 esp_err_t esp_wifi_set_config(int interface, wifi_config_t *config);
 esp_err_t esp_wifi_connect(void);
 esp_err_t esp_wifi_disconnect(void);
@@ -116,13 +122,14 @@ size_t strlcpy(char *out, const char *in, size_t capacity);
 
 enum fixture_api { API_MAC, API_MODE, API_STA_CONFIG, API_AP_CONFIG, API_CONNECT,
     API_DISCONNECT, API_AP_INFO, API_IP_INFO, API_REGISTER, API_UNREGISTER,
-    API_ATTACH, API_DEFAULT_HANDLERS, API_CLEAR, API_COUNT };
+    API_ATTACH, API_DEFAULT_HANDLERS, API_CLEAR, API_POWER, API_COUNT };
 typedef struct {
     unsigned queues, semaphores, events, ap_netifs, registrations;
     unsigned tasks, joins, api_calls[API_COUNT], config_rows[512], configs, connects;
     unsigned requested_stack, requested_priority;
     int requested_core;
     wifi_mode_t mode;
+    bool power_active;
     bool started, associated, netif_up, time_online;
     unsigned time_true, time_false;
 } fixture_stats_t;
@@ -144,6 +151,9 @@ void fixture_lock_snapshot(bool lock);
 void fixture_block_ap_info(void);
 void fixture_wait_ap_info(void);
 void fixture_release_ap_info(void);
+void fixture_block_power(void);
+void fixture_wait_power(void);
+void fixture_release_power(void);
 void fixture_block_send(void);
 void fixture_wait_send(void);
 void fixture_release_send(void);

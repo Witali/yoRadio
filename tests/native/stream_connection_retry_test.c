@@ -34,6 +34,7 @@ typedef uint32_t TickType_t;
 #define ESP_LOGW(tag, ...) ESP_LOGE(tag, __VA_ARGS__)
 #define ESP_LOGI(tag, ...) ESP_LOGE(tag, __VA_ARGS__)
 static atomic_uint s_generation, s_decoder_released_generation;
+static atomic_bool s_stream_retry_pending;
 static void *s_commands, *s_state;
 static icy_title_parser_t s_icy_title;
 typedef struct { int64_t started_us; uint64_t audio_bytes; } stream_bitrate_meter_t;
@@ -99,14 +100,20 @@ static uint8_t runtime_settings_get_station_timeout_sec(void) { return timeout_s
 static const char *esp_err_to_name(int error) { (void)error; return "stub"; }
 static void vTaskDelete(void *unused) { (void)unused; assert(false); }
 static void vTaskDelay(unsigned ticks) { now_us += (int64_t)ticks * 1000; }
-static void network_service_set_streaming(bool active) { (void)active; }
+#include "audio_power_seam.h"
+static bool maintenance_active(void) {return false;}
+static void maintenance_ack(unsigned bits) {(void)bits;assert(false);}
+static void maintenance_park(uint32_t generation) {(void)generation;assert(false);}
+#define MAINTENANCE_STREAM 1U
 static void state_set_audio(uint32_t gen, bool active, const char *state) {
     (void)active;
     if (gen == atomic_load(&s_generation)) snprintf(last_state, sizeof(last_state), "%s", state);
 }
+static void native_state_set_connecting(void *state,uint32_t generation) {(void)state;state_set_audio(generation,false,"connecting");}
 static void log_runtime_memory(const char *stage) { (void)stage; }
-static void native_state_set_bitrate(void *state, uint32_t gen, uint32_t rate) {
-    (void)state; (void)gen; (void)rate;
+enum {NATIVE_BITRATE_ICY};
+static void native_state_publish_bitrate(void *state, uint32_t gen, uint32_t rate,unsigned source) {
+    (void)state; (void)gen; (void)rate;assert(source==NATIVE_BITRATE_ICY);
 }
 static native_codec_t codec_from_content_type(const char *type) { (void)type; return NATIVE_CODEC_AAC; }
 static void publish_icy_title(uint32_t gen, const char *title) { (void)gen; (void)title; }
@@ -125,6 +132,7 @@ static bool send_encoded(uint32_t gen, native_codec_t codec, const void *data, s
 }
 static void queue_play(const char *url) {
     unsigned gen = atomic_fetch_add(&s_generation, 1) + 1;
+    network_service_audio_accept(gen,true); // Explicit queued-control seam.
     atomic_store(&s_decoder_released_generation, gen);
     queued_command = (play_command_t){.generation=gen, .requested_codec=NATIVE_CODEC_AAC};
     snprintf(queued_command.url, sizeof(queued_command.url), "%s", url);
@@ -134,12 +142,14 @@ static int xQueueReceive(void *queue, void *destination, TickType_t wait) {
     (void)queue;
     assert(!client.live); // Every backoff must release HTTP/TLS first.
     if (queued) { *(play_command_t *)destination = queued_command; queued = false; return pdTRUE; }
+    if (!atomic_load(&s_stream_retry_pending) || !strcmp(last_state,"station unavailable") ||
+        atomic_load(&s_generation)!=queued_command.generation || !watchdog) longjmp(finished,1);
     if (wait == portMAX_DELAY) longjmp(finished, 1);
     assert(wait > 0 && wait <= STREAM_RETRY_POLL_MS);
     int64_t end = now_us + (int64_t)wait * 1000;
     if (event_kind && event_us <= end) {
         now_us = event_us;
-        if (event_kind == 1) atomic_fetch_add(&s_generation, 1); // Stop, no queue item.
+        if (event_kind == 1) {unsigned gen=atomic_fetch_add(&s_generation,1)+1;network_service_audio_accept(gen,false);} // Stop, no queue item.
         if (event_kind == 2) watchdog = false;
         if (event_kind == 3) queue_play("http://fixture/second");
         event_kind = 0;
@@ -150,6 +160,10 @@ static int xQueueReceive(void *queue, void *destination, TickType_t wait) {
 }
 static esp_http_client_handle_t esp_http_client_init(const esp_http_client_config_t *config) {
     assert(!client.live);
+#ifdef AUDIO_POWER_INTEGRATION
+    native_network_power_snapshot_t power;native_network_power_snapshot(&power);
+    assert(power.generation==atomic_load(&s_generation)&&power.desired_active);
+#endif
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
     assert(input_prepared);
     input_prepared = false;
@@ -176,7 +190,7 @@ static void esp_http_client_set_header(esp_http_client_handle_t c, const char *k
 static int esp_http_client_open(esp_http_client_handle_t c, int size) {
     (void)c; (void)size;
     now_us += open_duration_us;
-    if (cancel_in_open) atomic_fetch_add(&s_generation, 1);
+    if (cancel_in_open) {unsigned gen=atomic_fetch_add(&s_generation,1)+1;network_service_audio_accept(gen,false);}
     return attempts[attempt_count-1].result;
 }
 static int64_t esp_http_client_fetch_headers(esp_http_client_handle_t c) {
@@ -242,6 +256,9 @@ static void reset(unsigned count) {
 static void execute(void) {
     if (!setjmp(finished)) stream_task(NULL);
     assert(!client.live);
+#ifdef AUDIO_POWER_INTEGRATION
+    audio_power_assert_quiet(atomic_load(&s_generation));
+#endif
     assert(connection_close_headers == attempt_count);
 #if CONFIG_YORADIO_FLAC_INPUT_EXTRA_SLOTS > 0
     assert(finish_calls == attempt_count);

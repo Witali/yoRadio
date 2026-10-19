@@ -33,7 +33,8 @@ def main():
              ROOT/'tests/run-web-warning-regressions.py',
              ROOT/'tools/codec_benchmark/run_output_dma_host.py',
              ROOT/'idf/esp32-cyd2usb-native/main/web_service.c',
-             ROOT/'idf/esp32-cyd2usb-native/main/network_status.h']
+             ROOT/'idf/esp32-cyd2usb-native/main/network_status.h',
+             ROOT/'idf/components/native_network_power/include/native_network_power.h']
     hashes = {}
     for path in files:
         data=path.read_bytes(); relative=path.relative_to(ROOT)
@@ -49,6 +50,7 @@ def main():
     command=['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
         '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
         '-I'+str(out),'-I'+str(frozen/'idf/esp32-cyd2usb-native/main'),
+        '-I'+str(frozen/'idf/components/native_network_power/include'),
         str(frozen/'tests/native/cyd_network_http_test.c'),'-o',str(out/'network-http')]
 
     def execute(name, source, assertion=None):
@@ -68,6 +70,12 @@ def main():
     positive=execute('positive',unit)
     parsed=[json.loads(line.split('=',1)[1]) for line in positive.splitlines() if line.startswith(('JSON=','JSON_MAX='))]
     assert len(parsed)==7 and parsed[-1]['rssi_age_ms']==2**64-1 and parsed[-1]['last_error']==-2**31
+    for phase, response in enumerate(parsed[:-1]):
+        assert response['power']['generation'] == phase
+        assert response['power']['desired_active'] is (phase % 2 != 0)
+        assert response['power']['applied_active'] is (phase % 2 == 0)
+        assert response['power']['applied_valid'] is True and response['power']['last_error'] == -1
+    assert parsed[-1]['power']['desired_revision'] == 2**32-1 and parsed[-1]['power']['last_error'] == -2**31
     controls={}
     mutations=[
         ('network_body_purge','return ESP_FAIL;','return ESP_OK;', 'network_handler(&request)==ESP_FAIL'),

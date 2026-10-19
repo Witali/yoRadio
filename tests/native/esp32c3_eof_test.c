@@ -52,7 +52,7 @@ static int xRingbufferSendComplete(void *ring, void *packet) {
 }
 static void vRingbufferReturnItem(void *ring, void *packet) { (void)ring; free(packet); }
 static void dispose_http_client(void *client) { (void)client; }
-static void network_service_set_streaming(bool running) { assert(!running); }
+static void network_service_audio_finish(uint32_t generation) {(void)generation;}
 #include "pipeline_profile.h"
 #include "production.inc"
 

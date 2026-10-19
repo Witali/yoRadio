@@ -25,6 +25,7 @@ CASES = [
     'same-ssid', 'snapshot-lock', 'rssi', 'rssi-late', 'projection-lock',
     'pending-publisher-stop', 'unregister-running', 'concurrent-stop', 'cleanup-poison', 'concurrent',
     'clock-limit', 'invalid-input',
+    'power-intent', 'power-errors', 'power-call-race', 'power-stale-error',
     *['rollback-' + name for name in ['queue', 'mutex', 'event', 'ap-netif', 'mac',
       'mode-ap', 'mode-sta', 'ap-config', 'ap-attach', 'ap-handlers',
       'wifi-handler', 'ip-handler', 'task', 'unregister']],
@@ -58,6 +59,8 @@ def main():
              Path('idf/components/native_wifi_store/native_wifi_store.c'),
              Path('idf/components/native_wifi_store/include/native_wifi_store.h'),
              Path('idf/components/native_time/include/native_time_sntp.h')]
+    files += [Path('idf/components/native_network_power/native_network_power.c'),
+              Path('idf/components/native_network_power/include/native_network_power.h')]
     report = dict(passed=False, scope=__doc__, complete_matrix=not args.case,
                   source_sha256={}, cases={}, negative_controls={}, physical_hardware=False,
                   target_abi=False, actual_rtos_scheduler=False)
@@ -87,10 +90,12 @@ def main():
                    '-I' + host(stubs), '-I' + host(frozen / TEST), '-I' + host(frozen / MAIN),
                    '-I' + host(frozen / 'idf/components/native_wifi_store/include'),
                    '-I' + host(frozen / 'idf/components/native_time/include'),
+                   '-I' + host(frozen / 'idf/components/native_network_power/include'),
                    host(runtime or frozen / MAIN / 'network_runtime.c'),
                    host(frozen / MAIN / 'network_netif.c'),
                    host(frozen / MAIN / 'native_state.c'),
                    host(frozen / 'idf/components/native_wifi_store/native_wifi_store.c'),
+                   host(frozen / 'idf/components/native_network_power/native_network_power.c'),
                    host(frozen / TEST / 'platform.c'), host(frozen / TEST / 'test.c'),
                    '-o', host(binary)]
         report.setdefault('commands', []).append(command)
@@ -147,6 +152,11 @@ def main():
              'manual-admission', 'manual_retry_retains_preconfigured_apsta'),
             ('rssi_query_keeps_old_sample', 'owner->view.rssi = 0; owner->view.rssi_valid = false;',
              '/* missing RSSI invalidation */', 'rssi', 'failed_or_late_rssi_invalidated'),
+            ('missing_power_poll', 'native_network_power_poll(now, apply_power, NULL);',
+             '(void)apply_power;', 'power-intent', 'prestartup_audio_intent_preserved'),
+            ('wrong_power_mode', 'esp_wifi_set_ps(active ? WIFI_PS_NONE : WIFI_PS_MIN_MODEM)',
+             'esp_wifi_set_ps(active ? WIFI_PS_MIN_MODEM : WIFI_PS_NONE)',
+             'power-intent', 'prestartup_audio_intent_preserved'),
         ]
         for name, old, new, case, marker in mutations:
             assert source.count(old) == 1, (name, source.count(old))

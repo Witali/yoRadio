@@ -98,7 +98,7 @@ size_t strlcpy(char *, const char *, size_t);
     assert rows['SETTINGS_MIN']==dict(volume=0,balance=-16,normalization=False,normgain=0,normtarget=-20,normtime=100)
     assert rows['SETTINGS_MAX']==dict(volume=254,balance=16,normalization=True,normgain=20,normtarget=0,normtime=10000)
     (OUT/'build.log').write_bytes(build);(OUT/'test.log').write_bytes(log)
-    sources=[Path(__file__),ROOT/'tests/native/cyd_stream_test.c',ROOT/'tests/run-cyd-lifecycle.py',
+    sources=[Path(__file__),ROOT/'tests/native/cyd_stream_test.c',ROOT/'tests/native/audio_power_seam.h',ROOT/'tests/run-cyd-lifecycle.py',
         *[MAIN/name for name in ('audio_service.c','web_service.c','native_state.c','native_state.h','native_health.h','native_health_json.c')],
         SHARED/'icy_title.c',*[SHARED/'include'/name for name in
         ('audio_completion.h','icy_title.h','stream_body.h','stream_bitrate.h','stream_probe.h','stream_tags.h','json_buffer.h')]]

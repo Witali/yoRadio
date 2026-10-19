@@ -30,12 +30,15 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--tsan',action='store_true')
+    p.add_argument('--network-power',action='store_true',help='Link actual shared policy and assert command/maintenance intent')
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
     main=ROOT/'idf/esp32-cyd2usb-native/main';shared=ROOT/'idf/components/native_stream'
     harness=ROOT/'tests/native/cyd_maintenance_test.c'
-    files=[Path(__file__).resolve(),harness,ROOT/'tests/native/cyd_maintenance_platform.h',ROOT/'tests/native/cyd_output_pause_test.c',
+    files=[Path(__file__).resolve(),harness,ROOT/'tests/native/cyd_maintenance_platform.h',ROOT/'tests/native/cyd_output_pause_test.c',ROOT/'tests/native/audio_power_seam.h',
            *[main/n for n in ('audio_service.c','audio_service.h','native_audio_output.c','native_audio_output.h','native_state.c','native_state.h','native_health.h','input_prefill.h')],
            shared/'adaptive_input.c',shared/'icy_title.c',*sorted((shared/'include').glob('*.h'))]
+    power=ROOT/'idf/components/native_network_power'
+    if a.network_power:files += [power/'native_network_power.c',power/'include/native_network_power.h']
     for f in files:
         target=out/'sources'/f.relative_to(ROOT);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(f.read_bytes())
     (out/'freertos').mkdir()
@@ -62,6 +65,7 @@ def main():
                  '-I'+host(out),'-I'+host(ROOT/'tests/native'),'-I'+host(main),'-I'+host(shared/'include'),
                  host(harness),host(shared/'icy_title.c'),'-o',host(binary)]
         if sanitizer=='thread':command.insert(1,'-DTEST_TSAN=1')
+        if a.network_power:command[1:1]=['-DAUDIO_POWER_INTEGRATION=1','-I'+host(power/'include'),'-I'+host(power)]
         code,log=execute(command,60);(out/(binary.name+'-build.log')).write_bytes(log)
         if code:print(log.decode(errors='replace'),file=sys.stderr);raise RuntimeError('build failed '+binary.name)
     for backend in ('PDM','DAC','LEGACY_DAC'):

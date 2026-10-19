@@ -28,6 +28,7 @@ static void start(unsigned count) {
     CHECK(network_runtime_start(&state, &station, &profiles) == ESP_OK, "runtime_start");
     fixture_wait_parked();
     CHECK(snapshot().phase == NETWORK_WAIT_START, "wait_for_actual_start_event");
+    CHECK(!fixture_stats().api_calls[API_POWER], "no_power_call_before_driver_start");
     fixture_emit(WIFI_EVENT, WIFI_EVENT_STA_START, NULL, 0); fixture_step(0);
 }
 static void next_connect(unsigned previous) {
@@ -306,6 +307,55 @@ int main(int argc, char **argv) {
         for (unsigned i = 0; i < 200; ++i) fixture_step(100000);
         for (unsigned i = 0; i < 6; ++i) CHECK(!pthread_join(threads[i], NULL), "concurrent_publisher_join");
         fixture_step(0); (void)snapshot();
+    } else if (!strcmp(name, "power-intent")) {
+        native_network_power_accept(UINT32_MAX, true); start(0);
+        network_snapshot_t view = snapshot();
+        CHECK(view.power.generation == UINT32_MAX && view.power.desired_active &&
+            view.power.applied_valid && view.power.applied_active && fixture_stats().power_active,
+            "prestartup_audio_intent_preserved");
+        native_network_power_finish(UINT32_MAX);
+        CHECK(!snapshot().power.desired_active && fixture_stats().power_active, "intent_does_not_call_driver");
+        fixture_step(0); CHECK(!fixture_stats().power_active, "finish_returns_modem_sleep");
+        native_network_power_accept(0, true);
+        native_network_power_finish(UINT32_MAX); native_network_power_receive(UINT32_MAX);
+        fixture_step(0); CHECK(fixture_stats().power_active && snapshot().power.generation == 0,
+            "stale_finish_and_begin_cannot_replace_wrap_generation");
+        native_network_power_finish(0); fixture_step(0);
+        native_network_power_receive(0); fixture_step(0);
+        CHECK(fixture_stats().power_active, "same_generation_receive_retry_reactivates");
+        native_network_power_accept(1, false); native_network_power_receive(0); fixture_step(0);
+        CHECK(!fixture_stats().power_active && !snapshot().power.desired_active, "late_receive_cannot_override_stop");
+    } else if (!strcmp(name, "power-errors")) {
+        start(0); fixture_fail_api(API_POWER, UINT_MAX, ESP_FAIL);
+        unsigned before = fixture_stats().api_calls[API_POWER];
+        native_network_power_accept(1, true); fixture_step(0);
+        CHECK(snapshot().power.attempts == 1, "power_failure_attempt_count");
+        fixture_step(249999); CHECK(fixture_stats().api_calls[API_POWER] == before + 1, "power_retry_delay");
+        fixture_step(1); fixture_step(250000); fixture_step(5000000);
+        network_snapshot_t view = snapshot();
+        CHECK(fixture_stats().api_calls[API_POWER] == before + 3 && view.power.attempts == 3 &&
+            view.power.last_error == ESP_FAIL && view.power.desired_active && !view.power.applied_active,
+            "power_failures_bounded_and_visible");
+        fixture_fail_api(API_POWER, 0, ESP_OK); native_network_power_accept(2, true); fixture_step(0);
+        view = snapshot();
+        CHECK(view.power.applied_valid && view.power.applied_active && view.power.last_error == ESP_OK &&
+            view.power.applied_revision == view.power.desired_revision, "new_command_rearms_failed_policy");
+    } else if (!strcmp(name, "power-call-race") || !strcmp(name, "power-stale-error")) {
+        bool fail = !strcmp(name, "power-stale-error");
+        start(0); native_network_power_accept(1, true);
+        if (fail) fixture_fail_api(API_POWER, 1, ESP_FAIL);
+        fixture_block_power(); fixture_release_step(0); fixture_wait_power();
+        native_network_power_accept(2, fail);
+        native_network_power_finish(1);
+        CHECK(snapshot().power.generation == 2 && snapshot().power.desired_active == fail,
+            "new_intent_not_blocked_by_driver_call");
+        fixture_release_power(); fixture_wait_parked();
+        CHECK(snapshot().power.attempts == 0 && snapshot().power.last_error == ESP_OK,
+            "stale_result_does_not_charge_new_revision");
+        fixture_step(0); network_snapshot_t view = snapshot();
+        CHECK(view.power.applied_valid && view.power.applied_active == fail &&
+            view.power.applied_revision == view.power.desired_revision && fixture_stats().power_active == fail,
+            "next_owner_step_reconciles_latest_power");
     } else if (!strcmp(name, "clock-limit")) {
         fixture_set_clock(INT64_MAX - 500000); start(5); first_connect(); fixture_step(400000);
         CHECK(esp_timer_get_time() == INT64_MAX && snapshot().phase == NETWORK_AP_IDLE && snapshot().ap_enabled, "saturated_deadlines_do_not_wrap");

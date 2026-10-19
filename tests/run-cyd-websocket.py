@@ -111,6 +111,7 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
                ROOT / 'idf/components/native_stream/include/json_buffer.h',
                ROOT / 'idf/components/native_stream/include/websocket_message.h',
                ROOT / 'idf/components/native_web_transport/include/native_web_transport.h',
+               ROOT / 'idf/components/native_network_power/include/native_network_power.h',
                ROOT / 'tools/codec_benchmark/run_output_dma_host.py']
     hashes = {}
     for path in sources:
@@ -136,6 +137,7 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
                      '-I' + host(frozen / 'idf/components/native_stream/include'),
                      '-I' + host(frozen / 'idf/components/native_audio_settings'),
                      '-I' + host(frozen / 'idf/components/native_storage/include'),
+                     '-I' + host(frozen / 'idf/components/native_network_power/include'),
                      host(out / 'cyd_websocket_test.c'), '-o', host(binary)])
         (out / 'build.log').write_bytes(build)
         log = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',

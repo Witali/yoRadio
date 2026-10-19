@@ -59,11 +59,12 @@ typedef int esp_err_t;
     generated+='\n'.join(helpers.function(source,name) for name in names)
     (OUT/'production.inc').write_text(generated)
     binary=OUT/'test'
-    sources=[ROOT/'tests/native/c3_command_concurrency_test.c',MAIN/'native_state.c']
+    power=ROOT/'idf/components/native_network_power'
+    sources=[ROOT/'tests/native/c3_command_concurrency_test.c',MAIN/'native_state.c',power/'native_network_power.c']
     build=run(['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
         '-Wno-format-truncation','-Wno-unused-variable','-pthread',
         '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
-        '-I'+host(OUT),'-I'+host(MAIN),*map(host,sources),'-o',host(binary)])
+        '-I'+host(OUT),'-I'+host(MAIN),'-I'+host(power/'include'),*map(host,sources),'-o',host(binary)])
     (OUT/'build.log').write_bytes(build)
     try:
         log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
@@ -72,7 +73,7 @@ typedef int esp_err_t;
     except subprocess.CalledProcessError as error:
         log=error.output;passed=False
     (OUT/'test.log').write_bytes(log)
-    sources += [Path(__file__),audio,MAIN/'native_state.h',MAIN/'audio_service.h']
+    sources += [Path(__file__),audio,MAIN/'native_state.h',MAIN/'audio_service.h',power/'include/native_network_power.h']
     (OUT/'report.json').write_text(json.dumps(dict(passed=passed,physical_hardware=False,
         scope='Actual command/state functions, deterministic preemption before state lock, real host mutexes and queue API seam; no RTOS/board timing qualification.',
         source_sha256={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}),indent=2)+'\n')

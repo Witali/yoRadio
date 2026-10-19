@@ -24,6 +24,7 @@
 #include "file_transaction.h"
 #include "credential_line.h"
 #include "native_wifi_file.h"
+#include "native_network_power.h"
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
@@ -119,14 +120,27 @@ static esp_err_t wifi_store_error(native_wifi_result_t result) {
 }
 // End desired next-boot credential owner.
 
+static esp_err_t apply_power(void *context, bool active) {
+    (void)context;
+    return esp_wifi_set_ps(active ? WIFI_PS_NONE : WIFI_PS_MIN_MODEM);
+}
+
 static void rssi_task(void *argument) {
     (void)argument;
+    int64_t rssi_next = 0;
     while (true) {
-        vTaskDelay(pdMS_TO_TICKS(WIFI_RSSI_INTERVAL_MS));
-        wifi_ap_record_t access_point = {0};
-        if (esp_wifi_sta_get_ap_info(&access_point) == ESP_OK) {
-            native_state_set_wifi_rssi(s_state, access_point.rssi);
+        int64_t now = esp_timer_get_time();
+        if (!atomic_load(&s_stopping_for_sleep)) {
+            native_network_power_poll(now, apply_power, NULL);
+            if (now >= rssi_next) {
+                wifi_ap_record_t access_point = {0};
+                if (esp_wifi_sta_get_ap_info(&access_point) == ESP_OK)
+                    native_state_set_wifi_rssi(s_state, access_point.rssi);
+                rssi_next = now > INT64_MAX - (int64_t)WIFI_RSSI_INTERVAL_MS * 1000
+                    ? INT64_MAX : now + (int64_t)WIFI_RSSI_INTERVAL_MS * 1000;
+            }
         }
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -337,11 +351,9 @@ esp_err_t network_service_start(native_state_t *state) {
                             "Station mode failed");
     }
     ESP_RETURN_ON_ERROR(esp_wifi_start(), TAG, "Wi-Fi start failed");
-    // Match the original Arduino YoRadio WiFi.setSleep(false) behavior while
-    // audio is active. Stop mode switches back to modem power saving.
-    // Power saving is optional; do not take down networking if the driver
-    // transiently refuses the policy update during startup.
-    network_service_set_streaming(false);
+    // Preserve audio intent if it arrived before networking was ready. The
+    // existing RSSI task is the sole power-policy driver caller.
+    native_network_power_invalidate();
 
     ESP_RETURN_ON_FALSE(xTaskCreate(rssi_task, "wifi_rssi",
                                     BOARD_TASK_STACK_WIFI_RSSI, NULL, 2,
@@ -357,17 +369,16 @@ esp_err_t network_service_start(native_state_t *state) {
     return start_access_point();
 }
 
-esp_err_t network_service_set_streaming(bool active) {
-    const wifi_ps_type_t mode = active ? WIFI_PS_NONE : WIFI_PS_MIN_MODEM;
-    esp_err_t result = esp_wifi_set_ps(mode);
-    if (result == ESP_OK) {
-        ESP_LOGI(TAG, "Wi-Fi power save: %s",
-                 active ? "disabled for audio" : "modem sleep");
-    } else {
-        ESP_LOGW(TAG, "Wi-Fi power save update failed: %s",
-                 esp_err_to_name(result));
-    }
-    return result;
+void network_service_audio_accept(uint32_t generation, bool active) {
+    native_network_power_accept(generation, active);
+}
+
+void network_service_audio_receive(uint32_t generation) {
+    native_network_power_receive(generation);
+}
+
+void network_service_audio_finish(uint32_t generation) {
+    native_network_power_finish(generation);
 }
 
 esp_err_t network_service_retry_client(void) {

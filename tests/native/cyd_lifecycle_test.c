@@ -10,6 +10,7 @@
 #include "stream_probe.h"
 #include "stream_bitrate.h"
 #include "native_health.h"
+#include "audio_power_seam.h"
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
 #include "adaptive_input.h"
 #endif

@@ -276,6 +276,7 @@ static esp_err_t maintenance_finish_locked(bool resume) {
         atomic_store(&s_generation, command.generation);
         portEXIT_CRITICAL(&s_generation_lock);
         s_last_generation = command.generation;
+        network_service_audio_accept(command.generation, true);
     } else {
         maintenance_state_locked(atomic_load(&s_generation), true);
         if (atomic_load(&s_maintenance_error) == ESP_OK)
@@ -823,7 +824,7 @@ static void begin_stream_deadline(stream_retry_t *retry) {
 static void station_unavailable(uint32_t generation) {
     if (generation != atomic_load(&s_generation)) return;
     state_set_audio(generation, false, AUDIO_STATUS_STATION_UNAVAILABLE);
-    network_service_set_streaming(false);
+    network_service_audio_finish(generation);
 }
 
 static void schedule_stream_retry(stream_retry_t *retry, uint32_t generation) {
@@ -900,7 +901,6 @@ static void stream_task(void *argument) {
             retry = (stream_retry_t){0};
             atomic_store(&s_stream_retry_pending, false);
             stream_transport_reset();
-            network_service_set_streaming(false);
             maintenance_ack(MAINTENANCE_STREAM);
             maintenance_park(parked_generation);
             continue;
@@ -923,7 +923,10 @@ static void stream_task(void *argument) {
                connection_remaining_ms(retry.deadline_us)) {
             vTaskDelay(pdMS_TO_TICKS(1));
         }
-        if (atomic_load(&s_generation) != command.generation) continue;
+        if (atomic_load(&s_generation) != command.generation) {
+            network_service_audio_finish(command.generation);
+            continue;
+        }
         if (!connection_remaining_ms(retry.deadline_us)) {
             station_unavailable(command.generation);
             continue;
@@ -934,7 +937,7 @@ static void stream_task(void *argument) {
         // queued packets and outstanding leases keep their owners.
         tls_input_reserve_prepare_connection();
 #endif
-        network_service_set_streaming(true);
+        network_service_audio_receive(command.generation);
         native_state_set_connecting(s_state, command.generation);
 
         esp_http_client_config_t config = {
@@ -957,8 +960,8 @@ static void stream_task(void *argument) {
         if (!client) {
             if (atomic_load(&s_generation) == command.generation) {
                 state_set_audio(command.generation, false, "HTTP allocation failed");
-                network_service_set_streaming(false);
             }
+            network_service_audio_finish(command.generation);
             continue;
         }
         esp_http_client_set_header(client, "Icy-MetaData", "1");
@@ -981,8 +984,8 @@ static void stream_task(void *argument) {
                 atomic_store(&s_stream_retry_pending, true);
             if (atomic_load(&s_generation) == command.generation) {
                 state_set_audio(command.generation, false, "connection failed");
-                network_service_set_streaming(false);
             }
+            network_service_audio_finish(command.generation);
             dispose_http_client(client);
             if (retryable) schedule_stream_retry(&retry, command.generation);
             if (!retry.pending) {
@@ -1012,6 +1015,7 @@ static void stream_task(void *argument) {
         esp_http_client_set_timeout_ms(client, STREAM_READ_TIMEOUT_MS);
         if (atomic_load(&s_generation) != command.generation) {
             dispose_http_client(client);
+            network_service_audio_finish(command.generation);
             continue;
         }
         // Match the original yoRadio player state: a successfully opened
@@ -1183,12 +1187,9 @@ static void stream_task(void *argument) {
         end_reason = finish_stream_audio(command.generation, &codec, &first_chunk, end_reason);
         send_encoded(command.generation, codec, NULL, 0, end_reason);
         dispose_http_client(client);
-        if (atomic_load(&s_generation) == command.generation) {
-            // The decoder still owns buffered input. Its last format callback
-            // must precede the terminal state, including delayed HE-AAC PCM.
-            // output_task publishes completion after the PCM queue drains.
-            network_service_set_streaming(false);
-        }
+        // Receive has ended; buffered PCM may still drain. Generation matching
+        // inside the intent owner prevents an old completion clearing new Play.
+        network_service_audio_finish(command.generation);
     }
 }
 
@@ -2307,13 +2308,11 @@ esp_err_t audio_service_start(native_state_t *state) {
 // The generation spinlock alone cannot order calls that block on state/NVS.
 static esp_err_t play_locked(const char *url, native_codec_t codec) {
     if (maintenance_active()) return ESP_ERR_INVALID_STATE;
-    // Power-save changes are best effort: a transient Wi-Fi driver error must
-    // not reject an otherwise valid Play command.
-    network_service_set_streaming(true);
     play_command_t command = {
         .generation = advance_generation(codec),
         .requested_codec = codec,
     };
+    network_service_audio_accept(command.generation, true);
     strlcpy(command.url, url, sizeof(command.url));
     strlcpy(s_last_url, url, sizeof(s_last_url));
     s_last_codec = codec;
@@ -2329,7 +2328,7 @@ static esp_err_t play_locked(const char *url, native_codec_t codec) {
     s_last_command_valid = false;
     if (atomic_load(&s_generation) == command.generation) {
         state_set_audio(command.generation, false, "command failed");
-        network_service_set_streaming(false);
+        network_service_audio_finish(command.generation);
     }
     return ESP_FAIL;
 }
@@ -2365,11 +2364,13 @@ static esp_err_t audio_service_play_fixture(size_t size,
         .requested_codec = codec,
         .fixture_size = (uint32_t)size,
     };
+    network_service_audio_accept(command.generation, false);
     s_last_url[0] = '\0';
     s_last_codec = NATIVE_CODEC_AUTO;
     s_last_command_valid = false;
     native_state_set_station(s_state, "flash:codec_test benchmark");
     esp_err_t result = xQueueOverwrite(s_commands, &command) == pdTRUE ? ESP_OK : ESP_FAIL;
+    if (result != ESP_OK) network_service_audio_finish(command.generation);
     xSemaphoreGive(s_control_lock);
     return result;
 }
@@ -2429,7 +2430,7 @@ void audio_service_stop(void) {
         return;
     }
     uint32_t generation = advance_generation(NATIVE_CODEC_AUTO);
-    network_service_set_streaming(false);
+    network_service_audio_accept(generation, false);
     // advance_generation clears the title under the state mutex. A separate
     // unguarded clear here could erase metadata from a concurrent newer Play.
     state_set_audio(generation, false, "stopped");
@@ -2488,6 +2489,7 @@ esp_err_t audio_service_maintenance_begin(uint32_t timeout_ms,
     uint64_t epoch = ++s_maintenance_epoch;
     atomic_store(&s_maintenance_phase, MAINTENANCE_REQUESTED);
     portEXIT_CRITICAL(&s_maintenance_token_lock);
+    network_service_audio_accept(generation + 1U, false);
     // Cancellation is visible only after owners can identify maintenance.
     // Otherwise a concurrent writer may treat the requested cancellation as
     // an ordinary playback failure before the phase is published.

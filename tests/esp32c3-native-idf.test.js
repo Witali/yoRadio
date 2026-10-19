@@ -964,22 +964,24 @@ test("native C3 uses wifi.csv as its only persistent credential source", () => {
   assert.doesNotMatch(network, /esp_wifi_get_config/);
 });
 
-test("native C3 disables modem sleep only while audio is active", () => {
+test("native C3 wires generation-aware audio power intents to the network owner", () => {
   const network = read("main", "network_service.c");
   const audio = read("main", "audio_service.c");
 
   assert.match(network, /active \? WIFI_PS_NONE : WIFI_PS_MIN_MODEM/);
-  assert.match(audio, /play_locked[\s\S]*network_service_set_streaming\(true\)/);
+  assert.match(audio, /play_locked[\s\S]*network_service_audio_accept\(command\.generation, true\)/);
   assert.match(audio, /audio_service_play[\s\S]*xSemaphoreTake\(s_control_lock, portMAX_DELAY\)[\s\S]*play_locked\(url, codec\)/);
-  assert.match(audio, /audio_service_stop[\s\S]*network_service_set_streaming\(false\)/);
+  assert.match(audio, /audio_service_stop[\s\S]*network_service_audio_accept\(generation, false\)/);
   assert.match(
     audio,
-    /atomic_load\(&s_generation\) == command\.generation[\s\S]*network_service_set_streaming\(false\)/,
+    /network_service_audio_receive\(command\.generation\)[\s\S]*network_service_audio_finish\(command\.generation\)/,
   );
   assert.doesNotMatch(
     audio,
-    /ESP_RETURN_ON_ERROR\(network_service_set_streaming\(true\)/,
+    /ESP_RETURN_ON_ERROR\(network_service_audio_/,
   );
+  assert.match(network, /native_network_power_poll\(/);
+  assert.doesNotMatch(audio, /network_service_set_streaming\(/);
 });
 
 test("native audio buffers cover high-bitrate remote streams", () => {

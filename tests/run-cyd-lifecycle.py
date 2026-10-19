@@ -121,6 +121,7 @@ size_t strlcpy(char *, const char *, size_t);
         'variants': results, 'compiler': run(['gcc','--version']).decode().splitlines()[0],
         'source_sha256': {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
             for p in [Path(__file__), ROOT/'tests/native/cyd_lifecycle_test.c',
+                      ROOT/'tests/native/audio_power_seam.h',
                       ROOT/'idf/components/native_stream/include/audio_completion.h',
                       ROOT/'idf/components/native_stream/include/adaptive_input.h',
                       ROOT/'idf/components/native_stream/include/stream_bitrate.h',

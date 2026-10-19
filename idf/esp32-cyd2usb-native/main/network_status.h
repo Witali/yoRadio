@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "esp_err.h"
+#include "native_network_power.h"
 
 typedef enum {
     NETWORK_WAIT_START, NETWORK_WAIT_DISCONNECT, NETWORK_RETRY_WAIT,
@@ -21,6 +22,7 @@ typedef struct {
     uint32_t ipv4;
     esp_err_t last_error;
     uint64_t updated_us, rssi_updated_us, rssi_age_ms;
+    native_network_power_snapshot_t power;
 } network_snapshot_t;
 
 // Authoritative bounded non-secret view; unchanged output on failure.

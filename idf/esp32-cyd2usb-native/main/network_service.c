@@ -19,6 +19,7 @@
 #include "network_profiles.h"
 #include "network_runtime.h"
 #include "network_netif.h"
+#include "native_network_power.h"
 
 static const char *const TAG = "network";
 static network_netif_t s_station_netif;
@@ -172,6 +173,18 @@ esp_err_t network_service_retry_client(void) {
 
 esp_err_t network_service_snapshot(network_snapshot_t *out, uint32_t timeout_ms) {
     return network_runtime_snapshot(out, timeout_ms);
+}
+
+void network_service_audio_accept(uint32_t generation, bool active) {
+    native_network_power_accept(generation, active);
+}
+
+void network_service_audio_receive(uint32_t generation) {
+    native_network_power_receive(generation);
+}
+
+void network_service_audio_finish(uint32_t generation) {
+    native_network_power_finish(generation);
 }
 
 esp_err_t network_service_validate_credentials_file(const uint8_t *data,

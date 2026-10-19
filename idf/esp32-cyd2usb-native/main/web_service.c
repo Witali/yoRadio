@@ -195,13 +195,19 @@ static esp_err_t network_handler(httpd_req_t *request) {
         "{\"phase\":\"%s\",\"epoch\":%lu,\"online\":%s,\"ap_enabled\":%s,"
         "\"reconciling\":%s,\"active_profiles\":%u,\"profile_index\":%u,\"target_profile\":%u,"
         "\"attempt\":%u,\"profiles_tried\":%u,\"ipv4\":%lu,\"rssi_valid\":%s,\"rssi\":%d,"
-        "\"rssi_age_ms\":%llu,\"event_overflows\":%lu,\"last_error\":%ld,\"disconnect_reason\":%u}",
+        "\"rssi_age_ms\":%llu,\"event_overflows\":%lu,\"last_error\":%ld,\"disconnect_reason\":%u,"
+        "\"power\":{\"generation\":%lu,\"desired_revision\":%lu,\"applied_revision\":%lu,"
+        "\"desired_active\":%s,\"applied_active\":%s,\"applied_valid\":%s,\"attempts\":%u,\"last_error\":%ld}}",
         phase, (unsigned long)view.epoch, view.online ? "true" : "false",
         view.ap_enabled ? "true" : "false", view.reconciling ? "true" : "false",
         view.profile_count, view.profile_index, view.target_profile, view.attempt, view.profiles_tried,
         (unsigned long)view.ipv4, view.rssi_valid ? "true" : "false", view.rssi,
         (unsigned long long)view.rssi_age_ms, (unsigned long)view.event_overflows,
-        (long)view.last_error, view.disconnect_reason);
+        (long)view.last_error, view.disconnect_reason,
+        (unsigned long)view.power.generation, (unsigned long)view.power.desired_revision,
+        (unsigned long)view.power.applied_revision, view.power.desired_active ? "true" : "false",
+        view.power.applied_active ? "true" : "false", view.power.applied_valid ? "true" : "false",
+        view.power.attempts, (long)view.power.last_error);
     if (size < 0 || (size_t)size >= sizeof(body))
         return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "Network status exhausted");
     httpd_resp_set_type(request, "application/json; charset=utf-8");

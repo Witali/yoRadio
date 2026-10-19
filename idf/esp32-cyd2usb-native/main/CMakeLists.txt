@@ -73,6 +73,7 @@ idf_component_register(
     native_ota
     native_time
     native_wifi_store
+    native_network_power
     custom_legacy_codecs
     custom_flac
     esp_audio_codec

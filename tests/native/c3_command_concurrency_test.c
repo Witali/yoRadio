@@ -7,6 +7,7 @@
 #include <string.h>
 #include <time.h>
 #include "audio_service.h"
+#include "native_network_power.h"
 
 static native_state_t state;
 static native_state_t *s_state=&state;
@@ -24,7 +25,17 @@ static unsigned queued_generation;
 static char queued_url[512];
 static bool fail_queue;
 static int xQueueOverwrite(void *,const void *);
-static void network_service_set_streaming(bool value) {atomic_store(&streaming,value);}
+static void record_power(void) {
+    native_network_power_snapshot_t snapshot;
+    native_network_power_snapshot(&snapshot);
+    atomic_store(&streaming, snapshot.desired_active);
+}
+static void network_service_audio_accept(uint32_t generation, bool active) {
+    native_network_power_accept(generation,active); record_power();
+}
+static void network_service_audio_finish(uint32_t generation) {
+    native_network_power_finish(generation); record_power();
+}
 #include "production.inc"
 
 SemaphoreHandle_t xSemaphoreCreateMutex(void) {

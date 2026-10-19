@@ -125,6 +125,7 @@ void esp_audio_simple_dec_unregister_default(void);
         print(error.output.decode(errors='replace'), file=sys.stderr)
         raise
     sources = [Path(__file__), ROOT / 'tests/native/cyd_startup_test.c',
+        ROOT / 'tests/native/audio_power_seam.h',
         ROOT / 'tests/run-cyd-lifecycle.py',
         *[MAIN / name for name in ('audio_service.c', 'audio_service.h', 'native_state.c',
           'native_state.h', 'native_health.h', 'decoder_registration.c', 'decoder_registration.h')],

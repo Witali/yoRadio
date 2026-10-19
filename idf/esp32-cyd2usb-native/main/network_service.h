@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "esp_err.h"
@@ -11,6 +12,10 @@
 esp_err_t network_service_start(native_state_t *state);
 esp_err_t network_service_retry_client(void);
 esp_err_t network_service_snapshot(network_snapshot_t *out, uint32_t timeout_ms);
+// Nonblocking generation-qualified audio power intent; Wi-Fi is owner-only.
+void network_service_audio_accept(uint32_t generation, bool active);
+void network_service_audio_receive(uint32_t generation);
+void network_service_audio_finish(uint32_t generation);
 
 // Initialize once during sequential startup, before exposing save APIs to tasks.
 esp_err_t network_service_storage_init(void);

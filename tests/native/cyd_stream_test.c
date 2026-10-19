@@ -15,6 +15,7 @@
 #include "native_health.h"
 #include "radio_control.h"
 #include "native_audio_settings.h"
+#include "audio_power_seam.h"
 
 typedef enum { NATIVE_CODEC_AUTO, NATIVE_CODEC_MP3, NATIVE_CODEC_AAC,
                NATIVE_CODEC_FLAC, NATIVE_CODEC_OGG } native_codec_t;

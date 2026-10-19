@@ -31,13 +31,16 @@ def main():
     parser.add_argument('--variant',action='append',choices=['native-staged','native-direct','custom-staged','custom-direct'])
     parser.add_argument('--tsan',action='store_true')
     parser.add_argument('--skip-mutants',action='store_true')
+    parser.add_argument('--network-power',action='store_true',help='Link the actual shared policy and assert accepted/maintenance intent')
     args=parser.parse_args();out=args.output.resolve();out.mkdir(parents=True,exist_ok=False)
     main=ROOT/'idf/esp32c3-oled-native/main';shared=ROOT/'idf/components/native_stream'
-    files=[Path(__file__),*[ROOT/'tests/native'/n for n in ('c3_maintenance_platform.h','c3_maintenance_seams.h','c3_maintenance_test.c')],
+    files=[Path(__file__),*[ROOT/'tests/native'/n for n in ('c3_maintenance_platform.h','c3_maintenance_seams.h','c3_maintenance_test.c','audio_power_seam.h')],
            *[main/n for n in ('audio_service.c','native_state.c','stream_http_reader.c','deep_sleep_clock.c')],*main.glob('*.h'),
            shared/'adaptive_input.c',shared/'icy_title.c',*sorted((shared/'include').glob('*.h')),
            ROOT/'idf/components/custom_flac/custom_flac_adapter.h',
            ROOT/'idf/components/custom_legacy_codecs/custom_legacy_adapter.h']
+    power=ROOT/'idf/components/native_network_power'
+    if args.network_power:files += [power/'native_network_power.c',power/'include/native_network_power.h']
     hashes={}
     for file in files:
         data=file.read_bytes();hashes[file.relative_to(ROOT).as_posix()]=hashlib.sha256(data).hexdigest()
@@ -83,6 +86,7 @@ def main():
                  '-I'+host(frozen/'idf/components/custom_legacy_codecs'),
                  host(test/'c3_maintenance_test.c'),host(shared/'icy_title.c'),'-o',host(binary)]
         if sanitizer=='thread':command.insert(1,'-DTEST_TSAN=1')
+        if args.network_power:command[1:1]=['-DAUDIO_POWER_INTEGRATION=1','-I'+host(frozen/'idf/components/native_network_power/include'),'-I'+host(frozen/'idf/components/native_network_power')]
         report['commands'].append(command);code,log=execute(command,90);(out/(binary.name+'-build.log')).write_bytes(log)
         if code:save();raise RuntimeError('build '+binary.name+': '+log.decode(errors='replace'))
     for variant in variants:

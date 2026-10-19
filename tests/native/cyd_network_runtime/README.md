@@ -21,7 +21,7 @@ queue capacity are checked, but pthread scheduling/stack memory does not model
 the ESP32. Actual FreeRTOS scheduling, RF/channel changes, TCP portal delivery,
 target memory/HWM and physical audio or power effects remain separate gates.
 
-Each case is a fresh process. Forty-four cases exercise the real loop: immutable
+Each case is a fresh process. Forty-eight cases exercise the real loop: immutable
 0/1/5-profile tables, bounded reconnect/wrap, 20-second attempt/startup and
 300-second cycle budgets, late events and duplicate SSIDs, APSTA preservation,
 manual admission before START and throughout its cycle, RSSI validity/age,
@@ -35,9 +35,20 @@ deadline. The SDK unregister seam returns promptly: the test does not claim
 that a real SDK event-loop unregister call has a bounded wall-clock duration.
 Concurrent publishers and snapshots run alongside the real owner thread.
 
-Four exact test-only production mutations must fail the intended semantic
+The shared generation-aware power component executes in full. SDK power calls
+must originate from the real owner thread. Cases preserve audio intent accepted
+before Wi-Fi startup, reject old receive/finish after a new command (including
+generation wrap), reactivate the same generation on receive retry, and check
+the three-attempt/250 ms failure budget and coherent desired/applied diagnostics.
+An SDK call barrier admits a newer command while the old call is blocked; its
+success or error cannot charge the new revision, and the next owner step
+reconciles the current intent. The critical-section seam is a pthread mutex;
+hardware power draw and real RTOS scheduling are not measured.
+
+Six exact test-only production mutations must fail the intended semantic
 assertion: failed-config publication, pending-event stale status, AP teardown
-during manual retry, and obsolete RSSI retention. Crashes, sanitizer failures
+during manual retry, obsolete RSSI retention, missing power polling and reversed
+Wi-Fi power modes. Crashes, sanitizer failures
 and timeouts do not count as mutation detections.
 
 ASan/UBSan are mandatory. Optional TSAN first runs an independent race-free

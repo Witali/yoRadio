@@ -10,7 +10,10 @@
 
 esp_err_t network_service_start(native_state_t *state);
 esp_err_t network_service_prepare_sleep(void);
-esp_err_t network_service_set_streaming(bool active);
+// Nonblocking generation-qualified audio power intent; Wi-Fi is owner-only.
+void network_service_audio_accept(uint32_t generation, bool active);
+void network_service_audio_receive(uint32_t generation);
+void network_service_audio_finish(uint32_t generation);
 esp_err_t network_service_retry_client(void);
 // Sequential startup before exposing tasks. Saved changes affect the next boot;
 // the active connection/fallback cache remains stable until explicit restart.

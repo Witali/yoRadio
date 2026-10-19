@@ -82,7 +82,7 @@ static atomic_bool watchdog_enabled=true;
 static bool runtime_settings_get_watchdog(void) {return watchdog_enabled;}
 static uint8_t runtime_settings_get_station_timeout_sec(void) {return 10;}
 static uint8_t runtime_settings_get_audio_buffer_blocks(void) {return 10;}
-static void network_service_set_streaming(bool v) {(void)v;}
+#include "audio_power_seam.h"
 static void tls_input_reserve_bind(adaptive_input_t *q) {(void)q;}
 static void tls_input_reserve_prepare_connection(void) {}
 static void tls_input_reserve_poll(void) {}
