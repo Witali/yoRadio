@@ -14,6 +14,7 @@
 #include "native_audio_output.h"
 #include "native_audio_settings.h"
 #include "radio_control.h"
+#include "network_status.h"
 #include "websocket_message.h"
 #include "native_web_transport.h"
 
@@ -57,6 +58,7 @@ typedef struct {
     uint8_t volume, fill;
     int8_t balance, rssi;
     bool running, pending, smartstart, normalization;
+    bool rssi_valid, network_online, ap_enabled;
     uint8_t normgain;
     int8_t normtarget;
     uint16_t normtime;
@@ -251,6 +253,8 @@ static bool capture_status(ws_status_key_t *key) {
         native_state_snapshot(s_state, &state);
         if (!radio_control_snapshot(&after)) return false;
         native_state_snapshot(s_state, &latest);
+        network_snapshot_t network;
+        if (network_service_snapshot(&network, 20) != ESP_OK) return false;
         if (!same_radio(&before, &after) || state.audio_generation != latest.audio_generation ||
             strcmp(state.station, latest.station) != 0) continue;
         memset(key, 0, sizeof(*key));
@@ -258,7 +262,10 @@ static bool capture_status(ws_status_key_t *key) {
         key->bitrate = state.bitrate_kbps;
         key->running = state.audio_running;
         key->pending = state.audio_pending;
-        key->rssi = state.wifi_rssi;
+        key->rssi_valid = network.online && network.rssi_valid;
+        key->rssi = key->rssi_valid ? network.rssi : 0;
+        key->network_online = network.online;
+        key->ap_enabled = network.ap_enabled;
         key->item = after.item;
         key->count = after.count;
         key->smartstart = after.smartstart;
@@ -305,11 +312,13 @@ static bool format_status(const ws_status_key_t *key) {
     json_buffer_raw(&out, "{\"status\":{\"station\":"); json_buffer_string(&out, key->station);
     json_buffer_raw(&out, ",\"title\":"); json_buffer_string(&out, key->title);
     json_buffer_raw(&out, ",\"format\":"); json_buffer_string(&out, key->format);
-    char values[384];
-    snprintf(values, sizeof(values), ",\"bitrate\":%lu,\"connecting\":%s,\"audio\":%s,\"generation\":%lu,\"volume\":%u,\"balance\":%d,\"current\":%u,\"count\":%u,\"smartstart\":%s,\"normalization\":%s,\"normgain\":%u,\"normtarget\":%d,\"normtime\":%u},\"payload\":[",
+    char values[512];
+    snprintf(values, sizeof(values), ",\"bitrate\":%lu,\"connecting\":%s,\"audio\":%s,\"generation\":%lu,\"volume\":%u,\"balance\":%d,\"current\":%u,\"count\":%u,\"smartstart\":%s,\"normalization\":%s,\"normgain\":%u,\"normtarget\":%d,\"normtime\":%u,\"network_online\":%s,\"ap_enabled\":%s,\"rssi_valid\":%s,\"rssi\":%d},\"payload\":[",
         (unsigned long)key->bitrate, key->pending ? "true" : "false", key->running ? "true" : "false",
         (unsigned long)key->generation, key->volume, key->balance, key->item, key->count,
-        key->smartstart ? "true" : "false", key->normalization ? "true" : "false", key->normgain, key->normtarget, key->normtime);
+        key->smartstart ? "true" : "false", key->normalization ? "true" : "false", key->normgain, key->normtarget, key->normtime,
+        key->network_online ? "true" : "false", key->ap_enabled ? "true" : "false",
+        key->rssi_valid ? "true" : "false", key->rssi);
     json_buffer_raw(&out, values);
     payload_string(&out, "nameset", key->name); json_buffer_raw(&out, ",");
     payload_string(&out, "meta", key->title); json_buffer_raw(&out, ",");

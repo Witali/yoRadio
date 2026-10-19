@@ -26,8 +26,26 @@ void native_state_set_network(native_state_t *state,
     if (xSemaphoreTake(state->lock, pdMS_TO_TICKS(100)) == pdTRUE) {
         state->network_mode = mode;
         state->ipv4 = ipv4;
+        if (mode != NATIVE_NETWORK_CLIENT) {
+            state->wifi_rssi = 0;
+            state->wifi_rssi_valid = false;
+        }
         xSemaphoreGive(state->lock);
     }
+}
+
+bool native_state_set_network_status(native_state_t *state,
+                                     native_network_mode_t mode, uint32_t ipv4,
+                                     bool ap_enabled, bool rssi_valid, int8_t rssi) {
+    if (!state || !state->lock ||
+        xSemaphoreTake(state->lock, pdMS_TO_TICKS(20)) != pdTRUE) return false;
+    state->network_mode = mode;
+    state->ipv4 = ipv4;
+    state->wifi_ap_enabled = ap_enabled;
+    state->wifi_rssi_valid = rssi_valid;
+    state->wifi_rssi = rssi_valid ? rssi : 0;
+    xSemaphoreGive(state->lock);
+    return true;
 }
 
 void native_state_snapshot(native_state_t *state, native_state_t *snapshot) {

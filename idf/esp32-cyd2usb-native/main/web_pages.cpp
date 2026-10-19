@@ -72,7 +72,7 @@ progress{width:24rem;max-width:100%}
 <button id="firmware-submit" disabled>Установить прошивку</button></fieldset></form>
 <p id="firmware-status" role="status"></p><progress id="firmware-progress" max="100" value="0" hidden></progress>
 <p><a id="firmware-refresh" href="/" hidden>Открыть радио после перезапуска</a></p></section>
-<small id="backend"></small>
+<p id="network-state" role="status"></p><small id="backend"></small>
 <script>
 // NATIVE_UI_BEGIN
 'use strict';
@@ -81,6 +81,7 @@ let socket, retryTimer, retryDelay = 1000, lastSeen = 0, ready = false, settings
 let capabilities = {}, uploadBusy = false, firmwareBusy = false, awaitingRestart = false;
 let wifiMetadata = null, timeDirty = false, timeBusy = false, timeAvailable = false, pollBusy = false;
 let timeRequestEpoch = 0;
+let networkRequestEpoch = 0;
 const message = text => { el('message').textContent = text; };
 async function api(path, query, method = 'GET') {
   const suffix = query ? '?' + new URLSearchParams(query).toString() : '';
@@ -89,12 +90,36 @@ async function api(path, query, method = 'GET') {
   return response.json();
 }
 function renderStatus(state) {
+  if (typeof state.network_online === 'boolean') {
+    ++networkRequestEpoch;
+    renderNetwork({...state, online:state.network_online});
+  }
   el('station').textContent = state.station || 'Радио';
   el('title').textContent = state.title || '';
   el('details').textContent = [state.connecting ? 'Подключение к станции…' : state.audio ? 'Воспроизведение' : 'Остановлено',
     state.format, state.bitrate ? state.bitrate + ' кбит/с' : ''].filter(Boolean).join(' · ');
   if (typeof state.current === 'number') renderRadio(state);
   if (typeof state.normalization === 'boolean') renderSettings(state, false);
+}
+function renderNetwork(state) {
+  if (typeof state.online !== 'boolean') {
+    el('network-state').textContent = 'Состояние Wi-Fi недоступно'; return;
+  }
+  const label = state.reconciling ? 'Проверка соединения Wi-Fi…' :
+    state.online ? 'Wi-Fi подключён' : 'Wi-Fi не подключён';
+  const rssi = state.online && !state.reconciling && state.rssi_valid === true &&
+    Number.isFinite(state.rssi) ? state.rssi + ' дБм' : '';
+  el('network-state').textContent = [label, state.ap_enabled ? 'Точка доступа включена' : '', rssi].filter(Boolean).join(' · ');
+}
+async function refreshNetwork() {
+  if (capabilities.nativeNetworkApi !== '/api/native/network') return;
+  const epoch = networkRequestEpoch;
+  try {
+    const network = await api('network');
+    if (epoch === networkRequestEpoch) renderNetwork(network);
+  } catch (error) {
+    if (epoch === networkRequestEpoch) renderNetwork({});
+  }
 }
 function renderRadio(radio) {
   el('station-count').textContent = 'из ' + radio.count;
@@ -437,6 +462,7 @@ setInterval(async () => {
       renderStatus(await api('status'));
       if (uploadBusy || awaitingRestart) return;
       renderRadio(await api('radio'));
+      await refreshNetwork();
     }
     if (!uploadBusy && !awaitingRestart && timeSupported() && !timeBusy) {
       const epoch = timeRequestEpoch;
@@ -458,6 +484,7 @@ setInterval(async () => {
     const radio = await api('radio');
     const settings = await api('settings');
     renderStatus(status); renderRadio(radio); renderSettings(settings);
+    await refreshNetwork();
     if (wifiSupported()) {
       try { await loadWifi(); } catch (error) { message(error.message); }
     }

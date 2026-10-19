@@ -27,6 +27,7 @@ typedef struct {
     bool audio_failed;
     uint32_t audio_generation;
     int8_t wifi_rssi;
+    bool wifi_rssi_valid, wifi_ap_enabled;
     uint32_t ipv4;
     uint32_t bitrate_kbps;
     native_bitrate_source_t bitrate_source;
@@ -45,6 +46,9 @@ void native_state_init(native_state_t *state);
 void native_state_set_network(native_state_t *state,
                               native_network_mode_t mode,
                               uint32_t ipv4);
+bool native_state_set_network_status(native_state_t *state,
+                                     native_network_mode_t mode, uint32_t ipv4,
+                                     bool ap_enabled, bool rssi_valid, int8_t rssi);
 void native_state_snapshot(native_state_t *state, native_state_t *snapshot);
 void native_state_begin_audio(native_state_t *state, uint32_t generation,
                               const char *station, const char *format);

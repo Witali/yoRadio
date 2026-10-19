@@ -6,9 +6,11 @@
 #include "esp_err.h"
 #include "native_state.h"
 #include "native_wifi_store.h"
+#include "network_runtime.h"
 
 esp_err_t network_service_start(native_state_t *state);
 esp_err_t network_service_retry_client(void);
+esp_err_t network_service_snapshot(network_snapshot_t *out, uint32_t timeout_ms);
 
 // Initialize once during sequential startup, before exposing save APIs to tasks.
 esp_err_t network_service_storage_init(void);

@@ -76,7 +76,8 @@ def main():
         (out/'start.log').write_bytes(start_log)
         caps = json.loads(next(line.split('=',1)[1] for line in start_log.decode().splitlines() if line.startswith('CAPABILITIES=')))
         assert caps['audio_output'] == 'PDM "test"' and caps['websocket_clients'] == 2
-        assert all(caps[name] is False for name in ('equalizer','sd','display_controls','wifi_profiles'))
+        assert all(caps[name] is False for name in ('equalizer','sd','display_controls'))
+        assert caps['wifi_profiles'] is True and caps['nativeNetworkApi']=='/api/native/network'
         assert caps['ota'] is True and caps['ota_max_bytes']==0x1B0000 and caps['ota_body_max_bytes']==0x1B0000+4096
         assert all(caps[name] is True for name in ('playlist_upload','asset_upload','wifi_upload'))
         assert caps['upload_max_bytes'] == 98304 and caps['upload_max_files'] == 16

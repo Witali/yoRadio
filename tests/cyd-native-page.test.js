@@ -36,6 +36,8 @@ function harness(failBoot = false, overrides = {}) {
     utc_offset_minutes:-30,sync_interval_minutes:60,server1:'pool.ntp.org',server2:'time.nist.gov',
     desired_revision:1,applied_revision:0,last_apply_error:0,utc_epoch:null,local_time:null};
   let failWifi = '', failTime = '', failTimeGet = '', unavailableWifi = false;
+  const network = {online:false,ap_enabled:true,rssi_valid:false,rssi:-70,reconciling:false};
+  let failNetwork=false,holdNetworkReads=false;const pendingNetworkReads=[];
   const wifiReply = {saved:true,rebooting:true};
   let holdTimeReads = false;
   const pendingTimeReads = [];
@@ -73,6 +75,12 @@ function harness(failBoot = false, overrides = {}) {
       requests.push({url,...options});
       const uri = new URL(url,'http://radio.local');
       const name = uri.pathname.split('/').at(-1);
+      if (name === 'network') {
+        const snapshot=structuredClone(network);
+        const reply={ok:!failNetwork,text:async()=>'Network unavailable',json:async()=>snapshot};
+        if(holdNetworkReads)return new Promise(resolve=>pendingNetworkReads.push(()=>resolve(reply)));
+        return reply;
+      }
       if (name === 'wifi') {
         if (options.method==='POST') {
           const error=failWifi;failWifi='';
@@ -106,7 +114,9 @@ function harness(failBoot = false, overrides = {}) {
       return {ok:true,json:async()=>structuredClone(data)};
     }});
   vm.runInContext(script,context);
-  return {element,context,buttons,radioButtons,sockets,requests,firmwareRequests,timers,intervals,settings,radio,state,capabilities,wifi,time,wifiReply,
+  return {element,context,buttons,radioButtons,sockets,requests,firmwareRequests,timers,intervals,settings,radio,state,capabilities,wifi,time,wifiReply,network,pendingNetworkReads,
+    failNetwork() {failNetwork=true;},holdNetworkReads() {holdNetworkReads=true;},
+    releaseNetworkRead() {const release=pendingNetworkReads.shift();assert(release);release();},
     setNow(value) { now=value; },failSettings() { failSettings=true; },failStatus() { failStatus=true; },
     failUpload(text) { failUpload=text; },holdUploads() { holdUpload=true; },
     failWifi(text) { failWifi=text; },failTime(text) { failTime=text; },failTimeGet(text) { failTimeGet=text; },unavailableWifi() { unavailableWifi=true; },
@@ -538,4 +548,39 @@ test('periodic polling is sequential and an old time GET cannot overwrite a comp
   assert.equal(h.element('time-offset').value,345);
   h.releaseTimeRead(0);await tick();assert.equal(h.element('time-offset').value,345);
   assert.match(h.element('time-status').textContent,/ожидается/);
+});
+
+
+test('native network view shows AP independently and hides invalid RSSI', async () => {
+  const h=harness(false,{nativeNetworkApi:'/api/native/network'});await tick();
+  assert.match(h.element('network-state').textContent,/Wi-Fi не подключён/);
+  assert.match(h.element('network-state').textContent,/Точка доступа включена/);
+  assert.doesNotMatch(h.element('network-state').textContent,/дБм/);
+  Object.assign(h.network,{online:true,rssi_valid:true,rssi:-53});
+  await h.intervals[0]();
+  assert.match(h.element('network-state').textContent,/-53 дБм/);
+  h.network.rssi_valid=false;h.network.rssi=-90;await h.intervals[0]();
+  assert.doesNotMatch(h.element('network-state').textContent,/дБм/);
+  assert.equal(h.radioButtons[1].disabled,false);
+});
+
+test('native network API errors hide signal without disabling audio', async () => {
+  const h=harness(false,{nativeNetworkApi:'/api/native/network'});await tick();
+  h.failNetwork();await h.intervals[0]();
+  assert.match(h.element('network-state').textContent,/недоступно/);
+  assert.doesNotMatch(h.element('network-state').textContent,/дБм/);
+  assert.equal(h.radioButtons[1].disabled,false);
+});
+
+test('a delayed network GET cannot overwrite a newer WebSocket link notice', async () => {
+  const h=harness(false,{nativeNetworkApi:'/api/native/network'});await tick();
+  Object.assign(h.network,{online:true,rssi_valid:true,rssi:-41});h.holdNetworkReads();
+  const pending=h.intervals[0]();await waitFor(()=>h.pendingNetworkReads.length===1);
+  h.sockets[0].open();h.sockets[0].message({status:{network_online:false,ap_enabled:true,rssi_valid:true,rssi:-20}});
+  assert.match(h.element('network-state').textContent,/Wi-Fi не подключён/);
+  h.releaseNetworkRead();await pending;
+  assert.match(h.element('network-state').textContent,/Wi-Fi не подключён/);
+  assert.doesNotMatch(h.element('network-state').textContent,/дБм/);
+  h.sockets[0].message({status:{network_online:true,ap_enabled:false,rssi_valid:true,rssi:'-50'}});
+  assert.doesNotMatch(h.element('network-state').textContent,/дБм/);
 });

@@ -104,21 +104,38 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
         path = out / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(contents)
+    sources = [Path(__file__), ROOT / 'tests/native/cyd_websocket_test.c',
+               MAIN / 'websocket_service.c', *MAIN.glob('*.h'),
+               ROOT / 'idf/components/native_audio_settings/native_audio_settings.h',
+               ROOT / 'idf/components/native_storage/include/radio_control.h',
+               ROOT / 'idf/components/native_stream/include/json_buffer.h',
+               ROOT / 'idf/components/native_stream/include/websocket_message.h',
+               ROOT / 'idf/components/native_web_transport/include/native_web_transport.h',
+               ROOT / 'tools/codec_benchmark/run_output_dma_host.py']
+    hashes = {}
+    for path in sources:
+        data = path.read_bytes(); relative = path.relative_to(ROOT)
+        snapshot = out / 'sources' / relative
+        snapshot.parent.mkdir(parents=True, exist_ok=True); snapshot.write_bytes(data)
+        hashes[relative.as_posix()] = hashlib.sha256(data).hexdigest()
+    frozen = out / 'sources'
+    frozen_main = frozen / MAIN.relative_to(ROOT)
     binary = out / 'cyd-websocket'
     production = MAIN / 'websocket_service.c'
-    source = subprocess.check_output(['git', 'show', args.source_ref + ':' + production.relative_to(ROOT).as_posix()], cwd=ROOT) if args.source_ref else production.read_bytes()
+    source = subprocess.check_output(['git', 'show', args.source_ref + ':' + production.relative_to(ROOT).as_posix()], cwd=ROOT) if args.source_ref else (frozen_main / 'websocket_service.c').read_bytes()
     (out / 'websocket-under-test.c').write_bytes(source)
-    fixture = (ROOT / 'tests/native/cyd_websocket_test.c').read_text().replace(
+    fixture = (frozen / 'tests/native/cyd_websocket_test.c').read_text().replace(
         '#include "../../idf/esp32-cyd2usb-native/main/websocket_service.c"',
         '#include "websocket-under-test.c"')
-    (out / 'cyd_websocket_test.c').write_text(fixture)
+    (out / 'cyd_websocket_test.c').write_text('#define TEST_NETWORK_STATUS '+str(int(b'network_service_snapshot' in source))+'\n'+fixture)
     try:
         build = run(['gcc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
                      '-Wno-misleading-indentation', '-pthread', '-fsanitize=address,undefined',
                      '-fno-omit-frame-pointer', '-fno-pie', '-no-pie', '-include', host(out / 'compat.h'),
-                     '-I' + host(out), '-I' + host(MAIN),
-                     '-I' + host(ROOT / 'idf/components/native_stream/include'),
-                     '-I' + host(ROOT / 'idf/components/native_audio_settings'),
+                     '-I' + host(out), '-I' + host(frozen_main),
+                     '-I' + host(frozen / 'idf/components/native_stream/include'),
+                     '-I' + host(frozen / 'idf/components/native_audio_settings'),
+                     '-I' + host(frozen / 'idf/components/native_storage/include'),
                      host(out / 'cyd_websocket_test.c'), '-o', host(binary)])
         (out / 'build.log').write_bytes(build)
         log = run(['env', 'ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
@@ -146,19 +163,12 @@ esp_err_t httpd_resp_send_err(httpd_req_t *,int,const char *);
         else:
             print(line)
     assert maximum is not None
-    sources = [Path(__file__), ROOT / 'tests/native/cyd_websocket_test.c',
-               MAIN / 'websocket_service.c', MAIN / 'websocket_service.h',
-               MAIN / 'native_state.h', MAIN / 'audio_service.h', MAIN / 'native_health.h', MAIN / 'native_audio_output.h',
-               ROOT / 'idf/components/native_audio_settings/native_audio_settings.h',
-               ROOT / 'idf/components/native_storage/include/radio_control.h',
-               ROOT / 'idf/components/native_stream/include/json_buffer.h',
-               ROOT / 'idf/components/native_web_transport/include/native_web_transport.h']
     report = {'passed': True, 'sanitizers': ['ASan', 'UBSan'], 'maximum_json_bytes': maximum_bytes,
               'source_ref': args.source_ref, 'qualified_implementation_sha256': hashlib.sha256(source).hexdigest(),
               'status_capacity': 5120, 'websocket_client_limit': 2, 'queued_status_work_limit': 1,
               'application_send_frame_budget_us': 1000000, 'application_receive_handler_budget_us': 1000000,
               'separate_budgets': 'HTTPD opcode read before handler and SDK control reads use separate finite per-read fallback budgets; TCP/RTOS timing remains unverified.',
-              'source_sha256': {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources},
+              'source_sha256': hashes,
               'scope': 'Actual production WS core with deferred HTTPD callbacks, synchronous send completion seams and real concurrent polling producers; no IDF framing/TCP/hardware/stack timing proof.'}
     (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
 

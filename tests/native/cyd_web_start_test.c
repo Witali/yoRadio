@@ -43,11 +43,11 @@ static int httpd_resp_send_err(httpd_req_t *r,int code,const char *v) { (void)r;
 static int network_service_storage_init(void) { if(fail_storage)return fail_storage;storage_ready=true;return 0; }
 static int web_reboot_start(void) { assert(storage_ready);if(fail_reboot)return fail_reboot;reboot_ready=true;return 0; }
 static int web_reboot_abort(void) { assert(!upload_active && !ota_active && !wifi_active);if(fail_reboot_abort)return fail_reboot_abort;reboot_ready=false;reboot_aborted++;return 0; }
-static void web_upload_activate(void) { assert(reboot_ready && server_live && ws_running && route_calls==20);upload_active=true; }
+static void web_upload_activate(void) { assert(reboot_ready && server_live && ws_running && route_calls==21);upload_active=true; }
 static void web_upload_deactivate(void) { upload_active=false; }
-static void web_ota_activate(void) { assert(upload_active && reboot_ready && server_live && ws_running && route_calls==20);ota_active=true; }
+static void web_ota_activate(void) { assert(upload_active && reboot_ready && server_live && ws_running && route_calls==21);ota_active=true; }
 static void web_ota_deactivate(void) { ota_active=false; }
-static void web_wifi_activate(void) { assert(upload_active && ota_active && reboot_ready && server_live && ws_running && route_calls==20);wifi_active=true; }
+static void web_wifi_activate(void) { assert(upload_active && ota_active && reboot_ready && server_live && ws_running && route_calls==21);wifi_active=true; }
 static void web_wifi_deactivate(void) { wifi_active=false; }
 #define WEB_OTA_MAX_IMAGE_BYTES 0x1B0000U
 #define WEB_OTA_MAX_BODY_BYTES (WEB_OTA_MAX_IMAGE_BYTES+4096U)
@@ -91,7 +91,7 @@ static int websocket_service_start(void) {
 static int websocket_service_stop(void) { stop_calls++;if(fail_ws_stop)return fail_ws_stop;ws_running=0;return 0; }
 static int websocket_service_server_stopped(void *server) { assert(server && !server_live);server_resets++;ws_registered=0;return 0; }
 #define HANDLER(name) static int name(httpd_req_t *r) { (void)r;return 0; }
-HANDLER(status_handler) HANDLER(health_handler) HANDLER(reconnect_handler)
+HANDLER(network_handler) HANDLER(status_handler) HANDLER(health_handler) HANDLER(reconnect_handler)
 HANDLER(radio_handler) HANDLER(play_handler) HANDLER(stop_handler) HANDLER(settings_handler)
 HANDLER(web_static_handler)
 HANDLER(web_upload_handler) HANDLER(web_board_upload_handler) HANDLER(web_wifi_upload_handler)
@@ -125,11 +125,11 @@ int main(void) {
     reset();fail_static=ESP_FAIL;assert(web_service_start(&state)==ESP_FAIL && !allocations && !aborted && !reboot_ready && reboot_aborted==1);
     reset();fail_server=ESP_FAIL;assert_failure();assert(!server_stopped && !server_resets);
     reset();fail_transport=ESP_FAIL;assert_failure();assert(!server_live);
-    for(unsigned i=1;i<=20;++i) { reset();fail_route=i;assert_failure();assert(server_stopped==1 && server_resets==1); }
+    for(unsigned i=1;i<=21;++i) { reset();fail_route=i;assert_failure();assert(server_stopped==1 && server_resets==1); }
     reset();fail_ws_register=ESP_FAIL;assert_failure();assert(server_resets==1);
     reset();fail_ws_start=ESP_FAIL;assert_failure();
     reset();assert(web_service_start(&state)==ESP_OK);
-    assert(atomic_load(&s_started) && state.web_ready && allocations==1 && server_live==1 && activated==1 && route_calls==20 && upload_active && ota_active && wifi_active && reboot_ready);
+    assert(atomic_load(&s_started) && state.web_ready && allocations==1 && server_live==1 && activated==1 && route_calls==21 && upload_active && ota_active && wifi_active && reboot_ready);
     assert(wifi_get_routes==1 && wifi_post_routes==1 && time_get_routes==1 && time_post_routes==1);
     assert(web_service_start(&state)==ESP_ERR_INVALID_STATE);
     httpd_req_t request={0};assert(capabilities_handler(&request)==ESP_OK);printf("CAPABILITIES=%s\n",body);

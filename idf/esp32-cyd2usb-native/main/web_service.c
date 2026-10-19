@@ -156,14 +156,57 @@ static esp_err_t radio_handler(httpd_req_t *request) {
 }
 
 static esp_err_t reconnect_handler(httpd_req_t *request) {
+    if (request->content_len) {
+        (void)httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "Reconnect does not accept a body");
+        return ESP_FAIL;
+    }
     esp_err_t result = network_service_retry_client();
     if (result != ESP_OK) {
-        httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR,
-                            "No saved client configuration");
-        return result;
+        httpd_resp_set_status(request, result == ESP_ERR_NOT_FOUND ? "400 Bad Request" :
+            result == ESP_ERR_TIMEOUT ? "409 Conflict" : "503 Service Unavailable");
+        httpd_resp_set_type(request, "application/json");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        return httpd_resp_sendstr(request, result == ESP_ERR_NOT_FOUND ?
+            "{\"error\":\"no_active_profiles\"}" : result == ESP_ERR_TIMEOUT ?
+            "{\"error\":\"retry_pending\"}" : "{\"error\":\"network_unavailable\"}");
     }
     httpd_resp_set_type(request, "application/json");
-    return httpd_resp_sendstr(request, "{\"reconnecting\":true}");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    return httpd_resp_sendstr(request, "{\"reconnecting\":true,\"accepted\":true}");
+}
+
+static esp_err_t network_handler(httpd_req_t *request) {
+    if (request->content_len) {
+        (void)httpd_resp_send_err(request, HTTPD_400_BAD_REQUEST, "Network status does not accept a body");
+        return ESP_FAIL;
+    }
+    network_snapshot_t view;
+    if (network_service_snapshot(&view, 100) != ESP_OK) {
+        httpd_resp_set_status(request, "503 Service Unavailable");
+        httpd_resp_set_type(request, "application/json; charset=utf-8");
+        httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+        return httpd_resp_sendstr(request, "{\"error\":\"network_unavailable\"}");
+    }
+    static const char *const phases[] = {"wait_start", "disconnecting", "retry_wait",
+                                         "connecting", "online", "ap_idle"};
+    const char *phase = (unsigned)view.phase < sizeof(phases)/sizeof(phases[0]) ? phases[view.phase] : "unknown";
+    char body[768];
+    int size = snprintf(body, sizeof(body),
+        "{\"phase\":\"%s\",\"epoch\":%lu,\"online\":%s,\"ap_enabled\":%s,"
+        "\"reconciling\":%s,\"active_profiles\":%u,\"profile_index\":%u,\"target_profile\":%u,"
+        "\"attempt\":%u,\"profiles_tried\":%u,\"ipv4\":%lu,\"rssi_valid\":%s,\"rssi\":%d,"
+        "\"rssi_age_ms\":%llu,\"event_overflows\":%lu,\"last_error\":%ld,\"disconnect_reason\":%u}",
+        phase, (unsigned long)view.epoch, view.online ? "true" : "false",
+        view.ap_enabled ? "true" : "false", view.reconciling ? "true" : "false",
+        view.profile_count, view.profile_index, view.target_profile, view.attempt, view.profiles_tried,
+        (unsigned long)view.ipv4, view.rssi_valid ? "true" : "false", view.rssi,
+        (unsigned long long)view.rssi_age_ms, (unsigned long)view.event_overflows,
+        (long)view.last_error, view.disconnect_reason);
+    if (size < 0 || (size_t)size >= sizeof(body))
+        return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "Network status exhausted");
+    httpd_resp_set_type(request, "application/json; charset=utf-8");
+    httpd_resp_set_hdr(request, "Cache-Control", "no-store");
+    return httpd_resp_sendstr(request, body);
 }
 
 static native_codec_t parse_codec(httpd_req_t *request) {
@@ -322,12 +365,12 @@ static esp_err_t capabilities_handler(httpd_req_t *request) {
     json_buffer_init(&output, body, sizeof(body));
     json_buffer_raw(&output, "{\"schema\":1,\"firmware\":\"esp32-cyd2usb-native\",\"audio_output\":");
     json_buffer_string(&output, native_audio_output_name());
-    json_buffer_raw(&output, ",\"websocket\":true,\"websocket_clients\":2,\"radio\":true,\"smartstart\":true,\"normalization\":true,\"wifi_reconnect\":true,\"playlist_upload\":true,\"asset_upload\":true,\"wifi_upload\":true,\"upload_max_bytes\":98304,\"upload_max_files\":16,\"upload_name_max_bytes\":22,\"wifi_file_max_bytes\":799,\"wifi_body_max_bytes\":4096,\"wifi_ssid_max_bytes\":31,\"wifi_password_max_bytes\":63,\"wifi_profiles\":false,\"ota\":true");
+    json_buffer_raw(&output, ",\"websocket\":true,\"websocket_clients\":2,\"radio\":true,\"smartstart\":true,\"normalization\":true,\"wifi_reconnect\":true,\"playlist_upload\":true,\"asset_upload\":true,\"wifi_upload\":true,\"upload_max_bytes\":98304,\"upload_max_files\":16,\"upload_name_max_bytes\":22,\"wifi_file_max_bytes\":799,\"wifi_body_max_bytes\":4096,\"wifi_ssid_max_bytes\":31,\"wifi_password_max_bytes\":63,\"wifi_profiles\":true,\"ota\":true");
     char ota_limits[80];
     snprintf(ota_limits, sizeof(ota_limits), ",\"ota_max_bytes\":%u,\"ota_body_max_bytes\":%u",
              (unsigned)WEB_OTA_MAX_IMAGE_BYTES, (unsigned)WEB_OTA_MAX_BODY_BYTES);
     json_buffer_raw(&output, ota_limits);
-    json_buffer_raw(&output, ",\"nativeWiFiApi\":\"/api/native/wifi\",\"nativeWiFiMaxProfiles\":5,\"nativeWiFiPrivateExport\":false,\"nativeTimeApi\":\"/api/native/time\"");
+    json_buffer_raw(&output, ",\"nativeWiFiApi\":\"/api/native/wifi\",\"nativeWiFiMaxProfiles\":5,\"nativeWiFiPrivateExport\":false,\"nativeTimeApi\":\"/api/native/time\",\"nativeNetworkApi\":\"/api/native/network\"");
     json_buffer_raw(&output, ",\"equalizer\":false,\"sd\":false,\"display_controls\":false}");
     if (output.failed) return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "Capabilities exhausted");
     httpd_resp_set_type(request, "application/json; charset=utf-8");
@@ -367,7 +410,7 @@ esp_err_t web_service_start(native_state_t *state) {
     // clients leave two for the stream and network activity. WS admits two.
     config.max_open_sockets = 5;
     config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
-    config.max_uri_handlers = 22; // 20 HTTP routes and the WebSocket route.
+    config.max_uri_handlers = 22; // 21 HTTP routes and the WebSocket route.
     config.lru_purge_enable = true;
     config.uri_match_fn = httpd_uri_match_wildcard;
     httpd_handle_t server = NULL;
@@ -383,6 +426,7 @@ esp_err_t web_service_start(native_state_t *state) {
     httpd_uri_t health = {
         .uri = "/api/native/health", .method = HTTP_GET, .handler = health_handler,
     };
+    httpd_uri_t network = {.uri="/api/native/network", .method=HTTP_GET, .handler=network_handler};
     httpd_uri_t reconnect = {
         .uri = "/api/native/reconnect",
         .method = HTTP_POST,
@@ -425,7 +469,7 @@ esp_err_t web_service_start(native_state_t *state) {
         .method = HTTP_GET,
         .handler = web_static_handler,
     };
-    const httpd_uri_t *routes[] = {&status, &health, &radio_get, &radio_post,
+    const httpd_uri_t *routes[] = {&status, &health, &network, &radio_get, &radio_post,
         &reconnect, &play, &stop, &settings_get, &settings_post, &capabilities,
         &upload, &board, &wifi, &ota, &ota_info,
         &wifi_info, &wifi_edit, &time_info, &time_edit};

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "network_status.h"
 #include "../../idf/esp32-cyd2usb-native/main/websocket_service.c"
 
 typedef struct { bool live, websocket; unsigned incarnation; void *context; httpd_free_ctx_fn_t free_context; httpd_send_func_t send_override; httpd_recv_func_t recv_override; } socket_t;
@@ -15,6 +16,8 @@ static unsigned http_errors;
 static int failed_socket = -1;
 static bool queue_failure, registration_failure, task_failure, radio_unavailable, setting_failure, slow_send;
 static bool context_failure;
+static bool network_unavailable;
+static network_snapshot_t network_view;
 static bool send_override_failure;
 static bool recv_override_failure;
 static int io_script[32], select_script[32];
@@ -49,6 +52,11 @@ size_t strlcpy(char *target_text, const char *source, size_t size) {
     return length;
 }
 int64_t esp_timer_get_time(void) { return now_us; }
+esp_err_t network_service_snapshot(network_snapshot_t *out, uint32_t timeout_ms) {
+    assert(timeout_ms == 20);
+    if (network_unavailable) return ESP_ERR_TIMEOUT;
+    *out = network_view; return ESP_OK;
+}
 void native_state_snapshot(native_state_t *source, native_state_t *out) {
     ++capture_calls;
     if (radio_aba_phase == 1) {
@@ -268,6 +276,8 @@ static void reset(void) {
     radio.item = 1; radio.count = 10; strcpy(radio.name, "first"); strcpy(state.station, "first"); strcpy(state.title, "initial title");
     strcpy(state.stream_format, "MP3 44.1k 2ch"); state.audio_generation = 1; state.audio_running = true; state.bitrate_kbps = 128;
     input.available = true; input.ready = 4; input.target = 8;
+    network_unavailable = false;
+    network_view = (network_snapshot_t){.online=true,.rssi_valid=true,.rssi=-42};
     ++cases;
 }
 static void start(void) {
@@ -624,12 +634,28 @@ int main(void) {
     memset(state.stream_format, '\3', sizeof(state.stream_format) - 1); state.stream_format[sizeof(state.stream_format) - 1] = 0;
     memset(radio.name, '\4', sizeof(radio.name) - 1); radio.name[sizeof(radio.name) - 1] = 0;
     state.bitrate_kbps = UINT32_MAX; state.audio_generation = UINT32_MAX; state.audio_pending = true;
+    network_view.rssi = INT8_MIN;
     state.wifi_rssi = INT8_MIN; volume = UINT8_MAX; balance = INT8_MIN; input.ready = UINT32_MAX - 1; input.target = UINT32_MAX;
     radio.item=radio.count=UINT16_MAX; radio.smartstart=normalization=true; gain=UINT8_MAX; target=INT8_MIN; normtime=UINT16_MAX;
     cycle(); printf("WS_MAX=%s\n", deliveries[0].text); printf("WS_MAX_BYTES=%zu\n", strlen(deliveries[0].text));
     assert(strlen(deliveries[0].text) < WS_STATUS_BYTES);
     memset(state.title, 0, sizeof(state.title)); strcpy(state.title, "broken \xc0\xaf utf8 \xe2\x82");
     cycle(); assert(strstr(deliveries[3].text, "\\ufffd"));
+#if TEST_NETWORK_STATUS
+    reset(); start(); open_socket(7, true); cycle();
+    assert(strstr(s_status, "\"rssi_valid\":true") && strstr(s_status, "\"rssi\":-42"));
+    network_view.rssi_valid=false; network_view.rssi=-70; cycle();
+    assert(strstr(s_status, "\"rssi_valid\":false") && strstr(s_status, "\"rssi\":0"));
+    network_view.ap_enabled=true; network_view.online=false; cycle();
+    assert(strstr(s_status, "\"ap_enabled\":true") && strstr(s_status, "\"network_online\":false"));
+    unsigned before_network_failure=delivery_count;
+    network_unavailable=true; cycle(); assert(delivery_count==before_network_failure);
+    network_unavailable=false; network_view.online=true; network_view.rssi_valid=true;
+    network_view.rssi=-30; cycle(); assert(delivery_count>before_network_failure);
+    assert(strstr(s_status, "\"rssi_valid\":true") && strstr(s_status, "\"rssi\":-30"));
+    assert(websocket_service_stop()==ESP_OK);
+    for(int i=0;i<16;++i)close_socket(i);
+#endif
     printf("PASS CYD WebSocket core: %u fixture groups, two clients, bounded async work, fd reuse, malformed commands, maximum JSON\n", cases);
     reset();
     return 0;
