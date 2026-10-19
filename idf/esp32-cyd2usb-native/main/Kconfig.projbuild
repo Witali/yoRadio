@@ -77,6 +77,23 @@ menu "yoRadio native firmware"
             replay bypasses it, and codec drain does not restart it. Zero keeps
             this disabled until a CYD network/audio profile is measured.
 
+    choice YORADIO_FLAC_DECODER
+        prompt "FLAC decoder"
+        default YORADIO_FLAC_DECODER_ESPRESSIF
+
+        config YORADIO_FLAC_DECODER_ESPRESSIF
+            bool "Espressif FLAC decoder"
+
+        config YORADIO_FLAC_DECODER_CUSTOM
+            bool "yoRadio FLAC decoder (PCM16, mono/stereo, source 4–24 bits)"
+            help
+                Select the shared streaming decoder with segmented workspace.
+                Source samples above 16 bits are converted to PCM16. Native
+                FLAC streams only; Ogg FLAC and CRC/MD5 validation are not
+                qualified. Keep the vendor default until CYD qualification.
+
+    endchoice
+
     choice YORADIO_NATIVE_AUDIO_OUTPUT
         prompt "Default audio output"
         default YORADIO_NATIVE_AUDIO_OUTPUT_PDM

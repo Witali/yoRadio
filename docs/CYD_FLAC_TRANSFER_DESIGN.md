@@ -1,11 +1,13 @@
 # Portable custom FLAC transfer to native CYD
 
-Status: **shared component exposed and compiled for both targets; CYD runtime
-integration is not implemented**.
+Status: **CYD runtime integration is implemented behind an explicit Kconfig
+choice; Espressif remains the default**. Actual CYD decoder-task host tests and
+the pinned Xtensa integration/component compilation pass. Custom-path target
+execution, complete application exports and physical CYD A/B remain open gates.
 This is stage CYD-C3-12 of the [transfer plan](ESP32_CYD_C3_TRANSFER_PLAN.md).
-The current native CYD continues using the Espressif FLAC backend. No display,
-board pins, core affinity, SDK version or audio backend changes belong to this
-document's donor EOF fix.
+Default CYD configurations continue using the Espressif FLAC backend. This port
+preserves display/board pins, audio backend, decoder/output task cores, priorities
+and stack budgets.
 
 ## Source entry points
 
@@ -47,11 +49,18 @@ change requires CYD qualification. Automatic fallback after custom consumption
 requires replayable encoded input and explicit ownership; silently switching
 after partial decode is not a complete design.
 
-The CYD `publish_stream_info` currently checks source depth as if it described
-the PCM queue. A custom callback must publish source depth separately, then pass
-`pcm_bits_per_sample == 16` to queue sizing, frame alignment, duration accounting
-and output. Otherwise valid 4/12/20-bit source is rejected, while 24-bit source
-can misdescribe the actual PCM16 buffer.
+The generic CYD `publish_stream_info` describes the vendor's PCM representation.
+The custom `custom_flac_output` callback publishes the original 4–24-bit source
+depth separately, validates `pcm_bits_per_sample == 16`, and passes PCM16 to
+queue sizing, frame alignment, duration accounting and output. Thus 4/12/20-bit
+source is accepted without describing a 24-bit source buffer as PCM24.
+
+`YORADIO_FLAC_DECODER` selects `YORADIO_FLAC_DECODER_ESPRESSIF` by default;
+`YORADIO_FLAC_DECODER_CUSTOM` is an explicit opt-in. The latter bypasses vendor
+FLAC registry registration and feeds the shared adapter directly. The shared
+component is an unconditional CMake dependency because ESP-IDF expands component
+requirements before loading Kconfig; its runtime calls remain conditional. The
+vendor path and custom AAC/MP3 combination retain their independent selection.
 
 Native Ogg FLAC mapping, complete malformed-stream conformance, frame CRC/MD5
 validation, source depths above 24 and mid-stream format changes are not qualified
@@ -120,6 +129,30 @@ firmware reconstruction. ASan/UBSan are enabled throughout.
 
 ## Existing evidence and missing gates
 
+The new [CYD runtime campaign](../tests/results/cyd-flac-runtime-20261019/README.md)
+executes the actual production `decoder_task`, callback, `send_pcm`, native state,
+shared streaming adapter and segmented core under ASan/UBSan. Its 130 valid
+fixtures × four schedules give 520 exact PCM comparisons against deterministic
+encoder PCM and fresh FFmpeg. Source depths 4/8/12/16/20/24, mono/stereo and stereo
+decorrelation, four subframe forms, 8192 blocks and short tails are represented.
+It also checks 4304 truncated metadata schedules, an empty-stream control,
+24 persistent allocation failures followed by 24 exact-PCM reopens, unknown and
+maximum frame windows, rejected oversized frame windows, codec replacement,
+nonterminal codec drain, generation cancellation and maintenance during three
+blocked queue attempts. A same-generation maintenance control explicitly checks
+workspace cleanup before ACK. Three executable semantic mutants demonstrate
+the source/PCM distinction and terminal/ACK cleanup assertions. Actual registry
+functions exercise both selections and every registration failure rollback.
+
+The FIFO, blocking scheduler, vendor/legacy codec calls and heap-failure injector
+are explicit host seams. The custom FLAC decode is real; the vendor binaries and
+RTOS scheduler do not execute in this host test. Six retained vendor/legacy task
+variants pass the existing lifecycle regression separately. The SDK evidence
+compiles the actual integration in both explicit custom and untouched-default
+vendor configurations, compiles the real custom adapter/core, and checks object
+symbols for selected ownership. These are software/compilation results, not an
+application link, Xtensa PCM execution or physical performance qualification.
+
 The latest warning-fix campaign's
 [depth report](../tests/results/native-warning-fixes-20261018/flac-depths/report.json)
 contains 120 deterministic fixtures × segmented core / contiguous core / streaming
@@ -156,18 +189,19 @@ claim or default change.
    exposed to both projects; the core and adapter algorithms retain their bytes.
    [Fresh qualification](../tests/results/custom-flac-transfer-20261018/README.md)
    repeats5387 EOF groups/720 PCM comparisons and compiles the actual component
-   on pinned RISC-V/Xtensa SDKs. CYD vendor/custom selection remains unimplemented.
-2. **Not implemented:** add the CYD callback with separate source and PCM16
-   representations; integrate create/feed/destroy into every generation, error,
-   EOF, Stop/Next and maintenance transition. Keep current task affinity.
-3. **Not implemented:** execute actual CYD lifecycle/callback tests with the real
-   adapter: every metadata cut/empty EOF, terminal error, blocked queue cancellation,
-   stale generation, reopen, OOM, max/unknown frame windows and no workspace at
-   maintenance ACK. Test both retained vendor and custom selection paths.
+   on pinned RISC-V/Xtensa SDKs. CYD vendor/custom selection is now implemented.
+2. **Software complete:** the CYD callback separates source depth and PCM16;
+   create/feed/destroy cover generation changes, codec replacement/drain, errors,
+   EOF and maintenance. The single decoder-task owner frees workspace before
+   publishing a released generation or maintenance ACK; task affinity is retained.
+3. **Host complete for the stated profile:** actual CYD task/real-adapter tests
+   cover metadata EOF, terminal errors, blocked send cancellation, generation
+   changes, reopen, allocation failures and frame-window policy. The retained
+   vendor path has regression coverage; its host codec calls remain doubles.
 4. **Partially complete:** fresh host exact PCM/sanitizers and pinned Xtensa
-   component compilation pass. Application integration and a custom-path QEMU
-   harness checking PCM/guards/lifecycle. Separate host platform seams and vendor
-   prebuilt-library coverage from target execution evidence.
+   integration/component compilation pass. Complete application builds and a
+   custom-path QEMU harness checking PCM/guards/lifecycle remain pending. Separate
+   host platform seams and vendor prebuilt coverage from target execution evidence.
 5. **Not implemented:** production build/archive and physical CYD A/B with matched
    configuration, both audio output profiles, ordinary/demanding FLAC, HTTP/HTTPS,
    UI traffic, EOF/Stop recovery, repeated codec changes, DMA and watchdog metrics.

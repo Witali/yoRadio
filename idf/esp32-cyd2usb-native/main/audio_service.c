@@ -31,6 +31,9 @@
 #include "stream_bitrate.h"
 #include "stream_probe.h"
 #include "sdkconfig.h"
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+#include "custom_flac_adapter.h"
+#endif
 #ifdef CONFIG_YORADIO_ADAPTIVE_INPUT_BUFFER
 #include "adaptive_input.h"
 #endif
@@ -749,6 +752,36 @@ static bool custom_legacy_output(void *user, const custom_legacy_info_t *info,
 }
 #endif
 
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+typedef struct {
+    uint32_t generation;
+} custom_flac_output_context_t;
+
+static bool custom_flac_output(void *user, const custom_flac_info_t *info,
+                               const uint8_t *pcm, size_t pcm_size) {
+    custom_flac_output_context_t *context = user;
+    if (context->generation != atomic_load(&s_generation) ||
+        context->generation == atomic_load(&s_failed_generation) ||
+        !info->sample_rate || info->bits_per_sample < 4 ||
+        info->bits_per_sample > 24 || info->channels > 2 || info->pcm_bits_per_sample != 16 ||
+        !native_audio_output_supports_pcm(info->pcm_bits_per_sample, info->channels))
+        return false;
+    native_stream_info_t description = {
+        .codec = "FLAC", .sample_rate_hz = info->sample_rate,
+        .channels = info->channels, .bits_per_sample = info->bits_per_sample,
+        .pcm_sample_rate_hz = info->sample_rate, .pcm_channels = info->channels,
+    };
+    native_state_set_stream_info(s_state, context->generation, &description);
+    state_set_decoder_bitrate(context->generation, info->bitrate);
+    esp_audio_simple_dec_info_t pcm_info = {
+        .sample_rate = info->sample_rate,
+        .bits_per_sample = info->pcm_bits_per_sample,
+        .channel = info->channels,
+    };
+    return send_pcm(context->generation, &pcm_info, pcm, pcm_size);
+}
+#endif
+
 static void decoder_release(esp_audio_simple_dec_handle_t *decoder,
                              uint8_t **output, size_t *output_size) {
     if (*decoder) esp_audio_simple_dec_close(*decoder);
@@ -767,6 +800,11 @@ static void decoder_task(void *argument) {
     uint8_t *output = NULL;
     size_t output_size = 0;
     esp_audio_simple_dec_handle_t decoder = NULL;
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+    // The shared core has process-global sample workspace. This task is its
+    // sole owner; destroy it before opening any successor or publishing ACK.
+    custom_flac_decoder_t *flac_decoder = NULL;
+#endif
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
     custom_legacy_decoder_t *legacy_decoder = NULL;
     custom_legacy_output_context_t legacy_context = {0};
@@ -783,6 +821,10 @@ static void decoder_task(void *argument) {
         if (generation != current_generation ||
             atomic_load(&s_failed_generation) == current_generation) {
             decoder_release(&decoder, &output, &output_size);
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+            if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
+            flac_decoder = NULL;
+#endif
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
             legacy_decoder = NULL;
@@ -802,6 +844,15 @@ static void decoder_task(void *argument) {
             // cannot be followed by an old late commit or a control packet.
             if (maintenance_active() && maintenance_acked(MAINTENANCE_STREAM) &&
                 generation == atomic_load(&s_generation)) {
+                decoder_release(&decoder, &output, &output_size);
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+                if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
+                flac_decoder = NULL;
+#endif
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
+                if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
+                legacy_decoder = NULL;
+#endif
                 maintenance_ack(MAINTENANCE_DECODER);
                 maintenance_park(generation);
             }
@@ -831,6 +882,9 @@ static void decoder_task(void *argument) {
         }
 #endif
         if (!packet->data_size && end_reason && !decoder
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+            && !flac_decoder
+#endif
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             && !legacy_decoder
 #endif
@@ -838,6 +892,10 @@ static void decoder_task(void *argument) {
         if (packet->generation != generation || packet->codec != codec) {
             if (decoder) esp_audio_simple_dec_close(decoder);
             decoder = NULL;
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+            if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
+            flac_decoder = NULL;
+#endif
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
             legacy_decoder = NULL;
@@ -849,6 +907,20 @@ static void decoder_task(void *argument) {
                 .generation = generation,
                 .codec = codec,
             };
+#endif
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+            if (codec == NATIVE_CODEC_FLAC) {
+                free(output);
+                output = NULL;
+                output_size = 0;
+                flac_decoder = custom_flac_decoder_create();
+                if (!flac_decoder) {
+                    ESP_LOGE(TAG, "Custom FLAC decoder allocation failed");
+                    end_reason = AUDIO_END_ALLOCATION_FAILED;
+                }
+            } else
+#endif
+#ifdef YORADIO_CUSTOM_LEGACY_DECODER
             if (
 #ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
                 codec == NATIVE_CODEC_AAC ||
@@ -896,6 +968,23 @@ static void decoder_task(void *argument) {
                 }
             }
         }
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+        if (codec == NATIVE_CODEC_FLAC) {
+            if (flac_decoder) {
+                custom_flac_feed_stats_t feed_stats = {0};
+                custom_flac_output_context_t context = {.generation = generation};
+                int result = custom_flac_decoder_feed(
+                    flac_decoder, packet->data, packet->data_size,
+                    packet->end_of_stream, custom_flac_output, &context, &feed_stats);
+                if (result < 0 && generation == atomic_load(&s_generation)) {
+                    failure_stage = NATIVE_HEALTH_PROCESS;
+                    failure_result = result;
+                    end_reason = AUDIO_END_DECODE_FAILED;
+                }
+            }
+            goto packet_done;
+        }
+#endif
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
         if (
 #ifdef CONFIG_YORADIO_AAC_DECODER_HELIX
@@ -1010,6 +1099,10 @@ packet_done:
                 native_health_decoder_failure(packet->generation, (uint32_t)packet->codec,
                     failure_stage, failure_result, end_reason, packet->data_size);
             decoder_release(&decoder, &output, &output_size);
+#ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
+            if (flac_decoder) custom_flac_decoder_destroy(flac_decoder);
+            flac_decoder = NULL;
+#endif
 #ifdef YORADIO_CUSTOM_LEGACY_DECODER
             if (legacy_decoder) custom_legacy_decoder_destroy(legacy_decoder);
             legacy_decoder = NULL;

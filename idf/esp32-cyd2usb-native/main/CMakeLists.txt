@@ -71,6 +71,7 @@ idf_component_register(
     native_time
     native_wifi_store
     custom_legacy_codecs
+    custom_flac
     esp_audio_codec
   PRIV_REQUIRES esp-tls)
 

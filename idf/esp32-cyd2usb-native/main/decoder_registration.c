@@ -24,7 +24,9 @@ esp_audio_err_t decoder_register_codecs(void) {
 #ifdef CONFIG_YORADIO_AAC_DECODER_ESPRESSIF
     REGISTER_CODEC(esp_aac_dec_register);
 #endif
+#ifndef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
     REGISTER_CODEC(esp_flac_dec_register);
+#endif
     REGISTER_CODEC(esp_vorbis_dec_register);
     REGISTER_CODEC(esp_opus_dec_register);
     REGISTER_CODEC(esp_audio_simple_dec_register_default);
