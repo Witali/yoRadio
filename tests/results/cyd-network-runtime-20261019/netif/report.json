@@ -1,0 +1,86 @@
+{
+  "passed": true,
+  "scope": "Qualify checked CYD netif construction over selected pinned SDK bodies.\n\nRuns the unchanged complete production wrapper plus actual v6.0.2 attach,\npost-attach, driver create/destroy, default callback registration/rollback and\npublic clear bodies. Netif/lwIP allocation and destruction, event registry,\nshutdown registry, Wi-Fi RX callback detach and field layout are explicit host\nseams. Faults wrap the actual setter; the actual attach still publishes its\ndriver before post_attach, and actual cleanup frees that driver even on error.\nThis is not target ABI, scheduler, lwIP/DHCP or RF/hardware qualification.\n",
+  "physical_hardware": false,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "sdk_revision": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "source_sha256": {
+    "tests/run-cyd-network-netif.py": "c1761ec53d8a5127fcdb5eb96ce7cc490b8f11ad53278a4c0d3a6a9d3e9fecaa",
+    "tests/native/network_netif/test.c": "b9524dbec415ccbe67e80cd7cb325340a50aa226a1713ce678b3360b955b9600",
+    "tests/native/network_netif/stubs.h": "c320e82ce96433dc454a3aafc444911965b6e5cc4e344e4dec3e114e59196874",
+    "idf/esp32-cyd2usb-native/main/network_netif.c": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c",
+    "idf/esp32-cyd2usb-native/main/network_netif.h": "cc53f1590ecabe6a72ee023b95d7cb09919eadd6aba545306adc8343be1b8b24",
+    "idf/esp32-cyd2usb-native/build-c3-transfer/config/sdkconfig.h": "ac9dc88fca1f7c4c88e01a82ccf6db8d86a00299fe7480edca188f5ab8021ef4"
+  },
+  "sdk_sha256": {
+    "components/esp_wifi/src/wifi_default.c": "d8dbb33692c1cec4cc4f2c3b9b86ad7d7b6d4e6f464a7eaa0fa126754f5a8466",
+    "components/esp_wifi/src/wifi_netif.c": "9721944d88d75cfb2ce3d2775a555d6c9b3bc705f270d38c7f654dcf82b19f1a",
+    "components/esp_netif/lwip/esp_netif_lwip.c": "c7fb9d080581b4abbc741e089d31e5a67bcb7695aa7e63800778ba263cfa216c",
+    "components/esp_netif/include/esp_netif_defaults.h": "9db316df0a8a6ef0962c8c36d8517c65338dc94d0013ad7184ff1bd9c1597ce0",
+    "components/esp_wifi/include/esp_wifi_default.h": "63c66e1db748f7eea637953e1b54a74510acdcc6aae7b1bae33f2df63252248a",
+    "components/esp_wifi/include/esp_wifi_netif.h": "11b9a427d06b1fbada43d32cc09f0195e9c717ab5e7596ad1dbcacef82e5ed69"
+  },
+  "generated_sha256": {
+    "sdk-netif.inc": "7358f1a04e076f577f14f06a1582f7e035f21904fab6879a7bc96a82b1fcfd38",
+    "sdk-driver-struct.inc": "967f6f6f0548f23387850f963d2e878179e77c900d72be923f2f4baaba02fab2",
+    "sdk-driver.inc": "e2a4aa6543fce460c0fed00a8006521bb50f6081015fee321ad432cd859085d8",
+    "sdk-default.inc": "b7717e1cf9b1dfa4b0787c46ab5a82fc28918d89e1d8d22475ad69b8382900f6",
+    "sdk-default-macros.inc": "9559b4208e05ff903e4d20fb3b2673b37c518f0111b19df444657a2633b5314b"
+  },
+  "negative_controls": {
+    "ignore-attach-failure": {
+      "detected": true,
+      "exit_status": 80,
+      "expected_marker": "driver_allocation_failure_propagates"
+    },
+    "ignore-handler-failure": {
+      "detected": true,
+      "exit_status": 80,
+      "expected_marker": "registration_failure_propagates_original_error"
+    },
+    "skip-partial-rollback": {
+      "detected": true,
+      "exit_status": 80,
+      "expected_marker": "failed_create_has_no_usable_owner"
+    },
+    "destroy-after-clear-error": {
+      "detected": true,
+      "exit_status": 80,
+      "expected_marker": "never_destroy_after_failed_clear"
+    },
+    "retry-failed-sdk-clear": {
+      "detected": true,
+      "exit_status": 80,
+      "expected_marker": "failed_cleanup_never_repeated"
+    },
+    "swap-sta-ap-config": {
+      "detected": true,
+      "exit_status": 80,
+      "expected_marker": "checked_create_success"
+    }
+  },
+  "positive": "PASS checked CYD netifs: 35 cases; actual pinned SDK attach/post-attach/default-handler rollback/driver cleanup, STA/AP ownership, allocation and registration failures, permanently retained failed cleanup",
+  "command": [
+    "gcc",
+    "-std=c11",
+    "-O1",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-cast-function-type",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-fno-pie",
+    "-no-pie",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-netif-qualified-02",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-netif-qualified-02/sources/idf/esp32-cyd2usb-native/main",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-netif-qualified-02/sources/tests/native/network_netif",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-netif-qualified-02/sources/tests/native/network_netif/test.c",
+    "-o",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-netif-qualified-02/netif"
+  ]
+}

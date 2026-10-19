@@ -1,0 +1,62 @@
+{
+  "tool": "LLVM (http://llvm.org/):\n  LLVM version 20.1.1\n  Optimized build.",
+  "build_dir": ".build/lint-cyd-network-custom-final/filtered-db",
+  "include_httpd_overlay": false,
+  "config_sha256": "27b1de038a07a9476ab195865192e9eebc8b58d036b0f359a6689caf2b7aed64",
+  "source_commit": "b736d38f108d1b3f3a5895d1948bbd21d9f1ba5a",
+  "dirty": true,
+  "units": 2,
+  "complete": true,
+  "results": [
+    {
+      "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+      "source_sha256": "5c3d454f36bd2cc7116c307685c98244a1aaa777db129fb3eabc6f3f6c1fd755",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h",
+          "line": 47,
+          "column": 33,
+          "severity": "warning",
+          "message": "The value '0' provided to the cast expression is not in the valid range of values for the enum",
+          "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+      "source_sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    }
+  ],
+  "warnings": 1,
+  "errors": 0,
+  "mode": "custom",
+  "scope": "All selected translation units, complete actual Clang -M dependency union including SDK/vendor/toolchain headers, all project headers and relevant build/configuration inputs frozen before clang-tidy. Analysis uses the original SDK compiler database; every captured source/header/build input is checked after it. No SDK/RTOS behavior is executed and no optimized Clang firmware code generation is claimed.",
+  "source_manifest": "source-manifest.json",
+  "source_manifest_sha256": "fc6c29e46a050b60401b07a6a4e48e413d6cb8350c233e132645f2f754fefc27",
+  "captured_input_count": 441,
+  "pre_analysis_snapshot": true,
+  "all_inputs_unchanged_after_analysis": true,
+  "raw_report": "analysis/report.json",
+  "raw_report_sha256": "94355a82e911f71d85131bf147577c037c3dfc45b7244b321de6d63676886960",
+  "analysis_command": [
+    "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+    "-B",
+    "-X",
+    "utf8",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\run_native_lint.py",
+    "--build-dir",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\lint-cyd-network-custom-final\\filtered-db",
+    "--clang-tidy",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\esp-clang\\esp-20.1.1_20250829\\esp-clang\\bin\\clang-tidy.exe",
+    "--output",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\lint-cyd-network-custom-final\\analysis",
+    "--jobs",
+    "2"
+  ],
+  "analysis_exit": 0
+}

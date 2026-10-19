@@ -1,0 +1,82 @@
+{
+  "passed": true,
+  "scope": "Execute current CYD bootstrap facade and app/time ordering with platform seams.\n\nProduction app startup and current network facade bodies run unchanged. SDK,\nRTOS, profile loading, display and time boundaries are deterministic host seams.\nCurrent CYD GOT/loss/time notifications execute in run-cyd-network-runtime.py;\nthe old CYD event handler is not represented as current production here.\n",
+  "physical_hardware": false,
+  "source_sha256": {
+    "tests/run-cyd-time-events.py": "e59961a3dc70a1a7fd77ca65c9dc444d1f90c9c382d4e2a926fe16afa006d3b5",
+    "tests/native/cyd_time_events_test.c": "cbefb99825dcd0891a6e17d52658d1496985d083a73ef4d422c48c8041113c1d",
+    "tests/run-web-warning-regressions.py": "b74ce4aec3f2c8d658825065f66432779764b4a7e8e5a33c0c308b36233529a7",
+    "idf/esp32-cyd2usb-native/main/app_main.c": "a633513bdf11cbddcfed23eb0f1998cee1599c99f56c4bff886b217e9285e5b3",
+    "idf/esp32-cyd2usb-native/main/network_service.c": "35771cdb94b57f77e0a064902aee17b21c8aa230fa2ab9765445635bab871f79",
+    "idf/esp32-cyd2usb-native/main/board_config.h": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e",
+    "idf/esp32-cyd2usb-native/main/network_profiles.h": "7f01b3c850e5f5f13950e4bbcf4c26e2a5a2fa837e633ba0035bdbb2710a64ea",
+    "idf/esp32-cyd2usb-native/main/network_netif.h": "cc53f1590ecabe6a72ee023b95d7cb09919eadd6aba545306adc8343be1b8b24",
+    "idf/esp32-cyd2usb-native/main/network_runtime.h": "44906b5208143021f3f2f42699545c2e96a3b0c2dceb96e6b8b9ace35433fd72",
+    "idf/esp32-cyd2usb-native/sdkconfig.defaults": "9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3",
+    "idf/esp32c3-oled-native/main/network_service.c": "7a38632ac391250131e280827f53e718cb42a2594e4009b2fed5ad7c740fc42d",
+    "tools/codec_benchmark/run_output_dma_host.py": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145"
+  },
+  "negative_controls": {
+    "missing_time_start": {
+      "detected": true,
+      "expected_assertion": "time_step>display_step",
+      "status": 134
+    },
+    "changed_network_affinity": {
+      "detected": true,
+      "expected_assertion": "priority == 3U && core == 0",
+      "status": 134
+    },
+    "driver_flash_persistence": {
+      "detected": true,
+      "expected_assertion": "driver_ram",
+      "status": 134
+    },
+    "missing_profile_load": {
+      "detected": true,
+      "expected_assertion": "profiles->count==(empty_profiles?0:2)",
+      "status": 134
+    },
+    "partial_profile_failure_handoff": {
+      "detected": true,
+      "expected_assertion": "!memcmp(profiles,&zero,sizeof(zero))",
+      "status": 134
+    },
+    "destroy_after_stop_failure": {
+      "detected": true,
+      "expected_assertion": "atomic_load(&s_network_start)==NETWORK_RETAINED",
+      "status": 134
+    },
+    "missing_runtime_rollback": {
+      "detected": true,
+      "expected_assertion": "runtime_stops==1&&releases==1&&!s_station_netif.handle",
+      "status": 134
+    },
+    "donor_empty_file_uses_retained_driver_profile": {
+      "detected": true,
+      "expected_assertion": "connect_calls==0U",
+      "status": 134
+    }
+  },
+  "positive": "PASS CYD startup facade: 28 groups; actual app/time ordering, task affinity, SDK bootstrap failure rollback, retained resources, default-loop ownership, atomic active-profile handoff; C3 guarded STA_START; platform seams only",
+  "command": [
+    "gcc",
+    "-std=c11",
+    "-O1",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-unused-function",
+    "-Wno-unused-variable",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-fno-pie",
+    "-no-pie",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-facade-current-final",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-facade-current-final/sources/idf/esp32-cyd2usb-native/main",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-facade-current-final/sources/tests/native/cyd_time_events_test.c",
+    "-o",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-facade-current-final/events"
+  ]
+}

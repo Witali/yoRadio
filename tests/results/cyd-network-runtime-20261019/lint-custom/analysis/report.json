@@ -1,0 +1,37 @@
+{
+  "tool": "LLVM (http://llvm.org/):\n  LLVM version 20.1.1\n  Optimized build.",
+  "build_dir": ".build/lint-cyd-network-custom-final/filtered-db",
+  "include_httpd_overlay": false,
+  "config_sha256": "27b1de038a07a9476ab195865192e9eebc8b58d036b0f359a6689caf2b7aed64",
+  "source_commit": "b736d38f108d1b3f3a5895d1948bbd21d9f1ba5a",
+  "dirty": true,
+  "units": 2,
+  "complete": true,
+  "results": [
+    {
+      "file": "idf/esp32-cyd2usb-native/main/audio_service.c",
+      "source_sha256": "5c3d454f36bd2cc7116c307685c98244a1aaa777db129fb3eabc6f3f6c1fd755",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": [
+        {
+          "file": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/components/native_stream/include/stream_frames.h",
+          "line": 47,
+          "column": 33,
+          "severity": "warning",
+          "message": "The value '0' provided to the cast expression is not in the valid range of values for the enum",
+          "check": "clang-analyzer-optin.core.EnumCastOutOfRange"
+        }
+      ]
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/decoder_registration.c",
+      "source_sha256": "64cff799edd1ec53ca06189579ef77704e265ef106164f5e721a4ae0fd60313a",
+      "returncode": 0,
+      "complete": true,
+      "diagnostics": []
+    }
+  ],
+  "warnings": 1,
+  "errors": 0
+}

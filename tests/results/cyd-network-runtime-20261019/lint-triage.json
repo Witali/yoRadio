@@ -1,0 +1,104 @@
+{
+  "passed": true,
+  "baseline": {
+    "report": "tests/results/native-runtime-transfer-20261018/lint-cyd/report.json",
+    "units": 46,
+    "warnings": 77,
+    "errors": 0
+  },
+  "vendor": {
+    "report": ".build/lint-cyd-network-vendor-final/report.json",
+    "units": 49,
+    "warnings": 81,
+    "errors": 0,
+    "pre_frozen_inputs": 639
+  },
+  "custom": {
+    "report": ".build/lint-cyd-network-custom-final/report.json",
+    "units": 2,
+    "warnings": 1,
+    "errors": 0,
+    "pre_frozen_inputs": 441
+  },
+  "new_units": [
+    "idf/esp32-cyd2usb-native/main/network_netif.c",
+    "idf/esp32-cyd2usb-native/main/network_profiles.c",
+    "idf/esp32-cyd2usb-native/main/network_runtime.c"
+  ],
+  "new_warning_instances": [
+    {
+      "unit": "idf/esp32-cyd2usb-native/main/native_state.c",
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_state.c",
+      "line": 46,
+      "column": 37,
+      "severity": "warning",
+      "message": "narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined",
+      "check": "bugprone-narrowing-conversions"
+    },
+    {
+      "unit": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\network_runtime.c",
+      "line": 380,
+      "column": 50,
+      "severity": "warning",
+      "message": "narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined",
+      "check": "bugprone-narrowing-conversions"
+    },
+    {
+      "unit": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\websocket_service.c",
+      "line": 266,
+      "column": 39,
+      "severity": "warning",
+      "message": "narrowing conversion from 'int' to signed type 'int8_t' (aka 'signed char') is implementation-defined",
+      "check": "bugprone-narrowing-conversions"
+    },
+    {
+      "unit": "idf/esp32-cyd2usb-native/main/websocket_service.c",
+      "file": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\websocket_service.c",
+      "line": 338,
+      "column": 29,
+      "severity": "warning",
+      "message": "comparing object representation of type 'ws_status_key_t' which does not have a unique object representation; consider comparing the members of the object manually",
+      "check": "bugprone-suspicious-memory-comparison"
+    }
+  ],
+  "removed_warning_instances": [],
+  "new_reproduced_production_defects": 0,
+  "triage": [
+    {
+      "check": "bugprone-narrowing-conversions",
+      "instances": 3,
+      "files": [
+        "idf/esp32-cyd2usb-native/main/native_state.c:46",
+        "idf/esp32-cyd2usb-native/main/network_runtime.c:380",
+        "idf/esp32-cyd2usb-native/main/websocket_service.c:266"
+      ],
+      "classification": "Value-range-preserving integer promotion; no unsafe narrowing or production defect found.",
+      "reasoning": "Each conditional chooses either an int8_t RSSI field/parameter or integer zero. C promotes the conditional to int, but its result is always in [-128,127]. Assigning/passing it back to int8_t is representable and defined. Frozen network_status.h, native_state.h/.c and actual callback/WS code establish the field and parameter types. No cast, suppression or source rewrite is needed.",
+      "evidence": [
+        ".build/lint-cyd-network-vendor-final/analysis/idf__esp32-cyd2usb-native__main__native_state.c.log",
+        ".build/lint-cyd-network-vendor-final/analysis/idf__esp32-cyd2usb-native__main__network_runtime.c.log",
+        ".build/lint-cyd-network-vendor-final/analysis/idf__esp32-cyd2usb-native__main__websocket_service.c.log"
+      ]
+    },
+    {
+      "check": "bugprone-suspicious-memory-comparison",
+      "instances": 1,
+      "files": [
+        "idf/esp32-cyd2usb-native/main/websocket_service.c:338"
+      ],
+      "classification": "Nonblocking representation-portability caveat retained; no unsafe access, incorrect payload or new high-risk defect reproduced.",
+      "reasoning": "The three added boolean flags introduce padding in the private ws_status_key_t. capture_status explicitly memset-zeroes the whole key before member population, and both previous/current objects have static storage; it then compares and copies them only in HTTPD owner context. This is not an uninitialized automatic struct or a credentials comparison. A portable C language guarantee that struct assignment preserves every padding byte is still absent: unusual compiler treatment could cause unnecessary status revisions/sends. This warning is not relabeled universally harmless or a memory-safety bug. Existing actual WS schedules cover unchanged suppression/heartbeat and all network validity changes; no new entire suite or cosmetic layout edit was requested.",
+      "evidence": [
+        ".build/lint-cyd-network-vendor-final/analysis/idf__esp32-cyd2usb-native__main__websocket_service.c.log",
+        "tests/native/cyd_websocket_test.c:637"
+      ]
+    }
+  ],
+  "limits": "All warnings and analyzer traces are retained. AST analysis does not prove concurrency/hardware behavior; actual-loop behavioral campaigns remain separate. No optimized Clang code generation was attempted because the prior time_settings_valid compiler crash remains a distinct known tool issue. No source warning suppression or cosmetic rewrite. The deferred AAC private owner-view issue was not retried or bypassed; C3/shared production sources are unchanged and no full C3 rerun was performed.",
+  "novel_warning_classes": 2,
+  "novel_warning_instances": 4,
+  "custom_warning_triage": "The sole custom-focused warning is the pre-existing stream_frames.h zero-initialized enum finding also present in the vendor/baseline flow. No custom FLAC callback/lifecycle warning was introduced; this does not replace behavioral or target execution evidence.",
+  "complete": true
+}

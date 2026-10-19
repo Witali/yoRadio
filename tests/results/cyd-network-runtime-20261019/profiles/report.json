@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "scope": "Qualify the actual CYD boot profile loader and existing file recovery.\n\nThe unchanged complete loader, physical-row helper, volatile erase, existing\nweb_upload_open_file/backup_name bodies and file_transaction.c run with mapped\nreal stdio, cookie read/close errors and RTOS lock seams. No Wi-Fi hardware,\nSPIFFS power-loss durability, scheduling or full network runtime is qualified.\n",
+  "physical_hardware": false,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-cyd-network-profiles.py": "b6473446f71cec88589e120ef6b2ddcb6bc1e56fa2e781a31199f4d84fecc3d7",
+    "tests/native/cyd_network_profiles_test.c": "8405f1c0f154e2f9b0e760514af8c84006a79fe3437350257203995322c83ab7",
+    "tests/run-web-warning-regressions.py": "b74ce4aec3f2c8d658825065f66432779764b4a7e8e5a33c0c308b36233529a7",
+    "idf/esp32-cyd2usb-native/main/network_profiles.c": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972",
+    "idf/esp32-cyd2usb-native/main/network_profiles.h": "7f01b3c850e5f5f13950e4bbcf4c26e2a5a2fa837e633ba0035bdbb2710a64ea",
+    "idf/esp32-cyd2usb-native/main/web_upload.c": "02881ca729812f2ca5a9740b6ffe0348de4eeb01c9b4e25faa24e099c53f7af7",
+    "idf/esp32-cyd2usb-native/main/web_upload.h": "c13fbe33f581520e2b92fd1cbbfe116d5e6f0036e77a2de9517300533b7df6b0",
+    "idf/components/native_storage/file_transaction.c": "b8345f3924414174c338b7d8c1ca3eb619564f3be94d34f9125e50369566a9ef",
+    "idf/components/native_storage/include/file_transaction.h": "747cbd757605cd4dcec31378ad7704f6f371a2db02bef6f53170f5bc6e22f53b",
+    "idf/components/native_storage/include/credential_line.h": "4d09bb3fc82c7125b82f6940778757a1aaebe4cf76dd8b9a6aff9641b7863fa2",
+    "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+    "idf/components/native_wifi_store/include/native_wifi_store.h": "060dda87c1d72a884cfeb16559c772963dfc018c73adf78804dad69462d76110",
+    "tools/codec_benchmark/run_output_dma_host.py": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145"
+  },
+  "negative_controls": {
+    "old-first-row-only": {
+      "detected": true,
+      "expected_marker": "complete_profile_count",
+      "exit_status": 80
+    },
+    "partial-publish-on-failure": {
+      "detected": true,
+      "expected_marker": "failed_io_never_publishes_partial",
+      "exit_status": 80
+    },
+    "ignore-full-file-read-error": {
+      "detected": true,
+      "expected_marker": "expected_error_contract",
+      "exit_status": 80
+    },
+    "ignore-close-error": {
+      "detected": true,
+      "expected_marker": "expected_error_contract",
+      "exit_status": 80
+    },
+    "skip-temporary-table-wipe": {
+      "detected": true,
+      "expected_marker": "all_secret_workspaces_wiped",
+      "exit_status": 80
+    },
+    "skip-line-wipe": {
+      "detected": true,
+      "expected_marker": "all_secret_workspaces_wiped",
+      "exit_status": 80
+    },
+    "stop-after-fifth-profile": {
+      "detected": true,
+      "expected_marker": "whole_file_read_after_five",
+      "exit_status": 80
+    }
+  },
+  "positive": "PASS CYD boot profiles: 44 cases; first-five ordered rows, legacy bounds, fragmented stdio, whole-file errors, unchanged output, checked close, full secret wipes, real recovery/empty-live semantics",
+  "command": [
+    "gcc",
+    "-std=c11",
+    "-O1",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-fno-pie",
+    "-no-pie",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-profiles-qualified-02",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-profiles-qualified-02/sources/idf/esp32-cyd2usb-native/main",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-profiles-qualified-02/sources/idf/components/native_storage",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-profiles-qualified-02/sources/idf/components/native_storage/include",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-profiles-qualified-02/sources/idf/components/native_wifi_store",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-profiles-qualified-02/sources/idf/components/native_wifi_store/include",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-profiles-qualified-02/sources/tests/native/cyd_network_profiles_test.c",
+    "-o",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-network-profiles-qualified-02/profiles"
+  ]
+}

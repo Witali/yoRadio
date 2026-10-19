@@ -1,0 +1,24 @@
+{
+  "baseline_commit": "4d5d8e1812a2e7f04a04144e27aeb472b2446ebf",
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "physical_tested": false,
+  "variants": {
+    "negative-old-source": "DETECTED",
+    "shared-reader": "PASS"
+  },
+  "source_sha256": {
+    "tests/run-cyd-wifi-warning.py": "71a5be7718cf7a4d7c4bffa242566229104d2c9f4c31745c33b2eecd323c4cb5",
+    "tests/native/cyd_wifi_warning_test.c": "9e84e9364b8acf7cc6c6923d00959679f208d2d0970430c003160786e7d441c1",
+    "idf/esp32-cyd2usb-native/main/network_profiles.c": "6a993d2228acda7c43ad4091a45ba8023efc9ef5ba22dc2ea53a297fd4310972",
+    "idf/esp32-cyd2usb-native/main/network_profiles.h": "7f01b3c850e5f5f13950e4bbcf4c26e2a5a2fa837e633ba0035bdbb2710a64ea",
+    "idf/components/native_storage/include/credential_line.h": "4d09bb3fc82c7125b82f6940778757a1aaebe4cf76dd8b9a6aff9641b7863fa2",
+    "tests/run-web-warning-regressions.py": "b74ce4aec3f2c8d658825065f66432779764b4a7e8e5a33c0c308b36233529a7",
+    "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+    "idf/components/native_wifi_store/include/native_wifi_store.h": "060dda87c1d72a884cfeb16559c772963dfc018c73adf78804dad69462d76110"
+  },
+  "passed": true,
+  "scope": "Actual current CYD atomic boot-profile loader and exact shared bounded row helper; the old first-valid reader executes only as a labelled historical oversized-row negative control. Mapped stdio/cookie IO seams, no Wi-Fi hardware or reconnect/timing/power claims."
+}

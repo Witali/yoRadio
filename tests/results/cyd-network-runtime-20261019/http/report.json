@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "scope": "Actual CYD network status/retry handlers with explicit HTTPD/snapshot seams.\n\nThis is handler semantics, not a TCP/parser/TLS or physical networking gate.\nThe permanent owner, SDK wrapper and wire foundations are qualified separately.\n",
+  "source_sha256": {
+    "tests/run-cyd-network-http.py": "0b73e981a7619e2307ba36cd96df68c5570f479eb56add3ad8689eb857d2bdd4",
+    "tests/native/cyd_network_http_test.c": "87a54f5bddfc79efbc941b3f7dc92d9ab6fcf27744fb0a6da6c906862538e792",
+    "tests/run-web-warning-regressions.py": "b74ce4aec3f2c8d658825065f66432779764b4a7e8e5a33c0c308b36233529a7",
+    "tools/codec_benchmark/run_output_dma_host.py": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+    "idf/esp32-cyd2usb-native/main/web_service.c": "d845cee9e6d112250ddb6c80a6e31529f68df81c253e9acad5a0c54e7fc7719a",
+    "idf/esp32-cyd2usb-native/main/network_status.h": "ba587a8114015a4c66d038484fe0ea52995c3241e13c9c419481bbdb579e24ff"
+  },
+  "actual_handler_cases": 16,
+  "parsed_actual_json_responses": 7,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "physical_hardware": false,
+  "negative_controls": {
+    "network_body_purge": {
+      "detected": true,
+      "expected_assertion": "network_handler(&request)==ESP_FAIL",
+      "exit_code": -6
+    },
+    "retry_body_purge": {
+      "detected": true,
+      "expected_assertion": "reconnect_handler(&request)==ESP_FAIL",
+      "exit_code": -6
+    },
+    "missing_no_store": {
+      "detected": true,
+      "expected_assertion": "status == 200 && no_store && json_type",
+      "exit_code": -6
+    },
+    "false_connected_claim": {
+      "detected": true,
+      "expected_assertion": "strstr(response,\"\\\"accepted\\\":true\")",
+      "exit_code": -6
+    }
+  }
+}

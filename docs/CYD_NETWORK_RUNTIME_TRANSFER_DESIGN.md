@@ -1,10 +1,45 @@
 # Runtime Wi-Fi: перенос профилей, reconnect, RSSI и power policy на CYD
 
-Дата: 2026-10-18. Остаток этапа **CYD-C3-09** из
-[общего плана](ESP32_CYD_C3_TRANSFER_PLAN.md#L72). Это проект следующего
-блока, а не отчёт о реализованном runtime. Production source этим документом
-не изменён. Приватный редактор desired credentials и
-[time service](CYD_TIME_TRANSFER_DESIGN.md) уже выполняются отдельно.
+Обновлено: 2026-10-19. Остаток этапа **CYD-C3-09** из
+[общего плана](ESP32_CYD_C3_TRANSFER_PLAN.md#L72). Блоки N0–N3 реализованы
+и программно проверены; N4 power policy и N5 hostname/AP timeout остаются
+открыты. Приватный редактор desired credentials и
+[time service](CYD_TIME_TRANSFER_DESIGN.md) выполняются отдельно.
+
+## Реализованный runtime и входы
+
+Постоянный [network_runtime.c](../idf/esp32-cyd2usb-native/main/network_runtime.c)
+сериализует driver operations, попытки профилей и RSSI. Новая задача имеет
+priority 2, core 0 и stack 4096; существующие audio/display/bootstrap bindings
+не изменены. [Facade](../idf/esp32-cyd2usb-native/main/network_service.c)
+выполняет checked startup/rollback; [profiles](../idf/esp32-cyd2usb-native/main/network_profiles.c)
+атомарно загружает первые пять valid rows; [netif wrapper](../idf/esp32-cyd2usb-native/main/network_netif.c)
+проверяет attach/handler setup без assert factories SDK.
+
+Активная таблица неизменна до reboot. Первичное и ручное подключение идут
+с первого профиля; после позднего обрыва цикл начинается с последнего
+успешного и проходит таблицу с wrap. Максимум три попытки на профиль,
+20 s на попытку и 300 s на весь цикл; общий deadline может сократить число
+попыток. Через 20 s startup доступен AP, owner продолжает работу. APSTA
+сохраняется при ручном retry. Ещё один ручной цикл отклоняется как busy
+до завершения принятого цикла, включая pending mailbox.
+
+[Snapshot API](../idf/esp32-cyd2usb-native/main/network_status.h) не содержит
+SSID/password, отдельно описывает STA online, AP enabled, RSSI validity/age,
+phase и budgets. Pending SDK events маскируют устаревший IP/RSSI.
+[HTTP](../idf/esp32-cyd2usb-native/main/web_service.c) публикует
+`GET /api/native/network`; reconnect подтверждает только admission.
+[WS](../idf/esp32-cyd2usb-native/main/websocket_service.c) и
+[страница](../idf/esp32-cyd2usb-native/main/web_pages.cpp) используют validity;
+поздний REST ответ не перезаписывает более новое WS уведомление.
+
+[Frozen qualification](../tests/results/cyd-network-runtime-20261019/README.md)
+содержит 44 полных owner-loop сценария и четыре semantic controls,
+loader/netif/rollback/API/WS/UI проверки с ASan/UBSan. TSAN недоступен:
+его независимый контроль падает при старте runtime. Xtensa GCC component
+compile проходит; полные production exports, RF, heap/stack и физическая
+SMP/audio приёмка остаются открыты. Таблицы ниже сохраняют исходные точки
+сравнения до замены runtime; source-level дефекты относятся к historical baseline.
 
 ## Входы и переносимые возможности
 

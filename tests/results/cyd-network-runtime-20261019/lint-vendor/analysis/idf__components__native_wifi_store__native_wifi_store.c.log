@@ -1,0 +1,10 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c:199:9: warning: function 'strcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+  199 |     if (strcmp(expected, edit->revision)) result = NATIVE_WIFI_CONFLICT;
+      |         ^                               
+      |                                          != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c:200:26: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  200 |     else if (!(workspace = calloc(1, sizeof(*workspace)))) result = NATIVE_WIFI_NO_MEMORY;
+      |                ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c:200:26: note: if it should be an assignment, move it out of the 'if' condition
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c:200:26: note: if it is meant to be an equality check, change '=' to '=='
+2 warnings generated.

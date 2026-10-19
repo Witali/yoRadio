@@ -1,0 +1,227 @@
+{
+  "passed": true,
+  "historical_revision": "048a5c42df67a24b6e99396aae382f91d3b4ef49",
+  "scope": "Preserve executable historical Wi-Fi defects before runtime replacement.\n\nThis is negative evidence from exact Git source bodies, not a current-runtime\nregression gate or a full historical firmware reconstruction. Actual startup,\nAP setup, event, retry and C3 selection/RSSI/power functions run unchanged with\ndeterministic SDK, RTOS, active-profile loader and state-publication seams.\nNo radio, driver binary, actual RTOS scheduling, SMP or audio interleaving runs.\n",
+  "evidence_kind": "historical_baseline_negative",
+  "current_runtime_tested": false,
+  "physical_hardware": false,
+  "actual_audio_generation_interleaving": false,
+  "source_sha256": {
+    "idf/esp32-cyd2usb-native/main/network_service.c": "f8bad93d3458a411249c3e4a57e4c41b92bebb3950fe4310df964a299588f45d",
+    "idf/esp32c3-oled-native/main/network_service.c": "c991aa569a2b5691d72c6a00bbaad7e857d978a9b1c01b80d217d0ceeebf56b1",
+    "tests/run-network-runtime-baseline.py": "e1b55619d06310cf3756d3353e33814376c22d08e080cb856586fadbbf8ee775",
+    "tests/native/network_runtime_baseline/platform.h": "77c65984f8d9b2ff6b746f68ef4201d7cfd604348f8c7165457e239d799dd6ff",
+    "tests/native/network_runtime_baseline/test.c": "72ad917a28551d86c56cdbbb8572c50bb3f79bb8a20ac0a89b6f0a8b9571bd87",
+    "tests/native/network_runtime_baseline/README.md": "1af17e4afe08f7028643b8a8d77e16673341340eb838627b1c14771bcc87022b",
+    "tools/codec_benchmark/run_output_dma_host.py": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145"
+  },
+  "source_origin": {
+    "idf/esp32-cyd2usb-native/main/network_service.c": "git:048a5c42df67a24b6e99396aae382f91d3b4ef49",
+    "idf/esp32c3-oled-native/main/network_service.c": "git:048a5c42df67a24b6e99396aae382f91d3b4ef49",
+    "tests/run-network-runtime-baseline.py": "working_tree_harness_snapshot",
+    "tests/native/network_runtime_baseline/platform.h": "working_tree_harness_snapshot",
+    "tests/native/network_runtime_baseline/test.c": "working_tree_harness_snapshot",
+    "tests/native/network_runtime_baseline/README.md": "working_tree_harness_snapshot",
+    "tools/codec_benchmark/run_output_dma_host.py": "working_tree_harness_snapshot"
+  },
+  "targets": {
+    "cyd": {
+      "actual_functions": [
+        {
+          "name": "station_lost_ip",
+          "source_character_start": 4530,
+          "source_character_end": 5007,
+          "sha256": "fa1ea861f16d214df7c4db7c0ffa5936430720d78925dcb8c5d58d6dd6d34b99"
+        },
+        {
+          "name": "event_handler",
+          "source_character_start": 5009,
+          "source_character_end": 6280,
+          "sha256": "89b2672344840f115fecac06e743b2ec323ba1b91c27af17cb1f30b6b5eaf862"
+        },
+        {
+          "name": "start_access_point",
+          "source_character_start": 6282,
+          "source_character_end": 7319,
+          "sha256": "ac88cd61b6a551d855fbf472c6762a4ed82d535c8f864c388cde77ab6e0b470a"
+        },
+        {
+          "name": "network_service_start",
+          "source_character_start": 7321,
+          "source_character_end": 9894,
+          "sha256": "df92d9fff204c7029a47261f917ab3d24a973178371cbd5f1743052eb8c8c759"
+        },
+        {
+          "name": "network_service_retry_client",
+          "source_character_start": 9896,
+          "source_character_end": 10529,
+          "sha256": "14874ffe916b307e72ae73776904d46ae126e22b6eb0d16589b67e73e6583ba8"
+        }
+      ],
+      "command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-function",
+        "-Wno-unused-variable",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-runtime-baseline-qualified-03/cyd",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-runtime-baseline-qualified-03/sources/tests/native/network_runtime_baseline",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-runtime-baseline-qualified-03/sources/tests/native/network_runtime_baseline/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-runtime-baseline-qualified-03/cyd/baseline"
+      ],
+      "generated_source_sha256": {
+        "actual.inc": "af1ba9753128272a2691532359ca41999f048453bd53147f352f42409532b705",
+        "policy.inc": "d88a4e9cbc066d02971f8aa3da25407d0ee06d8ea98c96d94b40f37b8337b39e"
+      },
+      "negative_controls": {
+        "late-fallback": {
+          "detected": true,
+          "exit_code": 42,
+          "expected_marker": "SAFETY_FAILURE:late_failure_requires_portal"
+        },
+        "manual-apsta": {
+          "detected": true,
+          "exit_code": 42,
+          "expected_marker": "SAFETY_FAILURE:manual_retry_preserves_portal_until_reply"
+        }
+      },
+      "characterizations": {},
+      "passed": true
+    },
+    "c3": {
+      "actual_functions": [
+        {
+          "name": "rssi_task",
+          "source_character_start": 4201,
+          "source_character_end": 4533,
+          "sha256": "6807e5e39fe77935933a14b07518575b2f52d06e4ce8f0f9be663638d1a9c8c6"
+        },
+        {
+          "name": "select_credential",
+          "source_character_start": 6311,
+          "source_character_end": 6641,
+          "sha256": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605"
+        },
+        {
+          "name": "event_handler",
+          "source_character_start": 6643,
+          "source_character_end": 9186,
+          "sha256": "a3cfd1f979049e32645d07ddc73454b2493aa16ade3e5465e73cb05315b75567"
+        },
+        {
+          "name": "softap_reboot_callback",
+          "source_character_start": 9188,
+          "source_character_end": 9337,
+          "sha256": "002d9a64fe7b238b8903bb791f93cca22948e8a3f957f1a70f144d0303874d0b"
+        },
+        {
+          "name": "start_access_point",
+          "source_character_start": 9339,
+          "source_character_end": 11066,
+          "sha256": "938e66467272f6abd991e0ebeb418b67722844e0d065578e91895d9c24d9f372"
+        },
+        {
+          "name": "network_service_set_streaming",
+          "source_character_start": 14590,
+          "source_character_end": 15047,
+          "sha256": "5d9fe5956892fd52cbc79424839455e31bba3b4feeba9b893a59c6bfee8d2477"
+        },
+        {
+          "name": "network_service_start",
+          "source_character_start": 11295,
+          "source_character_end": 14588,
+          "sha256": "eb1ae2d114f16dfede7ad67082bc2abaf3150c24ccade6bb8743388f465bc3a3"
+        },
+        {
+          "name": "network_service_retry_client",
+          "source_character_start": 15049,
+          "source_character_end": 15679,
+          "sha256": "5c54fbc2eeabbaf46c71caea9df80afee0c97ace804d60301aa5ad6d1ee40f17"
+        }
+      ],
+      "command": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-function",
+        "-Wno-unused-variable",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-runtime-baseline-qualified-03/c3",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-runtime-baseline-qualified-03/sources/tests/native/network_runtime_baseline",
+        "-DTARGET_C3=1",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-runtime-baseline-qualified-03/sources/tests/native/network_runtime_baseline/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/network-runtime-baseline-qualified-03/c3/baseline"
+      ],
+      "generated_source_sha256": {
+        "actual.inc": "f8f42c8e44be55366470a55610fe17b7008a154b2882661823988bdcb2d758d0",
+        "policy.inc": "9fd2fc7c7c14bca1a37986fa609599f3d8b28034190f8e343440df3e43088d0b"
+      },
+      "negative_controls": {
+        "late-fallback": {
+          "detected": true,
+          "exit_code": 42,
+          "expected_marker": "SAFETY_FAILURE:late_failure_requires_portal"
+        },
+        "manual-apsta": {
+          "detected": true,
+          "exit_code": 42,
+          "expected_marker": "SAFETY_FAILURE:manual_retry_preserves_portal_until_reply"
+        },
+        "stale-state": {
+          "detected": true,
+          "exit_code": 42,
+          "expected_marker": "SAFETY_FAILURE:disconnect_invalidates_client_and_ip"
+        },
+        "failed-config": {
+          "detected": true,
+          "exit_code": 42,
+          "expected_marker": "SAFETY_FAILURE:failed_config_keeps_applied_selection"
+        },
+        "stale-rssi": {
+          "detected": true,
+          "exit_code": 42,
+          "expected_marker": "SAFETY_FAILURE:failed_rssi_query_invalidates_sample"
+        },
+        "last-profile": {
+          "detected": true,
+          "exit_code": 42,
+          "expected_marker": "SAFETY_FAILURE:late_cycle_wraps_to_earlier_profiles"
+        }
+      },
+      "characterizations": {
+        "power-bool": {
+          "passed": true,
+          "exit_code": 0,
+          "actual_audio_interleaving": false
+        }
+      },
+      "passed": true
+    }
+  },
+  "seams": [
+    "SDK APIs accept/reject synchronously and expose modeled driver state",
+    "event-group wait delivers GOT_IP through actual handler, or returns timeout",
+    "task creation records admission; RSSI loop is explicitly executed until second delay",
+    "loader supplies two synthetic active profiles; storage/parsing is outside this suite",
+    "native_state setters expose a single-threaded field model without lock/ABI claims",
+    "netifs, event registration, timer creation, power and restart are deterministic seams",
+    "no complete application reconstruction, RF/TCP delivery or scheduler qualification"
+  ]
+}
