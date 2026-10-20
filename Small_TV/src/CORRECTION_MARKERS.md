@@ -13,6 +13,11 @@
 | `REQUESTED_CHANGE` | Добавлено поведение по явному запросу пользователя | Проверка отсутствия приватных метаданных в загружаемой фотографии |
 | `FIXED_TEST` | Исправлена проверка или наблюдение; поведение приложения не меняется | Ожидание календаря ограничено отдельно гостевым и хостовым временем, чтобы незавершённая загрузка медленной ВМ не считалась неправильной датой |
 
+`codec/jpeg_privacy` и его upload adapter помечены `REQUESTED_CHANGE`: отдельная
+metadata policy проходит все scans, разрешает только fixed JFIF/structural Adobe
+и отвергает private APP/COM, thumbnails и trailing data. Это не изменение
+JPEG-алгоритма factory; codec support проверяется отдельно.
+
 Host-квалификация новой JPEG-библиотеки также использует эти метки:
 `FIXED_RECONSTRUCTION` в `storage/jpeg_cache.c#jpeg_cache_read_source` относится
 к подтверждённому дефекту нового cache adapter: тихая ошибка чтения внутри decoder

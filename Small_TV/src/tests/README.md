@@ -3,6 +3,9 @@
 Offline production JPEG dependency и проверки повреждённых исходников/сборочного
 кэша описаны в [JPEG_DEPENDENCY_BUILD.md](JPEG_DEPENDENCY_BUILD.md). Компиляция
 adapter modules не означает включение нового декодера в UI/upload.
+В обычный native gate включён [JPEG privacy contract](JPEG_PRIVACY.md): metadata
+между scans, границы буфера, truncation, I/O и остановки проверяются отдельно от
+entropy decoding. Реальный upload finish использует этот модуль.
 
 ## Полнота переноса
 

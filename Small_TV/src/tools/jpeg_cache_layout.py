@@ -8,7 +8,7 @@ from jpeg_guard_layout import prepare_image,c_bytes
 from jpeg_storage_layout import parse_board
 
 PROJECT=Path(__file__).resolve().parents[1]
-CODEC_INPUTS=['codec/jpeg_decoder.c','codec/jpeg_decoder.h','codec/jpeg_decoder_internal.h','codec/jpeg_memory.c',
+CODEC_INPUTS=['codec/jpeg_privacy.c','codec/jpeg_privacy.h','codec/jpeg_decoder.c','codec/jpeg_decoder.h','codec/jpeg_decoder_internal.h','codec/jpeg_memory.c',
     'codec/jpeg_backing.c','codec/jpeg_backing.h','codec/jpeg_coefficients.c','codec/jpeg_coefficients.h',
     'app/media/color_convert.c','app/include/color_convert.h','storage/jpeg_cache.c','storage/jpeg_cache.h',
     'storage/jpeg_journal.c','storage/jpeg_journal.h','storage/jpeg_nor.c','storage/jpeg_nor.h',

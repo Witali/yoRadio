@@ -3,6 +3,7 @@
 #include "settings.h"
 #include "board.h"
 #include "esp_timer.h"
+#include "jpeg_privacy.h"
 #include <string.h>
 
 static struct
@@ -108,83 +109,27 @@ esp_err_t photo_upload_chunk(unsigned slot, unsigned index, unsigned total, cons
     return result;
 }
 
+static int privacy_read(void *context, uint32_t offset, void *data, size_t bytes)
+{
+    /* Read only this immutable upload while media_mutex owns its source slot. */
+    uint32_t base = *(const uint32_t *)context;
+    return media_read_unlocked(base + offset, data, bytes);
+}
+
+static int privacy_check(void *context)
+{
+    /* The synchronous legacy owner holds media_mutex; background owner later
+     * supplies its request deadline/cancellation checkpoint to the same gate. */
+    (void)context;
+    return 0;
+}
+
 static bool photo_headers_safe(uint32_t base, uint32_t length)
 {
-    /* Reject private metadata, unsupported JPEG headers and trailing data.
-     * REQUESTED_CHANGE: reject EXIF/APP/COM and embedded thumbnails as a second
-     * privacy check after the browser removes metadata and crops/resizes. */
-
-    uint8_t bytes[16];
-    bool dimensions = false;
-    if (media_read_unlocked(base, bytes, 2) != ESP_OK || bytes[0] != 255 || bytes[1] != 0xd8)
-        return false;
-    uint32_t pos = 2;
-    while (pos + 4 <= length)
-    {
-        if (media_read_unlocked(base + pos, bytes, 4) != ESP_OK || bytes[0] != 255 ||
-            bytes[1] == 255)
-            return false;
-        unsigned marker = bytes[1], segment = (bytes[2] << 8) | bytes[3];
-        if (segment < 2 || segment > length - pos - 2)
-            return false;
-        if (marker == 0xfe || (marker >= 0xe1 && marker <= 0xef) || marker == 0xc2)
-            return false;
-        if (marker == 0xe0)
-        {
-            if (segment < 16 || media_read_unlocked(base + pos + 4, bytes, 5) != ESP_OK ||
-                memcmp(bytes, "JFIF\0", 5))
-                return false;
-            /* Only the fixed JFIF header; embedded thumbnails may contain metadata. */
-            if (segment != 16 || media_read_unlocked(base + pos + 16, bytes, 2) != ESP_OK ||
-                bytes[0] || bytes[1])
-                return false;
-        }
-        if (marker == 0xc0)
-        {
-            if (segment < 8 || media_read_unlocked(base + pos + 4, bytes, 5) != ESP_OK ||
-                bytes[0] != 8 || ((bytes[1] << 8) | bytes[2]) != 240 ||
-                ((bytes[3] << 8) | bytes[4]) != 240)
-                return false;
-            dimensions = true;
-        }
-        if (marker == 0xda)
-        {
-            if (!dimensions)
-                return false;
-            /* Single baseline scan, with its EOI exactly at the declared end.
-             * Reject APP/COM segments after SOS and data appended after EOI. */
-            pos += segment + 2;
-            bool escaped = false;
-            uint8_t entropy[64];
-            while (pos < length)
-            {
-                size_t block = length - pos < sizeof(entropy) ? length - pos : sizeof(entropy);
-                if (media_read_unlocked(base + pos, entropy, block) != ESP_OK)
-                    return false;
-                for (size_t i = 0; i < block; ++i)
-                {
-                    unsigned byte = entropy[i];
-                    if (!escaped)
-                    {
-                        escaped = byte == 255;
-                        continue;
-                    }
-                    if (byte == 255)
-                        continue;
-                    if (byte == 0 || (byte >= 0xd0 && byte <= 0xd7))
-                    {
-                        escaped = false;
-                        continue;
-                    }
-                    return byte == 0xd9 && pos + i + 1 == length;
-                }
-                pos += (uint32_t)block;
-            }
-            return false;
-        }
-        pos += segment + 2;
-    }
-    return false;
+    /* REQUESTED_CHANGE: inspect metadata in every scan rather than conflating
+     * privacy with baseline-only decoder support. Entropy validation is separate. */
+    jpeg_privacy_source_t source = {&base, length, privacy_read, privacy_check};
+    return jpeg_privacy_check(&source, NULL) == JPEG_PRIVACY_OK;
 }
 
 esp_err_t photo_upload_finish(unsigned slot)

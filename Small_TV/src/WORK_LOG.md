@@ -3955,3 +3955,29 @@ invalidation-before-upload, typed HTTP errors и штатный async request li
 assets deployment с сохранением фото/settings, независимые LCD/network/full/24h/
 hardware gates. Цель не завершена. Подробности tests/JPEG_DEPENDENCY_BUILD.md и
 qemu/parity/jpeg-dependency-build-validation-20261020.json.
+
+
+## 2026-10-20 — metadata gate in the actual photo upload
+
+REQUESTED_CHANGE: baseline-only privacy scanner replaced by codec/jpeg_privacy;
+actual upload finish calls it before its existing full TJpgd decode. Gate handles
+multi-scan marker grammar, FF00/restart/TEM/fill, DNL continuation, fixed JFIF and
+canonical Adobe. APP/COM/private thumbnails/trailing data refuse with separate
+metadata/truncation/I/O/stop diagnostics. No heap/global mutable state. Decoder
+support and privacy are no longer the same scanner; HTTP format support still
+baseline until native worker/newcodec is integrated. JS crop/resize/privacy unchanged.
+
+63actual codec-qualified JPEGs pass;5late private/trailing files refuse. Direct
+3727assertions cover45metadata locations/353truncations/2physical read failures/
+343stops and255/256buffer boundary.7unsafe mutations compile and fail assertions.
+Direct controls now included in ordinary native runner;5806old checks and12reverse
+inventory controls pass, inventory469/172app.10cache generator rejects pass; policy
+source/header now bind cache identity. RV32maxframe368;1224code/180rodata/0data+bss,
+not whole HTTP chain. Main compile/link+6artifact checks pass. App733C006A/ELF
+C1F1D94B/source4C8C3878,1171136bytes/364864free, DEBUGoff, assetsBB4469E3 unchanged.
+No new VM or hardware flash; shared SDK and oldH10 only observed read-only.
+
+Next owner/worker+async HTTP, one decode into durablecache, source invalidation/
+publish ordering and typed network errors. Combined heap/stack/time/deployment/
+independent network/LCD/full/24h/hardware remain pending; goal active. Proof:
+qemu/parity/jpeg-privacy-validation-20261020.json; tests/JPEG_PRIVACY.md.

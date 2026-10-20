@@ -99,6 +99,12 @@ hash в upload/cache workflow, matching assets build/deployment с сохран�
 само это изменение ещё не переключает UI/upload с TJpgd. Расширен явный reverse
 inventory до459functions при прежних170app, добавлены omission controls для
 codec/storage. [Сборка и границы проверки](tests/JPEG_DEPENDENCY_BUILD.md).
+Следующий checkpoint: metadata-only multi-scan gate подключён к реальному
+upload finish,63validJPEG/5private-or-trailing refusals,7compiled unsafe variants
+отвергаются.3727direct controls включены в обычный native runner вместе с5806
+прежними checks. Source inventory469/172app. TJpgd пока остаётся decoder для
+upload/UI; разрешение progressive в HTTP ещё не включено. Новый gate не смешивает
+privacy и codec support. [Проверки](tests/JPEG_PRIVACY.md).
 
 1. Зафиксировать матрицу входов/лимитов: baseline/progressive, gray/RGB/CMYK/YCCK,
    8/12-bit lossy и 2–16-bit Huffman lossless. Не обещать весь T.81: библиотека

@@ -12,6 +12,10 @@ Checkpoint offline JPEG build: в явную обратную инвентари
 компилируются в app component, но UI/upload пока не вызывают новый decoder/cache;
 проверка ELF подтверждает section GC. Сборщик и production bundle включены в
 проверяемые входы. [Границы проверки](../tests/JPEG_DEPENDENCY_BUILD.md).
+Следующий snapshot учитывает JPEG privacy gate и два bounded upload adapters:
+469source functions/172app. Gate вызывается из upload finish; codec/privacy
+разделены, алгоритм TJpgd и его подтверждённые factory pixel corrections прежние.
+Никакой новый upstream decoder caller этим изменением не активирован.
 
 Точная карта: [correspondence.json](correspondence.json). В каждой заводской
 строке указаны адрес, файл reference, конкретные `file#function` и оговорки.

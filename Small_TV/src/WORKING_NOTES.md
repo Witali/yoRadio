@@ -2591,3 +2591,43 @@ framebuffer. Real combined heap/task stacks/time remain unverified. After owner
 integration deploy matching guard/cache headers/assets without erasing user photo
 slots/settings, then independent LCD/network/full/24h/hardware gates. Old H10/SDK/
 frozen46payloads+manifest readonly, no extra QMP/RSP or stop for old H10.
+
+
+## 2026-10-20 — live upload privacy gate checkpoint
+
+Предыдущий goal turn b4b7834e9 —implementation progress. В этой же worktree
+реальный photo_upload_finish теперь вызывает codec/jpeg_privacy. Старого
+baseline-only marker scanner больше нет; entropy/dimensions всё ещё проверяет
+TJpgd. Privacy module accepts fixed JFIF(no thumbnail)/canonical Adobe and scans
+все SOS/entropy/inter-scan markers доexactEOI; rejects other APP/COM/trailing.
+Domain statuses include I/O/stop/truncated/metadata separately. No private strings
+in diagnostics. Cache CODEC_INPUTS includes policy. Don't reimplement this gate.
+
+3727unit controls (45metadata positions/353truncations/2readfaults/343stops,
+FF00crosses255/256),63actual qualifiedJPEG/5private+trailing rejections and
+7compiled mutants pass. Ordinary tests/run.ps1 now also runs direct privacy gate;
+old5806native checks and6artifact checks pass. Inventory469/172app,12controls.
+Target module maxcompilerframe368,1224code+180rodata,0data/bss (not whole HTTP stack).
+Main app733C006A/ELF C1F1D94B/source4C8C3878,1171136bytes,364864partitionfree,
+DEBUGoff; assetsBB4469E3 unchanged. No new VM/runtime/hardware claim. Saved in
+firmware/development; tests/JPEG_PRIVACY.md and qemu/parity/jpeg-privacy-validation-20261020.json.
+
+Next: actual media owner/worker integration, not another standalone module/probe.
+Reuse existing privacy/cache/guard/decoder. Current upload state+source serialization
+must split short media_mutex from slow codec mutex. Need async HTTP begin/complete,
+keep body/request lifetime, invalidate journal BEFORE source erase/write, persist
+source length only after privacy+ONE decode+physicalcacheverify. Worker low priority
+may use idle-priority time slicing to let idle/WDT run without arbitrary vTaskDelay;
+verify scheduler settings, don't assume. UI should try codec mutex0 and keep clock/
+immutable animations running, no blanket upload_active pause. Avoid read-modify-write
+of selected source while UI reads; use owner state/short locks. Retry/failure/timeout
+must release ownership and all async requests. Own all new VM handles; oldH10 untouched.
+
+Baseline factory pixels still need comparison; consider TJpgd strip producer into
+cache for supported8baseline rather than silent IDCT/color rounding drift. Include
+producer/Tjpgd config/source in cache codec ID if used. UI has1920byte DMA, not full
+framebuffer. Then matching assets/cache-header deployment preserving photos/settings,
+combined heap/stack/time, independent LCD/network/full/24h/hardware. Goal active.
+User asked about backdoor: existing static audit Small_TV/analysis/security/README.md
+finds no confirmed malicious path but unauthenticated management/open AP/plaintext
+weather/unsafe factory bounds. Don't claim whole-image absence; full audit pending.

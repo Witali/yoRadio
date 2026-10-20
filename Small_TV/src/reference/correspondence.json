@@ -1847,8 +1847,8 @@
       "note": "Reviewed implementation support in app/media/photo_upload.c; factoring/validation/synchronization/formatting for the mapped module behavior, without a separate factory entry point. This classification does not prove every branch."
     },
     "app/media/photo_upload.c#photo_headers_safe": {
-      "kind": "reconstruction_support",
-      "note": "Reviewed implementation support in app/media/photo_upload.c; factoring/validation/synchronization/formatting for the mapped module behavior, without a separate factory entry point. This classification does not prove every branch."
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
     },
     "app/network/wifi.c#network_connected": {
       "kind": "reconstruction_support",
@@ -3169,6 +3169,46 @@
     "storage/jpeg_transport.c#jpeg_transport_port": {
       "kind": "requested_jpeg_extension",
       "note": "Epoch-scoped flash ports and global request I/O/time limits; see tests/JPEG_TRANSPORT.md. Requested cache extension."
+    },
+    "codec/jpeg_privacy.c#fail": {
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    },
+    "codec/jpeg_privacy.c#checkpoint": {
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    },
+    "codec/jpeg_privacy.c#byte": {
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    },
+    "codec/jpeg_privacy.c#payload": {
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    },
+    "codec/jpeg_privacy.c#frame_marker": {
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    },
+    "codec/jpeg_privacy.c#segment": {
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    },
+    "codec/jpeg_privacy.c#jpeg_privacy_check": {
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    },
+    "codec/jpeg_privacy.c#jpeg_privacy_status_name": {
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    },
+    "app/media/photo_upload.c#privacy_read": {
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
+    },
+    "app/media/photo_upload.c#privacy_check": {
+      "kind": "requested_privacy_policy",
+      "note": "Metadata-only multi-scan marker validation, called by the actual upload finish path. Rejects private APP/COM, JFIF thumbnails, noncanonical Adobe and trailing bytes; codec support/entropy remain separate. No factory parity claim for requested privacy policy."
     }
   },
   "assembly_only": {
@@ -3255,7 +3295,7 @@
     "local_site/pages/settings.html": "2eeada3e2c1e9cebfc588a86412f96735a9134fe8d203719205b677a1c2dccd7",
     "local_site/pages/setup.html": "4549825073fc61cc8e2797804ef8df317e6a790a609d4d7037b2c0ffe7bee175",
     "src/app/app_main.c": "299c34b3b1faffb96887183004326ebd2f10a17fcfdb8930d8da58ebad7bd015",
-    "src/app/CMakeLists.txt": "8d16aec98f1034be30fc3e906ac20f4afaa34426944ea4f61b391b8edef2a886",
+    "src/app/CMakeLists.txt": "4313aa15c4ce7f150cda886c0e3758fde0761cbde51535b8a289a644077f1f26",
     "src/app/display/backlight.c": "bb59bf2e72ef4b42bf9f2d0d5cb6f5ec8674ff89ea1fccfe8b3e5543ccc0ab03",
     "src/app/display/clock_ui.c": "8789756db122c93b5c9803d0c50ac48c505b5b383641aedf9681b52a8036b007",
     "src/app/display/factory_animation.c": "4a6f441cdcce6b2a40859f5cf6377c0c6768b794d19613d000484123cd865d09",
@@ -3283,7 +3323,7 @@
     "src/app/media/assets.c": "21a3553ad69f31c3ac3ae2fb1d38d7c02b6a2a3fda99db4108a2051953ac9c41",
     "src/app/media/color_convert.c": "850d354a60797b006d2d9249b604ba0cd98ddfe7d9148ca91204e7c1b273cf0a",
     "src/app/media/media_internal.h": "a18fc231725ee9297d539ed239085b88f661c7349632f17b56556996946a2a32",
-    "src/app/media/photo_upload.c": "e234368f41edabca3d92d14f6eaa37a7caec3a0de3b7dbcb35f32ea0a8475f04",
+    "src/app/media/photo_upload.c": "fde026fd4b54b3da14b31eb904cf5f8e21b38b648617ce979fc78ac85e0a7504",
     "src/app/network/dns.c": "a4bee538e60a4bca3aba5a7b00233c17a9c08ff39779aefde9965e3a17234025",
     "src/app/network/dns_packet.c": "cb807af1329c04c534d61296138529f71e0ac5b2b2c3cf5eeb225ac763d6feb1",
     "src/app/network/wifi.c": "54d1de158d20e1f41826ca902a14ee3c9e36dc8da540ab852665a91f696908ec",
@@ -3310,6 +3350,8 @@
     "src/codec/jpeg_decoder.h": "7fb6b864f96e4493962968428e641463299c96d0cf4bdd6596a6918ae8442a12",
     "src/codec/jpeg_decoder_internal.h": "f2bd6bd5baf76ec9d16353f5b86c80fd811bf70816c9385d29439e4d179d56ac",
     "src/codec/jpeg_memory.c": "5a3c3038c544f100cda971634814c9e82ca991ed418691c1198630973b6fbbf4",
+    "src/codec/jpeg_privacy.c": "1b956d3f082d173017b530050d049ec25dcab8f13e8abbb9052541588629a477",
+    "src/codec/jpeg_privacy.h": "2110442de0ab393fb157a2b09d69143652a3a118c0fd609c3169a116bef7913e",
     "src/partitions.csv": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e",
     "src/reference/application.c": "e7d5e924149ff566c09254957aff738c6e4eb98ee8f02aeef9adb4bb083150ef",
     "src/reference/assembly/advance_photo_slideshow_at_4200bc36.asm": "d6df34881c8748da95f25915faaf57eaa5788a13e9399826a51bc5b67956130b",
@@ -3558,7 +3600,7 @@
     "src/third_party/tjpgd/tjpgdcnf.h": "36f8d018658dc190fc7270e5e5912f3d404e8c8f06975cdb489e06ca9a1b4760",
     "src/third_party/tjpgd/UPSTREAM.json": "2cdbf82b21d79701d3d125ffc420f21fb1f22dab44785f00ee8e29cb8023be7b",
     "src/tools/build_jpeg_library.py": "cccef6c732e52f600445fd005817aebf4b24be7e9f7d3583f7952c1018343c29",
-    "src/tools/jpeg_cache_layout.py": "f546107446b9ea777052cfa337348ed3b4593e7f959365e3929919916b5e8151",
+    "src/tools/jpeg_cache_layout.py": "bc216ed1cb84076ec3f88743ee3fae9d71edd11576b1b243588fea5c9ce604a7",
     "src/tools/jpeg_guard_layout.py": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7",
     "src/tools/jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
     "src/tools/prepare_resources.py": "18f7a27e4b157060b80f4318c21b4802bfcfed8e219ab757ac755ba0f17d51f7",
