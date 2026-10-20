@@ -9,7 +9,10 @@ import time
 import sys
 from urllib.request import Request, urlopen
 
-from tls_error_codes import error_detail
+if __package__:
+    from .tls_error_codes import error_detail
+else:
+    from tls_error_codes import error_detail
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))

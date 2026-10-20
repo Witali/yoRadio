@@ -9,14 +9,22 @@ import sys
 import threading
 import time
 
-from common import (Blocked, Board, Failure, Report, check_cpu, check_playback,
+if __package__:
+    from .common import (Blocked, Board, Failure, Report, check_cpu, check_playback,
+                        check_recovery_heap, check_transitions, fixtures, require,
+                        filter_tls_line, check_certificate_rejection, exception_details,
+                        check_file_runtime, check_natural_eof)
+    from .production_health import capture_failure_snapshot, check_decoder_health, output_window
+    from .serial_lines import serial_lines
+else:
+    from common import (Blocked, Board, Failure, Report, check_cpu, check_playback,
                     check_recovery_heap, check_transitions, fixtures, require,
                     filter_tls_line, check_certificate_rejection, exception_details,
                     check_file_runtime, check_natural_eof)
-from production_health import capture_failure_snapshot, check_decoder_health, output_window
+    from production_health import capture_failure_snapshot, check_decoder_health, output_window
+    from serial_lines import serial_lines
 from audio_test_server.server import Server
 from audio_test_server.fixtures import SEQUENCES
-from serial_lines import serial_lines
 
 
 class Capture:
@@ -71,7 +79,7 @@ def check_file_output(states, health):
 
 
 class Suite:
-    def __init__(self, board, origin, specs, capture, output, *, checkpoint=None, cpu_budget=None):
+    def __init__(self, board, origin, specs, capture, output, *, checkpoint=None, cpu_budget=None, clock=None):
         self.board, self.origin, self.specs = board, origin.rstrip('/'), specs
         self.capture, self.output = capture, Path(output)
         self.output.mkdir(parents=True, exist_ok=True)
@@ -79,39 +87,41 @@ class Suite:
         self.file_failure_snapshots = []
         self.checkpoint = checkpoint
         self.cpu_budget = cpu_budget
+        self.clock = clock
 
     def url(self, mode, name, origin=None):
         return (origin or self.origin).rstrip('/') + '/' + mode + '/' + name
 
     def observe(self, seconds, name, interval=.4):
-        start = time.perf_counter()
+        clock = self.clock or time
+        start = clock.perf_counter()
         samples = []
         batch = dict(case=name, started_at=start, samples=samples)
         try:
-            while time.perf_counter() - start < seconds:
-                requested = time.perf_counter()
+            while clock.perf_counter() - start < seconds:
+                requested = clock.perf_counter()
                 state = self.board.status()
-                row = dict(seconds=time.perf_counter() - start, request_ms=(time.perf_counter()-requested)*1000, **state)
+                row = dict(seconds=clock.perf_counter() - start, request_ms=(clock.perf_counter()-requested)*1000, **state)
                 samples.append(row)
                 if self.checkpoint:
                     self.checkpoint(self.observations, batch)
-                time.sleep(interval)
+                clock.sleep(interval)
         except Exception as error:
             # Keep partial evidence on transport failures without retaining URLs
             # or exception text that could contain station/credential details.
             batch['interrupted'] = type(error).__name__
             batch['exception_chain'] = exception_details(error)
-            batch['elapsed_seconds'] = time.perf_counter() - start
+            batch['elapsed_seconds'] = clock.perf_counter() - start
             raise
         finally:
-            batch['ended_at'] = time.perf_counter()
+            batch['ended_at'] = clock.perf_counter()
             self.observations.append(batch)
             (self.output / 'status.json').write_text(json.dumps(self.observations, indent=2)+'\n', encoding='utf-8')
         return samples
 
     def start(self, name, mode='file', hint='auto', origin=None):
         self.board.stop()
-        time.sleep(.8)
+        (self.clock or time).sleep(.8)
         self.board.play(self.url(mode, name, origin), hint)
 
     def file(self, name, hint='auto', origin=None, mode='file'):

@@ -34,10 +34,20 @@ class AcceptanceTests(unittest.TestCase):
         cls.specs = common.fixtures()
 
     def test_matrix_has_all_firmware_codec_families_and_aac_profiles(self):
-        self.assertEqual({s['codec'] for s in self.specs.values()}, {'aac','mp3','flac','vorbis','opus'})
+        finite = {name:spec for name,spec in self.specs.items() if 'sequence' not in spec}
+        self.assertEqual({s['codec'] for s in finite.values()}, {'aac','mp3','flac','vorbis','opus'})
         self.assertEqual({s.get('profile') for s in self.specs.values() if s['codec']=='aac' and 'profile' in s},
                          {'AAC-LC','HE-AAC','HE-AACv2'})
-        self.assertEqual(len(self.specs),13)
+        self.assertEqual(len(self.specs),15)
+        sequences = {name:spec['sequence'] for name,spec in self.specs.items() if 'sequence' in spec}
+        self.assertEqual(sequences, {
+            'changing':['lc-44100-stereo','lc-48000-stereo','he-48000-stereo','hev2-44100-stereo'],
+            'implicit-sbr':['lc-22050-mono','hev2-44100-stereo','lc-48000-stereo'],
+            'mp3-he-mp3':['mp3-320','he-48000-stereo','mp3-320'],
+            'aac-mp3-hev2':['lc-48000-stereo','mp3-320','hev2-44100-stereo'],
+        })
+        self.assertEqual({name for name,spec in self.specs.items() if spec['codec']=='auto'},
+                         {'mp3-he-mp3','aac-mp3-hev2'})
 
     def test_core_fallback_and_stale_playback_never_pass(self):
         for spec, samples in [
@@ -91,13 +101,14 @@ class AcceptanceTests(unittest.TestCase):
                      '--suite','load','--case','lc-48000-stereo','--serial-port','TEST',
                      '--load-seconds','180','--load-idle-recovery','--unpaced-files','--leave-stopped','--output',tmp]):
                 self.assertEqual(acceptance_run.main(),1)
-                suite.sustained.assert_called_once_with(180,'lc-48000-stereo',cpu=True,load=True)
+                suite.sustained.assert_called_once_with(180,'lc-48000-stereo',cpu=True,load=True,origin=None)
                 self.assertEqual(suite.idle_heap.call_count,2)
                 report = json.loads((Path(tmp)/'report.json').read_text())
                 self.assertEqual(report['load_options'],{'seconds':180,'idle_recovery':True})
-                self.assertEqual(report['server_options'],{'unpaced_files':True,'delivery_stats':False})
+                self.assertEqual(report['server_options'],{'unpaced_files':True,'delivery_stats':False,'pacing_ratio':1.02})
                 self.assertIsNone(report['cpu_budget_percent'])
                 self.assertTrue(make_server.call_args.kwargs['unpaced_files'])
+                self.assertEqual(make_server.call_args.kwargs['pacing_ratio'],1.02)
                 self.assertEqual([r['result'] for r in report['cases']],
                                  ['PASS','FAIL','PASS' if recovered else 'FAIL','PASS'])
 

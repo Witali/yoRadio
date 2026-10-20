@@ -2,7 +2,10 @@
 import re
 import time
 
-from common import Board, exception_details, require
+if __package__:
+    from .common import Board, exception_details, require
+else:
+    from common import Board, exception_details, require
 
 NUMERIC = ('uptime_ms', 'reset_reason', 'heap', 'largest', 'minimum_heap',
            'tasks', 'allocation_failures', 'task_watchdog_events')

@@ -632,6 +632,15 @@ Stream остаётся на core0, decode/output на core1 с прежними
   SDK, record sizes и привязки задач сохранены. В новом полном прогоне `rxt02`
   оба reserve-off профиля прошли: storage16717, minimum allocation17396,
   getter4096. Остальные варианты выполняются; общий PASS ещё не заявлен.
+
+- 2026-10-20, CYD-C3-15: добавлен отдельный [контроллер приёмки CYD](../tools/cyd_tests/run.py)
+  и [инструкция](CYD_TESTING.md). Проверяются identity сохранённого образа,
+  native health обоих ядер, HTTP/HTTPS/EOF, переходы, Stop/switch, нагрузка,
+  длительное воспроизведение и WebSocket. Existing vendor Vorbis/Opus проверяются
+  через public dispatch; private bridge этим не квалифицируется. Прошли 28 новых
+  CYD и 44 существующих C3 проверки инструментов, всего 72. Прерывания и ошибки
+  cleanup сохраняют FAIL; установка firmware и перезагрузка не выполняются.
+  Это host/fake/loopback квалификация контроллера; физическая приёмка открыта.
   Исходники зафиксированы в `affa3caf1` после выполнения тестов; чистота Git
   на момент тестов не заявляется. Actual SDK/QEMU, application и physical gates
   остаются отдельными проверками; старый nonpass prototype не переименован.
