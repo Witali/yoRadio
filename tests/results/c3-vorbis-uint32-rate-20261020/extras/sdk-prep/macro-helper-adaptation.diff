@@ -1,0 +1,38 @@
+--- .build/cyd-vorbis-uint32-rate-sdk-prep-01/windows_compile_command.py
++++ .build/c3-vorbis-uint32-rate-sdk-prep-01/windows_compile_command.py
+@@ -1,4 +1,4 @@
+-"""Prepare a GCC macro dump from a real Windows compilation-database row."""
++"""Prepare a GCC macro dump from a real C3 Windows compilation-database row."""
+ import ctypes
+ from pathlib import Path
+ 
+@@ -24,16 +24,16 @@
+ def generated_cflags_inputs(argv, cwd):
+     """Validate the one observed generated cflags file without expanding it."""
+     response = [arg for arg in argv if arg.startswith('@')]
+-    if not response: return {}
++    if not response: raise ValueError('Expected the pinned C3 build/toolchain/cflags response')
+     cflags, specs = (cwd/'toolchain/cflags').resolve(), (cwd/'specs/picolibc.specs').resolve()
+     if (len(response) != 1 or (cwd/response[0][1:]).resolve() != cflags or
+         not cflags.is_relative_to(cwd) or not specs.is_relative_to(cwd)):
+         raise ValueError('Only this build/toolchain/cflags response is supported')
+     data = cflags.read_bytes()
+-    expected = ['-Wno-frame-address', '-mlongcalls', '-fno-builtin-memcpy',
+-                '-fno-builtin-memset', '-fno-builtin-bzero', '"-specs='+specs.as_posix()+'"']
++    expected = ['-march=rv32imc_zicsr_zifencei', '-mtune=esp-base',
++                '"-specs='+specs.as_posix()+'"', '-D__PICOLIBC_ERRNO_FUNCTION=__errno']
+     if data.decode('utf-8').splitlines() != expected:
+-        raise ValueError('Generated cflags content differs from the six reviewed lines')
++        raise ValueError('Generated cflags content differs from the four reviewed RV32 lines')
+     specs_data = specs.read_bytes()
+     if not specs_data: raise ValueError('Generated picolibc.specs is empty')
+     return {cflags:data, specs:specs_data}
+@@ -50,7 +50,7 @@
+     """Return argv,cwd,original-argv,generated-input-bytes; never execute/write.
+ 
+     Preserve the original @cflags argument for GCC. Only its reviewed generated
+-    path/six-line content is supported; arbitrary/nested responses are rejected.
++    path/four-line RV32 content is supported; arbitrary/nested responses are rejected.
+     """
+     cwd = Path(row['directory']).resolve()
+     locate = lambda value: (cwd / value).resolve()

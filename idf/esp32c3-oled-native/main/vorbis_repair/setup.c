@@ -951,11 +951,12 @@ static int repair__vorbis_unpack_info(vorbis_info *vi,oggpack_buffer *opb){
   ci->blocksizes[0]=1<<short_bits;
   ci->blocksizes[1]=1<<long_bits;
 
+/* Vorbis rate is unsigned; retain the fixed vendor ABI field layout. */
 #ifdef LIMIT_TO_64kHz
-  if(vi->rate>=64000 || ci->blocksizes[1]>4096)goto err_out;
+  if((uint32_t)vi->rate>=64000 || ci->blocksizes[1]>4096)goto err_out;
 #endif
 
-  if(vi->rate<1)goto err_out;
+  if((uint32_t)vi->rate<1)goto err_out;
   if(vi->channels<1)goto err_out;
   if(ci->blocksizes[0]<64)goto err_out;
   if(ci->blocksizes[1]<ci->blocksizes[0])goto err_out;

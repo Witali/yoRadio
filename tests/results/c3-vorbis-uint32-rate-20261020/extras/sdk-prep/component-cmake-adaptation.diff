@@ -1,0 +1,14 @@
+--- .build/cyd-vorbis-uint32-rate-sdk-prep-01/target/cyd_vorbis_uint32_rate_qemu/main/CMakeLists.txt
++++ .build/c3-vorbis-uint32-rate-sdk-prep-01/target/c3_vorbis_uint32_rate_qemu/main/CMakeLists.txt
+@@ -1,4 +1,3 @@
+-set(M "$ENV{CYD_VORBIS_CANDIDATE}")
+ idf_component_register(SRCS "main.c" INCLUDE_DIRS "."
+  REQUIRES esp_audio_codec freertos heap esp_system esp_rom)
+ if(NOT DEFINED RATE_MODE OR NOT RATE_MODE MATCHES "^(baseline|acceptance|limited)$")
+@@ -17,5 +16,5 @@
+ if(RATE_MODE STREQUAL "limited")
+     target_compile_definitions(${COMPONENT_LIB} PRIVATE LIMIT_TO_64kHz=1)
+ endif()
+-include("${M}/compat/vorbis_repair/enable.cmake")
++include("${CMAKE_CURRENT_LIST_DIR}/../raw-enable.cmake")
+ native_enable_vorbis_repair()

@@ -1,0 +1,105 @@
+--- .build/cyd-vorbis-uint32-rate-sdk-prep-01/test_rate_protocol.py
++++ .build/c3-vorbis-uint32-rate-sdk-prep-01/test_rate_protocol.py
+@@ -6,7 +6,7 @@
+ import rate_protocol as protocol
+ 
+ HERE=Path(__file__).resolve().parent
+-FIXTURE=HERE.parents[1]/'tests/target/cyd_vorbis_format_qemu/main/fixture.h'
++FIXTURE=HERE.parents[1]/'tests/target/c3_vorbis_format_qemu/main/fixture.h'
+ RATES=(48000,44100,32000,24000,22050,16000,12000,11025,8000,1,63999,64000,
+        192000,2147483647,2147483648,4294967295)
+ FACTS=dict(returncode=0,timed_out=False,interrupted=False)
+@@ -26,8 +26,8 @@
+ def synthetic(mode='acceptance',control=None):
+     sizes,pcms=fixture()
+     rows=[f'BEGIN expected_unsigned_rejection={int(mode=="baseline")} limited_policy={int(mode=="limited")} '
+-          'cases=16 short=256 long=2048 golden_rate=192000 coordinator=0','WORKER core=1',
+-          'ZERO_REJECT rate=0 result=-1 handle=0 handles_closed=1 core=1']
++          'cases=16 short=256 long=2048 golden_rate=192000 coordinator=0','WORKER core=0',
++          'ZERO_REJECT rate=0 result=-1 handle=0 handles_closed=1 core=0']
+     accepted=rejected=paired=total=0
+     for index,rate in enumerate(RATES):
+         coord=f'index={index} rate={rate}'
+@@ -35,20 +35,20 @@
+         effective=control is not None and rate==2147483648
+         bad_open=reject if not effective else control=='signed-validity'
+         result=-1 if bad_open else 0
+-        rows += [f'CASE_OPEN {coord} golden_rate=192000 vendor_open=0 checked_open={result} vendor_handle=1 checked_handle={int(not bad_open)} header_error={int(bad_open)} core=1']
++        rows += [f'CASE_OPEN {coord} golden_rate=192000 vendor_open=0 checked_open={result} vendor_handle=1 checked_handle={int(not bad_open)} header_error={int(bad_open)} core=0']
+         if effective:
+             rows += ['FAILURE '+('legal_unsigned_rate_open_required' if control=='signed-validity' else 'limited_rate_rejection_required')]
+             break
+         if reject:
+-            rows += [f'CASE_REJECT {coord} result=-1 header_error=1 handles_closed=1 core=1']; rejected+=1
++            rows += [f'CASE_REJECT {coord} result=-1 header_error=1 handles_closed=1 core=0']; rejected+=1
+             continue
+         for packet,(size,pcm) in enumerate(zip(sizes,pcms)):
+             rows += [f'PACKET {coord} packet={packet} expected={size} vendor_consumed={size} checked_consumed={size} pcm={pcm} '
+                 f'vendor_rate=192000 checked_rate={rate} vendor_channel=2 checked_channel=2 vendor_bits=16 checked_bits=16 '
+-                f'exact=1 canaries=1 nonzero={int(pcm>0)} core=1']
+-        rows += [f'CASE_COMPLETE {coord} packets=68 pcm={sum(pcms)} nonzero=67 handles_closed=1 core=1']
++                f'exact=1 canaries=1 nonzero={int(pcm>0)} core=0']
++        rows += [f'CASE_COMPLETE {coord} packets=68 pcm={sum(pcms)} nonzero=67 handles_closed=1 core=0']
+         accepted+=1; paired+=68; total+=sum(pcms)
+-    if not control: rows += [f'COMPLETE cases=16 accepted={accepted} rejected={rejected} paired_packets={paired} pcm={total} zero_rejected=1 core=1']
++    if not control: rows += [f'COMPLETE cases=16 accepted={accepted} rejected={rejected} paired_packets={paired} pcm={total} zero_rejected=1 core=0']
+     return '\n'.join(protocol.PREFIX+row for row in rows)+'\n'
+ 
+ 
+@@ -86,8 +86,8 @@
+         text=synthetic('acceptance','signed-validity')
+         self.rejects(text.replace('checked_open=-1 vendor_handle=1 checked_handle=0 header_error=1',
+                                  'checked_open=-4 vendor_handle=1 checked_handle=0 header_error=0',1),'acceptance','signed-validity')
+-        self.rejects(text.replace('header_error=1 core=1','header_error=0 core=1',1),'acceptance','signed-validity')
+-        self.rejects(text.replace(' header_error=1 core=1',' core=1',1),'acceptance','signed-validity')
++        self.rejects(text.replace('header_error=1 core=0','header_error=0 core=0',1),'acceptance','signed-validity')
++        self.rejects(text.replace(' header_error=1 core=0',' core=0',1),'acceptance','signed-validity')
+     def test_real_process_facts_required(self):
+         text=synthetic()
+         for facts in ({'returncode':1},{'returncode':-1},{'returncode':3199971767},{'returncode':None},{'returncode':False},
+@@ -96,9 +96,12 @@
+         with self.assertRaises(TypeError): protocol.validate_log(text,'acceptance')
+     def test_native_prefix_and_actual_cores(self):
+         text=synthetic()
+-        for before,after in (('coordinator=0','coordinator=1'),('WORKER core=1','WORKER core=0'),('core=1','core=0'),
+-                             ('CYD_VORBIS_RATE_','C3_VORBIS_RATE_'),('CYD_VORBIS_RATE_PACKET','noise CYD_VORBIS_RATE_PACKET')):
++        for before,after in (('coordinator=0','coordinator=1'),('WORKER core=0','WORKER core=1'),('core=0','core=1'),
++                             ('C3_VORBIS_RATE_','CYD_VORBIS_RATE_'),('C3_VORBIS_RATE_PACKET','noise C3_VORBIS_RATE_PACKET')):
+             with self.subTest(after=after): self.rejects(text.replace(before,after,1))
++        for packet in (0,67):
++            line=next(s for s in text.splitlines() if '_PACKET index=0 ' in s and f' packet={packet} ' in s)
++            self.rejects(text.replace(line,line.replace('core=0','core=1'),1))
+     def test_missing_duplicate_reordered_and_trailing_lines(self):
+         lines=synthetic().splitlines()
+         for text in ('\n'.join(lines[:8]+lines[9:]),'\n'.join(lines[:8]+[lines[8]]+lines[8:]),
+@@ -122,10 +125,10 @@
+             with self.subTest(new=new): self.rejects(text.replace(old,new,1))
+     def test_nonzero_byte_attestations_and_sum(self):
+         text=synthetic()
+-        self.rejects(text.replace('nonzero=0 core=1','nonzero=1 core=1',1))
+-        self.rejects(text.replace('nonzero=1 core=1','nonzero=99999 core=1',1))
++        self.rejects(text.replace('nonzero=0 core=0','nonzero=1 core=0',1))
++        self.rejects(text.replace('nonzero=1 core=0','nonzero=99999 core=0',1))
+         self.rejects(text.replace('pcm=272640 nonzero=67','pcm=272640 nonzero=66',1))
+-        self.rejects(text.replace('nonzero=1 core=1','nonzero=0 core=1'))
++        self.rejects(text.replace('nonzero=1 core=0','nonzero=0 core=0'))
+     def test_handles_and_totals(self):
+         text=synthetic()
+         for old,new in (('handles_closed=1','handles_closed=0'),('vendor_handle=1','vendor_handle=0'),
+@@ -155,14 +158,14 @@
+     def test_unexpected_failure_or_named_failure_wrong_position(self):
+         text=synthetic()
+         for reason in ('legal_unsigned_rate_open_required','limited_rate_rejection_required','any_other_failure'):
+-            self.rejects(text+'CYD_VORBIS_RATE_FAILURE '+reason+'\n')
++            self.rejects(text+'C3_VORBIS_RATE_FAILURE '+reason+'\n')
+         control=synthetic('acceptance','signed-validity')
+         self.rejects(control.replace('FAILURE legal_unsigned_rate_open_required','FAILURE any_other_failure'),'acceptance','signed-validity')
+         self.rejects(control.replace('index=14 rate=2147483648','index=13 rate=2147483647'),'acceptance','signed-validity')
+     def test_target_panics_timeouts_and_foreign_markers(self):
+         text=synthetic()
+         for extra in ('Guru Meditation','assert failed','CORRUPT HEAP','TimeoutExpired','timed out','Backtrace:',
+-                      'C3_VORBIS_RATE_COMPLETE','noise CYD_VORBIS_RATE_COMPLETE'):
++                      'CYD_VORBIS_RATE_COMPLETE','noise C3_VORBIS_RATE_COMPLETE'):
+             with self.subTest(extra=extra): self.rejects(text+extra+'\n')
+     def test_benign_boot_noise_is_not_protocol(self):
+         result=self.validate('boot: starting\n'+synthetic()+'QEMU shutdown\n')

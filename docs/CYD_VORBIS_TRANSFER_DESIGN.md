@@ -145,8 +145,8 @@ failure. The coordinator remains on core0 and decoding on core1.
 The [canonical protocol tests](../tests/vorbis_rate/README.md) pass all 19
 methods separately. These results cover one stereo S256/L2048 raw fixture,
 not every possible rate or format combination. They do not extend the radio
-output hardware's supported rates or qualify C3/RV32. The same signed-rate
-finding in C3 needs its own independently executed regression and fix.
+output hardware's supported rates. The same signed-rate finding has now been
+independently reproduced and fixed on C3/RV32 as described below.
 
 The [additional format generators](../tests/vorbis_format_corpus/README.md)
 now reproduce all 100 nonmanifest files for 17 books/floor0/residue0 cases;
@@ -154,6 +154,27 @@ eight construction tests pass. Their original host campaign accepted all 17
 with Xiph while FFmpeg native accepted seven and explicitly refused ten lookup2
 cases. Target capture and independent numerical comparison for this corpus are
 still pending. Neither checkpoint closes full G6 or enables radio integration.
+
+### Independent C3 unsigned-rate checkpoint
+
+The [C3 result archive](../tests/results/c3-vorbis-uint32-rate-20261020/README.md)
+records five independently executed SDK6.1/RV32 campaigns using the C3 archives,
+ELF machine243,160MHz/unicore configuration and bootloader offset0. Baseline
+decodes14 rates and rejects the two high-bit values; the C3 source then receives
+only the same two unsigned casts and explanatory comment, preserving its ABI.
+Acceptance decodes all16 rates with1088 paired packets and4362240 exact PCM
+bytes. The separately compiled cap accepts11 and rejects5; restoring each signed
+guard independently reaches its named failure. Both coordinator and worker
+remain on core0, including every packet witness. All five processes complete
+with exit0 and all45 owned commands have terminal success without interruption.
+
+Nineteen canonical C3 protocol methods pass; the source-preparation gate also
+retains four Windows/RV32 compiler-context methods (23 total). The705-file archive
+is verified offline from another working directory, including all five native
+protocols, frozen source versions and compile/config/tool identities. This
+standalone project does not configure the full C3 application or invoke the
+previously deferred AAC hooks. Production images, actual radio/hardware and
+other formats/lifetime/conformance gates remain separate.
 
 ## Entry points and confirmed problems
 

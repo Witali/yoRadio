@@ -1,0 +1,84 @@
+--- .build/cyd-vorbis-uint32-rate-sdk-prep-01/target/cyd_vorbis_uint32_rate_qemu/main/main.c
++++ .build/c3-vorbis-uint32-rate-sdk-prep-01/target/c3_vorbis_uint32_rate_qemu/main/main.c
+@@ -42,7 +42,7 @@
+ static uint32_t total_pcm;
+ 
+ static void stop(const char *reason) {
+-    if (reason) printf("CYD_VORBIS_RATE_FAILURE %s\n",reason);
++    if (reason) printf("C3_VORBIS_RATE_FAILURE %s\n",reason);
+     if (vendor) { esp_vorbis_dec_close(vendor); vendor=NULL; }
+     if (checked) { esp_vorbis_dec_close(checked); checked=NULL; }
+     fflush(stdout);
+@@ -51,7 +51,7 @@
+ }
+ static void check(bool condition,const char *reason) { if (!condition) stop(reason); }
+ static unsigned core(void) {
+-    unsigned value=(unsigned)xPortGetCoreID(); check(value==1U,"worker_core1"); return value;
++    unsigned value=(unsigned)xPortGetCoreID(); check(value==0U,"worker_core0"); return value;
+ }
+ static void close_handles(void) {
+     if (vendor) { void *h=vendor; vendor=NULL; check(esp_vorbis_dec_close(h)==ESP_AUDIO_ERR_OK,"vendor_close"); }
+@@ -83,7 +83,7 @@
+     int result=esp_vorbis_dec_open(&cfg,sizeof(cfg),&checked);
+     check(result==ESP_AUDIO_ERR_FAIL && !checked,"zero_rate_rejection_required");
+     close_handles();
+-    printf("CYD_VORBIS_RATE_ZERO_REJECT rate=0 result=%d handle=0 handles_closed=1 core=%u\n",result,core());
++    printf("C3_VORBIS_RATE_ZERO_REJECT rate=0 result=%d handle=0 handles_closed=1 core=%u\n",result,core());
+ }
+ static void compare(unsigned index,uint32_t rate) {
+     uint8_t golden[sizeof(fixture_info)],candidate[sizeof(fixture_info)];
+@@ -94,7 +94,7 @@
+     int ar=__real_esp_vorbis_dec_open(&a_cfg,sizeof(a_cfg),&vendor);
+     check(ar==ESP_AUDIO_ERR_OK && vendor,"golden192000_open_required");
+     int br=esp_vorbis_dec_open(&b_cfg,sizeof(b_cfg),&checked);
+-    printf("CYD_VORBIS_RATE_CASE_OPEN index=%u rate=%" PRIu32 " golden_rate=192000 vendor_open=%d checked_open=%d vendor_handle=%u checked_handle=%u header_error=%u core=%u\n",
++    printf("C3_VORBIS_RATE_CASE_OPEN index=%u rate=%" PRIu32 " golden_rate=192000 vendor_open=%d checked_open=%d vendor_handle=%u checked_handle=%u header_error=%u core=%u\n",
+            index,rate,ar,br,(unsigned)(vendor!=NULL),(unsigned)(checked!=NULL),
+            (unsigned)(br==ESP_AUDIO_ERR_FAIL && !checked),core());
+     bool limited=RATE_LIMITED_POLICY && rate>=64000U;
+@@ -102,7 +102,7 @@
+     if (limited || unsigned_reject) {
+         check(br==ESP_AUDIO_ERR_FAIL && !checked,limited?"limited_rate_rejection_required":"baseline_unsigned_rejection_required");
+         close_handles(); ++rejected;
+-        printf("CYD_VORBIS_RATE_CASE_REJECT index=%u rate=%" PRIu32 " result=%d header_error=1 handles_closed=1 core=%u\n",index,rate,br,core());
++        printf("C3_VORBIS_RATE_CASE_REJECT index=%u rate=%" PRIu32 " result=%d header_error=1 handles_closed=1 core=%u\n",index,rate,br,core());
+         return;
+     }
+     check(br==ESP_AUDIO_ERR_OK && checked,rate>INT32_MAX?"legal_unsigned_rate_open_required":"legal_rate_open_required");
+@@ -127,7 +127,7 @@
+               a_info.bits_per_sample==16 && b_info.bits_per_sample==16,"packet_public_metadata");
+         uint32_t nz=0; for (unsigned i=0;i<bo.decoded_size;++i) nz+=b_pcm.data[i]!=0;
+         pcm+=bo.decoded_size; nonzero+=nz; ++paired_packets;
+-        printf("CYD_VORBIS_RATE_PACKET index=%u rate=%" PRIu32 " packet=%u expected=%" PRIu32 " vendor_consumed=%" PRIu32 " checked_consumed=%" PRIu32 " pcm=%" PRIu32
++        printf("C3_VORBIS_RATE_PACKET index=%u rate=%" PRIu32 " packet=%u expected=%" PRIu32 " vendor_consumed=%" PRIu32 " checked_consumed=%" PRIu32 " pcm=%" PRIu32
+             " vendor_rate=%" PRIu32 " checked_rate=%" PRIu32 " vendor_channel=%u checked_channel=%u vendor_bits=%u checked_bits=%u exact=1 canaries=1 nonzero=%" PRIu32 " core=%u\n",
+             index,rate,packet,size,a.consumed,b.consumed,bo.decoded_size,a_info.sample_rate,b_info.sample_rate,
+             (unsigned)a_info.channel,(unsigned)b_info.channel,(unsigned)a_info.bits_per_sample,(unsigned)b_info.bits_per_sample,nz,core());
+@@ -135,22 +135,22 @@
+     }
+     check(pcm==FIXTURE_RAW2048_BYTES && nonzero,"complete_nonzero_pcm");
+     close_handles(); ++accepted; total_pcm+=pcm;
+-    printf("CYD_VORBIS_RATE_CASE_COMPLETE index=%u rate=%" PRIu32 " packets=68 pcm=%" PRIu32 " nonzero=%" PRIu32 " handles_closed=1 core=%u\n",index,rate,pcm,nonzero,core());
++    printf("C3_VORBIS_RATE_CASE_COMPLETE index=%u rate=%" PRIu32 " packets=68 pcm=%" PRIu32 " nonzero=%" PRIu32 " handles_closed=1 core=%u\n",index,rate,pcm,nonzero,core());
+ }
+ static void task(void *unused) {
+-    (void)unused; printf("CYD_VORBIS_RATE_WORKER core=%u\n",core());
++    (void)unused; printf("C3_VORBIS_RATE_WORKER core=%u\n",core());
+     zero_header();
+     for (unsigned i=0;i<sizeof(rates)/sizeof(rates[0]);++i) compare(i,rates[i]);
+     unsigned want_rejected=RATE_LIMITED_POLICY?5U:RATE_EXPECT_UNSIGNED_REJECTION?2U:0U;
+     check(rejected==want_rejected && accepted==16U-want_rejected && paired_packets==68U*accepted &&
+           total_pcm==FIXTURE_RAW2048_BYTES*accepted,"complete_case_accounting");
+-    printf("CYD_VORBIS_RATE_COMPLETE cases=16 accepted=%u rejected=%u paired_packets=%u pcm=%" PRIu32 " zero_rejected=1 core=%u\n",
++    printf("C3_VORBIS_RATE_COMPLETE cases=16 accepted=%u rejected=%u paired_packets=%u pcm=%" PRIu32 " zero_rejected=1 core=%u\n",
+            accepted,rejected,paired_packets,total_pcm,core());
+     stop(NULL);
+ }
+ void app_main(void) {
+     unsigned coordinator=(unsigned)xPortGetCoreID(); check(coordinator==0U,"coordinator_core0");
+-    printf("CYD_VORBIS_RATE_BEGIN expected_unsigned_rejection=%d limited_policy=%d cases=16 short=256 long=2048 golden_rate=192000 coordinator=%u\n",
++    printf("C3_VORBIS_RATE_BEGIN expected_unsigned_rejection=%d limited_policy=%d cases=16 short=256 long=2048 golden_rate=192000 coordinator=%u\n",
+            RATE_EXPECT_UNSIGNED_REJECTION,RATE_LIMITED_POLICY,coordinator);
+-    check(xTaskCreatePinnedToCore(task,"public_rate",16384,NULL,3,NULL,1)==pdPASS,"create_core1_rate_task");
++    check(xTaskCreatePinnedToCore(task,"public_rate",16384,NULL,3,NULL,0)==pdPASS,"create_core0_rate_task");
+ }
