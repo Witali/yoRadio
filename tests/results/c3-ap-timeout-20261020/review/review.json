@@ -1,0 +1,104 @@
+{
+  "reviewed_utc": "2026-10-20T09:51:44.557217+00:00",
+  "source_commit": "9cc619778148b5111a629f64388a51a445f25178",
+  "scope": "Independent read-only C3 AP-timeout repair review: actual callback/owner/retry/sleep admission, packed revision/NVS publication, checked pending connection cancellation and immediate reboot lease. No deferred AAC work, production edits, tests edits, index changes, firmware builds or device operations. Inputs may change during integration.",
+  "source_sha256": {
+    "idf/esp32c3-oled-native/main/network_service.c": "1ae70bd7c57d6aa06025668e4fd67b61dbb19383b81259f152e1b1f041638a8f",
+    "idf/esp32c3-oled-native/main/network_service.h": "ec254ac5fcf0741b0ce1cdb83787a3250082dbf24a194e05156abc06e47de43a",
+    "idf/esp32c3-oled-native/main/runtime_settings.c": "e89f84241e27b573dc37ece7ce64dfd4ab19a54ce1ecf5ef776b7a16a36bb22a",
+    "idf/esp32c3-oled-native/main/runtime_settings.h": "b45fe32e6d4223df7abaeb8f09644f5f15c02f341ead01ebcd4668596cecf146",
+    "idf/esp32c3-oled-native/main/websocket_service.c": "7b65e3c60a76fd3c9a670a5aff6101813d1ba00f0c454fcd33ec1d2e668cb26a",
+    "idf/esp32c3-oled-native/main/websocket_service.h": "bf4a33c0711d67b25a7d11417068a175f51d6b53d089cb046d5d19e397c4baca",
+    "idf/esp32c3-oled-native/main/deep_sleep_clock.c": "e0f78c6bb5a8bac07f358acdb517eb0c4d17939b0e51739fc5a368957b46646c",
+    "idf/esp32c3-oled-native/main/deep_sleep_clock.h": "d03e1a5b42d40a4b109dec3915c7b0098c332303e2998f52f3978df500a22b0c",
+    "idf/esp32c3-oled-native/main/web_ota.c": "67ac4bb57c8cca388d33ce76fe6e3be43e56c3fb04b297f25e35055af5b3736b",
+    "tests/run-c3-ap-timeout.py": "298d952513cea436bf55791d081703ab6f467e75615824b4ed88a142a6ce8c83",
+    "tests/native/c3_ap_timeout/platform.c": "230b5455e976552eba74bc9219f64274449dcaa7e59f8d60af1036f46d2fe460",
+    "tests/native/c3_ap_timeout/platform.h": "4ceaa17aed402faf376250d10d26dc9109b46c0a541a3037dba1e3a66f5ebac0",
+    "tests/native/c3_ap_timeout/README.md": "4afbb52b13e4b181dcef14581bde6d95002b08caa297f260bc4db90bdaa4104a",
+    "tests/native/c3_ap_timeout/test.c": "fe60ad009f95bfcc193ead4366ac9b7f5d1a987050802c69a2dfb1c071e0b9e6"
+  },
+  "findings": [],
+  "sdk_source_sha256": {
+    "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\esp_wifi\\include\\esp_wifi.h": "d419fb76b80b08f5e8c5194566f55c4209e038aa31431e3678c6af2eb28c6ae5",
+    "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\esp_netif\\include\\esp_netif.h": "54fdebdf832dc5c69f704a5a0190dd0cd5c584442da2e2338c8913727cc3c16e",
+    "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\esp_netif\\lwip\\esp_netif_lwip.c": "5faa7050ad20293c028c4a7d95ac59be373c10f4dce0d987947e8da7f72d0720",
+    "C:\\Work\\yoRadio\\.idf\\v6.1-9a97f6c54ec6\\components\\esp_netif\\esp_netif_handlers.c": "ddde04886cae7a9d96dd9773ce0eae290ac901375c31ec41c362cf12f5eaa6eb"
+  },
+  "production_unchanged_after_review": {
+    "idf/esp32c3-oled-native/main/network_service.c": true,
+    "idf/esp32c3-oled-native/main/runtime_settings.c": true,
+    "idf/esp32c3-oled-native/main/runtime_settings.h": true
+  },
+  "reviewed_contracts": [
+    "One deadline/policy owner is the existing wifi_rssi task at100ms; RSSI cadence2s, priority2/stack2048/task placement unchanged; no timer callback, new task or direct AP esp_restart remains.",
+    "Facts are coherent under a short portMUX; no Wi-Fi/netif/restart SDK call executes under that mux. Callback/retry/sleep operation count and monotonic version reject overlapping or stale owner observations.",
+    "Facts version UINT64_MAX is fail-closed through valid=false rather than wrapping authorization. Operation count is balanced on all modified actual entry/exit paths.",
+    "Default0, failed AP configuration, online state, disabled setting, negative clock, unavailable/full-interval saturation and sleep operations cannot admit restart.",
+    "Every accepted softap save, including same-value and0->1 coalescing, advances one packed27-bit revision. Value and revision are observed in one atomic32-bit load.",
+    "Softap setter serializes under existing finite writer lock, rejects revision exhaustion before NVS writes, preserves runtime namespace/key and only atomically publishes after successful commit; no fallible step remains between commit and publication.",
+    "runtime_settings_init is still sequential boot startup at its sole production caller; reload creates fresh boot-local revision1, not a runtime writer operation.",
+    "Due restart proves APSTA mode, exact NOT_CONNECT, down station netif and successful zero-IP read, then rechecks facts/config. Mode/association/IP query failures suppress admission.",
+    "Activity ownership excludes the actual deep-sleep CAS; existing OTA owns its own activity and exact reboot lease. AP reserve failure stores no ordinary deferred reboot and rearms from fresh SDK return time.",
+    "Final successful lease ownership does not replace eligibility: actual live facts/config/SDK checks run again before immediate restart; only own lease is cancelled on a returning seam/rejection.",
+    "Pending async-connect intent is not cleared by elapsed grace or NOT_CONNECT alone. Cancellation is requested only after live disconnected proof; pending clears only after ESP_OK and unchanged operation version, never over a newer callback/retry.",
+    "Cancellation and restart are separate branches. A successful cancellation cannot restart in that same iteration and always requires a fresh full interval and new live proof; failed cancellation stays pending.",
+    "Pinned SDK esp_wifi_sta_get_ap_info documents disconnect status but does not prove every async command finished. esp_wifi_disconnect ESP_OK is treated as accepted cancellation; later final SDK/live checks remain necessary.",
+    "Pinned default DHCP netif disconnected handler calls esp_netif_down; active DHCP down resets IP info before netif down. Requiring a successfully read zero stored IP is a conservative live guard.",
+    "Settings/RF/callbacks arriving after the documented final application arbitration check cannot be atomically excluded by this SDK restart API; this review does not introduce a stronger history/RF contract."
+  ],
+  "result": "No actionable correctness regression found in reviewed final production repair; all recorded final inputs match the passing final-02 evidence.",
+  "reviewed_utc_final": "2026-10-20T09:55:02.697518+00:00",
+  "test_scope_and_limits": [
+    "Frozen initial runner compiles complete runtime_settings.c and exact network prefix/function spans (startup, callback, retry, sleep preparation, RSSI loop and AP helpers), not the entire network_service translation unit.",
+    "The active credential loader is a seam that fills one boot profile. No AP facts, owner policy, acknowledgement or deadline is privately assigned by the fixture.",
+    "SDK/netif layouts and observations, RTOS clock/notifications, deep-sleep activity, reboot lease internals and shared power policy are modeled seams in this AP runner; actual reboot and shared power implementations have separate suites.",
+    "Final42-case report now covers raw valid/invalid persisted-NVS restoration without rewrite, two actual settings writers/400commits with2000atomic snapshots, and isolated static max-revision admission seed; documented seed is not a normal NVS restoration state. Eight semantic controls and three historical failures were inspected and input hashes independently verified.",
+    "Read-only review did not run target GCC/Clang, physical RF/DHCP, reset, OTA flash power loss, heap/stack HWM or physical sleep timing. SDK call durations are not proven bounded."
+  ],
+  "final_test_report_pending": false,
+  "final_source_sha256": {
+    "idf/esp32c3-oled-native/main/board_config.h": "27fa0686184d41aaeee74cc9d913cb2766754d569d2cf3fdac735bd44728e03f",
+    "idf/esp32c3-oled-native/main/deep_sleep_clock.c": "e0f78c6bb5a8bac07f358acdb517eb0c4d17939b0e51739fc5a368957b46646c",
+    "idf/esp32c3-oled-native/main/deep_sleep_clock.h": "d03e1a5b42d40a4b109dec3915c7b0098c332303e2998f52f3978df500a22b0c",
+    "idf/esp32c3-oled-native/main/network_service.c": "1ae70bd7c57d6aa06025668e4fd67b61dbb19383b81259f152e1b1f041638a8f",
+    "idf/esp32c3-oled-native/main/network_service.h": "ec254ac5fcf0741b0ce1cdb83787a3250082dbf24a194e05156abc06e47de43a",
+    "idf/esp32c3-oled-native/main/runtime_settings.c": "e89f84241e27b573dc37ece7ce64dfd4ab19a54ce1ecf5ef776b7a16a36bb22a",
+    "idf/esp32c3-oled-native/main/runtime_settings.h": "b45fe32e6d4223df7abaeb8f09644f5f15c02f341ead01ebcd4668596cecf146",
+    "idf/esp32c3-oled-native/main/web_ota.c": "67ac4bb57c8cca388d33ce76fe6e3be43e56c3fb04b297f25e35055af5b3736b",
+    "idf/esp32c3-oled-native/main/websocket_service.c": "7b65e3c60a76fd3c9a670a5aff6101813d1ba00f0c454fcd33ec1d2e668cb26a",
+    "idf/esp32c3-oled-native/main/websocket_service.h": "bf4a33c0711d67b25a7d11417068a175f51d6b53d089cb046d5d19e397c4baca",
+    "tests/native/c3_ap_timeout/README.md": "1a43bbfaa82afe59cfa5d958c51e725e5d2a6c1f9215ad6e871e90664caae0bd",
+    "tests/native/c3_ap_timeout/platform.c": "ed0a940594d4f43a082b4a29b49fbe01b01f599fda4fe373f8cb1cbcd98ecf6d",
+    "tests/native/c3_ap_timeout/platform.h": "235d36483e2708b6a72deb11a8b58c8bf0b00000bf319e41ff405b89c12077e3",
+    "tests/native/c3_ap_timeout/test.c": "2cee887e0b2ca449c957f356361f042e266d3c4302470e9ea5e86051b995965f",
+    "tests/run-c3-ap-timeout.py": "c1dc244d9d5f69584ffd303f7b13c66a182bdfc4c03b919ab37b1c16f72ee807",
+    "tests/run-network-runtime-baseline.py": "e1b55619d06310cf3756d3353e33814376c22d08e080cb856586fadbbf8ee775"
+  },
+  "inputs_changed_after_initial_snapshot": [
+    "tests/native/c3_ap_timeout/README.md",
+    "tests/native/c3_ap_timeout/platform.c",
+    "tests/native/c3_ap_timeout/platform.h",
+    "tests/native/c3_ap_timeout/test.c",
+    "tests/run-c3-ap-timeout.py"
+  ],
+  "final_evidence_binding": {
+    "report": ".build/c3-ap-timeout-final-02/report.json",
+    "report_sha256": "47af5a6386c2d6db1062f13b81528c959559e3677096e3403389ce320b7018c6",
+    "positive_cases": 42,
+    "exact_semantic_controls": 8,
+    "historical_actual_callback_failures": 3,
+    "all_test_report_sources_match_current": true,
+    "normal_complete_settings_tu_bytes_match_production": true,
+    "boundary_variant_changes_only_static_revision_seed": true,
+    "cases_independently_read": [
+      "restore",
+      "restore-invalid",
+      "concurrent-settings",
+      "pending-late-association",
+      "revision-exhaustion"
+    ],
+    "reviewer_reran_test_suite": false
+  },
+  "open_findings": []
+}

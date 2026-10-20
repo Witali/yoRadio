@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "scope": "Qualify actual donor runtime time snapshots and NVS publication ordering.",
+  "physical_flash": false,
+  "positive": "PASS C3 time settings all checks=66; actual runtime unit, NVS/RTOS seams; no target flash claim\nPASS C3 time settings invalid_load checks=3; actual runtime unit, NVS/RTOS seams; no target flash claim",
+  "negative_controls": {
+    "unlocked_snapshot": {
+      "case": "snapshot_timeout",
+      "expected_assertion": "runtime_settings_get_time_snapshot(&out,5)==ESP_ERR_TIMEOUT",
+      "rejected": true
+    },
+    "persist_without_lock": {
+      "case": "setter_timeout",
+      "expected_assertion": "nvs_opens==before",
+      "rejected": true
+    },
+    "publish_failed_commit": {
+      "case": "failures",
+      "expected_assertion": "equal(old,&now)",
+      "rejected": true
+    }
+  },
+  "source_sha256": {
+    "tests/run-c3-time-settings.py": "8e689b588a8558a5ea10ea33776da7795b39d247e80408769ac7af6526b80528",
+    "idf/esp32c3-oled-native/main/runtime_settings.c": "e89f84241e27b573dc37ece7ce64dfd4ab19a54ce1ecf5ef776b7a16a36bb22a",
+    "idf/esp32c3-oled-native/main/runtime_settings.h": "b45fe32e6d4223df7abaeb8f09644f5f15c02f341ead01ebcd4668596cecf146",
+    "tests/native/c3_time_settings_platform.h": "13fe9d0f57c7402ff59c2dfdf5b6060d792e745d87d0e20c349e42a5ec46e964",
+    "tests/native/c3_time_settings_test.c": "897f610fc0dc4d220358ca108824deb4848b6c025b6c17f9cff9259b508c967d",
+    "tools/codec_benchmark/run_output_dma_host.py": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145"
+  },
+  "source_files_still_match_snapshot": true
+}

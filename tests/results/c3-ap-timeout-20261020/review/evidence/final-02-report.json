@@ -1,0 +1,505 @@
+{
+  "passed": true,
+  "scope": "Execute historical C3 timer defects and actual repaired RSSI/AP owner paths.\n\nComplete runtime_settings.c executes; selected network functions/helpers are\nexact frozen spans. SDK/netif, RTOS, loader, activity and lease internals are\nexplicit seams, not target ABI/RF or a full application reconstruction.\n",
+  "baseline_revision": "1256de5952d82486a73d21fb56d27d41e12185eb",
+  "source_sha256": {
+    "tests/run-c3-ap-timeout.py": "c1dc244d9d5f69584ffd303f7b13c66a182bdfc4c03b919ab37b1c16f72ee807",
+    "tests/native/c3_ap_timeout/platform.h": "235d36483e2708b6a72deb11a8b58c8bf0b00000bf319e41ff405b89c12077e3",
+    "tests/native/c3_ap_timeout/platform.c": "ed0a940594d4f43a082b4a29b49fbe01b01f599fda4fe373f8cb1cbcd98ecf6d",
+    "tests/native/c3_ap_timeout/test.c": "2cee887e0b2ca449c957f356361f042e266d3c4302470e9ea5e86051b995965f",
+    "tests/native/c3_ap_timeout/README.md": "1a43bbfaa82afe59cfa5d958c51e725e5d2a6c1f9215ad6e871e90664caae0bd",
+    "idf/esp32c3-oled-native/main/network_service.c": "1ae70bd7c57d6aa06025668e4fd67b61dbb19383b81259f152e1b1f041638a8f",
+    "idf/esp32c3-oled-native/main/network_service.h": "ec254ac5fcf0741b0ce1cdb83787a3250082dbf24a194e05156abc06e47de43a",
+    "idf/esp32c3-oled-native/main/runtime_settings.c": "e89f84241e27b573dc37ece7ce64dfd4ab19a54ce1ecf5ef776b7a16a36bb22a",
+    "idf/esp32c3-oled-native/main/runtime_settings.h": "b45fe32e6d4223df7abaeb8f09644f5f15c02f341ead01ebcd4668596cecf146",
+    "idf/esp32c3-oled-native/main/board_config.h": "27fa0686184d41aaeee74cc9d913cb2766754d569d2cf3fdac735bd44728e03f",
+    "idf/esp32c3-oled-native/main/websocket_service.h": "bf4a33c0711d67b25a7d11417068a175f51d6b53d089cb046d5d19e397c4baca",
+    "idf/esp32c3-oled-native/main/deep_sleep_clock.h": "d03e1a5b42d40a4b109dec3915c7b0098c332303e2998f52f3978df500a22b0c",
+    "tests/run-network-runtime-baseline.py": "e1b55619d06310cf3756d3353e33814376c22d08e080cb856586fadbbf8ee775"
+  },
+  "historical": {
+    "ota": {
+      "detected": true,
+      "status": 42,
+      "marker": "SAFETY_FAILURE:ap_timeout_respects_ota"
+    },
+    "online": {
+      "detected": true,
+      "status": 42,
+      "marker": "SAFETY_FAILURE:ap_timeout_respects_online"
+    },
+    "disable": {
+      "detected": true,
+      "status": 42,
+      "marker": "SAFETY_FAILURE:ap_timeout_respects_disable"
+    }
+  },
+  "cases": {
+    "restore": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:restore\n"
+    },
+    "restore-invalid": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:restore-invalid\n"
+    },
+    "default": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:default\n"
+    },
+    "deadline": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:deadline\n"
+    },
+    "thirty": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:thirty\n"
+    },
+    "online": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:online\n"
+    },
+    "disable": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:disable\n"
+    },
+    "roundtrip": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:roundtrip\n"
+    },
+    "same-value": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:same-value\n"
+    },
+    "edit": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:edit\n"
+    },
+    "concurrent-settings": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:concurrent-settings\n"
+    },
+    "nvs-errors": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:nvs-errors\n"
+    },
+    "writer-timeout": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:writer-timeout\n"
+    },
+    "invalid-setting": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:invalid-setting\n"
+    },
+    "ota": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:ota\n"
+    },
+    "lease-error": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:lease-error\n"
+    },
+    "sleep": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:sleep\n"
+    },
+    "associated": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:associated\n"
+    },
+    "netif-up": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:netif-up\n"
+    },
+    "stale-ip": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:stale-ip\n"
+    },
+    "query-error": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:query-error\n"
+    },
+    "ip-error": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:ip-error\n"
+    },
+    "mode-error": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:mode-error\n"
+    },
+    "late-online": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:late-online\n"
+    },
+    "late-disable": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:late-disable\n"
+    },
+    "late-roundtrip": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:late-roundtrip\n"
+    },
+    "late-association": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:late-association\n"
+    },
+    "late-manual": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:late-manual\n"
+    },
+    "activity-race": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:activity-race\n"
+    },
+    "query-race": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:query-race\n"
+    },
+    "slow-lease": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:slow-lease\n"
+    },
+    "prepare-sleep": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:prepare-sleep\n"
+    },
+    "sleep-error": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:sleep-error\n"
+    },
+    "failed-enable": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:failed-enable\n"
+    },
+    "pending-cancel": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:pending-cancel\n"
+    },
+    "pending-cancel-error": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:pending-cancel-error\n"
+    },
+    "pending-late-online": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:pending-late-online\n"
+    },
+    "pending-late-association": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:pending-late-association\n"
+    },
+    "pending-new-attempt": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:pending-new-attempt\n"
+    },
+    "clock-limit": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:clock-limit\n"
+    },
+    "clock-negative": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:clock-negative\n"
+    },
+    "revision-exhaustion": {
+      "passed": true,
+      "status": 0,
+      "output": "PASS:revision-exhaustion\n",
+      "settings_initialization_seam": true
+    }
+  },
+  "negative_controls": {
+    "skip-final-check": {
+      "detected": true,
+      "status": 80,
+      "case": "late-online",
+      "marker": "final_change_cancels_only_own_ap_lease",
+      "generated_sha256": "a3b3e6a03915c36bb7371ba8a6de92dc7d28f5f49afff4d1d5557be4d4edcf06"
+    },
+    "ignore-armed-revision": {
+      "detected": true,
+      "status": 80,
+      "case": "roundtrip",
+      "marker": "new_revision_invalidates_old_deadline_even_same_final_value",
+      "generated_sha256": "765af71601405124bbab0ff658e14e57c78d146610b794e582ab86ed2e4ab391"
+    },
+    "ignore-final-revision": {
+      "detected": true,
+      "status": 80,
+      "case": "late-roundtrip",
+      "marker": "final_change_cancels_only_own_ap_lease",
+      "generated_sha256": "2259fe02c3d6b32c73f64d596f62fbaa0e73321444bc802f6de873105c953578"
+    },
+    "bypass-reservation": {
+      "detected": true,
+      "status": 80,
+      "case": "ota",
+      "marker": "blocked_admission_never_queues_ap_restart",
+      "generated_sha256": "1689f0440ef2e664d841e1b1824c5f1abda402e9385524d20f69875dda019de5"
+    },
+    "pending-restarts-without-cancel": {
+      "detected": true,
+      "status": 80,
+      "case": "pending-cancel",
+      "marker": "expired_connect_intent_cancelled_before_any_restart_admission",
+      "generated_sha256": "77c58f3603266b97c392b412de425106ef0c0a4ccd2366cad90241f258d0beb9"
+    },
+    "old-cancel-clears-new-intent": {
+      "detected": true,
+      "status": 80,
+      "case": "pending-new-attempt",
+      "marker": "older_cancel_does_not_clear_newer_connect_intent",
+      "generated_sha256": "2721d6dd89a37c685449cc83d870d7b1b7839671af46d1e63fe6f536b600ea33"
+    },
+    "rearm-from-stale-time": {
+      "detected": true,
+      "status": 80,
+      "case": "slow-lease",
+      "marker": "slow_failed_admission_rearms_from_return_time",
+      "generated_sha256": "a2b217730ac751e73d866365bc6dd6e9549efb5686c9e19a566260cf46d0db0d"
+    },
+    "ignore-exhaustion": {
+      "detected": true,
+      "status": 80,
+      "case": "revision-exhaustion",
+      "marker": "exhausted_admission_rejects_before_nvs"
+    }
+  },
+  "physical_hardware": false,
+  "historical_source_sha256": {
+    "idf/esp32c3-oled-native/main/network_service.c": "a866e0f345bb1af865ba2b4b1365dbfb9fa3c9e0ebafcc13bf833d7f9c1737ba",
+    "idf/esp32c3-oled-native/main/runtime_settings.c": "75d128bd16302d66bf3d8a2aaa240bcced4222ebf1bafdefb30984af072731c5",
+    "idf/esp32c3-oled-native/main/runtime_settings.h": "cc7e1c9193b2a994d00abd82acf38ba62af62b3b225133f18aec6da3855122d0"
+  },
+  "network_spans": {
+    "historical": {
+      "prefix_sha256": "35cbb67f74e361a2f968cf7f11406a58a0c482c4b3416981eead79e244cde90d",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "e69fe9cc7d4bdd07228ffe677fa439acd6dc2f032b0fda1ff665c49f066c25cd",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "a3cfd1f979049e32645d07ddc73454b2493aa16ade3e5465e73cb05315b75567",
+        "softap_reboot_callback": "002d9a64fe7b238b8903bb791f93cca22948e8a3f957f1a70f144d0303874d0b",
+        "start_access_point": "938e66467272f6abd991e0ebeb418b67722844e0d065578e91895d9c24d9f372",
+        "network_service_prepare_sleep": "5883a51f350b4cc96127387b639f311fa140ec58fb507aa7fe35b3bb62db6d60",
+        "network_service_start": "c4e9eaf4646a430c15506fdd51d70c54d3d5d5c3a66a1bcae9479f256cb15cd3",
+        "network_service_retry_client": "5c54fbc2eeabbaf46c71caea9df80afee0c97ace804d60301aa5ad6d1ee40f17"
+      },
+      "generated_sha256": "dde3f719cd88e01da2208e1328b03dffa1932f36236462b5e6d4a47e7a558d19"
+    },
+    "current": {
+      "prefix_sha256": "6db80357038653babf70289337cf77d8a00461018a326116a10a1c6e5d134179",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "ef3ba96da9e0e95b245c3e017fd278780016857656a2bf84e31168324f584a51",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "68d726599fb812698e5949cf1d929e865d84398a85f4aac188d48dd2817f4e06",
+        "start_access_point": "4d73c908b7264d7d8648f9d9f990ede47f74599e619240801be2461f8423594f",
+        "network_service_prepare_sleep": "abc4a854ff13bcaf566e6cd90a3576beaee458405e2714cd3a200ef2e0661e3d",
+        "network_service_start": "268993fb0f47c98069e52030a8bf9259c5c46d568f06de5db16f74df93754857",
+        "network_service_retry_client": "68e4f268f84774a0ff48795d6c112e3c27c47bac7b4b697e24b5df8f01b745f4"
+      },
+      "generated_sha256": "0f1908fcfed18fbc85544fe9a54997964e66df426214ade01104c3c897d44a13"
+    },
+    "settings-boundary": {
+      "prefix_sha256": "6db80357038653babf70289337cf77d8a00461018a326116a10a1c6e5d134179",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "ef3ba96da9e0e95b245c3e017fd278780016857656a2bf84e31168324f584a51",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "68d726599fb812698e5949cf1d929e865d84398a85f4aac188d48dd2817f4e06",
+        "start_access_point": "4d73c908b7264d7d8648f9d9f990ede47f74599e619240801be2461f8423594f",
+        "network_service_prepare_sleep": "abc4a854ff13bcaf566e6cd90a3576beaee458405e2714cd3a200ef2e0661e3d",
+        "network_service_start": "268993fb0f47c98069e52030a8bf9259c5c46d568f06de5db16f74df93754857",
+        "network_service_retry_client": "68e4f268f84774a0ff48795d6c112e3c27c47bac7b4b697e24b5df8f01b745f4"
+      },
+      "generated_sha256": "0f1908fcfed18fbc85544fe9a54997964e66df426214ade01104c3c897d44a13"
+    },
+    "skip-final-check": {
+      "prefix_sha256": "6db80357038653babf70289337cf77d8a00461018a326116a10a1c6e5d134179",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "ef3ba96da9e0e95b245c3e017fd278780016857656a2bf84e31168324f584a51",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "68d726599fb812698e5949cf1d929e865d84398a85f4aac188d48dd2817f4e06",
+        "start_access_point": "4d73c908b7264d7d8648f9d9f990ede47f74599e619240801be2461f8423594f",
+        "network_service_prepare_sleep": "abc4a854ff13bcaf566e6cd90a3576beaee458405e2714cd3a200ef2e0661e3d",
+        "network_service_start": "268993fb0f47c98069e52030a8bf9259c5c46d568f06de5db16f74df93754857",
+        "network_service_retry_client": "68e4f268f84774a0ff48795d6c112e3c27c47bac7b4b697e24b5df8f01b745f4"
+      },
+      "generated_sha256": "5fecba25b9c986ebae62e3fce0065f39cabd3fd79b1a052616dc8fc05148de7e"
+    },
+    "ignore-armed-revision": {
+      "prefix_sha256": "6db80357038653babf70289337cf77d8a00461018a326116a10a1c6e5d134179",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "ef3ba96da9e0e95b245c3e017fd278780016857656a2bf84e31168324f584a51",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "68d726599fb812698e5949cf1d929e865d84398a85f4aac188d48dd2817f4e06",
+        "start_access_point": "4d73c908b7264d7d8648f9d9f990ede47f74599e619240801be2461f8423594f",
+        "network_service_prepare_sleep": "abc4a854ff13bcaf566e6cd90a3576beaee458405e2714cd3a200ef2e0661e3d",
+        "network_service_start": "268993fb0f47c98069e52030a8bf9259c5c46d568f06de5db16f74df93754857",
+        "network_service_retry_client": "68e4f268f84774a0ff48795d6c112e3c27c47bac7b4b697e24b5df8f01b745f4"
+      },
+      "generated_sha256": "2e0b1227e4896df821d171a42aa6beabc2513de9594691eba8aa5f994162bc07"
+    },
+    "ignore-final-revision": {
+      "prefix_sha256": "6db80357038653babf70289337cf77d8a00461018a326116a10a1c6e5d134179",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "ef3ba96da9e0e95b245c3e017fd278780016857656a2bf84e31168324f584a51",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "68d726599fb812698e5949cf1d929e865d84398a85f4aac188d48dd2817f4e06",
+        "start_access_point": "4d73c908b7264d7d8648f9d9f990ede47f74599e619240801be2461f8423594f",
+        "network_service_prepare_sleep": "abc4a854ff13bcaf566e6cd90a3576beaee458405e2714cd3a200ef2e0661e3d",
+        "network_service_start": "268993fb0f47c98069e52030a8bf9259c5c46d568f06de5db16f74df93754857",
+        "network_service_retry_client": "68e4f268f84774a0ff48795d6c112e3c27c47bac7b4b697e24b5df8f01b745f4"
+      },
+      "generated_sha256": "0ac10b91d28d15c7dc7567eeb12faf87a63175eac893a29aca4a3ec19e57198a"
+    },
+    "bypass-reservation": {
+      "prefix_sha256": "6db80357038653babf70289337cf77d8a00461018a326116a10a1c6e5d134179",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "ef3ba96da9e0e95b245c3e017fd278780016857656a2bf84e31168324f584a51",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "68d726599fb812698e5949cf1d929e865d84398a85f4aac188d48dd2817f4e06",
+        "start_access_point": "4d73c908b7264d7d8648f9d9f990ede47f74599e619240801be2461f8423594f",
+        "network_service_prepare_sleep": "abc4a854ff13bcaf566e6cd90a3576beaee458405e2714cd3a200ef2e0661e3d",
+        "network_service_start": "268993fb0f47c98069e52030a8bf9259c5c46d568f06de5db16f74df93754857",
+        "network_service_retry_client": "68e4f268f84774a0ff48795d6c112e3c27c47bac7b4b697e24b5df8f01b745f4"
+      },
+      "generated_sha256": "04bda2fff3baf9d009af85dd93526d24c9677fd50c1c5d3ee48fc979ad9bad8f"
+    },
+    "pending-restarts-without-cancel": {
+      "prefix_sha256": "6db80357038653babf70289337cf77d8a00461018a326116a10a1c6e5d134179",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "ef3ba96da9e0e95b245c3e017fd278780016857656a2bf84e31168324f584a51",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "68d726599fb812698e5949cf1d929e865d84398a85f4aac188d48dd2817f4e06",
+        "start_access_point": "4d73c908b7264d7d8648f9d9f990ede47f74599e619240801be2461f8423594f",
+        "network_service_prepare_sleep": "abc4a854ff13bcaf566e6cd90a3576beaee458405e2714cd3a200ef2e0661e3d",
+        "network_service_start": "268993fb0f47c98069e52030a8bf9259c5c46d568f06de5db16f74df93754857",
+        "network_service_retry_client": "68e4f268f84774a0ff48795d6c112e3c27c47bac7b4b697e24b5df8f01b745f4"
+      },
+      "generated_sha256": "8e28b794769ceb2abbf2ed69d447623cbf7fdb89a903ee08e4418f71bcda2d2f"
+    },
+    "old-cancel-clears-new-intent": {
+      "prefix_sha256": "6db80357038653babf70289337cf77d8a00461018a326116a10a1c6e5d134179",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "ef3ba96da9e0e95b245c3e017fd278780016857656a2bf84e31168324f584a51",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "68d726599fb812698e5949cf1d929e865d84398a85f4aac188d48dd2817f4e06",
+        "start_access_point": "4d73c908b7264d7d8648f9d9f990ede47f74599e619240801be2461f8423594f",
+        "network_service_prepare_sleep": "abc4a854ff13bcaf566e6cd90a3576beaee458405e2714cd3a200ef2e0661e3d",
+        "network_service_start": "268993fb0f47c98069e52030a8bf9259c5c46d568f06de5db16f74df93754857",
+        "network_service_retry_client": "68e4f268f84774a0ff48795d6c112e3c27c47bac7b4b697e24b5df8f01b745f4"
+      },
+      "generated_sha256": "67910bbd27e168c253b8a4bf53a4da1ae9a97f084d093fcb483d36c2816a446b"
+    },
+    "rearm-from-stale-time": {
+      "prefix_sha256": "6db80357038653babf70289337cf77d8a00461018a326116a10a1c6e5d134179",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "ef3ba96da9e0e95b245c3e017fd278780016857656a2bf84e31168324f584a51",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "68d726599fb812698e5949cf1d929e865d84398a85f4aac188d48dd2817f4e06",
+        "start_access_point": "4d73c908b7264d7d8648f9d9f990ede47f74599e619240801be2461f8423594f",
+        "network_service_prepare_sleep": "abc4a854ff13bcaf566e6cd90a3576beaee458405e2714cd3a200ef2e0661e3d",
+        "network_service_start": "268993fb0f47c98069e52030a8bf9259c5c46d568f06de5db16f74df93754857",
+        "network_service_retry_client": "68e4f268f84774a0ff48795d6c112e3c27c47bac7b4b697e24b5df8f01b745f4"
+      },
+      "generated_sha256": "1ce6e6e1f6a785c7beef0e3611923f539630a5e41d73a8dbb42d92f6c6fa0336"
+    },
+    "ignore-exhaustion": {
+      "prefix_sha256": "6db80357038653babf70289337cf77d8a00461018a326116a10a1c6e5d134179",
+      "function_sha256": {
+        "apply_power": "02b949f370ca43cd0372808f3b53b562a374ca11d33a304675ba0da11e19a748",
+        "rssi_task": "ef3ba96da9e0e95b245c3e017fd278780016857656a2bf84e31168324f584a51",
+        "select_credential": "5942f74de19e78b89d298a8e9f9a63f62b07fdab6d3e720975d837ed0211f605",
+        "event_handler": "68d726599fb812698e5949cf1d929e865d84398a85f4aac188d48dd2817f4e06",
+        "start_access_point": "4d73c908b7264d7d8648f9d9f990ede47f74599e619240801be2461f8423594f",
+        "network_service_prepare_sleep": "abc4a854ff13bcaf566e6cd90a3576beaee458405e2714cd3a200ef2e0661e3d",
+        "network_service_start": "268993fb0f47c98069e52030a8bf9259c5c46d568f06de5db16f74df93754857",
+        "network_service_retry_client": "68e4f268f84774a0ff48795d6c112e3c27c47bac7b4b697e24b5df8f01b745f4"
+      },
+      "generated_sha256": "0f1908fcfed18fbc85544fe9a54997964e66df426214ade01104c3c897d44a13"
+    }
+  },
+  "settings_initialization_seams": {
+    "settings-boundary": {
+      "scope": "Test-only boot-local packed revision exhaustion seed; exact actual settings functions, no private owner phase/ACK writes. Not a normal NVS restoration state.",
+      "ignore_exhaustion_mutation": false,
+      "generated_settings_sha256": "4960f9a9991829ad43b88d038a849482afd1d7e130ce6794f9ff7ab1cc361c17"
+    },
+    "ignore-exhaustion": {
+      "scope": "Test-only boot-local packed revision exhaustion seed; exact actual settings functions, no private owner phase/ACK writes. Not a normal NVS restoration state.",
+      "ignore_exhaustion_mutation": true,
+      "generated_settings_sha256": "817eee744850c5a823ba931553665d324f2a3d2a621fb759fb6e99549d8a1566"
+    }
+  },
+  "source_unchanged_after": {
+    "tests/run-c3-ap-timeout.py": true,
+    "tests/native/c3_ap_timeout/platform.h": true,
+    "tests/native/c3_ap_timeout/platform.c": true,
+    "tests/native/c3_ap_timeout/test.c": true,
+    "tests/native/c3_ap_timeout/README.md": true,
+    "idf/esp32c3-oled-native/main/network_service.c": true,
+    "idf/esp32c3-oled-native/main/network_service.h": true,
+    "idf/esp32c3-oled-native/main/runtime_settings.c": true,
+    "idf/esp32c3-oled-native/main/runtime_settings.h": true,
+    "idf/esp32c3-oled-native/main/board_config.h": true,
+    "idf/esp32c3-oled-native/main/websocket_service.h": true,
+    "idf/esp32c3-oled-native/main/deep_sleep_clock.h": true,
+    "tests/run-network-runtime-baseline.py": true
+  },
+  "stub_sha256": {
+    "esp_check.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "esp_err.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "esp_log.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "nvs.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "freertos/FreeRTOS.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "freertos/semphr.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083"
+  }
+}

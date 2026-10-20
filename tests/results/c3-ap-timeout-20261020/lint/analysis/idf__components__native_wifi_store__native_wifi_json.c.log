@@ -1,0 +1,298 @@
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:61:5: warning: Out of bound access to memory after the end of 'action' [clang-analyzer-security.ArrayBound]
+   61 |     out[*used] = '\0';
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:182:9: note: Assuming 'out' is non-null
+  182 |     if (!out) return NATIVE_WIFI_INVALID;
+      |         ^~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:182:5: note: Taking false branch
+  182 |     if (!out) return NATIVE_WIFI_INVALID;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:184:9: note: Assuming 'body' is non-null
+  184 |     if (!body || !size || size > NATIVE_WIFI_BODY_BYTES) return NATIVE_WIFI_INVALID;
+      |         ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:184:9: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:184:18: note: Assuming 'size' is not equal to 0
+  184 |     if (!body || !size || size > NATIVE_WIFI_BODY_BYTES) return NATIVE_WIFI_INVALID;
+      |                  ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:184:9: note: Left side of '||' is false
+  184 |     if (!body || !size || size > NATIVE_WIFI_BODY_BYTES) return NATIVE_WIFI_INVALID;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:184:27: note: Assuming 'size' is <= NATIVE_WIFI_BODY_BYTES
+  184 |     if (!body || !size || size > NATIVE_WIFI_BODY_BYTES) return NATIVE_WIFI_INVALID;
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:184:5: note: Taking false branch
+  184 |     if (!body || !size || size > NATIVE_WIFI_BODY_BYTES) return NATIVE_WIFI_INVALID;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:187:5: note: Taking false branch
+  187 |     if (!consume(&in, '{')) goto invalid;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:188:5: note: Loop condition is true.  Entering loop body
+  188 |     for (;;) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:190:13: note: Left side of '||' is false
+  190 |         if (!string(&in, key, sizeof(key)) || !consume(&in, ':')) goto invalid;
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:190:9: note: Taking false branch
+  190 |         if (!string(&in, key, sizeof(key)) || !consume(&in, ':')) goto invalid;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:192:13: note: Assuming the condition is false
+  192 |         if (!strcmp(key, "revision")) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:192:9: note: Taking false branch
+  192 |         if (!strcmp(key, "revision")) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:195:20: note: Assuming the condition is true
+  195 |         } else if (!strcmp(key, "profiles")) {
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:195:16: note: Taking true branch
+  195 |         } else if (!strcmp(key, "profiles")) {
+      |                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:197:17: note: Left side of '||' is false
+  197 |             if ((fields & bit) || !profiles(&in, out)) goto invalid;
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:197:36: note: Calling 'profiles'
+  197 |             if ((fields & bit) || !profiles(&in, out)) goto invalid;
+      |                                    ^~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:161:5: note: Taking false branch
+  161 |     if (!consume(in, '[')) return false;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:162:5: note: Taking false branch
+  162 |     if (consume(in, ']')) return true;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:163:5: note: Loop condition is true.  Entering loop body
+  163 |     for (;;) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:164:13: note: Assuming field 'count' is not equal to NATIVE_WIFI_PROFILES
+  164 |         if (out->count == NATIVE_WIFI_PROFILES || !profile(in, &out->profiles[out->count])) return false;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:164:13: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:164:52: note: Calling 'profile'
+  164 |         if (out->count == NATIVE_WIFI_PROFILES || !profile(in, &out->profiles[out->count])) return false;
+      |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:127:5: note: Taking false branch
+  127 |     if (!consume(in, '{')) return false;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:129:5: note: Loop condition is true.  Entering loop body
+  129 |     for (;;) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:131:13: note: Left side of '||' is false
+  131 |         if (!string(in, key, sizeof(key)) || !consume(in, ':')) return false;
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:131:9: note: Taking false branch
+  131 |         if (!string(in, key, sizeof(key)) || !consume(in, ':')) return false;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:133:13: note: Assuming the condition is false
+  133 |         if (!strcmp(key, "id")) {
+      |             ^~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:133:9: note: Taking false branch
+  133 |         if (!strcmp(key, "id")) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:137:20: note: Assuming the condition is false
+  137 |         } else if (!strcmp(key, "ssid")) {
+      |                    ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:137:16: note: Taking false branch
+  137 |         } else if (!strcmp(key, "ssid")) {
+      |                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:140:20: note: Assuming the condition is false
+  140 |         } else if (!strcmp(key, "password_action")) {
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:140:16: note: Taking false branch
+  140 |         } else if (!strcmp(key, "password_action")) {
+      |                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:146:20: note: Assuming the condition is true
+  146 |         } else if (!strcmp(key, "password")) {
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:146:16: note: Taking true branch
+  146 |         } else if (!strcmp(key, "password")) {
+      |                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:148:17: note: Left side of '||' is false
+  148 |             if (fields & bit || !string(in, row->password, sizeof(row->password))) return false;
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:148:13: note: Taking false branch
+  148 |             if (fields & bit || !string(in, row->password, sizeof(row->password))) return false;
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:152:9: note: Taking false branch
+  152 |         if (consume(in, '}')) break;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:153:9: note: Taking false branch
+  153 |         if (!consume(in, ',')) return false;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:129:5: note: Loop condition is true.  Entering loop body
+  129 |     for (;;) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:131:13: note: Left side of '||' is false
+  131 |         if (!string(in, key, sizeof(key)) || !consume(in, ':')) return false;
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:131:9: note: Taking false branch
+  131 |         if (!string(in, key, sizeof(key)) || !consume(in, ':')) return false;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:133:13: note: Assuming the condition is false
+  133 |         if (!strcmp(key, "id")) {
+      |             ^~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:133:9: note: Taking false branch
+  133 |         if (!strcmp(key, "id")) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:137:20: note: Assuming the condition is false
+  137 |         } else if (!strcmp(key, "ssid")) {
+      |                    ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:137:16: note: Taking false branch
+  137 |         } else if (!strcmp(key, "ssid")) {
+      |                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:140:20: note: Assuming the condition is true
+  140 |         } else if (!strcmp(key, "password_action")) {
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:140:16: note: Taking true branch
+  140 |         } else if (!strcmp(key, "password_action")) {
+      |                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:142:17: note: Left side of '||' is false
+  142 |             if (fields & bit || !string(in, action, sizeof(action))) return false;
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:142:34: note: Calling 'string'
+  142 |             if (fields & bit || !string(in, action, sizeof(action))) return false;
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:66:9: note: Left side of '||' is false
+   66 |     if (!consume(in, '"') || !capacity) return false;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:66:31: note: 'capacity' is 5
+   66 |     if (!consume(in, '"') || !capacity) return false;
+      |                               ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:66:5: note: Taking false branch
+   66 |     if (!consume(in, '"') || !capacity) return false;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:69:5: note: Loop condition is true.  Entering loop body
+   69 |     while (in->at < in->end) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:71:13: note: Assuming the condition is false
+   71 |         if (c == '"') return true;
+      |             ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:71:9: note: Taking false branch
+   71 |         if (c == '"') return true;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:72:13: note: Assuming 'c' is >= 32
+   72 |         if (c < 0x20) return false;
+      |             ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:72:9: note: Taking false branch
+   72 |         if (c < 0x20) return false;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:73:13: note: Assuming the condition is false
+   73 |         if (c == '\\') {
+      |             ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:73:9: note: Taking false branch
+   73 |         if (c == '\\') {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:114:20: note: Assuming 'c' is >= 128
+  114 |         } else if (c >= 0x80) {
+      |                    ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:114:16: note: Taking true branch
+  114 |         } else if (c >= 0x80) {
+      |                ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:117:17: note: Assuming 'count' is not equal to 0
+  117 |             if (!count || !append(out, capacity, &used, in->at, count)) return false;
+      |                 ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:117:17: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:117:13: note: Taking false branch
+  117 |             if (!count || !append(out, capacity, &used, in->at, count)) return false;
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:119:13: note:  Execution continues on line 69
+  119 |             continue;
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:69:5: note: Loop condition is true.  Entering loop body
+   69 |     while (in->at < in->end) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:70:21: note: Assuming byte offset is less than the extent of the region
+   70 |         uint8_t c = *in->at++;
+      |                     ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:71:13: note: Assuming the condition is false
+   71 |         if (c == '"') return true;
+      |             ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:71:9: note: Taking false branch
+   71 |         if (c == '"') return true;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:72:13: note: Assuming 'c' is >= 32
+   72 |         if (c < 0x20) return false;
+      |             ^~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:72:9: note: Taking false branch
+   72 |         if (c < 0x20) return false;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:73:13: note: Assuming the condition is true
+   73 |         if (c == '\\') {
+      |             ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:73:9: note: Taking true branch
+   73 |         if (c == '\\') {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:74:17: note: Assuming field 'at' is not equal to field 'end'
+   74 |             if (in->at == in->end) return false;
+      |                 ^~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:74:13: note: Taking false branch
+   74 |             if (in->at == in->end) return false;
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:75:17: note: Assuming byte offset is less than the extent of the region
+   75 |             c = *in->at++;
+      |                 ^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:76:13: note: Control jumps to 'case 117:'  at line 83
+   76 |             switch (c) {
+      |             ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:85:21: note: Assuming the condition is false
+   85 |                 if (!hex4(in, &point) || !point) return false;
+      |                     ^~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:85:21: note: Left side of '||' is false
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:85:42: note: Assuming 'point' is not equal to 0
+   85 |                 if (!hex4(in, &point) || !point) return false;
+      |                                          ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:85:17: note: Taking false branch
+   85 |                 if (!hex4(in, &point) || !point) return false;
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:86:21: note: Assuming 'point' is >= 55296
+   86 |                 if (point >= 0xd800 && point <= 0xdbff) {
+      |                     ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:86:21: note: Left side of '&&' is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:86:40: note: Assuming 'point' is > 56319
+   86 |                 if (point >= 0xd800 && point <= 0xdbff) {
+      |                                        ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:86:17: note: Taking false branch
+   86 |                 if (point >= 0xd800 && point <= 0xdbff) {
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:92:28: note: 'point' is >= 56320
+   92 |                 } else if (point >= 0xdc00 && point <= 0xdfff) return false;
+      |                            ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:92:28: note: Left side of '&&' is true
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:92:47: note: Assuming 'point' is > 57343
+   92 |                 } else if (point >= 0xdc00 && point <= 0xdfff) return false;
+      |                                               ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:92:24: note: Taking false branch
+   92 |                 } else if (point >= 0xdc00 && point <= 0xdfff) return false;
+      |                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:95:21: note: 'point' is >= 128
+   95 |                 if (point < 0x80) { count = 1; bytes[0] = (uint8_t)point; }
+      |                     ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:95:17: note: Taking false branch
+   95 |                 if (point < 0x80) { count = 1; bytes[0] = (uint8_t)point; }
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:96:26: note: 'point' is >= 2048
+   96 |                 else if (point < 0x800) {
+      |                          ^~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:96:22: note: Taking false branch
+   96 |                 else if (point < 0x800) {
+      |                      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:99:28: note: Assuming 'point' is >= 65536
+   99 |                 } else if (point < 0x10000) {
+      |                            ^~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:99:24: note: Taking false branch
+   99 |                 } else if (point < 0x10000) {
+      |                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:109:22: note: Calling 'append'
+  109 |                 if (!append(out, capacity, &used, bytes, count)) return false;
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:58:9: note: Left side of '||' is false
+   58 |     if (*used >= capacity || size >= capacity - *used) return false;
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:58:30: note: Assuming the condition is false
+   58 |     if (*used >= capacity || size >= capacity - *used) return false;
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:58:5: note: Taking false branch
+   58 |     if (*used >= capacity || size >= capacity - *used) return false;
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_json.c:61:5: note: Access of 'action' at an overflowing index, while it holds only 5 'char' elements
+   61 |     out[*used] = '\0';
+      |     ^~~~~~~~~~
+1 warning generated.

@@ -1,0 +1,102 @@
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:163:13: warning: Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result' [clang-analyzer-deadcode.DeadStores]
+  163 |     while ((result = native_httpd_next_header(&headers, &item)) == 1) {
+      |             ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:163:13: note: Although the value stored to 'result' is used in the enclosing expression, the value is never actually read from 'result'
+  163 |     while ((result = native_httpd_next_header(&headers, &item)) == 1) {
+      |             ^        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:219:56: warning: incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++'s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings [bugprone-inc-dec-in-conditions]
+  219 |                         if (!any || p == item.end || *p++ != '"') return false;
+      |                                                        ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:219:37: note: variable is referenced here
+  219 |                         if (!any || p == item.end || *p++ != '"') return false;
+      |                                     ^
+C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h:274:9: warning: function 'strcmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+  274 |     if (strcmp(version, "13"))
+      |         ^                    
+      |                               != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:142:35: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  142 |     if ((parser_data->last.length += length) > raux->max_uri_len) {
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:142:35: note: if it should be an assignment, move it out of the 'if' condition
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:142:35: note: if it is meant to be an equality check, change '=' to '=='
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:160:24: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined [bugprone-narrowing-conversions]
+  160 |     ssize_t unparsed = parser_data->raw_datalen - (at - ra->scratch);
+      |                        ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:333:36: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'ssize_t' (aka 'int') is implementation-defined [bugprone-narrowing-conversions]
+  333 |         ssize_t remaining_length = parser_data->raw_datalen - (at - ra->scratch);
+      |                                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:609:20: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  609 |             return nparsed;
+      |                    ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:643:12: warning: narrowing conversion from 'size_t' (aka 'unsigned int') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  643 |     return offset + nparsed;
+      |            ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:684:22: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  684 |         if ((blk_len = read_block(r, &parser, offset, PARSER_BLOCK_SIZE)) < 0) {
+      |              ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:684:22: note: if it should be an assignment, move it out of the 'if' condition
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:684:22: note: if it is meant to be an equality check, change '=' to '=='
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:703:21: warning: an assignment within an 'if' condition is bug-prone [bugprone-assignment-in-if-condition]
+  703 |         if ((offset = parse_block(&parser, offset, blk_len)) < 0) {
+      |              ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:703:21: note: if it should be an assignment, move it out of the 'if' condition
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:703:21: note: if it is meant to be an equality check, change '=' to '=='
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:753:51: warning: Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd') [clang-analyzer-core.NullDereference]
+  753 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |                                                   ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:866:5: note: Loop condition is false. Execution continues on line 890
+  866 |     while (ra->remaining_len) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:890:30: note: Assuming field 'sd' is null
+  890 |     bool native_ws_closing = ra->sd && ra->sd->ws_close;
+      |                              ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:890:37: note: Left side of '&&' is false
+  890 |     bool native_ws_closing = ra->sd && ra->sd->ws_close;
+      |                                     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:894:5: note: Calling 'httpd_req_cleanup'
+  894 |     httpd_req_cleanup(r);
+      |     ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:753:10: note: Assuming the condition is true
+  753 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:753:9: note: Left side of '&&' is true
+  753 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |         ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:753:51: note: Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd')
+  753 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |                                                   ^   ~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:761:17: warning: Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd') [clang-analyzer-core.NullDereference]
+  761 |     ra->sd->ctx = r->sess_ctx;
+      |                 ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:866:5: note: Loop condition is false. Execution continues on line 890
+  866 |     while (ra->remaining_len) {
+      |     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:890:30: note: Assuming field 'sd' is null
+  890 |     bool native_ws_closing = ra->sd && ra->sd->ws_close;
+      |                              ^~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:890:37: note: Left side of '&&' is false
+  890 |     bool native_ws_closing = ra->sd && ra->sd->ws_close;
+      |                                     ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:894:5: note: Calling 'httpd_req_cleanup'
+  894 |     httpd_req_cleanup(r);
+      |     ^~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:753:10: note: Assuming the condition is false
+  753 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:753:47: note: Left side of '&&' is false
+  753 |     if ((r->ignore_sess_ctx_changes == false) && (ra->sd->ctx != r->sess_ctx)) {
+      |                                               ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:761:17: note: Access to field 'ctx' results in a dereference of a null pointer (loaded from field 'sd')
+  761 |     ra->sd->ctx = r->sess_ctx;
+      |         ~~      ^
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:940:14: warning: function 'strncasecmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+  940 |             (strncasecmp(qry_ptr, key, offset))) {
+      |              ^                                
+      |                                                != 0
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32c3-oled-native\build-lint-c3-ap-timeout-01\native-httpd-rfc6455\httpd_parse.c:1111:13: warning: function 'strncasecmp' is called without explicitly comparing result [bugprone-suspicious-string-compare]
+ 1111 |             strncasecmp(hdr_ptr, field, field_len)) {
+      |             ^                                     
+      |                                                    != 0
+37 warnings generated.
+Suppressed 23 warnings (23 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
