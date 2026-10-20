@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\results\cyd-vorbis-block-matrix-20261020\verify.py", line 289, in <module>
+    print(json.dumps(verify(p.parse_args().archive),indent=2))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\results\cyd-vorbis-block-matrix-20261020\verify.py", line 133, in verify
+    path=root('xiph','cases/'+c['id']+'/decode-libvorbis.json'); pin(path,c['receipt_sha256']); r=receipt(path,0); wav(c,r)
+                                                                                                                   ^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\results\cyd-vorbis-block-matrix-20261020\verify.py", line 68, in wav
+    path=command['argv'][-1]; row=rows[ref(path)]
+                                       ^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\results\cyd-vorbis-block-matrix-20261020\verify.py", line 51, in ref
+    value=norm(path).casefold(); need(value in rows,'Unarchived reference '+str(path)); return value
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\results\cyd-vorbis-block-matrix-20261020\verify.py", line 15, in need
+    if not ok: raise RuntimeError(message)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Unarchived reference C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\-

@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\results\cyd-vorbis-block-matrix-20261020\verify.py", line 289, in <module>
+    print(json.dumps(verify(p.parse_args().archive),indent=2))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\results\cyd-vorbis-block-matrix-20261020\verify.py", line 117, in verify
+    pin(path,entry['sha256']); command=receipt(path,0 if c['passed'] else 1)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\results\cyd-vorbis-block-matrix-20261020\verify.py", line 61, in receipt
+    need(r['status']=='TERMINAL' and type(r['returncode']) is int and r['returncode']==code and r.get('timed_out',False) is False,'Wrong actual terminal status')
+  File "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\tests\results\cyd-vorbis-block-matrix-20261020\verify.py", line 15, in need
+    if not ok: raise RuntimeError(message)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Wrong actual terminal status

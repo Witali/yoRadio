@@ -1,0 +1,105 @@
+--- historical/minimal/generate.py
++++ tests/vorbis_block_matrix/generate_minimal.py
+@@ -1,8 +1,7 @@
+ #!/usr/bin/env python3
+ """Construct a small Vorbis I raw-format supplement; never invoke a decoder.
+ 
+-Stdlib only. All output is create-only in one fresh child directory of this
+-source directory. The field and CRC checks establish construction accounting,
++Stdlib only. All output is create-only beneath this checkout's .build directory. The field and CRC checks establish construction accounting,
+ not independent decoding, audible quality or target acceptance.
+ """
+ from __future__ import annotations
+@@ -16,9 +15,10 @@
+ import struct
+ 
+ HERE = Path(__file__).resolve().parent
++ROOT = HERE.parents[1]
+ SPEC = "https://xiph.org/vorbis/doc/Vorbis_I_spec.html"
+ OGG_SPEC = "https://xiph.org/ogg/doc/framing.html"
+-RATE = 48000
++DEFAULT_RATE = 48000
+ CHANNELS = 2
+ MODES = tuple(0 if c == "S" else 1 for c in "SSLLLSLSSSLLSS")
+ EXPONENTS = tuple(range(6, 14))
+@@ -135,12 +135,12 @@
+     return b
+ 
+ 
+-def identification(short_exp, long_exp):
++def identification(short_exp, long_exp, rate):
+     b = Bits()
+     prefix(b, 1)
+     b.put("version", 32, 0)
+     b.put("channels", 8, CHANNELS)
+-    b.put("sample_rate", 32, RATE)
++    b.put("sample_rate", 32, rate)
+     for name in ("maximum", "nominal", "minimum"):
+         b.put("bitrate_" + name, 32, 0)
+     b.put("short_exponent", 4, short_exp)
+@@ -258,9 +258,14 @@
+     return "\n".join(lines + ["};", ""])
+ 
+ 
+-def generate(output):
+-    if output.resolve().parent != HERE or output.exists():
+-        raise ValueError("output must be a fresh direct child of generator directory")
++def generate(output, rate=DEFAULT_RATE):
++    if isinstance(rate, bool) or not isinstance(rate, int) or not 1 <= rate <= 0xffffffff:
++        raise ValueError("rate must be a positive uint32")
++    output = output.resolve()
++    build_root = (ROOT / ".build").resolve()
++    if (build_root.parent != ROOT or output == build_root
++            or not output.is_relative_to(build_root) or output.exists()):
++        raise ValueError("output must be fresh and remain beneath this checkout's .build")
+     minimum, delta = packed_float(-1), packed_float(2)
+     if minimum != 0xe2800001 or delta != 0x62800002 or unpack_float(minimum) != -1 or unpack_float(delta) != 2:
+         raise ValueError("Vorbis packed float derivation")
+@@ -283,7 +288,7 @@
+         for long_exp in range(short_exp, 14):
+             short, long = 1 << short_exp, 1 << long_exp
+             name = f"s{short}-l{long}"
+-            ib = identification(short_exp, long_exp)
++            ib = identification(short_exp, long_exp, rate)
+             bitfields["identification"][name] = ib.report()
+             sizes = [long if mode else short for mode in MODES]
+             frames = [0] + [(sizes[i - 1] + sizes[i]) // 4 for i in range(1, len(MODES))]
+@@ -306,7 +311,7 @@
+             payloads[f"cases/{name}/identification.bin"] = ib.data()
+             ogg = f"cases/{name}/reference.ogg"
+             payloads[ogg] = stream
+-            cases.append(dict(id=name, ogg=ogg, short=short, long=long, rate=RATE,
++            cases.append(dict(id=name, ogg=ogg, short=short, long=long, rate=rate,
+                 channels=CHANNELS, mode_flags=list(MODES), expected_raw_samples=total,
+                 expected_s16le_bytes=total * CHANNELS * 2, expected_packet_samples=frames,
+                 packet_granules=cumulative, page_crc32=[p["crc"] for p in decoded_pages],
+@@ -363,6 +368,7 @@
+         references=[SPEC, OGG_SPEC], independent_decode_pending=True,
+         files=[dict(path=p, bytes=len(d), sha256=sha(d)) for p, d in sorted(payloads.items())])
+     payloads["manifest.json"] = (json.dumps(manifest, indent=2) + "\n").encode()
++    output.parent.mkdir(parents=True, exist_ok=True)
+     output.mkdir()
+     for name, data in payloads.items():
+         path = output / name
+@@ -376,5 +382,8 @@
+ 
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("--output", required=True, type=Path)
+-    generate(parser.parse_args().output)
++    parser.add_argument("--output", type=Path, help="Fresh path beneath this checkout's .build")
++    parser.add_argument("--rate", type=int, default=DEFAULT_RATE, help="Positive uint32 sample rate (default: 48000)")
++    args = parser.parse_args()
++    output = args.output or (ROOT / ".build" / f"vorbis-minimal-block-{args.rate}-01")
++    generate(output, args.rate)
+--- historical/matrix_candidates.py
++++ tests/vorbis_block_matrix/generate_encoder_matrix.py
+@@ -8,7 +8,7 @@
+ 
+ HERE=Path(__file__).resolve().parent
+ ROOT=HERE.parents[1]
+-SOURCE=ROOT/'.build/cyd-vorbis-format-prep-01/reference/encoder-192000.ogg'
++SOURCE=HERE/'encoder-192000.ogg'
+ EXPECTED_SOURCE='82ef0b5354ac3baea18d24479360a4b1d84956c789b969333f333efcb018e2f1'
+ EXPECTED_AUDIO='4e7aee5fa90add769e2dc95d8c2e0fab858b07d176932fdc581d12608799c8cc'
+ 

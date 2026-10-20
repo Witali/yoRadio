@@ -91,6 +91,37 @@ This checkpoint does not run the production C3 application or qualify its Ogg,
 EOF/reset, allocation failures, resource margins or physical playback. The
 previously deferred application/AAC hooks are not invoked.
 
+## Full block-pair raw checkpoint, 2026-10-20
+
+The [reproducible fixture generators](../tests/vorbis_block_matrix/README.md)
+retain all 36 ordered short/long block pairs from 64 through 8192. Three banks
+cover the realistic encoder stream, explicit short/long transitions and a
+constructed nonzero floor1/residue1 supplement. The original dual-reference
+host campaign remains NONPASS: native FFmpeg 8.1.1 accepts 78 cases and rejects 30
+because of an additional floor1 endpoint bound. The [primary floor1 algorithm](https://xiph.org/vorbis/doc/Vorbis_I_spec.html)
+allows extending or truncating the curve to the transform length. A separate
+Xiph completion accepts all 108 cases, retaining the 78 native cross-checks and
+the 30 explicit native limitations. No cases are omitted. All 36 minimal 48000 Hz
+fixtures also have independently accepted 192000 Hz rate-only counterparts.
+
+The [frozen block-matrix evidence](../tests/results/cyd-vorbis-block-matrix-20261020/README.md)
+records the actual SDK 6.0.2/Xtensa campaign: 108 cases, 5472 paired raw packets,
+360 transition groups and 32543616 byte-exact PCM bytes. Each case opens fresh
+opaque original/checked public handles; every packet checks complete consumption,
+public metadata, guarded output and exact PCM, with nonzero output for every
+present transition. The original decoder runs first. Both handles use 192000 Hz;
+the separately qualified rate rebind is explicit. The coordinator runs on core 0
+and decoding on core 1. The actual two setup/output translation units, SDK/archive
+identities, ELF machine 94, unrestricted setup macro context, unchanged generated
+compiler inputs and terminal emulator exit 0 are bound to the result. Eight
+[protocol host tests](../tests/vorbis_block_matrix/PROTOCOL.md) pass separately.
+
+This is a raw-format checkpoint, not radio integration or full G6. The fixture
+Ogg carriers serve host references only. Target Ogg/EOF/reset/OOM, broader
+codebooks/floors/residues/channels, full callback ABI, SMP service, actual audio
+task integration and physical resource gates remain open. C3 matrix execution
+is separate; the earlier C3 raw8192 result does not qualify this larger matrix.
+
 ## Entry points and confirmed problems
 
 | Change | Donor implementation | CYD entry and required behavior |

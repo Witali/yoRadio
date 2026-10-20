@@ -1,0 +1,21 @@
+// TEMPLATE ONLY: root must freeze real independently qualified encoded payloads.
+#error Populate actual frozen encoded banks and reviewed manifest before building
+#pragma once
+#include "banks_contract.h"
+#include "identity_raw.h"
+#include "transitions_raw.h"
+#include "minimal_raw.h"
+#define BLOCK_MATRIX_DATA_MANIFEST_SHA256 "ROOT_REVIEWED_64_LOWERCASE_HEX_MANIFEST_SHA256"
+#define RAW_BANK(label,rate_value,pfx) { \
+    .name=(label), .source_rate=(rate_value), \
+    .info=pfx##_info, .info_size=sizeof(pfx##_info), \
+    .setup=pfx##_setup, .setup_size=sizeof(pfx##_setup), \
+    .audio=pfx##_audio, .audio_size=sizeof(pfx##_audio), \
+    .offsets=pfx##_offsets, .offsets_count=sizeof(pfx##_offsets)/sizeof(pfx##_offsets[0]), \
+    .modes=pfx##_modes, .modes_count=sizeof(pfx##_modes), .packet_count=sizeof(pfx##_modes) }
+static const block_bank_t block_banks[3]={
+    RAW_BANK("identity",192000,identity),
+    RAW_BANK("transitions",192000,transitions),
+    RAW_BANK("minimal",48000,minimal),
+};
+#undef RAW_BANK

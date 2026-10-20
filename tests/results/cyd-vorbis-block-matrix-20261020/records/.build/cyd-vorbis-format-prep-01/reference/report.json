@@ -1,0 +1,476 @@
+{
+  "target_executed": false,
+  "production_changed": false,
+  "commands": [
+    {
+      "name": "ffmpeg-version",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-version"
+      ],
+      "exit": 0,
+      "stdout_sha256": "ccf923e713e82e8b3d7b4534dca9347bfc69618112d3b7fdc02d7d148512476c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ffprobe-version",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffprobe.exe",
+        "-version"
+      ],
+      "exit": 0,
+      "stdout_sha256": "bda0892fcc264eb3c36b4e2a1d36d40221223b82656e4cd73fab0f17ef8462e2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "decoders",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-hide_banner",
+        "-decoders"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e196a6b1bc3d292a341ae504a9dc5a3133925ea54412c697eea4a8849026d3c4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "encode",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-f",
+        "lavfi",
+        "-i",
+        "aevalsrc=0.28*sin(2*PI*997*t)+0.17*sin(2*PI*3821*t)|0.31*sin(2*PI*1601*t)+0.13*sin(2*PI*6127*t):s=192000:d=0.35",
+        "-map_metadata",
+        "-1",
+        "-c:a",
+        "libvorbis",
+        "-q:a",
+        "4",
+        "-f",
+        "ogg",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\encoder-192000.ogg"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "probe-192000",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffprobe.exe",
+        "-v",
+        "error",
+        "-show_entries",
+        "stream=codec_name,sample_rate,channels:format=duration",
+        "-of",
+        "json",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate192000.ogg"
+      ],
+      "exit": 0,
+      "stdout_sha256": "4a054f8b62b818658611f6889c0429d9f501a2b4a7389891cdd0b9e194c77717",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "decode-192000-vorbis",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-err_detect",
+        "explode",
+        "-c:a",
+        "vorbis",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate192000.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate192000-vorbis.s16le"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "decode-192000-libvorbis",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-err_detect",
+        "explode",
+        "-c:a",
+        "libvorbis",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate192000.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate192000-libvorbis.s16le"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "92df94d48c1d852fd4a0ca29aa8ed8437474a7fc6a07610072776ae2b47a0d1e"
+    },
+    {
+      "name": "probe-64000",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffprobe.exe",
+        "-v",
+        "error",
+        "-show_entries",
+        "stream=codec_name,sample_rate,channels:format=duration",
+        "-of",
+        "json",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate64000.ogg"
+      ],
+      "exit": 0,
+      "stdout_sha256": "14493e826302daaff1216cf44455c75499ed00ca1249b7ba33b93d19c1549c84",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "decode-64000-vorbis",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-err_detect",
+        "explode",
+        "-c:a",
+        "vorbis",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate64000.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate64000-vorbis.s16le"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "decode-64000-libvorbis",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-err_detect",
+        "explode",
+        "-c:a",
+        "libvorbis",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate64000.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate64000-libvorbis.s16le"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "1b0dfdfe1c46f7152cffcd2a389ebb09c0190a79e3f9d626fe21200ea4d906dc"
+    },
+    {
+      "name": "probe-63999",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffprobe.exe",
+        "-v",
+        "error",
+        "-show_entries",
+        "stream=codec_name,sample_rate,channels:format=duration",
+        "-of",
+        "json",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate63999.ogg"
+      ],
+      "exit": 0,
+      "stdout_sha256": "30494b15f12661ae2f4090ba0dde7b39f141a59c30d0e24d29e1a488b555f423",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "decode-63999-vorbis",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-err_detect",
+        "explode",
+        "-c:a",
+        "vorbis",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate63999.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate63999-vorbis.s16le"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "decode-63999-libvorbis",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-err_detect",
+        "explode",
+        "-c:a",
+        "libvorbis",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate63999.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate63999-libvorbis.s16le"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "074bc5d7fcbb1fe65e3c8f24cf895415644dc908e09954f542d7b183e388d586"
+    },
+    {
+      "name": "probe-48000",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffprobe.exe",
+        "-v",
+        "error",
+        "-show_entries",
+        "stream=codec_name,sample_rate,channels:format=duration",
+        "-of",
+        "json",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate48000.ogg"
+      ],
+      "exit": 0,
+      "stdout_sha256": "f48a13ce86ce39ea8ed6fbd2ff9361970ab60774fa7848eec0d21886a7cb627a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "decode-48000-vorbis",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-err_detect",
+        "explode",
+        "-c:a",
+        "vorbis",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate48000.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate48000-vorbis.s16le"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "decode-48000-libvorbis",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-err_detect",
+        "explode",
+        "-c:a",
+        "libvorbis",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate48000.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate48000-libvorbis.s16le"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "9c90738d241cb3bbb71c29ccbc5f11288727fd010f7024b69efbf2ece3047bef"
+    }
+  ],
+  "tools": {
+    "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe": "09948d4cdd0650da6ff5a87577469f2a218dc2615ae379f8f734d24c49de0f73",
+    "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffprobe.exe": "a6618e99bb58869ded3c6f37b53aa1a8d701c3591dbb7b5b317d47369c112be2",
+    "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe": "ceabb31054d429f57cb3825775677eeaf0db35fdabbc5ff6aef661c037154b00"
+  },
+  "pins": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\vorbis_repair\\setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\vorbis_repair\\output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\vorbis_repair\\simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\vorbis_repair\\enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-vorbis-qemu.py": "894952fb427e0db9f8cf739ecf0941840201ed2264e7b9ce327a060f62e9d896",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\vorbis_packets.py": "7ac7b9af0800c6813e6a9ed4e6756f5c50d82d75650f2b9174ef56116671e301",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\codec_benchmark\\run_vorbis_lifecycle.py": "cb5e4cc38ce153b0d2b407a823a665b7596cb2b061eae290444a37c3f5d54eb6",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\fixtures\\esp32c3_calibration\\vorbis-q10.ogg": "09d6cfa599f2c4a25f5745e5c8a605b5a1583a42d7990b9e5242b8990adff12f",
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_vorbis_dec.h": "288aada7336181f878240a6df6c891f88a8e20ced3de38e50bb80b1c29bee8a4",
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\esp_audio_dec.h": "8713fb9801824c9e041db2a7f6624a397f12be92477a5100005928427e0eb941"
+  },
+  "encoder_identification": {
+    "rate": 192000,
+    "channels": 2,
+    "short": 256,
+    "long": 2048
+  },
+  "setup": {
+    "codebooks": 42,
+    "floors": [
+      1,
+      1
+    ],
+    "residues": [
+      {
+        "type": 2,
+        "begin": 0,
+        "end": 64,
+        "partition": 16
+      },
+      {
+        "type": 2,
+        "begin": 0,
+        "end": 416,
+        "partition": 32
+      }
+    ],
+    "modes": [
+      0,
+      1
+    ]
+  },
+  "audio_packets": {
+    "count": 68,
+    "long_modes": 67,
+    "short_modes": 1,
+    "concatenated_sha256": "4e7aee5fa90add769e2dc95d8c2e0fab858b07d176932fdc581d12608799c8cc"
+  },
+  "fixture_construction": {
+    "encoder_natural_8192": false,
+    "long_exponent_edit": true,
+    "eos_granule": 272448,
+    "note": "Encoder source remains separate; setup and every audio packet are unchanged. All rate variants share identical pages except identification sample-rate and that page CRC."
+  },
+  "variants": {
+    "192000": {
+      "sha256": "7511b210c385395ab0d7eec97d39da3996a98b3877827874ed39006872b0a6b2",
+      "size": 11636,
+      "decode": {
+        "vorbis": {
+          "bytes": 1089280,
+          "samples_per_channel": 272320,
+          "sha256": "8ec759b5cbdb7dde94aa36bf0435b0308d9ef536dbce661133b42ac9eafb8bf4",
+          "nonzero_bytes": 1079666
+        },
+        "libvorbis": {
+          "bytes": 1089280,
+          "samples_per_channel": 272320,
+          "sha256": "4fc1e5c9ff7c220410a5d89deb47fae309c71a6fecb6c49acd5d87b3b08291b1",
+          "nonzero_bytes": 1079663
+        }
+      }
+    },
+    "64000": {
+      "sha256": "3d1e4f74b058330801963f81d28be29f38ab5a6d05223677557a8f5df7f7f56e",
+      "size": 11636,
+      "decode": {
+        "vorbis": {
+          "bytes": 1089280,
+          "samples_per_channel": 272320,
+          "sha256": "8ec759b5cbdb7dde94aa36bf0435b0308d9ef536dbce661133b42ac9eafb8bf4",
+          "nonzero_bytes": 1079666
+        },
+        "libvorbis": {
+          "bytes": 1089280,
+          "samples_per_channel": 272320,
+          "sha256": "4fc1e5c9ff7c220410a5d89deb47fae309c71a6fecb6c49acd5d87b3b08291b1",
+          "nonzero_bytes": 1079663
+        }
+      }
+    },
+    "63999": {
+      "sha256": "159f28baa208297f0fa4824e9db1b3815b976ea9ec8383820a22430386091bb6",
+      "size": 11636,
+      "decode": {
+        "vorbis": {
+          "bytes": 1089280,
+          "samples_per_channel": 272320,
+          "sha256": "8ec759b5cbdb7dde94aa36bf0435b0308d9ef536dbce661133b42ac9eafb8bf4",
+          "nonzero_bytes": 1079666
+        },
+        "libvorbis": {
+          "bytes": 1089280,
+          "samples_per_channel": 272320,
+          "sha256": "4fc1e5c9ff7c220410a5d89deb47fae309c71a6fecb6c49acd5d87b3b08291b1",
+          "nonzero_bytes": 1079663
+        }
+      }
+    },
+    "48000": {
+      "sha256": "6f548bc9c5013df7e2e4b84b9d457f6e8d06bdc1ef9eb0dcc149449abe1acaab",
+      "size": 11636,
+      "decode": {
+        "vorbis": {
+          "bytes": 1089280,
+          "samples_per_channel": 272320,
+          "sha256": "8ec759b5cbdb7dde94aa36bf0435b0308d9ef536dbce661133b42ac9eafb8bf4",
+          "nonzero_bytes": 1079666
+        },
+        "libvorbis": {
+          "bytes": 1089280,
+          "samples_per_channel": 272320,
+          "sha256": "4fc1e5c9ff7c220410a5d89deb47fae309c71a6fecb6c49acd5d87b3b08291b1",
+          "nonzero_bytes": 1079663
+        }
+      }
+    }
+  },
+  "host_reference_complete": true,
+  "cross_decoder_pcm_exact_required": false,
+  "target_vendor_high8192_acceptance": "PENDING: no SDK build or target execution authorized in this preparation",
+  "current_pins_unchanged": true
+}

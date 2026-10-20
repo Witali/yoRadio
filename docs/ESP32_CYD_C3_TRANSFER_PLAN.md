@@ -108,7 +108,10 @@ allocation и численные настройки C3 являются канд
   concurrent scopes, полной callback ABI и format/conformance проверок. Raw PCM
   и undersized retries проверены отдельно; [raw8192 regression](../tests/results/cyd-vorbis-format-20261020/README.md)
   снимает только одно rate/block ограничение: 340 точных пакетных сравнений,
-  четыре malformed-header controls и точный old-guard отказ. Полное G6 открыто.
+  четыре malformed-header controls и точный old-guard отказ. Дополнительная
+  [матрица размеров блоков](../tests/results/cyd-vorbis-block-matrix-20261020/README.md)
+  проходит на Xtensa: 108 случаев, 5472 пакетных сравнения и 32 543 616 точных
+  PCM байт; все 36 пар размеров и переходы short/long сохранены. Полное G6 открыто.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
   Затем полный Clang, три backend exports и физическая приёмка.
@@ -719,3 +722,20 @@ Stream остаётся на core0, decode/output на core1 с прежними
   Ogg/EOF/reset/OOM и физическая приёмка этим прогоном не квалифицированы;
   отложенные AAC/application hooks не запускались. Все этапы 12–15 остаются
   открыты в прежнем объёме.
+
+- 2026-10-20, CYD-C3-14 G6: [полная raw-матрица пар размеров блоков](../tests/results/cyd-vorbis-block-matrix-20261020/README.md)
+  проверена на SDK 6.0.2/Xtensa/core1: 108 случаев, 5472 сравненных пакета,
+  360 групп переходов, 32 543 616 точных PCM байт и terminal QEMU exit0.
+  Все 36 допустимых пар 64–8192 проверены на трёх корпусах без пропусков.
+  Host Xiph принимает все 108; исходный dual-reference прогон остаётся nonpass:
+  native FFmpeg принимает 78 и отклоняет 30 из-за дополнительной floor1 границы.
+  Для minimal отдельно проверены все 36 rate-only вариантов 192000 Гц.
+  [Генераторы](../tests/vorbis_block_matrix/README.md) воспроизводят все 144
+  reference/rebind варианта побайтно; восемь canonical protocol tests проходят.
+  Это изолированный public raw API, исходные setup/output не менялись.
+  C3 matrix, остальное G6, Ogg/EOF/reset/OOM, callback ABI, SMP/audio-task
+  интеграция и физическая приёмка остаются. Отложенные пункты не возобновлялись.
+  Финальный архив проверен автономно из другого каталога; ранние ошибки
+  архивного валидатора сохранены отдельно от SDK/runtime результатов.
+  Manifest SHA256:
+  `97262bd2eda0a23595b322cdd91055214d919800ee3347143742137f256b0333`.

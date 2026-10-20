@@ -1,0 +1,127 @@
+{
+  "schema": "vorbis-minimal-block-source-readiness-v1",
+  "status": "READY_FOR_INDEPENDENT_HOST_REVIEW",
+  "scope": "Pure generator construction and byte/accounting checks only",
+  "generation_terminal": {
+    "returncode": 0,
+    "chunk": "8f4e49"
+  },
+  "payload_manifest_rows_verified": 79,
+  "case_count": 36,
+  "packet_count": 14,
+  "setup_used_bits": 604,
+  "setup_padding_bits": 4,
+  "short_packet_used_bits": 70,
+  "long_packet_used_bits": 72,
+  "classword_bits": 2,
+  "stagebook_bits": 32,
+  "floor_bits": 34,
+  "transitions": {
+    "(0, 0)": 4,
+    "(0, 1)": 3,
+    "(1, 0)": 3,
+    "(1, 1)": 3
+  },
+  "long_neighbors": {
+    "(0, 0)": 1,
+    "(0, 1)": 2,
+    "(1, 0)": 2,
+    "(1, 1)": 1
+  },
+  "references": [
+    {
+      "url": "https://xiph.org/vorbis/doc/Vorbis_I_spec.html",
+      "sections": [
+        "2",
+        "3.2.1/20150226 erratum",
+        "4.2.2",
+        "4.2.4",
+        "4.3.1",
+        "7.2.2-4",
+        "8.6.1-2",
+        "9.2.2",
+        "A.2"
+      ]
+    },
+    {
+      "url": "https://xiph.org/ogg/doc/framing.html",
+      "sections": [
+        "page checksum",
+        "granule position",
+        "segment table"
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "path": "generate.py",
+      "bytes": 16892,
+      "sha256": "2040e79e9dc0e6eda4e5055aabe3d672a0aa04cfb59d9e3d10f0e855a9a6cb72"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3399,
+      "sha256": "30a64a6adbde28e4c8285096d4d76669eb248b10fe45788dc9795d471caabf3e"
+    },
+    {
+      "path": "generation01.json",
+      "bytes": 1094,
+      "sha256": "9d8c42de4334870994fd64bef145a4cbe88ca59d0cb5996d76e8cbbced33b697"
+    },
+    {
+      "path": "generation01.stdout",
+      "bytes": 332,
+      "sha256": "09ad54cf9abf11899e926bd6ecd330cae3f9bc144f583e6b9cfcdb3eccb0e7a5"
+    },
+    {
+      "path": "generation01.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "generated01/manifest.json",
+      "bytes": 13278,
+      "sha256": "8e6f73baab5f9c444a2f1cf3c0d4cc89f52dcbaf10afe3bb6ce096eff47c5d5e"
+    },
+    {
+      "path": "generated01/matrix.json",
+      "bytes": 52837,
+      "sha256": "387e39230f7cb8ae372f1ec5aa96878eaa885a2cd21b823dd7568d4d53a41782"
+    },
+    {
+      "path": "generated01/bitfields.json",
+      "bytes": 164340,
+      "sha256": "33ec22a7a5217d766cdb32d91cff74865e6b97f23641423a0d8c4e729e1ac273"
+    },
+    {
+      "path": "generated01/pure-checks.json",
+      "bytes": 1033,
+      "sha256": "40ba9a04a9e9223f65440c2b6f1680a6240aabf8273c344f6679d7b4bd8d2bb0"
+    },
+    {
+      "path": "generated01/fixture.h",
+      "bytes": 12340,
+      "sha256": "5efe01eacdf575f2c336502c0a8d3a3bda1101ff5a50790a5da05db8792333aa"
+    },
+    {
+      "path": "generated01/setup.bin",
+      "bytes": 76,
+      "sha256": "be6dc549f70eef110a6c396748be52c951aaa23ecbaacf4274409e25fa9c9285"
+    },
+    {
+      "path": "generated01/comment.bin",
+      "bytes": 58,
+      "sha256": "e44f437158767cf8fdbaae25daa1f04ad1227d7adfc542e27e85d1586b22caba"
+    },
+    {
+      "path": "generated01/audio.bin",
+      "bytes": 126,
+      "sha256": "fe850e4579ab78d336934a10b14b352cfd6a048d6e213449f7a05333520b8d36"
+    }
+  ],
+  "independent_host_decode_executed": false,
+  "target_executed": false,
+  "observed_nonzero_pcm": false,
+  "pending": "Root independently decodes every one of the 36 Ogg carriers with FFmpeg native and libvorbis plus FFprobe metadata; check lengths/nonzero/diagnostics without forced rate/channel conversion.",
+  "limits": "Synthetic two-book supplement only; existing realistic42book corpus retained. No broad G6, target Ogg, EOF/reset/pending/OOM/AAC or physical/resource acceptance."
+}

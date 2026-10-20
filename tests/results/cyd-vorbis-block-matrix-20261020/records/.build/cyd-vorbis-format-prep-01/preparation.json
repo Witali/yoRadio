@@ -1,0 +1,137 @@
+{
+  "target_executed": false,
+  "production_changed": false,
+  "commands": [
+    {
+      "name": "frame-accounting",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffprobe.exe",
+        "-v",
+        "error",
+        "-show_packets",
+        "-show_frames",
+        "-show_entries",
+        "packet=pts,dts,duration,flags,side_data_list:frame=pts,nb_samples",
+        "-of",
+        "json",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\reference\\long8192-rate192000.ogg"
+      ],
+      "exit": 0,
+      "stdout_sha256": "28015e5055ef4a0b2967232c95f7cd5f6e14e5524b0529059661a3b47da35729",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "normal-decode-vorbis",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-err_detect",
+        "explode",
+        "-c:a",
+        "vorbis",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\normal2048-rate48000.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\normal2048-rate48000-vorbis.s16le"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "normal-decode-libvorbis",
+      "argv": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-err_detect",
+        "explode",
+        "-c:a",
+        "libvorbis",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\normal2048-rate48000.ogg",
+        "-map",
+        "0:a:0",
+        "-c:a",
+        "pcm_s16le",
+        "-f",
+        "s16le",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-format-prep-01\\normal2048-rate48000-libvorbis.s16le"
+      ],
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "3831c69300c116c9e73e17ccb58371b23c8b4de01b091bd05072bd55503a276f"
+    }
+  ],
+  "generated": {
+    "project\\CMakeLists.txt": "1e66ede67754e35e75cd95601e8e02fbe7f7eea2c79ab7bcc51a1e4dbed811e8",
+    "project\\main\\CMakeLists.txt": "7b11ec3f3fe1563bd5340150cecfce513606c45aaa7366715829a7ac4be665db",
+    "project\\main\\fixture.h": "839febe9f12d7bc33e6afd8a9f0b16ee799f12d6c8ecb88188537b7ae8349378",
+    "project\\main\\Kconfig.projbuild": "179cf4631d95dacaad58db5d00364c88136b16fee14dcf4a9d9ec890d8621266",
+    "project\\main\\main.c": "84852cc9c9e592fd76ae3e2826a5e9dffba95467de4145160a4ce428f6f2f4c9",
+    "project\\partitions.csv": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b",
+    "project\\sdkconfig.defaults": "7a327b86ffd1a0011ab2fd0bf42ab034d4895910e16a27c4a07bdee0e836f043",
+    "finish_preparation.py": "7fbbb16dca7e37550109023998ad231c8dcde312934328e0462daff064d441b9"
+  },
+  "reference_report_sha256": "6e1ed5c881851878b40882d5888af7f9089b3a49eff1ac0e85bb588bee7cfbf6",
+  "reference_preparer_sha256": "75faabf34ceaecb1dff62955451338f6c6c684aa5b49a6413253672f40b7b211",
+  "container_accounting": {
+    "first_packet_nominal_duration": 128,
+    "first_packet_pcm_frames": 0,
+    "first_output_samples": 2112,
+    "full4096_output_frames": 65,
+    "final_output_samples": 3968,
+    "skip_samples": 0,
+    "final_discard_padding": 128,
+    "output_samples_per_channel": 272320,
+    "raw_complete_packet_samples_per_channel": 272448,
+    "note": "Observed final container trimming; not raw decoder output or an initial PCM skip. No Ogg API is used by the target harness."
+  },
+  "normal_positive_control": {
+    "sha256": "80a5216ae74ea383063d9a92d68b5f23cd5c804b4b396a167ef621b5a97f9588",
+    "decode": {
+      "vorbis": {
+        "bytes": 272640,
+        "sha256": "869a74fd4b433ca80b51eb434aa4b0b67257aba919cbaddad86995941ca9dc43",
+        "nonzero_bytes": 270224
+      },
+      "libvorbis": {
+        "bytes": 272640,
+        "sha256": "261b77291b21fbac313829f7194fbe2464817363aee1d8c13218fbe3f4854328",
+        "nonzero_bytes": 270224
+      }
+    }
+  },
+  "raw_fixture": {
+    "packets": 68,
+    "long_mode_packets": 67,
+    "short_mode_packets": 1,
+    "setup_sha256": "ddf96884253b58b0449734cb874e21b8465625303c01bb5645012eb761cfcf43",
+    "audio_concatenated_sha256": "4e7aee5fa90add769e2dc95d8c2e0fab858b07d176932fdc581d12608799c8cc",
+    "full8192_pcm_packets": 66,
+    "expected_raw8192_bytes": 1089792,
+    "expected_raw2048_bytes": 272640
+  },
+  "pins_unchanged": true,
+  "source_review_updates": {
+    "previous_harness_sha256": "5a6535e79c92c57cf66eadb73acac6dedb9b04c6bf2feda5f9b9c4c2a26c88b3",
+    "current_harness_sha256": "84852cc9c9e592fd76ae3e2826a5e9dffba95467de4145160a4ce428f6f2f4c9",
+    "changes": [
+      "16-byte canaries before/after both public PCM buffers, armed/checked on each decode",
+      "different paired output fill bytes to reject stale/unwritten PCM",
+      "coordinator core0 assertion"
+    ],
+    "target_executed": false,
+    "host_reference_commands_not_rerun": true
+  }
+}
