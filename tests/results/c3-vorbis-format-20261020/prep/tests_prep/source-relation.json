@@ -1,0 +1,115 @@
+{
+  "schema": "c3-format-tests-proposal-source-relation-v1",
+  "relations": [
+    {
+      "source": {
+        "path": ".build/c3-vorbis-format-project-prep-01/project/CMakeLists.txt",
+        "bytes": 314,
+        "sha256": "33e1140c04681c3b644aee37d5ba3f2b3e7f80f5814166a7f3d6798b249dceaf"
+      },
+      "proposal": {
+        "path": ".build/c3-vorbis-format-tests-prep-01/proposed/tests/target/c3_vorbis_format_qemu/CMakeLists.txt",
+        "bytes": 314,
+        "sha256": "33e1140c04681c3b644aee37d5ba3f2b3e7f80f5814166a7f3d6798b249dceaf"
+      },
+      "relation": "byte-identical"
+    },
+    {
+      "source": {
+        "path": ".build/c3-vorbis-format-project-prep-01/project/partitions.csv",
+        "bytes": 96,
+        "sha256": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b"
+      },
+      "proposal": {
+        "path": ".build/c3-vorbis-format-tests-prep-01/proposed/tests/target/c3_vorbis_format_qemu/partitions.csv",
+        "bytes": 96,
+        "sha256": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b"
+      },
+      "relation": "byte-identical"
+    },
+    {
+      "source": {
+        "path": ".build/c3-vorbis-format-project-prep-01/project/sdkconfig.defaults",
+        "bytes": 969,
+        "sha256": "6ae9a568666bee77759e6333d83169d6aa545366efc7b7f2fd154fcf5f23479a"
+      },
+      "proposal": {
+        "path": ".build/c3-vorbis-format-tests-prep-01/proposed/tests/target/c3_vorbis_format_qemu/sdkconfig.defaults",
+        "bytes": 969,
+        "sha256": "6ae9a568666bee77759e6333d83169d6aa545366efc7b7f2fd154fcf5f23479a"
+      },
+      "relation": "byte-identical"
+    },
+    {
+      "source": {
+        "path": ".build/c3-vorbis-format-project-prep-01/project/main/main.c",
+        "bytes": 12750,
+        "sha256": "ecc9ba589a02f6587fbc2474bff510dd0eb768c84d8fbc5518a631458750b31a"
+      },
+      "proposal": {
+        "path": ".build/c3-vorbis-format-tests-prep-01/proposed/tests/target/c3_vorbis_format_qemu/main/main.c",
+        "bytes": 12750,
+        "sha256": "ecc9ba589a02f6587fbc2474bff510dd0eb768c84d8fbc5518a631458750b31a"
+      },
+      "relation": "byte-identical"
+    },
+    {
+      "source": {
+        "path": ".build/c3-vorbis-format-project-prep-01/project/main/fixture.h",
+        "bytes": 37944,
+        "sha256": "839febe9f12d7bc33e6afd8a9f0b16ee799f12d6c8ecb88188537b7ae8349378"
+      },
+      "proposal": {
+        "path": ".build/c3-vorbis-format-tests-prep-01/proposed/tests/target/c3_vorbis_format_qemu/main/fixture.h",
+        "bytes": 37944,
+        "sha256": "839febe9f12d7bc33e6afd8a9f0b16ee799f12d6c8ecb88188537b7ae8349378"
+      },
+      "relation": "byte-identical"
+    },
+    {
+      "source": {
+        "path": ".build/c3-vorbis-format-protocol-prep-01/c3_vorbis_format_protocol.py",
+        "bytes": 4221,
+        "sha256": "4ed1674fe7f09dc1c92bc829eb42122d788883c1effb1c4fa728008a686e707e"
+      },
+      "proposal": {
+        "path": ".build/c3-vorbis-format-tests-prep-01/proposed/tests/c3_vorbis_format_protocol.py",
+        "bytes": 4221,
+        "sha256": "4ed1674fe7f09dc1c92bc829eb42122d788883c1effb1c4fa728008a686e707e"
+      },
+      "relation": "byte-identical"
+    },
+    {
+      "source": {
+        "path": ".build/c3-vorbis-format-protocol-prep-01/test_c3_vorbis_format_protocol.py",
+        "bytes": 7180,
+        "sha256": "2913c28b0167efb5eefedd9437db979d34d202bebfc6db9aa83e0d27e68731ef"
+      },
+      "proposal": {
+        "path": ".build/c3-vorbis-format-tests-prep-01/proposed/tests/test-c3-vorbis-format-protocol.py",
+        "bytes": 7248,
+        "sha256": "51b61040b255bbf00bb3b434a4f2bd50c2bbcdc60d65027153fbaf0fc3923d62"
+      },
+      "relation": "two fixture path substitutions only",
+      "old": "(HERE/'fixture.h')",
+      "new": "(HERE/'target/c3_vorbis_format_qemu/main/fixture.h')"
+    },
+    {
+      "source": {
+        "path": ".build/c3-vorbis-format-project-prep-01/project/main/CMakeLists.txt",
+        "bytes": 2618,
+        "sha256": "e92d7e3e565e7a15750329c978e2eb6f00d1d1805f5d1f42ab7f27d7bc73d63a"
+      },
+      "proposal": {
+        "path": ".build/c3-vorbis-format-tests-prep-01/proposed/tests/target/c3_vorbis_format_qemu/main/CMakeLists.txt",
+        "bytes": 2882,
+        "sha256": "516cb75ea0edc5025cfb88b2dc25299106fa27823a3bc3bc92dacf44dba23caa"
+      },
+      "relation": "setup pin validation substitution only",
+      "old": "set(pinned_setup \"d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b\")",
+      "new": "# The campaign must bind its separately reviewed frozen setup.c bytes.\nstring(LENGTH \"${FORMAT_SETUP_SHA256}\" setup_sha_length)\nif(NOT setup_sha_length EQUAL 64 OR NOT \"${FORMAT_SETUP_SHA256}\" MATCHES \"^[0-9a-f]+$\")\n    message(FATAL_ERROR \"Explicit reviewed FORMAT_SETUP_SHA256 is required\")\nendif()\nset(pinned_setup \"${FORMAT_SETUP_SHA256}\")",
+      "source_list_compile_definitions_link_options_unchanged": true,
+      "adapted_project_sdk_qualified": false
+    }
+  ]
+}

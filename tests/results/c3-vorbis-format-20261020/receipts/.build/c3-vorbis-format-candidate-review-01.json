@@ -1,0 +1,61 @@
+{
+  "schema": "c3-public-vorbis-format-candidate-independent-source-review-v1",
+  "result": "SOURCE_RELATION_CONFIRMED",
+  "findings": [],
+  "scope": "Source/filesystem audit only; no SDK, compiler, preprocessor, QEMU, reference, test or Git command executed. Only this JSON written.",
+  "repository": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review",
+  "candidate_runtime_reviewed": false,
+  "production_promotion_qualified": false,
+  "identities": {
+    "baseline_pins_sha256": "a433b95841ae724549fb845058d61da3c12b01167efa7f9ca748ed46ecca970d",
+    "candidate_pins_sha256": "39a3a389a7263b48490043e3fc727af7f54bb3cc300eb84ceb966f97a773aeb5",
+    "baseline_qualification_sha256": "1866ad53fb7a8c546cb2605665b782c453811b32445e581273ca19d543997309",
+    "candidate_relation_sha256": "258e1f6979cb3943c75751e86f3987ef5c22a478e3076072d693fdb1d4a4c79a",
+    "candidate_diff_sha256": "842ffd57b84d5093a0be9d7b32085fca68b44051ea5bf2c96463f44391e1f810",
+    "baseline_setup_sha256": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+    "candidate_setup_sha256": "83ce582554970e1a4bb70587e036c45af7bfb84519d3d7d87580eb4b9b1d38de",
+    "baseline_main_cmake_sha256": "e92d7e3e565e7a15750329c978e2eb6f00d1d1805f5d1f42ab7f27d7bc73d63a",
+    "candidate_main_cmake_sha256": "bd0084308a83e3f1adef038e471a596cb8f2225b3e3c5416e4e42279a593d05c"
+  },
+  "verified_relation": {
+    "local_pinned_file_counts": [
+      12,
+      14
+    ],
+    "all_local_file_pins_match": true,
+    "external_inputs_verified": 20,
+    "external_and_tool_lists_identical": true,
+    "original_three_decoder_files_equal_current_canonical_c3": true,
+    "compile_relevant_changed_files": [
+      "variant/vorbis_repair/setup.c",
+      "project/main/CMakeLists.txt"
+    ],
+    "setup": "One exact two-line/68-byte CRLF deletion: #else plus default rate<64000 && longblock>4096 rejection. All other bytes equal.",
+    "cmake": "One literal setup hash replacement only; source list, two raw open/decode wraps, SDK6.1/C3/source/archive guards unchanged.",
+    "unchanged": "Caller/per-handle metadata lifetime, fixture, output.c, RV32 ABI, project CMake, defaults, partitions and launcher byte-identical.",
+    "metadata_changes": "REVIEW.md replaced; candidate.diff/relation added. Pins expected rejection 1->0 plus variant/baseline identity; other metadata unchanged."
+  },
+  "retained_checks": {
+    "optional_limit": "setup.c:954-956 retains #ifdef LIMIT_TO_64kHz and rate>=64000 || longblock>4096 rejection. A defined value0 still enables it; no limited-profile runtime qualification here.",
+    "headers": "setup.c:949-964 retains bit-read errors, positive rate/channels, short>=64, long>=short, long<=8192 and framing bit.",
+    "macro_scope": "main.c:12-14 rejects LIMIT_TO_64kHz only in caller TU. Actual setup-TU macro absence must come from its real compile invocation.",
+    "allocation": "setup.c:991-994 still sizes DSP storage by long block; unchanged output.c checks PCM by block history/channels. Opaque vendor transforms need actual RV32 proof."
+  },
+  "baseline": {
+    "classification": "REGRESSION_REPRODUCED",
+    "completed": true,
+    "passed": false,
+    "format_acceptance_qualified": false,
+    "vendor_packets": 68,
+    "exact_pairs": 3,
+    "exact_pair_packets": 204,
+    "meaning": "Completed old-guard regression reproduction, not acceptance. No live candidate/control outputs read as terminal proof."
+  },
+  "before_promotion": [
+    "Review authoritative terminal candidate ExpectedRejection=0: vendor68 prerequisite, five68-packet exact pairs including63999/48000Hz long8192, metadata every packet, consumption, nonzero PCM, full-size outputs, canaries, four invalid headers and exact COMPLETE; reject panic/timeout/missing or duplicate protocol/unrelated failure.",
+    "Retain unchanged old-guard ExpectedRejection=0 control: prerequisites succeed then exact legal_candidate_open_required failure at first low-rate8192 case. Preserve baseline ExpectedRejection=1 as REGRESSION_REPRODUCED.",
+    "Bind generated config, actual setup-TU macros, compile/link source closure, RISC-V ELF/ABI, only intended raw wraps, SDK6.1/tools/vendor archives, merged image and raw child terminal logs to reviewed candidate pins.",
+    "Promote only the reviewed C3 setup two-line deletion with reproducible evidence. Standalone raw proof does not establish normal C3 application integration: separately build/check intended C3 firmware before hand-off, preserving task/core settings and actual repair-enabled configuration."
+  ],
+  "limits": "No full Vorbis conformance, optional limited-profile runtime, physical audio/resource/heap benefit, application, Ogg/EOF/reset/OOM or AAC/private-owner claim."
+}

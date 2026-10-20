@@ -69,8 +69,27 @@ The generated cflags/specs remain byte-identical before and after probing.
 This selected nonzero stereo floor1 fixture advances G6 and G7 only for this
 restriction. Other formats, Ogg, callbacks, allocation/lifetime, SMP service,
 radio integration and physical resources remain open. The CYD bridge is still
-isolated. C3 has the same inherited guard and requires its own RISC-V execution
-before changing its enabled implementation.
+isolated.
+
+### Independent C3 checkpoint
+
+The [C3 raw-format results](../tests/results/c3-vorbis-format-20261020/README.md)
+independently reproduce the inherited restriction on SDK6.1/RISC-V, then qualify
+the same two-line removal in the C3 implementation. The original C3 vendor first
+decodes all 68 high-rate8192 packets. Candidate acceptance covers 340 paired
+packets and 4631808 exact PCM bytes at the same four rates and ordinary control;
+four malformed headers reject. The separate old-guard control restores every
+baseline setup byte and reaches the named failure after its full prerequisites.
+Both coordinator and decoder run on core0, with actual RV32 flags, ELF machine243
+and the C3 bootloader offset0 checked separately from CYD. Eight native protocol
+host tests pass. The optional limit and all other setup checks remain unchanged.
+
+The [reusable C3 target](../tests/target/c3_vorbis_format_qemu/README.md) preserves
+the exercised caller and compile/link directives; its explicit setup-hash input
+is a source-reviewed CMake adaptation, not an additional qualified SDK campaign.
+This checkpoint does not run the production C3 application or qualify its Ogg,
+EOF/reset, allocation failures, resource margins or physical playback. The
+previously deferred application/AAC hooks are not invoked.
 
 ## Entry points and confirmed problems
 

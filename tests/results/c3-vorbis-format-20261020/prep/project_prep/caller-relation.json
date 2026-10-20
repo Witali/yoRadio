@@ -1,0 +1,68 @@
+{
+  "schema": "c3-public-vorbis-format-caller-source-relation-v1",
+  "canonical_source": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/target/cyd_vorbis_format_qemu/main/main.c",
+  "canonical_sha256": "a946d2c8c867b0ab8f4d6d629b42381fc28f749cebf73d164bfafd5f1f4a09df",
+  "adapted_source": "project/main/main.c",
+  "adapted_sha256": "ecc9ba589a02f6587fbc2474bff510dd0eb768c84d8fbc5518a631458750b31a",
+  "changes": [
+    {
+      "before": "CYD_VORBIS_FORMAT",
+      "after": "C3_VORBIS_FORMAT",
+      "occurrences": 14
+    },
+    {
+      "before": "core=1",
+      "after": "core=0",
+      "occurrences": 4
+    },
+    {
+      "before": "xPortGetCoreID() == 1, \"public_decode_core1\"",
+      "after": "xPortGetCoreID() == 0, \"public_decode_core0\"",
+      "occurrences": 1
+    },
+    {
+      "before": "xTaskCreatePinnedToCore(task, \"public_format\", 16384, NULL, 3, NULL, 1)",
+      "after": "xTaskCreatePinnedToCore(task, \"public_format\", 16384, NULL, 3, NULL, 0)",
+      "occurrences": 1
+    },
+    {
+      "before": "create_core1_format_task",
+      "after": "create_core0_format_task",
+      "occurrences": 1
+    }
+  ],
+  "other_caller_edits": false,
+  "source_relation_only_not_compilation": true,
+  "byte_equal_copies": [
+    {
+      "original": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/target/cyd_vorbis_format_qemu/main/fixture.h",
+      "copy": "project/main/fixture.h",
+      "sha256": "839febe9f12d7bc33e6afd8a9f0b16ee799f12d6c8ecb88188537b7ae8349378",
+      "bytes": 37944
+    },
+    {
+      "original": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/tests/target/cyd_vorbis_format_qemu/partitions.csv",
+      "copy": "project/partitions.csv",
+      "sha256": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b",
+      "bytes": 96
+    },
+    {
+      "original": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/setup.c",
+      "copy": "variant/vorbis_repair/setup.c",
+      "sha256": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+      "bytes": 36055
+    },
+    {
+      "original": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair/output.c",
+      "copy": "variant/vorbis_repair/output.c",
+      "sha256": "7e7a49a1ba68b2417514ab4b0adb37c9ed31e2d1b65032fa06dbf4b2830c25e2",
+      "bytes": 2042
+    },
+    {
+      "original": "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/vorbis_repair_abi.h",
+      "copy": "variant/vorbis_repair_abi.h",
+      "sha256": "dd26a294cf3887853e12174f3958ea9cccdaa9425ff6a7b21d46faa350bde61c",
+      "bytes": 4673
+    }
+  ]
+}

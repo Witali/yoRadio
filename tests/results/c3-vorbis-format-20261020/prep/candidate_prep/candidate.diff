@@ -1,0 +1,11 @@
+--- baseline/setup.c
++++ candidate/setup.c
+@@ -953,8 +953,6 @@
+ 
+ #ifdef LIMIT_TO_64kHz
+   if(vi->rate>=64000 || ci->blocksizes[1]>4096)goto err_out;
+-#else
+-  if(vi->rate<64000 && ci->blocksizes[1]>4096)goto err_out;
+ #endif
+ 
+   if(vi->rate<1)goto err_out;

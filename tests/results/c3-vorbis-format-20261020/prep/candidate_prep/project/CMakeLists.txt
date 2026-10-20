@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.16)
+if("$ENV{YORADIO_AUDIO_CODEC_COMPONENT}" STREQUAL "")
+    message(FATAL_ERROR "Explicit pinned codec component required")
+endif()
+set(EXTRA_COMPONENT_DIRS "$ENV{YORADIO_AUDIO_CODEC_COMPONENT}")
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(c3_vorbis_public_format)

@@ -1,0 +1,42 @@
+{
+  "schema": "c3-public-vorbis-postbuild-observations-v1",
+  "target_executed": false,
+  "macros": {
+    "__riscv_xlen": 32,
+    "CONFIG_IDF_TARGET_ESP32C3": 1,
+    "CONFIG_FREERTOS_UNICORE": 1,
+    "CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ": 160,
+    "FORMAT_EXPECT_LOW_RATE_REJECTION": 0
+  },
+  "limit_to_64khz": false,
+  "symbols": [
+    "__wrap_esp_vorbis_dec_open",
+    "__wrap_esp_vorbis_dec_decode",
+    "esp_vorbis_dec_open",
+    "esp_vorbis_dec_decode"
+  ],
+  "commands": {
+    "setup-macros": {
+      "record": "setup-macros.json",
+      "sha256": "7f35fec6503ced93588b6251719dd821c6c5b0657e8add9e5ca0511984056c1e",
+      "returncode": 0
+    },
+    "symbols": {
+      "record": "symbols.json",
+      "sha256": "63d7b646a28b82ee55712e69e722804048594dba2e0b5977c04601ce4086e7e1",
+      "returncode": 0
+    },
+    "qemu-machine-help": {
+      "record": "qemu-machine-help.json",
+      "sha256": "51a4b84a8a198c4033282de762bd115bd3caacb13923524ff1b49fa2e21d213c",
+      "returncode": 0
+    }
+  },
+  "recipe_sha256": "c0e0f6830a7f7f757b793c395c20f71bc80bf6b996dc1bd2fbf2eb0e78dc456c",
+  "flash_inputs": {
+    "build\\bootloader\\bootloader.bin": "6eb8f9ef60e197c1ae38e35110875ea4ed66a4bde4d1bd009b0cda01b2e7923c",
+    "build\\partition_table\\partition-table.bin": "c9a826e85500d14d1854ce78e47452d4614a1be371bbd056278d2cb3398fbbfd",
+    "build\\c3_vorbis_public_format.bin": "9926235a0a5f3223eadb51ed3526cc8602f6030659c49c551227ad6686b26ff9"
+  },
+  "preparation_script_sha256": "e04b6a44e9e896acb84271944d4f8031d334dd5c4b05b2227c14d04b288092f8"
+}
