@@ -1,0 +1,80 @@
+{
+  "status": "host_processes_missing_without_terminal_footer",
+  "passed": false,
+  "all_functionality_verified": false,
+  "h10_accepted": false,
+  "captured_utc": "2026-10-18T14:44:28.121724+00:00",
+  "completed_cycles": 336,
+  "app_sha256": "bc68d3460332878b26226a41b74b0cae16376fbf6f41c7d8a98198af5514c393",
+  "qemu_sha256": "20b133d9078c05240bd6624c7ff91b997d176ae12e60f376b14eb2cb90e28f8e",
+  "required_duration_guest_seconds": 86400,
+  "last_sampled_guest_seconds": 5734.763623,
+  "observation": "Supervisor 23548 and workload 5036 are absent. Owned QEMU 18128 and UART guard 22392 remain alive. No new QMP/RSP connection was made.",
+  "cause": "Unconfirmed. A separate flash test observed ENOSPC at the same time, and the supervisor temporary file is zero length. These are correlations, not a proven termination cause.",
+  "follow_up": "Inspect host supervision and failure cleanup in a new unfrozen worktree; preserve these 31+11 inputs and rerun a complete H10 on the final candidate.",
+  "frozen_inputs": {
+    "latest_full": {
+      "input_count": 539,
+      "unchanged": true
+    },
+    "h10_runtime": {
+      "input_count": 31,
+      "unchanged": true
+    },
+    "h10_snapshot": {
+      "input_count": 11,
+      "unchanged": true
+    }
+  },
+  "artifacts": [
+    {
+      "file": "ap-services-h10-host-interruption-20261018-runtime-report.json.gz",
+      "original_sha256": "aa4295a815106115319a22ce408b3a65f98c2c4e1466c2813d003277ecb0a9f4",
+      "published_payload_sha256": "aa4295a815106115319a22ce408b3a65f98c2c4e1466c2813d003277ecb0a9f4",
+      "gzip_sha256": "15604d67952db0ee4db01f376e22477f35e31560099e055c4059a33b446c05e7",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "ap-services-h10-host-interruption-20261018-events.jsonl.gz",
+      "original_sha256": "648bca9b69cec0b914f4d93eb1e5aa3656ebf5737b3ff6e342a00e882b1abd57",
+      "published_payload_sha256": "648bca9b69cec0b914f4d93eb1e5aa3656ebf5737b3ff6e342a00e882b1abd57",
+      "gzip_sha256": "e593e0c002378dff218fb39c71c2a1fcc3dba574c1166eb876a9caed5ab35c28",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "ap-services-h10-host-interruption-20261018-guard.json.gz",
+      "original_sha256": "386bdbc366ff4bcee63715537d92f4a80801d10606ecfb677ab8ba727f07837f",
+      "published_payload_sha256": "386bdbc366ff4bcee63715537d92f4a80801d10606ecfb677ab8ba727f07837f",
+      "gzip_sha256": "a74572755a2404dd66b9dd2eb803cbf093ff552323f6ed15ae9bbed9427e94d8",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "ap-services-h10-host-interruption-20261018-uart.log.gz",
+      "original_sha256": "a6f094238b524c3afc685a04fd2f9d6c3608bd1cc1e9c0122c994451d175012d",
+      "published_payload_sha256": "a6f094238b524c3afc685a04fd2f9d6c3608bd1cc1e9c0122c994451d175012d",
+      "gzip_sha256": "85f2e6dfc49f97c1ab1d45c701b203ac60f18a138337d964df15f910e12d07b5",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "ap-services-h10-host-interruption-20261018-supervisor.json.gz",
+      "original_sha256": "1b756add89d7d3383183a7c4bc363c22fd06e34a30d56919e07f4d6f4d8a92f1",
+      "published_payload_sha256": "1b756add89d7d3383183a7c4bc363c22fd06e34a30d56919e07f4d6f4d8a92f1",
+      "gzip_sha256": "b3a43f1fc82978a6db744a3cb2e30147fe567514b1e8674cbdba61d069a5c68b",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "ap-services-h10-host-interruption-20261018-processes.json.gz",
+      "original_sha256": "215add4566860876b3555469c11ce1b03e2732e5df35884b202cc05723f32385",
+      "published_payload_sha256": "215add4566860876b3555469c11ce1b03e2732e5df35884b202cc05723f32385",
+      "gzip_sha256": "b7bd993f023529844bbb0aefbee4200ed5243c9d678f0353ab71845d1696662f",
+      "host_account_paths_normalized": false
+    },
+    {
+      "file": "ap-services-h10-host-interruption-20261018-snapshot-inputs.json.gz",
+      "original_sha256": "a2ddc0c5d958c9155523d3e0b93edccedb1fd6bd4a6df23c21e2345d2345fa4a",
+      "published_payload_sha256": "a2ddc0c5d958c9155523d3e0b93edccedb1fd6bd4a6df23c21e2345d2345fa4a",
+      "gzip_sha256": "0436b670deee8129967875d4feeea4a5ca0164f67beb8ee95eb63a503ceae8e4",
+      "host_account_paths_normalized": false
+    }
+  ]
+}
