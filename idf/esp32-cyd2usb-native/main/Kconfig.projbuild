@@ -37,6 +37,16 @@ menu "yoRadio native firmware"
             Quiet builds retain only cumulative fault counters and on-demand
             heap/input health. Diagnostic overhead needs board qualification.
 
+    config YORADIO_HTTP_REQUEST_BUFFER_RELEASE
+        bool "Release completed GET request TX buffer"
+        default y
+        help
+            Use the audited ESP-IDF 6.0.2 extension after final synchronous
+            radio GET headers. Retain the buffer if the SDK rejects release;
+            later requests restore the original configured TX capacity.
+            The radio requests 4096 TX payload bytes. Actual recovered heap
+            and fragmentation require measurement on the CYD board.
+
     config YORADIO_ADAPTIVE_INPUT_BUFFER
         bool "Leased compressed input queue"
         default y

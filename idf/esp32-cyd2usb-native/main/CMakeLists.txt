@@ -84,6 +84,9 @@ idf_component_register(
 include("${CMAKE_CURRENT_LIST_DIR}/compat/httpd_rfc6455/enable.cmake")
 native_enable_httpd_rfc6455()
 
+include("${CMAKE_CURRENT_LIST_DIR}/compat/http_request_buffer/enable.cmake")
+native_enable_http_request_buffer_release()
+
 target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP_IDF_NATIVE=1)
 
 if(CONFIG_ESP_TLS_USING_MBEDTLS)

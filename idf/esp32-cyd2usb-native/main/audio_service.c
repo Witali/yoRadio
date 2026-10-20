@@ -13,6 +13,7 @@
 #include "esp_check.h"
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
+#include "http_request_buffer.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "esp_timer.h"
@@ -360,7 +361,16 @@ static esp_err_t open_stream(esp_http_client_handle_t client,
         if (esp_timer_get_time() >= deadline) return ESP_ERR_TIMEOUT;
         if (length < 0) return ESP_FAIL;
         int status = esp_http_client_get_status_code(client);
-        if (status >= 200 && status < 300) return ESP_OK;
+        if (status >= 200 && status < 300) {
+#ifdef CONFIG_YORADIO_HTTP_REQUEST_BUFFER_RELEASE
+            if (headers->valid) {
+                esp_err_t released = yoradio_http_client_release_request_buffer(client);
+                if (released != ESP_OK)
+                    ESP_LOGD(TAG, "HTTP request buffer retained: %s", esp_err_to_name(released));
+            }
+#endif
+            return ESP_OK;
+        }
         bool redirected = status == 301 || status == 302 || status == 303 ||
                           status == 307 || status == 308;
         if (!redirected || redirect == MAX_HTTP_REDIRECTS) return ESP_FAIL;
