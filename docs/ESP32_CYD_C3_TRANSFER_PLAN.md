@@ -641,6 +641,13 @@ Stream остаётся на core0, decode/output на core1 с прежними
   CYD и 44 существующих C3 проверки инструментов, всего 72. Прерывания и ошибки
   cleanup сохраняют FAIL; установка firmware и перезагрузка не выполняются.
   Это host/fake/loopback квалификация контроллера; физическая приёмка открыта.
+
+- 2026-10-20, CYD-C3-08/15: добавлен отдельный [контроллер OTA-приёмки CYD](../tools/cyd_tests/ota.py).
+  Negative-only и явно выбранный same-image upload проверяют HTTP, image/backend,
+  boot/uptime/slot и неизменность settings/Wi-Fi metadata/playlist. Прошли 52
+  synthetic/fake теста, включая прерывания и primary/cleanup failures; независимое
+  ревью завершено. Обеим платам сохранены прежние image rejection policy.
+  Реальная сеть, flash/reboot, OTA во время playback и power-loss ещё не проверены.
   Исходники зафиксированы в `affa3caf1` после выполнения тестов; чистота Git
   на момент тестов не заявляется. Actual SDK/QEMU, application и physical gates
   остаются отдельными проверками; старый nonpass prototype не переименован.

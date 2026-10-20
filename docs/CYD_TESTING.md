@@ -84,6 +84,7 @@ synthetic valid/corrupt ESP images and existing local fixture bytes.
 
 ```powershell
 python -B -X utf8 tests/test-cyd-acceptance-tools.py
+python -B -X utf8 tests/test-cyd-ota-tools.py
 python -B -X utf8 tests/test-production-health.py
 python -B -X utf8 tests/test-quiet-file-gates.py
 python -B -X utf8 tests/test-sustained-output.py
@@ -135,3 +136,39 @@ The hostname must resolve to the controlled server from the board. Add
 artifact. Physical RF reconnect, watchdog coverage beyond sampled restarts,
 DMA/IRQ timing, analog listening/loopback, OTA/data/power-loss behavior and the
 full transfer-plan hardware matrix remain separate acceptance work.
+
+## OTA acceptance
+
+The separate [OTA controller](../tools/cyd_tests/ota.py) requires an explicitly
+selected CYD production app, backend and fresh report path. These examples have
+not been executed against a physical board:
+
+```text
+python -m tools.cyd_tests.ota --board http://BOARD --firmware firmware/development/VARIANT/app.bin --backend pdm --negative-only --output .build/cyd-ota-negative.json
+python -m tools.cyd_tests.ota --board http://BOARD --firmware firmware/development/VARIANT/app.bin --backend pdm --same-image-ota --output .build/cyd-ota-same-image.json
+```
+
+Preflight validates the complete chip0 CYD image and its app/config/manifest
+identities against the live ELF, version and selected backend. It stops existing
+audio before taking in-memory settings, public Wi-Fi metadata and playlist
+snapshots. Every upload rechecks identity. Cleanup stops playback; the runner has
+no serial/reset fallback, generic reboot or restoration upload.
+
+Both modes exercise rejected images, oversized requests and interrupted uploads.
+`--negative-only` never performs a successful update and always leaves
+`successful_update_qualified=false`. `--same-image-ota` adds exactly one successful
+upload of the selected image, requiring the other OTA slot, a new software boot,
+stable identity/uptime and unchanged settings/Wi-Fi metadata/playlist. Snapshot
+contents and private response/error text are not written to reports. Partial
+HTTP/boot evidence and separate primary/cleanup failures survive interruptions;
+failures and interruptions return a nonzero exit code.
+
+Optional active-playback maintenance requires `--same-image-ota`, `--play-url`
+and `--play-format FORMAT.json`. The JSON has exactly `codec`, `profile`, `rate`,
+`channels`, `bits`; supported fixtures are AAC, MP3 and FLAC with their complete
+expected PCM format. The runner does not serve or download the fixture or claim
+to verify the remote encoded bytes.
+
+Current qualification covers 52 synthetic-image and fake HTTP/upload/clock tests
+with real sockets forbidden. Actual CYD Wi-Fi, flash, reboot and playback OTA
+acceptance remains pending; no physical OTA run has been performed for this tool.

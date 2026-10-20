@@ -16,7 +16,10 @@ import time
 from urllib.error import HTTPError
 from urllib.parse import urlsplit
 
-from common import Board, Blocked, Failure, Report, fixtures, matches, require, sha
+if __package__:
+    from .common import Board, Blocked, Failure, Report, fixtures, matches, require, sha
+else:
+    from common import Board, Blocked, Failure, Report, fixtures, matches, require, sha
 
 
 BOUNDARY = 'yoradio-c3-acceptance-20260930'
@@ -232,7 +235,6 @@ def main():
     def accepted(name, slow=False, playing=False):
         playback = None
         if playing:
-            from common import Blocked
             if not args.play_url:
                 raise Blocked('Provide --play-url for OTA during active playback')
             timed_action(report, name+':play-request', lambda: board.play(args.play_url))
