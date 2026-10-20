@@ -3598,3 +3598,63 @@ qemu/parity/jpeg-transport-validation-20261020.json. Main app3E03/TJpgd unchange
 6artifact checks pass. Plan/notes/audit updated; весь IMPROVEMENT_PLAN активен.
 Далее shared scratch subfiles без4KiB rounding per-array, actual libjpeg NOR
 matrix/traffic/bounds, actual upload/source/journal/build integration и final gates.
+
+## 2026-10-20 — shared scratch и actual libjpeg/NOR qualification
+
+Продолжен пункт2 IMPROVEMENT_PLAN, вся цель остаётся активной. Предыдущий turn
+ответил на вопрос о плане без нового implementation checkpoint; продолжение
+прочитало текущие build.json/logs и перешло к проверке готовых reference-v2 и
+nor-v2, не перезапуская сборки из-за утраченного observation/session output.
+
+Добавлен storage/jpeg_scratch.c/.h:16byte-granular subfiles над ONE NOR/cache,
+без padding каждого файла. Four115200arrays fit exactly460800. First-fit/whole
+request bounds, initialized prefix, no writable gaps/unwritten reads, monotonically
+increasing by-value tokens over close/abort/reopen; overflow fails closed.
+Mandatory checkpoint даже при dirty RAM hit; ошибка poison всего job,
+cleanup/abort без I/O и flush временных данных. Heap/global writable0.
+Pinned actual jmemmgr first_undef_row contract проверен настоящими codec traces.
+
+Тронутый host probe разделён по назначению: общий capped pool allocator,
+независимый stdio backing oracle, NOR bridge и strict physical model.
+Модель проверяет page/1→0/erase, whole outside-scratch canaries, не откатывает
+partial writes и сохраняет physical bytes между двумя decode на одном object.
+Её8MiB host arrays не объявляются памятью ESP32-C2. Library patches/production
+UI app3E03/TJpgd, existing targetprobe6cb29771… и SDK не менялись.
+
+Native final16432assertions/5000random operations(128/256page),134partial
+error/silent cases, fragmentation/stale tokens/deadline and exhausted ID space;
+13compiled unsafe mutants runtime-rejected. FIXED_TEST: ID exhaustion terminal,
+поэтому тест выполняется последним; original failed source/log сохранены.
+First NOR build failed missing common hook include; CMake own include добавлен,
+failed original CMake/log и финальные успешные source-pinned builds сохранены.
+
+Actual libjpeg/NOR:25resources/924lossless/16invalid/4optional/18budget;
+38912table entries,48non-flat12-bit/12truncated;18Pillow independent pixels pass.
+1227logical fault recoveries,36truncated и12format transitions pass.
+Pillow отсутствовал в SDK Python: использован готовый bundled Python/Pillow,
+SDK packages не менялись. Ошибка первого запуска сохранена. Artifact script
+сначала вызван без required --output; correct invocation6checks pass, отдельные
+correspondence10controls pass. Ошибочные CLI не являются failed firmware runs.
+
+2238real partial physical errors с I/O return error: all2010small callbacks,
+4full-size fixtures по57sampled calls. First abort closes everyfile, recovery
+sameJPEGobject/retained permanent pools/partial physical NOR имеет exactpixels,
+final library pool0. Arbitrary silent read corruption без per-block hash не
+обещается detect. Separate NOR tests verify silent program/erase readback.
+Rich240×240CMYK12:460800scratch,16850432read/3780608program bytes/923erase calls.
+Это конкретная модель, не universal limits/timing/hardware endurance. Integration
+должна сохранять RGB565 cache и не повторять такой decode при каждом показе.
+
+RV32IMC/ILP32 object1240code,576handle/24token/32region, maxindividualframe48;
+не target execution/final link/whole heap/stack. Raw proof и exact hashes:
+qemu/parity/jpeg-scratch-validation-20261020.json. SDK tracked clean; six oldH10
+original process identities readonly-confirmed. Их ВМ/QMP/RSP/source не трогались.
+Следом expanded sampling/capacity (460800 всё ещё only fixtures), production
+budgets, actual source/upload journal+hash/cache workflow и matching assets
+deployment, затем native codec link/HTTP/LCD/full/24h/hardware acceptance.
+
+Во время checkpoint пользователь уточнил политику невозможных входов: отказ с
+правильной причиной или preflight rejection до decode. Сохранено в плане/notes:
+unsupported, invalid/truncated, RAM/scratch limit и I/O не смешивать; required/
+available для resource limit, без публикации partial cache. Это следующий
+контракт интеграции; текущий checkpoint не объявляет его уже реализованным в UI.

@@ -61,14 +61,24 @@ independent wire gate pass. RV32 code2976/const24/handle1032/maxframe448;
 variants/5fresh owned processes, actual writes/RMW/cold process persistence и
 readonly rejection чужого map/stamp/flags pass. Probe6cb29771… сохранена отдельно;
 main app3E03/TJpgd не менялась. [Результаты](tests/JPEG_TRANSPORT.md).
-Далее — byte-bounded shared scratch subfiles и actual libjpeg NOR/mode/traffic
-matrix для выбора production budgets; invalidation/source hash в upload/cache
-workflow, matching assets build/deployment с сохранением photos/settings.
+Следующий checkpoint: byte-bounded shared scratch реализован, один NOR cache
+обслуживает все files без per-file sector padding. Actual libjpeg/NOR matrix,
+18independent Pillow images,1227logical и2238physical error recoveries прошли;
+16432native assertions/13mutants и RV32 object1240/handle576/frame48 измерены.
+Трафик richCMYK12 —3780608program bytes/923erases на один tested240×240decode;
+это не production limits или endurance. [Результаты](tests/JPEG_SHARED_SCRATCH.md).
+Далее — расширить sampling/capacity bounds, выбрать budgets; invalidation/source
+hash в upload/cache workflow, matching assets build/deployment с сохранением photos/settings.
 Полный HTTP/power-loss workflow и native UI decoder integration ещё открыты.
 
 1. Зафиксировать матрицу входов/лимитов: baseline/progressive, gray/RGB/CMYK/YCCK,
    8/12-bit lossy и 2–16-bit Huffman lossless. Не обещать весь T.81: библиотека
    не поддерживает hierarchical, DNL, fractional subsampling и lossless arithmetic.
+   По уточнению пользователя: вход, который устройство не может декодировать,
+   отклонять с точной причиной. Различать unsupported mode, damaged JPEG и
+   resource limit; для последнего указывать required/available. По возможности
+   проверять до decode/backing writes. Не называть JPEG повреждённым из-за
+   недостатка RAM/scratch и не публиковать частичный результат как готовый cache.
 2. Реализовать отдельный NOR-aware storage module: sparse extents, ограниченный
    RAM sector cache, read/modify/erase/program, измерение износа. Проверенный
    layout planner сам не выполняет flash I/O; отдельные core/transport уже

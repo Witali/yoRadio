@@ -38,6 +38,10 @@ Host libjpeg allocation/I/O faults и recovery после abort проверяю
 [JPEG_FAULT_RECOVERY.md](JPEG_FAULT_RECOVERY.md). Эти результаты не заменяют
 NOR/HTTP/LCD или полный/суточный прогон будущей firmware.
 
+Actual libjpeg с одним общим NOR scratch проверен отдельной матрицей pixels,
+logical faults и 2238 partial physical error recoveries. Это host execution,
+не target UI integration. См. [JPEG_SHARED_SCRATCH.md](JPEG_SHARED_SCRATCH.md).
+
 Read-only [JPEG_STORAGE_LAYOUT.md](JPEG_STORAGE_LAYOUT.md) проверяет safe sectors
 для scratch и пяти RGB565 caches:30unsafe cases/4controls, ни одна flash write
 не выполняется. Это capacity/ownership plan, не готовый NOR backend.

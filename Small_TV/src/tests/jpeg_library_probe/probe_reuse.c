@@ -169,7 +169,10 @@ static void print_result(const char *name, const reuse_result *r)
            r->memory.stores_closed, r->faults.hits);
     for (unsigned i = 0; i < PROBE_FAULT_COUNT; ++i)
         printf("%s\"%s\":%lu", i ? "," : "", probe_fault_name((probe_fault_kind)i), r->faults.visits[i]);
-    printf("}}");
+    printf("},\"nor_calls\":%llu,\"nor_read_bytes\":%llu,\"nor_program_bytes\":%llu,\"nor_erases\":%llu,"
+           "\"nor_fault_hits\":%llu,\"scratch_peak_bytes\":%zu,\"scratch_peak_files\":%u,\"scratch_error\":%u}",
+           r->memory.nor_calls,r->memory.nor_read_bytes,r->memory.nor_program_bytes,r->memory.nor_erases,
+           r->memory.nor_fault_hits,r->memory.scratch_peak_bytes,r->memory.scratch_peak_files,r->memory.scratch_error);
 }
 
 int probe_reuse(int argc, char **argv)

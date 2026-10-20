@@ -168,9 +168,12 @@ done:
     printf("{\"passed\":%s,\"width\":%u,\"height\":%u,\"precision\":%u,\"channels\":%u,"
            "\"library_pool_peak\":%zu,\"library_pool_final\":%zu,\"row_bytes\":%zu,"
            "\"stores_opened\":%u,\"stores_closed\":%u,\"backing_capacity\":%llu,\"backing_read_bytes\":%llu,"
-           "\"backing_write_bytes\":%llu}\n", passed ? "true" : "false", width, height, precision, channels,
+           "\"backing_write_bytes\":%llu,\"nor_calls\":%llu,\"nor_read_bytes\":%llu,\"nor_program_bytes\":%llu,"
+           "\"nor_erases\":%llu,\"nor_fault_hits\":%llu,\"scratch_peak_bytes\":%zu,\"scratch_peak_files\":%u,\"scratch_error\":%u}\n",
+           passed ? "true" : "false", width, height, precision, channels,
            m.peak_bytes, m.current_bytes, row_bytes, m.stores_opened, m.stores_closed,
-           m.backing_capacity, m.bytes_read, m.bytes_written);
+           m.backing_capacity, m.bytes_read, m.bytes_written,m.nor_calls,m.nor_read_bytes,m.nor_program_bytes,
+           m.nor_erases,m.nor_fault_hits,m.scratch_peak_bytes,m.scratch_peak_files,m.scratch_error);
     free(s);
     return passed && m.current_bytes == 0 && m.stores_opened == m.stores_closed ? 0 : 1;
 }

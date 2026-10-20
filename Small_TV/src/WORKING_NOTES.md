@@ -66,14 +66,35 @@ stopped. Main3E03/TJpgd unchanged;6artifact pass,6oldH10 owners readonly-confirm
 acceptance. Port memory borrowed: abort/drop all old borrowers before reuse;
 RAM-only operations need explicit jpeg_transport_check, not just I/O callback.
 
-Следом shared scratch: byte-bounded files over ONE NOR cache, no per-file sector
-rounding. Pinned upstream c85e6b… src/jmemmgr.c tracks first_undef_row and rejects
-writable gaps; initialized-prefix tracking is a candidate, but must verify real
-codec backing traces/matrix before claiming it. Upstream source available readonly
-at C:/Work/yoRadio/.build/libjpeg-turbo-3.2.0. Current460800bound is only fixtures;
-expand sampling tests and choose real production budgets from NOR traffic/wear,
-not from small probe limits. Then source/upload journal invalidation, actual
-source/frame SHA, matching assets build/native codec bridge and final gates.
+Scratch checkpoint20Oct: byte-bounded files over ONE NOR cache выполнены.
+Pinned upstream c85e6b… src/jmemmgr.c first_undef_row contract подтверждён actual
+libjpeg/NOR pixels matrix:25resource/924lossless/48rich12-bit/18Pillow images,
+16+12negative/4optional/18budget cases. Native16432assertions/5000random/134faults,
+13compiled mutants;1227logical faults/36damaged recoveries/12transitions и
+2238partial physical I/O errors с same-object recovery прошли. Small physical
+calls exhaustive2010, четыре full-size sampled по57; silent read corruption не
+обещается detect. Byte prefix/token IDs/checkpoints/cleanup без temp flush.
+Pool allocator, stdio oracle и NOR bridge разделены по своим модулям. RV32
+scratch code1240/handle576/token24/region32/frame48; не target runtime/UI link.
+RichCMYK12 использует3780608program bytes/923erase calls на один tested decode;
+нужен persistent RGB565 cache вместо повторного scratch decode при показе.
+Current460800bound всё ещё только fixtures: расширить sampling matrix/rounded
+coefficient capacity, не исключать редкие требуемые варианты ради старого лимита.
+Source readonly C:/Work/yoRadio/.build/libjpeg-turbo-3.2.0. Production3E03/TJpgd
+и targetprobe6cb29771… unchanged; SDK clean, frozen47files/H10 original six
+owners проверены readonly. Proof jpeg-scratch-validation-20261020.json;
+tests/JPEG_SHARED_SCRATCH.md. Далее sampling/budgets, source/upload journal
+invalidation, actual source/frame SHA, matching assets build/native codec bridge
+и HTTP/target memory/time/LCD/full/24h/hardware gates. Весь план остаётся активным.
+
+Уточнение пользователя20Oct: объективно невозможный для устройства JPEG должен
+быть отклонён с правильной причиной, вплоть до отказа до decode. В native codec
+contract различать unsupported mode, malformed/truncated input, RAM/scratch limit
+и I/O failure. Для resource refusal сохранить required/available; preflight по
+реальным header/sampling/rounded allocations до backing writes, где это возможно.
+Отказ по нынешнему reserved scratch не означает, что сам JPEG испорчен или что
+все файлы этого coding mode невозможны. Нужны отдельные tests точной причины и
+отсутствия опубликованного частичного cache. Новый контракт ещё не включён в UI.
 
 ## Независимость проверок подсистем — 2026-10-18
 

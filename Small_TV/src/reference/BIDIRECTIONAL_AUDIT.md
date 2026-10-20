@@ -37,13 +37,15 @@ python Small_TV/src/tests/correspondence_test.py
 заводском образе. Подготовленная libjpeg ещё не подключена; её upstream-код
 и инструменты хостовых проб не являются переносом заводских функций.
 
-Новые storage modules jpeg_nor/guard/journal/transport/espidf — расширение JPEG,
+Новые storage modules jpeg_nor/guard/journal/transport/espidf/scratch — расширение JPEG,
 не перенос отдельных factory функций. Они пока не входят в native UI app3E03.
 NOR/guard/transport/espidf скомпилированы и исполнены в standalone target probe;
 journal проверен отдельно на host. Собственные [NOR contract](../tests/JPEG_NOR_STORAGE.md),
 [ownership guard](../tests/JPEG_OWNERSHIP_GUARD.md),
 [cache journal](../tests/JPEG_CACHE_JOURNAL.md) и
-[target transport](../tests/JPEG_TRANSPORT.md) хранят отдельные input closures.
+[target transport](../tests/JPEG_TRANSPORT.md) и
+[shared scratch](../tests/JPEG_SHARED_SCRATCH.md) хранят отдельные input closures.
+Scratch/actual libjpeg пока исполнены на host NOR model, не в target UI.
 При native UI integration их нужно включить в source inventory/сборочные inputs.
 Это REQUESTED_CHANGE helpers, не найденные пропущенные factory functions.
 
