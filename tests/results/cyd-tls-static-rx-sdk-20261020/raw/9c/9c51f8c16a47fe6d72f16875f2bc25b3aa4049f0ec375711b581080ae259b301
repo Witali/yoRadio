@@ -1,0 +1,491 @@
+"""Prepare/freeze/run/qualify the exact seven-export, six-Clang static RX gate.
+
+Only prepare-check and plan execute during preparation. Later phases need root review.
+No retry, setup, download, deploy, flash, network or private codec inspection.
+"""
+from pathlib import Path
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+import re
+import shlex
+import shutil
+import struct
+import subprocess
+import sys
+import time
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+PLAN = HERE / 'plan02'
+ARGV_CHECK = HERE / 'argv-roundtrip02.json'
+GUARD_CHECK = HERE / 'guard-check02/report.json'
+SHORT = ROOT / '.build/srx01'
+PROJECT = ROOT / 'idf/esp32-cyd2usb-native'
+MAIN = PROJECT / 'main'
+DEP = Path('C:/Work/yoRadio/.idf')
+SDK = DEP / 'v6.0.2'
+PW = Path('C:/Users/rudol/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe')
+PY = DEP / 'python-3.12.10/tools/python.exe'
+CLANG_BIN = DEP / 'tools-v6.0.2/tools/esp-clang/esp-20.1.1_20250829/esp-clang/bin'
+CMAKE = DEP / 'tools-v6.0.2/tools/cmake/4.0.3/bin/cmake.exe'
+NINJA = DEP / 'tools-v6.0.2/tools/ninja/1.12.1/ninja.exe'
+SDK_PY = DEP / 'tools-v6.0.2/python_env/idf6.0_py3.12_env/Scripts/python.exe'
+OPTION = 'YORADIO_TLS_STATIC_RX_RESERVE'
+SDK_COMMIT = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+LEGACY_COMMIT = '735507283d5b2f9fb363a1901172dbd9e847945d'
+SCHEMA = 'cyd-static-rx-production-v2'
+SPECS = [('pdm','pdm',False,'vp'),('continuous','continuous',False,'vc'),('legacy','legacy',False,'vl'),
+         ('custom-flac-pdm','pdm',True,'cp'),('custom-flac-continuous','continuous',True,'cc'),('custom-flac-legacy','legacy',True,'cl'),
+         ('disabled-pdm','pdm',False,'off')]
+CANONICAL = [MAIN / 'native_tls_rx_reserve.c', MAIN / 'native_tls_rx_reserve.h', MAIN / 'compat/tls_static_rx/enable.cmake',
+             MAIN / 'compat/tls_static_rx/sdk-source-guards.json', ROOT / 'tools/patch_cyd_tls_static_rx.py']
+FIELDS = {'app.bin':'app_sha256','sdkconfig':'sdkconfig_sha256','sdkconfig.json':'sdkconfig_json_sha256',
+          'partition-table.bin':'partition_table_sha256','project_description.json':'project_description_sha256','flasher_args.json':'flasher_args_sha256'}
+
+def require(value, message):
+    if not value: raise RuntimeError(message)
+def sha(raw): return hashlib.sha256(raw).hexdigest()
+def ident(p):
+    p=Path(p).resolve(); raw=p.read_bytes(); return {'path':str(p),'bytes':len(raw),'sha256':sha(raw)}
+def write(p, value): p.write_bytes((json.dumps(value,indent=2,sort_keys=True)+'\n').encode())
+def read(p): return json.loads(Path(p).read_bytes())
+def matching_bytes(path,expected):
+    actual=ident(path)
+    require(all(actual[key]==expected[key] for key in ['bytes','sha256']),'Prepared copy differs from frozen bytes: '+str(path))
+    return actual
+def recheck_identities(value):
+    if isinstance(value,dict):
+        if {'path','bytes','sha256'} <= value.keys():
+            require(ident(value['path'])=={k:value[k] for k in ['path','bytes','sha256']},'Recorded artifact changed: '+value['path'])
+        for nested in value.values():recheck_identities(nested)
+    elif isinstance(value,list):
+        for nested in value:recheck_identities(nested)
+def env():
+    e=os.environ.copy();e.update(PYTHONDONTWRITEBYTECODE='1',PYTHONNOUSERSITE='1',PYTHONUTF8='1',PYTHONIOENCODING='utf-8',IDF_COMPONENT_MANAGER='0',GIT_OPTIONAL_LOCKS='0')
+    n=int(e.get('GIT_CONFIG_COUNT','0'));e.update({'GIT_CONFIG_COUNT':str(n+1),'GIT_CONFIG_KEY_'+str(n):'core.longpaths','GIT_CONFIG_VALUE_'+str(n):'true'});return e
+def git(*args,cwd=ROOT): return subprocess.check_output(['git','-c','core.longpaths=true','-C',str(cwd),*args],env=env())
+def load_module(p, name):
+    spec=importlib.util.spec_from_file_location(name,p);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
+def exporter():
+    os.environ.update(env());return load_module(ROOT/'tools/export_cyd_production.py','static_rx_exporter')
+def delta(a,b):
+    return {k:{'before':a.get(k),'after':b.get(k)} for k in sorted(a.keys()|b.keys())
+            if k not in a or k not in b or type(a[k]) is not type(b[k]) or a[k]!=b[k]}
+def current_snapshot():
+    s=exporter().source_snapshot(ROOT)
+    require(not s['dirty'] and not s['source_dirty'] and not s['untracked'],'Require completely clean committed source/index before execution')
+    return s
+def global_configs(): return [ident(p) for p in sorted(PROJECT.glob('sdkconfig*')) if p.is_file()]
+def sdk_state():
+    result={}
+    for name,commit in [('v6.0.2',SDK_COMMIT),('v5.5.4',LEGACY_COMMIT)]:
+        p=DEP/name;require(git('rev-parse','HEAD',cwd=p).decode().strip()==commit,'Wrong installed SDK '+name)
+        require(not git('status','--porcelain','--untracked-files=no',cwd=p).strip(),'SDK tracked source dirty '+name)
+        result[name]=commit
+    return result
+def task_profile(commit):
+    result={}
+    for name in ['app_main.c','audio_service.c','network_runtime.c']:
+        rel=(MAIN/name).relative_to(ROOT).as_posix();a=git('show',commit+':'+rel).decode().replace('\r\n','\n');b=(MAIN/name).read_text()
+        calls=lambda x:re.findall(r'\bxTaskCreatePinnedToCore\([^;]+;',x,re.S)
+        require(calls(a)==calls(b) and calls(b),'Task calls changed: '+name); result[name]={'calls':calls(b)}
+        if name=='audio_service.c':
+            table=lambda x:re.search(r'static const pipeline_task_t task_config\[3\] = \{(.*?)\n    \};',x,re.S)[1]
+            require(table(a)==table(b),'Audio core/priority/stack table changed');result[name]['table']=table(b)
+    rel=(MAIN/'board_config.h').relative_to(ROOT).as_posix()
+    require(git('show',commit+':'+rel).replace(b'\r\n',b'\n')==(MAIN/'board_config.h').read_bytes().replace(b'\r\n',b'\n'),'Board profile changed')
+    result['board']=ident(MAIN/'board_config.h');return result
+def committed_file(p, expected=None):
+    rel=p.relative_to(ROOT).as_posix();blob=git('show','HEAD:'+rel);raw=p.read_bytes();lfs=re.fullmatch(rb'version https://git-lfs.github.com/spec/v1\noid sha256:([0-9a-f]{64})\nsize (\d+)\n',blob)
+    if lfs:
+        require(p.name in ['app.bin','partition-table.bin'] and sha(raw)==lfs[1].decode() and len(raw)==int(lfs[2]),'Hydrated baseline LFS identity')
+        storage={'kind':'lfs','pointer_ascii':blob.decode(),'pointer_sha256':sha(blob)}
+    else:
+        require(raw==blob,'Raw baseline differs from HEAD: '+rel);storage={'kind':'raw','git_blob_bytes_sha256':sha(blob)}
+    if expected:require(sha(raw)==expected,'Baseline manifest mismatch: '+rel)
+    return {**ident(p),'git':storage}
+def baseline(name, backend, custom):
+    p=ROOT/'firmware/development'/('esp32-cyd2usb-native-early-mpi-'+name);receipt=read(p/'manifest.json')
+    require(receipt['build_check']=='PASS' and receipt['target']=='esp32' and receipt['backend']==backend and not receipt['source_dirty'] and not receipt['source_untracked'],'Wrong/unqualified MPI baseline')
+    expected=set(FIELDS)|{'manifest.json'}|{x['file'] for x in receipt['build_logs']}
+    require({x.name for x in p.iterdir() if x.is_file()}==expected,'Complete baseline file set')
+    record={'directory':str(p),'files':{},'source_commit':receipt['source_commit'],'receipt':receipt}
+    for name in sorted(expected):
+        row=committed_file(p/name,receipt.get(FIELDS.get(name,'')));record['files'][name]=row
+        if name not in ['app.bin','partition-table.bin']:
+            out=PLAN/'baselines'/p.name/name;out.parent.mkdir(parents=True,exist_ok=True);out.write_bytes((p/name).read_bytes());row['snapshot']=str(out)
+    cfg=read(p/'sdkconfig.json');require(OPTION not in cfg,'Baseline already contains reserve option')
+    require(cfg['YORADIO_TLS_INPUT_RECLAIM'] is True and cfg['YORADIO_TLS_EARLY_MPI_LOCK'] is True,'Both MPI/reclaim must remain enabled')
+    require(cfg['YORADIO_FLAC_DECODER_CUSTOM'] is custom and cfg['YORADIO_FLAC_DECODER_ESPRESSIF'] is (not custom),'Wrong existing decoder selection')
+    desc=read(p/'project_description.json');oldbuild=Path(receipt['build_directory']);elf=oldbuild/desc['app_elf'];mp=oldbuild/(desc['project_name']+'.map')
+    require(elf.is_file() and ident(elf)['sha256']==receipt['elf_sha256'] and mp.is_file(),'Baseline ELF/map required for measured comparisons; recover exact existing artifacts, never rebuild silently')
+    record['elf']=ident(elf);record['map']=ident(mp);record['task_profile']=task_profile(receipt['source_commit']);return record,cfg
+def plan():
+    require(not PLAN.exists() and not SHORT.exists(),'Fresh plan and future short build root required');PLAN.mkdir()
+    initial_globals=global_configs();result={'schema':SCHEMA,'status':'prepared_only','builds_executed':0,'lint_executed':0,'baseline_git_head':git('rev-parse','HEAD').decode().strip(),'baselines':{},'rows':[]}
+    for name,backend,custom,tag in SPECS:
+        base='pdm' if name=='disabled-pdm' else name
+        if base not in result['baselines']:result['baselines'][base],_=baseline(base,backend,custom)
+        record=result['baselines'][base];text=Path(record['files']['sdkconfig']['snapshot']).read_bytes();newline=b'\r\n' if b'\r\n' in text else b'\n'
+        require(b'CONFIG_'+OPTION.encode() not in text,'Only new reserve option may be appended')
+        setting=('CONFIG_'+OPTION+'=y' if name!='disabled-pdm' else '# CONFIG_'+OPTION+' is not set').encode()+newline
+        marker=b'# Deprecated options for backward compatibility';position=text.find(marker)
+        seed=(text[:position]+setting+text[position:]) if position>=0 else text+setting
+        out=PLAN/'seeds'/name/'sdkconfig';out.parent.mkdir(parents=True);out.write_bytes(seed)
+        variant='esp32-cyd2usb-native-static-rx-'+name;destination=ROOT/'firmware/development'/variant
+        require(not destination.exists(),'New development variant already exists: '+variant)
+        row={'name':name,'tag':tag,'backend':backend,'custom_flac':custom,'enabled':name!='disabled-pdm','baseline':base,'seed':ident(out),'variant':variant,'output':str(destination),'build':str(SHORT/('g'+tag)),'config':str(SHORT/('g'+tag)/'sdkconfig')}
+        row['export_argv']=[str(PY),'-B','-X','utf8',str(ROOT/'tools/export_cyd_production.py'),'build','--repository',str(ROOT),'--dependency-root',str(DEP),'--powershell',str(PW),'--backend',backend,'--build-dir',row['build'],'--sdkconfig',row['config'],'--variant',variant,'--output-directory',str(destination)]
+        if row['enabled']:
+            row.update(clang_build=str(SHORT/('c'+tag)),clang_config=str(SHORT/('c'+tag)/'sdkconfig'),lint_output=str(PLAN/'execution'/('lint-'+name)))
+            row['clang_invocation']={'schema':SCHEMA,'dependencies':str(DEP),'project':str(PROJECT),'clang_build':row['clang_build'],'clang_config':row['clang_config'],'defaults':str(PROJECT/('sdkconfig.defaults' if backend=='pdm' else ('sdkconfig.defaults;sdkconfig.dac.defaults' if backend=='continuous' else 'sdkconfig.defaults;sdkconfig.legacy-dac.defaults')))}
+            # Defaults are passed as absolute paths for every backend input.
+            defaults=[PROJECT/'sdkconfig.defaults']+([] if backend=='pdm' else [PROJECT/('sdkconfig.dac.defaults' if backend=='continuous' else 'sdkconfig.legacy-dac.defaults')])
+            row['clang_invocation']['defaults']=';'.join(str(x) for x in defaults)
+            ip=PLAN/'seeds'/name/'clang-invocation.json';write(ip,row['clang_invocation'])
+            row['clang_invocation_file']=ident(ip)
+            row['clang_configure_argv']=[str(PW),'-NoProfile','-NonInteractive','-File',str(HERE/'clang-configure.ps1'),'-Invocation',str(ip)]
+            row['lint_argv']=[str(PY),'-B','-X','utf8',str(ROOT/'tools/run_native_lint.py'),'--build-dir',row['clang_build'],'--clang-tidy',str(CLANG_BIN/'clang-tidy.exe'),'--output',row['lint_output'],'--jobs','2','--include-httpd-overlay']
+        result['rows'].append(row)
+    require(global_configs()==initial_globals,'Mutable project configs changed during planning');validate_plan_inputs(result);write(PLAN/'plan.json',result);print(json.dumps({'plan':ident(PLAN/'plan.json'),'exports':7,'clang':6,'executed':0}))
+
+def validate_baselines(p,plan_root=PLAN):
+    identities=[]
+    for b in p['baselines'].values():
+        for name,row in b['files'].items():
+            original=ident(row['path']);require(original=={k:row[k] for k in ['path','bytes','sha256']},'Frozen baseline changed');identities.append(original)
+            if 'snapshot' in row:
+                expected=plan_root/'baselines'/Path(b['directory']).name/name
+                require(Path(row['snapshot']).resolve()==expected.resolve(),'Unexpected baseline snapshot path')
+                identities.append(matching_bytes(row['snapshot'],row))
+        for key in ['elf','map']:require(ident(b[key]['path'])==b[key],'Baseline '+key+' changed')
+    return identities
+def validate_plan_inputs(p,plan_root=PLAN):
+    identities=validate_baselines(p,plan_root)
+    for row in p['rows']:
+        seed=plan_root/'seeds'/row['name']/'sdkconfig';require(Path(row['seed']['path']).resolve()==seed.resolve(),'Unexpected seed path')
+        require(ident(seed)==row['seed'],'Prepared seed changed');identities.append(ident(seed))
+        if row['enabled']:
+            ip=plan_root/'seeds'/row['name']/'clang-invocation.json'
+            require(Path(row['clang_invocation_file']['path']).resolve()==ip.resolve(),'Unexpected invocation JSON path')
+            require(ident(ip)==row['clang_invocation_file'],'Prepared Clang invocation JSON changed')
+            require(read(ip)==row['clang_invocation'],'Clang invocation JSON differs from frozen plan content')
+            require(Path(row['clang_configure_argv'][-1]).resolve()==ip.resolve(),'Clang argv selects an unbound invocation JSON')
+            identities.append(ident(ip))
+    return identities
+def tool_closure(p):
+    compilers={b['receipt']['compiler'] for b in p['baselines'].values()};require(len(compilers)==1,'Baseline compiler identities differ')
+    compiler=Path(next(iter(compilers)));gcc=compiler.parent.parent;resolved_git=shutil.which('git');require(resolved_git,'Git binary missing')
+    roles={}
+    def add(role,paths):
+        paths=[Path(x).resolve() for x in paths];require(paths and all(x.is_file() for x in paths),'Missing planned tool role: '+role);roles[role]=[str(x) for x in sorted(set(paths))]
+    add('bootstrap_python',[PY]);add('sdk_python',[SDK_PY]);add('powershell',[PW]);add('git',[resolved_git]);add('cmake',[CMAKE]);add('ninja',[NINJA])
+    add('gcc_driver_and_binutils',compiler.parent.glob('xtensa-esp32-elf-*.exe'))
+    add('gcc_internal_drivers',(gcc/'libexec/gcc/xtensa-esp-elf/15.2.0').glob('*.exe'))
+    add('gcc_internal_binutils',(gcc/'xtensa-esp-elf/bin').glob('*.exe'))
+    add('clang_frontend_tidy_and_build_helpers',[CLANG_BIN/x for x in ['clang.exe','clang++.exe','clang-tidy.exe','llvm-ar.exe','llvm-ranlib.exe','ld.lld.exe']])
+    add('repository_python_powershell_and_lint_config',[ROOT/'tools/export_cyd_production.py',ROOT/'tools/run_native_lint.py',ROOT/'.clang-tidy',PROJECT/'build.ps1',CANONICAL[-1]])
+    add('sdk_entry_scripts',[SDK/'export.ps1',SDK/'tools/idf.py',SDK/'tools/idf_tools.py',SDK/'tools/activate.py',DEP/'tools-v6.0.2/idf-env.json'])
+    paths=sorted({x for group in roles.values() for x in group});return [ident(x) for x in paths],roles
+def freeze(a):
+    require(not (PLAN/'marker.json').exists(),'Never overwrite freeze marker');p=read(PLAN/'plan.json');plan_inputs=validate_plan_inputs(p);source=current_snapshot();require(source['commit']==a.expected_head,'Wrong clean integration commit')
+    require(not SHORT.exists(),'Short build root must be fresh')
+    for row in p['rows']:require(not Path(row['output']).exists(),'Development output must be new')
+    inputs=[ident(x) for x in CANONICAL]+[ident(MAIN/x) for x in ['audio_service.c','board_config.h','native_input_reclaim.c','native_tls_early_mpi.c']]
+    module=(MAIN/'native_tls_rx_reserve.c').read_text();require('mbedtls_ssl_conf_' not in module and 'user_data' not in module and re.search(r'static\s+uintptr_t\s+s_radio_configurations\[',module),'Expected separate integer-key registry with zero userdata access')
+    patcher=load_module(CANONICAL[-1],'static_rx_patcher');guards=patcher.validate_sdk_guards(SDK,CANONICAL[3]);require(len(guards)==19,'Nineteen supporting guards required')
+    require('yoradio_tls_static_rx_forget_configuration' in patcher.patch((SDK/'components/mbedtls/mbedtls/library/ssl_tls.c').read_bytes()).decode(),'SDK lifecycle hooks missing')
+    api=exporter();[api.preflight(DEP,b) for b in ['pdm','continuous','legacy']]
+    tools,tool_roles=tool_closure(p)
+    argv_check=read(ARGV_CHECK);require(argv_check['passed'] and argv_check['compiler_invocations']==0,'Preparation-only argv proof required')
+    recheck_identities(argv_check)
+    pure_checks=read(GUARD_CHECK);require(pure_checks['passed'] and pure_checks['configure_compiler_sdk_lint_export_invocations']==0,'Pure provenance guard checks required');recheck_identities(pure_checks)
+    required_evidence=[Path(x).resolve() for x in a.evidence];require(required_evidence,'Canonical software evidence must be explicitly supplied')
+    m={'schema':SCHEMA,'source_snapshot':source,'plan':ident(PLAN/'plan.json'),'plan_inputs':plan_inputs,'inputs':inputs,'sdk_state':sdk_state(),'guards':guards,'tools':tools,'tool_roles':tool_roles,'argv_preparation_check':ident(ARGV_CHECK),'pure_guard_check':ident(GUARD_CHECK),'evidence':[ident(x) for x in required_evidence],'global_configs':global_configs(),'scripts':[ident(HERE/x) for x in ['campaign.py','clang-configure.ps1','guard_checks.py','README.md']],'task_profiles':{k:task_profile(b['source_commit']) for k,b in p['baselines'].items()}}
+    require(current_snapshot()==source,'Source changed during freeze');write(PLAN/'marker.json',m);print(json.dumps({'marker_sha256':ident(PLAN/'marker.json')['sha256'],'source_commit':source['commit'],'ready_for_root_authorized_execution':True}))
+def checked(a):
+    require(ident(PLAN/'marker.json')['sha256']==a.marker_sha256,'Wrong marker SHA');m=read(PLAN/'marker.json');p=read(PLAN/'plan.json')
+    require(ident(PLAN/'plan.json')==m['plan'] and current_snapshot()==m['source_snapshot'],'Plan or complete source/HEAD changed')
+    require(validate_plan_inputs(p)==m['plan_inputs'],'Prepared baseline/seed/invocation inputs changed');require(global_configs()==m['global_configs'] and sdk_state()==m['sdk_state'],'Global config/SDK state changed')
+    for row in m['inputs']+m['tools']+m['evidence']+m['scripts']:require(ident(row['path'])==row,'Frozen input/tool/evidence changed')
+    require(ident(m['argv_preparation_check']['path'])==m['argv_preparation_check'],'Preparation argv proof changed')
+    require(ident(m['pure_guard_check']['path'])==m['pure_guard_check'],'Pure provenance guard proof changed')
+    patcher=load_module(CANONICAL[-1],'checked_rx_patcher');require(patcher.validate_sdk_guards(SDK,CANONICAL[3])==m['guards'],'SDK support headers changed')
+    for key,b in p['baselines'].items():require(task_profile(b['source_commit'])==m['task_profiles'][key],'Task/board profile changed')
+    return p,m
+def chosen(p,name):return next(x for x in p['rows'] if x['name']==name)
+def execute(command, logbase, record):
+    logbase.parent.mkdir(parents=True,exist_ok=True)
+    with logbase.with_suffix('.stdout.log').open('xb') as out,logbase.with_suffix('.stderr.log').open('xb') as err:
+        process=subprocess.Popen(list(map(str,command)),cwd=ROOT,env=env(),stdout=out,stderr=err)
+        record['commands'].append({'argv':list(map(str,command)),'pid':process.pid,'status':'RUNNING'});write(Path(record['record_path']),record)
+        code=process.wait();record['commands'][-1].update(status='TERMINAL',returncode=code)
+        record['commands'][-1]['logs']=[ident(logbase.with_suffix(s)) for s in ['.stdout.log','.stderr.log']];write(Path(record['record_path']),record)
+        require(code==0,'Terminal command failed; preserve this attempt, do not restart automatically')
+def run(a):
+    p,m=checked(a);row=chosen(p,a.row);require(a.kind=='export' or row['enabled'],'No disabled Clang row in this gate')
+    state=PLAN/'execution'/(a.kind+'-'+a.row+'.json');require(not state.exists(),'Run already has a record; inspect authoritative process state, never restart this attempt')
+    state.parent.mkdir(exist_ok=True);r={'schema':SCHEMA,'record_path':str(state),'kind':a.kind,'row':a.row,'status':'STARTING','commands':[],'marker_sha256':a.marker_sha256,'source_snapshot_before':m['source_snapshot'],'started_unix':time.time()};write(state,r)
+    try:
+        build=Path(row['build'] if a.kind=='export' else row['clang_build']);require(not build.exists(),'Build directory not fresh');build.mkdir(parents=True)
+        config=Path(row['config'] if a.kind=='export' else row['clang_config']);require(ident(row['seed']['path'])==row['seed'],'Seed changed');shutil.copyfile(row['seed']['path'],config);r['seed_before_build']=ident(config)
+        if a.kind=='export':
+            require(not Path(row['output']).exists(),'New output already exists');command=row['export_argv']+sum((['--evidence',x['path']] for x in m['evidence']),[])
+            execute(command,PLAN/'execution'/('export-'+a.row),r)
+        else:
+            execute(row['clang_configure_argv'],PLAN/'execution'/('configure-'+a.row),r)
+            execute(row['lint_argv'],PLAN/'execution'/('lint-'+a.row),r)
+        checked(a);r.update(status='TERMINAL_SUCCESS',ended_unix=time.time(),source_snapshot_after=m['source_snapshot'])
+    except BaseException as e:r.update(status='TERMINAL_FAILURE',error=repr(e),ended_unix=time.time());raise
+    finally:write(state,r)
+
+def nm_symbols(text):
+    result={}
+    for line in text.splitlines():
+        f=line.split()
+        if len(f)==4 and re.fullmatch('[0-9a-f]+',f[0]):result[f[3]]={'address':int(f[0],16),'bytes':int(f[1],16),'type':f[2]}
+    return result
+def elf_sections(raw):
+    off=struct.unpack_from('<I',raw,32)[0];size,count,names=struct.unpack_from('<HHH',raw,46)
+    rows=[struct.unpack_from('<10I',raw,off+i*size) for i in range(count)];strings=rows[names];table=raw[strings[4]:strings[4]+strings[5]]
+    return [{'name':table[r[0]:].split(b'\0',1)[0].decode(),'type':r[1],'flags':r[2],'address':r[3],'offset':r[4],'bytes':r[5]} for r in rows]
+def elf_word(raw,address):
+    for sec in elf_sections(raw):
+        if sec['type']!=8 and sec['address']<=address<=sec['address']+sec['bytes']-4:return struct.unpack_from('<I',raw,sec['offset']+address-sec['address'])[0]
+    raise RuntimeError('ELF initialized word not found')
+def call_trace(text,raw,syms):
+    registers={};calls=[]
+    for line in text.splitlines():
+        match=re.match(r'^\s*([0-9a-f]+):\s+[0-9a-f]+\s+(\S+)\s*(.*)$',line)
+        if not match:continue
+        pc,opcode,operands=match.groups()
+        if opcode=='l32r':
+            operand=re.match(r'(a\d+),\s*([0-9a-f]+)',operands)
+            if operand:registers[operand[1]]=elf_word(raw,int(operand[2],16))
+        elif re.fullmatch(r'call(?:0|4|8|12)',opcode):
+            calls.append(int(re.match('([0-9a-f]+)',operands)[1],16));registers.clear()
+        elif re.fullmatch(r'callx(?:0|4|8|12)',opcode):
+            calls.append(registers.get(operands.split(',')[0].strip()));registers.clear()
+        else:registers.pop(operands.split(',')[0].strip(),None)
+    return calls
+def footprint(elf,mapfile):
+    raw=elf.read_bytes();require(raw[:6]==b'\x7fELF\x01\x01' and struct.unpack_from('<H',raw,18)[0]==94,'Actual Xtensa ELF94 required')
+    sections=[x for x in elf_sections(raw) if x['flags']&2];return {'elf':ident(elf),'map':ident(mapfile),'sections':sections,'iram_bytes':sum(x['bytes'] for x in sections if 0x40080000<=x['address']<0x400a0000),'dram_bytes':sum(x['bytes'] for x in sections if 0x3ff80000<=x['address']<0x40000000)}
+def tool(command,path):
+    result=subprocess.run(list(map(str,command)),cwd=ROOT,env=env(),stdout=subprocess.PIPE,stderr=subprocess.STDOUT);path.write_bytes(result.stdout);require(result.returncode==0,'Read-only inspection failed: '+str(command));return result.stdout.decode(errors='replace')
+def config_check(row,p,cfg):
+    before=read(p['baselines'][row['baseline']]['files']['sdkconfig.json']['snapshot']);changes=delta(before,cfg)
+    require(changes=={OPTION:{'before':None,'after':row['enabled']}},'Unexpected complete normalized config delta: '+json.dumps(changes))
+    require(cfg['IDF_TARGET']=='esp32' and cfg['IDF_TARGET_ARCH']=='xtensa' and cfg['YORADIO_TLS_EARLY_MPI_LOCK'] is True and cfg['YORADIO_TLS_INPUT_RECLAIM'] is True and not cfg['FREERTOS_UNICORE'],'Preserved target/MPI/reclaim/dual-core')
+    require(cfg['MBEDTLS_SSL_IN_CONTENT_LEN']==16384 and cfg['MBEDTLS_SSL_OUT_CONTENT_LEN']==4096,'Full RX/TX capacity changed');return changes
+def source_rows(build,row,out,compiler_kind):
+    entries=read(build/'compile_commands.json');module=[x for x in entries if Path(x['file']).resolve()==CANONICAL[0]]
+    overlays=[x for x in entries if Path(x['file']).name=='ssl_tls.c'];expected=build/'native-tls-static-rx/ssl_tls.c'
+    require(len(module)==int(row['enabled']) and len(overlays)==1,'Actual module/SSL source count')
+    require(Path(overlays[0]['file']).resolve()==(expected if row['enabled'] else SDK/'components/mbedtls/mbedtls/library/ssl_tls.c'),'Wrong compiled SSL source')
+    if row['enabled']:
+        patcher=load_module(CANONICAL[-1],'qualifier_rx_patcher');require(expected.read_bytes()==patcher.patch((SDK/'components/mbedtls/mbedtls/library/ssl_tls.c').read_bytes()),'Compiled SSL overlay differs from exact canonical patch')
+    else:require(not expected.exists(),'Disabled SSL overlay unexpectedly exists')
+    selected=module+overlays
+    for entry in selected:require(compiler_kind in Path(entry_tokens(entry)[0]).name,'Wrong actual compiler row')
+    write(out/'actual-module-sdk-commands.json',selected);return entries,selected
+def exact_header_closure(headers,build,module):
+    expected=[SDK/'components/mbedtls/mbedtls/library/ssl_misc.h',SDK/'components/mbedtls/mbedtls/tf-psa-crypto/core/tf_psa_crypto_common.h',SDK/'components/mbedtls/mbedtls/include/mbedtls/ssl.h',build/'config/sdkconfig.h']
+    if module:expected.append(CANONICAL[1])
+    paths={Path(value['path']).resolve() for value in headers.values()}
+    for path in expected:
+        matches={p for p in paths if p.name==path.name}
+        require(matches=={path.resolve()},'Wrong or missing exact consumed header '+str(path))
+        require(headers[str(path.resolve())]==ident(path),'Consumed guarded header bytes changed '+str(path))
+    return [ident(x) for x in expected]
+def deps_gcc(build,out,selected):
+    ninja=DEP/'tools-v6.0.2/tools/ninja/1.12.1/ninja.exe';closure={}
+    for index,entry in enumerate(selected):
+        tokens=entry_tokens(entry);require('-o' in tokens,'Explicit actual object output required');obj=Path(tokens[tokens.index('-o')+1]);obj=obj if obj.is_absolute() else Path(entry['directory'])/obj
+        raw=obj.read_bytes();require(raw[:6]==b'\x7fELF\x01\x01' and struct.unpack_from('<H',raw,18)[0]==94,'Actual selected TU object architecture')
+        text=tool([ninja,'-C',build,'-t','deps',obj.relative_to(build).as_posix()],out/('dependencies-'+str(index)+'.log'));headers={}
+        require('deps mtime' in text and '(VALID)' in text,'Ninja did not report a valid consumed dependency closure')
+        for line in text.splitlines():
+            if not line.startswith('    '):continue
+            p=Path(line.strip());p=p if p.is_absolute() else build/p
+            require(p.is_file(),'Consumed dependency file missing');headers[str(p.resolve())]=ident(p)
+        pinned=exact_header_closure(headers,build,Path(entry['file']).name=='native_tls_rx_reserve.c')
+        closure[entry['file']]={'object':ident(obj),'headers':headers,'exact_required_headers':pinned,'command':entry}
+    write(out/'header-closure.json',closure);return closure
+def validate_record_logs(record):
+    require(record['commands'],'Missing actual terminal commands')
+    identities=[]
+    for command in record['commands']:
+        require(command['status']=='TERMINAL' and command['returncode']==0,'Unsuccessful or unknown command terminal')
+        require(len(command['logs'])==2,'Both original stdout/stderr logs required')
+        for log in command['logs']:
+            require(ident(log['path'])==log,'Recorded stdout/stderr bytes changed');identities.append(log)
+    # seed_before_build describes an earlier config phase; SDK normalization
+    # legitimately rewrites that working file, so never rehash it as final.
+    return identities
+def validate_export_logs(row,receipt,wrapper_root=ROOT/'.build/production-wrapper'):
+    require(receipt['build_check']=='PASS','Saved exporter receipt is not PASS')
+    logs=receipt['build_logs'];require([x['file'] for x in logs]==['build-1.log','build-2.log'],'Two authoritative exporter build logs required')
+    identities=[];parents=set();variant_root=(wrapper_root/row['variant']).resolve()
+    for expected_name,log in zip(['stdout.log','stderr.log'],logs):
+        original=Path(log['original_path']).resolve();require(original.is_relative_to(variant_root) and original.parent.parent==variant_root and original.name==expected_name,'Exporter original log path differs from actual wrapper layout')
+        parents.add(original.parent);saved=Path(row['output'])/log['file'];actual=ident(original);copy=ident(saved)
+        require(actual['sha256']==log['sha256']==copy['sha256'] and actual['bytes']==copy['bytes'],'Saved/original exporter log differs from receipt SHA')
+        identities.append({'original':actual,'saved':copy})
+    require(len(parents)==1,'Exporter stdout/stderr come from different attempts');return identities
+def qualify(a):
+    p,m=checked(a);row=chosen(p,a.row);record=read(PLAN/'execution'/(a.kind+'-'+a.row+'.json'));require(record['status']=='TERMINAL_SUCCESS' and all(x['status']=='TERMINAL' and x['returncode']==0 for x in record['commands']),'Actual successful terminal record required')
+    record_logs=validate_record_logs(record)
+    out=PLAN/'qualifications'/(a.kind+'-'+a.row);require(not out.exists(),'Never overwrite qualification');out.mkdir(parents=True)
+    report={'schema':SCHEMA,'passed':False,'kind':a.kind,'row':a.row,'source_snapshot':m['source_snapshot'],'physical_tested':False,'heap_saving_claimed':False,'run_record':ident(PLAN/'execution'/(a.kind+'-'+a.row+'.json')),'original_execution_logs':record_logs}
+    try:
+        build=Path(row['build'] if a.kind=='export' else row['clang_build']);cfg=read(build/'config/sdkconfig.json');report['config_delta']=config_check(row,p,cfg)
+        report['generated_config']=[ident(build/'config/sdkconfig.json'),ident(build/'config/sdkconfig.h'),ident(row['config'] if a.kind=='export' else row['clang_config'])]
+        # Explicitly bind actual selected frontends, Python and generator tools.
+        cache={match[0]:match[1] for match in re.findall(r'^([^#/:\n][^:=\n]*):[^=\n]*=(.*)$',(build/'CMakeCache.txt').read_text(),re.M)}
+        for key,path in [('CMAKE_COMMAND',CMAKE),('CMAKE_MAKE_PROGRAM',NINJA),('PYTHON',SDK_PY)]:require(Path(cache[key]).resolve()==path.resolve(),'Unexpected actual configured tool '+key)
+        report['cmake_cache']=ident(build/'CMakeCache.txt')
+        entries,selected=source_rows(build,row,out,'xtensa-esp32-elf-gcc' if a.kind=='export' else 'clang')
+        frozen_tools={x['path'] for x in m['tools']}
+        for entry in selected:require(str(Path(entry_tokens(entry)[0]).resolve()) in frozen_tools,'Actual compiler absent from frozen tools')
+        report['selected_commands']=[{'file':ident(x['file']),'command':x} for x in selected]
+        if a.kind=='export':qualify_export(row,p,m,build,out,report,selected)
+        else:qualify_clang(row,p,m,build,out,report,entries,selected)
+        checked(a);report['passed']=True
+    except BaseException as e:report['error']=repr(e);raise
+    finally:write(out/'report.json',report)
+    print(json.dumps({'passed':True,'report':ident(out/'report.json')}))
+
+def qualify_export(row,p,m,build,out,report,selected):
+    api=exporter();receipt=read(Path(row['output'])/'manifest.json');current=api.qualify(ROOT,build,DEP,row['backend'],m['source_snapshot'],Path(row['config']))
+    report['export_build_logs']=validate_export_logs(row,receipt)
+    for k,v in current['details'].items():require(receipt.get(k)==v,'Export receipt differs from actual build '+k)
+    require(receipt['source_commit']==m['source_snapshot']['commit'] and receipt['source_content_sha256']==m['source_snapshot']['content_sha256'] and not receipt['source_dirty'],'Wrong exported source identity')
+    for name,field in FIELDS.items():require(ident(Path(row['output'])/name)['sha256']==receipt[field],'Saved handoff artifact mismatch '+name)
+    baseline=p['baselines'][row['baseline']];require(receipt['ota_slots']==baseline['receipt']['ota_slots'] and receipt['partition_table_sha256']==baseline['receipt']['partition_table_sha256'],'OTA/partition layout changed')
+    desc=read(build/'project_description.json');elf=build/desc['app_elf'];raw=elf.read_bytes();binpath=Path(desc['c_compiler']).parent
+    syms=nm_symbols(tool([binpath/'xtensa-esp32-elf-nm.exe','-S','--defined-only',elf],out/'nm.log'))
+    for name in ['native_tls_early_mpi_prepare','__wrap_esp_mbedtls_mem_calloc','native_input_reclaim_bind','esp_mbedtls_mem_calloc','esp_mbedtls_mem_free','mbedtls_calloc_func','mbedtls_free_func']:require(name in syms,'Preserved symbol missing '+name)
+    for pointer,expected in [('mbedtls_calloc_func','__wrap_esp_mbedtls_mem_calloc'),('mbedtls_free_func','esp_mbedtls_mem_free')]:require(elf_word(raw,syms[pointer]['address'])==syms[expected]['address'],'Actual global allocator/free pointer changed')
+    require('__wrap_esp_mbedtls_mem_free' not in syms,'Global free wrapper introduced')
+    reserve_symbols=['native_tls_rx_reserve_crt_bundle_attach','yoradio_tls_static_rx_calloc','yoradio_tls_static_rx_forget_configuration','yoradio_tls_static_rx_free','yoradio_tls_static_rx_zeroize_free','s_rx','s_radio_configurations']
+    for name in reserve_symbols:require((name in syms)==row['enabled'],'Reserve on/off symbol mismatch '+name)
+    assembly={}
+    for name in ['mbedtls_ssl_setup','mbedtls_ssl_free','mbedtls_ssl_config_init','mbedtls_ssl_config_free']:
+        assembly[name]=tool([binpath/'xtensa-esp32-elf-objdump.exe','-dwC','--disassemble='+name,elf],out/(name+'.log'))
+    if row['enabled']:
+        setup_calls=call_trace(assembly['mbedtls_ssl_setup'],raw,syms);free_calls=call_trace(assembly['mbedtls_ssl_free'],raw,syms)
+        require(syms['yoradio_tls_static_rx_calloc']['address'] in setup_calls and syms['yoradio_tls_static_rx_free']['address'] in setup_calls and syms['yoradio_tls_static_rx_zeroize_free']['address'] in free_calls,'Actual direct/long-call paired RX targets missing')
+        for name in ['mbedtls_ssl_config_init','mbedtls_ssl_config_free']:require(syms['yoradio_tls_static_rx_forget_configuration']['address'] in call_trace(assembly[name],raw,syms),'Actual config lifecycle hook target missing '+name)
+        slot=syms['s_rx'];sec=next(x for x in elf_sections(raw) if x['address']<=slot['address'] and slot['address']+slot['bytes']<=x['address']+x['bytes'])
+        require(slot['bytes']>=16384 and slot['address']%8==0 and 0x3ff80000<=slot['address']<0x40000000 and sec['type']==8 and sec['flags']&3==3,'Full aligned static internal RX BSS ownership')
+        probe=capacity_probe(next(x for x in selected if Path(x['file']).name=='native_tls_rx_reserve.c'),out,binpath)
+        require(slot['bytes']==probe['actual_macro_bytes'],'Actual linked reserve differs from full SDK RX macro size')
+        require(syms['s_radio_configurations']['bytes']==8*4,'Eight uintptr_t ESP32 registry entries required');report['static_rx']={'symbol':slot,'section':sec,'record_content':16384,'actual_macro_probe':probe,'claim':'compiled full SDK macro storage; physical benefit unqualified'}
+    else:require(all('yoradio_tls_static_rx' not in x for x in assembly.values()),'Disabled SDK unexpectedly calls reserve')
+    app_asm=tool([binpath/'xtensa-esp32-elf-objdump.exe','-dwC','--disassemble=app_main',elf],out/'app-main.log');app_calls=call_trace(app_asm,raw,syms)
+    require(app_calls and app_calls[0]==syms['native_tls_early_mpi_prepare']['address'],'Preserved MPI call must remain first actual app_main call')
+    mpi_asm=tool([binpath/'xtensa-esp32-elf-objdump.exe','-dwC','--disassemble=native_tls_early_mpi_prepare',elf],out/'early-mpi.log')
+    require(call_trace(mpi_asm,raw,syms)==[syms[x]['address'] for x in ['esp_crypto_mpi_lock_acquire','esp_crypto_mpi_lock_release']],'Preserved MPI public lock pair')
+    for name,size in [('s_output_metrics',64),('s_output_metrics_lock',8)]:require(name in syms and syms[name]['bytes']==size and 0x3ff80000<=syms[name]['address']<0x40000000,'Preserved output metrics DRAM ownership')
+    if row['backend']=='pdm':
+        for name in ['pdm_completion_queue_drop','native_output_metrics_queue_drop']:require(name in syms and 0x40080000<=syms[name]['address']<0x400a0000,'PDM callback left IRAM '+name)
+    require(('custom_flac_decoder_feed' in syms)==row['custom_flac'] and ('esp_flac_dec_register' in syms)==(not row['custom_flac']),'Existing decoder profile mismatch')
+    commands=tool([DEP/'tools-v6.0.2/tools/ninja/1.12.1/ninja.exe','-C',build,'-t','commands'],out/'commands.log')
+    require('--wrap=esp_mbedtls_mem_calloc' in commands and '--wrap=esp_mbedtls_mem_free' not in commands,'Preserved reclaim link routing')
+    for name in ['heap_caps_calloc','heap_caps_free','yoradio_tls_static_rx_calloc','mbedtls_platform_zeroize']:require('--wrap='+name not in commands,'Test-only RX wrapper leaked into production '+name)
+    report['actual_header_closure']=deps_gcc(build,out,selected)
+    report['footprint']=footprint(elf,build/(desc['project_name']+'.map'));report['baseline_footprint']=footprint(Path(baseline['elf']['path']),Path(baseline['map']['path']))
+    report['size_deltas']={k:report['footprint'][k]-report['baseline_footprint'][k] for k in ['iram_bytes','dram_bytes']};report['app_bytes']=receipt['app_bytes'];report['app_delta_vs_baseline']=receipt['app_bytes']-baseline['receipt']['app_bytes'];report['ota_slots']=receipt['ota_slots']
+    report['comparison_scope']='baseline source commit differs; attribution/resource benefit is not inferred';report['saved_export']=[ident(x) for x in Path(row['output']).iterdir() if x.is_file()]
+
+def command_tokens(command):
+    if os.name!='nt':return shlex.split(command)
+    import ctypes
+    from ctypes import wintypes
+    argc=ctypes.c_int();function=ctypes.windll.shell32.CommandLineToArgvW
+    function.argtypes=[wintypes.LPCWSTR,ctypes.POINTER(ctypes.c_int)];function.restype=ctypes.POINTER(wintypes.LPWSTR)
+    result=function(command,ctypes.byref(argc));require(bool(result),'Windows command-line parsing failed')
+    try:return [result[i] for i in range(argc.value)]
+    finally:
+        free=ctypes.windll.kernel32.LocalFree;free.argtypes=[ctypes.c_void_p];free.restype=ctypes.c_void_p;free(ctypes.cast(result,ctypes.c_void_p))
+def entry_tokens(entry):
+    return list(entry['arguments']) if 'arguments' in entry else command_tokens(entry['command'])
+def frontend_tokens(entry):
+    tokens=entry_tokens(entry);clean=[];i=0
+    while i<len(tokens):
+        if tokens[i] in ['-o','-MF','-MT','-MQ']:i+=2;continue
+        if tokens[i] in ['-c','-MD','-MMD','-MP']:i+=1;continue
+        clean.append(tokens[i]);i+=1
+    return clean
+def capacity_probe(entry,out,binpath):
+    # Later qualification only: compile a standalone sizeof-array probe using
+    # the actual selected module flags. It is not linked into production.
+    source=out/'sdk-rx-size-probe.c';obj=out/'sdk-rx-size-probe.o'
+    source.write_bytes(b'#include "mbedtls/build_info.h"\n#include "ssl_misc.h"\nunsigned char yoradio_sdk_rx_size_probe[MBEDTLS_SSL_IN_BUFFER_LEN];\n')
+    tokens=frontend_tokens(entry);actual=Path(entry['file']).resolve();indices=[i for i,x in enumerate(tokens[1:],1) if not x.startswith('-') and Path(x).suffix=='.c' and (Path(x) if Path(x).is_absolute() else Path(entry['directory'])/x).resolve()==actual]
+    require(len(indices)==1,'Unique actual module input needed for SDK sizeof probe');tokens[indices[0]]=str(source);command=tokens+['-c','-o',str(obj)]
+    result=subprocess.run(command,cwd=entry['directory'],env=env(),stdout=subprocess.PIPE,stderr=subprocess.STDOUT);log=out/'sdk-rx-size-probe.log';log.write_bytes(result.stdout)
+    require(result.returncode==0,'Actual SDK RX capacity probe failed');raw=obj.read_bytes();require(raw[:6]==b'\x7fELF\x01\x01' and struct.unpack_from('<H',raw,18)[0]==94,'Capacity probe wrong target')
+    symbols=nm_symbols(tool([binpath/'xtensa-esp32-elf-nm.exe','-S','--defined-only',obj],out/'sdk-rx-size-probe-nm.log'));size=symbols['yoradio_sdk_rx_size_probe']['bytes']
+    return {'original_compile_entry':entry,'argv':command,'returncode':result.returncode,'source':ident(source),'object':ident(obj),'log':ident(log),'nm':ident(out/'sdk-rx-size-probe-nm.log'),'actual_macro_bytes':size}
+def prepare_check(a):
+    path=Path(a.compile_database).resolve();out=ARGV_CHECK;require(not out.exists(),'Never overwrite preparation argv report')
+    entries=read(path);entry=next(x for x in entries if Path(x['file']).name=='audio_service.c');original=entry['command'];tokens=entry_tokens(entry)
+    require(Path(tokens[0]).resolve()==(CLANG_BIN/'clang.exe').resolve(),'Preparation specimen must be real installed Clang')
+    require('-DMBEDTLS_CONFIG_FILE="mbedtls/esp_config.h"' in tokens and '-DIDF_VER="v6.0.2"' in tokens,'Quoted actual -D parsing failed')
+    includes=[x[2:] for x in tokens if x.startswith('-I')];require(includes and all(Path(x).is_dir() for x in includes),'Actual parsed include directories missing')
+    serialized=subprocess.list2cmdline(tokens);require(command_tokens(serialized)==tokens,'Real Clang argv Windows serialization roundtrip failed')
+    synthetic=[tokens[0],'-IC:\\parser-only path\\include\\','-DQUOTED="a b"','C:\\parser-only path\\source.c'];synthetic_text=subprocess.list2cmdline(synthetic);require(command_tokens(synthetic_text)==synthetic,'Quoted path/trailing slash parser-only roundtrip failed')
+    report={'schema':SCHEMA,'passed':True,'compiler_invocations':0,'configure_build_lint_export_invocations':0,'parser':'Windows CommandLineToArgvW' if os.name=='nt' else 'POSIX shlex.split','compile_database':ident(path),'actual_compile_entry':entry,'exact_original_command':original,'parsed_argv':tokens,'serialized_argv':serialized,'include_argv':includes,'actual_macro_argv':[x for x in tokens if x.startswith('-D')],'synthetic_parser_only':{'argv':synthetic,'serialized':synthetic_text},'scope':'Parser/serialization proof only; no compiler or build run'}
+    write(out,report);print(json.dumps({'passed':True,'report':ident(out),'compiler_invocations':0,'argv_count':len(tokens)}))
+def qualify_clang(row,p,m,build,out,report,entries,selected):
+    lint=read(Path(row['lint_output'])/'report.json');require(lint['complete'] and lint['errors']==0 and lint['source_commit']==m['source_snapshot']['commit'],'Incomplete/parser-error Clang analysis')
+    expected=set()
+    for entry in entries:
+        path=Path(entry['file']);path=(path if path.is_absolute() else Path(entry['directory'])/path).resolve()
+        if path.suffix.lower() not in ['.c','.cc','.cpp','.cxx'] or not path.is_relative_to(ROOT):continue
+        relative=path.relative_to(ROOT);http=path.parent==build/'native-httpd-rfc6455' and path.name in ['httpd_ws.c','httpd_parse.c']
+        if not http and any(x.startswith('build') or x.startswith('.') for x in relative.parts[:-1]):continue
+        expected.add(relative.as_posix())
+    require({x['file'] for x in lint['results']}==expected and lint['units']==len(expected) and (MAIN/'native_tls_rx_reserve.c').relative_to(ROOT).as_posix() in expected,'Full project lint TU coverage/new module missing')
+    for item in lint['results']:require(item['complete'] and item['returncode']==0 and ident(ROOT/item['file'])['sha256']==item['source_sha256'],'Stale/incomplete lint TU')
+    require(lint['config_sha256']==ident(ROOT/'.clang-tidy')['sha256'],'Lint configuration changed')
+    overlay=next(x for x in selected if Path(x['file']).name=='ssl_tls.c');tokens=entry_tokens(overlay);require('clang' in Path(tokens[0]).name,'Not an actual Clang compile row')
+    original_tokens=list(tokens);clean=frontend_tokens(overlay)
+    dep=out/'tls-sdk-frontend.d';command=clean+['-fsyntax-only','-MD','-MF',str(dep),'-MT','tls-overlay']
+    result=subprocess.run(command,cwd=overlay['directory'],env=env(),stdout=subprocess.PIPE,stderr=subprocess.STDOUT);(out/'tls-sdk-frontend.log').write_bytes(result.stdout)
+    require(result.returncode==0 and dep.is_file(),'Actual full TLS SDK Clang frontend/closure failed')
+    dependency_text=dep.read_text().replace('\\\r\n','').replace('\\\n','');require(dependency_text.startswith('tls-overlay:'),'Unexpected Clang dependency target')
+    headers={}
+    for token in re.findall(r'(?:\\[ #:\\]|[^\s])+',dependency_text.split(':',1)[1]):
+        name=re.sub(r'\\([ #:\\])',r'\1',token);path=Path(name);path=path if path.is_absolute() else Path(overlay['directory'])/path
+        require(path.is_file(),'Missing actual Clang SDK dependency '+name);headers[str(path.resolve())]=ident(path)
+    pinned=exact_header_closure(headers,build,False)
+    report['sdk_frontend']={'original_tokens':original_tokens,'argv':command,'returncode':result.returncode,'dependency_file':ident(dep),'headers':headers,'exact_required_headers':pinned,'log':ident(out/'tls-sdk-frontend.log'),'overlay':ident(overlay['file']),'scope':'separate actual SDK overlay frontend, not counted as project lint TU'}
+    report['lint_report']=ident(Path(row['lint_output'])/'report.json');report['lint_artifacts']=[ident(x) for x in sorted(Path(row['lint_output']).iterdir()) if x.is_file()];report['lint_units']=len(expected);report['warnings']=lint['warnings'];report['warning_triage']='Root must review warnings; complete does not mean warning-free'
+
+def close(a):
+    p,m=checked(a);require(not (PLAN/'summary.json').exists(),'Never overwrite closure');reports=[]
+    for row in p['rows']:
+        for kind in ['export']+(['clang'] if row['enabled'] else []):
+            path=PLAN/'qualifications'/(kind+'-'+row['name'])/'report.json';r=read(path);require(r['passed'] and r['source_snapshot']==m['source_snapshot'],'Missing final qualified row');recheck_identities(r)
+            validate_record_logs(read(r['run_record']['path']))
+            if kind=='export':validate_export_logs(row,read(Path(row['output'])/'manifest.json'))
+            reports.append(ident(path))
+    on=read(PLAN/'qualifications/export-pdm/report.json');off=read(PLAN/'qualifications/export-disabled-pdm/report.json')
+    summary={'schema':SCHEMA,'passed':True,'exports':7,'full_clang_runs':6,'source_snapshot':m['source_snapshot'],'reports':reports,'same_commit_vendor_pdm_on_off':{k:on['footprint'][k]-off['footprint'][k] for k in ['iram_bytes','dram_bytes']},'physical_qualified':False,'heap_saving_claimed':False,'warning_triage_remains_explicit':True}
+    write(PLAN/'summary.json',summary);print(json.dumps({'passed':True,'summary':ident(PLAN/'summary.json')}))
+def main():
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('phase',choices=['prepare-check','plan','freeze','run','qualify','close']);p.add_argument('--compile-database');p.add_argument('--expected-head');p.add_argument('--evidence',action='append',default=[]);p.add_argument('--kind',choices=['export','clang']);p.add_argument('--row',choices=[x[0] for x in SPECS]);p.add_argument('--marker-sha256');a=p.parse_args()
+    if a.phase=='prepare-check':require(a.compile_database,'Existing compile database required');prepare_check(a)
+    elif a.phase=='plan':plan()
+    elif a.phase=='freeze':require(a.expected_head,'Explicit clean integration HEAD required');freeze(a)
+    elif a.phase=='run':require(a.kind and a.row and a.marker_sha256,'Explicit kind/row/marker required');run(a)
+    elif a.phase=='qualify':require(a.kind and a.row and a.marker_sha256,'Explicit kind/row/marker required');qualify(a)
+    else:require(a.marker_sha256,'Explicit marker required');close(a)
+if __name__=='__main__':main()

@@ -1,0 +1,24 @@
+[CmdletBinding(PositionalBinding = $false)]
+param([Parameter(Mandatory)][string]$Invocation)
+$ErrorActionPreference = 'Stop'
+$p = Get-Content -LiteralPath $Invocation -Raw | ConvertFrom-Json
+if ($p.schema -ne 'cyd-static-rx-production-v2') { throw 'Wrong invocation schema' }
+$env:IDF_TOOLS_PATH = Join-Path $p.dependencies 'tools-v6.0.2'
+$env:IDF_COMPONENT_MANAGER = '0'
+$env:IDF_TOOLCHAIN = 'clang'
+$env:PYTHONNOUSERSITE = '1'
+$env:PYTHONUTF8 = '1'
+$env:PYTHONIOENCODING = 'utf-8'
+$env:YORADIO_AUDIO_CODEC_COMPONENT = Join-Path $p.dependencies 'esp-adf-libs/esp_audio_codec'
+$env:YORADIO_LEGACY_IDF = Join-Path $p.dependencies 'v5.5.4'
+$env:Path = (Join-Path $p.dependencies 'python-3.12.10/tools') + ';' + $env:Path
+. (Join-Path $p.dependencies 'v6.0.2/export.ps1')
+$python = (Get-Command python.exe -CommandType Application | Select-Object -First 1).Source
+$toolPath = @(Get-ChildItem Env: | Where-Object { $_.Name -imatch '^path$' -and $_.Value.Contains('tools\ninja') } | Select-Object -ExpandProperty Value)
+if ($toolPath.Count -ne 1) { throw 'SDK toolchain PATH missing' }
+Push-Location $p.project
+try {
+    $args = @((Join-Path $p.dependencies 'v6.0.2/tools/idf.py'), '-B', $p.clang_build, '--no-ccache', '-D', ('SDKCONFIG=' + $p.clang_config), '-D', ('SDKCONFIG_DEFAULTS=' + $p.defaults), '-D', 'IDF_TOOLCHAIN=clang', 'reconfigure')
+    $process = Start-Process -FilePath $python -ArgumentList $args -NoNewWindow -Wait -PassThru -Environment @{ PATH = $toolPath[0] }
+    if ($process.ExitCode -ne 0) { throw "Clang configure failed: $($process.ExitCode)" }
+} finally { Pop-Location }

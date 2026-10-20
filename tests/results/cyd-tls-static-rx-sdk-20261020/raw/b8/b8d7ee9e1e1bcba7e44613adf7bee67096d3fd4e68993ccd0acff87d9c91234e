@@ -1,0 +1,211 @@
+"""Pure copied-config policy controls; never calls SDK/Git/compiler/checkpoint.
+
+Synthetic six-profile positives are policy fixtures, not actual Clang runs.
+Only the separately labelled PDM positive uses the saved actual Clang config.
+"""
+from pathlib import Path
+import copy
+import hashlib
+import importlib.util
+import json
+import sys
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+ORIGINAL = ROOT / '.build/cyd-tls-static-rx-production-prep-01'
+
+
+def require(value, message):
+    if not value:
+        raise RuntimeError(message)
+
+
+def ident(path):
+    path = Path(path).resolve()
+    raw = path.read_bytes()
+    return {'path': str(path), 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}
+
+
+def read(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def write_new(path, value):
+    with Path(path).open('xb') as output:
+        output.write((json.dumps(value, sort_keys=True, indent=2) + '\n').encode())
+
+
+def main():
+    output = HERE / 'policy-check01'
+    require(not output.exists(), 'Never overwrite pure policy controls')
+    output.mkdir()
+    (output / 'fixtures').mkdir()
+    spec = importlib.util.spec_from_file_location('clang_policy_under_test', HERE / 'config_policy.py')
+    policy = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(policy)
+    plan = read(ORIGINAL / 'plan02/plan.json')
+    marker = read(ORIGINAL / 'plan02/marker.json')
+    # Bind immutable inputs without executing original.checked() or importing
+    # the campaign. Root may be writing other, unrelated export reports now.
+    pinned = [ORIGINAL / name for name in ['campaign.py', 'clang-configure.ps1',
+                                         'guard_checks.py', 'README.md', 'plan02/plan.json',
+                                         'plan02/marker.json',
+                                         'plan02/qualifications/clang-pdm/report.json']]
+    pinned += [Path(item['path']) for item in marker['scripts']]
+    pinned += [Path(item['files']['sdkconfig.json']['snapshot']) for item in plan['baselines'].values()]
+    rows = [row for row in plan['rows'] if row['enabled']]
+    pinned += [Path(row['seed']['path']) for row in rows]
+    pinned += [Path(row['clang_invocation_file']['path']) for row in rows]
+    pinned += [HERE / name for name in ['config_policy.py', 'repair.py', 'test_policy.py',
+                                      'README.md', 'DIAGNOSIS.md']]
+    sdk = Path('C:/Work/yoRadio/.idf/v6.0.2')
+    pinned += [sdk / 'Kconfig', sdk / 'components/esp_libc/Kconfig',
+               sdk / 'tools/cmake/toolchain-clang-esp32.cmake',
+               sdk / 'components/esp_common/project_include.cmake',
+               ROOT / 'idf/esp32-cyd2usb-native/sdkconfig.defaults']
+    actual_path = Path(rows[0]['clang_build']) / 'config/sdkconfig.json'
+    require(rows[0]['name'] == 'pdm', 'Expected saved PDM row first')
+    pinned.append(actual_path)
+    inputs = [ident(path) for path in sorted(set(pinned))]
+    results = []
+    report = {'schema': 'cyd-clang-config-policy-controls-v1', 'passed': False,
+              'scope': 'pure config policy only', 'inputs': inputs, 'results': results,
+              'configure_compiler_lint_export_sdk_git_device_invocations': 0,
+              'policy': policy.expected_delta(), 'fixtures': []}
+
+    def accepted(name, row, before, after, scope):
+        changes = policy.check(row, copy.deepcopy(before), copy.deepcopy(after))
+        require(changes == policy.expected_delta(), 'Positive delta mismatch')
+        results.append({'name': name, 'expected': 'accept', 'accepted': True, 'scope': scope})
+
+    def rejected(name, row, before, after):
+        try:
+            policy.check(row, copy.deepcopy(before), copy.deepcopy(after))
+        except RuntimeError as error:
+            require(str(error).startswith(('Unexpected complete typed Clang config delta:',
+                                          'Preserved target/profile/runtime invariant failed:',
+                                          'Clang gate is enabled rows only',
+                                          'Wrong pinned GCC baseline state:')),
+                    'Unexpected rejection path: ' + repr(error))
+            results.append({'name': name, 'expected': 'reject', 'rejected': True,
+                            'diagnostic': str(error)})
+        else:
+            raise RuntimeError('Required exact config rejection missing: ' + name)
+
+    try:
+        require(len(rows) == 6, 'Exactly six enabled policy fixture profiles')
+        for row in rows:
+            source = Path(plan['baselines'][row['baseline']]['files']['sdkconfig.json']['snapshot'])
+            fixture = output / 'fixtures' / (row['name'] + '-before.json')
+            fixture.write_bytes(source.read_bytes())
+            before = read(fixture)
+            after = policy.fixture_after(before)
+            expected = output / 'fixtures' / (row['name'] + '-synthetic-after.json')
+            write_new(expected, after)
+            report['fixtures'].extend([ident(fixture), ident(expected)])
+            accepted('synthetic_reviewed_transform_' + row['name'], row, before, read(expected),
+                     'synthetic policy fixture, not actual compiler/configure evidence')
+        row = rows[0]
+        before = read(output / 'fixtures/pdm-before.json')
+        actual_fixture = output / 'fixtures/pdm-saved-actual-clang.json'
+        actual_fixture.write_bytes(actual_path.read_bytes())
+        report['fixtures'].append(ident(actual_fixture))
+        actual = read(actual_fixture)
+        accepted('saved_actual_pdm_clang_normalization', row, before, actual,
+                 'saved actual normalized config only; not full Clang qualification')
+        require(len(policy.expected_delta()) == 14, 'Exactly 14 total transitions required')
+
+        # Each transition is essential, including absent-vs-present states.
+        for key in sorted(policy.TRANSITIONS):
+            changed = copy.deepcopy(actual)
+            if key in before:
+                changed[key] = before[key]
+            else:
+                changed.pop(key, None)
+            rejected('omit_expected_transition:' + key, row, before, changed)
+            changed = copy.deepcopy(actual)
+            if key in changed:
+                value = changed[key]
+                changed[key] = (1 if value else 0) if type(value) is bool else False
+            else:
+                changed[key] = None
+            rejected('wrong_type_or_present_null:' + key, row, before, changed)
+            changed_before = copy.deepcopy(before)
+            if key in changed_before:
+                changed_before[key] = None
+            else:
+                changed_before[key] = None
+            rejected('wrong_baseline_presence_or_type:' + key, row, changed_before, actual)
+
+        mutations = {
+            'hardware_chip': ('IDF_TARGET', 'esp32c3'),
+            'hardware_arch': ('IDF_TARGET_ARCH', 'riscv'),
+            'single_core': ('FREERTOS_UNICORE', True),
+            'tick_rate': ('FREERTOS_HZ', 100),
+            'wrong_backend_pdm': ('YORADIO_NATIVE_AUDIO_OUTPUT_PDM', False),
+            'wrong_backend_continuous': ('YORADIO_NATIVE_AUDIO_OUTPUT_DAC', True),
+            'wrong_backend_legacy': ('YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC', True),
+            'wrong_flac_family': ('YORADIO_FLAC_DECODER_CUSTOM', True),
+            'lost_reclaim': ('YORADIO_TLS_INPUT_RECLAIM', False),
+            'lost_mpi': ('YORADIO_TLS_EARLY_MPI_LOCK', False),
+            'rx_capacity': ('MBEDTLS_SSL_IN_CONTENT_LEN', 4096),
+            'tx_capacity': ('MBEDTLS_SSL_OUT_CONTENT_LEN', 16384),
+            'runtime_not_preserved': ('COMPILER_RT_LIB_GCCLIB', False),
+            'runtime_name_changed': ('COMPILER_RT_LIB_NAME', 'clang_rt.builtins'),
+            'new_unrelated_symbol': ('UNEXPECTED_QUALIFIER_POLICY_TEST', True),
+            'retained_gcc_symbol_false': ('IDF_TOOLCHAIN_GCC', False),
+            'newlib_nano_wrong_value': ('LIBC_NEWLIB_NANO_FORMAT', False),
+            'libclangrt_wrong_value': ('COMPILER_RT_LIB_CLANGRT', True),
+            'newlib_wrong_value': ('LIBC_NEWLIB', False),
+            'reserve_wrong_value': (policy.OPTION, False),
+        }
+        for name, (key, value) in mutations.items():
+            changed = copy.deepcopy(actual)
+            changed[key] = value
+            rejected(name, row, before, changed)
+        changed = copy.deepcopy(actual)
+        del changed['FREERTOS_HZ']
+        rejected('removed_unrelated_key', row, before, changed)
+        changed = copy.deepcopy(actual)
+        changed['FREERTOS_HZ'] = 1000.0
+        rejected('unchanged_numeric_wrong_type', row, before, changed)
+        changed = copy.deepcopy(actual)
+        changed[policy.OPTION] = 1
+        rejected('reserve_integer_one_is_not_true', row, before, changed)
+        changed = copy.deepcopy(actual)
+        changed['COMPILER_RT_LIB_CLANGRT'] = 0
+        rejected('clangrt_integer_zero_is_not_false', row, before, changed)
+        changed = copy.deepcopy(actual)
+        changed['LIBC_PICOLIBC'] = None
+        rejected('missing_picolibc_is_not_null', row, before, changed)
+        disabled = copy.deepcopy(row)
+        disabled['enabled'] = False
+        rejected('disabled_row_cannot_use_clang_policy', disabled, before, actual)
+        # An identical wrong hardware state in both files must also fail the
+        # independent invariant check rather than evade the delta comparison.
+        for key, value in [('IDF_TARGET', 'esp32c3'), ('FREERTOS_UNICORE', True),
+                           ('MBEDTLS_SSL_IN_CONTENT_LEN', 4096),
+                           ('YORADIO_TLS_INPUT_RECLAIM', False),
+                           ('COMPILER_RT_LIB_GCCLIB', False),
+                           ('YORADIO_NATIVE_AUDIO_OUTPUT_PDM', False)]:
+            changed_before, changed_after = copy.deepcopy(before), copy.deepcopy(actual)
+            changed_before[key] = changed_after[key] = value
+            rejected('both_sides_wrong:' + key, row, changed_before, changed_after)
+
+        require(inputs == [ident(item['path']) for item in inputs], 'Pure-check source inputs changed')
+        report['passed'] = True
+        report['accepted'] = sum(item['expected'] == 'accept' for item in results)
+        report['rejected'] = sum(item['expected'] == 'reject' for item in results)
+        report['inputs_unchanged'] = True
+    except BaseException as error:
+        report['error'] = repr(error)
+        raise
+    finally:
+        write_new(output / 'report.json', report)
+    print(json.dumps({'passed': True, 'accepted': report['accepted'], 'rejected': report['rejected'],
+                      'report': ident(output / 'report.json')}))
+
+
+if __name__ == '__main__':
+    main()

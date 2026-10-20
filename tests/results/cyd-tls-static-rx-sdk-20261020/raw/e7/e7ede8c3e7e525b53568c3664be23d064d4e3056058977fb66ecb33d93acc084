@@ -1,0 +1,96 @@
+"""Exact ESP-IDF 6.0.2 GCC-baseline -> Clang-analysis configuration policy.
+
+This is not a firmware configuration generator. Missing keys, null, false and
+zero are distinct; the complete normalized key set is compared without filters.
+"""
+import copy
+import json
+
+OPTION = 'YORADIO_TLS_STATIC_RX_RESERVE'
+
+# Literal reviewed transitions, not learned from whichever config is supplied.
+# None in this private table means ABSENT, never a present JSON null value.
+TRANSITIONS = {
+    'COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD': (False, None),
+    'COMPILER_CXX_GLIBCXX_CONSTEXPR_COLD_CONSTEXPR': (False, None),
+    'COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE': (True, None),
+    'COMPILER_NO_MERGE_CONSTANTS': (False, None),
+    'COMPILER_RT_LIB_CLANGRT': (None, False),
+    'COMPILER_STATIC_ANALYZER': (False, None),
+    'IDF_TOOLCHAIN': ('gcc', 'clang'),
+    'IDF_TOOLCHAIN_CLANG': (None, True),
+    'IDF_TOOLCHAIN_GCC': (True, None),
+    'LIBC_NEWLIB': (False, True),
+    'LIBC_NEWLIB_NANO_FORMAT': (None, True),
+    'LIBC_PICOLIBC': (True, None),
+    'LIBC_PICOLIBC_NEWLIB_COMPATIBILITY': (True, None),
+    OPTION: (None, True),
+}
+
+
+def require(value, message):
+    if not value:
+        raise RuntimeError(message)
+
+
+def value_state(value):
+    return {'present': True, 'type': type(value).__name__, 'value': value}
+
+
+def state(config, key):
+    return value_state(config[key]) if key in config else {'present': False}
+
+
+def complete_delta(before, after):
+    require(type(before) is dict and type(after) is dict,
+            'Normalized configuration must be a JSON object')
+    return {key: {'before': state(before, key), 'after': state(after, key)}
+            for key in sorted(before.keys() | after.keys())
+            if state(before, key) != state(after, key)}
+
+
+def expected_delta():
+    def expected(value):
+        return {'present': False} if value is None else value_state(value)
+    return {key: {'before': expected(pair[0]), 'after': expected(pair[1])}
+            for key, pair in sorted(TRANSITIONS.items())}
+
+
+def check(row, before, config):
+    require(row['enabled'] is True, 'Clang gate is enabled rows only')
+    changes = complete_delta(before, config)
+    require(changes == expected_delta(),
+            'Unexpected complete typed Clang config delta: ' + json.dumps(changes, sort_keys=True))
+    # Explicit before-state checks prevent a no-op expected transition from
+    # disappearing into some later policy extension.
+    for key, pair in TRANSITIONS.items():
+        expected = {'present': False} if pair[0] is None else value_state(pair[0])
+        require(state(before, key) == expected, 'Wrong pinned GCC baseline state: ' + key)
+    unchanged = {
+        'IDF_TARGET': 'esp32', 'IDF_TARGET_ARCH': 'xtensa',
+        'YORADIO_TLS_EARLY_MPI_LOCK': True, 'YORADIO_TLS_INPUT_RECLAIM': True,
+        'FREERTOS_UNICORE': False, 'MBEDTLS_SSL_IN_CONTENT_LEN': 16384,
+        'MBEDTLS_SSL_OUT_CONTENT_LEN': 4096, 'COMPILER_RT_LIB_GCCLIB': True,
+        'COMPILER_RT_LIB_NAME': 'gcc',
+        'YORADIO_FLAC_DECODER_CUSTOM': row['custom_flac'],
+        'YORADIO_FLAC_DECODER_ESPRESSIF': not row['custom_flac'],
+        'YORADIO_NATIVE_AUDIO_OUTPUT_PDM': row['backend'] == 'pdm',
+        'YORADIO_NATIVE_AUDIO_OUTPUT_DAC': row['backend'] == 'continuous',
+        'YORADIO_NATIVE_AUDIO_OUTPUT_LEGACY_DAC': row['backend'] == 'legacy',
+    }
+    for key, value in unchanged.items():
+        require(state(before, key) == value_state(value)
+                and state(config, key) == value_state(value),
+                'Preserved target/profile/runtime invariant failed: ' + key)
+    return changes
+
+
+def fixture_after(before):
+    """Test-only synthetic normalization; never feeds a real SDK or qualifier."""
+    result = copy.deepcopy(before)
+    for key, (_, value) in TRANSITIONS.items():
+        if value is None:
+            result.pop(key, None)
+        else:
+            result[key] = value
+    return result

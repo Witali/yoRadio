@@ -1,0 +1,289 @@
+"""Successor qualification only; reuse immutable original successful executions.
+
+No run/build/configure/lint/export phase exists here. freeze and every later
+phase retain original.checked() in full, without rebinding original globals.
+The qualify phase DOES invoke the original separate TLS Clang frontend, which
+was not reached by the failed qualifier. It requires root authorization.
+"""
+from pathlib import Path
+from types import SimpleNamespace
+import argparse
+import hashlib
+import importlib.util
+import json
+import re
+import sys
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+ORIGINAL = ROOT / '.build/cyd-tls-static-rx-production-prep-01'
+ORIGINAL_SCRIPT_SHA = '9c51f8c16a47fe6d72f16875f2bc25b3aa4049f0ec375711b581080ae259b301'
+ORIGINAL_MARKER_SHA = '7a2f5ed4ca33eddbd6c55d03e38a9ae9f7b7a8c689be4c3e926a0de8301ba81b'
+FAILED_REPORT_SHA = 'c66e7671e6366714d76a5d275119286c0eaef19abc271109814d3ad1df2b9964'
+EXPECTED_HEAD = '3a563324abdca56144a40d5759def0ccfe708b3c'
+SCHEMA = 'cyd-static-rx-clang-qualification-repair-v1'
+
+
+def require(value, message):
+    if not value:
+        raise RuntimeError(message)
+
+
+def ident(path):
+    path = Path(path).resolve()
+    raw = path.read_bytes()
+    return {'path': str(path), 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}
+
+
+def read(path):
+    return json.loads(Path(path).read_bytes())
+
+
+def write_new(path, value):
+    # All evidence outputs are create-only, including on failure.
+    with Path(path).open('xb') as output:
+        output.write((json.dumps(value, sort_keys=True, indent=2) + '\n').encode())
+
+
+def module(path, name):
+    spec = importlib.util.spec_from_file_location(name, path)
+    result = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(result)
+    return result
+
+
+def original():
+    require(ident(ORIGINAL / 'campaign.py')['sha256'] == ORIGINAL_SCRIPT_SHA,
+            'Original campaign source changed')
+    result = module(ORIGINAL / 'campaign.py', 'unmodified_static_rx_campaign')
+    require(result.HERE == ORIGINAL and result.PLAN == ORIGINAL / 'plan02'
+            and result.ROOT == ROOT, 'Original paths must remain original')
+    return result
+
+
+def checked_original(campaign):
+    plan, marker = campaign.checked(SimpleNamespace(marker_sha256=ORIGINAL_MARKER_SHA))
+    require(marker['source_snapshot']['commit'] == EXPECTED_HEAD, 'Wrong frozen source HEAD')
+    failure = ORIGINAL / 'plan02/qualifications/clang-pdm/report.json'
+    require(ident(failure)['sha256'] == FAILED_REPORT_SHA, 'Original failed report changed')
+    failed = read(failure)
+    require(failed['passed'] is False and failed['kind'] == 'clang' and failed['row'] == 'pdm'
+            and failed['error'].startswith("RuntimeError('Unexpected complete normalized config delta:")
+            and failed['source_snapshot'] == marker['source_snapshot'],
+            'Original failure identity or reason differs')
+    return plan, marker
+
+
+def local_sources():
+    return [ident(HERE / name) for name in
+            ['repair.py', 'config_policy.py', 'test_policy.py', 'README.md', 'DIAGNOSIS.md']]
+
+
+def rationale_inputs(campaign):
+    return [ident(path) for path in [
+        campaign.SDK / 'Kconfig', campaign.SDK / 'components/esp_libc/Kconfig',
+        campaign.SDK / 'tools/cmake/toolchain-clang-esp32.cmake',
+        campaign.SDK / 'components/esp_common/project_include.cmake',
+        campaign.PROJECT / 'sdkconfig.defaults',
+    ]]
+
+
+def freeze(_args):
+    require(not (HERE / 'marker.json').exists(), 'Never overwrite repair marker')
+    campaign = original()
+    plan, marker = checked_original(campaign)
+    policy = module(HERE / 'config_policy.py', 'reviewed_clang_config_policy')
+    tests = read(HERE / 'policy-check01/report.json')
+    require(tests['passed'] is True and tests['scope'] == 'pure config policy only',
+            'Passing pure config controls required before freeze')
+    campaign.recheck_identities(tests)
+    current = {
+        'schema': SCHEMA, 'source_snapshot': marker['source_snapshot'],
+        'original_campaign': ident(ORIGINAL / 'campaign.py'),
+        'original_marker': ident(ORIGINAL / 'plan02/marker.json'),
+        'original_plan': ident(ORIGINAL / 'plan02/plan.json'),
+        'original_qualifier_failure': ident(ORIGINAL / 'plan02/qualifications/clang-pdm/report.json'),
+        'scripts': local_sources(), 'rationale_inputs': rationale_inputs(campaign),
+        'policy_controls': ident(HERE / 'policy-check01/report.json'),
+        'exact_typed_clang_delta': policy.expected_delta(),
+        'scope': 'Successor Clang qualification and mixed-origin matrix closure; no execution rerun',
+    }
+    checked_original(campaign)
+    require(current['scripts'] == local_sources()
+            and current['rationale_inputs'] == rationale_inputs(campaign), 'Inputs changed during freeze')
+    write_new(HERE / 'marker.json', current)
+    print(json.dumps({'marker': ident(HERE / 'marker.json')}))
+
+
+def checked(args, campaign):
+    require(ident(HERE / 'marker.json')['sha256'] == args.repair_marker_sha256,
+            'Wrong repair marker SHA')
+    marker = read(HERE / 'marker.json')
+    require(marker['schema'] == SCHEMA and marker['scripts'] == local_sources()
+            and marker['rationale_inputs'] == rationale_inputs(campaign), 'Repair source/rationale changed')
+    campaign.recheck_identities(marker)
+    plan, old = checked_original(campaign)
+    require(marker['source_snapshot'] == old['source_snapshot'], 'Repair/source snapshot differs')
+    policy = module(HERE / 'config_policy.py', 'frozen_clang_config_policy')
+    require(marker['exact_typed_clang_delta'] == policy.expected_delta(), 'Repair config policy changed')
+    return plan, old, marker, policy
+
+
+def config_check(campaign, policy, row, plan, config):
+    before = read(plan['baselines'][row['baseline']]['files']['sdkconfig.json']['snapshot'])
+    return policy.check(row, before, config)
+
+
+def terminal_record(campaign, row, marker):
+    path = ORIGINAL / 'plan02/execution' / ('clang-' + row['name'] + '.json')
+    record = read(path)
+    require(record['status'] == 'TERMINAL_SUCCESS' and record['kind'] == 'clang'
+            and record['row'] == row['name'] and record['marker_sha256'] == ORIGINAL_MARKER_SHA,
+            'Exact original successful Clang execution required')
+    require(record['source_snapshot_before'] == marker['source_snapshot']
+            and record['source_snapshot_after'] == marker['source_snapshot'],
+            'Original Clang execution source identity differs')
+    require([item['argv'] for item in record['commands']]
+            == [row['clang_configure_argv'], row['lint_argv']],
+            'Original Clang commands differ from frozen plan')
+    return ident(path), campaign.validate_record_logs(record)
+
+
+def qualify(args):
+    campaign = original()
+    plan, old, repair_marker, policy = checked(args, campaign)
+    row = campaign.chosen(plan, args.row)
+    require(row['enabled'] is True, 'No disabled Clang qualification in this gate')
+    record, logs = terminal_record(campaign, row, old)
+    output = HERE / 'qualifications' / ('clang-' + args.row)
+    require(not output.exists(), 'Never overwrite successor qualification')
+    output.mkdir(parents=True)
+    report = {
+        'schema': SCHEMA, 'passed': False, 'kind': 'clang', 'row': args.row,
+        'source_snapshot': old['source_snapshot'],
+        'repair_marker': ident(HERE / 'marker.json'), 'run_record': record,
+        'original_execution_logs': logs,
+        'original_campaign_marker': repair_marker['original_marker'],
+        'original_qualifier_failure': repair_marker['original_qualifier_failure'],
+        'physical_tested': False, 'heap_saving_claimed': False,
+        'full_lint_reused_without_rerun': True,
+        'scope': 'Fresh successor qualification of original terminal-success execution; old failure retained',
+    }
+    try:
+        build = Path(row['clang_build'])
+        config = read(build / 'config/sdkconfig.json')
+        report['config_delta'] = config_check(campaign, policy, row, plan, config)
+        report['generated_config'] = [ident(build / 'config/sdkconfig.json'),
+                                      ident(build / 'config/sdkconfig.h'), ident(row['clang_config'])]
+        cache = {match[0]: match[1] for match in re.findall(
+            r'^([^#/:\n][^:=\n]*):[^=\n]*=(.*)$', (build / 'CMakeCache.txt').read_text(), re.M)}
+        for key, path in [('CMAKE_COMMAND', campaign.CMAKE),
+                          ('CMAKE_MAKE_PROGRAM', campaign.NINJA), ('PYTHON', campaign.SDK_PY)]:
+            require(Path(cache[key]).resolve() == path.resolve(), 'Unexpected actual configured tool ' + key)
+        require(cache['IDF_TOOLCHAIN'] == 'clang' and cache['IDF_TARGET'] == 'esp32',
+                'Actual Clang CMake toolchain/target mismatch')
+        require(Path(cache['SDKCONFIG']).resolve() == Path(row['clang_config']).resolve(),
+                'Actual Clang config path mismatch')
+        require(cache['SDKCONFIG_DEFAULTS'] == row['clang_invocation']['defaults'],
+                'Actual Clang defaults selection differs')
+        report['cmake_cache'] = ident(build / 'CMakeCache.txt')
+        report['compile_database'] = ident(build / 'compile_commands.json')
+        entries, selected = campaign.source_rows(build, row, output, 'clang')
+        frozen_tools = {item['path'] for item in old['tools']}
+        for entry in selected:
+            require(str(Path(campaign.entry_tokens(entry)[0]).resolve()) in frozen_tools,
+                    'Actual compiler absent from original frozen tools')
+        report['selected_commands'] = [{'file': ident(item['file']), 'command': item} for item in selected]
+        # Unmodified full-project lint checks AND actual guarded TLS frontend.
+        # Writes only to the fresh successor output provided above.
+        campaign.qualify_clang(row, plan, old, build, output, report, entries, selected)
+        campaign.recheck_identities(report)
+        terminal_record(campaign, row, old)
+        checked(args, campaign)
+        report['passed'] = True
+    except BaseException as error:
+        report['error'] = repr(error)
+        raise
+    finally:
+        write_new(output / 'report.json', report)
+    print(json.dumps({'passed': True, 'report': ident(output / 'report.json')}))
+
+
+def close(args):
+    campaign = original()
+    plan, old, _repair_marker, policy = checked(args, campaign)
+    require(not (HERE / 'summary.json').exists(), 'Never overwrite successor closure')
+    reports = []
+    for row in plan['rows']:
+        export_path = ORIGINAL / 'plan02/qualifications' / ('export-' + row['name']) / 'report.json'
+        exported = read(export_path)
+        require(exported['passed'] is True and exported['kind'] == 'export'
+                and exported['row'] == row['name'] and exported['source_snapshot'] == old['source_snapshot'],
+                'Missing original successful GCC qualification')
+        campaign.recheck_identities(exported)
+        export_record = read(exported['run_record']['path'])
+        require(export_record['status'] == 'TERMINAL_SUCCESS'
+                and export_record['kind'] == 'export' and export_record['row'] == row['name']
+                and export_record['marker_sha256'] == ORIGINAL_MARKER_SHA
+                and export_record['source_snapshot_before'] == old['source_snapshot']
+                and export_record['source_snapshot_after'] == old['source_snapshot'],
+                'Wrong original export execution identity')
+        campaign.validate_record_logs(export_record)
+        campaign.validate_export_logs(row, read(Path(row['output']) / 'manifest.json'))
+        # Keep the original reserve-only policy for GCC, including at closure.
+        campaign.config_check(row, plan, read(Path(row['build']) / 'config/sdkconfig.json'))
+        reports.append({'kind': 'export', 'origin': 'original', 'report': ident(export_path)})
+        if row['enabled']:
+            path = HERE / 'qualifications' / ('clang-' + row['name']) / 'report.json'
+            clang = read(path)
+            require(clang['passed'] is True and clang['schema'] == SCHEMA and clang['kind'] == 'clang'
+                    and clang['row'] == row['name'] and clang['source_snapshot'] == old['source_snapshot']
+                    and clang['repair_marker'] == ident(HERE / 'marker.json'),
+                    'Missing successor Clang qualification')
+            campaign.recheck_identities(clang)
+            terminal_record(campaign, row, old)
+            require(clang['config_delta'] == config_check(campaign, policy, row, plan,
+                    read(Path(row['clang_build']) / 'config/sdkconfig.json')), 'Final Clang config drift')
+            reports.append({'kind': 'clang', 'origin': 'successor', 'report': ident(path)})
+    require(len(reports) == 13 and sum(item['kind'] == 'export' for item in reports) == 7
+            and sum(item['kind'] == 'clang' for item in reports) == 6, 'Exact seven/six closure required')
+    on = read(ORIGINAL / 'plan02/qualifications/export-pdm/report.json')
+    off = read(ORIGINAL / 'plan02/qualifications/export-disabled-pdm/report.json')
+    summary = {
+        'schema': SCHEMA, 'passed': True, 'exports': 7, 'full_clang_runs': 6,
+        'source_snapshot': old['source_snapshot'], 'reports': reports,
+        'repair_marker': ident(HERE / 'marker.json'),
+        'original_qualifier_failure': ident(ORIGINAL / 'plan02/qualifications/clang-pdm/report.json'),
+        'same_commit_vendor_pdm_on_off': {key: on['footprint'][key] - off['footprint'][key]
+                                        for key in ['iram_bytes', 'dram_bytes']},
+        'physical_qualified': False, 'heap_saving_claimed': False,
+        'warning_triage_remains_explicit': True,
+        'scope': 'Original GCC qualifications plus fresh successor Clang qualifications; old failure unchanged',
+    }
+    checked(args, campaign)
+    campaign.recheck_identities(summary)
+    write_new(HERE / 'summary.json', summary)
+    print(json.dumps({'passed': True, 'summary': ident(HERE / 'summary.json')}))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('phase', choices=['freeze', 'qualify', 'close'])
+    parser.add_argument('--row', choices=['pdm', 'continuous', 'legacy', 'custom-flac-pdm',
+                                        'custom-flac-continuous', 'custom-flac-legacy'])
+    parser.add_argument('--repair-marker-sha256')
+    args = parser.parse_args()
+    if args.phase == 'freeze':
+        freeze(args)
+    else:
+        require(args.repair_marker_sha256, 'Explicit repair marker SHA required')
+        if args.phase == 'qualify':
+            require(args.row, 'Explicit enabled row required')
+            qualify(args)
+        else:
+            close(args)
+
+
+if __name__ == '__main__':
+    main()

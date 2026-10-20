@@ -1,0 +1,37 @@
+---
+MainSourceFile:  'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c'
+Diagnostics:
+  - DiagnosticName:  bugprone-suspicious-string-compare
+    DiagnosticMessage:
+      Message:         'function ''strcmp'' is called without explicitly comparing result'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c'
+      FileOffset:      7921
+      Replacements:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c'
+          Offset:          7953
+          Length:          0
+          ReplacementText: ' != 0'
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/srx01/ccc'
+  - DiagnosticName:  bugprone-assignment-in-if-condition
+    DiagnosticMessage:
+      Message:         'an assignment within an ''if'' condition is bug-prone'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c'
+      FileOffset:      8011
+      Replacements:    []
+      Ranges:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c'
+          FileOffset:      8001
+          Length:          41
+    Notes:
+      - Message:         'if it should be an assignment, move it out of the ''if'' condition'
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c'
+        FileOffset:      8011
+        Replacements:    []
+      - Message:         'if it is meant to be an equality check, change ''='' to ''=='''
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\components\native_wifi_store\native_wifi_store.c'
+        FileOffset:      8011
+        Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/srx01/ccc'
+...

@@ -1,0 +1,63 @@
+# Successor Clang qualifier: review before execution
+
+This directory repairs a qualification-policy error. The original campaign,
+plan02 marker, existing exports, run records and failed PDM qualification remain
+byte-unchanged. It has no run/build/configure/lint/export command. The six original
+full Clang lint runs can be reused after their actual terminal success.
+
+`repair.py` imports the original campaign at its real location and calls its
+complete `checked()` before/after each approved phase. It never replaces a
+function or changes the imported module's globals or paths. New qualification
+orchestration uses the original source/overlay/header/lint/frontend helpers with
+new output directories. The original GCC qualifier's reserve-only configuration
+policy is unchanged. `config_policy.py` requires all 14 exact typed/presence-aware
+Clang transitions and compares the entire normalized configuration.
+
+The successor marker binds this script/policy/tests/docs, original campaign
+9c51f8c16a47fe6d72f16875f2bc25b3aa4049f0ec375711b581080ae259b301,
+original marker 7a2f5ed4ca33eddbd6c55d03e38a9ae9f7b7a8c689be4c3e926a0de8301ba81b,
+original plan, retained failed report, source snapshot and pinned SDK Kconfig,
+toolchain and existing project defaults. Actual successful terminal records,
+logs, generated configs, CMake/cache tools, compile rows and all consumed headers
+are rechecked and retained by each fresh qualification. The separate TLS-overlay
+Clang frontend still must execute; it was not reached by the original failure.
+
+Pure preparation control only (no original.checked, SDK, Git or compiler call):
+
+```powershell
+$python = 'C:/Work/yoRadio/.idf/python-3.12.10/tools/python.exe'
+$repair = 'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-clang-config-repair-prep-01'
+& $python -B -X utf8 "$repair/test_policy.py"
+```
+
+After root reviews these sources and pure controls, root may separately authorize
+the following. These commands have **not** been run during preparation:
+
+```powershell
+& $python -B -X utf8 "$repair/repair.py" freeze
+# Copy the printed new marker SHA, distinct from the original campaign marker.
+& $python -B -X utf8 "$repair/repair.py" qualify --row pdm --repair-marker-sha256 $repairMarker
+```
+
+Repeat qualify for continuous, legacy, custom-flac-pdm,
+custom-flac-continuous and custom-flac-legacy only after each corresponding
+original execution is authoritatively terminal success. A failed successor
+output is preserved, never overwritten or automatically retried. Qualify invokes
+the separate actual TLS Clang frontend/dependency closure, but does not repeat
+configure or the full-project lint. Original successful GCC qualification
+reports are reused without rerunning export/probes.
+
+Only after all seven original GCC qualifications and six successor Clang
+qualifications pass, perform the successor closure:
+
+```powershell
+& $python -B -X utf8 "$repair/repair.py" close --repair-marker-sha256 $repairMarker
+```
+
+This writes a **new** summary explicitly combining seven original GCC exports
+and six new Clang qualifications. It retains the original PDM qualifier failure
+as nonpass evidence. Do not call or relabel original campaign.close(). Both
+original and successor markers/source/tool/SDK closure are rechecked; exact
+normalized policies are rechecked again at closure. All output paths here are
+fresh/create-only. Warning triage stays explicit; there is no physical-board,
+production-Clang, runtime-libc-equivalence or heap-saving claim.

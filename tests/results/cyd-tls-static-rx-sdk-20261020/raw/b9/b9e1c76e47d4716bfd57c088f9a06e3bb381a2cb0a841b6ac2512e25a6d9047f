@@ -1,0 +1,176 @@
+$ErrorActionPreference = 'Stop'
+$root = 'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review'
+$expectedCommit = '3a563324abdca56144a40d5759def0ccfe708b3c'
+$execution = Join-Path $root '.build/cyd-tls-static-rx-production-prep-01/plan02/execution'
+$baselinePath = Join-Path $root 'tests/results/cyd-input-reclaim-20261020/lint/raw/analysis/report.json'
+$rows = @('pdm', 'continuous', 'legacy', 'custom-flac-pdm', 'custom-flac-continuous', 'custom-flac-legacy')
+
+function Hash-File([string]$path) {
+    return (Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash.ToLowerInvariant()
+}
+
+function Normalize-Source([string]$path) {
+    $normalized = $path.Replace('\', '/')
+    if ($normalized -match 'native-httpd-rfc6455/(httpd_[^/]+\.c)$') {
+        return 'native-httpd-rfc6455/' + $Matches[1]
+    }
+    if ($normalized -match '(idf/(?:components|esp32-cyd2usb-native)/.+)$') { return $Matches[1] }
+    if ($normalized -match '(yoRadio/src/.+)$') { return $Matches[1] }
+    return $normalized
+}
+
+function Read-Warnings($report) {
+    $counts, $details = @{}, @{}
+    foreach ($unit in $report.results) {
+        foreach ($diagnostic in $unit.diagnostics) {
+            $tuple = @((Normalize-Source $unit.file), (Normalize-Source $diagnostic.file),
+                $diagnostic.severity, $diagnostic.check, $diagnostic.message)
+            $key = ConvertTo-Json -InputObject $tuple -Compress
+            if ($counts.ContainsKey($key)) { $counts[$key]++ } else {
+                $counts[$key] = 1
+                $details[$key] = [ordered]@{ unit=$tuple[0]; file=$tuple[1]; severity=$tuple[2];
+                    check=$tuple[3]; message=$tuple[4]; locations=@() }
+            }
+            $details[$key].locations += [ordered]@{ line=$diagnostic.line; column=$diagnostic.column }
+        }
+    }
+    return @{ counts=$counts; details=$details }
+}
+
+function Compare-Warnings($reference, $current) {
+    $added, $removed = @(), @()
+    $keys = @(@($reference.counts.Keys) + @($current.counts.Keys) | Sort-Object -Unique)
+    foreach ($key in $keys) {
+        $before = if ($reference.counts.ContainsKey($key)) { $reference.counts[$key] } else { 0 }
+        $after = if ($current.counts.ContainsKey($key)) { $current.counts[$key] } else { 0 }
+        if ($after -gt $before) {
+            $added += [ordered]@{ tuple=(ConvertFrom-Json $key); count=$after-$before }
+        }
+        if ($before -gt $after) {
+            $removed += [ordered]@{ tuple=(ConvertFrom-Json $key); count=$before-$after }
+        }
+    }
+    return [ordered]@{ identical=($added.Count -eq 0 -and $removed.Count -eq 0);
+        added=$added; removed=$removed }
+}
+
+$baselineReport = Get-Content -Raw -LiteralPath $baselinePath | ConvertFrom-Json
+$baseline = Read-Warnings $baselineReport
+$pdmPath = Join-Path $execution 'lint-pdm/report.json'
+$pdm = Read-Warnings (Get-Content -Raw -LiteralPath $pdmPath | ConvertFrom-Json)
+$matrix, $bags = @(), @{}
+foreach ($name in $rows) {
+    $path = Join-Path $execution ('lint-' + $name + '/report.json')
+    if (-not (Test-Path -LiteralPath $path)) {
+        $matrix += [ordered]@{ row=$name; status='PENDING_REPORT'; report=$path; complete=$false }
+        continue
+    }
+    $report = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
+    $bag = Read-Warnings $report
+    $bags[$name] = $bag
+    $terminal = $report.complete -eq $true -and @($report.results).Count -eq $report.units -and
+        @($report.results | Where-Object { $_.returncode -ne 0 -or $_.complete -ne $true }).Count -eq 0
+    $trusted = $terminal -and $report.errors -eq 0 -and $report.source_commit -eq $expectedCommit -and $report.dirty -eq $false
+    $warnings = foreach ($key in $bag.details.Keys | Sort-Object) {
+        $entry = $bag.details[$key]
+        [ordered]@{ unit=$entry.unit; file=$entry.file; severity=$entry.severity; check=$entry.check;
+            message=$entry.message; count=$bag.counts[$key]; locations=$entry.locations }
+    }
+    $tls = @($report.results | Where-Object { $_.file -match 'native_tls_(rx_reserve|early_mpi)\.c$' } |
+        ForEach-Object { [ordered]@{ file=$_.file; source_sha256=$_.source_sha256;
+            complete=$_.complete; returncode=$_.returncode; diagnostics=@($_.diagnostics).Count } })
+    $logs = @(Get-ChildItem -LiteralPath (Split-Path -Parent $path) -File |
+        Where-Object { $_.Extension -in @('.log', '.yaml') } | Sort-Object Name | ForEach-Object {
+            [ordered]@{ file=$_.Name; bytes=$_.Length; sha256=(Hash-File $_.FullName) }
+        })
+    $unitSources = @($report.results | ForEach-Object {
+        $unitPath = if ([IO.Path]::IsPathRooted($_.file)) { $_.file } else { Join-Path $root $_.file }
+        $actualHash = if (Test-Path -LiteralPath $unitPath) { Hash-File $unitPath } else { $null }
+        [ordered]@{ file=$_.file; recorded_sha256=$_.source_sha256; observed_sha256=$actualHash;
+            unchanged=($null -ne $actualHash -and $actualHash -eq $_.source_sha256) }
+    })
+    $sourcesMatch = @($unitSources | Where-Object { -not $_.unchanged }).Count -eq 0
+    $trusted = $trusted -and $sourcesMatch
+    $matrix += [ordered]@{ row=$name; status=$(if ($trusted) { 'REVIEWED' } else { 'PENDING_OR_INVALID_REPORT' });
+        report=$path; report_sha256=(Hash-File $path); source_commit=$report.source_commit;
+        dirty=$report.dirty; complete=$report.complete; units=$report.units; errors=$report.errors;
+        config_sha256=$report.config_sha256; compiler_tool=$report.tool;
+        warning_occurrences=$report.warnings; normalized_unique_tuples=$bag.counts.Count;
+        vs_pdm=(Compare-Warnings $pdm $bag); vs_reclaim_baseline=(Compare-Warnings $baseline $bag);
+        tls_units=$tls; unit_sources=$unitSources; all_unit_sources_unchanged=$sourcesMatch;
+        raw_logs_and_yaml=$logs; normalized_warnings=@($warnings) }
+}
+
+$paired = foreach ($backend in @('pdm', 'continuous', 'legacy')) {
+    $custom = 'custom-flac-' + $backend
+    if ($bags.ContainsKey($backend) -and $bags.ContainsKey($custom)) {
+        [ordered]@{ backend=$backend; comparison=(Compare-Warnings $bags[$backend] $bags[$custom]) }
+    } else { [ordered]@{ backend=$backend; status='PENDING_REPORT' } }
+}
+$pointers = @(
+    'idf/esp32-cyd2usb-native/main/native_audio_output.c',
+    'idf/esp32-cyd2usb-native/main/compat/httpd_rfc6455/native_httpd_headers.h',
+    'idf/esp32-cyd2usb-native/main/network_settings.c',
+    'idf/esp32-cyd2usb-native/main/time_settings.c',
+    'idf/esp32-cyd2usb-native/main/native_tls_early_mpi.c',
+    'idf/esp32-cyd2usb-native/main/native_tls_rx_reserve.c',
+    'yoRadio/src/audioI2S/flac_decoder/flac_decoder.cpp',
+    '.build/srx01/cvp/native-httpd-rfc6455/httpd_parse.c',
+    '.build/srx01/cvp/native-httpd-rfc6455/httpd_ws.c',
+    'C:/Work/yoRadio/.idf/v6.0.2/components/esp_http_server/src/httpd_sess.c',
+    'C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/driver/i2s_types_legacy.h'
+)
+$sourceHashes = foreach ($name in $pointers) {
+    $sourcePath = if ([IO.Path]::IsPathRooted($name)) { $name } else { Join-Path $root $name }
+    [ordered]@{ file=$name; sha256=(Hash-File $sourcePath) }
+}
+$complete = @($matrix | Where-Object { $_.status -ne 'REVIEWED' }).Count -eq 0
+$result = [ordered]@{
+    schema=1; scope='Read-only warning review of existing reports; no compiler, SDK, Git, tests or device execution';
+    frozen_source_commit=$expectedCommit; created_utc=[DateTime]::UtcNow.ToString('o');
+    review_script_sha256=(Hash-File $PSCommandPath); all_six_reports_reviewed=$complete;
+    actionable_warning_findings=@();
+    normalization='Preserve translation unit, logical diagnostic file, severity, check, full message and multiplicity; normalize separators and generated/frozen prefixes; ignore line/column only for equality, retain locations';
+    retained_baseline=[ordered]@{ report=$baselinePath; sha256=(Hash-File $baselinePath);
+        source_commit=$baselineReport.source_commit; units=$baselineReport.units;
+        warnings=$baselineReport.warnings; errors=$baselineReport.errors; complete=$baselineReport.complete };
+    matrix=$matrix; vendor_custom_pairs=@($paired); reviewed_source_hashes=@($sourceHashes)
+}
+$result | ConvertTo-Json -Depth 18 | Set-Content -LiteralPath (Join-Path $PSScriptRoot 'comparison.json') -Encoding utf8
+$table = ($matrix | ForEach-Object {
+    '| ' + $_.row + ' | ' + $_.status + ' | ' + $_.units + ' | ' + $_.warning_occurrences + ' | ' + $_.errors + ' |'
+}) -join "`n"
+$completion = if ($complete) { 'All six existing reports have been reviewed.' } else { 'The matrix review is incomplete. Missing or incomplete rows remain pending and have no PASS claim.' }
+$notes = @"
+# CYD static RX warning review
+
+Frozen source: $expectedCommit. $completion
+
+This artifact reads retained reports and source only. It does not execute a compiler, SDK, lint, tests, Git, or a device, and it changes no production source. It is a warning review, not build, physical, resource, or analog qualification.
+
+| Profile | Review status | TUs | Warnings | Errors |
+| --- | --- | ---: | ---: | ---: |
+$table
+
+## Comparison and findings
+
+No actionable dangerous warning was identified. The PDM warning multiset is identical to the retained 54-TU reclaim baseline: all 86 occurrences match with translation unit, logical diagnostic file, severity, check, full message, and duplicate multiplicity retained. Line and column shifts are ignored for equality; original locations remain in comparison.json.
+
+Continuous profiles remove the PDM-only ramp narrowing at native_audio_output.c:418 and constant-product widening at 345. Legacy profiles remove these two and add the mode bitmask enum diagnostic at 780. Completed custom FLAC profiles match their corresponding vendor backend; a missing custom profile is not inferred to match. Both newly added TLS translation units have zero diagnostics in each completed row.
+
+## Source triage pointers
+
+- HTTP parser null diagnostics at generated httpd_parse.c:742/750 assume ra->sd is null at the defensive check:879. Actual IDF 6.0.2 httpd_sess.c:425-435 rejects a null session and deletes only after successful req_new. req_new binds ra->sd at 778; cleanup clears the request aux and sd. No reachable valid-session null trigger was found.
+- Generated httpd_ws.c:120-130 uses a 25-byte key buffer and a 37-byte fixed GUID; concatenation destination is 63 bytes. native_httpd_headers.h:90-117 bounds copied header text and appends its terminator. The strcpy/strcat warnings do not establish an overflow.
+- PDM multiplication native_audio_output.c:345 first computes 9*512=4608 before multiplying by 1000ULL. The warned intermediate cannot overflow. PCM conditional expressions at 210/418 promote already bounded int16 samples or ramp samples and zero to int before assigning int16.
+- Legacy native_audio_output.c:780 combines I2S_MODE_MASTER=1, I2S_MODE_TX=4 and I2S_MODE_DAC_BUILT_IN=16. The actual compatibility header is C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/driver/i2s_types_legacy.h:114-128. Value 21 is the intended documented bitmask, not an invalid functional mode.
+- network_settings.c:45 and time_settings.c:85 copy four-byte binary record magic after zeroing the entire record; these fields are compared as bytes, not passed as unterminated C strings.
+- FLAC narrowings at 673/688/693/705/712 read only 4/2/4/4-or-5/5 bits. readUint:160-175 masks the requested width. readRiceSignedInt:192-237 bounds the uint32 folded code before returning its signed32 range, so assignment at 708 is bounded.
+- Remaining warnings concern explicit Boolean string comparisons, sequenced short-circuit pointer increments, sentinel/zero enum initialization, enum storage size, duplicate branches, signed conditional promotions, or a status struct pre-zeroed before byte comparison at websocket_service.c:260/338. None supplies a concrete dangerous trigger.
+
+comparison.json records input report/log/YAML hashes, source pointers and observed-versus-recorded source hashes, complete normalized multisets, cross-profile deltas, and pending states. pending-history.json retains the initial missing-last-row observation and the later root completion confirmation. Source/index freezing, original qualifier failure, and the separate qualifier repair remain root-owned and untouched.
+"@
+$notes | Set-Content -LiteralPath (Join-Path $PSScriptRoot 'REVIEW.md') -Encoding utf8
+[ordered]@{ all_six_reports_reviewed=$complete; rows=@($matrix | ForEach-Object {
+    [ordered]@{ row=$_.row; status=$_.status; units=$_.units; warnings=$_.warning_occurrences; errors=$_.errors }
+}); output=(Join-Path $PSScriptRoot 'comparison.json') } | ConvertTo-Json -Depth 4

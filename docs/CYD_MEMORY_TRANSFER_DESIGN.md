@@ -80,7 +80,7 @@ and physical benefit/default activation remain open. The source audit below
 is historical evidence from before this implementation, rather than its
 current status.
 
-## Opt-in static RX reserve; target qualification remains open
+## Opt-in static RX reserve; physical qualification remains open
 
 The [first isolated candidate](../tests/results/cyd-tls-rx-pointer-prototype-20261020/README.md)
 retained the complete SDK RX expression and passed
@@ -118,7 +118,7 @@ preparation snapshots; the tests ran before their source commit, so this does
 not backdate a clean Git tree. A later disabled-target fixture correction is
 versioned separately and does not change the production reserve module.
 These checks retain explicit host layout/crypto/RTOS/capacity seams. Actual
-Xtensa SDK/QEMU is qualified separately below. Full lint/application exports,
+Xtensa SDK/QEMU and production SDK/lint are qualified separately below.
 TLS traffic and physical resource benefit still need qualification. The static
 slot permanently withholds general heap, so this remains a default-off resource
 tradeoff rather than a claim of memory savings.
@@ -163,9 +163,36 @@ identities; derived ELF metadata cannot reconstruct omitted bytes offline.
 This isolated fixture qualification does not close production application/lint,
 radio boot, TLS protocol/traffic or physical memory/playback benefit gates.
 
+## Production SDK and Clang qualification
+
+The [production matrix](../tests/results/cyd-tls-static-rx-sdk-20261020/README.md)
+qualifies seven GCC exports from clean source `3a563324a`: vendor/custom FLAC
+across PDM, continuous DAC and legacy DAC, plus a reserve-off vendor PDM control.
+MPI and reclaim remain enabled in these selected test profiles. Full image/ELF,
+configuration, ordinary allocator/free, guarded SDK overlay, exact consumed
+headers, full RX storage, original board/task bindings and both OTA slots were
+checked. The seven saved variants are published in commit `4d3773086`; the
+minimum application-to-slot margin is 224192 bytes.
+
+Six complete Clang analysis profiles cover 338 translation units with zero
+parser errors and separate actual TLS SDK frontend checks. PDM/continuous/legacy
+produce 86/84/85 warnings, matching across vendor/custom FLAC. Their independent
+review found no new dangerous finding; both TLS units have no diagnostics.
+Clang uses the SDK's distinct experimental Newlib analysis profile. Production
+images use GCC/Picolibc. The retained original Clang qualifier failure compared
+those profiles incorrectly; a separate successor checks all fourteen exact
+typed/presence transitions and preserves that original nonpass report. The
+original reserve-only normalized policy remains in force for every GCC export.
+
+The controlled PDM ON/OFF pair uses the same source commit. Enabling reserve
+adds 672 application bytes and 16768 static DRAM bytes; linked IRAM is unchanged.
+The slot permanently reserves storage. Physical tests must establish its effect
+on TLS allocation, fragmentation, concurrent traffic and playback before any
+default activation or resource-benefit claim. The option remains default-off.
+
 ## Remaining work
 
-- Finish lint/application and physical qualification of the
+- Finish radio-boot, network-traffic and physical qualification of the
   CYD-specific TLS/full-record RX reservation against the
   [read-only SDK audit](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md).
   CYD uses static TLS buffers; the donor dynamic-RX allocation sites and capacity

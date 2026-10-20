@@ -1,0 +1,187 @@
+"""Pure filesystem provenance gates for production prep revision 2.
+
+No configure, compiler, SDK tool, lint, firmware export or device call occurs.
+Fixtures exercise the same input/header/log guards used by later qualification.
+"""
+from pathlib import Path
+import importlib.util
+import json
+import shutil
+import sys
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+spec = importlib.util.spec_from_file_location('static_rx_guard_subject', HERE / 'campaign.py')
+m = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(m)
+
+
+def main():
+    out = HERE / 'guard-check02'
+    m.require(not out.exists(), 'Never overwrite an earlier pure guard-check attempt')
+    out.mkdir()
+    results = []
+    report = {'schema': m.SCHEMA, 'passed': False,
+              'scope': 'Pure filesystem/argv provenance checks only; no firmware or run qualification',
+              'configure_compiler_sdk_lint_export_invocations': 0,
+              'campaign': m.ident(HERE / 'campaign.py'),
+              'guard_script': m.ident(Path(__file__)),
+              'plan': m.ident(m.PLAN / 'plan.json'), 'results': results}
+
+    def accepted(name, action):
+        action()
+        results.append({'name': name, 'expected': 'accept', 'accepted': True})
+
+    def rejected(name, fragment, action):
+        try:
+            action()
+        except RuntimeError as error:
+            m.require(fragment in str(error), 'Unexpected rejection in ' + name + ': ' + str(error))
+            results.append({'name': name, 'expected': 'reject', 'rejected': True, 'diagnostic': str(error)})
+        else:
+            raise RuntimeError('Missing required rejection in ' + name)
+
+    try:
+        plan = m.read(m.PLAN / 'plan.json')
+        accepted('all_actual_plan_inputs', lambda: m.validate_plan_inputs(plan))
+        fixture = out / 'plan-fixture'
+        shutil.copytree(m.PLAN, fixture)
+
+        def relocate(value):
+            if isinstance(value, dict): return {k: relocate(v) for k, v in value.items()}
+            if isinstance(value, list): return [relocate(v) for v in value]
+            if isinstance(value, str) and value.startswith(str(m.PLAN)):
+                return str(fixture) + value[len(str(m.PLAN)):]
+            return value
+
+        frozen = relocate(plan)
+        accepted('all_relocated_fixture_inputs', lambda: m.validate_plan_inputs(frozen, fixture))
+        for name, baseline in frozen['baselines'].items():
+            path = Path(baseline['files']['sdkconfig.json']['snapshot'])
+            original = path.read_bytes()
+            try:
+                # Valid JSON with different raw bytes must still fail its pin.
+                path.write_bytes(original + b' ')
+                rejected('baseline_copy_' + name, 'Prepared copy differs from frozen bytes',
+                         lambda: m.validate_plan_inputs(frozen, fixture))
+            finally:
+                path.write_bytes(original)
+
+        for row in frozen['rows']:
+            if not row['enabled']: continue
+            path = Path(row['clang_invocation_file']['path'])
+            original = path.read_bytes()
+            identity = dict(row['clang_invocation_file'])
+            try:
+                changed = m.read(path)
+                changed['clang_build'] += '-wrong'
+                m.write(path, changed)
+                rejected('invocation_bytes_' + row['name'], 'Prepared Clang invocation JSON changed',
+                         lambda: m.validate_plan_inputs(frozen, fixture))
+                # Even if a caller supplies the modified file identity, the
+                # separately frozen expected invocation content must disagree.
+                row['clang_invocation_file'] = m.ident(path)
+                rejected('invocation_content_' + row['name'], 'Clang invocation JSON differs from frozen plan content',
+                         lambda: m.validate_plan_inputs(frozen, fixture))
+            finally:
+                path.write_bytes(original)
+                row['clang_invocation_file'] = identity
+        accepted('all_fixture_inputs_restored', lambda: m.validate_plan_inputs(frozen, fixture))
+
+        build = out / 'header-fixture/build'
+        (build / 'config').mkdir(parents=True)
+        (build / 'config/sdkconfig.h').write_bytes(b'/* Pure exact-path guard fixture, not a generated SDK configuration. */\n')
+        required = [m.SDK / 'components/mbedtls/mbedtls/library/ssl_misc.h',
+                    m.SDK / 'components/mbedtls/mbedtls/tf-psa-crypto/core/tf_psa_crypto_common.h',
+                    m.SDK / 'components/mbedtls/mbedtls/include/mbedtls/ssl.h',
+                    build / 'config/sdkconfig.h', m.CANONICAL[1]]
+        headers = {str(x.resolve()): m.ident(x) for x in required}
+        accepted('exact_module_headers', lambda: m.exact_header_closure(headers, build, True))
+        accepted('exact_sdk_headers', lambda: m.exact_header_closure(
+            {k: v for k, v in headers.items() if Path(k) != m.CANONICAL[1]}, build, False))
+        wrong = out / 'header-fixture/wrong-directory'
+        wrong.mkdir()
+        for path in required:
+            shadow = wrong / path.name
+            shutil.copyfile(path, shadow)
+            changed = dict(headers)
+            del changed[str(path.resolve())]
+            changed[str(shadow.resolve())] = m.ident(shadow)
+            rejected('wrong_directory_' + path.name, 'Wrong or missing exact consumed header',
+                     lambda: m.exact_header_closure(changed, build, True))
+        duplicate = dict(headers)
+        duplicate[str((wrong / 'sdkconfig.h').resolve())] = m.ident(wrong / 'sdkconfig.h')
+        rejected('duplicate_same_basename_config', 'Wrong or missing exact consumed header',
+                 lambda: m.exact_header_closure(duplicate, build, True))
+
+        wrapper = out / 'log-fixture/wrapper'
+        attempt = wrapper / 'pure-fixture/attempt01'
+        attempt.mkdir(parents=True)
+        saved = out / 'log-fixture/saved'
+        saved.mkdir()
+        stdout = attempt / 'stdout.log'
+        stderr = attempt / 'stderr.log'
+        stdout.write_bytes(b'Pure stdout identity fixture; no compiler was invoked.\n')
+        stderr.write_bytes(b'Pure stderr identity fixture.\n')
+        row = {'variant': 'pure-fixture', 'output': str(saved)}
+        receipt = {'build_check': 'PASS', 'scope': 'Synthetic log guard fixture only', 'build_logs': []}
+        for index, original in enumerate([stdout, stderr], 1):
+            filename = 'build-' + str(index) + '.log'
+            shutil.copyfile(original, saved / filename)
+            receipt['build_logs'].append({'file': filename, 'original_path': str(original), 'sha256': m.ident(original)['sha256']})
+        receipt_path = saved / 'manifest.json'
+        m.write(receipt_path, receipt)
+        record = {'commands': [{'status': 'TERMINAL', 'returncode': 0, 'logs': [m.ident(stdout), m.ident(stderr)]}]}
+        accepted('recorded_stdout_stderr', lambda: m.validate_record_logs(record))
+        accepted('saved_original_receipt_logs', lambda: m.validate_export_logs(row, m.read(receipt_path), wrapper))
+        original_stdout = stdout.read_bytes()
+        try:
+            stdout.write_bytes(original_stdout + b'tampered\n')
+            rejected('tampered_recorded_stdout', 'Recorded stdout/stderr bytes changed', lambda: m.validate_record_logs(record))
+            rejected('tampered_original_exporter_log', 'Saved/original exporter log differs from receipt SHA',
+                     lambda: m.validate_export_logs(row, m.read(receipt_path), wrapper))
+        finally:
+            stdout.write_bytes(original_stdout)
+        copied = saved / 'build-1.log'
+        try:
+            copied.write_bytes(original_stdout + b'tampered copy\n')
+            rejected('tampered_saved_exporter_log', 'Saved/original exporter log differs from receipt SHA',
+                     lambda: m.validate_export_logs(row, m.read(receipt_path), wrapper))
+        finally:
+            copied.write_bytes(original_stdout)
+        try:
+            changed = json.loads(json.dumps(receipt))
+            changed['build_logs'][0]['sha256'] = '0' * 64
+            m.write(receipt_path, changed)
+            rejected('tampered_receipt_sha', 'Saved/original exporter log differs from receipt SHA',
+                     lambda: m.validate_export_logs(row, m.read(receipt_path), wrapper))
+            changed = json.loads(json.dumps(receipt))
+            changed['build_logs'][0]['original_path'] = str(saved / 'build-1.log')
+            m.write(receipt_path, changed)
+            rejected('tampered_receipt_original_path', 'Exporter original log path differs from actual wrapper layout',
+                     lambda: m.validate_export_logs(row, m.read(receipt_path), wrapper))
+            second = wrapper / 'pure-fixture/attempt02'
+            second.mkdir()
+            shutil.copyfile(stderr, second / 'stderr.log')
+            changed = json.loads(json.dumps(receipt))
+            changed['build_logs'][1]['original_path'] = str(second / 'stderr.log')
+            m.write(receipt_path, changed)
+            rejected('mixed_exporter_attempt_logs', 'Exporter stdout/stderr come from different attempts',
+                     lambda: m.validate_export_logs(row, m.read(receipt_path), wrapper))
+        finally:
+            m.write(receipt_path, receipt)
+        accepted('log_fixture_restored', lambda: (m.validate_record_logs(record), m.validate_export_logs(row, m.read(receipt_path), wrapper)))
+        report.update(passed=True, positive_checks=sum(x['expected'] == 'accept' for x in results),
+                      negative_checks=sum(x['expected'] == 'reject' for x in results))
+    except BaseException as error:
+        report['error'] = repr(error)
+        raise
+    finally:
+        m.write(out / 'report.json', report)
+    print(json.dumps({'passed': True, 'report': m.ident(out / 'report.json'),
+                      'positive_checks': report['positive_checks'], 'negative_checks': report['negative_checks'],
+                      'configure_compiler_sdk_lint_export_invocations': 0}))
+
+
+if __name__ == '__main__':
+    main()

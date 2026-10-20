@@ -1,0 +1,32 @@
+# CYD static RX warning review
+
+Frozen source: 3a563324abdca56144a40d5759def0ccfe708b3c. All six existing reports have been reviewed.
+
+This artifact reads retained reports and source only. It does not execute a compiler, SDK, lint, tests, Git, or a device, and it changes no production source. It is a warning review, not build, physical, resource, or analog qualification.
+
+| Profile | Review status | TUs | Warnings | Errors |
+| --- | --- | ---: | ---: | ---: |
+| pdm | REVIEWED | 56 | 86 | 0 |
+| continuous | REVIEWED | 56 | 84 | 0 |
+| legacy | REVIEWED | 57 | 85 | 0 |
+| custom-flac-pdm | REVIEWED | 56 | 86 | 0 |
+| custom-flac-continuous | REVIEWED | 56 | 84 | 0 |
+| custom-flac-legacy | REVIEWED | 57 | 85 | 0 |
+
+## Comparison and findings
+
+No actionable dangerous warning was identified. The PDM warning multiset is identical to the retained 54-TU reclaim baseline: all 86 occurrences match with translation unit, logical diagnostic file, severity, check, full message, and duplicate multiplicity retained. Line and column shifts are ignored for equality; original locations remain in comparison.json.
+
+Continuous profiles remove the PDM-only ramp narrowing at native_audio_output.c:418 and constant-product widening at 345. Legacy profiles remove these two and add the mode bitmask enum diagnostic at 780. Completed custom FLAC profiles match their corresponding vendor backend; a missing custom profile is not inferred to match. Both newly added TLS translation units have zero diagnostics in each completed row.
+
+## Source triage pointers
+
+- HTTP parser null diagnostics at generated httpd_parse.c:742/750 assume ra->sd is null at the defensive check:879. Actual IDF 6.0.2 httpd_sess.c:425-435 rejects a null session and deletes only after successful req_new. req_new binds ra->sd at 778; cleanup clears the request aux and sd. No reachable valid-session null trigger was found.
+- Generated httpd_ws.c:120-130 uses a 25-byte key buffer and a 37-byte fixed GUID; concatenation destination is 63 bytes. native_httpd_headers.h:90-117 bounds copied header text and appends its terminator. The strcpy/strcat warnings do not establish an overflow.
+- PDM multiplication native_audio_output.c:345 first computes 9*512=4608 before multiplying by 1000ULL. The warned intermediate cannot overflow. PCM conditional expressions at 210/418 promote already bounded int16 samples or ramp samples and zero to int before assigning int16.
+- Legacy native_audio_output.c:780 combines I2S_MODE_MASTER=1, I2S_MODE_TX=4 and I2S_MODE_DAC_BUILT_IN=16. The actual compatibility header is C:/Work/yoRadio/.idf/v5.5.4/components/driver/deprecated/driver/i2s_types_legacy.h:114-128. Value 21 is the intended documented bitmask, not an invalid functional mode.
+- network_settings.c:45 and time_settings.c:85 copy four-byte binary record magic after zeroing the entire record; these fields are compared as bytes, not passed as unterminated C strings.
+- FLAC narrowings at 673/688/693/705/712 read only 4/2/4/4-or-5/5 bits. readUint:160-175 masks the requested width. readRiceSignedInt:192-237 bounds the uint32 folded code before returning its signed32 range, so assignment at 708 is bounded.
+- Remaining warnings concern explicit Boolean string comparisons, sequenced short-circuit pointer increments, sentinel/zero enum initialization, enum storage size, duplicate branches, signed conditional promotions, or a status struct pre-zeroed before byte comparison at websocket_service.c:260/338. None supplies a concrete dangerous trigger.
+
+comparison.json records input report/log/YAML hashes, source pointers and observed-versus-recorded source hashes, complete normalized multisets, cross-profile deltas, and pending states. pending-history.json retains the initial missing-last-row observation and the later root completion confirmation. Source/index freezing, original qualifier failure, and the separate qualifier repair remain root-owned and untouched.

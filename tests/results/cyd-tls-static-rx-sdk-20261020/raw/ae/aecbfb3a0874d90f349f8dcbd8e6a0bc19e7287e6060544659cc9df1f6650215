@@ -1,0 +1,61 @@
+---
+MainSourceFile:  'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+Diagnostics:
+  - DiagnosticName:  bugprone-narrowing-conversions
+    DiagnosticMessage:
+      Message:         'narrowing conversion from ''int'' to signed type ''int16_t'' (aka ''short'') is implementation-defined'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+      FileOffset:      7614
+      Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/srx01/cvp'
+  - DiagnosticName:  bugprone-implicit-widening-of-multiplication-result
+    DiagnosticMessage:
+      Message:         'performing an implicit widening conversion to type ''unsigned long long'' of a multiplication performed in type ''unsigned int'''
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+      FileOffset:      13104
+      Replacements:    []
+    Notes:
+      - Message:         make conversion explicit to silence this warning
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+        FileOffset:      13104
+        Replacements:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+            Offset:          139
+            Length:          0
+            ReplacementText: "#include <stddef.h>\n"
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+            Offset:          13104
+            Length:          0
+            ReplacementText: '(unsigned long long)('
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+            Offset:          13148
+            Length:          0
+            ReplacementText: ')'
+        Ranges:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+            FileOffset:      13104
+            Length:          44
+      - Message:         perform multiplication in a wider type
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+        FileOffset:      13104
+        Replacements:
+          - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+            Offset:          13105
+            Length:          0
+            ReplacementText: '(unsigned long long)'
+        Ranges:
+          - FilePath:        ''
+            FileOffset:      0
+            Length:          0
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/srx01/cvp'
+  - DiagnosticName:  bugprone-narrowing-conversions
+    DiagnosticMessage:
+      Message:         'narrowing conversion from ''int'' to signed type ''int16_t'' (aka ''short'') is implementation-defined'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\native_audio_output.c'
+      FileOffset:      15813
+      Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/srx01/cvp'
+...

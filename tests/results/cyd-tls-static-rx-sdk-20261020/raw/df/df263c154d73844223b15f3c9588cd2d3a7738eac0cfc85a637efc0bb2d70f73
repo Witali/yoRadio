@@ -1,0 +1,42 @@
+# Qualifier defect and exact repair scope
+
+The original campaign is immutable. Its PDM configure and complete Clang lint
+commands terminated successfully. The original PDM qualification is **failed**:
+its shared `config_check()` compares both compiler profiles to the GCC MPI
+baseline and permits only the new reserve bool. It stopped before the separate
+TLS SDK frontend/dependency closure. Reusing the completed lint does not qualify
+that still-required frontend, and this repair does not mark the old report PASS.
+
+There are **14 total** normalized changes, comprising the reserve bool and 13
+compiler/libc changes. The exact table includes key presence and JSON types.
+It is a literal policy, not a learned allowlist or a compiler-prefix filter.
+
+| Keys | GCC baseline -> Clang analysis | Pinned SDK explanation |
+| --- | --- | --- |
+| IDF_TOOLCHAIN, IDF_TOOLCHAIN_GCC, IDF_TOOLCHAIN_CLANG | gcc -> clang; GCC true -> absent; Clang absent -> true | SDK Kconfig:39–53 records the selected toolchain. Actual saved command explicitly sets IDF_TOOLCHAIN=clang. |
+| COMPILER_NO_MERGE_CONSTANTS, COMPILER_STATIC_ANALYZER | false -> absent | SDK Kconfig:560–562 and 697–700 depend on GCC. |
+| Three COMPILER_CXX_GLIBCXX_CONSTEXPR_* symbols | no-change true and two false alternatives -> absent | SDK Kconfig:703–725 choice depends on GCC. |
+| COMPILER_RT_LIB_CLANGRT | absent -> false | SDK Kconfig:643–669 makes it visible for Clang. Saved libgcc=true and runtime name=gcc remain unchanged; stderr confirms saved selection wins over Clang's default. |
+| LIBC_NEWLIB, LIBC_PICOLIBC, LIBC_PICOLIBC_NEWLIB_COMPATIBILITY | false -> true; true -> absent; true -> absent | esp_libc/Kconfig:3–17 selects Newlib for Clang and disallows Picolibc. |
+| LIBC_NEWLIB_NANO_FORMAT | absent -> true | esp_libc/Kconfig:106–109 requires Newlib. Existing project sdkconfig.defaults:27 explicitly sets y; it was invisible in the GCC Picolibc baseline. |
+| YORADIO_TLS_STATIC_RX_RESERVE | absent -> true | The planned single application feature change. |
+
+All six frozen MPI baselines have exactly these before-values/presence. The
+complete actual PDM delta contains no additional board, backend, codec, task,
+core, MPI/reclaim, RX/TX, or unrelated configuration change. The fresh policy
+rejects omitted expected changes, extra changes and type/presence substitutions.
+
+Clang is an **experimental frontend/lint profile** under this SDK, as stated by
+components/esp_common/project_include.cmake. Newlib+nano and different compiler
+headers mean it is not the production GCC/Picolibc profile or a binary/runtime
+equivalence claim. Production images remain the seven original GCC exports.
+Full source/header/tool/SDK closure remains required in addition to the policy.
+
+The same-commit vendor PDM ON/OFF measurements reported by root are app +672 B,
+DRAM +16768 B, IRAM 0. They do not establish peak/free-heap benefit. The existing
+full SDK RX payload remains 16384 B and TX 4096 B. Physical acceptance is open.
+
+No compiler, SDK configuration, lint, firmware export, device or Git operation
+is performed during this source-only repair preparation. Pure controls use
+copied JSON configurations only. The SDK files cited above are hashed rationale
+inputs; source text was read, not executed.

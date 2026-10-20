@@ -1,0 +1,65 @@
+---
+MainSourceFile:  'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+Diagnostics:
+  - DiagnosticName:  bugprone-inc-dec-in-conditions
+    DiagnosticMessage:
+      Message:         'incrementing and referencing a variable in a complex condition can cause unintended side-effects due to C++''s order of evaluation, consider moving the modification outside of the condition to avoid misunderstandings'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+      FileOffset:      1696
+      Replacements:    []
+    Notes:
+      - Message:         variable is referenced here
+        FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+        FileOffset:      1680
+        Replacements:    []
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/srx01/ccp'
+  - DiagnosticName:  bugprone-not-null-terminated-result
+    DiagnosticMessage:
+      Message:         'the result from calling ''memcpy'' is not null-terminated'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+      FileOffset:      3074
+      Replacements:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+          Offset:          3024
+          Length:          0
+          ReplacementText: ' + 1'
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+          Offset:          3074
+          Length:          6
+          ReplacementText: strcpy
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+          Offset:          3081
+          Length:          0
+          ReplacementText: '(char *)'
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+          Offset:          3095
+          Length:          4
+          ReplacementText: ''
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/srx01/ccp'
+  - DiagnosticName:  bugprone-suspicious-string-compare
+    DiagnosticMessage:
+      Message:         'function ''memcmp'' is called without explicitly comparing result'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+      FileOffset:      3793
+      Replacements:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+          Offset:          3819
+          Length:          0
+          ReplacementText: ' != 0'
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/srx01/ccp'
+  - DiagnosticName:  bugprone-suspicious-string-compare
+    DiagnosticMessage:
+      Message:         'function ''memcmp'' is called without explicitly comparing result'
+      FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+      FileOffset:      4685
+      Replacements:
+        - FilePath:        'C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\idf\esp32-cyd2usb-native\main\time_settings.c'
+          Offset:          4728
+          Length:          0
+          ReplacementText: ' != 0'
+    Level:           Warning
+    BuildDirectory:  'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/srx01/ccp'
+...

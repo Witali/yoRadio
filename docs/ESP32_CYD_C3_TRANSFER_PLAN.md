@@ -73,14 +73,14 @@ allocation и численные настройки C3 являются канд
 | CYD-C3-10 | Программная часть выполнена | Gain рассчитывается один раз на packet; [общий normalizer](../tests/results/cyd-normalizer-20261018/README.md) подключён ко всем трём backend через owner-only DSP без изменения input PCM. [Итоговая квалификация](../tests/results/cyd-c3-format-dsp-20261018/README.md): HTTP controls, golden PCM, reset/layout/EOF и полный lint проходят. [PCM 8/16/24/32 и resampler](../tests/results/cyd-startup-pcm-web-20261018/HOST.md) квалифицированы: до 1359 сценариев/backend, исправлены PDM rate-tail и DAC priming/short writes. [Новые SDK images](../tests/results/native-warning-fixes-20261018/SDK.md) сохранены; PDM DSP/layout symbols — 555 B DRAM, soft-limit LUT — 1170 B flash (без linker padding). Физическая приёмка остаётся. |
 | CYD-C3-11 | Исключён | Перенос дисплея, рендеринга, физических controls и других аппаратных функций C3 не входит в задачу по уточнению пользователя. |
 | CYD-C3-12 | В работе | [Optional custom FLAC runtime](CYD_FLAC_TRANSFER_DESIGN.md) подключён к actual CYD decoder task; vendor остаётся default. [Квалификация](../tests/results/cyd-flac-runtime-20261019/README.md): 520 exact PCM сравнений, 4304 metadata-prefix случая, 24 allocation failure/reopen и lifecycle/maintenance controls, actual Xtensa custom/vendor component compile. Source depth и PCM16 разделены; workspace освобождается до maintenance ACK. [Полный custom PDM app export](../tests/results/network-power-transfer-20261019/SDK.md) проверен по ELF/image/configuration; текущий host rerun повторяет 520 точных PCM сравнений. [Все три custom backend exports](../tests/results/cyd-network-settings-20261020/SDK.md) собраны и проверены; [QEMU adapter/core](../tests/results/cyd-flac-qemu-20261020/README.md) проходит 520 byte-exact PCM случаев и 48 guards на SDK6.0.2/Xtensa/core0+1; [Actual CYD task QEMU](../tests/results/cyd-flac-task-qemu-20261020/README.md) проходит три public-API случая: ordered EOF/exact PCM, Stop/reopen и three-owner maintenance/resume; пять реальных decoder/client cleanup, исходные cores/priorities/stacks. OOM/backpressure/target semantic controls, production watchdog/ресурсы и физический vendor/custom A/B остаются. |
-| CYD-C3-13 | В работе | [Освобождение GET TX-буфера](CYD_MEMORY_TRANSFER_DESIGN.md) подключено через проверяемый build-local overlay SDK6.0.2. Host SDK17/8, actual open_stream62/6, CMake9 и whole Xtensa compile проходят. Число 4096 — configured capacity, не измеренная экономия heap. [Освобождение IDLE slots при отказе TLS allocation](CYD_INPUT_RECLAIM_DESIGN.md) реализовано отдельной default-off опцией: binding после READY, SMP pin/retirement и фиксированный бюджет повторов. Host21/17, startup12/4, CMake8 и полный Clang54/86warnings/0errors проходят без новых предупреждений. [Actual SDK/QEMU](../tests/results/cyd-input-reclaim-qemu-20261020/README.md) проходит пять сценариев и четыре exact controls: реальный calloc NULL/recovery, health hook, оба ядра, retirement/refill и timer ISR. [Семь production exports](../tests/results/cyd-input-reclaim-20261020/SDK.md) из чистого `a1b9d5a1` проверены для vendor/custom FLAC × три выхода и disabled PDM control; ELF allocator/free, OTA и прежние task bindings подтверждены. [Аудит TLS reserve/MPI](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md) завершён. [Ранняя MPI](CYD_EARLY_MPI_DESIGN.md) подключена default-off в `959f35486`: canonical startup, реальные SDK locks/heap, оба ядра и exact controls проходят; [архив проверок](../tests/results/cyd-early-mpi-20261020/README.md) сохранён. [Семь полных MPI exports](../tests/results/cyd-early-mpi-sdk-20261020/README.md) из чистого `1190aebce` также проверены: vendor/custom × три выхода и disabled PDM, actual first-call/allocator/free/config/OTA; минимальный запас OTA — 224912 B. Radio boot/board квалификация, TLS reserve, IRAM/stack и физические измерения CYD остаются. |
+| CYD-C3-13 | В работе | [Освобождение GET TX-буфера](CYD_MEMORY_TRANSFER_DESIGN.md) подключено через проверяемый build-local overlay SDK6.0.2. Host SDK17/8, actual open_stream62/6, CMake9 и whole Xtensa compile проходят. Число 4096 — configured capacity, не измеренная экономия heap. [Освобождение IDLE slots при отказе TLS allocation](CYD_INPUT_RECLAIM_DESIGN.md) реализовано отдельной default-off опцией: binding после READY, SMP pin/retirement и фиксированный бюджет повторов. Host21/17, startup12/4, CMake8 и полный Clang54/86warnings/0errors проходят без новых предупреждений. [Actual SDK/QEMU](../tests/results/cyd-input-reclaim-qemu-20261020/README.md) проходит пять сценариев и четыре exact controls: реальный calloc NULL/recovery, health hook, оба ядра, retirement/refill и timer ISR. [Семь production exports](../tests/results/cyd-input-reclaim-20261020/SDK.md) из чистого `a1b9d5a1` проверены для vendor/custom FLAC × три выхода и disabled PDM control; ELF allocator/free, OTA и прежние task bindings подтверждены. [Аудит TLS reserve/MPI](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md) завершён. [Ранняя MPI](CYD_EARLY_MPI_DESIGN.md) подключена default-off в `959f35486`: canonical startup, реальные SDK locks/heap, оба ядра и exact controls проходят; [архив проверок](../tests/results/cyd-early-mpi-20261020/README.md) сохранён. [Семь полных MPI exports](../tests/results/cyd-early-mpi-sdk-20261020/README.md) из чистого `1190aebce` также проверены: vendor/custom × три выхода и disabled PDM, actual first-call/allocator/free/config/OTA; минимальный запас OTA — 224912 B. [Статический TLS RX reserve](CYD_MEMORY_TRANSFER_DESIGN.md) также подключён default-off: host, 12 SDK/QEMU вариантов, [семь GCC exports и шесть Clang-профилей](../tests/results/cyd-tls-static-rx-sdk-20261020/README.md) проходят. Radio boot/board, TLS traffic, IRAM/stack и физические измерения CYD остаются. |
 | CYD-C3-14 | В работе | [Аудит и план Vorbis/Ogg](CYD_VORBIS_TRANSFER_DESIGN.md) подтверждают шесть проблем в реальных Xtensa archives2.6.2. Изолированный ESP32 bridge добавлен в `cbb69fdad`, в основной radio runtime пока не подключён. [Квалификация](../tests/results/cyd-vorbis-bridge-20261020/README.md): actual SDK6.0.2/Xtensa, три canonical translation units, 535 raw packets/2,112,000 byte-exact PCM bytes и 1602 undersized retries; bypass-preflight variant даёт точный ожидаемый отказ, 21 CMake configuration проверена. Private layout подтверждён частично. [Расширение Ogg target-проверок отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после автоматической проверки безопасности: SDK compile завершён, observer-selection отказал до QEMU; ноль новых runtime случаев квалифицировано. Ogg EOF/reset, allocation failure/reopen, concurrent scopes, format/conformance, полная callback ABI и audio-task интеграция остаются. AAC compact owners требуют отдельной адаптации; ранее отложенный private owner-view не исследовался и остаётся отложенным. |
 | CYD-C3-15 | В работе | [Production wrapper](../idf/esp32-cyd2usb-native/PRODUCTION_BUILD.md) и верифицированный экспорт реализованы; 42 host tests проходят, 1 symlink case пропущен. Изолированный sdkconfig сохраняет аппаратные настройки и обеспечивает минимум два SNTP servers. [Шесть CYD сборок после N5](../tests/results/cyd-network-settings-20261020/SDK.md) проверены: vendor/custom FLAC во всех трёх backend; [C3 N4 image](../tests/results/network-power-transfer-20261019/SDK.md) сохраняет отдельный baseline; конфигурации, image/ELF/compiler hashes, task affinity и запас OTA сохранены. Фактические DWARF размеры структур и static symbols зафиксированы без заявления об экономии heap. Единая физическая приёмка HTTP/HTTPS/кодеки/WebUI/OTA/длительное воспроизведение каждого backend ещё впереди. |
 
 ## Что осталось по переносу
 
-- **Этап 13, память:** завершить квалификацию TLS reserve под статические CYD TLS-буферы,
-  завершить radio-boot/board квалификацию [ранней MPI](CYD_EARLY_MPI_DESIGN.md)
+- **Этап 13, память:** завершить radio-boot/board и сетевую приёмку
+  статического CYD TLS RX reserve, завершить radio-boot/board квалификацию [ранней MPI](CYD_EARLY_MPI_DESIGN.md)
   и подобрать heap/IRAM/стеки по CYD. MPI уже подключена default-off и прошла
   проверки actual startup/SDK mutex/OOM/двух ядер, а также
   [семь полных application exports](../tests/results/cyd-early-mpi-sdk-20261020/README.md);
@@ -91,8 +91,9 @@ allocation и численные настройки C3 являются канд
   userdata. [Текущие host-результаты](../tests/results/cyd-tls-static-rx-host-20261020/README.md)
   сохраняют unit, полную service-матрицу и CMake-проверки;
   [Actual SDK/QEMU](../tests/results/cyd-tls-static-rx-qemu-20261020/README.md)
-  проходит полную матрицу из 12 вариантов; lint/application exports и физическая
-  польза ещё впереди.
+  проходит полную матрицу из 12 вариантов. [Семь production exports и шесть
+  Clang-профилей](../tests/results/cyd-tls-static-rx-sdk-20261020/README.md)
+  также проверены; radio-boot/board, TLS traffic и физическая польза ещё впереди.
   Старый pointer prototype и первая registry target-матрица завершились nonpass;
   их target gate остаётся nonpass. Новая полная матрица прошла после исправления
   ошибочного тестового отождествления pre-handshake MFL getter и размера RX storage.
@@ -623,6 +624,9 @@ Stream остаётся на core0, decode/output на core1 с прежними
   и CMake45. Самостоятельный verifier и независимый запуск из другого каталога
   проходят: raw sources/logs/config, точное воспроизведение SDK overlay и host
   predicates, 34 applied/preparation равенства и явные binary/tool omissions.
+  Исходники зафиксированы в `affa3caf1` после выполнения тестов; чистота Git
+  на момент тестов не заявляется. Actual SDK/QEMU, application и physical gates
+  остаются отдельными проверками; старый nonpass prototype не переименован.
 
 - 2026-10-20, CYD-C3-13: первая registry SDK/QEMU матрица `rxt01` завершилась
   с exit1: десять принятых вариантов, одиннадцатый reserve-off/reclaim-on отвергнут
@@ -658,6 +662,20 @@ Stream остаётся на core0, decode/output на core1 с прежними
   и оба reserve-off профиля. Архив хранит 1847 файлов и 19368 hash bindings;
   старый `rxt01` остаётся nonpass. Production application/lint, TLS traffic и
   физический выигрыш памяти открыты; reserve по умолчанию выключен.
-  Исходники зафиксированы в `affa3caf1` после выполнения тестов; чистота Git
-  на момент тестов не заявляется. Actual SDK/QEMU, application и physical gates
-  остаются отдельными проверками; старый nonpass prototype не переименован.
+
+- 2026-10-20, CYD-C3-13/15: [production SDK/Clang матрица TLS RX](../tests/results/cyd-tls-static-rx-sdk-20261020/README.md)
+  закрыта из чистого `3a563324a`: семь GCC exports (vendor/custom FLAC × три
+  выхода и reserve-off PDM), шесть полных Clang-профилей и отдельные TLS SDK
+  frontend/consumed-header проверки. 338 translation units, ноль parser errors;
+  предупреждения 86/84/85 по PDM/continuous/legacy, одинаковые у двух семейств
+  декодеров, разобраны без suppression и без новых опасных замечаний.
+  Первоначальная Clang-квалификация остаётся nonpass: ошибочное сравнение с GCC
+  исправлено отдельным квалификатором, который проверяет ровно 14 typed/presence
+  изменений toolchain/libc/feature. Для GCC по-прежнему допустима только новая
+  reserve bool. Прошивки сохранены и запушены в `4d3773086`; минимальный запас
+  OTA — 224192 B. Сравнение PDM ON/OFF на одном коммите: app +672 B, static DRAM
+  +16768 B, IRAM без увеличения. Это цена постоянного резерва; физическая польза,
+  radio boot, heap/stack и TLS/audio/WebUI/OTA нагрузка ещё требуют приёмки.
+  Архив SDK/Clang проверен автономно из другого каталога, включая все ссылки
+  на firmware; manifest SHA256 —
+  `8a120ba9329a190d7baf6f3b813bc61224a391101bcbf170b4c1f6dba96a1db1`.
