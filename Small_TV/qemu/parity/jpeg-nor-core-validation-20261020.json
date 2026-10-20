@@ -1,0 +1,610 @@
+{
+  "schema": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Portable sparse NOR core only: strict host model, per-callback fault/reopen tests, real native-image layout and RV32 object/ABI measurements. Not linked production, resource guard, atomic metadata, libjpeg integration, QEMU I/O or hardware endurance acceptance.",
+  "base_commit": "6d28c8b2ff78c55886548212b379ac5ea7aceff1",
+  "source_sha256": {
+    "Small_TV/src/storage/jpeg_nor.c": "fe99f7205c55d06dfc2b4adc77f86db0dbc4093a026070401d4b62a27ff65228",
+    "Small_TV/src/storage/jpeg_nor.h": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+    "Small_TV/src/tests/jpeg_nor/native_test.c": "dc422040514c802c4ee6fb762b3ce7d8187caffa5c83bf377d6aa53449f61756",
+    "Small_TV/src/tests/jpeg_nor/prepare.py": "77edb6c41415b44634d5f12d96eea3e5ad986a6ecd68aa360e7c9c50aca5ef03",
+    "Small_TV/src/tests/jpeg_nor/run.ps1": "d5d87d6c9dedd4fef9ac0f3165e090feb9e1923f4f5db458ef9f8b5fee3289b8",
+    "Small_TV/src/tests/jpeg_nor/mutation_contract.py": "d6ecc0d93e5704a7f675733c8c4b74f026ef68785a5ca6f4f54892a232c43c8f"
+  },
+  "host": {
+    "passed": true,
+    "checks": 1334640,
+    "random_operations": 3000,
+    "fault_scenarios": 83,
+    "real_layout_stores": 7,
+    "sector_cache_bytes": 4096,
+    "handle_bytes": 4368,
+    "random_model_erase_calls": 3780,
+    "random_model_program_calls": 90720,
+    "physical_hardware_tested": false
+  },
+  "negative_controls": {
+    "passed": true,
+    "cases": 6,
+    "inputs_unchanged": true
+  },
+  "rv32": {
+    "compiled": true,
+    "executed": false,
+    "object_type": "ET_REL",
+    "code_bytes": 1848,
+    "writable_section_bytes": 0,
+    "handle_bytes": 4352,
+    "sector_cache_bytes": 4096,
+    "max_single_function_stack_frame": 304,
+    "total_firmware_stack_verified": false,
+    "toolchain_sha256": {
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-gcc.exe": "9a96e8e77c263d4f7f16c084e8a2dfe89dfa8598c31fd3f9b152db35ccbb2a74",
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\libexec\\gcc\\riscv32-esp-elf\\15.2.0\\cc1.exe": "5bae30aa8db549c20fc40205914e0ba1ac938ff45c2ddf667dfb9dbec4d8ba1b"
+    }
+  },
+  "production": {
+    "changed": false,
+    "jpeg_decoder": "TJpgd",
+    "nor_core_linked": false,
+    "app_sha256": "3e030c1cc5f7b456fefc9985c397daf8340c33d1bb2805965b076147a07cd7e1",
+    "artifact_cases": 6
+  },
+  "test_gap": "Initial allow_protected_flash mutant escaped the earlier test corpus. FIXED_TEST adds the end-of-final-capability and beyond-final-capability cases; original report/executable/test source remain raw evidence.",
+  "next_required": [
+    "runtime immutable-resource/layout ownership guard",
+    "atomic cache metadata and cold recovery",
+    "single shared scratch context with bounded logical subfiles for libjpeg",
+    "ESP-IDF transport and per-decode operation/time budgets",
+    "actual codec/production link/heap/stack/HTTP/LCD/full/24h/physical acceptance"
+  ],
+  "raw": [
+    {
+      "file": "raw/jpeg-nor-core-20261020/before-boundary-native_test.c.gz",
+      "sha256": "56ddd493abb203dad4ca0ca96067afaca39134e77b0f84d4699903018a6ecb72",
+      "bytes": 4141,
+      "uncompressed_sha256": "21c390d6b63cdc268422dc013c1a9be6ece2c69d3d32b6bae798167d5e626428",
+      "uncompressed_bytes": 16247
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/final-host-v2/compile.cmd.gz",
+      "sha256": "f607216eaaa982aee816bf5d9e5763b6221946cc294685940626fc6a6cf76759",
+      "bytes": 341,
+      "uncompressed_sha256": "5bb84779002ef24eab19480797f48269fb74781c13ce0bd1adca419d3826b31d",
+      "uncompressed_bytes": 725
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/final-host-v2/jpeg_nor_test.exe.gz",
+      "sha256": "32c7eb6d1a7d98988079dbb1b195b94fb3c3852491c39d015a3366f8722379a2",
+      "bytes": 84861,
+      "uncompressed_sha256": "d4a1eb2ac3e38c36cc3e1e3bd6c09c404a0db898c986f88444b59117b812bebf",
+      "uncompressed_bytes": 178176
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/final-host-v2/plan.json.gz",
+      "sha256": "f6d8e7d84f7becbe5f322a397440f501d69a6a49337c9ab78bbb334bb900239b",
+      "bytes": 1598,
+      "uncompressed_sha256": "9251d77d0c482b32314a1e5633a05f671ca7a8b35b919ceb1fdd31dfdbd13132",
+      "uncompressed_bytes": 5531
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/final-host-v2/plan_fixture.h.gz",
+      "sha256": "8d0696bc315b4dad1f44adf493548493e6b98d0b8d90522387b71890c3ff6222",
+      "bytes": 406,
+      "uncompressed_sha256": "c35cd670fb079879421d964764a9e331a7120821004b484d3173b61a007cc5f9",
+      "uncompressed_bytes": 1384
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/final-host-v2/report.json.gz",
+      "sha256": "2c559685d0a2e64f246a9b02de5d70ab09de2e8a0449308ab5c09461c0fe6af1",
+      "bytes": 187,
+      "uncompressed_sha256": "7ebce4326f49ed6e71fc2e6e41a5fa4f1767e15e7af08ced9249678e7720e262",
+      "uncompressed_bytes": 249
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/final-host-v2.log.gz",
+      "sha256": "c6245cf3933a855d7602e033e146e4bceaf9cab666b7dd1047c4df33ed87fc76",
+      "bytes": 272,
+      "uncompressed_sha256": "9b7cc87ca22a3c2dfdcfa5f2df6360bbf2bf7705c6a51a3a09cbffa25f6a9f3d",
+      "uncompressed_bytes": 355
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/final-host.log.gz",
+      "sha256": "31a30288321105b3a451e79b140035747834d4a416372397b93670019ea1e721",
+      "bytes": 272,
+      "uncompressed_sha256": "4658e33111c0ab2f39d6f3146e6fabd6c9876020675c1677751aff2d358c50f9",
+      "uncompressed_bytes": 355
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/host.log.gz",
+      "sha256": "9dbb5d2d27707fc27312e80452bf28906b29d170d68753bd9a7cc0283f113282",
+      "bytes": 242,
+      "uncompressed_sha256": "dedc0a1a0cf9f7fba24596923b3b23fb917db218e177b4060b802a771bb94fcb",
+      "uncompressed_bytes": 288
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/allow_protected_flash/compile.cmd.gz",
+      "sha256": "3e2656be09a2862a6c2cf8a159acace2dcfaa3a17db9a36d8a1c6e7ea8844e80",
+      "bytes": 381,
+      "uncompressed_sha256": "85301b47647c573f532e0ee901c0fbdd2a6403ff7694d3268d4a1aac572e30e8",
+      "uncompressed_bytes": 885
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/allow_protected_flash/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/allow_protected_flash/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/allow_protected_flash/mutant.c.gz",
+      "sha256": "c0b50abe5a2209e40c74ed7934e435e3120d2c0e72932e3c44ab0fb3c1fa4a1b",
+      "bytes": 3070,
+      "uncompressed_sha256": "44fe2c0ffeb766389780aa60ea24f0f1e43dc2f50ec94f3141cb7f133b4ebed2",
+      "uncompressed_bytes": 12454
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/allow_protected_flash/mutant.exe.gz",
+      "sha256": "6e9a6f2d052443341804cb07720d5c30f052249652e60bf63f593f9a9e87d5e8",
+      "bytes": 84728,
+      "uncompressed_sha256": "4b1fd41cc8d764f701c1fd0dc916695a66363f00d46fc8cc0a9c1500d88f47f1",
+      "uncompressed_bytes": 177152
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/allow_protected_flash/run.log.gz",
+      "sha256": "276ba99267b4a722b4a8fe6a67ec3682aac005675248ce824a9f9449f40e6895",
+      "bytes": 187,
+      "uncompressed_sha256": "c24c2886c9ecc149f253dd6c88539bd3fd68c179393360d54b642b4227bb6349",
+      "uncompressed_bytes": 249
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/lose_unchanged_pages/compile.cmd.gz",
+      "sha256": "f8532bec5a3b396e76d6b7d1a8d73261b14bc7843ee834eb7d03dd0fabce169b",
+      "bytes": 381,
+      "uncompressed_sha256": "0067faacf5d2ad831cd139468c20d9f719c5ec45e75e132f94d0a02e3531b4df",
+      "uncompressed_bytes": 882
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/lose_unchanged_pages/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/lose_unchanged_pages/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/lose_unchanged_pages/mutant.c.gz",
+      "sha256": "5a01c0020dae67f7e3d4e0af998e90fe43c79281a1dc9c3091fd2706d7ab751b",
+      "bytes": 3072,
+      "uncompressed_sha256": "d87b7a3d9bbce691917934b66b84f3483ab08574f315be949581ccda76a52852",
+      "uncompressed_bytes": 12445
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/lose_unchanged_pages/mutant.exe.gz",
+      "sha256": "a147a37c70b311c46b719055f476aebef59a9b380885dfa6faba5ca496c75370",
+      "bytes": 84742,
+      "uncompressed_sha256": "c1563daf38f736472997b8d837a850d80ca3637c8b249a544d90ccb91023fc8c",
+      "uncompressed_bytes": 177152
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/lose_unchanged_pages/run.log.gz",
+      "sha256": "8bb83fa47fae45624d81c0a1c2757623cbe47fe36390225f3b76d04743b03188",
+      "bytes": 172,
+      "uncompressed_sha256": "2062b902a07b5ecc95dbf5b52176ddb1e728332d3d91972d78ab9df4d3c9fd0a",
+      "uncompressed_bytes": 180
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/report.json.gz",
+      "sha256": "83642223da6a8a67a59cde42c9650b0fb8568e65a9a901b5f037639f6ce044c8",
+      "bytes": 1016,
+      "uncompressed_sha256": "57f740614a2331da0d923fdd8a98e0bff65d73b72f650cd8067fcd7e2594a937",
+      "uncompressed_bytes": 2394
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/skip_erase/compile.cmd.gz",
+      "sha256": "07d8b16bf0615304a969cbdb992d71ff2b79b06cbe3fd6030d9872bd1187fb7b",
+      "bytes": 374,
+      "uncompressed_sha256": "e4a96b2f58d053a299340809641f8ea4e004f2930f667557572715a2f7fcbf92",
+      "uncompressed_bytes": 852
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/skip_erase/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/skip_erase/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/skip_erase/mutant.c.gz",
+      "sha256": "5a0f48cc522c2e79a6e69880459351755c455663016be3371d175b272b10270e",
+      "bytes": 3077,
+      "uncompressed_sha256": "ca702f1cb53de200d1e9a92622fd536225849de482f41da9d3ae91f263605d98",
+      "uncompressed_bytes": 12464
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/skip_erase/mutant.exe.gz",
+      "sha256": "7e9b35fda9e3b886f2380cf77bda7f74d1aac767259ac8684da35f6362baa375",
+      "bytes": 84737,
+      "uncompressed_sha256": "a6b1caff4beacc0c8eae1a805a01ddfa2e48dd68d53e72844841d272efbc4e2f",
+      "uncompressed_bytes": 177152
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative/skip_erase/run.log.gz",
+      "sha256": "8bb83fa47fae45624d81c0a1c2757623cbe47fe36390225f3b76d04743b03188",
+      "bytes": 172,
+      "uncompressed_sha256": "2062b902a07b5ecc95dbf5b52176ddb1e728332d3d91972d78ab9df4d3c9fd0a",
+      "uncompressed_bytes": 180
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/allow_protected_flash/compile.cmd.gz",
+      "sha256": "79f368ee48acc6ca03322f0d4c76b1461782f4730026fd47fc621b3bc2401f78",
+      "bytes": 386,
+      "uncompressed_sha256": "5cf322d75812babeab15935a7fae508e869f49535b667cec0e778ef3f140ab92",
+      "uncompressed_bytes": 897
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/allow_protected_flash/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/allow_protected_flash/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/allow_protected_flash/mutant.c.gz",
+      "sha256": "c0b50abe5a2209e40c74ed7934e435e3120d2c0e72932e3c44ab0fb3c1fa4a1b",
+      "bytes": 3070,
+      "uncompressed_sha256": "44fe2c0ffeb766389780aa60ea24f0f1e43dc2f50ec94f3141cb7f133b4ebed2",
+      "uncompressed_bytes": 12454
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/allow_protected_flash/mutant.exe.gz",
+      "sha256": "df5084bb8c2f55b3c637935fb9b3e97b467900214c6f5a7b60f0aa4bc0550777",
+      "bytes": 84843,
+      "uncompressed_sha256": "d454b8a89e41dce5412c9d8f11880f5f33fb90a28af3ca68622b84606205f275",
+      "uncompressed_bytes": 178176
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/allow_protected_flash/run.log.gz",
+      "sha256": "97836fbf08c120948177ca7082161974f9ed3f8352b0f63f33f16ee51ee3e22f",
+      "bytes": 172,
+      "uncompressed_sha256": "52971cb7ce2304bff8f650f927d13520413b03ea6afa7ef41accbf8ef6bf0778",
+      "uncompressed_bytes": 172
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_erased_sector_verification/compile.cmd.gz",
+      "sha256": "381e2f281ad5027d29f32e63fdee6493b0b21283796665bc11327ea17a6a0ded",
+      "bytes": 393,
+      "uncompressed_sha256": "fff897b8cebb422f282b6372516385413ae19f475fd6ba27e5d7685e243b6dce",
+      "uncompressed_bytes": 933
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_erased_sector_verification/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_erased_sector_verification/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_erased_sector_verification/mutant.c.gz",
+      "sha256": "d7963951c03bf7776867eed202f74ec754de603cc10f4bbfdc55573acd45187a",
+      "bytes": 3076,
+      "uncompressed_sha256": "f24adfc1991b92c078c418ff4de96034aa6a5df113aed91307c96be00b749c19",
+      "uncompressed_bytes": 12450
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_erased_sector_verification/mutant.exe.gz",
+      "sha256": "6d5a9c80204d505fa16aff0a442dd1e0aeab9e29db6350aba6d8b670875a1506",
+      "bytes": 84856,
+      "uncompressed_sha256": "5ea8430f88d23cae9a66060c93833bbd1db048baa6593fdffc7784b6844f8574",
+      "uncompressed_bytes": 178176
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_erased_sector_verification/run.log.gz",
+      "sha256": "8388621b96c9dd611b3b73206642ba3943d7c70452db92f187f7674e209438ac",
+      "bytes": 159,
+      "uncompressed_sha256": "6cda68a29a8a20826bcf5dd9aaba53b08f39126e3e04826f1c444a05be5d0d33",
+      "uncompressed_bytes": 155
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_program_verification/compile.cmd.gz",
+      "sha256": "757b9f250dc902c7574891bafc5152f4e8fc4fcd39d85890ddf78adb7644aeda",
+      "bytes": 388,
+      "uncompressed_sha256": "bdc5510f2efe2eee2ccb20889df2cdf0b22094c3c9c1b714178240f369d29673",
+      "uncompressed_bytes": 915
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_program_verification/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_program_verification/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_program_verification/mutant.c.gz",
+      "sha256": "c8e8024e63a1fe80b36387dbaa151359aa134923df2fb423307f38c08adfcc09",
+      "bytes": 3082,
+      "uncompressed_sha256": "8ded7c59f86fac8decf653f362882c63e929a1430daaa43982f580dad86d7701",
+      "uncompressed_bytes": 12469
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_program_verification/mutant.exe.gz",
+      "sha256": "269719532c222fe38b19f3a60afd1088467188ab0f86a9b3dfa9ef910875dc49",
+      "bytes": 84867,
+      "uncompressed_sha256": "3eaf1fdb269681970c5e38bd4a7091968c40050d4b5707352c28d1973b4a1c35",
+      "uncompressed_bytes": 178176
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/ignore_program_verification/run.log.gz",
+      "sha256": "8388621b96c9dd611b3b73206642ba3943d7c70452db92f187f7674e209438ac",
+      "bytes": 159,
+      "uncompressed_sha256": "6cda68a29a8a20826bcf5dd9aaba53b08f39126e3e04826f1c444a05be5d0d33",
+      "uncompressed_bytes": 155
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/lose_unchanged_pages/compile.cmd.gz",
+      "sha256": "00b15f71b4588e1ed26cbdb3e66eaa6c6e40a4203d233d62b18a30ff3412b694",
+      "bytes": 385,
+      "uncompressed_sha256": "84f7c138a6553ac05c14d13df5d44603d14abf243115cb13e8f05c4de94cd413",
+      "uncompressed_bytes": 894
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/lose_unchanged_pages/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/lose_unchanged_pages/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/lose_unchanged_pages/mutant.c.gz",
+      "sha256": "5a01c0020dae67f7e3d4e0af998e90fe43c79281a1dc9c3091fd2706d7ab751b",
+      "bytes": 3072,
+      "uncompressed_sha256": "d87b7a3d9bbce691917934b66b84f3483ab08574f315be949581ccda76a52852",
+      "uncompressed_bytes": 12445
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/lose_unchanged_pages/mutant.exe.gz",
+      "sha256": "b683290dfd53baef5cae63a1ebb8a742601ccbdbc7d2cfddd675345aa0c675e2",
+      "bytes": 84845,
+      "uncompressed_sha256": "c2b5393342dbde685e11b4aff621318db61bf3e538c313eef186b42f8b73ed11",
+      "uncompressed_bytes": 178176
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/lose_unchanged_pages/run.log.gz",
+      "sha256": "8bb83fa47fae45624d81c0a1c2757623cbe47fe36390225f3b76d04743b03188",
+      "bytes": 172,
+      "uncompressed_sha256": "2062b902a07b5ecc95dbf5b52176ddb1e728332d3d91972d78ab9df4d3c9fd0a",
+      "uncompressed_bytes": 180
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/read_stale_flash/compile.cmd.gz",
+      "sha256": "870e1fe97fe341204e998c3169877af403f725caec5f2d5c90b55d064b1a4599",
+      "bytes": 382,
+      "uncompressed_sha256": "b6de2269daf78a0616653878561a6a9eb11609b81811eaf16bc2e3aa2b4829e7",
+      "uncompressed_bytes": 882
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/read_stale_flash/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/read_stale_flash/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/read_stale_flash/mutant.c.gz",
+      "sha256": "d563dfec9615571ab6778495614feba040ba89cfc286b7277e74bf2443f435b5",
+      "bytes": 3068,
+      "uncompressed_sha256": "2f193114408ab1df96b81318c9070e04da56790956aeaa8d5ae11d3e3fcb3d72",
+      "uncompressed_bytes": 12412
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/read_stale_flash/mutant.exe.gz",
+      "sha256": "e039904b32ec4cb4aa48b6f5157f23e670f32dc4d302af16c7d481816a0cc9ef",
+      "bytes": 84872,
+      "uncompressed_sha256": "967097a95781da240a53f5394c72136f2d7e749b0bc8404e407109f6684ab63f",
+      "uncompressed_bytes": 178176
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/read_stale_flash/run.log.gz",
+      "sha256": "0ca2fd85f41f86297a50f9fc6670866dd2ad1d3c93c3b457bfbea4e6257a6efe",
+      "bytes": 156,
+      "uncompressed_sha256": "9053a87dea6059e2b7ccdfa03cdab19bdce609121358bd7dc6e1945658900904",
+      "uncompressed_bytes": 154
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/report.json.gz",
+      "sha256": "5737070c90996c553b7e95307a623004e37f58bb8a41dbbad9151e61b32f2d4b",
+      "bytes": 1542,
+      "uncompressed_sha256": "2685ae287984e952c7f57709c8108e5600cfa16f0d1c48c4d7c66aa2314a4a7d",
+      "uncompressed_bytes": 4669
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/skip_erase/compile.cmd.gz",
+      "sha256": "b399092bd2413faf9e2c3a8547db401d1714ef214b31f6307654bf0514c37790",
+      "bytes": 377,
+      "uncompressed_sha256": "bd7662e5f44a5ac16c7691b6034d9afb88f3b17cd926f556a4af3e6f04464def",
+      "uncompressed_bytes": 864
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/skip_erase/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/skip_erase/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/skip_erase/mutant.c.gz",
+      "sha256": "5a0f48cc522c2e79a6e69880459351755c455663016be3371d175b272b10270e",
+      "bytes": 3077,
+      "uncompressed_sha256": "ca702f1cb53de200d1e9a92622fd536225849de482f41da9d3ae91f263605d98",
+      "uncompressed_bytes": 12464
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/skip_erase/mutant.exe.gz",
+      "sha256": "2212b2a7d7b4ce6f4c297c73f503a58a73c9083a2cb9d4598fc01f13279b44a7",
+      "bytes": 84851,
+      "uncompressed_sha256": "c95925b08eeb7ea42497124c617359daacb4840a0fe1fe4ac91aafee746d1c56",
+      "uncompressed_bytes": 178176
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2/skip_erase/run.log.gz",
+      "sha256": "8bb83fa47fae45624d81c0a1c2757623cbe47fe36390225f3b76d04743b03188",
+      "bytes": 172,
+      "uncompressed_sha256": "2062b902a07b5ecc95dbf5b52176ddb1e728332d3d91972d78ab9df4d3c9fd0a",
+      "uncompressed_bytes": 180
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative-v2.log.gz",
+      "sha256": "f18fc559f109b2e6efc4a837f2260fcdbe18a2b4596a8d8f6d31fff607a7b8a7",
+      "bytes": 142,
+      "uncompressed_sha256": "28f032b6bc40f750d33c1b49d3304deae2e133be30851ca705fb66e3c82e524c",
+      "uncompressed_bytes": 265
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/negative.log.gz",
+      "sha256": "17d1a8cf3d47414ab7f0ccbf952ec20242331dad8ef11302e0954a8f9c465de5",
+      "bytes": 303,
+      "uncompressed_sha256": "372acda55fc1425167aa5d696e68ab4fdfce19a2e627011dd2e9138aa4c9c2be",
+      "uncompressed_bytes": 558
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/production-integrity.json.gz",
+      "sha256": "4bbdbe024a904a2b0c239a02104e9589c4caf4df7a3a512873b95ec70a49620c",
+      "bytes": 237,
+      "uncompressed_sha256": "76de3539cebffb27b0c5b8661525a92dcb8376ef307540c6fef1ea7a622dcae7",
+      "uncompressed_bytes": 341
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/production-integrity.log.gz",
+      "sha256": "6382f873fbc6bee487b451f083cca35d541a8f7a14ad818bc207416bc3ced284",
+      "bytes": 230,
+      "uncompressed_sha256": "70aacf38852b83263609c0a2191964a04e7af4594cfa846d189c967bb37d9ea0",
+      "uncompressed_bytes": 665
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/rv32/abi-section4.txt.gz",
+      "sha256": "25c726efbddcd5ad6d805a21aea9f83a7df0c843005ba8d94776a2ccf857bb04",
+      "bytes": 78,
+      "uncompressed_sha256": "a93411e1021b0f592e9346bf3f37226241b67a29ecd95cfdddae611198714506",
+      "uncompressed_bytes": 96
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/rv32/abi-symbols.txt.gz",
+      "sha256": "e56ceb88e4ad351ed235f9c787bfd3507e1563baa98d2215dd5e82b547d2590d",
+      "bytes": 316,
+      "uncompressed_sha256": "c8df93a5e615c6abf869ce118e995854109260ffcb4b539e869bbd3dfce200c1",
+      "uncompressed_bytes": 802
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/rv32/abi.txt.gz",
+      "sha256": "46b50c321b39e89a491b6727a01628c34245605a30beb3e7414c5e01cff90e6e",
+      "bytes": 20,
+      "uncompressed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uncompressed_bytes": 0
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/rv32/abi_probe.c.gz",
+      "sha256": "8c6ad39197dbcfed37da6010f2d87692e2356e9abd96a05f891a8f708c03c939",
+      "bytes": 117,
+      "uncompressed_sha256": "5a488244556f542d650863ba37174777ed5dfdf737692fdf6abc6ef79ae03bce",
+      "uncompressed_bytes": 142
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/rv32/abi_probe.o.gz",
+      "sha256": "7c7b4b8b4f601023077bfcfbbef21509cc312811beba4d64cb0e9b5c911542f5",
+      "bytes": 400,
+      "uncompressed_sha256": "d1046eecc7c5e9fbca120e75ca8b454c8b342a4b484c3a0b0c4c41e48735ebe5",
+      "uncompressed_bytes": 956
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/rv32/attributes.txt.gz",
+      "sha256": "5e4758306ac891969bf28a25bb265c6a99641a09b4752e3e17e4dd6318961db5",
+      "bytes": 139,
+      "uncompressed_sha256": "8ffba731a5344b3245a85601378b31bccbd5bc8df142935ef14993dd91ac1913",
+      "uncompressed_bytes": 155
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/rv32/jpeg_nor.o.gz",
+      "sha256": "b2f0615aef4ca9330cd62eb4e39248db7a541007cf600dcadba879b61fd8a959",
+      "bytes": 3620,
+      "uncompressed_sha256": "0aa8447cd2e93d15baa92274a8fb55df07c750ebcfb4ee582b9724ebb9061490",
+      "uncompressed_bytes": 7728
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/rv32/jpeg_nor.su.gz",
+      "sha256": "392859422575a6c12b88b86747bdd22e9dbe58e3ab66a9425b5539afea754837",
+      "bytes": 203,
+      "uncompressed_sha256": "88b554fdea66b29e7168ade36db5d3899319707c55f0e71c3527550d05ebdde1",
+      "uncompressed_bytes": 628
+    },
+    {
+      "file": "raw/jpeg-nor-core-20261020/rv32/sections.txt.gz",
+      "sha256": "743e275d47c32882450cb7d8126bc49f8d722cb69449587c8c9a137baa49db57",
+      "bytes": 274,
+      "uncompressed_sha256": "f0227330732b008761a632b6f5d6272b856d46b25cdc61182a9f4e190766e4ee",
+      "uncompressed_bytes": 690
+    }
+  ]
+}

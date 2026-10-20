@@ -41,6 +41,14 @@ H10 относится к B50D. Его frozen source/SDK/snapshot и владе�
 
 Статус: **подготовительные стенды готовы; production integration не выполнена**.
 
+Checkpoint 2026-10-20: реализован portable NOR core с 4 KiB cache, sparse mapping,
+sector RMW и read-back verification. 3000 random operations, 83 injected partial
+failures, 7 реальных layout stores и 6 compiled mutation controls прошли.
+RV32 object1848bytes/handle4352/frame304 измерены; это ещё не production link
+или hardware execution. [Результаты](tests/JPEG_NOR_STORAGE.md).
+Далее — immutable-resource guard, atomic metadata/cold recovery, ESP-IDF adapter
+с operation/time budgets и shared scratch subfiles для libjpeg.
+
 1. Зафиксировать матрицу входов/лимитов: baseline/progressive, gray/RGB/CMYK/YCCK,
    8/12-bit lossy и 2–16-bit Huffman lossless. Не обещать весь T.81: библиотека
    не поддерживает hierarchical, DNL, fractional subsampling и lossless arithmetic.

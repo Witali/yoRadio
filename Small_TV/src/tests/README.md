@@ -42,6 +42,11 @@ Read-only [JPEG_STORAGE_LAYOUT.md](JPEG_STORAGE_LAYOUT.md) проверяет sa
 для scratch и пяти RGB565 caches:30unsafe cases/4controls, ни одна flash write
 не выполняется. Это capacity/ownership plan, не готовый NOR backend.
 
+Portable NOR storage core реализован отдельно: 3000random operations,83partial
+fault/reopen scenarios,7actual-layout stores и6compiled mutation controls.
+См. [JPEG_NOR_STORAGE.md](JPEG_NOR_STORAGE.md). Он не подключён к production:
+resource guard, atomic metadata, ESP-IDF adapter и codec integration ещё нужны.
+
 ## JPEG Huffman selectors
 
 Отдельный `jpeg_selector_oracle.py` проверяет136valid/32invalid входа с

@@ -11,6 +11,17 @@ ESP32-C2 с собираемым C-проектом в `Small_TV/src`. Исто�
 lifecycle, аппаратные различия, full-image audit и приёмка окончательной сборки.
 Старый H10 B50D не изменять.
 
+JPEG/NOR checkpoint20Oct: portable core в storage/jpeg_nor.c/.h, вне production.
+Один4096byte cache, sparse allowlisted extents, RMW только при0→1, проверка erase
+и окончательных bytes, poisoned handle после I/O/verification failure.3000random,
+83fault,7actual stores и6compiled negative mutations pass. Первоначальный
+allowlist mutant выявил test gap конца последнего range; FIXED_TEST и failed
+evidence сохранены. RV32 object1848/handle4352/cache4096/maxframe304; не whole
+firmware RAM/stack. App3E03/TJpgd не меняется;6artifact tests pass. Следом runtime
+immutable guard и journal/publication/cold recovery. Backing arrays должны быть
+bounded logical subfiles одного scratch store, без per-file sector rounding или
+независимых dirty caches общих sectors. Детали tests/JPEG_NOR_STORAGE.md.
+
 ## Независимость проверок подсистем — 2026-10-18
 
 ## План улучшений форматов изображений — 2026-10-19

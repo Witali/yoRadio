@@ -37,6 +37,11 @@ python Small_TV/src/tests/correspondence_test.py
 заводском образе. Подготовленная libjpeg ещё не подключена; её upstream-код
 и инструменты хостовых проб не являются переносом заводских функций.
 
+Новый `storage/jpeg_nor.c` — подготовленный unlinked компонент для расширения
+JPEG, не перенос отдельной factory функции. Он проверяется собственным
+[NOR contract](../tests/JPEG_NOR_STORAGE.md); при production integration его
+нужно включить в source inventory и привязку сборочных входов.
+
 ## Найденные пробелы
 
 1. **HTTP-404, исправлено и проверено.** Заводская `0x4200d4be` читает

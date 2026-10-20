@@ -3439,3 +3439,30 @@ App3e030c1c...,1170432bytes/free365568, ELF54293e97..., DEBUGoff/TJpgd;
 qemu/parity/city-reinit-validation-20261020.json. Полный suite/24h/physical для
 этой app не выполнялись. Подробности tests/CITY_REINIT.md; план обновлён.
 Следующий этап — NOR-aware JPEG scratch/cache и безопасная metadata publication.
+
+## 2026-10-20 — базовый NOR слой для JPEG
+
+Активная цель: выполнить весь IMPROVEMENT_PLAN, не ограничивая её одним JPEG
+стендом. Завершён следующий самостоятельный checkpoint, не весь пункт2:
+storage/jpeg_nor.c/.h — reusable portable core с trusted extent allowlist,
+overflow/alias/bounds checks, одним sector cache4096, sparse logical I/O, RMW,
+erase/program verification, explicit sync/abort и poisoned failure state.
+Данные не считаются атомарными: следующий metadata слой должен invalidate cache
+до записи и publish только после полного успешного flush/hash verification.
+
+MSVC /W4 /WX:3000random operations при128/256page geometry,83partial I/O/silent
+erase/program failures с reopen и сверкой protected bytes всего4MiB,7реальных
+layout stores pass.6скомпилированных mutants runtime-rejected. Первый allowlist
+mutant escaped: corpus не проверял final allowed boundary. FIXED_TEST добавил
+эту границу/полностью чужой final range; прежний report/exe/source сохранены.
+Текущий core уже правильно отвергал этот случай, production bug не объявлялся.
+
+Настоящий GCC15.2 RV32IMC/ilp32: code1848,static writable0,handle4352 включая
+cache4096; max single stack frame304. Первичный запуск compiler в sandbox
+не прошёл Windows loader; тот же tool вне sandbox собрался без source changes.
+Это object/ABI compile measurement, не execution/whole firmware memory proof.
+Proof78raw: qemu/parity/jpeg-nor-core-validation-20261020.json.6artifact checks
+подтвердили unchanged app3E03; physical flash/SDK/H10/QEMU не менялись.
+Далее ownership guard, atomic metadata/cold recovery, ESP-IDF transport/budgets,
+shared scratch subfiles и реальная libjpeg integration. Остальные пункты плана
+и full/24h/hardware acceptance остаются открытыми.
