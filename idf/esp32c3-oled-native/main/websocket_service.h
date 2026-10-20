@@ -19,3 +19,9 @@ esp_err_t websocket_service_reboot_reserve(websocket_reboot_lease_t *lease);
 esp_err_t websocket_service_reboot_cancel(websocket_reboot_lease_t *lease);
 esp_err_t websocket_service_reboot_commit(websocket_reboot_lease_t *lease,
                                           unsigned delay_ms);
+// The exclusive owner may restart immediately after its final eligibility
+// check. Do not copy, cancel or commit this lease concurrently. Keep it reserved
+// across esp_restart(), outside the portMUX, blocking ordinary pending reboots
+// and other owners. A real successful restart never returns. A returning test
+// double returns ESP_OK while this same lease remains reserved and owned.
+esp_err_t websocket_service_reboot_restart_reserved_now(websocket_reboot_lease_t *lease);

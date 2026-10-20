@@ -48,6 +48,7 @@ typedef websocket_reboot_lease_t lease_t;
 #define cancel websocket_service_reboot_cancel
 #define commit websocket_service_reboot_commit
 #define request websocket_service_request_reboot
+#define restart_now websocket_service_reboot_restart_reserved_now
 #define pending s_reboot_pending
 #define deadline s_reboot_at
 #define reserved s_reboot_reserved_epoch
@@ -62,6 +63,7 @@ typedef web_reboot_lease_t lease_t;
 #define cancel web_reboot_cancel
 #define commit web_reboot_commit
 #define request web_reboot_request
+#define restart_now web_reboot_restart_reserved_now
 #define pending s_pending
 #define deadline s_deadline
 #define reserved s_reserved_epoch
@@ -88,7 +90,6 @@ static lease_t raced_lease;
 static esp_err_t reserve_result;
 static void *reserve_thread(void *arg) {(void)arg;pthread_barrier_wait(&barrier);reserve_result=reserve(&raced_lease);return NULL;}
 static void *request_thread(void *arg) {(void)arg;pthread_barrier_wait(&barrier);request(0);return NULL;}
-#ifndef TARGET_C3
 static pthread_barrier_t restart_barrier;
 static uint64_t immediate_epoch;
 static bool check_competing_reserve;
@@ -132,7 +133,7 @@ static void interleaved_immediate_cases(void) {
         assert(!pthread_barrier_init(&restart_barrier,NULL,2));
         pthread_t observer;assert(!pthread_create(&observer,NULL,observe_restart,NULL));
         unsigned before=restarts,allocated=allocations;restart_observer=rendezvous_restart;
-        require(web_reboot_restart_reserved_now(&lease)==ESP_OK,
+        require(restart_now(&lease)==ESP_OK,
                 "valid_immediate_calls_sdk");
         restart_observer=NULL;
         assert(!pthread_join(observer,NULL)&&!pthread_barrier_destroy(&restart_barrier));
@@ -148,8 +149,8 @@ static void immediate_cases(void) {
     // incorrectly reaches the SDK; do not longjmp to an uninitialized target.
     restart_observer=returning_restart;
     reset();unsigned before=restarts,notified=notifications,allocated=allocations;
-    require(web_reboot_restart_reserved_now(NULL)==ESP_ERR_INVALID_ARG&&
-            web_reboot_restart_reserved_now(&lease)==ESP_ERR_INVALID_STATE,
+    require(restart_now(NULL)==ESP_ERR_INVALID_ARG&&
+            restart_now(&lease)==ESP_ERR_INVALID_STATE,
             "immediate_rejects_invalid_token");
     require(!reserved&&!pending&&notifications==notified&&allocations==allocated&&
             restarts==before,"invalid_immediate_has_no_effects");
@@ -157,7 +158,7 @@ static void immediate_cases(void) {
     reset();assert(reserve(&lease)==ESP_OK);stale=lease;
     assert(cancel(&lease)==ESP_OK&&reserve(&lease)==ESP_OK);
     immediate_epoch=lease.epoch;before=restarts;notified=notifications;
-    require(web_reboot_restart_reserved_now(&stale)==ESP_ERR_INVALID_STATE&&
+    require(restart_now(&stale)==ESP_ERR_INVALID_STATE&&
             reserved==immediate_epoch&&lease.epoch==immediate_epoch&&
             restarts==before&&notifications==notified&&!pending,
             "stale_copy_cannot_restart_or_consume_new_lease");
@@ -166,7 +167,7 @@ static void immediate_cases(void) {
     reset();assert(reserve(&lease)==ESP_OK);immediate_epoch=lease.epoch;
     unavailable();before=restarts;notified=notifications;
     restart_observer=returning_restart;
-    require(web_reboot_restart_reserved_now(&lease)==ESP_ERR_INVALID_STATE&&
+    require(restart_now(&lease)==ESP_ERR_INVALID_STATE&&
             restarts==before&&lease.epoch==immediate_epoch&&
             reserved==immediate_epoch&&notifications==notified&&!pending,
             "unavailable_service_rejects_immediate");
@@ -175,7 +176,7 @@ static void immediate_cases(void) {
     reset();assert(reserve(&lease)==ESP_OK);immediate_epoch=lease.epoch;
     before=restarts;notified=notifications;allocated=allocations;
     restart_observer=returning_restart;
-    require(web_reboot_restart_reserved_now(&lease)==ESP_OK&&restarts==before+1&&
+    require(restart_now(&lease)==ESP_OK&&restarts==before+1&&
             lease.epoch==immediate_epoch&&reserved==immediate_epoch&&
             notifications==notified&&allocations==allocated&&!pending,
             "returning_double_keeps_exclusive_lease");
@@ -185,7 +186,7 @@ static void immediate_cases(void) {
     reset();assert(reserve(&lease)==ESP_OK);immediate_epoch=lease.epoch;
     before=restarts;
     int returned=setjmp(task_exit);
-    if(!returned){(void)web_reboot_restart_reserved_now(&lease);require(false,"sdk_restart_does_not_return");}
+    if(!returned){(void)restart_now(&lease);require(false,"sdk_restart_does_not_return");}
     require(returned==2&&restarts==before+1&&reserved==immediate_epoch&&
             lease.epoch==immediate_epoch&&!critical_depth,
             "nonreturning_restart_retains_lease");
@@ -197,7 +198,7 @@ static void immediate_cases(void) {
     // request still restarts, and the stale immediate authorization is rejected.
     reset();assert(reserve(&lease)==ESP_OK);stale=lease;request(0);
     assert(cancel(&lease)==ESP_OK);before=restarts;
-    require(web_reboot_restart_reserved_now(&stale)==ESP_ERR_INVALID_STATE&&
+    require(restart_now(&stale)==ESP_ERR_INVALID_STATE&&
             pending&&!reserved&&restarts==before,"cancelled_guard_preserves_durable_reboot");
     expect_task(2);
 
@@ -220,14 +221,9 @@ static void immediate_cases(void) {
     }
     puts("PASS reserved-immediate: 208 scenarios; 200 real AP/OTA admission races, 2 SDK-entry interleavings, outside-critical restart, stale/cancelled/zero/NULL/unavailable rejection, returning and nonreturning SDK seams");
 }
-#endif
 int main(int argc,char **argv) {
-#ifndef TARGET_C3
     if(argc==2&&!strcmp(argv[1],"immediate")){immediate_cases();return 0;}
     if(argc==2&&!strcmp(argv[1],"interleaving")){interleaved_immediate_cases();return 0;}
-#else
-    (void)argc;(void)argv;
-#endif
     lease_t lease={0},second={0};
     reset();unavailable();assert(reserve(&lease)==ESP_ERR_INVALID_STATE&&!lease.epoch);
     assert(reserve(NULL)==ESP_ERR_INVALID_ARG&&cancel(NULL)==ESP_ERR_INVALID_ARG&&commit(NULL,0)==ESP_ERR_INVALID_ARG);
@@ -267,8 +263,6 @@ int main(int argc,char **argv) {
         expect_task(2);
     }
     printf("PASS reboot leases: %u scenarios; 200 real thread admission/request races, stale/duplicate tokens, pending rejection, deferred execution, commit allocation-free, tick wrap\n",cases);
-#ifndef TARGET_C3
     immediate_cases();
-#endif
     return 0;
 }

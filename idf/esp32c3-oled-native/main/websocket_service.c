@@ -617,6 +617,20 @@ esp_err_t websocket_service_reboot_commit(websocket_reboot_lease_t *lease, unsig
     portEXIT_CRITICAL(&s_reboot_lock);
     return ESP_OK;
 }
+esp_err_t websocket_service_reboot_restart_reserved_now(websocket_reboot_lease_t *lease) {
+    if (!lease) return ESP_ERR_INVALID_ARG;
+    portENTER_CRITICAL(&s_reboot_lock);
+    if (!atomic_load(&s_reboot_ready) || !lease->epoch || lease->epoch != s_reboot_reserved_epoch) {
+        portEXIT_CRITICAL(&s_reboot_lock);
+        return ESP_ERR_INVALID_STATE;
+    }
+    // Retain the reservation while the SDK restarts outside the portMUX: an
+    // ordinary pending reboot and a competing OTA admission must stay blocked.
+    portEXIT_CRITICAL(&s_reboot_lock);
+    esp_restart();
+    return ESP_OK; // Only a returning test double can reach this line.
+}
+
 static void poll_reboot(void) {
     portENTER_CRITICAL(&s_reboot_lock);
     bool pending = s_reboot_pending && !s_reboot_reserved_epoch;

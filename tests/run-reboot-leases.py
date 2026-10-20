@@ -46,23 +46,26 @@ def main():
         try:return 0,run(command)
         except subprocess.CalledProcessError as error:return error.returncode,error.output
 
+    variant_sources={}
     for name,mainpath in [('cyd',cyd),('c3',c3)]:
         directory=out/name;frozen=out/'sources'/mainpath.relative_to(ROOT)
-        text=(frozen/('websocket_service.c' if name=='c3' else 'web_reboot.c')).read_text()
-        if name=='c3':text=text[text.index('// The status task exists'):text.index('static void log_setting_error')]
+        text=(frozen/('websocket_service.c' if name=='c3' else 'web_reboot.c')).read_bytes()
+        if name=='c3':text=text[text.index(b'// The status task exists'):text.index(b'static void log_setting_error')]
         else:text=original_cyd
+        variant_sources[name]=text
         binary=build(directory,frozen,text,name=='c3')
         status,log=execute(binary)
         (directory/'test.log').write_bytes(log);print(name+': '+log.decode().strip(),flush=True)
         assert status==0 and b'PASS reboot leases:' in log,(name,status,log)
         assert b'AddressSanitizer' not in log and b'runtime error:' not in log,log
         report['variants'][name]={'passed':True,'result':log.decode().strip()}
+        assert b'PASS reserved-immediate: 208 scenarios;' in log,log
         if name=='cyd':
-            assert b'PASS reserved-immediate: 208 scenarios;' in log,log
             report['variants'][name]['complete_tu_matches_frozen_bytes']=(directory/'reboot-production.inc').read_bytes()==original_cyd
             assert report['variants'][name]['complete_tu_matches_frozen_bytes']
-    source=original_cyd.decode().replace('\r\n','\n')
-    immediate=source[source.index('esp_err_t web_reboot_restart_reserved_now'):source.index('esp_err_t web_reboot_abort')]
+        else:
+            report['variants'][name]['complete_reboot_region_matches_frozen_bytes']=(directory/'reboot-production.inc').read_bytes()==text
+            assert report['variants'][name]['complete_reboot_region_matches_frozen_bytes']
     mutations=[
         ('release-before-sdk','    portEXIT_CRITICAL(&s_deadline_lock);\n    esp_restart();',
          '    s_reserved_epoch = lease->epoch = 0;\n    portEXIT_CRITICAL(&s_deadline_lock);\n    esp_restart();',
@@ -74,16 +77,28 @@ def main():
          '!lease->epoch || lease->epoch != s_reserved_epoch','unavailable_service_rejects_immediate'),
         ('ignore-exact-token','!atomic_load(&s_ready) || !lease->epoch || lease->epoch != s_reserved_epoch',
          '!atomic_load(&s_ready) || !lease->epoch','stale_copy_cannot_restart_or_consume_new_lease')]
-    for name,old,new,marker in mutations:
-        assert immediate.count(old)==1,(name,old)
-        mutant=source.replace(immediate,immediate.replace(old,new))
-        directory=out/name;binary=build(directory,out/'sources'/cyd.relative_to(ROOT),mutant)
-        status,log=execute(binary,['interleaving' if name=='release-before-sdk' else 'immediate'])
-        (directory/'test.log').write_bytes(log)
-        assert status==80 and ('SEMANTIC_FAILURE:'+marker+':').encode() in log,(name,status,log)
-        assert b'AddressSanitizer' not in log and b'runtime error:' not in log,log
-        report['negative_controls'][name]={'detected':True,'exit_status':status,'expected_marker':marker}
-        print('CONTROL '+name+': '+marker,flush=True)
+    for target,mainpath in [('cyd',cyd),('c3',c3)]:
+        source=variant_sources[target].decode().replace('\r\n','\n')
+        function='web_reboot_restart_reserved_now' if target=='cyd' else 'websocket_service_reboot_restart_reserved_now'
+        start=source.index('esp_err_t '+function)
+        immediate=source[start:source.index('\n}\n',start)+3]
+        def names(text):
+            if target=='c3':
+                for old,new in [('s_deadline_lock','s_reboot_lock'),('s_reserved_epoch','s_reboot_reserved_epoch'),('s_ready','s_reboot_ready')]:
+                    text=text.replace(old,new)
+            return text
+        for name,old,new,marker in mutations:
+            old,new=names(old),names(new)
+            assert immediate.count(old)==1,(target,name,old)
+            mutant=source.replace(immediate,immediate.replace(old,new))
+            key=name if target=='cyd' else 'c3-'+name
+            directory=out/key;binary=build(directory,out/'sources'/mainpath.relative_to(ROOT),mutant,target=='c3')
+            status,log=execute(binary,['interleaving' if name=='release-before-sdk' else 'immediate'])
+            (directory/'test.log').write_bytes(log)
+            assert status==80 and ('SEMANTIC_FAILURE:'+marker+':').encode() in log,(target,name,status,log)
+            assert b'AddressSanitizer' not in log and b'runtime error:' not in log,log
+            report['negative_controls'][key]={'detected':True,'target':target,'exit_status':status,'expected_marker':marker}
+            print('CONTROL '+key+': '+marker,flush=True)
     report['passed']=True;report['scope']='Complete unchanged CYD reboot translation unit and unchanged C3 reboot/lease source slice; real pthread admission/request and AP/OTA reservation races, SDK-entry barriers, mutex critical sections. Deterministic RTOS notification/clock/restart seams. No hardware scheduler, RF eligibility, target ABI or reboot durability claim.'
     report['generated_sha256']={p.relative_to(out).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in out.rglob('*') if p.is_file() and p.name not in ['test','report.json'] and 'sources' not in p.relative_to(out).parts}
     (out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
