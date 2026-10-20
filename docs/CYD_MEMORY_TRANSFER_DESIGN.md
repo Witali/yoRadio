@@ -41,14 +41,24 @@ also passes; physical HTTP/TLS behavior remains separate. The full-pipeline
 FLAC QEMU test deliberately disables release because
 its synthetic transport does not enter the SDK response state.
 
+## Opt-in idle-input reclaim
+
+The [implementation and contracts](CYD_INPUT_RECLAIM_DESIGN.md) now provide
+allocation-pressure reclaim of IDLE adaptive-input slots with post-READY
+publication, SMP pin/retirement and an immutable retry budget. The option stays
+default off. Host/service, actual startup and CMake guards pass; full opt-in
+Clang adds no warnings. Actual SDK/QEMU controls and production application
+exports remain in progress, followed by physical qualification.
+
+The earlier [frozen proposal](../tests/results/cyd-http-request-buffer-20261020/plan/idle-input-reclaim/README.md)
+is retained as historical evidence from before implementation. Its status must
+not be read as the current implementation checkpoint.
+
 ## Remaining work
 
-- The [frozen next-step plan](../tests/results/cyd-http-request-buffer-20261020/plan/idle-input-reclaim/README.md)
-  specifies lifetime, bounded reclaim, lock ordering and OOM/SMP gates. It is
-  explicitly unimplemented and unqualified.
-- Add allocation-pressure reclaim of idle adaptive-input slots only after a
-  successful CYD startup binds their lifetime. The donor bind-before-allocation
-  order must not be copied across CYD startup rollback.
+- Finish target semantic controls and production application qualification for
+  opt-in reclaim. The donor bind-before-allocation order was not copied across
+  CYD startup rollback; runtime pool teardown is not introduced.
 - Audit and qualify any dynamic TLS/full-record RX reservation or early MPI
   allocation policy against the pinned CYD SDK. Preserve complete TLS record
   capacity and verify cleanup, OOM, reconnect and codec replacement.
