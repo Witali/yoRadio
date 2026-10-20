@@ -1,0 +1,835 @@
+{
+  "passed": true,
+  "scope": "Isolated actual SDK mutex observations; no fixture crypto calculation/network.",
+  "commands": [
+    {
+      "label": "canonical-build",
+      "argv": [
+        "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\sdk-build.ps1",
+        "-CampaignDirectory",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02",
+        "-CandidateDirectory",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\sources\\variants\\canonical"
+      ],
+      "exit_status": 0,
+      "seconds": 130.93699999997625,
+      "sha256": "357c9bea66771cb1f7db8f87f8f66e6a2846e9b487851c3541535c50d9bd211f"
+    },
+    {
+      "label": "canonical-nm",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe",
+        "-n",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.06300000002374873,
+      "sha256": "b41d99c4d409b2cd5ebcd89584c9a8082525c4831f09fc67a6b225fb9156a542"
+    },
+    {
+      "label": "canonical-asm-native_tls_early_mpi_prepare",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=native_tls_early_mpi_prepare",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.030999999959021807,
+      "sha256": "17f396f537ad5e20d78916abc5a3ab1edf7fc3e8d720a99e1b9e59f67149587e"
+    },
+    {
+      "label": "canonical-asm-esp_crypto_mpi_lock_acquire",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=esp_crypto_mpi_lock_acquire",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.06300000002374873,
+      "sha256": "da96b91e8d2854307f3238ad504a40da65411fb5ba2331204a4dac89594fca59"
+    },
+    {
+      "label": "canonical-asm-esp_crypto_mpi_lock_release",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=esp_crypto_mpi_lock_release",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.061999999976251274,
+      "sha256": "a253a3fc653458b4c7408c40b4c2547edadbca7bae13489cede22ac5ece5565c"
+    },
+    {
+      "label": "canonical-dependencies",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe",
+        "-C",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build",
+        "-t",
+        "deps"
+      ],
+      "exit_status": 0,
+      "seconds": 0.125,
+      "sha256": "9b5198a5074c1c0068a6eea6b4c6544defae05b4ef9504e3e2dedcd32b97d72d"
+    },
+    {
+      "label": "canonical-merge",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe",
+        "-m",
+        "esptool",
+        "--chip",
+        "esp32",
+        "merge-bin",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\variants\\canonical\\qemu-flash.bin",
+        "--flash-mode",
+        "dio",
+        "--flash-size",
+        "4MB",
+        "--flash-freq",
+        "40m",
+        "0x1000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\bootloader\\bootloader.bin",
+        "0x8000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\partition_table\\partition-table.bin",
+        "0x10000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.bin",
+        "--pad-to-size",
+        "4MB"
+      ],
+      "exit_status": 0,
+      "seconds": 0.26600000000325963,
+      "sha256": "1ddc604f21502c397500580a58833ac81caec72dc6e25ec91c38ed544a4b5b59"
+    },
+    {
+      "label": "canonical-qemu",
+      "argv": [
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "-M",
+        "esp32",
+        "-smp",
+        "2",
+        "-L",
+        "C:\\Work\\QEMU-ESP32\\pc-bios",
+        "-display",
+        "none",
+        "-monitor",
+        "none",
+        "-serial",
+        "stdio",
+        "-no-reboot",
+        "-snapshot",
+        "-nic",
+        "none",
+        "-drive",
+        "file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\variants\\canonical\\qemu-flash.bin,if=mtd,format=raw"
+      ],
+      "exit_status": 0,
+      "seconds": 1.047000000020489,
+      "sha256": "695803a35e31bb891fb36fa06e9730b571de91302f5ca3cf89a351ce878e946f"
+    },
+    {
+      "label": "skip-acquire-build",
+      "argv": [
+        "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\sdk-build.ps1",
+        "-CampaignDirectory",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02",
+        "-CandidateDirectory",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\sources\\variants\\skip-acquire",
+        "-SkipAcquireControl"
+      ],
+      "exit_status": 0,
+      "seconds": 29.04699999996228,
+      "sha256": "f9478a8b56e3ad5a58aa8aca70fe51913608ffe76624128f4ccaed830df61b93"
+    },
+    {
+      "label": "skip-acquire-nm",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe",
+        "-n",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.06300000002374873,
+      "sha256": "dfa904bbc4b1bc4241a06f892842e6ed6f0cb16c7fcb518f1fe31a90490be55b"
+    },
+    {
+      "label": "skip-acquire-asm-native_tls_early_mpi_prepare",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=native_tls_early_mpi_prepare",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.09299999999348074,
+      "sha256": "2c727b7f445d69e77793545077f46661387f5088fc79a45474dc9bc53ff2c6a8"
+    },
+    {
+      "label": "skip-acquire-asm-esp_crypto_mpi_lock_acquire",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=esp_crypto_mpi_lock_acquire",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.06300000002374873,
+      "sha256": "d0547f63e6cf8efe159e881b1a1f408e33f821690e70af976d94a52fa58a380b"
+    },
+    {
+      "label": "skip-acquire-asm-esp_crypto_mpi_lock_release",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=esp_crypto_mpi_lock_release",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.030999999959021807,
+      "sha256": "633d43b4c6c6f8c6fc7a9802f465ed0923c11c364f384dd3ea2a253d285f2e18"
+    },
+    {
+      "label": "skip-acquire-dependencies",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe",
+        "-C",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build",
+        "-t",
+        "deps"
+      ],
+      "exit_status": 0,
+      "seconds": 0.125,
+      "sha256": "2617729e1b108da280a6e74e3e49cb3a123518ec65717c7a7b75a3e82dc5ed9a"
+    },
+    {
+      "label": "skip-acquire-merge",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe",
+        "-m",
+        "esptool",
+        "--chip",
+        "esp32",
+        "merge-bin",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\variants\\skip-acquire\\qemu-flash.bin",
+        "--flash-mode",
+        "dio",
+        "--flash-size",
+        "4MB",
+        "--flash-freq",
+        "40m",
+        "0x1000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\bootloader\\bootloader.bin",
+        "0x8000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\partition_table\\partition-table.bin",
+        "0x10000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.bin",
+        "--pad-to-size",
+        "4MB"
+      ],
+      "exit_status": 0,
+      "seconds": 0.28100000001722947,
+      "sha256": "0d58e7ddc4d0cec406c5826954ea5883701c060d29d347eaf909f803b0ddf106"
+    },
+    {
+      "label": "skip-acquire-qemu",
+      "argv": [
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "-M",
+        "esp32",
+        "-smp",
+        "2",
+        "-L",
+        "C:\\Work\\QEMU-ESP32\\pc-bios",
+        "-display",
+        "none",
+        "-monitor",
+        "none",
+        "-serial",
+        "stdio",
+        "-no-reboot",
+        "-snapshot",
+        "-nic",
+        "none",
+        "-drive",
+        "file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\variants\\skip-acquire\\qemu-flash.bin,if=mtd,format=raw"
+      ],
+      "exit_status": 0,
+      "seconds": 1.0150000000139698,
+      "sha256": "1f8c3bc859db9ed5126a0b261d82e0686ae2f12c652a67e4ffa8400790edc10c"
+    },
+    {
+      "label": "skip-release-build",
+      "argv": [
+        "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\sdk-build.ps1",
+        "-CampaignDirectory",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02",
+        "-CandidateDirectory",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\sources\\variants\\skip-release"
+      ],
+      "exit_status": 0,
+      "seconds": 26.92200000002049,
+      "sha256": "856e09e75d9ef5c79f3fc8c94ecd9d8b6ba5e6e81a48fb67b0eee9900b7ab7a4"
+    },
+    {
+      "label": "skip-release-nm",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe",
+        "-n",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.031000000017229468,
+      "sha256": "95eb53d15632f54cee67792a07a862a7ea09c550118be8678e6d4c3d7db6d341"
+    },
+    {
+      "label": "skip-release-asm-native_tls_early_mpi_prepare",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=native_tls_early_mpi_prepare",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.061999999976251274,
+      "sha256": "8c4112b7343cbef54f4d86e61c9e5dcd2e387f6c06593931a915958127913ee1"
+    },
+    {
+      "label": "skip-release-asm-esp_crypto_mpi_lock_acquire",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=esp_crypto_mpi_lock_acquire",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.03200000000651926,
+      "sha256": "2155b3d01002d3a9bc02eb27b6585944552b753b025f9a3dd0e99899f336cfa9"
+    },
+    {
+      "label": "skip-release-asm-esp_crypto_mpi_lock_release",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=esp_crypto_mpi_lock_release",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.031000000017229468,
+      "sha256": "0de90173339cd164fb11850cc2873387b8be6a1ca867f089cf3fdb1491fc388c"
+    },
+    {
+      "label": "skip-release-dependencies",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe",
+        "-C",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build",
+        "-t",
+        "deps"
+      ],
+      "exit_status": 0,
+      "seconds": 0.125,
+      "sha256": "298d5ebb3f8f4c63979f9734dc18576e6709d5ba6fcc1039ecbd8d82ccc3f94e"
+    },
+    {
+      "label": "skip-release-merge",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe",
+        "-m",
+        "esptool",
+        "--chip",
+        "esp32",
+        "merge-bin",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\variants\\skip-release\\qemu-flash.bin",
+        "--flash-mode",
+        "dio",
+        "--flash-size",
+        "4MB",
+        "--flash-freq",
+        "40m",
+        "0x1000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\bootloader\\bootloader.bin",
+        "0x8000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\partition_table\\partition-table.bin",
+        "0x10000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.bin",
+        "--pad-to-size",
+        "4MB"
+      ],
+      "exit_status": 0,
+      "seconds": 0.26600000000325963,
+      "sha256": "02cba199491eb926fddeba18e31279aee4b790d5e9c9674fb834550641f8e783"
+    },
+    {
+      "label": "skip-release-qemu",
+      "argv": [
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "-M",
+        "esp32",
+        "-smp",
+        "2",
+        "-L",
+        "C:\\Work\\QEMU-ESP32\\pc-bios",
+        "-display",
+        "none",
+        "-monitor",
+        "none",
+        "-serial",
+        "stdio",
+        "-no-reboot",
+        "-snapshot",
+        "-nic",
+        "none",
+        "-drive",
+        "file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\variants\\skip-release\\qemu-flash.bin,if=mtd,format=raw"
+      ],
+      "exit_status": 0,
+      "seconds": 1.0,
+      "sha256": "4532622c9e994003e5a02270b1b045dd5c735a83dbf2d36cd8b5a636626e6a9d"
+    },
+    {
+      "label": "void-oom-build",
+      "argv": [
+        "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\sdk-build.ps1",
+        "-CampaignDirectory",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02",
+        "-CandidateDirectory",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\sources\\variants\\void-oom",
+        "-OomGate"
+      ],
+      "exit_status": 0,
+      "seconds": 29.07900000002701,
+      "sha256": "1c14533a6d2287125a10a882c6c1db115af08ce874236e1ea9afbe4cad32eb02"
+    },
+    {
+      "label": "void-oom-nm",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe",
+        "-n",
+        "-S",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.0470000000204891,
+      "sha256": "f9bcf70041792b3601a611c618e29faee6642e4b7fb9ce1e7cb571082e68e191"
+    },
+    {
+      "label": "void-oom-asm-native_tls_early_mpi_prepare",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=native_tls_early_mpi_prepare",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.046999999962281436,
+      "sha256": "2a1b22d73ef497bfecf2644c35909451917cbdc49b93df741e2d7cb08d95b306"
+    },
+    {
+      "label": "void-oom-asm-esp_crypto_mpi_lock_acquire",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=esp_crypto_mpi_lock_acquire",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.031000000017229468,
+      "sha256": "5035c61dec4a4ec083408965c9ce23dfcfdcc504ca7536a8d0d6927b29feadc6"
+    },
+    {
+      "label": "void-oom-asm-esp_crypto_mpi_lock_release",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe",
+        "-dwC",
+        "--disassemble=esp_crypto_mpi_lock_release",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.elf"
+      ],
+      "exit_status": 0,
+      "seconds": 0.03200000000651926,
+      "sha256": "c4bfbabe963af11e18ed19987dedfe3fe3d9899d99ad68190f088849d4e312bb"
+    },
+    {
+      "label": "void-oom-dependencies",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe",
+        "-C",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build",
+        "-t",
+        "deps"
+      ],
+      "exit_status": 0,
+      "seconds": 0.14100000000325963,
+      "sha256": "4dbf8535e30aa72ab00e88ff5ffbf794a5a3c0107a740e6ac99722d8e53bb2fa"
+    },
+    {
+      "label": "void-oom-merge",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe",
+        "-m",
+        "esptool",
+        "--chip",
+        "esp32",
+        "merge-bin",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\variants\\void-oom\\qemu-flash.bin",
+        "--flash-mode",
+        "dio",
+        "--flash-size",
+        "4MB",
+        "--flash-freq",
+        "40m",
+        "0x1000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\bootloader\\bootloader.bin",
+        "0x8000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\partition_table\\partition-table.bin",
+        "0x10000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\working-build\\cyd_early_mpi_observation.bin",
+        "--pad-to-size",
+        "4MB"
+      ],
+      "exit_status": 0,
+      "seconds": 0.26600000000325963,
+      "sha256": "270cb214314a67d6ba85a5c2574a0731cfa0716cc94309c0bc392edb1a19aa5b"
+    },
+    {
+      "label": "void-oom-qemu",
+      "argv": [
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "-M",
+        "esp32",
+        "-smp",
+        "2",
+        "-L",
+        "C:\\Work\\QEMU-ESP32\\pc-bios",
+        "-display",
+        "none",
+        "-monitor",
+        "none",
+        "-serial",
+        "stdio",
+        "-no-reboot",
+        "-snapshot",
+        "-nic",
+        "none",
+        "-drive",
+        "file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\variants\\void-oom\\qemu-flash.bin,if=mtd,format=raw"
+      ],
+      "exit_status": 0,
+      "seconds": 1.327999999979511,
+      "sha256": "c7b034cb3e1aa34a38f15427342dd6a9925b3bb6688f951d71d93f1930685c05"
+    },
+    {
+      "label": "void-oom-abort-site",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-addr2line.exe",
+        "-e",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\variants\\void-oom\\artifacts\\cyd_early_mpi_observation.elf",
+        "-pfia",
+        "0x400825b3"
+      ],
+      "exit_status": 0,
+      "seconds": 0.06300000002374873,
+      "sha256": "99ce7cca7a855fc31dfa2eae422b37fe2706157e7be74bbc892e90a6bcf99bf0"
+    }
+  ],
+  "variants": {
+    "canonical": {
+      "passed": true,
+      "fixture_boot_observation": [
+        "0",
+        "0x00000000",
+        "0x3ffafebc",
+        "lazy_at_fixture",
+        "4"
+      ],
+      "radio_pre_app_status": "pending actual integration boot, not inferred from this minimal fixture",
+      "execution_bundle_sha256": "b7cac2ed154eccf358bab2862b38ad6a7f4a8cd4507e6d4ce752c2a834da8849",
+      "sources_unchanged_after": true
+    },
+    "skip-acquire": {
+      "passed": true,
+      "exact_semantic_failure": "warm_acquire_once",
+      "fixture_control_only_public_prewarm": true,
+      "execution_bundle_sha256": "4c8d1bd5b6fea98001a48bd7fac85ad9b3fa8e13e806da325c1f5a1828546e6f",
+      "sources_unchanged_after": true
+    },
+    "skip-release": {
+      "passed": true,
+      "exact_semantic_failure": "warm_release_once",
+      "fixture_control_only_public_prewarm": false,
+      "execution_bundle_sha256": "98f1846b4ca899bbc559b4bccbed9b5211412ee47201e190069277e365cf77cc",
+      "sources_unchanged_after": true
+    },
+    "void-oom": {
+      "passed": true,
+      "gate": "void API actual allocator exhaustion then exact SDK lock constructor abort",
+      "abort_pc": "0x400825b3",
+      "resolved_site": "0x400825b3: lock_init_generic at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:77\n (inlined by) lock_acquire_generic at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:133\n",
+      "generic_panic_is_not_success": true,
+      "execution_bundle_sha256": "148f1b104004f9d38c6bea6a5a963d56391a15f2260e37809b417f9a58e92c93",
+      "sources_unchanged_after": true
+    }
+  },
+  "inputs": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\Kconfig.fragment": {
+      "sha256": "4990b1f7d268469cd6670969edc5b8d55265066cc81d2d4b91ca9b894a030166",
+      "snapshot": "sources\\draft\\candidate\\Kconfig.fragment",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\integration\\app_main.c": {
+      "sha256": "e4017553c20208d44f37a1a493529b17cbe9406ba739c3a5da48b0be0c6b2e70",
+      "snapshot": "sources\\draft\\candidate\\integration\\app_main.c",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\integration\\CMakeLists.txt": {
+      "sha256": "3dee1cc263d8e3058d70ea30371f28dd3870eac86ba54fce17d3b30dad02a22f",
+      "snapshot": "sources\\draft\\candidate\\integration\\CMakeLists.txt",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\integration\\Kconfig.projbuild": {
+      "sha256": "ad80d3dc7ca4c9777b3302e71f359a5db23cb14025454f8133bd066c7d92e930",
+      "snapshot": "sources\\draft\\candidate\\integration\\Kconfig.projbuild",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\main\\native_tls_early_mpi.c": {
+      "sha256": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c",
+      "snapshot": "sources\\draft\\candidate\\main\\native_tls_early_mpi.c",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\main\\native_tls_early_mpi.h": {
+      "sha256": "2f5244849db636bfe738548d4196f24cbdac5236b6b94bee3642993ea587eb77",
+      "snapshot": "sources\\draft\\candidate\\main\\native_tls_early_mpi.h",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\main\\compat\\early_mpi\\enable.cmake": {
+      "sha256": "b22083a65917d492e0f0d1ef3288b2eb99bfee9acea5cb2b3721d63c1cb36943",
+      "snapshot": "sources\\draft\\candidate\\main\\compat\\early_mpi\\enable.cmake",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\sdk-build.ps1": {
+      "sha256": "55847c8b921a5bc7fc565c3cf618eaa5bf3f13cedcbb0daebefa8f0128a33fd1",
+      "snapshot": "sources\\draft\\target\\sdk-build.ps1",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\project\\CMakeLists.txt": {
+      "sha256": "abff2bb0f19bfb9992993b7c873a5f30e6da762180ba758b226b294d3c356ecd",
+      "snapshot": "sources\\draft\\target\\project\\CMakeLists.txt",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\project\\partitions.csv": {
+      "sha256": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b",
+      "snapshot": "sources\\draft\\target\\project\\partitions.csv",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\project\\sdkconfig.defaults": {
+      "sha256": "d8ac88fa566a2e225561372a3f032dc5e4e54d2725786ff4bed6f2e68210e74e",
+      "snapshot": "sources\\draft\\target\\project\\sdkconfig.defaults",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\project\\main\\CMakeLists.txt": {
+      "sha256": "a07992db25fc13e34f7704c5fb45cb69002788be2de0da0c58e2dd3c43d52cf5",
+      "snapshot": "sources\\draft\\target\\project\\main\\CMakeLists.txt",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\project\\main\\Kconfig.projbuild": {
+      "sha256": "15696c5fe273b37c50489741b10b4aff3d6bfffe2ab46d7430db90224f408253",
+      "snapshot": "sources\\draft\\target\\project\\main\\Kconfig.projbuild",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target\\project\\main\\main.c": {
+      "sha256": "23a5ca820ec58360b2a7e46c184e57f6700a06b7b272692ede2db9dd35abdb95",
+      "snapshot": "sources\\draft\\target\\project\\main\\main.c",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\host\\platform.h": {
+      "sha256": "004789158684a41b166467fc27c2ef0a6660d63e439f520b76e51a8a4e2c5ad6",
+      "snapshot": "sources\\draft\\host\\platform.h",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\host\\test.c": {
+      "sha256": "bfe221338dbb344b284b25e415c1ae1f0f142947b3d73c5ab51d71712e6d1fa5",
+      "snapshot": "sources\\draft\\host\\test.c",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\baseline\\app_main.c": {
+      "sha256": "69089b40bd9ff5e40078977d675bea8cb024b173d5f1c0ddaa1bf0cc0f932301",
+      "snapshot": "sources\\draft\\baseline\\app_main.c",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\baseline\\board_config.h": {
+      "sha256": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e",
+      "snapshot": "sources\\draft\\baseline\\board_config.h",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\baseline\\CMakeLists.txt": {
+      "sha256": "b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d",
+      "snapshot": "sources\\draft\\baseline\\CMakeLists.txt",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\baseline\\Kconfig.projbuild": {
+      "sha256": "e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe",
+      "snapshot": "sources\\draft\\baseline\\Kconfig.projbuild",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\integration.patch": {
+      "sha256": "e29ceced15acf7979ad351a135fd72ad3d9f61fa2ed49195ac43529b156d8929",
+      "snapshot": "sources\\draft\\integration.patch",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\integration-inputs.json": {
+      "sha256": "c92757bb941210800f754471b3a8b561bb1026893c98af3177a98d31a8e0dd46",
+      "snapshot": "sources\\draft\\integration-inputs.json",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\prepare.py": {
+      "sha256": "cd9e1069886d6974df93b7eac26e16f1a38de4d96c341b0a1f9639b97cb01d87",
+      "snapshot": "sources\\draft\\prepare.py",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\run_host.py": {
+      "sha256": "fdd28923bf4ef2418cf74ce3b41d54161c3be23380d9bf9594e2d11a4efb5db5",
+      "snapshot": "sources\\draft\\run_host.py",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\run_target.py": {
+      "sha256": "29a5912db3feab6b47503a79c6e4e68ad7227debc26d455ed50bb32d260cbc9a",
+      "snapshot": "sources\\draft\\run_target.py",
+      "role": "frozen draft/source/test input before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\tools\\cmake\\version.cmake": {
+      "sha256": "3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee",
+      "snapshot": "sources\\sdk\\tools\\cmake\\version.cmake",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\tools\\idf.py": {
+      "sha256": "5f703be3a915433f63206a28260357ad807ec83ae0a8589c684c9c08516a7a40",
+      "snapshot": "sources\\sdk\\tools\\idf.py",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\export.ps1": {
+      "sha256": "80a99f8bc285f32ba4da02b8a1348854978c9efac0a16cbc54caf6be85e95dda",
+      "snapshot": "sources\\sdk\\export.ps1",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp_crypto_lock.c": {
+      "sha256": "7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057",
+      "snapshot": "sources\\sdk\\components\\esp_security\\src\\esp_crypto_lock.c",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\include\\esp_crypto_lock.h": {
+      "sha256": "ffc8b49e52a1a1c09fa7cf9230efb9bbc767067f5ec45498082ea93d61d34898",
+      "snapshot": "sources\\sdk\\components\\esp_security\\include\\esp_crypto_lock.h",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\CMakeLists.txt": {
+      "sha256": "e9a3870a84285e720e14264556bb28ce3be6ae72bccd581beaa93c4c034127b4",
+      "snapshot": "sources\\sdk\\components\\esp_security\\CMakeLists.txt",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\init.c": {
+      "sha256": "dcea9910e43b3145936d36aece0667f48b97a906068e9508a4c12138e980c3c2",
+      "snapshot": "sources\\sdk\\components\\esp_security\\src\\init.c",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp32\\esp_crypto_clk.h": {
+      "sha256": "739b3476c3e21b4b9ed60f9a9badb13e329b85a07303be422d26bf56e6de84e9",
+      "snapshot": "sources\\sdk\\components\\esp_security\\src\\esp32\\esp_crypto_clk.h",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\locks.c": {
+      "sha256": "724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+      "snapshot": "sources\\sdk\\components\\esp_libc\\src\\locks.c",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\platform_include\\sys\\lock.h": {
+      "sha256": "698695d7425fb1c7a3003ca72de41d8ca6e346548e34370680139cb7daafbdb0",
+      "snapshot": "sources\\sdk\\components\\esp_libc\\platform_include\\sys\\lock.h",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\init.c": {
+      "sha256": "715e1c17e00b37443a376d4d541ff19e69d596c8e6437c3f332e7e42d478cfd1",
+      "snapshot": "sources\\sdk\\components\\esp_libc\\src\\init.c",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\picolibc\\picolibc_init.c": {
+      "sha256": "0062be588abcf15bbe62d6308c1f64aa22c626ac8eaf88628c2ffe83e67e55cf",
+      "snapshot": "sources\\sdk\\components\\esp_libc\\src\\picolibc\\picolibc_init.c",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\queue.c": {
+      "sha256": "b37c27ee5151d6c342d56737699e199dd6532248e7d8f5da3824b4679a21f8c5",
+      "snapshot": "sources\\sdk\\components\\freertos\\FreeRTOS-Kernel\\queue.c",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\include\\freertos\\queue.h": {
+      "sha256": "81b0073fde402e1a35f97508cfd7fa03f4948e4bcf4bdee46befc155fe2be716",
+      "snapshot": "sources\\sdk\\components\\freertos\\FreeRTOS-Kernel\\include\\freertos\\queue.h",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\include\\freertos\\semphr.h": {
+      "sha256": "b7cdb4c58cba76a9ba0bdb1b1de7ec25b1ae067ed373992f43f5416a27295864",
+      "snapshot": "sources\\sdk\\components\\freertos\\FreeRTOS-Kernel\\include\\freertos\\semphr.h",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\app_startup.c": {
+      "sha256": "9f3ae1b71307ad21e5716a5957619f47422f10d33d88e274c0f1b595c046794b",
+      "snapshot": "sources\\sdk\\components\\freertos\\app_startup.c",
+      "role": "actual SDK source/header before SDK build"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_psa_crypto_init.c": {
+      "sha256": "3903ebec3dc6ad4d9ef7e2cdd260074d7147884fa5b32dfd791889eb675ee1e1",
+      "snapshot": "sources\\sdk\\components\\mbedtls\\port\\esp_psa_crypto_init.c",
+      "role": "actual SDK source/header before SDK build"
+    }
+  },
+  "tools": {
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14",
+    "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+    "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35",
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom.bin": "9115bbcd03da9f54d3baca5ad94d588a43da54ed332347137ba3dc9010df258b",
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom-app.bin": "6d3240e7cdb1ec9c1d683515e0a8578e9fb8ece3e7736cb9a996512c656e8442",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\tools\\tools.json": "44f1cf25be0b1ff13f8a94c13420341bc732799ad44d2efcc430eff8544a2237",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-addr2line.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe": "68865c3276d449d746cea5065fdec2baf755d7813e161ab04205b0907b2629b8"
+  },
+  "production_pre_app_status": "Not observed in actual radio firmware; pending later integration. Minimal SDK fixture observations are separately labeled.",
+  "sdk_boot_initialization": "Unchanged ordinary SDK startup may run its existing PSA/RNG initialization; fixture invokes no crypto algorithm.",
+  "production_integration": false,
+  "private_mutex_writes": false,
+  "network_or_device": false,
+  "source_manifest_sha256": "4a30b95ed70dbe2cce594b0823e47855068c3c4fc0cd489deba71885f2194a1c",
+  "all_bound_inputs_current": true
+}

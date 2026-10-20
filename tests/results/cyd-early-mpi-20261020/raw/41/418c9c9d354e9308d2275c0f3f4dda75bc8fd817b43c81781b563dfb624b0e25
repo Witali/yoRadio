@@ -1,0 +1,77 @@
+"""Read-only bounded MPI source/harness review. No test or SDK execution."""
+from pathlib import Path
+import hashlib,json,subprocess,os
+ROOT=Path(__file__).resolve().parents[2]
+OUT=Path(__file__).resolve().parent
+SDK=Path('C:/Work/yoRadio/.idf/v6.0.2')
+sha=lambda raw:hashlib.sha256(raw).hexdigest()
+rows={}
+def capture(path,mutable=False):
+ path=Path(path).resolve();raw=path.read_bytes();key=str(path)
+ if key not in rows:
+  target=OUT/'inputs'/sha(raw);target.parent.mkdir(exist_ok=True);target.write_bytes(raw)
+  rows[key]={'source':key,'bytes':len(raw),'sha256':sha(raw),'snapshot':target.relative_to(OUT).as_posix(),'mutable_running_evidence':mutable}
+ return raw
+def write(name,value):(OUT/name).write_text(json.dumps(value,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+assert not (OUT/'review.json').exists()
+MAIN=ROOT/'idf/esp32-cyd2usb-native/main'
+for name in ('native_tls_early_mpi.c','native_tls_early_mpi.h','compat/early_mpi/enable.cmake','app_main.c','board_config.h','CMakeLists.txt','Kconfig.projbuild'):
+ capture(MAIN/name)
+for name in ('run-cyd-early-mpi-host.py','run-cyd-early-mpi-qemu.py'):capture(ROOT/'tests'/name)
+for folder in ('cyd_early_mpi_host','cyd_early_mpi_qemu'):
+ for p in (ROOT/'tests/target'/folder).rglob('*'):
+  if p.is_file():capture(p)
+pins=json.loads((ROOT/'tests/target/cyd_early_mpi_qemu/sdk-pins.json').read_bytes())
+for name,digest in pins['inputs'].items():assert sha(capture(SDK/name))==digest
+capture(SDK/'components/freertos/heap_idf.c')
+capture(SDK/'components/heap/heap_caps.c')
+hostfolder=ROOT/'.build/cyd-early-mpi-host-01'
+host=json.loads(capture(hostfolder/'report.json'))
+assert host['passed'] and host['all_bound_inputs_current']
+for path,record in host['inputs'].items():
+ assert sha(capture(path))==record['sha256']
+ assert sha(capture(hostfolder/record['snapshot']))==record['sha256']
+for command in host['commands']:
+ assert sha(capture(hostfolder/(command['label']+'.log')))==command['sha256']
+for path,digest in host['generated_inputs'].items():assert sha(capture(hostfolder/path))==digest
+qemupath=ROOT/'.build/cyd-early-mpi-qemu-01/report.json'
+qemu=json.loads(capture(qemupath,True))
+write('evidence-state.json',{'host':{'passed':True,'report_sha256':sha((hostfolder/'report.json').read_bytes()),
+ 'cases':host['cases'],'controls':host['controls'],'all_bound_inputs_current':True},
+ 'qemu_at_read':{'passed':qemu['passed'],'error':qemu.get('error'),'completed_variants':qemu['variants'],
+ 'last_completed_command':qemu['commands'][-1]['label'] if qemu['commands'] else None,
+ 'in_progress_snapshot':not qemu['passed'],'not_claimed_as_full_pass':not qemu['passed']}})
+for row in rows.values():
+ if not row['mutable_running_evidence']:
+  row['after_sha256']=sha(Path(row['source']).read_bytes());row['unchanged_after']=row['sha256']==row['after_sha256']
+assert all(row.get('unchanged_after',True) for row in rows.values())
+write('inputs.json',{'inputs':list(rows.values()),'stable_inputs_unchanged_after':True,
+ 'live_qemu_evidence_is_historical_read_snapshot':True})
+write('review.json',{'review_complete':True,'ready_for_unqualified_host_profile_claim':False,
+ 'independent_source_and_harness_review':True,'test_or_sdk_reruns':0,'cryptographic_calculations_run':0,
+ 'findings':[{'priority':2,'file':'tests/target/cyd_early_mpi_host/platform.h','line':11,
+  'title':'Host startup test substitutes the wrong actual CYD network stack size',
+  'detail':'platform.h defines BOARD_TASK_STACK_NETWORK=7168 while actual board_config.h:25 defines6144. The host runner generates a board_config.h stub and places stubs before frozen MAIN in include search. Thus app_main and fixture assertion both use7168, allowing a PASS for a profile that is not the current production one. Freezing actual board_config.h without using its values does not detect this.',
+  'repair':'Use the frozen real board_config.h with a narrow driver/gpio.h seam, remove duplicate task-stack constants, or explicitly derive and compare the seam values against that frozen header. Rerun the host gate after this fixture correction. No production MPI change is indicated.'}],
+ 'checks':[
+  'Production function consists of public esp_crypto_mpi_lock_acquire then release; there are no private mutex writes, crypto calculations, allocation replacements or task affinity changes.',
+  'app_main calls prepare before logging, health and application services; disabled inline stub and default-n Kconfig preserve the inactive profile.',
+  'Source and CMake reject unsupported ESP32/SOC MPI/hardware MPI/mbedTLS profiles; helper is called after component registration with esp_security dependency.',
+  'Host gate uses whole source/module and exact skip-acquire, skip-release, late-startup controls, four rejected compile profiles, seven CMake cases and strict ASan/UBSan exit predicates. Actual completed report is bound, subject to the board-profile finding.',
+  'QEMU runner freezes canonical source/variants, explicit SDK17 source pins, tools/ROM/image/ELF/config/header closure before execution and rechecks afterward; SDK commit/tracked cleanliness are checked around builds/runs.',
+  'QEMU warm-pair/ownership/reuse and pinned two-core workers use the SDK-owned mutex, not a replacement. Skip-acquire uses a separate explicitly labeled public-prewarm control; skip-release cleanup releases only the already-held SDK mutex.',
+  'OOM fixture exhausts real INTERNAL|8BIT heap using real allocations; FreeRTOS heap_idf.c uses that same capability set. xQueueCreateMutex wrapper calls the real constructor first and only observes NULL. Runner requires actual MPI static-symbol address, SDK lock_init_generic abort and full acquire→prepare→app_main backtrace. Generic panic, timeout, missing completion or non-matching OOM are not accepted.'
+ ],'limitations':[
+  'No tests, SDK builds, QEMU or cryptographic calculation were executed by this review.',
+  'Completed host ordering evidence uses explicit SDK/RTOS/service seams and does not establish real mutex semantics, board runtime or heap effects.',
+  'The QEMU report was read while the canonical campaign was still in progress; only its observed state is retained, not relabeled as a completed pass.',
+  'Even successful minimal SDK QEMU observations do not establish actual radio pre-app lock state or physical fresh-boot/OOM behavior. Normal SDK boot may run its existing PSA/RNG initialization; fixture invokes no algorithm.',
+  'Void SDK lazy initialization aborts if mutex allocation fails. This change offers no recoverable result, RAM/fragmentation benefit guarantee, latency improvement or hardware claim.'
+ ],'inputs':'inputs.json','evidence':'evidence-state.json','stable_input_count':sum(not x['mutable_running_evidence'] for x in rows.values())})
+files=[]
+for path in sorted(OUT.rglob('*')):
+ if path.is_file() and path!=OUT/'manifest.json':
+  raw=path.read_bytes();files.append({'path':path.relative_to(OUT).as_posix(),'bytes':len(raw),'sha256':sha(raw)})
+write('manifest.json',{'files':files})
+print(json.dumps({'complete':True,'findings':1,'inputs':len(rows),'files':len(files)+1,
+ 'review_sha256':sha((OUT/'review.json').read_bytes()),'manifest_sha256':sha((OUT/'manifest.json').read_bytes())},indent=2))

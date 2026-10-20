@@ -1,0 +1,85 @@
+{
+  "passed": false,
+  "scope": "Whole actual candidate module plus whole copied/patched CYD app_main TU; explicit host SDK seams. No target mutex/runtime proof.",
+  "commands": [
+    {
+      "label": "enabled-build",
+      "argv": [
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-draft-01/host-01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-draft-01/host-01/sources/host",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-draft-01/host-01/sources/candidate/main",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-draft-01/host-01/enabled/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-draft-01/host-01/enabled/app_main.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-draft-01/host-01/sources/host/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-draft-01/host-01/enabled/test"
+      ],
+      "exit_status": 4294967295,
+      "sha256": "d3deef600cfe844252ac45d1056859d520f149e27e7c1dabd54f0aae6f6de48b"
+    }
+  ],
+  "cases": {},
+  "controls": {},
+  "inputs": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\Kconfig.fragment": {
+      "sha256": "4990b1f7d268469cd6670969edc5b8d55265066cc81d2d4b91ca9b894a030166",
+      "snapshot": "sources\\candidate\\Kconfig.fragment"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\integration\\app_main.c": {
+      "sha256": "e4017553c20208d44f37a1a493529b17cbe9406ba739c3a5da48b0be0c6b2e70",
+      "snapshot": "sources\\candidate\\integration\\app_main.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\integration\\CMakeLists.txt": {
+      "sha256": "3dee1cc263d8e3058d70ea30371f28dd3870eac86ba54fce17d3b30dad02a22f",
+      "snapshot": "sources\\candidate\\integration\\CMakeLists.txt"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\integration\\Kconfig.projbuild": {
+      "sha256": "ad80d3dc7ca4c9777b3302e71f359a5db23cb14025454f8133bd066c7d92e930",
+      "snapshot": "sources\\candidate\\integration\\Kconfig.projbuild"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\main\\native_tls_early_mpi.c": {
+      "sha256": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c",
+      "snapshot": "sources\\candidate\\main\\native_tls_early_mpi.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\main\\native_tls_early_mpi.h": {
+      "sha256": "2f5244849db636bfe738548d4196f24cbdac5236b6b94bee3642993ea587eb77",
+      "snapshot": "sources\\candidate\\main\\native_tls_early_mpi.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\candidate\\main\\compat\\early_mpi\\enable.cmake": {
+      "sha256": "b22083a65917d492e0f0d1ef3288b2eb99bfee9acea5cb2b3721d63c1cb36943",
+      "snapshot": "sources\\candidate\\main\\compat\\early_mpi\\enable.cmake"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\host\\platform.h": {
+      "sha256": "004789158684a41b166467fc27c2ef0a6660d63e439f520b76e51a8a4e2c5ad6",
+      "snapshot": "sources\\host\\platform.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\host\\test.c": {
+      "sha256": "bfe221338dbb344b284b25e415c1ae1f0f142947b3d73c5ab51d71712e6d1fa5",
+      "snapshot": "sources\\host\\test.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\run_host.py": {
+      "sha256": "e7b7b0b7d9a8f92c6e1c7632ecb95e0fb6f541f6f66954b99943661a6a6eaca2",
+      "snapshot": "sources\\run_host.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\integration.patch": {
+      "sha256": "e29ceced15acf7979ad351a135fd72ad3d9f61fa2ed49195ac43529b156d8929",
+      "snapshot": "sources\\integration.patch"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\integration-inputs.json": {
+      "sha256": "c92757bb941210800f754471b3a8b561bb1026893c98af3177a98d31a8e0dd46",
+      "snapshot": "sources\\integration-inputs.json"
+    }
+  }
+}

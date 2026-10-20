@@ -1,0 +1,66 @@
+--- a/idf/esp32-cyd2usb-native/main/app_main.c
++++ b/idf/esp32-cyd2usb-native/main/app_main.c
+@@ -10,7 +10,8 @@
+ #include "freertos/task.h"
+ #include "native_audio_settings.h"
+ #include "native_state.h"
+-#include "native_health.h"
++#include "native_health.h"
++#include "native_tls_early_mpi.h"
+ #include "network_service.h"
+ #include "network_settings.h"
+ #include "radio_control.h"
+@@ -95,7 +96,8 @@
+     vTaskDelete(NULL);
+ }
+ 
+-void app_main(void) {
++void app_main(void) {
++    native_tls_early_mpi_prepare();
+     ESP_LOGI(TAG, "Starting pure ESP-IDF yoRadio (Arduino-free)");
+     if (!native_health_start()) ESP_LOGW(TAG, "Health sampler initialization failed");
+     native_state_init(&s_state);
+--- a/idf/esp32-cyd2usb-native/main/CMakeLists.txt
++++ b/idf/esp32-cyd2usb-native/main/CMakeLists.txt
+@@ -80,7 +80,7 @@
+     custom_legacy_codecs
+     custom_flac
+     esp_audio_codec
+-  PRIV_REQUIRES esp-tls)
++  PRIV_REQUIRES esp-tls esp_security)
+ 
+ include("${CMAKE_CURRENT_LIST_DIR}/compat/httpd_rfc6455/enable.cmake")
+ native_enable_httpd_rfc6455()
+@@ -89,7 +89,10 @@
+ native_enable_http_request_buffer_release()
+ 
+ include("${CMAKE_CURRENT_LIST_DIR}/compat/input_reclaim/enable.cmake")
+-native_enable_tls_input_reclaim()
++native_enable_tls_input_reclaim()
++
++include("${CMAKE_CURRENT_LIST_DIR}/compat/early_mpi/enable.cmake")
++native_enable_tls_early_mpi()
+ 
+ target_compile_definitions(${COMPONENT_LIB} PRIVATE YORADIO_ESP_IDF_NATIVE=1)
+ 
+--- a/idf/esp32-cyd2usb-native/main/Kconfig.projbuild
++++ b/idf/esp32-cyd2usb-native/main/Kconfig.projbuild
+@@ -144,4 +144,18 @@
+ 
+     endchoice
+ 
++    config YORADIO_TLS_EARLY_MPI_LOCK
++        bool "Initialize the SDK hardware MPI mutex before services (experimental)"
++        depends on IDF_TARGET_ESP32 && SOC_MPI_SUPPORTED
++        depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_HARDWARE_MPI
++        default n
++        help
++            Acquire and release the existing SDK-owned MPI peripheral mutex
++            at normal app_main entry, before application service allocations.
++            This may move a lazy lifetime allocation earlier. The SDK may
++            already have initialized it; no RAM or fragmentation gain is
++            guaranteed. Its void API aborts on lazy mutex allocation failure.
++            No private mutex, cryptographic calculation or task profile changes.
++            Keep disabled until fresh-boot, OOM and two-core evidence is reviewed.
++
+ endmenu

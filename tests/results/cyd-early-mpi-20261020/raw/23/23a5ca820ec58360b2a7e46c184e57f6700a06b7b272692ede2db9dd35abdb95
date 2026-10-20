@@ -1,0 +1,197 @@
+#include <stdatomic.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <sys/lock.h>
+#include "esp_crypto_lock.h"
+#include "esp_heap_caps.h"
+#include "esp_rom_sys.h"
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
+#include "native_tls_early_mpi.h"
+#include "soc/soc_caps.h"
+
+_Static_assert(SOC_CPU_CORES_NUM == 2, "Actual ESP32 two-core target required");
+#if defined(CONFIG_FREERTOS_UNICORE) && CONFIG_FREERTOS_UNICORE
+#error "Two-core runtime required"
+#endif
+
+typedef struct {
+    _lock_t *address;
+    uintptr_t before, after;
+    unsigned phase;
+} trace_t;
+static trace_t s_trace[256];
+static portMUX_TYPE s_trace_lock = portMUX_INITIALIZER_UNLOCKED;
+static unsigned s_trace_count;
+static bool s_trace_overflow;
+static atomic_uint s_phase, s_window, s_watch_acquire, s_watch_release, s_watch_create;
+static atomic_uint s_acquire_owned, s_release_owned, s_active, s_violations, s_cores;
+static atomic_bool s_trace_enabled = true;
+static _lock_t *s_mpi_address;
+static uintptr_t s_handle_before, s_handle_after;
+static unsigned s_counter;
+static StaticSemaphore_t s_start_storage[2], s_done_storage[2];
+static SemaphoreHandle_t s_start[2], s_done[2];
+#if DRAFT_OOM
+static void *s_pressure[4096];
+#endif
+
+static bool held_here(void) {
+    return s_mpi_address && *s_mpi_address &&
+        xSemaphoreGetMutexHolder((SemaphoreHandle_t)*s_mpi_address) == xTaskGetCurrentTaskHandle();
+}
+
+__attribute__((noreturn)) static void fail(const char *name) {
+    atomic_store(&s_window, 0);
+    // Only fixture cleanup, after detecting the mutant. Never replace/free SDK lock.
+    if (held_here()) esp_crypto_mpi_lock_release();
+    esp_rom_printf("EARLY_MPI_FAILURE %s\n", name);
+    esp_rom_printf("EARLY_MPI_CONTROLLED_STOP\n");
+    esp_restart();
+    for (;;) {}
+}
+
+static void check(bool condition, const char *name) {
+    if (!condition) fail(name);
+}
+
+void __real__lock_acquire(_lock_t *lock);
+void __real__lock_release(_lock_t *lock);
+QueueHandle_t __real_xQueueCreateMutex(uint8_t type);
+
+void __wrap__lock_acquire(_lock_t *lock) {
+    unsigned phase = atomic_load(&s_phase);
+    bool trace = atomic_load(&s_trace_enabled);
+    uintptr_t before = (uintptr_t)*lock;
+    bool watch = atomic_load(&s_window) != 0;
+    if (watch) {
+        if (!s_mpi_address) {
+            s_mpi_address = lock;
+            s_handle_before = before;
+        }
+        ++s_watch_acquire;
+    }
+    __real__lock_acquire(lock);
+    if (watch) {
+        s_handle_after = (uintptr_t)*lock;
+        if (held_here()) ++s_acquire_owned;
+    }
+    if (trace) {
+        portENTER_CRITICAL(&s_trace_lock);
+        if (s_trace_count < sizeof(s_trace)/sizeof(s_trace[0])) {
+            s_trace[s_trace_count++] = (trace_t){lock, before, (uintptr_t)*lock, phase};
+        } else s_trace_overflow = true;
+        portEXIT_CRITICAL(&s_trace_lock);
+    }
+}
+
+void __wrap__lock_release(_lock_t *lock) {
+    bool watch = atomic_load(&s_window) != 0;
+    if (watch) {
+        if (!s_mpi_address) {
+            s_mpi_address = lock;
+            s_handle_before = (uintptr_t)*lock;
+        }
+        ++s_watch_release;
+        if (held_here()) ++s_release_owned;
+    }
+    __real__lock_release(lock);
+}
+
+QueueHandle_t __wrap_xQueueCreateMutex(uint8_t type) {
+    QueueHandle_t result = __real_xQueueCreateMutex(type);
+    if (atomic_load(&s_window)) {
+        ++s_watch_create;
+        if (!result) {
+            // The real unmodified SDK queue constructor returned NULL.
+            esp_rom_printf("EARLY_MPI_OOM_QUEUE_NULL phase=%u lock=%p\n", atomic_load(&s_phase), s_mpi_address);
+        }
+    }
+    return result;
+}
+
+static void worker(void *argument) {
+    unsigned id = (unsigned)(uintptr_t)argument;
+    check(xPortGetCoreID() == (int)id, "worker_core");
+    atomic_fetch_or(&s_cores, 1U << id);
+    check(xSemaphoreTake(s_start[id], pdMS_TO_TICKS(10000)) == pdTRUE, "worker_start");
+    for (unsigned i = 0; i < 1000; ++i) {
+        esp_crypto_mpi_lock_acquire();
+        if (!held_here() || atomic_fetch_add(&s_active, 1) != 0) ++s_violations;
+        unsigned value = s_counter;
+        for (volatile unsigned spin = 0; spin < 32; ++spin) {}
+        s_counter = value + 1;
+        if (atomic_fetch_sub(&s_active, 1) != 1) ++s_violations;
+        esp_crypto_mpi_lock_release();
+    }
+    xSemaphoreGive(s_done[id]);
+    vTaskDelete(NULL);
+}
+
+void app_main(void) {
+    atomic_store(&s_phase, 1);
+    esp_rom_printf("EARLY_MPI_APP_ENTRY scheduler=%d core=%d\n", xTaskGetSchedulerState(), xPortGetCoreID());
+#if DRAFT_SKIP_ACQUIRE
+    // A separate control-only valid public prewarm avoids accepting a NULL-lock
+    // SDK panic as the skip-acquire semantic detection. Canonical has no prewarm.
+    esp_crypto_mpi_lock_acquire();
+    esp_crypto_mpi_lock_release();
+#endif
+#if DRAFT_OOM
+    // Fresh isolated boot. Exhaust the actual INTERNAL|8BIT allocator without
+    // replacing its NULL result. No mutex/queue/private field is reset.
+    unsigned count = 0;
+    const size_t sizes[] = {4096, 512, 128, 32};
+    for (unsigned i = 0; i < sizeof(sizes)/sizeof(sizes[0]); ++i) {
+        void *pointer;
+        while (count < sizeof(s_pressure)/sizeof(s_pressure[0]) &&
+               (pointer = heap_caps_malloc(sizes[i], MALLOC_CAP_INTERNAL|MALLOC_CAP_8BIT))) {
+            s_pressure[count++] = pointer;
+        }
+    }
+    esp_rom_printf("EARLY_MPI_OOM_PRESSURE blocks=%u\n", count);
+#endif
+    atomic_store(&s_window, 1);
+    native_tls_early_mpi_prepare();
+    atomic_store(&s_window, 0);
+    atomic_store(&s_trace_enabled, false);
+#if DRAFT_OOM
+    fail("oom_did_not_abort");
+#endif
+    check(atomic_load(&s_watch_acquire) == 1, "warm_acquire_once");
+    check(atomic_load(&s_watch_release) == 1, "warm_release_once");
+    check(atomic_load(&s_acquire_owned) == 1 && atomic_load(&s_release_owned) == 1, "warm_public_owner");
+    check(s_mpi_address && s_handle_after && !held_here(), "warm_released");
+    check(!s_trace_overflow, "boot_trace_capacity");
+    unsigned pre_app = 0;
+    for (unsigned i = 0; i < s_trace_count; ++i) {
+        if (s_trace[i].address == s_mpi_address && s_trace[i].phase == 0) ++pre_app;
+    }
+    check(atomic_load(&s_watch_create) == (s_handle_before ? 0U : 1U), "lazy_creation_observation");
+    esp_rom_printf("EARLY_MPI_BOOT_OBSERVATION pre_app_acquires=%u initial_handle=%p final_handle=%p classification=%s trace_events=%u\n",
+                   pre_app, (void *)s_handle_before, (void *)s_handle_after,
+                   s_handle_before ? "already_warm_at_fixture" : "lazy_at_fixture", s_trace_count);
+    unsigned creates = atomic_load(&s_watch_create);
+    atomic_store(&s_window, 1);
+    for (unsigned i = 0; i < 16; ++i) native_tls_early_mpi_prepare();
+    atomic_store(&s_window, 0);
+    check(atomic_load(&s_watch_acquire) == 17 && atomic_load(&s_watch_release) == 17, "repeat_pairs");
+    check(atomic_load(&s_watch_create) == creates && (uintptr_t)*s_mpi_address == s_handle_after, "repeat_no_replacement");
+    for (unsigned i = 0; i < 2; ++i) {
+        s_start[i] = xSemaphoreCreateBinaryStatic(&s_start_storage[i]);
+        s_done[i] = xSemaphoreCreateBinaryStatic(&s_done_storage[i]);
+        check(s_start[i] && s_done[i], "fixture_semaphores");
+        check(xTaskCreatePinnedToCore(worker, "mpi_worker", 3072, (void *)(uintptr_t)i, 3, NULL, (int)i) == pdPASS, "fixture_task");
+    }
+    xSemaphoreGive(s_start[0]);
+    xSemaphoreGive(s_start[1]);
+    for (unsigned i = 0; i < 2; ++i) check(xSemaphoreTake(s_done[i], pdMS_TO_TICKS(15000)) == pdTRUE, "worker_done");
+    check(atomic_load(&s_cores) == 3 && !atomic_load(&s_violations) && !atomic_load(&s_active) && s_counter == 2000, "two_core_mutual_exclusion");
+    check((uintptr_t)*s_mpi_address == s_handle_after && !held_here(), "two_core_no_replacement");
+    esp_rom_printf("EARLY_MPI_COMPLETE warm_pairs=17 dualcore=1 increments=2000 public_api=1 crypto_calculations=0\n");
+    esp_restart();
+    for (;;) {}
+}

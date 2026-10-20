@@ -1,0 +1,236 @@
+{
+  "status": "PASS fresh canonical-source standalone qualification; full production exports pending root",
+  "passed": true,
+  "tracked_source_or_test_mutations_by_qualifier": false,
+  "host": {
+    "report": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-02\\report.json",
+    "sha256": "c6f59672c1bce23a7ea1c9ae8de2a00151a8887d72f2fb093bba688dc6e11d21",
+    "positive_whole_startups": 2,
+    "exact_ordering_mutants": 3,
+    "invalid_compile_profiles": 4,
+    "cmake_configurations": 7,
+    "strict_sanitizers": "ASan/UBSan -fno-sanitize-recover=all; -Wall -Wextra -Werror -pedantic",
+    "actual_board_header_proven_by_gcc_H": true,
+    "actual_network_stack_bytes": 6144,
+    "seams": "SDK/RTOS/services and driver/gpio names only; all BOARD_TASK_STACK_* come from frozen canonical board_config.h"
+  },
+  "target": {
+    "report": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\report.json",
+    "sha256": "9b41f4bcc76fde069f2b9d3e8d3443ec2a57ecc96a8f6dca56a30063e7c57e08",
+    "canonical_module_byte_identical_to_production": true,
+    "source_inputs": 33,
+    "source_files_before_build": 45,
+    "tools_before_build_and_after": 12,
+    "sdk_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+    "sdk_tracked_clean_before_after_each_build_and_qemu": true,
+    "variants": {
+      "canonical": {
+        "result": {
+          "passed": true,
+          "fixture_boot_observation": [
+            "0",
+            "0x00000000",
+            "0x3ffafebc",
+            "lazy_at_fixture",
+            "4"
+          ],
+          "radio_pre_app_status": "pending actual integration boot, not inferred from this minimal fixture",
+          "execution_bundle_sha256": "576f2d9cfa65155524267c4fc5776fde5bd9ec0080e99f304c62d08bb4b13684",
+          "sources_unchanged_after": true
+        },
+        "elf": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\variants\\canonical\\artifacts\\cyd_early_mpi_observation.elf",
+        "elf_sha256": "d04d5367d501067f9183a504fad0b786e65dc379bbe6e548133cac918297a469",
+        "elf_machine": 94,
+        "source_sha256": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c",
+        "module_compile_command": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\variants\\canonical\\actual-module-command.json",
+        "external_header_count": 1498,
+        "raw_runtime_log": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\canonical-qemu.log"
+      },
+      "skip-acquire": {
+        "result": {
+          "passed": true,
+          "exact_semantic_failure": "warm_acquire_once",
+          "fixture_control_only_public_prewarm": true,
+          "execution_bundle_sha256": "5d5c2bec09917f80dc38708eeb19f2d183d01fc2b6e9df382355331d468a655b",
+          "sources_unchanged_after": true
+        },
+        "elf": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\variants\\skip-acquire\\artifacts\\cyd_early_mpi_observation.elf",
+        "elf_sha256": "df4990bfca95a88ca692d86c76dc9dd575e3238fd0723dbab0e5af3990e33b9d",
+        "elf_machine": 94,
+        "source_sha256": "c4465d14c1b3a9c55d71865f7d1609c9e43634284f14c7c23731cfb4d83c6aa2",
+        "module_compile_command": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\variants\\skip-acquire\\actual-module-command.json",
+        "external_header_count": 1498,
+        "raw_runtime_log": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\skip-acquire-qemu.log"
+      },
+      "skip-release": {
+        "result": {
+          "passed": true,
+          "exact_semantic_failure": "warm_release_once",
+          "fixture_control_only_public_prewarm": false,
+          "execution_bundle_sha256": "37da8d8397ae197e0f8c5b183680c9d70bff4daebd5bfb2ca64298113d4387bc",
+          "sources_unchanged_after": true
+        },
+        "elf": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\variants\\skip-release\\artifacts\\cyd_early_mpi_observation.elf",
+        "elf_sha256": "1014762396368219c91bbfece16a1b8f499881ace6f39a085bcc86a67657bd5a",
+        "elf_machine": 94,
+        "source_sha256": "5eacedda6a4a5874d5ab9d332731baf6967bb36f9ece439d546d4a9969bc9756",
+        "module_compile_command": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\variants\\skip-release\\actual-module-command.json",
+        "external_header_count": 1498,
+        "raw_runtime_log": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\skip-release-qemu.log"
+      },
+      "void-oom": {
+        "result": {
+          "passed": true,
+          "gate": "void API actual allocator exhaustion then exact SDK lock constructor abort",
+          "abort_pc": "0x400825b3",
+          "resolved_site": "0x400825b3: lock_init_generic at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:77\n (inlined by) lock_acquire_generic at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:133\n",
+          "actual_sdk_lock_address": "0x3ffb31b4",
+          "resolved_whole_stack": "0x40085791: panic_abort at C:/Work/yoRadio/.idf/v6.0.2/components/esp_system/panic.c:464\n0x4008575d: esp_system_abort at C:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/esp_system_chip.c:87\n0x40085482: abort at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/abort.c:38\n0x400825b3: lock_init_generic at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:77\n (inlined by) lock_acquire_generic at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:133\n0x40082721: _lock_acquire at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:169\n0x400d522b: __wrap__lock_acquire at C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-qemu-01/sources/repo/tests/target/cyd_early_mpi_qemu/main/main.c:77\n0x400d590e: esp_crypto_mpi_lock_acquire at C:/Work/yoRadio/.idf/v6.0.2/components/esp_security/src/esp_crypto_lock.c:117\n0x400d5433: native_tls_early_mpi_prepare at C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-qemu-01/sources/variants/void-oom/native_tls_early_mpi.c:14\n0x400d53d9: app_main at C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-qemu-01/sources/repo/tests/target/cyd_early_mpi_qemu/main/main.c:158\n0x400d3ca4: main_task at C:/Work/yoRadio/.idf/v6.0.2/components/freertos/app_startup.c:206\n",
+          "generic_panic_is_not_success": true,
+          "execution_bundle_sha256": "90efe41e3a9e801676ecb6886ee581917c0714c70d22786226839af872540497",
+          "sources_unchanged_after": true
+        },
+        "elf": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\variants\\void-oom\\artifacts\\cyd_early_mpi_observation.elf",
+        "elf_sha256": "04993595fbcac340527c19e183fafbb8991d2376016cebe5bad8ef1f875ccea3",
+        "elf_machine": 94,
+        "source_sha256": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c",
+        "module_compile_command": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\variants\\void-oom\\actual-module-command.json",
+        "external_header_count": 1498,
+        "raw_runtime_log": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-qemu-01\\void-oom-qemu.log"
+      }
+    }
+  },
+  "guards": {
+    "report": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-preflight-02\\report.json",
+    "sha256": "e41a5ce3d2c40e8a4f88d4065a9bc213ec2dd102587b6c2bf5ee144d9c896a47",
+    "path_cases": 8,
+    "expected_sdk_pin_mismatch": 1,
+    "scope": "Actual Git HEAD on unchanged SDK; isolated expected-pin mutation. No alternate checkout or SDK/ref mutation."
+  },
+  "negative_predicates": {
+    "host_skip_acquire": "exit2; exactly EARLY_MPI_HOST_FAILURE release_without_acquire; no sanitizer output",
+    "host_skip_release_and_late_startup": "exit2; exactly EARLY_MPI_HOST_FAILURE startup_before_warm; no sanitizer output",
+    "target_skip_acquire": "unique EARLY_MPI_FAILURE warm_acquire_once + controlled restart; no panic/timeout/complete",
+    "target_skip_release": "unique EARLY_MPI_FAILURE warm_release_once + controlled restart; no panic/timeout/complete",
+    "target_void_oom": "real heap pressure + real queue NULL; marker pointer equals actual ELF SDK symbol; exact abort site and whole public API stack; generic panic rejected"
+  },
+  "source_entries": {
+    "production_module": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.c:13",
+    "first_application_statement": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c:100",
+    "actual_board_network_profile": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\board_config.h:25",
+    "host_public_lock_stubs": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_host\\test.c:15",
+    "target_unchanged_public_lock_delegates": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\main\\main.c:65",
+    "target_unchanged_queue_delegate": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\main\\main.c:104",
+    "target_two_core_workers": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\main\\main.c:116",
+    "target_real_heap_pressure": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\main\\main.c:143",
+    "target_exact_acquire_release_checks": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\main\\main.c:164"
+  },
+  "owned_tracked_test_files": {
+    "tests\\run-cyd-early-mpi-host.py": {
+      "bytes": 10671,
+      "sha256": "cfb76150d5e55d7b957e8eb82a6aaf00229f3850851feb7afbed2fdad578123c"
+    },
+    "tests\\run-cyd-early-mpi-qemu.py": {
+      "bytes": 16302,
+      "sha256": "8409e8613668bd7069100d0cc8db3b2be7039dc944d586838535e4f98063ea4a"
+    },
+    "tests\\target\\cyd_early_mpi_host\\platform.h": {
+      "bytes": 1991,
+      "sha256": "9c69dc405966bdddac077d25266216c5c10e0c43511a167bbd916d99c310b22a"
+    },
+    "tests\\target\\cyd_early_mpi_host\\test.c": {
+      "bytes": 3011,
+      "sha256": "bfe221338dbb344b284b25e415c1ae1f0f142947b3d73c5ab51d71712e6d1fa5"
+    },
+    "tests\\target\\cyd_early_mpi_qemu\\CMakeLists.txt": {
+      "bytes": 143,
+      "sha256": "abff2bb0f19bfb9992993b7c873a5f30e6da762180ba758b226b294d3c356ecd"
+    },
+    "tests\\target\\cyd_early_mpi_qemu\\partitions.csv": {
+      "bytes": 96,
+      "sha256": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b"
+    },
+    "tests\\target\\cyd_early_mpi_qemu\\sdk-build.ps1": {
+      "bytes": 4098,
+      "sha256": "6e5a6d3b0b5de6cbf047658a515a0bc8d991e7a72b13f47931a3402ddf90aaf0"
+    },
+    "tests\\target\\cyd_early_mpi_qemu\\sdk-pins.json": {
+      "bytes": 2001,
+      "sha256": "1d9204cbaad471873e5f95446dab6bb5d5fa5e76706a85cf403015c07aa0747c"
+    },
+    "tests\\target\\cyd_early_mpi_qemu\\sdkconfig.defaults": {
+      "bytes": 929,
+      "sha256": "d8ac88fa566a2e225561372a3f032dc5e4e54d2725786ff4bed6f2e68210e74e"
+    },
+    "tests\\target\\cyd_early_mpi_qemu\\main\\CMakeLists.txt": {
+      "bytes": 652,
+      "sha256": "b2c88dbe801fdff00129e0d2cb6e6ce473b2255666ae2fb4581918b27c9fa129"
+    },
+    "tests\\target\\cyd_early_mpi_qemu\\main\\Kconfig.projbuild": {
+      "bytes": 28,
+      "sha256": "15696c5fe273b37c50489741b10b4aff3d6bfffe2ab46d7430db90224f408253"
+    },
+    "tests\\target\\cyd_early_mpi_qemu\\main\\main.c": {
+      "bytes": 7994,
+      "sha256": "68a7b942dd207a0528872d123581d3d7cf05a180e6a0b8070dfe2ffe46746ff8"
+    }
+  },
+  "frozen_live_source_sha256": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.c": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.h": "2f5244849db636bfe738548d4196f24cbdac5236b6b94bee3642993ea587eb77",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\early_mpi\\enable.cmake": "b22083a65917d492e0f0d1ef3288b2eb99bfee9acea5cb2b3721d63c1cb36943",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\board_config.h": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\CMakeLists.txt": "2e3bf7f0bc22714e559fb235391020f46e400f6aa84fb379c4060ddbe3b113cb",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\Kconfig.projbuild": "0941618beb1438ba7a2a56c2a0b9082557622ecbcfd0251b41585cf523c3719e",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_host\\platform.h": "9c69dc405966bdddac077d25266216c5c10e0c43511a167bbd916d99c310b22a",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_host\\test.c": "bfe221338dbb344b284b25e415c1ae1f0f142947b3d73c5ab51d71712e6d1fa5",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-host.py": "cfb76150d5e55d7b957e8eb82a6aaf00229f3850851feb7afbed2fdad578123c",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\CMakeLists.txt": "abff2bb0f19bfb9992993b7c873a5f30e6da762180ba758b226b294d3c356ecd",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\partitions.csv": "d84dff481acb102cbe252024ad8a6e39b2395c6a0261139e463bb54cc4fa1e7b",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\sdk-build.ps1": "6e5a6d3b0b5de6cbf047658a515a0bc8d991e7a72b13f47931a3402ddf90aaf0",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\sdk-pins.json": "1d9204cbaad471873e5f95446dab6bb5d5fa5e76706a85cf403015c07aa0747c",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\sdkconfig.defaults": "d8ac88fa566a2e225561372a3f032dc5e4e54d2725786ff4bed6f2e68210e74e",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\main\\CMakeLists.txt": "b2c88dbe801fdff00129e0d2cb6e6ce473b2255666ae2fb4581918b27c9fa129",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\main\\Kconfig.projbuild": "15696c5fe273b37c50489741b10b4aff3d6bfffe2ab46d7430db90224f408253",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_qemu\\main\\main.c": "68a7b942dd207a0528872d123581d3d7cf05a180e6a0b8070dfe2ffe46746ff8",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-qemu.py": "8409e8613668bd7069100d0cc8db3b2be7039dc944d586838535e4f98063ea4a",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\tools\\cmake\\version.cmake": "3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\tools\\idf.py": "5f703be3a915433f63206a28260357ad807ec83ae0a8589c684c9c08516a7a40",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\export.ps1": "80a99f8bc285f32ba4da02b8a1348854978c9efac0a16cbc54caf6be85e95dda",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp_crypto_lock.c": "7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\include\\esp_crypto_lock.h": "ffc8b49e52a1a1c09fa7cf9230efb9bbc767067f5ec45498082ea93d61d34898",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\CMakeLists.txt": "e9a3870a84285e720e14264556bb28ce3be6ae72bccd581beaa93c4c034127b4",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\init.c": "dcea9910e43b3145936d36aece0667f48b97a906068e9508a4c12138e980c3c2",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp32\\esp_crypto_clk.h": "739b3476c3e21b4b9ed60f9a9badb13e329b85a07303be422d26bf56e6de84e9",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\locks.c": "724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\platform_include\\sys\\lock.h": "698695d7425fb1c7a3003ca72de41d8ca6e346548e34370680139cb7daafbdb0",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\init.c": "715e1c17e00b37443a376d4d541ff19e69d596c8e6437c3f332e7e42d478cfd1",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\picolibc\\picolibc_init.c": "0062be588abcf15bbe62d6308c1f64aa22c626ac8eaf88628c2ffe83e67e55cf",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\queue.c": "b37c27ee5151d6c342d56737699e199dd6532248e7d8f5da3824b4679a21f8c5",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\include\\freertos\\queue.h": "81b0073fde402e1a35f97508cfd7fa03f4948e4bcf4bdee46befc155fe2be716",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\include\\freertos\\semphr.h": "b7cdb4c58cba76a9ba0bdb1b1de7ec25b1ae067ed373992f43f5416a27295864",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\app_startup.c": "9f3ae1b71307ad21e5716a5957619f47422f10d33d88e274c0f1b595c046794b",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_psa_crypto_init.c": "3903ebec3dc6ad4d9ef7e2cdd260074d7147884fa5b32dfd791889eb675ee1e1"
+  },
+  "all_bound_sources_tools_artifacts_current": true,
+  "historical_evidence": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-01\\report.json",
+      "status": "ordering PASS historical; board-profile proof rejected (old self-consistent7168 seam), superseded by host02"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-draft-01\\target-02\\report.json",
+      "status": "unchanged prototype PASS; not relabeled as canonical production-source run"
+    }
+  ],
+  "limitations": [
+    "Target report legacy production_integration=false means no full radio application build. The compiled standalone module is a byte-identical canonical production snapshot; actual app_main is compiled in host gate.",
+    "Minimal SDK fixture observed lazy initial MPI handle; complete radio pre-app state remains unobserved.",
+    "Void OOM is the actual constructor abort path under this fixture configuration, not a recoverable allocation API.",
+    "The fixture invokes no crypto algorithm/network/device; ordinary SDK PSA/RNG startup remains unchanged.",
+    "No full production firmware export or board execution was done by these gates; root owns those after a clean source commit.",
+    "Default-off activation, fragmentation/RAM benefit and physical board behavior remain separately unqualified. No record/pool/task/core/timing/stacks changes or private mutex replacement.",
+    "AAC is excluded."
+  ]
+}

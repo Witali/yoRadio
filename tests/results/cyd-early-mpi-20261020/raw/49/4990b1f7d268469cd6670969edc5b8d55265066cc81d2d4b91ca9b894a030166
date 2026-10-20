@@ -1,0 +1,13 @@
+    config YORADIO_TLS_EARLY_MPI_LOCK
+        bool "Initialize the SDK hardware MPI mutex before services (experimental)"
+        depends on IDF_TARGET_ESP32 && SOC_MPI_SUPPORTED
+        depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_HARDWARE_MPI
+        default n
+        help
+            Acquire and release the existing SDK-owned MPI peripheral mutex
+            at normal app_main entry, before application service allocations.
+            This may move a lazy lifetime allocation earlier. The SDK may
+            already have initialized it; no RAM or fragmentation gain is
+            guaranteed. Its void API aborts on lazy mutex allocation failure.
+            No private mutex, cryptographic calculation or task profile changes.
+            Keep disabled until fresh-boot, OOM and two-core evidence is reviewed.

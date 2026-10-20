@@ -1,0 +1,119 @@
+"""Bind fresh canonical-source host/QEMU evidence without changing source files."""
+import hashlib, json, pathlib, re, struct
+
+ROOT = pathlib.Path.cwd()
+OUT = ROOT/'.build/cyd-early-mpi-qualification-01'
+OUT.mkdir(exist_ok=False)
+
+def sha(path): return hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
+def load(path): return json.loads(pathlib.Path(path).read_text())
+
+host_dir=ROOT/'.build/cyd-early-mpi-host-02'
+qemu_dir=ROOT/'.build/cyd-early-mpi-qemu-01'
+guards_dir=ROOT/'.build/cyd-early-mpi-preflight-02'
+host=load(host_dir/'report.json');qemu=load(qemu_dir/'report.json');guards=load(guards_dir/'report.json')
+assert host['passed'] and qemu['passed'] and guards['passed']
+frozen={}
+for folder,report in [(host_dir,host),(qemu_dir,qemu)]:
+    for path,record in report['inputs'].items():
+        assert sha(path)==record['sha256'] and sha(folder/record['snapshot'])==record['sha256'],path
+        if path in frozen:assert frozen[path]==record['sha256'],path
+        frozen[path]=record['sha256']
+    for command in report['commands']:
+        assert sha(folder/(command['label']+'.log'))==command['sha256'],command
+for path,expected in guards['sources'].items():assert sha(path)==expected,path
+for path,expected in qemu['tools'].items():assert sha(path)==expected,path
+for path,expected in host['generated_inputs'].items():assert sha(host_dir/path)==expected,path
+assert qemu['sdk_commit']=='7101770dc6db2667b3c477cc31365dd1acd6db4e' and qemu['sdk_tracked_clean']
+
+main=ROOT/'idf/esp32-cyd2usb-native/main'
+board=(main/'board_config.h').read_text()
+network=re.search(r'^#define BOARD_TASK_STACK_NETWORK (\d+)$',board,re.M)[1]
+assert network=='6144'
+for name in ['enabled','disabled','skip-acquire','skip-release','late-startup']:
+    log=(host_dir/(name+'-build.log')).read_text()
+    assert (host_dir/'sources/idf/esp32-cyd2usb-native/main/board_config.h').as_posix().replace('C:','/mnt/c') in log
+assert not (host_dir/'stubs/board_config.h').exists()
+assert 'BOARD_TASK_STACK_' not in (ROOT/'tests/target/cyd_early_mpi_host/platform.h').read_text()
+
+recipes=load(qemu_dir/'source-manifest.json')['variant_recipes']
+assert recipes['canonical']['source_sha256']==sha(main/'native_tls_early_mpi.c')
+variants={}
+for name,result in qemu['variants'].items():
+    directory=qemu_dir/'variants'/name
+    bundle=load(directory/'execution-bundle.json')
+    assert sha(directory/'execution-bundle.json')==result['execution_bundle_sha256']
+    for relative,expected in bundle['artifacts'].items():assert sha(qemu_dir/relative)==expected,relative
+    for relative,expected in bundle['frozen_sources'].items():assert sha(qemu_dir/relative)==expected,relative
+    for path,expected in bundle['external_header_closure'].items():assert sha(path)==expected,path
+    desc=load(directory/'artifacts/project_description.json')
+    elf=directory/'artifacts'/desc['app_elf']
+    assert struct.unpack_from('<H',elf.read_bytes(),18)[0]==94
+    variants[name]={'result':result,'elf':str(elf),'elf_sha256':sha(elf),
+                    'elf_machine':94,'source_sha256':recipes[name]['source_sha256'],
+                    'module_compile_command':str(directory/'actual-module-command.json'),
+                    'external_header_count':len(bundle['external_header_closure']),
+                    'raw_runtime_log':str(qemu_dir/(name+'-qemu.log'))}
+
+owned=[ROOT/'tests/run-cyd-early-mpi-host.py',ROOT/'tests/run-cyd-early-mpi-qemu.py',
+       *[p for prefix in ['cyd_early_mpi_host','cyd_early_mpi_qemu']
+         for p in (ROOT/'tests/target'/prefix).rglob('*') if p.is_file()]]
+assert len(owned)==12
+entries={str(path.relative_to(ROOT)):{'bytes':path.stat().st_size,'sha256':sha(path)} for path in owned}
+source_links={
+    'production_module':str(main/'native_tls_early_mpi.c')+':13',
+    'first_application_statement':str(main/'app_main.c')+':100',
+    'actual_board_network_profile':str(main/'board_config.h')+':25',
+    'host_public_lock_stubs':str(ROOT/'tests/target/cyd_early_mpi_host/test.c')+':15',
+    'target_unchanged_public_lock_delegates':str(ROOT/'tests/target/cyd_early_mpi_qemu/main/main.c')+':65',
+    'target_unchanged_queue_delegate':str(ROOT/'tests/target/cyd_early_mpi_qemu/main/main.c')+':104',
+    'target_two_core_workers':str(ROOT/'tests/target/cyd_early_mpi_qemu/main/main.c')+':116',
+    'target_real_heap_pressure':str(ROOT/'tests/target/cyd_early_mpi_qemu/main/main.c')+':143',
+    'target_exact_acquire_release_checks':str(ROOT/'tests/target/cyd_early_mpi_qemu/main/main.c')+':164',
+}
+report={
+    'status':'PASS fresh canonical-source standalone qualification; full production exports pending root',
+    'passed':True,'tracked_source_or_test_mutations_by_qualifier':False,
+    'host':{'report':str(host_dir/'report.json'),'sha256':sha(host_dir/'report.json'),
+            'positive_whole_startups':2,'exact_ordering_mutants':3,'invalid_compile_profiles':4,'cmake_configurations':7,
+            'strict_sanitizers':'ASan/UBSan -fno-sanitize-recover=all; -Wall -Wextra -Werror -pedantic',
+            'actual_board_header_proven_by_gcc_H':True,'actual_network_stack_bytes':int(network),
+            'seams':'SDK/RTOS/services and driver/gpio names only; all BOARD_TASK_STACK_* come from frozen canonical board_config.h'},
+    'target':{'report':str(qemu_dir/'report.json'),'sha256':sha(qemu_dir/'report.json'),
+              'canonical_module_byte_identical_to_production':True,
+              'source_inputs':len(qemu['inputs']),'source_files_before_build':len(load(qemu_dir/'source-manifest.json')['frozen_sources']),
+              'tools_before_build_and_after':len(qemu['tools']),'sdk_commit':qemu['sdk_commit'],
+              'sdk_tracked_clean_before_after_each_build_and_qemu':True,'variants':variants},
+    'guards':{'report':str(guards_dir/'report.json'),'sha256':sha(guards_dir/'report.json'),
+              'path_cases':8,'expected_sdk_pin_mismatch':1,
+              'scope':'Actual Git HEAD on unchanged SDK; isolated expected-pin mutation. No alternate checkout or SDK/ref mutation.'},
+    'negative_predicates':{
+        'host_skip_acquire':'exit2; exactly EARLY_MPI_HOST_FAILURE release_without_acquire; no sanitizer output',
+        'host_skip_release_and_late_startup':'exit2; exactly EARLY_MPI_HOST_FAILURE startup_before_warm; no sanitizer output',
+        'target_skip_acquire':'unique EARLY_MPI_FAILURE warm_acquire_once + controlled restart; no panic/timeout/complete',
+        'target_skip_release':'unique EARLY_MPI_FAILURE warm_release_once + controlled restart; no panic/timeout/complete',
+        'target_void_oom':'real heap pressure + real queue NULL; marker pointer equals actual ELF SDK symbol; exact abort site and whole public API stack; generic panic rejected',
+    },
+    'source_entries':source_links,'owned_tracked_test_files':entries,
+    'frozen_live_source_sha256':frozen,
+    'all_bound_sources_tools_artifacts_current':True,
+    'historical_evidence':[
+        {'path':str(ROOT/'.build/cyd-early-mpi-host-01/report.json'),
+         'status':'ordering PASS historical; board-profile proof rejected (old self-consistent7168 seam), superseded by host02'},
+        {'path':str(ROOT/'.build/cyd-early-mpi-draft-01/target-02/report.json'),
+         'status':'unchanged prototype PASS; not relabeled as canonical production-source run'},
+    ],
+    'limitations':[
+        'Target report legacy production_integration=false means no full radio application build. The compiled standalone module is a byte-identical canonical production snapshot; actual app_main is compiled in host gate.',
+        'Minimal SDK fixture observed lazy initial MPI handle; complete radio pre-app state remains unobserved.',
+        'Void OOM is the actual constructor abort path under this fixture configuration, not a recoverable allocation API.',
+        'The fixture invokes no crypto algorithm/network/device; ordinary SDK PSA/RNG startup remains unchanged.',
+        'No full production firmware export or board execution was done by these gates; root owns those after a clean source commit.',
+        'Default-off activation, fragmentation/RAM benefit and physical board behavior remain separately unqualified. No record/pool/task/core/timing/stacks changes or private mutex replacement.',
+        'AAC is excluded.',
+    ],
+}
+(OUT/'report.json').write_bytes((json.dumps(report,indent=2)+'\n').encode())
+print(json.dumps({'passed':True,'report_sha256':sha(OUT/'report.json'),
+                  'host_sha256':sha(host_dir/'report.json'),'target_sha256':sha(qemu_dir/'report.json'),
+                  'test_files':len(owned)},indent=2))

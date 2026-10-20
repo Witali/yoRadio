@@ -1,0 +1,75 @@
+"""Read-only closure of the actual-board host include finding; no reruns."""
+from pathlib import Path
+import hashlib,json,re
+ROOT=Path(__file__).resolve().parents[2]
+OUT=Path(__file__).resolve().parent
+sha=lambda raw:hashlib.sha256(raw).hexdigest()
+inputs={}
+def freeze(path,live=False):
+ path=Path(path).resolve();raw=path.read_bytes();key=str(path)
+ if key not in inputs:
+  target=OUT/'inputs'/sha(raw);target.parent.mkdir(exist_ok=True);target.write_bytes(raw)
+  inputs[key]={'source':key,'sha256':sha(raw),'bytes':len(raw),'snapshot':target.relative_to(OUT).as_posix(),'live_evidence_snapshot':live}
+ return raw
+def write(name,value):(OUT/name).write_text(json.dumps(value,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+assert not (OUT/'review.json').exists()
+prior=ROOT/'.build/cyd-early-mpi-review-01/review.json';freeze(prior)
+folder=ROOT/'.build/cyd-early-mpi-host-02'
+report=json.loads(freeze(folder/'report.json'))
+assert report['passed'] and report['all_bound_inputs_current']
+for path,row in report['inputs'].items():
+ assert sha(freeze(path))==row['sha256']
+ assert sha(freeze(folder/row['snapshot']))==row['sha256']
+for command in report['commands']:
+ assert sha(freeze(folder/(command['label']+'.log')))==command['sha256']
+for path,digest in report['generated_inputs'].items():assert sha(freeze(folder/path))==digest
+source=freeze(ROOT/'tests/run-cyd-early-mpi-host.py').decode()
+platform=freeze(ROOT/'tests/target/cyd_early_mpi_host/platform.h').decode()
+board=ROOT/'idf/esp32-cyd2usb-native/main/board_config.h'
+board_raw=freeze(board)
+assert '#include "board_config.h"' in platform
+assert 'BOARD_TASK_STACK_' not in platform
+assert '#define BOARD_TASK_STACK_NETWORK 6144' in board_raw.decode()
+assert not (folder/'stubs/board_config.h').exists()
+assert (folder/'stubs/driver/gpio.h').is_file()
+assert "'-H'" in source
+trace=[]
+frozen_board=folder/'sources/idf/esp32-cyd2usb-native/main/board_config.h'
+assert freeze(frozen_board)==board_raw
+expected=frozen_board.resolve().as_posix()
+expected='/mnt/'+expected[0].lower()+expected[2:]
+for name in ('enabled','disabled','skip-acquire','skip-release','late-startup'):
+ log=freeze(folder/(name+'-build.log')).decode().replace('\r\n','\n')
+ lines=[line for line in log.splitlines() if re.match(r'^\.+ ',line) and expected in line]
+ assert lines,(name,'no actual GCC -H include trace')
+ trace.append({'build':name,'frozen_actual_header':str(frozen_board),'gcc_include_trace':lines})
+qemu_path=ROOT/'.build/cyd-early-mpi-qemu-01/report.json'
+qemu=json.loads(freeze(qemu_path,True))
+runtime={'full_campaign_passed_at_read':qemu['passed'],'completed_variants':qemu['variants'],
+ 'last_completed_command':qemu['commands'][-1]['label'],'scope_pending':not qemu['passed'],
+ 'note':'No waiting or rerun; the running campaign snapshot is not treated as final4 qualification.'}
+for row in inputs.values():
+ if not row['live_evidence_snapshot']:
+  row['unchanged_after']=sha(Path(row['source']).read_bytes())==row['sha256']
+assert all(row.get('unchanged_after',True) for row in inputs.values())
+write('inputs.json',{'inputs':list(inputs.values()),'stable_inputs_unchanged_after':True})
+write('host-header-proof.json',{'actual_board_network_stack_bytes':6144,'duplicate_task_constants_removed':True,
+ 'stub_board_header_absent':True,'five_successful_compile_include_traces':trace})
+write('runtime-status.json',runtime)
+write('review.json',{'review_complete':True,'finding_closed':True,'findings':[],
+ 'closed_finding':'review01 P2 host substituted network stack7168 instead of actual6144',
+ 'closure':'Host platform includes the frozen actual board_config.h; duplicated task constants and board stub are removed. GCC -H confirms the real frozen header in all five successful build/control traces. Current source/snapshot/report/log hashes match.',
+ 'host_report_sha256':sha((folder/'report.json').read_bytes()),'host_cases':report['cases'],'host_controls':report['controls'],
+ 'whole_module_app_ordering_scope_preserved':True,'input_count':len(inputs),'all_stable_inputs_current_after':True,
+ 'runtime_scope_pending':not qemu['passed'],'runtime_status':'runtime-status.json','include_proof':'host-header-proof.json',
+ 'limitations':['No host test, SDK build, QEMU or cryptographic calculation was rerun.',
+  'This follow-up closes the host actual-board-header finding only. Host SDK/RTOS/service behavior remains explicit seams.',
+  'QEMU void-OOM was still in progress when read. Canonical plus two controls already reported success; the full four-variant/runtime claim remains pending terminal evidence.',
+  'No actual radio pre-app state, physical fresh-boot/OOM behavior, hardware or memory-benefit claim.']})
+files=[]
+for path in sorted(OUT.rglob('*')):
+ if path.is_file() and path!=OUT/'manifest.json':
+  raw=path.read_bytes();files.append({'path':path.relative_to(OUT).as_posix(),'bytes':len(raw),'sha256':sha(raw)})
+write('manifest.json',{'files':files})
+print(json.dumps({'complete':True,'finding_closed':True,'inputs':len(inputs),'files':len(files)+1,'qemu_full_pass_at_read':qemu['passed'],
+ 'review_sha256':sha((OUT/'review.json').read_bytes()),'manifest_sha256':sha((OUT/'manifest.json').read_bytes())},indent=2))

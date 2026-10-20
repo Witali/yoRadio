@@ -1,0 +1,152 @@
+{
+  "passed": true,
+  "cases": {
+    "host-valid": {
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-host.py",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-preflight-01\\proposed-host"
+      ],
+      "exit_status": 0,
+      "expected_terminal": "\"output_created\": false",
+      "log_sha256": "5c8eca243b9159d34eee3cd7b551263eb43ab4e33a4f2991a392d7e558b91ae0"
+    },
+    "host-source-output": {
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-host.py",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\rejected-early-mpi-host"
+      ],
+      "exit_status": 2,
+      "expected_terminal": "output must be a new directory inside repository .build",
+      "log_sha256": "6c46b37e98477fd44ca50bcc54dabfe8c943ab650c5029edd12d77936153dfa5"
+    },
+    "host-existing-output": {
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-host.py",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-preflight-01"
+      ],
+      "exit_status": 2,
+      "expected_terminal": "Output already exists",
+      "log_sha256": "5a1996395541f6289429ac4cb4ad94fa1b27f73bd8f4da7903c79bcfa198e67e"
+    },
+    "host-nested-output": {
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-host.py",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-01\\rejected-host"
+      ],
+      "exit_status": 2,
+      "expected_terminal": "Output must not be nested in an evidence campaign",
+      "log_sha256": "0b13d38b551b05efd9e14795e5577d765195aaa3a780a08f17b3c8fea63e65af"
+    },
+    "qemu-valid": {
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-qemu.py",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-preflight-01\\proposed-qemu"
+      ],
+      "exit_status": 0,
+      "expected_terminal": "\"output_created\": false",
+      "log_sha256": "92f2aca58e825328e133ec0a528da15182d4f5fdf301919f92de7a707fa5ac7f"
+    },
+    "qemu-source-output": {
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-qemu.py",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\rejected-early-mpi-qemu"
+      ],
+      "exit_status": 2,
+      "expected_terminal": "output must be a new directory inside repository .build",
+      "log_sha256": "0945ad4d768cf31ce747eda6ebba9cc262e0677f34e20ac61775334937b3a78c"
+    },
+    "qemu-existing-output": {
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-qemu.py",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-preflight-01"
+      ],
+      "exit_status": 2,
+      "expected_terminal": "Output already exists",
+      "log_sha256": "144ae5dab39f2d1d8e1c3708ab05cf4d88a5ac325608adce7ad27b993cc7877d"
+    },
+    "qemu-nested-output": {
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-qemu.py",
+        "--preflight-only",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-01\\rejected-qemu"
+      ],
+      "exit_status": 2,
+      "expected_terminal": "Output must not be nested in an evidence campaign",
+      "log_sha256": "f5d7051995022702cbb2aaf3092f341e087fadd1ba7b9e1550a20aa6e9c7c6ed"
+    },
+    "wrong-sdk-pin": {
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-B",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-preflight-01\\execute-sdk-pin-control.py",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-wrong-sdk-pin-01"
+      ],
+      "exit_status": 1,
+      "expected_terminal": "Unsupported SDK commit: 7101770dc6db2667b3c477cc31365dd1acd6db4e",
+      "log_sha256": "8772045ce9589d52aeca5dfeeecf24cf9862d06ae3f77cb8fc78c4814adb9906"
+    }
+  },
+  "sources": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-host.py": "4986ea8ebfb3d9edff2700f5867e4e3b8a97e9ce0c545dea6f8c045af20bcabe",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-qemu.py": "8409e8613668bd7069100d0cc8db3b2be7039dc944d586838535e4f98063ea4a"
+  },
+  "sdk_modified": false,
+  "expected_sdk_pin_control": {
+    "status": "expected-pin mutation against unchanged real SDK; no SDK checkout mutation",
+    "original_runner_sha256": "8409e8613668bd7069100d0cc8db3b2be7039dc944d586838535e4f98063ea4a",
+    "mutant_image_sha256": "540c334da7fa49aafd09831591c97aa01783cd2c0d2cf746960953be51585ece",
+    "wrapper_sha256": "e03c5610e9338bf233c2177a64235c5a9bec3dfe5766be0d48d3f5a7560c2905",
+    "negative_report_sha256": "81d88112c16951093f52415898f2f6c74912ed94c8619e779f335f796a8859f7",
+    "build_or_qemu_executed": false
+  }
+}

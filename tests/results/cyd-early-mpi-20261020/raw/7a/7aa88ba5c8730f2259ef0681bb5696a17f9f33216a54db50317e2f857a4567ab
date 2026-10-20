@@ -1,0 +1,64 @@
+"""Dry output guards plus exact SDK-commit predicate control; no SDK build."""
+import hashlib, json, pathlib, subprocess, sys
+
+ROOT = pathlib.Path.cwd()
+OUT = ROOT / '.build/cyd-early-mpi-preflight-02'
+OUT.mkdir(exist_ok=False)
+RUNNERS = [ROOT/'tests/run-cyd-early-mpi-host.py', ROOT/'tests/run-cyd-early-mpi-qemu.py']
+report = {'passed':False, 'cases':{}, 'sources':{}, 'sdk_modified':False}
+def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+for path in RUNNERS:
+    report['sources'][str(path)] = sha(path)
+    (OUT/path.name).write_bytes(path.read_bytes())
+
+def run(label, command, expected, text):
+    done = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60)
+    log = OUT/(label+'.log'); log.write_bytes(done.stdout)
+    value = done.stdout.decode(errors='replace')
+    assert done.returncode == expected and text in value, (label, done.returncode, value)
+    report['cases'][label] = {'argv':list(map(str,command)), 'exit_status':done.returncode,
+                              'expected_terminal':text, 'log_sha256':sha(log)}
+
+for path in RUNNERS:
+    kind = 'host' if path.name.endswith('host.py') else 'qemu'
+    proposed = OUT/('proposed-'+kind)
+    prefix = [sys.executable,'-B','-X','utf8',str(path),'--preflight-only','--output']
+    run(kind+'-valid',prefix+[str(proposed)],0,'"output_created": false')
+    assert not proposed.exists()
+    bad = ROOT/'tests'/('rejected-early-mpi-'+kind)
+    run(kind+'-source-output',prefix+[str(bad)],2,'output must be a new directory inside repository .build')
+    assert not bad.exists()
+    run(kind+'-existing-output',prefix+[str(OUT)],2,'Output already exists')
+    nested = ROOT/'.build/cyd-early-mpi-host-02'/('rejected-'+kind)
+    run(kind+'-nested-output',prefix+[str(nested)],2,'Output must not be nested in an evidence campaign')
+    assert not nested.exists()
+
+# Mutate only the EXPECTED commit constant in an isolated runner image. The
+# unchanged real installed SDK is read through actual git rev-parse. This tests
+# the mismatch predicate without changing an SDK checkout/ref/index/object.
+runner = RUNNERS[1]
+payload = runner.read_bytes()
+old = b"SDK_COMMIT='7101770dc6db2667b3c477cc31365dd1acd6db4e'"
+new = b"SDK_COMMIT='0000000000000000000000000000000000000000'"
+assert payload.count(old) == 1
+mutant = OUT/'expected-sdk-pin-mismatch.py'
+mutant.write_bytes(payload.replace(old,new))
+wrapper = OUT/'execute-sdk-pin-control.py'
+wrapper.write_text('import pathlib\nreal='+repr(str(runner))+'\nimage='+repr(str(mutant))+"\nexec(compile(pathlib.Path(image).read_bytes(),image,'exec'),{'__file__':real,'__name__':'__main__'})\n")
+rejected = ROOT/'.build/cyd-early-mpi-wrong-sdk-pin-02'
+run('wrong-sdk-pin',[sys.executable,'-B','-X','utf8',str(wrapper),'--output',str(rejected)],1,
+    'Unsupported SDK commit: 7101770dc6db2667b3c477cc31365dd1acd6db4e')
+negative = json.loads((rejected/'report.json').read_text())
+assert not negative['passed'] and negative['commands'][-1]['label']=='sdk-head-before'
+assert all(not item['label'].endswith('-build') for item in negative['commands'])
+report['expected_sdk_pin_control'] = {
+    'status':'expected-pin mutation against unchanged real SDK; no SDK checkout mutation',
+    'original_runner_sha256':sha(runner), 'mutant_image_sha256':sha(mutant),
+    'wrapper_sha256':sha(wrapper), 'negative_report_sha256':sha(rejected/'report.json'),
+    'build_or_qemu_executed':False,
+}
+assert all(sha(path)==expected for path,expected in [(pathlib.Path(k),v) for k,v in report['sources'].items()])
+report['passed']=True
+(OUT/'report.json').write_bytes((json.dumps(report,indent=2)+'\n').encode())
+print(json.dumps({'passed':True,'guards':8,'exact_expected_pin_mismatch':1,
+                  'report_sha256':sha(OUT/'report.json')},indent=2))

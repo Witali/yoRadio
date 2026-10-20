@@ -1,0 +1,40 @@
+#pragma once
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+typedef int esp_err_t;
+enum { ESP_OK = 0, NATIVE_NETWORK_CLIENT=1, NATIVE_NETWORK_ACCESS_POINT=2, NATIVE_NETWORK_ERROR=3 };
+typedef int native_network_mode_t;
+typedef struct { int network_mode; } native_state_t;
+typedef struct { int unused; } cyd_display_t;
+typedef struct { const char *base_path,*partition_label; int max_files; bool format_if_mount_failed; } esp_vfs_spiffs_conf_t;
+enum { CYD_DISPLAY_WIDTH=320, CYD_DISPLAY_HEIGHT=240, BOARD_TASK_STACK_DISPLAY=3072, BOARD_TASK_STACK_NETWORK=7168 };
+void event(unsigned id);
+void error_check(esp_err_t result);
+#define ESP_LOGI(tag, ...) do { (void)(tag); event(3); } while (0)
+#define ESP_LOGW(tag, ...) do { (void)(tag); event(3); } while (0)
+#define ESP_LOGE(tag, ...) do { (void)(tag); event(3); } while (0)
+#define ESP_ERROR_CHECK(x) error_check(x)
+#define pdMS_TO_TICKS(x) (x)
+int native_health_start(void);
+void native_state_init(native_state_t *s);
+void native_state_snapshot(native_state_t *s,native_state_t *out);
+void native_state_set_network(native_state_t *s,int mode,int value);
+int nvs_flash_init(void);
+int native_audio_settings_init(void);
+int network_settings_init(void);
+int esp_vfs_spiffs_register(const esp_vfs_spiffs_conf_t *config);
+int cyd_display_init(cyd_display_t *display);
+int time_service_start(void);
+int audio_service_start(native_state_t *state);
+int radio_control_init(native_state_t *state);
+int network_service_start(native_state_t *state);
+int web_service_start(native_state_t *state);
+int cyd_display_rows_per_transfer(cyd_display_t *d);
+uint16_t *cyd_display_acquire_buffer(cyd_display_t *d);
+int cyd_display_draw_bitmap(cyd_display_t *d,int x0,int y0,int x1,int y1,uint16_t *pixels);
+void cyd_display_flush(cyd_display_t *d);
+void vTaskDelete(void *task);
+void vTaskDelay(unsigned ticks);
+int xTaskCreatePinnedToCore(void (*fn)(void *),const char *name,unsigned stack,void *arg,unsigned priority,void *handle,int core);
+const char *esp_err_to_name(int result);

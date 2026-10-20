@@ -1,0 +1,16 @@
+set(M "$ENV{EARLY_MPI_CANDIDATE_ROOT}")
+idf_component_register(SRCS "main.c"
+    INCLUDE_DIRS "." "${M}"
+    REQUIRES freertos heap esp_system mbedtls esp-tls
+    PRIV_REQUIRES esp_security)
+include("${M}/compat/early_mpi/enable.cmake")
+native_enable_tls_early_mpi()
+foreach(symbol _lock_acquire _lock_release xQueueCreateMutex)
+    target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${symbol}")
+endforeach()
+if(DRAFT_SKIP_ACQUIRE)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE DRAFT_SKIP_ACQUIRE=1)
+endif()
+if(DRAFT_OOM)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE DRAFT_OOM=1)
+endif()

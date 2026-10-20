@@ -1,0 +1,36 @@
+{
+  "review_complete": true,
+  "ready_for_unqualified_host_profile_claim": false,
+  "independent_source_and_harness_review": true,
+  "test_or_sdk_reruns": 0,
+  "cryptographic_calculations_run": 0,
+  "findings": [
+    {
+      "priority": 2,
+      "file": "tests/target/cyd_early_mpi_host/platform.h",
+      "line": 11,
+      "title": "Host startup test substitutes the wrong actual CYD network stack size",
+      "detail": "platform.h defines BOARD_TASK_STACK_NETWORK=7168 while actual board_config.h:25 defines6144. The host runner generates a board_config.h stub and places stubs before frozen MAIN in include search. Thus app_main and fixture assertion both use7168, allowing a PASS for a profile that is not the current production one. Freezing actual board_config.h without using its values does not detect this.",
+      "repair": "Use the frozen real board_config.h with a narrow driver/gpio.h seam, remove duplicate task-stack constants, or explicitly derive and compare the seam values against that frozen header. Rerun the host gate after this fixture correction. No production MPI change is indicated."
+    }
+  ],
+  "checks": [
+    "Production function consists of public esp_crypto_mpi_lock_acquire then release; there are no private mutex writes, crypto calculations, allocation replacements or task affinity changes.",
+    "app_main calls prepare before logging, health and application services; disabled inline stub and default-n Kconfig preserve the inactive profile.",
+    "Source and CMake reject unsupported ESP32/SOC MPI/hardware MPI/mbedTLS profiles; helper is called after component registration with esp_security dependency.",
+    "Host gate uses whole source/module and exact skip-acquire, skip-release, late-startup controls, four rejected compile profiles, seven CMake cases and strict ASan/UBSan exit predicates. Actual completed report is bound, subject to the board-profile finding.",
+    "QEMU runner freezes canonical source/variants, explicit SDK17 source pins, tools/ROM/image/ELF/config/header closure before execution and rechecks afterward; SDK commit/tracked cleanliness are checked around builds/runs.",
+    "QEMU warm-pair/ownership/reuse and pinned two-core workers use the SDK-owned mutex, not a replacement. Skip-acquire uses a separate explicitly labeled public-prewarm control; skip-release cleanup releases only the already-held SDK mutex.",
+    "OOM fixture exhausts real INTERNAL|8BIT heap using real allocations; FreeRTOS heap_idf.c uses that same capability set. xQueueCreateMutex wrapper calls the real constructor first and only observes NULL. Runner requires actual MPI static-symbol address, SDK lock_init_generic abort and full acquire→prepare→app_main backtrace. Generic panic, timeout, missing completion or non-matching OOM are not accepted."
+  ],
+  "limitations": [
+    "No tests, SDK builds, QEMU or cryptographic calculation were executed by this review.",
+    "Completed host ordering evidence uses explicit SDK/RTOS/service seams and does not establish real mutex semantics, board runtime or heap effects.",
+    "The QEMU report was read while the canonical campaign was still in progress; only its observed state is retained, not relabeled as a completed pass.",
+    "Even successful minimal SDK QEMU observations do not establish actual radio pre-app lock state or physical fresh-boot/OOM behavior. Normal SDK boot may run its existing PSA/RNG initialization; fixture invokes no algorithm.",
+    "Void SDK lazy initialization aborts if mutex allocation fails. This change offers no recoverable result, RAM/fragmentation benefit guarantee, latency improvement or hardware claim."
+  ],
+  "inputs": "inputs.json",
+  "evidence": "evidence-state.json",
+  "stable_input_count": 114
+}

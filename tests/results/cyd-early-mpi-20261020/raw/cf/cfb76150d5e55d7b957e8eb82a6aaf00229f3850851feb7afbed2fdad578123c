@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+"""Strict host ordering of whole canonical CYD early-MPI/app_main TUs.
+
+Explicit SDK/RTOS/service seams. This does not prove target mutex semantics.
+All production/harness inputs are frozen before compile and checked afterward.
+"""
+import argparse, hashlib, json, os, pathlib, subprocess, sys
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output', type=pathlib.Path, default=ROOT/'.build/cyd-early-mpi-host-01')
+parser.add_argument('--preflight-only', action='store_true')
+args = parser.parse_args()
+OUT = args.output.resolve()
+if not OUT.is_relative_to((ROOT/'.build').resolve()):
+    parser.error('output must be a new directory inside repository .build')
+if OUT.exists():
+    parser.error('Output already exists; choose a fresh campaign directory')
+if any((parent/'report.json').exists() for parent in OUT.parents):
+    parser.error('Output must not be nested in an evidence campaign')
+if args.preflight_only:
+    print(json.dumps({'preflight_passed':True,'output_created':False,'output':str(OUT)}))
+    sys.exit(0)
+OUT.mkdir(parents=True, exist_ok=False)
+MAIN = pathlib.Path('idf/esp32-cyd2usb-native/main')
+FIXTURE = pathlib.Path('tests/target/cyd_early_mpi_host')
+HELPER = MAIN/'compat/early_mpi/enable.cmake'
+FILES = [MAIN/'native_tls_early_mpi.c', MAIN/'native_tls_early_mpi.h', HELPER,
+         MAIN/'app_main.c', MAIN/'board_config.h', MAIN/'CMakeLists.txt', MAIN/'Kconfig.projbuild',
+         FIXTURE/'platform.h', FIXTURE/'test.c', pathlib.Path(__file__).resolve().relative_to(ROOT)]
+report = {'passed':False, 'scope':__doc__, 'inputs':{}, 'commands':[], 'cases':{}, 'controls':{}}
+def sha(path): return hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
+def save(): (OUT/'report.json').write_bytes((json.dumps(report,indent=2)+'\n').encode())
+def host_path(path):
+    value=path.resolve().as_posix()
+    return '/mnt/'+value[0].lower()+value[2:] if sys.platform=='win32' else value
+env=os.environ.copy()
+env.update(PYTHONDONTWRITEBYTECODE='1', GIT_OPTIONAL_LOCKS='0',
+           ASAN_OPTIONS='detect_leaks=1:halt_on_error=1', UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
+def execute(label, command):
+    native=command[0].lower().endswith('.exe')
+    invocation=(['wsl.exe','--exec'] if sys.platform=='win32' and not native else [])+list(map(str,command))
+    try:
+        done=subprocess.run(invocation, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, timeout=60)
+    except subprocess.TimeoutExpired as error:
+        data=error.output or b''
+        (OUT/(label+'.log')).write_bytes(data)
+        report['commands'].append({'label':label,'argv':invocation,'exit_status':'timeout',
+                                    'sha256':hashlib.sha256(data).hexdigest()})
+        save()
+        raise RuntimeError(label+' timed out; timeout is not a successful control') from error
+    (OUT/(label+'.log')).write_bytes(done.stdout)
+    report['commands'].append({'label':label,'argv':invocation,'exit_status':done.returncode,
+                                'sha256':hashlib.sha256(done.stdout).hexdigest()})
+    save()
+    return done.returncode,done.stdout.decode(errors='replace').replace('\r\n','\n')
+try:
+    for relative in FILES:
+        source=ROOT/relative; destination=OUT/'sources'/relative
+        destination.parent.mkdir(parents=True,exist_ok=True)
+        destination.write_bytes(source.read_bytes())
+        report['inputs'][str(source)]={'sha256':sha(source),'snapshot':str(destination.relative_to(OUT))}
+    save()
+    F=OUT/'sources'
+    source=(F/MAIN/'native_tls_early_mpi.c').read_bytes()
+    app=(F/MAIN/'app_main.c').read_bytes()
+    stubs=OUT/'stubs';stubs.mkdir()
+    headers=['audio_service.h','cyd_display.h','esp_check.h','esp_log.h','esp_spiffs.h',
+             'native_audio_settings.h','native_state.h','native_health.h','network_service.h','network_settings.h',
+             'radio_control.h','nvs_flash.h','web_service.h','time_service.h','freertos/FreeRTOS.h','freertos/task.h']
+    for name in headers:
+        path=stubs/name;path.parent.mkdir(parents=True,exist_ok=True)
+        path.write_bytes(b'#pragma once\n#include "platform.h"\n')
+    (stubs/'esp_crypto_lock.h').write_bytes(b'#pragma once\nvoid esp_crypto_mpi_lock_acquire(void);\nvoid esp_crypto_mpi_lock_release(void);\n')
+    # The real frozen board_config.h supplies all task stack/profile constants.
+    # This seam only supplies the public GPIO names used in that header.
+    gpio=stubs/'driver/gpio.h';gpio.parent.mkdir()
+    gpio.write_bytes(('#pragma once\ntypedef int gpio_num_t;\nenum { '+
+                      ', '.join('GPIO_NUM_'+str(value)+'='+str(value) for value in range(40))+' };\n').encode())
+    guards=['IDF_TARGET_ESP32','SOC_MPI_SUPPORTED','MBEDTLS_HARDWARE_MPI','ESP_TLS_USING_MBEDTLS']
+    def configuration(directory,enabled,invalid=None):
+        text='#define CONFIG_YORADIO_TLS_EARLY_MPI_LOCK '+str(int(enabled))+'\n'
+        text+=''.join('#define CONFIG_'+key+' '+str(int(key!=invalid))+'\n' for key in guards)
+        (directory/'sdkconfig.h').write_bytes(text.encode())
+    def flags(directory):
+        return ['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-pedantic','-H',
+                '-fsanitize=address,undefined','-fno-sanitize-recover=all','-fno-omit-frame-pointer','-fno-pie','-no-pie',
+                '-I'+host_path(directory),'-I'+host_path(stubs),'-I'+host_path(F/FIXTURE),'-I'+host_path(F/MAIN)]
+    for name,enabled,edit,expected in [
+        ('enabled',True,None,None),('disabled',False,None,None),
+        ('skip-acquire',True,(b'    esp_crypto_mpi_lock_acquire();',b'    (void)0;'),'release_without_acquire'),
+        ('skip-release',True,(b'    esp_crypto_mpi_lock_release();',b'    (void)0;'),'startup_before_warm'),
+        ('late-startup',True,None,'startup_before_warm')]:
+        directory=OUT/name;directory.mkdir();configuration(directory,enabled)
+        module=source;startup=app
+        if edit:
+            assert module.count(edit[0])==1
+            module=module.replace(*edit)
+        if name=='late-startup':
+            # Mutate the real source in memory, retaining every other source byte.
+            eol=b'\r\n' if b'\r\n' in startup else b'\n'
+            old=b'    native_tls_early_mpi_prepare();'+eol
+            assert startup.count(old)==1
+            startup=startup.replace(old,b'')
+            anchor=b'    native_state_init(&s_state);'
+            assert startup.count(anchor)==1
+            startup=startup.replace(anchor,old+anchor)
+        (directory/'module.c').write_bytes(module)
+        (directory/'app_main.c').write_bytes(startup)
+        executable=directory/'test'
+        code,log=execute(name+'-build',flags(directory)+[host_path(directory/'module.c'),host_path(directory/'app_main.c'),
+                                                       host_path(F/FIXTURE/'test.c'),'-o',host_path(executable)])
+        assert code==0,(name,log[-6000:])
+        assert host_path(F/MAIN/'board_config.h') in log,(name,'actual board header was not included')
+        code,log=execute(name+'-run',[host_path(executable)])
+        assert not any(value in log for value in ['AddressSanitizer','runtime error:','LeakSanitizer']),log
+        if expected:
+            assert code==2 and log.splitlines()==['EARLY_MPI_HOST_FAILURE '+expected],(name,code,log)
+            report['controls'][name]={'expected_failure':expected,'exit_status':code}
+        else:
+            assert code==0 and log.splitlines()==['EARLY_MPI_HOST_COMPLETE actual_module=1 actual_app_main_copy=1'],(name,code,log)
+            report['cases'][name]=True
+    for key in guards:
+        directory=OUT/('invalid-'+key);directory.mkdir();configuration(directory,True,key)
+        code,log=execute('invalid-'+key,flags(directory)+['-c',host_path(F/MAIN/'native_tls_early_mpi.c'),'-o',host_path(directory/'module.o')])
+        assert code!=0 and 'Early MPI requires ESP32, SOC MPI and the mbedTLS hardware MPI profile' in log
+        report['controls']['invalid-'+key]='compile_rejected'
+    cmake=next((parent/'.idf/tools-v6.0.2/tools/cmake/4.0.3/bin/cmake.exe' for parent in [ROOT,*ROOT.parents]
+                if (parent/'.idf/tools-v6.0.2/tools/cmake/4.0.3/bin/cmake.exe').is_file()),None) if sys.platform=='win32' else pathlib.Path('/usr/bin/cmake')
+    assert cmake and cmake.is_file(),'Pinned CMake unavailable'
+    for name,enabled,early,invalid in [('valid',True,False,None),('off',False,False,'SOC_MPI_SUPPORTED'),('early',True,True,None)]+[(key,True,False,key) for key in guards]:
+        script=OUT/('cmake-'+name+'.cmake')
+        text=''.join('set(CONFIG_'+key+' '+('FALSE' if key==invalid else 'TRUE')+')\n' for key in guards)
+        text+='set(CONFIG_YORADIO_TLS_EARLY_MPI_LOCK '+str(enabled).upper()+')\nset(CMAKE_BUILD_EARLY_EXPANSION '+str(early).upper()+')\nset(COMPONENT_LIB fixture)\n'
+        text+='set(EXPECTED_SOURCE "'+(F/MAIN/'native_tls_early_mpi.c').resolve().as_posix()+'")\n'
+        text+='function(target_sources target scope source)\n get_filename_component(actual "${source}" REALPATH)\n if(NOT target STREQUAL "fixture" OR NOT scope STREQUAL "PRIVATE" OR NOT actual STREQUAL EXPECTED_SOURCE)\n message(FATAL_ERROR "wrong_target_source")\n endif()\n set_property(GLOBAL PROPERTY ADDED TRUE)\nendfunction()\n'
+        text+='include("'+(F/HELPER).resolve().as_posix()+'")\nnative_enable_tls_early_mpi()\nget_property(added GLOBAL PROPERTY ADDED)\n'
+        text+=('if(NOT added)\n message(FATAL_ERROR "missing_source")\nendif()\n' if enabled and not early and invalid is None else 'if(added)\n message(FATAL_ERROR "unexpected_source")\nendif()\n')
+        script.write_bytes(text.encode());code,log=execute('cmake-'+name,[str(cmake),'-P',str(script)])
+        if enabled and not early and invalid:assert code!=0 and 'Early MPI requires ESP32' in log
+        else:assert code==0,(name,log)
+        report['cases']['cmake-'+name]=True
+    report['all_bound_inputs_current']=all(sha(path)==record['sha256'] and sha(OUT/record['snapshot'])==record['sha256'] for path,record in report['inputs'].items())
+    assert report['all_bound_inputs_current']
+    report['generated_inputs']={str(path.relative_to(OUT)):sha(path) for path in OUT.rglob('*') if path.is_file() and path.suffix in ['.c','.h','.cmake'] and not path.is_relative_to(F)}
+    report['passed']=True;save()
+    print(json.dumps({'passed':True,'positive_startups':2,'semantic_controls':3,'invalid_compile_configs':4,'cmake_configs':7,'report_sha256':sha(OUT/'report.json')},indent=2))
+except BaseException as error:
+    report['error']=type(error).__name__+': '+str(error);save();raise

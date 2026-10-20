@@ -1,0 +1,44 @@
+{
+  "host": {
+    "passed": true,
+    "report_sha256": "11770b6a5c5a320465384c09996321df9f1279f4100e38f9f734fc47665ed8be",
+    "cases": {
+      "enabled": true,
+      "disabled": true,
+      "cmake-valid": true,
+      "cmake-off": true,
+      "cmake-early": true,
+      "cmake-IDF_TARGET_ESP32": true,
+      "cmake-SOC_MPI_SUPPORTED": true,
+      "cmake-MBEDTLS_HARDWARE_MPI": true,
+      "cmake-ESP_TLS_USING_MBEDTLS": true
+    },
+    "controls": {
+      "skip-acquire": {
+        "expected_failure": "release_without_acquire",
+        "exit_status": 2
+      },
+      "skip-release": {
+        "expected_failure": "startup_before_warm",
+        "exit_status": 2
+      },
+      "late-startup": {
+        "expected_failure": "startup_before_warm",
+        "exit_status": 2
+      },
+      "invalid-IDF_TARGET_ESP32": "compile_rejected",
+      "invalid-SOC_MPI_SUPPORTED": "compile_rejected",
+      "invalid-MBEDTLS_HARDWARE_MPI": "compile_rejected",
+      "invalid-ESP_TLS_USING_MBEDTLS": "compile_rejected"
+    },
+    "all_bound_inputs_current": true
+  },
+  "qemu_at_read": {
+    "passed": false,
+    "error": null,
+    "completed_variants": {},
+    "last_completed_command": "sdk-state-before",
+    "in_progress_snapshot": true,
+    "not_claimed_as_full_pass": true
+  }
+}

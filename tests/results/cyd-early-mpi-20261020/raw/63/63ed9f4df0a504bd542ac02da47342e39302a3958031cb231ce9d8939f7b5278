@@ -1,0 +1,132 @@
+"""Bind the finished isolated draft evidence; do not apply its production patch."""
+import difflib, hashlib, json, os, pathlib, re, struct, subprocess
+
+D = pathlib.Path(__file__).resolve().parent
+O = D / 'handoff-01'
+O.mkdir(exist_ok=False)
+
+def sha(path):
+    return hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
+
+def load(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+target = load(D / 'target-02/report.json')
+host = load(D / 'host-04/report.json')
+assert target['passed'] and host['passed']
+assert len(target['variants']) == 4 and all(v['passed'] for v in target['variants'].values())
+for base, report in [(D / 'target-02', target), (D / 'host-04', host)]:
+    for source, record in report['inputs'].items():
+        assert sha(source) == record['sha256'], source
+        assert sha(base / record['snapshot']) == record['sha256'], record
+for path, expected in target['tools'].items():
+    assert sha(path) == expected, path
+for command in target['commands'] + host['commands']:
+    base = D / ('target-02' if command in target['commands'] else 'host-04')
+    assert sha(base / (command['label'] + '.log')) == command['sha256']
+
+baseline = load(D / 'integration-inputs.json')
+production_current = {p: sha(p) == r['sha256'] for p, r in baseline.items()}
+assert all(production_current.values()), production_current
+
+# Supply an LF-normalized review patch without modifying the historical mixed-EOL
+# patch or any candidate bytes used in the qualified compiler/QEMU campaigns.
+patch = []
+for name in ['app_main.c', 'CMakeLists.txt', 'Kconfig.projbuild']:
+    before = (D / 'baseline' / name).read_text(encoding='utf-8')
+    after = (D / 'candidate/integration' / name).read_text(encoding='utf-8')
+    path = 'idf/esp32-cyd2usb-native/main/' + name
+    patch.extend(difflib.unified_diff(before.splitlines(True), after.splitlines(True),
+                                    fromfile='a/' + path, tofile='b/' + path))
+(O / 'integration-normalized.patch').write_bytes(''.join(patch).encode())
+
+variant_proof = {}
+for name in target['variants']:
+    folder = D / 'target-02/variants' / name
+    bundle = load(folder / 'execution-bundle.json')
+    assert sha(folder / 'execution-bundle.json') == target['variants'][name]['execution_bundle_sha256']
+    for relative, expected in bundle['artifacts'].items():
+        assert sha(D / 'target-02' / relative) == expected, relative
+    for source, expected in bundle['external_header_closure'].items():
+        assert sha(source) == expected, source
+    desc = load(folder / 'artifacts/project_description.json')
+    elf = folder / 'artifacts' / desc['app_elf']
+    raw = elf.read_bytes()
+    assert raw[:4] == b'\x7fELF' and struct.unpack_from('<H', raw, 18)[0] == 94
+    symbols = (D / 'target-02' / (name + '-nm.log')).read_text()
+    matched = re.findall(r'^([0-9a-f]+)\s+[0-9a-f]+\s+[bB]\s+s_crypto_mpi_lock$', symbols, re.M)
+    assert len(matched) == 1, matched
+    variant_proof[name] = {
+        'elf': str(elf), 'elf_sha256': sha(elf), 'elf_machine': 94,
+        'actual_sdk_mpi_lock_address': '0x' + matched[0],
+        'external_compiled_header_count': len(bundle['external_header_closure']),
+        'module_compile_row': bundle['module_compile_row'],
+    }
+
+oom_log = (D / 'target-02/void-oom-qemu.log').read_text()
+pointer = re.findall(r'^EARLY_MPI_OOM_QUEUE_NULL phase=1 lock=(0x[0-9a-f]+)$', oom_log, re.M)
+assert pointer == [variant_proof['void-oom']['actual_sdk_mpi_lock_address']], pointer
+backtrace = re.search(r'^Backtrace:\s*(.+)$', oom_log, re.M)[1]
+addresses = re.findall(r'(0x[0-9a-f]+):0x[0-9a-f]+', backtrace)
+assert addresses
+tool = next(path for path in target['tools'] if path.endswith('addr2line.exe'))
+args = [tool, '-e', variant_proof['void-oom']['elf'], '-pfia', *addresses]
+env = os.environ.copy()
+env.update(PYTHONDONTWRITEBYTECODE='1', GIT_OPTIONAL_LOCKS='0', TEMP=str(O), TMP=str(O))
+resolved = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                          timeout=30, env=env, creationflags=subprocess.CREATE_NO_WINDOW)
+(O / 'void-oom-whole-backtrace.log').write_bytes(resolved.stdout)
+text = resolved.stdout.decode(errors='replace')
+assert resolved.returncode == 0
+for symbol in ['lock_init_generic', 'lock_acquire_generic', '__wrap__lock_acquire',
+               'esp_crypto_mpi_lock_acquire', 'native_tls_early_mpi_prepare', 'app_main']:
+    assert symbol in text, (symbol, text)
+assert 'components/esp_libc/src/locks.c:77' in text
+
+report = {
+    'status': 'isolated_draft_qualified_not_integrated',
+    'passed': True,
+    'production_applied': False,
+    'production_baseline_current_at_handoff': production_current,
+    'canonical_candidate_source': str(D / 'candidate/main/native_tls_early_mpi.c'),
+    'public_api': 'void native_tls_early_mpi_prepare(void)',
+    'cmake_entry': 'native_enable_tls_early_mpi()',
+    'configuration': 'YORADIO_TLS_EARLY_MPI_LOCK; default n; ESP32 + SOC_MPI + ESP_TLS_USING_MBEDTLS + MBEDTLS_HARDWARE_MPI',
+    'host': {'report': str(D / 'host-04/report.json'), 'sha256': sha(D / 'host-04/report.json'),
+             'positive_startups': 2, 'exact_semantic_controls': 3,
+             'invalid_compile_configurations': 4, 'cmake_configurations': 7,
+             'sanitizers': 'ASan + UBSan; -fno-sanitize-recover=all; -Wall -Wextra -Werror -pedantic',
+             'scope': 'whole module and whole copied/patched actual CYD app_main; explicit SDK service seams'},
+    'target': {'report': str(D / 'target-02/report.json'), 'sha256': sha(D / 'target-02/report.json'),
+               'gates': target['variants'], 'source_inputs': len(target['inputs']),
+               'frozen_source_files': len(load(D / 'target-02/source-manifest.json')['frozen_sources']),
+               'metadata_tools': len(target['tools']), 'variants': variant_proof,
+               'oom_public_pointer_matches_actual_sdk_symbol': True,
+               'oom_whole_stack': {'argv': args, 'log': str(O / 'void-oom-whole-backtrace.log'),
+                                   'sha256': sha(O / 'void-oom-whole-backtrace.log')}},
+    'freeze_limits': [
+        'Draft module/test/selected SDK source bytes frozen before SDK configure/build, checked before and after QEMU.',
+        'SDK compiler/binutils/Ninja executable metadata and compiled external header closure first captured after the first build, before QEMU; not claimed as pre-build capture.',
+        'Launch Python/PowerShell/QEMU/ROM metadata captured before SDK execution.',
+    ],
+    'history': [
+        {'path': 'host-01', 'status': 'failed: WSL sandbox access denied, no successful build claimed'},
+        {'path': 'host-02', 'status': 'failed: WSL CMake unavailable after earlier host cases; not a completed gate'},
+        {'path': 'host-03', 'status': 'historical PASS; host-04 adds explicit UBSan nonrecover; raw evidence unchanged'},
+        {'path': 'target-01', 'status': 'failed before SDK execution: wrong queue.h snapshot path; raw evidence unchanged'},
+    ],
+    'pending': [
+        'Root source review and deliberate production integration.',
+        'Fresh promoted host and target campaigns against canonical production source and actual production app_main.',
+        'Full radio fresh-boot pre-app MPI state; minimal fixture lazy observation cannot establish it.',
+        'Production firmware configuration/build gates and optional board lifetime/pressure qualification.',
+        'Any fragmentation/heap benefit measurement before activation; default remains off.',
+    ],
+    'exclusions': ['No private SDK mutex reset/replacement/free', 'No explicit fixture crypto algorithm or network/device operations',
+                   'Ordinary SDK startup PSA/RNG initialization preserved', 'No AAC investigation',
+                   'No TLS record/pool/core/task/stack/timing changes in production', 'No speed/RAM savings claim'],
+}
+(O / 'report.json').write_bytes((json.dumps(report, indent=2) + '\n').encode())
+print(json.dumps({'passed': True, 'report_sha256': sha(O / 'report.json'),
+                  'host_sha256': sha(D / 'host-04/report.json'),
+                  'target_sha256': sha(D / 'target-02/report.json')}, indent=2))

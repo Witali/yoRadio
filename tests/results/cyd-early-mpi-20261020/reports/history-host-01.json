@@ -1,0 +1,519 @@
+{
+  "passed": true,
+  "scope": "Strict host ordering of whole canonical CYD early-MPI/app_main TUs.\n\nExplicit SDK/RTOS/service seams. This does not prove target mutex semantics.\nAll production/harness inputs are frozen before compile and checked afterward.\n",
+  "inputs": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.c": {
+      "sha256": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c",
+      "snapshot": "sources\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.h": {
+      "sha256": "2f5244849db636bfe738548d4196f24cbdac5236b6b94bee3642993ea587eb77",
+      "snapshot": "sources\\idf\\esp32-cyd2usb-native\\main\\native_tls_early_mpi.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\early_mpi\\enable.cmake": {
+      "sha256": "b22083a65917d492e0f0d1ef3288b2eb99bfee9acea5cb2b3721d63c1cb36943",
+      "snapshot": "sources\\idf\\esp32-cyd2usb-native\\main\\compat\\early_mpi\\enable.cmake"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c": {
+      "sha256": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80",
+      "snapshot": "sources\\idf\\esp32-cyd2usb-native\\main\\app_main.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\board_config.h": {
+      "sha256": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e",
+      "snapshot": "sources\\idf\\esp32-cyd2usb-native\\main\\board_config.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\CMakeLists.txt": {
+      "sha256": "2e3bf7f0bc22714e559fb235391020f46e400f6aa84fb379c4060ddbe3b113cb",
+      "snapshot": "sources\\idf\\esp32-cyd2usb-native\\main\\CMakeLists.txt"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\Kconfig.projbuild": {
+      "sha256": "0941618beb1438ba7a2a56c2a0b9082557622ecbcfd0251b41585cf523c3719e",
+      "snapshot": "sources\\idf\\esp32-cyd2usb-native\\main\\Kconfig.projbuild"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_host\\platform.h": {
+      "sha256": "004789158684a41b166467fc27c2ef0a6660d63e439f520b76e51a8a4e2c5ad6",
+      "snapshot": "sources\\tests\\target\\cyd_early_mpi_host\\platform.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_early_mpi_host\\test.c": {
+      "sha256": "bfe221338dbb344b284b25e415c1ae1f0f142947b3d73c5ab51d71712e6d1fa5",
+      "snapshot": "sources\\tests\\target\\cyd_early_mpi_host\\test.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-early-mpi-host.py": {
+      "sha256": "4986ea8ebfb3d9edff2700f5867e4e3b8a97e9ce0c545dea6f8c045af20bcabe",
+      "snapshot": "sources\\tests\\run-cyd-early-mpi-host.py"
+    }
+  },
+  "commands": [
+    {
+      "label": "enabled-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/enabled",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/enabled/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/enabled/app_main.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/enabled/test"
+      ],
+      "exit_status": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "enabled-run",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/enabled/test"
+      ],
+      "exit_status": 0,
+      "sha256": "8b59ca8207f8b81ff7cbac50434a7036cffa21a9c63039e2ce66f0d2f961101b"
+    },
+    {
+      "label": "disabled-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/disabled",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/disabled/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/disabled/app_main.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/disabled/test"
+      ],
+      "exit_status": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "disabled-run",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/disabled/test"
+      ],
+      "exit_status": 0,
+      "sha256": "8b59ca8207f8b81ff7cbac50434a7036cffa21a9c63039e2ce66f0d2f961101b"
+    },
+    {
+      "label": "skip-acquire-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/skip-acquire",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/skip-acquire/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/skip-acquire/app_main.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/skip-acquire/test"
+      ],
+      "exit_status": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "skip-acquire-run",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/skip-acquire/test"
+      ],
+      "exit_status": 2,
+      "sha256": "608f36e7c020c7e0504fe07793b5cc34513a1e737f562eb369f6a7e35927cd98"
+    },
+    {
+      "label": "skip-release-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/skip-release",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/skip-release/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/skip-release/app_main.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/skip-release/test"
+      ],
+      "exit_status": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "skip-release-run",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/skip-release/test"
+      ],
+      "exit_status": 2,
+      "sha256": "b3b2080964c0b34056ce793924836781ccc5822eb24020b05937ac28aa04d371"
+    },
+    {
+      "label": "late-startup-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/late-startup",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/late-startup/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/late-startup/app_main.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/late-startup/test"
+      ],
+      "exit_status": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "late-startup-run",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/late-startup/test"
+      ],
+      "exit_status": 2,
+      "sha256": "b3b2080964c0b34056ce793924836781ccc5822eb24020b05937ac28aa04d371"
+    },
+    {
+      "label": "invalid-IDF_TARGET_ESP32",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/invalid-IDF_TARGET_ESP32",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main/native_tls_early_mpi.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/invalid-IDF_TARGET_ESP32/module.o"
+      ],
+      "exit_status": 1,
+      "sha256": "16207ecc941ad6d8123d31d70284db023f10ed7c7b94b1c5bdb5b062952d7346"
+    },
+    {
+      "label": "invalid-SOC_MPI_SUPPORTED",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/invalid-SOC_MPI_SUPPORTED",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main/native_tls_early_mpi.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/invalid-SOC_MPI_SUPPORTED/module.o"
+      ],
+      "exit_status": 1,
+      "sha256": "16207ecc941ad6d8123d31d70284db023f10ed7c7b94b1c5bdb5b062952d7346"
+    },
+    {
+      "label": "invalid-MBEDTLS_HARDWARE_MPI",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/invalid-MBEDTLS_HARDWARE_MPI",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main/native_tls_early_mpi.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/invalid-MBEDTLS_HARDWARE_MPI/module.o"
+      ],
+      "exit_status": 1,
+      "sha256": "16207ecc941ad6d8123d31d70284db023f10ed7c7b94b1c5bdb5b062952d7346"
+    },
+    {
+      "label": "invalid-ESP_TLS_USING_MBEDTLS",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "gcc",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/invalid-ESP_TLS_USING_MBEDTLS",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/tests/target/cyd_early_mpi_host",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/sources/idf/esp32-cyd2usb-native/main/native_tls_early_mpi.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-host-01/invalid-ESP_TLS_USING_MBEDTLS/module.o"
+      ],
+      "exit_status": 1,
+      "sha256": "16207ecc941ad6d8123d31d70284db023f10ed7c7b94b1c5bdb5b062952d7346"
+    },
+    {
+      "label": "cmake-valid",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-P",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-01\\cmake-valid.cmake"
+      ],
+      "exit_status": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "cmake-off",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-P",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-01\\cmake-off.cmake"
+      ],
+      "exit_status": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "cmake-early",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-P",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-01\\cmake-early.cmake"
+      ],
+      "exit_status": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "cmake-IDF_TARGET_ESP32",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-P",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-01\\cmake-IDF_TARGET_ESP32.cmake"
+      ],
+      "exit_status": 1,
+      "sha256": "40f112236fdb70c854ffcbf2007be8359cb07e38b7866ba64cf0e3d6bf3fcb89"
+    },
+    {
+      "label": "cmake-SOC_MPI_SUPPORTED",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-P",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-01\\cmake-SOC_MPI_SUPPORTED.cmake"
+      ],
+      "exit_status": 1,
+      "sha256": "bda1cc4eb1d94563fa48482abb1eb1670684d01f89c5d301deab0bac8f9d47f9"
+    },
+    {
+      "label": "cmake-MBEDTLS_HARDWARE_MPI",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-P",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-01\\cmake-MBEDTLS_HARDWARE_MPI.cmake"
+      ],
+      "exit_status": 1,
+      "sha256": "a5e9d903572e8e7b33e60edb680f7d19e1bf58c9a6dbaae73de31ef65d9c56d2"
+    },
+    {
+      "label": "cmake-ESP_TLS_USING_MBEDTLS",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-P",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-early-mpi-host-01\\cmake-ESP_TLS_USING_MBEDTLS.cmake"
+      ],
+      "exit_status": 1,
+      "sha256": "8950915fc058342461a46594f3c80d4d5d83ab4db729468e43d3243dd1410421"
+    }
+  ],
+  "cases": {
+    "enabled": true,
+    "disabled": true,
+    "cmake-valid": true,
+    "cmake-off": true,
+    "cmake-early": true,
+    "cmake-IDF_TARGET_ESP32": true,
+    "cmake-SOC_MPI_SUPPORTED": true,
+    "cmake-MBEDTLS_HARDWARE_MPI": true,
+    "cmake-ESP_TLS_USING_MBEDTLS": true
+  },
+  "controls": {
+    "skip-acquire": {
+      "expected_failure": "release_without_acquire",
+      "exit_status": 2
+    },
+    "skip-release": {
+      "expected_failure": "startup_before_warm",
+      "exit_status": 2
+    },
+    "late-startup": {
+      "expected_failure": "startup_before_warm",
+      "exit_status": 2
+    },
+    "invalid-IDF_TARGET_ESP32": "compile_rejected",
+    "invalid-SOC_MPI_SUPPORTED": "compile_rejected",
+    "invalid-MBEDTLS_HARDWARE_MPI": "compile_rejected",
+    "invalid-ESP_TLS_USING_MBEDTLS": "compile_rejected"
+  },
+  "all_bound_inputs_current": true,
+  "generated_inputs": {
+    "cmake-early.cmake": "814a5125d96849474bc1c9b88b4c2d5031e9c8d9e62be8ba5fa0b0e3dd7a7b32",
+    "cmake-ESP_TLS_USING_MBEDTLS.cmake": "6eab7fefc71f883e94cd6568bcc993961b648324b17340803c30b4303762f2ed",
+    "cmake-IDF_TARGET_ESP32.cmake": "a8ad4f270acbc5c21a1852c31badf0047db4838391e1e76d0c4a8c1dedcfb1d9",
+    "cmake-MBEDTLS_HARDWARE_MPI.cmake": "dc01f1abd98968253c001b6fecd5766e1fc6abb9abd6783563dee64e8da2dae8",
+    "cmake-off.cmake": "8059955f04112825469b27a40718bde117696d66a1dc0e93b2803e7ee01427b4",
+    "cmake-SOC_MPI_SUPPORTED.cmake": "756558cf8da6aaa399c90ee992e5d721e78ea640160fa86011184d89df9c211d",
+    "cmake-valid.cmake": "170e190456aa4d1401b7b3c9cff3a1407078f2716683a078a3f656f16892b2c7",
+    "disabled\\app_main.c": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80",
+    "disabled\\module.c": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c",
+    "disabled\\sdkconfig.h": "e6a3267e9dd1fbf33b9b10869e3c8c251a23047522b61fbc4c8045352ed570c7",
+    "enabled\\app_main.c": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80",
+    "enabled\\module.c": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c",
+    "enabled\\sdkconfig.h": "baf35520d802d9bcd4c951f3f6b81876d800c81837282c1a0e457f6aaba50bce",
+    "invalid-ESP_TLS_USING_MBEDTLS\\sdkconfig.h": "e98a6b689e39760b8cd8a0df2d3daae6b3e366906c27e761c25bcbcc3f1e02c7",
+    "invalid-IDF_TARGET_ESP32\\sdkconfig.h": "6d6c5da3ac6095582f13963a239cd573bf0d83b2693a7dfad3c8f26edfe60f5a",
+    "invalid-MBEDTLS_HARDWARE_MPI\\sdkconfig.h": "834231f5944b9792a38746159f2e330ad5bdd8b49f5bd3a55d66ecc67591f9dd",
+    "invalid-SOC_MPI_SUPPORTED\\sdkconfig.h": "1b174ba5eec7ab5ff618e051de9fbed4c9202606f765c4f873e9fa756e8e8a06",
+    "late-startup\\app_main.c": "6052fdcd07d5de3538dbfd3884e8d5fd5831d32464e1ec2df5110493210d2d9f",
+    "late-startup\\module.c": "558b9ff571488f1dc19856135ff5ffb51cb917ab31544ed100e52baaa3f4392c",
+    "late-startup\\sdkconfig.h": "baf35520d802d9bcd4c951f3f6b81876d800c81837282c1a0e457f6aaba50bce",
+    "skip-acquire\\app_main.c": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80",
+    "skip-acquire\\module.c": "3ee2f7f7badccae7d8c4176e95033cfe25f0f5e387220e76caab5ab3b76bb00f",
+    "skip-acquire\\sdkconfig.h": "baf35520d802d9bcd4c951f3f6b81876d800c81837282c1a0e457f6aaba50bce",
+    "skip-release\\app_main.c": "0ecc474c15d292a2beb3315e31a086c255fc201c8c84fa516036d857833cfd80",
+    "skip-release\\module.c": "762acaf281b1adb34a7c16dc76744b43a3256436549e0ce432b124da63649be4",
+    "skip-release\\sdkconfig.h": "baf35520d802d9bcd4c951f3f6b81876d800c81837282c1a0e457f6aaba50bce",
+    "stubs\\audio_service.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\board_config.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\cyd_display.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\esp_check.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\esp_crypto_lock.h": "f99237f5a082eb6265f2938498a6caff6acc68cfb0a6f27f5e343e2df19b2108",
+    "stubs\\esp_log.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\esp_spiffs.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\native_audio_settings.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\native_health.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\native_state.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\network_service.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\network_settings.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\nvs_flash.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\radio_control.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\time_service.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\web_service.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\freertos\\FreeRTOS.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b",
+    "stubs\\freertos\\task.h": "9d243f0b0d51e80f17ab8e9dcdc1e497005b9eca493ea9b92e554379c5621b9b"
+  }
+}

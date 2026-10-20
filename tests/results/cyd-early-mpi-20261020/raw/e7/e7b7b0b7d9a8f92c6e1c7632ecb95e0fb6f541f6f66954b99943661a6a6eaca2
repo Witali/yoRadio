@@ -1,0 +1,61 @@
+import hashlib,json,pathlib,subprocess,sys
+D=pathlib.Path(__file__).resolve().parent;OUT=D/'host-01';OUT.mkdir(exist_ok=False)
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def host(p):
+ t=p.resolve().as_posix();return '/mnt/'+t[0].lower()+t[2:] if sys.platform=='win32' else t
+report={'passed':False,'scope':'Whole actual candidate module plus whole copied/patched CYD app_main TU; explicit host SDK seams. No target mutex/runtime proof.','commands':[],'cases':{},'controls':{},'inputs':{}}
+def save():(OUT/'report.json').write_text(json.dumps(report,indent=2)+'\n')
+def execute(label,args):
+ r=subprocess.run((['wsl.exe','--exec'] if sys.platform=='win32' else [])+args,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=60)
+ (OUT/(label+'.log')).write_bytes(r.stdout);report['commands'].append({'label':label,'argv':args,'exit_status':r.returncode,'sha256':sha(r.stdout)});save();return r.returncode,r.stdout.decode(errors='replace')
+inputs=[*[p for p in (D/'candidate').rglob('*') if p.is_file()],*[p for p in (D/'host').rglob('*') if p.is_file()],D/'run_host.py',D/'integration.patch',D/'integration-inputs.json']
+for p in inputs:
+ raw=p.read_bytes();target=OUT/'sources'/p.relative_to(D);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(raw);report['inputs'][str(p)]={'sha256':sha(raw),'snapshot':str(target.relative_to(OUT))}
+save();F=OUT/'sources';module=(F/'candidate/main/native_tls_early_mpi.c').read_text();startup=(F/'candidate/integration/app_main.c').read_text()
+stubs=OUT/'stubs';stubs.mkdir()
+headers=['audio_service.h','board_config.h','cyd_display.h','esp_check.h','esp_log.h','esp_spiffs.h','native_audio_settings.h','native_state.h','native_health.h','network_service.h','network_settings.h','radio_control.h','nvs_flash.h','web_service.h','time_service.h','freertos/FreeRTOS.h','freertos/task.h']
+for name in headers:
+ p=stubs/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text('#pragma once\n#include "platform.h"\n')
+(stubs/'esp_crypto_lock.h').write_text('#pragma once\nvoid esp_crypto_mpi_lock_acquire(void);\nvoid esp_crypto_mpi_lock_release(void);\n')
+guards=['IDF_TARGET_ESP32','SOC_MPI_SUPPORTED','MBEDTLS_HARDWARE_MPI','ESP_TLS_USING_MBEDTLS']
+def config(enabled,invalid=None):
+ lines=['#define CONFIG_YORADIO_TLS_EARLY_MPI_LOCK '+str(int(enabled))]
+ lines+=['#define CONFIG_'+key+' '+str(int(key!=invalid)) for key in guards]
+ (stubs/'sdkconfig.h').write_text('\n'.join(lines)+'\n')
+flags=['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-pedantic','-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie','-I'+host(stubs),'-I'+host(F/'host'),'-I'+host(F/'candidate/main')]
+for name,enabled,edit,expected in [('enabled',True,None,None),('disabled',False,None,None),
+ ('skip-acquire',True,('    esp_crypto_mpi_lock_acquire();','    (void)0;'),'release_without_acquire'),
+ ('skip-release',True,('    esp_crypto_mpi_lock_release();','    (void)0;'),'startup_before_warm'),
+ ('late-startup',True,None,'startup_before_warm')]:
+ config(enabled);directory=OUT/name;directory.mkdir();data=module;app=startup
+ if edit:
+  assert data.count(edit[0])==1;data=data.replace(*edit)
+ if name=='late-startup':
+  old='    native_tls_early_mpi_prepare();\n';assert app.count(old)==1;app=app.replace(old,'');app=app.replace('    native_state_init(&s_state);',old+'    native_state_init(&s_state);')
+ (directory/'module.c').write_text(data);(directory/'app_main.c').write_text(app)
+ executable=directory/'test'
+ code,log=execute(name+'-build',flags+[host(directory/'module.c'),host(directory/'app_main.c'),host(F/'host/test.c'),'-o',host(executable)])
+ if code:raise RuntimeError(log[-6000:])
+ code,log=execute(name+'-run',[host(executable)])
+ if expected:
+  assert code==2 and 'EARLY_MPI_HOST_FAILURE '+expected+'\n' in log and 'HOST_COMPLETE' not in log,(name,code,log);report['controls'][name]=expected
+ else:
+  assert code==0 and log.count('EARLY_MPI_HOST_COMPLETE actual_module=1 actual_app_main_copy=1')==1,(name,code,log);report['cases'][name]=True
+for key in guards:
+ config(True,key);code,log=execute('invalid-'+key,flags+['-c',host(F/'candidate/main/native_tls_early_mpi.c'),'-o',host(OUT/(key+'.o'))])
+ assert code!=0 and 'Early MPI requires ESP32, SOC MPI and the mbedTLS hardware MPI profile' in log;report['controls']['invalid-'+key]='compile_rejected'
+# Exercise the exact CMake helper without an SDK build.
+for name,enabled,early,invalid in [('valid',True,False,None),('off',False,False,'SOC_MPI_SUPPORTED'),('early',True,True,None)]+[(key,True,False,key) for key in guards]:
+ script=OUT/('cmake-'+name+'.cmake')
+ defs='\n'.join('set(CONFIG_'+key+' '+('FALSE' if key==invalid else 'TRUE')+')' for key in guards)
+ text=defs+'\nset(CONFIG_YORADIO_TLS_EARLY_MPI_LOCK '+str(enabled).upper()+')\nset(CMAKE_BUILD_EARLY_EXPANSION '+str(early).upper()+')\nset(COMPONENT_LIB fixture)\n'
+ text+='function(target_sources)\n set_property(GLOBAL PROPERTY ADDED TRUE)\nendfunction()\ninclude("'+host(F/'candidate/main/compat/early_mpi/enable.cmake')+'")\nnative_enable_tls_early_mpi()\nget_property(added GLOBAL PROPERTY ADDED)\n'
+ if enabled and not early and invalid is None:text+='if(NOT added)\n message(FATAL_ERROR "missing_source")\nendif()\n'
+ else:text+='if(added)\n message(FATAL_ERROR "unexpected_source")\nendif()\n'
+ script.write_text(text);code,log=execute('cmake-'+name,['cmake','-P',host(script)])
+ if enabled and not early and invalid:assert code!=0 and 'Early MPI requires ESP32' in log
+ else:assert code==0,(name,log)
+ report['cases']['cmake-'+name]=True
+report['inputs_current']={p:sha(pathlib.Path(p).read_bytes())==v['sha256'] for p,v in report['inputs'].items()};assert all(report['inputs_current'].values())
+baseline=json.loads((D/'integration-inputs.json').read_text());report['production_unchanged']={p:sha(pathlib.Path(p).read_bytes())==v['sha256'] for p,v in baseline.items()};assert all(report['production_unchanged'].values())
+report['passed']=True;save();print(json.dumps({'passed':True,'positive_startups':2,'semantic_controls':3,'invalid_compile_configs':4,'cmake_configs':7,'report_sha256':sha((OUT/'report.json').read_bytes())},indent=2))

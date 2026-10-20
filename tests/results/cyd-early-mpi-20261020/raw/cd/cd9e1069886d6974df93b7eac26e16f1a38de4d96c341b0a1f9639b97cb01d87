@@ -1,0 +1,30 @@
+"""Create reviewable copies/patches only inside this isolated draft."""
+import difflib,hashlib,json,pathlib
+ROOT=pathlib.Path.cwd();D=pathlib.Path(__file__).resolve().parent
+assert not (D/'integration-inputs.json').exists()
+base=ROOT/'idf/esp32-cyd2usb-native/main'; records={};patches=[]
+fragment=(D/'candidate/Kconfig.fragment').read_text(encoding='utf-8')
+for name in ['app_main.c','CMakeLists.txt','Kconfig.projbuild','board_config.h']:
+ p=base/name;raw=p.read_bytes();before=raw.decode();after=before
+ target=D/'baseline'/name;target.parent.mkdir(exist_ok=True);target.write_bytes(raw)
+ records[str(p)]={'sha256':hashlib.sha256(raw).hexdigest(),'snapshot':str(target.relative_to(D))}
+ if name=='app_main.c':
+  old='#include "native_health.h"';assert after.count(old)==1
+  after=after.replace(old,old+'\n#include "native_tls_early_mpi.h"')
+  old='void app_main(void) {';assert after.count(old)==1
+  after=after.replace(old,old+'\n    native_tls_early_mpi_prepare();')
+ elif name=='CMakeLists.txt':
+  old='PRIV_REQUIRES esp-tls)';assert after.count(old)==1
+  after=after.replace(old,'PRIV_REQUIRES esp-tls esp_security)')
+  old='native_enable_tls_input_reclaim()';assert after.count(old)==1
+  after=after.replace(old,old+'\n\ninclude("${CMAKE_CURRENT_LIST_DIR}/compat/early_mpi/enable.cmake")\nnative_enable_tls_early_mpi()')
+ elif name=='Kconfig.projbuild':
+  index=after.rfind('\nendmenu');assert index>=0
+  after=after[:index]+'\n'+fragment+after[index:]
+ if name!='board_config.h':
+  out=D/'candidate/integration'/name;out.parent.mkdir(exist_ok=True);out.write_bytes(after.encode())
+  rel='idf/esp32-cyd2usb-native/main/'+name
+  patches.extend(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+rel,tofile='b/'+rel))
+(D/'integration.patch').write_text(''.join(patches),encoding='utf-8')
+(D/'integration-inputs.json').write_text(json.dumps(records,indent=2)+'\n',encoding='utf-8')
+print('Prepared isolated copies and integration.patch; production untouched')

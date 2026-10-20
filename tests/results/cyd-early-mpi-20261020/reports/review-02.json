@@ -1,0 +1,51 @@
+{
+  "review_complete": true,
+  "finding_closed": true,
+  "findings": [],
+  "closed_finding": "review01 P2 host substituted network stack7168 instead of actual6144",
+  "closure": "Host platform includes the frozen actual board_config.h; duplicated task constants and board stub are removed. GCC -H confirms the real frozen header in all five successful build/control traces. Current source/snapshot/report/log hashes match.",
+  "host_report_sha256": "c6f59672c1bce23a7ea1c9ae8de2a00151a8887d72f2fb093bba688dc6e11d21",
+  "host_cases": {
+    "enabled": true,
+    "disabled": true,
+    "cmake-valid": true,
+    "cmake-off": true,
+    "cmake-early": true,
+    "cmake-IDF_TARGET_ESP32": true,
+    "cmake-SOC_MPI_SUPPORTED": true,
+    "cmake-MBEDTLS_HARDWARE_MPI": true,
+    "cmake-ESP_TLS_USING_MBEDTLS": true
+  },
+  "host_controls": {
+    "skip-acquire": {
+      "expected_failure": "release_without_acquire",
+      "exit_status": 2
+    },
+    "skip-release": {
+      "expected_failure": "startup_before_warm",
+      "exit_status": 2
+    },
+    "late-startup": {
+      "expected_failure": "startup_before_warm",
+      "exit_status": 2
+    },
+    "invalid-IDF_TARGET_ESP32": "compile_rejected",
+    "invalid-SOC_MPI_SUPPORTED": "compile_rejected",
+    "invalid-MBEDTLS_HARDWARE_MPI": "compile_rejected",
+    "invalid-ESP_TLS_USING_MBEDTLS": "compile_rejected"
+  },
+  "whole_module_app_ordering_scope_preserved": true,
+  "input_count": 88,
+  "all_stable_inputs_current_after": true,
+  "runtime_scope_pending": false,
+  "runtime_status": "runtime-status.json",
+  "include_proof": "host-header-proof.json",
+  "limitations": [
+    "No host test, SDK build, QEMU or cryptographic calculation was rerun by this follow-up review.",
+    "Host SDK/RTOS/service behavior remains explicit seams; the actual frozen board header finding is closed.",
+    "All four final minimal SDK/QEMU variants, logs, bundles, pins, artifacts and external header closure hashes are current and bound. Owner confirmed terminal session37815 exit0.",
+    "Canonical minimal fixture observed lazy allocation at its app_main entry; this is not evidence of actual radio pre-app state or physical fresh-boot/OOM behavior.",
+    "Void-OOM gate observes the real queue constructor NULL under actual INTERNAL|8BIT heap pressure and exact SDK abort/backtrace; no recoverability, heap-benefit, latency or hardware claim."
+  ],
+  "final_runtime_binding": "runtime-binding.json"
+}

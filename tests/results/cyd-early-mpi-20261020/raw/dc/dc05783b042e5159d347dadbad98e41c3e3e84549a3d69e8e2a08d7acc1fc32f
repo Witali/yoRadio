@@ -1,0 +1,46 @@
+{
+  "full_campaign_passed_at_read": true,
+  "completed_variants": {
+    "canonical": {
+      "passed": true,
+      "fixture_boot_observation": [
+        "0",
+        "0x00000000",
+        "0x3ffafebc",
+        "lazy_at_fixture",
+        "4"
+      ],
+      "radio_pre_app_status": "pending actual integration boot, not inferred from this minimal fixture",
+      "execution_bundle_sha256": "576f2d9cfa65155524267c4fc5776fde5bd9ec0080e99f304c62d08bb4b13684",
+      "sources_unchanged_after": true
+    },
+    "skip-acquire": {
+      "passed": true,
+      "exact_semantic_failure": "warm_acquire_once",
+      "fixture_control_only_public_prewarm": true,
+      "execution_bundle_sha256": "5d5c2bec09917f80dc38708eeb19f2d183d01fc2b6e9df382355331d468a655b",
+      "sources_unchanged_after": true
+    },
+    "skip-release": {
+      "passed": true,
+      "exact_semantic_failure": "warm_release_once",
+      "fixture_control_only_public_prewarm": false,
+      "execution_bundle_sha256": "37da8d8397ae197e0f8c5b183680c9d70bff4daebd5bfb2ca64298113d4387bc",
+      "sources_unchanged_after": true
+    },
+    "void-oom": {
+      "passed": true,
+      "gate": "void API actual allocator exhaustion then exact SDK lock constructor abort",
+      "abort_pc": "0x400825b3",
+      "resolved_site": "0x400825b3: lock_init_generic at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:77\n (inlined by) lock_acquire_generic at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:133\n",
+      "actual_sdk_lock_address": "0x3ffb31b4",
+      "resolved_whole_stack": "0x40085791: panic_abort at C:/Work/yoRadio/.idf/v6.0.2/components/esp_system/panic.c:464\n0x4008575d: esp_system_abort at C:/Work/yoRadio/.idf/v6.0.2/components/esp_system/port/esp_system_chip.c:87\n0x40085482: abort at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/abort.c:38\n0x400825b3: lock_init_generic at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:77\n (inlined by) lock_acquire_generic at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:133\n0x40082721: _lock_acquire at C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:169\n0x400d522b: __wrap__lock_acquire at C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-qemu-01/sources/repo/tests/target/cyd_early_mpi_qemu/main/main.c:77\n0x400d590e: esp_crypto_mpi_lock_acquire at C:/Work/yoRadio/.idf/v6.0.2/components/esp_security/src/esp_crypto_lock.c:117\n0x400d5433: native_tls_early_mpi_prepare at C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-qemu-01/sources/variants/void-oom/native_tls_early_mpi.c:14\n0x400d53d9: app_main at C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-early-mpi-qemu-01/sources/repo/tests/target/cyd_early_mpi_qemu/main/main.c:158\n0x400d3ca4: main_task at C:/Work/yoRadio/.idf/v6.0.2/components/freertos/app_startup.c:206\n",
+      "generic_panic_is_not_success": true,
+      "execution_bundle_sha256": "90efe41e3a9e801676ecb6886ee581917c0714c70d22786226839af872540497",
+      "sources_unchanged_after": true
+    }
+  },
+  "last_completed_command": "sdk-state-void-oom-after-qemu",
+  "scope_pending": false,
+  "note": "No waiting or rerun; the running campaign snapshot is not treated as final4 qualification."
+}

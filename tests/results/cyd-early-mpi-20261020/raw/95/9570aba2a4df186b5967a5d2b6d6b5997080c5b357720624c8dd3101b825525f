@@ -1,0 +1,92 @@
+"""Bind completed MPI QEMU artifacts read-only; no tool/SDK/test execution."""
+from pathlib import Path
+import hashlib,json,re
+OUT=Path(__file__).resolve().parent
+ROOT=OUT.parents[1]
+RUN=ROOT/'.build/cyd-early-mpi-qemu-01'
+sha=lambda raw:hashlib.sha256(raw).hexdigest()
+inputs={}
+def record(path,retain=True):
+ path=Path(path).resolve();raw=path.read_bytes();key=str(path)
+ if key not in inputs:
+  row={'path':key,'sha256':sha(raw),'bytes':len(raw),'retained':retain}
+  if retain:
+   target=OUT/'runtime-inputs'/sha(raw);target.parent.mkdir(exist_ok=True);target.write_bytes(raw);row['snapshot']=target.relative_to(OUT).as_posix()
+  inputs[key]=row
+ return raw
+def write(name,value):(OUT/name).write_text(json.dumps(value,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+assert not (OUT/'runtime-binding.json').exists()
+r=json.loads(record(RUN/'report.json'))
+assert r['passed'] and r['all_bound_inputs_current'] and not r.get('error')
+assert set(r['variants'])=={'canonical','skip-acquire','skip-release','void-oom'}
+assert all(v['passed'] for v in r['variants'].values())
+assert r['sdk_commit']=='7101770dc6db2667b3c477cc31365dd1acd6db4e' and r['sdk_tracked_clean']
+for path,v in r['inputs'].items():
+ assert sha(record(path))==v['sha256']
+ assert sha(record(RUN/v['snapshot']))==v['sha256']
+for path,digest in r['tools'].items():assert sha(record(path,False))==digest
+for command in r['commands']:
+ assert command['exit_status']==0
+ assert sha(record(RUN/(command['label']+'.log')))==command['sha256']
+manifest=json.loads(record(RUN/'source-manifest.json'))
+assert sha((RUN/'source-manifest.json').read_bytes())==r['source_manifest_sha256']
+for path,digest in manifest['frozen_sources'].items():assert sha(record(RUN/path))==digest
+variants={}
+for name,v in r['variants'].items():
+ bundle_path=RUN/'variants'/name/'execution-bundle.json'
+ raw=record(bundle_path);bundle=json.loads(raw)
+ assert sha(raw)==v['execution_bundle_sha256'] and bundle['variant']==name and bundle['elf_machine']==94
+ for path,digest in bundle['artifacts'].items():assert sha(record(RUN/path,False))==digest
+ for path,digest in bundle['external_header_closure'].items():assert sha(record(path,False))==digest
+ log=record(RUN/(name+'-qemu.log')).decode().replace('\r\n','\n')
+ assert log.count('EARLY_MPI_APP_ENTRY scheduler=2 core=0')==1
+ assert log.count('ESP-IDF:          v6.0.2')==1
+ assert not re.search(r'CORRUPT HEAP|watchdog.*triggered',log,re.I)
+ if name=='canonical':
+  assert log.count('EARLY_MPI_COMPLETE warm_pairs=17 dualcore=1 increments=2000 public_api=1 crypto_calculations=0')==1
+  assert 'classification=lazy_at_fixture' in log
+  assert not re.search(r'EARLY_MPI_FAILURE|EARLY_MPI_OOM_|Guru Meditation|abort\(\)|Backtrace:|assert failed',log,re.I)
+ elif name.startswith('skip-'):
+  expected={'skip-acquire':'warm_acquire_once','skip-release':'warm_release_once'}[name]
+  assert re.findall(r'^EARLY_MPI_FAILURE (.+)$',log,re.M)==[expected]
+  assert log.count('EARLY_MPI_CONTROLLED_STOP')==1 and 'EARLY_MPI_COMPLETE' not in log
+  assert not re.search(r'Guru Meditation|abort\(\)|Backtrace:|assert failed',log,re.I)
+ else:
+  observed=re.findall(r'^EARLY_MPI_OOM_QUEUE_NULL phase=1 lock=(0x[0-9a-f]+)$',log,re.M)
+  assert observed==[v['actual_sdk_lock_address']]
+  assert len(re.findall(r'abort\(\) was called at PC (0x[0-9a-fA-F]+)',log))==1
+  site=record(RUN/'void-oom-abort-site.log').decode()
+  stack=record(RUN/'void-oom-whole-backtrace.log').decode()
+  assert 'lock_init_generic' in site and 'locks.c:' in site
+  for symbol in ('lock_init_generic','lock_acquire_generic','__wrap__lock_acquire','esp_crypto_mpi_lock_acquire','native_tls_early_mpi_prepare','app_main'):assert symbol in stack
+  assert 'EARLY_MPI_COMPLETE' not in log and 'EARLY_MPI_CONTROLLED_STOP' not in log
+ variants[name]={'passed':True,'execution_bundle_sha256':sha(raw),'artifact_count':len(bundle['artifacts']),
+  'external_header_closure_count':len(bundle['external_header_closure']),'qemu_log_sha256':sha((RUN/(name+'-qemu.log')).read_bytes())}
+for row in inputs.values():row['current_after']=sha(Path(row['path']).read_bytes())==row['sha256']
+assert all(row['current_after'] for row in inputs.values())
+write('runtime-inputs.json',{'inputs':list(inputs.values()),'all_current_after':True,
+ 'binary_and_external_header_bytes_hashed_not_recopied':True})
+write('runtime-binding.json',{'passed':True,'variants':variants,'sdk_commit':r['sdk_commit'],
+ 'report_sha256':sha((RUN/'report.json').read_bytes()),'inputs':'runtime-inputs.json','input_count':len(inputs),
+ 'terminal_status':{'session':37815,'exit_status':0,'source':'owning agent n5_reboot confirmed terminal handle via collaboration message'},
+ 'scope':'Minimal actual SDK/QEMU mutex/lazy-constructor and true heap-exhaustion observations; not actual radio/physical qualification',
+ 'reruns':0,'crypto_calculations_run_by_review':0})
+review=json.loads((OUT/'review.json').read_bytes())
+review['runtime_scope_pending']=False
+review['final_runtime_binding']='runtime-binding.json'
+review['limitations']=[
+ 'No host test, SDK build, QEMU or cryptographic calculation was rerun by this follow-up review.',
+ 'Host SDK/RTOS/service behavior remains explicit seams; the actual frozen board header finding is closed.',
+ 'All four final minimal SDK/QEMU variants, logs, bundles, pins, artifacts and external header closure hashes are current and bound. Owner confirmed terminal session37815 exit0.',
+ 'Canonical minimal fixture observed lazy allocation at its app_main entry; this is not evidence of actual radio pre-app state or physical fresh-boot/OOM behavior.',
+ 'Void-OOM gate observes the real queue constructor NULL under actual INTERNAL|8BIT heap pressure and exact SDK abort/backtrace; no recoverability, heap-benefit, latency or hardware claim.'
+]
+write('review.json',review)
+files=[]
+for path in sorted(OUT.rglob('*')):
+ if path.is_file() and path!=OUT/'manifest.json':
+  raw=path.read_bytes();files.append({'path':path.relative_to(OUT).as_posix(),'bytes':len(raw),'sha256':sha(raw)})
+write('manifest.json',{'files':files})
+print(json.dumps({'finding_closed':True,'runtime_variants':4,'runtime_inputs':len(inputs),'files':len(files)+1,
+ 'review_sha256':sha((OUT/'review.json').read_bytes()),'runtime_binding_sha256':sha((OUT/'runtime-binding.json').read_bytes()),
+ 'manifest_sha256':sha((OUT/'manifest.json').read_bytes())},indent=2))
