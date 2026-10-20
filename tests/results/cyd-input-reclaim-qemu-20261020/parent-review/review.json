@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "actual_cases": 5,
+  "exact_controls": 4,
+  "report_sha256": "7ba6ef4ba322e65fc1658b38488720a3be256793bbe6c1fcc04cf65ebaa34c65",
+  "current_sources": 246,
+  "command_count": 61,
+  "variants": {
+    "canonical": {
+      "expected_failure": null,
+      "bundle_sha256": "0ec91ff827ee7e9d8eedb234f2e5ca5043f2c536eb3dbb1bb9ba9d61a6919d3f",
+      "elf_sha256": "262bde85e944739511a1a6e418fb6a213e34e58256c36d84006dde99cf4e94c5",
+      "pointer_words_independently_checked": true
+    },
+    "skip-first-real": {
+      "expected_failure": "real_allocator_failed_before_release",
+      "bundle_sha256": "b6e127e961dc317e425f0bf009818b9bff8ac64ef1ca2cab1058fc4bf1b444f8",
+      "elf_sha256": "77640ae64c32cb76ddd4dd042d722c4b9b346bbeb09bb4d1c235aea534413c70",
+      "pointer_words_independently_checked": true
+    },
+    "skip-reclaim": {
+      "expected_failure": "recovery_after_real_null",
+      "bundle_sha256": "937112d21b38aad0a3d8b990c0dc1c7e72a1e521b4c95deb00f8af9cc74e161b",
+      "elf_sha256": "6a1a1c8f5273536f0d9f64ff42730abdd816605cfb155c817b5be05b20520b83",
+      "pointer_words_independently_checked": true
+    },
+    "omit-pin": {
+      "expected_failure": "detach_busy_while_pinned",
+      "bundle_sha256": "871f5713cc29afe57e2222f64bfcb3f621e0c27e06788eb4cda6bfcbb74cb97f",
+      "elf_sha256": "807444b32012ec4ec529448be4a44a45c0a881bd82b54b45794076a5765797f3",
+      "pointer_words_independently_checked": true
+    },
+    "extend-budget": {
+      "expected_failure": "fixed_initial_budget",
+      "bundle_sha256": "a92338ae5caed085219024091c37406a876e0691f1b56bda933956809feebd7c",
+      "elf_sha256": "db61599517e7b1656f77727d9383b97ac3bb28e5bfca2c877e7e27ec0757d59e",
+      "pointer_words_independently_checked": true
+    }
+  },
+  "physical_tested": false,
+  "scope": "Read-only independent current-source/log/bundle/ELF-pointer review. Not a new SDK build or emulator run."
+}

@@ -1,0 +1,410 @@
+"""Actual SDK ESP32 QEMU gate for opt-in TLS input reclamation.
+
+Exercise public mbedtls_calloc through its unchanged SDK platform function
+pointer and linker wrapper, real observed allocator NULL under controlled heap
+pressure, ordinary SDK free, native_health failed-allocation callback, queue
+payload/floor protection and dual-core retirement/restore races. Four exact
+source mutants require named failure plus controlled restart; panic, build
+failure or timeout is never a successful detection. No physical device or
+production memory/performance claim. The production option remains default off.
+"""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import struct
+import subprocess
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+HARNESS = ROOT / 'tests/target/cyd_input_reclaim_qemu'
+MAIN = Path('idf/esp32-cyd2usb-native/main')
+SDK_COMMIT = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+MUTANTS = {
+    'skip-first-real': [('void *result = __real_esp_mbedtls_mem_calloc(count, size);',
+                         'void *result = NULL;')],
+    'skip-reclaim': [('if (result || !count || !size || size > SIZE_MAX / count || xPortInIsrContext())',
+                      'if (true)')],
+    'omit-pin': [('++s_pins;', '(void)0; /* semantic control: omit pin */'),
+                 ('--s_pins;', '(void)0; /* semantic control: omit unpin */')],
+    'extend-budget': [('const unsigned budget = stats.target - stats.minimum;',
+                       'const unsigned budget = stats.target - stats.minimum + 1U;')],
+}
+EXPECTED_FAILURE = {'skip-first-real': 'real_allocator_failed_before_release',
+                    'skip-reclaim': 'recovery_after_real_null',
+                    'omit-pin': 'detach_busy_while_pinned',
+                    'extend-budget': 'fixed_initial_budget'}
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def write_json(path, value):
+    path.write_text(json.dumps(value, indent=2) + '\n', encoding='utf-8')
+
+
+def nearest(relative):
+    return next((base / relative for base in (ROOT, *ROOT.parents) if (base / relative).exists()), None)
+
+
+def arguments():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--idf', type=Path, default=os.environ.get('IDF_PATH') or nearest('.idf/v6.0.2'))
+    parser.add_argument('--idf-tools', type=Path, default=os.environ.get('IDF_TOOLS_PATH') or nearest('.idf/tools-v6.0.2'))
+    parser.add_argument('--idf-python', type=Path)
+    parser.add_argument('--qemu', type=Path, default=shutil.which('qemu-system-xtensa.exe'))
+    parser.add_argument('--rom-directory', type=Path)
+    parser.add_argument('--powershell', type=Path, default=shutil.which('pwsh.exe') or shutil.which('pwsh'))
+    parser.add_argument('--build-timeout', type=int, default=600)
+    parser.add_argument('--qemu-timeout', type=int, default=90)
+    parser.add_argument('--preflight-only', action='store_true')
+    args = parser.parse_args()
+    if sys.platform != 'win32':
+        parser.error('This installed SDK/QEMU launcher supports Windows only')
+    if not 1 <= args.build_timeout <= 3600 or not 1 <= args.qemu_timeout <= 3600:
+        parser.error('Timeouts must be 1..3600 seconds')
+    for name in ['idf', 'idf_tools', 'qemu', 'powershell']:
+        if not getattr(args, name):
+            parser.error('--' + name.replace('_', '-') + ' is required when not discoverable')
+        setattr(args, name, Path(getattr(args, name)).resolve())
+    args.idf_python = (args.idf_python or args.idf_tools / 'python_env/idf6.0_py3.12_env/Scripts/python.exe').resolve()
+    args.rom_directory = (args.rom_directory or args.qemu.parent.parent / 'pc-bios').resolve()
+    args.output = args.output.resolve()
+    out = args.output
+    if out.exists():
+        parser.error('Output already exists; choose a fresh campaign directory')
+    if out == ROOT or out in ROOT.parents or (out.is_relative_to(ROOT) and not out.is_relative_to(ROOT / '.build')):
+        parser.error('Source directories are protected; use .build/ or an external output')
+    protected = [args.idf, args.idf_tools, args.idf_python.parent, Path(sys.executable).resolve().parent,
+                 args.qemu.parent, args.rom_directory, args.powershell.parent]
+    if any(out == path or out.is_relative_to(path) or path.is_relative_to(out) for path in protected):
+        parser.error('Output must not overlap installed SDK/Python/PowerShell/QEMU/ROM directories')
+    if any((parent / 'execution-bundle.json').exists() or (parent / 'report.json').exists() for parent in out.parents):
+        parser.error('Output must not be nested in an evidence campaign')
+    if not out.is_relative_to(ROOT / '.build'):
+        enclosing = next((parent for parent in out.parents if (parent / '.git').exists()), None)
+        if enclosing and not out.is_relative_to(enclosing / '.build'):
+            parser.error('Output in another repository must be below its .build/')
+    required = [args.idf / 'tools/idf.py', args.idf / 'export.ps1', args.idf / 'tools/tools.json',
+                args.idf_tools / 'idf-env.json', args.idf_python, args.qemu, args.powershell,
+                args.rom_directory / 'esp32-v3-rom.bin', args.rom_directory / 'esp32-v3-rom-app.bin',
+                ROOT / MAIN / 'native_input_reclaim.c', ROOT / MAIN / 'native_input_reclaim.h',
+                ROOT / MAIN / 'compat/input_reclaim/enable.cmake', HARNESS / 'sdk-build.ps1']
+    missing = [str(path) for path in required if not path.is_file()]
+    if missing:
+        parser.error('Missing inputs: ' + ', '.join(missing))
+    return args
+
+
+class Campaign:
+    def __init__(self, args):
+        self.args, self.out = args, args.output
+        self.sources, self.runtime = {}, {}
+        self.report = {'passed': False, 'scope': __doc__, 'commands': [], 'variants': {},
+                       'physical_hardware': False, 'real_oom': True, 'default_activation': False}
+        self.env = os.environ.copy()
+        self.env.update(GIT_OPTIONAL_LOCKS='0', PYTHONUTF8='1', PYTHONIOENCODING='utf-8', PYTHONNOUSERSITE='1')
+
+    def save(self):
+        write_json(self.out / 'report.json', self.report)
+
+    def execute(self, name, command, timeout=60):
+        command = list(map(str, command))
+        started = time.monotonic()
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                   env=self.env, creationflags=subprocess.CREATE_NO_WINDOW)
+        timed_out = False
+        try:
+            data, _ = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            cleanup = subprocess.run(['taskkill.exe', '/PID', str(process.pid), '/T', '/F'],
+                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=15,
+                                     creationflags=subprocess.CREATE_NO_WINDOW)
+            (self.out / (name + '-timeout-cleanup.log')).write_bytes(cleanup.stdout)
+            data, _ = process.communicate(timeout=15)
+        (self.out / (name + '.log')).write_bytes(data)
+        self.report['commands'].append({'name': name, 'command': command, 'exit_status': process.returncode,
+                                        'timed_out': timed_out, 'elapsed_seconds': time.monotonic() - started,
+                                        'sha256': hashlib.sha256(data).hexdigest()})
+        self.save()
+        if timed_out or process.returncode:
+            raise RuntimeError(name + (' timeout' if timed_out else ' failed') + ': ' + data.decode(errors='replace')[-6000:])
+        return data.decode(errors='replace').replace('\r\n', '\n')
+
+    def snapshot(self, original, relative, role):
+        original = original.resolve()
+        data = original.read_bytes()
+        target = self.out / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+        digest = hashlib.sha256(data).hexdigest()
+        assert sha(original) == digest, 'Source changed while freezing: ' + str(original)
+        self.sources[str(original)] = {'sha256': digest, 'snapshot': str(relative), 'role': role}
+
+    def freeze(self):
+        main = ROOT / MAIN
+        paths = set(main.rglob('*.h'))
+        paths.update(main / name for name in ['native_input_reclaim.c', 'native_health.c', 'CMakeLists.txt',
+                                              'Kconfig.projbuild', 'compat/input_reclaim/enable.cmake'])
+        paths.update(ROOT / name for name in ['idf/components/native_stream/adaptive_input.c',
+                     'idf/components/native_stream/include/adaptive_input.h', 'idf/components/native_stream/CMakeLists.txt'])
+        for path in sorted(paths):
+            self.snapshot(path, Path('sources/repository') / path.relative_to(ROOT), 'canonical repository input')
+        for path in sorted(HARNESS.rglob('*')):
+            if path.is_file():
+                self.snapshot(path, Path('sources/harness') / path.relative_to(HARNESS), 'target harness')
+        runner = Path(__file__).resolve()
+        self.snapshot(runner, Path('sources/runner') / runner.name, 'runner')
+        for relative in ['components/mbedtls/port/esp_mem.c',
+                         'components/mbedtls/mbedtls/tf-psa-crypto/platform/platform.c', 'components/heap/heap_caps.c']:
+            self.snapshot(self.args.idf / relative, Path('sources/sdk') / relative,
+                          'actual SDK TU compiled from pinned installation; audit copy')
+        module = (self.out / 'sources/repository' / MAIN / 'native_input_reclaim.c').read_bytes()
+        helper = (self.out / 'sources/repository' / MAIN / 'compat/input_reclaim/enable.cmake').read_bytes()
+        recipes = {}
+        for name in ['canonical', *MUTANTS]:
+            directory = self.out / 'sources/variants' / name
+            (directory / 'compat/input_reclaim').mkdir(parents=True)
+            data = module
+            changes = []
+            for before, after in MUTANTS.get(name, []):
+                old, new = before.encode(), after.encode()
+                assert data.count(old) == 1, (name, before)
+                data = data.replace(old, new)
+                changes.append({'before': before, 'after': after})
+            (directory / 'native_input_reclaim.c').write_bytes(data)
+            (directory / 'compat/input_reclaim/enable.cmake').write_bytes(helper)
+            recipes[name] = {'canonical_sha256': hashlib.sha256(module).hexdigest(),
+                             'variant_sha256': hashlib.sha256(data).hexdigest(), 'exact_changes': changes,
+                             'expected_failure': EXPECTED_FAILURE.get(name)}
+        write_json(self.out / 'sources/variant-recipes.json', recipes)
+        write_json(self.out / 'source-manifest.json', self.sources)
+
+    def verify_sources(self):
+        return all(sha(original) == meta['sha256'] and sha(self.out / meta['snapshot']) == meta['sha256']
+                   for original, meta in self.sources.items())
+
+    def verify_sdk(self, suffix):
+        command = ['git', '-c', 'core.longpaths=true', '-C', self.args.idf]
+        assert self.execute('sdk-head-' + suffix, command + ['rev-parse', 'HEAD']).strip() == SDK_COMMIT
+        assert not self.execute('sdk-state-' + suffix, command + ['status', '--porcelain', '--untracked-files=no']).strip()
+
+    def collect_closure(self, name, commands, ninja, directory):
+        lookup = {str((self.out / meta['snapshot']).resolve()).casefold(): original for original, meta in self.sources.items()}
+        dependencies, used = {}, []
+        for row in commands:
+            source = Path(row['file']).resolve()
+            sdk_tu = source in {self.args.idf / 'components/mbedtls/port/esp_mem.c',
+                               self.args.idf / 'components/mbedtls/mbedtls/tf-psa-crypto/platform/platform.c',
+                               self.args.idf / 'components/heap/heap_caps.c'}
+            if not source.is_relative_to(self.out / 'sources') and not sdk_tu:
+                continue
+            row = dict(row)
+            used.append(row)
+            text = self.execute(name + '-deps-' + str(len(used)),
+                                [ninja, '-C', self.out / 'working-build', '-t', 'deps', row['output'].replace('\\', '/')])
+            assert '(VALID)' in text and '#deps ' in text, row['output']
+            paths = []
+            for line in text.splitlines():
+                if not line.startswith('    '):
+                    continue
+                path = Path(line.strip())
+                path = path.resolve() if path.is_absolute() else (self.out / 'working-build' / path).resolve()
+                assert path.is_file(), str(path)
+                paths.append(str(path))
+                digest = sha(path)
+                if path.is_relative_to(self.out / 'working-build'):
+                    snapshot = directory / 'generated-dependencies' / digest / path.name
+                    snapshot.parent.mkdir(parents=True, exist_ok=True)
+                    snapshot.write_bytes(path.read_bytes())
+                    reference = str(snapshot.relative_to(self.out))
+                elif path.is_relative_to(self.out / 'sources'):
+                    reference = str(path.relative_to(self.out))
+                else:
+                    original = lookup.get(str(path).casefold()) or str(path)
+                    if original not in self.sources:
+                        relative = Path('sources/compiler-dependencies') / digest / path.name
+                        self.snapshot(path, relative, 'actual installed compiler/SDK dependency')
+                    reference = self.sources[original]['snapshot']
+                dependencies[str(path)] = {'sha256': digest, 'snapshot': reference}
+            row['actual_dependency_paths'] = paths
+        assert len(used) == 7, [(row['file']) for row in used]
+        write_json(directory / 'actual-compiler-closure.json', {'translation_units': used, 'dependencies': dependencies})
+        write_json(self.out / 'source-manifest.json', self.sources)
+        write_json(directory / 'source-manifest.json', self.sources)
+
+    def symbol_pointer_proof(self, elf, nm, name):
+        symbols = self.execute(name + '-nm', [nm, '-S', '--defined-only', elf])
+        def symbol(label):
+            match = re.search(r'^([0-9a-f]+)\s+([0-9a-f]+)\s+\w\s+' + re.escape(label) + r'$', symbols, re.M)
+            assert match, label
+            return int(match[1], 16), int(match[2], 16)
+        data = elf.read_bytes()
+        phoff = struct.unpack_from('<I', data, 28)[0]
+        phsize, phcount = struct.unpack_from('<HH', data, 42)
+        proof = {}
+        for pointer, expected in [('mbedtls_calloc_func', '__wrap_esp_mbedtls_mem_calloc'),
+                                  ('mbedtls_free_func', 'esp_mbedtls_mem_free')]:
+            address, size = symbol(pointer)
+            assert size == 4
+            segments = [struct.unpack_from('<8I', data, phoff + index * phsize) for index in range(phcount)]
+            segment = next(row for row in segments if row[0] == 1 and row[2] <= address < row[2] + row[4])
+            initial = struct.unpack_from('<I', data, segment[1] + address - segment[2])[0]
+            assert initial == symbol(expected)[0], (pointer, hex(initial), expected)
+            proof[pointer] = {'address': address, 'initial_value': initial, 'expected_symbol': expected}
+        for required in ['mbedtls_calloc', 'esp_mbedtls_mem_calloc', 'native_input_reclaim_bind',
+                         'native_input_reclaim_detach', 'adaptive_input_release_one', 'native_health_start']:
+            symbol(required)
+        return proof
+
+    def variant(self, name):
+        print('Building SDK variant ' + name, flush=True)
+        directory = self.out / 'variants' / name
+        directory.mkdir(parents=True)
+        self.execute(name + '-build', [self.args.powershell, '-NoLogo', '-NoProfile', '-NonInteractive', '-File',
+                     self.out / 'sources/harness/sdk-build.ps1', '-OutputDirectory', self.out,
+                     '-IdfDirectory', self.args.idf, '-IdfToolsDirectory', self.args.idf_tools,
+                     '-IdfPythonExecutable', self.args.idf_python,
+                     '-VariantDirectory', self.out / 'sources/variants' / name], self.args.build_timeout)
+        build = self.out / 'working-build'
+        description = json.loads((build / 'project_description.json').read_text())
+        assert description['target'] == 'esp32' and Path(description['idf_path']).resolve() == self.args.idf
+        config = json.loads((build / 'config/sdkconfig.json').read_text())
+        for key in ['YORADIO_TLS_INPUT_RECLAIM', 'YORADIO_ADAPTIVE_INPUT_BUFFER', 'MBEDTLS_INTERNAL_MEM_ALLOC',
+                    'ESP_TLS_USING_MBEDTLS', 'ESP_TIMER_SUPPORTS_ISR_DISPATCH_METHOD', 'HEAP_POISONING_LIGHT',
+                    'COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE', 'FREERTOS_CHECK_STACKOVERFLOW_CANARY']:
+            assert config[key], key
+        for key in ['MBEDTLS_CUSTOM_MEM_ALLOC', 'HEAP_ABORT_WHEN_ALLOCATION_FAILS', 'FREERTOS_UNICORE']:
+            assert not config.get(key, False), key
+        compiler = Path(description['c_compiler'])
+        nm = compiler.with_name('xtensa-esp32-elf-nm.exe')
+        self.runtime.update({str(path): sha(path) for path in [compiler, nm]})
+        cache = (build / 'CMakeCache.txt').read_text()
+        installed = {}
+        for tool, key in [('ninja', 'CMAKE_MAKE_PROGRAM'), ('cmake', 'CMAKE_COMMAND')]:
+            path = Path(re.search(r'^' + key + r':[A-Z_]+=(.+)$', cache, re.M)[1].strip())
+            installed[tool] = path
+            self.runtime[str(path)] = sha(path)
+        commands = json.loads((build / 'compile_commands.json').read_text())
+        module = (self.out / 'sources/variants' / name / 'native_input_reclaim.c').resolve()
+        chosen = [row for row in commands if Path(row['file']).resolve() == module]
+        assert len(chosen) == 1 and '-include' not in chosen[0]['command']
+        self.collect_closure(name, commands, installed['ninja'], directory)
+        elf, app = build / description['app_elf'], build / description['app_bin']
+        assert elf.read_bytes()[:4] == b'\x7fELF' and struct.unpack_from('<H', elf.read_bytes(), 18)[0] == 94
+        assert app.read_bytes()[0] == 0xe9 and struct.unpack_from('<H', app.read_bytes(), 12)[0] == 0
+        assert app.stat().st_size <= 0x3f0000
+        write_json(directory / 'sdk-platform-pointer-proof.json', self.symbol_pointer_proof(elf, nm, name))
+        recipe = json.loads((build / 'flasher_args.json').read_text())
+        assert recipe['extra_esptool_args']['chip'] == 'esp32'
+        flash_files = [(int(offset, 0), build / path) for offset, path in recipe['flash_files'].items()]
+        flash = directory / 'qemu-flash.bin'
+        merge = [self.args.idf_python, '-m', 'esptool', '--chip', 'esp32', 'merge-bin', '--output', flash,
+                 '--flash-mode', 'dio', '--flash-size', '4MB', '--flash-freq', '40m']
+        for offset, path in sorted(flash_files):
+            merge += [hex(offset), path]
+        self.execute(name + '-merge', merge + ['--pad-to-size', '4MB'])
+        merged = flash.read_bytes()
+        assert len(merged) == 0x400000
+        assert all(merged[offset:offset + path.stat().st_size] == path.read_bytes() for offset, path in flash_files)
+        artifact_sources = {elf, app, build / 'project_description.json', build / 'flasher_args.json',
+            build / 'compile_commands.json', build / 'CMakeCache.txt', build / 'build.ninja',
+            build / 'config/sdkconfig.json', self.out / 'working-sdkconfig'}
+        artifact_sources.update(path for _, path in flash_files)
+        artifact_sources.update(path for path in (build / 'toolchain').rglob('*') if path.is_file())
+        for original in sorted(artifact_sources):
+            relative = original.relative_to(build) if original.is_relative_to(build) else Path(original.name)
+            target = directory / 'artifacts' / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(original.read_bytes())
+        for original in sorted((build / 'log').glob('*')):
+            if original.is_file():
+                target = directory / 'sdk-logs' / original.name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(original.read_bytes())
+        inputs = {str(path.relative_to(self.out)): sha(path) for path in (self.out / 'sources').rglob('*') if path.is_file()}
+        artifacts = {str(path.relative_to(self.out)): sha(path) for path in directory.rglob('*') if path.is_file()}
+        assert self.verify_sources() and all(sha(path) == digest for path, digest in self.runtime.items())
+        bundle = {'variant': name, 'frozen_input_sha256': inputs, 'artifact_sha256': artifacts,
+                  'runtime_sha256': dict(self.runtime), 'sdk_commit': SDK_COMMIT,
+                  'working_build_is_transient': True, 'actual_module_command': chosen[0], 'scope': __doc__}
+        write_json(directory / 'execution-bundle.json', bundle)
+        print('Frozen ' + name + ' artifacts; starting actual SDK QEMU', flush=True)
+        log = self.execute(name + '-qemu', [self.args.qemu, '-M', 'esp32', '-smp', '2', '-L', self.args.rom_directory,
+                           '-display', 'none', '-monitor', 'none', '-serial', 'stdio', '-no-reboot', '-snapshot',
+                           '-nic', 'none', '-drive', 'file=' + str(flash).replace(',', ',,') + ',if=mtd,format=raw'],
+                           self.args.qemu_timeout)
+        assert not re.search(r'Guru Meditation|assert failed|panic.ed|watchdog.*triggered|stack smashing|CORRUPT HEAP', log, re.I)
+        if name == 'canonical':
+            cases = re.findall(r'^CYD_INPUT_RECLAIM_CASE id=(R\d)\b', log, re.M)
+            assert cases == ['R0', 'R1', 'R2', 'R3', 'R4'], cases
+            assert len(re.findall(r'^CYD_INPUT_RECLAIM_COMPLETE cases=5 actual_module=1 real_sdk_allocator=1 real_oom=1 dualcore=1 hardware=0$', log, re.M)) == 1
+            assert 'CYD_INPUT_RECLAIM_FAILURE' not in log and 'CYD_INPUT_RECLAIM_CONTROLLED_STOP' not in log
+        else:
+            failures = re.findall(r'^CYD_INPUT_RECLAIM_FAILURE (.+)$', log, re.M)
+            assert failures == [EXPECTED_FAILURE[name]], failures
+            assert len(re.findall(r'^CYD_INPUT_RECLAIM_CONTROLLED_STOP$', log, re.M)) == 1
+            assert 'CYD_INPUT_RECLAIM_COMPLETE' not in log
+        assert all(sha(self.out / relative) == digest for group in [inputs, artifacts] for relative, digest in group.items())
+        assert self.verify_sources() and all(sha(path) == digest for path, digest in self.runtime.items())
+        self.report['variants'][name] = {'passed': True, 'bundle_sha256': sha(directory / 'execution-bundle.json'),
+                                        'expected_failure': EXPECTED_FAILURE.get(name), 'bound_inputs_unchanged_after': True}
+        self.save()
+
+    def run(self):
+        self.out.mkdir(parents=True, exist_ok=False)
+        try:
+            self.freeze()
+            paths = [self.args.idf_python, Path(sys.executable).resolve(), self.args.powershell,
+                     self.args.qemu, self.args.rom_directory / 'esp32-v3-rom.bin',
+                     self.args.rom_directory / 'esp32-v3-rom-app.bin', self.args.idf / 'tools/tools.json']
+            self.runtime = {str(path): sha(path) for path in paths}
+            self.verify_sdk('before')
+            self.execute('qemu-version', [self.args.qemu, '--version'])
+            version = self.execute('powershell-version', [self.args.powershell, '-NoLogo', '-NoProfile',
+                                   '-NonInteractive', '-Command', '$PSVersionTable.PSVersion.ToString()'])
+            assert int(version.strip().split('.')[0]) >= 7
+            for name in ['canonical', *MUTANTS]:
+                self.variant(name)
+            self.verify_sdk('after')
+            assert self.verify_sources()
+            for name, result in self.report['variants'].items():
+                directory = self.out / 'variants' / name
+                assert sha(directory / 'execution-bundle.json') == result['bundle_sha256']
+                bundle = json.loads((directory / 'execution-bundle.json').read_text())
+                assert all(sha(self.out / path) == digest for group in ['frozen_input_sha256', 'artifact_sha256']
+                           for path, digest in bundle[group].items())
+            self.report.update(passed=True, actual_cases=5, exact_semantic_controls=4,
+                               all_bound_inputs_current=True, runtime_sha256=self.runtime)
+            print('PASS actual SDK real-OOM/retirement gate: 5 cases + 4 exact semantic controls', flush=True)
+        except BaseException as error:
+            self.report['error'] = type(error).__name__ + ': ' + str(error)
+            raise
+        finally:
+            self.report['live_source_verification'] = {original: sha(original) == meta['sha256']
+                                                        for original, meta in self.sources.items()}
+            if not all(self.report['live_source_verification'].values()):
+                self.report['passed'] = False
+            self.save()
+        if not self.report['passed']:
+            raise RuntimeError('Final source verification failed')
+
+
+def main():
+    args = arguments()
+    if args.preflight_only:
+        print(json.dumps({'preflight_passed': True, 'output_created': False,
+                          'resolved': {key: str(value) for key, value in vars(args).items()}}, indent=2))
+        return
+    Campaign(args).run()
+
+
+if __name__ == '__main__':
+    main()

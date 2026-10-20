@@ -1,0 +1,11 @@
+set(R "$ENV{CYD_INPUT_RECLAIM_FROZEN_ROOT}")
+set(M "${R}/idf/esp32-cyd2usb-native/main")
+idf_component_register(SRCS "main.cpp" "${M}/native_health.c"
+ "${R}/idf/components/native_stream/adaptive_input.c"
+ INCLUDE_DIRS "." "${M}" "${R}/idf/components/native_stream/include"
+ REQUIRES freertos heap esp_timer esp_system esp-tls mbedtls log)
+include("$ENV{CYD_INPUT_RECLAIM_VARIANT_ROOT}/compat/input_reclaim/enable.cmake")
+native_enable_tls_input_reclaim()
+foreach(symbol heap_caps_calloc adaptive_input_release_one)
+ target_link_options(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${symbol}")
+endforeach()

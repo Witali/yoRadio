@@ -1,0 +1,56 @@
+{
+  "canonical": {
+    "canonical_sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "variant_sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "exact_changes": [],
+    "expected_failure": null
+  },
+  "skip-first-real": {
+    "canonical_sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "variant_sha256": "b4e2d577dcd05f245d5bdfb1b0ed4048f35847e9b0a09bbe89f3759b6223efe2",
+    "exact_changes": [
+      {
+        "before": "void *result = __real_esp_mbedtls_mem_calloc(count, size);",
+        "after": "void *result = NULL;"
+      }
+    ],
+    "expected_failure": "real_allocator_failed_before_release"
+  },
+  "skip-reclaim": {
+    "canonical_sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "variant_sha256": "eca9d860deac3291daf054a606d3a484d511c89ec792bff8437b8f0987e4052c",
+    "exact_changes": [
+      {
+        "before": "if (result || !count || !size || size > SIZE_MAX / count || xPortInIsrContext())",
+        "after": "if (true)"
+      }
+    ],
+    "expected_failure": "recovery_after_real_null"
+  },
+  "omit-pin": {
+    "canonical_sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "variant_sha256": "7ca227db9f8cff0aece0780d17aa0fe39e3bbc7abd6c28b4ce74c06320395185",
+    "exact_changes": [
+      {
+        "before": "++s_pins;",
+        "after": "(void)0; /* semantic control: omit pin */"
+      },
+      {
+        "before": "--s_pins;",
+        "after": "(void)0; /* semantic control: omit unpin */"
+      }
+    ],
+    "expected_failure": "detach_busy_while_pinned"
+  },
+  "extend-budget": {
+    "canonical_sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+    "variant_sha256": "1579fcbd050dd116235c93a8c497cb9ca73c8197f71aa0723db723218624a064",
+    "exact_changes": [
+      {
+        "before": "const unsigned budget = stats.target - stats.minimum;",
+        "after": "const unsigned budget = stats.target - stats.minimum + 1U;"
+      }
+    ],
+    "expected_failure": "fixed_initial_budget"
+  }
+}

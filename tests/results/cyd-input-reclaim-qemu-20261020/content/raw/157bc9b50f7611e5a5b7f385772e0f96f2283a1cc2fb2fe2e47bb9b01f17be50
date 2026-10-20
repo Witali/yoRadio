@@ -1,0 +1,35 @@
+Activating ESP-IDF 6.0
+Setting IDF_PATH to 'C:\Work\yoRadio\.idf\v6.0.2'.
+* Checking python version ... 3.12.10
+* Checking python dependencies ... OK
+* Deactivating the current ESP-IDF environment (if any) ... OK
+* Establishing a new ESP-IDF environment ... OK
+* Identifying shell ... pwsh.exe
+* Detecting outdated tools in system ... OK - no outdated tools found
+
+Done! You can now compile ESP-IDF projects.
+Go to the project directory and run:
+
+  idf.py build
+
+Executing action: all (aliases: build)
+Running ninja in directory C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-input-reclaim-qemu-01\working-build
+Executing "ninja all"...
+[1/4] C:\Windows\system32\cmd.exe /C "cd /D C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-input-reclaim-qemu-01\working-build && C:\Work\yoRadio\.idf\tools-v6.0.2\python_env\idf6.0_py3.12_env\Scripts\python.exe C:/Work/yoRadio/.idf/v6.0.2/components/partition_table/check_sizes.py --offset 0x8000 partition --type app C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-input-reclaim-qemu-01/working-build/partition_table/partition-table.bin C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-input-reclaim-qemu-01/working-build/cyd_input_reclaim_qemu.bin"
+cyd_input_reclaim_qemu.bin binary size 0x23b00 bytes. Smallest app partition is 0x3f0000 bytes. 0x3cc500 bytes (96%) free.
+[2/4] Performing build step for 'bootloader'
+[1/1] C:\Windows\system32\cmd.exe /C "cd /D C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-input-reclaim-qemu-01\working-build\bootloader && C:\Work\yoRadio\.idf\tools-v6.0.2\python_env\idf6.0_py3.12_env\Scripts\python.exe C:/Work/yoRadio/.idf/v6.0.2/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-input-reclaim-qemu-01/working-build/bootloader/bootloader.bin"
+Bootloader binary size 0x65f0 bytes. 0xa10 bytes (9%) free.
+[3/4] No install step for 'bootloader'
+[4/4] Completed 'bootloader'
+
+Project build complete. To flash, run:
+ idf.py flash
+or
+ idf.py -p PORT flash
+or
+ python -m esptool --chip esp32 -b 460800 --before default-reset --after hard-reset write-flash --flash-mode dio --flash-size 4MB --flash-freq 40m 0x1000 .build\cyd-input-reclaim-qemu-01\working-build\bootloader\bootloader.bin 0x8000 .build\cyd-input-reclaim-qemu-01\working-build\partition_table\partition-table.bin 0x10000 .build\cyd-input-reclaim-qemu-01\working-build\cyd_input_reclaim_qemu.bin
+or from the "C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-input-reclaim-qemu-01\working-build" directory
+ python -m esptool --chip esp32 -b 460800 --before default-reset --after hard-reset write-flash "@flash_args"
+
+

@@ -1,0 +1,64 @@
+Adding SPI flash device
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0040,len:6272
+load:0x40078000,len:15820
+load:0x40080400,len:3920
+entry 0x40080644
+I (669) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (670) boot: compile time Oct 20 2026 13:16:37
+I (670) boot: Multicore bootloader
+I (714) boot: chip revision: v0.0
+I (716) boot.esp32: SPI Speed      : 40MHz
+I (716) boot.esp32: SPI Mode       : DIO
+I (716) boot.esp32: SPI Flash Size : 4MB
+I (726) boot: Enabling RNG early entropy source...
+I (737) boot: Partition Table:
+I (737) boot: ## Label            Usage          Type ST Offset   Length
+I (737) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (738) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (738) boot:  2 factory          factory app      00 00 00010000 003f0000
+I (743) boot: End of partition table
+I (785) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=09220h ( 37408) map
+I (895) esp_image: segment 1: paddr=00019248 vaddr=3ffb0000 size=02a64h ( 10852) load
+I (918) esp_image: segment 2: paddr=0001bcb4 vaddr=40080000 size=04364h ( 17252) load
+I (944) esp_image: segment 3: paddr=00020020 vaddr=400d0020 size=0d764h ( 55140) map
+I (970) esp_image: segment 4: paddr=0002d78c vaddr=40084364 size=06350h ( 25424) load
+I (995) esp_image: segment 5: paddr=00033ae4 vaddr=50000000 size=00028h (    40) load
+I (1055) boot: Loaded app from partition at offset 0x10000
+I (1055) boot: Disabling RNG early entropy source...
+I (1073) cpu_start: Multicore app
+I (2597) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (2601) cpu_start: Pro cpu start user code
+I (2601) cpu_start: cpu freq: 240000000 Hz
+I (2601) app_init: Application information:
+I (2601) app_init: Project name:     cyd_input_reclaim_qemu
+I (2601) app_init: App version:      v0.9.693-1915-g0255eaac6
+I (2601) app_init: Compile time:     Oct 20 2026 13:16:15
+I (2602) app_init: ELF file SHA256:  262bde85e...
+I (2602) app_init: ESP-IDF:          v6.0.2
+I (2602) efuse_init: Min chip rev:     v0.0
+I (2602) efuse_init: Max chip rev:     v3.99 
+I (2602) efuse_init: Chip rev:         v0.0
+I (2603) heap_init: Initializing. RAM available for dynamic allocation:
+I (2604) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (2604) heap_init: At 3FFB74C0 len 00028B40 (162 KiB): DRAM
+I (2604) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (2605) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (2605) heap_init: At 4008A6B4 len 0001594C (86 KiB): IRAM
+I (2634) spi_flash: detected chip: gd
+I (2640) spi_flash: flash io: dio
+I (2656) main_task: Started on CPU0
+I (2660) main_task: Calling app_main()
+CYD_INPUT_RECLAIM_BOOT sdk=v6.0.2 real_allocator=1 dualcore=1 hardware=0
+CYD_INPUT_RECLAIM_STDIO_PREWARM
+CYD_INPUT_RECLAIM_CASE id=R0 real_null=1 zeroed=1 ordinary_free=1 health_retained=1 protected_payloads=1
+CYD_INPUT_RECLAIM_CASE id=R1 real_null=5 floor=4 protected_payloads=1
+CYD_INPUT_RECLAIM_CASE id=R2 core0_detach=1 core1_pin=1 restore_overlap=1 retirement=1
+CYD_INPUT_RECLAIM_CASE id=R3 fixed_initial_budget=4 concurrent_restores=4 real_null=5
+CYD_INPUT_RECLAIM_CASE id=R4 zero=1 overflow=1 actual_isr=1 delegated=1
+CYD_INPUT_RECLAIM_COMPLETE cases=5 actual_module=1 real_sdk_allocator=1 real_oom=1 dualcore=1 hardware=0

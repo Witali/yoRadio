@@ -1,0 +1,365 @@
+#include <atomic>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <initializer_list>
+#include "esp_heap_caps.h"
+#include "esp_system.h"
+#include "esp_timer.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
+#include "mbedtls/platform.h"
+extern "C" {
+#include "adaptive_input.h"
+#include "native_health.h"
+#include "native_input_reclaim.h"
+}
+
+static_assert(std::atomic<unsigned>::is_always_lock_free, "ISR counters must not allocate or lock");
+enum class Mode : unsigned { OFF, RECOVERY, FLOOR, OVERLAP, BUDGET, DELEGATE, ISR };
+static std::atomic<Mode> mode;
+static std::atomic<unsigned> calls, nulls, successes, releases, released, isr_calls;
+static std::atomic<size_t> watched_count, watched_size;
+static std::atomic<bool> isr_done;
+static std::atomic<void *> allocation_result;
+static SemaphoreHandle_t before_release, permit_release, after_release, permit_retry, worker_done;
+static TaskHandle_t worker;
+static esp_timer_handle_t isr_timer;
+static void *fillers[4096];
+static unsigned filler_count;
+static unsigned pressure_nulls;
+static uint8_t control_storage[64];
+static constexpr uint32_t CAPS = MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT;
+static constexpr size_t CAPACITY = 1024;
+static constexpr size_t IMPOSSIBLE = 1U << 30;
+
+[[noreturn]] static void fail(const char *name) {
+    printf("CYD_INPUT_RECLAIM_FAILURE %s\n", name);
+    printf("CYD_INPUT_RECLAIM_CONTROLLED_STOP\n");
+    fflush(stdout);
+    esp_restart();
+    for (;;) {}
+}
+
+static void check(bool condition, const char *name) {
+    if (!condition) fail(name);
+}
+
+static void wait(SemaphoreHandle_t semaphore, const char *name) {
+    check(xSemaphoreTake(semaphore, pdMS_TO_TICKS(10000)) == pdTRUE, name);
+}
+
+static void watch(Mode next, size_t count, size_t size) {
+    mode = Mode::OFF;
+    calls = nulls = successes = releases = released = isr_calls = 0;
+    watched_count = count;
+    watched_size = size;
+    allocation_result = nullptr;
+    mode = next;
+}
+
+extern "C" void *__real_heap_caps_calloc(size_t, size_t, uint32_t);
+extern "C" void *__wrap_heap_caps_calloc(size_t count, size_t size, uint32_t caps) {
+    // Observe the real SDK result. This spy never substitutes a NULL or success.
+    void *result = __real_heap_caps_calloc(count, size, caps);
+    if (mode != Mode::OFF && count == watched_count && size == watched_size && caps == CAPS) {
+        ++calls;
+        if (result) ++successes;
+        else ++nulls;
+        if (xPortInIsrContext()) ++isr_calls;
+    }
+    return result;
+}
+
+extern "C" bool __real_adaptive_input_release_one(adaptive_input_t *);
+extern "C" bool __wrap_adaptive_input_release_one(adaptive_input_t *input) {
+    Mode current = mode.load();
+    if (current == Mode::OFF) return __real_adaptive_input_release_one(input);
+    unsigned ordinal = ++releases;
+    // A mutant that reclaims before its first real attempt must stop here,
+    // independently of whether the subsequent real allocation would succeed.
+    if (!xPortInIsrContext()) {
+        check(nulls > 0, "real_allocator_failed_before_release");
+        check(ordinal <= 4, "fixed_initial_budget");
+    }
+    bool barrier = current == Mode::BUDGET || (current == Mode::OVERLAP && ordinal == 1);
+    if (barrier) {
+        check(xPortGetCoreID() == 1, "release_barrier_actual_core1");
+        xSemaphoreGive(before_release);
+        wait(permit_release, "coordinator_permits_release");
+    }
+    bool result = __real_adaptive_input_release_one(input);
+    if (result) ++released;
+    if (barrier) {
+        xSemaphoreGive(after_release);
+        wait(permit_retry, "coordinator_permits_retry");
+    }
+    return result;
+}
+
+static void pressure() {
+    check(!filler_count, "pressure_starts_empty");
+    pressure_nulls = 0;
+    for (size_t chunk : {size_t(256), size_t(64)}) {
+        for (;;) {
+            check(filler_count < sizeof(fillers) / sizeof(fillers[0]), "static_filler_array_bound");
+            void *pointer = heap_caps_malloc(chunk, CAPS);
+            if (!pointer) { ++pressure_nulls; break; }
+            fillers[filler_count++] = pointer;
+        }
+    }
+    check(pressure_nulls == 2 && filler_count > 0, "pressure_observed_real_malloc_null");
+}
+
+static void unpressure() {
+    mode = Mode::OFF;
+    while (filler_count) heap_caps_free(fillers[--filler_count]);
+    check(heap_caps_check_integrity_all(true), "real_heap_integrity_after_pressure");
+}
+
+struct Pool {
+    adaptive_input_t *input;
+    void *reading;
+    void *writing;
+};
+
+static Pool pool_create() {
+    Pool pool = {adaptive_input_create(8 * CAPACITY, 4 * CAPACITY, CAPACITY), nullptr, nullptr};
+    check(pool.input, "actual_queue_create");
+    check(adaptive_input_attach_control(pool.input, control_storage, sizeof(control_storage)), "attach_real_control");
+    void *packet = nullptr;
+    check(adaptive_input_acquire(pool.input, &packet, CAPACITY, 0) == pdTRUE, "acquire_reading_source");
+    memset(packet, 0xa1, CAPACITY);
+    check(adaptive_input_commit(pool.input, packet) == pdTRUE, "commit_reading_source");
+    size_t size = 0;
+    pool.reading = adaptive_input_receive(pool.input, &size, 0);
+    check(pool.reading == packet && size == CAPACITY, "actual_reading_lease");
+    check(adaptive_input_acquire(pool.input, &packet, CAPACITY, 0) == pdTRUE, "acquire_ready_source");
+    memset(packet, 0xb2, CAPACITY);
+    check(adaptive_input_commit(pool.input, packet) == pdTRUE, "actual_ready_lease");
+    check(adaptive_input_acquire(pool.input, &pool.writing, CAPACITY, 0) == pdTRUE, "actual_writing_lease");
+    memset(pool.writing, 0xc3, CAPACITY);
+    check(adaptive_input_acquire_control(pool.input, &packet, sizeof(control_storage), 0) == pdTRUE,
+          "actual_control_lease");
+    memset(packet, 0xd4, sizeof(control_storage));
+    check(adaptive_input_commit(pool.input, packet) == pdTRUE, "actual_control_fifo");
+    auto stats = adaptive_input_stats(pool.input);
+    check(stats.target == 8 && stats.minimum == 4 && stats.resident == 8 &&
+          stats.ready == 1 && stats.reading == 1 && stats.writing == 1, "public_pool_geometry");
+    check(native_input_reclaim_bind(pool.input), "bind_actual_pool");
+    check(native_input_reclaim_bind(pool.input), "idempotent_bind_actual_pool");
+    return pool;
+}
+
+static void bytes_are(const void *data, size_t size, uint8_t expected, const char *name) {
+    const uint8_t *bytes = static_cast<const uint8_t *>(data);
+    for (size_t i = 0; i < size; ++i) check(bytes[i] == expected, name);
+}
+
+static void pool_quiet_destroy(Pool &pool, bool detached = false) {
+    mode = Mode::OFF;
+    auto stats = adaptive_input_stats(pool.input);
+    check(stats.resident >= 4 && stats.ready == 1 && stats.reading == 1 && stats.writing == 1,
+          "nonidle_and_floor_protected");
+    bytes_are(pool.reading, CAPACITY, 0xa1, "reading_payload_intact");
+    bytes_are(pool.writing, CAPACITY, 0xc3, "writing_payload_intact");
+    size_t size = 0;
+    void *ready = adaptive_input_receive(pool.input, &size, 0);
+    check(ready && size == CAPACITY, "ready_fifo_preserved");
+    bytes_are(ready, size, 0xb2, "ready_payload_intact");
+    check(adaptive_input_return(pool.input, ready), "return_ready_owner");
+    void *control = adaptive_input_receive(pool.input, &size, 0);
+    check(control == control_storage && size == sizeof(control_storage), "control_fifo_preserved");
+    bytes_are(control, size, 0xd4, "control_payload_intact");
+    check(adaptive_input_return(pool.input, control), "return_control_owner");
+    check(adaptive_input_return(pool.input, pool.reading), "return_reading_owner");
+    check(adaptive_input_cancel(pool.input, pool.writing), "cancel_writing_owner");
+    stats = adaptive_input_stats(pool.input);
+    check(!stats.ready && !stats.reading && !stats.writing, "ordinary_owners_quiet");
+    if (!detached) check(native_input_reclaim_detach(pool.input) == NATIVE_INPUT_RECLAIM_DETACHED,
+                         "detach_before_quiescent_destroy");
+    adaptive_input_destroy(pool.input);
+    pool.input = nullptr;
+    check(heap_caps_check_integrity_all(true), "heap_after_real_destroy");
+}
+
+static void free_zeroed(void *pointer) {
+    check(pointer, "recovery_after_real_null");
+    bytes_are(pointer, CAPACITY, 0, "real_calloc_zeroed_bytes");
+    memset(pointer, 0x55, CAPACITY);
+    mbedtls_free(pointer); // Actual SDK platform free, with no free wrapper.
+}
+
+static void worker_task(void *) {
+    check(xPortGetCoreID() == 1 && uxTaskPriorityGet(nullptr) == 3, "actual_worker_profile");
+    for (;;) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        allocation_result = mbedtls_calloc(watched_count.load(), watched_size.load());
+        xSemaphoreGive(worker_done); // The wrapper has returned, so its pin is gone.
+    }
+}
+
+static void timer_isr(void *) {
+    allocation_result = mbedtls_calloc(1, CAPACITY);
+    isr_done = xPortInIsrContext();
+}
+
+static void case_recovery() {
+    Pool pool = pool_create();
+    watch(Mode::DELEGATE, 1, 32);
+    auto before = adaptive_input_stats(pool.input);
+    void *small = mbedtls_calloc(1, 32);
+    check(small, "ordinary_real_calloc_success");
+    bytes_are(small, 32, 0, "ordinary_zeroed_bytes");
+    mbedtls_free(small);
+    check(adaptive_input_stats(pool.input).resident == before.resident, "success_does_not_reclaim");
+    pressure();
+    auto faults_before = native_health_snapshot().faults;
+    watch(Mode::RECOVERY, 1, CAPACITY);
+    void *result = mbedtls_calloc(1, CAPACITY);
+    check(result, "recovery_after_real_null");
+    check(nulls >= 1 && successes == 1 && calls == released + 1 && released >= 1 && released <= 4,
+          "observed_real_null_then_release_retry");
+    auto faults_after = native_health_snapshot().faults;
+    check(faults_after.allocation_failures > faults_before.allocation_failures &&
+          faults_after.allocation_size == CAPACITY && faults_after.allocation_caps == CAPS,
+          "native_health_real_failure_retained");
+    free_zeroed(result);
+    unpressure();
+    pool_quiet_destroy(pool);
+    printf("CYD_INPUT_RECLAIM_CASE id=R0 real_null=1 zeroed=1 ordinary_free=1 health_retained=1 protected_payloads=1\n");
+}
+
+static void case_floor() {
+    Pool pool = pool_create();
+    watch(Mode::FLOOR, 1, IMPOSSIBLE);
+    void *result = mbedtls_calloc(1, IMPOSSIBLE);
+    check(!result && calls == 5 && nulls == 5 && releases == 4 && released == 4,
+          "floor_and_bounded_failed_retry");
+    check(adaptive_input_stats(pool.input).resident == 4, "minimum_floor_preserved");
+    pool_quiet_destroy(pool);
+    printf("CYD_INPUT_RECLAIM_CASE id=R1 real_null=5 floor=4 protected_payloads=1\n");
+}
+
+static void case_retirement() {
+    Pool pool = pool_create();
+    adaptive_input_t *other = adaptive_input_create(2 * CAPACITY, 2 * CAPACITY, CAPACITY);
+    check(other, "alternate_pool_create");
+    pressure();
+    watch(Mode::OVERLAP, 1, CAPACITY);
+    xTaskNotifyGive(worker);
+    wait(before_release, "actual_worker_pin_entered");
+    check(native_input_reclaim_detach(pool.input) == NATIVE_INPUT_RECLAIM_BUSY,
+          "detach_busy_while_pinned");
+    check(!native_input_reclaim_bind(pool.input) && !native_input_reclaim_bind(other),
+          "bind_denied_while_retiring");
+    check(native_input_reclaim_detach(other) == NATIVE_INPUT_RECLAIM_WRONG_OWNER,
+          "wrong_owner_keeps_retirement");
+    unsigned old_releases = releases.load(), old_nulls = nulls.load();
+    check(!mbedtls_calloc(1, CAPACITY) && releases == old_releases && nulls > old_nulls,
+          "new_pin_denied_while_retiring");
+    xSemaphoreGive(permit_release);
+    wait(after_release, "actual_release_completed_under_pin");
+    // A real producer restore races the live allocator pin and consumes the
+    // freshly freed block before its retry. No queue state is fabricated.
+    check(adaptive_input_restore_one(pool.input), "real_restore_overlaps_pinned_owner");
+    check(native_input_reclaim_detach(pool.input) == NATIVE_INPUT_RECLAIM_BUSY,
+          "detach_still_busy_after_restore");
+    xSemaphoreGive(permit_retry);
+    wait(worker_done, "retiring_worker_returns_and_unpins");
+    void *result = allocation_result.load();
+    check(result && released >= 2 && released <= 4, "pinned_owner_finishes_bounded_recovery");
+    check(!native_input_reclaim_bind(other), "last_unpin_keeps_retirement_until_retry");
+    check(native_input_reclaim_detach(pool.input) == NATIVE_INPUT_RECLAIM_DETACHED,
+          "explicit_detach_retry_drains_pin");
+    check(native_input_reclaim_bind(other), "new_owner_after_explicit_detach");
+    check(native_input_reclaim_detach(other) == NATIVE_INPUT_RECLAIM_DETACHED, "detach_alternate_owner");
+    free_zeroed(result);
+    unpressure();
+    pool_quiet_destroy(pool, true);
+    adaptive_input_destroy(other);
+    printf("CYD_INPUT_RECLAIM_CASE id=R2 core0_detach=1 core1_pin=1 restore_overlap=1 retirement=1\n");
+}
+
+static void case_fixed_budget() {
+    Pool pool = pool_create();
+    watch(Mode::BUDGET, 1, IMPOSSIBLE);
+    xTaskNotifyGive(worker);
+    for (unsigned attempt = 0; attempt < 4; ++attempt) {
+        wait(before_release, "budget_worker_before_actual_release");
+        xSemaphoreGive(permit_release);
+        wait(after_release, "budget_worker_after_actual_release");
+        check(adaptive_input_restore_one(pool.input), "producer_restore_each_real_release");
+        xSemaphoreGive(permit_retry);
+    }
+    wait(worker_done, "fixed_budget_worker_terminates");
+    check(!allocation_result && calls == 5 && nulls == 5 && releases == 4 && released == 4,
+          "fixed_initial_budget");
+    check(adaptive_input_stats(pool.input).resident == 8, "restores_do_not_extend_budget");
+    pool_quiet_destroy(pool);
+    printf("CYD_INPUT_RECLAIM_CASE id=R3 fixed_initial_budget=4 concurrent_restores=4 real_null=5\n");
+}
+
+static void case_delegation() {
+    Pool pool = pool_create();
+    watch(Mode::DELEGATE, 0, CAPACITY);
+    void *zero = mbedtls_calloc(0, CAPACITY);
+    check(!zero && calls == 1 && !releases, "zero_delegates_without_reclaim");
+    watch(Mode::DELEGATE, SIZE_MAX, 2);
+    void *overflow = mbedtls_calloc(SIZE_MAX, 2);
+    check(!overflow && calls == 1 && !releases, "overflow_delegates_without_reclaim");
+    pressure();
+    watch(Mode::ISR, 1, CAPACITY);
+    isr_done = false;
+    check(esp_timer_start_once(isr_timer, 1000) == ESP_OK, "start_actual_sdk_isr");
+    int64_t deadline = esp_timer_get_time() + 10000000;
+    while (!isr_done) {
+        check(esp_timer_get_time() < deadline, "actual_sdk_isr_completes");
+        vTaskDelay(1);
+    }
+    check(!allocation_result && calls == 1 && nulls == 1 && isr_calls == 1 && !releases &&
+          adaptive_input_stats(pool.input).resident == 8, "isr_delegates_without_reclaim");
+    unpressure();
+    pool_quiet_destroy(pool);
+    printf("CYD_INPUT_RECLAIM_CASE id=R4 zero=1 overflow=1 actual_isr=1 delegated=1\n");
+}
+
+extern "C" void app_main(void) {
+    check(xPortGetCoreID() == 0, "coordinator_actual_core0");
+    // All task/semaphore/timer allocations and stdio initialization precede
+    // controlled pressure. The pressure pointer array is static caller storage.
+    printf("CYD_INPUT_RECLAIM_BOOT sdk=%s real_allocator=1 dualcore=1 hardware=0\n", esp_get_idf_version());
+    fprintf(stderr, "CYD_INPUT_RECLAIM_STDIO_PREWARM\n");
+    fflush(stdout);
+    fflush(stderr);
+    before_release = xSemaphoreCreateBinary();
+    permit_release = xSemaphoreCreateBinary();
+    after_release = xSemaphoreCreateBinary();
+    permit_retry = xSemaphoreCreateBinary();
+    worker_done = xSemaphoreCreateBinary();
+    check(before_release && permit_release && after_release && permit_retry && worker_done,
+          "preallocated_sdk_barriers");
+    check(native_health_start(), "actual_health_failed_alloc_callback");
+    check(xTaskCreatePinnedToCore(worker_task, "reclaim_probe", 4096, nullptr, 3, &worker, 1) == pdPASS,
+          "preallocated_actual_sdk_worker");
+    esp_timer_create_args_t timer = {};
+    timer.callback = timer_isr;
+    timer.dispatch_method = ESP_TIMER_ISR;
+    timer.name = "reclaim_isr";
+    check(esp_timer_create(&timer, &isr_timer) == ESP_OK, "preallocated_actual_sdk_isr_timer");
+    check(!native_input_reclaim_bind(nullptr) &&
+          native_input_reclaim_detach(nullptr) == NATIVE_INPUT_RECLAIM_WRONG_OWNER,
+          "null_owner_public_contract");
+    case_recovery();
+    case_floor();
+    case_retirement();
+    case_fixed_budget();
+    case_delegation();
+    mode = Mode::OFF;
+    check(esp_timer_delete(isr_timer) == ESP_OK, "delete_actual_isr_timer");
+    check(heap_caps_check_integrity_all(true), "final_actual_heap_integrity");
+    printf("CYD_INPUT_RECLAIM_COMPLETE cases=5 actual_module=1 real_sdk_allocator=1 real_oom=1 dualcore=1 hardware=0\n");
+    fflush(stdout);
+    esp_restart();
+}
