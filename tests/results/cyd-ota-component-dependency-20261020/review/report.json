@@ -1,0 +1,240 @@
+{
+  "schema": "ota-component-audit-v1",
+  "status": "PASS",
+  "source_commit": "52b1f273cd53c8212b2f427e0f293ce5159a11cc",
+  "full_application": false,
+  "hardware_tested": false,
+  "cases": [
+    {
+      "attempt": "cyd-present-01",
+      "qualification": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\cyd-present-01\\qualification-02.json",
+        "bytes": 131350,
+        "sha256": "050107ed1912d692fbc1226bcbc08e86e59c35700da7bb258d6c5a60ff678386"
+      },
+      "target": "esp32",
+      "stream": "present",
+      "ota_translation_units": 3,
+      "common_config_changes": 0,
+      "unavailable_symbols": 0,
+      "new_source_warnings": 0,
+      "baseline_diagnostic_bodies": 1,
+      "harness_advisories": [
+        {
+          "kind": "long isolated build path",
+          "body": "CMake Warning in C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/core/CMakeLists.txt: The object file directory C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-ota-component-dependency-01/cyd-present-01/b/esp-idf/mbedtls/mbedtls/tf-psa-crypto/core/CMakeFiles/tfpsacrypto.dir/./ has 174 characters. The maximum full path to an object file is 250 characters (see CMAKE_OBJECT_PATH_MAX). Object file dfc954cd2dbdb5a3006a0af5f4c8a069/psa_crypto_driver_esp_hmac_transparent.c.obj cannot be safely placed under this directory. The build may not work correctly.",
+          "scope": "actual archive and three OTA objects compiled successfully; this advisory does not qualify full application portability"
+        }
+      ],
+      "partition_tracebacks": [],
+      "generated_link_metadata": {
+        "original": {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\cyd-present-01\\b\\build.ninja",
+          "bytes": 8053333,
+          "sha256": "47c8fae0ef7d575c302027f804f4cb66064a121dc4d1c30db5990a3ec8c8f6e1"
+        },
+        "offset_bytes": 48046,
+        "selected_row": {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\review\\cyd-present-01-link-row.txt",
+          "bytes": 21647,
+          "sha256": "f56916ff71b871fb94de661049f04b15adc0adb3c3e9739c8808bc100d0fd08a"
+        },
+        "native_stream_archives": [
+          {
+            "token": "esp-idf/native_stream/libnative_stream.a",
+            "whole_archive": false
+          },
+          {
+            "token": "esp-idf/native_stream/libnative_stream.a",
+            "whole_archive": false
+          }
+        ],
+        "scope": "configuration-generated metadata; full application linker not executed"
+      }
+    },
+    {
+      "attempt": "cyd-absent-01",
+      "qualification": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\cyd-absent-01\\qualification.json",
+        "bytes": 141778,
+        "sha256": "e2238f77c680703f7538cbc14259cfd3527d705d41a4bc05b518c8ecbf2df464"
+      },
+      "target": "esp32",
+      "stream": "absent",
+      "ota_translation_units": 3,
+      "common_config_changes": 0,
+      "unavailable_symbols": 35,
+      "new_source_warnings": 0,
+      "baseline_diagnostic_bodies": 1,
+      "harness_advisories": [],
+      "partition_tracebacks": [],
+      "generated_link_metadata": {
+        "original": {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\ba\\build.ninja",
+          "bytes": 7443120,
+          "sha256": "a40b5d5809ba4ae40af19fe842c7bb7ba614a4531a27c04be533bc1c9fcec3ce"
+        },
+        "offset_bytes": 43273,
+        "selected_row": {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\review\\cyd-absent-01-link-row.txt",
+          "bytes": 19931,
+          "sha256": "b68655c2e595270c8e5b7ee8b602b9bd67618bb0c9889acccee0ad9c0d554abd"
+        },
+        "native_stream_archives": [],
+        "scope": "configuration-generated metadata; full application linker not executed"
+      }
+    },
+    {
+      "attempt": "c3-present-01",
+      "qualification": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\c3-present-01\\qualification.json",
+        "bytes": 166315,
+        "sha256": "d54f749d4b1580783bc3063772b87253cc905b08f26f9a4342acd3091d52a963"
+      },
+      "target": "esp32c3",
+      "stream": "present",
+      "ota_translation_units": 3,
+      "common_config_changes": 0,
+      "unavailable_symbols": 53,
+      "new_source_warnings": 0,
+      "baseline_diagnostic_bodies": 5,
+      "harness_advisories": [],
+      "partition_tracebacks": [],
+      "generated_link_metadata": {
+        "original": {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\bp\\build.ninja",
+          "bytes": 8954802,
+          "sha256": "2afd7ce63c612d07407b16c0bc5fb34f0022250bf2a01d179d35b950d905b440"
+        },
+        "offset_bytes": 47643,
+        "selected_row": {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\review\\c3-present-01-link-row.txt",
+          "bytes": 20850,
+          "sha256": "0e7284f0371207c9958613ce7c4a9931890417314f122e981dc8faa192db52b0"
+        },
+        "native_stream_archives": [
+          {
+            "token": "esp-idf/native_stream/libnative_stream.a",
+            "whole_archive": false
+          },
+          {
+            "token": "esp-idf/native_stream/libnative_stream.a",
+            "whole_archive": false
+          }
+        ],
+        "scope": "configuration-generated metadata; full application linker not executed"
+      }
+    },
+    {
+      "attempt": "c3-absent-01",
+      "qualification": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\c3-absent-01\\qualification.json",
+        "bytes": 163436,
+        "sha256": "4a39da6b69a2921c68bbb8f1ec088414ad1ceb8c42cd2dddc69d192282a98a9b"
+      },
+      "target": "esp32c3",
+      "stream": "absent",
+      "ota_translation_units": 3,
+      "common_config_changes": 0,
+      "unavailable_symbols": 53,
+      "new_source_warnings": 0,
+      "baseline_diagnostic_bodies": 5,
+      "harness_advisories": [
+        {
+          "kind": "isolated project omitted partition CSV",
+          "body": "CMake Warning at C:/Work/yoRadio/.idf/v6.1-9a97f6c54ec6/components/partition_table/project_include.cmake:37 (message): Partition table CSV file C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-ota-component-dependency-01/c3-absent-01/project/partitions.csv not found. Change custom partition CSV path in menuconfig.",
+          "scope": "no partition/image/full application qualification; native_ota component compilation succeeded"
+        }
+      ],
+      "partition_tracebacks": [
+        "FileNotFoundError: [Errno 2] No such file or directory: 'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-ota-component-dependency-01/c3-absent-01/project/partitions.csv'",
+        "FileNotFoundError: [Errno 2] No such file or directory: 'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-ota-component-dependency-01/c3-absent-01/project/partitions.csv'",
+        "FileNotFoundError: [Errno 2] No such file or directory: 'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-ota-component-dependency-01/c3-absent-01/project/partitions.csv'",
+        "FileNotFoundError: [Errno 2] No such file or directory: 'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-ota-component-dependency-01/c3-absent-01/project/partitions.csv'",
+        "FileNotFoundError: [Errno 2] No such file or directory: 'C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-ota-component-dependency-01/c3-absent-01/project/partitions.csv'"
+      ],
+      "generated_link_metadata": {
+        "original": {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\c3-absent-01\\b\\build.ninja",
+          "bytes": 8970042,
+          "sha256": "288935d3448da6290622775407405402236c471994e73120e71d96f2650b2c32"
+        },
+        "offset_bytes": 47454,
+        "selected_row": {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\review\\c3-absent-01-link-row.txt",
+          "bytes": 20766,
+          "sha256": "524c227afab6e3b4e845c84bb05e4b434fd426023857da05db875a9225a0a3f2"
+        },
+        "native_stream_archives": [],
+        "scope": "configuration-generated metadata; full application linker not executed"
+      }
+    }
+  ],
+  "tool": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\audit.py",
+    "bytes": 6141,
+    "sha256": "f5be0fcf0e27cfb45daa177b4e6457bc672113acc1f07003d24426ddc272f9f4"
+  },
+  "source_patch": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-ota-component-dependency-01\\review\\source.patch",
+    "bytes": 981,
+    "sha256": "d78f8714fa8845e7a0f30f0281946de9ac0c59f1ff3fdcd0d9ceb7926d3bf9aa"
+  },
+  "source_change": {
+    "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\CMakeLists.txt",
+    "bytes": 676,
+    "sha256": "c8280acd7f9f44f441cac3dcf5a5a224eb739bcd5ae81e85b45f939190a891fb"
+  },
+  "unchanged_c3_and_ota_sources": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\CMakeLists.txt",
+      "bytes": 13281,
+      "sha256": "ce7814a37fb03ce7890300065171662a51b94c1da9be018ee8e41451ff715e4f"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\CMakeLists.txt",
+      "bytes": 29073,
+      "sha256": "d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\adaptive_input.c",
+      "bytes": 177,
+      "sha256": "dd8ae2f4030205d949a362165e49558ac4baeb92daa3c9df8240180baae7a239"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\icy_title.c",
+      "bytes": 295,
+      "sha256": "f70f14db312ccf03a57dd87dadb202bde5e67241acf8250bc405d5cb94791204"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\native_ota_form.c",
+      "bytes": 3405,
+      "sha256": "4e9dd35aa7f824dbc98f84c9d084acd1472b40e04ca7bd3f87c9a9855d44742f"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\native_ota_http.c",
+      "bytes": 10911,
+      "sha256": "d6a597817572c4a07ef19b89436f70be8122d91f8cfc711d4b4a25573e7857e8"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\native_ota_sink.c",
+      "bytes": 5941,
+      "sha256": "43689b67da57e4a37d1f7e887f81c78fb3f17f5c43d7db6c07c7380feae09cb2"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\include\\native_ota_form.h",
+      "bytes": 807,
+      "sha256": "f3149208c358ef906a4bd9014f0f8b1961791992cc0d33f00168e3c1b22818a0"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\include\\native_ota_http.h",
+      "bytes": 1152,
+      "sha256": "5f1ec06dcc00ea5ef006b4e4ff6019d7856f0739b03b9ca062650c55a518fee9"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\native_ota\\include\\native_ota_sink.h",
+      "bytes": 2061,
+      "sha256": "4e27ffa36951b4fd2f459e094c4ef287bad5b163ce3bc9b74b05cd846a3d2dde"
+    }
+  ]
+}
