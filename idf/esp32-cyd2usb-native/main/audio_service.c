@@ -14,6 +14,7 @@
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
 #include "http_request_buffer.h"
+#include "native_tls_rx_reserve.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "esp_timer.h"
@@ -611,7 +612,7 @@ static void stream_task(void *argument) {
             .timeout_ms = 10000,
             .buffer_size = STREAM_CHUNK_SIZE,
             .buffer_size_tx = 4096,
-            .crt_bundle_attach = esp_crt_bundle_attach,
+            .crt_bundle_attach = native_tls_rx_reserve_crt_bundle_attach,
             .disable_auto_redirect = true,
             .max_redirection_count = MAX_HTTP_REDIRECTS,
             .keep_alive_enable = true,

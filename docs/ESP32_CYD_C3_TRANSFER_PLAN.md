@@ -79,7 +79,7 @@ allocation и численные настройки C3 являются канд
 
 ## Что осталось по переносу
 
-- **Этап 13, память:** адаптировать TLS reserve под статические CYD TLS-буферы,
+- **Этап 13, память:** завершить квалификацию TLS reserve под статические CYD TLS-буферы,
   завершить radio-boot/board квалификацию [ранней MPI](CYD_EARLY_MPI_DESIGN.md)
   и подобрать heap/IRAM/стеки по CYD. MPI уже подключена default-off и прошла
   проверки actual startup/SDK mutex/OOM/двух ядер, а также
@@ -87,8 +87,9 @@ allocation и численные настройки C3 являются канд
   physical benefit ещё открыт. Первый кандидат reserve прошёл локальные
   host/config проверки, но не подключён к firmware: ревью выявило неполный
   контракт pointer/numeric `user_data`. [Новая привязка конфигураций](CYD_MEMORY_TRANSFER_DESIGN.md)
-  не использует application userdata и прошла изолированные host-проверки;
-  итоговая версия, actual SDK/QEMU и подключение к радио ещё впереди.
+  уже подключена к радио отдельной default-off опцией и не использует application
+  userdata. Текущие исходники прошли unit, полную service-матрицу и CMake-проверки;
+  actual SDK/QEMU, lint/application exports и физическая польза ещё впереди.
   Первая target-матрица завершилась nonpass; полный target gate остаётся открытым.
   Освобождение HTTP GET TX и lifetime-safe reclaim уже реализованы;
   семь production exports reclaim проверены, физический выигрыш ещё не измерен.
@@ -602,3 +603,13 @@ Stream остаётся на core0, decode/output на core1 с прежними
   незапущенных варианта. Raw report, SDK source/config/tool identities и точная
   цепочка panic сохранены; автономный verifier подтверждает целостность архива,
   сохраняя target status nonpass. Новый registry в этот архив не включён.
+- 2026-10-20, CYD-C3-13: default-off [static RX reserve](CYD_MEMORY_TRANSFER_DESIGN.md)
+  подключён через отдельный integer-identity registry и точные SDK init/free hooks.
+  [Самодостаточные canonical tests](../tests/native/cyd_tls_static_rx/README.md)
+  проходят на текущих исходниках: unit8/9controls/14compile rejections и8restored,
+  service536 сценариев/12вариантов/2controls, CMake45 с19SDK guard mutations.
+  Проверены оба вида userdata, config-free-before-ssl-free, новая radio config по
+  старому адресу при живом старом RX loan, overflow/fallback, cleanup и SMP host
+  seams. Source/snapshot/log/tool identities перепроверены после terminal0 всех
+  трёх runners. Это не actual target ISR/SMP/OOM, SDK/QEMU или physical PASS;
+  целевая матрица и production qualification остаются открытыми.

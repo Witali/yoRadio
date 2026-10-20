@@ -80,7 +80,7 @@ and physical benefit/default activation remain open. The source audit below
 is historical evidence from before this implementation, rather than its
 current status.
 
-## Static RX reserve candidate remains under review
+## Opt-in static RX reserve; target qualification remains open
 
 The [first isolated candidate](../tests/results/cyd-tls-rx-pointer-prototype-20261020/README.md)
 retained the complete SDK RX expression and passed
@@ -91,23 +91,30 @@ after the numeric-userdata setter. Pointer-cookie tests therefore cannot prove
 isolation for all other configurations. The existing application userdata must
 remain available to its owner, regardless of which public setter it uses.
 
-A replacement uses a bounded, separately synchronized registry
-of explicitly radio-attached configuration identities. Exact configuration
-initialization/free hooks must revoke eligibility without releasing an existing
-RX loan. This separation is necessary because the actual ESP-TLS teardown frees
-its configuration before freeing the SSL context. Registry overflow must fall
-back to ordinary allocation; it must not reject a connection or evict a live
-configuration. Numeric/pointer userdata, early setup failure, cancellation,
-address reuse, full registry and both-core lifetime checks remain required.
+The replacement is now integrated behind the default-off
+`CONFIG_YORADIO_TLS_STATIC_RX_RESERVE` option. It uses an eight-entry,
+separately synchronized registry of explicitly radio-attached integer address
+identities; application userdata is neither read nor changed. Exact SDK
+configuration init/free hooks revoke eligibility without releasing a live RX
+loan. This separation matches actual ESP-TLS teardown, which frees its
+configuration before the SSL context. A full registry uses ordinary allocation
+without rejecting a connection or evicting a registered identity. The same
+build-local overlay guards nineteen supporting SDK sources and retains the
+complete SDK RX expression, ordinary allocation/free pairing and independently
+enabled input reclaim. The radio change is limited to its certificate callback;
+task cores, priorities, stacks and board settings remain unchanged.
 
-The isolated registry candidate passed seven host groups, nine exact semantic
-controls and fourteen invalid-profile compile rejections with ASan/UBSan, followed
-by all seven restored positive groups. These checks exercise selected pinned SDK
-lifetime bodies with explicit host layout/crypto/RTOS/capacity seams; they do not
-qualify the actual Xtensa SDK build, TLS traffic or physical memory benefit. The
-next self-contained revision also replaces retained pointer keys with integer
-address identities. Its final source, target matrix and radio integration still
-need their own qualification.
+[Canonical tests and commands](../tests/native/cyd_tls_static_rx/README.md) no
+longer depend on historical ignored drafts. Current source passed eight host
+groups, nine exact semantic controls, fourteen invalid-profile compile rejections
+and all eight restored groups with ASan/UBSan. Whole-service coverage passed 536
+scenarios across twelve reserve/reclaim/backend variants and two binding
+controls; forty-five configure-only cases include nineteen SDK guard mutations.
+These checks retain explicit host layout/crypto/RTOS/capacity seams. Actual
+Xtensa SDK/QEMU, the real ISR and two-core checks, full lint/application exports,
+TLS traffic and physical resource benefit still need qualification. The static
+slot permanently withholds general heap, so this remains a default-off resource
+tradeoff rather than a claim of memory savings.
 
 The original ten-variant campaign ended nonpassing: six variants were accepted,
 the seventh emitted its expected semantic marker and then panicked when its
@@ -126,7 +133,8 @@ qualification false and does not cover the replacement registry.
 
 ## Remaining work
 
-- Implement and qualify a CYD-specific TLS/full-record RX reservation after the
+- Finish SDK/QEMU, lint/application and physical qualification of the
+  CYD-specific TLS/full-record RX reservation against the
   [read-only SDK audit](../tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md).
   CYD uses static TLS buffers; the donor dynamic-RX allocation sites and capacity
   formula do not apply. Preserve the SDK full-record capacity expression,

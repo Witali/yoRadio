@@ -91,6 +91,9 @@ native_enable_http_request_buffer_release()
 include("${CMAKE_CURRENT_LIST_DIR}/compat/input_reclaim/enable.cmake")
 native_enable_tls_input_reclaim()
 
+include("${CMAKE_CURRENT_LIST_DIR}/compat/tls_static_rx/enable.cmake")
+native_enable_tls_static_rx_reserve()
+
 include("${CMAKE_CURRENT_LIST_DIR}/compat/early_mpi/enable.cmake")
 native_enable_tls_early_mpi()
 

@@ -144,6 +144,27 @@ menu "yoRadio native firmware"
 
     endchoice
 
+    config YORADIO_TLS_STATIC_RX_RESERVE
+        bool "Reserve one complete radio TLS RX buffer (experimental)"
+        depends on IDF_TARGET_ESP32 && ESP_TLS_USING_MBEDTLS
+        depends on MBEDTLS_INTERNAL_MEM_ALLOC && !MBEDTLS_CUSTOM_MEM_ALLOC
+        depends on MBEDTLS_CERTIFICATE_BUNDLE && !MBEDTLS_DYNAMIC_BUFFER
+        depends on !MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH
+        depends on !MBEDTLS_SSL_PROTO_GMTSSL1_1 && !MBEDTLS_SSL_CONTEXT_SERIALIZATION
+        default n
+        help
+            Keep one complete SDK RX buffer in static internal RAM, available
+            only to explicitly attached radio config identities. A bounded
+            registry tracks config init/free without using application userdata.
+            Registry overflow uses ordinary TLS allocation. Retain
+            the original full input record size and allocator/free dispatcher.
+            Concurrent or unrelated contexts use ordinary allocation, including
+            independently enabled idle-input reclaim. This permanently reduces
+            general heap even during HTTP. Keep disabled until physical CYD
+            memory, fragmentation, playback and concurrent-client tests justify
+            the static-versus-heap-held resource tradeoff. Task profiles, buffer
+            pool limits, authentication, clocks and pins are unchanged.
+
     config YORADIO_TLS_EARLY_MPI_LOCK
         bool "Initialize the SDK hardware MPI mutex before services (experimental)"
         depends on IDF_TARGET_ESP32 && SOC_MPI_SUPPORTED
