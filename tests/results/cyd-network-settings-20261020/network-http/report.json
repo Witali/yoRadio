@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "scope": "Actual CYD network status/retry handlers with explicit HTTPD/snapshot seams.\n\nThis is handler semantics, not a TCP/parser/TLS or physical networking gate.\nThe permanent owner, SDK wrapper and wire foundations are qualified separately.\n",
+  "source_sha256": {
+    "tests/run-cyd-network-http.py": "c7bb5941a49fc946be81e383d66b7eeb5ce0c62e88f5b3a269e84339929e682e",
+    "tests/native/cyd_network_http_test.c": "8b6fcefc6edd4bee9cf3da65a1ae488af988cab09a6d1964c386d25055401c64",
+    "tests/run-web-warning-regressions.py": "b74ce4aec3f2c8d658825065f66432779764b4a7e8e5a33c0c308b36233529a7",
+    "tools/codec_benchmark/run_output_dma_host.py": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145",
+    "idf/esp32-cyd2usb-native/main/web_service.c": "a0bbe01b946f31d3f78eac02b3313f52aefa68c70bcadbfd47dba0eb24da0066",
+    "idf/esp32-cyd2usb-native/main/network_status.h": "3e5006a5eecfc3ea896af90f7c0bddba8200bca78f2af251129f76a122867b44",
+    "idf/esp32-cyd2usb-native/main/network_settings.h": "fc7c79da8fb40872fb36a43c9bfdc32015a2aa4e74b2232a5925e649ff8d24b6",
+    "idf/components/native_network_power/include/native_network_power.h": "9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4"
+  },
+  "actual_handler_cases": 16,
+  "parsed_actual_json_responses": 7,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "physical_hardware": false,
+  "negative_controls": {
+    "network_body_purge": {
+      "detected": true,
+      "expected_assertion": "network_handler(&request)==ESP_FAIL",
+      "exit_code": -6
+    },
+    "retry_body_purge": {
+      "detected": true,
+      "expected_assertion": "reconnect_handler(&request)==ESP_FAIL",
+      "exit_code": -6
+    },
+    "missing_no_store": {
+      "detected": true,
+      "expected_assertion": "status == 200 && no_store && json_type",
+      "exit_code": -6
+    },
+    "false_connected_claim": {
+      "detected": true,
+      "expected_assertion": "strstr(response,\"\\\"accepted\\\":true\")",
+      "exit_code": -6
+    }
+  }
+}

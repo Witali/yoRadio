@@ -1,0 +1,84 @@
+{
+  "source_sha256": {
+    "tests/run-reboot-leases.py": "5d6fc4d89a3e11f2628be891109390859c3b4a66816270f2c77d29b577990aea",
+    "tests/native/reboot_lease_test.c": "50e73079f88d33999410826f4833cb7f38e4e231c096c01fb38eba2f1967a2c2",
+    "idf/esp32-cyd2usb-native/main/web_reboot.c": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b",
+    "idf/esp32-cyd2usb-native/main/web_reboot.h": "281b0e908d5432589394564a31d9d030c43f2ab7ea9138be4e58eb84bb8748e9",
+    "idf/esp32c3-oled-native/main/websocket_service.c": "a48c3e5d13223a136f87cee4a53a1ded93a22469fb6da959ea10cba45813d8a6",
+    "idf/esp32c3-oled-native/main/websocket_service.h": "870786b4028900c2d14022f2316d05f3246254db35737af3d52d6e6a1b797a07",
+    "tools/codec_benchmark/run_output_dma_host.py": "5e4141132d46f26ca0ab056b23524b30d72addd1ac3551f08dd6af2d8b76c145"
+  },
+  "variants": {
+    "cyd": {
+      "passed": true,
+      "result": "PASS reboot leases: 208 scenarios; 200 real thread admission/request races, stale/duplicate tokens, pending rejection, deferred execution, commit allocation-free, tick wrap\nPASS reserved-immediate: 208 scenarios; 200 real AP/OTA admission races, 2 SDK-entry interleavings, outside-critical restart, stale/cancelled/zero/NULL/unavailable rejection, returning and nonreturning SDK seams",
+      "complete_tu_matches_frozen_bytes": true
+    },
+    "c3": {
+      "passed": true,
+      "result": "PASS reboot leases: 208 scenarios; 200 real thread admission/request races, stale/duplicate tokens, pending rejection, deferred execution, commit allocation-free, tick wrap"
+    }
+  },
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "negative_controls": {
+    "release-before-sdk": {
+      "detected": true,
+      "exit_status": 80,
+      "expected_marker": "reservation_retained_during_restart"
+    },
+    "restart-under-portmux": {
+      "detected": true,
+      "exit_status": 80,
+      "expected_marker": "restart_outside_critical"
+    },
+    "ignore-service-lifetime": {
+      "detected": true,
+      "exit_status": 80,
+      "expected_marker": "unavailable_service_rejects_immediate"
+    },
+    "ignore-exact-token": {
+      "detected": true,
+      "exit_status": 80,
+      "expected_marker": "stale_copy_cannot_restart_or_consume_new_lease"
+    }
+  },
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "passed": true,
+  "scope": "Complete unchanged CYD reboot translation unit and unchanged C3 reboot/lease source slice; real pthread admission/request and AP/OTA reservation races, SDK-entry barriers, mutex critical sections. Deterministic RTOS notification/clock/restart seams. No hardware scheduler, RF eligibility, target ABI or reboot durability claim.",
+  "generated_sha256": {
+    "compiler.log": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048",
+    "esp_err.h": "7a2470588a1e829dabbed36a398bb8f385b453ae7105afdaf51eb19549880687",
+    "esp_http_server.h": "05219283e7e7dacbb3c9c8b1d374dd54f7644192dcdbae514fefeca325548ea9",
+    "esp_system.h": "aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+    "native_state.h": "566c1dde15ee876b81ea829a144faeb22de69a39189adc3b8fd8102cc0da5f02",
+    "c3/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "c3/command.json": "a7c0692f3ec8488bfa10d03cb8934a1590211a1913a4c56047d9cf5abe96c259",
+    "c3/reboot-production.inc": "2f4009be0b590d1c1d6972056e1a868fcbc38f62cb6e02687a3b7a52b3bdb4b5",
+    "c3/test.log": "2b87ed12c6b522a2b2a6c1cb9a7ac25ea572c8efb59adc9d1e22066b1982b3a8",
+    "cyd/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cyd/command.json": "d9e3b00fcdc7898fbc7fc3dbdc44cb5123fc2130b5ef40e60708d749942232db",
+    "cyd/reboot-production.inc": "d06e40935be7e47a1c0e3bd48f57917d9b3dd2ead1227cf9824024bb8f10185b",
+    "cyd/test.log": "10a9f8b9e5ae67ad5bf1a8e23937ce0658df97e9a50fed3fbeb71a2a4a49d88c",
+    "freertos/FreeRTOS.h": "aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+    "freertos/task.h": "aecb9819eb04bf5ad6cd2535cfac9b1bed5ef7946e551eff2224759862e16294",
+    "ignore-exact-token/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ignore-exact-token/command.json": "1410c9fdf7f5b13db7014b9a64fe8636f356be4961945e13f1b9178420ab956c",
+    "ignore-exact-token/reboot-production.inc": "03f4bdd566743ebf19f96b4da13975dd653d293e2c5304979da88fc8ce5a826b",
+    "ignore-exact-token/test.log": "837faf3d79833019344f12f677c225504eaf9418daf401811f9c119ab587886e",
+    "ignore-service-lifetime/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ignore-service-lifetime/command.json": "46cd09928763069050638c58f081922a3733e40ba9e0bbbd9d89fb7420dc0437",
+    "ignore-service-lifetime/reboot-production.inc": "d1111703c16e86ba11c2c761b4d818426eebe1c7d37ba1aed3253705d97dfe7d",
+    "ignore-service-lifetime/test.log": "cd4ac7014ac65618f0bf5c9cfbd9979b0997e026957083efa3c5afecc572d6e8",
+    "release-before-sdk/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-before-sdk/command.json": "52333eaea5c2331013c2bbe5cbf73ed73d8b4d033959a09a73ebf5e918a9016d",
+    "release-before-sdk/reboot-production.inc": "ba26d76351decf3b3441008e764342fbcafe51d887d474d69ad2112b9e96cb41",
+    "release-before-sdk/test.log": "25291f0a5ca17fb93a225fe4220a6875598ade4ed36f957250119e1ada80ca60",
+    "restart-under-portmux/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "restart-under-portmux/command.json": "f8d421cc3ebfb3d846bcad6db7c776dd1c498029dfaa698d4e2dbeb361d8e709",
+    "restart-under-portmux/reboot-production.inc": "8b9db4911aacb2c1425c591338c8dd478a278c317d06afec6e8d200f50501a6e",
+    "restart-under-portmux/test.log": "3be69887a05f140577e5891e68a98618ae892827fe2b0a09191d7062a0e10123"
+  }
+}

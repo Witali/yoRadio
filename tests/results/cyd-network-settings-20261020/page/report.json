@@ -1,0 +1,216 @@
+{
+  "passed": true,
+  "scope": "Run the actual compact CYD page script, including OTA, Wi-Fi and network/time edits.\n\nBrowser DOM/fetch/WebSocket boundaries are controlled Node seams. Semantic\nmutants run only against frozen alternate page files; production is unchanged.\nThese tests do not replace browser layout or physical-device qualification.\n",
+  "physical_hardware": false,
+  "source_sha256": {
+    "tests/run-cyd-native-page.py": "6a14bbcabe67ae75696832a6cc39389a8b0af25018ee14788e9b6f18fb2a4bcf",
+    "idf/esp32-cyd2usb-native/main/web_pages.cpp": "34176d8adacd9c8d49caaff70eb985bc2e7ad41e9b9eb7af31291786c5baf86e",
+    "tests/cyd-native-page.test.js": "12f214dbb0048f752e78970011394e1f1e76687dc70a21888fd40789f1d2893c"
+  },
+  "command": [
+    "C:\\Program Files\\nodejs\\node.EXE",
+    "--test",
+    "--test-reporter=tap",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+  ],
+  "positive_groups": 48,
+  "negative_controls": {
+    "drop_other_profiles": {
+      "case": "Wi-Fi first-row editor preserves all five IDs and omits untouched SSIDs and passwords",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^Wi\\-Fi\\ first\\-row\\ editor\\ preserves\\ all\\ five\\ IDs\\ and\\ omits\\ untouched\\ SSIDs\\ and\\ passwords$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "rewrite_legacy_ssid": {
+      "case": "unchanged non-UTF8 legacy SSID presentation is omitted even when replacement text exceeds the byte cap",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^unchanged\\ non\\-UTF8\\ legacy\\ SSID\\ presentation\\ is\\ omitted\\ even\\ when\\ replacement\\ text\\ exceeds\\ the\\ byte\\ cap$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "blank_password_clears": {
+      "case": "Wi-Fi blank password keeps existing secret and persistence failure keeps the new input",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^Wi\\-Fi\\ blank\\ password\\ keeps\\ existing\\ secret\\ and\\ persistence\\ failure\\ keeps\\ the\\ new\\ input$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "implicit_open": {
+      "case": "open network requires an explicit action and sends set with an empty password",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^open\\ network\\ requires\\ an\\ explicit\\ action\\ and\\ sends\\ set\\ with\\ an\\ empty\\ password$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "wrong_offset_sign": {
+      "case": "time saves exact four query fields without a body and announces persistence without claiming synchronization",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^time\\ saves\\ exact\\ four\\ query\\ fields\\ without\\ a\\ body\\ and\\ announces\\ persistence\\ without\\ claiming\\ synchronization$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "stale_time_response": {
+      "case": "periodic polling is sequential and an old time GET cannot overwrite a completed edit",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^periodic\\ polling\\ is\\ sequential\\ and\\ an\\ old\\ time\\ GET\\ cannot\\ overwrite\\ a\\ completed\\ edit$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "overlapping_polls": {
+      "case": "periodic polling is sequential and an old time GET cannot overwrite a completed edit",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^periodic\\ polling\\ is\\ sequential\\ and\\ an\\ old\\ time\\ GET\\ cannot\\ overwrite\\ a\\ completed\\ edit$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "legacy_capability_fallback": {
+      "case": "legacy upload capability does not enable native Wi-Fi editing and unconfirmed success never claims restart",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^legacy\\ upload\\ capability\\ does\\ not\\ enable\\ native\\ Wi\\-Fi\\ editing\\ and\\ unconfirmed\\ success\\ never\\ claims\\ restart$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "stale_network_settings_response": {
+      "case": "stale network settings GET cannot overwrite completed save or later dirty input",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^stale\\ network\\ settings\\ GET\\ cannot\\ overwrite\\ completed\\ save\\ or\\ later\\ dirty\\ input$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "clobber_dirty_network_settings": {
+      "case": "network polling preserves dirty fields and reports configured error and AP deadline separately",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^network\\ polling\\ preserves\\ dirty\\ fields\\ and\\ reports\\ configured\\ error\\ and\\ AP\\ deadline\\ separately$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "accept_unconfirmed_network_save": {
+      "case": "network persistence errors preserve edits and success with failed refresh stays visibly saved",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^network\\ persistence\\ errors\\ preserve\\ edits\\ and\\ success\\ with\\ failed\\ refresh\\ stays\\ visibly\\ saved$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "drop_network_input_epoch": {
+      "case": "new network input during pending save and refresh is retained",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^new\\ network\\ input\\ during\\ pending\\ save\\ and\\ refresh\\ is\\ retained$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "allow_ota_during_network_save": {
+      "case": "network saves serialize time Wi-Fi and file forms and block OTA until persistence finishes",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^network\\ saves\\ serialize\\ time\\ Wi\\-Fi\\ and\\ file\\ forms\\ and\\ block\\ OTA\\ until\\ persistence\\ finishes$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    },
+    "retain_old_timer_after_failed_refresh": {
+      "case": "saved AP timeout with failed refresh never retains the previous disabled or armed label",
+      "status": 1,
+      "expected_failure": "ERR_ASSERTION",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "^saved\\ AP\\ timeout\\ with\\ failed\\ refresh\\ never\\ retains\\ the\\ previous\\ disabled\\ or\\ armed\\ label$",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\cyd-native-page.test.js"
+      ],
+      "rejected": true
+    }
+  },
+  "source_files_still_match_snapshot": true
+}

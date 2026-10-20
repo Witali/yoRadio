@@ -1,0 +1,148 @@
+{
+  "passed": true,
+  "scope": "Qualify the complete CYD desired network settings source on the host.\n\nThe unchanged production C and header are frozen before compilation. pthread\nmutexes model FreeRTOS writer admission and the snapshot critical section;\nadmission failure is injected rather than claimed to reproduce RTOS timing.\nThe NVS seam models staged writes, commit, read/open errors and durable reload.\nIt does not qualify target ABI, flash power-loss recovery, NVS internals or RF.\n",
+  "physical_hardware": false,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-cyd-network-settings.py": "12020d76df58a729085da8f94f88f6ac9e3c098a37d41641eac6a607f39d2760",
+    "idf/esp32-cyd2usb-native/main/network_settings.c": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6",
+    "idf/esp32-cyd2usb-native/main/network_settings.h": "fc7c79da8fb40872fb36a43c9bfdc32015a2aa4e74b2232a5925e649ff8d24b6",
+    "tests/native/cyd_network_settings/platform.h": "1253e50a069375f8cb3a74fe7952716015d6373aea4a253f51c9bc8cdafadea6",
+    "tests/native/cyd_network_settings/test.c": "e3fb9a5abc5643fb8aec50b5fdba094c9a2640ab56467dac96947376f9cb61ab"
+  },
+  "generated_sha256": {
+    "esp_err.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "nvs.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "freertos/FreeRTOS.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "freertos/semphr.h": "d1de9cc5f4bd8dd525eef1b9e9a268cb215ee5543a29cc92c24b8181472b9083",
+    "network-settings-under-test.c": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6"
+  },
+  "cases": {
+    "defaults": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "validation": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "roundtrip": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "invalid-record": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "read-errors": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "wrong-type": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "save-errors": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "mutex-oom": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "revision-limit": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "concurrent-init": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "concurrent-save": {
+      "passed": true,
+      "exit_status": 0
+    },
+    "candidate-owned": {
+      "passed": true,
+      "exit_status": 0
+    }
+  },
+  "negative_controls": {
+    "publish-failed-commit": {
+      "detected": true,
+      "case": "save-errors",
+      "exit_status": 80,
+      "expected_marker": "failed_commit_never_publishes"
+    },
+    "publish-before-commit": {
+      "detected": true,
+      "case": "concurrent-save",
+      "exit_status": 80,
+      "expected_marker": "commit_must_precede_publication"
+    },
+    "ignore-canonical-tail": {
+      "detected": true,
+      "case": "invalid-record",
+      "exit_status": 80,
+      "expected_marker": "invalid_record_rejected_without_publication"
+    },
+    "drop-revision-increment": {
+      "detected": true,
+      "case": "roundtrip",
+      "exit_status": 80,
+      "expected_marker": "successful_save_advances_revision"
+    },
+    "drop-writer-admission": {
+      "detected": true,
+      "case": "defaults",
+      "exit_status": 80,
+      "expected_marker": "writer_admission_required"
+    },
+    "accept-dotted-hostname": {
+      "detected": true,
+      "case": "validation",
+      "exit_status": 80,
+      "expected_marker": "invalid_hostname_rejected"
+    },
+    "accept-timeout-31": {
+      "detected": true,
+      "case": "validation",
+      "exit_status": 80,
+      "expected_marker": "bounded_ap_timeout"
+    }
+  },
+  "validation_contract": "One ASCII DHCP hostname label, 1-23 bytes, alnum/internal hyphen; AP 0-30 minutes.",
+  "donor_difference": "C3 permits empty/dots/underscores/non-ASCII; this new CYD setting deliberately requires one ASCII label.",
+  "command": [
+    "gcc",
+    "-std=c11",
+    "-O1",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-fno-pie",
+    "-no-pie",
+    "-pthread",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-settings-persistence-01",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-settings-persistence-01/sources/idf/esp32-cyd2usb-native/main",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-settings-persistence-01/sources/tests/native/cyd_network_settings",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-settings-persistence-01/sources/tests/native/cyd_network_settings/test.c",
+    "-o",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-settings-persistence-01/settings"
+  ],
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "compiled_production_matches_frozen_bytes": true,
+  "sources_unchanged_after": {
+    "tests/run-cyd-network-settings.py": true,
+    "idf/esp32-cyd2usb-native/main/network_settings.c": true,
+    "idf/esp32-cyd2usb-native/main/network_settings.h": true,
+    "tests/native/cyd_network_settings/platform.h": true,
+    "tests/native/cyd_network_settings/test.c": true
+  }
+}

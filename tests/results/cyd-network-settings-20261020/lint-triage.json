@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "previous_units": 50,
+  "current_units": 52,
+  "previous_warnings": 81,
+  "current_warnings": 86,
+  "errors": 0,
+  "new_warning_instances": 5,
+  "new_warning_triage": [
+    {
+      "file": "idf/esp32-cyd2usb-native/main/network_runtime.c",
+      "check": "bugprone-suspicious-string-compare",
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "instances": 1,
+      "assessment": "Intentional nonzero string/binary comparison in a boolean condition; false is equality. No inverted predicate or unbounded read found."
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+      "check": "bugprone-not-null-terminated-result",
+      "message": "the result from calling 'memcpy' is not null-terminated",
+      "instances": 1,
+      "assessment": "NNET is the four-byte magic of a canonical binary32-byte NVS record, not a C string. The record is zeroed first and no string API reads its magic."
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/network_settings.c",
+      "check": "bugprone-suspicious-string-compare",
+      "message": "function 'memcmp' is called without explicitly comparing result",
+      "instances": 2,
+      "assessment": "Intentional nonzero string/binary comparison in a boolean condition; false is equality. No inverted predicate or unbounded read found."
+    },
+    {
+      "file": "idf/esp32-cyd2usb-native/main/web_network_settings.c",
+      "check": "bugprone-suspicious-string-compare",
+      "message": "function 'strcmp' is called without explicitly comparing result",
+      "instances": 1,
+      "assessment": "Intentional nonzero string/binary comparison in a boolean condition; false is equality. No inverted predicate or unbounded read found."
+    }
+  ],
+  "scope": "All 52 actual Clang units and 652 frozen inputs passed; five new low-risk diagnostics reviewed explicitly. No warning suppression, no firmware-code-generation or hardware claim."
+}

@@ -1,9 +1,9 @@
 # Runtime Wi-Fi: перенос профилей, reconnect, RSSI и power policy на CYD
 
-Обновлено: 2026-10-19. Остаток этапа **CYD-C3-09** из
-[общего плана](ESP32_CYD_C3_TRANSFER_PLAN.md#L72). Блоки N0–N4 реализованы
-и программно проверены. Для N5 готово checked хранилище; подключение
-hostname/AP timeout к runtime/WebUI остаётся открытым. Приватный редактор desired credentials и
+Обновлено: 2026-10-20. Сетевой runtime этапа **CYD-C3-09** из
+[общего плана](ESP32_CYD_C3_TRANSFER_PLAN.md#L72). Блоки N0–N5 реализованы
+и программно проверены. Полные SDK exports новых настроек и физическая
+приёмка остаются открытыми. Приватный редактор desired credentials и
 [time service](CYD_TIME_TRANSFER_DESIGN.md) выполняются отдельно.
 
 ## Реализованный runtime и входы
@@ -72,16 +72,40 @@ compiles обеих платформ проходят. [Полные GCC images]
 FLAC PDM сохранены и проверены по target/OTA/configuration/ELF. Hardware gates
 остаются открыты.
 
-### N5: только persisted precursor
+### N5: hostname и optional AP timeout подключены
 
 [network_settings.c](../idf/esp32-cyd2usb-native/main/network_settings.c) хранит
 маленькую versioned NVS record, публикует coherent desired snapshot/revision
 после commit. Defaults: `yoradio`, timeout 0. Новый CYD hostname contract —
 одна ASCII label 1–23 bytes с внутренними hyphens; C3 legacy validation шире.
-[12 случаев и 7 controls](../tests/results/network-power-transfer-20261019/settings-precursor/report.json)
-проверяют полный source с NVS/RTOS seams. Этот модуль пока не подключён к
-CMake/runtime/routes: сохранение/AP timer/hostname application через UI ещё
-не реализованы и не считаются завершёнными.
+[Квалификация](../tests/results/cyd-network-settings-20261020/README.md)
+проверяет полный source с NVS/RTOS seams, actual owner loop, HTTP и WebUI.
+Модуль зарегистрирован в CMake и инициализируется после NVS до network task.
+Ошибка хранилища не маскируется как успешно сохранённые defaults: HTTP отвечает
+503, runtime использует локальные defaults с revision 0/available false.
+
+Owner настраивает hostname до Wi-Fi start и перед connect после checked
+NOT_CONNECT. Online edit не разрывает соединение. Desired и configured имя
+разделены; результат старого SDK вызова не считается применением нового имени.
+При hostname OOM validity сбрасывается: pinned SDK уже мог освободить прежнюю
+строку. Это настройка netif/DHCP, подтверждение сервера и mDNS не обещаются.
+
+Абсолютный AP deadline обслуживается существующим owner каждые 100 ms;
+новой задачи или esp_timer нет. Online/disable/stop отменяют его, изменение
+timeout или connection epoch запускает новый интервал; hostname-only edit
+сохраняет deadline. При expiry нужны AP_IDLE, отсутствие active/pending cycle,
+точный NOT_CONNECT, netif down/zero IP, актуальные settings/link/lifecycle.
+После reboot reservation проверки повторяются. Используется отдельный
+immediate reserved restart: обычный необратимый pending reboot не создаётся.
+Отказ admission/проверки запускает полный новый интервал; отмена OTA не
+выпускает старый AP reboot. Последняя успешная проверка — граница решения
+приложения, асинхронный RF event после неё атомарно исключить нельзя.
+
+`GET/POST /api/native/network-settings` использует query до 192 bytes и ровно
+hostname/ap_timeout_minutes. WebUI сохраняет dirty edits, игнорирует stale GET,
+показывает desired/configured/pending/error и отдельно состояние таймера.
+82 owner случая/12 controls, HTTP80/7, UI48/14 и полный Clang52/86warnings/0errors
+проходят. Host seams и аппаратные ограничения перечислены в frozen отчёте.
 
 ## Входы и переносимые возможности
 
@@ -311,7 +335,7 @@ C3 runtime_settings. Hostname bounded по donor capacity 24, ASCII hostname
 validation; default `yoradio`. `esp_netif_set_hostname` после соединения
 отражается только после reconnect (public esp_netif.h:350); runtime edit не
 обещает немедленную смену DHCP имени. AP timeout 0–30 min/default 0, проверка
-epoch/состояния перед request reboot. Timer callback только уведомляет owner;
+epoch/состояния перед restart. Deadline проверяет существующий owner;
 lease [web_reboot.h](../idf/esp32-cyd2usb-native/main/web_reboot.h) защищает OTA.
 Не добавлять автоматический reboot при обычном late disconnect.
 

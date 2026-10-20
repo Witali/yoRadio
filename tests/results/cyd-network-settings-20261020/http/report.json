@@ -1,0 +1,103 @@
+{
+  "passed": true,
+  "scope": "Qualify complete CYD network-settings handlers with actual settings/NVS code.\n\nOnly includes are replaced by frozen production type headers and explicit\nHTTPD/query/transport, bounded runtime snapshot, RTOS lock and NVS seams. Every\nproduction function body is compiled. This does not model HTTPD wire parsing,\nflash power loss, target ABI, SDK timing, DHCP/RF or a physical restart.\n",
+  "physical_hardware": false,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "command": [
+    "gcc",
+    "-std=c11",
+    "-O1",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-unused-function",
+    "-Wno-unused-variable",
+    "-pthread",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-fno-pie",
+    "-no-pie",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-http-02",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-http-02/sources/tests/native/cyd_network_settings",
+    "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-http-02/sources/idf/components/native_stream/include",
+    "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-http-02/sources/tests/native/cyd_web_network_settings_test.c"
+  ],
+  "source_sha256": {
+    "tests/run-cyd-web-network-settings.py": "e2497fb8eb57e8ee5477012305669715731096cb346abd21b4dc91255c323be3",
+    "tests/native/cyd_web_network_settings_test.c": "837fbc88b5369b31c2553a6cb66592076a4dfcd86a664fe57f049bbe8eb9064f",
+    "tests/native/cyd_network_settings/platform.h": "1253e50a069375f8cb3a74fe7952716015d6373aea4a253f51c9bc8cdafadea6",
+    "idf/components/native_network_power/include/native_network_power.h": "9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4",
+    "idf/esp32-cyd2usb-native/main/network_settings.c": "7d1dbae7348a44af2410c55485b8a49d9969878b1d84d6ebbc30d5f39112d7c6",
+    "idf/esp32-cyd2usb-native/main/network_settings.h": "fc7c79da8fb40872fb36a43c9bfdc32015a2aa4e74b2232a5925e649ff8d24b6",
+    "idf/esp32-cyd2usb-native/main/network_status.h": "3e5006a5eecfc3ea896af90f7c0bddba8200bca78f2af251129f76a122867b44",
+    "idf/esp32-cyd2usb-native/main/web_network_settings.c": "c1818a16c2fabe975a56b767551fb1fd681ae562d7018b048a2bde7bfbb401f5",
+    "idf/esp32-cyd2usb-native/main/web_network_settings.h": "e78555d1a9d708dd3933d0ce7ef4d046a5b59a0f7ae3491092d0173e8fc79319",
+    "idf/components/native_stream/include/json_buffer.h": "0bb4f88346019a5d319f2264c4bc3132d8ab87d8c644699d43814b4cfa82aa30"
+  },
+  "cases": {
+    "get": "JSON {\"hostname\":\"yoradio\",\"ap_timeout_minutes\":0,\"desired_revision\":1,\"runtime_available\":true,\"configured_hostname\":null,\"hostname_pending\":true,\"hostname_revision\":0,\"last_hostname_error\":0,\"ap_timeout_armed\":false,\"ap_timeout_remaining_ms\":0}\nJSON {\"hostname\":\"yoradio\",\"ap_timeout_minutes\":0,\"desired_revision\":1,\"runtime_available\":true,\"configured_hostname\":\"yoradio\",\"hostname_pending\":false,\"hostname_revision\":1,\"last_hostname_error\":0,\"ap_timeout_armed\":false,\"ap_timeout_remaining_ms\":0}\nJSON {\"hostname\":\"yoradio\",\"ap_timeout_minutes\":30,\"desired_revision\":2,\"runtime_available\":true,\"configured_hostname\":\"yoradio\",\"hostname_pending\":false,\"hostname_revision\":1,\"last_hostname_error\":0,\"ap_timeout_armed\":false,\"ap_timeout_remaining_ms\":0}\nJSON {\"hostname\":\"Radio-1\",\"ap_timeout_minutes\":15,\"desired_revision\":3,\"runtime_available\":true,\"configured_hostname\":\"yoradio\",\"hostname_pending\":true,\"hostname_revision\":3,\"last_hostname_error\":0,\"ap_timeout_armed\":false,\"ap_timeout_remaining_ms\":0}\nJSON {\"hostname\":\"Radio-1\",\"ap_timeout_minutes\":15,\"desired_revision\":3,\"runtime_available\":false,\"configured_hostname\":null,\"hostname_pending\":true,\"hostname_revision\":null,\"last_hostname_error\":null,\"ap_timeout_armed\":null,\"ap_timeout_remaining_ms\":null}\nJSON {\"hostname\":\"Radio-1\",\"ap_timeout_minutes\":15,\"desired_revision\":3,\"runtime_available\":true,\"configured_hostname\":null,\"hostname_pending\":true,\"hostname_revision\":3,\"last_hostname_error\":257,\"ap_timeout_armed\":false,\"ap_timeout_remaining_ms\":0}\nPASS get: 6 checks",
+    "valid": "JSON {\"saved\":true,\"application_pending\":true,\"rebooting\":false}\nPASS valid: 5 checks",
+    "invalid": "PASS invalid: 40 checks",
+    "body": "PASS body: 4 checks",
+    "boundaries": "JSON {\"hostname\":\"ABCDEFGHIJKLMNOPQRSTUVW\",\"ap_timeout_minutes\":30,\"desired_revision\":4294967295,\"runtime_available\":true,\"configured_hostname\":\"ABCDEFGHIJKLMNOPQRSTUVW\",\"hostname_pending\":false,\"hostname_revision\":4294967295,\"last_hostname_error\":-2147483648,\"ap_timeout_armed\":true,\"ap_timeout_remaining_ms\":18446744073709551615}\nPASS boundaries: 8 checks",
+    "save_errors": "PASS save_errors: 9 checks",
+    "uninitialized": "PASS uninitialized: 3 checks",
+    "response_errors": "PASS response_errors: 5 checks"
+  },
+  "positive_checks": 80,
+  "json_responses": 8,
+  "negative_controls": {
+    "accept_duplicate": {
+      "rejected": true,
+      "case": "invalid",
+      "status": 80,
+      "expected_marker": "strict_query_rejected"
+    },
+    "accept_nul": {
+      "rejected": true,
+      "case": "invalid",
+      "status": 80,
+      "expected_marker": "strict_query_rejected"
+    },
+    "accept_partial": {
+      "rejected": true,
+      "case": "invalid",
+      "status": 80,
+      "expected_marker": "strict_query_rejected"
+    },
+    "skip_persist_error": {
+      "rejected": true,
+      "case": "save_errors",
+      "status": 80,
+      "expected_marker": "honest_store_status"
+    },
+    "claim_hostname_by_revision": {
+      "rejected": true,
+      "case": "get",
+      "status": 80,
+      "expected_marker": "timeout_revision_does_not_unapply_hostname"
+    },
+    "hide_desired_when_runtime_busy": {
+      "rejected": true,
+      "case": "get",
+      "status": 80,
+      "expected_marker": "runtime_failure_keeps_desired"
+    },
+    "sdk_body_purge": {
+      "rejected": true,
+      "case": "body",
+      "status": 80,
+      "expected_marker": "body_never_enters_sdk_purge"
+    }
+  },
+  "source_files_still_match_snapshot": true,
+  "generated_sha256": {
+    "headers.inc": "1479a8797afc34a636807c61edfb1da90324f7016a36ff3ad1652345e7c45f30",
+    "settings.inc": "f0261919706a63ebe531c54aad3ecbdfbb0c632e10c3ab8108cf51fcffbed7a7",
+    "web-network-settings.inc": "62b6de49d9f58a6c5304876593a00439cb7b7cba71afb153269fd12f38f4f37a"
+  }
+}

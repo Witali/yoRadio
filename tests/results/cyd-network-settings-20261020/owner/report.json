@@ -1,0 +1,939 @@
+{
+  "passed": true,
+  "scope": "Execute the complete CYD network owner task with pthread RTOS boundaries.\n\nThe production network_runtime.c, native_state.c and shared erase implementation\nare compiled as complete translation units. Actual registered event callbacks,\nowner loop and public APIs execute concurrently. Tests control a virtual clock\nwhile the owner is parked in vTaskDelay or blocked at an explicit SDK barrier;\nseparate cases inject negative and saturated clock values. They never write owner\nphase, acknowledgments or private state. Wi-Fi/netif observations and SDK failures\nare deterministic seams. No target ABI, RF, scheduler timing or heap/HWM claim.\nN5 settings use a coherent committed RAM API seam; NVS persistence and reboot\nlease internals are tested separately, not claimed as cross-layer execution.\n",
+  "complete_matrix": true,
+  "source_sha256": {
+    "tests/run-cyd-network-runtime.py": "e613eda2e5ef5b29f39343b75f9a37ed405ae785602e5981ca4b1ad51fb95577",
+    "tests/native/cyd_network_runtime/platform.h": "ce1b34413427d730814c7b145f7906e3ccf472941e5f11043969e5e976254fa4",
+    "tests/native/cyd_network_runtime/platform.c": "aa637a80ee227cbb9a8537a862990bf97ad3f2708da3814904260b8ad9a36788",
+    "tests/native/cyd_network_runtime/test.c": "3e308090719ce13a24e4734ea9db1bd2039878a274254fe82977642ffceaa552",
+    "tests/native/cyd_network_runtime/tsan_control.c": "ba14e5cdd217a5e11d284444c3554f8c7af35a49ae493a2313ae835bf5805828",
+    "tests/native/cyd_network_runtime/README.md": "a0523b8ff6da6a8f977c56c49e021698f1366a9938cfa3d6fe479d9c61abb3f9",
+    "idf/esp32-cyd2usb-native/main/network_runtime.c": "e5155aa26e6759132389bf983c11f0c3b0ca6548c754b327b8cc40154727d6a0",
+    "idf/esp32-cyd2usb-native/main/network_runtime.h": "44906b5208143021f3f2f42699545c2e96a3b0c2dceb96e6b8b9ace35433fd72",
+    "idf/esp32-cyd2usb-native/main/network_status.h": "3e5006a5eecfc3ea896af90f7c0bddba8200bca78f2af251129f76a122867b44",
+    "idf/esp32-cyd2usb-native/main/network_netif.c": "c2843fd146d0936b291fb5c710ff88749f0f1a4e819ca4ffc447b8082f50993c",
+    "idf/esp32-cyd2usb-native/main/network_netif.h": "cc53f1590ecabe6a72ee023b95d7cb09919eadd6aba545306adc8343be1b8b24",
+    "idf/esp32-cyd2usb-native/main/network_profiles.h": "7f01b3c850e5f5f13950e4bbcf4c26e2a5a2fa837e633ba0035bdbb2710a64ea",
+    "idf/esp32-cyd2usb-native/main/board_config.h": "40f71ebbc27171d0e2ac0b56dd3b6c32ada0b21b712a62824955776400c3f91e",
+    "idf/esp32-cyd2usb-native/main/native_state.c": "ff2dc00c88212376ca0324d4b824aff29636d832dbc3a8212b7936a31a3c1bf7",
+    "idf/esp32-cyd2usb-native/main/native_state.h": "28757ce7ac676bd1251539e53a5545c29e52bdeb884e88b13ee8a223f1727185",
+    "idf/esp32-cyd2usb-native/main/time_service.h": "ec288898ac91a6295f1f28b7ee40127e2d984815bad0c3bff71a8c70d6dc0b4a",
+    "idf/esp32-cyd2usb-native/main/time_settings.h": "c9649a330e44d86aaf866534f169a93220b0a4b4bfed6b9aed3763d247de8f12",
+    "idf/esp32-cyd2usb-native/main/network_settings.h": "fc7c79da8fb40872fb36a43c9bfdc32015a2aa4e74b2232a5925e649ff8d24b6",
+    "idf/esp32-cyd2usb-native/main/web_reboot.h": "281b0e908d5432589394564a31d9d030c43f2ab7ea9138be4e58eb84bb8748e9",
+    "idf/components/native_wifi_store/native_wifi_store.c": "bb57b43f173adb41b74274686fa4584a24f0c9944025a3fab008853f71ca70f2",
+    "idf/components/native_wifi_store/include/native_wifi_store.h": "060dda87c1d72a884cfeb16559c772963dfc018c73adf78804dad69462d76110",
+    "idf/components/native_time/include/native_time_sntp.h": "7f028d0f7aa2dc41f53d05b61cf444dda8e0f12285eb829373f9ba335513e9cb",
+    "idf/components/native_network_power/native_network_power.c": "b27b11b459fb4bd0a01208b147369724fd026544b839ee01ca592a59f9ee2e0e",
+    "idf/components/native_network_power/include/native_network_power.h": "9217d1a0e8039a2933b1dc83b27f62010d510e1d7ee9727dc9c4c78bade341a4"
+  },
+  "cases": {
+    "no-profiles": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:no-profiles"
+    },
+    "one-immutable": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:one-immutable"
+    },
+    "five-attempts": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:five-attempts"
+    },
+    "late-wrap": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:late-wrap"
+    },
+    "startup-deadline": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:startup-deadline"
+    },
+    "cycle-deadline": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:cycle-deadline"
+    },
+    "manual-admission": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:manual-admission"
+    },
+    "manual-before-start": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:manual-before-start"
+    },
+    "manual-exhaustion": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:manual-exhaustion"
+    },
+    "config-failure": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:config-failure"
+    },
+    "connect-failure": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:connect-failure"
+    },
+    "config-busy": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:config-busy"
+    },
+    "disconnect-error": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:disconnect-error"
+    },
+    "disconnect-stuck": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:disconnect-stuck"
+    },
+    "ap-enable-errors": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-enable-errors"
+    },
+    "queue-overflow": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:queue-overflow"
+    },
+    "start-overflow": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:start-overflow"
+    },
+    "stale-events": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:stale-events"
+    },
+    "same-ssid": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:same-ssid"
+    },
+    "snapshot-lock": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:snapshot-lock"
+    },
+    "rssi": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rssi"
+    },
+    "rssi-late": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rssi-late"
+    },
+    "projection-lock": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:projection-lock"
+    },
+    "pending-publisher-stop": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:pending-publisher-stop"
+    },
+    "unregister-running": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:unregister-running"
+    },
+    "concurrent-stop": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:concurrent-stop"
+    },
+    "cleanup-poison": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:cleanup-poison"
+    },
+    "concurrent": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:concurrent"
+    },
+    "clock-limit": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:clock-limit"
+    },
+    "invalid-input": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:invalid-input"
+    },
+    "power-intent": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:power-intent"
+    },
+    "power-errors": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:power-errors"
+    },
+    "power-call-race": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:power-call-race"
+    },
+    "power-stale-error": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:power-stale-error"
+    },
+    "settings-defaults": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:settings-defaults"
+    },
+    "settings-unavailable": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:settings-unavailable"
+    },
+    "hostname-online": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:hostname-online"
+    },
+    "hostname-oom": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:hostname-oom"
+    },
+    "hostname-start-failure": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:hostname-start-failure"
+    },
+    "hostname-stale": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:hostname-stale"
+    },
+    "hostname-same": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:hostname-same"
+    },
+    "hostname-error-budget": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:hostname-error-budget"
+    },
+    "ap-disabled": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-disabled"
+    },
+    "ap-expiry": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-expiry"
+    },
+    "ap-thirty-minutes": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-thirty-minutes"
+    },
+    "ap-timeout-edit": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-timeout-edit"
+    },
+    "ap-hostname-edit": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-hostname-edit"
+    },
+    "ap-online-cancel": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-online-cancel"
+    },
+    "ap-ota-block": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-ota-block"
+    },
+    "ap-live-associated": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-live-associated"
+    },
+    "ap-live-netif": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-live-netif"
+    },
+    "ap-lease-error": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-lease-error"
+    },
+    "ap-slow-lease": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-slow-lease"
+    },
+    "ap-pending-callback": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-pending-callback"
+    },
+    "ap-query-race": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-query-race"
+    },
+    "ap-live-ip": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-live-ip"
+    },
+    "ap-query-error": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-query-error"
+    },
+    "ap-ip-error": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-ip-error"
+    },
+    "ap-late-event": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-late-event"
+    },
+    "ap-late-association": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-late-association"
+    },
+    "ap-late-settings": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-late-settings"
+    },
+    "ap-late-manual": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-late-manual"
+    },
+    "ap-manual-cycle": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-manual-cycle"
+    },
+    "ap-failed-enable": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-failed-enable"
+    },
+    "ap-stop-race": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-stop-race"
+    },
+    "ap-restart-lifetime": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-restart-lifetime"
+    },
+    "ap-clock-saturation": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-clock-saturation"
+    },
+    "ap-negative-clock": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:ap-negative-clock"
+    },
+    "rollback-queue": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-queue"
+    },
+    "rollback-mutex": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-mutex"
+    },
+    "rollback-event": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-event"
+    },
+    "rollback-ap-netif": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-ap-netif"
+    },
+    "rollback-mac": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-mac"
+    },
+    "rollback-mode-ap": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-mode-ap"
+    },
+    "rollback-mode-sta": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-mode-sta"
+    },
+    "rollback-ap-config": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-ap-config"
+    },
+    "rollback-ap-attach": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-ap-attach"
+    },
+    "rollback-ap-handlers": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-ap-handlers"
+    },
+    "rollback-wifi-handler": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-wifi-handler"
+    },
+    "rollback-ip-handler": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-ip-handler"
+    },
+    "rollback-task": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-task"
+    },
+    "rollback-unregister": {
+      "status": 0,
+      "passed": true,
+      "output": "PASS:rollback-unregister"
+    }
+  },
+  "negative_controls": {
+    "publish_failed_config": {
+      "detected": true,
+      "status": 80,
+      "case": "config-failure",
+      "expected_marker": "failed_set_config_not_published",
+      "sha256": "eacda158b06ea84ff46c3589ad1e75ae40d989ce254566d3c846866e034582ed"
+    },
+    "stale_pending_snapshot": {
+      "detected": true,
+      "status": 80,
+      "case": "late-wrap",
+      "expected_marker": "pending_loss_masks_old_status",
+      "sha256": "cc2bc9ba96400acbde81a206f09a6b02373b04a109f581c606345ff5168e7b9f"
+    },
+    "manual_tears_down_portal": {
+      "detected": true,
+      "status": 80,
+      "case": "manual-admission",
+      "expected_marker": "manual_retry_retains_preconfigured_apsta",
+      "sha256": "d573173fc2855cf8050f03c12dc8a600420bd929c2dcdce82d21d6f90bbdf49c"
+    },
+    "rssi_query_keeps_old_sample": {
+      "detected": true,
+      "status": 80,
+      "case": "rssi",
+      "expected_marker": "failed_or_late_rssi_invalidated",
+      "sha256": "9605a2667e3bfaa017201a26fd5d38061af47146a5a10967659c6d09bdad263c"
+    },
+    "missing_power_poll": {
+      "detected": true,
+      "status": 80,
+      "case": "power-intent",
+      "expected_marker": "prestartup_audio_intent_preserved",
+      "sha256": "263b0b4d61a8b0592dbe941bfba227891991068d82bdeaa0dc8415453315eaca"
+    },
+    "wrong_power_mode": {
+      "detected": true,
+      "status": 80,
+      "case": "power-intent",
+      "expected_marker": "prestartup_audio_intent_preserved",
+      "sha256": "52a920f21b4b35c84195c1977955a3bb54ffd9ac33833f23f2cba8d3f3e95152"
+    },
+    "hostname_oom_keeps_valid": {
+      "detected": true,
+      "status": 80,
+      "case": "hostname-oom",
+      "expected_marker": "hostname_oom_clears_old_success_and_preserves_desired",
+      "sha256": "be07fe65388e6ae12e68008e0192af9184ae705b4140c4500a7164a3ce9a12e9"
+    },
+    "hostname_stale_claims_latest": {
+      "detected": true,
+      "status": 80,
+      "case": "hostname-stale",
+      "expected_marker": "stale_setter_success_reports_actual_old_value_with_new_desired_pending",
+      "sha256": "461e9301746d571e667f3aa52acf31cfa03e48f38c2d2dea4b68fa1c7742b9ae"
+    },
+    "missing_final_ap_guard": {
+      "detected": true,
+      "status": 80,
+      "case": "ap-late-event",
+      "expected_marker": "final_changed_authorization_cancels_only_own_lease",
+      "sha256": "5da200ad9f6138ee4963e7a0110feee8a0e218f8e6fc5b5525dbac3dcd31ab7c"
+    },
+    "ap_uses_ordinary_queue": {
+      "detected": true,
+      "status": 80,
+      "case": "ap-expiry",
+      "expected_marker": "due_ap_restart_uses_exact_immediate_lease_without_pending_queue",
+      "sha256": "20951c26097c60fe39c4e7f55c025e739ee85e4cb24e5355b676dca1266d2309"
+    },
+    "ap_skips_netif_proof": {
+      "detected": true,
+      "status": 80,
+      "case": "ap-live-netif",
+      "expected_marker": "unproved_disconnection_rearms_without_restart_lease",
+      "sha256": "433722feec010778f5b37bc4d1ae26ec031e6cdc663ac27c5904f746433709c0"
+    },
+    "ap_lease_rearms_old_time": {
+      "detected": true,
+      "status": 80,
+      "case": "ap-slow-lease",
+      "expected_marker": "slow_failed_lease_cannot_rearm_an_already_expired_deadline",
+      "sha256": "976f841d56bc28d09f9d7da082a35bd4a3748b7b6e17ef35cbe4540877cd5548"
+    }
+  },
+  "physical_hardware": false,
+  "target_abi": false,
+  "actual_rtos_scheduler": false,
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "commands": [
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/runtime"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/publish_failed_config/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/publish_failed_config/publish_failed_config"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/stale_pending_snapshot/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/stale_pending_snapshot/stale_pending_snapshot"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/manual_tears_down_portal/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/manual_tears_down_portal/manual_tears_down_portal"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/rssi_query_keeps_old_sample/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/rssi_query_keeps_old_sample/rssi_query_keeps_old_sample"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/missing_power_poll/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/missing_power_poll/missing_power_poll"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/wrong_power_mode/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/wrong_power_mode/wrong_power_mode"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/hostname_oom_keeps_valid/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/hostname_oom_keeps_valid/hostname_oom_keeps_valid"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/hostname_stale_claims_latest/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/hostname_stale_claims_latest/hostname_stale_claims_latest"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/missing_final_ap_guard/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/missing_final_ap_guard/missing_final_ap_guard"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/ap_uses_ordinary_queue/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/ap_uses_ordinary_queue/ap_uses_ordinary_queue"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/ap_skips_netif_proof/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/ap_skips_netif_proof/ap_skips_netif_proof"
+    ],
+    [
+      "gcc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pthread",
+      "-fno-omit-frame-pointer",
+      "-fno-pie",
+      "-no-pie",
+      "-fsanitize=address,undefined",
+      "-include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.h",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/stubs",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_time/include",
+      "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/include",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/ap_lease_rearms_old_time/network_runtime.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/network_netif.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/esp32-cyd2usb-native/main/native_state.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_wifi_store/native_wifi_store.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/idf/components/native_network_power/native_network_power.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/platform.c",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/sources/tests/native/cyd_network_runtime/test.c",
+      "-o",
+      "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/n5-runtime-final-03/mutants/ap_lease_rearms_old_time/ap_lease_rearms_old_time"
+    ]
+  ],
+  "mutants_enabled": true
+}

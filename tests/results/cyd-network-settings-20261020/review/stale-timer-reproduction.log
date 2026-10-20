@@ -1,0 +1,32 @@
+TAP version 13
+# Subtest: independent review: successful timer save cannot leave disabled status after refresh failure
+not ok 1 - independent review: successful timer save cannot leave disabled status after refresh failure
+  ---
+  duration_ms: 22.8268
+  type: 'test'
+  location: 'C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\n5-independent-review-01\\stale-timer-reproduction.test.js:1520:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input was expected to not match the regular expression /перезапуск отключён/. Input:
+    
+    'Автоматический перезапуск отключён'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'Автоматический перезапуск отключён'
+  operator: 'doesNotMatch'
+  stack: |-
+    TestContext.<anonymous> (C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\n5-independent-review-01\stale-timer-reproduction.test.js:1528:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 120.7474
