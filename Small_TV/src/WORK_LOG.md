@@ -3338,3 +3338,18 @@ true. Это только начало нового прогона, не 24 ча
   к measured matrix, не всемуT.81. Нужны NOR backend/RMW/fault/cold recovery,
   atomic metadata, source/codec/layout keys, immutable resource guards и физические
   erase counts. C8FD source/firmware, shared SDK и frozen B50D не менялись.
+
+
+## 2026-10-20 — двусторонняя сверка переноса
+
+Просмотрены все16 reference modules и26 app C modules. Явная карта
+reference/correspondence.json:176 factory (120app/56SDK),168native app,
+13TJpgd+116cJSON,11assembly-only codec entries.198direct factory callees
+вне выбранного экспорта перечислены, а не объявлены автоматически перенесёнными.
+Найдены HTTP-404 (Host/root/absolute redirect), CITY-REINIT (updateCity снимает
+factory theme-init latch), HTTP lifetime multi-peer test gap, RESET/DC pulls
+и устаревшая coarse navigation. Подробности reference/BIDIRECTIONAL_AUDIT.md.
+Checker+10tests проверяют пропуски в обоих направлениях/опечатки/stale inputs,
+не доказывают semantic equivalence. В native run добавлен обязательный gate.
+Firmware C8FD пока не менялась. Frozen B50D full завершился exit0 в10:56UTC;
+H10 всё ещё running, никаких новых QMP/RSP к нему не подключали.
