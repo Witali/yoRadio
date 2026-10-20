@@ -1,0 +1,269 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-xtensa-audit-01\members\esp32\11-ogg_dec.c.obj:     file format elf32-xtensa-le
+
+
+Disassembly of section .literal.esp_ogg_dec_close:
+
+00000000 <.literal.esp_ogg_dec_close>:
+	...
+	0: R_XTENSA_32	esp_audio_dec_close
+	4: R_XTENSA_32	media_lib_free
+
+Disassembly of section .literal.esp_ogg_dec_decode:
+
+00000000 <.literal.esp_ogg_dec_decode>:
+	...
+	0: R_XTENSA_32	esp_audio_dec_process
+	4: R_XTENSA_32	esp_audio_dec_get_info
+
+Disassembly of section .literal.esp_ogg_dec_open:
+
+00000000 <.literal.esp_ogg_dec_open>:
+   0:	00000000 		0: R_XTENSA_32	.rodata.esp_ogg_dec_open.str1.4
+   4:	00000008 		4: R_XTENSA_32	.rodata.esp_ogg_dec_open.str1.4
+   8:	00000038 		8: R_XTENSA_32	.rodata.esp_ogg_dec_open.str1.4
+   c:	00000074 		c: R_XTENSA_32	.rodata.esp_ogg_dec_open.str1.4
+  10:	00000080 		10: R_XTENSA_32	.rodata.esp_ogg_dec_open.str1.4
+  14:	53424f56 	
+  18:	5355504f 	
+  1c:	000000a8 		1c: R_XTENSA_32	.rodata.esp_ogg_dec_open.str1.4
+	...
+	20: R_XTENSA_32	esp_log_timestamp
+	24: R_XTENSA_32	esp_log
+	28: R_XTENSA_32	esp_log_timestamp
+	2c: R_XTENSA_32	esp_log
+	30: R_XTENSA_32	media_lib_module_calloc
+	34: R_XTENSA_32	esp_log_timestamp
+	38: R_XTENSA_32	esp_log
+	3c: R_XTENSA_32	esp_audio_dec_open
+	40: R_XTENSA_32	esp_log_timestamp
+	44: R_XTENSA_32	esp_log
+	48: R_XTENSA_32	esp_audio_dec_close
+	4c: R_XTENSA_32	media_lib_free
+
+Disassembly of section .literal.esp_ogg_dec_register:
+
+00000000 <.literal.esp_ogg_dec_register>:
+   0:	00000000 		0: R_XTENSA_32	.rodata
+   4:	2047474f 	
+	...
+	8: R_XTENSA_32	memcpy
+	c: R_XTENSA_32	esp_audio_simple_dec_register
+
+Disassembly of section .literal.esp_ogg_dec_unregister:
+
+00000000 <.literal.esp_ogg_dec_unregister>:
+   0:	2047474f 	
+   4:	00000000 		4: R_XTENSA_32	esp_audio_simple_dec_unregister
+
+Disassembly of section .text.esp_ogg_dec_close:
+
+00000000 <esp_ogg_dec_close>:
+   0:	004136        	entry	a1, 32
+   3:	629c      	beqz.n	a2, 1d <esp_ogg_dec_close+0x1d>	3: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_close+0x1d
+   5:	02a8      	l32i.n	a10, a2, 0
+   7:	005a16        	beqz	a10, 10 <esp_ogg_dec_close+0x10>	7: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_close+0x10
+   a:	000081        	l32r	a8, fffc000c <esp_ogg_dec_close+0xfffc000c>	a: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_close
+	a: R_XTENSA_ASM_EXPAND	esp_audio_dec_close
+   d:	0008e0        	callx8	a8
+  10:	02ad      	mov.n	a10, a2
+  12:	000081        	l32r	a8, fffc0014 <esp_ogg_dec_close+0xfffc0014>	12: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_close+0x4
+	12: R_XTENSA_ASM_EXPAND	media_lib_free
+  15:	0008e0        	callx8	a8
+  18:	020c      	movi.n	a2, 0
+  1a:	000046        	j	1f <esp_ogg_dec_close+0x1f>	1a: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_close+0x1f
+  1d:	b27c      	movi.n	a2, -5
+  1f:	f01d      	retw.n
+
+Disassembly of section .text.esp_ogg_dec_decode:
+
+00000000 <esp_ogg_dec_decode>:
+   0:	006136        	entry	a1, 48
+   3:	027d      	mov.n	a7, a2
+   5:	053216        	beqz	a2, 5c <esp_ogg_dec_decode+0x5c>	5: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_decode+0x5c
+   8:	1298      	l32i.n	a9, a2, 4
+   a:	03c8      	l32i.n	a12, a3, 0
+   c:	13b8      	l32i.n	a11, a3, 4
+   e:	0409a2        	l8ui	a10, a9, 4
+  11:	080c      	movi.n	a8, 0
+  13:	2189      	s32i.n	a8, a1, 8
+  15:	01c9      	s32i.n	a12, a1, 0
+  17:	11b9      	s32i.n	a11, a1, 4
+  19:	3189      	s32i.n	a8, a1, 12
+  1b:	aa8c      	beqz.n	a10, 29 <esp_ogg_dec_decode+0x29>	1b: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_decode+0x29
+  1d:	2988      	l32i.n	a8, a9, 8
+  1f:	688c      	beqz.n	a8, 29 <esp_ogg_dec_decode+0x29>	1f: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_decode+0x29
+  21:	3998      	l32i.n	a9, a9, 12
+  23:	298c      	beqz.n	a9, 29 <esp_ogg_dec_decode+0x29>	23: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_decode+0x29
+  25:	0189      	s32i.n	a8, a1, 0
+  27:	1199      	s32i.n	a9, a1, 4
+  29:	07a8      	l32i.n	a10, a7, 0
+  2b:	04cd      	mov.n	a12, a4
+  2d:	01bd      	mov.n	a11, a1
+  2f:	000081        	l32r	a8, fffc0030 <esp_ogg_dec_decode+0xfffc0030>	2f: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_decode
+	2f: R_XTENSA_ASM_EXPAND	esp_audio_dec_process
+  32:	0008e0        	callx8	a8
+  35:	0a2d      	mov.n	a2, a10
+  37:	bacc      	bnez.n	a10, 46 <esp_ogg_dec_decode+0x46>	37: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_decode+0x46
+  39:	1788      	l32i.n	a8, a7, 4
+  3b:	040892        	l8ui	a9, a8, 4
+  3e:	498c      	beqz.n	a9, 46 <esp_ogg_dec_decode+0x46>	3e: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_decode+0x46
+  40:	0448a2        	s8i	a10, a8, 4
+  43:	0368a2        	s32i	a10, a8, 12
+  46:	3488      	l32i.n	a8, a4, 12
+  48:	888c      	beqz.n	a8, 54 <esp_ogg_dec_decode+0x54>	48: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_decode+0x54
+  4a:	07a8      	l32i.n	a10, a7, 0
+  4c:	05bd      	mov.n	a11, a5
+  4e:	000081        	l32r	a8, fffc0050 <esp_ogg_dec_decode+0xfffc0050>	4e: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_decode+0x4
+	4e: R_XTENSA_ASM_EXPAND	esp_audio_dec_get_info
+  51:	0008e0        	callx8	a8
+  54:	1388      	l32i.n	a8, a3, 4
+  56:	2389      	s32i.n	a8, a3, 8
+  58:	000086        	j	5e <esp_ogg_dec_decode+0x5e>	58: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_decode+0x5e
+  5b:	00          	.byte	00
+  5c:	b27c      	movi.n	a2, -5
+  5e:	f01d      	retw.n
+
+Disassembly of section .text.esp_ogg_dec_open:
+
+00000000 <esp_ogg_dec_open>:
+   0:	008136        	entry	a1, 64
+   3:	40f280        	nsau	a8, a2
+   6:	047d      	mov.n	a7, a4
+   8:	418580        	srli	a8, a8, 5
+   b:	928c      	beqz.n	a2, 18 <esp_ogg_dec_open+0x18>	b: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0x18
+   d:	c8c392        	addi	a9, a3, -56
+  10:	01a042        	movi	a4, 1
+  13:	834890        	moveqz	a4, a8, a9
+  16:	04ac      	beqz.n	a4, 3a <esp_ogg_dec_open+0x3a>	16: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0x3a
+  18:	000081        	l32r	a8, fffc0018 <esp_ogg_dec_open+0xfffc0018>	18: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x20
+	18: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  1b:	0008e0        	callx8	a8
+  1e:	0000b1        	l32r	a11, fffc0020 <esp_ogg_dec_open+0xfffc0020>	1e: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open
+  21:	0000c1        	l32r	a12, fffc0024 <esp_ogg_dec_open+0xfffc0024>	21: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x4
+  24:	0add      	mov.n	a13, a10
+  26:	0139      	s32i.n	a3, a1, 0
+  28:	02fd      	mov.n	a15, a2
+  2a:	0bed      	mov.n	a14, a11
+  2c:	1a0c      	movi.n	a10, 1
+  2e:	000081        	l32r	a8, fffc0030 <esp_ogg_dec_open+0xfffc0030>	2e: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x24
+	2e: R_XTENSA_ASM_EXPAND	esp_log
+  31:	0008e0        	callx8	a8
+  34:	000786        	j	56 <esp_ogg_dec_open+0x56>	34: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0x56
+  37:	00          	.byte	00
+  38:	00          	.byte	00
+  39:	00          	.byte	00
+  3a:	3288      	l32i.n	a8, a2, 12
+  3c:	d8dc      	bnez.n	a8, 5d <esp_ogg_dec_open+0x5d>	3c: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0x5d
+  3e:	000081        	l32r	a8, fffc0040 <esp_ogg_dec_open+0xfffc0040>	3e: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x28
+	3e: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  41:	0008e0        	callx8	a8
+  44:	0000b1        	l32r	a11, fffc0044 <esp_ogg_dec_open+0xfffc0044>	44: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open
+  47:	0000c1        	l32r	a12, fffc0048 <esp_ogg_dec_open+0xfffc0048>	47: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x8
+  4a:	0add      	mov.n	a13, a10
+  4c:	0bed      	mov.n	a14, a11
+  4e:	1a0c      	movi.n	a10, 1
+  50:	000081        	l32r	a8, fffc0050 <esp_ogg_dec_open+0xfffc0050>	50: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x2c
+	50: R_XTENSA_ASM_EXPAND	esp_log
+  53:	0008e0        	callx8	a8
+  56:	b27c      	movi.n	a2, -5
+  58:	0024c6        	j	ef <esp_ogg_dec_open+0xef>	58: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0xef
+  5b:	00          	.byte	00
+  5c:	00          	.byte	00
+  5d:	0000a1        	l32r	a10, fffc0060 <esp_ogg_dec_open+0xfffc0060>	5d: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0xc
+  60:	8c0c      	movi.n	a12, 8
+  62:	1b0c      	movi.n	a11, 1
+  64:	000081        	l32r	a8, fffc0064 <esp_ogg_dec_open+0xfffc0064>	64: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x30
+	64: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  67:	0008e0        	callx8	a8
+  6a:	0a3d      	mov.n	a3, a10
+  6c:	cadc      	bnez.n	a10, 8c <esp_ogg_dec_open+0x8c>	6c: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0x8c
+  6e:	000081        	l32r	a8, fffc0070 <esp_ogg_dec_open+0xfffc0070>	6e: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x34
+	6e: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  71:	0008e0        	callx8	a8
+  74:	0000b1        	l32r	a11, fffc0074 <esp_ogg_dec_open+0xfffc0074>	74: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open
+  77:	0000c1        	l32r	a12, fffc0078 <esp_ogg_dec_open+0xfffc0078>	77: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x10
+  7a:	0add      	mov.n	a13, a10
+  7c:	0bed      	mov.n	a14, a11
+  7e:	1a0c      	movi.n	a10, 1
+  80:	000081        	l32r	a8, fffc0080 <esp_ogg_dec_open+0xfffc0080>	80: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x38
+	80: R_XTENSA_ASM_EXPAND	esp_log
+  83:	0008e0        	callx8	a8
+  86:	e27c      	movi.n	a2, -2
+  88:	0018c6        	j	ef <esp_ogg_dec_open+0xef>	88: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0xef
+  8b:	00          	.byte	00
+  8c:	3288      	l32i.n	a8, a2, 12
+  8e:	0000a1        	l32r	a10, fffc0090 <esp_ogg_dec_open+0xfffc0090>	8e: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x14
+  91:	0898      	l32i.n	a9, a8, 0
+  93:	1389      	s32i.n	a8, a3, 4
+  95:	5149      	s32i.n	a4, a1, 20
+  97:	6149      	s32i.n	a4, a1, 24
+  99:	4199      	s32i.n	a9, a1, 16
+  9b:	0519a7        	beq	a9, a10, a4 <esp_ogg_dec_open+0xa4>	9b: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0xa4
+  9e:	0000a1        	l32r	a10, fffc00a0 <esp_ogg_dec_open+0xfffc00a0>	9e: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x18
+  a1:	0899a7        	bne	a9, a10, ad <esp_ogg_dec_open+0xad>	a1: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0xad
+  a4:	10c882        	addi	a8, a8, 16
+  a7:	5189      	s32i.n	a8, a1, 20
+  a9:	081c      	movi.n	a8, 16
+  ab:	6189      	s32i.n	a8, a1, 24
+  ad:	03bd      	mov.n	a11, a3
+  af:	10c1a2        	addi	a10, a1, 16
+  b2:	000081        	l32r	a8, fffc00b4 <esp_ogg_dec_open+0xfffc00b4>	b2: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x3c
+	b2: R_XTENSA_ASM_EXPAND	esp_audio_dec_open
+  b5:	0008e0        	callx8	a8
+  b8:	0a2d      	mov.n	a2, a10
+  ba:	faac      	beqz.n	a10, ed <esp_ogg_dec_open+0xed>	ba: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0xed
+  bc:	000081        	l32r	a8, fffc00bc <esp_ogg_dec_open+0xfffc00bc>	bc: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x40
+	bc: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  bf:	0008e0        	callx8	a8
+  c2:	0000b1        	l32r	a11, fffc00c4 <esp_ogg_dec_open+0xfffc00c4>	c2: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open
+  c5:	41f8      	l32i.n	a15, a1, 16
+  c7:	0000c1        	l32r	a12, fffc00c8 <esp_ogg_dec_open+0xfffc00c8>	c7: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x1c
+  ca:	0add      	mov.n	a13, a10
+  cc:	0129      	s32i.n	a2, a1, 0
+  ce:	1a0c      	movi.n	a10, 1
+  d0:	0bed      	mov.n	a14, a11
+  d2:	000081        	l32r	a8, fffc00d4 <esp_ogg_dec_open+0xfffc00d4>	d2: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x44
+	d2: R_XTENSA_ASM_EXPAND	esp_log
+  d5:	0008e0        	callx8	a8
+  d8:	03a8      	l32i.n	a10, a3, 0
+  da:	4a8c      	beqz.n	a10, e2 <esp_ogg_dec_open+0xe2>	da: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0xe2
+  dc:	000081        	l32r	a8, fffc00dc <esp_ogg_dec_open+0xfffc00dc>	dc: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x48
+	dc: R_XTENSA_ASM_EXPAND	esp_audio_dec_close
+  df:	0008e0        	callx8	a8
+  e2:	03ad      	mov.n	a10, a3
+  e4:	000081        	l32r	a8, fffc00e4 <esp_ogg_dec_open+0xfffc00e4>	e4: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_open+0x4c
+	e4: R_XTENSA_ASM_EXPAND	media_lib_free
+  e7:	0008e0        	callx8	a8
+  ea:	000046        	j	ef <esp_ogg_dec_open+0xef>	ea: R_XTENSA_SLOT0_OP	.text.esp_ogg_dec_open+0xef
+  ed:	0739      	s32i.n	a3, a7, 0
+  ef:	f01d      	retw.n
+
+Disassembly of section .text.esp_ogg_dec_register:
+
+00000000 <esp_ogg_dec_register>:
+   0:	008136        	entry	a1, 64
+   3:	0000b1        	l32r	a11, fffc0004 <esp_ogg_dec_register+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_register
+   6:	8c1c      	movi.n	a12, 24
+   8:	20a110        	or	a10, a1, a1
+   b:	000081        	l32r	a8, fffc000c <esp_ogg_dec_register+0xfffc000c>	b: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_register+0x8
+	b: R_XTENSA_ASM_EXPAND	memcpy
+   e:	0008e0        	callx8	a8
+  11:	0000a1        	l32r	a10, fffc0014 <esp_ogg_dec_register+0xfffc0014>	11: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_register+0x4
+  14:	01bd      	mov.n	a11, a1
+  16:	000081        	l32r	a8, fffc0018 <esp_ogg_dec_register+0xfffc0018>	16: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_register+0xc
+	16: R_XTENSA_ASM_EXPAND	esp_audio_simple_dec_register
+  19:	0008e0        	callx8	a8
+  1c:	0a2d      	mov.n	a2, a10
+  1e:	f01d      	retw.n
+
+Disassembly of section .text.esp_ogg_dec_unregister:
+
+00000000 <esp_ogg_dec_unregister>:
+   0:	004136        	entry	a1, 32
+   3:	0000a1        	l32r	a10, fffc0004 <esp_ogg_dec_unregister+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_unregister
+   6:	000081        	l32r	a8, fffc0008 <esp_ogg_dec_unregister+0xfffc0008>	6: R_XTENSA_SLOT0_OP	.literal.esp_ogg_dec_unregister+0x4
+	6: R_XTENSA_ASM_EXPAND	esp_audio_simple_dec_unregister
+   9:	0008e0        	callx8	a8
+   c:	0a2d      	mov.n	a2, a10
+   e:	f01d      	retw.n

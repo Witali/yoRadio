@@ -1,0 +1,394 @@
+
+C:\Work\yoRadio\.worktree\esp32-cyd-c3-review\.build\cyd-vorbis-xtensa-audit-01\members\esp32\3-audio_simple_dec_reg.c.obj:     file format elf32-xtensa-le
+
+
+Disassembly of section .literal.audio_simple_dec_get_default_decoder:
+
+00000000 <.literal.audio_simple_dec_get_default_decoder>:
+   0:	43414c46 	
+   4:	204d4350 	
+   8:	20434141 	
+   c:	20434253 	
+  10:	2033504d 	
+  14:	32323747 	
+  18:	43414c41 	
+  1c:	3033434c 	
+  20:	5355504f 	
+  24:	4e524d41 	
+  28:	53424f56 	
+  2c:	43504441 	
+  30:	57414c55 	
+  34:	57524d41 	
+  38:	57414c41 	
+
+Disassembly of section .literal.audio_simple_dec_get_default_parser:
+
+00000000 <.literal.audio_simple_dec_get_default_parser>:
+   0:	43414c46 	
+   4:	2033504d 	
+   8:	20434141 	
+   c:	4e524d41 	
+  10:	57524d41 	
+
+Disassembly of section .literal.audio_simple_dec_get_register_map:
+
+00000000 <.literal.audio_simple_dec_get_register_map>:
+   0:	00000000 		0: R_XTENSA_32	.bss.aud_es_list
+
+Disassembly of section .literal.esp_audio_simple_dec_unregister:
+
+00000000 <.literal.esp_audio_simple_dec_unregister>:
+	...
+	0: R_XTENSA_32	.bss.aud_es_list
+	4: R_XTENSA_32	esp_es_parse_remove_parser
+	8: R_XTENSA_32	esp_audio_dec_unregister
+	c: R_XTENSA_32	media_lib_free
+
+Disassembly of section .literal.esp_audio_simple_dec_register:
+
+00000000 <.literal.esp_audio_simple_dec_register>:
+   0:	00000000 		0: R_XTENSA_32	.rodata.esp_audio_simple_dec_register.str1.4
+   4:	00000010 		4: R_XTENSA_32	.rodata.esp_audio_simple_dec_register.str1.4
+   8:	00000000 		8: R_XTENSA_32	.bss.aud_es_list
+   c:	00000048 		c: R_XTENSA_32	.rodata.esp_audio_simple_dec_register.str1.4
+  10:	00000054 		10: R_XTENSA_32	.rodata.esp_audio_simple_dec_register.str1.4
+  14:	43414c46 	
+  18:	2033504d 	
+  1c:	20434141 	
+  20:	4e524d41 	
+  24:	57524d41 	
+  28:	00000080 		28: R_XTENSA_32	.rodata.esp_audio_simple_dec_register.str1.4
+  2c:	000000a8 		2c: R_XTENSA_32	.rodata.esp_audio_simple_dec_register.str1.4
+	...
+	30: R_XTENSA_32	esp_log_timestamp
+	34: R_XTENSA_32	esp_log
+	38: R_XTENSA_32	media_lib_module_calloc
+	3c: R_XTENSA_32	esp_log_timestamp
+	40: R_XTENSA_32	esp_log
+	44: R_XTENSA_32	memcpy
+	48: R_XTENSA_32	esp_es_parse_get_avail_customer_type
+	4c: R_XTENSA_32	esp_es_parse_add_parser
+	50: R_XTENSA_32	audio_simple_dec_get_default_decoder
+	54: R_XTENSA_32	esp_audio_dec_get_avail_type
+	58: R_XTENSA_32	esp_audio_dec_register
+	5c: R_XTENSA_32	esp_log_timestamp
+	60: R_XTENSA_32	esp_log
+	64: R_XTENSA_32	esp_audio_simple_dec_unregister
+	68: R_XTENSA_32	esp_log_timestamp
+	6c: R_XTENSA_32	esp_log
+	70: R_XTENSA_32	esp_es_parse_remove_parser
+	74: R_XTENSA_32	esp_audio_dec_unregister
+
+Disassembly of section .text.audio_simple_dec_get_default_decoder:
+
+00000000 <audio_simple_dec_get_default_decoder>:
+   0:	004136        	entry	a1, 32
+   3:	000081        	l32r	a8, fffc0004 <audio_simple_dec_get_default_decoder+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder
+   6:	7e1287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	6: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+   9:	3f3827        	bltu	a8, a2, 4c <audio_simple_dec_get_default_decoder+0x4c>	9: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x4c
+   c:	000081        	l32r	a8, fffc000c <audio_simple_dec_get_default_decoder+0xfffc000c>	c: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x4
+   f:	751287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	f: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  12:	1a3827        	bltu	a8, a2, 30 <audio_simple_dec_get_default_decoder+0x30>	12: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x30
+  15:	000081        	l32r	a8, fffc0018 <audio_simple_dec_get_default_decoder+0xfffc0018>	15: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x8
+  18:	6c1287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	18: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  1b:	000081        	l32r	a8, fffc001c <audio_simple_dec_get_default_decoder+0xfffc001c>	1b: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0xc
+  1e:	661287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	1e: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  21:	000081        	l32r	a8, fffc0024 <audio_simple_dec_get_default_decoder+0xfffc0024>	21: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x10
+  24:	090c      	movi.n	a9, 0
+  26:	c08280        	sub	a8, a2, a8
+  29:	932980        	movnez	a2, a9, a8
+  2c:	001606        	j	88 <audio_simple_dec_get_default_decoder+0x88>	2c: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  2f:	00          	.byte	00
+  30:	000081        	l32r	a8, fffc0030 <audio_simple_dec_get_default_decoder+0xfffc0030>	30: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x14
+  33:	511287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	33: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  36:	000081        	l32r	a8, fffc0038 <audio_simple_dec_get_default_decoder+0xfffc0038>	36: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x18
+  39:	4b1287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	39: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  3c:	000081        	l32r	a8, fffc003c <audio_simple_dec_get_default_decoder+0xfffc003c>	3c: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x1c
+  3f:	090c      	movi.n	a9, 0
+  41:	c08280        	sub	a8, a2, a8
+  44:	932980        	movnez	a2, a9, a8
+  47:	000f46        	j	88 <audio_simple_dec_get_default_decoder+0x88>	47: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  4a:	00          	.byte	00
+  4b:	00          	.byte	00
+  4c:	000081        	l32r	a8, fffc004c <audio_simple_dec_get_default_decoder+0xfffc004c>	4c: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x20
+  4f:	351287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	4f: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  52:	1b3827        	bltu	a8, a2, 71 <audio_simple_dec_get_default_decoder+0x71>	52: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x71
+  55:	000081        	l32r	a8, fffc0058 <audio_simple_dec_get_default_decoder+0xfffc0058>	55: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x24
+  58:	2c1287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	58: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  5b:	000081        	l32r	a8, fffc005c <audio_simple_dec_get_default_decoder+0xfffc005c>	5b: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x28
+  5e:	261287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	5e: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  61:	000081        	l32r	a8, fffc0064 <audio_simple_dec_get_default_decoder+0xfffc0064>	61: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x2c
+  64:	090c      	movi.n	a9, 0
+  66:	c08280        	sub	a8, a2, a8
+  69:	932980        	movnez	a2, a9, a8
+  6c:	000606        	j	88 <audio_simple_dec_get_default_decoder+0x88>	6c: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  6f:	00          	.byte	00
+  70:	00          	.byte	00
+  71:	000081        	l32r	a8, fffc0074 <audio_simple_dec_get_default_decoder+0xfffc0074>	71: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x30
+  74:	101287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	74: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  77:	000081        	l32r	a8, fffc0078 <audio_simple_dec_get_default_decoder+0xfffc0078>	77: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x34
+  7a:	0a1287        	beq	a2, a8, 88 <audio_simple_dec_get_default_decoder+0x88>	7a: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_decoder+0x88
+  7d:	000081        	l32r	a8, fffc0080 <audio_simple_dec_get_default_decoder+0xfffc0080>	7d: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_decoder+0x38
+  80:	090c      	movi.n	a9, 0
+  82:	c08280        	sub	a8, a2, a8
+  85:	932980        	movnez	a2, a9, a8
+  88:	f01d      	retw.n
+
+Disassembly of section .text.audio_simple_dec_get_default_parser:
+
+00000000 <audio_simple_dec_get_default_parser>:
+   0:	004136        	entry	a1, 32
+   3:	000091        	l32r	a9, fffc0004 <audio_simple_dec_get_default_parser+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_parser
+   6:	028d      	mov.n	a8, a2
+   8:	341297        	beq	a2, a9, 40 <audio_simple_dec_get_default_parser+0x40>	8: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_parser+0x40
+   b:	193927        	bltu	a9, a2, 28 <audio_simple_dec_get_default_parser+0x28>	b: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_parser+0x28
+   e:	000091        	l32r	a9, fffc0010 <audio_simple_dec_get_default_parser+0xfffc0010>	e: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_parser+0x4
+  11:	221c      	movi.n	a2, 18
+  13:	2b1897        	beq	a8, a9, 42 <audio_simple_dec_get_default_parser+0x42>	13: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_parser+0x42
+  16:	000091        	l32r	a9, fffc0018 <audio_simple_dec_get_default_parser+0xfffc0018>	16: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_parser+0x8
+  19:	020c      	movi.n	a2, 0
+  1b:	c08890        	sub	a8, a8, a9
+  1e:	191c      	movi.n	a9, 17
+  20:	832980        	moveqz	a2, a9, a8
+  23:	0006c6        	j	42 <audio_simple_dec_get_default_parser+0x42>	23: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_parser+0x42
+  26:	00          	.byte	00
+  27:	00          	.byte	00
+  28:	000091        	l32r	a9, fffc0028 <audio_simple_dec_get_default_parser+0xfffc0028>	28: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_parser+0xc
+  2b:	321c      	movi.n	a2, 19
+  2d:	111897        	beq	a8, a9, 42 <audio_simple_dec_get_default_parser+0x42>	2d: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_parser+0x42
+  30:	000091        	l32r	a9, fffc0030 <audio_simple_dec_get_default_parser+0xfffc0030>	30: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_default_parser+0x10
+  33:	020c      	movi.n	a2, 0
+  35:	c08890        	sub	a8, a8, a9
+  38:	491c      	movi.n	a9, 20
+  3a:	832980        	moveqz	a2, a9, a8
+  3d:	000046        	j	42 <audio_simple_dec_get_default_parser+0x42>	3d: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_default_parser+0x42
+  40:	521c      	movi.n	a2, 21
+  42:	f01d      	retw.n
+
+Disassembly of section .text.audio_simple_dec_get_register_map:
+
+00000000 <audio_simple_dec_get_register_map>:
+   0:	004136        	entry	a1, 32
+   3:	000081        	l32r	a8, fffc0004 <audio_simple_dec_get_register_map+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.audio_simple_dec_get_register_map
+   6:	0888      	l32i.n	a8, a8, 0
+   8:	888c      	beqz.n	a8, 14 <audio_simple_dec_get_register_map+0x14>	8: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_register_map+0x14
+   a:	6898      	l32i.n	a9, a8, 24
+   c:	041927        	beq	a9, a2, 14 <audio_simple_dec_get_register_map+0x14>	c: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_register_map+0x14
+   f:	7888      	l32i.n	a8, a8, 28
+  11:	ff5856        	bnez	a8, a <audio_simple_dec_get_register_map+0xa>	11: R_XTENSA_SLOT0_OP	.text.audio_simple_dec_get_register_map+0xa
+  14:	082d      	mov.n	a2, a8
+  16:	f01d      	retw.n
+
+Disassembly of section .text.esp_audio_simple_dec_unregister:
+
+00000000 <esp_audio_simple_dec_unregister>:
+   0:	004136        	entry	a1, 32
+   3:	0000c1        	l32r	a12, fffc0004 <esp_audio_simple_dec_unregister+0xfffc0004>	3: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_unregister
+   6:	02ad      	mov.n	a10, a2
+   8:	0c88      	l32i.n	a8, a12, 0
+   a:	88bc      	beqz.n	a8, 46 <esp_audio_simple_dec_unregister+0x46>	a: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_unregister+0x46
+   c:	0b0c      	movi.n	a11, 0
+   e:	6898      	l32i.n	a9, a8, 24
+  10:	082d      	mov.n	a2, a8
+  12:	7888      	l32i.n	a8, a8, 28
+  14:	2999a7        	bne	a9, a10, 41 <esp_audio_simple_dec_unregister+0x41>	14: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_unregister+0x41
+  17:	3bcc      	bnez.n	a11, 1e <esp_audio_simple_dec_unregister+0x1e>	17: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_unregister+0x1e
+  19:	0c89      	s32i.n	a8, a12, 0
+  1b:	000046        	j	20 <esp_audio_simple_dec_unregister+0x20>	1b: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_unregister+0x20
+  1e:	7b89      	s32i.n	a8, a11, 28
+  20:	52a8      	l32i.n	a10, a2, 20
+  22:	4a8c      	beqz.n	a10, 2a <esp_audio_simple_dec_unregister+0x2a>	22: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_unregister+0x2a
+  24:	000081        	l32r	a8, fffc0024 <esp_audio_simple_dec_unregister+0xfffc0024>	24: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_unregister+0x4
+	24: R_XTENSA_ASM_EXPAND	esp_es_parse_remove_parser
+  27:	0008e0        	callx8	a8
+  2a:	42a8      	l32i.n	a10, a2, 16
+  2c:	4a8c      	beqz.n	a10, 34 <esp_audio_simple_dec_unregister+0x34>	2c: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_unregister+0x34
+  2e:	000081        	l32r	a8, fffc0030 <esp_audio_simple_dec_unregister+0xfffc0030>	2e: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_unregister+0x8
+	2e: R_XTENSA_ASM_EXPAND	esp_audio_dec_unregister
+  31:	0008e0        	callx8	a8
+  34:	02ad      	mov.n	a10, a2
+  36:	000081        	l32r	a8, fffc0038 <esp_audio_simple_dec_unregister+0xfffc0038>	36: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_unregister+0xc
+	36: R_XTENSA_ASM_EXPAND	media_lib_free
+  39:	0008e0        	callx8	a8
+  3c:	020c      	movi.n	a2, 0
+  3e:	000186        	j	48 <esp_audio_simple_dec_unregister+0x48>	3e: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_unregister+0x48
+  41:	02bd      	mov.n	a11, a2
+  43:	fc7856        	bnez	a8, e <esp_audio_simple_dec_unregister+0xe>	43: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_unregister+0xe
+  46:	727c      	movi.n	a2, -9
+  48:	f01d      	retw.n
+
+Disassembly of section .text.esp_audio_simple_dec_register:
+
+00000000 <esp_audio_simple_dec_register>:
+   0:	006136        	entry	a1, 48
+   3:	40f290        	nsau	a9, a2
+   6:	036d      	mov.n	a6, a3
+   8:	419590        	srli	a9, a9, 5
+   b:	528c      	beqz.n	a2, 14 <esp_audio_simple_dec_register+0x14>	b: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x14
+   d:	180c      	movi.n	a8, 1
+   f:	938930        	movnez	a8, a9, a3
+  12:	f89c      	beqz.n	a8, 35 <esp_audio_simple_dec_register+0x35>	12: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x35
+  14:	000081        	l32r	a8, fffc0014 <esp_audio_simple_dec_register+0xfffc0014>	14: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x30
+	14: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  17:	0008e0        	callx8	a8
+  1a:	0000b1        	l32r	a11, fffc001c <esp_audio_simple_dec_register+0xfffc001c>	1a: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register
+  1d:	0000c1        	l32r	a12, fffc0020 <esp_audio_simple_dec_register+0xfffc0020>	1d: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x4
+  20:	0add      	mov.n	a13, a10
+  22:	0169      	s32i.n	a6, a1, 0
+  24:	02fd      	mov.n	a15, a2
+  26:	0bed      	mov.n	a14, a11
+  28:	1a0c      	movi.n	a10, 1
+  2a:	000081        	l32r	a8, fffc002c <esp_audio_simple_dec_register+0xfffc002c>	2a: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x34
+	2a: R_XTENSA_ASM_EXPAND	esp_log
+  2d:	0008e0        	callx8	a8
+  30:	b77c      	movi.n	a7, -5
+  32:	0052c6        	j	181 <esp_audio_simple_dec_register+0x181>	32: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x181
+  35:	000071        	l32r	a7, fffc0038 <esp_audio_simple_dec_register+0xfffc0038>	35: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x8
+  38:	0738      	l32i.n	a3, a7, 0
+  3a:	b38c      	beqz.n	a3, 49 <esp_audio_simple_dec_register+0x49>	3a: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x49
+  3c:	6388      	l32i.n	a8, a3, 24
+  3e:	029827        	bne	a8, a2, 44 <esp_audio_simple_dec_register+0x44>	3e: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x44
+  41:	004206        	j	14d <esp_audio_simple_dec_register+0x14d>	41: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x14d
+  44:	7338      	l32i.n	a3, a3, 28
+  46:	ff2356        	bnez	a3, 3c <esp_audio_simple_dec_register+0x3c>	46: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x3c
+  49:	0000a1        	l32r	a10, fffc004c <esp_audio_simple_dec_register+0xfffc004c>	49: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0xc
+  4c:	0c2c      	movi.n	a12, 32
+  4e:	1b0c      	movi.n	a11, 1
+  50:	000081        	l32r	a8, fffc0050 <esp_audio_simple_dec_register+0xfffc0050>	50: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x38
+	50: R_XTENSA_ASM_EXPAND	media_lib_module_calloc
+  53:	0008e0        	callx8	a8
+  56:	0a3d      	mov.n	a3, a10
+  58:	cadc      	bnez.n	a10, 78 <esp_audio_simple_dec_register+0x78>	58: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x78
+  5a:	000081        	l32r	a8, fffc005c <esp_audio_simple_dec_register+0xfffc005c>	5a: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x3c
+	5a: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+  5d:	0008e0        	callx8	a8
+  60:	0000b1        	l32r	a11, fffc0060 <esp_audio_simple_dec_register+0xfffc0060>	60: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register
+  63:	0000c1        	l32r	a12, fffc0064 <esp_audio_simple_dec_register+0xfffc0064>	63: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x10
+  66:	0add      	mov.n	a13, a10
+  68:	0bed      	mov.n	a14, a11
+  6a:	1a0c      	movi.n	a10, 1
+  6c:	000081        	l32r	a8, fffc006c <esp_audio_simple_dec_register+0xfffc006c>	6c: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x40
+	6c: R_XTENSA_ASM_EXPAND	esp_log
+  6f:	0008e0        	callx8	a8
+  72:	e77c      	movi.n	a7, -2
+  74:	004246        	j	181 <esp_audio_simple_dec_register+0x181>	74: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x181
+  77:	00          	.byte	00
+  78:	0788      	l32i.n	a8, a7, 0
+  7a:	888c      	beqz.n	a8, 86 <esp_audio_simple_dec_register+0x86>	7a: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x86
+  7c:	089d      	mov.n	a9, a8
+  7e:	7888      	l32i.n	a8, a8, 28
+  80:	ff8856        	bnez	a8, 7c <esp_audio_simple_dec_register+0x7c>	80: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x7c
+  83:	000106        	j	8b <esp_audio_simple_dec_register+0x8b>	83: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x8b
+  86:	07a9      	s32i.n	a10, a7, 0
+  88:	000046        	j	8d <esp_audio_simple_dec_register+0x8d>	88: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x8d
+  8b:	7939      	s32i.n	a3, a9, 28
+  8d:	6329      	s32i.n	a2, a3, 24
+  8f:	06bd      	mov.n	a11, a6
+  91:	0c1c      	movi.n	a12, 16
+  93:	20a330        	or	a10, a3, a3
+  96:	000081        	l32r	a8, fffc0098 <esp_audio_simple_dec_register+0xfffc0098>	96: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x44
+	96: R_XTENSA_ASM_EXPAND	memcpy
+  99:	0008e0        	callx8	a8
+  9c:	46b8      	l32i.n	a11, a6, 16
+  9e:	070c      	movi.n	a7, 0
+  a0:	052b16        	beqz	a11, f6 <esp_audio_simple_dec_register+0xf6>	a0: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xf6
+  a3:	000081        	l32r	a8, fffc00a4 <esp_audio_simple_dec_register+0xfffc00a4>	a3: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x14
+  a6:	029287        	bne	a2, a8, ac <esp_audio_simple_dec_register+0xac>	a6: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xac
+  a9:	002406        	j	13d <esp_audio_simple_dec_register+0x13d>	a9: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x13d
+  ac:	153827        	bltu	a8, a2, c5 <esp_audio_simple_dec_register+0xc5>	ac: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xc5
+  af:	000081        	l32r	a8, fffc00b0 <esp_audio_simple_dec_register+0xfffc00b0>	af: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x18
+  b2:	029287        	bne	a2, a8, b8 <esp_audio_simple_dec_register+0xb8>	b2: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xb8
+  b5:	002246        	j	142 <esp_audio_simple_dec_register+0x142>	b5: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x142
+  b8:	000081        	l32r	a8, fffc00b8 <esp_audio_simple_dec_register+0xfffc00b8>	b8: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x1c
+  bb:	1a1c      	movi.n	a10, 17
+  bd:	291287        	beq	a2, a8, ea <esp_audio_simple_dec_register+0xea>	bd: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xea
+  c0:	0003c6        	j	d3 <esp_audio_simple_dec_register+0xd3>	c0: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xd3
+  c3:	00          	.byte	00
+  c4:	00          	.byte	00
+  c5:	000081        	l32r	a8, fffc00c8 <esp_audio_simple_dec_register+0xfffc00c8>	c5: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x20
+  c8:	7c1287        	beq	a2, a8, 148 <esp_audio_simple_dec_register+0x148>	c8: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x148
+  cb:	000081        	l32r	a8, fffc00cc <esp_audio_simple_dec_register+0xfffc00cc>	cb: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x24
+  ce:	4a1c      	movi.n	a10, 20
+  d0:	161287        	beq	a2, a8, ea <esp_audio_simple_dec_register+0xea>	d0: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xea
+  d3:	080c      	movi.n	a8, 0
+  d5:	056382        	s32i	a8, a3, 20
+  d8:	000081        	l32r	a8, fffc00d8 <esp_audio_simple_dec_register+0xfffc00d8>	d8: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x48
+	d8: R_XTENSA_ASM_EXPAND	esp_es_parse_get_avail_customer_type
+  db:	0008e0        	callx8	a8
+  de:	53a9      	s32i.n	a10, a3, 20
+  e0:	46b8      	l32i.n	a11, a6, 16
+  e2:	6a8c      	beqz.n	a10, ec <esp_audio_simple_dec_register+0xec>	e2: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xec
+  e4:	10a082        	movi	a8, 16
+  e7:	20aa80        	or	a10, a10, a8
+  ea:	53a9      	s32i.n	a10, a3, 20
+  ec:	56c8      	l32i.n	a12, a6, 20
+  ee:	000081        	l32r	a8, fffc00f0 <esp_audio_simple_dec_register+0xfffc00f0>	ee: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x4c
+	ee: R_XTENSA_ASM_EXPAND	esp_es_parse_add_parser
+  f1:	0008e0        	callx8	a8
+  f4:	0a7d      	mov.n	a7, a10
+  f6:	02ad      	mov.n	a10, a2
+  f8:	000081        	l32r	a8, fffc00f8 <esp_audio_simple_dec_register+0xfffc00f8>	f8: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x50
+	f8: R_XTENSA_ASM_EXPAND	audio_simple_dec_get_default_decoder
+  fb:	0008e0        	callx8	a8
+  fe:	43a9      	s32i.n	a10, a3, 16
+ 100:	6acc      	bnez.n	a10, 10a <esp_audio_simple_dec_register+0x10a>	100: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x10a
+ 102:	000081        	l32r	a8, fffc0104 <esp_audio_simple_dec_register+0xfffc0104>	102: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x54
+	102: R_XTENSA_ASM_EXPAND	esp_audio_dec_get_avail_type
+ 105:	0008e0        	callx8	a8
+ 108:	43a9      	s32i.n	a10, a3, 16
+ 10a:	03bd      	mov.n	a11, a3
+ 10c:	000081        	l32r	a8, fffc010c <esp_audio_simple_dec_register+0xfffc010c>	10c: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x58
+	10c: R_XTENSA_ASM_EXPAND	esp_audio_dec_register
+ 10f:	0008e0        	callx8	a8
+ 112:	2077a0        	or	a7, a7, a10
+ 115:	068716        	beqz	a7, 181 <esp_audio_simple_dec_register+0x181>	115: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x181
+ 118:	000081        	l32r	a8, fffc0118 <esp_audio_simple_dec_register+0xfffc0118>	118: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x5c
+	118: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+ 11b:	0008e0        	callx8	a8
+ 11e:	0000b1        	l32r	a11, fffc0120 <esp_audio_simple_dec_register+0xfffc0120>	11e: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register
+ 121:	0000c1        	l32r	a12, fffc0124 <esp_audio_simple_dec_register+0xfffc0124>	121: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x28
+ 124:	0add      	mov.n	a13, a10
+ 126:	02fd      	mov.n	a15, a2
+ 128:	0bed      	mov.n	a14, a11
+ 12a:	1a0c      	movi.n	a10, 1
+ 12c:	000081        	l32r	a8, fffc012c <esp_audio_simple_dec_register+0xfffc012c>	12c: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x60
+	12c: R_XTENSA_ASM_EXPAND	esp_log
+ 12f:	0008e0        	callx8	a8
+ 132:	02ad      	mov.n	a10, a2
+ 134:	000081        	l32r	a8, fffc0134 <esp_audio_simple_dec_register+0xfffc0134>	134: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x64
+	134: R_XTENSA_ASM_EXPAND	esp_audio_simple_dec_unregister
+ 137:	0008e0        	callx8	a8
+ 13a:	0010c6        	j	181 <esp_audio_simple_dec_register+0x181>	13a: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x181
+ 13d:	5a1c      	movi.n	a10, 21
+ 13f:	ffe9c6        	j	ea <esp_audio_simple_dec_register+0xea>	13f: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xea
+ 142:	2a1c      	movi.n	a10, 18
+ 144:	ffe886        	j	ea <esp_audio_simple_dec_register+0xea>	144: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xea
+ 147:	00          	.byte	00
+ 148:	3a1c      	movi.n	a10, 19
+ 14a:	ffe706        	j	ea <esp_audio_simple_dec_register+0xea>	14a: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0xea
+ 14d:	000081        	l32r	a8, fffc0150 <esp_audio_simple_dec_register+0xfffc0150>	14d: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x68
+	14d: R_XTENSA_ASM_EXPAND	esp_log_timestamp
+ 150:	0008e0        	callx8	a8
+ 153:	0000b1        	l32r	a11, fffc0154 <esp_audio_simple_dec_register+0xfffc0154>	153: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register
+ 156:	0000c1        	l32r	a12, fffc0158 <esp_audio_simple_dec_register+0xfffc0158>	156: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x2c
+ 159:	0add      	mov.n	a13, a10
+ 15b:	02fd      	mov.n	a15, a2
+ 15d:	20ebb0        	or	a14, a11, a11
+ 160:	2a0c      	movi.n	a10, 2
+ 162:	000081        	l32r	a8, fffc0164 <esp_audio_simple_dec_register+0xfffc0164>	162: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x6c
+	162: R_XTENSA_ASM_EXPAND	esp_log
+ 165:	0008e0        	callx8	a8
+ 168:	53a8      	l32i.n	a10, a3, 20
+ 16a:	070c      	movi.n	a7, 0
+ 16c:	000081        	l32r	a8, fffc016c <esp_audio_simple_dec_register+0xfffc016c>	16c: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x70
+	16c: R_XTENSA_ASM_EXPAND	esp_es_parse_remove_parser
+ 16f:	0008e0        	callx8	a8
+ 172:	43a8      	l32i.n	a10, a3, 16
+ 174:	5379      	s32i.n	a7, a3, 20
+ 176:	000081        	l32r	a8, fffc0178 <esp_audio_simple_dec_register+0xfffc0178>	176: R_XTENSA_SLOT0_OP	.literal.esp_audio_simple_dec_register+0x74
+	176: R_XTENSA_ASM_EXPAND	esp_audio_dec_unregister
+ 179:	0008e0        	callx8	a8
+ 17c:	4379      	s32i.n	a7, a3, 16
+ 17e:	ffc346        	j	8f <esp_audio_simple_dec_register+0x8f>	17e: R_XTENSA_SLOT0_OP	.text.esp_audio_simple_dec_register+0x8f
+ 181:	072d      	mov.n	a2, a7
+ 183:	f01d      	retw.n

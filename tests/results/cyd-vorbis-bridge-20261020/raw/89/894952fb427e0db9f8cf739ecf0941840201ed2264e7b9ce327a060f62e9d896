@@ -1,0 +1,195 @@
+"""Isolated canonical Xtensa Vorbis bridge: raw PCM and retry gate. Radio integration, Ogg/OOM/format gates remain pending."""
+import argparse
+from pathlib import Path
+import hashlib
+import json
+import os
+import re
+import shutil
+import struct
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = ROOT / 'idf/esp32-cyd2usb-native/main'
+HARNESS = ROOT / 'tests/target/cyd_vorbis_qemu'
+def nearest(relative):
+    return next((parent / relative for parent in (ROOT, *ROOT.parents) if (parent / relative).exists()), None)
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--control', choices=['skip-preflight'])
+parser.add_argument('--idf', type=Path, default=nearest('.idf/v6.0.2'))
+parser.add_argument('--idf-tools', type=Path)
+parser.add_argument('--codec', type=Path)
+parser.add_argument('--qemu', type=Path, default=shutil.which('qemu-system-xtensa.exe'))
+parser.add_argument('--powershell', type=Path, default=shutil.which('pwsh.exe') or shutil.which('pwsh'))
+args = parser.parse_args()
+if sys.platform != 'win32':
+    parser.error('This pinned SDK launcher supports Windows only')
+for name in ('idf', 'qemu', 'powershell'):
+    if not getattr(args, name):
+        parser.error('--' + name + ' is required when not discoverable')
+SDK = args.idf.resolve()
+TOOLS = (args.idf_tools or SDK.parent / 'tools-v6.0.2').resolve()
+CODEC = (args.codec or SDK.parent / 'esp-adf-libs/esp_audio_codec').resolve()
+PY = TOOLS / 'python_env/idf6.0_py3.12_env/Scripts/python.exe'
+PS = args.powershell.resolve()
+QEMU = args.qemu.resolve()
+OUT = args.output.resolve()
+if OUT == ROOT / '.build' or not OUT.is_relative_to((ROOT / '.build').resolve()):
+    parser.error('Use a fresh output strictly inside repository .build')
+if any((parent / 'report.json').is_file() for parent in OUT.parents if parent != ROOT):
+    parser.error('Do not nest a new run inside an existing evidence campaign')
+protected = (SDK, TOOLS, CODEC, PY.parent, PS.parent, QEMU.parent, QEMU.parent.parent / 'pc-bios')
+if any(OUT == path or OUT.is_relative_to(path) or path.is_relative_to(OUT) for path in protected):
+    parser.error('Output must not overlap SDK, tools, codec, Python, PowerShell or QEMU directories')
+required = (SDK / 'export.ps1', SDK / 'tools/idf.py', PY, PS, QEMU,
+            QEMU.parent.parent / 'pc-bios/esp32-v3-rom.bin', QEMU.parent.parent / 'pc-bios/esp32-v3-rom-app.bin',
+            CODEC / 'lib/esp32/libesp_audio_codec.a', CODEC / 'lib/esp32/libesp_audio_simple_dec.a')
+if any(not path.is_file() for path in required):
+    parser.error('Missing required pinned runtime: ' + ', '.join(str(path) for path in required if not path.is_file()))
+if OUT.exists():
+    parser.error('Output exists; choose a fresh campaign')
+OUT.mkdir(parents=True, exist_ok=False)
+report = {'passed': False, 'scope': __doc__, 'production_radio_integration': False, 'canonical_bridge_sources': True,
+          'physical_device': False, 'commands': [], 'inputs': {}, 'tools': {}}
+sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def save():
+    (OUT / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+def execute(name, argv, timeout=60):
+    proc = subprocess.Popen(list(map(str, argv)), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        creationflags=subprocess.CREATE_NO_WINDOW, env=env)
+    try:
+        data, _ = proc.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        subprocess.run(['taskkill.exe', '/PID', str(proc.pid), '/T', '/F'], capture_output=True, timeout=15,
+                       creationflags=subprocess.CREATE_NO_WINDOW)
+        data, _ = proc.communicate(timeout=15)
+        (OUT / (name + '.log')).write_bytes(data)
+        raise RuntimeError(name + ' timeout; not a passing gate')
+    (OUT / (name + '.log')).write_bytes(data)
+    report['commands'].append({'name': name, 'argv': list(map(str, argv)), 'exit_status': proc.returncode,
+                              'sha256': hashlib.sha256(data).hexdigest()})
+    save()
+    if proc.returncode:
+        raise RuntimeError(name + ' failed: ' + data.decode(errors='replace')[-5000:])
+    return data.decode(errors='replace').replace('\r\n', '\n')
+def freeze(path, name):
+    data = path.read_bytes()
+    dest = OUT / 'sources' / name
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_bytes(data)
+    report['inputs'][str(path.resolve())] = {'sha256': sha(path), 'snapshot': str(dest.relative_to(OUT))}
+def current():
+    return (all(sha(name) == row['sha256'] == sha(OUT / row['snapshot']) for name, row in report['inputs'].items())
+            and all(sha(path) == digest for path, digest in report['tools'].items()))
+env = os.environ.copy()
+env.update(PYTHONUTF8='1', PYTHONIOENCODING='utf-8', PYTHONDONTWRITEBYTECODE='1', GIT_OPTIONAL_LOCKS='0')
+try:
+    for name in ('vorbis_repair/setup.c', 'vorbis_repair/simple.c', 'vorbis_repair/output.c',
+                 'vorbis_repair/COPYING', 'vorbis_repair_abi.h', 'compat/vorbis_repair/enable.cmake'):
+        freeze(MAIN / name, Path('candidate/main') / name)
+    for path in HARNESS.rglob('*'):
+        if path.is_file() and path.name != 'sdk-build.ps1':
+            freeze(path, Path('project') / path.relative_to(HARNESS))
+    freeze(HARNESS / 'sdk-build.ps1', Path('helpers/sdk-build.ps1'))
+    freeze(Path(__file__).resolve(), Path('helpers/run_probe.py'))
+    fixture = ROOT / 'tests/fixtures/esp32c3_calibration/vorbis-q10.ogg'
+    freeze(fixture, Path('fixture/input.ogg'))
+    for name in ('tools/cmake/version.cmake', 'export.ps1', 'tools/idf.py'):
+        freeze(SDK / name, Path('sdk') / name)
+    for tool in (PY, PS, QEMU, QEMU.parent.parent / 'pc-bios/esp32-v3-rom.bin', QEMU.parent.parent / 'pc-bios/esp32-v3-rom-app.bin'):
+        report['tools'][str(tool)] = sha(tool)
+    assert execute('sdk-head', ['git', '-c', 'core.longpaths=true', '-C', SDK, 'rev-parse', 'HEAD']).strip() == '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+    assert not execute('sdk-clean', ['git', '-c', 'core.longpaths=true', '-C', SDK, 'status', '--porcelain', '--untracked-files=no']).strip()
+    codec = CODEC
+    report['archives'] = {name: sha(codec / 'lib/esp32' / name) for name in ('libesp_audio_codec.a', 'libesp_audio_simple_dec.a')}
+    assert report['archives'] == {'libesp_audio_codec.a': '92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58',
+                                  'libesp_audio_simple_dec.a': 'ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6'}
+    for path in sorted(codec.rglob('*')):
+        if path.is_file() and (path.suffix in ('.h', '.c') or path.name in ('CMakeLists.txt', 'Kconfig')):
+            freeze(path, Path('codec') / path.relative_to(codec))
+    shutil.copytree(OUT / 'sources/candidate/main', OUT / 'variant')
+    if args.control:
+        source = OUT / 'variant/vorbis_repair/output.c'
+        text = source.read_text()
+        anchor = '    if (!handle || !raw || !out || !info || !raw->buffer || !out->buffer)'
+        assert text.count(anchor) == 1
+        text = text.replace(anchor, '    return __real_esp_vorbis_dec_decode(handle, raw, out, info);\n' + anchor)
+        source.write_text(text, encoding='utf-8')
+    variants = {str(path.relative_to(OUT)): sha(path) for path in (OUT / 'variant').rglob('*') if path.is_file()}
+    report['control'] = args.control
+    report['variant_sources'] = variants
+    sys.path.insert(0, str(ROOT / 'tools/codec_benchmark'))
+    freeze(ROOT / 'tools/codec_benchmark/vorbis_packets.py', Path('helpers/vorbis_packets.py'))
+    freeze(ROOT / 'tools/codec_benchmark/run_vorbis_lifecycle.py', Path('helpers/run_vorbis_lifecycle.py'))
+    from vorbis_packets import packets
+    values = packets(fixture.read_bytes())
+    offsets = [0]
+    payload = bytearray()
+    for packet in values[3:]:
+        payload.extend(packet['data'])
+        offsets.append(len(payload))
+    def array(name, data):
+        return 'static const uint8_t ' + name + '[] = {' + ','.join(map(str, data)) + '};\n'
+    header = '#pragma once\n' + array('fixture_info', values[0]['data'][7:]) + array('fixture_setup', values[2]['data'][7:])
+    header += array('fixture_packets', payload)
+    header += 'static const uint32_t fixture_offsets[] = {' + ','.join(map(str, offsets)) + '};\n'
+    header += '#define FIXTURE_PACKETS ' + str(len(values) - 3) + '\n'
+    (OUT / 'sources/project/main/fixture.h').write_text(header, encoding='utf-8')
+    generated = {'sources/project/main/fixture.h': sha(OUT / 'sources/project/main/fixture.h')}
+    save()
+    assert current()
+    execute('build', [PS, '-NoProfile', '-NonInteractive', '-File', OUT / 'sources/helpers/sdk-build.ps1',
+            '-Campaign', OUT, '-Repository', ROOT, '-SdkDirectory', SDK, '-ToolsDirectory', TOOLS, '-CodecDirectory', CODEC], 1200)
+    assert current() and all(sha(OUT / path) == digest for path, digest in {**generated, **variants}.items())
+    build = OUT / 'build'
+    desc = json.loads((build / 'project_description.json').read_text())
+    elf = build / desc['app_elf']
+    assert struct.unpack_from('<H', elf.read_bytes(), 18)[0] == 94
+    report['elf_sha256'] = sha(elf)
+    report['app_sha256'] = sha(build / desc['app_bin'])
+    report['sdkconfig_sha256'] = sha(OUT / 'sdkconfig')
+    cc = Path(desc['c_compiler'])
+    nm = cc.with_name('xtensa-esp32-elf-nm.exe')
+    report['tools'][str(cc)] = sha(cc)
+    report['tools'][str(nm)] = sha(nm)
+    symbols = execute('symbols', [nm, '-n', '-S', elf])
+    for symbol in ('__wrap_esp_vorbis_dec_open', '__wrap_esp_vorbis_dec_decode', 'esp_vorbis_dec_open', 'esp_vorbis_dec_decode'):
+        assert re.search(r'\b' + symbol + '$', symbols, re.M), symbol
+    rows = json.loads((build / 'compile_commands.json').read_text())
+    selected = [row for row in rows if Path(row['file']).resolve().is_relative_to(OUT / 'variant')]
+    assert len(selected) == 3
+    report['actual_module_rows'] = selected
+    recipe = json.loads((build / 'flasher_args.json').read_text())
+    flash = OUT / 'qemu-flash.bin'
+    merge = [PY, '-m', 'esptool', '--chip', 'esp32', 'merge-bin', '--output', flash, '--flash-mode', 'dio', '--flash-size', '4MB', '--flash-freq', '40m']
+    for offset, name in sorted(recipe['flash_files'].items(), key=lambda row: int(row[0], 0)):
+        merge.extend([offset, build / name])
+    execute('merge', merge + ['--pad-to-size', '4MB'])
+    report['execution_bundle'] = {'frozen_inputs': report['inputs'], 'generated': generated,
+        'variant_sources': variants, 'elf_sha256': sha(elf), 'flash_sha256': sha(flash), 'archives': report['archives'], 'tools': report['tools']}
+    save()
+    log = execute('qemu', [QEMU, '-M', 'esp32', '-smp', '2', '-L', QEMU.parent.parent / 'pc-bios', '-display', 'none', '-monitor', 'none', '-serial', 'stdio', '-no-reboot', '-snapshot', '-nic', 'none', '-drive', 'file=' + str(flash) + ',if=mtd,format=raw'], 120)
+    assert not re.search(r'Guru Meditation|abort\(\)|Backtrace:|assert failed|CORRUPT HEAP', log), log[-3000:]
+    matches = re.findall(r'^CYD_VORBIS_RAW_COMPLETE packets=(\d+) rejected=(\d+) pcm=(\d+) original_exact=1 core=1$', log, re.M)
+    failures = re.findall(r'^CYD_VORBIS_FAILURE (.+)$', log, re.M)
+    if args.control:
+        assert not matches and failures == ['rejected_dsp_unchanged'] and log.count('CYD_VORBIS_CONTROLLED_STOP') == 1, log[-3000:]
+        report['exact_failure'] = failures[0]
+    else:
+        assert not failures and len(matches) == 1 and int(matches[0][0]) == len(values) - 3 and int(matches[0][1]) > 100
+    assert execute('sdk-head-after', ['git', '-c', 'core.longpaths=true', '-C', SDK, 'rev-parse', 'HEAD']).strip() == '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+    assert not execute('sdk-clean-after', ['git', '-c', 'core.longpaths=true', '-C', SDK, 'status', '--porcelain', '--untracked-files=no']).strip()
+    assert all(sha(codec / 'lib/esp32' / name) == digest for name, digest in report['archives'].items())
+    assert current()
+    assert all(sha(OUT / path) == digest for path, digest in {**generated, **variants}.items())
+    report.update(passed=True, actual_result=matches[0] if matches else None, all_sources_current=True,
+                  limitations='Single raw fixture PCM/retry gate only; Ogg, OOM, broader formats, actual radio pipeline, further exact controls and production integration are pending.')
+    save()
+    print(json.dumps({'passed': True, 'control': args.control, 'result': report['actual_result'], 'report': str(OUT / 'report.json')}))
+except Exception as exc:
+    report['error'] = str(exc)
+    save()
+    raise

@@ -1,0 +1,126 @@
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "esp_vorbis_dec.h"
+#include "esp_heap_caps.h"
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "vorbis_repair_abi.h"
+#include "fixture.h"
+
+extern esp_audio_err_t __real_esp_vorbis_dec_open(void *, uint32_t, void **);
+extern esp_audio_err_t __real_esp_vorbis_dec_decode(void *, esp_audio_dec_in_raw_t *,
+    esp_audio_dec_out_frame_t *, esp_audio_dec_info_t *);
+
+static uint8_t original_pcm[16384], repaired_pcm[16384];
+static void *original, *repaired;
+static unsigned packets_done, rejections;
+static uint32_t total_bytes;
+
+static void stop(const char *reason) {
+    if (reason) printf("CYD_VORBIS_FAILURE %s\n", reason);
+    if (original) { esp_vorbis_dec_close(original); original = NULL; }
+    if (repaired) { esp_vorbis_dec_close(repaired); repaired = NULL; }
+    if (reason) puts("CYD_VORBIS_CONTROLLED_STOP");
+    fflush(stdout);
+    esp_restart();
+}
+
+static void check(bool ok, const char *reason) {
+    if (!ok) stop(reason);
+}
+
+static uint8_t *state_copy;
+static size_t state_capacity;
+static bool state_matches(bool save) {
+    vorbis_wrapper *wrapper = repaired;
+    vorbis_dsp_state *dsp = wrapper->dsp;
+    codec_setup_info *setup = dsp->vi->codec_setup;
+    size_t offset = 0;
+    bool same = true;
+#define STATE_BYTES(pointer, count) do { \
+    size_t bytes = (count); \
+    check(offset + bytes <= state_capacity, "state_snapshot_capacity"); \
+    if (save) memcpy(state_copy + offset, (pointer), bytes); \
+    else if (memcmp(state_copy + offset, (pointer), bytes)) same = false; \
+    offset += bytes; \
+} while (0)
+    STATE_BYTES(wrapper, sizeof(*wrapper));
+    STATE_BYTES(dsp, sizeof(*dsp));
+    for (int c = 0; c < dsp->vi->channels; ++c) {
+        STATE_BYTES(dsp->work[c], setup->blocksizes[1] / 2 * sizeof(int32_t));
+        STATE_BYTES(dsp->mdctright[c], setup->blocksizes[1] / 4 * sizeof(int32_t));
+    }
+#undef STATE_BYTES
+    return same;
+}
+
+static void decode_task(void *unused) {
+    (void)unused;
+    check(xPortGetCoreID() == 1, "actual_decode_core1");
+    esp_vorbis_dec_cfg_t cfg = {
+        .info_header = (uint8_t *)fixture_info, .info_size = sizeof(fixture_info),
+        .setup_header = (uint8_t *)fixture_setup, .setup_size = sizeof(fixture_setup),
+    };
+    check(__real_esp_vorbis_dec_open(&cfg, sizeof(cfg), &original) == ESP_AUDIO_ERR_OK && original,
+          "original_ample_open");
+    check(esp_vorbis_dec_open(&cfg, sizeof(cfg), &repaired) == ESP_AUDIO_ERR_OK && repaired,
+          "repaired_checked_open");
+    vorbis_dsp_state *dsp = ((vorbis_wrapper *)repaired)->dsp;
+    state_capacity = sizeof(vorbis_wrapper) + sizeof(*dsp) +
+        dsp->vi->channels * (dsp->vi->codec_setup->blocksizes[1] * 3 / 4) * sizeof(int32_t);
+    state_copy = malloc(state_capacity);
+    check(state_copy != NULL, "allocate_test_only_state_snapshot");
+    for (unsigned packet = 0; packet < FIXTURE_PACKETS; ++packet) {
+        uint8_t *data = (uint8_t *)fixture_packets + fixture_offsets[packet];
+        uint32_t size = fixture_offsets[packet + 1] - fixture_offsets[packet];
+        esp_audio_dec_in_raw_t raw_a = {.buffer = data, .len = size};
+        esp_audio_dec_in_raw_t raw_b = raw_a;
+        esp_audio_dec_out_frame_t out_a = {.buffer = original_pcm, .len = sizeof(original_pcm)};
+        esp_audio_dec_out_frame_t out_b = {.buffer = repaired_pcm, .len = sizeof(repaired_pcm)};
+        esp_audio_dec_info_t info_a = {0}, info_b = {0};
+        int result_a = __real_esp_vorbis_dec_decode(original, &raw_a, &out_a, &info_a);
+        check(result_a == ESP_AUDIO_ERR_OK, "original_ample_decode");
+        if (packet && out_a.decoded_size) {
+            state_matches(true);
+            for (unsigned retry = 0; retry < 3; ++retry) {
+                raw_b.consumed = 99;
+                out_b.decoded_size = 99;
+                out_b.len = retry ? out_a.decoded_size - 1 : 1;
+                int result = esp_vorbis_dec_decode(repaired, &raw_b, &out_b, &info_b);
+                check(result == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH, "undersized_returns_resize");
+                check(state_matches(false), "rejected_dsp_unchanged");
+                check(!raw_b.consumed && !out_b.decoded_size, "rejected_input_pcm_unchanged");
+                check(out_b.needed_size == out_a.decoded_size, "exact_needed_capacity");
+                ++rejections;
+            }
+            out_b.len = out_a.decoded_size;
+        }
+        int result_b = esp_vorbis_dec_decode(repaired, &raw_b, &out_b, &info_b);
+        check(result_b == result_a && raw_b.consumed == raw_a.consumed &&
+              out_b.decoded_size == out_a.decoded_size, "per_packet_result_size_consumed");
+        check(out_b.decoded_size <= sizeof(repaired_pcm) &&
+              !memcmp(original_pcm, repaired_pcm, out_b.decoded_size), "original_exact_pcm");
+        check(info_a.sample_rate == info_b.sample_rate && info_a.channel == info_b.channel &&
+              info_a.bits_per_sample == info_b.bits_per_sample, "original_format");
+        total_bytes += out_b.decoded_size;
+        ++packets_done;
+        if ((packet & 15U) == 0) vTaskDelay(1);
+    }
+    check(packets_done == FIXTURE_PACKETS && rejections > 100, "complete_packet_matrix");
+    check(esp_vorbis_dec_close(original) == ESP_AUDIO_ERR_OK, "original_close"); original = NULL;
+    check(esp_vorbis_dec_close(repaired) == ESP_AUDIO_ERR_OK, "repaired_close"); repaired = NULL;
+    free(state_copy); state_copy = NULL;
+    check(heap_caps_check_integrity_all(true), "actual_heap_integrity");
+    printf("CYD_VORBIS_RAW_COMPLETE packets=%u rejected=%u pcm=%" PRIu32 " original_exact=1 core=1\n",
+           packets_done, rejections, total_bytes);
+    stop(NULL);
+}
+
+void app_main(void) {
+    check(xPortGetCoreID() == 0, "coordinator_core0");
+    check(xTaskCreatePinnedToCore(decode_task, "vorbis_probe", 16384, NULL, 3, NULL, 1) == pdPASS,
+          "create_actual_core1_task");
+}

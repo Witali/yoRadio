@@ -1,0 +1,68 @@
+{
+  "archives": {
+    "esp32/libesp_audio_codec.a": {
+      "path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a",
+      "sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+      "bytes": 4384572
+    },
+    "esp32/libesp_audio_simple_dec.a": {
+      "path": "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a",
+      "sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+      "bytes": 156872
+    }
+  },
+  "members": "binary-evidence.json:selected_members (only named Ogg/Vorbis members)",
+  "required_nine_wraps": [
+    "esp_vorbis_dec_open",
+    "esp_vorbis_dec_register",
+    "esp_vorbis_dec_decode",
+    "esp_audio_simple_dec_open",
+    "esp_audio_simple_dec_process",
+    "esp_audio_simple_dec_reset",
+    "esp_es_parse_frame",
+    "esp_ogg_parse_frame",
+    "media_lib_module_realloc"
+  ],
+  "post_link_required": [
+    "repaired operations callback table open/decode; original reset/close",
+    "canonical three repair TUs included once",
+    "Xtensa machine94; direct original pass-through calls retained",
+    "vendor DSP/synthesis/PCM core symbols remain original archive implementations"
+  ],
+  "exact_invalid_guard_tests": [
+    {
+      "case": "wrong target archive even with target=esp32",
+      "predicate": "exact whole-archive SHA for codec/simple"
+    },
+    {
+      "case": "repacked member or swapped Ogg/Vorbis member",
+      "predicate": "whole archive SHA and selected member index/name/hash/machine"
+    },
+    {
+      "case": "wrong callback table direct original decode/open",
+      "predicate": "final ELF 4-pointer operations table exact wrapper open/decode + original reset/close; no host assertion substitute"
+    },
+    {
+      "case": "missing any of nine wrappers",
+      "predicate": "each expected wrap present once in linked flags and function availability; actual ELF callbacks/call relocations checked"
+    },
+    {
+      "case": "alter packet offset8/int64 alignment or DSP counters",
+      "predicate": "actual Xtensa compiler offsetof/sizeof/_Alignof failures before target link"
+    },
+    {
+      "case": "reorder simple pending words/container44",
+      "predicate": "all field offsets asserted, not size-only"
+    },
+    {
+      "case": "RV64/host LP64 same typedef names",
+      "predicate": "pointer/int/long/size_t widths and target ELF machine94"
+    },
+    {
+      "case": "unknown codebook/floor/residue consumer semantics",
+      "predicate": "remain target decode/PCM/guard/OOM gate; do not force-pass with compile-only assertions"
+    }
+  ],
+  "executed_cmake_cases": "../guard-02/report.json",
+  "target_compilation_or_runtime_executed": false
+}

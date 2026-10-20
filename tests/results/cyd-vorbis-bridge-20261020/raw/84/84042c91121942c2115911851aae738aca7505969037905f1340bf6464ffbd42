@@ -1,0 +1,185 @@
+"""Bounded Vorbis/Ogg ABI evidence: read archives, never execute a decoder."""
+from pathlib import Path
+import hashlib
+import json
+import re
+import struct
+
+HERE=Path(__file__).resolve().parent
+ROOT=HERE.parents[1]
+OUTPUT=HERE/'abi-02'
+OUTPUT.mkdir(exist_ok=False)
+AUDIT=ROOT/'tests/results/cyd-vorbis-xtensa-audit-20261020'
+sha=lambda raw:hashlib.sha256(raw).hexdigest()
+inputs={}
+def freeze(path,retain=True):
+ path=Path(path).resolve();raw=path.read_bytes();key=str(path)
+ if key not in inputs:
+  row={'source':key,'sha256':sha(raw),'bytes':len(raw),'retained':retain}
+  if retain:
+   target=OUTPUT/'inputs'/sha(raw);target.parent.mkdir(exist_ok=True);target.write_bytes(raw);row['snapshot']=target.relative_to(OUTPUT).as_posix()
+  inputs[key]=row
+ return raw
+def write(name,value): (OUTPUT/name).write_text(json.dumps(value,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+capture=json.loads(freeze(AUDIT/'raw/capture.json'))
+audit=json.loads(freeze(AUDIT/'raw/report.json'))
+for path in (AUDIT/'README.md',HERE/'candidate/main/compat/vorbis_repair/enable.cmake',HERE/'check_guard.py',HERE/'guard-02/report.json',Path(__file__)):
+ freeze(path)
+donor={}
+for name in ('vorbis_repair_abi.h','vorbis_repair/setup.c','vorbis_repair/simple.c','vorbis_repair/output.c'):
+ path=ROOT/'idf/esp32c3-oled-native/main'/name;raw=freeze(path)
+ assert sha(raw)==capture['input_sha256'][str(path)]
+ donor[name]={'sha256':sha(raw),'line_count':len(raw.decode().splitlines())}
+for path in (AUDIT/'raw/tool-output').glob('*.txt'): freeze(path)
+
+def members(raw):
+ assert raw[:8]==b'!<arch>\n';pos=8;table=b'';index=0
+ while pos<len(raw):
+  header=raw[pos:pos+60];assert header[58:]==b'`\n';size=int(header[48:58]);name=header[:16].decode().strip()
+  data=raw[pos+60:pos+60+size];pos+=60+size+size%2;index+=1
+  if name=='//': table=data;continue
+  if name=='/':continue
+  name=table[int(name[1:]):].split(b'/\n',1)[0].decode() if name.startswith('/') and name[1:].isdigit() else name.rstrip('/')
+  yield index,name,data
+def elf(raw):
+ assert raw[:6]==b'\x7fELF\x01\x01';machine=struct.unpack_from('<H',raw,18)[0]
+ off=struct.unpack_from('<I',raw,32)[0];size,count,names=struct.unpack_from('<HHH',raw,46)
+ sections=[struct.unpack_from('<10I',raw,off+i*size) for i in range(count)]
+ n=sections[names];strings=raw[n[4]:n[4]+n[5]]
+ named={strings[s[0]:].split(b'\0',1)[0].decode():s for s in sections}
+ symbols={}
+ for s in sections:
+  if s[1]!=2:continue
+  n=sections[s[6]];strings=raw[n[4]:n[4]+n[5]]
+  for p in range(s[4],s[4]+s[5],s[9]):
+   name,value,bytes_,info,other,index=struct.unpack_from('<IIIBBH',raw,p)
+   if name:
+    text=strings[name:].split(b'\0',1)[0].decode()
+    symbols[text]={'bytes':bytes_,'section_relative_offset':value,'defined':bool(index),'binding':info>>4,'type':info&15}
+ return machine,named,symbols
+
+archives={};selected={}
+for key,metadata in capture['archives'].items():
+ path=Path(metadata['path']);raw=freeze(path,False)
+ assert sha(raw)==metadata['sha256'] and len(raw)==metadata['bytes']
+ board,archive=key.split('/')
+ wanted={r['archive_index']: (label,r) for label,r in capture['members'].items() if label.startswith(board+'-') and r['archive']==archive}
+ for index,name,data in members(raw):
+  if index not in wanted:continue
+  label,row=wanted[index]
+  assert name==row['member'] and sha(data)==row['sha256'] and len(data)==row['bytes']
+  machine,sections,symbols=elf(data)
+  assert machine==row['elf_machine']==(94 if board=='esp32' else 243) and '.debug_info' not in sections
+  target=OUTPUT/'members'/board/(str(index)+'-'+name);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+  selected[label]={'archive':key,'archive_index':index,'member':name,'sha256':sha(data),'bytes':len(data),
+   'machine':machine,'snapshot':target.relative_to(OUTPUT).as_posix(),'dwarf':False,
+   'section_sizes':{n:s[5] for n,s in sections.items()},'symbols':symbols}
+ archives[key]={'path':str(path),'sha256':sha(raw),'bytes':len(raw)}
+assert len(selected)==38
+
+# Each candidate offset is an explicit ILP32 view, never relabeled as a
+# vendor type declaration. Binary-confirmed subsets and missing data follow.
+layouts={}
+def layout(name,size,align,fields,confirmed=(),size_proof='binary allocation/clear/stride corroboration',note=''):
+ layouts[name]={'candidate_size':size,'candidate_align':align,'exact_vendor_align':'missing (no DWARF/type declaration)',
+  'size_evidence':size_proof,'fields':{k:{'offset':v,'evidence':'binary-correlated' if k in confirmed else 'candidate; remaining consumer/type check required'} for k,v in fields.items()},'note':note}
+layout('ogg_buffer',16,4,{'data':0,'size':4,'refcount':8,'owner':12},('data',), 'candidate only; direct data@0 consumer corroborated')
+layout('ogg_reference',16,4,{'buffer':0,'begin':4,'length':8,'next':12},('buffer','begin','length'), 'candidate only; bitreader accesses first three words')
+layout('oggpack_buffer',24,4,{'headbit':0,'headptr':4,'headend':8,'head':12,'tail':16,'count':20},('headbit','headptr','headend','head','tail','count'))
+layout('ogg_packet',32,8,{'packet':0,'bytes':4,'b_o_s':8,'e_o_s':12,'granulepos':16,'packetno':24},('packet','e_o_s','granulepos','packetno'),
+ 'packet consumer and wrapper boundary corroborate 32-byte footprint; exact align not proven', 'Both counter pairs are copied as 32-bit halves. Layout is consistent with int64 alignment8, not proof of _Alignof.')
+layout('vorbis_info',32,4,{'version':0,'channels':4,'rate':8,'bitrate_upper':12,'bitrate_nominal':16,'bitrate_lower':20,'bitrate_window':24,'codec_setup':28},('channels','codec_setup'))
+layout('vorbis_dsp_state',80,8,{'vi':0,'opb':4,'work':28,'mdctright':32,'out_begin':36,'out_end':40,'lW':44,'W':48,'granulepos':56,'sequence':64,'sample_count':72},
+ ('vi','work','mdctright','out_begin','out_end','lW','W','granulepos','sequence','sample_count'), note='52..55 is a gap before first int64 field; exact vendor alignment8 remains inferred.')
+layout('codebook',64,4,dict(zip(('dim','entries','used_entries','dec_maxlength','dec_table','dec_nodeb','dec_leafw','dec_type','q_min','q_minp','q_del','q_delp','q_seq','q_bits','q_pack','q_val'),range(0,64,4))),
+ ('dec_table','q_val'),note='All typed offsets are candidate assertions. Size/stride64 and owned pointers16/60 are confirmed; decode type/signedness/math remains a target gate.')
+layout('vorbis_info_floor0',40,4,{'order':0,'rate':4,'barkmap':8,'ampbits':12,'ampdB':16,'numbooks':20,'books':24})
+layout('floor1class',11,1,{'class_dim':0,'class_subs':1,'class_book':2,'class_subbook':3},(), 'binary array stride11 corroborated; field signedness not fully qualified')
+layout('vorbis_info_floor1',36,4,{'class':0,'partitionclass':4,'postlist':8,'forward_index':12,'hineighbor':16,'loneighbor':20,'partitions':24,'posts':28,'mult':32},
+ ('class','partitionclass','postlist','forward_index','hineighbor','loneighbor'))
+layout('vorbis_info_residue',28,4,{'type':0,'stagemasks':4,'stagebooks':8,'begin':12,'end':16,'grouping':20,'partitions':24,'groupbook':25,'stages':26},('stagemasks','stagebooks'))
+layout('vorbis_info_mode',2,1,{'blockflag':0,'mapping':1},(), 'candidate; verify synthesis/mapping byte consumers')
+layout('coupling_step',2,1,{'mag':0,'ang':1},(), 'candidate; verify mapping byte consumers')
+layout('submap',2,1,{'floor':0,'residue':1},(), 'candidate; verify mapping byte consumers')
+layout('vorbis_info_mapping',20,4,{'submaps':0,'chmuxlist':4,'submaplist':8,'coupling_steps':12,'coupling':16},('chmuxlist','submaplist','coupling'))
+layout('codec_setup_info',52,4,{'blocksizes':0,'modes':8,'maps':12,'floors':16,'residues':20,'books':24,'mode_param':28,'map_param':32,'floor_type':36,'floor_param':40,'residue_param':44,'book_param':48},
+ ('blocksizes','modes','maps','floors','residues','books','mode_param','map_param','floor_type','floor_param','residue_param','book_param'))
+layout('vorbis_wrapper',48,8,{'dsp':0,'packet':8,'sent_info':40},('dsp','packet','sent_info'),note='calloc48 + packet address+8 + byte40 are observed. Exact _Alignof is missing.')
+layout('simple_registration',32,4,{'operations':0,'decoder_type':16,'parser_type':20,'container_type':24,'next':28},('decoder_type','parser_type'), 'registration32 is candidate plus donor assertion; open consumers16/20 confirmed')
+layout('simple_state',48,4,{'decoder_type':0,'parser':4,'decoder':8,'pending_data':12,'pending_bytes':16,'pending_consumed':20,'padding_start':24,'output_bytes':28,'padding_end':32,'decoder_ready':36,'reserved':37,'errors':38,'error_limit':40,'alignment':42,'container_type':44},
+ ('decoder_type','parser','decoder','pending_data','pending_bytes','pending_consumed','padding_start','output_bytes','padding_end','decoder_ready','errors','error_limit','alignment','container_type'))
+layout('ogg_state',52,4,{'base':0,'has_tail':48,'tail':49},(), 'owned extension only, not a vendor type', 'Vendor close frees base allocation; extension footprint is an application contract.')
+
+observations=audit['private_layout_observations_not_full_abi_proof']['observations']
+proof=[]
+for row in observations:
+ for e in row['evidence']:
+  original=Path(e['disassembly']).name;path=AUDIT/'raw/tool-output'/original
+  raw=freeze(path);assert sha(raw)==e['disassembly_sha256']
+  lines=raw.decode().splitlines()
+  for ins in e['instructions']:
+   assert lines[ins['line']-1].strip()==ins['instruction'].strip(),ins
+  proof.append({'group':row['type'],'member':e['member'],'member_sha256':e['member_sha256'],
+   'symbol':e['symbol_or_section'],'disassembly':str(path.relative_to(ROOT)),
+   'disassembly_sha256':sha(raw),'instructions':e['instructions']})
+
+assertions=['/* Candidate target-compiler contract; NOT full vendor ABI proof. */','#include <limits.h>','#include <stddef.h>','#include <stdint.h>',
+ '_Static_assert(CHAR_BIT == 8, "Vorbis ABI CHAR_BIT");']
+for type_,size in [('void *',4),('int',4),('long',4),('size_t',4),('int64_t',8),('bool',1)]:
+ assertions.append(f'_Static_assert(sizeof({type_}) == {size}, "Vorbis ABI width {type_}");')
+for name,row in layouts.items():
+ assertions.append(f'_Static_assert(sizeof({name}) == {row["candidate_size"]}, "Vorbis ABI size {name}");')
+ assertions.append(f'_Static_assert(_Alignof({name}) == {row["candidate_align"]}, "Vorbis ABI alignment {name}");')
+ for field,value in row['fields'].items():
+  assertions.append(f'_Static_assert(offsetof({name}, {field}) == {value["offset"]}, "Vorbis ABI {name}.{field}");')
+(OUTPUT/'candidate-layout-assertions.inc').write_text('\n'.join(assertions)+'\n')
+write('layout-contract.json',{'status':'candidate compiler contract plus explicitly partial vendor binary corroboration',
+ 'layouts':layouts,'note':'The inc uses both header-private and simple.c-private types and must be split between those translation units; it is not compiled here.',
+ 'special_alignment':{'int64_t':{'candidate':8,'exact_vendor':'missing'},'ogg_packet':{'candidate':8,'exact_vendor':'missing'},
+  'vorbis_dsp_state':{'candidate':8,'exact_vendor':'missing'},'vorbis_wrapper':{'candidate':8,'exact_vendor':'missing'}},
+ 'rv32_vs_lx6':{'machine_ids':[243,94],'observed_used_offset_conflicts':[],
+  'common_layout':'Observed compared offsets/footprints agree; instruction encodings, relocation/calling conventions and symbol byte sizes differ.',
+  'not_claimed':'No global RV32/LX6 private ABI equivalence, exact vendor alignment or full consumer/type equivalence.'}})
+write('binary-evidence.json',{'archives':archives,'selected_members':selected,'evidence':proof})
+invalid=[
+ {'case':'wrong target archive even with target=esp32','predicate':'exact whole-archive SHA for codec/simple'},
+ {'case':'repacked member or swapped Ogg/Vorbis member','predicate':'whole archive SHA and selected member index/name/hash/machine'},
+ {'case':'wrong callback table direct original decode/open','predicate':'final ELF 4-pointer operations table exact wrapper open/decode + original reset/close; no host assertion substitute'},
+ {'case':'missing any of nine wrappers','predicate':'each expected wrap present once in linked flags and function availability; actual ELF callbacks/call relocations checked'},
+ {'case':'alter packet offset8/int64 alignment or DSP counters','predicate':'actual Xtensa compiler offsetof/sizeof/_Alignof failures before target link'},
+ {'case':'reorder simple pending words/container44','predicate':'all field offsets asserted, not size-only'},
+ {'case':'RV64/host LP64 same typedef names','predicate':'pointer/int/long/size_t widths and target ELF machine94'},
+ {'case':'unknown codebook/floor/residue consumer semantics','predicate':'remain target decode/PCM/guard/OOM gate; do not force-pass with compile-only assertions'},
+]
+write('production-guard-contract.json',{'archives':{k:v for k,v in archives.items() if k.startswith('esp32/')},
+ 'members':'binary-evidence.json:selected_members (only named Ogg/Vorbis members)',
+ 'required_nine_wraps':['esp_vorbis_dec_open','esp_vorbis_dec_register','esp_vorbis_dec_decode','esp_audio_simple_dec_open','esp_audio_simple_dec_process','esp_audio_simple_dec_reset','esp_es_parse_frame','esp_ogg_parse_frame','media_lib_module_realloc'],
+ 'post_link_required':['repaired operations callback table open/decode; original reset/close','canonical three repair TUs included once',
+  'Xtensa machine94; direct original pass-through calls retained','vendor DSP/synthesis/PCM core symbols remain original archive implementations'],
+ 'exact_invalid_guard_tests':invalid,'executed_cmake_cases':'../guard-02/report.json','target_compilation_or_runtime_executed':False})
+for row in inputs.values():
+ row['unchanged_after']=sha(Path(row['source']).read_bytes())==row['sha256']
+assert all(row['unchanged_after'] for row in inputs.values())
+write('inputs.json',{'inputs':list(inputs.values()),'all_current_after':True,'no_native_tool_or_decoder_execution':True})
+guard=json.loads((HERE/'guard-02/report.json').read_bytes())
+assert guard['passed'] and len(guard['cases'])==21
+write('report.json',{'completed':True,'scope':'Vorbis/Ogg private ABI and configure guard draft only; no AAC investigation or transitive verifier execution',
+ 'donor_inputs':donor,'archive_count':4,'current_archive_and_selected_member_hashes_match_historical_audit':True,
+ 'selected_members':38,'binary_instruction_anchors_checked':sum(len(e['instructions']) for e in proof),
+ 'layout_contract':'layout-contract.json','binary_evidence':'binary-evidence.json','guard_contract':'production-guard-contract.json',
+ 'helper':'../candidate/main/compat/vorbis_repair/enable.cmake','helper_sha256':sha((HERE/'candidate/main/compat/vorbis_repair/enable.cmake').read_bytes()),
+ 'cmake21_passed':True,'guard_report_sha256':sha((HERE/'guard-02/report.json').read_bytes()),
+ 'missing':['exact vendor alignments (all private structs; especially int64/packet/DSP/wrapper)',
+  'complete field-by-field signedness/representation and all codebook/floor/residue consumers',
+  'actual target compiler contract compilation and final ELF callback/link proof',
+  'target PCM/golden/OOM/lifecycle/conformance qualification'],
+ 'no_observed_used_offset_conflict':True,'full_vendor_abi_qualified':False,'target_build_or_runtime':False,
+ 'all_inputs_current_after':True,'input_count':len(inputs)})
+files=[]
+for p in sorted(OUTPUT.rglob('*')):
+ if p.is_file() and p!=OUTPUT/'manifest.json':
+  raw=p.read_bytes();files.append({'path':p.relative_to(OUTPUT).as_posix(),'bytes':len(raw),'sha256':sha(raw)})
+write('manifest.json',{'files':files})
+print(json.dumps({'completed':True,'cmake_cases':21,'selected_members':38,'inputs':len(inputs),'files':len(files)+1,
+ 'report_sha256':sha((OUTPUT/'report.json').read_bytes()),'helper_sha256':sha((HERE/'candidate/main/compat/vorbis_repair/enable.cmake').read_bytes()),
+ 'manifest_sha256':sha((OUTPUT/'manifest.json').read_bytes())},indent=2))

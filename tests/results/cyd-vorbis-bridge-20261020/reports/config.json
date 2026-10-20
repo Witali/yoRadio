@@ -1,0 +1,742 @@
+{
+  "passed": true,
+  "scope": "Configure-only tests of the canonical CYD Vorbis repair CMake helper.\n\nRun real CMake project(NONE) configuration, never a compiler, SDK export or\ndecoder. Verify exact source/link properties and 18 named guard rejections.\nThis gate does not qualify private ABI, playback, OOM or format conformance.\n",
+  "configure_only": true,
+  "compiler_invoked": false,
+  "sdk_export_invoked": false,
+  "runtime_invoked": false,
+  "inputs": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-vorbis-config.py": {
+      "bytes": 15635,
+      "sha256": "4feaf11b04ffd0523bfbc24ffc63531e27bf9a75b3e9950318c1f1a02d595a23",
+      "snapshot": "inputs/repo/tests/run-cyd-vorbis-config.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\vorbis_repair\\enable.cmake": {
+      "bytes": 2908,
+      "sha256": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+      "snapshot": "inputs/repo/idf/esp32-cyd2usb-native/main/compat/vorbis_repair/enable.cmake"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\vorbis_repair_abi.h": {
+      "bytes": 19182,
+      "sha256": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+      "snapshot": "inputs/repo/idf/esp32-cyd2usb-native/main/vorbis_repair_abi.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\vorbis_repair\\setup.c": {
+      "bytes": 36500,
+      "sha256": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+      "snapshot": "inputs/repo/idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\vorbis_repair\\simple.c": {
+      "bytes": 12255,
+      "sha256": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+      "snapshot": "inputs/repo/idf/esp32-cyd2usb-native/main/vorbis_repair/simple.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\vorbis_repair\\output.c": {
+      "bytes": 2003,
+      "sha256": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+      "snapshot": "inputs/repo/idf/esp32-cyd2usb-native/main/vorbis_repair/output.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\impl\\esp_vorbis_dec.h": {
+      "bytes": 5690,
+      "sha256": "288aada7336181f878240a6df6c891f88a8e20ced3de38e50bb80b1c29bee8a4",
+      "snapshot": "inputs/codec_component/include/decoder/impl/esp_vorbis_dec.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\decoder\\esp_audio_dec.h": {
+      "bytes": 9237,
+      "sha256": "8713fb9801824c9e041db2a7f6624a397f12be92477a5100005928427e0eb941",
+      "snapshot": "inputs/codec_component/include/decoder/esp_audio_dec.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_audio_simple_dec.h": {
+      "bytes": 13931,
+      "sha256": "94b5f996b8276f9b4fb291d4878d73201b5fd6aacc8e67c2ff87cdfde2e39750",
+      "snapshot": "inputs/codec_component/include/simple_dec/esp_audio_simple_dec.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\include\\simple_dec\\esp_audio_simple_dec_reg.h": {
+      "bytes": 3241,
+      "sha256": "de08e5c318810652de0c66c463bd99fed84369705a4ad8533ff42ffce02aaef1",
+      "snapshot": "inputs/codec_component/include/simple_dec/esp_audio_simple_dec_reg.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_codec.a": {
+      "bytes": 4384572,
+      "sha256": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+      "snapshot": "inputs/codec_component/lib/esp32/libesp_audio_codec.a"
+    },
+    "C:\\Work\\yoRadio\\.idf\\esp-adf-libs\\esp_audio_codec\\lib\\esp32\\libesp_audio_simple_dec.a": {
+      "bytes": 156872,
+      "sha256": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+      "snapshot": "inputs/codec_component/lib/esp32/libesp_audio_simple_dec.a"
+    }
+  },
+  "tools": {
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe": "392ab4d6c3c91543fd297ed6c7e7354bf62edcd26fdf2706ad8613ad620cc45e",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe": "68865c3276d449d746cea5065fdec2baf755d7813e161ab04205b0907b2629b8",
+    "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a"
+  },
+  "cases": {
+    "enabled": {
+      "passed": true,
+      "expected_rejection": false,
+      "predicate": null,
+      "exit_status": 0,
+      "log_sha256": "de2f512c92027f264a13b9fbc6b8a5486b8cb7fc0148ccaa144d00c8be6b009b",
+      "actual_sources": [
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/enabled/project/main/vorbis_repair/setup.c",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/enabled/project/main/vorbis_repair/simple.c",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/enabled/project/main/vorbis_repair/output.c"
+      ],
+      "actual_link_options": [
+        "-Wl,--undefined=preserve_existing",
+        "-Wl,--wrap=esp_vorbis_dec_open",
+        "-Wl,--wrap=esp_vorbis_dec_register",
+        "-Wl,--wrap=esp_vorbis_dec_decode",
+        "-Wl,--wrap=esp_audio_simple_dec_open",
+        "-Wl,--wrap=esp_audio_simple_dec_process",
+        "-Wl,--wrap=esp_audio_simple_dec_reset",
+        "-Wl,--wrap=esp_es_parse_frame",
+        "-Wl,--wrap=esp_ogg_parse_frame",
+        "-Wl,--wrap=media_lib_module_realloc"
+      ]
+    },
+    "disabled": {
+      "passed": true,
+      "expected_rejection": false,
+      "predicate": null,
+      "exit_status": 0,
+      "log_sha256": "fbd556e7d59734b2a6d76ff27fcda2255fd0e5232c43a266ef3c7173c2d33598",
+      "actual_sources": [],
+      "actual_link_options": [
+        "-Wl,--undefined=preserve_existing"
+      ]
+    },
+    "early": {
+      "passed": true,
+      "expected_rejection": false,
+      "predicate": null,
+      "exit_status": 0,
+      "log_sha256": "4dc596686fff8527c85ae3fd27fcc3aaa3784dd840e0309eacb9dd10252e07b1",
+      "actual_sources": [],
+      "actual_link_options": [
+        "-Wl,--undefined=preserve_existing"
+      ]
+    },
+    "wrong-target": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires classic ESP32 Xtensa",
+      "exit_status": 1,
+      "log_sha256": "3e349b81b1dae6bfde15f92e65d040994d00d50f30c635d2023d22b8817632db"
+    },
+    "missing-target-bool": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires classic ESP32 Xtensa",
+      "exit_status": 1,
+      "log_sha256": "3e349b81b1dae6bfde15f92e65d040994d00d50f30c635d2023d22b8817632db"
+    },
+    "wrong-major": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires pinned ESP-IDF 6.0.2",
+      "exit_status": 1,
+      "log_sha256": "06a07dca5bef5d48506be797cd6a1ef57d67bd03660c0879a2b6ccf5d32e9ad1"
+    },
+    "wrong-minor": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires pinned ESP-IDF 6.0.2",
+      "exit_status": 1,
+      "log_sha256": "06a07dca5bef5d48506be797cd6a1ef57d67bd03660c0879a2b6ccf5d32e9ad1"
+    },
+    "wrong-patch": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires pinned ESP-IDF 6.0.2",
+      "exit_status": 1,
+      "log_sha256": "06a07dca5bef5d48506be797cd6a1ef57d67bd03660c0879a2b6ccf5d32e9ad1"
+    },
+    "missing-version": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires pinned ESP-IDF 6.0.2",
+      "exit_status": 1,
+      "log_sha256": "c32225d82689822303ca258bff74bade9b910aaae332300f9030c5f2464578ce"
+    },
+    "malformed-minor": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires pinned ESP-IDF 6.0.2",
+      "exit_status": 1,
+      "log_sha256": "06a07dca5bef5d48506be797cd6a1ef57d67bd03660c0879a2b6ccf5d32e9ad1"
+    },
+    "malformed-patch": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires pinned ESP-IDF 6.0.2",
+      "exit_status": 1,
+      "log_sha256": "06a07dca5bef5d48506be797cd6a1ef57d67bd03660c0879a2b6ccf5d32e9ad1"
+    },
+    "absent-component": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires registered component target",
+      "exit_status": 1,
+      "log_sha256": "f5a23a652d13501b5fdbbd87f02a52f954aa8c9e39e931779310eb066205b256"
+    },
+    "missing-component-env": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires pinned codec component directory",
+      "exit_status": 1,
+      "log_sha256": "03c5d76379531f56041eecc32f77f7384392417a06918123df1120c012ed2d03"
+    },
+    "bad-codec": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires audited ESP32 codec archive",
+      "exit_status": 1,
+      "log_sha256": "4a805043816a93baf85075df4eb00d415930b180cddaef3d3a9099330894aa1d"
+    },
+    "bad-simple": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "requires audited ESP32 simple_dec archive",
+      "exit_status": 1,
+      "log_sha256": "f834dad3b5ff44266859313eeee756f8855d3903dcf1d2cb746fcfeafccc6fec"
+    },
+    "missing-codec": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "missing codec archive",
+      "exit_status": 1,
+      "log_sha256": "7057343a92080adb4fe6fbd6e830b173c7f5e3893db1307ed5e1101604128bfb"
+    },
+    "missing-simple": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "missing simple_dec archive",
+      "exit_status": 1,
+      "log_sha256": "94c79de60ea231b6eefdda50d53e727ff91e8313625e96df2ba265d63e55d3a6"
+    },
+    "missing-setup.c": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "missing canonical setup.c",
+      "exit_status": 1,
+      "log_sha256": "46a8af5e5486b35b1378cc38c3577d36a961c3295277c66dd3c8d58696a7f75c"
+    },
+    "missing-simple.c": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "missing canonical simple.c",
+      "exit_status": 1,
+      "log_sha256": "148a9100938b3e9288770051dbdf85e30b7bdbe48bd3fda7ca1fbd270e6f782d"
+    },
+    "missing-output.c": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "missing canonical output.c",
+      "exit_status": 1,
+      "log_sha256": "0848863d461c8d91c85507214931cfa21840ca0ebba7d8c382518854aeb8f3af"
+    },
+    "missing-abi": {
+      "passed": true,
+      "expected_rejection": true,
+      "predicate": "missing canonical ABI header",
+      "exit_status": 1,
+      "log_sha256": "87538fc4a82d39dcbb1db6302f423f15faae92896a844f6cdb16b5f19ce9e60c"
+    }
+  },
+  "commands": [
+    {
+      "case": "enabled",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/enabled/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/enabled/build"
+      ],
+      "exit_status": 0,
+      "log_sha256": "de2f512c92027f264a13b9fbc6b8a5486b8cb7fc0148ccaa144d00c8be6b009b"
+    },
+    {
+      "case": "disabled",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/disabled/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/disabled/build"
+      ],
+      "exit_status": 0,
+      "log_sha256": "fbd556e7d59734b2a6d76ff27fcda2255fd0e5232c43a266ef3c7173c2d33598"
+    },
+    {
+      "case": "early",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/early/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/early/build"
+      ],
+      "exit_status": 0,
+      "log_sha256": "4dc596686fff8527c85ae3fd27fcc3aaa3784dd840e0309eacb9dd10252e07b1"
+    },
+    {
+      "case": "wrong-target",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/wrong-target/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/wrong-target/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "3e349b81b1dae6bfde15f92e65d040994d00d50f30c635d2023d22b8817632db"
+    },
+    {
+      "case": "missing-target-bool",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-target-bool/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-target-bool/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "3e349b81b1dae6bfde15f92e65d040994d00d50f30c635d2023d22b8817632db"
+    },
+    {
+      "case": "wrong-major",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/wrong-major/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/wrong-major/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "06a07dca5bef5d48506be797cd6a1ef57d67bd03660c0879a2b6ccf5d32e9ad1"
+    },
+    {
+      "case": "wrong-minor",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/wrong-minor/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/wrong-minor/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "06a07dca5bef5d48506be797cd6a1ef57d67bd03660c0879a2b6ccf5d32e9ad1"
+    },
+    {
+      "case": "wrong-patch",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/wrong-patch/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/wrong-patch/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "06a07dca5bef5d48506be797cd6a1ef57d67bd03660c0879a2b6ccf5d32e9ad1"
+    },
+    {
+      "case": "missing-version",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-version/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-version/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "c32225d82689822303ca258bff74bade9b910aaae332300f9030c5f2464578ce"
+    },
+    {
+      "case": "malformed-minor",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/malformed-minor/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/malformed-minor/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "06a07dca5bef5d48506be797cd6a1ef57d67bd03660c0879a2b6ccf5d32e9ad1"
+    },
+    {
+      "case": "malformed-patch",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/malformed-patch/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/malformed-patch/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "06a07dca5bef5d48506be797cd6a1ef57d67bd03660c0879a2b6ccf5d32e9ad1"
+    },
+    {
+      "case": "absent-component",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/absent-component/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/absent-component/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "f5a23a652d13501b5fdbbd87f02a52f954aa8c9e39e931779310eb066205b256"
+    },
+    {
+      "case": "missing-component-env",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-component-env/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-component-env/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "03c5d76379531f56041eecc32f77f7384392417a06918123df1120c012ed2d03"
+    },
+    {
+      "case": "bad-codec",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/bad-codec/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/bad-codec/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "4a805043816a93baf85075df4eb00d415930b180cddaef3d3a9099330894aa1d"
+    },
+    {
+      "case": "bad-simple",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/bad-simple/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/bad-simple/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "f834dad3b5ff44266859313eeee756f8855d3903dcf1d2cb746fcfeafccc6fec"
+    },
+    {
+      "case": "missing-codec",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-codec/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-codec/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "7057343a92080adb4fe6fbd6e830b173c7f5e3893db1307ed5e1101604128bfb"
+    },
+    {
+      "case": "missing-simple",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-simple/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-simple/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "94c79de60ea231b6eefdda50d53e727ff91e8313625e96df2ba265d63e55d3a6"
+    },
+    {
+      "case": "missing-setup.c",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-setup.c/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-setup.c/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "46a8af5e5486b35b1378cc38c3577d36a961c3295277c66dd3c8d58696a7f75c"
+    },
+    {
+      "case": "missing-simple.c",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-simple.c/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-simple.c/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "148a9100938b3e9288770051dbdf85e30b7bdbe48bd3fda7ca1fbd270e6f782d"
+    },
+    {
+      "case": "missing-output.c",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-output.c/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-output.c/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "0848863d461c8d91c85507214931cfa21840ca0ebba7d8c382518854aeb8f3af"
+    },
+    {
+      "case": "missing-abi",
+      "argv": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=C:/Work/yoRadio/.idf/tools-v6.0.2/tools/ninja/1.12.1/ninja.exe",
+        "-DCMAKE_TOOLCHAIN_FILE=",
+        "-S",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-abi/project",
+        "-B",
+        "C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-vorbis-config-02/missing-abi/build"
+      ],
+      "exit_status": 1,
+      "log_sha256": "87538fc4a82d39dcbb1db6302f423f15faae92896a844f6cdb16b5f19ce9e60c"
+    }
+  ],
+  "generated_inputs_before_cmake": {
+    "components/bad-codec/lib/esp32/libesp_audio_codec.a": "d21373f1466b9bdad7205651c53da1d69b2a42c4428f7b7f98ec658e8215f52d",
+    "components/bad-codec/lib/esp32/libesp_audio_simple_dec.a": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+    "components/bad-simple/lib/esp32/libesp_audio_codec.a": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+    "components/bad-simple/lib/esp32/libesp_audio_simple_dec.a": "543ba5047f646f5d0d91f59f1ef65ba8e607e42d1e8338ca0bbbfb80b4b57244",
+    "components/good/lib/esp32/libesp_audio_codec.a": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+    "components/good/lib/esp32/libesp_audio_simple_dec.a": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+    "components/missing-codec/lib/esp32/libesp_audio_simple_dec.a": "ca3b95dfc83b6984ae91c509bf859e4334fcc74654d2fe8b68bfc34f06126cc6",
+    "components/missing-simple/lib/esp32/libesp_audio_codec.a": "92ba997358f50994d41422438c78bf2d7ee86dc1efc265f5356a66e221ae2e58",
+    "enabled/command.json": "70a49e446d1ea29e7a68c4d07c1c0b4613eca47052408dabac7ebb02243bd3dc",
+    "enabled/project/CMakeLists.txt": "d2b3c41249a0cb96864bb796d91a2619ebbfea7b5f9324e931639d8bf1e7e90e",
+    "enabled/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "enabled/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "enabled/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "enabled/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "enabled/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "disabled/command.json": "6bb43c3fb0bc28220e0daae0eda940276a83363389ca5827ab19ad6bf69da1ce",
+    "disabled/project/CMakeLists.txt": "601e8afc5915cddfa88fd3e9c9cccff69374c9f82af1f2773901107c11785378",
+    "disabled/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "disabled/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "disabled/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "disabled/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "disabled/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "early/command.json": "15e4422943b82fa6dec20223052b618407adeff6624e1331585711374f2d6ded",
+    "early/project/CMakeLists.txt": "edee8210acc8cba85a611b00bd336ca28a35dfc301a1af06cf4c9036dfdd0a69",
+    "early/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "early/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "early/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "early/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "early/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "wrong-target/command.json": "7cdd56bbee2175fc0413f10cc25927107c008a6f903d46aeffadd7fc0387ac94",
+    "wrong-target/project/CMakeLists.txt": "f25cf57c61628cd5a74487f5198ea0f50ce0e0fd6d3067f035ede8f8f867fd4e",
+    "wrong-target/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "wrong-target/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "wrong-target/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "wrong-target/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "wrong-target/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "missing-target-bool/command.json": "3e7e26b8d2c72e7c7e0f78d0e58657c486e62179d89a86733bdb20d0819c4f6b",
+    "missing-target-bool/project/CMakeLists.txt": "5a1581224556a92efba78ec2e1d4efb9c838c7273b7ef7fd82e1e8feffe9d464",
+    "missing-target-bool/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "missing-target-bool/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "missing-target-bool/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "missing-target-bool/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "missing-target-bool/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "wrong-major/command.json": "4d1631f63058c98931a130d4ba8ae2f1be8388a64bb927e17353f463ec6bb54b",
+    "wrong-major/project/CMakeLists.txt": "10b57cf6bbca49fa7d3fec92b8193338e1c37a0a941e8723a88c681afe962ad9",
+    "wrong-major/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "wrong-major/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "wrong-major/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "wrong-major/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "wrong-major/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "wrong-minor/command.json": "13ce50897ed137154ed9a6aa2da38aad770ff70376fbbda5ef1d787a0e7ea021",
+    "wrong-minor/project/CMakeLists.txt": "cb24421de55b4b3b3fbd50e87ab20996a646fc797df3852cb6719e715d459e06",
+    "wrong-minor/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "wrong-minor/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "wrong-minor/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "wrong-minor/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "wrong-minor/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "wrong-patch/command.json": "1dfbebc647fe8262619800f66cb2c0a6ff46f3a88e84fcf07281d869ce61499d",
+    "wrong-patch/project/CMakeLists.txt": "c2272fafb8e02d049eecdf26f8e48a81e563299ca7e7a654f456c244f6bcacdb",
+    "wrong-patch/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "wrong-patch/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "wrong-patch/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "wrong-patch/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "wrong-patch/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "missing-version/command.json": "07ece7a645847c829fc985af8a0721de1518014c19256596c44a6ff62e5f16de",
+    "missing-version/project/CMakeLists.txt": "5fbd40bd1b73d726f40a7f84eaec3794cc5e4509cd3654a20c45d260c8d38dda",
+    "missing-version/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "missing-version/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "missing-version/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "missing-version/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "missing-version/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "malformed-minor/command.json": "0c8653b5e6a866cefe3270e932d800b801804f187d225bad77c38936ddfccc18",
+    "malformed-minor/project/CMakeLists.txt": "298d64b97c56ce2dfbe841843f96ce4a0bc5a62a9b2bb747e2afb65c78da87ab",
+    "malformed-minor/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "malformed-minor/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "malformed-minor/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "malformed-minor/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "malformed-minor/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "malformed-patch/command.json": "c9f7e796eda1ce1d34d37a9dab38a8c5feaa6ea5aed34a10c54b748a5127e55a",
+    "malformed-patch/project/CMakeLists.txt": "1ea354312e356e457db33bb40709c5f566de98deb8ce64fee3060fa5c7cbcca4",
+    "malformed-patch/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "malformed-patch/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "malformed-patch/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "malformed-patch/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "malformed-patch/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "absent-component/command.json": "a2702c6d7a690526381f18b23d5587397072b074ccfa00be711d7a29c3f858e9",
+    "absent-component/project/CMakeLists.txt": "decaa6b170ab65fac6fa406d6f4580b1c668fa7802fecb9e8d687e6594428ba4",
+    "absent-component/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "absent-component/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "absent-component/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "absent-component/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "absent-component/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "missing-component-env/command.json": "7d72cc377944490643a2168f0f46892ba0bd18dda9cfc332b002a9fe8b51e0fa",
+    "missing-component-env/project/CMakeLists.txt": "38a88bdf8b2f395c9ff734a0775bbba60b10670b31d9be068748085660b0f518",
+    "missing-component-env/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "missing-component-env/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "missing-component-env/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "missing-component-env/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "missing-component-env/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "bad-codec/command.json": "5e4bd119ff02156c1810eb7e90a72808d6128166350028ed9647ed5ed0de0868",
+    "bad-codec/project/CMakeLists.txt": "f8dd0b9e868de29cc98aa671e1e72eef0df8116b81a5b70ca5f08836df723ef5",
+    "bad-codec/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "bad-codec/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "bad-codec/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "bad-codec/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "bad-codec/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "bad-simple/command.json": "983e3c6bd16781ed0dc8116c1de6701f848d0a195ff640b6a6c4f76ff0b59bd2",
+    "bad-simple/project/CMakeLists.txt": "074292b87be09b6a8595eb1c2991b2bed977d852df6e8dd22eec1ea12d3f9776",
+    "bad-simple/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "bad-simple/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "bad-simple/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "bad-simple/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "bad-simple/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "missing-codec/command.json": "df1b4bc40a556a49357add5fc710869d171fb773fd801e57441ff52c270e4488",
+    "missing-codec/project/CMakeLists.txt": "616c760278848ad328bd9cde0359472140bee906005e2df0b0a72c2fafe960cf",
+    "missing-codec/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "missing-codec/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "missing-codec/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "missing-codec/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "missing-codec/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "missing-simple/command.json": "69f6f510de9a067908625dd9fa5b134b9eb903ca4c56079bc727d4cf0c4f12bd",
+    "missing-simple/project/CMakeLists.txt": "3059a335c4a71fc960db897d7daf04a3112129a71712678aa33c805d962d4e02",
+    "missing-simple/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "missing-simple/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "missing-simple/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "missing-simple/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "missing-simple/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "missing-setup.c/command.json": "6d0e714962273a3c5c3157810da2a74801f512f67ee985444dcb624365d23b6b",
+    "missing-setup.c/project/CMakeLists.txt": "74b5c8a2a28fb88284b7e222f947b01d04482a69ee90f3ca63703582dbc3b4e5",
+    "missing-setup.c/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "missing-setup.c/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "missing-setup.c/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "missing-setup.c/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "missing-simple.c/command.json": "7a3d1e9fe6afa83545c46daf160394b2ac0dc3826e02b3c5e044cd7dc2e2a067",
+    "missing-simple.c/project/CMakeLists.txt": "8aa5e738be4c28f297726451e1437a6d0b87cc1a498ab647e6ab6afcbda52424",
+    "missing-simple.c/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "missing-simple.c/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "missing-simple.c/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "missing-simple.c/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "missing-output.c/command.json": "e5e1b6354a2e33a7c9c29a5994ca62f2a9d062c2aaf34011104f781fd473cb08",
+    "missing-output.c/project/CMakeLists.txt": "9773219ec04bd840a704994d4e727cfdcfb205be0dedd2911eae2d92cf5c925a",
+    "missing-output.c/project/main/vorbis_repair_abi.h": "e60e572a2cfc21ea7d9abdeb4994b1c1320c626d75ad64f980eb5ca375255f60",
+    "missing-output.c/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "missing-output.c/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "missing-output.c/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+    "missing-abi/command.json": "35e65fd8e1d2a96e43628ca7beb80a453a41b7011943f26b994741cc1607823f",
+    "missing-abi/project/CMakeLists.txt": "178e896c6626f0d8399af4fa430ff30b1f2b8069e7a6c9969cfe6be6ca085e3a",
+    "missing-abi/project/main/vorbis_repair/output.c": "dc2849819692943c4d86838b03219bde27062e09dc2fc91a04683a6435b09fe7",
+    "missing-abi/project/main/vorbis_repair/setup.c": "26a294fd703bf9e8f120c869efc354a8ff6f35f010393ff01349fc8af3512cb2",
+    "missing-abi/project/main/vorbis_repair/simple.c": "8e2695aa56a02b0c65216c02141f94cae700411e04bb43f8f5350b682195bc8a",
+    "missing-abi/project/main/compat/vorbis_repair/enable.cmake": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569"
+  },
+  "all_inputs_unchanged_after": true,
+  "all_generated_inputs_unchanged_after": true
+}

@@ -1,0 +1,44 @@
+{
+  "completed": true,
+  "scope": "Vorbis/Ogg private ABI and configure guard draft only; no AAC investigation or transitive verifier execution",
+  "donor_inputs": {
+    "vorbis_repair_abi.h": {
+      "sha256": "dd26a294cf3887853e12174f3958ea9cccdaa9425ff6a7b21d46faa350bde61c",
+      "line_count": 144
+    },
+    "vorbis_repair/setup.c": {
+      "sha256": "d9393371872a3ffb292a9693ba254a7e3c5ac8646701166f0ae7260024e5c53b",
+      "line_count": 1131
+    },
+    "vorbis_repair/simple.c": {
+      "sha256": "4ac14765cb24249983fba9f564b239bcfc325d28fef6d139728d16b18d22744e",
+      "line_count": 197
+    },
+    "vorbis_repair/output.c": {
+      "sha256": "7e7a49a1ba68b2417514ab4b0adb37c9ed31e2d1b65032fa06dbf4b2830c25e2",
+      "line_count": 39
+    }
+  },
+  "archive_count": 4,
+  "current_archive_and_selected_member_hashes_match_historical_audit": true,
+  "selected_members": 38,
+  "binary_instruction_anchors_checked": 59,
+  "layout_contract": "layout-contract.json",
+  "binary_evidence": "binary-evidence.json",
+  "guard_contract": "production-guard-contract.json",
+  "helper": "../candidate/main/compat/vorbis_repair/enable.cmake",
+  "helper_sha256": "19e824b0e339acec36606032cd9a491d0a20b0ae711a65ffce13dbb313037569",
+  "cmake21_passed": true,
+  "guard_report_sha256": "d3b2e175c5922409407e00f8ce6fae5c90c34917c5f740dc2fc7cf939a1a0c4b",
+  "missing": [
+    "exact vendor alignments (all private structs; especially int64/packet/DSP/wrapper)",
+    "complete field-by-field signedness/representation and all codebook/floor/residue consumers",
+    "actual target compiler contract compilation and final ELF callback/link proof",
+    "target PCM/golden/OOM/lifecycle/conformance qualification"
+  ],
+  "no_observed_used_offset_conflict": true,
+  "full_vendor_abi_qualified": false,
+  "target_build_or_runtime": false,
+  "all_inputs_current_after": true,
+  "input_count": 95
+}

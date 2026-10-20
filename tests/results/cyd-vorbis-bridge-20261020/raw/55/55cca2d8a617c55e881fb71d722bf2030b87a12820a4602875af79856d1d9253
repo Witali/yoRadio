@@ -1,0 +1,745 @@
+{
+  "status": "candidate compiler contract plus explicitly partial vendor binary corroboration",
+  "layouts": {
+    "ogg_buffer": {
+      "candidate_size": 16,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "candidate only; direct data@0 consumer corroborated",
+      "fields": {
+        "data": {
+          "offset": 0,
+          "evidence": "binary-correlated"
+        },
+        "size": {
+          "offset": 4,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "refcount": {
+          "offset": 8,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "owner": {
+          "offset": 12,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": ""
+    },
+    "ogg_reference": {
+      "candidate_size": 16,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "candidate only; bitreader accesses first three words",
+      "fields": {
+        "buffer": {
+          "offset": 0,
+          "evidence": "binary-correlated"
+        },
+        "begin": {
+          "offset": 4,
+          "evidence": "binary-correlated"
+        },
+        "length": {
+          "offset": 8,
+          "evidence": "binary-correlated"
+        },
+        "next": {
+          "offset": 12,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": ""
+    },
+    "oggpack_buffer": {
+      "candidate_size": 24,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "headbit": {
+          "offset": 0,
+          "evidence": "binary-correlated"
+        },
+        "headptr": {
+          "offset": 4,
+          "evidence": "binary-correlated"
+        },
+        "headend": {
+          "offset": 8,
+          "evidence": "binary-correlated"
+        },
+        "head": {
+          "offset": 12,
+          "evidence": "binary-correlated"
+        },
+        "tail": {
+          "offset": 16,
+          "evidence": "binary-correlated"
+        },
+        "count": {
+          "offset": 20,
+          "evidence": "binary-correlated"
+        }
+      },
+      "note": ""
+    },
+    "ogg_packet": {
+      "candidate_size": 32,
+      "candidate_align": 8,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "packet consumer and wrapper boundary corroborate 32-byte footprint; exact align not proven",
+      "fields": {
+        "packet": {
+          "offset": 0,
+          "evidence": "binary-correlated"
+        },
+        "bytes": {
+          "offset": 4,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "b_o_s": {
+          "offset": 8,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "e_o_s": {
+          "offset": 12,
+          "evidence": "binary-correlated"
+        },
+        "granulepos": {
+          "offset": 16,
+          "evidence": "binary-correlated"
+        },
+        "packetno": {
+          "offset": 24,
+          "evidence": "binary-correlated"
+        }
+      },
+      "note": "Both counter pairs are copied as 32-bit halves. Layout is consistent with int64 alignment8, not proof of _Alignof."
+    },
+    "vorbis_info": {
+      "candidate_size": 32,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "version": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "channels": {
+          "offset": 4,
+          "evidence": "binary-correlated"
+        },
+        "rate": {
+          "offset": 8,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "bitrate_upper": {
+          "offset": 12,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "bitrate_nominal": {
+          "offset": 16,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "bitrate_lower": {
+          "offset": 20,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "bitrate_window": {
+          "offset": 24,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "codec_setup": {
+          "offset": 28,
+          "evidence": "binary-correlated"
+        }
+      },
+      "note": ""
+    },
+    "vorbis_dsp_state": {
+      "candidate_size": 80,
+      "candidate_align": 8,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "vi": {
+          "offset": 0,
+          "evidence": "binary-correlated"
+        },
+        "opb": {
+          "offset": 4,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "work": {
+          "offset": 28,
+          "evidence": "binary-correlated"
+        },
+        "mdctright": {
+          "offset": 32,
+          "evidence": "binary-correlated"
+        },
+        "out_begin": {
+          "offset": 36,
+          "evidence": "binary-correlated"
+        },
+        "out_end": {
+          "offset": 40,
+          "evidence": "binary-correlated"
+        },
+        "lW": {
+          "offset": 44,
+          "evidence": "binary-correlated"
+        },
+        "W": {
+          "offset": 48,
+          "evidence": "binary-correlated"
+        },
+        "granulepos": {
+          "offset": 56,
+          "evidence": "binary-correlated"
+        },
+        "sequence": {
+          "offset": 64,
+          "evidence": "binary-correlated"
+        },
+        "sample_count": {
+          "offset": 72,
+          "evidence": "binary-correlated"
+        }
+      },
+      "note": "52..55 is a gap before first int64 field; exact vendor alignment8 remains inferred."
+    },
+    "codebook": {
+      "candidate_size": 64,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "dim": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "entries": {
+          "offset": 4,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "used_entries": {
+          "offset": 8,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "dec_maxlength": {
+          "offset": 12,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "dec_table": {
+          "offset": 16,
+          "evidence": "binary-correlated"
+        },
+        "dec_nodeb": {
+          "offset": 20,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "dec_leafw": {
+          "offset": 24,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "dec_type": {
+          "offset": 28,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "q_min": {
+          "offset": 32,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "q_minp": {
+          "offset": 36,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "q_del": {
+          "offset": 40,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "q_delp": {
+          "offset": 44,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "q_seq": {
+          "offset": 48,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "q_bits": {
+          "offset": 52,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "q_pack": {
+          "offset": 56,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "q_val": {
+          "offset": 60,
+          "evidence": "binary-correlated"
+        }
+      },
+      "note": "All typed offsets are candidate assertions. Size/stride64 and owned pointers16/60 are confirmed; decode type/signedness/math remains a target gate."
+    },
+    "vorbis_info_floor0": {
+      "candidate_size": 40,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "order": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "rate": {
+          "offset": 4,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "barkmap": {
+          "offset": 8,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "ampbits": {
+          "offset": 12,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "ampdB": {
+          "offset": 16,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "numbooks": {
+          "offset": 20,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "books": {
+          "offset": 24,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": ""
+    },
+    "floor1class": {
+      "candidate_size": 11,
+      "candidate_align": 1,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary array stride11 corroborated; field signedness not fully qualified",
+      "fields": {
+        "class_dim": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "class_subs": {
+          "offset": 1,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "class_book": {
+          "offset": 2,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "class_subbook": {
+          "offset": 3,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": ""
+    },
+    "vorbis_info_floor1": {
+      "candidate_size": 36,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "class": {
+          "offset": 0,
+          "evidence": "binary-correlated"
+        },
+        "partitionclass": {
+          "offset": 4,
+          "evidence": "binary-correlated"
+        },
+        "postlist": {
+          "offset": 8,
+          "evidence": "binary-correlated"
+        },
+        "forward_index": {
+          "offset": 12,
+          "evidence": "binary-correlated"
+        },
+        "hineighbor": {
+          "offset": 16,
+          "evidence": "binary-correlated"
+        },
+        "loneighbor": {
+          "offset": 20,
+          "evidence": "binary-correlated"
+        },
+        "partitions": {
+          "offset": 24,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "posts": {
+          "offset": 28,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "mult": {
+          "offset": 32,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": ""
+    },
+    "vorbis_info_residue": {
+      "candidate_size": 28,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "type": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "stagemasks": {
+          "offset": 4,
+          "evidence": "binary-correlated"
+        },
+        "stagebooks": {
+          "offset": 8,
+          "evidence": "binary-correlated"
+        },
+        "begin": {
+          "offset": 12,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "end": {
+          "offset": 16,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "grouping": {
+          "offset": 20,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "partitions": {
+          "offset": 24,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "groupbook": {
+          "offset": 25,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "stages": {
+          "offset": 26,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": ""
+    },
+    "vorbis_info_mode": {
+      "candidate_size": 2,
+      "candidate_align": 1,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "candidate; verify synthesis/mapping byte consumers",
+      "fields": {
+        "blockflag": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "mapping": {
+          "offset": 1,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": ""
+    },
+    "coupling_step": {
+      "candidate_size": 2,
+      "candidate_align": 1,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "candidate; verify mapping byte consumers",
+      "fields": {
+        "mag": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "ang": {
+          "offset": 1,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": ""
+    },
+    "submap": {
+      "candidate_size": 2,
+      "candidate_align": 1,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "candidate; verify mapping byte consumers",
+      "fields": {
+        "floor": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "residue": {
+          "offset": 1,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": ""
+    },
+    "vorbis_info_mapping": {
+      "candidate_size": 20,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "submaps": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "chmuxlist": {
+          "offset": 4,
+          "evidence": "binary-correlated"
+        },
+        "submaplist": {
+          "offset": 8,
+          "evidence": "binary-correlated"
+        },
+        "coupling_steps": {
+          "offset": 12,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "coupling": {
+          "offset": 16,
+          "evidence": "binary-correlated"
+        }
+      },
+      "note": ""
+    },
+    "codec_setup_info": {
+      "candidate_size": 52,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "blocksizes": {
+          "offset": 0,
+          "evidence": "binary-correlated"
+        },
+        "modes": {
+          "offset": 8,
+          "evidence": "binary-correlated"
+        },
+        "maps": {
+          "offset": 12,
+          "evidence": "binary-correlated"
+        },
+        "floors": {
+          "offset": 16,
+          "evidence": "binary-correlated"
+        },
+        "residues": {
+          "offset": 20,
+          "evidence": "binary-correlated"
+        },
+        "books": {
+          "offset": 24,
+          "evidence": "binary-correlated"
+        },
+        "mode_param": {
+          "offset": 28,
+          "evidence": "binary-correlated"
+        },
+        "map_param": {
+          "offset": 32,
+          "evidence": "binary-correlated"
+        },
+        "floor_type": {
+          "offset": 36,
+          "evidence": "binary-correlated"
+        },
+        "floor_param": {
+          "offset": 40,
+          "evidence": "binary-correlated"
+        },
+        "residue_param": {
+          "offset": 44,
+          "evidence": "binary-correlated"
+        },
+        "book_param": {
+          "offset": 48,
+          "evidence": "binary-correlated"
+        }
+      },
+      "note": ""
+    },
+    "vorbis_wrapper": {
+      "candidate_size": 48,
+      "candidate_align": 8,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "dsp": {
+          "offset": 0,
+          "evidence": "binary-correlated"
+        },
+        "packet": {
+          "offset": 8,
+          "evidence": "binary-correlated"
+        },
+        "sent_info": {
+          "offset": 40,
+          "evidence": "binary-correlated"
+        }
+      },
+      "note": "calloc48 + packet address+8 + byte40 are observed. Exact _Alignof is missing."
+    },
+    "simple_registration": {
+      "candidate_size": 32,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "registration32 is candidate plus donor assertion; open consumers16/20 confirmed",
+      "fields": {
+        "operations": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "decoder_type": {
+          "offset": 16,
+          "evidence": "binary-correlated"
+        },
+        "parser_type": {
+          "offset": 20,
+          "evidence": "binary-correlated"
+        },
+        "container_type": {
+          "offset": 24,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "next": {
+          "offset": 28,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": ""
+    },
+    "simple_state": {
+      "candidate_size": 48,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "binary allocation/clear/stride corroboration",
+      "fields": {
+        "decoder_type": {
+          "offset": 0,
+          "evidence": "binary-correlated"
+        },
+        "parser": {
+          "offset": 4,
+          "evidence": "binary-correlated"
+        },
+        "decoder": {
+          "offset": 8,
+          "evidence": "binary-correlated"
+        },
+        "pending_data": {
+          "offset": 12,
+          "evidence": "binary-correlated"
+        },
+        "pending_bytes": {
+          "offset": 16,
+          "evidence": "binary-correlated"
+        },
+        "pending_consumed": {
+          "offset": 20,
+          "evidence": "binary-correlated"
+        },
+        "padding_start": {
+          "offset": 24,
+          "evidence": "binary-correlated"
+        },
+        "output_bytes": {
+          "offset": 28,
+          "evidence": "binary-correlated"
+        },
+        "padding_end": {
+          "offset": 32,
+          "evidence": "binary-correlated"
+        },
+        "decoder_ready": {
+          "offset": 36,
+          "evidence": "binary-correlated"
+        },
+        "reserved": {
+          "offset": 37,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "errors": {
+          "offset": 38,
+          "evidence": "binary-correlated"
+        },
+        "error_limit": {
+          "offset": 40,
+          "evidence": "binary-correlated"
+        },
+        "alignment": {
+          "offset": 42,
+          "evidence": "binary-correlated"
+        },
+        "container_type": {
+          "offset": 44,
+          "evidence": "binary-correlated"
+        }
+      },
+      "note": ""
+    },
+    "ogg_state": {
+      "candidate_size": 52,
+      "candidate_align": 4,
+      "exact_vendor_align": "missing (no DWARF/type declaration)",
+      "size_evidence": "owned extension only, not a vendor type",
+      "fields": {
+        "base": {
+          "offset": 0,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "has_tail": {
+          "offset": 48,
+          "evidence": "candidate; remaining consumer/type check required"
+        },
+        "tail": {
+          "offset": 49,
+          "evidence": "candidate; remaining consumer/type check required"
+        }
+      },
+      "note": "Vendor close frees base allocation; extension footprint is an application contract."
+    }
+  },
+  "note": "The inc uses both header-private and simple.c-private types and must be split between those translation units; it is not compiled here.",
+  "special_alignment": {
+    "int64_t": {
+      "candidate": 8,
+      "exact_vendor": "missing"
+    },
+    "ogg_packet": {
+      "candidate": 8,
+      "exact_vendor": "missing"
+    },
+    "vorbis_dsp_state": {
+      "candidate": 8,
+      "exact_vendor": "missing"
+    },
+    "vorbis_wrapper": {
+      "candidate": 8,
+      "exact_vendor": "missing"
+    }
+  },
+  "rv32_vs_lx6": {
+    "machine_ids": [
+      243,
+      94
+    ],
+    "observed_used_offset_conflicts": [],
+    "common_layout": "Observed compared offsets/footprints agree; instruction encodings, relocation/calling conventions and symbol byte sizes differ.",
+    "not_claimed": "No global RV32/LX6 private ABI equivalence, exact vendor alignment or full consumer/type equivalence."
+  }
+}

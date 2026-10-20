@@ -1,0 +1,309 @@
+// Private ESP32 Xtensa ABI of esp_audio_codec 2.6.2, checked against the pinned objects.
+// Tremor type definitions adapted from Xiph.Org's BSD-licensed low-memory
+// decoder; see vorbis_repair/COPYING and README.md for provenance.
+#pragma once
+#include "sdkconfig.h"
+#if !defined(CONFIG_IDF_TARGET_ESP32) || !CONFIG_IDF_TARGET_ESP32
+#error "The CYD Vorbis bridge requires the audited ESP32 target"
+#endif
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+typedef int32_t ogg_int32_t;
+typedef uint32_t ogg_uint32_t;
+typedef uint16_t ogg_uint16_t;
+typedef struct ogg_buffer {
+    unsigned char *data;
+    long size;
+    int refcount;
+    void *owner;
+} ogg_buffer;
+typedef struct ogg_reference {
+    ogg_buffer *buffer;
+    long begin, length;
+    struct ogg_reference *next;
+} ogg_reference;
+typedef struct oggpack_buffer {
+    int headbit;
+    unsigned char *headptr;
+    long headend;
+    ogg_reference *head, *tail;
+    long count;
+} oggpack_buffer;
+typedef struct ogg_packet {
+    ogg_reference *packet;
+    long bytes, b_o_s, e_o_s;
+    int64_t granulepos, packetno;
+} ogg_packet;
+typedef struct vorbis_info {
+    int version, channels;
+    long rate, bitrate_upper, bitrate_nominal, bitrate_lower, bitrate_window;
+    struct codec_setup_info *codec_setup;
+} vorbis_info;
+typedef struct vorbis_dsp_state {
+    vorbis_info *vi;
+    oggpack_buffer opb;
+    int32_t **work, **mdctright;
+    int out_begin, out_end;
+    long lW, W;
+    int64_t granulepos, sequence, sample_count;
+} vorbis_dsp_state;
+typedef struct codebook {
+    long dim, entries, used_entries;
+    int dec_maxlength;
+    void *dec_table;
+    int dec_nodeb, dec_leafw, dec_type;
+    int32_t q_min;
+    int q_minp;
+    int32_t q_del;
+    int q_delp, q_seq, q_bits, q_pack;
+    void *q_val;
+} codebook;
+typedef void vorbis_info_floor;
+typedef struct {
+    int order;
+    long rate, barkmap;
+    int ampbits, ampdB, numbooks;
+    unsigned char books[16];
+} vorbis_info_floor0;
+typedef struct {
+    char class_dim, class_subs;
+    unsigned char class_book, class_subbook[8];
+} floor1class;
+typedef struct {
+    floor1class *class;
+    char *partitionclass;
+    uint16_t *postlist;
+    char *forward_index, *hineighbor, *loneighbor;
+    int partitions, posts, mult;
+} vorbis_info_floor1;
+typedef struct {
+    int type;
+    unsigned char *stagemasks, *stagebooks;
+    long begin, end;
+    int grouping;
+    char partitions;
+    unsigned char groupbook;
+    char stages;
+} vorbis_info_residue;
+typedef struct { unsigned char blockflag, mapping; } vorbis_info_mode;
+typedef struct { unsigned char mag, ang; } coupling_step;
+typedef struct { unsigned char floor, residue; } submap;
+typedef struct {
+    int submaps;
+    unsigned char *chmuxlist;
+    submap *submaplist;
+    int coupling_steps;
+    coupling_step *coupling;
+} vorbis_info_mapping;
+typedef struct codec_setup_info {
+    long blocksizes[2];
+    int modes, maps, floors, residues, books;
+    vorbis_info_mode *mode_param;
+    vorbis_info_mapping *map_param;
+    char *floor_type;
+    vorbis_info_floor **floor_param;
+    vorbis_info_residue *residue_param;
+    codebook *book_param;
+} codec_setup_info;
+typedef struct {
+    vorbis_dsp_state *dsp;
+    ogg_packet packet;
+    bool sent_info;
+} vorbis_wrapper;
+
+#define VORBIS_ABI_SIZE(type, bytes) _Static_assert(sizeof(type) == bytes, #type " size")
+#define VORBIS_ABI_FIELD(type, field, offset) \
+    _Static_assert(offsetof(type, field) == offset, #type "." #field)
+_Static_assert(sizeof(void *) == 4 && sizeof(long) == 4, "ESP32 ILP32 ABI");
+_Static_assert(_Alignof(int64_t) == 8, "ESP32 int64 alignment");
+_Static_assert(_Alignof(ogg_packet) == 8, "ESP32 packet alignment");
+_Static_assert(_Alignof(vorbis_dsp_state) == 8, "ESP32 DSP alignment");
+_Static_assert(_Alignof(vorbis_wrapper) == 8, "ESP32 wrapper alignment");
+VORBIS_ABI_SIZE(ogg_buffer, 16);
+VORBIS_ABI_SIZE(ogg_reference, 16);
+VORBIS_ABI_SIZE(oggpack_buffer, 24);
+VORBIS_ABI_SIZE(ogg_packet, 32);
+VORBIS_ABI_SIZE(vorbis_info, 32);
+VORBIS_ABI_FIELD(vorbis_info, codec_setup, 28);
+VORBIS_ABI_SIZE(vorbis_dsp_state, 80);
+VORBIS_ABI_FIELD(vorbis_dsp_state, work, 28);
+VORBIS_ABI_FIELD(vorbis_dsp_state, mdctright, 32);
+VORBIS_ABI_FIELD(vorbis_dsp_state, out_begin, 36);
+VORBIS_ABI_FIELD(vorbis_dsp_state, granulepos, 56);
+VORBIS_ABI_SIZE(codebook, 64);
+VORBIS_ABI_FIELD(codebook, dec_table, 16);
+VORBIS_ABI_FIELD(codebook, q_val, 60);
+VORBIS_ABI_SIZE(vorbis_info_floor0, 40);
+VORBIS_ABI_SIZE(floor1class, 11);
+VORBIS_ABI_SIZE(vorbis_info_floor1, 36);
+VORBIS_ABI_FIELD(vorbis_info_floor1, hineighbor, 16);
+VORBIS_ABI_SIZE(vorbis_info_residue, 28);
+VORBIS_ABI_SIZE(vorbis_info_mapping, 20);
+VORBIS_ABI_SIZE(codec_setup_info, 52);
+VORBIS_ABI_FIELD(codec_setup_info, mode_param, 28);
+VORBIS_ABI_FIELD(codec_setup_info, floor_param, 40);
+VORBIS_ABI_FIELD(codec_setup_info, book_param, 48);
+VORBIS_ABI_SIZE(vorbis_wrapper, 48);
+VORBIS_ABI_FIELD(vorbis_wrapper, packet, 8);
+VORBIS_ABI_FIELD(vorbis_wrapper, sent_info, 40);
+
+long tremor_oggpack_read(oggpack_buffer *, int);
+int tremor_oggpack_eop(oggpack_buffer *);
+
+/* Candidate target-compiler contract; NOT full vendor ABI proof. */
+#include <limits.h>
+#include <stddef.h>
+#include <stdint.h>
+_Static_assert(CHAR_BIT == 8, "Vorbis ABI CHAR_BIT");
+_Static_assert(sizeof(void *) == 4, "Vorbis ABI width void *");
+_Static_assert(sizeof(int) == 4, "Vorbis ABI width int");
+_Static_assert(sizeof(long) == 4, "Vorbis ABI width long");
+_Static_assert(sizeof(size_t) == 4, "Vorbis ABI width size_t");
+_Static_assert(sizeof(int64_t) == 8, "Vorbis ABI width int64_t");
+_Static_assert(sizeof(bool) == 1, "Vorbis ABI width bool");
+_Static_assert(sizeof(ogg_buffer) == 16, "Vorbis ABI size ogg_buffer");
+_Static_assert(_Alignof(ogg_buffer) == 4, "Vorbis ABI alignment ogg_buffer");
+_Static_assert(offsetof(ogg_buffer, data) == 0, "Vorbis ABI ogg_buffer.data");
+_Static_assert(offsetof(ogg_buffer, size) == 4, "Vorbis ABI ogg_buffer.size");
+_Static_assert(offsetof(ogg_buffer, refcount) == 8, "Vorbis ABI ogg_buffer.refcount");
+_Static_assert(offsetof(ogg_buffer, owner) == 12, "Vorbis ABI ogg_buffer.owner");
+_Static_assert(sizeof(ogg_reference) == 16, "Vorbis ABI size ogg_reference");
+_Static_assert(_Alignof(ogg_reference) == 4, "Vorbis ABI alignment ogg_reference");
+_Static_assert(offsetof(ogg_reference, buffer) == 0, "Vorbis ABI ogg_reference.buffer");
+_Static_assert(offsetof(ogg_reference, begin) == 4, "Vorbis ABI ogg_reference.begin");
+_Static_assert(offsetof(ogg_reference, length) == 8, "Vorbis ABI ogg_reference.length");
+_Static_assert(offsetof(ogg_reference, next) == 12, "Vorbis ABI ogg_reference.next");
+_Static_assert(sizeof(oggpack_buffer) == 24, "Vorbis ABI size oggpack_buffer");
+_Static_assert(_Alignof(oggpack_buffer) == 4, "Vorbis ABI alignment oggpack_buffer");
+_Static_assert(offsetof(oggpack_buffer, headbit) == 0, "Vorbis ABI oggpack_buffer.headbit");
+_Static_assert(offsetof(oggpack_buffer, headptr) == 4, "Vorbis ABI oggpack_buffer.headptr");
+_Static_assert(offsetof(oggpack_buffer, headend) == 8, "Vorbis ABI oggpack_buffer.headend");
+_Static_assert(offsetof(oggpack_buffer, head) == 12, "Vorbis ABI oggpack_buffer.head");
+_Static_assert(offsetof(oggpack_buffer, tail) == 16, "Vorbis ABI oggpack_buffer.tail");
+_Static_assert(offsetof(oggpack_buffer, count) == 20, "Vorbis ABI oggpack_buffer.count");
+_Static_assert(sizeof(ogg_packet) == 32, "Vorbis ABI size ogg_packet");
+_Static_assert(_Alignof(ogg_packet) == 8, "Vorbis ABI alignment ogg_packet");
+_Static_assert(offsetof(ogg_packet, packet) == 0, "Vorbis ABI ogg_packet.packet");
+_Static_assert(offsetof(ogg_packet, bytes) == 4, "Vorbis ABI ogg_packet.bytes");
+_Static_assert(offsetof(ogg_packet, b_o_s) == 8, "Vorbis ABI ogg_packet.b_o_s");
+_Static_assert(offsetof(ogg_packet, e_o_s) == 12, "Vorbis ABI ogg_packet.e_o_s");
+_Static_assert(offsetof(ogg_packet, granulepos) == 16, "Vorbis ABI ogg_packet.granulepos");
+_Static_assert(offsetof(ogg_packet, packetno) == 24, "Vorbis ABI ogg_packet.packetno");
+_Static_assert(sizeof(vorbis_info) == 32, "Vorbis ABI size vorbis_info");
+_Static_assert(_Alignof(vorbis_info) == 4, "Vorbis ABI alignment vorbis_info");
+_Static_assert(offsetof(vorbis_info, version) == 0, "Vorbis ABI vorbis_info.version");
+_Static_assert(offsetof(vorbis_info, channels) == 4, "Vorbis ABI vorbis_info.channels");
+_Static_assert(offsetof(vorbis_info, rate) == 8, "Vorbis ABI vorbis_info.rate");
+_Static_assert(offsetof(vorbis_info, bitrate_upper) == 12, "Vorbis ABI vorbis_info.bitrate_upper");
+_Static_assert(offsetof(vorbis_info, bitrate_nominal) == 16, "Vorbis ABI vorbis_info.bitrate_nominal");
+_Static_assert(offsetof(vorbis_info, bitrate_lower) == 20, "Vorbis ABI vorbis_info.bitrate_lower");
+_Static_assert(offsetof(vorbis_info, bitrate_window) == 24, "Vorbis ABI vorbis_info.bitrate_window");
+_Static_assert(offsetof(vorbis_info, codec_setup) == 28, "Vorbis ABI vorbis_info.codec_setup");
+_Static_assert(sizeof(vorbis_dsp_state) == 80, "Vorbis ABI size vorbis_dsp_state");
+_Static_assert(_Alignof(vorbis_dsp_state) == 8, "Vorbis ABI alignment vorbis_dsp_state");
+_Static_assert(offsetof(vorbis_dsp_state, vi) == 0, "Vorbis ABI vorbis_dsp_state.vi");
+_Static_assert(offsetof(vorbis_dsp_state, opb) == 4, "Vorbis ABI vorbis_dsp_state.opb");
+_Static_assert(offsetof(vorbis_dsp_state, work) == 28, "Vorbis ABI vorbis_dsp_state.work");
+_Static_assert(offsetof(vorbis_dsp_state, mdctright) == 32, "Vorbis ABI vorbis_dsp_state.mdctright");
+_Static_assert(offsetof(vorbis_dsp_state, out_begin) == 36, "Vorbis ABI vorbis_dsp_state.out_begin");
+_Static_assert(offsetof(vorbis_dsp_state, out_end) == 40, "Vorbis ABI vorbis_dsp_state.out_end");
+_Static_assert(offsetof(vorbis_dsp_state, lW) == 44, "Vorbis ABI vorbis_dsp_state.lW");
+_Static_assert(offsetof(vorbis_dsp_state, W) == 48, "Vorbis ABI vorbis_dsp_state.W");
+_Static_assert(offsetof(vorbis_dsp_state, granulepos) == 56, "Vorbis ABI vorbis_dsp_state.granulepos");
+_Static_assert(offsetof(vorbis_dsp_state, sequence) == 64, "Vorbis ABI vorbis_dsp_state.sequence");
+_Static_assert(offsetof(vorbis_dsp_state, sample_count) == 72, "Vorbis ABI vorbis_dsp_state.sample_count");
+_Static_assert(sizeof(codebook) == 64, "Vorbis ABI size codebook");
+_Static_assert(_Alignof(codebook) == 4, "Vorbis ABI alignment codebook");
+_Static_assert(offsetof(codebook, dim) == 0, "Vorbis ABI codebook.dim");
+_Static_assert(offsetof(codebook, entries) == 4, "Vorbis ABI codebook.entries");
+_Static_assert(offsetof(codebook, used_entries) == 8, "Vorbis ABI codebook.used_entries");
+_Static_assert(offsetof(codebook, dec_maxlength) == 12, "Vorbis ABI codebook.dec_maxlength");
+_Static_assert(offsetof(codebook, dec_table) == 16, "Vorbis ABI codebook.dec_table");
+_Static_assert(offsetof(codebook, dec_nodeb) == 20, "Vorbis ABI codebook.dec_nodeb");
+_Static_assert(offsetof(codebook, dec_leafw) == 24, "Vorbis ABI codebook.dec_leafw");
+_Static_assert(offsetof(codebook, dec_type) == 28, "Vorbis ABI codebook.dec_type");
+_Static_assert(offsetof(codebook, q_min) == 32, "Vorbis ABI codebook.q_min");
+_Static_assert(offsetof(codebook, q_minp) == 36, "Vorbis ABI codebook.q_minp");
+_Static_assert(offsetof(codebook, q_del) == 40, "Vorbis ABI codebook.q_del");
+_Static_assert(offsetof(codebook, q_delp) == 44, "Vorbis ABI codebook.q_delp");
+_Static_assert(offsetof(codebook, q_seq) == 48, "Vorbis ABI codebook.q_seq");
+_Static_assert(offsetof(codebook, q_bits) == 52, "Vorbis ABI codebook.q_bits");
+_Static_assert(offsetof(codebook, q_pack) == 56, "Vorbis ABI codebook.q_pack");
+_Static_assert(offsetof(codebook, q_val) == 60, "Vorbis ABI codebook.q_val");
+_Static_assert(sizeof(vorbis_info_floor0) == 40, "Vorbis ABI size vorbis_info_floor0");
+_Static_assert(_Alignof(vorbis_info_floor0) == 4, "Vorbis ABI alignment vorbis_info_floor0");
+_Static_assert(offsetof(vorbis_info_floor0, order) == 0, "Vorbis ABI vorbis_info_floor0.order");
+_Static_assert(offsetof(vorbis_info_floor0, rate) == 4, "Vorbis ABI vorbis_info_floor0.rate");
+_Static_assert(offsetof(vorbis_info_floor0, barkmap) == 8, "Vorbis ABI vorbis_info_floor0.barkmap");
+_Static_assert(offsetof(vorbis_info_floor0, ampbits) == 12, "Vorbis ABI vorbis_info_floor0.ampbits");
+_Static_assert(offsetof(vorbis_info_floor0, ampdB) == 16, "Vorbis ABI vorbis_info_floor0.ampdB");
+_Static_assert(offsetof(vorbis_info_floor0, numbooks) == 20, "Vorbis ABI vorbis_info_floor0.numbooks");
+_Static_assert(offsetof(vorbis_info_floor0, books) == 24, "Vorbis ABI vorbis_info_floor0.books");
+_Static_assert(sizeof(floor1class) == 11, "Vorbis ABI size floor1class");
+_Static_assert(_Alignof(floor1class) == 1, "Vorbis ABI alignment floor1class");
+_Static_assert(offsetof(floor1class, class_dim) == 0, "Vorbis ABI floor1class.class_dim");
+_Static_assert(offsetof(floor1class, class_subs) == 1, "Vorbis ABI floor1class.class_subs");
+_Static_assert(offsetof(floor1class, class_book) == 2, "Vorbis ABI floor1class.class_book");
+_Static_assert(offsetof(floor1class, class_subbook) == 3, "Vorbis ABI floor1class.class_subbook");
+_Static_assert(sizeof(vorbis_info_floor1) == 36, "Vorbis ABI size vorbis_info_floor1");
+_Static_assert(_Alignof(vorbis_info_floor1) == 4, "Vorbis ABI alignment vorbis_info_floor1");
+_Static_assert(offsetof(vorbis_info_floor1, class) == 0, "Vorbis ABI vorbis_info_floor1.class");
+_Static_assert(offsetof(vorbis_info_floor1, partitionclass) == 4, "Vorbis ABI vorbis_info_floor1.partitionclass");
+_Static_assert(offsetof(vorbis_info_floor1, postlist) == 8, "Vorbis ABI vorbis_info_floor1.postlist");
+_Static_assert(offsetof(vorbis_info_floor1, forward_index) == 12, "Vorbis ABI vorbis_info_floor1.forward_index");
+_Static_assert(offsetof(vorbis_info_floor1, hineighbor) == 16, "Vorbis ABI vorbis_info_floor1.hineighbor");
+_Static_assert(offsetof(vorbis_info_floor1, loneighbor) == 20, "Vorbis ABI vorbis_info_floor1.loneighbor");
+_Static_assert(offsetof(vorbis_info_floor1, partitions) == 24, "Vorbis ABI vorbis_info_floor1.partitions");
+_Static_assert(offsetof(vorbis_info_floor1, posts) == 28, "Vorbis ABI vorbis_info_floor1.posts");
+_Static_assert(offsetof(vorbis_info_floor1, mult) == 32, "Vorbis ABI vorbis_info_floor1.mult");
+_Static_assert(sizeof(vorbis_info_residue) == 28, "Vorbis ABI size vorbis_info_residue");
+_Static_assert(_Alignof(vorbis_info_residue) == 4, "Vorbis ABI alignment vorbis_info_residue");
+_Static_assert(offsetof(vorbis_info_residue, type) == 0, "Vorbis ABI vorbis_info_residue.type");
+_Static_assert(offsetof(vorbis_info_residue, stagemasks) == 4, "Vorbis ABI vorbis_info_residue.stagemasks");
+_Static_assert(offsetof(vorbis_info_residue, stagebooks) == 8, "Vorbis ABI vorbis_info_residue.stagebooks");
+_Static_assert(offsetof(vorbis_info_residue, begin) == 12, "Vorbis ABI vorbis_info_residue.begin");
+_Static_assert(offsetof(vorbis_info_residue, end) == 16, "Vorbis ABI vorbis_info_residue.end");
+_Static_assert(offsetof(vorbis_info_residue, grouping) == 20, "Vorbis ABI vorbis_info_residue.grouping");
+_Static_assert(offsetof(vorbis_info_residue, partitions) == 24, "Vorbis ABI vorbis_info_residue.partitions");
+_Static_assert(offsetof(vorbis_info_residue, groupbook) == 25, "Vorbis ABI vorbis_info_residue.groupbook");
+_Static_assert(offsetof(vorbis_info_residue, stages) == 26, "Vorbis ABI vorbis_info_residue.stages");
+_Static_assert(sizeof(vorbis_info_mode) == 2, "Vorbis ABI size vorbis_info_mode");
+_Static_assert(_Alignof(vorbis_info_mode) == 1, "Vorbis ABI alignment vorbis_info_mode");
+_Static_assert(offsetof(vorbis_info_mode, blockflag) == 0, "Vorbis ABI vorbis_info_mode.blockflag");
+_Static_assert(offsetof(vorbis_info_mode, mapping) == 1, "Vorbis ABI vorbis_info_mode.mapping");
+_Static_assert(sizeof(coupling_step) == 2, "Vorbis ABI size coupling_step");
+_Static_assert(_Alignof(coupling_step) == 1, "Vorbis ABI alignment coupling_step");
+_Static_assert(offsetof(coupling_step, mag) == 0, "Vorbis ABI coupling_step.mag");
+_Static_assert(offsetof(coupling_step, ang) == 1, "Vorbis ABI coupling_step.ang");
+_Static_assert(sizeof(submap) == 2, "Vorbis ABI size submap");
+_Static_assert(_Alignof(submap) == 1, "Vorbis ABI alignment submap");
+_Static_assert(offsetof(submap, floor) == 0, "Vorbis ABI submap.floor");
+_Static_assert(offsetof(submap, residue) == 1, "Vorbis ABI submap.residue");
+_Static_assert(sizeof(vorbis_info_mapping) == 20, "Vorbis ABI size vorbis_info_mapping");
+_Static_assert(_Alignof(vorbis_info_mapping) == 4, "Vorbis ABI alignment vorbis_info_mapping");
+_Static_assert(offsetof(vorbis_info_mapping, submaps) == 0, "Vorbis ABI vorbis_info_mapping.submaps");
+_Static_assert(offsetof(vorbis_info_mapping, chmuxlist) == 4, "Vorbis ABI vorbis_info_mapping.chmuxlist");
+_Static_assert(offsetof(vorbis_info_mapping, submaplist) == 8, "Vorbis ABI vorbis_info_mapping.submaplist");
+_Static_assert(offsetof(vorbis_info_mapping, coupling_steps) == 12, "Vorbis ABI vorbis_info_mapping.coupling_steps");
+_Static_assert(offsetof(vorbis_info_mapping, coupling) == 16, "Vorbis ABI vorbis_info_mapping.coupling");
+_Static_assert(sizeof(codec_setup_info) == 52, "Vorbis ABI size codec_setup_info");
+_Static_assert(_Alignof(codec_setup_info) == 4, "Vorbis ABI alignment codec_setup_info");
+_Static_assert(offsetof(codec_setup_info, blocksizes) == 0, "Vorbis ABI codec_setup_info.blocksizes");
+_Static_assert(offsetof(codec_setup_info, modes) == 8, "Vorbis ABI codec_setup_info.modes");
+_Static_assert(offsetof(codec_setup_info, maps) == 12, "Vorbis ABI codec_setup_info.maps");
+_Static_assert(offsetof(codec_setup_info, floors) == 16, "Vorbis ABI codec_setup_info.floors");
+_Static_assert(offsetof(codec_setup_info, residues) == 20, "Vorbis ABI codec_setup_info.residues");
+_Static_assert(offsetof(codec_setup_info, books) == 24, "Vorbis ABI codec_setup_info.books");
+_Static_assert(offsetof(codec_setup_info, mode_param) == 28, "Vorbis ABI codec_setup_info.mode_param");
+_Static_assert(offsetof(codec_setup_info, map_param) == 32, "Vorbis ABI codec_setup_info.map_param");
+_Static_assert(offsetof(codec_setup_info, floor_type) == 36, "Vorbis ABI codec_setup_info.floor_type");
+_Static_assert(offsetof(codec_setup_info, floor_param) == 40, "Vorbis ABI codec_setup_info.floor_param");
+_Static_assert(offsetof(codec_setup_info, residue_param) == 44, "Vorbis ABI codec_setup_info.residue_param");
+_Static_assert(offsetof(codec_setup_info, book_param) == 48, "Vorbis ABI codec_setup_info.book_param");
+_Static_assert(sizeof(vorbis_wrapper) == 48, "Vorbis ABI size vorbis_wrapper");
+_Static_assert(_Alignof(vorbis_wrapper) == 8, "Vorbis ABI alignment vorbis_wrapper");
+_Static_assert(offsetof(vorbis_wrapper, dsp) == 0, "Vorbis ABI vorbis_wrapper.dsp");
+_Static_assert(offsetof(vorbis_wrapper, packet) == 8, "Vorbis ABI vorbis_wrapper.packet");
+_Static_assert(offsetof(vorbis_wrapper, sent_info) == 40, "Vorbis ABI vorbis_wrapper.sent_info");
