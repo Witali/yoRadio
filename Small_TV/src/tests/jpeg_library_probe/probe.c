@@ -6,6 +6,7 @@
 #include "jpeglib.h"
 #include "probe_memory.h"
 #include "table_dump.h"
+#include "probe_faults.h"
 
 typedef struct { struct jpeg_error_mgr pub; jmp_buf jump; } probe_error;
 typedef struct {
@@ -177,6 +178,7 @@ done:
 int main(int argc, char **argv)
 {
     /* Keep fixture generation and measured decode in separate process invocations. */
+    if (argc > 1 && !strcmp(argv[1], "reuse")) return probe_reuse(argc, argv);
     if ((argc == 5 || argc == 10) && !strcmp(argv[1], "generate"))
         return generate(argv[2], argv[3], (unsigned)strtoul(argv[4], NULL, 10),
                         argc == 10 ? (unsigned)atoi(argv[5]) : 240,

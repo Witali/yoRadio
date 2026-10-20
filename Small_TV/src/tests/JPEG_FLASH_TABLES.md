@@ -91,8 +91,13 @@ binary, fixture hashes и raw results. Прежние b7bfb69c/855e55507 рез�
 относятся к прежним исходникам и не переименовываются в новые.
 
 Остаются полноценный production link, общий heap/stack, NOR-aware temporary
-storage и его износ, I/O fault/reuse tests, RGB565 conversion с factory pixels,
+storage и его износ, production I/O fault/reuse tests, RGB565 conversion с factory pixels,
 HTTP/storage, отдельный LCD gate, full regression/soak и physical acceptance.
 Это не заявление полного покрытия JPEG/T.81. Дополнительные subsampling cases
 411/440/410 и другие допустимые таблицы/scan arrangements нужно включать при
 дальнейшем расширении device matrix. JPEG-LS/JPEG2000/JPEGXL/WebP остаются планом.
+
+Host allocation/I/O fault/reuse gate завершён отдельно2026-10-20:
+1227инъекций,36truncated recoveries,12format transitions. См.
+[JPEG_FAULT_RECOVERY.md](JPEG_FAULT_RECOVERY.md). Он не проверяет будущий NOR
+backend или production source/output.

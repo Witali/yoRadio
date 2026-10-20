@@ -4,6 +4,7 @@
 #include "jpeglib.h"
 #include "jmemsys.h"
 #include "probe_memory.h"
+#include "probe_faults.h"
 #include <assert.h>
 
 static probe_memory_stats stats;
@@ -28,6 +29,7 @@ probe_memory_stats probe_memory_snapshot(void)
 static void *allocate(size_t size)
 {
     /* Enforce the actual allocation budget, including pool alignment overhead. */
+    if (probe_fault_visit(PROBE_FAULT_ALLOC)) return NULL;
     if (stats.limit_bytes && (stats.current_bytes > stats.limit_bytes ||
                              size > stats.limit_bytes - stats.current_bytes))
         return NULL;
@@ -99,20 +101,27 @@ static void read_store(j_common_ptr cinfo, backing_store_ptr info, void *data,
 {
     /* Read only initialized virtual-array bytes through the host temporary file. */
     check_range(cinfo, info, offset, count);
-    if (fseek(info->temp_file, offset, SEEK_SET) ||
-        fread(data, 1, (size_t)count, info->temp_file) != (size_t)count)
-        ERREXIT(cinfo, JERR_TFILE_READ);
-    stats.bytes_read += (unsigned long long)count;
+    if (probe_fault_visit(PROBE_FAULT_SEEK) || fseek(info->temp_file, offset, SEEK_SET))
+        ERREXIT(cinfo, JERR_TFILE_SEEK);
+    size_t wanted = (size_t)count;
+    /* A short transfer really touches the file before the fatal error unwinds. */
+    size_t request = probe_fault_visit(PROBE_FAULT_READ) && wanted ? wanted - 1 : wanted;
+    size_t received = fread(data, 1, request, info->temp_file);
+    stats.bytes_read += received;
+    if (received != wanted) ERREXIT(cinfo, JERR_TFILE_READ);
 }
 static void write_store(j_common_ptr cinfo, backing_store_ptr info, void *data,
                         long offset, long count)
 {
     /* Count actual logical writes; this is not a NOR erase/wear simulation. */
     check_range(cinfo, info, offset, count);
-    if (fseek(info->temp_file, offset, SEEK_SET) ||
-        fwrite(data, 1, (size_t)count, info->temp_file) != (size_t)count)
-        ERREXIT(cinfo, JERR_TFILE_WRITE);
-    stats.bytes_written += (unsigned long long)count;
+    if (probe_fault_visit(PROBE_FAULT_SEEK) || fseek(info->temp_file, offset, SEEK_SET))
+        ERREXIT(cinfo, JERR_TFILE_SEEK);
+    size_t wanted = (size_t)count;
+    size_t request = probe_fault_visit(PROBE_FAULT_WRITE) && wanted ? wanted - 1 : wanted;
+    size_t written = fwrite(data, 1, request, info->temp_file);
+    stats.bytes_written += written;
+    if (written != wanted) ERREXIT(cinfo, JERR_TFILE_WRITE);
 }
 static void close_store(j_common_ptr cinfo, backing_store_ptr info)
 {
@@ -128,6 +137,7 @@ GLOBAL(void) jpeg_open_backing_store(j_common_ptr cinfo, backing_store_ptr info,
 {
     /* Model optional backing storage without pretending that C2 already has it. */
     if (!stats.allow_backing) ERREXIT(cinfo, JERR_NO_BACKING_STORE);
+    if (probe_fault_visit(PROBE_FAULT_OPEN)) ERREXITS(cinfo, JERR_TFILE_CREATE, "injected");
     unsigned slot;
     for (slot = 0; slot < 16 && stores[slot].owner; ++slot) {}
     if (slot == 16 || size < 0) ERREXIT(cinfo, JERR_NO_BACKING_STORE);

@@ -55,7 +55,8 @@ def main():
         parser.error("--flash-tables requires --adapted")
     if args.compact_pools and not args.adapted:
         parser.error("--compact-pools requires --adapted")
-    input_names = ("probe.c", "probe_memory.c", "probe_memory.h", "CMakeLists.txt",
+    input_names = ("probe.c", "probe_memory.c", "probe_memory.h", "probe_faults.c",
+                   "probe_faults.h", "probe_reuse.c", "CMakeLists.txt",
                    "table_dump.c", "table_dump.h", "libjpeg-turbo-3.2.0-bounded.patch", "build.py",
                    "generate_flash_tables.py", "libjpeg-turbo-3.2.0-flash-tables.patch",
                    "libjpeg-turbo-3.2.0-compact-pools.patch")

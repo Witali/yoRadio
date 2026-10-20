@@ -3265,3 +3265,26 @@ true. Это только начало нового прогона, не 24 ча
   guard18268 подтверждены черезОС09:29UTC, launchers outside callerJob. VM
   SmallTV-131b35021705. Launch/checkpoint c8e56f932 в baseline branch. Старые
   каталоги19Oct не переименованы; новые20Oct покаrunning, не acceptance.
+
+## 2026-10-20 — JPEG allocation/I/O failures и reuse после fatal error
+
+- Добавлены отдельные host modules probe_faults и probe_reuse. В7точках считаются
+  настоящие вызовы: allocation, temporary open/read/write/seek, input и output.
+  Short transfers действительно выполняют частичную операцию до fatal error.
+  Heap session сохраняет cleanup state через longjmp. После create failure —
+  destroy/recreate, после остальных errors —abort и повторное использование
+  того же объекта, как требует pinned upstream API.
+- Прошли1227инъекций:346allocation,22open,169read,169write,317seek,40input,
+  164output; ещё36truncated recoveries и12format transitions. Recovery pixels
+  exact upstream.63разовых allocation failures восстановлены pool manager;
+  не требовать ошибку там, где allocator retry штатно успешен.36create failures
+  требуют нового объекта. После abort backing closed; final pool0, cap64KiB.
+  Peak61421/session4096 — отдельные host measurement, не общий heap C2.
+- На новых точных upstream/candidate builds повторены25resource/924lossless/
+  16negative/4optional/18budget и48rich12-bit/12truncated/38912table entries:
+  проходят. Прежние binary proofs не переименовываются. Начальная сборка
+  закончилась до последнего изменения runner C; для acceptance созданы новые
+  v2directories с текущими hashes. Новый gate и raw evidence сохранены отдельно.
+- Production app B50D, frozen ELF/resources/SDK/full/H10 не менялись. На10:05UTC
+  H10 supervisor сообщает100cycles, cleanup[]; terminal acceptance ещё нет.
+  NOR backing/износ, RGB565, final app link и hardware gates остаются открытыми.

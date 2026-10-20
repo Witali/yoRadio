@@ -98,6 +98,13 @@ warning handler отвергает truncated input, даже если upstream �
 
 ## Что требуется до переноса в production
 
+Обновление2026-10-20: host fault/reuse gate выполнен отдельно —1227инъекций,
+36truncated-input recoveries и12format transitions, с точными pixels и cleanup.
+См. [JPEG_FAULT_RECOVERY.md](../JPEG_FAULT_RECOVERY.md). Это закрывает host часть
+пункта5; production source/output/NOR faults после интеграции ещё нужны.
+Текущий12-bit RAM/RV32 результат см. [JPEG_FLASH_TABLES.md](../JPEG_FLASH_TABLES.md).
+Таблица выше сохраняет исходное измерение2026-10-19 до flash/compact patches.
+
 1. Измерить RV32 code/rodata, общий peak heap, stack и время. Все нужные ordinary
    JPEG modes сохраняются в матрице; отключение 12-bit/lossless не заменяет перенос.
 2. Снизить fixed-table memory 12-bit lossy с побайтовым сравнением IDCT/color.

@@ -26,6 +26,11 @@ Host-квалификация новой JPEG-библиотеки также и
 остаётся в отчёте. Hard memory cap рабочих cases не ослаблен. См.
 [JPEG_FLASH_TABLES.md](tests/JPEG_FLASH_TABLES.md).
 
+`REQUESTED_CHANGE` в host `probe_reuse.c`/`fault_contract.py` отмечает отдельно
+запрошенные проверки отказов и восстановления JPEG. После fatal error используются
+только abort/destroy, затем проверяются recovery pixels и cleanup. Это тестовый
+стенд; production source/output/NOR failures остаются отдельной работой.
+
 ## Как ставить метку
 
 Метка находится в первом комментарии внутри исправленной функции, рядом с

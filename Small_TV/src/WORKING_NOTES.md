@@ -92,6 +92,18 @@ Exact creations в baseline/Small_TV/qemu/parity/jpeg-selector-baseline-launch-c
 полный/24h pass. По-прежнему freeze baseline SRC/ELF/resources/SDK/snapshot и
 не добавлять guest QMP/RSP clients. JPEG library меняется только в отдельном tree.
 
+На20Oct host fault/reuse проверка JPEG завершена:1227инъекций allocations/open/
+backing read/write/seek/input/output,36усечённых inputs и12format transitions.
+После ошибки выполняется abort и reuse того же объекта; при36отказах самого
+create —destroy/recreate.63разовых allocation failures восстановились внутри
+pool manager, output pixels exact. Все backing files закрыты после abort,
+final pools0; hard cap65536, peak этого стенда61421, session4096отдельно.
+На новых binaries прошли прежние25/924/16/4/18 и48rich12-bit/12truncated/
+38912table entries. Это host gate, не production/NOR/общий RAM. Детали
+tests/JPEG_FAULT_RECOVERY.md; proof jpeg-library-fault-recovery-20261020.json.
+Далее RGB565 module, NOR-aware backing/износ, production link/heap/stack и
+HTTP/LCD/full/soak. Frozen baseline app/resources/SDK по-прежнему не менять.
+
 Обновление2026-10-19: исторический F1 full завершился успешно,19automatic
 groups и566frozen inputs совпали. Его старый publisher отдельно отвергает
 24HTTP checks из-за прежнего списка22; исправление списка уже входит в56010f00.
