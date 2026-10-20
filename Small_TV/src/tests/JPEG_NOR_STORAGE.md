@@ -3,8 +3,9 @@
 Checkpoint 2026-10-20: `storage/jpeg_nor.c/.h` реализует настоящий алгоритм
 sector read/modify/erase/program поверх транспортных callbacks. Он пока не
 включён в production CMake и не выполняет запись в подключённое устройство.
-Ownership guard, atomic metadata, ESP-IDF adapter и libjpeg integration —
-следующие обязательные этапы, не закрытые данным результатом.
+Readonly [ownership guard](JPEG_OWNERSHIP_GUARD.md) теперь также подготовлен
+отдельно. Atomic metadata, его production authorization/build integration,
+ESP-IDF adapter и libjpeg integration остаются обязательными этапами.
 
 ## Контракт записи
 
@@ -39,9 +40,10 @@ ESP-IDF требует ранее стёртые данные для запис�
 Нельзя использовать старую RAM cache как доказательство восстановления flash.
 
 Owner сериализует операции. Allowlist — доверенная capability от будущего
-resource/layout guard, не произвольные адреса из HTTP. Guard должен проверять
-matching immutable resources/partitions; один поиск FF или full assets hash
-после пользовательских загрузок для этого не подходит.
+resource/layout guard, не произвольные адреса из HTTP. Подготовленный guard
+проверяет matching immutable resources/partitions и ownership stamp; transport
+ещё должен подключить эту проверку перед выдачей capabilities. Один поиск FF
+или full assets hash после пользовательских загрузок для этого не подходит.
 
 ## Проверки
 

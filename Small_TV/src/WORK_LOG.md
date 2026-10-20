@@ -3466,3 +3466,42 @@ Proof78raw: qemu/parity/jpeg-nor-core-validation-20261020.json.6artifact checks
 Далее ownership guard, atomic metadata/cold recovery, ESP-IDF transport/budgets,
 shared scratch subfiles и реальная libjpeg integration. Остальные пункты плана
 и full/24h/hardware acceptance остаются открытыми.
+
+## 2026-10-20 — portable ownership guard для JPEG flash
+
+После status-only turn план/чистая рабочая копия revalidated; выполнен следующий
+самостоятельный checkpoint, не вся production integration. Новый readonly
+storage/jpeg_guard проверяет точную ALL-partition map/geometry, classified
+sector ownership и streaming SHA27immutable payloads. Новая crypto implementation
+не добавляется: provider API, host BCrypt, future ESP-IDF mbedTLS adapter.
+
+При review найден недостаток payload-only identity: прежние hashes могут
+сохраниться при новом использовании свободных хвостов. Поэтому tools/
+jpeg_guard_layout создаёт matching const descriptors и отдельный stamped native
+assets copy. Canonical ownership ID включает resources/map/allocation. Stamp64
+на0x28f720 находится внутри уже protected final-sector padding анимации; spare
+8KiB не расходуется, все photo/resource payloads сохранены. Legacy/unmarked или
+чужой stamp запрещает authorization. Pipeline никогда не перезаписывает занятое
+padding/исходные images. Runtime guard не модифицирует flash и не принимает
+whole-assets hash после user uploads. Это mismatch guard, не authentication.
+
+MSVC /W4 /WX:49invalid layout,84resource/stamp corruptions,3050read faults
+(2954partial callback ordinals+96silent corruptions),3010SHA callback failures
+pass; cleanup/readonly invariants проверены. Generator12rejects/12controls,
+включая changed layout со старыми27payloads.10compiled mutants runtime-rejected.
+Ранний generator test ошибочно считал icon hashes уникальными; FIXED_TEST
+проверяет кратность, прежние failed log/source сохранены. Guard bug не было.
+
+GCC15.2 RV32IMC/ilp32:core1150code/static writable0,generated const1448,
+maxsingleframe320+caller96 (не whole call-chain stack); успешная проверка
+752121bytes/2954read calls. Только ET_REL/ABI compile, не RV32 execution.
+Proof85raw: qemu/parity/jpeg-ownership-guard-validation-20261020.json.
+6artifact checks:app3E03/TJpgd и archive неизменны.6oldH10 original process
+identities подтверждены readonlyCIM; SDK/QMP/RSP/snapshots/physical flash не
+менялись, новыхVM нет. Working log/plan/audit обновлены.
+
+Далее atomic metadata invalidation/publication/cold recovery, затем полный
+ESP-IDF partition enumeration/SHA/authorization adapter, matching stamped
+assets build с сохранением user photos/settings, budgets/shared subfiles и
+libjpeg bridge. Guard/NOR пока не включены в CMake, production capabilities
+не выдаются. Полная цель и остальные network/hardware/audit/final gates открыты.

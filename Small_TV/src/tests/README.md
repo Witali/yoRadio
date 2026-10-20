@@ -44,8 +44,11 @@ Read-only [JPEG_STORAGE_LAYOUT.md](JPEG_STORAGE_LAYOUT.md) проверяет sa
 
 Portable NOR storage core реализован отдельно: 3000random operations,83partial
 fault/reopen scenarios,7actual-layout stores и6compiled mutation controls.
-См. [JPEG_NOR_STORAGE.md](JPEG_NOR_STORAGE.md). Он не подключён к production:
-resource guard, atomic metadata, ESP-IDF adapter и codec integration ещё нужны.
+См. [JPEG_NOR_STORAGE.md](JPEG_NOR_STORAGE.md). Он не подключён к production.
+Readonly resource/layout guard также подготовлен отдельно:27payloads + ownership
+stamp, partial read/hash failures и10compiled mutants проверены. См.
+[JPEG_OWNERSHIP_GUARD.md](JPEG_OWNERSHIP_GUARD.md). Atomic metadata, authorization/
+SHA transport, matching assets build и codec integration ещё нужны.
 
 ## JPEG Huffman selectors
 

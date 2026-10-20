@@ -22,6 +22,21 @@ immutable guard и journal/publication/cold recovery. Backing arrays должн�
 bounded logical subfiles одного scratch store, без per-file sector rounding или
 независимых dirty caches общих sectors. Детали tests/JPEG_NOR_STORAGE.md.
 
+Ownership guard checkpoint20Oct: storage/jpeg_guard.c/.h и tools/jpeg_guard_layout.py
+подготовлены вне production. Verify all boot partitions/flash geometry, sector
+ownership,27immutable payloads +64byte stamp в protected animation padding
+0x28f720. Stamp нужен для changed allocation со старыми payloads; SHA known
+payloads без marker этого не доказывает. Новый assets copy только для host gate,
+production archive3E03 не меняется.49layout/84corruption/3050read/3010hash faults,
+12generator invalid inputs+12controls и10compiled mutants pass. RV32 code1150,
+const descriptors1448,maxsingleframe320, не runtime/link/whole stack.85rawproof;
+6artifact checks pass;6old H10 original owners readonly-confirmed, VM не трогать.
+Следом atomic journal invalidation/publication/cold recovery. ESP-IDF adapter
+обязан enumerate ALL partitions, provide SHA и gate write capabilities только
+после OK. Build должен связать stamped assets/header без потери photos/settings;
+на неизвестной flash marker автоматически не записывать. Детали
+tests/JPEG_OWNERSHIP_GUARD.md. Полная цель IMPROVEMENT_PLAN остаётся активной.
+
 ## Независимость проверок подсистем — 2026-10-18
 
 ## План улучшений форматов изображений — 2026-10-19

@@ -46,8 +46,14 @@ sector RMW и read-back verification. 3000 random operations, 83 injected partia
 failures, 7 реальных layout stores и 6 compiled mutation controls прошли.
 RV32 object1848bytes/handle4352/frame304 измерены; это ещё не production link
 или hardware execution. [Результаты](tests/JPEG_NOR_STORAGE.md).
-Далее — immutable-resource guard, atomic metadata/cold recovery, ESP-IDF adapter
-с operation/time budgets и shared scratch subfiles для libjpeg.
+Следующий checkpoint: portable immutable-resource/layout guard готов отдельно.
+27payloads + ownership stamp в уже protected padding;49layout/84corruption,
+3050read/3010hash faults,12generator rejects/12controls и10compiled mutants pass.
+Runtime capabilities/build integration пока не подключены. RV32 core1150 и
+const descriptors1448bytes измерены. [Результаты](tests/JPEG_OWNERSHIP_GUARD.md).
+Далее — atomic metadata/cold recovery, ESP-IDF authorization/SHA adapter,
+сборка matching stamped assets с сохранением photos/settings, operation/time
+budgets и shared scratch subfiles для libjpeg. Production остаётся3E03/TJpgd.
 
 1. Зафиксировать матрицу входов/лимитов: baseline/progressive, gray/RGB/CMYK/YCCK,
    8/12-bit lossy и 2–16-bit Huffman lossless. Не обещать весь T.81: библиотека

@@ -1,0 +1,867 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "all_functionality_verified": false,
+  "scope": "Portable readonly ownership guard + prepared sanitized assets, host fault/mutation tests and RV32 object/ABI measurements. Not enabled in production or an atomic cache/storage/hardware gate.",
+  "source_sha256": {
+    "Small_TV/src/storage/jpeg_guard.c": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
+    "Small_TV/src/storage/jpeg_guard.h": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88",
+    "Small_TV/src/storage/jpeg_nor.h": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+    "Small_TV/src/tools/jpeg_guard_layout.py": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7",
+    "Small_TV/src/tools/jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a",
+    "Small_TV/src/tests/jpeg_guard/native_test.c": "6ce4fc58aeb56a8f50ce3c109a8012724f1eed3088c101d4f08d3d25e3f08056",
+    "Small_TV/src/tests/jpeg_guard/generator_contract.py": "16b844f3b7802786d4a35de62645bd4625839decdde05774b2bb9f1082fc9896",
+    "Small_TV/src/tests/jpeg_guard/mutation_contract.py": "e19e8a2e303de068ad1803fa71f40e0826a18aa5a7990cce688adefc1e7042a7",
+    "Small_TV/src/tests/jpeg_guard/run.ps1": "d839f8178b0d3dc6c709042a45f64175e4e7681feadbd81960e3c1c0e2fc8bd8",
+    "Small_TV/src/app/include/board.h": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
+    "Small_TV/src/partitions.csv": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e"
+  },
+  "compiler_sha256": {
+    "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\bin\\riscv32-esp-elf-gcc.exe": "9a96e8e77c263d4f7f16c084e8a2dfe89dfa8598c31fd3f9b152db35ccbb2a74",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.1\\tools\\riscv32-esp-elf\\esp-15.2.0_20251204\\riscv32-esp-elf\\libexec\\gcc\\riscv32-esp-elf\\15.2.0\\cc1.exe": "5bae30aa8db549c20fc40205914e0ba1ac938ff45c2ddf667dfb9dbec4d8ba1b"
+  },
+  "host": {
+    "passed": true,
+    "checks": 47640716,
+    "immutable_payloads": 27,
+    "ownership_stamps": 1,
+    "corruptions_rejected": 84,
+    "layout_rejections": 49,
+    "read_faults": 3050,
+    "hash_faults": 3010,
+    "max_read_bytes": 256,
+    "program_erase_calls": 0,
+    "production_linked": false
+  },
+  "generator": {
+    "passed": true,
+    "immutable_payloads": 27,
+    "ownership_stamps": 1,
+    "rejected_inputs": [
+      "encrypted-partition",
+      "unknown-flags",
+      "extra-column",
+      "unsupported-type",
+      "unencodable-subtype",
+      "unterminated-label",
+      "label-injection",
+      "partition-gap-owned",
+      "stale-image",
+      "missing-immutable",
+      "photo-promoted-to-scratch",
+      "stale-or-corrupt-ownership-stamp"
+    ],
+    "controls": [
+      "hash-each-immutable",
+      "exclude-five-photos",
+      "all-partition-fields",
+      "sorted-resource-order",
+      "matching-cli-header",
+      "refuse-existing-output",
+      "ownership-id-complete-allocation",
+      "stamp-only-protected-padding",
+      "stamp-generation-idempotent",
+      "matching-cli-stamped-assets",
+      "new-layout-new-stamp-same-payloads",
+      "inputs-unchanged"
+    ],
+    "layout_id": "44268211f268cfdaf07208a74ef030bc2f09a784e305a8ca2502a3d64afad4a1",
+    "inputs_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets.bin": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\firmware\\development\\small-tv-esp32c2-reconstructed\\assets-manifest.json": "9f034fa7d5793c24da9a5399c68d93f921d6716b923fb6193a7a54a1ec7a6e0b",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\app\\include\\board.h": "ff5edf217a65c68994c5bbf2a5020eb48c69929e99e0c37d5521d06039fdc1c0",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\partitions.csv": "4d3d855a6d1677a20ab74887053390dce6330f63225c540e856568bef656105e",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\generator_contract.py": "16b844f3b7802786d4a35de62645bd4625839decdde05774b2bb9f1082fc9896",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tools\\jpeg_guard_layout.py": "d6aa5f3baa75de6a590afe22eacd7d9f44b186f705a739dad37ab029f504a8d7",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tools\\jpeg_storage_layout.py": "9aa0e89b3c940141c7aec0bfadaa912d15179ff1257233bd704ea98b186e973a"
+    }
+  },
+  "mutations": {
+    "passed": true,
+    "cases": [
+      {
+        "name": "ignore_partition_identity",
+        "rejected": true,
+        "exit_code": 1,
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c:149: verify() == JPEG_GUARD_LAYOUT",
+        "source_sha256": "e0d90978e398862fcd1c646bd0ed6a08bb59d7d3c03f0bb967d138433b209a49",
+        "executable_sha256": "97dbf3463d3ded6daeae538cf5ae33d39be95fd93b1ac96f52da0e65e6dbf179",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53"
+      },
+      {
+        "name": "ignore_resource_digest",
+        "rejected": true,
+        "exit_code": 1,
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c:184: verify() == JPEG_GUARD_RESOURCE",
+        "source_sha256": "560d9a6e2a8e2c55fd61de2b1cb77858d9e78a68d51be87bd7edf7442c860315",
+        "executable_sha256": "aede4823b438aa97c218cd5ab2dfab8737e9041db4069de9c29bf2b5d2b1b6ad",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53"
+      },
+      {
+        "name": "ignore_read_failure",
+        "rejected": true,
+        "exit_code": 1,
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c:268: verify() == JPEG_GUARD_IO && model.reads == n",
+        "source_sha256": "08de0b14130c85319a5f2ca7c95804a2ef829c6e79cdc9a185464e3fd1e8a2b2",
+        "executable_sha256": "af203a18d0b69ac5a24794395dac78daa170038609b177e2c8b494f9fc233f95",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53"
+      },
+      {
+        "name": "ignore_hash_update_failure",
+        "rejected": true,
+        "exit_code": 1,
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c:274: verify() == JPEG_GUARD_HASH && model.hash_calls == n",
+        "source_sha256": "4231862c8e7b28d78e2b2e9319281d0cca3255110cf86e69e02fdfadd0e0f491",
+        "executable_sha256": "8e710c72df18d4ce8d37d7f479bc40f6039cd836450c191cb4df5e96c752f260",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53"
+      },
+      {
+        "name": "ignore_hash_finish_failure",
+        "rejected": true,
+        "exit_code": 1,
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c:274: verify() == JPEG_GUARD_HASH && model.hash_calls == n",
+        "source_sha256": "ec59bd040d81b5c8917b09d95c270f4a1446f71b392963df9b0f17740ba7dd33",
+        "executable_sha256": "1a4782dcad328d78af8d51d11b02fc44fd104787e4f6cb416b9a7d930879af20",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53"
+      },
+      {
+        "name": "leak_hash_state",
+        "rejected": true,
+        "exit_code": 1,
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c:36: context == &model && !model.hash",
+        "source_sha256": "bd19d74327ac1617947905fb5003de4c6b26f50b22188ed79e50ab33469e921e",
+        "executable_sha256": "7487493c6a6d1229226b96ecf4b38e926592289018710b915eac60ddaff79077",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53"
+      },
+      {
+        "name": "allow_boot_prefix",
+        "rejected": true,
+        "exit_code": 1,
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c:149: verify() == JPEG_GUARD_LAYOUT",
+        "source_sha256": "546797427a42fe003651635fc92f943d711aa9597837e53547260d63777ba9f2",
+        "executable_sha256": "8dc00557cfee15550aed269f176c80f2042f20227e62eccfabd5a8c932f68922",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53"
+      },
+      {
+        "name": "allow_photo_reclassification",
+        "rejected": true,
+        "exit_code": 1,
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c:149: verify() == JPEG_GUARD_LAYOUT",
+        "source_sha256": "d5cee2b11d74533192deb9251858a0203d463df34d15490f24970f5c77068a9f",
+        "executable_sha256": "01dfaee7a480203f07eee76314268681b3229137d7e048db27bff09793ff7960",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53"
+      },
+      {
+        "name": "allow_settings_reclassification",
+        "rejected": true,
+        "exit_code": 1,
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c:149: verify() == JPEG_GUARD_LAYOUT",
+        "source_sha256": "1ee58b6ccd5e4430cb478abf2cd77f6049d6856960358662776be8fd8a591b02",
+        "executable_sha256": "e35d90f4ca103e2195bf41d612a5e9f92e4834fd43d0432e63c8e3f384f57a39",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53"
+      },
+      {
+        "name": "ignore_ownership_stamp",
+        "rejected": true,
+        "exit_code": 1,
+        "assertion": "FAIL C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c:160: model.read_bytes == total && model.begins == 28 && model.finishes == 28",
+        "source_sha256": "00114290815a7ec232a76c2426f8ab8be5e0dbe57fa693a10cf80ec088a1ef01",
+        "executable_sha256": "82e7581e07f349aa106a324e8163e7231f34e7ec7f0b7235ee51ce9ff4077d63",
+        "compiler_sha256": "dc8426b8760d92cf757df3d10b9f0244a95b454ff43194a58161568a0ec70d53"
+      }
+    ],
+    "inputs_sha256": {
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_guard.c": "dc1828c826618b448bf271f08f35097099320c28ce563f52258be9516b416534",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_guard.h": "b930fc809209afdb3388af6486dd496d7e255dcf4e878b481ad3787d7ea47c88",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\storage\\jpeg_nor.h": "ddcc40055c5ada7cdfa54453accb2a0b7c1b0efa8612f675d762cde4c8d5d40e",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\native_test.c": "6ce4fc58aeb56a8f50ce3c109a8012724f1eed3088c101d4f08d3d25e3f08056",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\Small_TV\\src\\tests\\jpeg_guard\\mutation_contract.py": "e19e8a2e303de068ad1803fa71f40e0826a18aa5a7990cce688adefc1e7042a7",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-guard-20261020\\stamped-host\\jpeg_layout.h": "ec2646a30ab296085e3db291d4a3fb510b51e3e7777a1e6b6da8bd21b47d0f9f",
+      "C:\\Work\\yoRadio\\.worktree\\small-tv-improvement-plan\\.build\\jpeg-guard-20261020\\stamped-host\\assets.bin": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+      "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\VsDevCmd.bat": "a7815e85d636828e5cf70fe4235b11fcb41750896a4d2d60756b43bacaf4f0b2"
+    },
+    "inputs_unchanged": true
+  },
+  "rv32": {
+    "core": {
+      "code_bytes": 1150,
+      "writable_bytes": 0
+    },
+    "descriptor_rodata_bytes": 1448,
+    "descriptor_sections": {
+      ".rodata.jpeg_layout": 72,
+      ".rodata.jpeg_layout_resources": 1120,
+      ".rodata.jpeg_layout_protected": 72,
+      ".rodata.jpeg_layout_allowed": 56,
+      ".rodata.jpeg_layout_partitions": 128
+    },
+    "abi": {
+      "jpeg_guard_partition_bytes": 32,
+      "jpeg_guard_resource_bytes": 40,
+      "jpeg_guard_layout_bytes": 72
+    },
+    "single_frames": {
+      "contained": 0,
+      "verify_resource": 320,
+      "valid_ranges": 0,
+      "jpeg_guard_verify": 96
+    },
+    "executed": false,
+    "production_linked": false,
+    "flags": [
+      "-std=c11",
+      "-Os",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-fstack-usage",
+      "-march=rv32imc_zicsr_zifencei",
+      "-mabi=ilp32",
+      "-c"
+    ]
+  },
+  "ownership": {
+    "layout_id": "44268211f268cfdaf07208a74ef030bc2f09a784e305a8ca2502a3d64afad4a1",
+    "ownership_id": "35a937cdf3191c56e6d472a1496f530e27db9ab55f1c9d6626ebe41c337b0405",
+    "stamp": {
+      "offset": 2684704,
+      "bytes": 64
+    },
+    "prepared_assets_sha256": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+    "original_assets_sha256": "bb4469e3c331cf18941dcac3bcf37617ca3f4c4c6e2d4dce6f9bea8a9084edc1",
+    "only_protected_padding_changed": true,
+    "available_sectors": 262,
+    "allocated_sectors": 260,
+    "spare_sectors": 2,
+    "verification_read_calls": 2954,
+    "verification_read_bytes": 752121
+  },
+  "production": {
+    "changed": false,
+    "guard_linked": false,
+    "assets_stamped": false,
+    "artifact_checks": {
+      "passed": true,
+      "cases": 6,
+      "failures": 0,
+      "errors": 0,
+      "source_sha256": "ebc0fb059639612e3181654dd1c9aa0d29bbe5ac485619c90b3f43284d8f9b2f",
+      "app_sha256": "3e030c1cc5f7b456fefc9985c397daf8340c33d1bb2805965b076147a07cd7e1",
+      "factory_flash_sha256": "5321a6b9016a8fc8335958193b4ab182e0d9ea85cfc3363063f120080c1844f4"
+    },
+    "app_sha256": "3e030c1cc5f7b456fefc9985c397daf8340c33d1bb2805965b076147a07cd7e1"
+  },
+  "early_test_failure": {
+    "reason": "Different icon slots intentionally have identical payload digests; test uniqueness assumption was wrong.",
+    "source_sha256": "3bf7f53e511a7ff57f309ec5745bd878ae8053d6a50a7351d057e9b46fad6ee0",
+    "production_bug": false
+  },
+  "old_h10": "Six original live owner identities read with CIM only; no QMP/RSP/source/SDK/snapshot mutation.",
+  "required_remaining": [
+    "atomic metadata invalidation/publication/cold recovery",
+    "ESP-IDF complete observed partition enumeration, SHA provider and write authorization",
+    "integrate prepared assets + matching descriptors into build without destroying user photos/settings",
+    "operation/time budgets + shared scratch bounded subfiles",
+    "real JPEG bridge/final link/size/heap/stack/time/HTTP/LCD/full/24h/hardware gates"
+  ],
+  "raw_artifacts": [
+    {
+      "file": "raw/jpeg-guard-20261020/final-generator/assets-manifest.json.gz",
+      "sha256": "f2dd782516b7339e3a9380cb1a07179f8e27b3110ab2a76913e9a6f5a29f4acd",
+      "bytes": 1344,
+      "uncompressed_sha256": "a63ebf788367d79e8070dfd821e2d705716254ad8e9525c69a372454c9822f9c",
+      "uncompressed_bytes": 4939
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/final-generator/jpeg_layout.h.gz",
+      "sha256": "27b787fb54146daf122de2798575a4c05d495204e300b275e744aec3e5cd2fcc",
+      "bytes": 1850,
+      "uncompressed_sha256": "ec2646a30ab296085e3db291d4a3fb510b51e3e7777a1e6b6da8bd21b47d0f9f",
+      "uncompressed_bytes": 6623
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/final-generator/plan.json.gz",
+      "sha256": "18d2f84512142f206b253331c15876d09f533e961b50ce1e6ff707bda7788ef0",
+      "bytes": 3307,
+      "uncompressed_sha256": "34a98f877b5a7a7966a953f82dd9b097b82d15a44f530dc003b962e0355b9f37",
+      "uncompressed_bytes": 15701
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/final-generator/report.json.gz",
+      "sha256": "5e17de7bd813e8474c951d238576aecb0f3c111bfd81530bcb6c535683d880cd",
+      "bytes": 968,
+      "uncompressed_sha256": "1edebb450c3ebcaf74a73489657d8c3ae08c581053c0eb17423c2163aff0e7f8",
+      "uncompressed_bytes": 2198
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/final-generator.log.gz",
+      "sha256": "489ffd68ad2c462b88d16a3b848980d8cf0d410dff32dac54771a9f965e381a9",
+      "bytes": 73,
+      "uncompressed_sha256": "96dfc1014d4fa34bcd40f7c8a43b266d205b86078cf198ef49c6ae8d590341b2",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/generator-before-duplicate-fix.py.gz",
+      "sha256": "0d0d216b445dcbeb3c313ec43f86ea662cab44e0cde09dced1dff5ec09a61681",
+      "bytes": 1945,
+      "uncompressed_sha256": "3bf7f53e511a7ff57f309ec5745bd878ae8053d6a50a7351d057e9b46fad6ee0",
+      "uncompressed_bytes": 5518
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/generator-first-failure.log.gz",
+      "sha256": "8c5a41c65813d6f6ef4070b7e4335129dfb6c982a39cf7190aba7385c5392daa",
+      "bytes": 245,
+      "uncompressed_sha256": "1023b7eae4846853cf3ba2ae3254f6db6e3578388d84268e6fcdbd275b540336",
+      "uncompressed_bytes": 440
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/h10-live-owners.json.gz",
+      "sha256": "408a124ad1ccbbba0a8f379bd70ebe98692d6e2fb845c09842971a82971cf24b",
+      "bytes": 224,
+      "uncompressed_sha256": "54936ccfc4493226445be4af51482f7f627783bf4dec5c53185cc806d40affcb",
+      "uncompressed_bytes": 730
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/production-integrity.json.gz",
+      "sha256": "4bbdbe024a904a2b0c239a02104e9589c4caf4df7a3a512873b95ec70a49620c",
+      "bytes": 237,
+      "uncompressed_sha256": "76de3539cebffb27b0c5b8661525a92dcb8376ef307540c6fef1ea7a622dcae7",
+      "uncompressed_bytes": 341
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/production-integrity.log.gz",
+      "sha256": "2bb2587be29cb9aafb2d85fb3d069e77eeefb2b6896590efd865422862b46d17",
+      "bytes": 230,
+      "uncompressed_sha256": "7c41099b6e5b7c3beed7dc68ee3ff478c4472236a78d78beb1a3406b9215e970",
+      "uncompressed_bytes": 665
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/rv32/abi_probe.c.gz",
+      "sha256": "d39f7c76a46c7f4d445ab87c77fd8a6dd239e0a372f5d9c9a43fbfac20fc757e",
+      "bytes": 209,
+      "uncompressed_sha256": "8095fecbc05e4ad4e76ee0c9c50e708be6ef54c6fd5d2a5cb441a04f30f1e054",
+      "uncompressed_bytes": 431
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/rv32-stamped/abi_probe.o.gz",
+      "sha256": "cc18ad9760bbb6c36adf9be244f2e333a19040c6d2c977c1189defecb999a41f",
+      "bytes": 1735,
+      "uncompressed_sha256": "7a9cd8842f4a27bc927ea4ba5d6e9dac181b94a45da430aef7d44e87a8ede764",
+      "uncompressed_bytes": 3664
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/rv32-stamped/abi_probe.su.gz",
+      "sha256": "d53fbffa2385d3fc43c139655f7904e565e2b746424207f336155caf5582246c",
+      "bytes": 99,
+      "uncompressed_sha256": "0d932a2e0aa483f84700eba59e2b2c4fd2cc0c7532ed31fffb602697b193273e",
+      "uncompressed_bytes": 85
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/rv32-stamped/jpeg_guard.o.gz",
+      "sha256": "4fd1dd6520cc6d3962865c0659fa43c6d1e00f866fb845f56d4946e3e0a53654",
+      "bytes": 2338,
+      "uncompressed_sha256": "48c184718ef436ab725b34500f03b336a8e0de00862be36583ce8c31c72e9466",
+      "uncompressed_bytes": 4768
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/rv32-stamped/jpeg_guard.su.gz",
+      "sha256": "0e3192dab1868fe50e9a786d3c7222c5748e9a215ab89c781a0e6ace77ace102",
+      "bytes": 139,
+      "uncompressed_sha256": "87cee8d8214ae5c95dfd84fbc28a0a6e4fdce925375b1595da208782b3a21e2c",
+      "uncompressed_bytes": 261
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-host/assets-manifest.json.gz",
+      "sha256": "f2dd782516b7339e3a9380cb1a07179f8e27b3110ab2a76913e9a6f5a29f4acd",
+      "bytes": 1344,
+      "uncompressed_sha256": "a63ebf788367d79e8070dfd821e2d705716254ad8e9525c69a372454c9822f9c",
+      "uncompressed_bytes": 4939
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-host/assets.bin.gz",
+      "sha256": "c4b6042a439f34cecbcf70116514b21c63941c321c085140d503bce24a09a742",
+      "bytes": 963019,
+      "uncompressed_sha256": "1032119b810b0fecf39457e2f6ce8f4a02b29cd730037f8f68e56a426b5c62b9",
+      "uncompressed_bytes": 1994752
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-host/compile.cmd.gz",
+      "sha256": "ac647019acbbe9a2510bde643ecc7fc38aeab4673a16dbb1f97f5482a9723e36",
+      "bytes": 384,
+      "uncompressed_sha256": "b854270427b3aa9a2667538b4f106b29f5457c0a6869224882e1b515a0650d76",
+      "uncompressed_bytes": 858
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-host/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-host/jpeg_guard_test.exe.gz",
+      "sha256": "a115f61a6ae4f15feafa3c20b11f746c4fd7a975f7253176753ec4ed34f483a2",
+      "bytes": 89172,
+      "uncompressed_sha256": "fae800c973f3bd86d190e3431d482e807ba5527ca8cddede7603f738b428fe1d",
+      "uncompressed_bytes": 175104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-host/jpeg_layout.h.gz",
+      "sha256": "27b787fb54146daf122de2798575a4c05d495204e300b275e744aec3e5cd2fcc",
+      "bytes": 1850,
+      "uncompressed_sha256": "ec2646a30ab296085e3db291d4a3fb510b51e3e7777a1e6b6da8bd21b47d0f9f",
+      "uncompressed_bytes": 6623
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-host/plan.json.gz",
+      "sha256": "18d2f84512142f206b253331c15876d09f533e961b50ce1e6ff707bda7788ef0",
+      "bytes": 3307,
+      "uncompressed_sha256": "34a98f877b5a7a7966a953f82dd9b097b82d15a44f530dc003b962e0355b9f37",
+      "uncompressed_bytes": 15701
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-host/report.json.gz",
+      "sha256": "137902abe3c3f71fdbf8ac3f3be7cb522b12b8df51cffb4a784f5fdcc69a0025",
+      "bytes": 188,
+      "uncompressed_sha256": "8d25197de807885a98d223ff739f36043b550ee6cfbb592c44ba3d5a4a8a1d62",
+      "uncompressed_bytes": 238
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_boot_prefix/compile.cmd.gz",
+      "sha256": "aa355c7b38e61456102a4a6176b3a6b5f82004b8c1d5fd22fde2d4e8109009c3",
+      "bytes": 396,
+      "uncompressed_sha256": "0de6a48a5c7ecd09d125a9eed25a75c89cc18570729225091d2c841299bf035f",
+      "uncompressed_bytes": 929
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_boot_prefix/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_boot_prefix/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_boot_prefix/mutant.c.gz",
+      "sha256": "ce26cfe863eb610354a9b208a670c24e525bc1b631475dee938433fb21501745",
+      "bytes": 2120,
+      "uncompressed_sha256": "546797427a42fe003651635fc92f943d711aa9597837e53547260d63777ba9f2",
+      "uncompressed_bytes": 7591
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_boot_prefix/mutant.exe.gz",
+      "sha256": "4051de4b5a8e2228d2c0c43726851e212cf00f6e7461fbd5b6b43d87adeb1cc0",
+      "bytes": 89117,
+      "uncompressed_sha256": "8dc00557cfee15550aed269f176c80f2042f20227e62eccfabd5a8c932f68922",
+      "uncompressed_bytes": 174592
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_boot_prefix/run.log.gz",
+      "sha256": "bdd00f685756f2d9dc16e4a86dbba1062b2ae20d5237f3d73fbfad01a0e58cfd",
+      "bytes": 151,
+      "uncompressed_sha256": "7392b0c1154902cd7cb3e8fec6546d91722aff5d6f3377d1bc6763cc93dc1a26",
+      "uncompressed_bytes": 137
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_photo_reclassification/compile.cmd.gz",
+      "sha256": "5c9f6097c0e97c8c5b1a4e6e786870b3b9a2fae496cf562e47d7d56f1a82242c",
+      "bytes": 402,
+      "uncompressed_sha256": "55412b741f259b0b4df81366fda79fab3474fb45a48bd11e31915b25be9d9088",
+      "uncompressed_bytes": 962
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_photo_reclassification/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_photo_reclassification/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_photo_reclassification/mutant.c.gz",
+      "sha256": "a3015009046f75856e936b670ac39470a9946496757eaa7e84a203a0919652b3",
+      "bytes": 2106,
+      "uncompressed_sha256": "d5cee2b11d74533192deb9251858a0203d463df34d15490f24970f5c77068a9f",
+      "uncompressed_bytes": 7520
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_photo_reclassification/mutant.exe.gz",
+      "sha256": "f03ab47b33e51a8d2342f52f7c43bd4a5b24a3523039da955ee87c3806e5fb3c",
+      "bytes": 89121,
+      "uncompressed_sha256": "01dfaee7a480203f07eee76314268681b3229137d7e048db27bff09793ff7960",
+      "uncompressed_bytes": 174592
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_photo_reclassification/run.log.gz",
+      "sha256": "bdd00f685756f2d9dc16e4a86dbba1062b2ae20d5237f3d73fbfad01a0e58cfd",
+      "bytes": 151,
+      "uncompressed_sha256": "7392b0c1154902cd7cb3e8fec6546d91722aff5d6f3377d1bc6763cc93dc1a26",
+      "uncompressed_bytes": 137
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_settings_reclassification/compile.cmd.gz",
+      "sha256": "cc97339545d6d05ae8aacdea11814a68e499a87cb664b2068b2cfddd0ee958f3",
+      "bytes": 404,
+      "uncompressed_sha256": "ff459820fbe6b0b6f6a55305b98353c9bb3fedc98f588f01aaf5d2cc30e2432b",
+      "uncompressed_bytes": 971
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_settings_reclassification/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_settings_reclassification/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_settings_reclassification/mutant.c.gz",
+      "sha256": "4d5d8537d74d9c10d7fff41374bd762d8b44713228624fc1f621de3a2c22d25d",
+      "bytes": 2115,
+      "uncompressed_sha256": "1ee58b6ccd5e4430cb478abf2cd77f6049d6856960358662776be8fd8a591b02",
+      "uncompressed_bytes": 7504
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_settings_reclassification/mutant.exe.gz",
+      "sha256": "02664be1316e391ba9efec4ac1a270aa0cce50d90344446c5828c86115ce63a3",
+      "bytes": 89116,
+      "uncompressed_sha256": "e35d90f4ca103e2195bf41d612a5e9f92e4834fd43d0432e63c8e3f384f57a39",
+      "uncompressed_bytes": 174592
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/allow_settings_reclassification/run.log.gz",
+      "sha256": "bdd00f685756f2d9dc16e4a86dbba1062b2ae20d5237f3d73fbfad01a0e58cfd",
+      "bytes": 151,
+      "uncompressed_sha256": "7392b0c1154902cd7cb3e8fec6546d91722aff5d6f3377d1bc6763cc93dc1a26",
+      "uncompressed_bytes": 137
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_finish_failure/compile.cmd.gz",
+      "sha256": "53f662615a526738933fd95c274cc713e137a192c5573186a3a44ba723e52e32",
+      "bytes": 402,
+      "uncompressed_sha256": "b1631cfc330874ff24a6d841e1692b82c65041e1765726a21716ee78204a9827",
+      "uncompressed_bytes": 956
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_finish_failure/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_finish_failure/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_finish_failure/mutant.c.gz",
+      "sha256": "8fb2976b1aa2025f9869d7af028466edae8c11b02a4eca7564848cd37b3208e4",
+      "bytes": 2132,
+      "uncompressed_sha256": "ec59bd040d81b5c8917b09d95c270f4a1446f71b392963df9b0f17740ba7dd33",
+      "uncompressed_bytes": 7666
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_finish_failure/mutant.exe.gz",
+      "sha256": "ffbe0fc4ff4fe5c3598f75b360a3e48a1bf83adee8baf54135ff37dc38e55c98",
+      "bytes": 89173,
+      "uncompressed_sha256": "1a4782dcad328d78af8d51d11b02fc44fd104787e4f6cb416b9a7d930879af20",
+      "uncompressed_bytes": 175104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_finish_failure/run.log.gz",
+      "sha256": "c46c2a413908ebd71e2b6e15726dd8becfb9e8a87b51219de4213ef79ea72928",
+      "bytes": 168,
+      "uncompressed_sha256": "e7a0fda7b3a3698e5ac6fdf3a4e652bcc2a9044ca62db0be53fac923e75e8f08",
+      "uncompressed_bytes": 160
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_update_failure/compile.cmd.gz",
+      "sha256": "10814889e017aba694f48f79848b98f84283b0404ccad07c01face14f2801bb4",
+      "bytes": 403,
+      "uncompressed_sha256": "61daa4ae487c31a16b44acf76185600807c9a1f7ab4ae6db96acca40849bc94d",
+      "uncompressed_bytes": 956
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_update_failure/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_update_failure/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_update_failure/mutant.c.gz",
+      "sha256": "1e02104bf0c800023f9d47b400730b534c5cfff7ba7e030c3a62da2d43556e9f",
+      "bytes": 2133,
+      "uncompressed_sha256": "4231862c8e7b28d78e2b2e9319281d0cca3255110cf86e69e02fdfadd0e0f491",
+      "uncompressed_bytes": 7668
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_update_failure/mutant.exe.gz",
+      "sha256": "66d67fd86049a8ad831529509858dc04b2160e437ffaacd9950ac58a164ecdaa",
+      "bytes": 89175,
+      "uncompressed_sha256": "8e710c72df18d4ce8d37d7f479bc40f6039cd836450c191cb4df5e96c752f260",
+      "uncompressed_bytes": 175104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_hash_update_failure/run.log.gz",
+      "sha256": "c46c2a413908ebd71e2b6e15726dd8becfb9e8a87b51219de4213ef79ea72928",
+      "bytes": 168,
+      "uncompressed_sha256": "e7a0fda7b3a3698e5ac6fdf3a4e652bcc2a9044ca62db0be53fac923e75e8f08",
+      "uncompressed_bytes": 160
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_ownership_stamp/compile.cmd.gz",
+      "sha256": "f157e43ceadc333792751400b7598846ae6e72455049922ca55cceea8e500f7d",
+      "bytes": 397,
+      "uncompressed_sha256": "4a4968071f58adf346464a1ceea36d0e297b4cb1863c10bc87ae4010961a9ec9",
+      "uncompressed_bytes": 944
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_ownership_stamp/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_ownership_stamp/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_ownership_stamp/mutant.c.gz",
+      "sha256": "662e3cb86d74a20cc24d757bd15fc87897cdc08539ab32015c15eb444614539b",
+      "bytes": 2137,
+      "uncompressed_sha256": "00114290815a7ec232a76c2426f8ab8be5e0dbe57fa693a10cf80ec088a1ef01",
+      "uncompressed_bytes": 7712
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_ownership_stamp/mutant.exe.gz",
+      "sha256": "7f67e9f5da9d5a133519f8676b95b72d0647b0d24291ac11169662dac5dc7ec2",
+      "bytes": 89171,
+      "uncompressed_sha256": "82e7581e07f349aa106a324e8163e7231f34e7ec7f0b7235ee51ce9ff4077d63",
+      "uncompressed_bytes": 175104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_ownership_stamp/run.log.gz",
+      "sha256": "61b540d13def223776cae6d5ca9ab0a8a97a1be7bdc04cefe77b653943672c27",
+      "bytes": 163,
+      "uncompressed_sha256": "4d42b6852730ad6a1b5fbeeaecbcd7ef84de94942eacfcf7bd0db4656ce58626",
+      "uncompressed_bytes": 179
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_partition_identity/compile.cmd.gz",
+      "sha256": "57dd222719a173df0a6f60c3568a6ec3326390065b0f09a2afa34993d3360271",
+      "bytes": 400,
+      "uncompressed_sha256": "dd62744969e93dd1d9137209d3e704baf525d90804ef5ccea8df3422ef584ae3",
+      "uncompressed_bytes": 953
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_partition_identity/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_partition_identity/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_partition_identity/mutant.c.gz",
+      "sha256": "97de59dc6d2186d0b41608b767aaab5d17c456b5d48d8a57c2f9dd069da99e4c",
+      "bytes": 2115,
+      "uncompressed_sha256": "e0d90978e398862fcd1c646bd0ed6a08bb59d7d3c03f0bb967d138433b209a49",
+      "uncompressed_bytes": 7629
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_partition_identity/mutant.exe.gz",
+      "sha256": "7f980125a3c3026607cb70a3a11e083a2527b2bafeb26dfb6a5b209d57232105",
+      "bytes": 89073,
+      "uncompressed_sha256": "97dbf3463d3ded6daeae538cf5ae33d39be95fd93b1ac96f52da0e65e6dbf179",
+      "uncompressed_bytes": 174592
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_partition_identity/run.log.gz",
+      "sha256": "bdd00f685756f2d9dc16e4a86dbba1062b2ae20d5237f3d73fbfad01a0e58cfd",
+      "bytes": 151,
+      "uncompressed_sha256": "7392b0c1154902cd7cb3e8fec6546d91722aff5d6f3377d1bc6763cc93dc1a26",
+      "uncompressed_bytes": 137
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_read_failure/compile.cmd.gz",
+      "sha256": "223d4d48fc485534b9638ad30817eb04d8b957d7a4c26ce150c08426c5731fbd",
+      "bytes": 397,
+      "uncompressed_sha256": "970e8ee8eeeef17fa2f7d4a5fd3fc757c19957f4c3ec96cebbb7eb96511352f8",
+      "uncompressed_bytes": 935
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_read_failure/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_read_failure/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_read_failure/mutant.c.gz",
+      "sha256": "9da938892fef514d43f47690c710645be6b0c4044f0ce0bc2352c3da48811624",
+      "bytes": 2131,
+      "uncompressed_sha256": "08de0b14130c85319a5f2ca7c95804a2ef829c6e79cdc9a185464e3fd1e8a2b2",
+      "uncompressed_bytes": 7668
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_read_failure/mutant.exe.gz",
+      "sha256": "b46cf6df796dad892847be6758219fdcde54227ea512d0ee0ffa9a7f4cfdbf8f",
+      "bytes": 89175,
+      "uncompressed_sha256": "af203a18d0b69ac5a24794395dac78daa170038609b177e2c8b494f9fc233f95",
+      "uncompressed_bytes": 175104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_read_failure/run.log.gz",
+      "sha256": "f43ea7ee603191301422d7a06a7c6bd1cefeb63766152dd768381b4ec7197d7f",
+      "bytes": 161,
+      "uncompressed_sha256": "88d2ffb7a255208a44aac0afacf8d5cc2e52ebc5214de3c94245fe0011ae1771",
+      "uncompressed_bytes": 153
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_resource_digest/compile.cmd.gz",
+      "sha256": "97fdb3d940c607ba057e7848cda22a3c2691eaec9f2c7d7ade5997b1407f5f82",
+      "bytes": 398,
+      "uncompressed_sha256": "f96ddeacfabba7e6a2dc6f940db961db0374e8ef6cce8bd4c489b4af7a3eee2f",
+      "uncompressed_bytes": 944
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_resource_digest/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_resource_digest/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_resource_digest/mutant.c.gz",
+      "sha256": "f8451039495dbe0fc336b4ac69dde8d39057e70307c088c03b5555e81c2dfb98",
+      "bytes": 2116,
+      "uncompressed_sha256": "560d9a6e2a8e2c55fd61de2b1cb77858d9e78a68d51be87bd7edf7442c860315",
+      "uncompressed_bytes": 7616
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_resource_digest/mutant.exe.gz",
+      "sha256": "b25aceb881a85a062f811223001e6b9ed0adcf1817745b6dd487c6bec3f1395c",
+      "bytes": 89134,
+      "uncompressed_sha256": "aede4823b438aa97c218cd5ab2dfab8737e9041db4069de9c29bf2b5d2b1b6ad",
+      "uncompressed_bytes": 174592
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/ignore_resource_digest/run.log.gz",
+      "sha256": "19d1530e996c4646dc22f42ea4b2e0c96bb9ae2855f572723427a51c3ec3237a",
+      "bytes": 153,
+      "uncompressed_sha256": "1b6930b505921e30177e7f20de4de4554eb17b588c7ba8157c9e8f00aaf657f0",
+      "uncompressed_bytes": 139
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/leak_hash_state/compile.cmd.gz",
+      "sha256": "bf47cf0daa68e7c3242c07efa43efbdfd74380b2600abd15525fb37fb125507f",
+      "bytes": 394,
+      "uncompressed_sha256": "34da5dd98d044f0e70fda8527ca262b346e78ad8bb36e12e28bbaaf3f2b3a7f0",
+      "uncompressed_bytes": 923
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/leak_hash_state/compile.log.gz",
+      "sha256": "52872b2391bf1066f3bffbb884c3b26e71c75e74494401a3792395367f4655c5",
+      "bytes": 71,
+      "uncompressed_sha256": "c084fc34be3b553ba377ec64ba213ffa5aab49e8e2d8c86237d76cedf786904b",
+      "uncompressed_bytes": 55
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/leak_hash_state/compiler-path.txt.gz",
+      "sha256": "6bb6d3ade4d00893d0ac8b9155825fc19c686048e11c06ecef10fbb086f35894",
+      "bytes": 119,
+      "uncompressed_sha256": "ff7b6b76161873ee43b6f1607e8592bd759efed8c25481d83621441d7224e16b",
+      "uncompressed_bytes": 104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/leak_hash_state/mutant.c.gz",
+      "sha256": "ce5c78bdf76535c19a3f5c855d2648f47a19431c91b14fcf5b14c8fc6c83cd1b",
+      "bytes": 2130,
+      "uncompressed_sha256": "bd19d74327ac1617947905fb5003de4c6b26f50b22188ed79e50ab33469e921e",
+      "uncompressed_bytes": 7640
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/leak_hash_state/mutant.exe.gz",
+      "sha256": "9d7821261bee4c157c524ff980857ac2c9dc6896dab0c5bea2eb686b73791325",
+      "bytes": 89167,
+      "uncompressed_sha256": "7487493c6a6d1229226b96ecf4b38e926592289018710b915eac60ddaff79077",
+      "uncompressed_bytes": 175104
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/leak_hash_state/run.log.gz",
+      "sha256": "9d47ab49897d3599de522bd463d6a9bdbc63532bb23935fa893fb0a73b87764f",
+      "bytes": 144,
+      "uncompressed_sha256": "b9ebfaae06d83cc71cceb33a56737238304bdc2b4582a6db0c77f4ed25fa2989",
+      "uncompressed_bytes": 139
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations/report.json.gz",
+      "sha256": "b1f30fd31e8a4f1a4ba8197920c87faa0f839c8fce1b68eb7dc5540c8b4cbafc",
+      "bytes": 1949,
+      "uncompressed_sha256": "b04014331f2dad79a749b95c91e621e31d899373945a6fef6cdfd92ce2c0205d",
+      "uncompressed_bytes": 7060
+    },
+    {
+      "file": "raw/jpeg-guard-20261020/stamped-mutations.log.gz",
+      "sha256": "165eda7507c22bbf0ddad39dfd9eb77ecdbf733b6e84e40d79a8d7f6e462a7c4",
+      "bytes": 177,
+      "uncompressed_sha256": "064e9136cedfd8c0b90a4aba61146898e2790be0f3c99f0758b6619e4908b648",
+      "uncompressed_bytes": 481
+    }
+  ]
+}

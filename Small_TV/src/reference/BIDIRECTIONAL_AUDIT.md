@@ -37,10 +37,12 @@ python Small_TV/src/tests/correspondence_test.py
 заводском образе. Подготовленная libjpeg ещё не подключена; её upstream-код
 и инструменты хостовых проб не являются переносом заводских функций.
 
-Новый `storage/jpeg_nor.c` — подготовленный unlinked компонент для расширения
+Новые `storage/jpeg_nor.c` и `storage/jpeg_guard.c` — подготовленные unlinked компоненты для расширения
 JPEG, не перенос отдельной factory функции. Он проверяется собственным
-[NOR contract](../tests/JPEG_NOR_STORAGE.md); при production integration его
-нужно включить в source inventory и привязку сборочных входов.
+[NOR contract](../tests/JPEG_NOR_STORAGE.md) и
+[ownership guard](../tests/JPEG_OWNERSHIP_GUARD.md); при production integration их
+нужно включить в source inventory и привязку сборочных входов. Это новые
+REQUESTED_CHANGE helpers, не найденные пропущенные factory functions.
 
 ## Найденные пробелы
 
