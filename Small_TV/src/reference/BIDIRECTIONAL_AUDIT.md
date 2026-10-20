@@ -6,6 +6,13 @@
 Результат — карта переноса и список пробелов; полной эквивалентности программы
 эта проверка не доказывает.
 
+Checkpoint offline JPEG build: в явную обратную инвентаризацию добавлены160
+функций из11codec/storage C-файлов как requested extensions, без утверждения
+эквивалентности factory. Всего459source functions, по-прежнему170app. Они
+компилируются в app component, но UI/upload пока не вызывают новый decoder/cache;
+проверка ELF подтверждает section GC. Сборщик и production bundle включены в
+проверяемые входы. [Границы проверки](../tests/JPEG_DEPENDENCY_BUILD.md).
+
 Точная карта: [correspondence.json](correspondence.json). В каждой заводской
 строке указаны адрес, файл reference, конкретные `file#function` и оговорки.
 Обратный список со строками, вызовами и хешами строится командой:

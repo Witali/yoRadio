@@ -12,11 +12,11 @@ CODEC_INPUTS=['codec/jpeg_decoder.c','codec/jpeg_decoder.h','codec/jpeg_decoder_
     'codec/jpeg_backing.c','codec/jpeg_backing.h','codec/jpeg_coefficients.c','codec/jpeg_coefficients.h',
     'app/media/color_convert.c','app/include/color_convert.h','storage/jpeg_cache.c','storage/jpeg_cache.h',
     'storage/jpeg_journal.c','storage/jpeg_journal.h','storage/jpeg_nor.c','storage/jpeg_nor.h',
-    'storage/jpeg_scratch.c','storage/jpeg_scratch.h','tests/jpeg_library_probe/UPSTREAM.json',
-    'tests/jpeg_library_probe/libjpeg-turbo-3.2.0-bounded.patch',
-    'tests/jpeg_library_probe/libjpeg-turbo-3.2.0-flash-tables.patch',
-    'tests/jpeg_library_probe/libjpeg-turbo-3.2.0-compact-pools.patch',
-    'tests/jpeg_library_probe/generate_flash_tables.py']
+    'storage/jpeg_scratch.c','storage/jpeg_scratch.h','third_party/libjpeg-turbo/UPSTREAM.json',
+    'third_party/libjpeg-turbo/BUNDLE.json',
+    'third_party/libjpeg-turbo/libjpeg-turbo-3.2.0-bounded.patch',
+    'third_party/libjpeg-turbo/libjpeg-turbo-3.2.0-flash-tables.patch',
+    'third_party/libjpeg-turbo/libjpeg-turbo-3.2.0-compact-pools.patch']
 
 
 def sha(path):
@@ -32,7 +32,7 @@ def prepare_cache(assets,manifest,board_text,partitions_text,library):
     if library['upstream_commit']!='c85e6b905bf237038faa936dab160ebfc5da0344' or not library['flash_tables'] or not library['compact_pools']:
         raise ValueError('Use qualified pinned bounded/flash-table/compact decoder')
     for key,name in (('patch_sha256','bounded'),('flash_patch_sha256','flash-tables'),('pool_patch_sha256','compact-pools')):
-        if library[key]!=sha(PROJECT/f'tests/jpeg_library_probe/libjpeg-turbo-3.2.0-{name}.patch'):
+        if library[key]!=sha(PROJECT/f'third_party/libjpeg-turbo/libjpeg-turbo-3.2.0-{name}.patch'):
             raise ValueError('Library does not match current adaptation patches')
     guard,plan,prepared,prepared_manifest=prepare_image(assets,manifest,board_text,partitions_text)
     width,height=board['LCD_WIDTH'],board['LCD_HEIGHT']

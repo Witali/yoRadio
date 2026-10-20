@@ -1,5 +1,9 @@
 # Функциональные тесты Small TV ESP32-C2
 
+Offline production JPEG dependency и проверки повреждённых исходников/сборочного
+кэша описаны в [JPEG_DEPENDENCY_BUILD.md](JPEG_DEPENDENCY_BUILD.md). Компиляция
+adapter modules не означает включение нового декодера в UI/upload.
+
 ## Полнота переноса
 
 [Двусторонняя карта](../reference/BIDIRECTIONAL_AUDIT.md) учитывает каждый

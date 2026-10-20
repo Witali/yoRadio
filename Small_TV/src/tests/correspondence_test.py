@@ -55,6 +55,16 @@ class CorrespondenceTest(unittest.TestCase):
     def test_stale_source(self):
         self.reject(lambda m: m['inputs'].update({'src/app/app_main.c': '0'*64}), 'Review inputs changed')
 
+    def test_missing_jpeg_support(self):
+        """The newly compiled extension must remain visible in reverse review."""
+        self.reject(lambda m: m['native_support'].pop('codec/jpeg_decoder.c#jpeg_decoder_decode'),
+                    'Unaccounted native function')
+
+    def test_stale_jpeg_adapter(self):
+        """Changing an adapter cannot retain an old factory/native inventory pin."""
+        self.reject(lambda m: m['inputs'].update({'src/storage/jpeg_cache.c': '0'*64}),
+                    'Review inputs changed')
+
     def test_wrong_reference(self):
         self.reject(lambda m: m['factory'][0].update(reference='reference/application.c'), 'Wrong reference')
 

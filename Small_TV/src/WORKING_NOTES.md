@@ -2553,3 +2553,41 @@ Proof qemu/parity/jpeg-cache-pipeline-validation-20261020.json; tests/JPEG_CACHE
 UI вызывает media API. Нужен owner/worker protocol без нарушения source serialization
 и отзывчивости UI/HTTP. После integration shared RAM/stack/time, reset/power-loss,
 independent network/LCD/full/24h/hardware. Старые SDK/H10/frozen read-only, no QMP/RSP.
+
+
+## 2026-10-20 — offline dependency/main build checkpoint
+
+Текущая worktree/branch прежние. Goal active, предыдущий read-only ответ о
+сокращении записей —no implementation progress; этот turn реализовал production
+build. Не возвращаться к повторному исследованию vendor workflow: теперь есть
+third_party/libjpeg-turbo/upstream.tar.gz +3qualified patches/licenses и tools/
+build_jpeg_library.py. build.ps1 автоматически собирает dependency, app CMake
+компилирует11codec/storage sources; API roots GC, UI/upload по-прежнему TJpgd.
+Production .a D690BDF3 и configured headers побайтно одинаковы с old RV32 qualified
+library; Os был и прежде в actual Ninja FLAGS, несмотря на O3 в CMakeCache.
+
+Main archive app676C5EDF/ELF CB84E536/source2D1FB659,1170432bytes,365568free;
+assetsBB4469E3 unchanged. Native5806/13dependency/12inventory/10generator/6artifact
+checks pass. Explicit source inventory459/170app. No new VM, SDK tracked clean,
+шесть protected H10 owners present. Локальные logs .build/jpeg-main-20261020;
+доказательства qemu/parity/jpeg-dependency-build-validation-20261020.json.
+Build helper refuses incomplete/corrupt cached output; use fresh dir on failure.
+No source edits during build: post-link input recheck fails. Builds archive in
+firmware/development; no push in this turn.
+
+Next REAL integration: media owner/worker and privacy, not another decoder probe.
+Source/journal invalidation before upload writes; one decoder+verified RGB565 cache,
+source readback protections; no global media_mutex across slow decode. SDK async
+HTTP begin/complete can retain legacy OK after actual finish; inspect server
+lifetime and request/body ownership. Current UI has explicit upload_active pause,
+remove with slot-scoped protection. Current privacy parser baseline-only: needs
+strict metadata-only multi-scan scanner allowing only fixed JFIF/structural Adobe,
+all EXIF/COM/etc rejected even between scans. Keep JS crop/resize/privacy.
+
+Factory baseline photo pixel parity matters: compare TJpgd vs libjpeg output;
+consider a purpose-specific baseline adapter/strip cache if needed rather than
+silently changing factory pixels. UI has1920byte DMA buffer, NOT a115200byte full
+framebuffer. Real combined heap/task stacks/time remain unverified. After owner
+integration deploy matching guard/cache headers/assets without erasing user photo
+slots/settings, then independent LCD/network/full/24h/hardware gates. Old H10/SDK/
+frozen46payloads+manifest readonly, no extra QMP/RSP or stop for old H10.

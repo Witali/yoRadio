@@ -31,7 +31,9 @@ virtual-time limitations; physical-board and Internet weather checks remain pend
 | `app/services/` | SNTP, factory timezone selection, HTTP/Kelvin weather and cached results |
 | `app/text/` | Strict UTF-8 scalar decoding and complete label prefixes |
 | `app/web/` | Recovered HTTP contracts, pages, settings and photo APIs |
-| `third_party/` | Pinned cJSON, TJpgDec and licensed Spleen font |
+| `codec/` | Bounded JPEG API, memory/backing adapters and coefficient conversion; UI integration pending |
+| `storage/` | Guarded NOR transport, scratch files, atomic journal and verified frame cache |
+| `third_party/` | Pinned cJSON, TJpgDec, offline libjpeg-turbo source bundle and licensed Spleen font |
 | `reference/` | 176 exported functions split into 16 logical pseudocode modules |
 
 [`symbol-map.json`](symbol-map.json) preserves every exported function's

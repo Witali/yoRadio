@@ -218,6 +218,12 @@ def main():
     generate_timezones(args.output)
     compiled = sorted((ROOT / "app").rglob("*.c")) + sorted((ROOT / "app").rglob("*.h"))
     compiled += sorted((ROOT / "third_party").rglob("*.c")) + sorted((ROOT / "third_party").rglob("*.h"))
+    for directory in ('codec', 'storage'):
+        compiled += sorted((ROOT / directory).glob('*.c')) + sorted((ROOT / directory).glob('*.h'))
+    # Include the offline dependency and adapters even while the UI still uses
+    # TJpgd. Their separate build report records the actual target archive.
+    compiled += sorted(p for p in (ROOT / 'third_party/libjpeg-turbo').rglob('*') if p.is_file())
+    compiled += [ROOT / 'tools/build_jpeg_library.py', ROOT / 'tools/prepare_resources.py', ROOT / 'build.ps1']
     compiled += [ROOT / "CMakeLists.txt", ROOT / "app/CMakeLists.txt", ROOT / "sdkconfig.defaults", ROOT / "partitions.csv"]
     compiled += [ROOT / "cmake/debug_logging.cmake"]
     records = [{"file":str(path.relative_to(ROOT)).replace("\\","/"), "sha256":hashlib.sha256(path.read_bytes()).hexdigest()} for path in compiled]

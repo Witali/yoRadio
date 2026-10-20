@@ -3919,3 +3919,39 @@ photo_upload_finish удерживает общий media_mutex на всём va
 туда slow decode напрямую нельзя, это заблокирует UI/media clients. Затем общий
 heap/stack/time и reset/power-loss, независимые network/LCD/full/24h/hardware;
 остальные factory/network/electrical audit пункты остаются. Goal не закрыт.
+# 2026-10-20 — offline JPEG dependency in the main build
+
+Продолжена прежняя цель IMPROVEMENT_PLAN. Предыдущий ответ об объёме записей был
+read-only status, без нового implementation progress. Текущий checkpoint меняет
+реальную production build path: больше не нужен отдельный upstream checkout и
+тестовый build script для libjpeg. Сохранён deterministic upstream archive2520264
+bytes (исходный tar9932800), три ранее проверенных patch bytes и licenses.
+Production helper проверяет pins, exports/patches в build dir, вызывает pinned
+RV32/CMake/Ninja и проверяет reuse по actual archive/source/private headers.
+13dependency controls pass, включая повреждения gzip/tar/patch/license/headers/
+archive/report и прерванную сборку.10cache-layout rejects pass.
+
+App CMake компилирует11codec/storage sources; early component expansion ESP-IDF
+не получает custom JPEG path, поэтому проверка dependency availability выполняется
+только на полном configure pass. Первоначальная ошибка сохранена в raw evidence.
+Новый explicit reverse inventory459functions/170app,12omission controls pass.
+Native result **5806checks**,107JPEG/98animation/18BMP, pass.
+Никакой новый decoder/cache ещё не вызван из UI/upload: это проверено по finalELF.
+
+Уточнение про flags: CMakeCache старого probe показывалO3, но actual Ninja commands
+использовалиOs. Теперь Release задан явно и проверяются реальные FLAGS. Новая
+libjpeg.a побайтно совпала с qualified D690BDF3; configured headers тоже одинаковы.
+Это не новое уменьшение размера или новая target runtime qualification.
+
+Main development build сохранён: app676C5EDF/ELF CB84E536,1170432bytes,
+365568bytes free; source2D1FB659. AssetsBB4469E3 не менялись, stamp/cache deployment
+ещё не активированы. DEBUGoff, SDK9a97f6c5.6artifact checks pass. Во время build
+отключена Python bytecode generation, pins rechecked после link. Shared SDK clean;
+шесть старых H10 owners сохранены, новых VM/прошивки платы не было.
+
+Далее — source privacy parser и media owner/worker, один decode→verified cache,
+invalidation-before-upload, typed HTTP errors и штатный async request lifecycle.
+Не держать общий media_mutex весь decode. Затем общий RAM/stack/time, safe matching
+assets deployment с сохранением фото/settings, независимые LCD/network/full/24h/
+hardware gates. Цель не завершена. Подробности tests/JPEG_DEPENDENCY_BUILD.md и
+qemu/parity/jpeg-dependency-build-validation-20261020.json.

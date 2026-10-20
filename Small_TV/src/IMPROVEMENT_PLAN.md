@@ -93,6 +93,12 @@ source read bug, проверены все218input/readback points. RV32cache ha
 Далее — расширить sampling/capacity bounds, выбрать budgets; invalidation/source
 hash в upload/cache workflow, matching assets build/deployment с сохранением photos/settings.
 Полный HTTP/power-loss workflow и native UI decoder integration ещё открыты.
+Следующий checkpoint: обычная production-сборка сама готовит offline JPEG из
+закреплённого source bundle, компилирует codec/storage adapters и сохраняет
+точный dependency report. Архив RV32 побайтно совпал с ранее проверенным D690;
+само это изменение ещё не переключает UI/upload с TJpgd. Расширен явный reverse
+inventory до459functions при прежних170app, добавлены omission controls для
+codec/storage. [Сборка и границы проверки](tests/JPEG_DEPENDENCY_BUILD.md).
 
 1. Зафиксировать матрицу входов/лимитов: baseline/progressive, gray/RGB/CMYK/YCCK,
    8/12-bit lossy и 2–16-bit Huffman lossless. Не обещать весь T.81: библиотека
