@@ -1,0 +1,367 @@
+#include "platform.h"
+#include "native_tls_rx_reserve.h"
+#include "native_input_reclaim.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static void check(bool condition, const char *name) {
+    if (condition) return;
+    fprintf(stderr, "TLS_RX_HOST_FAILURE %s\n", name);
+    fflush(stderr);
+    _Exit(2); /* Exact semantic controls stop before further invalid ownership. */
+}
+#define CHECK(condition, name) check((condition), (name))
+static _Thread_local unsigned critical_depth, allocation_attempt, fail_at;
+static _Thread_local bool isr;
+static pthread_mutex_t ledger_lock = PTHREAD_MUTEX_INITIALIZER;
+typedef struct { void *pointer; size_t bytes; } entry_t;
+static entry_t ledger[1024];
+static unsigned outstanding, allocations, releases, zeroize_calls;
+static unsigned backend_calls, dispatch_calls;
+static void *known_reserve;
+static bool reclaim_enabled, fail_until_released;
+static adaptive_input_t pool;
+static int checksum_failure, attach_result;
+static unsigned attach_calls;
+static void *attach_seen_userdata;
+static bool attach_nested;
+static pthread_mutex_t erase_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t erase_cond = PTHREAD_COND_INITIALIZER;
+static bool erase_gate, erase_entered, erase_continue;
+
+void host_enter(portMUX_TYPE *lock) {
+    CHECK(pthread_mutex_lock(lock) == 0, "critical_enter");
+    ++critical_depth;
+}
+void host_exit(portMUX_TYPE *lock) {
+    CHECK(critical_depth != 0, "critical_balanced");
+    --critical_depth;
+    CHECK(pthread_mutex_unlock(lock) == 0, "critical_exit");
+}
+bool xPortInIsrContext(void) { return isr; }
+bool host_erase_control_active(void) { return erase_gate; }
+
+void *__real_esp_mbedtls_mem_calloc(size_t count, size_t bytes) {
+    CHECK(critical_depth == 0, "allocator_outside_critical");
+    ++allocation_attempt;
+    CHECK(pthread_mutex_lock(&ledger_lock) == 0, "ledger_lock");
+    ++backend_calls;
+    bool fail = fail_at == allocation_attempt ||
+        (fail_until_released && pool.released == 0);
+    CHECK(pthread_mutex_unlock(&ledger_lock) == 0, "ledger_unlock");
+    if (fail || !count || !bytes || bytes > SIZE_MAX / count) return NULL;
+    void *result = calloc(count, bytes);
+    CHECK(result != NULL, "host_heap_available");
+    CHECK(pthread_mutex_lock(&ledger_lock) == 0, "ledger_lock");
+    unsigned slot;
+    for (slot = 0; slot < 1024 && ledger[slot].pointer; ++slot) {}
+    CHECK(slot < 1024, "ledger_capacity");
+    ledger[slot] = (entry_t){result, count * bytes};
+    ++outstanding; ++allocations;
+    CHECK(pthread_mutex_unlock(&ledger_lock) == 0, "ledger_unlock");
+    return result;
+}
+void *mbedtls_calloc(size_t count, size_t bytes) {
+    CHECK(pthread_mutex_lock(&ledger_lock) == 0, "ledger_lock");
+    ++dispatch_calls;
+    CHECK(pthread_mutex_unlock(&ledger_lock) == 0, "ledger_unlock");
+    return reclaim_enabled ? __wrap_esp_mbedtls_mem_calloc(count, bytes) :
+        __real_esp_mbedtls_mem_calloc(count, bytes);
+}
+void mbedtls_free(void *pointer) {
+    CHECK(critical_depth == 0, "free_outside_critical");
+    if (!pointer) return;
+    CHECK(pointer != known_reserve, "reserved_pointer_never_sdk_heap_free");
+    CHECK(pthread_mutex_lock(&ledger_lock) == 0, "ledger_lock");
+    unsigned slot;
+    for (slot = 0; slot < 1024 && ledger[slot].pointer != pointer; ++slot) {}
+    CHECK(slot < 1024, "ordinary_free_paired");
+    ledger[slot] = (entry_t){0}; --outstanding; ++releases;
+    CHECK(pthread_mutex_unlock(&ledger_lock) == 0, "ledger_unlock");
+    free(pointer);
+}
+void mbedtls_platform_zeroize(void *pointer, size_t bytes) {
+    CHECK(critical_depth == 0, "zeroize_outside_critical");
+    CHECK(pthread_mutex_lock(&erase_lock) == 0, "erase_lock");
+    ++zeroize_calls;
+    if (erase_gate && pointer == known_reserve) {
+        erase_entered = true;
+        CHECK(pthread_cond_broadcast(&erase_cond) == 0, "erase_enter_signal");
+        while (!erase_continue)
+            CHECK(pthread_cond_wait(&erase_cond, &erase_lock) == 0, "erase_wait");
+    }
+    CHECK(pthread_mutex_unlock(&erase_lock) == 0, "erase_unlock");
+    volatile unsigned char *destination = pointer;
+    for (size_t index = 0; index < bytes; ++index) destination[index] = 0;
+}
+adaptive_input_stats_t adaptive_input_stats(adaptive_input_t *input) {
+    CHECK(input == &pool, "canonical_reclaim_bound_owner");
+    return (adaptive_input_stats_t){.target = 8, .minimum = 4};
+}
+bool adaptive_input_release_one(adaptive_input_t *input) {
+    CHECK(input == &pool && critical_depth == 0, "reclaim_outside_critical");
+    if (!input->idle) return false;
+    --input->idle; ++input->released;
+    return true;
+}
+
+int ssl_conf_check(const mbedtls_ssl_context *ssl) {
+    return ssl->conf->reject ? -777 : 0;
+}
+void mbedtls_ssl_transform_free(mbedtls_ssl_transform *value) { (void)value; }
+void mbedtls_ssl_session_free(mbedtls_ssl_session *value) { (void)value; }
+void mbedtls_ssl_handshake_free(mbedtls_ssl_context *ssl) { (void)ssl; }
+void mbedtls_ssl_session_init(mbedtls_ssl_session *value) { memset(value, 0, sizeof(*value)); }
+void ssl_handshake_params_init(mbedtls_ssl_handshake_params *value) { memset(value, 0, sizeof(*value)); }
+void mbedtls_ssl_transform_init(mbedtls_ssl_transform *value) { memset(value, 0, sizeof(*value)); }
+int mbedtls_ssl_reset_checksum(mbedtls_ssl_context *ssl) { (void)ssl; return checksum_failure; }
+void mbedtls_ssl_reset_in_pointers(mbedtls_ssl_context *ssl) {
+    ssl->in_hdr = ssl->in_ctr = ssl->in_len = ssl->in_iv = ssl->in_msg = ssl->in_buf;
+}
+void mbedtls_ssl_reset_out_pointers(mbedtls_ssl_context *ssl) {
+    ssl->out_hdr = ssl->out_ctr = ssl->out_len = ssl->out_iv = ssl->out_msg = ssl->out_buf;
+}
+void mbedtls_ssl_set_timer(mbedtls_ssl_context *ssl, unsigned milliseconds) {
+    (void)ssl; (void)milliseconds;
+}
+
+static mbedtls_ssl_config configuration(bool radio) {
+    mbedtls_ssl_config config = {.max_tls_version = 0x303};
+    if (radio)
+        CHECK(native_tls_rx_reserve_crt_bundle_attach(&config) == ESP_OK, "radio_attach_success");
+    return config;
+}
+esp_err_t esp_crt_bundle_attach(void *value) {
+    mbedtls_ssl_config *conf = value;
+    ++attach_calls;
+    attach_seen_userdata = mbedtls_ssl_conf_get_user_data_p(conf);
+    ++conf->attached;
+    if (attach_nested) {
+        mbedtls_ssl_config ordinary = configuration(false);
+        mbedtls_ssl_context nested;
+        mbedtls_ssl_init(&nested);
+        CHECK(mbedtls_ssl_setup(&nested, &ordinary) == 0, "nested_client_setup");
+        CHECK(nested.in_buf != known_reserve, "nested_client_ordinary_rx");
+        mbedtls_ssl_free(&nested);
+    }
+    return attach_result;
+}
+static bool all_zero(const void *value, size_t bytes) {
+    const unsigned char *data = value;
+    for (size_t index = 0; index < bytes; ++index) if (data[index]) return false;
+    return true;
+}
+static void setup(mbedtls_ssl_context *ssl, const mbedtls_ssl_config *conf) {
+    mbedtls_ssl_init(ssl);
+    allocation_attempt = 0;
+    CHECK(mbedtls_ssl_setup(ssl, conf) == 0, "setup_success");
+}
+static void clean(mbedtls_ssl_context *ssl) {
+    mbedtls_ssl_free(ssl);
+    CHECK(all_zero(ssl, sizeof(*ssl)), "ssl_free_clears_context");
+    mbedtls_ssl_free(ssl);
+}
+
+static void ownership(void) {
+    mbedtls_ssl_config radio = configuration(true);
+    known_reserve = yoradio_tls_static_rx_calloc(&radio, 1, MBEDTLS_SSL_IN_BUFFER_LEN);
+    CHECK(known_reserve != NULL, "initial_reserve_claim");
+    yoradio_tls_static_rx_free(known_reserve);
+    mbedtls_ssl_config ordinary = configuration(false);
+    mbedtls_ssl_context context;
+    setup(&context, &ordinary);
+    CHECK(context.in_buf != known_reserve, "unlabelled_client_ordinary_rx");
+    clean(&context);
+    int occupied;
+    mbedtls_ssl_config occupied_conf = {.user_data.p = &occupied, .max_tls_version = 0x303};
+    unsigned prior_calls = attach_calls;
+    CHECK(native_tls_rx_reserve_crt_bundle_attach(&occupied_conf) == ESP_OK, "occupied_attach_success");
+    CHECK(occupied_conf.user_data.p == &occupied && attach_seen_userdata == &occupied &&
+          attach_calls == prior_calls + 1 && occupied_conf.attached == 1,
+          "occupied_userdata_and_attach_order_preserved");
+    setup(&context, &occupied_conf);
+    CHECK(context.in_buf != known_reserve, "occupied_client_ordinary_rx");
+    clean(&context);
+    attach_result = -42;
+    mbedtls_ssl_config rejected = {.max_tls_version = 0x303};
+    CHECK(native_tls_rx_reserve_crt_bundle_attach(&rejected) == -42 &&
+          rejected.user_data.p == NULL && rejected.attached == 1, "failed_attach_unchanged_no_marker");
+    attach_result = 0;
+    attach_nested = true;
+    mbedtls_ssl_config nested_radio = configuration(true);
+    attach_nested = false;
+    CHECK(nested_radio.user_data.p != NULL, "radio_marked_after_callback");
+    setup(&context, &radio);
+    CHECK(context.in_buf == known_reserve && all_zero(context.in_buf, MBEDTLS_SSL_IN_BUFFER_LEN),
+          "radio_full_capacity_reserved");
+    mbedtls_ssl_context second;
+    setup(&second, &nested_radio);
+    CHECK(second.in_buf != context.in_buf, "independent_context_rx_no_alias");
+    clean(&second);
+    memset(context.in_buf, 0xa5, MBEDTLS_SSL_IN_BUFFER_LEN);
+    unsigned before = zeroize_calls;
+    clean(&context);
+    CHECK(zeroize_calls > before && all_zero(known_reserve, MBEDTLS_SSL_IN_BUFFER_LEN),
+          "full_erase_before_publish");
+    for (unsigned cycle = 0; cycle < 32; ++cycle) {
+        setup(&context, &radio);
+        CHECK(context.in_buf == known_reserve, "reconnect_reuses_reserve");
+        memset(context.in_buf, 0x66, MBEDTLS_SSL_IN_BUFFER_LEN);
+        mbedtls_ssl_session_reset_msg_layer(&context, 0);
+        CHECK(context.in_buf == known_reserve && all_zero(context.in_buf, MBEDTLS_SSL_IN_BUFFER_LEN),
+              "reset_retains_full_rx");
+        clean(&context);
+    }
+    puts("TLS_RX_HOST_CASE ownership_binding_reset_reconnect");
+}
+
+static void rollback(void) {
+    mbedtls_ssl_config radio = configuration(true);
+    for (unsigned allocation = 1; allocation <= 4; ++allocation) {
+        mbedtls_ssl_context context;
+        mbedtls_ssl_init(&context);
+        allocation_attempt = 0; fail_at = allocation;
+        CHECK(mbedtls_ssl_setup(&context, &radio) == MBEDTLS_ERR_SSL_ALLOC_FAILED,
+              "setup_failure_returns_original_error");
+        fail_at = 0;
+        CHECK(context.in_buf == NULL && context.out_buf == NULL && context.conf == NULL,
+              "setup_rollback_clears_rx_tx_conf");
+        void *next = yoradio_tls_static_rx_calloc(&radio, 1, MBEDTLS_SSL_IN_BUFFER_LEN);
+        CHECK(next == known_reserve, "rollback_returns_slot");
+        yoradio_tls_static_rx_free(next);
+        clean(&context);
+        CHECK(outstanding == 0, "rollback_no_heap_leaks");
+    }
+    checksum_failure = -778;
+    mbedtls_ssl_context context;
+    mbedtls_ssl_init(&context);
+    CHECK(mbedtls_ssl_setup(&context, &radio) == -778, "checksum_failure_returns_original_error");
+    checksum_failure = 0;
+    clean(&context);
+    radio.reject = true;
+    mbedtls_ssl_init(&context);
+    unsigned before = backend_calls;
+    CHECK(mbedtls_ssl_setup(&context, &radio) == -777 && backend_calls == before,
+          "config_failure_before_rx_no_allocation");
+    clean(&context);
+    radio.reject = false;
+    setup(&context, &radio);
+    CHECK(context.in_buf == known_reserve, "pre_setup_failure_did_not_loan_slot");
+    clean(&context);
+    puts("TLS_RX_HOST_CASE exact_sdk_setup_rollback_free");
+}
+
+static void fallback(void) {
+    mbedtls_ssl_config radio = configuration(true);
+    void *held = yoradio_tls_static_rx_calloc(&radio, 1, MBEDTLS_SSL_IN_BUFFER_LEN);
+    CHECK(held == known_reserve, "fallback_holder_reserved");
+    CHECK(native_input_reclaim_bind(&pool), "canonical_reclaim_bind");
+    pool = (adaptive_input_t){.idle = 4};
+    reclaim_enabled = true; fail_until_released = true;
+    unsigned before = backend_calls;
+    void *ordinary = yoradio_tls_static_rx_calloc(&radio, 1, MBEDTLS_SSL_IN_BUFFER_LEN);
+    CHECK(ordinary && ordinary != held && pool.released == 1 && backend_calls == before + 2,
+          "busy_slot_reclaim_retry_preserved");
+    fail_until_released = false;
+    yoradio_tls_static_rx_zeroize_free(ordinary, MBEDTLS_SSL_IN_BUFFER_LEN);
+    before = backend_calls;
+    CHECK(yoradio_tls_static_rx_calloc(&radio, 0, MBEDTLS_SSL_IN_BUFFER_LEN) == NULL &&
+          backend_calls == before + 1, "zero_argument_sdk_semantics");
+    before = backend_calls;
+    CHECK(yoradio_tls_static_rx_calloc(&radio, SIZE_MAX, 2) == NULL &&
+          backend_calls == before + 1, "overflow_argument_sdk_semantics");
+    isr = true;
+    ordinary = yoradio_tls_static_rx_calloc(&radio, 1, MBEDTLS_SSL_IN_BUFFER_LEN);
+    isr = false;
+    CHECK(ordinary && ordinary != held, "isr_has_no_reservation");
+    yoradio_tls_static_rx_free(ordinary);
+    CHECK(native_input_reclaim_detach(&pool) == NATIVE_INPUT_RECLAIM_DETACHED,
+          "canonical_reclaim_detach");
+    reclaim_enabled = false;
+    yoradio_tls_static_rx_free(held);
+    puts("TLS_RX_HOST_CASE ordinary_dispatcher_and_canonical_reclaim");
+}
+
+typedef struct {
+    mbedtls_ssl_config conf;
+    mbedtls_ssl_context context;
+    pthread_barrier_t *barrier;
+} worker_t;
+static void *parallel_setup(void *argument) {
+    worker_t *worker = argument;
+    int result = pthread_barrier_wait(worker->barrier);
+    CHECK(result == 0 || result == PTHREAD_BARRIER_SERIAL_THREAD, "parallel_start_barrier");
+    setup(&worker->context, &worker->conf);
+    return NULL;
+}
+static void *release_worker(void *argument) {
+    clean(argument);
+    return NULL;
+}
+static void concurrent(void) {
+    pthread_barrier_t barrier;
+    CHECK(pthread_barrier_init(&barrier, NULL, 3) == 0, "parallel_barrier_init");
+    worker_t workers[2] = {{.conf = configuration(true), .barrier = &barrier},
+                           {.conf = configuration(true), .barrier = &barrier}};
+    pthread_t threads[2];
+    for (unsigned index = 0; index < 2; ++index)
+        CHECK(pthread_create(&threads[index], NULL, parallel_setup, &workers[index]) == 0,
+              "parallel_thread_create");
+    int result = pthread_barrier_wait(&barrier);
+    CHECK(result == 0 || result == PTHREAD_BARRIER_SERIAL_THREAD, "parallel_main_barrier");
+    for (unsigned index = 0; index < 2; ++index)
+        CHECK(pthread_join(threads[index], NULL) == 0, "parallel_thread_join");
+    CHECK(workers[0].context.in_buf != workers[1].context.in_buf &&
+          ((workers[0].context.in_buf == known_reserve) != (workers[1].context.in_buf == known_reserve)),
+          "parallel_configs_exactly_one_reserve");
+    clean(&workers[0].context); clean(&workers[1].context);
+    CHECK(pthread_barrier_destroy(&barrier) == 0, "parallel_barrier_destroy");
+
+    mbedtls_ssl_config radio = configuration(true);
+    mbedtls_ssl_context releasing, during;
+    setup(&releasing, &radio);
+    CHECK(releasing.in_buf == known_reserve, "erase_holder_reserved");
+    memset(known_reserve, 0x7a, MBEDTLS_SSL_IN_BUFFER_LEN);
+    CHECK(pthread_mutex_lock(&erase_lock) == 0, "erase_lock");
+    erase_gate = true; erase_entered = false; erase_continue = false;
+    CHECK(pthread_mutex_unlock(&erase_lock) == 0, "erase_unlock");
+    CHECK(pthread_create(&threads[0], NULL, release_worker, &releasing) == 0, "erase_thread_create");
+    CHECK(pthread_mutex_lock(&erase_lock) == 0, "erase_lock");
+    while (!erase_entered)
+        CHECK(pthread_cond_wait(&erase_cond, &erase_lock) == 0, "erase_main_wait");
+    CHECK(pthread_mutex_unlock(&erase_lock) == 0, "erase_unlock");
+    setup(&during, &radio);
+    CHECK(during.in_buf != known_reserve, "no_reloan_during_erase");
+    clean(&during);
+    CHECK(pthread_mutex_lock(&erase_lock) == 0, "erase_lock");
+    erase_continue = true;
+    CHECK(pthread_cond_broadcast(&erase_cond) == 0, "erase_continue_signal");
+    CHECK(pthread_mutex_unlock(&erase_lock) == 0, "erase_unlock");
+    CHECK(pthread_join(threads[0], NULL) == 0, "erase_thread_join");
+    erase_gate = false;
+    CHECK(all_zero(known_reserve, MBEDTLS_SSL_IN_BUFFER_LEN), "erase_complete_before_reopen");
+    setup(&during, &radio);
+    CHECK(during.in_buf == known_reserve, "erase_reopen_reuses_slot");
+    clean(&during);
+    puts("TLS_RX_HOST_CASE parallel_ownership_and_erase_barrier");
+}
+
+int main(int argc, char **argv) {
+    CHECK(argc == 2, "case_argument");
+    if (strcmp(argv[1], "ownership") == 0) ownership();
+    else {
+        mbedtls_ssl_config radio = configuration(true);
+        known_reserve = yoradio_tls_static_rx_calloc(&radio, 1, MBEDTLS_SSL_IN_BUFFER_LEN);
+        CHECK(known_reserve != NULL, "initial_reserve_claim");
+        yoradio_tls_static_rx_free(known_reserve);
+        if (strcmp(argv[1], "rollback") == 0) rollback();
+        else if (strcmp(argv[1], "fallback") == 0) fallback();
+        else if (strcmp(argv[1], "concurrent") == 0) concurrent();
+        else CHECK(false, "known_case_argument");
+    }
+    CHECK(outstanding == 0 && allocations == releases, "final_allocator_ledger_balanced");
+    CHECK(dispatch_calls >= backend_calls - pool.released, "dispatcher_calls_recorded");
+    printf("TLS_RX_HOST_COMPLETE case=%s heap_allocations=%u heap_releases=%u\n", argv[1], allocations, releases);
+    return 0;
+}

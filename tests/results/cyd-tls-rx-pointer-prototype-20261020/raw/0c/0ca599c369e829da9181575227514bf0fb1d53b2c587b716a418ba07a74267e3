@@ -1,0 +1,105 @@
+"""Read-only current identity and scope check for unapplied host/config proof."""
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import struct
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+PREP = ROOT / '.build/cyd-tls-reserve-port-prep-01'
+HOST = HERE / 'attempt05'
+CONFIG = ROOT / '.build/cyd-tls-reserve-config-draft-01'
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def main():
+    output = HERE / 'qualification-report.json'
+    if output.exists():
+        raise ValueError('Qualification report already exists')
+    h = json.loads((HOST / 'report.json').read_text())
+    c = json.loads((CONFIG / 'report.json').read_text())
+    assert h['passed'] and c['passed']
+    assert len(h['positive_cases']) == 4 and len(h['controls']) == 7 and len(h['compile_rejections']) == 14
+    for source, record in h['inputs'].items():
+        assert sha(source) == record['sha256'] == sha(HOST / record['snapshot'])
+    for source, record in c['inputs'].items():
+        assert sha(source) == record['sha256']
+        if 'snapshot' in record:
+            assert sha(CONFIG / record['snapshot']) == record['sha256']
+    for path, digest in h['generated_inputs'].items():
+        assert sha(HOST / path) == digest
+    assert sha(HOST / 'candidate-fixed.c') == h['candidate_fix']['fixed_sha256']
+    assert h['host_tool_identities_before'] == h['host_tool_identities']
+    for path, digest in h['native_tools'].items():
+        assert sha(path) == digest
+    for command in h['commands']:
+        assert sha(HOST / (command['label'] + '.log')) == command['log_sha256']
+    for name, control in h['controls'].items():
+        if name == 'original-getter-const-rejection':
+            continue
+        log = (HOST / (name + '-' + control['scenario'] + '.log')).read_text()
+        assert log.splitlines() == ['TLS_RX_HOST_FAILURE ' + control['expected']]
+        executable = HOST / name / 'test'
+        header = executable.read_bytes()[:20]
+        assert header[:4] == b'\x7fELF' and struct.unpack('<H', header[18:20])[0] == 62
+    spec = importlib.util.spec_from_file_location('frozen_host_runner', HOST / 'inputs/runner/run-host.py')
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    sdk = Path('C:/Work/yoRadio/.idf/v6.0.2')
+    patcher_spec = importlib.util.spec_from_file_location('frozen_patcher', HOST / 'inputs/candidate/patch_cyd_tls_static_rx.py')
+    patcher = importlib.util.module_from_spec(patcher_spec)
+    patcher_spec.loader.exec_module(patcher)
+    overlay = patcher.patch((sdk / 'components/mbedtls/mbedtls/library/ssl_tls.c').read_bytes())
+    assert overlay == (HOST / 'sdk-overlay.c').read_bytes()
+    for span in h['sdk_spans']:
+        assert hashlib.sha256(runner.function(overlay, span['anchor'].encode())).hexdigest() == span['sha256']
+    ssl = (sdk / 'components/mbedtls/mbedtls/include/mbedtls/ssl.h').read_bytes()
+    expected_public = runner.function(ssl, b'static inline void mbedtls_ssl_conf_set_user_data_p(') + b'\n' + \
+        runner.function(ssl, b'static inline void *mbedtls_ssl_conf_get_user_data_p(') + b'\n'
+    assert (HOST / 'stubs/public_user_data.h').read_bytes() == expected_public
+    misc = (sdk / 'components/mbedtls/mbedtls/library/ssl_misc.h').read_bytes()
+    expected_capacity = b''.join(runner.macro(misc, name) for name in
+        ['MBEDTLS_SSL_PAYLOAD_OVERHEAD', 'MBEDTLS_SSL_IN_PAYLOAD_LEN', 'MBEDTLS_SSL_OUT_PAYLOAD_LEN',
+         'MBEDTLS_SSL_HEADER_LEN', 'MBEDTLS_SSL_IN_BUFFER_LEN', 'MBEDTLS_SSL_OUT_BUFFER_LEN'])
+    assert (HOST / 'stubs/capacity.h').read_bytes() == expected_capacity
+    assert c['configure_case_count'] == 24
+    assert all(record['passed'] for record in c['cases'].values())
+    assert Path(c['canonical_overlay']['actual']).read_bytes() == overlay
+    for name, record in c['cases'].items():
+        if name.endswith('-capture'):
+            assert record['actual'] == record['expected']
+            continue
+        assert sha(CONFIG / name / 'configure.log') == record['log_sha256']
+        assert all(sha(CONFIG / name / path) == digest for path, digest in record['generated_inputs_before'].items())
+    manifest = json.loads((PREP / 'manifest.json').read_text())
+    assert all(sha(PREP / path) == entry['sha256'] for path, entry in manifest['files'].items())
+    attempts = {}
+    for name in ('attempt01', 'attempt02', 'attempt03', 'attempt04', 'attempt05'):
+        report = HERE / name / 'report.json'
+        attempts[name] = {'report_sha256': sha(report), 'passed': json.loads(report.read_text())['passed']}
+    assert all(not attempts[name]['passed'] for name in ('attempt01', 'attempt02', 'attempt03', 'attempt04'))
+    result = {'passed': True, 'scope': __doc__, 'host_report_sha256': sha(HOST / 'report.json'),
+              'configure_report_sha256': sha(CONFIG / 'report.json'),
+              'candidate_sha256': sha(HOST / 'candidate-fixed.c'), 'prep01_manifest_sha256': sha(PREP / 'manifest.json'),
+              'exact_current_sdk_spans_public_inline_and_macro_inputs': True,
+              'named_controls_exactly_detected': 6, 'erase_control_phase_scoped': True,
+              'host_runtime_positive_groups': 4, 'invalid_compile_configs': 14,
+              'actual_project_none_configurations': 24, 'attempts': attempts,
+              'processes': {'68509': {'attempt': '03', 'terminal_exit': 1},
+                            '67194': {'attempt': '04', 'terminal_exit': 1},
+                            '46216': {'attempt': '05', 'terminal_exit': 0},
+                            '75428': {'attempt': 'config01', 'terminal_exit': 0}},
+              'pending': ['production implementation', 'supporting-source guard enforcement', 'real target header/ABI/capacity ownership/OOM gate',
+                          'actual audio-service binding and cooperative cancellation', 'canonical lint and application exports',
+                          'physical protocol/resources and reservation usefulness/default decision']}
+    output.write_bytes((json.dumps(result, indent=2) + '\n').encode())
+    print(json.dumps({'passed': True, 'qualification_sha256': sha(output),
+                      'host_report_sha256': result['host_report_sha256'], 'config_report_sha256': result['configure_report_sha256']}))
+
+
+if __name__ == '__main__':
+    main()

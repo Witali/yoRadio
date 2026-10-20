@@ -1,0 +1,18 @@
+#pragma once
+
+#include <stddef.h>
+#include "esp_err.h"
+#include "mbedtls/ssl.h"
+
+/* UNAPPLIED PROPOSAL. Only the radio's existing certificate-bundle callback
+ * should use this wrapper. Other configs, including occupied user-data, retain
+ * ordinary SDK allocation. Authentication and attach return values are retained. */
+esp_err_t native_tls_rx_reserve_crt_bundle_attach(void *configuration);
+
+/* Called only by the exact audited static RX allocation and release sites in
+ * the build-local ssl_tls.c overlay. This is a NEW ownership contract. The
+ * process-wide SDK calloc/free dispatcher remains installed and unchanged. */
+void *yoradio_tls_static_rx_calloc(const mbedtls_ssl_config *configuration,
+                                 size_t count, size_t bytes);
+void yoradio_tls_static_rx_free(void *pointer);
+void yoradio_tls_static_rx_zeroize_free(void *pointer, size_t bytes);

@@ -1,0 +1,55 @@
+{
+  "runner_session": 14586,
+  "runner_terminal_exit": 1,
+  "observed_utc": "2026-10-20 13:20:41 UTC",
+  "report_sha256": "d4b6e019c0dcf1eaa59ca6f10f32be7d995fa82be2402fdb92ef8d9833561efc",
+  "accepted_variants": [
+    "canonical",
+    "skip-marker",
+    "skip-exclusive",
+    "skip-rollback",
+    "early-publish-phase",
+    "ordinary-free-static"
+  ],
+  "executed_qemu_variants": [
+    "canonical-qemu",
+    "skip-marker-qemu",
+    "skip-exclusive-qemu",
+    "skip-rollback-qemu",
+    "early-publish-phase-qemu",
+    "ordinary-free-static-qemu",
+    "bypass-reclaim-qemu"
+  ],
+  "not_executed": [
+    "canonical-reclaim-off",
+    "reserve-off-reclaim-on",
+    "reserve-off-reclaim-off"
+  ],
+  "last_control": {
+    "name": "bypass-reclaim",
+    "expected_semantic_marker_observed": true,
+    "controlled_stop_observed": true,
+    "generic_panic_after_marker": true,
+    "accepted_as_pass": false,
+    "log_sha256": "bc328e4c32c4f2e10173759ec7cb0d1e094bd1063da8d7819d5b52976ea8bbc7",
+    "nm_sha256": "4149a435289015a6c3eb6e74cf56f6a046aed25e81281924f269b2f06428e06c",
+    "resolved_chain": [
+      "lock_init_generic+0x17",
+      "lock_acquire_generic",
+      "_lock_acquire",
+      "get_adjusted_boot_time",
+      "_gettimeofday_r",
+      "gettimeofday",
+      "esp_sync_timekeeping_timers",
+      "esp_restart",
+      "fixture require"
+    ]
+  },
+  "superseding_review": {
+    "gap": "Public pointer userdata getter is undefined after numeric setter; old tests cover pointer userdata only",
+    "candidate_production_integrated": false,
+    "next": "userdata-free config identity registry with exact SDK lifecycle revocation and numeric/pointer regression tests"
+  },
+  "old_evidence_unchanged": true,
+  "restart_performed": false
+}

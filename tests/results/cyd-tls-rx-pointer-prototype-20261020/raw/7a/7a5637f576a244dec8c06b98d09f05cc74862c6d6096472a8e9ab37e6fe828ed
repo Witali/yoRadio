@@ -1,0 +1,9 @@
+source "$RX_RESERVE_PRODUCTION_KCONFIG"
+
+config YORADIO_TLS_STATIC_RX_RESERVE
+    bool "Isolated full-record static radio RX reserve candidate"
+    depends on IDF_TARGET_ESP32 && ESP_TLS_USING_MBEDTLS
+    depends on MBEDTLS_INTERNAL_MEM_ALLOC && !MBEDTLS_CUSTOM_MEM_ALLOC
+    depends on MBEDTLS_CERTIFICATE_BUNDLE && !MBEDTLS_DYNAMIC_BUFFER
+    depends on !MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH
+    default y

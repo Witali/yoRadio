@@ -1,0 +1,361 @@
+/* UNBUILT PREPARATION. Actual SDK APIs; no TCP, radio or private SSL fields. */
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include "sdkconfig.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
+#include "esp_crt_bundle.h"
+#include "esp_heap_caps.h"
+#include "esp_system.h"
+#include "mbedtls/platform.h"
+#include "mbedtls/platform_util.h"
+#include "mbedtls/ssl.h"
+#include "ssl_misc.h"
+#include "native_tls_rx_reserve.h"
+#include "native_input_reclaim.h"
+
+typedef struct {
+    const mbedtls_ssl_config *configuration;
+    void *pointer;
+    size_t bytes;
+    unsigned calls;
+    int core;
+} rx_trace_t;
+static portMUX_TYPE s_trace_lock = portMUX_INITIALIZER_UNLOCKED;
+static rx_trace_t s_traces[32];
+static void *s_reserve;
+static bool s_injection, s_pressure, s_erase_arm;
+static TaskHandle_t s_injection_task, s_pressure_task;
+static unsigned s_heap_ordinal, s_inject_at, s_injected_nulls;
+static unsigned s_real_nulls, s_real_recoveries;
+static size_t s_last_failed_count, s_last_failed_bytes;
+static SemaphoreHandle_t s_worker_start, s_worker_done, s_erase_entered, s_erase_resume;
+static void *s_pressure_blocks[256];
+
+static void require(bool condition, const char *name) {
+    if (condition) return;
+    printf("TLS_RX_TARGET_FAILURE %s\nTLS_RX_TARGET_CONTROLLED_STOP\n", name);
+    fflush(stdout);
+    esp_restart();
+    for (;;) vTaskDelay(portMAX_DELAY);
+}
+static void integrity(const char *name) {
+    require(heap_caps_check_integrity_all(true), name);
+}
+static bool zeroed(const void *pointer, size_t bytes) {
+    const unsigned char *data = pointer;
+    for (size_t index = 0; index < bytes; ++index) if (data[index]) return false;
+    return true;
+}
+void *__real_yoradio_tls_static_rx_calloc(const mbedtls_ssl_config *, size_t, size_t);
+void *__wrap_yoradio_tls_static_rx_calloc(const mbedtls_ssl_config *configuration,
+                                         size_t count, size_t bytes) {
+    void *result = __real_yoradio_tls_static_rx_calloc(configuration, count, bytes);
+    portENTER_CRITICAL(&s_trace_lock);
+    unsigned slot;
+    for (slot = 0; slot < 32; ++slot)
+        if (!s_traces[slot].configuration || s_traces[slot].configuration == configuration) break;
+    if (slot < 32) {
+        s_traces[slot] = (rx_trace_t){configuration, result, bytes,
+            s_traces[slot].calls + 1U, xPortGetCoreID()};
+    }
+    portEXIT_CRITICAL(&s_trace_lock);
+    require(slot < 32, "allocation_trace_capacity");
+    return result;
+}
+static rx_trace_t trace(const mbedtls_ssl_config *configuration) {
+    rx_trace_t result = {0};
+    portENTER_CRITICAL(&s_trace_lock);
+    for (unsigned slot = 0; slot < 32; ++slot)
+        if (s_traces[slot].configuration == configuration) result = s_traces[slot];
+    portEXIT_CRITICAL(&s_trace_lock);
+    return result;
+}
+void *__real_heap_caps_calloc(size_t, size_t, uint32_t);
+void *__wrap_heap_caps_calloc(size_t count, size_t bytes, uint32_t caps) {
+    TaskHandle_t task = xTaskGetCurrentTaskHandle();
+    portENTER_CRITICAL(&s_trace_lock);
+    bool inject = s_injection && s_injection_task == task && ++s_heap_ordinal == s_inject_at;
+    if (inject) ++s_injected_nulls;
+    bool observing = s_pressure && s_pressure_task == task;
+    portEXIT_CRITICAL(&s_trace_lock);
+    /* The injected branch is explicitly NOT real allocator exhaustion proof. */
+    void *result = inject ? NULL : __real_heap_caps_calloc(count, bytes, caps);
+    if (observing && !inject) {
+        portENTER_CRITICAL(&s_trace_lock);
+        if (!result) {
+            ++s_real_nulls;
+            s_last_failed_count = count; s_last_failed_bytes = bytes;
+        } else if (s_real_nulls && s_last_failed_count == count && s_last_failed_bytes == bytes) {
+            ++s_real_recoveries;
+        }
+        portEXIT_CRITICAL(&s_trace_lock);
+    }
+    return result;
+}
+void __real_heap_caps_free(void *);
+void __wrap_heap_caps_free(void *pointer) {
+    require(!pointer || pointer != s_reserve, "reserved_pointer_never_sdk_heap_free");
+    __real_heap_caps_free(pointer);
+}
+void __real_mbedtls_platform_zeroize(void *, size_t);
+void __wrap_mbedtls_platform_zeroize(void *pointer, size_t bytes) {
+    portENTER_CRITICAL(&s_trace_lock);
+    bool wait = s_erase_arm && pointer == s_reserve;
+    portEXIT_CRITICAL(&s_trace_lock);
+    if (wait) {
+        xSemaphoreGive(s_erase_entered);
+        require(xSemaphoreTake(s_erase_resume, pdMS_TO_TICKS(5000)) == pdTRUE, "erase_resume_timeout");
+    }
+    __real_mbedtls_platform_zeroize(pointer, bytes);
+}
+/* Control-only candidate copies may call this phase predicate. Canonical
+ * candidate never calls it. This is not a production hook. */
+int tls_reserve_test_erase_phase(void) {
+    portENTER_CRITICAL(&s_trace_lock);
+    bool result = s_erase_arm;
+    portEXIT_CRITICAL(&s_trace_lock);
+    return result;
+}
+
+static void configure(mbedtls_ssl_config *configuration, bool radio) {
+    mbedtls_ssl_config_init(configuration);
+    require(mbedtls_ssl_config_defaults(configuration, MBEDTLS_SSL_IS_CLIENT,
+        MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT) == 0, "configuration_defaults");
+    require((radio ? native_tls_rx_reserve_crt_bundle_attach(configuration) :
+             esp_crt_bundle_attach(configuration)) == ESP_OK, "actual_certificate_bundle_attach");
+}
+static void setup(mbedtls_ssl_context *context, const mbedtls_ssl_config *configuration) {
+    mbedtls_ssl_init(context);
+    require(mbedtls_ssl_setup(context, configuration) == 0, "actual_sdk_setup_success");
+    rx_trace_t result = trace(configuration);
+    require(result.pointer && result.bytes == MBEDTLS_SSL_IN_BUFFER_LEN, "actual_sdk_full_record_capacity");
+}
+static void cleanup(mbedtls_ssl_context *context) {
+    mbedtls_ssl_free(context);
+    mbedtls_ssl_free(context);
+}
+static void ownership_and_rollback(void) {
+    mbedtls_ssl_config radio, ordinary, occupied;
+    configure(&radio, true);
+    s_reserve = yoradio_tls_static_rx_calloc(&radio, 1, MBEDTLS_SSL_IN_BUFFER_LEN);
+    require(s_reserve != NULL, "initial_reserved_pointer");
+    yoradio_tls_static_rx_free(s_reserve);
+    configure(&ordinary, false);
+    mbedtls_ssl_context context, second;
+    setup(&context, &ordinary);
+    require(trace(&ordinary).pointer != s_reserve, "unlabelled_client_ordinary_rx");
+    cleanup(&context);
+    configure(&occupied, false);
+    int marker;
+    mbedtls_ssl_conf_set_user_data_p(&occupied, &marker);
+    require(native_tls_rx_reserve_crt_bundle_attach(&occupied) == ESP_OK &&
+        mbedtls_ssl_conf_get_user_data_p(&occupied) == &marker, "occupied_userdata_preserved");
+    setup(&context, &occupied);
+    require(trace(&occupied).pointer != s_reserve, "occupied_client_ordinary_rx");
+    cleanup(&context);
+    setup(&context, &radio);
+    require(trace(&radio).pointer == s_reserve, "radio_reserved_rx");
+    configure(&occupied, true);
+    setup(&second, &occupied);
+    require(trace(&occupied).pointer != trace(&radio).pointer, "independent_context_rx_no_alias");
+    cleanup(&second);
+    memset(s_reserve, 0x9a, MBEDTLS_SSL_IN_BUFFER_LEN);
+    require(mbedtls_ssl_session_reset(&context) == 0, "actual_sdk_session_reset");
+    require(trace(&radio).pointer == s_reserve && zeroed(s_reserve, MBEDTLS_SSL_IN_BUFFER_LEN),
+        "session_reset_retains_full_rx");
+    cleanup(&context);
+    require(zeroed(s_reserve, MBEDTLS_SSL_IN_BUFFER_LEN), "erase_complete_before_reopen");
+    for (unsigned cycle = 0; cycle < 16; ++cycle) {
+        setup(&context, &radio);
+        require(trace(&radio).pointer == s_reserve, "reopen_reserved_rx");
+        cleanup(&context);
+    }
+    for (unsigned ordinal = 1; ordinal <= 4; ++ordinal) {
+        mbedtls_ssl_init(&context);
+        portENTER_CRITICAL(&s_trace_lock);
+        s_injection = true; s_injection_task = xTaskGetCurrentTaskHandle();
+        s_heap_ordinal = 0; s_inject_at = ordinal;
+        unsigned prior = s_injected_nulls;
+        portEXIT_CRITICAL(&s_trace_lock);
+        int result = mbedtls_ssl_setup(&context, &radio);
+        portENTER_CRITICAL(&s_trace_lock);
+        s_injection = false;
+        unsigned injected = s_injected_nulls;
+        portEXIT_CRITICAL(&s_trace_lock);
+        require(result == MBEDTLS_ERR_SSL_ALLOC_FAILED && injected == prior + 1,
+            "scoped_injection_setup_rollback");
+        void *again = yoradio_tls_static_rx_calloc(&radio, 1, MBEDTLS_SSL_IN_BUFFER_LEN);
+        require(again == s_reserve, "rollback_returns_slot");
+        yoradio_tls_static_rx_free(again);
+        cleanup(&context);
+    }
+    mbedtls_ssl_config_free(&occupied);
+    mbedtls_ssl_config_free(&ordinary);
+    mbedtls_ssl_config_free(&radio);
+    integrity("ownership_rollback_heap_integrity");
+    printf("TLS_RX_TARGET_CASE ownership_rollback_reopen injected_nulls=%u real_oom_claim=0\n", s_injected_nulls);
+}
+
+typedef struct {
+    mbedtls_ssl_config configuration;
+    mbedtls_ssl_context context;
+    bool release;
+} worker_t;
+static worker_t s_worker;
+static void core_one_worker(void *unused) {
+    (void)unused;
+    for (;;) {
+        xSemaphoreTake(s_worker_start, portMAX_DELAY);
+        require(xPortGetCoreID() == 1, "worker_core_one");
+        if (s_worker.release) cleanup(&s_worker.context);
+        else setup(&s_worker.context, &s_worker.configuration);
+        xSemaphoreGive(s_worker_done);
+    }
+}
+static void wait_worker(void) {
+    require(xSemaphoreTake(s_worker_done, pdMS_TO_TICKS(8000)) == pdTRUE, "worker_completion_timeout");
+}
+static void smp_and_erase(void) {
+    mbedtls_ssl_config radio;
+    configure(&radio, true);
+    configure(&s_worker.configuration, true);
+    mbedtls_ssl_context context;
+    s_worker.release = false;
+    xSemaphoreGive(s_worker_start);
+    setup(&context, &radio);
+    wait_worker();
+    void *left = trace(&radio).pointer, *right = trace(&s_worker.configuration).pointer;
+    require(left != right && ((left == s_reserve) != (right == s_reserve)),
+        "parallel_configs_exactly_one_reserve");
+    cleanup(&context);
+    s_worker.release = true; xSemaphoreGive(s_worker_start); wait_worker();
+    s_worker.release = false; xSemaphoreGive(s_worker_start); wait_worker();
+    require(trace(&s_worker.configuration).pointer == s_reserve, "core_one_handover_claim");
+    memset(s_reserve, 0xa6, MBEDTLS_SSL_IN_BUFFER_LEN);
+    portENTER_CRITICAL(&s_trace_lock); s_erase_arm = true; portEXIT_CRITICAL(&s_trace_lock);
+    s_worker.release = true; xSemaphoreGive(s_worker_start);
+    require(xSemaphoreTake(s_erase_entered, pdMS_TO_TICKS(5000)) == pdTRUE, "erase_barrier_entered");
+    setup(&context, &radio);
+    require(trace(&radio).pointer != s_reserve, "no_reloan_during_erase");
+    cleanup(&context);
+    xSemaphoreGive(s_erase_resume);
+    wait_worker();
+    portENTER_CRITICAL(&s_trace_lock); s_erase_arm = false; portEXIT_CRITICAL(&s_trace_lock);
+    require(zeroed(s_reserve, MBEDTLS_SSL_IN_BUFFER_LEN), "erase_complete_before_reopen");
+    setup(&context, &radio);
+    require(trace(&radio).pointer == s_reserve, "core_zero_handover_after_erase");
+    cleanup(&context);
+    mbedtls_ssl_config_free(&s_worker.configuration);
+    mbedtls_ssl_config_free(&radio);
+    integrity("smp_heap_integrity");
+    puts("TLS_RX_TARGET_CASE smp_ownership_handover_erase cores=0,1");
+}
+
+static unsigned heap_pressure(void) {
+    unsigned count = 0;
+    const size_t sizes[] = {4096, 512, 64};
+    for (unsigned index = 0; index < 3; ++index) {
+        while (count < 256) {
+            void *block = heap_caps_malloc(sizes[index], MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+            if (!block) break;
+            s_pressure_blocks[count++] = block;
+        }
+    }
+    require(count < 256, "pressure_pointer_capacity");
+    return count;
+}
+static void release_pressure(unsigned count) {
+    for (unsigned index = 0; index < count; ++index) {
+        heap_caps_free(s_pressure_blocks[index]); s_pressure_blocks[index] = NULL;
+    }
+}
+static void actual_heap_cases(void) {
+    mbedtls_ssl_config radio;
+    configure(&radio, true);
+    mbedtls_ssl_context context;
+    unsigned blocks = heap_pressure();
+    portENTER_CRITICAL(&s_trace_lock);
+    s_pressure = true; s_pressure_task = xTaskGetCurrentTaskHandle(); s_real_nulls = 0; s_real_recoveries = 0;
+    portEXIT_CRITICAL(&s_trace_lock);
+    mbedtls_ssl_init(&context);
+    int result = mbedtls_ssl_setup(&context, &radio);
+    portENTER_CRITICAL(&s_trace_lock); s_pressure = false; unsigned nulls = s_real_nulls; portEXIT_CRITICAL(&s_trace_lock);
+    require(trace(&radio).pointer == s_reserve && result == MBEDTLS_ERR_SSL_ALLOC_FAILED && nulls > 0,
+        "real_heap_exhaustion_after_reserved_rx");
+    cleanup(&context);
+    release_pressure(blocks);
+    setup(&context, &radio);
+    require(trace(&radio).pointer == s_reserve, "real_oom_rollback_returns_slot");
+    cleanup(&context);
+    integrity("real_oom_heap_integrity");
+    printf("TLS_RX_TARGET_CASE real_oom_reserved_rx blocks=%u actual_backend_nulls=%u\n", blocks, nulls);
+
+#if CONFIG_YORADIO_TLS_INPUT_RECLAIM
+    adaptive_input_t *input = adaptive_input_create(8U * 16384U, 4U * 16384U, 16384U);
+    require(input && native_input_reclaim_bind(input), "actual_input_reclaim_bind");
+    void *reading, *ready, *writing;
+    require(adaptive_input_acquire(input, &reading, 16, 0) == pdTRUE, "input_reading_acquire");
+    memset(reading, 0xa5, 16); require(adaptive_input_commit(input, reading) == pdTRUE, "input_reading_commit");
+    require(adaptive_input_acquire(input, &ready, 16, 0) == pdTRUE, "input_ready_acquire");
+    memset(ready, 0x5a, 16); require(adaptive_input_commit(input, ready) == pdTRUE, "input_ready_commit");
+    size_t received;
+    require(adaptive_input_receive(input, &received, 0) == reading && received == 16, "input_reading_receive");
+    require(adaptive_input_acquire(input, &writing, 16, 0) == pdTRUE, "input_writing_acquire");
+    memset(writing, 0x33, 16);
+    void *held = yoradio_tls_static_rx_calloc(&radio, 1, MBEDTLS_SSL_IN_BUFFER_LEN);
+    require(held == s_reserve, "reclaim_holder_reserved");
+    blocks = heap_pressure();
+    portENTER_CRITICAL(&s_trace_lock);
+    s_pressure = true; s_pressure_task = xTaskGetCurrentTaskHandle(); s_real_nulls = 0; s_real_recoveries = 0;
+    portEXIT_CRITICAL(&s_trace_lock);
+    /* This call must first receive an actual unchanged heap allocator NULL,
+     * then pass through canonical reclaim and recover the same request. */
+    void *ordinary = yoradio_tls_static_rx_calloc(&radio, 1, MBEDTLS_SSL_IN_BUFFER_LEN);
+    portENTER_CRITICAL(&s_trace_lock);
+    s_pressure = false; nulls = s_real_nulls; unsigned recoveries = s_real_recoveries;
+    portEXIT_CRITICAL(&s_trace_lock);
+    adaptive_input_stats_t stats = adaptive_input_stats(input);
+    require(ordinary && ordinary != held && nulls > 0 && recoveries > 0 && stats.released > 0,
+        "busy_slot_reclaim_retry_preserved");
+    require(stats.resident >= stats.minimum && stats.minimum == 4 && stats.target == 8 &&
+        stats.ready == 1 && stats.reading == 1 && stats.writing == 1,
+        "actual_reclaim_floor_and_leases_preserved");
+    for (unsigned index = 0; index < 16; ++index)
+        require(((unsigned char *)reading)[index] == 0xa5 && ((unsigned char *)ready)[index] == 0x5a &&
+            ((unsigned char *)writing)[index] == 0x33, "actual_reclaim_payloads_preserved");
+    yoradio_tls_static_rx_zeroize_free(ordinary, MBEDTLS_SSL_IN_BUFFER_LEN);
+    release_pressure(blocks);
+    yoradio_tls_static_rx_free(held);
+    require(adaptive_input_return(input, reading) && adaptive_input_cancel(input, writing), "input_lease_cleanup");
+    require(adaptive_input_receive(input, &received, 0) == ready && adaptive_input_return(input, ready), "input_ready_cleanup");
+    require(native_input_reclaim_detach(input) == NATIVE_INPUT_RECLAIM_DETACHED, "actual_reclaim_detach");
+    adaptive_input_destroy(input);
+    integrity("reclaim_coexistence_heap_integrity");
+    printf("TLS_RX_TARGET_CASE actual_reclaim_recovery real_nulls=%u recoveries=%u released=%u min=4 target=8\n",
+        nulls, recoveries, stats.released);
+#endif
+    mbedtls_ssl_config_free(&radio);
+}
+
+void app_main(void) {
+    puts("TLS_RX_TARGET_ENTRY unbuilt_candidate_fixture=1");
+    s_worker_start = xSemaphoreCreateBinary(); s_worker_done = xSemaphoreCreateBinary();
+    s_erase_entered = xSemaphoreCreateBinary(); s_erase_resume = xSemaphoreCreateBinary();
+    require(s_worker_start && s_worker_done && s_erase_entered && s_erase_resume, "fixture_semaphore_creation");
+    require(xTaskCreatePinnedToCore(core_one_worker, "tls_rx_worker", 6144, NULL, 3, NULL, 1) == pdPASS,
+        "fixture_core_one_task_creation");
+    require(xPortGetCoreID() == 0, "coordinator_core_zero");
+    printf("TLS_RX_TARGET_CAPACITY content=%u storage=%u pointer_alignment=%u\n",
+        (unsigned)MBEDTLS_SSL_IN_CONTENT_LEN, (unsigned)MBEDTLS_SSL_IN_BUFFER_LEN, (unsigned)_Alignof(max_align_t));
+    ownership_and_rollback();
+    smp_and_erase();
+    actual_heap_cases();
+    integrity("final_heap_integrity");
+    puts("TLS_RX_TARGET_COMPLETE canonical_candidate=1 production_radio=0 physical_benefit=0");
+    fflush(stdout);
+    esp_restart();
+}

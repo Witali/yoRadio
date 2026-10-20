@@ -1,0 +1,113 @@
+"""Pure packager preparation checks; never collect/seal a live target report."""
+import ast
+import copy
+import importlib.util
+from pathlib import Path
+import subprocess
+import sys
+
+import build_archive as b
+from archive_core import Collector, encode, hashfile, load, require
+
+
+def main():
+    out = b.HERE / 'prep-check-02'
+    require(not out.exists(), 'Preserve existing preparation check')
+    out.mkdir()
+    files = ('archive_core.py', 'build_archive.py', 'verify.py', 'SPEC.md', 'README.template.md', 'HOST.template.md', 'check-prep.py')
+    before = {name: hashfile(b.HERE / name) for name in files}
+    report = {'passed': False, 'scope': 'Packager preparation only; no final live JSON binding, SDK/QEMU/Git or archive action', 'scripts_sha256': before, 'checks': []}
+    try:
+        require(not b.OUT.exists(), 'Archive absent until later root permission')
+        for name in files:
+            if name.endswith('.py'):
+                ast.parse((b.HERE / name).read_text(encoding='utf-8'))
+        report['checks'].append('Python AST')
+        done = subprocess.run([sys.executable, '-B', str(b.HERE / 'build_archive.py'), '--help'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=20)
+        (out / 'help.log').write_bytes(done.stdout)
+        require(done.returncode == 0, 'CLI help')
+        report['checks'].append('CLI help creates no archive or attempt')
+        require(hashfile(b.PREP / 'manifest.json') == b.PREP_MANIFEST, 'Full exact immutable prep02 manifest')
+        for name, (path, digest) in b.PINS.items():
+            require(hashfile(path) == digest, 'Existing immutable ' + name)
+        report['checks'].append('Immutable host/config/prep pins only')
+        synthetic = {'passed': True, 'full_target_matrix_complete': True, 'all_current_inputs_match': True,
+                     'compile_only': False, 'production_integration': False, 'physical_benefit_claimed': False,
+                     'network_or_device': False, 'candidate_sha256': b.CANDIDATE,
+                     'variants': {name: {'passed': True, **({'exact_semantic_failure': b.FAILURES[name]} if name in b.FAILURES else {})} for name in b.VARIANTS}, 'commands': []}
+        for name in b.VARIANTS:
+            build = ['pwsh', '-CampaignDirectory', name]
+            if name.startswith('reserve-off-'):
+                build.append('-DisableReserve')
+            if name in ('canonical-reclaim-off', 'reserve-off-reclaim-off'):
+                build.append('-DisableReclaim')
+            synthetic['commands'].extend([{'label': name + '-build', 'argv': build, 'terminal_exit': 0, 'timed_out': False},
+                                          {'label': name + '-qemu', 'argv': ['qemu', '-smp', '2', '-nic', 'none', '-snapshot', '-no-reboot'], 'terminal_exit': 0, 'timed_out': False}])
+        b.terminal_contract(synthetic)
+        mutations = [('live-incomplete', lambda row: row.update(passed=False)), ('missing-variant', lambda row: row['variants'].pop('skip-marker')),
+                     ('wrong-control', lambda row: row['variants']['skip-marker'].update(exact_semantic_failure='unrelated')),
+                     ('timeout', lambda row: row['commands'][0].update(timed_out=True)),
+                     ('failed-child', lambda row: row['commands'][0].update(terminal_exit=1)),
+                     ('missing-real-build', lambda row: row['commands'].pop(0)),
+                     ('wrong-option-build', lambda row: row['commands'][0]['argv'].append('-DisableReserve')),
+                     ('unicore', lambda row: row['commands'][1]['argv'].__setitem__(2, '1'))]
+        for name, change in mutations:
+            row = copy.deepcopy(synthetic)
+            change(row)
+            try:
+                b.terminal_contract(row)
+            except ValueError:
+                pass
+            else:
+                raise ValueError('Terminal contract accepted negative: ' + name)
+        report['checks'].append('Eight rejecting synthetic final-report contracts')
+        spec = importlib.util.spec_from_file_location('reserve_offline_verifier', b.HERE / 'verify.py')
+        verifier = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(verifier)
+        for name, marker in b.FAILURES.items():
+            log = 'TLS_RX_TARGET_ENTRY unbuilt_candidate_fixture=1\nTLS_RX_TARGET_FAILURE ' + marker + '\nTLS_RX_TARGET_CONTROLLED_STOP\n'
+            verifier.runtime_oracle(name, log, True, True)
+            for bad in (log + 'TLS_RX_TARGET_FAILURE unrelated\n', log + 'abort()\n', log.replace(marker, 'unrelated')):
+                try:
+                    verifier.runtime_oracle(name, bad, True, True)
+                except ValueError:
+                    pass
+                else:
+                    raise ValueError('Semantic oracle accepted duplicate/generic/wrong marker')
+        report['checks'].append('Six exact runtime markers plus18 rejection controls')
+        # Root reported canonical runtime terminal PASS. Read only that completed
+        # variant for schema/decoder compatibility; never inspect/bind live parent
+        # report.json or pending variant logs as a final qualification.
+        campaign = b.TARGET / 'campaigns/canonical'
+        bundle = load(campaign / 'execution/execution-bundle.json')
+        desc = load(campaign / 'working-build/project_description.json')
+        elf = campaign / 'execution/artifacts' / desc['app_elf']
+        asm = sorted(b.TARGET.glob('canonical-asm-*.log'))
+        metadata = b.elf_details(elf, b.TARGET / 'canonical-nm.log', asm)
+        symbols = {}
+        for line in (b.TARGET / 'canonical-nm.log').read_text().splitlines():
+            fields = line.split()
+            if len(fields) == 4:
+                symbols[fields[3]] = int(fields[0], 16)
+        setup = verifier.trace((b.TARGET / 'canonical-asm-mbedtls_ssl_setup.log').read_text(), metadata['words'])
+        free = verifier.trace((b.TARGET / 'canonical-asm-mbedtls_ssl_free.log').read_text(), metadata['words'])
+        require(symbols['__wrap_yoradio_tls_static_rx_calloc'] in setup and symbols['yoradio_tls_static_rx_free'] in setup and symbols['yoradio_tls_static_rx_zeroize_free'] in free, 'Completed canonical actual ownership call decoder')
+        verifier.runtime_oracle('canonical', (b.TARGET / 'canonical-qemu.log').read_text().replace('\r\n', '\n'), True, True)
+        collector = Collector()
+        require(collector.add(elf, 'ELF omission schema')['disposition'] == 'omitted' and not collector.files, 'Do not copy ELF')
+        linux = collector.reported_tool('/usr/bin/reported-only-tool', 'a' * 64)
+        require(linux['bytes'] is None and linux['observed_bytes'] is False, 'No invented Linux tool observation')
+        report['checks'].append('Completed canonical decoder/schema and truthful omissions; not final matrix proof')
+        require(all(hashfile(b.HERE / name) == digest for name, digest in before.items()) and not b.OUT.exists(), 'Prep source stable/no archive')
+        report.update(passed=True, archive_written=False, final_matrix_report_bound=False, target_sdk_qemu_git_processes_invoked=False,
+                      candidate_sha256=b.CANDIDATE, canonical_schema_elf_sha256=metadata['elf_sha256'])
+    except BaseException as error:
+        report['error'] = type(error).__name__ + ': ' + str(error)
+        (out / 'report.json').write_bytes(encode(report))
+        raise
+    (out / 'report.json').write_bytes(encode(report))
+    print(encode({'passed': True, 'checks': len(report['checks']), 'report_sha256': hashfile(out / 'report.json'), 'archive_written': False}).decode())
+
+
+if __name__ == '__main__':
+    main()

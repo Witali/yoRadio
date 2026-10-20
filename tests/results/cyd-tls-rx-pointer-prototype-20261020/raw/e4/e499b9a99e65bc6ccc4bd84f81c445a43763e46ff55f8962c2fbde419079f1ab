@@ -1,0 +1,76 @@
+"""Bind current unbuilt target preparation and previous immutable software gates."""
+import hashlib
+import json
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def main():
+    if (HERE / 'readiness.json').exists() or (HERE / 'manifest.json').exists():
+        raise ValueError('Readiness already frozen')
+    guard_path = HERE / 'guard-checks-01/report.json'
+    freeze_path = ROOT / '.build/cyd-tls-reserve-target-matrix-freeze-check-01/report.json'
+    guard = json.loads(guard_path.read_text())
+    freeze = json.loads(freeze_path.read_text())
+    assert guard['passed'] and len(guard['guard_cases']) == 22
+    assert all(sha(path) == digest for path, digest in guard['proposal_sources'].items())
+    assert freeze['preparation_passed'] and not freeze['passed'] and freeze['status'] == 'frozen_unbuilt_unrun'
+    assert not freeze['target_build_invoked'] and not freeze['qemu_invoked']
+    assert len(freeze['frozen_campaign_manifests']) == 10
+    for path, digest in freeze['frozen_campaign_manifests'].items():
+        assert sha(path) == digest
+        manifest = json.loads(Path(path).read_text())
+        assert all(sha(Path(path).parent / name) == checksum for name, checksum in manifest['frozen_sources'].items())
+    for original, entry in freeze['inputs'].items():
+        assert sha(original) == entry['sha256'] == sha(freeze_path.parent / entry['snapshot'])
+    assert all(sha(path) == digest for path, digest in freeze['tools'].items())
+    parser = json.loads((HERE / 'launcher-parser-current.json').read_text())
+    assert parser['terminal_exit'] == 0 and parser['result']['passed']
+    assert sha(HERE / 'sdk-build.ps1') == parser['result']['sdk_launcher_sha256']
+    prior = {}
+    for relative in ['.build/cyd-tls-reserve-host-draft-01/qualification-report.json',
+                     '.build/cyd-tls-reserve-host-draft-01/attempt05/report.json',
+                     '.build/cyd-tls-reserve-config-draft-01/report.json']:
+        path = ROOT / relative
+        report = json.loads(path.read_text())
+        assert report['passed']
+        prior[str(path)] = sha(path)
+        for original, entry in report.get('inputs', {}).items():
+            assert sha(original) == entry['sha256']
+            if 'snapshot' in entry:
+                assert sha(path.parent / entry['snapshot']) == entry['sha256']
+    result = {'ready_for_root_review': True, 'status': 'prepared_unbuilt_unrun_no_target_qualification',
+        'target_compilation_performed': False, 'qemu_performed': False, 'sdk_export_or_configure_performed': False,
+        'candidate_equals_passing_host_copy': sha(HERE / 'candidate/native_tls_rx_reserve.c') ==
+            '77db50af0ff65dfa333b28584b48632c625d999984e7ff8fffd48cb0e52cdb0f',
+        'offline_guard_cases': 22, 'frozen_variant_count': 10,
+        'full_option_matrix_planned': ['reserve on/reclaim on', 'reserve on/reclaim off',
+                                      'reserve off/reclaim on', 'reserve off/reclaim off'],
+        'guard_report_sha256': sha(guard_path), 'freeze_only_report': str(freeze_path),
+        'freeze_only_report_sha256': sha(freeze_path), 'prior_immutable_passing_gates': prior,
+        'runner_sha256': sha(HERE / 'run-target.py'),
+        'source_manifest_hashes': freeze['frozen_campaign_manifests'],
+        'next_after_root_review': [
+            'python -B .build/cyd-tls-reserve-target-prep-02/run-target.py --output .build/cyd-tls-reserve-target-compile-01 --variants canonical --compile-only',
+            'python -B .build/cyd-tls-reserve-target-prep-02/run-target.py --output .build/cyd-tls-reserve-target-runtime-01'],
+        'pending': ['actual target compilation/header/ABI/allocator/capacity/runtime proof',
+            'full ten-variant target gate including four real option combinations', 'production integration', 'actual audio-service binding/cancellation',
+            'canonical lint and firmware application matrix', 'physical full-record protocol/resource/usefulness/default decisions']}
+    assert result['candidate_equals_passing_host_copy']
+    (HERE / 'readiness.json').write_bytes((json.dumps(result, indent=2) + '\n').encode())
+    files = {path.relative_to(HERE).as_posix(): {'bytes': path.stat().st_size, 'sha256': sha(path)}
+             for path in sorted(HERE.rglob('*')) if path.is_file() and path.name != 'manifest.json'}
+    (HERE / 'manifest.json').write_bytes((json.dumps({'scope': 'unbuilt_target_preparation_only', 'files': files}, indent=2) + '\n').encode())
+    print(json.dumps({'ready_for_root_review': True, 'target_build_or_qemu': False,
+        'readiness_sha256': sha(HERE / 'readiness.json'), 'manifest_sha256': sha(HERE / 'manifest.json'),
+        'files': len(files)}))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,43 @@
+{
+  "status": "unrun_plan_for_unapplied_candidate",
+  "scope": "Classic ESP32 CYD IDF6.0.2 static full-record radio RX reservation",
+  "sdk_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "preparation_entry": "python -B prepare.py --sdk C:/Work/yoRadio/.idf/v6.0.2",
+  "configure_entry": "python -B run-config.py --sdk C:/Work/yoRadio/.idf/v6.0.2 --output <fresh ignored directory> --cmake <installed cmake.exe> --ninja <installed ninja.exe>",
+  "execution_order": ["root_ownership_and_resource_design_review", "complete_supporting_source_guards", "source_preflight_and_patch_controls", "host_module_and_actual_sdk_spans", "configure_matrix", "isolated_actual_sdk_target", "canonical_service_binding", "full_lint_and_production_exports", "physical_resource_and_protocol_matrix"],
+  "host_harness_not_yet_written": {
+    "whole_candidate_module": true,
+    "strict_flags": ["-Wall", "-Wextra", "-Werror", "-fsanitize=address,undefined", "-fno-sanitize-recover=all"],
+    "seams": ["FreeRTOS critical-section/task APIs", "certificate attach", "public config user-data functions", "mbedTLS dispatcher and heap ledger", "host capacity seam is not real Xtensa capacity"],
+    "cases": ["successful attach preserves authentication callback and return", "failed attach has no tag or loan", "occupied config userdata retained and ineligible", "unlabelled WebUI/OTA and same-sized unrelated calloc use original dispatcher", "radio claim exact count/capacity only", "zero/count overflow and malformed arguments delegated without reclaim side effects", "one reserved loan plus distinct busy fallback", "full erase before reacquire", "setup failure at RX fallback/TX/transform/session/handshake allocation", "every rollback clears SDK pointers and returns reserve", "ordinary calloc and both ordinary free routes remain paired", "session reset retains loan", "close/free/reconnect repeats without leaks", "before-setup configuration failure has no loan", "second cleanup is SDK-idempotent", "two independent radio configs and unrelated nested config cannot alias", "concurrent claim and release/erase barriers"]
+  },
+  "target_fixture_not_yet_written": {
+    "runner_base": "tests/run-cyd-early-mpi-qemu.py source/tool/SDK closure pattern, not its runtime case logic",
+    "canonical_sdk": true,
+    "calls": ["public mbedtls_ssl_config_init/defaults", "radio attach wrapper", "actual mbedtls_ssl_setup", "actual mbedtls_ssl_session_reset", "actual mbedtls_ssl_free", "actual SDK allocator/reclaim module"],
+    "scope": "No TCP/network required for ownership/setup tests; local protocol fixture is a separate later gate",
+    "cases": ["tagged full-capacity RX versus untouched original SDK result", "unlabelled first client cannot claim reserve", "radio-first plus ordinary parallel client", "two eligible clients across core0/core1 exactly one reserve", "core-to-core loan handover after zeroize", "real allocator exhaustion with reserve available", "real exhaustion with reserve busy returns original alloc failure", "RX succeeded but each later setup allocation fails and releases exactly once", "configuration rejected before RX allocation", "reset and repeated setup/free cycles", "reclaim on/off crossed with reserve on/off", "leased/queued input data and min/target bounds preserved", "Stop/abort cooperative unwind and redirected reconnect", "actual heap integrity and no reserved pointer reaches heap_caps_free"],
+    "source_identity_requirements": ["clean pinned SDK before/after each build and run", "full source/header/tool closure", "actual Xtensa ELF94 and symbol/call destinations", "actual SDK buffer macro constants from compiler output", "real allocator failures rather than injected pretend NULL", "terminal owner handles and raw logs"]
+  },
+  "semantic_negative_controls": [
+    {"mutation": "omit radio marker check", "exact_assertion": "unlabelled_client_ordinary_rx"},
+    {"mutation": "omit busy exclusion", "exact_assertion": "independent_context_rx_no_alias"},
+    {"mutation": "publish FREE before erase barrier", "exact_assertion": "no_reloan_during_erase"},
+    {"mutation": "omit setup-error reserve release", "exact_assertion": "rollback_returns_slot"},
+    {"mutation": "send reserved pointer through ordinary free", "exact_assertion": "reserved_pointer_never_sdk_heap_free"},
+    {"mutation": "bypass canonical reclaim fallback", "exact_assertion": "busy_slot_reclaim_retry_preserved"},
+    {"mutation": "reduce full RX capacity", "exact_assertion": "actual_sdk_full_record_capacity"}
+  ],
+  "canonical_service_harness_not_yet_written": {
+    "input": "actual audio_service.c and exact public SDK client callback/transport/setup spans",
+    "cases": ["radio callback supplied only by stream client", "init failure before callback", "DNS/socket/config failure before setup", "HTTPS successful open and final cleanup", "HTTP without TLS never loans", "HTTP-to-HTTPS and HTTPS-to-HTTP redirects", "failed redirect header/timeout cleanup", "generation changed before/during/after open", "invalid headers and read failure cleanup", "Stop and restart after borrower release", "WebUI/OTA simultaneous client remains ordinary", "preexisting user-data preserved", "callback attach failure semantics identical to SDK"]
+  },
+  "production_matrix": {
+    "backends": ["PDM", "DAC continuous", "legacy DAC"],
+    "decoders": ["vendor", "custom FLAC already qualified source only"],
+    "features": ["reserve on/reclaim on", "reserve on/reclaim off", "reserve off/reclaim on", "reserve off/reclaim off"],
+    "checks": ["clean source_snapshot/HEAD frozen before and after", "all baseline config differences explicitly allowed", "saved handoff images and SHA", "OTA both-slot capacity", "actual allocator/free call destinations", "unchanged board task cores/priorities/stacks/pools/pins/IRAM", "static .bss cost and alignment", "no unrelated Vorbis or deferred work activation", "fresh project-owned Clang analysis including reserve module and generated SDK TU check"]
+  },
+  "physical_pending": ["full TLS 16384-byte application record receive versus original SDK", "HTTP and HTTPS radio playback across codecs/backends", "reconnect and concurrent WebUI/OTA", "prolonged playback and repeated cancellation", "internal/DMA free heap plus largest blocks and allocation peaks before/after", "stack margins and scheduler latency while display/network/audio active", "reserve usefulness and default activation decision"],
+  "excluded": ["deferred AAC work", "blocked FLAC extension", "SDK private owner-view work", "serial/OTA/reset/flash during preparation"]
+}

@@ -1,0 +1,103 @@
+# Unapplied CYD TLS RX reserve host/config candidate gate
+
+The immutable prep01 proposal is unchanged. This draft is not tracked production
+implementation, target ABI proof, TLS protocol conformance, a RAM saving or a
+default-activation decision. No SDK target build, QEMU, network or device action
+ran. The parent independently builds MPI production applications from frozen
+tracked source; these draft files do not participate.
+
+## Current results
+
+- `attempt05/report.json`: terminal PASS, four positive runtime groups, six
+  exact semantic controls, fourteen invalid-source configurations. Whole
+  candidate and whole canonical `native_input_reclaim.c` compile with GCC13,
+  `-Wall -Wextra -Werror -pedantic`, ASan/UBSan, no sanitizer recovery and pthreads.
+  Normal successful process exit runs leak detection. Expected semantic-control
+  exits use an exact named check before subsequent invalid ownership; a generic
+  assert, signal, timeout or sanitizer diagnostic is never accepted.
+- Actual SDK `ssl_handshake_init`, `mbedtls_ssl_init`, patched
+  `mbedtls_ssl_setup`, `mbedtls_ssl_session_reset_msg_layer`, patched
+  `mbedtls_ssl_free`, and original `mbedtls_zeroize_and_free` bodies are extracted
+  byte-for-byte into the test translation unit. Only the proposed three RX
+  lifetime call sites differ from the SDK. SDK public user-data getter/setter
+  inline bodies and full RX/TX buffer macro expressions are also exact inputs.
+- The host platform deliberately substitutes config/context/crypto types,
+  IV/MAC/padding inputs, pointer-reset helpers, checksum/attach callbacks,
+  pthread-backed RTOS locks and allocation dispatcher. The adaptive-input seam
+  models an IDLE release; its canonical reclaim wrapper code is actual source.
+  These are not actual ESP32 layouts, target header compatibility, certificate
+  validation, TCP/HTTPS, full audio-service binding or real allocator exhaustion.
+- Sibling `.build/cyd-tls-reserve-config-draft-01/report.json`: terminal PASS,
+  **24 actual configure cases**, with three additional capture records. Exact
+  main and mbedtls source lists and link options are compared, including retained
+  SDK sibling source and existing options. The generated canonical overlay is
+  byte-equal to the audited three-site patch. Off/early cases retain both targets
+  exactly despite invalid settings, absent proposal paths, nonexistent Python,
+  unregistered main-component name and a component-access failure trap.
+  `project(NONE)` compiler capture remains empty. This qualifies the current
+  helper prototype's observed behavior; supporting-header/allocator guard
+  enforcement is still missing and must be implemented before production use.
+
+## Concrete correction found
+
+The prep candidate passed a `const mbedtls_ssl_config *` to the pinned public
+getter, whose actual declaration accepts a non-const pointer. An expected
+`-Werror=discarded-qualifiers` compile rejection proves that mismatch. Only the
+new frozen candidate copy adds an explicit cast for this read-only public getter;
+no config field or private layout is accessed by production candidate code.
+The original prep module and report are retained unchanged. Actual Xtensa
+compilation of all real includes/declarations is still required.
+
+## Runtime groups
+
+1. Callback result and original ordering, occupied user-data preservation,
+   failed attach without marker, unlabelled and nested unrelated configurations,
+   exactly one loan, zeroing, 32 cleanup/reopen/reset cycles.
+2. Exact SDK setup failure at TX/transform/session/handshake allocation,
+   checksum failure after allocation, rejection before RX allocation, rollback
+   pointer clearing and reserve return, final free and repeated cleanup, ledger
+   balance.
+3. Normal dispatcher and ordinary free pairing, busy fallback through the whole
+   canonical reclaim wrapper with SDK-first NULL/release/retry, zero/overflow
+   arguments, ISR no-reserve path, canonical bind/detach. Heap and input storage
+   are explicit host seams.
+4. Simultaneous pthread setup of two independent eligible contexts (exactly one
+   slot), then release blocked before erase while a second context must use heap.
+   Storage can be loaned again only after the erase provider completes.
+
+Exact semantic controls detect omitted marker admission, omitted loan exclusion,
+premature FREE publication, omitted setup rollback release, accidental ordinary
+heap free of the reserved pointer, and bypass of canonical reclaim fallback.
+The final premature-publication mutant is **phase scoped**: its changed state
+assignment is armed only during the erase-barrier scenario. Outside that phase
+it preserves ordinary initialization/release, allowing the named ownership
+assertion to observe the ordering defect. This scope must not be described as a
+fully active mutant across every earlier setup.
+
+## Attempt history
+
+All attempts and their exact inputs/logs remain separate.
+
+| Attempt | Authoritative terminal | Interpretation |
+|---|---|---|
+| 01 | exit 1 | Harness Python bytes/string extraction typo; no compiler/runtime |
+| 02 | exit 1 | WSL launch denied in sandbox; no decoder/module runtime |
+| 03 | owner 68509, exit 1 | Original getter mismatch correctly rejected; corrected candidate build rejected missing fixture `string.h` include |
+| 04 | owner 67194, exit 1 | Four positives and two controls passed; fully active early-publish mutant reached generic internal assertion during initial release, **not accepted** |
+| 05 | owner 46216, exit 0 | Current final host candidate gate PASS; erase mutation explicitly phase scoped |
+| Config 01 | owner 75428, exit 0 | Current exact configure prototype gate PASS |
+
+## Still required
+
+Implement and test complete supporting-header/allocator/callback source guards;
+review static-versus-heap-held reservation tradeoffs; prove real target
+declarations, full SDK capacity, SMP ownership, real OOM and cleanup; run actual
+audio-service callback/init/redirect/cancellation binding; integrate canonical
+sources only after the root ends its freeze; then repeat all canonical checks,
+lint and application profiles and complete physical protocol/resource tests.
+The private-header target compile and full-record behavior remain open.
+
+`qualify.py` rereads final report snapshots, exact SDK bodies/macros/public
+inlines, generated variants, named control logs, config captures/overlay and
+the immutable prep manifest. It writes an additional qualification report;
+it does not rerun or broaden runtime scope.

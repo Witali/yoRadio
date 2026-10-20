@@ -1,0 +1,104 @@
+"""Freeze a fresh isolated target campaign; does not configure/build or run it.
+
+Root must review this new candidate/fixture before invoking sdk-build.ps1.
+The earlier passing host/config campaigns and original prep remain immutable.
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import shutil
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+VARIANTS = ('canonical', 'skip-marker', 'skip-exclusive', 'skip-rollback',
+            'early-publish-phase', 'ordinary-free-static', 'bypass-reclaim')
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--variant', choices=VARIANTS, default='canonical')
+    args = parser.parse_args()
+    out = args.output.resolve()
+    if out.exists() or not out.is_relative_to(ROOT / '.build') or out.is_relative_to(HERE):
+        parser.error('Choose a fresh sibling ignored campaign directory')
+    if any((parent / 'report.json').exists() for parent in out.parents):
+        parser.error('Do not nest a campaign in another evidence directory')
+    out.mkdir()
+    identities = {}
+    sources = [*sorted((HERE / 'candidate').glob('*')), *sorted((HERE / 'project').rglob('*')),
+               HERE / 'sdk-build.ps1', HERE / 'freeze-run.py']
+    sources += [ROOT / 'idf/esp32-cyd2usb-native/main' / name for name in
+                ('native_input_reclaim.c', 'native_input_reclaim.h', 'compat/input_reclaim/enable.cmake', 'Kconfig.projbuild')]
+    sources += [ROOT / 'idf/components/native_stream' / name for name in ('adaptive_input.c', 'include/adaptive_input.h')]
+    for source in sources:
+        if not source.is_file():
+            continue
+        if source.is_relative_to(HERE):
+            relative = source.relative_to(HERE)
+        elif source.is_relative_to(ROOT / 'idf/esp32-cyd2usb-native/main'):
+            relative = Path('reclaim') / source.relative_to(ROOT / 'idf/esp32-cyd2usb-native/main')
+        else:
+            relative = Path('adaptive') / source.relative_to(ROOT / 'idf/components/native_stream')
+        destination = out / 'sources' / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(source.read_bytes())
+        identities[str(source)] = {'sha256': sha(source), 'snapshot': destination.relative_to(out).as_posix()}
+    module = out / 'sources/candidate/native_tls_rx_reserve.c'
+    patcher = out / 'sources/candidate/patch_cyd_tls_static_rx.py'
+    edits = []
+    def replace(path, original, replacement):
+        data = path.read_bytes()
+        newline = b'\r\n' if b'\r\n' in data else b'\n'
+        old = original.encode().replace(b'\n', newline)
+        new = replacement.encode().replace(b'\n', newline)
+        assert data.count(old) == 1
+        path.write_bytes(data.replace(old, new))
+        edits.append({'file': path.relative_to(out).as_posix(), 'before': original, 'after': replacement})
+    expected = None
+    if args.variant == 'skip-marker':
+        replace(module,
+            'bytes == sizeof(s_rx) && mbedtls_ssl_conf_get_user_data_p((mbedtls_ssl_config *)configuration) ==\n            (const void *)&s_radio_configuration_marker;',
+            'bytes == sizeof(s_rx);')
+        expected = 'unlabelled_client_ordinary_rx'
+    elif args.variant == 'skip-exclusive':
+        replace(module, 'if (s_state == RX_FREE) {', 'if (true) {')
+        expected = 'independent_context_rx_no_alias'
+    elif args.variant == 'skip-rollback':
+        replace(patcher, "b'    yoradio_tls_static_rx_free(ssl->in_buf);\\n'", "b'    (void)ssl->in_buf;\\n'")
+        expected = 'rollback_returns_slot'
+    elif args.variant == 'early-publish-phase':
+        replace(module, '#include "tf_psa_crypto_common.h"',
+                '#include "tf_psa_crypto_common.h"\nextern int tls_reserve_test_erase_phase(void);')
+        replace(module, 's_state = RX_RETURNING;',
+                's_state = tls_reserve_test_erase_phase() ? RX_FREE : RX_RETURNING;')
+        expected = 'no_reloan_during_erase'
+    elif args.variant == 'ordinary-free-static':
+        replace(module, 'if (pointer != s_rx) return false;',
+                'if (pointer != s_rx) return false;\n    mbedtls_free(pointer);\n    return true;')
+        expected = 'reserved_pointer_never_sdk_heap_free'
+    elif args.variant == 'bypass-reclaim':
+        replace(module, '#include "tf_psa_crypto_common.h"',
+                '#include "tf_psa_crypto_common.h"\nextern void *__real_esp_mbedtls_mem_calloc(size_t, size_t);')
+        replace(module, 'return mbedtls_calloc(count, bytes);',
+                'return __real_esp_mbedtls_mem_calloc(count, bytes);')
+        expected = 'busy_slot_reclaim_retry_preserved'
+    generated = {path.relative_to(out).as_posix(): sha(path) for path in (out / 'sources').rglob('*') if path.is_file()}
+    result = {'status': 'frozen_unbuilt_unrun_target_candidate', 'variant': args.variant,
+              'expected_failure': expected, 'exact_changes': edits, 'original_inputs': identities,
+              'frozen_sources': generated, 'SDK_commit': '7101770dc6db2667b3c477cc31365dd1acd6db4e',
+              'scoped_injection_is_not_real_oom_proof': True,
+              'early_publish_mutation_phase_scoped': args.variant == 'early-publish-phase'}
+    (out / 'source-manifest.json').write_bytes((json.dumps(result, indent=2) + '\n').encode())
+    assert all(sha(source) == record['sha256'] for source, record in identities.items())
+    print(json.dumps({'frozen': True, 'unbuilt': True, 'variant': args.variant, 'output': str(out),
+                      'manifest_sha256': sha(out / 'source-manifest.json')}))
+
+
+if __name__ == '__main__':
+    main()

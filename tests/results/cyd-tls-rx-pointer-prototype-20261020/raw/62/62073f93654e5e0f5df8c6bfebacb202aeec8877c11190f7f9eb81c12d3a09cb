@@ -1,0 +1,114 @@
+# CYD full-record TLS RX reservation: unapplied preparation
+
+This is preparation for stage 13, based on clean branch HEAD
+`1190aebce400375c382a5ad54211e2400f98161d`. No tracked source, SDK, Git index,
+configuration, firmware or board was changed. The C files in `candidate/` are
+unapplied proposals. No compiler, IDF configure/build, QEMU or device test ran.
+`prepare.py` performs read-only source checks and creates ignored evidence only.
+
+## Concrete entry points
+
+1. New `CONFIG_YORADIO_TLS_STATIC_RX_RESERVE`, default `n`, selects a build-local
+   overlay of the SDK **mbedtls** library target's `ssl_tls.c`, not the ESP-IDF
+   wrapper target and not the installed SDK. Exact ESP32/6.0.2 plus whole-source
+   and supporting-header/config/allocator guards must be enforced before a
+   tracked implementation is enabled. Candidate `enable.cmake` is a configure
+   prototype: it does not yet enforce the complete supporting-guard manifest.
+2. In radio `audio_service.c`, replace only `.crt_bundle_attach =
+   esp_crt_bundle_attach` with the optional wrapper
+   `native_tls_rx_reserve_crt_bundle_attach`. A disabled header alias/no-op
+   integration must preserve the original callback exactly. Do not wrap other
+   clients, global allocators, task startup, pins or audio backends.
+3. The wrapper calls the original bundle attach with the same pointer, returns
+   its result, and labels only a successful, otherwise-unused **public**
+   `mbedtls_ssl_config` pointer user-data field. Existing non-NULL user-data is
+   retained and makes that config ineligible. SDK `esp_http_client.c` passes
+   that callback through `transport_ssl.c` into `esp_tls_mbedtls.c`, which calls
+   it before `mbedtls_ssl_setup`. These are source observations; an actual
+   service/target test must prove the binding. The existing SDK ignores this
+   callback's result; this proposal must not silently change that behavior.
+4. Replace exactly the static RX allocation in `mbedtls_ssl_setup` with
+   `yoradio_tls_static_rx_calloc(conf, 1, in_buf_len)`. Only the radio-labelled
+   config and exact full SDK capacity are eligible. TX, handshake, certificate,
+   same-size ordinary allocations, WebUI/OTA and unlabelled nested clients use
+   the original configured `mbedtls_calloc` dispatcher.
+5. Replace exactly the setup-error RX `mbedtls_free` and final RX
+   `mbedtls_zeroize_and_free` with paired RX helpers. Ordinary pointers keep the
+   original corresponding free function. The reserved pointer is erased and
+   returned to the slot. **This is a new, separately qualified ownership
+   contract**; existing input-reclaim qualification does not qualify it.
+   There is no global `esp_mbedtls_mem_free` interception. Every original TX and
+   other free site remains ordinary.
+
+## Ownership and cancellation
+
+One aligned internal static slot has FREE, LOANED and RETURNING states behind a
+short SMP critical section. Zeroing and allocator calls happen outside that
+section. A claim remains exclusive until zeroization completes and release
+publishes FREE. No ISR reservation is supported. A busy eligible client falls
+back to the ordinary allocator; it cannot borrow the same storage. No context
+or task is forcibly reset, no lease or queued input is reclaimed on behalf of
+the slot, and no watchdog/reset task is added.
+
+The original SDK owns the loan while its SSL context owns `in_buf`. Session
+reset retains it; teardown/rollback releases it. Caller-side same-context
+concurrent use or asynchronous task deletion during an SDK call is unsupported
+by the existing client and is not made safe by this module. Cooperative Stop,
+generation cancellation and stream errors must unwind through existing cleanup.
+The complete setup-error ladder, configuration failure before setup, cleanup
+twice, final close+cleanup, reconnect, redirects and late cancellation remain
+required tests. If future SDK code adds an RX resize/ownership route, pinned
+guards must reject it until the ownership audit and release sites are updated.
+
+No task-core, priority, stack, FreeRTOS TLS-slot count, input pool, IRAM placement,
+HTTP TX/RX or TLS content-size setting is changed. The task-local Vorbis code
+is unrelated and is not enabled by this proposal.
+
+## Reclaim coexistence
+
+The existing CYD `native_input_reclaim.c` wrapper is kept byte for byte. Every
+fallback calls the real configured `mbedtls_calloc` API, whose default
+dispatcher reaches the SDK calloc and existing opt-in wrapper. Its SDK-first
+semantics, SMP pin/detach and fixed initial retry budget remain the contract.
+Do not import donor preconnection input-floor/headroom, largest-block polling,
+codec expansion or donor `TLS_RESERVE_CAPACITY`. Reserve on/off and reclaim
+on/off are independent combinations that all require actual target checks.
+
+## Resource alternatives: root decision remains open
+
+Let **C = MBEDTLS_SSL_IN_BUFFER_LEN**, evaluated by the actual audited
+`ssl_misc.h` under each build's real headers. C includes record content,
+maximum IV, MAC, padding, possible connection-ID allowance and SDK header
+storage. The input **content** stays 16384. No numerical C is guessed here.
+
+| Alternative | Permanently held resource | Ordinary free pairing | Reconnect behavior |
+|---|---|---|---|
+| Recommended bounded candidate: static slot | C aligned internal `.bss` bytes plus state/lock/marker and alignment overhead, even for HTTP | Ordinary fallback unchanged; two exact RX release sites implement the new static loan contract | Same slot available after complete RX release/erase; concurrent clients fall back |
+| Heap-held reusable reserve | C requested heap payload plus allocator metadata/rounding, allocated early; may fail at prepare | Original `mbedtls_calloc`/`mbedtls_free` remain paired if handed off, but retaining the held allocation across clients still needs a new exact RX loan/release contract | Reuse requires keeping that block held and returning it to reserve rather than ordinary free |
+| Heap-held one-shot handoff | C requested heap payload while held; after handoff SDK owns/frees it normally | Ordinary pair can stay exact without special free | First reservation only; later reconnect requires a new prepare and can fail under fragmentation. This narrower option does not complete a persistent-reserve transfer |
+
+The static candidate's `.bss` increase generally lowers general internal heap
+availability; it is **not free RAM**. At an active single reserved connection,
+the SDK's C-sized RX heap request is avoided, but the C-sized static cost already
+exists. Plain HTTP or no connection still pays C. A second connection can pay
+both static C and an ordinary C heap allocation. The heap-held alternative also
+removes a large allocatable block while idle; transient early prepare, handoff
+and rearm can affect peaks. No scalar peak or fragmentation benefit follows
+from these accounting identities. ELF section size, requested payload, usable
+allocation, free heap and largest free block are distinct measurements.
+
+Keep the option off until physical CYD metrics under TFT, Wi-Fi, audio,
+WebUI/OTA and repeated HTTPS demonstrate a useful tradeoff for each supported
+backend. Full software gates prove ownership and capacity, not usefulness.
+
+## Gates and controls
+
+`test-plan.json` gives the next execution order, exact cases, controls and honest
+scope boundaries. `run-config.py` is runnable configure-only preparation and
+must be reviewed before invocation; no SDK export/compilers run. Host and target
+checks are intentionally specified as the next harness work, not represented
+as already executable passing tests. The proposed CMake helper deliberately
+uses explicit ignored input paths; root must select canonical production paths
+and complete source guards before tracked implementation. The preparation is
+not implementation, security qualification, TLS conformance, runtime evidence
+or measured memory improvement.

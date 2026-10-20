@@ -1,0 +1,159 @@
+"""Capture preparation evidence only; no compiler/configure/SDK export or runtime.
+
+Writes only inside this ignored proposal directory. Source hash/line checks and
+patch transformation controls do not qualify the proposed reserve module.
+"""
+import argparse
+import ast
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+SDK_PATHS = [
+    'components/mbedtls/mbedtls/library/ssl_tls.c',
+    'components/mbedtls/mbedtls/library/ssl_misc.h',
+    'components/mbedtls/mbedtls/include/mbedtls/ssl.h',
+    'components/mbedtls/mbedtls/tf-psa-crypto/include/mbedtls/platform.h',
+    'components/mbedtls/mbedtls/tf-psa-crypto/include/mbedtls/platform_util.h',
+    'components/mbedtls/mbedtls/tf-psa-crypto/core/tf_psa_crypto_common.h',
+    'components/mbedtls/mbedtls/tf-psa-crypto/platform/platform.c',
+    'components/mbedtls/mbedtls/tf-psa-crypto/platform/platform_util.c',
+    'components/mbedtls/port/include/mbedtls/esp_config.h',
+    'components/mbedtls/port/esp_mem.c',
+    'components/mbedtls/CMakeLists.txt',
+    'components/mbedtls/esp_crt_bundle/esp_crt_bundle.c',
+    'components/mbedtls/esp_crt_bundle/include/esp_crt_bundle.h',
+    'components/esp-tls/esp_tls_mbedtls.c',
+    'components/tcp_transport/transport_ssl.c',
+    'components/esp_http_client/esp_http_client.c',
+    'components/esp_common/include/esp_idf_version.h',
+]
+REPO_PATHS = [
+    'idf/esp32c3-oled-native/main/tls_large_reserve.c',
+    'idf/esp32c3-oled-native/main/tls_large_reserve.h',
+    'idf/esp32c3-oled-native/main/tls_input_reserve.c',
+    'idf/esp32-cyd2usb-native/main/native_input_reclaim.c',
+    'idf/esp32-cyd2usb-native/main/native_input_reclaim.h',
+    'idf/esp32-cyd2usb-native/main/compat/input_reclaim/enable.cmake',
+    'idf/esp32-cyd2usb-native/main/audio_service.c',
+    'idf/esp32-cyd2usb-native/main/CMakeLists.txt',
+    'idf/esp32-cyd2usb-native/main/Kconfig.projbuild',
+    'idf/esp32-cyd2usb-native/main/board_config.h',
+    'docs/CYD_MEMORY_TRANSFER_DESIGN.md',
+    'tests/results/cyd-tls-reserve-mpi-audit-20261020/README.md',
+    'tests/results/cyd-tls-reserve-mpi-audit-20261020/raw/report.json',
+    'firmware/development/esp32-cyd2usb-native-tls-input-reclaim-pdm/sdkconfig',
+]
+
+
+def identity(payload):
+    return {'bytes': len(payload), 'sha256': hashlib.sha256(payload).hexdigest(),
+            'normalized_lf_sha256': hashlib.sha256(payload.replace(b'\r\n', b'\n')).hexdigest()}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--sdk', type=Path, required=True)
+    args = parser.parse_args()
+    sdk = args.sdk.resolve()
+    sdk_status_before = subprocess.check_output(['git', '-c', 'core.longpaths=true', 'status', '--porcelain=v1', '-uno'], cwd=sdk)
+    assert not sdk_status_before
+    report_path = HERE / 'preparation-report.json'
+    if report_path.exists():
+        parser.error('Preparation evidence already exists; use a fresh proposal directory')
+    for script in (HERE / 'prepare.py', HERE / 'run-config.py', HERE / 'candidate/patch_cyd_tls_static_rx.py'):
+        ast.parse(script.read_text(encoding='utf-8'), filename=str(script))
+    before = {}
+    snapshots = HERE / 'snapshots'
+    for scope, base, paths in [('sdk', sdk, SDK_PATHS), ('repo', ROOT, REPO_PATHS)]:
+        for relative in paths:
+            source = base / relative
+            data = source.read_bytes()
+            record = identity(data)
+            record.update(scope=scope, relative=relative)
+            snapshot = snapshots / record['sha256']
+            snapshot.parent.mkdir(exist_ok=True)
+            snapshot.write_bytes(data)
+            record['snapshot'] = snapshot.relative_to(HERE).as_posix()
+            before[str(source)] = record
+    candidate_files = [HERE / 'PROPOSAL.md', HERE / 'test-plan.json', HERE / 'run-config.py',
+                       HERE / 'prepare.py', *sorted((HERE / 'candidate').glob('*'))]
+    proposal_identities = {path.relative_to(HERE).as_posix(): identity(path.read_bytes()) for path in candidate_files}
+    spec = importlib.util.spec_from_file_location('proposal_patcher', HERE / 'candidate/patch_cyd_tls_static_rx.py')
+    patcher = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(patcher)
+    source = (sdk / SDK_PATHS[0]).read_bytes()
+    normalized = source.replace(b'\r\n', b'\n')
+    patched = patcher.patch(source)
+    patched_lf = patcher.patch(normalized)
+    assert patched.replace(b'\r\n', b'\n') == patched_lf
+    assert patched.count(b'yoradio_tls_static_rx_calloc(conf, 1, in_buf_len)') == 1
+    assert patched.count(b'yoradio_tls_static_rx_free(ssl->in_buf)') == 1
+    assert patched.count(b'yoradio_tls_static_rx_zeroize_free(ssl->in_buf, in_buf_len)') == 1
+    assert b'ssl->out_buf = mbedtls_calloc(1, out_buf_len);' in patched
+    assert b'mbedtls_free(ssl->out_buf);' in patched
+    for original, replacement in reversed(patcher.REPLACEMENTS):
+        patched_lf = patched_lf.replace(replacement, original, 1)
+    assert patched_lf == normalized
+    rejected = []
+    for name, variant in [('mutated-source', normalized + b'\n/* changed */\n'),
+                          ('mixed-line-endings', normalized.replace(b'\n', b'\r\n', 1))]:
+        try:
+            patcher.patch(variant)
+        except ValueError as error:
+            rejected.append({'case': name, 'message': str(error)})
+        else:
+            raise AssertionError('Patcher accepted ' + name)
+    (HERE / 'candidate/ssl_tls.overlay.c').write_bytes(patched)
+    proposal_identities['candidate/ssl_tls.overlay.c'] = identity(patched)
+    guards = {record['relative']: {key: record[key] for key in ('bytes', 'sha256', 'normalized_lf_sha256')}
+              for record in before.values() if record['scope'] == 'sdk'}
+    (HERE / 'supporting-source-guards.json').write_text(json.dumps(guards, indent=2) + '\n', encoding='utf-8', newline='\n')
+    anchors = {
+        SDK_PATHS[0]: ['int mbedtls_ssl_setup(', 'ssl->in_buf = mbedtls_calloc(1, in_buf_len);',
+                       'mbedtls_free(ssl->in_buf);', 'mbedtls_zeroize_and_free(ssl->in_buf, in_buf_len);'],
+        SDK_PATHS[1]: ['#define MBEDTLS_SSL_IN_BUFFER_LEN'],
+        SDK_PATHS[2]: ['static inline void mbedtls_ssl_conf_set_user_data_p(',
+                       'static inline void *mbedtls_ssl_conf_get_user_data_p('],
+        'components/esp-tls/esp_tls_mbedtls.c': ['cfg->crt_bundle_attach(&tls->conf);',
+                                               'mbedtls_ssl_setup(&tls->ssl, &tls->conf)'],
+        'components/esp_http_client/esp_http_client.c': ['esp_transport_ssl_crt_bundle_attach(ssl, config->crt_bundle_attach);'],
+    }
+    entries = {}
+    for relative, tokens in anchors.items():
+        lines = (sdk / relative).read_text(encoding='utf-8').splitlines()
+        entries[relative] = [{ 'token': token, 'lines': [index + 1 for index, line in enumerate(lines) if token in line]}
+                             for token in tokens]
+        assert all(entry['lines'] for entry in entries[relative])
+    clean = subprocess.check_output(['git', '-c', 'core.longpaths=true', 'status', '--porcelain=v1', '-uno'], cwd=ROOT)
+    head = subprocess.check_output(['git', '-c', 'core.longpaths=true', 'rev-parse', 'HEAD'], cwd=ROOT).decode().strip()
+    sdk_head = subprocess.check_output(['git', '-c', 'core.longpaths=true', 'rev-parse', 'HEAD'], cwd=sdk).decode().strip()
+    assert head == '1190aebce400375c382a5ad54211e2400f98161d'
+    assert sdk_head == '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+    assert not clean
+    sdk_status_after = subprocess.check_output(['git', '-c', 'core.longpaths=true', 'status', '--porcelain=v1', '-uno'], cwd=sdk)
+    assert not sdk_status_after
+    assert all(identity(Path(path).read_bytes())['sha256'] == record['sha256'] for path, record in before.items())
+    report = {'status': 'preparation_only_sources_checked_candidate_unapplied_runtime_unrun',
+              'tracked_source_changed': False, 'sdk_changed': False,
+              'host_compiler_invoked': False, 'cmake_invoked': False, 'sdk_export_invoked': False,
+              'sdk_build_invoked': False, 'qemu_invoked': False, 'device_operations': False,
+              'head': head, 'sdk_head': sdk_head, 'sdk_tracked_clean_before_after': True,
+              'inputs': before, 'proposal_inputs': proposal_identities,
+              'sdk_entry_lines': entries, 'patch_transformation': {'lf_crlf_equivalent': True,
+              'exact_three_lifetime_sites': True, 'reverse_recovers_exact_original': True,
+              'negative_controls': rejected}, 'original_inputs_unchanged_after': True,
+              'remaining': ['root design review', 'supporting guards enforced in helper', 'host harness',
+                            'run configure prototype', 'real target include/declaration/ownership qualification',
+                            'service binding harness', 'canonical integration', 'full lint/application exports',
+                            'physical protocol/resources and default decision']}
+    report_path.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8', newline='\n')
+    print(json.dumps({'status': report['status'], 'inputs': len(before), 'report': str(report_path)}))
+
+
+if __name__ == '__main__':
+    main()

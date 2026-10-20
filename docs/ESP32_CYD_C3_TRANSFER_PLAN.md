@@ -597,3 +597,8 @@ Stream остаётся на core0, decode/output на core1 с прежними
   адреса и переполнение реестра. Host layout/crypto/RTOS остаются явными seams;
   это не actual SDK/QEMU или radio integration PASS. Следующая самостоятельная
   ревизия будет хранить integer address identities и требует отдельных проверок.
+- 2026-10-20, CYD-C3-13: [исторический архив первого TLS RX prototype](../tests/results/cyd-tls-rx-pointer-prototype-20261020/README.md)
+  сохранён отдельно: шесть принятых результатов, один отвергнутый panic и три
+  незапущенных варианта. Raw report, SDK source/config/tool identities и точная
+  цепочка panic сохранены; автономный verifier подтверждает целостность архива,
+  сохраняя target status nonpass. Новый registry в этот архив не включён.

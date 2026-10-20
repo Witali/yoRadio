@@ -1,0 +1,181 @@
+"""Offline integrity/oracle checks for an unapplied static RX reserve candidate.
+
+Reads only this archive. No SDK, WSL, Git, network or device is required. Omitted
+binaries retain original identities; this is not production/protocol proof.
+"""
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import struct
+
+ROOT = Path(__file__).resolve().parent
+CANDIDATE = '77db50af0ff65dfa333b28584b48632c625d999984e7ff8fffd48cb0e52cdb0f'
+SDK = '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+VARIANTS = ('canonical', 'skip-marker', 'skip-exclusive', 'skip-rollback', 'early-publish-phase', 'ordinary-free-static', 'bypass-reclaim', 'canonical-reclaim-off', 'reserve-off-reclaim-on', 'reserve-off-reclaim-off')
+FAILURES = {'skip-marker': 'unlabelled_client_ordinary_rx', 'skip-exclusive': 'independent_context_rx_no_alias', 'skip-rollback': 'rollback_returns_slot', 'early-publish-phase': 'no_reloan_during_erase', 'ordinary-free-static': 'reserved_pointer_never_sdk_heap_free', 'bypass-reclaim': 'busy_slot_reclaim_retry_preserved'}
+
+
+def require(value, message):
+    if not value:
+        raise ValueError(message)
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def read_json(name):
+    return json.loads((ROOT / name).read_bytes())
+
+
+def trace(text, words):
+    registers, calls = {}, []
+    for line in text.splitlines():
+        match = re.match(r'^\s*([0-9a-f]+):\s+[0-9a-f]+\s+(\S+)\s*(.*)$', line)
+        if not match:
+            continue
+        pc, opcode, operands = match.groups()
+        if opcode == 'l32r':
+            operand = re.match(r'(a\d+),\s*([0-9a-f]+)', operands)
+            if operand:
+                register, literal = operand.groups()
+                row = words[str(int(literal, 16))]
+                require(struct.unpack('<I', bytes.fromhex(row['raw_hex']))[0] == row['value'], 'ELF data word encoding')
+                registers[register] = row['value']
+        elif re.fullmatch(r'call(?:0|4|8|12)', opcode):
+            calls.append(int(re.match(r'([0-9a-f]+)', operands)[1], 16))
+            registers.clear()
+        elif re.fullmatch(r'callx(?:0|4|8|12)', opcode):
+            calls.append(registers.get(operands.split(',')[0].strip()))
+            registers.clear()
+        else:
+            registers.pop(operands.split(',')[0].strip(), None)
+    return calls
+
+
+def runtime_oracle(name, log, reserve, reclaim):
+    require(not re.search(r'Guru Meditation|abort\(\)|Backtrace:|assert failed|CORRUPT HEAP|watchdog.*triggered', log, re.I), 'Generic failure cannot pass runtime oracle')
+    if not reserve:
+        require(log.count('TLS_RX_DISABLED_ENTRY ordinary_sdk=1') == 1 and log.count('TLS_RX_DISABLED_COMPLETE reserve=0 reclaim=' + str(int(reclaim)) + ' cycles=16 ordinary_sdk=1') == 1, 'Exact reserve-off public lifecycle completion')
+        require(not any(token in log for token in ('TLS_RX_TARGET_ENTRY', 'TLS_RX_TARGET_FAILURE', 'TLS_RX_TARGET_CONTROLLED_STOP')), 'No reserve-on/control marker in off case')
+    elif name in FAILURES:
+        require(log.count('TLS_RX_TARGET_ENTRY unbuilt_candidate_fixture=1') == 1 and re.findall(r'^TLS_RX_TARGET_FAILURE (.+)$', log, re.M) == [FAILURES[name]], 'Exact named semantic failure')
+        require(log.count('TLS_RX_TARGET_CONTROLLED_STOP') == 1 and 'TLS_RX_TARGET_COMPLETE' not in log, 'Unique controlled stop, no canonical completion')
+    else:
+        require(log.count('TLS_RX_TARGET_ENTRY unbuilt_candidate_fixture=1') == 1 and log.count('TLS_RX_TARGET_COMPLETE canonical_candidate=1 production_radio=0 physical_benefit=0') == 1, 'Unique canonical candidate completion')
+        require('TLS_RX_TARGET_FAILURE' not in log and 'TLS_RX_TARGET_CONTROLLED_STOP' not in log, 'Canonical no failure marker')
+        require(log.count('TLS_RX_TARGET_CASE ownership_rollback_reopen injected_nulls=4 real_oom_claim=0') == 1 and log.count('TLS_RX_TARGET_CASE smp_ownership_handover_erase cores=0,1') == 1, 'Distinct injected rollback and real two-core handover')
+        capacity = re.findall(r'^TLS_RX_TARGET_CAPACITY content=(\d+) storage=(\d+) pointer_alignment=(\d+)$', log, re.M)
+        require(len(capacity) == 1 and int(capacity[0][0]) == 16384 and int(capacity[0][1]) >= 16384, 'Observed target capacity, no guessed constant')
+        oom = re.findall(r'^TLS_RX_TARGET_CASE real_oom_reserved_rx blocks=(\d+) actual_backend_nulls=(\d+)$', log, re.M)
+        require(len(oom) == 1 and all(int(value) > 0 for value in oom[0]), 'Real backend NULL/heap observation separate from injected rollback')
+        recovered = re.findall(r'^TLS_RX_TARGET_CASE actual_reclaim_recovery real_nulls=(\d+) recoveries=(\d+) released=(\d+) min=4 target=8$', log, re.M)
+        require(len(recovered) == 1 and all(int(value) > 0 for value in recovered[0]) if reclaim else not recovered, 'Reclaim-on recovery vs reclaim-off no recovery')
+
+
+def main():
+    manifest = read_json('manifest.json')
+    expected = {row['path']: row for row in manifest['files']}
+    actual = {path.relative_to(ROOT).as_posix() for path in ROOT.rglob('*') if path.is_file() and path != ROOT / 'manifest.json'}
+    require(len(expected) == len(manifest['files']) and set(expected) == actual, 'Complete unique manifest file set')
+    for name, row in expected.items():
+        path = (ROOT / name).resolve()
+        require(path.is_relative_to(ROOT), 'Manifest path escapes')
+        raw = path.read_bytes()
+        require(sha(raw) == row['sha256'] and len(raw) == row['bytes'], 'Manifest bytes: ' + name)
+    mapping = read_json('path-map.json')['entries']
+    by_id = {row['id']: row for row in mapping}
+    require(len(by_id) == len(mapping), 'Unique provenance IDs')
+    decoded = {}
+    for row in mapping:
+        require(re.fullmatch('[0-9a-f]{64}', row['sha256']) and row['roles'], 'Mapped identity')
+        if row['disposition'] == 'omitted':
+            require(row['reason'] and 'stored_path' not in row, 'Explicit omission')
+            require(row['bytes'] is None if row['observed_bytes'] is False else type(row['bytes']) is int, 'Reported vs observed omitted bytes truthful')
+            continue
+        require(row['disposition'] == 'stored' and row['stored_path'] in expected and row['observed_bytes'] is True, 'Stored payload provenance')
+        stored = (ROOT / row['stored_path']).read_bytes()
+        require(sha(stored) == row['stored_sha256'] and len(stored) == row['stored_bytes'], 'Encoded identity')
+        require(row['encoding'] in ('gzip', 'raw'), 'Known encoding')
+        raw = gzip.decompress(stored) if row['encoding'] == 'gzip' else stored
+        require(sha(raw) == row['sha256'] and len(raw) == row['bytes'], 'Raw byte fidelity')
+        require(not raw.startswith((b'\x7fELF', b'MZ', b'!<arch>\n')), 'Binary must be omitted')
+        decoded[row['id']] = raw
+
+    def document(number):
+        require(number in decoded, 'Required JSON payload omitted')
+        return json.loads(decoded[number])
+
+    for binding in read_json('bindings.json')['bindings']:
+        value = document(binding['container_id'])
+        for token in binding['hash_tokens']:
+            value = value[token]
+        require(value == by_id[binding['target_id']]['sha256'], 'Exact original JSON hash relationship')
+    index = read_json('index.json')
+    require(index['candidate_sha256'] == CANDIDATE and set(index['variants']) == set(VARIANTS), 'Exact canonical candidate/ten variants')
+    require(index['status'] == {'unapplied_candidate': True, 'isolated_ten_variant_target_qualified': True, 'four_real_option_builds': True, 'production_integrated': False, 'audio_owner_integrated': False, 'application_exports_qualified': False, 'physical_benefit_claimed': False, 'protocol_conformance_claimed': False}, 'Exact qualification limits')
+    primary = {name: document(number) for name, number in index['primary_report_ids'].items()}
+    target, host, config = primary['target'], primary['host'], primary['configure']
+    require(by_id[index['primary_report_ids']['target']]['sha256'] == index['target_report_sha256'], 'Root-authorized final report identity')
+    require(target['passed'] is True and target['full_target_matrix_complete'] is True and target['all_current_inputs_match'] is True and target['compile_only'] is False and target['production_integration'] is False and target['physical_benefit_claimed'] is False and target['network_or_device'] is False, 'Completed candidate-only matrix')
+    require(set(target['variants']) == set(VARIANTS) and all(row['passed'] is True for row in target['variants'].values()), 'Exact ten PASS outcomes')
+    require(all(row['terminal_exit'] == 0 and row['timed_out'] is False for row in target['commands']), 'No failure/timeout promoted')
+    require(host['passed'] is True and host['inputs_unchanged'] is True and len(host['positive_cases']) == 4 and len(host['compile_rejections']) == 14 and host['candidate_fix']['fixed_sha256'] == CANDIDATE, 'Actual host source/14 invalid configs/four runtime groups')
+    semantic = {name: row for name, row in host['controls'].items() if name != 'original-getter-const-rejection'}
+    require(len(semantic) == 6 and all(row['exit_status'] == 2 for row in semantic.values()), 'Six exact host semantic controls')
+    require(host['host_tool_identities_before'] == host['host_tool_identities'], 'Original host tools before/after')
+    require(config['passed'] is True and config['configure_case_count'] == 24 and all(row['passed'] is True for row in config['cases'].values()) and config['all_input_snapshots_match'] is True, '24 actual configure-only cases')
+    guard = document(index['guard_report_id'])
+    guardmap = document(index['guard_manifest_id'])
+    require(guard['passed'] is True and len(guard['guard_cases']) == 22 and all(row['passed'] is True for row in guard['guard_cases'].values()) and len(guardmap) == len(guard['actual_sdk_guards']) == 17, 'Exact17 guard source closure/22 preparation cases')
+    for relative, row in guardmap.items():
+        require(row['sha256'] == guard['actual_sdk_guards'][relative], 'Raw supporting source hash')
+        raws = [raw for number, raw in decoded.items() if by_id[number]['sha256'] == row['sha256']]
+        require(raws and sha(raws[0].replace(b'\r\n', b'\n')) == row['normalized_lf_sha256'], 'Both raw and normalized source identities retained, raw bytes unmodified')
+    facts = read_json('elf-metadata.json')
+    option_proofs = {}
+    for name, row in index['variants'].items():
+        bundle, source = document(row['bundle_id']), document(row['manifest_id'])
+        reserve = not name.startswith('reserve-off-')
+        reclaim = name not in ('canonical-reclaim-off', 'reserve-off-reclaim-off')
+        require(bundle['candidate_only'] is True and bundle['elf_machine'] == facts[name]['machine'] == 94 and bundle['sdk_commit'] == SDK and bundle['reserve_enabled'] is reserve and bundle['reclaim_enabled'] is reclaim, 'Actual target ABI/options')
+        require(by_id[row['elf_id']]['disposition'] == 'omitted' and by_id[row['elf_id']]['sha256'] == bundle['elf_sha256'] == facts[name]['elf_sha256'], 'Actual binary identity omitted')
+        cfg = bundle['configuration']
+        require(cfg['MBEDTLS_SSL_IN_CONTENT_LEN'] == 16384 and cfg['MBEDTLS_SSL_OUT_CONTENT_LEN'] == 4096 and all(cfg[key] for key in ('ESP_TLS_USING_MBEDTLS', 'MBEDTLS_INTERNAL_MEM_ALLOC', 'MBEDTLS_CERTIFICATE_BUNDLE', 'COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE')), 'Actual static/internal/assert profile')
+        require(all(not cfg.get(key, False) for key in ('FREERTOS_UNICORE', 'MBEDTLS_DYNAMIC_BUFFER', 'MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH', 'MBEDTLS_CUSTOM_MEM_ALLOC', 'HEAP_ABORT_WHEN_ALLOCATION_FAILS')), 'No wrong ABI/allocator/unicore profile')
+        require(bool(cfg.get('YORADIO_TLS_STATIC_RX_RESERVE', False)) == reserve and bool(cfg.get('YORADIO_TLS_INPUT_RECLAIM', False)) == reclaim, 'Actual build config options')
+        symbols = {}
+        for line in decoded[row['nm_id']].decode(errors='replace').splitlines():
+            fields = line.split()
+            if len(fields) == 4:
+                symbols[fields[3]] = {'address': int(fields[0], 16), 'bytes': int(fields[1], 16)}
+        require('__wrap_esp_mbedtls_mem_free' not in symbols, 'Ordinary SDK free pairing preserved')
+        expected_alloc = '__wrap_esp_mbedtls_mem_calloc' if reclaim else 'esp_mbedtls_mem_calloc'
+        for symbol, expected_symbol in (('mbedtls_calloc_func', expected_alloc), ('mbedtls_free_func', 'esp_mbedtls_mem_free')):
+            word = facts[name]['words'][str(symbols[symbol]['address'])]
+            require(word['value'] == struct.unpack('<I', bytes.fromhex(word['raw_hex']))[0] == symbols[expected_symbol]['address'], 'Actual allocator function-pointer word')
+        assemblies = {symbol: decoded[number].decode(errors='replace') for symbol, number in row['asm_ids'].items()}
+        calls = {symbol: trace(text, facts[name]['words']) for symbol, text in assemblies.items()}
+        if reserve:
+            require(symbols['__wrap_yoradio_tls_static_rx_calloc']['address'] in calls['mbedtls_ssl_setup'], 'Actual setup ownership allocator call')
+            if name != 'skip-rollback':
+                require(symbols['yoradio_tls_static_rx_free']['address'] in calls['mbedtls_ssl_setup'], 'Actual rollback slot return call')
+            require(symbols['yoradio_tls_static_rx_zeroize_free']['address'] in calls['mbedtls_ssl_free'], 'Actual public lifecycle erase/return call')
+            require(symbols['__wrap_heap_caps_free']['address'] in calls['esp_mbedtls_mem_free'], 'Actual ordinary SDK free observation route')
+        else:
+            require(all(symbol not in symbols for symbol in ('native_tls_rx_reserve_crt_bundle_attach', 'yoradio_tls_static_rx_calloc', 's_rx', 's_radio_configuration_marker', '__wrap_heap_caps_free')), 'Reserve-off original SDK/static slot/wrap absence')
+        log = decoded[row['qemu_log_id']].decode(errors='replace').replace('\r\n', '\n')
+        runtime_oracle(name, log, reserve, reclaim)
+        if name in FAILURES:
+            require(target['variants'][name]['exact_semantic_failure'] == source['expected_failure'] == FAILURES[name], 'Exact variant-to-mutant association')
+        if name in ('canonical', 'canonical-reclaim-off', 'reserve-off-reclaim-on', 'reserve-off-reclaim-off'):
+            option_proofs[(reserve, reclaim)] = bundle['elf_sha256']
+    require(set(option_proofs) == {(False, False), (False, True), (True, False), (True, True)} and len(set(option_proofs.values())) == 4, 'Four distinct actual independently linked option builds')
+    require(read_json('current-verification.json')['all_selected_inputs_stable_after'] is True, 'Archive input stability')
+    print(json.dumps({'passed': True, 'files': len(expected), 'mapped_versions': len(mapping), 'target_variants': 10, 'real_option_builds': 4, 'offline_only': True}, indent=2))
+
+
+if __name__ == '__main__':
+    main()

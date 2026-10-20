@@ -1,0 +1,94 @@
+"""Validate historical-only packager without collecting or writing an archive."""
+import ast
+import copy
+import importlib.util
+import subprocess
+import sys
+
+import build_archive as b
+from archive_core import encode, hashfile, load, require
+
+
+def main():
+    out = b.HERE / 'prep-check-02'
+    require(not out.exists(), 'Keep prior prep check')
+    out.mkdir()
+    files = ('archive_core.py', 'build_archive.py', 'verify.py', 'SPEC.md', 'README.template.md', 'HOST.template.md', 'check-prep.py')
+    before = {name: hashfile(b.HERE / name) for name in files}
+    old = b.ROOT / '.build/cyd-tls-reserve-archive-prep-01'
+    old_before = {str(path): hashfile(path) for path in old.rglob('*') if path.is_file()}
+    report = {'passed': False, 'scope': 'Historical partial/nonpass packager preparation only; no archive/target/tools execution', 'scripts_sha256': before, 'old_prep_sha256': old_before, 'checks': []}
+    try:
+        require(not b.OUT.exists(), 'New archive must remain absent')
+        for name in files:
+            if name.endswith('.py'):
+                ast.parse((b.HERE / name).read_text())
+        report['checks'].append('Python AST')
+        done = subprocess.run([sys.executable, '-B', str(b.HERE / 'build_archive.py'), '--help'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=20)
+        (out / 'help.log').write_bytes(done.stdout)
+        require(done.returncode == 0, 'CLI help')
+        observation = load(b.OBSERVATION)
+        target = load(b.TARGET / 'report.json')
+        require(hashfile(b.OBSERVATION) == b.OBSERVATION_SHA and hashfile(b.TARGET / 'report.json') == b.REPORT_SHA, 'Exact terminal1 observation/nonpass report')
+        b.terminal_contract(target, observation)
+        report['checks'].append('Exact final nonpass report/observation with accepted6/executed7/unrun3')
+        mutations = [('promote-to-pass', lambda r, o: r.update(passed=True)),
+                     ('promote-matrix', lambda r, o: r.update(full_target_matrix_complete=True)),
+                     ('accept-seventh', lambda r, o: r['variants'].update({'bypass-reclaim': {'passed': True}})),
+                     ('runner-exit-zero', lambda r, o: o.update(runner_terminal_exit=0)),
+                     ('panic-accepted', lambda r, o: o['last_control'].update(accepted_as_pass=True)),
+                     ('missing-qemu', lambda r, o: r['commands'].pop()),
+                     ('run-unrun-variant', lambda r, o: r['commands'].append({'label': 'canonical-reclaim-off-qemu', 'terminal_exit': 0, 'timed_out': False, 'argv': []}))]
+        for name, mutation in mutations:
+            r, o = copy.deepcopy(target), copy.deepcopy(observation)
+            mutation(r, o)
+            try:
+                b.terminal_contract(r, o)
+            except ValueError:
+                pass
+            else:
+                raise ValueError('Historical contract accepted invalid promotion: ' + name)
+        report['checks'].append('Seven rejecting partial-status/promotion controls')
+        spec = importlib.util.spec_from_file_location('pointer_history_verifier', b.HERE / 'verify.py')
+        verifier = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(verifier)
+        for name in b.ACCEPTED:
+            verifier.runtime_oracle(name, (b.TARGET / (name + '-qemu.log')).read_text().replace('\r\n', '\n'), True, True)
+        log = (b.TARGET / 'bypass-reclaim-qemu.log').read_text().replace('\r\n', '\n')
+        nm = (b.TARGET / 'bypass-reclaim-nm.log').read_text()
+        verifier.rejected_panic_oracle(log)
+        try:
+            verifier.runtime_oracle('bypass-reclaim', log, True, True)
+        except ValueError:
+            pass
+        else:
+            raise ValueError('Rejected panic incorrectly accepted by ordinary semantic oracle')
+        for bad in (log.replace('abort() was called', 'removed abort marker'), log.replace('4008279b', '4008279c'), log + '\nTLS_RX_TARGET_FAILURE unrelated\n'):
+            try:
+                verifier.rejected_panic_oracle(bad)
+            except ValueError:
+                pass
+            else:
+                raise ValueError('Rejected-panic evidence oracle accepted wrong/duplicate panic')
+        failure = b.failure_details(b.TARGET / 'bypass-reclaim-qemu.log', b.TARGET / 'bypass-reclaim-nm.log')
+        require(verifier.resolve_frames(log, nm) == failure['resolved_frames'], 'Exact raw frame recomputation')
+        report['checks'].append('Six accepted raw oracles plus rejected panic/frame chain and negative controls')
+        for name in b.UNRUN:
+            campaign = b.TARGET / 'campaigns' / name
+            require((campaign / 'source-manifest.json').is_file() and not (campaign / 'working-build').exists() and not (campaign / 'execution').exists(), 'Three pending source recipes remain unbuilt/unrun')
+        header = (b.PREP / 'guard-checks-01/sdk-copy/components/mbedtls/mbedtls/include/mbedtls/ssl.h').read_text()
+        require('The value is undefined if mbedtls_ssl_conf_set_user_data_n() has been called without a subsequent call to mbedtls_ssl_conf_set_user_data_p().' in ' '.join(header.replace('*', ' ').split()), 'Pinned public getter contract gap')
+        report['checks'].append('Unrun recipes and documented numeric/pointer userdata gap')
+        require(all(hashfile(path) == digest for path, digest in old_before.items()) and all(hashfile(b.HERE / name) == digest for name, digest in before.items()) and not b.OUT.exists(), 'Old prep/new tools unchanged/no archive')
+        report.update(passed=True, archive_written=False, old_prep_unchanged=True, historical_target_campaign_passed=False,
+                      corrected_registry_covered=False, sdk_qemu_wsl_git_network_device_processes_invoked=False)
+    except BaseException as error:
+        report['error'] = type(error).__name__ + ': ' + str(error)
+        (out / 'report.json').write_bytes(encode(report))
+        raise
+    (out / 'report.json').write_bytes(encode(report))
+    print(encode({'prepared': True, 'checks': len(report['checks']), 'report_sha256': hashfile(out / 'report.json'), 'archive_written': False, 'historical_target_campaign_passed': False}).decode())
+
+
+if __name__ == '__main__':
+    main()

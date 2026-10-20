@@ -1,0 +1,435 @@
+{
+  "passed": false,
+  "scope": "Whole unapplied reserve candidate + exact SDK RX lifetime bodies on host.\n\nActual typed public inline user-data bodies are extracted, with explicit host\ntypes, crypto callbacks, RTOS locks, capacity inputs and allocation dispatcher.\nActual canonical reclaim module runs against an explicit adaptive-input seam.\nNo actual SDK target compilation, protocol/network, QEMU or hardware claim.\n",
+  "candidate_only": true,
+  "target_compiler_invoked": false,
+  "sdk_build_invoked": false,
+  "qemu_invoked": false,
+  "device_or_network": false,
+  "inputs": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-port-prep-01\\manifest.json": {
+      "bytes": 8008,
+      "sha256": "437dd9e447d395201e67d849209311488b3ea3f5aba8b1e6042a47caba31acfd",
+      "snapshot": "inputs/prep/manifest.json"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-port-prep-01\\candidate\\native_tls_rx_reserve.c": {
+      "bytes": 4627,
+      "sha256": "dfa70f9fbf27cf89b46505a897e81e38510b88af9d8c9f44bcc8058965538b83",
+      "snapshot": "inputs/candidate/native_tls_rx_reserve.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-port-prep-01\\candidate\\native_tls_rx_reserve.h": {
+      "bytes": 885,
+      "sha256": "4fc3e437b3c21a2c035463c476795b16b1348962f8fe1a2de5c035482362511b",
+      "snapshot": "inputs/candidate/native_tls_rx_reserve.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-port-prep-01\\candidate\\patch_cyd_tls_static_rx.py": {
+      "bytes": 2772,
+      "sha256": "1ee4b636e4ba66dbf02280bf04463b22e94c1a8e3ed5b28019ac7fbf2fbff78e",
+      "snapshot": "inputs/candidate/patch_cyd_tls_static_rx.py"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-host-draft-01\\harness\\platform.h": {
+      "bytes": 4104,
+      "sha256": "c843821c32c7efeb54cc36c7de4304a30f0a7fae88ab85be9ca6b16287f0255c",
+      "snapshot": "inputs/harness/platform.h"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-host-draft-01\\harness\\test.c": {
+      "bytes": 17080,
+      "sha256": "bd7575ec066dae95faf57ff186f13341a5b5cae102560184808c5d8af33e99c3",
+      "snapshot": "inputs/harness/test.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-host-draft-01\\run-host.py": {
+      "bytes": 18879,
+      "sha256": "91d6f747654e62fa55c5e4b6552255ef15ea14847af2ef40c84e09af01669ae4",
+      "snapshot": "inputs/runner/run-host.py"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c": {
+      "bytes": 307833,
+      "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/library/ssl_tls.c"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_misc.h": {
+      "bytes": 115094,
+      "sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/library/ssl_misc.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\include\\mbedtls\\ssl.h": {
+      "bytes": 272726,
+      "sha256": "e0cf0f1d80b0148a2252e110907d7b03d59ba6fd69b63acd70bb1d7cf1667f59",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/include/mbedtls/ssl.h"
+    },
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform_util.c": {
+      "bytes": 13698,
+      "sha256": "3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+      "snapshot": "inputs/sdk/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform_util.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.c": {
+      "bytes": 2274,
+      "sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+      "snapshot": "inputs/reclaim/native_input_reclaim.c"
+    },
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.h": {
+      "bytes": 1498,
+      "sha256": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+      "snapshot": "inputs/reclaim/native_input_reclaim.h"
+    }
+  },
+  "commands": [
+    {
+      "label": "host-tool-identities-before",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/python3",
+        "-c",
+        "import hashlib,json,pathlib,subprocess; names=[\"/usr/bin/gcc\",\"/usr/bin/as\",\"/usr/bin/ld\"]; names += [subprocess.check_output([\"/usr/bin/gcc\",v],text=True).strip() for v in [\"-print-prog-name=cc1\",\"-print-prog-name=collect2\",\"-print-file-name=libasan.so\",\"-print-file-name=libubsan.so\"]]; print(json.dumps({str(pathlib.Path(p).resolve()):hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() for p in names})); print(subprocess.check_output([\"/usr/bin/gcc\",\"--version\"],text=True))"
+      ],
+      "exit_status": 0,
+      "log_sha256": "e7d452c61cf155e9d8a216d0cd8a2779b56c32ed1615749bcce8e377dda7e4c6"
+    },
+    {
+      "label": "original-getter-const-rejection",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/original-getter-const-rejection",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/reclaim",
+        "-c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/candidate/native_tls_rx_reserve.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/original-getter-const-rejection/module.o"
+      ],
+      "exit_status": 1,
+      "log_sha256": "d17c9b96235623ac391793c0999a7c56e5f309feb0ebff1eb65d2f3c52790685"
+    },
+    {
+      "label": "canonical-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/canonical",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/canonical/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/canonical/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/harness/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/canonical/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "ada5036a20bd27a36946f1fd32973fe75317a46d20ea50def926a1329541ccda"
+    },
+    {
+      "label": "canonical-ownership",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/canonical/test",
+        "ownership"
+      ],
+      "exit_status": 0,
+      "log_sha256": "416a5b618418e374905b62ddd87a46cefe968a6883ee865fc29471143d561604"
+    },
+    {
+      "label": "canonical-rollback",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/canonical/test",
+        "rollback"
+      ],
+      "exit_status": 0,
+      "log_sha256": "d761295416323b535a160e23500d010e83890c41a91e6f9f4c92e6865359785a"
+    },
+    {
+      "label": "canonical-fallback",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/canonical/test",
+        "fallback"
+      ],
+      "exit_status": 0,
+      "log_sha256": "86f469aa2eede1eb69f13adc69197eaea40735a982e6f8a30d7dc15efab08a2f"
+    },
+    {
+      "label": "canonical-concurrent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/canonical/test",
+        "concurrent"
+      ],
+      "exit_status": 0,
+      "log_sha256": "b495156b51186c078612a30ce71bbffb80fdd91bbb4b291a5f7d5fee81f72147"
+    },
+    {
+      "label": "skip-marker-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/skip-marker",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/skip-marker/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/skip-marker/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/harness/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/skip-marker/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "cd3b38845ee793cd5d5b849ec4620e1f955e3f4dc0ebf685305e3460f1e18a53"
+    },
+    {
+      "label": "skip-marker-ownership",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/skip-marker/test",
+        "ownership"
+      ],
+      "exit_status": 2,
+      "log_sha256": "cbef3ccb1b2ccf5527d866cf82503ecb5cc2fa1d234c33d740ff457f6d531638"
+    },
+    {
+      "label": "skip-exclusive-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/skip-exclusive",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/skip-exclusive/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/skip-exclusive/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/harness/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/skip-exclusive/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "2bc59691bc39f5d6d52cf866329fde5e5fe1c26edd9be085879e80beaa426f0f"
+    },
+    {
+      "label": "skip-exclusive-ownership",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/skip-exclusive/test",
+        "ownership"
+      ],
+      "exit_status": 2,
+      "log_sha256": "1c626a9788098ec20c5863a6675742648adbe7e63e362d539b908744afb67c13"
+    },
+    {
+      "label": "early-publish-build",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/usr/bin/gcc",
+        "-std=c11",
+        "-D_XOPEN_SOURCE=700",
+        "-O1",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-undef",
+        "-pedantic",
+        "-H",
+        "-pthread",
+        "-fsanitize=address,undefined",
+        "-fno-sanitize-recover=all",
+        "-fno-omit-frame-pointer",
+        "-fno-pie",
+        "-no-pie",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/early-publish",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/stubs",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/harness",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/candidate",
+        "-I/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/reclaim",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/early-publish/module.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/early-publish/sdk.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/reclaim/native_input_reclaim.c",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/inputs/harness/test.c",
+        "-o",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/early-publish/test"
+      ],
+      "exit_status": 0,
+      "log_sha256": "c7ccec4449e18a0812d5236f78410443f4259c09e391a1f30ccb2d49889a2b4e"
+    },
+    {
+      "label": "early-publish-concurrent",
+      "argv": [
+        "wsl.exe",
+        "--exec",
+        "/mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/early-publish/test",
+        "concurrent"
+      ],
+      "exit_status": 134,
+      "log_sha256": "b8dc74529ce1f24f5a98dac7a90a3b67ba3451fef47b49c6842bed648f132d12"
+    }
+  ],
+  "positive_cases": {
+    "ownership": {
+      "exit_status": 0,
+      "stdout": "TLS_RX_HOST_CASE ownership_binding_reset_reconnect\nTLS_RX_HOST_COMPLETE case=ownership heap_allocations=152 heap_releases=152\n"
+    },
+    "rollback": {
+      "exit_status": 0,
+      "stdout": "TLS_RX_HOST_CASE exact_sdk_setup_rollback_free\nTLS_RX_HOST_COMPLETE case=rollback heap_allocations=17 heap_releases=17\n"
+    },
+    "fallback": {
+      "exit_status": 0,
+      "stdout": "TLS_RX_HOST_CASE ordinary_dispatcher_and_canonical_reclaim\nTLS_RX_HOST_COMPLETE case=fallback heap_allocations=2 heap_releases=2\n"
+    },
+    "concurrent": {
+      "exit_status": 0,
+      "stdout": "TLS_RX_HOST_CASE parallel_ownership_and_erase_barrier\nTLS_RX_HOST_COMPLETE case=concurrent heap_allocations=22 heap_releases=22\n"
+    }
+  },
+  "controls": {
+    "original-getter-const-rejection": {
+      "expected": "actual_public_getter_nonconst_Werror",
+      "exit_status": 1
+    },
+    "skip-marker": {
+      "scenario": "ownership",
+      "expected": "unlabelled_client_ordinary_rx",
+      "exit_status": 2
+    },
+    "skip-exclusive": {
+      "scenario": "ownership",
+      "expected": "independent_context_rx_no_alias",
+      "exit_status": 2
+    }
+  },
+  "compile_rejections": {},
+  "limitations": [
+    "Host config/context/crypto types are seams, not target ABI/layout proof",
+    "Actual SDK capacity expressions use explicitly chosen host IV/MAC/padding inputs",
+    "Actual public getter/setter bodies compile against host config type only",
+    "No actual certificate validation, handshake crypto, TCP or full service executes",
+    "Adaptive input storage is a metadata/release seam; canonical reclaim wrapper is whole actual source",
+    "No physical resource/fragmentation/default activation or protocol conformance claim"
+  ],
+  "sdk_head": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "sdk_spans": [
+    {
+      "anchor": "static int ssl_handshake_init(",
+      "sha256": "132cd54ff798bb8ee666317a5a57baca361942c0d32f9784b2133171ffc84f92"
+    },
+    {
+      "anchor": "void mbedtls_ssl_init(",
+      "sha256": "2969ae0eaa85049ddf2fac08552d62ec2acda22850852e3f437285db67470156"
+    },
+    {
+      "anchor": "int mbedtls_ssl_setup(",
+      "sha256": "6817bee207c3c43fcb31e94115a8183185be8beba861c872e2317e1e79a293d6"
+    },
+    {
+      "anchor": "void mbedtls_ssl_session_reset_msg_layer(",
+      "sha256": "f0e9bc07ef0003ec84ff0058f3512a920699ebc715aef43ca85f95afe4fba353"
+    },
+    {
+      "anchor": "void mbedtls_ssl_free(",
+      "sha256": "ec924894ab331561b32a7779cd92fe0927d8c802f490e557ebd2c432c5a8bdf7"
+    }
+  ],
+  "host_tool_identities_before": {
+    "/usr/bin/x86_64-linux-gnu-gcc-13": "1b99826121ae6682a634e5efe09bd3e3df58ce58e0b28f849114ab5b89139c26",
+    "/usr/bin/x86_64-linux-gnu-as": "21aff249b692b5c31a44007491f922dcb49f41323e362c57d2ada3f52eddb7f0",
+    "/usr/bin/x86_64-linux-gnu-ld.bfd": "e9ceb054c12207970f2726dfc07e9a66b411602748628baf27399f02a9bbb31b",
+    "/usr/libexec/gcc/x86_64-linux-gnu/13/cc1": "5d1679131184e2de4435b426eb264bf13472fe026db8e5c6bc97445814e8e2f4",
+    "/usr/libexec/gcc/x86_64-linux-gnu/13/collect2": "4d1f341ae5b763b513258ee2812422a45e063c30a2f1924a0cf63d3699f3a158",
+    "/usr/lib/x86_64-linux-gnu/libasan.so.8.0.0": "8d5845bdf056b5db4cfb9fff40ad5eeea8f6da05a8ca6f5935a7d1c138ed2558",
+    "/usr/lib/x86_64-linux-gnu/libubsan.so.1.0.0": "f4a999fcf8392a200e9d93fb066ddb9e89daab8cd94a62137f4506472240a2e8"
+  },
+  "native_tools": {
+    "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+    "C:\\Windows\\System32\\wsl.exe": "fcd08205b608b5c4831e0dcb1801dd274436cd2c8420815f18ae58a085891a18"
+  },
+  "candidate_fix": {
+    "original_sha256": "dfa70f9fbf27cf89b46505a897e81e38510b88af9d8c9f44bcc8058965538b83",
+    "fixed_sha256": "77db50af0ff65dfa333b28584b48632c625d999984e7ff8fffd48cb0e52cdb0f",
+    "change": "Explicit cast solely for actual public read-only getter whose pinned declaration lacks const"
+  },
+  "error": "AssertionError: test: /mnt/c/Work/yoRadio/.worktree/esp32-cyd-c3-review/.build/cyd-tls-reserve-host-draft-01/attempt04/early-publish/module.c:96: release_reserved: Assertion `s_state == RX_RETURNING' failed.\n"
+}

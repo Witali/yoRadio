@@ -1,0 +1,15 @@
+config YORADIO_TLS_STATIC_RX_RESERVE
+    bool "Reserve one full radio TLS RX buffer (experimental)"
+    depends on IDF_TARGET_ESP32 && ESP_TLS_USING_MBEDTLS
+    depends on MBEDTLS_INTERNAL_MEM_ALLOC && !MBEDTLS_CUSTOM_MEM_ALLOC
+    depends on MBEDTLS_CERTIFICATE_BUNDLE && !MBEDTLS_DYNAMIC_BUFFER
+    depends on !MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH
+    depends on !MBEDTLS_SSL_PROTO_GMTSSL1_1 && !MBEDTLS_SSL_CONTEXT_SERIALIZATION
+    default n
+    help
+        Hold one complete SDK RX buffer in static internal RAM. Only radio
+        configurations explicitly labelled by the existing certificate-bundle
+        callback are eligible. Concurrent contexts use the normal allocator,
+        including opt-in idle-input reclaim. All TLS record sizes, task profiles
+        and backend settings stay unchanged. This permanently reduces general
+        heap; useful peak/fragmentation behavior needs physical CYD evidence.

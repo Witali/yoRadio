@@ -1,0 +1,285 @@
+"""Whole unapplied reserve candidate + exact SDK RX lifetime bodies on host.
+
+Actual typed public inline user-data bodies are extracted, with explicit host
+types, crypto callbacks, RTOS locks, capacity inputs and allocation dispatcher.
+Actual canonical reclaim module runs against an explicit adaptive-input seam.
+No actual SDK target compilation, protocol/network, QEMU or hardware claim.
+"""
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+PREP = ROOT / '.build/cyd-tls-reserve-port-prep-01'
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def host(path):
+    value = Path(path).resolve().as_posix()
+    return '/mnt/' + value[0].lower() + value[2:] if sys.platform == 'win32' else value
+
+
+def function(source, anchor):
+    start = source.index(anchor)
+    opening = source.index(b'{', start)
+    # Lexing preserves source positions while excluding braces in comments or
+    # string literals. The returned span itself remains byte-for-byte source.
+    lexical = re.sub(rb'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
+                     lambda match: b' ' * len(match[0]), source, flags=re.S)
+    depth = 0
+    for index in range(opening, len(source)):
+        if lexical[index] == 123:
+            depth += 1
+        elif lexical[index] == 125:
+            depth -= 1
+            if depth == 0:
+                return source[start:index + 1]
+    raise ValueError('Unterminated SDK function')
+
+
+def macro(source, name):
+    lines = source.splitlines(keepends=True)
+    for index, line in enumerate(lines):
+        if re.match(rb'#define\s+' + name.encode() + rb'(?:\s|$)', line):
+            output = line
+            while lines[index].rstrip().endswith(b'\\'):
+                index += 1
+                output += lines[index]
+            return output
+    raise ValueError('Missing SDK capacity macro: ' + name)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--sdk', type=Path, required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    sdk = args.sdk.resolve()
+    out = args.output.resolve()
+    if out.exists() or not out.is_relative_to(HERE):
+        parser.error('Choose a fresh campaign below this ignored draft')
+    out.mkdir()
+    report = {'passed': False, 'scope': __doc__, 'candidate_only': True,
+              'target_compiler_invoked': False, 'sdk_build_invoked': False,
+              'qemu_invoked': False, 'device_or_network': False,
+              'inputs': {}, 'commands': [], 'positive_cases': {}, 'controls': {},
+              'compile_rejections': {}, 'limitations': [
+                  'Host config/context/crypto types are seams, not target ABI/layout proof',
+                  'Actual SDK capacity expressions use explicitly chosen host IV/MAC/padding inputs',
+                  'Actual public getter/setter bodies compile against host config type only',
+                  'No actual certificate validation, handshake crypto, TCP or full service executes',
+                  'Adaptive input storage is a metadata/release seam; canonical reclaim wrapper is whole actual source',
+                  'No physical resource/fragmentation/default activation or protocol conformance claim']}
+    def save():
+        (out / 'report.json').write_bytes((json.dumps(report, indent=2) + '\n').encode())
+    def freeze(path, relative):
+        path = path.resolve()
+        data = path.read_bytes()
+        destination = out / 'inputs' / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(data)
+        report['inputs'][str(path)] = {'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest(),
+                                      'snapshot': destination.relative_to(out).as_posix()}
+        return destination
+    env = os.environ.copy()
+    env.update(PYTHONDONTWRITEBYTECODE='1', GIT_OPTIONAL_LOCKS='0',
+               ASAN_OPTIONS='detect_leaks=1:halt_on_error=1',
+               UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')
+    def execute(label, command):
+        invocation = (['wsl.exe', '--exec'] if sys.platform == 'win32' else []) + list(map(str, command))
+        try:
+            result = subprocess.run(invocation, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60)
+        except subprocess.TimeoutExpired as error:
+            data = error.output or b''
+            (out / (label + '.log')).write_bytes(data)
+            report['commands'].append({'label': label, 'argv': invocation, 'exit_status': 'timeout',
+                                       'log_sha256': hashlib.sha256(data).hexdigest()})
+            save()
+            raise RuntimeError(label + ' timed out; no successful control inferred') from error
+        (out / (label + '.log')).write_bytes(result.stdout)
+        report['commands'].append({'label': label, 'argv': invocation, 'exit_status': result.returncode,
+                                   'log_sha256': hashlib.sha256(result.stdout).hexdigest()})
+        save()
+        return result.returncode, result.stdout.decode(errors='replace').replace('\r\n', '\n')
+    try:
+        manifest = json.loads((PREP / 'manifest.json').read_text())
+        assert all(sha(PREP / key) == entry['sha256'] for key, entry in manifest['files'].items())
+        freeze(PREP / 'manifest.json', Path('prep/manifest.json'))
+        for name in ('native_tls_rx_reserve.c', 'native_tls_rx_reserve.h', 'patch_cyd_tls_static_rx.py'):
+            freeze(PREP / 'candidate' / name, Path('candidate') / name)
+        for name in ('platform.h', 'test.c'):
+            freeze(HERE / 'harness' / name, Path('harness') / name)
+        freeze(Path(__file__), Path('runner/run-host.py'))
+        sources = {}
+        for relative in ['components/mbedtls/mbedtls/library/ssl_tls.c',
+                         'components/mbedtls/mbedtls/library/ssl_misc.h',
+                         'components/mbedtls/mbedtls/include/mbedtls/ssl.h',
+                         'components/mbedtls/mbedtls/tf-psa-crypto/platform/platform_util.c']:
+            sources[Path(relative).name] = freeze(sdk / relative, Path('sdk') / relative)
+        main = ROOT / 'idf/esp32-cyd2usb-native/main'
+        for name in ('native_input_reclaim.c', 'native_input_reclaim.h'):
+            freeze(main / name, Path('reclaim') / name)
+        report['sdk_head'] = subprocess.check_output(['git', '-c', 'core.longpaths=true', 'rev-parse', 'HEAD'], cwd=sdk).decode().strip()
+        assert report['sdk_head'] == '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+        spec = importlib.util.spec_from_file_location('frozen_patcher', out / 'inputs/candidate/patch_cyd_tls_static_rx.py')
+        patcher = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(patcher)
+        overlay = patcher.patch(sources['ssl_tls.c'].read_bytes())
+        (out / 'sdk-overlay.c').write_bytes(overlay)
+        anchors = [b'static int ssl_handshake_init(', b'void mbedtls_ssl_init(',
+                   b'int mbedtls_ssl_setup(', b'void mbedtls_ssl_session_reset_msg_layer(',
+                   b'void mbedtls_ssl_free(']
+        spans = b'\n\n'.join(function(overlay, anchor) for anchor in anchors)
+        spans += b'\n\n' + function(sources['platform_util.c'].read_bytes(), b'void mbedtls_zeroize_and_free(') + b'\n'
+        (out / 'sdk-spans.c').write_bytes(b'#include "platform.h"\n#include "native_tls_rx_reserve.h"\n' + spans)
+        report['sdk_spans'] = [{'anchor': anchor.decode(), 'sha256': hashlib.sha256(function(overlay, anchor)).hexdigest()}
+                               for anchor in anchors]
+        stubs = out / 'stubs'
+        stubs.mkdir()
+        ssl_header = sources['ssl.h'].read_bytes()
+        (stubs / 'public_user_data.h').write_bytes(function(ssl_header, b'static inline void mbedtls_ssl_conf_set_user_data_p(') +
+                                                  b'\n' + function(ssl_header, b'static inline void *mbedtls_ssl_conf_get_user_data_p(') + b'\n')
+        misc = sources['ssl_misc.h'].read_bytes()
+        (stubs / 'capacity.h').write_bytes(b''.join(macro(misc, name) for name in
+            ['MBEDTLS_SSL_PAYLOAD_OVERHEAD', 'MBEDTLS_SSL_IN_PAYLOAD_LEN', 'MBEDTLS_SSL_OUT_PAYLOAD_LEN',
+             'MBEDTLS_SSL_HEADER_LEN', 'MBEDTLS_SSL_IN_BUFFER_LEN', 'MBEDTLS_SSL_OUT_BUFFER_LEN']))
+        for name in ['esp_err.h', 'esp_crt_bundle.h', 'freertos/FreeRTOS.h', 'freertos/task.h',
+                     'mbedtls/ssl.h', 'mbedtls/platform.h', 'mbedtls/platform_util.h',
+                     'ssl_misc.h', 'tf_psa_crypto_common.h', 'adaptive_input.h']:
+            path = stubs / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b'#pragma once\n#include "platform.h"\n')
+        required_flags = ['YORADIO_TLS_STATIC_RX_RESERVE', 'IDF_TARGET_ESP32', 'ESP_TLS_USING_MBEDTLS',
+                          'MBEDTLS_INTERNAL_MEM_ALLOC', 'MBEDTLS_CERTIFICATE_BUNDLE']
+        def config(directory, zero=None, absent=None, extra='', version='60002'):
+            data = ''.join('#define CONFIG_' + flag + ' ' + ('0' if flag == zero else '1') + '\n'
+                           for flag in required_flags if flag != absent) + extra
+            (directory / 'sdkconfig.h').write_bytes(data.encode())
+            (directory / 'esp_idf_version.h').write_bytes(('#define ESP_IDF_VERSION_VAL(a,b,c) ((a)*10000+(b)*100+(c))\n'
+                                                          '#define ESP_IDF_VERSION ' + version + '\n').encode())
+        def flags(directory):
+            return ['/usr/bin/gcc', '-std=c11', '-D_XOPEN_SOURCE=700', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
+                    '-Wno-undef', '-pedantic', '-H', '-pthread', '-fsanitize=address,undefined',
+                    '-fno-sanitize-recover=all', '-fno-omit-frame-pointer', '-fno-pie', '-no-pie',
+                    '-I' + host(directory), '-I' + host(stubs), '-I' + host(out / 'inputs/harness'),
+                    '-I' + host(out / 'inputs/candidate'), '-I' + host(out / 'inputs/reclaim')]
+        tool_probe = ['/usr/bin/python3', '-c',
+            'import hashlib,json,pathlib,subprocess; names=["/usr/bin/gcc","/usr/bin/as","/usr/bin/ld"]; '
+            'names += [subprocess.check_output(["/usr/bin/gcc",v],text=True).strip() for v in '
+            '["-print-prog-name=cc1","-print-prog-name=collect2","-print-file-name=libasan.so","-print-file-name=libubsan.so"]]; '
+            'print(json.dumps({str(pathlib.Path(p).resolve()):hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() for p in names})); '
+            'print(subprocess.check_output(["/usr/bin/gcc","--version"],text=True))']
+        code, log = execute('host-tool-identities-before', tool_probe)
+        assert code == 0
+        report['host_tool_identities_before'] = json.loads(log.splitlines()[0])
+        report['native_tools'] = {str(Path(sys.executable).resolve()): sha(sys.executable)}
+        if sys.platform == 'win32':
+            launcher = Path(os.environ['WINDIR']) / 'System32/wsl.exe'
+            report['native_tools'][str(launcher)] = sha(launcher)
+        original = (out / 'inputs/candidate/native_tls_rx_reserve.c').read_bytes()
+        compatibility = out / 'original-getter-const-rejection'
+        compatibility.mkdir(); config(compatibility)
+        code, log = execute('original-getter-const-rejection', flags(compatibility) +
+                            ['-c', host(out / 'inputs/candidate/native_tls_rx_reserve.c'), '-o', host(compatibility / 'module.o')])
+        assert code != 0 and 'discarded-qualifiers' in log and 'mbedtls_ssl_conf_get_user_data_p' in log, (code, log[-6000:])
+        report['controls']['original-getter-const-rejection'] = {'expected': 'actual_public_getter_nonconst_Werror', 'exit_status': code}
+        old = b'mbedtls_ssl_conf_get_user_data_p(configuration)'
+        new = b'mbedtls_ssl_conf_get_user_data_p((mbedtls_ssl_config *)configuration)'
+        assert original.count(old) == 1
+        candidate = original.replace(old, new)
+        (out / 'candidate-fixed.c').write_bytes(candidate)
+        report['candidate_fix'] = {'original_sha256': hashlib.sha256(original).hexdigest(),
+                                   'fixed_sha256': hashlib.sha256(candidate).hexdigest(),
+                                   'change': 'Explicit cast solely for actual public read-only getter whose pinned declaration lacks const'}
+        variants = [
+            ('canonical', None, None, None, None),
+            ('skip-marker', (b'bytes == sizeof(s_rx) && mbedtls_ssl_conf_get_user_data_p((mbedtls_ssl_config *)configuration) ==\n            (const void *)&s_radio_configuration_marker;', b'bytes == sizeof(s_rx);'), None, 'ownership', 'unlabelled_client_ordinary_rx'),
+            ('skip-exclusive', (b'if (s_state == RX_FREE) {', b'if (true) {'), None, 'ownership', 'independent_context_rx_no_alias'),
+            ('early-publish', (b's_state = RX_RETURNING;', b's_state = RX_FREE;'), None, 'concurrent', 'no_reloan_during_erase'),
+            ('skip-rollback', None, (b'    yoradio_tls_static_rx_free(ssl->in_buf);', b'    (void)ssl->in_buf;'), 'rollback', 'rollback_returns_slot'),
+            ('ordinary-free-static', (b'if (pointer != s_rx) return false;', b'if (pointer != s_rx) return false;\n    mbedtls_free(pointer);\n    return true;'), None, 'ownership', 'reserved_pointer_never_sdk_heap_free'),
+            ('bypass-reclaim', (b'return mbedtls_calloc(count, bytes);', b'return __real_esp_mbedtls_mem_calloc(count, bytes);'), None, 'fallback', 'busy_slot_reclaim_retry_preserved'),
+        ]
+        for name, mutation, sdk_mutation, case, expected in variants:
+            directory = out / name
+            directory.mkdir(); config(directory)
+            module = candidate
+            sdk_body = (out / 'sdk-spans.c').read_bytes()
+            for label, edit, data in [('module', mutation, module), ('sdk', sdk_mutation, sdk_body)]:
+                if edit:
+                    newline = b'\r\n' if b'\r\n' in data else b'\n'
+                    edit = tuple(value.replace(b'\n', newline) for value in edit)
+                    assert data.count(edit[0]) == 1, (name, label)
+                    data = data.replace(*edit)
+                if label == 'module': module = data
+                else: sdk_body = data
+            (directory / 'module.c').write_bytes(module)
+            (directory / 'sdk.c').write_bytes(sdk_body)
+            executable = directory / 'test'
+            command = flags(directory) + [host(directory / 'module.c'), host(directory / 'sdk.c'),
+                host(out / 'inputs/reclaim/native_input_reclaim.c'), host(out / 'inputs/harness/test.c'), '-o', host(executable)]
+            code, log = execute(name + '-build', command)
+            assert code == 0, (name, log[-8000:])
+            assert host(stubs / 'public_user_data.h') in log and host(stubs / 'capacity.h') in log
+            for scenario in ([case] if case else ['ownership', 'rollback', 'fallback', 'concurrent']):
+                code, log = execute(name + '-' + scenario, [host(executable), scenario])
+                assert not any(marker in log for marker in ('AddressSanitizer', 'LeakSanitizer', 'runtime error:', 'Assertion ')), log
+                if expected:
+                    assert code == 2 and log.splitlines()[-1] == 'TLS_RX_HOST_FAILURE ' + expected, (name, code, log)
+                    assert sum('TLS_RX_HOST_FAILURE' in line for line in log.splitlines()) == 1
+                    report['controls'][name] = {'scenario': scenario, 'expected': expected, 'exit_status': code}
+                else:
+                    assert code == 0 and 'TLS_RX_HOST_COMPLETE case=' + scenario in log, (name, code, log)
+                    report['positive_cases'][scenario] = {'exit_status': code, 'stdout': log}
+                save()
+        invalids = [(flag + '-zero', flag, None, '', '60002') for flag in required_flags]
+        invalids += [(flag + '-absent', None, flag, '', '60002') for flag in required_flags]
+        invalids += [('dynamic', None, None, '#define CONFIG_MBEDTLS_DYNAMIC_BUFFER 1\n', '60002'),
+                     ('custom', None, None, '#define CONFIG_MBEDTLS_CUSTOM_MEM_ALLOC 1\n', '60002'),
+                     ('variable-actual-macro', None, None, '#define MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH\n', '60002'),
+                     ('version', None, None, '', '60100')]
+        for name, zero, absent, extra, version in invalids:
+            directory = out / ('compile-reject-' + name)
+            directory.mkdir(); config(directory, zero, absent, extra, version)
+            module = directory / 'module.c'
+            module.write_bytes(candidate)
+            code, log = execute('compile-reject-' + name, flags(directory) + ['-c', host(module), '-o', host(directory / 'module.o')])
+            expected = 'CYD RX reserve requires the audited ESP-IDF6.0.2 declaration/layout profile' if name == 'version' else 'CYD RX reserve requires the audited classic ESP32 static/internal profile'
+            assert code != 0 and expected in log, (name, code, log[-3000:])
+            report['compile_rejections'][name] = {'exit_status': code, 'exact_diagnostic': expected}
+            save()
+        code, log = execute('host-tool-identities-after', tool_probe)
+        assert code == 0
+        report['host_tool_identities'] = json.loads(log.splitlines()[0])
+        assert report['host_tool_identities'] == report['host_tool_identities_before']
+        assert all(sha(path) == digest for path, digest in report['native_tools'].items())
+        report['inputs_unchanged'] = all(sha(path) == entry['sha256'] and sha(out / entry['snapshot']) == entry['sha256']
+                                          for path, entry in report['inputs'].items())
+        assert report['inputs_unchanged']
+        assert all(sha(PREP / key) == entry['sha256'] for key, entry in manifest['files'].items())
+        report['prep01_immutable_manifest_verified'] = True
+        report['generated_inputs'] = {path.relative_to(out).as_posix(): sha(path) for path in out.rglob('*')
+                                      if path.is_file() and path.suffix in ('.c', '.h') and not path.is_relative_to(out / 'inputs')}
+        report['passed'] = True
+        save()
+        print(json.dumps({'passed': True, 'positive_cases': len(report['positive_cases']),
+                          'semantic_controls': len(report['controls']) - 1, 'invalid_compiles': len(report['compile_rejections']),
+                          'report_sha256': sha(out / 'report.json')}))
+    except BaseException as error:
+        report['error'] = type(error).__name__ + ': ' + str(error)
+        save()
+        raise
+
+
+if __name__ == '__main__':
+    main()

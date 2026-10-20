@@ -1,0 +1,157 @@
+"""UNRUN configure-only prototype gate. No compiler, SDK export/build or QEMU.
+
+Every case receives fresh ignored SDK source/proposal copies; originals are
+hashed before/after. This gate does not yet qualify a tracked integration.
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+
+HERE = Path(__file__).resolve().parent
+CASES = {
+    'canonical': {}, 'disabled': {'enabled': False}, 'early': {'early': True},
+    'wrong-target': {'IDF_TARGET': 'esp32c3'},
+    'wrong-major': {'IDF_VERSION_MAJOR': '7'},
+    'wrong-minor': {'IDF_VERSION_MINOR': '1'},
+    'wrong-patch': {'IDF_VERSION_PATCH': '3'},
+    'malformed-major': {'IDF_VERSION_MAJOR': '6junk'},
+    'missing-major': {'IDF_VERSION_MAJOR': ''},
+    'external-allocator': {'CONFIG_MBEDTLS_INTERNAL_MEM_ALLOC': 'OFF'},
+    'custom-allocator': {'CONFIG_MBEDTLS_CUSTOM_MEM_ALLOC': 'ON'},
+    'dynamic-rx': {'CONFIG_MBEDTLS_DYNAMIC_BUFFER': 'ON'},
+    'variable-rx': {'CONFIG_MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH': 'ON'},
+    'wrong-tls': {'CONFIG_ESP_TLS_USING_MBEDTLS': 'OFF'},
+    'no-bundle': {'CONFIG_MBEDTLS_CERTIFICATE_BUNDLE': 'OFF'},
+    'short-content': {'CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN': '4096'},
+    'serialization': {'CONFIG_MBEDTLS_SSL_CONTEXT_SERIALIZATION': 'ON'},
+    'gmtssl': {'CONFIG_MBEDTLS_SSL_PROTO_GMTSSL1_1': 'ON'},
+    'missing-target': {'target': False},
+    'source-absent': {'sources': 'absent'},
+    'source-duplicate': {'sources': 'duplicate'},
+    'source-mutated': {'mutate': True},
+    'missing-patcher': {'patcher': False},
+    'missing-module': {'module': False},
+}
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--sdk', type=Path, required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--cmake', type=Path, required=True)
+    parser.add_argument('--ninja', type=Path, required=True)
+    args = parser.parse_args()
+    sdk = args.sdk.resolve()
+    out = args.output.resolve()
+    worktree = HERE.parent.parent
+    if not out.is_relative_to(worktree / '.build') or out.exists() or out.is_relative_to(HERE):
+        parser.error('Choose a fresh sibling ignored .build output')
+    originals = [HERE / 'run-config.py', *sorted((HERE / 'candidate').glob('*')),
+                 sdk / 'components/mbedtls/mbedtls/library/ssl_tls.c']
+    originals += [args.cmake.resolve(), args.ninja.resolve(), Path(sys.executable).resolve()]
+    if not all(path.is_file() for path in originals):
+        parser.error('Required source or tool input missing')
+    identities = {str(path): {'bytes': path.stat().st_size, 'sha256': sha(path)} for path in originals}
+    out.mkdir()
+    report = {'passed': False, 'scope': __doc__, 'compiler_invoked': False,
+              'sdk_build_invoked': False, 'qemu_invoked': False,
+              'candidate_only': True, 'inputs': identities, 'cases': {}}
+
+    def save():
+        (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8', newline='\n')
+
+    def unchanged():
+        return all(sha(path) == identity['sha256'] for path, identity in identities.items())
+
+    save()
+    for name, variant in CASES.items():
+        directory = out / name
+        project = directory / 'project'
+        project.mkdir(parents=True)
+        proposal = directory / 'candidate'
+        shutil.copytree(HERE / 'candidate', proposal)
+        sdk_copy = directory / 'sdk/components/mbedtls'
+        library = sdk_copy / 'mbedtls/library'
+        library.mkdir(parents=True)
+        sdk_source = library / 'ssl_tls.c'
+        sdk_source.write_bytes((sdk / 'components/mbedtls/mbedtls/library/ssl_tls.c').read_bytes())
+        if variant.get('mutate'):
+            sdk_source.write_bytes(sdk_source.read_bytes() + b'\n/* guard control */\n')
+        settings = {
+            'CONFIG_YORADIO_TLS_STATIC_RX_RESERVE': 'OFF' if variant.get('enabled') is False else 'ON',
+            'CMAKE_BUILD_EARLY_EXPANSION': 'ON' if variant.get('early') else 'OFF',
+            'IDF_VERSION_MAJOR': '6', 'IDF_VERSION_MINOR': '0', 'IDF_VERSION_PATCH': '2',
+            'IDF_TARGET': 'esp32', 'CONFIG_ESP_TLS_USING_MBEDTLS': 'ON',
+            'CONFIG_MBEDTLS_INTERNAL_MEM_ALLOC': 'ON', 'CONFIG_MBEDTLS_CERTIFICATE_BUNDLE': 'ON',
+            'CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN': '16384', 'COMPONENT_LIB': 'main',
+            'PYTHON': Path(sys.executable).as_posix(),
+            'YORADIO_RX_RESERVE_PATCHER': (proposal / ('patch_cyd_tls_static_rx.py' if variant.get('patcher') is not False else 'absent.py')).as_posix(),
+            'YORADIO_RX_RESERVE_MODULE': (proposal / ('native_tls_rx_reserve.c' if variant.get('module') is not False else 'absent.c')).as_posix(),
+        }
+        settings.update({key: value for key, value in variant.items() if key.isupper()})
+        lines = ['cmake_minimum_required(VERSION 3.20)', 'project(RxReserveConfig NONE)',
+                 'add_library(main INTERFACE)', 'target_link_options(main INTERFACE keep-existing)']
+        if variant.get('target') is not False:
+            sources = ['ssl_tls.c']
+            if variant.get('sources') == 'absent':
+                sources = ['ssl_other.c']
+            if variant.get('sources') == 'duplicate':
+                sources.append(sdk_source.as_posix())
+            lines += ['add_library(mbedtls INTERFACE)',
+                      'set_property(TARGET mbedtls PROPERTY SOURCES "' + ';'.join(sources) + '")']
+        lines += ['set(' + key + ' "' + value + '")' for key, value in settings.items()]
+        lines += ['function(idf_component_get_property destination component property)',
+                  'set(${destination} "' + sdk_copy.as_posix() + '" PARENT_SCOPE)', 'endfunction()',
+                  'include("' + (proposal / 'enable.cmake').as_posix() + '")',
+                  'native_enable_tls_static_rx_reserve()',
+                  'get_target_property(main_sources main SOURCES)',
+                  'get_target_property(main_options main INTERFACE_LINK_OPTIONS)',
+                  'file(WRITE "${CMAKE_BINARY_DIR}/captured.txt" "${main_sources}\\n${main_options}\\n${CMAKE_C_COMPILER}|${CMAKE_CXX_COMPILER}\\n")']
+        (project / 'CMakeLists.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+        command = [str(args.cmake.resolve()), '-G', 'Ninja', '-DCMAKE_MAKE_PROGRAM=' + args.ninja.resolve().as_posix(),
+                   '-DCMAKE_TOOLCHAIN_FILE=', '-S', str(project), '-B', str(directory / 'build')]
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60)
+        (directory / 'configure.log').write_bytes(result.stdout)
+        (directory / 'command.json').write_text(json.dumps(command, indent=2) + '\n', encoding='utf-8', newline='\n')
+        positive = name in ('canonical', 'disabled', 'early')
+        if positive:
+            passed = result.returncode == 0
+            if passed:
+                captured = (directory / 'build/captured.txt').read_text()
+                expected = 'native_tls_rx_reserve.c' if name == 'canonical' else 'main_sources-NOTFOUND'
+                passed = expected in captured and 'keep-existing' in captured and captured.endswith('|\n')
+        else:
+            if name == 'source-mutated':
+                expected = 'CYD static RX overlay rejected SDK'
+            elif name in ('source-absent', 'source-duplicate'):
+                expected = 'Expected exactly one audited static RX source'
+            elif name == 'missing-target':
+                expected = 'CYD static RX reserve requires registered canonical targets'
+            elif name in ('missing-patcher', 'missing-module'):
+                expected = 'Missing unapplied RX reserve proposal inputs'
+            elif name.startswith(('wrong-target', 'wrong-major', 'wrong-minor', 'wrong-patch', 'malformed', 'missing-major')):
+                expected = 'CYD static RX reserve requires exact ESP32 IDF6.0.2'
+            else:
+                expected = 'CYD static RX reserve rejects unsupported allocator/buffer/config lifetime'
+            passed = result.returncode != 0 and expected.encode() in result.stdout
+        report['cases'][name] = {'passed': passed, 'exit_code': result.returncode,
+                                  'expected': expected, 'log_sha256': hashlib.sha256(result.stdout).hexdigest()}
+        save()
+        if not passed or not unchanged():
+            raise RuntimeError('Config prototype case or source closure failed: ' + name)
+    report['original_inputs_unchanged'] = unchanged()
+    report['passed'] = report['original_inputs_unchanged'] and all(case['passed'] for case in report['cases'].values())
+    save()
+    print(json.dumps({'passed': report['passed'], 'cases': len(report['cases']), 'report': str(out / 'report.json')}))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,134 @@
+# CYD static full-record RX reserve: complete option-matrix target preparation
+
+**Unbuilt, unrun and not integrated. Root review must precede any SDK configure,
+target build or QEMU invocation.** Previous prep01 and passing host/config
+campaigns and earlier eight-variant target-prep01 remain immutable. Its eight
+variants did not include actual reserve-off targets. This new prep02 adds both
+reserve-off builds and requires ten variants for the full target gate.
+All files here are ignored task drafts; production
+source, Git, SDK and board are unchanged. Ogg, deferred AAC and blocked FLAC
+extensions are excluded.
+
+## New guard enforcement
+
+The candidate module is byte-equal to the corrected host-tested copy
+`77db50af0ff65dfa333b28584b48632c625d999984e7ff8fffd48cb0e52cdb0f`.
+Only new helper/patcher copies changed. They now require the immutable complete
+17-source supporting guard manifest and uniform LF/CRLF source bytes with
+pinned normalized content. This binds full RX macro arithmetic, public getter
+declarations, the SDK allocator dispatcher/free and zeroization, certificate
+attach implementation, and actual HTTP→transport→ESP-TLS callback chain. Exact
+classic ESP32 target and its positive target boolean are both checked. Every
+guarded source is registered as a configure dependency; all three RX lifetime
+sites still use the original audited SDK source. Installed SDK output paths are
+rejected. The SDK commit/clean state must also hold before/after actual builds.
+
+`prepare-checks.py` only imports the new patcher, validates current sources and
+tests isolated copied sources/manifests. It does not run CMake or any compiler.
+These checks cannot substitute for actual CMake wiring and real target private
+header/public API compilation. The older passing configure report qualified
+the earlier helper bytes, not this strengthened helper.
+
+## Unbuilt actual SDK fixture
+
+`project/main/main.c` uses real public config init/defaults, certificate-bundle
+attach, SSL setup/session reset/free and real heap/adaptive-input APIs. It
+observes the new RX allocator's public return values through a fixture-only
+wrapper; it does not read private SSL context fields, replace process-wide
+allocator dispatchers, or alter TLS content sizes. Ordinary wrapper calls
+forward to the real SDK functions.
+
+Planned execution covers unlabelled first-client exclusion, occupied public
+user-data retention, two independent eligible configs, repeated cleanup/reset
+and reopen, dual-core claim/handover, erase-before-reloan and heap integrity.
+The fixture's main/worker stacks are isolated test resources, not changes to
+production board profiles. No radio/TFT/audio service or network executes.
+
+`project/main/disabled.c` supplies two distinct actual reserve-off controls.
+CMake selects this entry instead of main.c, compiles the original SDK ssl_tls.c,
+omits the reserve module/static storage and all four RX/heap observation wraps,
+and calls the original certificate-bundle attach directly. SDK calloc/free
+dispatchers remain ordinary; only the existing canonical reclaim wrapper is
+selected when that independent option is on. The disabled smoke tests use real
+setup/reset/free/reopen, full public incoming-payload capacity, simultaneous
+independent contexts and heap integrity. They do not claim real-heap OOM or
+reclaim-recovery coverage beyond what the enabled fixture separately executes.
+
+Four explicitly labelled **ordinal failure injections** at the underlying heap
+calloc seam exercise the first four ordinary SDK setup allocations after the
+reserved RX allocation. They return test-controlled NULL and are not evidence
+of real heap exhaustion. The original setup/rollback/free bodies execute.
+
+Separate actual-heap-pressure cases call the unchanged allocator under internal
+heap exhaustion, observe genuine NULL and recovery, and use the whole canonical
+reclaim module and adaptive queue. A busy reserve falls back through the SDK
+dispatcher; IDLE extras may be released while READY/READING/WRITING leases and
+payloads are checked. Injection is disabled for those cases. Target results
+must demonstrate the real observed NULL/request/recovery sequence before any
+actual allocator claim; none is yet claimed here. Successful ordinary allocations
+are forwarded to their original free function, and any reserved pointer reaching
+ordinary heap free is a named fixture failure before heap corruption.
+
+## Frozen variants and next commands after review
+
+`freeze-run.py` writes a fresh sibling ignored campaign, canonical candidate,
+complete project, actual canonical reclaim/adaptive sources and production
+Kconfig snapshot, with all source identities fixed before build. Exact mutations
+are recorded separately for marker omission, busy exclusion, setup rollback,
+phase-scoped early FREE publication, ordinary free misuse and reclaim bypass.
+Expected controls require one exact `TLS_RX_TARGET_FAILURE <name>` plus
+`TLS_RX_TARGET_CONTROLLED_STOP`; generic panic/assert, build failure and timeout
+must remain nonpass. The early-publication mutant is intentionally phase scoped
+to the erase-barrier scenario.
+
+After root review, prepare one fresh campaign per variant:
+
+```text
+python -B .build/cyd-tls-reserve-target-prep-02/freeze-run.py --output .build/cyd-tls-reserve-target-01 --variant canonical
+```
+
+Its frozen `sources/sdk-build.ps1` builds only that isolated campaign, with
+installed SDK/tool paths supplied explicitly. Use `-RepositoryDirectory` for
+this worktree and the campaign's frozen launcher. `-DisableReclaim` and
+`-DisableReserve` create independent option controls; each must use a fresh
+campaign, not overwrite a
+previous build. No download, flashing, serial, OTA or reset command is present.
+The launcher is not yet executed or target-qualified.
+
+`run-target.py` now supplies the runnable source→build→ELF→compiled-header
+closure→merge→QEMU→exact-result chain. It uses the reviewed early-MPI runner's
+source/tool/SDK discipline and distinct reserve result logic. It freezes each
+variant before creating the parent report; pins the clean SDK and original
+inputs; captures installed tools/ROM, actual ELF machine94, exact module and
+generated SDK-TU rows, initialized allocator-dispatch words and ownership call
+destinations, compiled header closure before/after runtime, config values and
+flash merge bytes. Child PID and authoritative terminal exit/log hashes are
+saved; timeout terminates the same child tree and remains nonpass. QEMU runs
+with no NIC. No device command exists.
+
+Concrete commands **after root review**:
+
+```text
+python -B .build/cyd-tls-reserve-target-prep-02/run-target.py --output .build/cyd-tls-reserve-target-compile-01 --variants canonical --compile-only
+python -B .build/cyd-tls-reserve-target-prep-02/run-target.py --output .build/cyd-tls-reserve-target-runtime-01
+```
+
+The second command defaults to all ten variants: canonical reserve-on/reclaim-on,
+six exact mutants, reserve-on/reclaim-off, reserve-off/reclaim-on and
+reserve-off/reclaim-off. The four option combinations require real target builds
+and runs; the earlier configure-only off case is not their qualification.
+The runner checks exact source rows, absence of module/static-slot/RX-wrapper
+symbols, actual link wrap options and ordinary callback/allocator routes for
+reserve-off builds. SDK/tools/QEMU/PowerShell paths can be supplied
+explicitly with their named options. Compile-only leaves `passed=false` and
+runtime unrun. Selected runtime variants have their actual narrower scope
+reported; `full_target_matrix_complete` requires all ten. `--preflight-only`
+creates no output; `--freeze-only` checks the source/tool/SDK preparation path
+without SDK export, configure, compilation or QEMU. Both preparation modes have
+been exercised only as preparation; no target result is yet qualified.
+
+Production integration, whole-service callback/redirect/Stop/cancel binding,
+full lint and application variants, physical full-record HTTP/HTTPS behavior,
+resource measurements and static-versus-heap-held usefulness/default decisions
+remain pending. All tests named above are **planned/unrun** unless an offline
+guard report explicitly says otherwise.

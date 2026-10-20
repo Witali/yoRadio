@@ -1,0 +1,50 @@
+"""Review immutable variant recipes only; no compiler, SDK export or runtime."""
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+VARIANTS = ('canonical', 'skip-marker', 'skip-exclusive', 'skip-rollback',
+            'early-publish-phase', 'ordinary-free-static', 'bypass-reclaim')
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def main():
+    output = HERE / 'frozen-recipe-review.json'
+    if output.exists():
+        raise ValueError('Frozen recipe review already exists')
+    report = {'passed': False, 'scope': __doc__, 'commands': [], 'variants': {}}
+    for name in VARIANTS:
+        campaign = ROOT / ('.build/cyd-tls-reserve-target-frozen-' + name + '-01')
+        command = [sys.executable, '-B', '-X', 'utf8', str(HERE / 'freeze-run.py'),
+                   '--output', str(campaign), '--variant', name]
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=30)
+        report['commands'].append({'argv': command, 'exit_status': result.returncode,
+                                   'stdout': result.stdout.decode(errors='replace')})
+        assert result.returncode == 0
+        manifest = json.loads((campaign / 'source-manifest.json').read_text())
+        assert manifest['status'] == 'frozen_unbuilt_unrun_target_candidate' and manifest['variant'] == name
+        assert all(sha(campaign / path) == digest for path, digest in manifest['frozen_sources'].items())
+        assert all(sha(path) == record['sha256'] for path, record in manifest['original_inputs'].items())
+        if name == 'canonical':
+            assert not manifest['exact_changes'] and manifest['expected_failure'] is None
+        else:
+            assert manifest['expected_failure'] and manifest['exact_changes']
+        report['variants'][name] = {'campaign': str(campaign),
+            'source_manifest_sha256': sha(campaign / 'source-manifest.json'),
+            'expected_failure': manifest['expected_failure'],
+            'early_publish_mutation_phase_scoped': manifest['early_publish_mutation_phase_scoped']}
+    report['passed'] = True
+    output.write_bytes((json.dumps(report, indent=2) + '\n').encode())
+    print(json.dumps({'passed': True, 'variants_frozen': len(VARIANTS),
+                      'build_or_runtime': False, 'report_sha256': sha(output)}))
+
+
+if __name__ == '__main__':
+    main()

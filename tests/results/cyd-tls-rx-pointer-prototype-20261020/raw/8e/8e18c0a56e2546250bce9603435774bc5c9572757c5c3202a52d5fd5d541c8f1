@@ -1,0 +1,124 @@
+"""Offline source guard/preparation checks only. No SDK configure/build/runtime."""
+import argparse
+import ast
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import subprocess
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--sdk', type=Path, required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    sdk = args.sdk.resolve()
+    out = args.output.resolve()
+    if out.exists() or not out.is_relative_to(HERE):
+        parser.error('Choose a fresh directory within this target prep')
+    for script in (HERE / 'freeze-run.py', HERE / 'prepare-checks.py', HERE / 'run-target.py',
+                   HERE / 'review-freezes.py', HERE / 'candidate/patch_cyd_tls_static_rx.py'):
+        ast.parse(script.read_text(encoding='utf-8'), filename=str(script))
+    out.mkdir()
+    spec = importlib.util.spec_from_file_location('new_guarded_patcher', HERE / 'candidate/patch_cyd_tls_static_rx.py')
+    patcher = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(patcher)
+    guards = HERE / 'candidate/supporting-source-guards.json'
+    entries = json.loads(guards.read_text())
+    canonical = patcher.validate_sdk_guards(sdk, guards)
+    assert len(canonical) == 17
+    report = {'passed': False, 'scope': __doc__, 'candidate_unbuilt': True,
+              'sdk_build_invoked': False, 'sdk_configure_invoked': False, 'target_runtime_invoked': False,
+              'actual_sdk_guards': canonical, 'guard_cases': {}, 'original_inputs': {}}
+    copy = out / 'sdk-copy'
+    for relative, digest in canonical.items():
+        path = sdk / relative
+        data = path.read_bytes()
+        destination = copy / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(data)
+        report['original_inputs'][str(path)] = {'sha256': digest, 'snapshot': destination.relative_to(out).as_posix()}
+    for kind in ('raw', 'uniform-lf', 'uniform-crlf'):
+        for relative in canonical:
+            original = (sdk / relative).read_bytes()
+            normalized = original.replace(b'\r\n', b'\n')
+            (copy / relative).write_bytes(original if kind == 'raw' else normalized if kind == 'uniform-lf' else normalized.replace(b'\n', b'\r\n'))
+        assert len(patcher.validate_sdk_guards(copy, guards)) == 17
+        report['guard_cases'][kind] = {'passed': True, 'accepted': True}
+    for relative in canonical:
+        (copy / relative).write_bytes((sdk / relative).read_bytes())
+    for index, relative in enumerate(canonical):
+        path = copy / relative
+        original = path.read_bytes()
+        mutated = original + b'\n/* exact supporting source mutation */\n'
+        path.write_bytes(mutated)
+        try:
+            patcher.validate_sdk_guards(copy, guards)
+        except ValueError as error:
+            expected = 'Unaudited static RX supporting source: ' + relative
+            assert str(error) == expected
+        else:
+            raise AssertionError('Accepted unaudited support source')
+        snapshot = out / 'mutations' / str(index) / Path(relative).name
+        snapshot.parent.mkdir(parents=True)
+        snapshot.write_bytes(mutated)
+        report['guard_cases']['mutate-' + str(index)] = {'passed': True, 'expected': expected,
+            'relative': relative, 'mutated_sha256': hashlib.sha256(mutated).hexdigest(),
+            'snapshot': snapshot.relative_to(out).as_posix()}
+        path.write_bytes(original)
+    changed_guard = out / 'changed-guards.json'
+    changed_guard.write_bytes(guards.read_bytes() + b'\n')
+    try:
+        patcher.validate_sdk_guards(copy, changed_guard)
+    except ValueError as error:
+        assert str(error) == 'Unsupported static RX supporting-source guard manifest'
+    else:
+        raise AssertionError('Accepted changed manifest')
+    report['guard_cases']['changed-manifest'] = {'passed': True, 'expected': 'Unsupported static RX supporting-source guard manifest'}
+    mixed_path = copy / 'components/mbedtls/mbedtls/library/ssl_misc.h'
+    original = mixed_path.read_bytes()
+    normalized = original.replace(b'\r\n', b'\n')
+    mixed_path.write_bytes(normalized.replace(b'\n', b'\r\n', 1))
+    try:
+        patcher.validate_sdk_guards(copy, guards)
+    except ValueError as error:
+        assert str(error) == 'Unaudited static RX supporting source: components/mbedtls/mbedtls/library/ssl_misc.h'
+    else:
+        raise AssertionError('Accepted mixed header line endings')
+    mixed_path.write_bytes(original)
+    report['guard_cases']['mixed-header-line-endings'] = {'passed': True, 'rejected': True}
+    assert patcher.validate_sdk_guards(copy, guards) == canonical
+    original_rx = (sdk / 'components/mbedtls/mbedtls/library/ssl_tls.c').read_bytes()
+    overlay = patcher.patch(original_rx)
+    (out / 'canonical-ssl_tls.overlay.c').write_bytes(overlay)
+    report['overlay'] = {'bytes': len(overlay), 'sha256': hashlib.sha256(overlay).hexdigest()}
+    host_source = ROOT / '.build/cyd-tls-reserve-host-draft-01/attempt05/candidate-fixed.c'
+    assert sha(host_source) == sha(HERE / 'candidate/native_tls_rx_reserve.c')
+    report['candidate_equals_qualified_host_fixed_copy'] = True
+    report['host_candidate_sha256'] = sha(host_source)
+    paths = [*sorted((HERE / 'candidate').glob('*')), *sorted((HERE / 'project').rglob('*')),
+             HERE / 'sdk-build.ps1', HERE / 'freeze-run.py', HERE / 'prepare-checks.py', HERE / 'README.md',
+             HERE / 'run-target.py', HERE / 'check-launcher.ps1', HERE / 'review-freezes.py']
+    report['proposal_sources'] = {str(path): sha(path) for path in paths if path.is_file()}
+    report['sdk_head'] = subprocess.check_output(['git', '-c', 'core.longpaths=true', '-C', str(sdk), 'rev-parse', 'HEAD']).decode().strip()
+    assert report['sdk_head'] == '7101770dc6db2667b3c477cc31365dd1acd6db4e'
+    assert all(sha(source) == record['sha256'] for source, record in report['original_inputs'].items())
+    for campaign in [ROOT / '.build/cyd-tls-reserve-host-draft-01/qualification-report.json',
+                     ROOT / '.build/cyd-tls-reserve-config-draft-01/report.json']:
+        report.setdefault('prior_passing_report_identities', {})[str(campaign)] = sha(campaign)
+    report['passed'] = True
+    (out / 'report.json').write_bytes((json.dumps(report, indent=2) + '\n').encode())
+    print(json.dumps({'passed': True, 'scope': 'offline guard/preparation only', 'guard_cases': len(report['guard_cases']),
+                      'target_build_or_runtime': False, 'report_sha256': sha(out / 'report.json')}))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,109 @@
+/* UNAPPLIED CYD PROPOSAL. No production or target qualification is claimed. */
+#include "native_tls_rx_reserve.h"
+
+#include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
+#include "sdkconfig.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_crt_bundle.h"
+#include "esp_idf_version.h"
+#include "mbedtls/platform.h"
+#include "mbedtls/platform_util.h"
+#include "ssl_misc.h"
+#include "tf_psa_crypto_common.h"
+extern int tls_reserve_test_erase_phase(void);
+
+#if !CONFIG_YORADIO_TLS_STATIC_RX_RESERVE || !CONFIG_IDF_TARGET_ESP32 || \
+    !CONFIG_ESP_TLS_USING_MBEDTLS || !CONFIG_MBEDTLS_INTERNAL_MEM_ALLOC || \
+    !CONFIG_MBEDTLS_CERTIFICATE_BUNDLE || CONFIG_MBEDTLS_CUSTOM_MEM_ALLOC || \
+    CONFIG_MBEDTLS_DYNAMIC_BUFFER || CONFIG_MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH || \
+    CONFIG_MBEDTLS_SSL_PROTO_GMTSSL1_1 || CONFIG_MBEDTLS_SSL_CONTEXT_SERIALIZATION || \
+    defined(MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH)
+#error "CYD RX reserve requires the audited classic ESP32 static/internal profile"
+#endif
+#if ESP_IDF_VERSION != ESP_IDF_VERSION_VAL(6, 0, 2)
+#error "CYD RX reserve requires the audited ESP-IDF6.0.2 declaration/layout profile"
+#endif
+
+_Static_assert(MBEDTLS_SSL_IN_CONTENT_LEN == 16384,
+               "CYD reservation retains the full input record content capacity");
+_Static_assert(MBEDTLS_SSL_IN_BUFFER_LEN >= MBEDTLS_SSL_IN_CONTENT_LEN,
+               "The complete SDK RX buffer expression must include its overhead");
+
+/* Exact pinned SDK formula. No donor dynamic-adapter header or numerical size.
+ * The slot is permanently withheld from general heap even during plain HTTP.
+ * It is not a claim of peak/free heap improvement. */
+static _Alignas(max_align_t) unsigned char s_rx[MBEDTLS_SSL_IN_BUFFER_LEN];
+static const unsigned char s_radio_configuration_marker;
+static portMUX_TYPE s_lock = portMUX_INITIALIZER_UNLOCKED;
+typedef enum { RX_FREE, RX_LOANED, RX_RETURNING } rx_state_t;
+static rx_state_t s_state;
+
+esp_err_t native_tls_rx_reserve_crt_bundle_attach(void *configuration) {
+    /* Preserve the existing function call and result. Do not overwrite another
+     * public API user's data. No allocation is claimed before ssl_setup. */
+    esp_err_t result = esp_crt_bundle_attach(configuration);
+    if (result == ESP_OK && configuration) {
+        mbedtls_ssl_config *conf = configuration;
+        if (mbedtls_ssl_conf_get_user_data_p(conf) == NULL)
+            mbedtls_ssl_conf_set_user_data_p(conf,
+                (void *)&s_radio_configuration_marker);
+    }
+    return result;
+}
+
+void *yoradio_tls_static_rx_calloc(const mbedtls_ssl_config *configuration,
+                                 size_t count, size_t bytes) {
+    bool eligible = configuration && !xPortInIsrContext() && count == 1 &&
+        bytes == sizeof(s_rx) && mbedtls_ssl_conf_get_user_data_p((mbedtls_ssl_config *)configuration) ==
+            (const void *)&s_radio_configuration_marker;
+    bool claimed = false;
+    if (eligible) {
+        portENTER_CRITICAL(&s_lock);
+        if (s_state == RX_FREE) {
+            s_state = RX_LOANED;
+            claimed = true;
+        }
+        portEXIT_CRITICAL(&s_lock);
+    }
+    if (!claimed) {
+        /* Follow the actual configured dispatcher. When input reclaim is on,
+         * its unchanged wrapper still calls the SDK allocator first and then
+         * uses its immutable retry budget. No premature pool-floor policy. */
+        return mbedtls_calloc(count, bytes);
+    }
+    /* Do not zero or allocate under an SMP critical section. The state excludes
+     * every other loan until zeroing is complete and the pointer is published. */
+    memset(s_rx, 0, sizeof(s_rx));
+    return s_rx;
+}
+
+static bool release_reserved(void *pointer) {
+    if (pointer != s_rx) return false;
+    /* Both audited SDK release sites run in task context. Ordinary client
+     * same-context concurrent use/task deletion remains unsupported. */
+    assert(!xPortInIsrContext());
+    portENTER_CRITICAL(&s_lock);
+    assert(s_state == RX_LOANED);
+    s_state = tls_reserve_test_erase_phase() ? RX_FREE : RX_RETURNING;
+    portEXIT_CRITICAL(&s_lock);
+    /* Erase full capacity before reuse, including setup-failure cleanup, which
+     * the ordinary SDK otherwise frees without an explicit zeroize here. */
+    mbedtls_platform_zeroize(s_rx, sizeof(s_rx));
+    portENTER_CRITICAL(&s_lock);
+    assert(s_state == RX_RETURNING);
+    s_state = RX_FREE;
+    portEXIT_CRITICAL(&s_lock);
+    return true;
+}
+
+void yoradio_tls_static_rx_free(void *pointer) {
+    if (!release_reserved(pointer)) mbedtls_free(pointer);
+}
+
+void yoradio_tls_static_rx_zeroize_free(void *pointer, size_t bytes) {
+    if (!release_reserved(pointer)) mbedtls_zeroize_and_free(pointer, bytes);
+}

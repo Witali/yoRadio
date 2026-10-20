@@ -1,0 +1,9 @@
+{
+  "header_id": 580,
+  "line_start": 2705,
+  "line_end": 2719,
+  "raw_excerpt": "/** \\brief Retrieve the user data in an SSL configuration as a pointer.\n *\n * This is the value last set with mbedtls_ssl_conf_set_user_data_p(), or\n * \\c NULL if mbedtls_ssl_conf_set_user_data_p() has not previously been\n * called. The value is undefined if mbedtls_ssl_conf_set_user_data_n() has\n * been called without a subsequent call to mbedtls_ssl_conf_set_user_data_p().\n *\n * \\param conf           The SSL configuration context to modify.\n * \\return               The current value of the user data.\n */\nstatic inline void *mbedtls_ssl_conf_get_user_data_p(\n    mbedtls_ssl_config *conf)\n{\n    return conf->MBEDTLS_PRIVATE(user_data).p;\n}",
+  "numeric_userdata_isolation_proven": false,
+  "old_candidate_superseded": true,
+  "scope": "Public pointer getter is undefined after numeric setter; tests covered pointer userdata only; corrected registry is separate and not archived"
+}

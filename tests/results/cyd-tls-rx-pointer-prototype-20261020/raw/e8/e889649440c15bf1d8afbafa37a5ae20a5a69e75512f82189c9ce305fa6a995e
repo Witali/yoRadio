@@ -1,0 +1,8 @@
+$ErrorActionPreference = 'Stop'
+$parseTokens = $null
+$parseErrors = $null
+$path = Join-Path $PSScriptRoot 'sdk-build.ps1'
+$null = [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$parseTokens, [ref]$parseErrors)
+if ($parseErrors.Count) { throw ($parseErrors | Out-String) }
+[ordered]@{ passed = $true; scope = 'PowerShell parser only; launcher not executed';
+    sdk_launcher_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash.ToLowerInvariant() } | ConvertTo-Json

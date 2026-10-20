@@ -82,7 +82,8 @@ current status.
 
 ## Static RX reserve candidate remains under review
 
-The first isolated candidate retained the complete SDK RX expression and passed
+The [first isolated candidate](../tests/results/cyd-tls-rx-pointer-prototype-20261020/README.md)
+retained the complete SDK RX expression and passed
 its canonical ownership, rollback, real-heap and two-core erase/handover case.
 It is not integrated into radio firmware. Independent review found a public-API
 gap: the pinned configuration pointer-userdata getter has an undefined result
@@ -116,6 +117,12 @@ pass. The corrected fixture must record the failed predicate and release its
 own pressure allocations before reporting/stopping, while retaining strict
 rejection of generic panics. These prototype results do not close the target,
 production integration or physical resource gates.
+
+Its immutable archive preserves six accepted outcomes, the rejected seventh
+panic and three unbuilt/unrun source recipes, together with raw host/config/SDK
+evidence and the documented userdata API gap. The standalone offline verifier
+checks this exact partial history; archive integrity success leaves target
+qualification false and does not cover the replacement registry.
 
 ## Remaining work
 

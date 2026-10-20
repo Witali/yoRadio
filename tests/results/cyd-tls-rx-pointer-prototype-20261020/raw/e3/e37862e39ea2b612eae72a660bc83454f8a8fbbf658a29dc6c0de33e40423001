@@ -1,0 +1,1777 @@
+{
+  "status": "read_only_audit_complete_both_candidates_unimplemented_and_unqualified",
+  "stage": 13,
+  "created_utc": "2026-10-20T11:18:20.190828+00:00",
+  "scope": "Read-only stage13 TLS reserve/early MPI audit. AAC/deferred private owner-view excluded. No builds, crypto/network operations, SDK/config/Git/source mutations or device operations.",
+  "no_claims": [
+    "No guessed reserve byte count (including17058).",
+    "No heap saving, reduced fragmentation, CPU/timing gain or hardware qualification claimed.",
+    "No default TLS record sizes, cores, timings, input pool, stacks or IRAM choices changed.",
+    "No compilation, preprocessor, crypto or network operations ran."
+  ],
+  "frozen_cyd_profile": {
+    "CONFIG_IDF_TARGET": "\"esp32\"",
+    "CONFIG_MBEDTLS_INTERNAL_MEM_ALLOC": "y",
+    "CONFIG_MBEDTLS_CUSTOM_MEM_ALLOC": "n",
+    "CONFIG_MBEDTLS_DYNAMIC_BUFFER": "n",
+    "CONFIG_MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH": "n",
+    "CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN": "16384",
+    "CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN": "4096",
+    "CONFIG_MBEDTLS_SSL_PROTO_TLS1_2": "y",
+    "CONFIG_MBEDTLS_SSL_PROTO_TLS1_3": "n",
+    "CONFIG_MBEDTLS_CIPHER_MODE_CBC": "y",
+    "CONFIG_MBEDTLS_HARDWARE_MPI": "y",
+    "CONFIG_LIBC_PICOLIBC": "y",
+    "CONFIG_FREERTOS_UNICORE": "n",
+    "CONFIG_HEAP_ABORT_WHEN_ALLOCATION_FAILS": "n",
+    "CONFIG_ESP_TLS_USING_MBEDTLS": "y",
+    "CONFIG_YORADIO_TLS_INPUT_RECLAIM": "y",
+    "CONFIG_MBEDTLS_MPI_USE_INTERRUPT": "absent"
+  },
+  "summary": [
+    "C3 dynamic RX reserve cannot be copied into the current CYD static profile. Prefer a distinct opt-in static RX call-site reserve using the existing SDK full-record buffer formula and exact free pairing; it is not a heap-capacity saving.",
+    "Current CYD idle-input reclaim already has stronger pin/detach/bounded retry ownership than the donor TLS input wrapper. Do not replace it or import donor pool-floor/headroom policies.",
+    "SDK6.0.2 explicitly initializes common libc/PSA objects before app_main, but no eager initializer for s_crypto_mpi_lock was found. The normal MPI API remains lazy and can be warmed in normal app_main before service allocations. Exact first-use boot tracing remains required before claiming benefit.",
+    "Early MPI APIs return void. The underlying lazy mutex constructor calls abort on allocation failure; no recoverable esp_err_t contract exists."
+  ],
+  "allocator_and_static_routes": {
+    "public_pair": {
+      "description": "mbedtls_calloc/free dispatch through process-wide function pointers initialized to ESP SDK esp_mbedtls_mem_calloc/free. INTERNAL_MEM_ALLOC calloc uses heap_caps_calloc(INTERNAL|8BIT), free uses heap_caps_free. Reserved static storage must be intercepted by the matching free route before heap_caps_free; never send it to libc realloc/free or heap_caps_free.",
+      "entries": [
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\include\\mbedtls\\esp_config.h",
+          "line": 164,
+          "token": "#define MBEDTLS_PLATFORM_STD_CALLOC",
+          "sha256": "c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+          "snapshot": "snapshots\\c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+          "link": "[esp_config.h:164](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/include/mbedtls/esp_config.h:164)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform.c",
+          "line": 44,
+          "token": "static void * (*mbedtls_calloc_func)",
+          "sha256": "fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+          "snapshot": "snapshots\\fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+          "link": "[platform.c:44](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform.c:44)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform.c",
+          "line": 57,
+          "token": "int mbedtls_platform_set_calloc_free(",
+          "sha256": "fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+          "snapshot": "snapshots\\fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+          "link": "[platform.c:57](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform.c:57)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_mem.c",
+          "line": 14,
+          "token": "void *esp_mbedtls_mem_calloc(",
+          "sha256": "18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+          "snapshot": "snapshots\\18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+          "link": "[esp_mem.c:14](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/esp_mem.c:14)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_mem.c",
+          "line": 36,
+          "token": "void esp_mbedtls_mem_free(",
+          "sha256": "18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+          "snapshot": "snapshots\\18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+          "link": "[esp_mem.c:36](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/esp_mem.c:36)"
+        }
+      ]
+    },
+    "static_setup": {
+      "description": "With DYNAMIC_BUFFER=n, mbedtls_ssl_setup allocates in_buf directly as calloc(1, MBEDTLS_SSL_IN_BUFFER_LEN), then out_buf as calloc(1, MBEDTLS_SSL_OUT_BUFFER_LEN), then handshake structures. No dynamic struct header precedes these allocations. Error cleanup frees both and clears pointers/config. The RX allocation statement is the bounded source-patch candidate.",
+      "entries": [
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c",
+          "line": 1178,
+          "token": "int mbedtls_ssl_setup(",
+          "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+          "snapshot": "snapshots\\0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+          "link": "[ssl_tls.c:1178](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_tls.c:1178)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c",
+          "line": 1202,
+          "token": "ssl->in_buf = mbedtls_calloc(1, in_buf_len);",
+          "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+          "snapshot": "snapshots\\0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+          "link": "[ssl_tls.c:1202](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_tls.c:1202)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c",
+          "line": 1212,
+          "token": "ssl->out_buf = mbedtls_calloc(1, out_buf_len);",
+          "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+          "snapshot": "snapshots\\0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+          "link": "[ssl_tls.c:1212](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_tls.c:1212)"
+        }
+      ]
+    },
+    "size_formula": {
+      "description": "Static slot capacity should be exactly MBEDTLS_SSL_IN_BUFFER_LEN under the audited full RX16384 configuration, including SDK header and configured cipher overhead. Do not add SSL_BUF_HEAD_OFFSET_SIZE or a second TLS header/payload-overhead term. That extra allowance belongs to the donor dynamic set-static path, not static setup. TX remains4096 content; no literal allocation-size claim is derived without actual compiler macro/config qualification.",
+      "entries": [
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_misc.h",
+          "line": 309,
+          "token": "#define MBEDTLS_SSL_PAYLOAD_OVERHEAD",
+          "sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+          "snapshot": "snapshots\\50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+          "link": "[ssl_misc.h:309](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_misc.h:309)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_misc.h",
+          "line": 382,
+          "token": "#define MBEDTLS_SSL_HEADER_LEN 13",
+          "sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+          "snapshot": "snapshots\\50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+          "link": "[ssl_misc.h:382](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_misc.h:382)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_misc.h",
+          "line": 385,
+          "token": "#define MBEDTLS_SSL_IN_BUFFER_LEN",
+          "sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+          "snapshot": "snapshots\\50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+          "link": "[ssl_misc.h:385](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_misc.h:385)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_large_reserve.c",
+          "line": 19,
+          "token": "TLS_RESERVE_CAPACITY =",
+          "sha256": "3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e",
+          "snapshot": "snapshots\\3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e",
+          "link": "[tls_large_reserve.c:19](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/tls_large_reserve.c:19)"
+        }
+      ]
+    },
+    "reset_and_free": {
+      "description": "Static session reset retains both buffer allocations and clears the full configured lengths; it must not release the slot. Final mbedtls_ssl_free calls mbedtls_zeroize_and_free, which zeroizes and calls mbedtls_free. Setup error paths use mbedtls_free directly, so the free wrapper must zeroize its claimed bytes before marking the slot available even when the SDK has not zeroized first.",
+      "entries": [
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c",
+          "line": 1267,
+          "token": "void mbedtls_ssl_session_reset_msg_layer(",
+          "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+          "snapshot": "snapshots\\0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+          "link": "[ssl_tls.c:1267](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_tls.c:1267)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c",
+          "line": 5154,
+          "token": "void mbedtls_ssl_free(",
+          "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+          "snapshot": "snapshots\\0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+          "link": "[ssl_tls.c:5154](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_tls.c:5154)"
+        },
+        {
+          "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform_util.c",
+          "line": 123,
+          "token": "void mbedtls_zeroize_and_free(",
+          "sha256": "3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+          "snapshot": "snapshots\\3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+          "link": "[platform_util.c:123](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform_util.c:123)"
+        }
+      ]
+    },
+    "resize": {
+      "description": "VARIABLE_BUFFER_LENGTH=n in the frozen profile. If enabled later, resize_buffer allocates a new mbedtls_calloc buffer, copies min(old,new), zeroizes/frees old, and only then publishes the new pointer/length. This is not libc realloc. Current bounded reserve should reject that option until all resize/copy/failure/reuse paths are qualified; passing static storage to a heap realloc remains forbidden.",
+      "entry": {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c",
+        "line": 316,
+        "token": "static int resize_buffer(",
+        "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+        "snapshot": "snapshots\\0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+        "link": "[ssl_tls.c:316](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_tls.c:316)"
+      }
+    },
+    "runtime_pair_risk": "mbedtls_platform_set_calloc_free changes both process-wide callbacks without live-owner synchronization. No call was found in current CYD main or ESP-TLS. Do not use a temporary allocator swap to tag RX. Future callback replacement while any reserved allocation is live must be rejected by integration contract or be separately paired/qualified."
+  },
+  "donor_dynamic_comparison": {
+    "facts": "C3 Kconfig requires DYNAMIC_BUFFER and INTERNAL_MEM_ALLOC. Broad reserve is size-eligible (minimum full RX content), so an unrelated large allocation may occupy it. RX-only option avoids this using four explicit dynamic call sites. Its minimum1 accepts small cached RX too; not a size tag. C3 input wrapper pre-reclaims on largest-block observations and automatically trims/funds the reserve at bind/connection, unlike current CYD service.",
+    "entries": [
+      {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\Kconfig.projbuild",
+        "line": 79,
+        "token": "config YORADIO_TLS_LARGE_BLOCK_RESERVE",
+        "sha256": "c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83",
+        "snapshot": "snapshots\\c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83",
+        "link": "[Kconfig.projbuild:79](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/Kconfig.projbuild:79)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\Kconfig.projbuild",
+        "line": 94,
+        "token": "config YORADIO_TLS_RX_ONLY_RESERVE",
+        "sha256": "c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83",
+        "snapshot": "snapshots\\c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83",
+        "link": "[Kconfig.projbuild:94](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/Kconfig.projbuild:94)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\patch_tls_rx_reserve.py",
+        "line": 12,
+        "token": "RX_FUNCTIONS =",
+        "sha256": "d45751f349a0bfa721593927d4babe59f850e9f2604eac7dd86b1fb8cd3b9838",
+        "snapshot": "snapshots\\d45751f349a0bfa721593927d4babe59f850e9f2604eac7dd86b1fb8cd3b9838",
+        "link": "[patch_tls_rx_reserve.py:12](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/tools/patch_tls_rx_reserve.py:12)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_input_reserve.c",
+        "line": 36,
+        "token": "void tls_input_reserve_prepare_connection(void)",
+        "sha256": "5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e",
+        "snapshot": "snapshots\\5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e",
+        "link": "[tls_input_reserve.c:36](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32c3-oled-native/main/tls_input_reserve.c:36)"
+      }
+    ],
+    "sdk_comparison": {
+      "esp_mbedtls_dynamic_impl.c": {
+        "donor_raw_sha256": "ba44a3b41004625fbbfbd5fbb4fed6f3e40de83119f6f5b98a1d4b6e7e74577f",
+        "cyd_raw_sha256": "8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "donor_lf_sha256": "1671a803b3ecf2c91d21c43a3a91f8b363946241872ecfdc5598e9d0dcfe8314",
+        "cyd_lf_sha256": "843a97b9a7cb186a4755a3471509c0d511576add264c5f030990f997adb45842",
+        "same_normalized_text": false,
+        "diff_payload": "esp_mbedtls_dynamic_impl.c.diff"
+      },
+      "esp_mbedtls_dynamic_impl.h": {
+        "donor_raw_sha256": "9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3",
+        "cyd_raw_sha256": "9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3",
+        "donor_lf_sha256": "f6d39cc6bee9be957175bcddda88a4142603ec79ecde476c7987e523bff9d131",
+        "cyd_lf_sha256": "f6d39cc6bee9be957175bcddda88a4142603ec79ecde476c7987e523bff9d131",
+        "same_normalized_text": true,
+        "diff_payload": "esp_mbedtls_dynamic_impl.h.diff"
+      }
+    },
+    "dynamic_routes": "SDK CMake adds dynamic sources only when DYNAMIC_BUFFER is set. Four RX sites allocate header+post-handshake static-conversion buffer, reset full RX, record-sized RX, and small16-byte cached RX. esp_mbedtls_free_buf converts interior buf back to its header/base before mbedtls_free. Dynamic wrappers replace setup/free/reset and require exact paired call-site review. Even if donor normalized source hash matches6.0.2, those functions are not the current static RX route.",
+    "dynamic_entries": [
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\CMakeLists.txt",
+        "line": 250,
+        "token": "if(CONFIG_MBEDTLS_DYNAMIC_BUFFER)",
+        "sha256": "4ad5952449def575c6db11fd4cb83cdb40746955479a4a30b0895ab24365a913",
+        "snapshot": "snapshots\\4ad5952449def575c6db11fd4cb83cdb40746955479a4a30b0895ab24365a913",
+        "link": "[CMakeLists.txt:250](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/CMakeLists.txt:250)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.c",
+        "line": 46,
+        "token": "void esp_mbedtls_free_buf(",
+        "sha256": "8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "snapshot": "snapshots\\8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "link": "[esp_mbedtls_dynamic_impl.c:46](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/dynamic/esp_mbedtls_dynamic_impl.c:46)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.c",
+        "line": 154,
+        "token": "esp_err_t esp_mbedtls_dynamic_set_rx_buf_static(",
+        "sha256": "8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "snapshot": "snapshots\\8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "link": "[esp_mbedtls_dynamic_impl.c:154](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/dynamic/esp_mbedtls_dynamic_impl.c:154)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.c",
+        "line": 238,
+        "token": "int esp_mbedtls_reset_add_rx_buffer(",
+        "sha256": "8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "snapshot": "snapshots\\8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "link": "[esp_mbedtls_dynamic_impl.c:238](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/dynamic/esp_mbedtls_dynamic_impl.c:238)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.c",
+        "line": 359,
+        "token": "int esp_mbedtls_add_rx_buffer(",
+        "sha256": "8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "snapshot": "snapshots\\8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "link": "[esp_mbedtls_dynamic_impl.c:359](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/dynamic/esp_mbedtls_dynamic_impl.c:359)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.c",
+        "line": 458,
+        "token": "int esp_mbedtls_free_rx_buffer(",
+        "sha256": "8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "snapshot": "snapshots\\8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "link": "[esp_mbedtls_dynamic_impl.c:458](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/dynamic/esp_mbedtls_dynamic_impl.c:458)"
+      }
+    ],
+    "not_ported": "Do not enable DYNAMIC_BUFFER to make the donor patch fit; do not transplant donor minimum queue limit,32KiB headroom, large allocation threshold, reserve byte count or per-codec expansion policy.",
+    "hash_guard_observation": {
+      "donor_patch_expected_normalized_sha256": "b783870fb5e7423a1fa44af78772151ddb931ee1480b954cf513cd877cda5070",
+      "cyd_sdk602_actual_normalized_sha256": "843a97b9a7cb186a4755a3471509c0d511576add264c5f030990f997adb45842",
+      "installed_donor_sdk61_actual_normalized_sha256": "1671a803b3ecf2c91d21c43a3a91f8b363946241872ecfdc5598e9d0dcfe8314",
+      "cyd_matches_donor_patch_guard": false,
+      "installed_donor_sdk61_matches_guard": false,
+      "interpretation": "The existing donor RX patch hash guard does not admit either of these current installed source snapshots. This is a static compatibility observation, not an executed failed build or a claim about historical donor qualified builds/options. The preserved diff shows the installed6.1 vs6.0.2 difference is in TLS1.3 CCS sizing conditions; the frozen CYD profile has TLS1.3 disabled and dynamic buffers disabled. Do not weaken the old guard or port that unrelated SDK behavior as part of the static reserve candidate."
+    }
+  },
+  "static_reserve_candidate_unimplemented": {
+    "preferred_scope": "New explicit static RX-only call-site hook in a generated build-local copy of actual ssl_tls.c; no SDK checkout edit, no wholesale crypto allocator or record-size change.",
+    "configuration_guards": [
+      "Defaultn and IDF_TARGET_ESP32 with ESP_TLS_USING_MBEDTLS, MBEDTLS_INTERNAL_MEM_ALLOC and !MBEDTLS_CUSTOM_MEM_ALLOC.",
+      "!MBEDTLS_DYNAMIC_BUFFER and !MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH; full RXcontent==16384 and current TXcontent==4096 compile assertions for this initial profile.",
+      "Recoverable-failure profile !HEAP_ABORT_WHEN_ALLOCATION_FAILS for OOM return tests. Do not silently select or alter any dependency.",
+      "Strict default calloc/free callback pair, no process-wide callback replacement while reserve live. Preserve native_health sole failed-allocation hook and existing native_input_reclaim owner/pins."
+    ],
+    "guarded_files": [
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c",
+        "line": 1178,
+        "token": "int mbedtls_ssl_setup(",
+        "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+        "snapshot": "snapshots\\0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+        "link": "[ssl_tls.c:1178](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_tls.c:1178)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_misc.h",
+        "line": 309,
+        "token": "#define MBEDTLS_SSL_PAYLOAD_OVERHEAD",
+        "sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+        "snapshot": "snapshots\\50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+        "link": "[ssl_misc.h:309](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/library/ssl_misc.h:309)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform.c",
+        "line": 44,
+        "token": "static void * (*mbedtls_calloc_func)",
+        "sha256": "fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+        "snapshot": "snapshots\\fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+        "link": "[platform.c:44](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform.c:44)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform_util.c",
+        "line": 123,
+        "token": "void mbedtls_zeroize_and_free(",
+        "sha256": "3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+        "snapshot": "snapshots\\3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+        "link": "[platform_util.c:123](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/platform/platform_util.c:123)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_mem.c",
+        "line": 14,
+        "token": "void *esp_mbedtls_mem_calloc(",
+        "sha256": "18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+        "snapshot": "snapshots\\18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+        "link": "[esp_mem.c:14](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/esp_mem.c:14)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\include\\mbedtls\\esp_config.h",
+        "line": 165,
+        "token": "#define MBEDTLS_PLATFORM_STD_FREE",
+        "sha256": "c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+        "snapshot": "snapshots\\c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+        "link": "[esp_config.h:165](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/include/mbedtls/esp_config.h:165)"
+      }
+    ],
+    "source_patch_contract": "Guard SDK version6.0.2, selected actual component directory, exact raw source hashes and the generated configuration/header tuple. Replace exactly the one RX allocation statement inside mbedtls_ssl_setup, leave TX/handshake/all unrelated bytes unchanged. Replace exactly one target source, preserve original per-source flags/includes/config, set configure dependencies on source/tool/guard headers. New revisions or dynamic sources fail closed. No private context-layout manipulation.",
+    "slot_contract": "One max_align_t-aligned static slot sized by the SDK IN_BUFFER_LEN expression; CAS ownership, zero requested bytes before publishing, record used size. Reject zero/overflow/oversize/reserve claim from ISR; delegate ordinary SDK semantics. Concurrent contexts fall back to their normal allocator. Free intercept recognizes exact base pointer, wipes before release publication, never forwards that address to heap free, preserves other pointers/NULL. SDK allocator ownership forbids stale/double free; no ABA protection for invalid stale pointers is claimed.",
+    "composition": "RX hook tries its static slot, otherwise calls the normal public mbedtls_calloc route so current input-reclaim wrapper still delegates original once first and retains its bounded retry/pin behavior. Add one esp_mbedtls_mem_free owner-aware wrapper; avoid duplicate calloc wrapper definitions. Keep --undefined retention for callback-pointer routes and verify actual final ELF. Slot release does not rebind/detach/destroy input or allocate/restore slots.",
+    "cost_and_measurement": "The .bss slot consumes permanent internal RAM even for HTTP/no TLS, reduces boot heap availability and serves at most one eligible live RX buffer. It can replace one heap request, not create free RAM. Busy contexts still need full ordinary heap storage. Measure .bss/link map, free/largest/internal actual heap, retained slot occupation, input residency and concurrent HTTPS/OTA playback before deciding whether it is worth enabling."
+  },
+  "early_mpi_candidate_unimplemented": {
+    "source_verdict": "No explicit before-app MPI mutex creation found in the pinned normal ESP32 SDK path. s_crypto_mpi_lock is static zero; public acquire uses the legacy lazy _lock_acquire route, including when LIBC_PICOLIBC is enabled. libc common static mutex initialization does not initialize this separate variable. An indirect earlier user can still acquire it; only an actual boot trace can settle its first runtime use.",
+    "entries": [
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp_crypto_lock.c",
+        "line": 34,
+        "token": "static _lock_t s_crypto_mpi_lock;",
+        "sha256": "7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057",
+        "snapshot": "snapshots\\7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057",
+        "link": "[esp_crypto_lock.c:34](C:/Work/yoRadio/.idf/v6.0.2/components/esp_security/src/esp_crypto_lock.c:34)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp_crypto_lock.c",
+        "line": 115,
+        "token": "void esp_crypto_mpi_lock_acquire(void)",
+        "sha256": "7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057",
+        "snapshot": "snapshots\\7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057",
+        "link": "[esp_crypto_lock.c:115](C:/Work/yoRadio/.idf/v6.0.2/components/esp_security/src/esp_crypto_lock.c:115)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\locks.c",
+        "line": 53,
+        "token": "static void LIBC_LOCKS_IRAM_ATTR lock_init_generic(",
+        "sha256": "724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+        "snapshot": "snapshots\\724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+        "link": "[locks.c:53](C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:53)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\locks.c",
+        "line": 414,
+        "token": "void esp_libc_locks_init(void)",
+        "sha256": "724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+        "snapshot": "snapshots\\724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+        "link": "[locks.c:414](C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:414)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\init.c",
+        "line": 11,
+        "token": "ESP_SYSTEM_INIT_FN(init_libc,",
+        "sha256": "715e1c17e00b37443a376d4d541ff19e69d596c8e6437c3f332e7e42d478cfd1",
+        "snapshot": "snapshots\\715e1c17e00b37443a376d4d541ff19e69d596c8e6437c3f332e7e42d478cfd1",
+        "link": "[init.c:11](C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/init.c:11)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\init.c",
+        "line": 56,
+        "token": "ESP_SYSTEM_INIT_FN(esp_security_init,",
+        "sha256": "dcea9910e43b3145936d36aece0667f48b97a906068e9508a4c12138e980c3c2",
+        "snapshot": "snapshots\\dcea9910e43b3145936d36aece0667f48b97a906068e9508a4c12138e980c3c2",
+        "link": "[init.c:56](C:/Work/yoRadio/.idf/v6.0.2/components/esp_security/src/init.c:56)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp32\\esp_crypto_clk.h",
+        "line": 10,
+        "token": "static inline void esp_crypto_clk_init(void) {}",
+        "sha256": "739b3476c3e21b4b9ed60f9a9badb13e329b85a07303be422d26bf56e6de84e9",
+        "snapshot": "snapshots\\739b3476c3e21b4b9ed60f9a9badb13e329b85a07303be422d26bf56e6de84e9",
+        "link": "[esp_crypto_clk.h:10](C:/Work/yoRadio/.idf/v6.0.2/components/esp_security/src/esp32/esp_crypto_clk.h:10)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_psa_crypto_init.c",
+        "line": 22,
+        "token": "ESP_SYSTEM_INIT_FN(mbedtls_psa_crypto_init_fn,",
+        "sha256": "3903ebec3dc6ad4d9ef7e2cdd260074d7147884fa5b32dfd791889eb675ee1e1",
+        "snapshot": "snapshots\\3903ebec3dc6ad4d9ef7e2cdd260074d7147884fa5b32dfd791889eb675ee1e1",
+        "link": "[esp_psa_crypto_init.c:22](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/esp_psa_crypto_init.c:22)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\core\\psa_crypto_driver_wrappers.h",
+        "line": 124,
+        "token": "static inline psa_status_t psa_driver_wrapper_init(",
+        "sha256": "01156730d11f5b38436eab7e3fb9bc382494be441ab09aa3515ad39f9e555a4c",
+        "snapshot": "snapshots\\01156730d11f5b38436eab7e3fb9bc382494be441ab09aa3515ad39f9e555a4c",
+        "link": "[psa_crypto_driver_wrappers.h:124](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/mbedtls/tf-psa-crypto/core/psa_crypto_driver_wrappers.h:124)"
+      }
+    ],
+    "preapp_distinction": "libc CORE102 initializes common locks; security SECONDARY103 performs target clock/security setup (ESP32 clock helper empty); PSA SECONDARY104 initializes driver wrappers/key slots/RNG/transaction. PSA mutexes and RNG initialization are not the MPI peripheral lock. The examined driver initializer has only optional test-driver initialization. No claim that every possible build/constructor never performs MPI is made.",
+    "startup_plan": "Add a default-off CYD option guarded ESP_TLS_USING_MBEDTLS && MBEDTLS_HARDWARE_MPI && SOC_MPI_SUPPORTED && IDF_TARGET_ESP32 in normal non-bootloader/non-NON_OS application. Include public esp_crypto_lock.h and declare explicit esp_security component dependency (PRIV_REQUIRES is sufficient for app_main-only use). Call public acquire then release once at start of ordinary app_main, with scheduler running and before health/NVS/display/network/audio task allocations. Do not copy C3 deep-sleep fast-path or benchmark behavior into CYD. No constructor/pre-RTOS call, private lock replacement or freeing, crypto calculation, peripheral clock operation or task-affinity change.",
+    "oom_and_locking": "_lock_acquire is void and discards its internal int result; lock_init_generic serializes construction using lock_init_spinlock, calls xQueueCreateMutex, and aborts when that returns NULL. Before the scheduler, acquire is a no-op and does not prove initialization. No recoverable ESP_ERR_NO_MEM can be promised. Normal successful warmup must release the same SDK lock; early OOM remains documented SDK abort unless a separately reviewed SDK API is introduced. Other tasks can later block normally; do not hold another application registry/queue lock while warming it.",
+    "oom_entry": {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\locks.c",
+      "line": 77,
+      "token": "abort(); /* No more semaphores available or OOM */",
+      "sha256": "724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+      "snapshot": "snapshots\\724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+      "link": "[locks.c:77](C:/Work/yoRadio/.idf/v6.0.2/components/esp_libc/src/locks.c:77)"
+    },
+    "public_contract": {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\include\\esp_crypto_lock.h",
+      "line": 86,
+      "token": "void esp_crypto_mpi_lock_acquire(void);",
+      "sha256": "ffc8b49e52a1a1c09fa7cf9230efb9bbc767067f5ec45498082ea93d61d34898",
+      "snapshot": "snapshots\\ffc8b49e52a1a1c09fa7cf9230efb9bbc767067f5ec45498082ea93d61d34898",
+      "link": "[esp_crypto_lock.h:86](C:/Work/yoRadio/.idf/v6.0.2/components/esp_security/include/esp_crypto_lock.h:86)"
+    },
+    "real_hardware_lock_route": {
+      "path": "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\bignum\\bignum_alt.c",
+      "line": 17,
+      "token": "esp_crypto_mpi_lock_acquire();",
+      "sha256": "cf381dadda47db5097a5fb905bb637f2534de289f8ae0779672e63cad3c1756a",
+      "snapshot": "snapshots\\cf381dadda47db5097a5fb905bb637f2534de289f8ae0779672e63cad3c1756a",
+      "link": "[bignum_alt.c:17](C:/Work/yoRadio/.idf/v6.0.2/components/mbedtls/port/bignum/bignum_alt.c:17)"
+    },
+    "current_app_entry": {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c",
+      "line": 98,
+      "token": "void app_main(void)",
+      "sha256": "69089b40bd9ff5e40078977d675bea8cb024b173d5f1c0ddaa1bf0cc0f932301",
+      "snapshot": "snapshots\\69089b40bd9ff5e40078977d675bea8cb024b173d5f1c0ddaa1bf0cc0f932301",
+      "link": "[app_main.c:98](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/app_main.c:98)"
+    },
+    "guarding": "Public API warmup need not patch SDK bytes, but qualify exact SDK lock/header/esp_security init/libc locks/FreeRTOS queue/config hashes and explicit component dependency. A future eager initializer or changed void/OOM behavior invalidates benefit assumptions and requires reevaluation; sourcehash guards are mandatory for any private source instrumentation or patch, not an invented permanent public ABI restriction.",
+    "measurement": "Moves at most this SDK mutex first allocation earlier when it was not already created. Does not remove its lifetime allocation or guarantee larger heap blocks. Record actual allocator size and first-use point; no guessed semaphore size, C3 bytes or fragmentation/latency benefit."
+  },
+  "existing_cyd_reclaim_to_preserve": {
+    "description": "Current qualified service keeps owner/pins/retiring, explicit detach, real allocator first and bounded initial target-minus-minimum release budget. The donor atomic raw input pointer, pre-reclaim heuristic and startup pool floor are not an appropriate replacement.",
+    "entries": [
+      {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.c",
+        "line": 55,
+        "token": "void *__wrap_esp_mbedtls_mem_calloc(",
+        "sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+        "snapshot": "snapshots\\f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+        "link": "[native_input_reclaim.c:55](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/native_input_reclaim.c:55)"
+      },
+      {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\input_reclaim\\enable.cmake",
+        "line": 2,
+        "token": "function(native_enable_tls_input_reclaim)",
+        "sha256": "85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8",
+        "snapshot": "snapshots\\85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8",
+        "link": "[enable.cmake:2](C:/Work/yoRadio/.worktree/esp32-cyd-c3-review/idf/esp32-cyd2usb-native/main/compat/input_reclaim/enable.cmake:2)"
+      }
+    ]
+  },
+  "unrun_gates": [
+    {
+      "id": "R1",
+      "name": "Static profile/config/target ABI and hash preflight",
+      "checks": "Actual SDK6.0.2 compile of whole patched ssl_tls TU with existing Xtensa flags/includes, SDK IN/OUT capacity symbols and max_align_t checks, full RX16384 unchanged. Exact source replacement/config negative controls, wrong version/source/variable/dynamic/custom/external/abort profile rejection. This audit did not preprocess capacity."
+    },
+    {
+      "id": "R2",
+      "name": "Actual allocator/free pairing",
+      "checks": "Whole actual SDK setup/reset/free/error paths plus real public mbedtls_calloc/free function-pointer dispatch in target ELF. Pointer of reserved base never reaches heap free/realloc; ordinary pointers/NULL still do. SDK source host seams supplement actual target; no direct fake private function proof. Corrupt free route exact named failure."
+    },
+    {
+      "id": "R3",
+      "name": "Reserve lifetime/OOM/two-core concurrency",
+      "checks": "Two real FreeRTOS contexts on cores0/1 with barrier-controlled claim and free/zeroization overlap: one slot owner, fallback second, no publication until zeroed, no re-claim before wipe completes. Setup failure at TX or later handshake frees RX; reset retains it; final free releases; repeated lifecycle. Actual allocator failures, fallback+native_input_reclaim pins/detach and malformed zero/overflow requests preserve contracts. No application lock allocation/logging/wait in new slot critical path."
+    },
+    {
+      "id": "R4",
+      "name": "Record/protocol/resource and physical gate",
+      "checks": "Future encrypted full16384 records, fragmented reads/CBC/GCM/certificates/errors, reset/reuse, simultaneous HTTPS/OTA and streaming, all codecs/output variants. Original app behavior and record sizes unchanged; measure permanent .bss cost and real heap/stack/CPU before enablement. No such network/crypto run occurred here."
+    },
+    {
+      "id": "M1",
+      "name": "Fresh boot observation before warmup",
+      "checks": "Actual SDK2-core boot traces external _lock_acquire and mutex-create calls in fixed storage without allocation or crypto. Identify MPI lock through public acquire path, then inspect earlier trace by exact lock pointer. Determine whether any constructor/security/PSA path acquired it before app_main; do not write private lock state or assume all preapp allocations are MPI."
+    },
+    {
+      "id": "M2",
+      "name": "Real API startup and contention",
+      "checks": "With actual SDK esp_crypto_lock.c + esp_libc locks.c + FreeRTOS queue, first normal app_main warmup creates at most one mutex, subsequent calls allocate none. Two-core concurrent first acquire creates once; hold/release contention provides mutual exclusion and no deadlock. Pre-scheduler no-op must not be counted as initialized. Verify startup ordering before service allocations and option-off no extra call; no RSA operation needed."
+    },
+    {
+      "id": "M3",
+      "name": "Void API OOM and exact controls",
+      "checks": "Fresh isolated boot for injected actual xQueueCreateMutex failure: expected named SDK abort/panic path, not fabricated recoverable error. Finite terminal logs and explicit expected status; no private reset of persistent lock. Controls late/no warmup, missing release, false early pre-RTOS initialization and duplicate lazy construction must trigger named failures. Avoid ordinary uncontrolled crash as success."
+    },
+    {
+      "id": "M4",
+      "name": "Production and useful-effect gate",
+      "checks": "Full option-on/off builds/lint for all CYD outputs and actual2CPU scheduler, public esp_security dependency, header/config hashes, final ELF symbol routing. Measure first-use actual allocation size and settled memory/largest-block history across fresh boots and later approved TLS/playback/OTA; preserve all existing cores/stacks/timings. Public mutex warmup does not by itself prove fragmentation improvement."
+    }
+  ],
+  "evidence": {
+    "capture_sha256": "5ce3f4c8d500e258cf28be4933a10dbf19cd6ed7e803fbb2707dc300983e693a",
+    "supplement_sha256": "fda96e1d0e9ed2d2f9c261326cdfa1a22d241cf4d3ef0ad997be1c53bca165ac",
+    "inputs": {
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_large_reserve.c": {
+        "sha256": "3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e",
+        "bytes": 3353,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_large_reserve.h": {
+        "sha256": "f8e4cd3fdaa8ff70a0dc2360092808c60666be61cc6379732c1d52caefafce9c",
+        "bytes": 342,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\f8e4cd3fdaa8ff70a0dc2360092808c60666be61cc6379732c1d52caefafce9c"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_input_reserve.c": {
+        "sha256": "5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e",
+        "bytes": 7409,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_input_reserve.h": {
+        "sha256": "69360e52662a5c926eb6eabcdcdbe34cf569483f64baee53e9cdad201d007b72",
+        "bytes": 1232,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\69360e52662a5c926eb6eabcdcdbe34cf569483f64baee53e9cdad201d007b72"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\Kconfig.projbuild": {
+        "sha256": "c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83",
+        "bytes": 50994,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\CMakeLists.txt": {
+        "sha256": "d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19",
+        "bytes": 29073,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\app_main.c": {
+        "sha256": "1ec056470034e4c1ec9f06e9d0fdb21b044c25f10b12ab921997eb565c4bf0cc",
+        "bytes": 41673,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\1ec056470034e4c1ec9f06e9d0fdb21b044c25f10b12ab921997eb565c4bf0cc"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c": {
+        "sha256": "2c20f62f092b19ae3f45a27b003ef2a406a373a729d9cfe229c29e75461ab838",
+        "bytes": 115229,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\2c20f62f092b19ae3f45a27b003ef2a406a373a729d9cfe229c29e75461ab838"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\CMakeLists.txt": {
+        "sha256": "ce7814a37fb03ce7890300065171662a51b94c1da9be018ee8e41451ff715e4f",
+        "bytes": 13281,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\ce7814a37fb03ce7890300065171662a51b94c1da9be018ee8e41451ff715e4f"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\patch_tls_rx_reserve.py": {
+        "sha256": "d45751f349a0bfa721593927d4babe59f850e9f2604eac7dd86b1fb8cd3b9838",
+        "bytes": 2099,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\d45751f349a0bfa721593927d4babe59f850e9f2604eac7dd86b1fb8cd3b9838"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\sdkconfig.tls-rx-reserve.defaults": {
+        "sha256": "a44609b5313bd36eb4451563e1bbb4d5e1d90256fcf911046a1ca43ef29ca410",
+        "bytes": 141,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\a44609b5313bd36eb4451563e1bbb4d5e1d90256fcf911046a1ca43ef29ca410"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\sdkconfig.tls-large-reserve.defaults": {
+        "sha256": "788f98529ced1087008d9f407ef5825a3792fd836c03bd4f9dbc4297b7dff28d",
+        "bytes": 125,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\788f98529ced1087008d9f407ef5825a3792fd836c03bd4f9dbc4297b7dff28d"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\CMakeLists.txt": {
+        "sha256": "b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d",
+        "bytes": 3527,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\Kconfig.projbuild": {
+        "sha256": "e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe",
+        "bytes": 6047,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c": {
+        "sha256": "69089b40bd9ff5e40078977d675bea8cb024b173d5f1c0ddaa1bf0cc0f932301",
+        "bytes": 4782,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\69089b40bd9ff5e40078977d675bea8cb024b173d5f1c0ddaa1bf0cc0f932301"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c": {
+        "sha256": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+        "bytes": 68181,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.c": {
+        "sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+        "bytes": 2274,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.h": {
+        "sha256": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+        "bytes": 1498,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\CMakeLists.txt": {
+        "sha256": "771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977",
+        "bytes": 1157,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\sdkconfig.defaults": {
+        "sha256": "9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3",
+        "bytes": 3874,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\sdkconfig": {
+        "sha256": "6dbb9efe52cb06265ccf8cc6d20e3b24b66c789d10a9de0ed3082c27512e1900",
+        "bytes": 78877,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\6dbb9efe52cb06265ccf8cc6d20e3b24b66c789d10a9de0ed3082c27512e1900"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\config\\sdkconfig.h": {
+        "sha256": "99a09764f7caeca12ae9739197dac59330fa6f263b7347c99aac4b389fb75209",
+        "bytes": 40232,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\99a09764f7caeca12ae9739197dac59330fa6f263b7347c99aac4b389fb75209"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\project_description.json": {
+        "sha256": "5b8803d1f086e232c5ff64cb32f993117e8fe2b4beeeb632904c188ae2555364",
+        "bytes": 272869,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\5b8803d1f086e232c5ff64cb32f993117e8fe2b4beeeb632904c188ae2555364"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\compile_commands.json": {
+        "sha256": "c221e08f6946e177675279daf810ac24b35442c46dd5287174b11c5b5f297bce",
+        "bytes": 6638472,
+        "role": "repository source or existing build config/metadata",
+        "snapshot": "snapshots\\c221e08f6946e177675279daf810ac24b35442c46dd5287174b11c5b5f297bce"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\tools\\cmake\\version.cmake": {
+        "sha256": "3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee",
+        "bytes": 168,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\CMakeLists.txt": {
+        "sha256": "4ad5952449def575c6db11fd4cb83cdb40746955479a4a30b0895ab24365a913",
+        "bytes": 27176,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\4ad5952449def575c6db11fd4cb83cdb40746955479a4a30b0895ab24365a913"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\Kconfig": {
+        "sha256": "420b469d6712316f3d9e61e78faf7b764cc0f6f842f0c6200bff378344e50aa8",
+        "bytes": 73593,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\420b469d6712316f3d9e61e78faf7b764cc0f6f842f0c6200bff378344e50aa8"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_mem.c": {
+        "sha256": "18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+        "bytes": 1240,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\include\\esp_mem.h": {
+        "sha256": "47f635e795492c2b1a6ab666a946bb8107c7a57c617056fb5fbe3dc56cb56ea6",
+        "bytes": 261,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\47f635e795492c2b1a6ab666a946bb8107c7a57c617056fb5fbe3dc56cb56ea6"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\include\\mbedtls\\esp_config.h": {
+        "sha256": "c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+        "bytes": 97401,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.h": {
+        "sha256": "9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3",
+        "bytes": 2644,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.c": {
+        "sha256": "8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "bytes": 20212,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_ssl_tls.c": {
+        "sha256": "791079366d124d52aea2256fdf52fa0704a1ec4526fdb012104e6f0cd4044756",
+        "bytes": 15229,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\791079366d124d52aea2256fdf52fa0704a1ec4526fdb012104e6f0cd4044756"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_ssl_cli.c": {
+        "sha256": "b3cbaa1c22894ff0ab59cf78cf3e31dc59fd9677a3bc5e5c55eb1bf2e53609b5",
+        "bytes": 10139,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\b3cbaa1c22894ff0ab59cf78cf3e31dc59fd9677a3bc5e5c55eb1bf2e53609b5"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_ssl_srv.c": {
+        "sha256": "047dc85b6f2741f623cd93783c47d82d04d80a664d7f66fc400581b603754d02",
+        "bytes": 7196,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\047dc85b6f2741f623cd93783c47d82d04d80a664d7f66fc400581b603754d02"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c": {
+        "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+        "bytes": 307833,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_msg.c": {
+        "sha256": "a649812c0fff02ec38b1f9794223a95dea31b2a3c4d0f39458e72b06281a9c52",
+        "bytes": 231859,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\a649812c0fff02ec38b1f9794223a95dea31b2a3c4d0f39458e72b06281a9c52"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_misc.h": {
+        "sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+        "bytes": 115094,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\include\\mbedtls\\ssl.h": {
+        "sha256": "e0cf0f1d80b0148a2252e110907d7b03d59ba6fd69b63acd70bb1d7cf1667f59",
+        "bytes": 272726,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\e0cf0f1d80b0148a2252e110907d7b03d59ba6fd69b63acd70bb1d7cf1667f59"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform.c": {
+        "sha256": "fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+        "bytes": 10363,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\include\\mbedtls\\platform.h": {
+        "sha256": "84c9357095fb24618d55ff69920828d02ecafb125e9b2929094db8cfe0a29069",
+        "bytes": 19257,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\84c9357095fb24618d55ff69920828d02ecafb125e9b2929094db8cfe0a29069"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_psa_crypto_init.c": {
+        "sha256": "3903ebec3dc6ad4d9ef7e2cdd260074d7147884fa5b32dfd791889eb675ee1e1",
+        "bytes": 972,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\3903ebec3dc6ad4d9ef7e2cdd260074d7147884fa5b32dfd791889eb675ee1e1"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\bignum\\esp_bignum.c": {
+        "sha256": "05a03eb3a08b53e262c2fb95a30e242d63ff44de2d65a1f1f5bc64be0dd70d37",
+        "bytes": 21674,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\05a03eb3a08b53e262c2fb95a30e242d63ff44de2d65a1f1f5bc64be0dd70d37"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\core\\psa_crypto.c": {
+        "sha256": "8cc3426ace5d504b10e2bf947197f27db49d6cf1828aa1ce8dc988890b560855",
+        "bytes": 343539,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\8cc3426ace5d504b10e2bf947197f27db49d6cf1828aa1ce8dc988890b560855"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\core\\psa_crypto_driver_wrappers_no_static.c": {
+        "sha256": "eccdda8e9b7db2d37b1c49a95362b572b109fca79657aac4ccb4992973777df9",
+        "bytes": 9610,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\eccdda8e9b7db2d37b1c49a95362b572b109fca79657aac4ccb4992973777df9"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp_crypto_lock.c": {
+        "sha256": "7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057",
+        "bytes": 5808,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\include\\esp_crypto_lock.h": {
+        "sha256": "ffc8b49e52a1a1c09fa7cf9230efb9bbc767067f5ec45498082ea93d61d34898",
+        "bytes": 3842,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\ffc8b49e52a1a1c09fa7cf9230efb9bbc767067f5ec45498082ea93d61d34898"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\CMakeLists.txt": {
+        "sha256": "e9a3870a84285e720e14264556bb28ce3be6ae72bccd581beaa93c4c034127b4",
+        "bytes": 1991,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\e9a3870a84285e720e14264556bb28ce3be6ae72bccd581beaa93c4c034127b4"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\locks.c": {
+        "sha256": "724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+        "bytes": 16382,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\platform_include\\sys\\lock.h": {
+        "sha256": "698695d7425fb1c7a3003ca72de41d8ca6e346548e34370680139cb7daafbdb0",
+        "bytes": 1927,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\698695d7425fb1c7a3003ca72de41d8ca6e346548e34370680139cb7daafbdb0"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\init.c": {
+        "sha256": "715e1c17e00b37443a376d4d541ff19e69d596c8e6437c3f332e7e42d478cfd1",
+        "bytes": 641,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\715e1c17e00b37443a376d4d541ff19e69d596c8e6437c3f332e7e42d478cfd1"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\picolibc\\picolibc_init.c": {
+        "sha256": "0062be588abcf15bbe62d6308c1f64aa22c626ac8eaf88628c2ffe83e67e55cf",
+        "bytes": 5906,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\0062be588abcf15bbe62d6308c1f64aa22c626ac8eaf88628c2ffe83e67e55cf"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\CMakeLists.txt": {
+        "sha256": "ba7e181cd6162d03dccb157b8e580ecbfeb616f0e04a96a515f6f3efd3df2f38",
+        "bytes": 6785,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\ba7e181cd6162d03dccb157b8e580ecbfeb616f0e04a96a515f6f3efd3df2f38"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\soc\\esp32\\include\\soc\\soc_caps.h": {
+        "sha256": "b526678c75c70d4551ad23b88d5e6e8fffbd998b48b746a55e321171a1763ca7",
+        "bytes": 19424,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\b526678c75c70d4551ad23b88d5e6e8fffbd998b48b746a55e321171a1763ca7"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_system\\startup.c": {
+        "sha256": "4e6ab3e3139030e68687b0cabf29fa6d36232dc62f60842c80f1d7d01756ad51",
+        "bytes": 6875,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\4e6ab3e3139030e68687b0cabf29fa6d36232dc62f60842c80f1d7d01756ad51"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\queue.c": {
+        "sha256": "b37c27ee5151d6c342d56737699e199dd6532248e7d8f5da3824b4679a21f8c5",
+        "bytes": 143713,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\b37c27ee5151d6c342d56737699e199dd6532248e7d8f5da3824b4679a21f8c5"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\app_startup.c": {
+        "sha256": "9f3ae1b71307ad21e5716a5957619f47422f10d33d88e274c0f1b595c046794b",
+        "bytes": 8042,
+        "role": "pinned SDK6.0.2 source/header",
+        "snapshot": "snapshots\\9f3ae1b71307ad21e5716a5957619f47422f10d33d88e274c0f1b595c046794b"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.1\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.c": {
+        "sha256": "ba44a3b41004625fbbfbd5fbb4fed6f3e40de83119f6f5b98a1d4b6e7e74577f",
+        "bytes": 20404,
+        "role": "donor SDK dynamic comparison",
+        "snapshot": "snapshots\\ba44a3b41004625fbbfbd5fbb4fed6f3e40de83119f6f5b98a1d4b6e7e74577f"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.1\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.h": {
+        "sha256": "9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3",
+        "bytes": 2644,
+        "role": "donor SDK dynamic comparison",
+        "snapshot": "snapshots\\9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-mpi-audit-01\\capture.py": {
+        "sha256": "5d4d69ce535822e508df29c18ccb553afe0daad2d07d6a911ef85b72606046b1",
+        "bytes": 4562,
+        "role": "audit capture helper",
+        "snapshot": "snapshots\\5d4d69ce535822e508df29c18ccb553afe0daad2d07d6a911ef85b72606046b1"
+      },
+      "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe": {
+        "sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+        "bytes": 104952,
+        "role": "Python metadata tool; hash only"
+      },
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe": {
+        "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+        "bytes": 906240,
+        "role": "target tool metadata; not executed"
+      },
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe": {
+        "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+        "bytes": 906240,
+        "role": "target tool metadata; not executed"
+      },
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe": {
+        "sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+        "bytes": 906240,
+        "role": "target tool metadata; not executed"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\mbedtls\\libmbedtls.a": {
+        "sha256": "35394d9b349d0aeac191df85f29695c8f9694cecb7acc9c570529d8e961fcd9f",
+        "bytes": 135316,
+        "role": "existing build archive identity only; not a new build or runtime proof"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\esp_security\\libesp_security.a": {
+        "sha256": "6f97d6990f090c80789ec4c93b255e5a44e8c7132540836022ea85ce807d7adb",
+        "bytes": 28254,
+        "role": "existing build archive identity only; not a new build or runtime proof"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\esp_libc\\libesp_libc.a": {
+        "sha256": "0e99e084c947ac1868662fa3ba0b2dd743d1fb933d125f1e7256980e2d4b8f0c",
+        "bytes": 461244,
+        "role": "existing build archive identity only; not a new build or runtime proof"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\init.c": {
+        "sha256": "dcea9910e43b3145936d36aece0667f48b97a906068e9508a4c12138e980c3c2",
+        "bytes": 4978,
+        "role": "Additional SDK source discovered while tracing startup/allocator ownership",
+        "snapshot": "snapshots\\dcea9910e43b3145936d36aece0667f48b97a906068e9508a4c12138e980c3c2"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp32\\esp_crypto_clk.h": {
+        "sha256": "739b3476c3e21b4b9ed60f9a9badb13e329b85a07303be422d26bf56e6de84e9",
+        "bytes": 210,
+        "role": "Additional SDK source discovered while tracing startup/allocator ownership",
+        "snapshot": "snapshots\\739b3476c3e21b4b9ed60f9a9badb13e329b85a07303be422d26bf56e6de84e9"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp_crypto_periph_clk.c": {
+        "sha256": "d87fb49a4e3e38df12cd1ff237c5d81d6fc01727426ac184d0014a3a83c87716",
+        "bytes": 3720,
+        "role": "Additional SDK source discovered while tracing startup/allocator ownership",
+        "snapshot": "snapshots\\d87fb49a4e3e38df12cd1ff237c5d81d6fc01727426ac184d0014a3a83c87716"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\core\\psa_crypto_driver_wrappers.h": {
+        "sha256": "01156730d11f5b38436eab7e3fb9bc382494be441ab09aa3515ad39f9e555a4c",
+        "bytes": 150214,
+        "role": "Additional SDK source discovered while tracing startup/allocator ownership",
+        "snapshot": "snapshots\\01156730d11f5b38436eab7e3fb9bc382494be441ab09aa3515ad39f9e555a4c"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform_util.c": {
+        "sha256": "3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+        "bytes": 13698,
+        "role": "Additional SDK source discovered while tracing startup/allocator ownership",
+        "snapshot": "snapshots\\3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\include\\mbedtls\\platform_util.h": {
+        "sha256": "814a379a5b8c87505b1922b432ed833e2731042176fc5cf6ed63d9ecdbad612e",
+        "bytes": 8205,
+        "role": "Additional SDK source discovered while tracing startup/allocator ownership",
+        "snapshot": "snapshots\\814a379a5b8c87505b1922b432ed833e2731042176fc5cf6ed63d9ecdbad612e"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\bignum\\bignum_alt.c": {
+        "sha256": "cf381dadda47db5097a5fb905bb637f2534de289f8ae0779672e63cad3c1756a",
+        "bytes": 7750,
+        "role": "Additional SDK source discovered while tracing startup/allocator ownership",
+        "snapshot": "snapshots\\cf381dadda47db5097a5fb905bb637f2534de289f8ae0779672e63cad3c1756a"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\include\\bignum_impl.h": {
+        "sha256": "c780e906b6b8130b2a648be06a87b45d1ba7152234e935077d17c9e0b5d91458",
+        "bytes": 2823,
+        "role": "Additional SDK source discovered while tracing startup/allocator ownership",
+        "snapshot": "snapshots\\c780e906b6b8130b2a648be06a87b45d1ba7152234e935077d17c9e0b5d91458"
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp-tls\\esp_tls_mbedtls.c": {
+        "sha256": "72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7",
+        "bytes": 58690,
+        "role": "Additional SDK source discovered while tracing startup/allocator ownership",
+        "snapshot": "snapshots\\72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\input_reclaim\\enable.cmake": {
+        "sha256": "85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8",
+        "bytes": 884,
+        "role": "Existing CYD allocator wrapper integration",
+        "snapshot": "snapshots\\85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\mbedtls\\mbedtls\\library\\libmbedtls.a": {
+        "sha256": "5d4df7fca09192321d71b3923bc7c5582c41e8fd86e82ff30f48fb647144a5ee",
+        "bytes": 1143002,
+        "role": "Existing linked-library identity; hash-only, no decoder/crypto execution"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\mbedtls\\mbedtls\\library\\libtfpsacrypto.a": {
+        "sha256": "305b51284cdf4902e5a55c725b7751317d8204762d450e6868fd1924f2ea5f08",
+        "bytes": 4320458,
+        "role": "Existing linked-library identity; hash-only, no decoder/crypto execution"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\libplatform.a": {
+        "sha256": "967ff4453f73c610b0d11a6f1f058b93cd54c55d48e8fa31de4fdfe2d18e0239",
+        "bytes": 43660,
+        "role": "Existing linked-library identity; hash-only, no decoder/crypto execution"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-mpi-audit-01\\report.py": {
+        "sha256": "454d8aa45389071f7c67580088e76a9551d75cbebcbb2eee0b7c49ef8012b647",
+        "bytes": 25741,
+        "role": "Audit analysis helper",
+        "snapshot": "snapshots\\454d8aa45389071f7c67580088e76a9551d75cbebcbb2eee0b7c49ef8012b647"
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-mpi-audit-01\\finalize.py": {
+        "sha256": "6403a2d038d6c953e1244cab665582e1924f5c1fa25aea2b0eb93fae0c6f6527",
+        "bytes": 3169,
+        "role": "Final audit binding helper",
+        "snapshot": "snapshots\\6403a2d038d6c953e1244cab665582e1924f5c1fa25aea2b0eb93fae0c6f6527"
+      }
+    },
+    "existing_compile_rows": "selected-compile-rows.json",
+    "dynamic_diff": "sdk-dynamic-comparison.json",
+    "before_after": {
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_large_reserve.c": {
+        "before_sha256": "3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e",
+        "after_sha256": "3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_large_reserve.h": {
+        "before_sha256": "f8e4cd3fdaa8ff70a0dc2360092808c60666be61cc6379732c1d52caefafce9c",
+        "after_sha256": "f8e4cd3fdaa8ff70a0dc2360092808c60666be61cc6379732c1d52caefafce9c",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_input_reserve.c": {
+        "before_sha256": "5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e",
+        "after_sha256": "5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\tls_input_reserve.h": {
+        "before_sha256": "69360e52662a5c926eb6eabcdcdbe34cf569483f64baee53e9cdad201d007b72",
+        "after_sha256": "69360e52662a5c926eb6eabcdcdbe34cf569483f64baee53e9cdad201d007b72",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\Kconfig.projbuild": {
+        "before_sha256": "c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83",
+        "after_sha256": "c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\CMakeLists.txt": {
+        "before_sha256": "d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19",
+        "after_sha256": "d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\app_main.c": {
+        "before_sha256": "1ec056470034e4c1ec9f06e9d0fdb21b044c25f10b12ab921997eb565c4bf0cc",
+        "after_sha256": "1ec056470034e4c1ec9f06e9d0fdb21b044c25f10b12ab921997eb565c4bf0cc",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\main\\audio_service.c": {
+        "before_sha256": "2c20f62f092b19ae3f45a27b003ef2a406a373a729d9cfe229c29e75461ab838",
+        "after_sha256": "2c20f62f092b19ae3f45a27b003ef2a406a373a729d9cfe229c29e75461ab838",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\CMakeLists.txt": {
+        "before_sha256": "ce7814a37fb03ce7890300065171662a51b94c1da9be018ee8e41451ff715e4f",
+        "after_sha256": "ce7814a37fb03ce7890300065171662a51b94c1da9be018ee8e41451ff715e4f",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\patch_tls_rx_reserve.py": {
+        "before_sha256": "d45751f349a0bfa721593927d4babe59f850e9f2604eac7dd86b1fb8cd3b9838",
+        "after_sha256": "d45751f349a0bfa721593927d4babe59f850e9f2604eac7dd86b1fb8cd3b9838",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\sdkconfig.tls-rx-reserve.defaults": {
+        "before_sha256": "a44609b5313bd36eb4451563e1bbb4d5e1d90256fcf911046a1ca43ef29ca410",
+        "after_sha256": "a44609b5313bd36eb4451563e1bbb4d5e1d90256fcf911046a1ca43ef29ca410",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32c3-oled-native\\sdkconfig.tls-large-reserve.defaults": {
+        "before_sha256": "788f98529ced1087008d9f407ef5825a3792fd836c03bd4f9dbc4297b7dff28d",
+        "after_sha256": "788f98529ced1087008d9f407ef5825a3792fd836c03bd4f9dbc4297b7dff28d",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\CMakeLists.txt": {
+        "before_sha256": "b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d",
+        "after_sha256": "b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\Kconfig.projbuild": {
+        "before_sha256": "e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe",
+        "after_sha256": "e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\app_main.c": {
+        "before_sha256": "69089b40bd9ff5e40078977d675bea8cb024b173d5f1c0ddaa1bf0cc0f932301",
+        "after_sha256": "69089b40bd9ff5e40078977d675bea8cb024b173d5f1c0ddaa1bf0cc0f932301",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\audio_service.c": {
+        "before_sha256": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+        "after_sha256": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.c": {
+        "before_sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+        "after_sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\native_input_reclaim.h": {
+        "before_sha256": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+        "after_sha256": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\CMakeLists.txt": {
+        "before_sha256": "771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977",
+        "after_sha256": "771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\sdkconfig.defaults": {
+        "before_sha256": "9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3",
+        "after_sha256": "9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\sdkconfig": {
+        "before_sha256": "6dbb9efe52cb06265ccf8cc6d20e3b24b66c789d10a9de0ed3082c27512e1900",
+        "after_sha256": "6dbb9efe52cb06265ccf8cc6d20e3b24b66c789d10a9de0ed3082c27512e1900",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\config\\sdkconfig.h": {
+        "before_sha256": "99a09764f7caeca12ae9739197dac59330fa6f263b7347c99aac4b389fb75209",
+        "after_sha256": "99a09764f7caeca12ae9739197dac59330fa6f263b7347c99aac4b389fb75209",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\project_description.json": {
+        "before_sha256": "5b8803d1f086e232c5ff64cb32f993117e8fe2b4beeeb632904c188ae2555364",
+        "after_sha256": "5b8803d1f086e232c5ff64cb32f993117e8fe2b4beeeb632904c188ae2555364",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\compile_commands.json": {
+        "before_sha256": "c221e08f6946e177675279daf810ac24b35442c46dd5287174b11c5b5f297bce",
+        "after_sha256": "c221e08f6946e177675279daf810ac24b35442c46dd5287174b11c5b5f297bce",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\tools\\cmake\\version.cmake": {
+        "before_sha256": "3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee",
+        "after_sha256": "3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\CMakeLists.txt": {
+        "before_sha256": "4ad5952449def575c6db11fd4cb83cdb40746955479a4a30b0895ab24365a913",
+        "after_sha256": "4ad5952449def575c6db11fd4cb83cdb40746955479a4a30b0895ab24365a913",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\Kconfig": {
+        "before_sha256": "420b469d6712316f3d9e61e78faf7b764cc0f6f842f0c6200bff378344e50aa8",
+        "after_sha256": "420b469d6712316f3d9e61e78faf7b764cc0f6f842f0c6200bff378344e50aa8",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_mem.c": {
+        "before_sha256": "18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+        "after_sha256": "18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\include\\esp_mem.h": {
+        "before_sha256": "47f635e795492c2b1a6ab666a946bb8107c7a57c617056fb5fbe3dc56cb56ea6",
+        "after_sha256": "47f635e795492c2b1a6ab666a946bb8107c7a57c617056fb5fbe3dc56cb56ea6",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\include\\mbedtls\\esp_config.h": {
+        "before_sha256": "c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+        "after_sha256": "c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.h": {
+        "before_sha256": "9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3",
+        "after_sha256": "9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.c": {
+        "before_sha256": "8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "after_sha256": "8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_ssl_tls.c": {
+        "before_sha256": "791079366d124d52aea2256fdf52fa0704a1ec4526fdb012104e6f0cd4044756",
+        "after_sha256": "791079366d124d52aea2256fdf52fa0704a1ec4526fdb012104e6f0cd4044756",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_ssl_cli.c": {
+        "before_sha256": "b3cbaa1c22894ff0ab59cf78cf3e31dc59fd9677a3bc5e5c55eb1bf2e53609b5",
+        "after_sha256": "b3cbaa1c22894ff0ab59cf78cf3e31dc59fd9677a3bc5e5c55eb1bf2e53609b5",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\dynamic\\esp_ssl_srv.c": {
+        "before_sha256": "047dc85b6f2741f623cd93783c47d82d04d80a664d7f66fc400581b603754d02",
+        "after_sha256": "047dc85b6f2741f623cd93783c47d82d04d80a664d7f66fc400581b603754d02",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_tls.c": {
+        "before_sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+        "after_sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_msg.c": {
+        "before_sha256": "a649812c0fff02ec38b1f9794223a95dea31b2a3c4d0f39458e72b06281a9c52",
+        "after_sha256": "a649812c0fff02ec38b1f9794223a95dea31b2a3c4d0f39458e72b06281a9c52",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\library\\ssl_misc.h": {
+        "before_sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+        "after_sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\include\\mbedtls\\ssl.h": {
+        "before_sha256": "e0cf0f1d80b0148a2252e110907d7b03d59ba6fd69b63acd70bb1d7cf1667f59",
+        "after_sha256": "e0cf0f1d80b0148a2252e110907d7b03d59ba6fd69b63acd70bb1d7cf1667f59",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform.c": {
+        "before_sha256": "fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+        "after_sha256": "fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\include\\mbedtls\\platform.h": {
+        "before_sha256": "84c9357095fb24618d55ff69920828d02ecafb125e9b2929094db8cfe0a29069",
+        "after_sha256": "84c9357095fb24618d55ff69920828d02ecafb125e9b2929094db8cfe0a29069",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\esp_psa_crypto_init.c": {
+        "before_sha256": "3903ebec3dc6ad4d9ef7e2cdd260074d7147884fa5b32dfd791889eb675ee1e1",
+        "after_sha256": "3903ebec3dc6ad4d9ef7e2cdd260074d7147884fa5b32dfd791889eb675ee1e1",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\bignum\\esp_bignum.c": {
+        "before_sha256": "05a03eb3a08b53e262c2fb95a30e242d63ff44de2d65a1f1f5bc64be0dd70d37",
+        "after_sha256": "05a03eb3a08b53e262c2fb95a30e242d63ff44de2d65a1f1f5bc64be0dd70d37",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\core\\psa_crypto.c": {
+        "before_sha256": "8cc3426ace5d504b10e2bf947197f27db49d6cf1828aa1ce8dc988890b560855",
+        "after_sha256": "8cc3426ace5d504b10e2bf947197f27db49d6cf1828aa1ce8dc988890b560855",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\core\\psa_crypto_driver_wrappers_no_static.c": {
+        "before_sha256": "eccdda8e9b7db2d37b1c49a95362b572b109fca79657aac4ccb4992973777df9",
+        "after_sha256": "eccdda8e9b7db2d37b1c49a95362b572b109fca79657aac4ccb4992973777df9",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp_crypto_lock.c": {
+        "before_sha256": "7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057",
+        "after_sha256": "7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\include\\esp_crypto_lock.h": {
+        "before_sha256": "ffc8b49e52a1a1c09fa7cf9230efb9bbc767067f5ec45498082ea93d61d34898",
+        "after_sha256": "ffc8b49e52a1a1c09fa7cf9230efb9bbc767067f5ec45498082ea93d61d34898",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\CMakeLists.txt": {
+        "before_sha256": "e9a3870a84285e720e14264556bb28ce3be6ae72bccd581beaa93c4c034127b4",
+        "after_sha256": "e9a3870a84285e720e14264556bb28ce3be6ae72bccd581beaa93c4c034127b4",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\locks.c": {
+        "before_sha256": "724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+        "after_sha256": "724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\platform_include\\sys\\lock.h": {
+        "before_sha256": "698695d7425fb1c7a3003ca72de41d8ca6e346548e34370680139cb7daafbdb0",
+        "after_sha256": "698695d7425fb1c7a3003ca72de41d8ca6e346548e34370680139cb7daafbdb0",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\init.c": {
+        "before_sha256": "715e1c17e00b37443a376d4d541ff19e69d596c8e6437c3f332e7e42d478cfd1",
+        "after_sha256": "715e1c17e00b37443a376d4d541ff19e69d596c8e6437c3f332e7e42d478cfd1",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\src\\picolibc\\picolibc_init.c": {
+        "before_sha256": "0062be588abcf15bbe62d6308c1f64aa22c626ac8eaf88628c2ffe83e67e55cf",
+        "after_sha256": "0062be588abcf15bbe62d6308c1f64aa22c626ac8eaf88628c2ffe83e67e55cf",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_libc\\CMakeLists.txt": {
+        "before_sha256": "ba7e181cd6162d03dccb157b8e580ecbfeb616f0e04a96a515f6f3efd3df2f38",
+        "after_sha256": "ba7e181cd6162d03dccb157b8e580ecbfeb616f0e04a96a515f6f3efd3df2f38",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\soc\\esp32\\include\\soc\\soc_caps.h": {
+        "before_sha256": "b526678c75c70d4551ad23b88d5e6e8fffbd998b48b746a55e321171a1763ca7",
+        "after_sha256": "b526678c75c70d4551ad23b88d5e6e8fffbd998b48b746a55e321171a1763ca7",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_system\\startup.c": {
+        "before_sha256": "4e6ab3e3139030e68687b0cabf29fa6d36232dc62f60842c80f1d7d01756ad51",
+        "after_sha256": "4e6ab3e3139030e68687b0cabf29fa6d36232dc62f60842c80f1d7d01756ad51",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\FreeRTOS-Kernel\\queue.c": {
+        "before_sha256": "b37c27ee5151d6c342d56737699e199dd6532248e7d8f5da3824b4679a21f8c5",
+        "after_sha256": "b37c27ee5151d6c342d56737699e199dd6532248e7d8f5da3824b4679a21f8c5",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\freertos\\app_startup.c": {
+        "before_sha256": "9f3ae1b71307ad21e5716a5957619f47422f10d33d88e274c0f1b595c046794b",
+        "after_sha256": "9f3ae1b71307ad21e5716a5957619f47422f10d33d88e274c0f1b595c046794b",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.1\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.c": {
+        "before_sha256": "ba44a3b41004625fbbfbd5fbb4fed6f3e40de83119f6f5b98a1d4b6e7e74577f",
+        "after_sha256": "ba44a3b41004625fbbfbd5fbb4fed6f3e40de83119f6f5b98a1d4b6e7e74577f",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.1\\components\\mbedtls\\port\\dynamic\\esp_mbedtls_dynamic_impl.h": {
+        "before_sha256": "9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3",
+        "after_sha256": "9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-mpi-audit-01\\capture.py": {
+        "before_sha256": "5d4d69ce535822e508df29c18ccb553afe0daad2d07d6a911ef85b72606046b1",
+        "after_sha256": "5d4d69ce535822e508df29c18ccb553afe0daad2d07d6a911ef85b72606046b1",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe": {
+        "before_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+        "after_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe": {
+        "before_sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+        "after_sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-nm.exe": {
+        "before_sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+        "after_sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-objdump.exe": {
+        "before_sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+        "after_sha256": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\mbedtls\\libmbedtls.a": {
+        "before_sha256": "35394d9b349d0aeac191df85f29695c8f9694cecb7acc9c570529d8e961fcd9f",
+        "after_sha256": "35394d9b349d0aeac191df85f29695c8f9694cecb7acc9c570529d8e961fcd9f",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\esp_security\\libesp_security.a": {
+        "before_sha256": "6f97d6990f090c80789ec4c93b255e5a44e8c7132540836022ea85ce807d7adb",
+        "after_sha256": "6f97d6990f090c80789ec4c93b255e5a44e8c7132540836022ea85ce807d7adb",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\esp_libc\\libesp_libc.a": {
+        "before_sha256": "0e99e084c947ac1868662fa3ba0b2dd743d1fb933d125f1e7256980e2d4b8f0c",
+        "after_sha256": "0e99e084c947ac1868662fa3ba0b2dd743d1fb933d125f1e7256980e2d4b8f0c",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\init.c": {
+        "before_sha256": "dcea9910e43b3145936d36aece0667f48b97a906068e9508a4c12138e980c3c2",
+        "after_sha256": "dcea9910e43b3145936d36aece0667f48b97a906068e9508a4c12138e980c3c2",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp32\\esp_crypto_clk.h": {
+        "before_sha256": "739b3476c3e21b4b9ed60f9a9badb13e329b85a07303be422d26bf56e6de84e9",
+        "after_sha256": "739b3476c3e21b4b9ed60f9a9badb13e329b85a07303be422d26bf56e6de84e9",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_security\\src\\esp_crypto_periph_clk.c": {
+        "before_sha256": "d87fb49a4e3e38df12cd1ff237c5d81d6fc01727426ac184d0014a3a83c87716",
+        "after_sha256": "d87fb49a4e3e38df12cd1ff237c5d81d6fc01727426ac184d0014a3a83c87716",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\core\\psa_crypto_driver_wrappers.h": {
+        "before_sha256": "01156730d11f5b38436eab7e3fb9bc382494be441ab09aa3515ad39f9e555a4c",
+        "after_sha256": "01156730d11f5b38436eab7e3fb9bc382494be441ab09aa3515ad39f9e555a4c",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\platform_util.c": {
+        "before_sha256": "3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+        "after_sha256": "3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\mbedtls\\tf-psa-crypto\\include\\mbedtls\\platform_util.h": {
+        "before_sha256": "814a379a5b8c87505b1922b432ed833e2731042176fc5cf6ed63d9ecdbad612e",
+        "after_sha256": "814a379a5b8c87505b1922b432ed833e2731042176fc5cf6ed63d9ecdbad612e",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\bignum\\bignum_alt.c": {
+        "before_sha256": "cf381dadda47db5097a5fb905bb637f2534de289f8ae0779672e63cad3c1756a",
+        "after_sha256": "cf381dadda47db5097a5fb905bb637f2534de289f8ae0779672e63cad3c1756a",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\mbedtls\\port\\include\\bignum_impl.h": {
+        "before_sha256": "c780e906b6b8130b2a648be06a87b45d1ba7152234e935077d17c9e0b5d91458",
+        "after_sha256": "c780e906b6b8130b2a648be06a87b45d1ba7152234e935077d17c9e0b5d91458",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp-tls\\esp_tls_mbedtls.c": {
+        "before_sha256": "72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7",
+        "after_sha256": "72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\main\\compat\\input_reclaim\\enable.cmake": {
+        "before_sha256": "85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8",
+        "after_sha256": "85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\mbedtls\\mbedtls\\library\\libmbedtls.a": {
+        "before_sha256": "5d4df7fca09192321d71b3923bc7c5582c41e8fd86e82ff30f48fb647144a5ee",
+        "after_sha256": "5d4df7fca09192321d71b3923bc7c5582c41e8fd86e82ff30f48fb647144a5ee",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\mbedtls\\mbedtls\\library\\libtfpsacrypto.a": {
+        "before_sha256": "305b51284cdf4902e5a55c725b7751317d8204762d450e6868fd1924f2ea5f08",
+        "after_sha256": "305b51284cdf4902e5a55c725b7751317d8204762d450e6868fd1924f2ea5f08",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\esp32-cyd2usb-native\\build-c3-transfer\\esp-idf\\mbedtls\\mbedtls\\tf-psa-crypto\\platform\\libplatform.a": {
+        "before_sha256": "967ff4453f73c610b0d11a6f1f058b93cd54c55d48e8fa31de4fdfe2d18e0239",
+        "after_sha256": "967ff4453f73c610b0d11a6f1f058b93cd54c55d48e8fa31de4fdfe2d18e0239",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-mpi-audit-01\\report.py": {
+        "before_sha256": "454d8aa45389071f7c67580088e76a9551d75cbebcbb2eee0b7c49ef8012b647",
+        "after_sha256": "454d8aa45389071f7c67580088e76a9551d75cbebcbb2eee0b7c49ef8012b647",
+        "unchanged": true
+      },
+      "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-tls-reserve-mpi-audit-01\\finalize.py": {
+        "before_sha256": "6403a2d038d6c953e1244cab665582e1924f5c1fa25aea2b0eb93fae0c6f6527",
+        "after_sha256": "6403a2d038d6c953e1244cab665582e1924f5c1fa25aea2b0eb93fae0c6f6527",
+        "unchanged": true
+      }
+    },
+    "all_inputs_unchanged_after": true,
+    "payloads": {
+      "capture.json": {
+        "sha256": "5ce3f4c8d500e258cf28be4933a10dbf19cd6ed7e803fbb2707dc300983e693a",
+        "bytes": 24875
+      },
+      "capture.py": {
+        "sha256": "5d4d69ce535822e508df29c18ccb553afe0daad2d07d6a911ef85b72606046b1",
+        "bytes": 4562
+      },
+      "esp_mbedtls_dynamic_impl.c.diff": {
+        "sha256": "ada2b69e343e46400fe4b6819ec39431ec3d3b0d74f74dda2ff35c53f46b49c6",
+        "bytes": 1688
+      },
+      "esp_mbedtls_dynamic_impl.h.diff": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "finalize.py": {
+        "sha256": "6403a2d038d6c953e1244cab665582e1924f5c1fa25aea2b0eb93fae0c6f6527",
+        "bytes": 3169
+      },
+      "report-initial.json": {
+        "sha256": "39ae34ac63e919a3866e7fc0ac6d3145f75ae7b004c507830632b720bd2b0b9c",
+        "bytes": 116463
+      },
+      "report.py": {
+        "sha256": "454d8aa45389071f7c67580088e76a9551d75cbebcbb2eee0b7c49ef8012b647",
+        "bytes": 25741
+      },
+      "sdk-dynamic-comparison.json": {
+        "sha256": "145887650ace0b8ed09e36dbfe57420f8b2f78ab8a8cffeb4a006b4e94c803fb",
+        "bytes": 1000
+      },
+      "selected-compile-rows.json": {
+        "sha256": "52b53b61cc006b8cc925f231bd2cd4444f91b8e96c109a860b1b5e043c49ff37",
+        "bytes": 48542
+      },
+      "snapshots\\0062be588abcf15bbe62d6308c1f64aa22c626ac8eaf88628c2ffe83e67e55cf": {
+        "sha256": "0062be588abcf15bbe62d6308c1f64aa22c626ac8eaf88628c2ffe83e67e55cf",
+        "bytes": 5906
+      },
+      "snapshots\\01156730d11f5b38436eab7e3fb9bc382494be441ab09aa3515ad39f9e555a4c": {
+        "sha256": "01156730d11f5b38436eab7e3fb9bc382494be441ab09aa3515ad39f9e555a4c",
+        "bytes": 150214
+      },
+      "snapshots\\047dc85b6f2741f623cd93783c47d82d04d80a664d7f66fc400581b603754d02": {
+        "sha256": "047dc85b6f2741f623cd93783c47d82d04d80a664d7f66fc400581b603754d02",
+        "bytes": 7196
+      },
+      "snapshots\\05a03eb3a08b53e262c2fb95a30e242d63ff44de2d65a1f1f5bc64be0dd70d37": {
+        "sha256": "05a03eb3a08b53e262c2fb95a30e242d63ff44de2d65a1f1f5bc64be0dd70d37",
+        "bytes": 21674
+      },
+      "snapshots\\0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3": {
+        "sha256": "0db160de866d75e97692b57e7deb6871df8937fbaf7d87af1ebe6045075290f3",
+        "bytes": 307833
+      },
+      "snapshots\\18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45": {
+        "sha256": "18cf447521dd47b141bc23e7c8e1ba78cf9ce543522c82cb65a0b44de1f73d45",
+        "bytes": 1240
+      },
+      "snapshots\\1ec056470034e4c1ec9f06e9d0fdb21b044c25f10b12ab921997eb565c4bf0cc": {
+        "sha256": "1ec056470034e4c1ec9f06e9d0fdb21b044c25f10b12ab921997eb565c4bf0cc",
+        "bytes": 41673
+      },
+      "snapshots\\2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3": {
+        "sha256": "2a6ce80817df10e20c1d44e694a27dbce7acb5484f869897f2f0590d1e72f8d3",
+        "bytes": 1498
+      },
+      "snapshots\\2c20f62f092b19ae3f45a27b003ef2a406a373a729d9cfe229c29e75461ab838": {
+        "sha256": "2c20f62f092b19ae3f45a27b003ef2a406a373a729d9cfe229c29e75461ab838",
+        "bytes": 115229
+      },
+      "snapshots\\3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e": {
+        "sha256": "3337d84c9e7a054c6ca3853f82624add5ce3e41ae699de59dc2df55a509d156e",
+        "bytes": 3353
+      },
+      "snapshots\\3903ebec3dc6ad4d9ef7e2cdd260074d7147884fa5b32dfd791889eb675ee1e1": {
+        "sha256": "3903ebec3dc6ad4d9ef7e2cdd260074d7147884fa5b32dfd791889eb675ee1e1",
+        "bytes": 972
+      },
+      "snapshots\\3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee": {
+        "sha256": "3a6ffe5d413dac0890e9a070da9e0a6950307fd1b7aba50c63c6257d17d986ee",
+        "bytes": 168
+      },
+      "snapshots\\3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d": {
+        "sha256": "3ac0410f1dfd5a471591af1ab25e44968157916541c21536203963d9863f1f0d",
+        "bytes": 13698
+      },
+      "snapshots\\420b469d6712316f3d9e61e78faf7b764cc0f6f842f0c6200bff378344e50aa8": {
+        "sha256": "420b469d6712316f3d9e61e78faf7b764cc0f6f842f0c6200bff378344e50aa8",
+        "bytes": 73593
+      },
+      "snapshots\\454d8aa45389071f7c67580088e76a9551d75cbebcbb2eee0b7c49ef8012b647": {
+        "sha256": "454d8aa45389071f7c67580088e76a9551d75cbebcbb2eee0b7c49ef8012b647",
+        "bytes": 25741
+      },
+      "snapshots\\47f635e795492c2b1a6ab666a946bb8107c7a57c617056fb5fbe3dc56cb56ea6": {
+        "sha256": "47f635e795492c2b1a6ab666a946bb8107c7a57c617056fb5fbe3dc56cb56ea6",
+        "bytes": 261
+      },
+      "snapshots\\4ad5952449def575c6db11fd4cb83cdb40746955479a4a30b0895ab24365a913": {
+        "sha256": "4ad5952449def575c6db11fd4cb83cdb40746955479a4a30b0895ab24365a913",
+        "bytes": 27176
+      },
+      "snapshots\\4e6ab3e3139030e68687b0cabf29fa6d36232dc62f60842c80f1d7d01756ad51": {
+        "sha256": "4e6ab3e3139030e68687b0cabf29fa6d36232dc62f60842c80f1d7d01756ad51",
+        "bytes": 6875
+      },
+      "snapshots\\50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6": {
+        "sha256": "50edba14afacfa2db14e4ced28e63ea53e1fdd3683768c150ae28ea13c9ebcb6",
+        "bytes": 115094
+      },
+      "snapshots\\5b8803d1f086e232c5ff64cb32f993117e8fe2b4beeeb632904c188ae2555364": {
+        "sha256": "5b8803d1f086e232c5ff64cb32f993117e8fe2b4beeeb632904c188ae2555364",
+        "bytes": 272869
+      },
+      "snapshots\\5d4d69ce535822e508df29c18ccb553afe0daad2d07d6a911ef85b72606046b1": {
+        "sha256": "5d4d69ce535822e508df29c18ccb553afe0daad2d07d6a911ef85b72606046b1",
+        "bytes": 4562
+      },
+      "snapshots\\5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e": {
+        "sha256": "5ea1f85bb2df1c6ba41be08a86e90bf02da8c67473f69601f254e9737d53363e",
+        "bytes": 7409
+      },
+      "snapshots\\6403a2d038d6c953e1244cab665582e1924f5c1fa25aea2b0eb93fae0c6f6527": {
+        "sha256": "6403a2d038d6c953e1244cab665582e1924f5c1fa25aea2b0eb93fae0c6f6527",
+        "bytes": 3169
+      },
+      "snapshots\\69089b40bd9ff5e40078977d675bea8cb024b173d5f1c0ddaa1bf0cc0f932301": {
+        "sha256": "69089b40bd9ff5e40078977d675bea8cb024b173d5f1c0ddaa1bf0cc0f932301",
+        "bytes": 4782
+      },
+      "snapshots\\69360e52662a5c926eb6eabcdcdbe34cf569483f64baee53e9cdad201d007b72": {
+        "sha256": "69360e52662a5c926eb6eabcdcdbe34cf569483f64baee53e9cdad201d007b72",
+        "bytes": 1232
+      },
+      "snapshots\\698695d7425fb1c7a3003ca72de41d8ca6e346548e34370680139cb7daafbdb0": {
+        "sha256": "698695d7425fb1c7a3003ca72de41d8ca6e346548e34370680139cb7daafbdb0",
+        "bytes": 1927
+      },
+      "snapshots\\6dbb9efe52cb06265ccf8cc6d20e3b24b66c789d10a9de0ed3082c27512e1900": {
+        "sha256": "6dbb9efe52cb06265ccf8cc6d20e3b24b66c789d10a9de0ed3082c27512e1900",
+        "bytes": 78877
+      },
+      "snapshots\\715e1c17e00b37443a376d4d541ff19e69d596c8e6437c3f332e7e42d478cfd1": {
+        "sha256": "715e1c17e00b37443a376d4d541ff19e69d596c8e6437c3f332e7e42d478cfd1",
+        "bytes": 641
+      },
+      "snapshots\\724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46": {
+        "sha256": "724db9717157895bd9749431a243d54659c6ef808d9052762b2752cf9f31bd46",
+        "bytes": 16382
+      },
+      "snapshots\\72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7": {
+        "sha256": "72dd83355fa64fc66e3a8636776c4b3ebbc5ec219834559a3aba33d217f730c7",
+        "bytes": 58690
+      },
+      "snapshots\\739b3476c3e21b4b9ed60f9a9badb13e329b85a07303be422d26bf56e6de84e9": {
+        "sha256": "739b3476c3e21b4b9ed60f9a9badb13e329b85a07303be422d26bf56e6de84e9",
+        "bytes": 210
+      },
+      "snapshots\\771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977": {
+        "sha256": "771952b864eba0fde4a2d0a9532fbaa5ede7e6a6ed047913bd400b6e14ca3977",
+        "bytes": 1157
+      },
+      "snapshots\\788f98529ced1087008d9f407ef5825a3792fd836c03bd4f9dbc4297b7dff28d": {
+        "sha256": "788f98529ced1087008d9f407ef5825a3792fd836c03bd4f9dbc4297b7dff28d",
+        "bytes": 125
+      },
+      "snapshots\\791079366d124d52aea2256fdf52fa0704a1ec4526fdb012104e6f0cd4044756": {
+        "sha256": "791079366d124d52aea2256fdf52fa0704a1ec4526fdb012104e6f0cd4044756",
+        "bytes": 15229
+      },
+      "snapshots\\7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057": {
+        "sha256": "7a26e7318ce75be88b246c3f0bd60ffc7f57e6b557d212ff2e27f26bb0a6d057",
+        "bytes": 5808
+      },
+      "snapshots\\814a379a5b8c87505b1922b432ed833e2731042176fc5cf6ed63d9ecdbad612e": {
+        "sha256": "814a379a5b8c87505b1922b432ed833e2731042176fc5cf6ed63d9ecdbad612e",
+        "bytes": 8205
+      },
+      "snapshots\\84c9357095fb24618d55ff69920828d02ecafb125e9b2929094db8cfe0a29069": {
+        "sha256": "84c9357095fb24618d55ff69920828d02ecafb125e9b2929094db8cfe0a29069",
+        "bytes": 19257
+      },
+      "snapshots\\85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8": {
+        "sha256": "85162c323a7e87b417d3296d053e239defb01d42717287a13d1c8507520ccac8",
+        "bytes": 884
+      },
+      "snapshots\\8cc3426ace5d504b10e2bf947197f27db49d6cf1828aa1ce8dc988890b560855": {
+        "sha256": "8cc3426ace5d504b10e2bf947197f27db49d6cf1828aa1ce8dc988890b560855",
+        "bytes": 343539
+      },
+      "snapshots\\8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a": {
+        "sha256": "8dcf71de877d7cb35052dcd6ab7a919db1ae4cd6440501e9017b264f6e84dd4a",
+        "bytes": 20212
+      },
+      "snapshots\\99a09764f7caeca12ae9739197dac59330fa6f263b7347c99aac4b389fb75209": {
+        "sha256": "99a09764f7caeca12ae9739197dac59330fa6f263b7347c99aac4b389fb75209",
+        "bytes": 40232
+      },
+      "snapshots\\9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3": {
+        "sha256": "9a933302532a772d638d8eb1fee2ab3bda729f04797bcbeeb825b77e7d4036d3",
+        "bytes": 2644
+      },
+      "snapshots\\9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb": {
+        "sha256": "9b7b8466f4848b84de3384a293f6a59edb034d95c46409cc45a0ec82ffec02bb",
+        "bytes": 68181
+      },
+      "snapshots\\9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3": {
+        "sha256": "9eb8905ae4625581aca8c0610ed46e25d045eb4c00fef34a9fab6a2312ad1fa3",
+        "bytes": 3874
+      },
+      "snapshots\\9f3ae1b71307ad21e5716a5957619f47422f10d33d88e274c0f1b595c046794b": {
+        "sha256": "9f3ae1b71307ad21e5716a5957619f47422f10d33d88e274c0f1b595c046794b",
+        "bytes": 8042
+      },
+      "snapshots\\a44609b5313bd36eb4451563e1bbb4d5e1d90256fcf911046a1ca43ef29ca410": {
+        "sha256": "a44609b5313bd36eb4451563e1bbb4d5e1d90256fcf911046a1ca43ef29ca410",
+        "bytes": 141
+      },
+      "snapshots\\a649812c0fff02ec38b1f9794223a95dea31b2a3c4d0f39458e72b06281a9c52": {
+        "sha256": "a649812c0fff02ec38b1f9794223a95dea31b2a3c4d0f39458e72b06281a9c52",
+        "bytes": 231859
+      },
+      "snapshots\\b37c27ee5151d6c342d56737699e199dd6532248e7d8f5da3824b4679a21f8c5": {
+        "sha256": "b37c27ee5151d6c342d56737699e199dd6532248e7d8f5da3824b4679a21f8c5",
+        "bytes": 143713
+      },
+      "snapshots\\b3cbaa1c22894ff0ab59cf78cf3e31dc59fd9677a3bc5e5c55eb1bf2e53609b5": {
+        "sha256": "b3cbaa1c22894ff0ab59cf78cf3e31dc59fd9677a3bc5e5c55eb1bf2e53609b5",
+        "bytes": 10139
+      },
+      "snapshots\\b526678c75c70d4551ad23b88d5e6e8fffbd998b48b746a55e321171a1763ca7": {
+        "sha256": "b526678c75c70d4551ad23b88d5e6e8fffbd998b48b746a55e321171a1763ca7",
+        "bytes": 19424
+      },
+      "snapshots\\b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d": {
+        "sha256": "b631b490cca60403cc1571f390a8bf506511a5834511eb785f364e7ac3a1937d",
+        "bytes": 3527
+      },
+      "snapshots\\ba44a3b41004625fbbfbd5fbb4fed6f3e40de83119f6f5b98a1d4b6e7e74577f": {
+        "sha256": "ba44a3b41004625fbbfbd5fbb4fed6f3e40de83119f6f5b98a1d4b6e7e74577f",
+        "bytes": 20404
+      },
+      "snapshots\\ba7e181cd6162d03dccb157b8e580ecbfeb616f0e04a96a515f6f3efd3df2f38": {
+        "sha256": "ba7e181cd6162d03dccb157b8e580ecbfeb616f0e04a96a515f6f3efd3df2f38",
+        "bytes": 6785
+      },
+      "snapshots\\c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83": {
+        "sha256": "c19202b001b46a295a61d5fdee088c71ca407424e381a85411ba0ee3bdc13c83",
+        "bytes": 50994
+      },
+      "snapshots\\c221e08f6946e177675279daf810ac24b35442c46dd5287174b11c5b5f297bce": {
+        "sha256": "c221e08f6946e177675279daf810ac24b35442c46dd5287174b11c5b5f297bce",
+        "bytes": 6638472
+      },
+      "snapshots\\c780e906b6b8130b2a648be06a87b45d1ba7152234e935077d17c9e0b5d91458": {
+        "sha256": "c780e906b6b8130b2a648be06a87b45d1ba7152234e935077d17c9e0b5d91458",
+        "bytes": 2823
+      },
+      "snapshots\\c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50": {
+        "sha256": "c9c20b5432c34c34c32c2438c375ec5b11cbe0107cef4129c1e3e3d715eb4a50",
+        "bytes": 97401
+      },
+      "snapshots\\ce7814a37fb03ce7890300065171662a51b94c1da9be018ee8e41451ff715e4f": {
+        "sha256": "ce7814a37fb03ce7890300065171662a51b94c1da9be018ee8e41451ff715e4f",
+        "bytes": 13281
+      },
+      "snapshots\\cf381dadda47db5097a5fb905bb637f2534de289f8ae0779672e63cad3c1756a": {
+        "sha256": "cf381dadda47db5097a5fb905bb637f2534de289f8ae0779672e63cad3c1756a",
+        "bytes": 7750
+      },
+      "snapshots\\d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19": {
+        "sha256": "d44b73a71497507b1c98c164b40e2d91cc63c5b2234cc3e969806ac3769f5a19",
+        "bytes": 29073
+      },
+      "snapshots\\d45751f349a0bfa721593927d4babe59f850e9f2604eac7dd86b1fb8cd3b9838": {
+        "sha256": "d45751f349a0bfa721593927d4babe59f850e9f2604eac7dd86b1fb8cd3b9838",
+        "bytes": 2099
+      },
+      "snapshots\\d87fb49a4e3e38df12cd1ff237c5d81d6fc01727426ac184d0014a3a83c87716": {
+        "sha256": "d87fb49a4e3e38df12cd1ff237c5d81d6fc01727426ac184d0014a3a83c87716",
+        "bytes": 3720
+      },
+      "snapshots\\dcea9910e43b3145936d36aece0667f48b97a906068e9508a4c12138e980c3c2": {
+        "sha256": "dcea9910e43b3145936d36aece0667f48b97a906068e9508a4c12138e980c3c2",
+        "bytes": 4978
+      },
+      "snapshots\\e0cf0f1d80b0148a2252e110907d7b03d59ba6fd69b63acd70bb1d7cf1667f59": {
+        "sha256": "e0cf0f1d80b0148a2252e110907d7b03d59ba6fd69b63acd70bb1d7cf1667f59",
+        "bytes": 272726
+      },
+      "snapshots\\e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe": {
+        "sha256": "e5fece8143f4dbef37e16373a1cf5f57744ed8416d4e86fd780e271e3149ecfe",
+        "bytes": 6047
+      },
+      "snapshots\\e9a3870a84285e720e14264556bb28ce3be6ae72bccd581beaa93c4c034127b4": {
+        "sha256": "e9a3870a84285e720e14264556bb28ce3be6ae72bccd581beaa93c4c034127b4",
+        "bytes": 1991
+      },
+      "snapshots\\eccdda8e9b7db2d37b1c49a95362b572b109fca79657aac4ccb4992973777df9": {
+        "sha256": "eccdda8e9b7db2d37b1c49a95362b572b109fca79657aac4ccb4992973777df9",
+        "bytes": 9610
+      },
+      "snapshots\\f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69": {
+        "sha256": "f8d1e96e8ba6155a020c9737cd3a7dba329778c2ecf31a89feacb40bf40a7c69",
+        "bytes": 2274
+      },
+      "snapshots\\f8e4cd3fdaa8ff70a0dc2360092808c60666be61cc6379732c1d52caefafce9c": {
+        "sha256": "f8e4cd3fdaa8ff70a0dc2360092808c60666be61cc6379732c1d52caefafce9c",
+        "bytes": 342
+      },
+      "snapshots\\fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597": {
+        "sha256": "fe8a7a9a65757c411fc41095b4beca8762fed0b39c8779424209df2a37b53597",
+        "bytes": 10363
+      },
+      "snapshots\\ffc8b49e52a1a1c09fa7cf9230efb9bbc767067f5ec45498082ea93d61d34898": {
+        "sha256": "ffc8b49e52a1a1c09fa7cf9230efb9bbc767067f5ec45498082ea93d61d34898",
+        "bytes": 3842
+      },
+      "supplement.json": {
+        "sha256": "fda96e1d0e9ed2d2f9c261326cdfa1a22d241cf4d3ef0ad997be1c53bca165ac",
+        "bytes": 5604
+      }
+    },
+    "initial_report_sha256": "39ae34ac63e919a3866e7fc0ac6d3145f75ae7b004c507830632b720bd2b0b9c"
+  },
+  "frozen_profile_context": "Existing build-c3-transfer metadata at capture time, including opt-in TLS_INPUT_RECLAIM=y; this is not an assertion that the production Kconfig default was changed (it remains n in captured source)."
+}
