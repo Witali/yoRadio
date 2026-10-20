@@ -1,0 +1,26 @@
+{
+  "state": "NONPASS",
+  "format_acceptance_qualified": false,
+  "regression_reproduced": false,
+  "production_changed": false,
+  "physical_qualified": false,
+  "commands_sha256": {
+    "build-command.json": "2cf3216c7ead29752626de05cf4a3758036010d934890603599c54fae2d30702",
+    "merge-command.json": "0c687f6d967de5fcb57395466a80f3ba44d3495e10e3d569d6be34554d7160ba",
+    "qemu-command.json": "04b57f0d475dceff7b23be7e8728a3a5643c8ccad0005c0b1a5bfc05b62ad215"
+  },
+  "observations": [
+    "CYD_VORBIS_FORMAT_VENDOR_OPEN rate=192000 long=8192 result=0 handle=1",
+    "CYD_VORBIS_FORMAT_VENDOR_METADATA packet=0 result=0 consumed=32 decoded=0 rate=192000 channel=2 bits=16",
+    "CYD_VORBIS_FORMAT_VENDOR_METADATA packet=1 result=0 consumed=111 decoded=8448 rate=0 channel=0 bits=0",
+    "CYD_VORBIS_FORMAT_FAILURE vendor_high8192_metadata"
+  ],
+  "diagnosis": "The original public decoder publishes192000Hz/stereo/16-bit metadata on priming packet0. The harness then replaces that output structure with zeros for packet1, where the vendor does not populate it again. Correct the harness to retain public metadata per handle and require expected values on every packet including priming. This run does not prove completion of8192 PCM decoding or low-rate rejection.",
+  "source_inputs_unchanged": true,
+  "outputs_sha256": {
+    "build\\cyd_vorbis_public_format.elf": "e4ccf6b6b4819f84128695554a8711bf7f288035a098ec9296282496a04aa3fc",
+    "build\\cyd_vorbis_public_format.bin": "a43d54a8703f1b9611e98394dd7f1877250326f223dd88d33a2cce910d11dbd9",
+    "build\\flasher_args.json": "cd0966e0bb0827c8e544768dff398a07f855674d17daa40e3a31fb35a401728f",
+    "qemu-flash.bin": "8f13049f3854133a383b3e85b42da73213c2238c7b0087e14ae3e2fc858a0048"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "scope": "Public raw Vorbis8192 diagnostic; no production changes, Ogg APIs, private state reads or hardware operations",
+  "state": "NONPASS",
+  "source_commit": "e1cc90dc966d4e17a7534660046f731b2b72feb9",
+  "regression_reproduced": false,
+  "format_acceptance_qualified": false,
+  "physical_qualified": false,
+  "production_changed": false,
+  "observation": "Original vendor open succeeds at192000Hz/8192, then public metadata assertion fails. Actual metadata values were not printed; diagnosis pending. QEMU terminal0 alone is not a qualification pass.",
+  "failures": [
+    "vendor_high8192_metadata"
+  ],
+  "command_records_sha256": {
+    "build-command02.json": "e4afe17139474d044442cb3c2895f1fed4781bd1c7fa0f814c0456d687f77429",
+    "macro-command.json": "dc20faf22cc0bc0b432443abafde3ac862ed2e2d676685c499f3cb168430b7a4",
+    "nm-command.json": "16afcdd81812bb3024e388a0c7c27c885cb9765cac012fd9ae75041089db8f8d",
+    "merge-command.json": "6125690e63f7b55adbd18d438fe295b236c7be07e879e032969fd81cb34bcb27",
+    "qemu-command.json": "9f59d54c96528807c593c3b83efff9846543e2808cea4e94fb80d49eed96fba5"
+  },
+  "link_symbols": [
+    "__wrap_esp_vorbis_dec_decode",
+    "__wrap_esp_vorbis_dec_open",
+    "esp_vorbis_dec_decode",
+    "esp_vorbis_dec_open"
+  ],
+  "macro_context": "actual setup.c compilation: ESP32 and repair enabled; LIMIT_TO_64kHz absent"
+}

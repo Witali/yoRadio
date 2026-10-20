@@ -953,8 +953,6 @@ static int repair__vorbis_unpack_info(vorbis_info *vi,oggpack_buffer *opb){
 
 #ifdef LIMIT_TO_64kHz
   if(vi->rate>=64000 || ci->blocksizes[1]>4096)goto err_out;
-#else
-  if(vi->rate<64000 && ci->blocksizes[1]>4096)goto err_out;
 #endif
 
   if(vi->rate<1)goto err_out;

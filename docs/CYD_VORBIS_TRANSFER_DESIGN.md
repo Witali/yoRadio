@@ -36,8 +36,41 @@ task-local scopes, broader codebook/format coverage, actual audio-task
 integration, final static analysis/application exports and physical resource
 measurements remain. The stripped vendor objects only partly corroborate
 private layouts; compiler assertions and this fixture do not prove every field's
-vendor semantics. Inherited rate/block-size limits remain unqualified against
-the standard. No memory, speed or full conformance claim follows from this run.
+vendor semantics. The later raw8192 checkpoint resolves one inherited
+rate/block-size restriction. No memory, speed or full conformance claim follows
+from either checkpoint.
+
+## Raw8192 format checkpoint, 2026-10-20
+
+The default identification parser rejected 8192 long blocks below 64000 Hz.
+[Vorbis I, section 4.2.2](https://xiph.org/vorbis/doc/Vorbis_I_spec.html) permits
+those block sizes independently of the positive rate. The two-line fix removes
+only that default branch; the optional `LIMIT_TO_64kHz` policy and the ordinary
+rate, channel, block-order, block-bound and framing checks remain.
+
+The [public raw target](../tests/target/cyd_vorbis_format_qemu/README.md) uses
+opaque handles, complete packets and ample guarded output buffers. The
+[frozen results](../tests/results/cyd-vorbis-format-20261020/README.md) record
+SDK6.0.2/Xtensa execution: the original vendor first decodes all 68 packets at
+8192 blocks, including 66 full 16384-byte outputs. Five original/checked pairs
+then compare 340 packets and 4631808 PCM bytes exactly: four 8192-block rates
+(192000, 64000, 63999 and 48000 Hz) and an ordinary 48000 Hz / 2048 control.
+All four malformed identification headers still reject. A separate control
+restores the original setup bytes and reaches exactly
+`legal_candidate_open_required` after the full vendor/high/ordinary checks.
+
+Ten host tests cover the runner's packet protocol, metadata, quoting and
+generated compiler-input handling. Earlier metadata-lifetime and unsupported
+response-file attempts remain NONPASS; the baseline's unchanged SDK build was
+completed manually with a separate qualification record. Public metadata is
+retained per opened handle and checked on every packet, including priming.
+The generated cflags/specs remain byte-identical before and after probing.
+
+This selected nonzero stereo floor1 fixture advances G6 and G7 only for this
+restriction. Other formats, Ogg, callbacks, allocation/lifetime, SMP service,
+radio integration and physical resources remain open. The CYD bridge is still
+isolated. C3 has the same inherited guard and requires its own RISC-V execution
+before changing its enabled implementation.
 
 ## Entry points and confirmed problems
 

@@ -1,0 +1,45 @@
+param([Parameter(Mandatory)][string]$Campaign,
+      [Parameter(Mandatory)][string]$Repository,
+      [Parameter(Mandatory)][string]$SdkDirectory,
+      [Parameter(Mandatory)][string]$ToolsDirectory,
+      [Parameter(Mandatory)][string]$CodecDirectory)
+$ErrorActionPreference = 'Stop'
+$Campaign = [IO.Path]::GetFullPath($Campaign)
+$draftRoot = Join-Path ([IO.Path]::GetFullPath($Repository)) '.build'
+if (!$Campaign.StartsWith($draftRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+    !(Test-Path -LiteralPath (Join-Path $Campaign 'report.json') -PathType Leaf) -or
+    !(Test-Path -LiteralPath (Join-Path $Campaign 'variant/vorbis_repair_abi.h') -PathType Leaf)) {
+    throw 'Only a runner-prepared fresh campaign inside repository .build is supported'
+}
+$env:IDF_PATH = [IO.Path]::GetFullPath($SdkDirectory)
+$env:IDF_TOOLS_PATH = [IO.Path]::GetFullPath($ToolsDirectory)
+$env:YORADIO_AUDIO_CODEC_COMPONENT = [IO.Path]::GetFullPath($CodecDirectory)
+$env:CYD_VORBIS_CANDIDATE = (Join-Path $Campaign 'variant').Replace('\', '/')
+$env:IDF_COMPONENT_MANAGER = '0'
+$env:PYTHONNOUSERSITE = '1'
+$env:PYTHONUTF8 = '1'
+$env:PYTHONIOENCODING = 'utf-8'
+$env:GIT_CONFIG_COUNT = '1'
+$env:GIT_CONFIG_KEY_0 = 'core.longpaths'
+$env:GIT_CONFIG_VALUE_0 = 'true'
+$env:GIT_OPTIONAL_LOCKS = '0'
+$python = Join-Path $env:IDF_TOOLS_PATH 'python_env/idf6.0_py3.12_env/Scripts/python.exe'
+$env:IDF_PYTHON_ENV_PATH = Split-Path (Split-Path $python)
+$env:Path = (Split-Path $python) + ';' + $env:Path
+. (Join-Path $env:IDF_PATH 'export.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'SDK activation failed' }
+$argsForIdf = @((Join-Path $env:IDF_PATH 'tools/idf.py'), '-C', (Join-Path $Campaign 'sources/project'),
+ '-B', (Join-Path $Campaign 'build'), '--no-ccache', '-D', 'IDF_TARGET=esp32',
+ '-D', "SDKCONFIG=$Campaign/sdkconfig", '-D', "SDKCONFIG_DEFAULTS=$Campaign/sources/project/sdkconfig.defaults",
+ '-D', 'FORMAT_EXPECT_LOW_RATE_REJECTION=1', '-D', 'CMAKE_JOB_POOLS=compile=2;link=1', '-D', 'CMAKE_JOB_POOL_COMPILE=compile', '-D', 'CMAKE_JOB_POOL_LINK=link', 'build')
+$toolPaths = @(Get-ChildItem Env: | Where-Object { $_.Name -imatch '^path$' -and $_.Value.Contains('tools\ninja') } | Select-Object -ExpandProperty Value)
+if ($toolPaths.Count -ne 1) { throw 'Activated toolchain PATH missing' }
+$start = [Diagnostics.ProcessStartInfo]::new()
+$start.FileName = $python
+$start.UseShellExecute = $false
+$start.CreateNoWindow = $true
+$start.Environment['PATH'] = $toolPaths[0]
+foreach ($arg in $argsForIdf) { [void]$start.ArgumentList.Add($arg) }
+$process = [Diagnostics.Process]::Start($start)
+$process.WaitForExit()
+if ($process.ExitCode -ne 0) { throw "SDK build failed: $($process.ExitCode)" }
