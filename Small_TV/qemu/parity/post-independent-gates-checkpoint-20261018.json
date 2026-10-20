@@ -1,0 +1,112 @@
+{
+  "status": "frozen_full_and_h10_inputs_unchanged",
+  "all_functionality_verified": false,
+  "captured_utc": "2026-10-18T17:19:55.925927+00:00",
+  "full_input_counts": [
+    566,
+    561
+  ],
+  "h10_registries": {
+    "runtime_inputs_sha256": 32,
+    "qemu_snapshot_sha256": 47,
+    "supervisor_sources_sha256": 8
+  },
+  "os_processes": {
+    "captured_utc": "2026-10-18T17:17:01.4433791Z",
+    "processes": [
+      {
+        "pid": 30244,
+        "created_utc": "2026-10-18T16:04:24.3281330Z",
+        "name": "pwsh.exe",
+        "command_line": "\"C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" -NoProfile -NonInteractive -File \"C:\\Work\\yoRadio\\.worktree\\small-tv-reset-display\\.build\\run_reset_display_complete_full.ps1\""
+      },
+      {
+        "pid": 17200,
+        "created_utc": "2026-10-18T16:34:14.2973860Z",
+        "name": "pwsh.exe",
+        "command_line": "\"C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" -NoProfile -NonInteractive -File \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\run_jpeg_header_complete_full.ps1\""
+      },
+      {
+        "pid": 23208,
+        "created_utc": "2026-10-18T16:37:04.1096700Z",
+        "name": "pwsh.exe",
+        "command_line": "\"C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" \"-NoProfile\" \"-NonInteractive\" \"-File\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\Small_TV\\src\\tools\\runtime_supervisor.ps1\" \"-YoradioRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\" \"-QemuRoot\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018\" \"-DependencyRoot\" \"C:\\Work\\yoRadio\" \"-OutputDirectory\" \"C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\" \"-DurationSeconds\" \"86400\" \"-IntervalSeconds\" \"15\" \"-OutageEvery\" \"60\""
+      },
+      {
+        "pid": 6908,
+        "created_utc": "2026-10-18T16:37:04.8768140Z",
+        "name": "python.exe",
+        "command_line": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" -X utf8 -B C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\Small_TV\\src\\tests\\runtime_qemu.py --yoradio C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers --dependency-root C:\\Work\\yoRadio --qemu-root C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018 --output C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018 --interval-seconds 15 --outage-every 60 --outage-seconds 1 --duration-seconds 86400"
+      },
+      {
+        "pid": 26708,
+        "created_utc": "2026-10-18T16:37:10.2562310Z",
+        "name": "qemu-system-riscv32.exe",
+        "command_line": "C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018\\bin\\qemu-system-riscv32.exe -M esp32c2,default-peripherals=off -name SmallTV-c3536427c9be -L C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\\vm -drive file=C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\\vm\\flash.bin,if=mtd,format=raw -display none -serial file:C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018\\vm\\uart.log -monitor none -icount shift=3,align=off,sleep=on -qmp tcp:127.0.0.1:60927,server=on,wait=off -device {\\\"driver\\\":\\\"esp-spi-module\\\",\\\"id\\\":\\\"lcd\\\",\\\"bus\\\":\\\"/spi2/spi\\\",\\\"gpio\\\":\\\"/machine/gpio\\\",\\\"spi-host\\\":2,\\\"cs\\\":0,\\\"model\\\":\\\"st7789\\\",\\\"sck\\\":4,\\\"mosi\\\":6,\\\"miso\\\":-1,\\\"cs-gpio\\\":-1,\\\"dc-gpio\\\":5,\\\"reset-gpio\\\":1,\\\"backlight-gpio\\\":18,\\\"backlight-active-low\\\":true,\\\"properties\\\":\\\"{\\\\\\\"visible-width\\\\\\\":240,\\\\\\\"controls\\\\\\\":false,\\\\\\\"panel-inverted\\\\\\\":true}\\\"} -global esp32c3-wifi.clock-services=on -global esp32c3-wifi.ntp-hosts=ntp1.aliyun.com;cn.pool.ntp.org;pool.ntp.org -global esp32c3-wifi.station-ssid=yoRadio-QEMU -nic user,model=esp32c3-wifi,restrict=on,hostfwd=tcp:127.0.0.1:18082-10.0.2.15:80,guestfwd=tcp:10.0.2.100:80-tcp:127.0.0.1:60925 -global esp32c3-wifi.service-hosts=api.openweathermap.org -snapshot -gdb tcp:127.0.0.1:60926 -S"
+      },
+      {
+        "pid": 15664,
+        "created_utc": "2026-10-18T16:37:39.9558250Z",
+        "name": "python.exe",
+        "command_line": "\"C:\\Work\\yoRadio\\.idf\\tools-v6.1\\python_env\\idf6.1_py3.12_env\\Scripts\\python.exe\" -X utf8 -B C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\Small_TV\\src\\tools\\runtime_run_guard.py --run C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-h10-20261018 --qemu-tools C:\\Work\\yoRadio\\.worktree\\small-tv-jpeg-headers\\.build\\jpeg-header-qemu-complete-20261018\\tools"
+      }
+    ],
+    "new_qmp_rsp_clients": 0,
+    "all_functionality_verified": false
+  },
+  "h10": {
+    "status": "pending",
+    "complete_cycles_audited": 104,
+    "outages": 1,
+    "elapsed_guest_seconds": 1763.8595990000001,
+    "prefix_analysis": "h10-after-independent-gates-prefix-20261018.json",
+    "accepted": false,
+    "analysis_journal_observed_sha256": "0417fe8c56bb26a1b27e1c7126db6bcba69fc516257e05db77ce12e33ebd247e"
+  },
+  "separate_test_branch": "codex/small-tv-browser-controls-verify",
+  "separate_test_commit": "d37d691b8c4e900c86d0470e4b5e4189b08abe6e",
+  "independent_gates": {
+    "cold_display_vm_processes": 40,
+    "network_phases_without_lcd": 4,
+    "display_proof_sha256": "a99263573dfb2c5a33f11fd536bcc7442c7f6f2724daa4de642d8516ce56a8e1",
+    "network_proof_sha256": "5ca520bd33a51e60c4881303627a637b328b789bb73221d656d96e86cbafba92"
+  },
+  "evidence": [
+    {
+      "file": "post-independent-gates-checkpoint-20261018-raw/h10-report.json.gz",
+      "sha256": "458a74efcb3ad19bd8d88898363944c3db43090d4a650c77f0fdfa35e2854544",
+      "original_sha256": "14ce79578a38c341eb068323d0675888058f7fdc893f7d80767aa40d729d0c5f"
+    },
+    {
+      "file": "post-independent-gates-checkpoint-20261018-raw/h10-events.jsonl.gz",
+      "sha256": "2ffdf170a567a726c0902cb2028b953f755a41db794396649eeea3c101bed1c4",
+      "original_sha256": "57981f32ca767aa4951c118e4d059d217aa79fef5203da20f2e37174cd02c2c9"
+    },
+    {
+      "file": "post-independent-gates-checkpoint-20261018-raw/h10-guard.json.gz",
+      "sha256": "db4e8ce1611ab2308326218a29299393b9af2ba20130f33dd4f914d2bfe69704",
+      "original_sha256": "e91520bf722d1c67d22c75ca25927cb28d6ab7cbb9b4feea9853e259f98fcbe5"
+    },
+    {
+      "file": "post-independent-gates-checkpoint-20261018-raw/h10-uart.log.gz",
+      "sha256": "bdea9c39041a635d7a53e5b86cf12579af62bc7573b9504d84fbc985b7ba0c03",
+      "original_sha256": "b7b4eed0f97d208ecbb3ea2530a2ce2bf4cb59add483f68f2d39ca0acf37e10a"
+    },
+    {
+      "file": "post-independent-gates-checkpoint-20261018-raw/h10-supervisor.json.gz",
+      "sha256": "4925b21534e4ffed2fbc5023e49536c33b9017d017ac7db9c92f29cf9065fc6b",
+      "original_sha256": "e6ed711232161dde1a4482ebb94fd00173a9c271e7d33a64804a0660b6823735"
+    },
+    {
+      "file": "post-independent-gates-checkpoint-20261018-raw/os-processes.json.gz",
+      "sha256": "d790f83e8d71eb63c59819c0302dbf1316c238a04c34e57e4a27dd75d57c49b9",
+      "original_sha256": "3807f53d95c0ec92f5368682db80a4546735a99a28eaa04f0661ba89c54a9c6d"
+    },
+    {
+      "file": "post-independent-gates-checkpoint-20261018-raw/h10-session.json.gz",
+      "sha256": "bb87c2eaf1da6c8e5091c5cfe3d07fa7be650b0283cbeda17573582dfc8c4378",
+      "original_sha256": "bc3365e441e6adb12f7095a203cbfd82b0ccabad42d8e211a727501b1d22b4fe"
+    }
+  ],
+  "scope": "All selected sources unchanged, six exact OS identities live, and a pending file-only H10 prefix with a completed outage. Separate test-only branch proofs do not modify the frozen workloads or establish terminal full/24-hour/physical acceptance. The live raw files were copied sequentially after the analysis, not atomically; their later journal hash need not equal the separately recorded analyzed prefix hash. No terminal decision is inferred from that live copy."
+}
