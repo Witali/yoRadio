@@ -33,6 +33,9 @@
 #include "stream_bitrate.h"
 #include "stream_probe.h"
 #include "sdkconfig.h"
+#ifdef CONFIG_YORADIO_TLS_INPUT_RECLAIM
+#include "native_input_reclaim.h"
+#endif
 #ifdef CONFIG_YORADIO_FLAC_DECODER_CUSTOM
 #include "custom_flac_adapter.h"
 #endif
@@ -1365,6 +1368,12 @@ esp_err_t audio_service_start(native_state_t *state) {
     native_health_track_task(NATIVE_HEALTH_DECODE, tasks[1]);
     native_health_track_task(NATIVE_HEALTH_OUTPUT, tasks[2]);
     atomic_store(&s_start_state, AUDIO_START_READY);
+#ifdef CONFIG_YORADIO_TLS_INPUT_RECLAIM
+    // All fallible startup work has committed. A rejected optional binding
+    // must not roll back READY or destroy a pool published to another task.
+    if (!native_input_reclaim_bind(s_encoded))
+        ESP_LOGW(TAG, "TLS input reclamation not attached");
+#endif
     for (unsigned i = 0; i < 3; ++i) xTaskNotifyGive(tasks[i]);
     ESP_LOGI(TAG,
              "Pipeline ready: %s, 16 KiB compressed + 8 KiB PCM, free heap %u",

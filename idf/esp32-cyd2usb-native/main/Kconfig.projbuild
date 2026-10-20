@@ -59,6 +59,19 @@ menu "yoRadio native firmware"
         depends on YORADIO_ADAPTIVE_INPUT_BUFFER
         default y
 
+    config YORADIO_TLS_INPUT_RECLAIM
+        bool "Reclaim idle input slots after TLS allocation failure"
+        depends on YORADIO_ADAPTIVE_INPUT_BUFFER && ESP_TLS_USING_MBEDTLS
+        depends on MBEDTLS_INTERNAL_MEM_ALLOC && !MBEDTLS_CUSTOM_MEM_ALLOC
+        depends on !HEAP_ABORT_WHEN_ALLOCATION_FAILS
+        default n
+        help
+            Retry a failed task-context TLS allocation after freeing only
+            idle input slots above the existing minimum. Keep queued data,
+            leases, control storage, TLS record sizes and all pool limits.
+            Attach only after successful pipeline startup. Default activation
+            requires CYD network/audio and memory-pressure qualification.
+
     config YORADIO_STREAM_CONFIRM
         bool "Continuous bounded frame confirmation"
         depends on YORADIO_FRAME_ROUTER
