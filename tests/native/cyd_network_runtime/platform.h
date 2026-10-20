@@ -47,6 +47,7 @@ typedef unsigned EventBits_t;
 QueueHandle_t xQueueCreate(unsigned count, size_t size);
 BaseType_t xQueueSend(QueueHandle_t queue, const void *value, TickType_t timeout);
 BaseType_t xQueueReceive(QueueHandle_t queue, void *value, TickType_t timeout);
+UBaseType_t uxQueueMessagesWaiting(QueueHandle_t queue);
 void vQueueDelete(QueueHandle_t queue);
 SemaphoreHandle_t xSemaphoreCreateMutex(void);
 BaseType_t xSemaphoreTake(SemaphoreHandle_t sem, TickType_t timeout);
@@ -107,6 +108,7 @@ esp_err_t esp_wifi_set_default_wifi_sta_handlers(void);
 esp_err_t esp_wifi_clear_default_wifi_driver_and_handlers(esp_netif_t *netif);
 bool esp_netif_is_netif_up(esp_netif_t *netif);
 esp_err_t esp_netif_get_ip_info(esp_netif_t *netif, esp_netif_ip_info_t *info);
+esp_err_t esp_netif_set_hostname(esp_netif_t *netif, const char *hostname);
 esp_err_t esp_wifi_set_mode(wifi_mode_t mode);
 esp_err_t esp_wifi_set_ps(wifi_ps_type_t mode);
 esp_err_t esp_wifi_set_config(int interface, wifi_config_t *config);
@@ -122,7 +124,8 @@ size_t strlcpy(char *out, const char *in, size_t capacity);
 
 enum fixture_api { API_MAC, API_MODE, API_STA_CONFIG, API_AP_CONFIG, API_CONNECT,
     API_DISCONNECT, API_AP_INFO, API_IP_INFO, API_REGISTER, API_UNREGISTER,
-    API_ATTACH, API_DEFAULT_HANDLERS, API_CLEAR, API_POWER, API_COUNT };
+    API_ATTACH, API_DEFAULT_HANDLERS, API_CLEAR, API_POWER, API_HOSTNAME,
+    API_REBOOT_RESERVE, API_REBOOT_CANCEL, API_REBOOT_NOW, API_COUNT };
 typedef struct {
     unsigned queues, semaphores, events, ap_netifs, registrations;
     unsigned tasks, joins, api_calls[API_COUNT], config_rows[512], configs, connects;
@@ -132,6 +135,9 @@ typedef struct {
     bool power_active;
     bool started, associated, netif_up, time_online;
     unsigned time_true, time_false;
+    unsigned restarts;
+    char hostname[24];
+    bool reboot_reserved, reboot_pending;
 } fixture_stats_t;
 void fixture_init(void);
 void fixture_step(int64_t delta_us);
@@ -160,3 +166,12 @@ void fixture_release_send(void);
 void fixture_block_unregister(void);
 void fixture_wait_unregister(void);
 void fixture_release_unregister(void);
+void fixture_settings(const char *hostname, unsigned minutes);
+void fixture_settings_unavailable(bool unavailable);
+void fixture_reboot_held(bool held);
+void fixture_block_hostname(void);
+void fixture_wait_hostname(void);
+void fixture_release_hostname(void);
+void fixture_block_reserve(void);
+void fixture_wait_reserve(void);
+void fixture_release_reserve(void);

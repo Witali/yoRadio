@@ -37,6 +37,7 @@ def main():
              main_dir / 'network_service.c', main_dir / 'board_config.h',
              main_dir / 'network_profiles.h', main_dir / 'network_netif.h',
              main_dir / 'network_runtime.h',
+             main_dir / 'network_settings.h',
              ROOT / 'idf/esp32-cyd2usb-native/sdkconfig.defaults',
              ROOT / 'idf/esp32c3-oled-native/main/network_service.c',
              ROOT / 'tools/codec_benchmark/run_output_dma_host.py']
@@ -95,6 +96,8 @@ def main():
     mutations = [
         ('missing_time_start', 'startup', 'result = time_service_start();',
          'result = ESP_OK;', 'time_step>display_step'),
+        ('missing_network_settings_start', 'startup', 'result = network_settings_init();',
+         'result = ESP_OK;', 'network_settings_step>nvs_step'),
         ('changed_network_affinity', 'startup', 'NULL, 3, NULL, 0);',
          'NULL, 3, NULL, 1);', 'priority == 3U && core == 0'),
         ('driver_flash_persistence', 'network', 'esp_wifi_set_storage(WIFI_STORAGE_RAM)',

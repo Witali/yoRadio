@@ -63,6 +63,14 @@ progress{width:24rem;max-width:100%}
 <label>Сервер SNTP 2 <input id="time-server2" maxlength="34" autocomplete="off"></label><br>
 <small>Второй сервер можно оставить пустым. Настройки сохраняются без перезапуска.</small><br>
 <button id="time-submit" disabled>Сохранить время</button></fieldset></form></section>
+<section id="network-settings-section" hidden><h2>Настройки сети</h2>
+<p id="network-settings-status" role="status"></p><p id="network-timeout-status"></p>
+<form id="network-settings-form"><fieldset id="network-settings-fields" disabled>
+<label>Имя устройства DHCP <input id="network-hostname" maxlength="23" pattern="[A-Za-z0-9]([A-Za-z0-9-]{0,21}[A-Za-z0-9])?" autocomplete="off" required></label><br>
+<label>Перезапуск в точке доступа, мин <input id="network-ap-timeout" type="number" min="0" max="30" step="1" required value="0"></label><br>
+<small>0 отключает автоматический перезапуск. Таймер действует, пока точка доступа включена и нет подключения к Wi-Fi.
+Имя DHCP применяется при следующем подключении; mDNS не включается. Сохранение не разрывает соединение и не запускает перезапуск сразу.</small><br>
+<button id="network-settings-submit" disabled>Сохранить настройки сети</button></fieldset></form></section>
 <section id="firmware" hidden><h2>Обновление прошивки</h2>
 <form id="firmware-form" action="/update" method="post" enctype="multipart/form-data">
 <fieldset id="firmware-fields" disabled><p id="firmware-limits"></p>
@@ -82,6 +90,8 @@ let capabilities = {}, uploadBusy = false, firmwareBusy = false, awaitingRestart
 let wifiMetadata = null, timeDirty = false, timeBusy = false, timeAvailable = false, pollBusy = false;
 let timeRequestEpoch = 0;
 let networkRequestEpoch = 0;
+let networkSettingsDirty = false, networkSettingsBusy = false, networkSettingsAvailable = false;
+let networkSettingsRequestEpoch = 0;
 const message = text => { el('message').textContent = text; };
 async function api(path, query, method = 'GET') {
   const suffix = query ? '?' + new URLSearchParams(query).toString() : '';
@@ -175,8 +185,10 @@ const uploadLimit = (name, fallback) => Number.isSafeInteger(capabilities[name])
 const wifiSupported = () => capabilities.nativeWiFiApi === '/api/native/wifi' &&
   capabilities.nativeWiFiMaxProfiles === 5 && capabilities.nativeWiFiPrivateExport === false;
 const timeSupported = () => capabilities.nativeTimeApi === '/api/native/time';
+const networkSettingsSupported = () => capabilities.nativeNetworkSettingsApi === '/api/native/network-settings' &&
+  capabilities.network_hostname_max_bytes === 23 && capabilities.network_ap_timeout_max_minutes === 30;
 function updateUploadControls() {
-  const blocked = uploadBusy || awaitingRestart;
+  const blocked = uploadBusy || awaitingRestart || timeBusy || networkSettingsBusy;
   let available = false;
   for (const [name, capability] of [['playlist','playlist_upload'],['assets','asset_upload']]) {
     const supported = capabilities[capability] === true;
@@ -206,6 +218,9 @@ function updateUploadControls() {
   el('time-section').hidden = !timeSupported();
   el('time-fields').disabled = !ready || blocked || timeBusy || !timeSupported() || !timeAvailable;
   el('time-submit').disabled = el('time-fields').disabled;
+  el('network-settings-section').hidden = !networkSettingsSupported();
+  el('network-settings-fields').disabled = !ready || blocked || !networkSettingsSupported() || !networkSettingsAvailable;
+  el('network-settings-submit').disabled = el('network-settings-fields').disabled;
   const firmware = capabilities.ota === true;
   el('firmware').hidden = !firmware;
   el('firmware-fields').disabled = !ready || blocked || !firmware;
@@ -250,7 +265,7 @@ function uploadForm(kind) {
   return {form, playlist};
 }
 async function sendUpload(kind, path, capability) {
-  if (uploadBusy || awaitingRestart) { message('Дождитесь завершения текущей загрузки и перезапуска'); return; }
+  if (uploadBusy || timeBusy || networkSettingsBusy || awaitingRestart) { message('Дождитесь завершения текущей загрузки и перезапуска'); return; }
   if (!ready || capabilities[capability] !== true) { message('Эта загрузка недоступна'); return; }
   uploadBusy = true; updateUploadControls(); message('Проверка файлов…');
   let saved = false;
@@ -308,7 +323,7 @@ function wifiEdit() {
   return {revision:wifiMetadata.revision,profiles};
 }
 async function saveWifi() {
-  if (uploadBusy || awaitingRestart) { message('Дождитесь завершения текущей загрузки и перезапуска'); return; }
+  if (uploadBusy || timeBusy || networkSettingsBusy || awaitingRestart) { message('Дождитесь завершения текущей загрузки и перезапуска'); return; }
   if (!ready || !wifiSupported()) { message('Настройка Wi-Fi недоступна'); return; }
   let body;
   try { body = JSON.stringify(wifiEdit()); } catch (error) { message(error.message); return; }
@@ -326,7 +341,7 @@ async function saveWifi() {
 el('wifi-form').addEventListener('submit', event => { event.preventDefault(); saveWifi(); });
 el('wifi-open').addEventListener('change', () => { if (el('wifi-open').checked) el('wifi-password').value = ''; });
 el('wifi-refresh').addEventListener('click', () => action(async () => {
-  if (uploadBusy || !wifiSupported()) return;
+  if (uploadBusy || timeBusy || networkSettingsBusy || !wifiSupported()) return;
   uploadBusy = true; updateUploadControls();
   try { await loadWifi(); message('Список Wi-Fi обновлён'); }
   finally { uploadBusy = false; updateUploadControls(); }
@@ -349,7 +364,7 @@ function renderTime(state, force = false) {
 el('time-form').addEventListener('input', () => { timeDirty = true; });
 el('time-form').addEventListener('submit', event => {
   event.preventDefault();
-  if (!ready || uploadBusy || timeBusy || awaitingRestart || !timeSupported() || !timeAvailable) return;
+  if (!ready || uploadBusy || timeBusy || networkSettingsBusy || awaitingRestart || !timeSupported() || !timeAvailable) return;
   action(async () => {
     timeBusy = true; ++timeRequestEpoch; updateUploadControls();
     try {
@@ -361,6 +376,75 @@ el('time-form').addEventListener('submit', event => {
     } finally { timeBusy = false; updateUploadControls(); }
   });
 });
+const validHostname = text => typeof text === 'string' && /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,21}[A-Za-z0-9])?$/.test(text);
+function renderNetworkSettings(state) {
+  if (!state || !validHostname(state.hostname) || !Number.isInteger(state.ap_timeout_minutes) ||
+      state.ap_timeout_minutes < 0 || state.ap_timeout_minutes > 30 ||
+      !Number.isSafeInteger(state.desired_revision) || state.desired_revision < 1)
+    throw new Error('Некорректное состояние настроек сети');
+  networkSettingsAvailable = true;
+  const configured = state.runtime_available === true && validHostname(state.configured_hostname);
+  const pending = !configured || state.hostname_pending !== false || state.hostname !== state.configured_hostname;
+  el('network-settings-status').textContent = ['Сохранено имя DHCP: ' + state.hostname,
+    configured ? 'Настроено в сетевом интерфейсе: ' + state.configured_hostname : 'Настроенное имя пока неизвестно',
+    pending ? 'Применение имени ожидается при подключении' : 'Имя настроено в сетевом интерфейсе',
+    state.last_hostname_error ? 'Ошибка применения имени: ' + state.last_hostname_error : ''].filter(Boolean).join(' · ');
+  el('network-timeout-status').textContent = !state.ap_timeout_minutes ? 'Автоматический перезапуск отключён' :
+    state.ap_timeout_armed === true && Number.isSafeInteger(state.ap_timeout_remaining_ms) && state.ap_timeout_remaining_ms >= 0 ?
+      'Таймер точки доступа: осталось около ' + Math.ceil(state.ap_timeout_remaining_ms / 1000) + ' с' :
+      state.runtime_available === true ? 'Таймер точки доступа сейчас не запущен' : 'Состояние таймера пока недоступно';
+  if (!networkSettingsDirty) {
+    el('network-hostname').value = state.hostname;
+    el('network-ap-timeout').value = state.ap_timeout_minutes;
+  }
+  updateUploadControls();
+}
+async function refreshNetworkSettings() {
+  if (!networkSettingsSupported() || networkSettingsBusy) return;
+  const epoch = networkSettingsRequestEpoch;
+  try {
+    const state = await api('network-settings');
+    if (epoch === networkSettingsRequestEpoch) renderNetworkSettings(state);
+  } catch (error) {
+    if (epoch !== networkSettingsRequestEpoch) return;
+    networkSettingsAvailable = false;
+    el('network-settings-status').textContent = 'Сервис настроек сети недоступен';
+    el('network-timeout-status').textContent = 'Состояние таймера пока недоступно';
+    updateUploadControls();
+  }
+}
+el('network-settings-form').addEventListener('input', () => {
+  networkSettingsDirty = true; ++networkSettingsRequestEpoch;
+});
+el('network-settings-form').addEventListener('submit', event => {
+  event.preventDefault();
+  if (!ready || uploadBusy || timeBusy || networkSettingsBusy || awaitingRestart ||
+      !networkSettingsSupported() || !networkSettingsAvailable) return;
+  const hostname = el('network-hostname').value, timeout = String(el('network-ap-timeout').value);
+  if (!validHostname(hostname) || !/^(0|[1-9][0-9]?)$/.test(timeout) || Number(timeout) > 30) {
+    message('Проверьте имя DHCP (1–23 латинских символа, цифры и внутренний дефис) и таймер (0–30 минут)'); return;
+  }
+  action(async () => {
+    networkSettingsBusy = true;
+    const epoch = ++networkSettingsRequestEpoch;
+    updateUploadControls(); message('Сохранение настроек сети…');
+    try {
+      const saved = await api('network-settings', {hostname,ap_timeout_minutes:timeout}, 'POST');
+      if (saved.saved !== true) throw new Error('Сохранение настроек сети не подтверждено');
+      if (epoch === networkSettingsRequestEpoch) networkSettingsDirty = false;
+      message('Настройки сети сохранены. Применение имени и таймер проверяются отдельно.');
+      try {
+        const state = await api('network-settings');
+        if (epoch === networkSettingsRequestEpoch) renderNetworkSettings(state);
+      } catch (error) {
+        if (epoch === networkSettingsRequestEpoch) {
+          el('network-settings-status').textContent = 'Настройки сохранены; состояние пока недоступно';
+          el('network-timeout-status').textContent = 'Состояние таймера пока недоступно';
+        }
+      }
+    } finally { networkSettingsBusy = false; updateUploadControls(); }
+  });
+});
 function updateFirmwareControls() {
   for (const button of document.querySelectorAll('button'))
     button.disabled = !ready || firmwareBusy || awaitingRestart;
@@ -369,7 +453,7 @@ function updateFirmwareControls() {
   updateUploadControls();
 }
 async function sendFirmware() {
-  if (uploadBusy || awaitingRestart) { message('Дождитесь завершения текущей загрузки и перезапуска'); return; }
+  if (uploadBusy || timeBusy || networkSettingsBusy || awaitingRestart) { message('Дождитесь завершения текущей загрузки и перезапуска'); return; }
   if (!ready || capabilities.ota !== true) { message('Обновление прошивки недоступно'); return; }
   let selected;
   try {
@@ -472,6 +556,7 @@ setInterval(async () => {
       }
       catch (error) { el('time-status').textContent = 'Состояние времени недоступно'; }
     }
+    if (!uploadBusy && !awaitingRestart) await refreshNetworkSettings();
   } catch (error) { message(error.message); }
   finally { pollBusy = false; }
 }, 3000);
@@ -491,6 +576,7 @@ setInterval(async () => {
     if (timeSupported()) {
       try { renderTime(await api('time'), true); } catch (error) { el('time-status').textContent = 'Сервис времени недоступен'; }
     }
+    await refreshNetworkSettings();
     el('backend').textContent = 'Аудиовыход: ' + caps.audio_output;
     for (const button of document.querySelectorAll('button')) button.disabled = false;
     el('smartstart').disabled = !caps.smartstart;

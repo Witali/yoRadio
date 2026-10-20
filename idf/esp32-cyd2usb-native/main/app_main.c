@@ -12,6 +12,7 @@
 #include "native_state.h"
 #include "native_health.h"
 #include "network_service.h"
+#include "network_settings.h"
 #include "radio_control.h"
 #include "nvs_flash.h"
 #include "web_service.h"
@@ -106,6 +107,10 @@ void app_main(void) {
                  esp_err_to_name(result));
     }
     ESP_ERROR_CHECK(native_audio_settings_init());
+    result = network_settings_init();
+    if (result != ESP_OK) {
+        ESP_LOGW(TAG, "Network settings unavailable: %s", esp_err_to_name(result));
+    }
     result = mount_spiffs();
     if (result != ESP_OK) {
         ESP_LOGE(TAG, "SPIFFS mount failed without format: %s",

@@ -34,6 +34,7 @@ def main():
              ROOT/'tools/codec_benchmark/run_output_dma_host.py',
              ROOT/'idf/esp32-cyd2usb-native/main/web_service.c',
              ROOT/'idf/esp32-cyd2usb-native/main/network_status.h',
+             ROOT/'idf/esp32-cyd2usb-native/main/network_settings.h',
              ROOT/'idf/components/native_network_power/include/native_network_power.h']
     hashes = {}
     for path in files:

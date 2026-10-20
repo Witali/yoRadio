@@ -15,6 +15,7 @@ set(NATIVE_SRCS
   "network_profiles.c"
   "network_netif.c"
   "network_runtime.c"
+  "network_settings.c"
   "time_service.c"
   "time_settings.c"
   "web_service.c"
@@ -24,6 +25,7 @@ set(NATIVE_SRCS
   "web_ota.c"
   "web_wifi.c"
   "web_time.c"
+  "web_network_settings.c"
   "web_pages.cpp"
   "websocket_service.c")
 

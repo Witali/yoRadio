@@ -85,6 +85,8 @@ def main():
         assert caps['wifi_body_max_bytes'] == 4096 and caps['wifi_ssid_max_bytes'] == 31 and caps['wifi_password_max_bytes'] == 63
         assert caps['nativeWiFiApi']=='/api/native/wifi' and caps['nativeWiFiMaxProfiles']==5
         assert caps['nativeWiFiPrivateExport'] is False and caps['nativeTimeApi']=='/api/native/time'
+        assert caps['nativeNetworkSettingsApi']=='/api/native/network-settings'
+        assert caps['network_hostname_max_bytes']==23 and caps['network_ap_timeout_max_minutes']==30
         controls = {}
         mutations = [
             ('missing_admission_guard','static', static_source.rindex('    if (!native_wifi_public_static_uri'),
@@ -92,6 +94,7 @@ def main():
             ('missing_worker_guard','static', static_source.index('    if (!native_wifi_public_static_uri'),
              'open_calls==opens'),
             ('wrong_wifi_edit_route','startup', None, 'route->handler==web_wifi_edit_handler'),
+            ('wrong_network_settings_edit_route','startup', None, 'route->handler==web_network_settings_edit_handler'),
             ('missing_wifi_activation','startup', None, 'wifi_active && reboot_ready'),
         ]
         for name,kind,position,assertion in mutations:
@@ -102,6 +105,9 @@ def main():
             elif name=='wrong_wifi_edit_route':
                 changed=contents.replace('.method=HTTP_POST, .handler=web_wifi_edit_handler',
                                          '.method=HTTP_POST, .handler=web_wifi_info_handler',1)
+            elif name=='wrong_network_settings_edit_route':
+                changed=contents.replace('.method=HTTP_POST, .handler=web_network_settings_edit_handler',
+                                         '.method=HTTP_POST, .handler=web_network_settings_info_handler',1)
             else: changed=contents.replace('    web_wifi_activate();','    /* missing activation */',1)
             assert changed!=contents
             (out/('production.inc' if kind=='static' else 'web-start.inc')).write_text(changed)

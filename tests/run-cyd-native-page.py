@@ -1,4 +1,4 @@
-"""Run the actual compact CYD page script, including OTA, Wi-Fi and time edits.
+"""Run the actual compact CYD page script, including OTA, Wi-Fi and network/time edits.
 
 Browser DOM/fetch/WebSocket boundaries are controlled Node seams. Semantic
 mutants run only against frozen alternate page files; production is unchanged.
@@ -50,6 +50,22 @@ def main():
         'stale_time_response':('if (epoch === timeRequestEpoch) renderTime(state);','if (true) renderTime(state);',late),
         'overlapping_polls':(' || pollBusy) return;',') return;',late),
         'legacy_capability_fallback':("const wifiSupported = () => capabilities.nativeWiFiApi === '/api/native/wifi' &&","const wifiSupported = () => (capabilities.nativeWiFiApi === '/api/native/wifi' || capabilities.wifi_upload === true) &&",capabilities),
+        'stale_network_settings_response':("const state = await api('network-settings');\n    if (epoch === networkSettingsRequestEpoch) renderNetworkSettings(state);",
+            "const state = await api('network-settings');\n    renderNetworkSettings(state);",
+            'stale network settings GET cannot overwrite completed save or later dirty input'),
+        'clobber_dirty_network_settings':('if (!networkSettingsDirty) {','if (true) {',
+            'network polling preserves dirty fields and reports configured error and AP deadline separately'),
+        'accept_unconfirmed_network_save':("if (saved.saved !== true) throw new Error('Сохранение настроек сети не подтверждено');",
+            "if (false) throw new Error('Сохранение настроек сети не подтверждено');",
+            'network persistence errors preserve edits and success with failed refresh stays visibly saved'),
+        'drop_network_input_epoch':('networkSettingsDirty = true; ++networkSettingsRequestEpoch;',
+            'networkSettingsDirty = true;', 'new network input during pending save and refresh is retained'),
+        'allow_ota_during_network_save':('async function sendFirmware() {\n  if (uploadBusy || timeBusy || networkSettingsBusy || awaitingRestart)',
+            'async function sendFirmware() {\n  if (uploadBusy || timeBusy || awaitingRestart)',
+            'network saves serialize time Wi-Fi and file forms and block OTA until persistence finishes'),
+        'retain_old_timer_after_failed_refresh':("el('network-settings-status').textContent = 'Настройки сохранены; состояние пока недоступно';\n          el('network-timeout-status').textContent = 'Состояние таймера пока недоступно';",
+            "el('network-settings-status').textContent = 'Настройки сохранены; состояние пока недоступно';",
+            'saved AP timeout with failed refresh never retains the previous disabled or armed label'),
     }
     for name,(old,new,case) in mutations.items():
         assert source.count(old)==1,name;alternate=out/(name+'.cpp');alternate.write_text(source.replace(old,new),encoding='utf-8')

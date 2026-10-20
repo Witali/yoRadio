@@ -1,6 +1,8 @@
 #include "platform.h"
 #include <limits.h>
 #include "board_config.h"
+#include "network_settings.h"
+#include "web_reboot.h"
 
 struct test_sem { pthread_mutex_t mutex; pthread_cond_t cond; bool available; };
 struct test_queue { pthread_mutex_t mutex; unsigned count, head, used; size_t size; uint8_t data[]; };
@@ -30,6 +32,12 @@ static pthread_cond_t boundary_changed = PTHREAD_COND_INITIALIZER;
 static bool block_query, query_blocked, query_release, block_send, send_blocked, send_release;
 static bool block_unregister, unregister_blocked, unregister_release;
 static bool block_power, power_blocked, power_release;
+static bool block_hostname, hostname_blocked, hostname_release;
+static bool block_reserve, reserve_blocked, reserve_release;
+static network_settings_t settings;
+static uint32_t settings_revision = 1;
+static bool settings_unavailable;
+static uint64_t reboot_epoch;
 const char fixture_wifi_base[] = "wifi", fixture_ip_base[] = "ip";
 
 static struct timespec until_ms(unsigned ms) {
@@ -55,9 +63,9 @@ fixture_stats_t fixture_stats(void) {
     pthread_mutex_lock(&driver_lock); fixture_stats_t copy = stats;
     pthread_mutex_unlock(&driver_lock); return copy;
 }
-void fixture_init(void) { atomic_store(&virtual_now, 1000000); stats.mode = WIFI_MODE_STA; }
+void fixture_init(void) { atomic_store(&virtual_now, 1000000); stats.mode = WIFI_MODE_STA; network_settings_defaults(&settings); }
 int64_t esp_timer_get_time(void) { return atomic_load(&virtual_now); }
-void fixture_set_clock(int64_t now) { CHECK(now >= 0, "nonnegative_clock"); atomic_store(&virtual_now, now); }
+void fixture_set_clock(int64_t now) { atomic_store(&virtual_now, now); }
 static void advance_clock(int64_t delta) {
     CHECK(delta >= 0, "monotonic_test_clock");
     int64_t old = atomic_load(&virtual_now);
@@ -77,6 +85,24 @@ void fixture_hold_disconnect(bool hold) { pthread_mutex_lock(&driver_lock); hold
 void fixture_driver_stopped(void) {
     pthread_mutex_lock(&driver_lock); stats.started = stats.associated = stats.netif_up = false;
     observed_ip = 0; pthread_mutex_unlock(&driver_lock);
+}
+
+void network_settings_defaults(network_settings_t *out) {
+    memset(out, 0, sizeof(*out)); memcpy(out->hostname, "yoradio", 8);
+}
+bool network_settings_snapshot(network_settings_t *out, uint32_t *revision) {
+    pthread_mutex_lock(&driver_lock); bool available = !settings_unavailable;
+    if (available) { *out = settings; if (revision) *revision = settings_revision; }
+    pthread_mutex_unlock(&driver_lock); return available;
+}
+void fixture_settings(const char *hostname, unsigned minutes) {
+    CHECK(strlen(hostname) < sizeof(settings.hostname) && minutes <= 30, "valid_committed_settings_seam");
+    pthread_mutex_lock(&driver_lock); memset(&settings, 0, sizeof(settings));
+    strcpy(settings.hostname, hostname); settings.ap_timeout_minutes = (uint8_t)minutes;
+    ++settings_revision; pthread_mutex_unlock(&driver_lock);
+}
+void fixture_settings_unavailable(bool unavailable) {
+    pthread_mutex_lock(&driver_lock); settings_unavailable = unavailable; pthread_mutex_unlock(&driver_lock);
 }
 
 QueueHandle_t xQueueCreate(unsigned count, size_t size) {
@@ -104,6 +130,10 @@ BaseType_t xQueueReceive(QueueHandle_t q, void *value, TickType_t timeout) {
     pthread_mutex_lock(&q->mutex); bool ok = q->used > 0;
     if (ok) { memcpy(value, q->data + q->head * q->size, q->size); q->head = (q->head + 1) % q->count; --q->used; }
     pthread_mutex_unlock(&q->mutex); return ok;
+}
+UBaseType_t uxQueueMessagesWaiting(QueueHandle_t q) {
+    pthread_mutex_lock(&q->mutex); unsigned count = q->used;
+    pthread_mutex_unlock(&q->mutex); return count;
 }
 void vQueueDelete(QueueHandle_t q) {
     CHECK(pthread_mutex_destroy(&q->mutex) == 0, "queue_not_in_use_at_delete"); free(q);
@@ -274,6 +304,62 @@ esp_err_t esp_netif_get_ip_info(esp_netif_t *netif, esp_netif_ip_info_t *info) {
     esp_err_t result = api_result_locked(API_IP_INFO); if (!result) info->ip.addr = observed_ip;
     pthread_mutex_unlock(&driver_lock); return result;
 }
+esp_err_t esp_netif_set_hostname(esp_netif_t *netif, const char *hostname) {
+    CHECK(netif && netif->identity == 1 && strlen(hostname) < 24, "hostname_station_and_bound");
+    char captured[24] = {0}; strcpy(captured, hostname);
+    pthread_mutex_lock(&driver_lock);
+    CHECK(!stats.associated && (!stats.started || owner_thread), "hostname_only_before_start_or_disconnected_owner");
+    esp_err_t result = api_result_locked(API_HOSTNAME); pthread_mutex_unlock(&driver_lock);
+    pthread_mutex_lock(&boundary);
+    if (block_hostname) {
+        block_hostname = false; hostname_blocked = true; pthread_cond_broadcast(&boundary_changed);
+        while (!hostname_release) wait_changed(&boundary_changed, &boundary);
+        hostname_blocked = false;
+    }
+    pthread_mutex_unlock(&boundary);
+    pthread_mutex_lock(&driver_lock);
+    if (result == ESP_OK) strcpy(stats.hostname, captured);
+    else if (result == ESP_ERR_NO_MEM) strcpy(stats.hostname, "espressif");
+    pthread_mutex_unlock(&driver_lock); return result;
+}
+
+void fixture_reboot_held(bool held) {
+    pthread_mutex_lock(&driver_lock); CHECK(!stats.reboot_pending, "no_ordinary_pending_to_release");
+    stats.reboot_reserved = held; pthread_mutex_unlock(&driver_lock);
+}
+esp_err_t web_reboot_reserve(web_reboot_lease_t *lease) {
+    CHECK(owner_thread && lease && !lease->epoch, "owner_fresh_reboot_lease");
+    pthread_mutex_lock(&driver_lock); esp_err_t result = api_result_locked(API_REBOOT_RESERVE);
+    if (!result && (stats.reboot_reserved || stats.reboot_pending)) result = ESP_ERR_INVALID_STATE;
+    if (!result) { lease->epoch = ++reboot_epoch; stats.reboot_reserved = true; }
+    pthread_mutex_unlock(&driver_lock);
+    pthread_mutex_lock(&boundary);
+    if (block_reserve) {
+        block_reserve = false; reserve_blocked = true; pthread_cond_broadcast(&boundary_changed);
+        while (!reserve_release) wait_changed(&boundary_changed, &boundary);
+        reserve_blocked = false;
+    }
+    pthread_mutex_unlock(&boundary); return result;
+}
+esp_err_t web_reboot_cancel(web_reboot_lease_t *lease) {
+    CHECK(owner_thread, "owner_cancels_own_reboot_lease");
+    pthread_mutex_lock(&driver_lock); esp_err_t result = api_result_locked(API_REBOOT_CANCEL);
+    CHECK(lease && lease->epoch == reboot_epoch && stats.reboot_reserved, "only_exact_active_lease_cancelled");
+    if (!result) { stats.reboot_reserved = false; lease->epoch = 0; }
+    pthread_mutex_unlock(&driver_lock); return result;
+}
+esp_err_t web_reboot_restart_reserved_now(web_reboot_lease_t *lease) {
+    CHECK(owner_thread, "owner_immediate_restart");
+    pthread_mutex_lock(&driver_lock); esp_err_t result = api_result_locked(API_REBOOT_NOW);
+    CHECK(lease && lease->epoch == reboot_epoch && stats.reboot_reserved && !stats.reboot_pending,
+          "immediate_restart_retains_exact_lease_without_ordinary_queue");
+    if (!result) ++stats.restarts;
+    pthread_mutex_unlock(&driver_lock); return result;
+}
+void web_reboot_request(unsigned delay_ms) {
+    (void)delay_ms; pthread_mutex_lock(&driver_lock); stats.reboot_pending = true;
+    pthread_mutex_unlock(&driver_lock);
+}
 esp_err_t esp_wifi_set_mode(wifi_mode_t mode) {
     pthread_mutex_lock(&driver_lock); esp_err_t result = api_result_locked(API_MODE);
     if (!result) stats.mode = mode;
@@ -402,3 +488,9 @@ void fixture_release_send(void) { pthread_mutex_lock(&boundary); send_release = 
 void fixture_block_unregister(void) { pthread_mutex_lock(&boundary); block_unregister = true; unregister_blocked = unregister_release = false; pthread_mutex_unlock(&boundary); }
 void fixture_wait_unregister(void) { pthread_mutex_lock(&boundary); while (!unregister_blocked) wait_changed(&boundary_changed, &boundary); pthread_mutex_unlock(&boundary); }
 void fixture_release_unregister(void) { pthread_mutex_lock(&boundary); unregister_release = true; pthread_cond_broadcast(&boundary_changed); pthread_mutex_unlock(&boundary); }
+void fixture_block_hostname(void) { pthread_mutex_lock(&boundary); block_hostname = true; hostname_blocked = hostname_release = false; pthread_mutex_unlock(&boundary); }
+void fixture_wait_hostname(void) { pthread_mutex_lock(&boundary); while (!hostname_blocked) wait_changed(&boundary_changed, &boundary); pthread_mutex_unlock(&boundary); }
+void fixture_release_hostname(void) { pthread_mutex_lock(&boundary); hostname_release = true; pthread_cond_broadcast(&boundary_changed); pthread_mutex_unlock(&boundary); }
+void fixture_block_reserve(void) { pthread_mutex_lock(&boundary); block_reserve = true; reserve_blocked = reserve_release = false; pthread_mutex_unlock(&boundary); }
+void fixture_wait_reserve(void) { pthread_mutex_lock(&boundary); while (!reserve_blocked) wait_changed(&boundary_changed, &boundary); pthread_mutex_unlock(&boundary); }
+void fixture_release_reserve(void) { pthread_mutex_lock(&boundary); reserve_release = true; pthread_cond_broadcast(&boundary_changed); pthread_mutex_unlock(&boundary); }

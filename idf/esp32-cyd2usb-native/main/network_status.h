@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "esp_err.h"
 #include "native_network_power.h"
+#include "network_settings.h"
 
 typedef enum {
     NETWORK_WAIT_START, NETWORK_WAIT_DISCONNECT, NETWORK_RETRY_WAIT,
@@ -11,6 +12,19 @@ typedef enum {
 } network_phase_t;
 
 #define NETWORK_NO_PROFILE UINT8_MAX
+
+typedef struct {
+    network_settings_t desired;
+    uint32_t desired_revision;
+    bool available;
+    // Last successful netif configuration, not DHCP server acceptance or mDNS.
+    char configured_hostname[NETWORK_SETTINGS_HOSTNAME_CAPACITY];
+    bool hostname_valid;
+    uint32_t hostname_revision;
+    esp_err_t hostname_error;
+    bool ap_timeout_armed;
+    uint64_t ap_timeout_remaining_ms;
+} network_settings_runtime_t;
 
 typedef struct {
     network_phase_t phase;
@@ -23,6 +37,7 @@ typedef struct {
     esp_err_t last_error;
     uint64_t updated_us, rssi_updated_us, rssi_age_ms;
     native_network_power_snapshot_t power;
+    network_settings_runtime_t settings;
 } network_snapshot_t;
 
 // Authoritative bounded non-secret view; unchanged output on failure.

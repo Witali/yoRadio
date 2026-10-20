@@ -19,6 +19,7 @@
 #include "native_audio_output.h"
 #include "native_audio_settings.h"
 #include "network_service.h"
+#include "web_network_settings.h"
 #include "radio_control.h"
 #include "json_buffer.h"
 #include "web_static.h"
@@ -366,7 +367,7 @@ static esp_err_t settings_handler(httpd_req_t *request) {
 }
 
 static esp_err_t capabilities_handler(httpd_req_t *request) {
-    char body[1152];
+    char body[1408];
     json_buffer_t output;
     json_buffer_init(&output, body, sizeof(body));
     json_buffer_raw(&output, "{\"schema\":1,\"firmware\":\"esp32-cyd2usb-native\",\"audio_output\":");
@@ -377,6 +378,7 @@ static esp_err_t capabilities_handler(httpd_req_t *request) {
              (unsigned)WEB_OTA_MAX_IMAGE_BYTES, (unsigned)WEB_OTA_MAX_BODY_BYTES);
     json_buffer_raw(&output, ota_limits);
     json_buffer_raw(&output, ",\"nativeWiFiApi\":\"/api/native/wifi\",\"nativeWiFiMaxProfiles\":5,\"nativeWiFiPrivateExport\":false,\"nativeTimeApi\":\"/api/native/time\",\"nativeNetworkApi\":\"/api/native/network\"");
+    json_buffer_raw(&output, ",\"nativeNetworkSettingsApi\":\"/api/native/network-settings\",\"network_hostname_max_bytes\":23,\"network_ap_timeout_max_minutes\":30");
     json_buffer_raw(&output, ",\"equalizer\":false,\"sd\":false,\"display_controls\":false}");
     if (output.failed) return httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "Capabilities exhausted");
     httpd_resp_set_type(request, "application/json; charset=utf-8");
@@ -416,7 +418,7 @@ esp_err_t web_service_start(native_state_t *state) {
     // clients leave two for the stream and network activity. WS admits two.
     config.max_open_sockets = 5;
     config.send_wait_timeout = CONFIG_YORADIO_WEB_SEND_TIMEOUT_SECONDS;
-    config.max_uri_handlers = 22; // 21 HTTP routes and the WebSocket route.
+    config.max_uri_handlers = 24; // 23 HTTP routes and the WebSocket route.
     config.lru_purge_enable = true;
     config.uri_match_fn = httpd_uri_match_wildcard;
     httpd_handle_t server = NULL;
@@ -470,6 +472,8 @@ esp_err_t web_service_start(native_state_t *state) {
     httpd_uri_t wifi_edit = {.uri="/api/native/wifi", .method=HTTP_POST, .handler=web_wifi_edit_handler};
     httpd_uri_t time_info = {.uri="/api/native/time", .method=HTTP_GET, .handler=web_time_info_handler};
     httpd_uri_t time_edit = {.uri="/api/native/time", .method=HTTP_POST, .handler=web_time_edit_handler};
+    httpd_uri_t network_settings_info = {.uri="/api/native/network-settings", .method=HTTP_GET, .handler=web_network_settings_info_handler};
+    httpd_uri_t network_settings_edit = {.uri="/api/native/network-settings", .method=HTTP_POST, .handler=web_network_settings_edit_handler};
     httpd_uri_t files = {
         .uri = "/*",
         .method = HTTP_GET,
@@ -478,7 +482,8 @@ esp_err_t web_service_start(native_state_t *state) {
     const httpd_uri_t *routes[] = {&status, &health, &network, &radio_get, &radio_post,
         &reconnect, &play, &stop, &settings_get, &settings_post, &capabilities,
         &upload, &board, &wifi, &ota, &ota_info,
-        &wifi_info, &wifi_edit, &time_info, &time_edit};
+        &wifi_info, &wifi_edit, &time_info, &time_edit,
+        &network_settings_info, &network_settings_edit};
     for (unsigned i = 0; i < sizeof(routes) / sizeof(routes[0]); ++i) {
         result = httpd_register_uri_handler(server, routes[i]);
         if (result != ESP_OK) goto failed;

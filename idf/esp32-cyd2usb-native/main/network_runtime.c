@@ -19,6 +19,7 @@
 #include "native_network_power.h"
 #include "network_netif.h"
 #include "time_service.h"
+#include "web_reboot.h"
 
 #define EVENT_SLOTS 16U
 #define OWNER_POLL_MS 100U
@@ -59,6 +60,10 @@ typedef struct {
     unsigned ap_attempts;
     int64_t boot_deadline, cycle_deadline, attempt_deadline;
     int64_t disconnect_deadline, next_action, ap_next, rssi_next;
+    int64_t ap_timeout_deadline;
+    uint32_t ap_timeout_cycle;
+    uint8_t ap_timeout_minutes;
+    bool ap_timeout_saturated;
 } network_owner_t;
 
 static network_owner_t s_owner;
@@ -73,6 +78,44 @@ static atomic_bool s_stop, s_exited, s_retry, s_manual_admitted, s_resync;
 
 static int64_t after(int64_t now, int64_t delay) {
     return now > INT64_MAX - delay ? INT64_MAX : now + delay;
+}
+
+static void refresh_settings(network_owner_t *owner) {
+    network_settings_runtime_t *settings = &owner->view.settings;
+    network_settings_t desired;
+    uint32_t revision = 0;
+    bool available = network_settings_snapshot(&desired, &revision);
+    if (!available) network_settings_defaults(&desired);
+    settings->desired = desired;
+    settings->desired_revision = revision;
+    settings->available = available;
+}
+
+static void configure_hostname(network_owner_t *owner) {
+    refresh_settings(owner);
+    network_settings_runtime_t *settings = &owner->view.settings;
+    network_settings_t desired = settings->desired;
+    uint32_t revision = settings->desired_revision;
+    if (settings->hostname_valid &&
+        !strcmp(settings->configured_hostname, desired.hostname)) {
+        settings->hostname_revision = revision;
+        return;
+    }
+    esp_err_t result = esp_netif_set_hostname(owner->station, desired.hostname);
+    settings->hostname_error = result;
+    settings->hostname_valid = result == ESP_OK;
+    if (result == ESP_OK) {
+        memcpy(settings->configured_hostname, desired.hostname, sizeof(desired.hostname));
+        settings->hostname_revision = revision;
+    } else {
+        // The pinned lwIP implementation frees the old string before strdup.
+        // OOM can replace it with the SDK default; old success is no longer valid.
+        memset(settings->configured_hostname, 0, sizeof(settings->configured_hostname));
+        settings->hostname_revision = 0;
+    }
+    // A save during the SDK call remains desired and pending, never mislabeled
+    // as the hostname actually passed to the netif.
+    refresh_settings(owner);
 }
 
 static bool enter(void) {
@@ -278,6 +321,9 @@ static void configure_attempt(network_owner_t *owner, int64_t now) {
         failed_attempt(owner, result, now);
         return;
     }
+    // The driver has acknowledged disconnection. A form save alone never
+    // disconnects an online link or changes its active DHCP hostname.
+    configure_hostname(owner);
     wifi_config_t config = {0};
     const network_profile_t *profile = &owner->profiles.rows[owner->view.target_profile];
     memcpy(config.sta.ssid, profile->ssid, sizeof(profile->ssid));
@@ -386,7 +432,95 @@ static esp_err_t apply_power(void *context, bool active) {
     return esp_wifi_set_ps(active ? WIFI_PS_NONE : WIFI_PS_MIN_MODEM);
 }
 
+static void cancel_ap_timeout(network_owner_t *owner) {
+    owner->view.settings.ap_timeout_armed = false;
+    owner->view.settings.ap_timeout_remaining_ms = 0;
+}
+
+static void arm_ap_timeout(network_owner_t *owner, int64_t now) {
+    owner->ap_timeout_minutes = owner->view.settings.desired.ap_timeout_minutes;
+    owner->ap_timeout_cycle = owner->view.epoch;
+    int64_t interval = (int64_t)owner->ap_timeout_minutes * 60000000LL;
+    owner->ap_timeout_saturated = now > INT64_MAX - interval;
+    owner->ap_timeout_deadline = after(now, interval);
+    owner->view.settings.ap_timeout_armed = true;
+}
+
+static bool ap_timeout_local(network_owner_t *owner, uint32_t version) {
+    return owner->started && owner->view.ap_enabled && !owner->view.online &&
+        owner->view.phase == NETWORK_AP_IDLE && !owner->cycle_active &&
+        owner->view.settings.ap_timeout_armed &&
+        owner->view.settings.desired.ap_timeout_minutes != 0 &&
+        owner->view.epoch == owner->ap_timeout_cycle &&
+        atomic_load_explicit(&s_lifecycle, memory_order_acquire) == RUNTIME_RUNNING &&
+        !atomic_load_explicit(&s_stop, memory_order_acquire) &&
+        !atomic_load_explicit(&s_retry, memory_order_acquire) &&
+        !atomic_load_explicit(&s_manual_admitted, memory_order_acquire) &&
+        !atomic_load_explicit(&s_resync, memory_order_acquire) &&
+        atomic_load_explicit(&s_gate, memory_order_acquire) == 0 &&
+        uxQueueMessagesWaiting(owner->events) == 0 &&
+        atomic_load_explicit(&s_link_version, memory_order_acquire) == version;
+}
+
+static bool ap_timeout_live(network_owner_t *owner, uint32_t version) {
+    if (!ap_timeout_local(owner, version)) return false;
+    wifi_ap_record_t ap = {0};
+    esp_netif_ip_info_t info = {0};
+    if (esp_wifi_sta_get_ap_info(&ap) != ESP_ERR_WIFI_NOT_CONNECT ||
+        esp_netif_is_netif_up(owner->station) ||
+        esp_netif_get_ip_info(owner->station, &info) != ESP_OK || info.ip.addr)
+        return false;
+    network_settings_t desired;
+    uint32_t revision = 0;
+    if (!network_settings_snapshot(&desired, &revision) ||
+        !owner->view.settings.available ||
+        revision != owner->view.settings.desired_revision ||
+        strcmp(desired.hostname, owner->view.settings.desired.hostname) ||
+        desired.ap_timeout_minutes != owner->view.settings.desired.ap_timeout_minutes)
+        return false;
+    return ap_timeout_local(owner, version);
+}
+
+static void poll_ap_timeout(network_owner_t *owner, int64_t now, uint32_t version) {
+    network_settings_runtime_t *settings = &owner->view.settings;
+    if (now < 0 || !owner->started || !owner->view.ap_enabled || owner->view.online ||
+        !settings->available || !settings->desired.ap_timeout_minutes ||
+        atomic_load_explicit(&s_lifecycle, memory_order_acquire) != RUNTIME_RUNNING ||
+        atomic_load_explicit(&s_stop, memory_order_acquire)) {
+        cancel_ap_timeout(owner);
+        return;
+    }
+    if (!settings->ap_timeout_armed ||
+        settings->desired.ap_timeout_minutes != owner->ap_timeout_minutes ||
+        owner->view.epoch != owner->ap_timeout_cycle) arm_ap_timeout(owner, now);
+    // An unrepresentable full interval cannot authorize an early restart.
+    if (!owner->ap_timeout_saturated && now >= owner->ap_timeout_deadline) {
+        web_reboot_lease_t lease = {0};
+        if (ap_timeout_live(owner, version) && web_reboot_reserve(&lease) == ESP_OK) {
+            // Recheck after reservation: OTA/credential ownership and our
+            // current local/link/settings authorization must all agree.
+            // This final check is the application arbitration boundary. The
+            // SDK cannot atomically exclude a later RF event or form save.
+            if (ap_timeout_live(owner, version)) (void)web_reboot_restart_reserved_now(&lease);
+            if (lease.epoch) (void)web_reboot_cancel(&lease);
+        }
+        // No deferred AP reboot is ever placed in the ordinary durable queue.
+        // Blocked eligibility or OTA admission gets a fresh full interval,
+        // so cancelling a failed OTA cannot release an already expired reboot.
+        int64_t rearm_now = esp_timer_get_time();
+        if (rearm_now < now || rearm_now < 0) {
+            cancel_ap_timeout(owner);
+            return;
+        }
+        now = rearm_now;
+        arm_ap_timeout(owner, now);
+    }
+    settings->ap_timeout_remaining_ms = owner->ap_timeout_deadline > now ?
+        (uint64_t)(owner->ap_timeout_deadline - now) / 1000U : 0;
+}
+
 static void owner_step(network_owner_t *owner, int64_t now) {
+    refresh_settings(owner);
     uint32_t version = atomic_load_explicit(&s_link_version, memory_order_acquire);
     network_notice_t notice;
     // Bounded drain: an event storm cannot starve deadlines/manual requests.
@@ -452,6 +586,7 @@ static void owner_step(network_owner_t *owner, int64_t now) {
             }
         }
     }
+    poll_ap_timeout(owner, now, version);
     publish(owner, now, version);
 }
 
@@ -462,6 +597,7 @@ static void owner_task(void *argument) {
         vTaskDelay(pdMS_TO_TICKS(OWNER_POLL_MS));
     }
     offline(owner);
+    cancel_ap_timeout(owner);
     atomic_store_explicit(&s_exited, true, memory_order_release);
     vTaskDelete(NULL);
 }
@@ -524,6 +660,8 @@ esp_err_t network_runtime_start(native_state_t *state, esp_netif_t *station,
     if (!owner->events || !owner->lock || !owner->initial) goto failed;
     result = prepare_portal(owner);
     if (result != ESP_OK) goto failed;
+    configure_hostname(owner);
+    owner->published = owner->view;
     result = esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, event_handler, NULL, &owner->wifi_handler);
     if (result != ESP_OK) goto failed;
     owner->wifi_registered = true;

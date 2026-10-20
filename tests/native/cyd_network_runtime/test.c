@@ -24,11 +24,12 @@ static void make_profiles(unsigned count) {
     }
 }
 static void start(unsigned count) {
+    unsigned power_before = fixture_stats().api_calls[API_POWER];
     make_profiles(count);
     CHECK(network_runtime_start(&state, &station, &profiles) == ESP_OK, "runtime_start");
     fixture_wait_parked();
     CHECK(snapshot().phase == NETWORK_WAIT_START, "wait_for_actual_start_event");
-    CHECK(!fixture_stats().api_calls[API_POWER], "no_power_call_before_driver_start");
+    CHECK(fixture_stats().api_calls[API_POWER] == power_before, "no_power_call_before_driver_start");
     fixture_emit(WIFI_EVENT, WIFI_EVENT_STA_START, NULL, 0); fixture_step(0);
 }
 static void next_connect(unsigned previous) {
@@ -52,6 +53,14 @@ static void fail_attempt(void) {
     fixture_emit(WIFI_EVENT, WIFI_EVENT_STA_CONNECTED, NULL, 0); fixture_step(0);
     fixture_observe(false, false, 0, 0, 0);
     fixture_emit(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, NULL, 0); fixture_step(0);
+}
+static void idle_one(void) {
+    start(1); first_connect();
+    for (unsigned i = 0; i < 3; ++i) {
+        unsigned previous = fixture_stats().connects; fail_attempt();
+        if (i != 2) next_connect(previous);
+    }
+    CHECK(snapshot().phase == NETWORK_AP_IDLE && snapshot().ap_enabled, "real_cycle_finished_before_ap_timeout");
 }
 static void stopped(void) {
     fixture_driver_stopped();
@@ -97,7 +106,209 @@ static void *publisher(void *argument) {
 int main(int argc, char **argv) {
     CHECK(argc == 2, "case_argument"); const char *name = argv[1];
     fixture_init(); native_state_init(&state); CHECK(state.lock, "state_mutex");
-    if (!strcmp(name, "no-profiles")) {
+    if (!strcmp(name, "settings-defaults") || !strcmp(name, "settings-unavailable")) {
+        bool unavailable = !strcmp(name, "settings-unavailable");
+        fixture_settings_unavailable(unavailable); start(0);
+        network_settings_runtime_t settings = snapshot().settings;
+        CHECK(settings.available == !unavailable && settings.desired_revision == (unavailable ? 0U : 1U) &&
+            !strcmp(settings.desired.hostname, "yoradio") && !settings.desired.ap_timeout_minutes &&
+            settings.hostname_valid && !strcmp(settings.configured_hostname, "yoradio") &&
+            settings.hostname_error == ESP_OK && !settings.ap_timeout_armed &&
+            fixture_stats().api_calls[API_HOSTNAME] == 1, "initial_hostname_and_honest_storage_availability");
+    } else if (!strcmp(name, "hostname-start-failure")) {
+        fixture_fail_api(API_HOSTNAME, 1, ESP_ERR_NO_MEM); start(0);
+        network_settings_runtime_t settings = snapshot().settings;
+        CHECK(settings.available && !settings.hostname_valid && !settings.configured_hostname[0] &&
+            !settings.hostname_revision && settings.hostname_error == ESP_ERR_NO_MEM &&
+            !strcmp(fixture_stats().hostname, "espressif") && snapshot().ap_enabled,
+            "hostname_start_oom_does_not_disable_portal_or_claim_old_value");
+    } else if (!strcmp(name, "hostname-online")) {
+        start(1); first_connect(); online_current(0x01020304);
+        fixture_stats_t before = fixture_stats(); fixture_settings("radio-new", 0); fixture_step(100000);
+        network_settings_runtime_t settings = snapshot().settings;
+        CHECK(!strcmp(settings.desired.hostname, "radio-new") && !strcmp(settings.configured_hostname, "yoradio") &&
+            settings.hostname_valid && settings.desired_revision > settings.hostname_revision &&
+            fixture_stats().api_calls[API_HOSTNAME] == before.api_calls[API_HOSTNAME] &&
+            fixture_stats().api_calls[API_DISCONNECT] == before.api_calls[API_DISCONNECT] &&
+            fixture_stats().connects == before.connects && snapshot().online, "online_save_is_pending_without_disconnect_or_setter");
+        CHECK(network_runtime_retry() == ESP_OK, "explicit_reconnect_admitted_for_hostname");
+        fixture_step(0); next_connect(before.connects); settings = snapshot().settings;
+        CHECK(!strcmp(settings.configured_hostname, "radio-new") &&
+            settings.hostname_revision == settings.desired_revision &&
+            fixture_stats().api_calls[API_HOSTNAME] == before.api_calls[API_HOSTNAME] + 1,
+            "latest_hostname_applied_at_checked_reconnect");
+        online_current(0x05060708); fixture_settings("radio-late", 0); fixture_step(0);
+        unsigned previous = fixture_stats().connects; fixture_observe(false, false, 0, 0, 0);
+        fixture_emit(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, NULL, 0); fixture_step(0); next_connect(previous);
+        CHECK(!strcmp(snapshot().settings.configured_hostname, "radio-late"),
+            "natural_link_loss_applies_latest_hostname_at_checked_reconnect");
+    } else if (!strcmp(name, "hostname-oom")) {
+        start(1); fixture_settings("radio-new", 0); fixture_fail_api(API_HOSTNAME, 1, ESP_ERR_NO_MEM); first_connect();
+        network_settings_runtime_t settings = snapshot().settings;
+        CHECK(!settings.hostname_valid && !settings.configured_hostname[0] && !settings.hostname_revision &&
+            settings.hostname_error == ESP_ERR_NO_MEM && !strcmp(settings.desired.hostname, "radio-new") &&
+            !strcmp(fixture_stats().hostname, "espressif"), "hostname_oom_clears_old_success_and_preserves_desired");
+        unsigned previous = fixture_stats().connects; fail_attempt(); next_connect(previous); settings = snapshot().settings;
+        CHECK(settings.hostname_valid && settings.hostname_error == ESP_OK &&
+            !strcmp(settings.configured_hostname, "radio-new"), "hostname_oom_retried_only_at_next_real_attempt");
+    } else if (!strcmp(name, "hostname-stale")) {
+        start(1); fixture_settings("radio-old", 0); fixture_block_hostname();
+        fixture_release_step(100000); fixture_wait_hostname(); fixture_settings("radio-new", 0);
+        fixture_release_hostname(); fixture_wait_parked(); network_settings_runtime_t settings = snapshot().settings;
+        CHECK(settings.hostname_valid && !strcmp(settings.configured_hostname, "radio-old") &&
+            !strcmp(settings.desired.hostname, "radio-new") && settings.hostname_revision < settings.desired_revision,
+            "stale_setter_success_reports_actual_old_value_with_new_desired_pending");
+        unsigned previous = fixture_stats().connects; fail_attempt(); next_connect(previous);
+        CHECK(!strcmp(snapshot().settings.configured_hostname, "radio-new"), "later_real_attempt_applies_latest_hostname");
+    } else if (!strcmp(name, "hostname-same")) {
+        start(1); fixture_settings("yoradio", 30); first_connect();
+        CHECK(fixture_stats().api_calls[API_HOSTNAME] == 1 &&
+            snapshot().settings.hostname_revision == snapshot().settings.desired_revision,
+            "same_hostname_revision_needs_no_second_allocation");
+    } else if (!strcmp(name, "hostname-error-budget")) {
+        fixture_fail_api(API_HOSTNAME, UINT_MAX, ESP_ERR_NO_MEM); start(1); first_connect();
+        for (unsigned i = 0; i < 3; ++i) {
+            unsigned previous = fixture_stats().connects; fail_attempt();
+            if (i != 2) next_connect(previous);
+        }
+        CHECK(snapshot().phase == NETWORK_AP_IDLE && fixture_stats().api_calls[API_HOSTNAME] == 4,
+            "persistent_hostname_error_bounded_by_initial_and_real_attempts");
+        fixture_step(100000000); CHECK(fixture_stats().api_calls[API_HOSTNAME] == 4,
+            "idle_hostname_error_never_spins_or_reconnects");
+    } else if (!strcmp(name, "ap-disabled")) {
+        start(0); fixture_step(1800000000LL);
+        CHECK(!snapshot().settings.ap_timeout_armed && !fixture_stats().api_calls[API_REBOOT_RESERVE] &&
+            !fixture_stats().restarts && !fixture_stats().reboot_pending, "default_zero_never_arms_or_requests_reboot");
+    } else if (!strcmp(name, "ap-expiry") || !strcmp(name, "ap-thirty-minutes")) {
+        unsigned minutes = !strcmp(name, "ap-expiry") ? 1U : 30U;
+        fixture_settings("yoradio", minutes); start(0);
+        CHECK(snapshot().settings.ap_timeout_armed && snapshot().settings.ap_timeout_remaining_ms == minutes * 60000U,
+            "ap_timeout_armed_once_from_actual_enable");
+        fixture_step((int64_t)minutes * 60000000LL - 1);
+        CHECK(!fixture_stats().restarts, "no_restart_before_exact_ap_deadline"); fixture_step(1);
+        CHECK(fixture_stats().restarts == 1 && fixture_stats().api_calls[API_REBOOT_NOW] == 1 &&
+            !fixture_stats().reboot_reserved && !fixture_stats().reboot_pending,
+            "due_ap_restart_uses_exact_immediate_lease_without_pending_queue");
+        fixture_step(0); CHECK(fixture_stats().restarts == 1, "one_decision_per_ap_interval_even_when_restart_double_returns");
+    } else if (!strcmp(name, "ap-timeout-edit")) {
+        fixture_settings("yoradio", 1); start(0); fixture_step(30000000);
+        fixture_settings("yoradio", 2); fixture_step(0);
+        CHECK(snapshot().settings.ap_timeout_remaining_ms == 120000, "changed_timeout_rearms_full_interval");
+        fixture_step(60000000); CHECK(!fixture_stats().restarts, "old_timeout_not_retained_after_edit");
+        fixture_settings("yoradio", 0); fixture_step(0); fixture_step(1800000000LL);
+        CHECK(!snapshot().settings.ap_timeout_armed && !fixture_stats().restarts, "timeout_zero_cancels_old_deadline");
+    } else if (!strcmp(name, "ap-hostname-edit")) {
+        fixture_settings("yoradio", 1); start(0); fixture_step(30000000);
+        fixture_settings("radio-new", 1); fixture_step(0);
+        CHECK(snapshot().settings.ap_timeout_remaining_ms == 30000, "hostname_only_edit_keeps_timeout_deadline");
+        fixture_step(30000000); CHECK(fixture_stats().restarts == 1, "hostname_only_edit_does_not_postpone_timeout");
+    } else if (!strcmp(name, "ap-online-cancel")) {
+        fixture_settings("yoradio", 1); start(1); first_connect(); fixture_step(20000000);
+        unsigned previous = fixture_stats().connects; next_connect(previous); online_current(0x01020304);
+        CHECK(snapshot().ap_enabled && !snapshot().settings.ap_timeout_armed, "online_cancels_timeout_even_with_live_apsta");
+        fixture_step(60000000); CHECK(!fixture_stats().restarts, "online_portal_never_restarts");
+        fixture_observe(false, false, 0, 0, 0); fixture_emit(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, NULL, 0); fixture_step(0);
+        CHECK(snapshot().settings.ap_timeout_armed && snapshot().settings.ap_timeout_remaining_ms == 60000,
+            "late_loss_starts_fresh_offline_ap_interval");
+    } else if (!strcmp(name, "ap-ota-block")) {
+        fixture_settings("yoradio", 1); start(0); fixture_reboot_held(true); fixture_step(60000000);
+        CHECK(!fixture_stats().restarts && !fixture_stats().reboot_pending && snapshot().settings.ap_timeout_remaining_ms == 60000,
+            "ota_owned_expiry_has_no_deferred_ap_restart");
+        fixture_reboot_held(false); fixture_step(0); fixture_step(59999999);
+        CHECK(!fixture_stats().restarts && !fixture_stats().reboot_pending, "ota_cancel_cannot_release_stale_expired_ap_restart");
+        fixture_step(1); CHECK(fixture_stats().restarts == 1, "fresh_full_interval_can_restart_after_ota_cancel");
+    } else if (!strcmp(name, "ap-lease-error")) {
+        fixture_settings("yoradio", 1); start(0); fixture_fail_api(API_REBOOT_RESERVE, 1, ESP_FAIL);
+        fixture_step(60000000);
+        CHECK(!fixture_stats().restarts && !fixture_stats().reboot_pending && !fixture_stats().reboot_reserved &&
+            snapshot().settings.ap_timeout_remaining_ms == 60000, "lease_error_rearms_full_interval_without_queueing");
+        fixture_step(59999999); CHECK(!fixture_stats().restarts, "lease_error_does_not_retry_immediately");
+        fixture_step(1); CHECK(fixture_stats().restarts == 1, "lease_error_fresh_interval_can_retry");
+    } else if (!strcmp(name, "ap-slow-lease")) {
+        fixture_settings("yoradio", 1); start(0); fixture_fail_api(API_REBOOT_RESERVE, 1, ESP_FAIL);
+        fixture_block_reserve(); fixture_release_step(60000000); fixture_wait_reserve();
+        fixture_set_clock(esp_timer_get_time() + 60000000); fixture_release_reserve(); fixture_wait_parked();
+        CHECK(!fixture_stats().restarts && snapshot().settings.ap_timeout_remaining_ms == 60000,
+            "slow_failed_lease_rearms_from_return_time"); fixture_step(0);
+        CHECK(!fixture_stats().restarts, "slow_failed_lease_cannot_rearm_an_already_expired_deadline");
+    } else if (!strcmp(name, "ap-pending-callback")) {
+        fixture_settings("yoradio", 1); start(0); fixture_block_send(); pthread_t callback;
+        CHECK(!pthread_create(&callback, NULL, blocked_callback, NULL), "timeout_pending_callback_create"); fixture_wait_send();
+        fixture_step(60000000);
+        CHECK(!fixture_stats().restarts && !fixture_stats().api_calls[API_REBOOT_RESERVE],
+            "inflight_callback_reference_blocks_timeout_even_before_queue_publication");
+        fixture_release_send(); CHECK(!pthread_join(callback, NULL), "timeout_pending_callback_join"); fixture_step(0);
+    } else if (!strcmp(name, "ap-query-race")) {
+        fixture_settings("yoradio", 1); start(0); fixture_block_ap_info(); fixture_release_step(60000000); fixture_wait_ap_info();
+        fixture_observe(true, false, 0, -55, 0); fixture_emit(WIFI_EVENT, WIFI_EVENT_STA_CONNECTED, NULL, 0);
+        fixture_release_ap_info(); fixture_wait_parked();
+        CHECK(!fixture_stats().restarts && !fixture_stats().api_calls[API_REBOOT_RESERVE],
+            "link_change_during_live_query_blocks_expiry_authorization"); fixture_step(0);
+    } else if (!strcmp(name, "ap-live-associated") || !strcmp(name, "ap-live-netif") ||
+               !strcmp(name, "ap-live-ip") || !strcmp(name, "ap-query-error") || !strcmp(name, "ap-ip-error")) {
+        fixture_settings("yoradio", 1); start(0);
+        if (!strcmp(name, "ap-live-associated")) fixture_observe(true, false, 0, -55, 0);
+        else if (!strcmp(name, "ap-live-netif")) fixture_observe(false, true, 0, 0, 0);
+        else if (!strcmp(name, "ap-live-ip")) fixture_observe(false, false, 0x01020304, 0, 0);
+        else fixture_fail_api(!strcmp(name, "ap-query-error") ? API_AP_INFO : API_IP_INFO, 1, ESP_FAIL);
+        fixture_step(60000000);
+        CHECK(!fixture_stats().restarts && !fixture_stats().api_calls[API_REBOOT_RESERVE] &&
+            snapshot().settings.ap_timeout_remaining_ms == 60000, "unproved_disconnection_rearms_without_restart_lease");
+    } else if (!strcmp(name, "ap-late-event") || !strcmp(name, "ap-late-association") || !strcmp(name, "ap-late-settings") ||
+               !strcmp(name, "ap-late-manual")) {
+        fixture_settings("yoradio", 1);
+        if (!strcmp(name, "ap-late-manual")) idle_one(); else start(0);
+        fixture_block_reserve(); fixture_release_step(60000000); fixture_wait_reserve();
+        if (!strcmp(name, "ap-late-event")) {
+            fixture_observe(true, false, 0, -55, 0); fixture_emit(WIFI_EVENT, WIFI_EVENT_STA_CONNECTED, NULL, 0);
+        } else if (!strcmp(name, "ap-late-association")) {
+            fixture_observe(true, false, 0, -55, 0);
+        } else if (!strcmp(name, "ap-late-settings")) fixture_settings("yoradio", 0);
+        else CHECK(network_runtime_retry() == ESP_OK, "manual_retry_admitted_before_final_timeout_check");
+        fixture_release_reserve(); fixture_wait_parked();
+        CHECK(!fixture_stats().restarts && fixture_stats().api_calls[API_REBOOT_CANCEL] == 1 &&
+            !fixture_stats().reboot_reserved && !fixture_stats().reboot_pending, "final_changed_authorization_cancels_only_own_lease");
+        fixture_step(0);
+        if (!strcmp(name, "ap-late-settings")) CHECK(!snapshot().settings.ap_timeout_armed, "late_disable_observed_on_next_tick");
+    } else if (!strcmp(name, "ap-manual-cycle")) {
+        fixture_settings("yoradio", 1); idle_one(); fixture_step(30000000);
+        CHECK(network_runtime_retry() == ESP_OK, "ap_timeout_manual_cycle_admitted"); fixture_step(0);
+        CHECK(snapshot().settings.ap_timeout_remaining_ms == 60000 && snapshot().phase == NETWORK_WAIT_DISCONNECT,
+            "manual_cycle_invalidates_and_rearms_old_timeout");
+        fixture_step(30000000); CHECK(!fixture_stats().restarts, "old_cycle_deadline_cannot_restart_new_cycle");
+    } else if (!strcmp(name, "ap-failed-enable")) {
+        fixture_settings("yoradio", 1); make_profiles(0);
+        CHECK(network_runtime_start(&state, &station, &profiles) == ESP_OK, "failed_ap_timeout_runtime_start"); fixture_wait_parked();
+        fixture_fail_api(API_MODE, UINT_MAX, ESP_FAIL); fixture_emit(WIFI_EVENT, WIFI_EVENT_STA_START, NULL, 0);
+        fixture_step(0); fixture_step(250000); fixture_step(250000); fixture_step(60000000);
+        CHECK(!snapshot().ap_enabled && !snapshot().settings.ap_timeout_armed && !fixture_stats().restarts,
+            "failed_portal_enable_never_arms_timeout");
+    } else if (!strcmp(name, "ap-stop-race")) {
+        fixture_settings("yoradio", 1); start(0); fixture_block_reserve(); fixture_release_step(60000000); fixture_wait_reserve();
+        fixture_driver_stopped(); fixture_block_unregister(); pthread_t stopper;
+        CHECK(!pthread_create(&stopper, NULL, concurrent_stop, NULL), "ap_timeout_concurrent_stop_create"); fixture_wait_unregister();
+        fixture_release_reserve(); fixture_wait_parked();
+        CHECK(!fixture_stats().restarts && fixture_stats().api_calls[API_REBOOT_CANCEL] == 1,
+            "stopping_lifetime_cancels_final_ap_authorization");
+        fixture_release_unregister(); CHECK(!pthread_join(stopper, NULL) && atomic_load(&stop_result) == ESP_OK,
+            "ap_timeout_concurrent_stop_completed"); fixture_join();
+    } else if (!strcmp(name, "ap-restart-lifetime")) {
+        fixture_settings("yoradio", 1); start(0); fixture_step(30000000); fixture_driver_stopped();
+        CHECK(network_runtime_stop(1000) == ESP_OK, "armed_ap_runtime_stopped"); fixture_join();
+        fixture_settings("yoradio", 0); start(0); fixture_step(60000000);
+        CHECK(!fixture_stats().restarts && !fixture_stats().api_calls[API_REBOOT_RESERVE] &&
+            !snapshot().settings.ap_timeout_armed, "old_lifetime_deadline_cannot_restart_recreated_owner");
+    } else if (!strcmp(name, "ap-clock-saturation")) {
+        fixture_settings("yoradio", 1); fixture_set_clock(INT64_MAX - 30000000); start(0); fixture_step(30000000);
+        CHECK(!fixture_stats().restarts && !fixture_stats().api_calls[API_REBOOT_RESERVE],
+            "unrepresentable_full_timeout_does_not_authorize_early_restart");
+        fixture_driver_stopped(); CHECK(network_runtime_stop(1000) == ESP_ERR_TIMEOUT, "saturated_ap_cleanup_retains_until_exit"); fixture_step(0);
+    } else if (!strcmp(name, "ap-negative-clock")) {
+        fixture_settings("yoradio", 1); start(0); fixture_set_clock(-1); fixture_step(0);
+        CHECK(!snapshot().settings.ap_timeout_armed && !fixture_stats().restarts, "invalid_clock_suppresses_timeout_admission");
+        fixture_set_clock(1000000); fixture_step(0);
+        CHECK(snapshot().settings.ap_timeout_remaining_ms == 60000, "valid_clock_rearms_full_timeout");
+    } else if (!strcmp(name, "no-profiles")) {
         start(0); network_snapshot_t view = snapshot();
         CHECK(view.phase == NETWORK_AP_IDLE && view.ap_enabled && !view.online && !fixture_stats().connects, "no_profiles_portal_without_connect");
         CHECK(network_runtime_retry() == ESP_ERR_NOT_FOUND && network_runtime_wait_initial(0) == ESP_OK, "empty_profile_admission");
