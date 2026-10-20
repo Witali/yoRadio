@@ -1,0 +1,219 @@
+"""Test actual CYD open_stream and the configure-time SDK HTTP source overlay.
+
+The host executes the unchanged extracted production function with explicit SDK
+HTTP/clock/release-result seams, enabled and disabled, checking identical HTTP
+outcomes. The separate SDK-source suite proves release/reallocation ownership.
+The real CMake helper executes against build-local copied SDK input and a mock
+component target; this does not replace the full target firmware build.
+No installed SDK edits, application link, device or physical heap measurement.
+"""
+import argparse
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+sys.dont_write_bytecode=True
+ROOT=Path(__file__).resolve().parents[1]
+MAIN=Path('idf/esp32-cyd2usb-native/main')
+CASES=['success200','success204','success299','zero-length','large-length',
+       'redirect301','redirect302','redirect303','redirect307','redirect308',
+       'five-redirects','redirect-limit','redirect-rejected','status199','status300',
+       'status400','status500','open-failed','fetch-failed','deadline-before',
+       'deadline-open','deadline-fetch','deadline-fetch-over','timeout-rounding',
+       'invalid-headers','rejected-state','async-rejected','body-rejected',
+       'partial-rejected','repeated-open','metadata-reset']
+
+
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+
+
+def host(path):
+    value=Path(path).resolve().as_posix()
+    return '/mnt/'+value[0].lower()+value[2:] if sys.platform=='win32' else value
+
+
+def run(command):
+    result=subprocess.run((['wsl.exe','--exec'] if sys.platform=='win32' else [])+command,
+                          stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=60)
+    return result.returncode,result.stdout
+
+
+def module(path,name):
+    spec=importlib.util.spec_from_file_location(name,path)
+    result=importlib.util.module_from_spec(spec);spec.loader.exec_module(result)
+    return result
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--idf',type=Path,default=Path('C:/Work/yoRadio/.idf/v6.0.2'))
+    parser.add_argument('--output',type=Path,required=True)
+    args=parser.parse_args();out=args.output.resolve()
+    if not out.is_relative_to(ROOT/'.build'):parser.error('Use fresh repository .build/ output')
+    out.mkdir(parents=True,exist_ok=False)
+    files=[Path(__file__).resolve().relative_to(ROOT),
+           Path('tests/native/cyd_http_request_buffer_integration/test.c'),
+           MAIN/'audio_service.c',MAIN/'http_request_buffer.h',MAIN/'Kconfig.projbuild',
+           MAIN/'compat/http_request_buffer/enable.cmake',
+           Path('tools/patch_cyd_http_request_buffer.py'),Path('tests/run-cyd-http-request-buffer.py')]
+    repository=out/'sources/repository';sdk_source=args.idf.resolve()/'components/esp_http_client/esp_http_client.c'
+    report={'passed':False,'scope':__doc__,'source_sha256':{},'sdk_sha256':{},
+            'sanitizers':['ASan','UBSan'],'enabled':{},'disabled':{},'negative_controls':{},
+            'cmake':{},'hardware':False,'actual_sdk_release_runtime_in_this_suite':False}
+    def save():(out/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    for relative in files:
+        raw=(ROOT/relative).read_bytes();target=repository/relative
+        target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(raw)
+        report['source_sha256'][relative.as_posix()]=sha(raw)
+    raw=sdk_source.read_bytes();(out/'sources/sdk').mkdir();(out/'sources/sdk/esp_http_client.c').write_bytes(raw)
+    report['sdk_sha256'][str(sdk_source)]=sha(raw)
+    helpers=module(repository/'tests/run-cyd-http-request-buffer.py','frozen_http_helpers')
+    patcher=module(repository/'tools/patch_cyd_http_request_buffer.py','frozen_http_patch')
+    source=(repository/MAIN/'audio_service.c').read_text()
+    assert '#include "http_request_buffer.h"' in source
+    unit=helpers.function(source,'open_stream')
+    report['actual_open_stream_sha256']=sha(unit.encode())
+    kconfig=(repository/MAIN/'Kconfig.projbuild').read_text()
+    option=re.search(r'^    config YORADIO_HTTP_REQUEST_BUFFER_RELEASE\n(.*?)(?=^    (?:config|choice)|^endmenu)',kconfig,re.M|re.S)
+    assert option and '        default y\n' in option[1]
+    stubs=out/'stubs';stubs.mkdir()
+    (stubs/'esp_http_client.h').write_text('#pragma once\ntypedef int esp_err_t;\n#define ESP_OK 0\ntypedef struct test_client *esp_http_client_handle_t;\n')
+    status,log=run(['gcc','--version']);assert status==0,log
+    (out/'compiler.log').write_bytes(log);report['compiler']=log.decode().splitlines()[0]
+
+    def build(name,contents,enabled):
+        directory=out/name;directory.mkdir();(directory/'production.inc').write_text(contents)
+        binary=directory/'test'
+        command=['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-Wno-unused-function',
+                 '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
+                 '-I'+host(stubs),'-I'+host(directory),'-I'+host(repository/MAIN)]
+        if enabled:command+=['-DCONFIG_YORADIO_HTTP_REQUEST_BUFFER_RELEASE=1']
+        command+=[host(repository/'tests/native/cyd_http_request_buffer_integration/test.c'),'-o',host(binary)]
+        (directory/'command.json').write_text(json.dumps(command,indent=2)+'\n')
+        code,log=run(command);(directory/'build.log').write_bytes(log);assert code==0,log.decode(errors='replace')
+        return directory,binary
+
+    def execute(directory,binary,case,marker=None):
+        code,log=run(['env','ASAN_OPTIONS=detect_leaks=1:halt_on_error=1',
+                      'UBSAN_OPTIONS=halt_on_error=1',host(binary),case])
+        (directory/(case+'.log')).write_bytes(log)
+        assert not any(value in log for value in [b'AddressSanitizer',b'LeakSanitizer',b'runtime error:']),log
+        if marker:assert code==80 and re.fullmatch(rb'SEMANTIC_FAILURE:'+marker.encode()+rb':\d+\n',log),(case,code,log)
+        else:assert code==0 and log.startswith(('PASS:'+case+' ').encode()),(case,code,log)
+        return log.decode().strip()
+
+    save()
+    for mode in ['enabled','disabled']:
+        directory,binary=build(mode,unit,mode=='enabled')
+        for case in CASES:
+            text=execute(directory,binary,case);report[mode][case]={'passed':True,'trace':text}
+        print('PASS actual open_stream '+mode+': '+str(len(CASES))+' cases',flush=True);save()
+    for case in CASES:assert report['enabled'][case]['trace']==report['disabled'][case]['trace']
+    report['enabled_disabled_http_traces_identical']=True
+    release_start=unit.index('#ifdef CONFIG_YORADIO_HTTP_REQUEST_BUFFER_RELEASE')
+    release_end=unit.index('#endif',release_start)+len('#endif')
+    release=unit[release_start:release_end]
+    mutations=[
+        ('missing-release',unit.replace(release,'',1),'success200','accepted_get_release_count'),
+        ('reject-breaks-playback',unit.replace('                if (released != ESP_OK)\n','                if (released != ESP_OK) return released;\n                if (released != ESP_OK)\n',1),'rejected-state','release_rejection_preserves_success'),
+        ('release-on-redirect',unit.replace(release,'',1).replace('        bool redirected =',release+'\n        bool redirected =',1),'redirect302','release_final_success_only'),
+        ('release-before-headers',unit.replace(release,'',1).replace('        int64_t length =',release+'\n        int64_t length =',1),'success200','release_after_final_headers'),
+        ('ignore-header-deadline',unit.replace('        if (esp_timer_get_time() >= deadline) return ESP_ERR_TIMEOUT;\n','',1),'deadline-fetch','release_before_deadline'),
+        ('release-invalid-headers',unit.replace('if (headers->valid)', 'if (true)',1),'invalid-headers','invalid_headers_retain_request')]
+    for name,mutated,case,marker in mutations:
+        assert mutated!=unit
+        directory,binary=build(name,mutated,True);text=execute(directory,binary,case,marker)
+        report['negative_controls'][name]={'detected':True,'case':case,'expected_marker':marker,'trace':text}
+        print('CONTROL '+name,flush=True);save()
+
+    cmake_helper=repository/MAIN/'compat/http_request_buffer/enable.cmake'
+    for scenario in ['enabled-absolute','enabled-relative','disabled','early','wrong-version',
+                     'no-original','duplicate-original','wrong-content','already-patched']:
+        directory=out/'cmake'/scenario;project=directory/'project';project.mkdir(parents=True)
+        sdk=directory/'sdk';sdk.mkdir();original=sdk/'esp_http_client.c'
+        original.write_bytes(raw+b'\n/* unaudited */' if scenario=='wrong-content' else patcher.patch(raw) if scenario=='already-patched' else raw)
+        before=sha(original.read_bytes());other=sdk/'other.c';other.write_text('int preserved(void) { return 1; }\n')
+        original_arg=host(original)
+        if scenario=='enabled-relative':original_arg='esp_http_client.c'
+        elif scenario=='no-original':original_arg=host(other)
+        sources=[original_arg,host(other)]
+        if scenario=='duplicate-original':sources.insert(0,original_arg)
+        disabled=scenario=='disabled';early=scenario=='early'
+        cmake='''cmake_minimum_required(VERSION 3.20)
+project(CydHttpOverlay C)
+set(CONFIG_YORADIO_HTTP_REQUEST_BUFFER_RELEASE @ENABLED@)
+set(CMAKE_BUILD_EARLY_EXPANSION @EARLY@)
+set(IDF_VERSION_MAJOR 6)
+set(IDF_VERSION_MINOR 0)
+set(IDF_VERSION_PATCH @PATCH@)
+set(PYTHON python3)
+add_library(audited_http STATIC @SOURCES@)
+target_include_directories(audited_http PRIVATE "@SDK@/private")
+target_compile_options(audited_http PRIVATE -Werror -DKEEP_FLAG=17)
+function(idf_component_get_property output component property)
+    if(@NO_PROPERTIES@)
+        message(FATAL_ERROR "disabled/early mode accessed SDK target")
+    endif()
+    if(NOT component STREQUAL "esp_http_client")
+        message(FATAL_ERROR "unexpected component")
+    endif()
+    if(property STREQUAL "COMPONENT_LIB")
+        set(${output} audited_http PARENT_SCOPE)
+    elseif(property STREQUAL "COMPONENT_DIR")
+        set(${output} "@SDK@" PARENT_SCOPE)
+    else()
+        message(FATAL_ERROR "unexpected property")
+    endif()
+endfunction()
+include("@HELPER@")
+native_enable_http_request_buffer_release()
+get_target_property(captured_sources audited_http SOURCES)
+get_target_property(captured_includes audited_http INCLUDE_DIRECTORIES)
+get_target_property(captured_options audited_http COMPILE_OPTIONS)
+get_property(captured_depends DIRECTORY PROPERTY CMAKE_CONFIGURE_DEPENDS)
+file(WRITE "${CMAKE_BINARY_DIR}/captured.txt" "${captured_sources}\\n${captured_includes}\\n${captured_options}\\n${captured_depends}\\n")
+'''
+        replacements={'ENABLED':'OFF' if disabled else 'ON','EARLY':'ON' if early else 'OFF',
+                      'PATCH':'3' if scenario=='wrong-version' else '2',
+                      'SOURCES':' '.join('"'+item+'"' for item in sources),'SDK':host(sdk),
+                      'NO_PROPERTIES':'TRUE' if disabled or early else 'FALSE','HELPER':host(cmake_helper)}
+        for key,value in replacements.items():cmake=cmake.replace('@'+key+'@',value)
+        (project/'CMakeLists.txt').write_text(cmake)
+        command=['cmake','-S',host(project),'-B',host(directory/'build')]
+        (directory/'command.json').write_text(json.dumps(command,indent=2)+'\n')
+        code,log=run(command);(directory/'configure.log').write_bytes(log)
+        expected_error={'wrong-version':'requires audited ESP-IDF 6.0.2','no-original':'source, found 0',
+                        'duplicate-original':'source, found 2','wrong-content':'Unaudited CYD SDK6.0.2',
+                        'already-patched':'Unaudited CYD SDK6.0.2'}.get(scenario)
+        assert sha(original.read_bytes())==before
+        generated=directory/'build/native-http-request-buffer/esp_http_client.c'
+        if expected_error:
+            assert code!=0 and expected_error.encode() in log,(scenario,code,log)
+            assert not generated.exists()
+        else:
+            assert code==0,(scenario,code,log.decode(errors='replace'))
+            captured=(directory/'build/captured.txt').read_text().splitlines()
+            assert captured[1]==host(sdk)+'/private' and captured[2]=='-Werror;-DKEEP_FLAG=17'
+            if disabled or early:
+                assert captured[0].split(';')==sources and not generated.exists()
+            else:
+                assert captured[0].split(';')==[host(generated),host(other)]
+                assert generated.read_bytes()==patcher.patch(raw)
+                assert set(captured[3].split(';'))=={host(original),host(repository/'tools/patch_cyd_http_request_buffer.py')}
+        report['cmake'][scenario]={'passed':True,'exit_status':code,'expected_rejection':expected_error,
+                                   'sdk_input_unchanged':True,'configure_log_sha256':sha(log)}
+        print('PASS CMake '+scenario,flush=True);save()
+    report['source_unchanged_after']={name:sha((ROOT/name).read_bytes())==digest for name,digest in report['source_sha256'].items()}
+    report['sdk_unchanged_after']={name:sha(Path(name).read_bytes())==digest for name,digest in report['sdk_sha256'].items()}
+    assert all(report['source_unchanged_after'].values()) and all(report['sdk_unchanged_after'].values())
+    report['evidence_sha256']={path.relative_to(out).as_posix():sha(path.read_bytes()) for path in out.rglob('*')
+                              if path.is_file() and path.name!='report.json' and 'build' not in path.relative_to(out).parts and path.name!='test'}
+    report['passed']=True;save()
+    print('PASS actual CYD HTTP release integration: '+str(len(CASES))+' paired cases, 6 exact semantic controls, 9 CMake scenarios',flush=True)
+
+
+if __name__=='__main__':main()

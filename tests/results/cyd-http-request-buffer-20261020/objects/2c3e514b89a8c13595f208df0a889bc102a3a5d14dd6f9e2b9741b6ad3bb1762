@@ -1,0 +1,36 @@
+static esp_err_t open_stream(esp_http_client_handle_t client,
+                             stream_headers_t *headers, int64_t deadline) {
+    for (unsigned redirect=0; redirect<=MAX_HTTP_REDIRECTS; ++redirect) {
+        *headers = (stream_headers_t){.valid=true};
+        int64_t remaining = deadline - esp_timer_get_time();
+        if (remaining <= 0) return ESP_ERR_TIMEOUT;
+        esp_http_client_set_timeout_ms(client, (int)((remaining + 999) / 1000));
+        esp_err_t result = esp_http_client_open(client, 0);
+        if (result != ESP_OK) return result;
+        remaining = deadline - esp_timer_get_time();
+        if (remaining <= 0) return ESP_ERR_TIMEOUT;
+        esp_http_client_set_timeout_ms(client, (int)((remaining + 999) / 1000));
+        int64_t length = esp_http_client_fetch_headers(client);
+        if (esp_timer_get_time() >= deadline) return ESP_ERR_TIMEOUT;
+        if (length < 0) return ESP_FAIL;
+        int status = esp_http_client_get_status_code(client);
+        if (status >= 200 && status < 300) {
+#ifdef CONFIG_YORADIO_HTTP_REQUEST_BUFFER_RELEASE
+            if (headers->valid) {
+                esp_err_t released = yoradio_http_client_release_request_buffer(client);
+                if (released != ESP_OK) return released;
+                if (released != ESP_OK)
+                    ESP_LOGD(TAG, "HTTP request buffer retained: %s", esp_err_to_name(released));
+            }
+#endif
+            return ESP_OK;
+        }
+        bool redirected = status == 301 || status == 302 || status == 303 ||
+                          status == 307 || status == 308;
+        if (!redirected || redirect == MAX_HTTP_REDIRECTS) return ESP_FAIL;
+        result = esp_http_client_set_redirection(client);
+        esp_http_client_close(client);
+        if (result != ESP_OK) return result;
+    }
+    return ESP_FAIL;
+}

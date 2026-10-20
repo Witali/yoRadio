@@ -36,12 +36,16 @@ semantic controls, whole patched source compilation against real Xtensa SDK
 headers, 62 actual `open_stream` cases with six controls, and nine actual CMake
 helper configurations. Private host response/transport preparation is an
 explicit seam; target compilation establishes layout/API compatibility. The
-production application matrix and physical HTTP/TLS behavior are separate
-checks. The full-pipeline FLAC QEMU test deliberately disables release because
+six-image [production application matrix](../tests/results/cyd-http-request-buffer-20261020/SDK.md)
+also passes; physical HTTP/TLS behavior remains separate. The full-pipeline
+FLAC QEMU test deliberately disables release because
 its synthetic transport does not enter the SDK response state.
 
 ## Remaining work
 
+- The [frozen next-step plan](../tests/results/cyd-http-request-buffer-20261020/plan/idle-input-reclaim/README.md)
+  specifies lifetime, bounded reclaim, lock ordering and OOM/SMP gates. It is
+  explicitly unimplemented and unqualified.
 - Add allocation-pressure reclaim of idle adaptive-input slots only after a
   successful CYD startup binds their lifetime. The donor bind-before-allocation
   order must not be copied across CYD startup rollback.

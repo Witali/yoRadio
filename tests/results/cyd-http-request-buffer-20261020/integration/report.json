@@ -1,0 +1,554 @@
+{
+  "passed": true,
+  "scope": "Test actual CYD open_stream and the configure-time SDK HTTP source overlay.\n\nThe host executes the unchanged extracted production function with explicit SDK\nHTTP/clock/release-result seams, enabled and disabled, checking identical HTTP\noutcomes. The separate SDK-source suite proves release/reallocation ownership.\nThe real CMake helper executes against build-local copied SDK input and a mock\ncomponent target; this does not replace the full target firmware build.\nNo installed SDK edits, application link, device or physical heap measurement.\n",
+  "source_sha256": {
+    "tests/run-cyd-http-request-buffer-integration.py": "7d6ceb048d6de48c017fccfaae0368d913e144fcf986cc1ad9b07846f313b8e6",
+    "tests/native/cyd_http_request_buffer_integration/test.c": "f02b03134d77b468a022ee236a401f1005e46d76c656b17be5666cbba09fcb9a",
+    "idf/esp32-cyd2usb-native/main/audio_service.c": "31afaf7a88f280b584c8395e831833e5c60ae94cb76578d7fde472d5b51a3669",
+    "idf/esp32-cyd2usb-native/main/http_request_buffer.h": "70b3eccc1d0f8ee51094edaf205fe2a2c317b9c877a4d3d55ea6999480b28deb",
+    "idf/esp32-cyd2usb-native/main/Kconfig.projbuild": "5ac22b8576db14d2198d6fe7bc39d8f4c9be071feea54e044edb90da2e9ea747",
+    "idf/esp32-cyd2usb-native/main/compat/http_request_buffer/enable.cmake": "e158caf97151782cc2c1609dcd4178432157004ccfea4faa09d51e980f96ac1b",
+    "tools/patch_cyd_http_request_buffer.py": "d9b4337cc6db39bd4888afc7c0e81880b752d487ef9f9e91f3816c66297e530e",
+    "tests/run-cyd-http-request-buffer.py": "0c767d5b6bc2042702ddbd8e7a33995163115a0eb858de6dc6199e7c6c62c520"
+  },
+  "sdk_sha256": {
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406"
+  },
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "enabled": {
+    "success200": {
+      "passed": true,
+      "trace": "PASS:success200 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "success204": {
+      "passed": true,
+      "trace": "PASS:success204 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "success299": {
+      "passed": true,
+      "trace": "PASS:success299 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "zero-length": {
+      "passed": true,
+      "trace": "PASS:zero-length result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "large-length": {
+      "passed": true,
+      "trace": "PASS:large-length result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect301": {
+      "passed": true,
+      "trace": "PASS:redirect301 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect302": {
+      "passed": true,
+      "trace": "PASS:redirect302 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect303": {
+      "passed": true,
+      "trace": "PASS:redirect303 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect307": {
+      "passed": true,
+      "trace": "PASS:redirect307 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect308": {
+      "passed": true,
+      "trace": "PASS:redirect308 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "five-redirects": {
+      "passed": true,
+      "trace": "PASS:five-redirects result=0 opens=6 fetches=6 statuses=6 redirects=5 closes=5 timeouts=12 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect-limit": {
+      "passed": true,
+      "trace": "PASS:redirect-limit result=-1 opens=6 fetches=6 statuses=6 redirects=5 closes=5 timeouts=12 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect-rejected": {
+      "passed": true,
+      "trace": "PASS:redirect-rejected result=291 opens=1 fetches=1 statuses=1 redirects=1 closes=1 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status199": {
+      "passed": true,
+      "trace": "PASS:status199 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status300": {
+      "passed": true,
+      "trace": "PASS:status300 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status400": {
+      "passed": true,
+      "trace": "PASS:status400 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status500": {
+      "passed": true,
+      "trace": "PASS:status500 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "open-failed": {
+      "passed": true,
+      "trace": "PASS:open-failed result=801 opens=1 fetches=0 statuses=0 redirects=0 closes=0 timeouts=1 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "fetch-failed": {
+      "passed": true,
+      "trace": "PASS:fetch-failed result=-1 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-before": {
+      "passed": true,
+      "trace": "PASS:deadline-before result=263 opens=0 fetches=0 statuses=0 redirects=0 closes=0 timeouts=0 first_timeout=0 last_timeout=0 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-open": {
+      "passed": true,
+      "trace": "PASS:deadline-open result=263 opens=1 fetches=0 statuses=0 redirects=0 closes=0 timeouts=1 first_timeout=10 last_timeout=10 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-fetch": {
+      "passed": true,
+      "trace": "PASS:deadline-fetch result=263 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-fetch-over": {
+      "passed": true,
+      "trace": "PASS:deadline-fetch-over result=263 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=10001 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "timeout-rounding": {
+      "passed": true,
+      "trace": "PASS:timeout-rounding result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=9 last_timeout=8 now=2235 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "invalid-headers": {
+      "passed": true,
+      "trace": "PASS:invalid-headers result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=0 seen=0"
+    },
+    "rejected-state": {
+      "passed": true,
+      "trace": "PASS:rejected-state result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "async-rejected": {
+      "passed": true,
+      "trace": "PASS:async-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "body-rejected": {
+      "passed": true,
+      "trace": "PASS:body-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "partial-rejected": {
+      "passed": true,
+      "trace": "PASS:partial-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "repeated-open": {
+      "passed": true,
+      "trace": "PASS:repeated-open result=0 opens=2 fetches=2 statuses=2 redirects=0 closes=0 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "metadata-reset": {
+      "passed": true,
+      "trace": "PASS:metadata-reset result=0 opens=3 fetches=3 statuses=3 redirects=2 closes=2 timeouts=6 first_timeout=10 last_timeout=10 now=0 interval=789 bitrate=192 valid=1 seen=1"
+    }
+  },
+  "disabled": {
+    "success200": {
+      "passed": true,
+      "trace": "PASS:success200 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "success204": {
+      "passed": true,
+      "trace": "PASS:success204 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "success299": {
+      "passed": true,
+      "trace": "PASS:success299 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "zero-length": {
+      "passed": true,
+      "trace": "PASS:zero-length result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "large-length": {
+      "passed": true,
+      "trace": "PASS:large-length result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect301": {
+      "passed": true,
+      "trace": "PASS:redirect301 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect302": {
+      "passed": true,
+      "trace": "PASS:redirect302 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect303": {
+      "passed": true,
+      "trace": "PASS:redirect303 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect307": {
+      "passed": true,
+      "trace": "PASS:redirect307 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect308": {
+      "passed": true,
+      "trace": "PASS:redirect308 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "five-redirects": {
+      "passed": true,
+      "trace": "PASS:five-redirects result=0 opens=6 fetches=6 statuses=6 redirects=5 closes=5 timeouts=12 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect-limit": {
+      "passed": true,
+      "trace": "PASS:redirect-limit result=-1 opens=6 fetches=6 statuses=6 redirects=5 closes=5 timeouts=12 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect-rejected": {
+      "passed": true,
+      "trace": "PASS:redirect-rejected result=291 opens=1 fetches=1 statuses=1 redirects=1 closes=1 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status199": {
+      "passed": true,
+      "trace": "PASS:status199 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status300": {
+      "passed": true,
+      "trace": "PASS:status300 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status400": {
+      "passed": true,
+      "trace": "PASS:status400 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status500": {
+      "passed": true,
+      "trace": "PASS:status500 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "open-failed": {
+      "passed": true,
+      "trace": "PASS:open-failed result=801 opens=1 fetches=0 statuses=0 redirects=0 closes=0 timeouts=1 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "fetch-failed": {
+      "passed": true,
+      "trace": "PASS:fetch-failed result=-1 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-before": {
+      "passed": true,
+      "trace": "PASS:deadline-before result=263 opens=0 fetches=0 statuses=0 redirects=0 closes=0 timeouts=0 first_timeout=0 last_timeout=0 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-open": {
+      "passed": true,
+      "trace": "PASS:deadline-open result=263 opens=1 fetches=0 statuses=0 redirects=0 closes=0 timeouts=1 first_timeout=10 last_timeout=10 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-fetch": {
+      "passed": true,
+      "trace": "PASS:deadline-fetch result=263 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-fetch-over": {
+      "passed": true,
+      "trace": "PASS:deadline-fetch-over result=263 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=10001 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "timeout-rounding": {
+      "passed": true,
+      "trace": "PASS:timeout-rounding result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=9 last_timeout=8 now=2235 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "invalid-headers": {
+      "passed": true,
+      "trace": "PASS:invalid-headers result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=0 seen=0"
+    },
+    "rejected-state": {
+      "passed": true,
+      "trace": "PASS:rejected-state result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "async-rejected": {
+      "passed": true,
+      "trace": "PASS:async-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "body-rejected": {
+      "passed": true,
+      "trace": "PASS:body-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "partial-rejected": {
+      "passed": true,
+      "trace": "PASS:partial-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "repeated-open": {
+      "passed": true,
+      "trace": "PASS:repeated-open result=0 opens=2 fetches=2 statuses=2 redirects=0 closes=0 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "metadata-reset": {
+      "passed": true,
+      "trace": "PASS:metadata-reset result=0 opens=3 fetches=3 statuses=3 redirects=2 closes=2 timeouts=6 first_timeout=10 last_timeout=10 now=0 interval=789 bitrate=192 valid=1 seen=1"
+    }
+  },
+  "negative_controls": {
+    "missing-release": {
+      "detected": true,
+      "case": "success200",
+      "expected_marker": "accepted_get_release_count",
+      "trace": "SEMANTIC_FAILURE:accepted_get_release_count:168"
+    },
+    "reject-breaks-playback": {
+      "detected": true,
+      "case": "rejected-state",
+      "expected_marker": "release_rejection_preserves_success",
+      "trace": "SEMANTIC_FAILURE:release_rejection_preserves_success:160"
+    },
+    "release-on-redirect": {
+      "detected": true,
+      "case": "redirect302",
+      "expected_marker": "release_final_success_only",
+      "trace": "SEMANTIC_FAILURE:release_final_success_only:83"
+    },
+    "release-before-headers": {
+      "detected": true,
+      "case": "success200",
+      "expected_marker": "release_after_final_headers",
+      "trace": "SEMANTIC_FAILURE:release_after_final_headers:81"
+    },
+    "ignore-header-deadline": {
+      "detected": true,
+      "case": "deadline-fetch",
+      "expected_marker": "release_before_deadline",
+      "trace": "SEMANTIC_FAILURE:release_before_deadline:85"
+    },
+    "release-invalid-headers": {
+      "detected": true,
+      "case": "invalid-headers",
+      "expected_marker": "invalid_headers_retain_request",
+      "trace": "SEMANTIC_FAILURE:invalid_headers_retain_request:86"
+    }
+  },
+  "cmake": {
+    "enabled-absolute": {
+      "passed": true,
+      "exit_status": 0,
+      "expected_rejection": null,
+      "sdk_input_unchanged": true,
+      "configure_log_sha256": "f6b6f9c46f8d8f028a3f9418e97e6508e5a6ae291ef9ac5b6d7d5fe3cd46c763"
+    },
+    "enabled-relative": {
+      "passed": true,
+      "exit_status": 0,
+      "expected_rejection": null,
+      "sdk_input_unchanged": true,
+      "configure_log_sha256": "d00edc442b4b1742f70779ad66a5bb331917b98a5db3b81d4454a47c4c242970"
+    },
+    "disabled": {
+      "passed": true,
+      "exit_status": 0,
+      "expected_rejection": null,
+      "sdk_input_unchanged": true,
+      "configure_log_sha256": "14412ba17208611f829ba0f6a0827bd03a84bd080895d4f74be9f0f71bc61f73"
+    },
+    "early": {
+      "passed": true,
+      "exit_status": 0,
+      "expected_rejection": null,
+      "sdk_input_unchanged": true,
+      "configure_log_sha256": "1c400d64bb71f54128ce4d1a818cac909a14432b3be9d1c345847c4ceeb5152c"
+    },
+    "wrong-version": {
+      "passed": true,
+      "exit_status": 1,
+      "expected_rejection": "requires audited ESP-IDF 6.0.2",
+      "sdk_input_unchanged": true,
+      "configure_log_sha256": "136463f9d485b3fe9499cb71d56d6ac1f646dbfeb48a75a6678f9740aa79730b"
+    },
+    "no-original": {
+      "passed": true,
+      "exit_status": 1,
+      "expected_rejection": "source, found 0",
+      "sdk_input_unchanged": true,
+      "configure_log_sha256": "7828a30f46ab5837d1b9a1fcdfed1a5a6b07ad46cb461069646165fd5d91ac10"
+    },
+    "duplicate-original": {
+      "passed": true,
+      "exit_status": 1,
+      "expected_rejection": "source, found 2",
+      "sdk_input_unchanged": true,
+      "configure_log_sha256": "6a7ca36a6b0e090906c0276afbbe67bcb17c04663f81621170de90adfa1befec"
+    },
+    "wrong-content": {
+      "passed": true,
+      "exit_status": 1,
+      "expected_rejection": "Unaudited CYD SDK6.0.2",
+      "sdk_input_unchanged": true,
+      "configure_log_sha256": "281c5d2f2fe6febf2cbc0f3e87e836112ef2f2dcfd4e3d939978a500b799b103"
+    },
+    "already-patched": {
+      "passed": true,
+      "exit_status": 1,
+      "expected_rejection": "Unaudited CYD SDK6.0.2",
+      "sdk_input_unchanged": true,
+      "configure_log_sha256": "281c5d2f2fe6febf2cbc0f3e87e836112ef2f2dcfd4e3d939978a500b799b103"
+    }
+  },
+  "hardware": false,
+  "actual_sdk_release_runtime_in_this_suite": false,
+  "actual_open_stream_sha256": "8d351453b0a685020ae3cbe442e4b485d393a3d4ff5a2b6816ae36b6c9f89254",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "enabled_disabled_http_traces_identical": true,
+  "cmake_tool_sha256": {
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe": "392ab4d6c3c91543fd297ed6c7e7354bf62edcd26fdf2706ad8613ad620cc45e",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe": "68865c3276d449d746cea5065fdec2baf755d7813e161ab04205b0907b2629b8",
+    "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a"
+  },
+  "source_unchanged_after": {
+    "tests/run-cyd-http-request-buffer-integration.py": true,
+    "tests/native/cyd_http_request_buffer_integration/test.c": true,
+    "idf/esp32-cyd2usb-native/main/audio_service.c": true,
+    "idf/esp32-cyd2usb-native/main/http_request_buffer.h": true,
+    "idf/esp32-cyd2usb-native/main/Kconfig.projbuild": true,
+    "idf/esp32-cyd2usb-native/main/compat/http_request_buffer/enable.cmake": true,
+    "tools/patch_cyd_http_request_buffer.py": true,
+    "tests/run-cyd-http-request-buffer.py": true
+  },
+  "sdk_unchanged_after": {
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\esp_http_client.c": true
+  },
+  "cmake_tools_unchanged_after": {
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe": true,
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe": true,
+    "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe": true
+  },
+  "evidence_sha256": {
+    "compiler.log": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048",
+    "disabled/async-rejected.log": "f90681d8ddcd57f1c097eb53b1c9881e27fa7d9061fc1f40b71b5790761601e6",
+    "disabled/body-rejected.log": "30cf50dcdaebd9155b9eeed890f2c0475262136c426226e436512e61ed1de6f1",
+    "disabled/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "disabled/command.json": "b0c2782a3ee0b5aaaef7288c24ca3e407688cff0dbbb3ffa23979f796dee4edc",
+    "disabled/deadline-before.log": "f5a9062296b0f42262bf6b6d21405718f0bc5d66840c562a0edbfea20563526e",
+    "disabled/deadline-fetch-over.log": "baaf7f07c80a9d103e48fdba4ed6fb03decc412f14a7b5b009ac6b00698fce3a",
+    "disabled/deadline-fetch.log": "d829dcfcb255191d129df24cacfaf113e70cb68aa0dc4d5c6c7d1a7a7749dbd1",
+    "disabled/deadline-open.log": "7ae4011ff3d7eb87b78f349d6712ac0d0e106a84d057f22fb9e9004a02b20dd0",
+    "disabled/fetch-failed.log": "3d30afda5f1722aed0bbafb9547a7e0407a1149da80b8e70bfb446f734ed1350",
+    "disabled/five-redirects.log": "5c0ffc919ede92d0e3ba4b0a06bf87c023049365c7f2f0f021128b01690b3509",
+    "disabled/invalid-headers.log": "09a4f3406b871d419aa90399fc9bc0c8f4cacf39d4f263e50d3343d2987de311",
+    "disabled/large-length.log": "2bed4f2366861c67f1a54173b20a720d85a2b3bf48134c3be21dee6b864a9946",
+    "disabled/metadata-reset.log": "e4ea64c0e04a607e551a8e5d53f426516892d460672514385e96fdc7daae9668",
+    "disabled/open-failed.log": "9a8b67af6136ff3f5d75a4aa1a1bf2d1638ed5bafe1ccc80c4320449a64ac467",
+    "disabled/partial-rejected.log": "c2f6d2ce5f24300f6f9e5fc1bb6fb7f2307265792f7c25b958dcad29c1b84267",
+    "disabled/production.inc": "86743b436edceef468e917e6bf730a6a54952c29f590ee51ecc2b2732b582668",
+    "disabled/redirect-limit.log": "203e098ed3b0ba7160c0e7e7c212a54e211acf663fae4990076c49daab849f70",
+    "disabled/redirect-rejected.log": "a8a38063e3da8566c11e745690070505bac98cfc5305ea9fc68c290f53bd374c",
+    "disabled/redirect301.log": "0a2444fbb9394c339ef8a84c2f173fbe948df121720a1c3e8fda4259c5aafce3",
+    "disabled/redirect302.log": "44c121b6c4130bda8f9e0442f7b7bbabc38c8c9638e3d38a462bbd3000de51f5",
+    "disabled/redirect303.log": "186e0a2414c4444ee7c5b5faa8befe71a7c66097c8983b68983460991578c1ff",
+    "disabled/redirect307.log": "f81ffc6c0885d8ab01d5cac905a3224076562f336f1fb2c08901e947f6dfca3f",
+    "disabled/redirect308.log": "dfb70223310fcd6e7273076f4ad9805af912656e3f687a136523903804154d75",
+    "disabled/rejected-state.log": "7439318727c32f2d8fcb414e562a8ec1a3a8dbf77026a695218ecd8ebfcf2f51",
+    "disabled/repeated-open.log": "343e7abdc3a4c331b5402167c299dd8f25e7dbba085b08eb251e718b13dcdb9e",
+    "disabled/status199.log": "eb6878be9825b1061f5ed7784ceb788947bd9117ba323d48bc05033003c2b322",
+    "disabled/status300.log": "7a9a9262ab5123581cc9fa7bce55827fc09ced29211cdd78541e604eb9209e9a",
+    "disabled/status400.log": "f0d9d01991bfb7f28bb97356dad311876f326b01c909e73d8c48dd349b1a7b82",
+    "disabled/status500.log": "1084a77e9608f72850938d5c4ae42696daee29352470304877da80292ade2ae4",
+    "disabled/success200.log": "ea7536545ed2e9ff8647d82a009e87fa4016b87ef8174fce30fe83a47bdc6e4b",
+    "disabled/success204.log": "a904f5bef313b411e1b5ad48806de42c5c91c717338554fb542bb77e0d2d3113",
+    "disabled/success299.log": "efa1b17a90de18ed29bfe5ee1abe69bc7dab5813ad7b2ad12626b80003d120ae",
+    "disabled/timeout-rounding.log": "84ee4b16bbb52986714366e6b764415113df0745924324d3296db51a123b2221",
+    "disabled/zero-length.log": "857c913e861aeca1b0655d046a0097ef041fb2e19b4385f7d7de6591a7dc9d2e",
+    "enabled/async-rejected.log": "f90681d8ddcd57f1c097eb53b1c9881e27fa7d9061fc1f40b71b5790761601e6",
+    "enabled/body-rejected.log": "30cf50dcdaebd9155b9eeed890f2c0475262136c426226e436512e61ed1de6f1",
+    "enabled/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "enabled/command.json": "bb1efe81361449f9ba5abf50003512a1afc802dfc0a480c90e1919a0b4b36520",
+    "enabled/deadline-before.log": "f5a9062296b0f42262bf6b6d21405718f0bc5d66840c562a0edbfea20563526e",
+    "enabled/deadline-fetch-over.log": "baaf7f07c80a9d103e48fdba4ed6fb03decc412f14a7b5b009ac6b00698fce3a",
+    "enabled/deadline-fetch.log": "d829dcfcb255191d129df24cacfaf113e70cb68aa0dc4d5c6c7d1a7a7749dbd1",
+    "enabled/deadline-open.log": "7ae4011ff3d7eb87b78f349d6712ac0d0e106a84d057f22fb9e9004a02b20dd0",
+    "enabled/fetch-failed.log": "3d30afda5f1722aed0bbafb9547a7e0407a1149da80b8e70bfb446f734ed1350",
+    "enabled/five-redirects.log": "5c0ffc919ede92d0e3ba4b0a06bf87c023049365c7f2f0f021128b01690b3509",
+    "enabled/invalid-headers.log": "09a4f3406b871d419aa90399fc9bc0c8f4cacf39d4f263e50d3343d2987de311",
+    "enabled/large-length.log": "2bed4f2366861c67f1a54173b20a720d85a2b3bf48134c3be21dee6b864a9946",
+    "enabled/metadata-reset.log": "e4ea64c0e04a607e551a8e5d53f426516892d460672514385e96fdc7daae9668",
+    "enabled/open-failed.log": "9a8b67af6136ff3f5d75a4aa1a1bf2d1638ed5bafe1ccc80c4320449a64ac467",
+    "enabled/partial-rejected.log": "c2f6d2ce5f24300f6f9e5fc1bb6fb7f2307265792f7c25b958dcad29c1b84267",
+    "enabled/production.inc": "86743b436edceef468e917e6bf730a6a54952c29f590ee51ecc2b2732b582668",
+    "enabled/redirect-limit.log": "203e098ed3b0ba7160c0e7e7c212a54e211acf663fae4990076c49daab849f70",
+    "enabled/redirect-rejected.log": "a8a38063e3da8566c11e745690070505bac98cfc5305ea9fc68c290f53bd374c",
+    "enabled/redirect301.log": "0a2444fbb9394c339ef8a84c2f173fbe948df121720a1c3e8fda4259c5aafce3",
+    "enabled/redirect302.log": "44c121b6c4130bda8f9e0442f7b7bbabc38c8c9638e3d38a462bbd3000de51f5",
+    "enabled/redirect303.log": "186e0a2414c4444ee7c5b5faa8befe71a7c66097c8983b68983460991578c1ff",
+    "enabled/redirect307.log": "f81ffc6c0885d8ab01d5cac905a3224076562f336f1fb2c08901e947f6dfca3f",
+    "enabled/redirect308.log": "dfb70223310fcd6e7273076f4ad9805af912656e3f687a136523903804154d75",
+    "enabled/rejected-state.log": "7439318727c32f2d8fcb414e562a8ec1a3a8dbf77026a695218ecd8ebfcf2f51",
+    "enabled/repeated-open.log": "343e7abdc3a4c331b5402167c299dd8f25e7dbba085b08eb251e718b13dcdb9e",
+    "enabled/status199.log": "eb6878be9825b1061f5ed7784ceb788947bd9117ba323d48bc05033003c2b322",
+    "enabled/status300.log": "7a9a9262ab5123581cc9fa7bce55827fc09ced29211cdd78541e604eb9209e9a",
+    "enabled/status400.log": "f0d9d01991bfb7f28bb97356dad311876f326b01c909e73d8c48dd349b1a7b82",
+    "enabled/status500.log": "1084a77e9608f72850938d5c4ae42696daee29352470304877da80292ade2ae4",
+    "enabled/success200.log": "ea7536545ed2e9ff8647d82a009e87fa4016b87ef8174fce30fe83a47bdc6e4b",
+    "enabled/success204.log": "a904f5bef313b411e1b5ad48806de42c5c91c717338554fb542bb77e0d2d3113",
+    "enabled/success299.log": "efa1b17a90de18ed29bfe5ee1abe69bc7dab5813ad7b2ad12626b80003d120ae",
+    "enabled/timeout-rounding.log": "84ee4b16bbb52986714366e6b764415113df0745924324d3296db51a123b2221",
+    "enabled/zero-length.log": "857c913e861aeca1b0655d046a0097ef041fb2e19b4385f7d7de6591a7dc9d2e",
+    "ignore-header-deadline/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ignore-header-deadline/command.json": "a1db792888158d76ee4f978ad7ee78b8567f2eeda914eb4dbdcc7016de2f561c",
+    "ignore-header-deadline/deadline-fetch.log": "2b385b3e51bb9545595c7e541cf637f136ef73aa5b5b9215086d8f8d77c74930",
+    "ignore-header-deadline/production.inc": "257ab764ef2cd428b811674eeab613d37974d7564e5ef2ef9157fcaaf78a1af1",
+    "missing-release/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "missing-release/command.json": "51bb1f25e709163345bc62dfa95cb2786401e11be2392fdd7c7f3a7860b97796",
+    "missing-release/production.inc": "35b9ba47d68fac68d759c010daf215e77ba6a2aa7b23e299848c5ad69ad01361",
+    "missing-release/success200.log": "3ce43dc564895b9881eadd0e7f58bbb24b9cb08fbd899518f4acb23a425896e9",
+    "reject-breaks-playback/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reject-breaks-playback/command.json": "7577590b5b2daf6284af641317e6c12883dbe72fecc95cf84677bb7b6f1c572e",
+    "reject-breaks-playback/production.inc": "2c3e514b89a8c13595f208df0a889bc102a3a5d14dd6f9e2b9741b6ad3bb1762",
+    "reject-breaks-playback/rejected-state.log": "6f10b97d0170e669af0e2f1fd8a4717ea0663b86619e363f0f375d42cc3862c6",
+    "release-before-headers/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-before-headers/command.json": "5a3839f519dc871e7133b874dc89cde3353a28778f4f40021eb8859433e85de6",
+    "release-before-headers/production.inc": "338e42c554164f017e0e47e36ed8c15a641264e76f746caf2a4dd1579d12537a",
+    "release-before-headers/success200.log": "c25d395f4762bc760b26c8603ed0da907f0010ef269985f6d4948f05dbed006b",
+    "release-invalid-headers/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-invalid-headers/command.json": "fe2f1e609bb4223915c2c1c56f48c4f08ef4848fc4a24df32ef6428280ca681e",
+    "release-invalid-headers/invalid-headers.log": "f102c6685f416578240d359d74871e1009d7e43b723909af3df9f2df1dacde9e",
+    "release-invalid-headers/production.inc": "6477271a2c11148528926efb579b33103358c022827117d540358f21aa79d3cd",
+    "release-on-redirect/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-on-redirect/command.json": "9ce8736fb3eab57d19f5ab2ce51e1dd65190a5d558b15808ee4661d264a989d4",
+    "release-on-redirect/production.inc": "429f2f0e6add89f62fc47ba3ae060327532b12fbc7d791f8565752028813ef8d",
+    "release-on-redirect/redirect302.log": "eab20c056353cb73985fa666c4cdc1db1005bbfb6780c3cd1e06cc87043bb472",
+    "stubs/esp_http_client.h": "77eac62f2625ce8163c0b13292d33116a57618712ab4ce066b6ee0d5a899df8f",
+    "cmake/already-patched/command.json": "03cb2a55933a3eafa13309c0ea201de8bc059e9433c7b869b0e01f9a90d6963f",
+    "cmake/already-patched/configure.log": "281c5d2f2fe6febf2cbc0f3e87e836112ef2f2dcfd4e3d939978a500b799b103",
+    "cmake/disabled/command.json": "7fd67020a87807dc2872b29cb51fc4b01c6f47f5669c00d53399f545842e3f90",
+    "cmake/disabled/configure.log": "14412ba17208611f829ba0f6a0827bd03a84bd080895d4f74be9f0f71bc61f73",
+    "cmake/duplicate-original/command.json": "a18f51fa58940610ae72f0dd9ec25c9b4bddab564974449dfe9d1b3c23695813",
+    "cmake/duplicate-original/configure.log": "6a7ca36a6b0e090906c0276afbbe67bcb17c04663f81621170de90adfa1befec",
+    "cmake/early/command.json": "767ee1921f06276e0191596cecf2e594e9b41f4280b3ef980d24c461aef02539",
+    "cmake/early/configure.log": "1c400d64bb71f54128ce4d1a818cac909a14432b3be9d1c345847c4ceeb5152c",
+    "cmake/enabled-absolute/command.json": "988d254e29fedd70ccfd4028dd4a5df7f692b3b6dc1d23d66c4216ec875f26cc",
+    "cmake/enabled-absolute/configure.log": "f6b6f9c46f8d8f028a3f9418e97e6508e5a6ae291ef9ac5b6d7d5fe3cd46c763",
+    "cmake/enabled-relative/command.json": "45d531160a110fda68bc1ff0a13e85c23fe996745d324c3350cd1548e33bceeb",
+    "cmake/enabled-relative/configure.log": "d00edc442b4b1742f70779ad66a5bb331917b98a5db3b81d4454a47c4c242970",
+    "cmake/no-original/command.json": "42e8d0d649b604edd89ef98c3e2f92b6fde70966f83158cc63aa32e862a265c5",
+    "cmake/no-original/configure.log": "7828a30f46ab5837d1b9a1fcdfed1a5a6b07ad46cb461069646165fd5d91ac10",
+    "cmake/wrong-content/command.json": "95c42b6899fa1d2ad49c909005a53e76ced2d5d6abb5d1a5cacf9fc9bcb46f63",
+    "cmake/wrong-content/configure.log": "281c5d2f2fe6febf2cbc0f3e87e836112ef2f2dcfd4e3d939978a500b799b103",
+    "cmake/wrong-version/command.json": "9f3f016f13b80f83e34cfd5015701ad35b04217d899108187ed31bd3c4bc8488",
+    "cmake/wrong-version/configure.log": "136463f9d485b3fe9499cb71d56d6ac1f646dbfeb48a75a6678f9740aa79730b",
+    "cmake/already-patched/project/CMakeLists.txt": "9e35e5290df5b98c647c46b4d1d261c419ca9aa8e6c9ef8615c4a08730452cf6",
+    "cmake/already-patched/sdk/esp_http_client.c": "a512dd156d6f50f1db0064a43b4dbf818f8c2d0f90598a5fc35dbf8beebc1c99",
+    "cmake/already-patched/sdk/other.c": "bbc226d9d56221d7d0ee5f0e7f852851758ddddf9910c5e794c292b998915e41",
+    "cmake/disabled/project/CMakeLists.txt": "b1db9661a1a2b11641861df5f200f137120af90f6d82e8f9a30fa49c6615f970",
+    "cmake/disabled/sdk/esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+    "cmake/disabled/sdk/other.c": "bbc226d9d56221d7d0ee5f0e7f852851758ddddf9910c5e794c292b998915e41",
+    "cmake/duplicate-original/project/CMakeLists.txt": "10f40fa730abb19f1047e0cb4e7db55998b4b8a3f9950ccc009889227fb3104b",
+    "cmake/duplicate-original/sdk/esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+    "cmake/duplicate-original/sdk/other.c": "bbc226d9d56221d7d0ee5f0e7f852851758ddddf9910c5e794c292b998915e41",
+    "cmake/early/project/CMakeLists.txt": "d7395ece56937002605e53e41c69a4bef741ac4822c564d6f6e1bc6fe914aabc",
+    "cmake/early/sdk/esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+    "cmake/early/sdk/other.c": "bbc226d9d56221d7d0ee5f0e7f852851758ddddf9910c5e794c292b998915e41",
+    "cmake/enabled-absolute/project/CMakeLists.txt": "22701bd56af5069871bf5a8edbdde95a1f9d590539cc23224de4c1e556b4c501",
+    "cmake/enabled-absolute/sdk/esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+    "cmake/enabled-absolute/sdk/other.c": "bbc226d9d56221d7d0ee5f0e7f852851758ddddf9910c5e794c292b998915e41",
+    "cmake/enabled-relative/project/CMakeLists.txt": "d25962038ed929e6ef7bf30c947fb06c77f161d31715256160365703fa09b33c",
+    "cmake/enabled-relative/sdk/esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+    "cmake/enabled-relative/sdk/other.c": "bbc226d9d56221d7d0ee5f0e7f852851758ddddf9910c5e794c292b998915e41",
+    "cmake/no-original/project/CMakeLists.txt": "c024c2a3ae0f2180c268b4df5bc0c17a2b813afee5d807e3caf2a1f55d42cd82",
+    "cmake/no-original/sdk/esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+    "cmake/no-original/sdk/other.c": "bbc226d9d56221d7d0ee5f0e7f852851758ddddf9910c5e794c292b998915e41",
+    "cmake/wrong-content/project/CMakeLists.txt": "64401a811911031283e602d785a0d74452aa4ea7b3d0577600178c7c1f3692d3",
+    "cmake/wrong-content/sdk/esp_http_client.c": "1bef78e376e09265d64d5c0b1f9265c8c74f6da8a48a55a3f34b9d0c63eeb9ed",
+    "cmake/wrong-content/sdk/other.c": "bbc226d9d56221d7d0ee5f0e7f852851758ddddf9910c5e794c292b998915e41",
+    "cmake/wrong-version/project/CMakeLists.txt": "aa5af6488f185940d69e2f1b1a796d93097a41e233e9e014b004b55eb041d40b",
+    "cmake/wrong-version/sdk/esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+    "cmake/wrong-version/sdk/other.c": "bbc226d9d56221d7d0ee5f0e7f852851758ddddf9910c5e794c292b998915e41",
+    "sources/sdk/esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+    "sources/repository/tests/run-cyd-http-request-buffer-integration.py": "7d6ceb048d6de48c017fccfaae0368d913e144fcf986cc1ad9b07846f313b8e6",
+    "sources/repository/tests/run-cyd-http-request-buffer.py": "0c767d5b6bc2042702ddbd8e7a33995163115a0eb858de6dc6199e7c6c62c520",
+    "sources/repository/tools/patch_cyd_http_request_buffer.py": "d9b4337cc6db39bd4888afc7c0e81880b752d487ef9f9e91f3816c66297e530e",
+    "sources/repository/idf/esp32-cyd2usb-native/main/audio_service.c": "31afaf7a88f280b584c8395e831833e5c60ae94cb76578d7fde472d5b51a3669",
+    "sources/repository/idf/esp32-cyd2usb-native/main/http_request_buffer.h": "70b3eccc1d0f8ee51094edaf205fe2a2c317b9c877a4d3d55ea6999480b28deb",
+    "sources/repository/idf/esp32-cyd2usb-native/main/Kconfig.projbuild": "5ac22b8576db14d2198d6fe7bc39d8f4c9be071feea54e044edb90da2e9ea747",
+    "sources/repository/idf/esp32-cyd2usb-native/main/compat/http_request_buffer/enable.cmake": "e158caf97151782cc2c1609dcd4178432157004ccfea4faa09d51e980f96ac1b",
+    "sources/repository/tests/native/cyd_http_request_buffer_integration/test.c": "f02b03134d77b468a022ee236a401f1005e46d76c656b17be5666cbba09fcb9a"
+  }
+}

@@ -1,0 +1,317 @@
+{
+  "passed": false,
+  "scope": "Test actual CYD open_stream and the configure-time SDK HTTP source overlay.\n\nThe host executes the unchanged extracted production function with explicit SDK\nHTTP/clock/release-result seams, enabled and disabled, checking identical HTTP\noutcomes. The separate SDK-source suite proves release/reallocation ownership.\nThe real CMake helper executes against build-local copied SDK input and a mock\ncomponent target; this does not replace the full target firmware build.\nNo installed SDK edits, application link, device or physical heap measurement.\n",
+  "source_sha256": {
+    "tests/run-cyd-http-request-buffer-integration.py": "f01c3fba97e8cd1c8a3718313ad2f5e6f08273decc3b1dfd552a60757c8344b0",
+    "tests/native/cyd_http_request_buffer_integration/test.c": "f02b03134d77b468a022ee236a401f1005e46d76c656b17be5666cbba09fcb9a",
+    "idf/esp32-cyd2usb-native/main/audio_service.c": "31afaf7a88f280b584c8395e831833e5c60ae94cb76578d7fde472d5b51a3669",
+    "idf/esp32-cyd2usb-native/main/http_request_buffer.h": "70b3eccc1d0f8ee51094edaf205fe2a2c317b9c877a4d3d55ea6999480b28deb",
+    "idf/esp32-cyd2usb-native/main/Kconfig.projbuild": "5ac22b8576db14d2198d6fe7bc39d8f4c9be071feea54e044edb90da2e9ea747",
+    "idf/esp32-cyd2usb-native/main/compat/http_request_buffer/enable.cmake": "e158caf97151782cc2c1609dcd4178432157004ccfea4faa09d51e980f96ac1b",
+    "tools/patch_cyd_http_request_buffer.py": "d9b4337cc6db39bd4888afc7c0e81880b752d487ef9f9e91f3816c66297e530e",
+    "tests/run-cyd-http-request-buffer.py": "0c767d5b6bc2042702ddbd8e7a33995163115a0eb858de6dc6199e7c6c62c520"
+  },
+  "sdk_sha256": {
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406"
+  },
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "enabled": {
+    "success200": {
+      "passed": true,
+      "trace": "PASS:success200 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "success204": {
+      "passed": true,
+      "trace": "PASS:success204 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "success299": {
+      "passed": true,
+      "trace": "PASS:success299 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "zero-length": {
+      "passed": true,
+      "trace": "PASS:zero-length result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "large-length": {
+      "passed": true,
+      "trace": "PASS:large-length result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect301": {
+      "passed": true,
+      "trace": "PASS:redirect301 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect302": {
+      "passed": true,
+      "trace": "PASS:redirect302 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect303": {
+      "passed": true,
+      "trace": "PASS:redirect303 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect307": {
+      "passed": true,
+      "trace": "PASS:redirect307 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect308": {
+      "passed": true,
+      "trace": "PASS:redirect308 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "five-redirects": {
+      "passed": true,
+      "trace": "PASS:five-redirects result=0 opens=6 fetches=6 statuses=6 redirects=5 closes=5 timeouts=12 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect-limit": {
+      "passed": true,
+      "trace": "PASS:redirect-limit result=-1 opens=6 fetches=6 statuses=6 redirects=5 closes=5 timeouts=12 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect-rejected": {
+      "passed": true,
+      "trace": "PASS:redirect-rejected result=291 opens=1 fetches=1 statuses=1 redirects=1 closes=1 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status199": {
+      "passed": true,
+      "trace": "PASS:status199 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status300": {
+      "passed": true,
+      "trace": "PASS:status300 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status400": {
+      "passed": true,
+      "trace": "PASS:status400 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status500": {
+      "passed": true,
+      "trace": "PASS:status500 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "open-failed": {
+      "passed": true,
+      "trace": "PASS:open-failed result=801 opens=1 fetches=0 statuses=0 redirects=0 closes=0 timeouts=1 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "fetch-failed": {
+      "passed": true,
+      "trace": "PASS:fetch-failed result=-1 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-before": {
+      "passed": true,
+      "trace": "PASS:deadline-before result=263 opens=0 fetches=0 statuses=0 redirects=0 closes=0 timeouts=0 first_timeout=0 last_timeout=0 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-open": {
+      "passed": true,
+      "trace": "PASS:deadline-open result=263 opens=1 fetches=0 statuses=0 redirects=0 closes=0 timeouts=1 first_timeout=10 last_timeout=10 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-fetch": {
+      "passed": true,
+      "trace": "PASS:deadline-fetch result=263 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-fetch-over": {
+      "passed": true,
+      "trace": "PASS:deadline-fetch-over result=263 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=10001 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "timeout-rounding": {
+      "passed": true,
+      "trace": "PASS:timeout-rounding result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=9 last_timeout=8 now=2235 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "invalid-headers": {
+      "passed": true,
+      "trace": "PASS:invalid-headers result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=0 seen=0"
+    },
+    "rejected-state": {
+      "passed": true,
+      "trace": "PASS:rejected-state result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "async-rejected": {
+      "passed": true,
+      "trace": "PASS:async-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "body-rejected": {
+      "passed": true,
+      "trace": "PASS:body-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "partial-rejected": {
+      "passed": true,
+      "trace": "PASS:partial-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "repeated-open": {
+      "passed": true,
+      "trace": "PASS:repeated-open result=0 opens=2 fetches=2 statuses=2 redirects=0 closes=0 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "metadata-reset": {
+      "passed": true,
+      "trace": "PASS:metadata-reset result=0 opens=3 fetches=3 statuses=3 redirects=2 closes=2 timeouts=6 first_timeout=10 last_timeout=10 now=0 interval=789 bitrate=192 valid=1 seen=1"
+    }
+  },
+  "disabled": {
+    "success200": {
+      "passed": true,
+      "trace": "PASS:success200 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "success204": {
+      "passed": true,
+      "trace": "PASS:success204 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "success299": {
+      "passed": true,
+      "trace": "PASS:success299 result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "zero-length": {
+      "passed": true,
+      "trace": "PASS:zero-length result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "large-length": {
+      "passed": true,
+      "trace": "PASS:large-length result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect301": {
+      "passed": true,
+      "trace": "PASS:redirect301 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect302": {
+      "passed": true,
+      "trace": "PASS:redirect302 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect303": {
+      "passed": true,
+      "trace": "PASS:redirect303 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect307": {
+      "passed": true,
+      "trace": "PASS:redirect307 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect308": {
+      "passed": true,
+      "trace": "PASS:redirect308 result=0 opens=2 fetches=2 statuses=2 redirects=1 closes=1 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "five-redirects": {
+      "passed": true,
+      "trace": "PASS:five-redirects result=0 opens=6 fetches=6 statuses=6 redirects=5 closes=5 timeouts=12 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect-limit": {
+      "passed": true,
+      "trace": "PASS:redirect-limit result=-1 opens=6 fetches=6 statuses=6 redirects=5 closes=5 timeouts=12 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "redirect-rejected": {
+      "passed": true,
+      "trace": "PASS:redirect-rejected result=291 opens=1 fetches=1 statuses=1 redirects=1 closes=1 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status199": {
+      "passed": true,
+      "trace": "PASS:status199 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status300": {
+      "passed": true,
+      "trace": "PASS:status300 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status400": {
+      "passed": true,
+      "trace": "PASS:status400 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "status500": {
+      "passed": true,
+      "trace": "PASS:status500 result=-1 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "open-failed": {
+      "passed": true,
+      "trace": "PASS:open-failed result=801 opens=1 fetches=0 statuses=0 redirects=0 closes=0 timeouts=1 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "fetch-failed": {
+      "passed": true,
+      "trace": "PASS:fetch-failed result=-1 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-before": {
+      "passed": true,
+      "trace": "PASS:deadline-before result=263 opens=0 fetches=0 statuses=0 redirects=0 closes=0 timeouts=0 first_timeout=0 last_timeout=0 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-open": {
+      "passed": true,
+      "trace": "PASS:deadline-open result=263 opens=1 fetches=0 statuses=0 redirects=0 closes=0 timeouts=1 first_timeout=10 last_timeout=10 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-fetch": {
+      "passed": true,
+      "trace": "PASS:deadline-fetch result=263 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=10000 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "deadline-fetch-over": {
+      "passed": true,
+      "trace": "PASS:deadline-fetch-over result=263 opens=1 fetches=1 statuses=0 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=10001 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "timeout-rounding": {
+      "passed": true,
+      "trace": "PASS:timeout-rounding result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=9 last_timeout=8 now=2235 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "invalid-headers": {
+      "passed": true,
+      "trace": "PASS:invalid-headers result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=0 seen=0"
+    },
+    "rejected-state": {
+      "passed": true,
+      "trace": "PASS:rejected-state result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "async-rejected": {
+      "passed": true,
+      "trace": "PASS:async-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "body-rejected": {
+      "passed": true,
+      "trace": "PASS:body-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "partial-rejected": {
+      "passed": true,
+      "trace": "PASS:partial-rejected result=0 opens=1 fetches=1 statuses=1 redirects=0 closes=0 timeouts=2 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "repeated-open": {
+      "passed": true,
+      "trace": "PASS:repeated-open result=0 opens=2 fetches=2 statuses=2 redirects=0 closes=0 timeouts=4 first_timeout=10 last_timeout=10 now=0 interval=0 bitrate=0 valid=1 seen=0"
+    },
+    "metadata-reset": {
+      "passed": true,
+      "trace": "PASS:metadata-reset result=0 opens=3 fetches=3 statuses=3 redirects=2 closes=2 timeouts=6 first_timeout=10 last_timeout=10 now=0 interval=789 bitrate=192 valid=1 seen=1"
+    }
+  },
+  "negative_controls": {
+    "missing-release": {
+      "detected": true,
+      "case": "success200",
+      "expected_marker": "accepted_get_release_count",
+      "trace": "SEMANTIC_FAILURE:accepted_get_release_count:168"
+    },
+    "reject-breaks-playback": {
+      "detected": true,
+      "case": "rejected-state",
+      "expected_marker": "release_rejection_preserves_success",
+      "trace": "SEMANTIC_FAILURE:release_rejection_preserves_success:160"
+    },
+    "release-on-redirect": {
+      "detected": true,
+      "case": "redirect302",
+      "expected_marker": "release_final_success_only",
+      "trace": "SEMANTIC_FAILURE:release_final_success_only:83"
+    },
+    "release-before-headers": {
+      "detected": true,
+      "case": "success200",
+      "expected_marker": "release_after_final_headers",
+      "trace": "SEMANTIC_FAILURE:release_after_final_headers:81"
+    },
+    "ignore-header-deadline": {
+      "detected": true,
+      "case": "deadline-fetch",
+      "expected_marker": "release_before_deadline",
+      "trace": "SEMANTIC_FAILURE:release_before_deadline:85"
+    },
+    "release-invalid-headers": {
+      "detected": true,
+      "case": "invalid-headers",
+      "expected_marker": "invalid_headers_retain_request",
+      "trace": "SEMANTIC_FAILURE:invalid_headers_retain_request:86"
+    }
+  },
+  "cmake": {},
+  "hardware": false,
+  "actual_sdk_release_runtime_in_this_suite": false,
+  "actual_open_stream_sha256": "8d351453b0a685020ae3cbe442e4b485d393a3d4ff5a2b6816ae36b6c9f89254",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "enabled_disabled_http_traces_identical": true
+}

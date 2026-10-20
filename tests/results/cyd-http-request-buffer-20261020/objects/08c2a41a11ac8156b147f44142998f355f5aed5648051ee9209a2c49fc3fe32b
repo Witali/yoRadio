@@ -1,0 +1,269 @@
+{
+  "passed": true,
+  "scope": "Qualify the narrow SDK6.0.2 completed-GET TX release prototype on the host.\n\nActual SDK request generation, body sender, cached response reader and request\ncleanup span execute with real SDK header/utilities. Transport, response-state\npreparation, allocation accounting and private struct layout are explicit host\nseams. This is not full auth/redirect/parser/TLS or target ABI/heap evidence.\nNo installed SDK or production configuration is modified.\n",
+  "physical_hardware": false,
+  "target_abi": false,
+  "sanitizers": [
+    "ASan",
+    "UBSan"
+  ],
+  "source_sha256": {
+    "tests/run-cyd-http-request-buffer.py": "0c767d5b6bc2042702ddbd8e7a33995163115a0eb858de6dc6199e7c6c62c520",
+    "tools/patch_cyd_http_request_buffer.py": "d9b4337cc6db39bd4888afc7c0e81880b752d487ef9f9e91f3816c66297e530e",
+    "tests/native/cyd_http_request_buffer/test.c": "f22b22288b47facd73d7f5259f252efd7461c2fa8e298dd743333ada07bf167a"
+  },
+  "sdk_sha256": {
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\esp_http_client.c": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\include\\esp_http_client.h": "df634a7271311a8c79956467f9e19e308d9fc8fad4abaaea129817f1a7fc4559",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\lib\\http_header.c": "9e2a49b627aa121a31127c74f5834c30ac98865583d8e4f5613dc813c345f836",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\lib\\http_utils.c": "4c4bf4b3ecd93cb873b7c72fa8758b120f9b5e7db5f49cda44b3d1b6bc256e14",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\lib\\include\\http_header.h": "22b3ef87d239e81e9e734f895263da3c6e5f06e602b4bc117cd69cb1448c2490",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\lib\\include\\http_utils.h": "1fe33df8681e336d0e0604865ab7b0ce15ece9bc0e10436f7053f8799abdc8b3"
+  },
+  "patch_guards": {
+    "lf": {
+      "accepted": true,
+      "unrelated_source_bytes_identical": true,
+      "generated_sha256": "64c84ebd71c62a285e4be69917d18201a91a7ddf03c90c333984918bc64112ea"
+    },
+    "crlf": {
+      "accepted": true,
+      "unrelated_source_bytes_identical": true,
+      "generated_sha256": "a512dd156d6f50f1db0064a43b4dbf818f8c2d0f90598a5fc35dbf8beebc1c99"
+    },
+    "unknown": {
+      "rejected": true
+    },
+    "already-patched": {
+      "rejected": true
+    },
+    "one-byte-drift": {
+      "rejected": true
+    },
+    "mixed-line-endings": {
+      "rejected": true
+    }
+  },
+  "cases": {
+    "invalid": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:invalid requested_tx_payload_bytes=0"
+    },
+    "long-reuse": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:long-reuse requested_tx_payload_bytes=86016"
+    },
+    "capacity8192": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:capacity8192 requested_tx_payload_bytes=172032"
+    },
+    "idempotent": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:idempotent requested_tx_payload_bytes=4096"
+    },
+    "oom": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:oom requested_tx_payload_bytes=12288"
+    },
+    "partial-null": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:partial-null requested_tx_payload_bytes=4096"
+    },
+    "states": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:states requested_tx_payload_bytes=4096"
+    },
+    "async": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:async requested_tx_payload_bytes=4096"
+    },
+    "body-pending": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:body-pending requested_tx_payload_bytes=4096"
+    },
+    "write-pending": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:write-pending requested_tx_payload_bytes=4096"
+    },
+    "post": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:post requested_tx_payload_bytes=4096"
+    },
+    "head": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:head requested_tx_payload_bytes=4096"
+    },
+    "write-failure": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:write-failure requested_tx_payload_bytes=4096"
+    },
+    "async-partial": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:async-partial requested_tx_payload_bytes=4096"
+    },
+    "borrowed-body": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:borrowed-body requested_tx_payload_bytes=8192"
+    },
+    "authorization": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:authorization requested_tx_payload_bytes=8192"
+    },
+    "cached-body": {
+      "passed": true,
+      "exit_status": 0,
+      "result": "PASS:cached-body requested_tx_payload_bytes=4096"
+    }
+  },
+  "negative_controls": {
+    "missing-reallocation": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "long-reuse",
+      "expected_marker": "tx_buffer_live_before_request_write"
+    },
+    "reduced-reuse-capacity": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "long-reuse",
+      "expected_marker": "requested_capacity_restored"
+    },
+    "release-before-response": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "authorization",
+      "expected_marker": "headers_sent_cannot_release_tx"
+    },
+    "forget-null-after-release": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "idempotent",
+      "expected_marker": "release_nulls_pointer"
+    },
+    "touch-borrowed-body": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "borrowed-body",
+      "expected_marker": "release_preserves_borrowed_post_data"
+    },
+    "release-async": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "async",
+      "expected_marker": "nonfinal_get_rejected_without_free"
+    },
+    "release-with-body": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "body-pending",
+      "expected_marker": "nonfinal_get_rejected_without_free"
+    },
+    "stale-errno-on-oom": {
+      "detected": true,
+      "exit_status": 80,
+      "case": "oom",
+      "expected_marker": "oom_keeps_reuse_retryable_without_wire"
+    }
+  },
+  "original_sdk_sha256": "589f4958f7a11c92e904f562ad3cb364d14d14b54ef03f90a00cf1f52d830406",
+  "patched_sdk_sha256": "a512dd156d6f50f1db0064a43b4dbf818f8c2d0f90598a5fc35dbf8beebc1c99",
+  "sdk_function_sha256": {
+    "http_client_prepare_first_line": "0876a9fda7533223b7779e2b1b3acd16d1143de7cfdad10c0b3563ef96591c9d",
+    "esp_http_client_request_send": "b35e15cffaac8486d524d72f5923db4e97bb44ca28bed1ded3485f5303a83e3e",
+    "esp_http_client_send_post_data": "e4da8d23363cf0e722abf01e349bb15b82e2a1b10c65d7f3dc1a415217537d24",
+    "esp_http_client_cached_buf_cleanup": "59ab57f0ca0a4fbb5abb01895966d1149683b0710b4161acb5e755c6a4a2644b",
+    "esp_http_client_is_complete_data_received": "ca2270e62a66b3b04587071de2fab13824f06185c68a01d82a254baab12bcfc9",
+    "esp_http_client_read": "5ff6e5ee2e4fe904b6759b34aff6d0c442f46b76519ad3528f6226309b4d9dee"
+  },
+  "sdk_request_cleanup_span_sha256": "7ecfee199c2a1aafe7d901b08882b82f9d546bad86b93f098c2fcab08ab25403",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "source_unchanged_after": {
+    "tests/run-cyd-http-request-buffer.py": true,
+    "tools/patch_cyd_http_request_buffer.py": true,
+    "tests/native/cyd_http_request_buffer/test.c": true
+  },
+  "sdk_unchanged_after": {
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\esp_http_client.c": true,
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\include\\esp_http_client.h": true,
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\lib\\http_header.c": true,
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\lib\\http_utils.c": true,
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\lib\\include\\http_header.h": true,
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\components\\esp_http_client\\lib\\include\\http_utils.h": true
+  },
+  "generated_sha256": {
+    "compiler.log": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048",
+    "forget-null-after-release/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "forget-null-after-release/command.json": "6ab55513f89ba8df3d273f81b9a45018fa4d7db35bafb7567d09eba2c5ba1002",
+    "forget-null-after-release/idempotent.log": "0e17170613d6a6e2fbea70cb9e5fc88c95fb781841f95d82226942e38a4d6c7b",
+    "forget-null-after-release/sdk-functions.inc": "c2c651c97b220effe472558d2848ef74eafb79ada39f8fce6f5c63f3f3747680",
+    "missing-reallocation/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "missing-reallocation/command.json": "6c7b8fb14f275d3ead5b8e9e9b53531a3ea2065036d1b87bc4144df3bd244711",
+    "missing-reallocation/long-reuse.log": "11e245fcefb7e92e43eb2422cc394b8bec29879da5f52caf72b2672cd48bd3f8",
+    "missing-reallocation/sdk-functions.inc": "c97e95dbe5461297121d954d915ab0a5938d7bc46ee00cb850e98af8e79eb47a",
+    "patched/esp_http_client.c": "a512dd156d6f50f1db0064a43b4dbf818f8c2d0f90598a5fc35dbf8beebc1c99",
+    "positive/async-partial.log": "5abcd5b82f3b454625ef8d26ecc1327821e297c1c7e32fdda992971f82aee0d6",
+    "positive/async.log": "f0110b8207e5ca3a91ad3f7810952b0e7c6a6f69f6ddcf7d075102edc2e61e43",
+    "positive/authorization.log": "404180629e459f6f2880740da3a27bd27ef1aa70c6d87c309a1aaca8491156e8",
+    "positive/body-pending.log": "1931043dfbfb7ebb457a9f8988e4cd3f92f95ba5d9a21034ad5affc6aa77570d",
+    "positive/borrowed-body.log": "900f3c01e550f1ed8896ba1092a2d308c650f25d78805e282857adb4a91a0e5e",
+    "positive/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "positive/cached-body.log": "d1fd19534003b26ee9384b596600fd5b05632045af944928568608218a556eac",
+    "positive/capacity8192.log": "aff1484450d335e9f79d07b573962092f38093d98bb4ef30401551b48db12e6b",
+    "positive/command.json": "b3f33c7256a30e2da02166354d8ef6bff75040f4e0c6bf85c465712463d8cb0b",
+    "positive/head.log": "d750ed3e91373ffe6d1486fd3fff481c841c4b636a133fdbf46c4aa3c842420c",
+    "positive/idempotent.log": "7a24c4a8667f2b8d958e2c2e8b9364d194d8806a0141ca612c7135f76928aa21",
+    "positive/invalid.log": "a27e234b56275a7c0a6d4dd3b6d8e2d8a2840bedd0e1b51c8dab44095266f098",
+    "positive/long-reuse.log": "7bc0d96a99a9dea1c54cd217e62e23005732cac7dd222f948fce07c33301e265",
+    "positive/oom.log": "a2493d32ff9980c538402d703fc8fb021fa06623977006bd39fbd2e93d784e7d",
+    "positive/partial-null.log": "2163f106f05410f784fa991854e98ead94ad8f5eb9b41891a6109297b29c8324",
+    "positive/post.log": "0b132dff51bc8130559a4edbe65af2237db9022b94245c1ee7587adb892acedf",
+    "positive/sdk-functions.inc": "b92dedbee5fd19c88a0e8833b99bb54c9a5b809cb916c4b2aba3c7dd923c93ca",
+    "positive/states.log": "4fec70f8abfe6baa24898ce58b7abaa0ffeb415ea69ea3154025f8134d906e9c",
+    "positive/write-failure.log": "8038a695919d9039414e5179925cfd13736f7c203a0347ca2634b71f2b54eab2",
+    "positive/write-pending.log": "c3d47fbb0e36d4e07e39de3310822f932e97ce54dd731b6ce625d6fbcd8d43fd",
+    "reduced-reuse-capacity/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reduced-reuse-capacity/command.json": "a62d7936dcbb175f5a80b3aefce882ab176986974b8e0f5f612cab5a5bed47f8",
+    "reduced-reuse-capacity/long-reuse.log": "7555cdcdc04ea885c6dcad9654272d0ba0373b05bff6e3a63c7c82a5159e77f3",
+    "reduced-reuse-capacity/sdk-functions.inc": "bb2d4bd38b11dd48b5f62e11ff448851f99e39c29ad7ba4d3edbcc8266c8766b",
+    "release-async/async.log": "54b083ab96b787467c32c13a687b1b8132535b7c0730844badb2952bc1a6f620",
+    "release-async/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-async/command.json": "a4b436d7ea75f7d0952a277dc0f157849a1bec2f735359a90d67a07afa53edf4",
+    "release-async/sdk-functions.inc": "262bf865babcfba8b8336b62f2b18771574f1e09863abd742a9cc6893ca93b09",
+    "release-before-response/authorization.log": "0c0f7029eccfd3c42a2f00832ca543d034c018dc9458aafef3481f704bcfc1ea",
+    "release-before-response/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-before-response/command.json": "379aed0fe5d0e30bdec1c71d75d62ba26764f50a44e1f2a1cb8fe2288c2a0d93",
+    "release-before-response/sdk-functions.inc": "158cae4e1f926ebc06be093042f709d3d460e0232766bca95918554e5aa7c44d",
+    "release-with-body/body-pending.log": "54b083ab96b787467c32c13a687b1b8132535b7c0730844badb2952bc1a6f620",
+    "release-with-body/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-with-body/command.json": "9341193f54da4b92968fead933cafa85cac9c1a676bc4b945880d74a0621687d",
+    "release-with-body/sdk-functions.inc": "800b1608c7da81194d1e4432e53918f3420c9d394c9379b43b7abe005ce971c9",
+    "stale-errno-on-oom/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stale-errno-on-oom/command.json": "9efae63ffa667295759dafc583dbd9b7985ffa489d66c2622f332eda55a39aff",
+    "stale-errno-on-oom/oom.log": "530a691852213ae65818241e55452d6fb29b6b04bbbc27f8dcf5252c6f377148",
+    "stale-errno-on-oom/sdk-functions.inc": "5040690259746e08150a00924b4e26e955c1cee8f7a18b637098217b1baaf036",
+    "stubs/esp_check.h": "44092025d000d57e78a20eb022f8268277d6a99cdbe641b007b2ddfce2b50056",
+    "stubs/esp_err.h": "1fc032502253666af7ad5f2a5c51013f67a91ecaf31d9f3cd7a2b6e7862547e3",
+    "stubs/esp_log.h": "63c935d2c757a48dd0b3794e889bcf910e411126e21f955ddcdc8db66b7dca0b",
+    "touch-borrowed-body/borrowed-body.log": "a4235b22a78a2dea906083be5cc1d800b0f2a1c0c97ebe7c6ddc6c9b0b35c65d",
+    "touch-borrowed-body/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "touch-borrowed-body/command.json": "7d5c6d8a012d54a59a0cae2b8a33b02651cc225eda9d02eb8635fdd75170ed11",
+    "touch-borrowed-body/sdk-functions.inc": "0739fd93c6e26231795c8552550dbfab043dfe907d958027f50c1a8288abe11c"
+  },
+  "requested_buffer_note": "Current CYD radio config requests4096TX payload bytes; fixture also tests8192capacity. Allocator usable bytes, overhead, fragmentation and physical recovered heap are not measured or claimed."
+}
