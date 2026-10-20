@@ -1,0 +1,41 @@
+--- .build/cyd-vorbis-mono-mapping-prep-01/generate.py
++++ tests/vorbis_format_corpus/generate_mono_mapping.py
+@@ -14,8 +14,6 @@
+ ROOT = HERE.parents[1]
+ BASE = ROOT / "tests/vorbis_block_matrix/generate_minimal.py"
+ BASE_SHA = "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+-SETUP_SOURCE = ROOT / "idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c"
+-SETUP_SHA = "d23fd5cb2ad7d8c3a87ebcda2197421245f571dea5724de3d328058264e491c2"
+ RATES = (8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000)
+ SHORT, LONG, RANGEBITS = 256, 2048, 10
+ SPEC = "https://xiph.org/vorbis/doc/Vorbis_I_spec.html"
+@@ -283,9 +281,11 @@
+ 
+ def generate(output):
+     output = output.resolve()
+-    need(output.parent == HERE and not output.exists(), "fresh_direct_child_output")
+-    need(sha(SETUP_SOURCE.read_bytes()) == SETUP_SHA, "audited_setup_source_pin")
+-    inputs = [Path(__file__).resolve(), BASE, SETUP_SOURCE, HERE / "README.md"]
++    build_root = (ROOT / ".build").resolve()
++    need(build_root.parent == ROOT and output != build_root
++         and output.is_relative_to(build_root) and not output.exists(),
++         "fresh output beneath this checkout's .build required")
++    inputs = [Path(__file__).resolve(), BASE, HERE / "README.md"]
+     before = [fact(path) for path in inputs]
+     need(base.CHANNELS == 2 and base.unpack_float(base.packed_float(-2)) == -2, "helper_unmodified_contract")
+     transitions = Counter(zip(MODES, MODES[1:])); neighbors = Counter((MODES[i - 1], MODES[i + 1]) for i in range(1, 13) if MODES[i])
+@@ -347,6 +347,7 @@
+     manifest = dict(schema="vorbis-mono-mapping-manifest-v1", source_inputs=before, references=REFERENCES,
+         files=[dict(path=name, bytes=len(data), sha256=sha(data)) for name, data in sorted(payloads.items())])
+     payloads["manifest.json"] = (json.dumps(manifest, indent=2) + "\n").encode()
++    output.parent.mkdir(parents=True, exist_ok=True)
+     output.mkdir()
+     for name, data in payloads.items():
+         path = output / name; path.parent.mkdir(parents=True, exist_ok=True)
+@@ -357,5 +358,5 @@
+ 
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(description=__doc__)
+-    parser.add_argument("--output", type=Path, required=True)
++    parser.add_argument("--output", type=Path, default=ROOT / ".build/vorbis-mono-mapping-corpus-01")
+     generate(parser.parse_args().output)

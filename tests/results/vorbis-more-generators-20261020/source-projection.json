@@ -1,0 +1,131 @@
+{
+  "schema": "unapplied-more-generator-source-projection-v1",
+  "generator_imported_or_executed": false,
+  "codec_SDK_compiler_QEMU_reference_test_Git_executed": false,
+  "inputs_before": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_format_corpus\\generate_books.py",
+      "bytes": 21108,
+      "sha256": "de9b09de59a0825feda741c0343c6d60821ddad1258ce7df5ae342c68e268fc1"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_block_matrix\\generate_minimal.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_format_corpus\\README.md",
+      "bytes": 6105,
+      "sha256": "c4a64d138e7593d1d61019d134767e04039b864d5c89abf28202b68cf55b2fd3"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-mono-mapping-prep-01\\generate.py",
+      "bytes": 21136,
+      "sha256": "4e26ccfb00298c869f15761db00ef6a77ed33b6092cb9f106d3cd8fdd18e4e01"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-map2-regression-prep-01\\generate02.py",
+      "bytes": 18147,
+      "sha256": "842577227a4418bfffa7c354e0a162350d9d926887a43b1ef2b3bb25db0184fc"
+    }
+  ],
+  "sources": [
+    {
+      "name": "mono_mapping",
+      "original": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-mono-mapping-prep-01\\generate.py",
+        "bytes": 21136,
+        "sha256": "4e26ccfb00298c869f15761db00ef6a77ed33b6092cb9f106d3cd8fdd18e4e01"
+      },
+      "proposed": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-more-generators-canonical-prep-01\\repository\\tests\\vorbis_format_corpus\\generate_mono_mapping.py",
+        "bytes": 21135,
+        "sha256": "c7c494f8b03266a4589a8b141e4b12b008e545f8081a09cf57c9b0965cd14a27"
+      },
+      "inverse_projection_sha256": "4e26ccfb00298c869f15761db00ef6a77ed33b6092cb9f106d3cd8fdd18e4e01",
+      "exact_original_bytes_recovered": true,
+      "changes": [
+        {
+          "label": "remove_mutable_decoder_setup_provenance",
+          "old": "SETUP_SOURCE = ROOT / \"idf/esp32-cyd2usb-native/main/vorbis_repair/setup.c\"\nSETUP_SHA = \"d23fd5cb2ad7d8c3a87ebcda2197421245f571dea5724de3d328058264e491c2\"\n",
+          "new": ""
+        },
+        {
+          "label": "checkout_output_guard_and_portable_sources",
+          "old": "    need(output.parent == HERE and not output.exists(), \"fresh_direct_child_output\")\n    need(sha(SETUP_SOURCE.read_bytes()) == SETUP_SHA, \"audited_setup_source_pin\")\n    inputs = [Path(__file__).resolve(), BASE, SETUP_SOURCE, HERE / \"README.md\"]\n",
+          "new": "    build_root = (ROOT / \".build\").resolve()\n    need(build_root.parent == ROOT and output != build_root\n         and output.is_relative_to(build_root) and not output.exists(),\n         \"fresh output beneath this checkout's .build required\")\n    inputs = [Path(__file__).resolve(), BASE, HERE / \"README.md\"]\n"
+        },
+        {
+          "label": "guarded_parent_creation",
+          "old": "    output.mkdir()\n",
+          "new": "    output.parent.mkdir(parents=True, exist_ok=True)\n    output.mkdir()\n"
+        },
+        {
+          "label": "checkout_default_output",
+          "old": "    parser.add_argument(\"--output\", type=Path, required=True)\n",
+          "new": "    parser.add_argument(\"--output\", type=Path, default=ROOT / \".build/vorbis-mono-mapping-corpus-01\")\n"
+        }
+      ]
+    },
+    {
+      "name": "map2_regression",
+      "original": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-map2-regression-prep-01\\generate02.py",
+        "bytes": 18147,
+        "sha256": "842577227a4418bfffa7c354e0a162350d9d926887a43b1ef2b3bb25db0184fc"
+      },
+      "proposed": {
+        "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-more-generators-canonical-prep-01\\repository\\tests\\vorbis_format_corpus\\generate_map2_regression.py",
+        "bytes": 18401,
+        "sha256": "49015a8a849682ad886c970ea3b1a3bc06f02f21a4f01785b7d52695e23d3caa"
+      },
+      "inverse_projection_sha256": "842577227a4418bfffa7c354e0a162350d9d926887a43b1ef2b3bb25db0184fc",
+      "exact_original_bytes_recovered": true,
+      "changes": [
+        {
+          "label": "checkout_output_guard_and_readme_provenance",
+          "old": "    output = output.resolve(); need(output.parent == HERE and not output.exists(), \"fresh_direct_child_output\")\n    inputs = [Path(__file__).resolve(), HERE / \"README02.md\", BOOKS, MINIMAL]\n",
+          "new": "    output = output.resolve()\n    build_root = (ROOT / \".build\").resolve()\n    need(build_root.parent == ROOT and output != build_root\n         and output.is_relative_to(build_root) and not output.exists(),\n         \"fresh output beneath this checkout's .build required\")\n    inputs = [Path(__file__).resolve(), HERE / \"README.md\", BOOKS, MINIMAL]\n"
+        },
+        {
+          "label": "guarded_parent_creation",
+          "old": "    output.mkdir()\n",
+          "new": "    output.parent.mkdir(parents=True, exist_ok=True)\n    output.mkdir()\n"
+        },
+        {
+          "label": "checkout_default_output",
+          "old": "    parser.add_argument(\"--output\", type=Path, required=True)\n",
+          "new": "    parser.add_argument(\"--output\", type=Path, default=ROOT / \".build/vorbis-map2-regression-corpus-01\")\n"
+        }
+      ]
+    }
+  ],
+  "inputs_after": [
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_format_corpus\\generate_books.py",
+      "bytes": 21108,
+      "sha256": "de9b09de59a0825feda741c0343c6d60821ddad1258ce7df5ae342c68e268fc1"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_block_matrix\\generate_minimal.py",
+      "bytes": 17559,
+      "sha256": "8e3eff3fbe08f24399dd74c5ca449eb7ead0fe0f27e464f6d8314e7fbcaf64f1"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\vorbis_format_corpus\\README.md",
+      "bytes": 6105,
+      "sha256": "c4a64d138e7593d1d61019d134767e04039b864d5c89abf28202b68cf55b2fd3"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-mono-mapping-prep-01\\generate.py",
+      "bytes": 21136,
+      "sha256": "4e26ccfb00298c869f15761db00ef6a77ed33b6092cb9f106d3cd8fdd18e4e01"
+    },
+    {
+      "path": "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-vorbis-map2-regression-prep-01\\generate02.py",
+      "bytes": 18147,
+      "sha256": "842577227a4418bfffa7c354e0a162350d9d926887a43b1ef2b3bb25db0184fc"
+    }
+  ],
+  "status": "SOURCE_PROPOSAL_ONLY_GENERATION_AND_PAYLOAD_COMPARISON_PENDING"
+}

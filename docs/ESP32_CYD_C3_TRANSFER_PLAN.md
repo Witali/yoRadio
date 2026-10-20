@@ -117,8 +117,10 @@ allocation и численные настройки C3 являются канд
   4 362 240 точных PCM байт; отдельный optional-cap прогон и оба восстановления
   старых guards проходят. [Независимая C3/RV32 проверка](../tests/results/c3-vorbis-uint32-rate-20261020/README.md)
   той же находки и исправления также проходит все пять отдельных кампаний.
-  [Новые генераторы](../tests/vorbis_format_corpus/README.md) воспроизводят 17
-  books/floor0/residue0 случаев; их target PCM и независимое численное сравнение
+  [Генераторы](../tests/vorbis_format_corpus/README.md) воспроизводят 17
+  books/floor0/residue0 случаев и ещё 29 mono/stereo/mapping и map2-регрессий;
+  [новые 149 файлов](../tests/results/vorbis-more-generators-20261020/README.md)
+  совпадают с исходными побайтно. Их target PCM и независимое численное сравнение
   ещё не квалифицированы. Полное G6 открыто.
   [Ogg target-расширение отложено](CYD_VORBIS_OGG_DEFERRED_20261020.md) после
   автоматической проверки безопасности; ноль новых runtime случаев квалифицировано.
@@ -781,3 +783,12 @@ Stream остаётся на core0, decode/output на core1 с прежними
   SHA256 `ce5bb45115eba8710b51a4d85ae376a77bb7b99e4b1e87bcb0065027a0b8cbde`.
   Полное C3 приложение и отложенные AAC hooks не запускались. Остальное G6,
   G1–G8, production exports и физическая приёмка остаются открытыми.
+- 2026-10-20, CYD-C3-14 G6: [два дополнительных генератора](../tests/vorbis_format_corpus/README.md)
+  сохраняют 21 случай mono/stereo на девяти частотах, coupling/submaps/residue2
+  и восемь lookup2 sparse-wide/single-entry случаев. Actual generation и
+  [сравнение](../tests/results/vorbis-more-generators-20261020/README.md) проходят:
+  29 случаев/406 пакетов, все 149 файлов данных, включая 145 бинарных,
+  побайтно равны исходным. Изменены только четыре provenance файла;
+  14 construction rejection controls проходят. Это воспроизводимые fixtures,
+  новый target/PCM результат этим не заявляется. Manifest SHA256:
+  `c66cefeb56522cdb0b4b466c9823ca02c85d9c9772ed8679aa8944f611cf95ba`.

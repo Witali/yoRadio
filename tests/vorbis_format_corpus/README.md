@@ -1,6 +1,6 @@
 # Public raw Vorbis format corpus generators
 
-These two Python stdlib generators construct finite, complete public Vorbis
+These Python stdlib generators construct finite, complete public Vorbis
 packets. They do not execute a codec, synthesize PCM, or run an SDK, compiler,
 emulator or physical board. Their internal checks cover field/token parsing,
 packet accounting, Ogg framing and CRC. Generated qualification fields remain
@@ -22,7 +22,19 @@ unused final LSP scalar. Residue0 retains its dimension2/interleave-step8 layout
 Each case has 14 complete audio packets. Packet metadata records the exact
 per-packet overlap frames and expected PCM sizes.
 
-Both generators retain `SSLLLSLSSSLLSS`, all four short/long transitions and all
+`generate_mono_mapping.py` produces 21 cases: mono and stereo at each of nine
+advertised rates (8000 through 48000 Hz), plus stereo coupling with all four
+sign quadrants, two submaps with swapped channel mux, and bundled residue2.
+Blocks remain 256/2048. All 294 packets produce 464640 expected PCM16 bytes.
+
+`generate_map2_regression.py` produces eight stereo/192000 Hz cases. Four pairs
+compare sparse lookup2 vectors of dimension16 against dense active rows, or a
+mapped single-entry book against two identical dense rows, with sequence0/1.
+The single-entry audio uses both one-bit values, as specified by Vorbis
+Errata20150226. All 112 packets produce 225280 expected PCM16 bytes. Expected
+within-decoder PCM equalities are metadata until actual PCM is compared.
+
+All generators retain `SSLLLSLSSSLLSS`, all four short/long transitions and all
 long-window neighbor flags. They emit full identification/comment/setup headers,
 concatenated full audio packets with offsets, field audits, matrix metadata and
 one-packet-per-page reference Ogg carriers with natural granules/EOS. These
@@ -39,10 +51,13 @@ repository root, the default create-only commands are:
 python -B tests/vorbis_format_corpus/generate_books.py
 python -B tests/vorbis_format_corpus/test_books.py
 python -B tests/vorbis_format_corpus/generate_floor0.py
+python -B tests/vorbis_format_corpus/generate_mono_mapping.py
+python -B tests/vorbis_format_corpus/generate_map2_regression.py
 ```
 
-Defaults are this checkout's `.build/vorbis-books-corpus-01` and
-`.build/vorbis-floor0-corpus-01`. Existing outputs are rejected. To choose a fresh
+Defaults are this checkout's `.build/vorbis-books-corpus-01`,
+`.build/vorbis-floor0-corpus-01`, `.build/vorbis-mono-mapping-corpus-01` and
+`.build/vorbis-map2-regression-corpus-01`. Existing outputs are rejected. To choose a fresh
 output beneath this checkout's `.build`, use `--output`; pass the corresponding
 books directory to `test_books.py --data`. Relative arguments resolve from the
 calling working directory. Parents are created only after the guard has accepted
