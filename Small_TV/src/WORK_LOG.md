@@ -3407,3 +3407,11 @@ active selector H10/CYD инезакоммиченные C3/ESP8266 сохран
 H10/CYD не прерывались. Пользовательские изменения root совпадают с начальным
 inventory. Код и firmware не менялись; тесты повторно не запускались.
 Подробности: Small_TV/WORKTREE_INTEGRATION_20261020.md и машинный отчёт.
+
+## 2026-10-20 — план следующего этапа
+
+По запросу пользователя сохранён IMPROVEMENT_PLAN.md с порядком и критериями:
+CITY-REINIT → JPEG/NOR integration → AP lifecycle → hardware → full-image audit
+→ приёмка окончательной версии. Работа в отдельной small-tv-improvement-plan;
+активный H10 B50D/source/SDK/snapshot не меняются. Первое исправление — город
+и команда переинициализации темы, согласованно опубликованные под mutex.
