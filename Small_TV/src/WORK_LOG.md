@@ -3505,3 +3505,46 @@ ESP-IDF partition enumeration/SHA/authorization adapter, matching stamped
 assets build с сохранением user photos/settings, budgets/shared subfiles и
 libjpeg bridge. Guard/NOR пока не включены в CMake, production capabilities
 не выдаются. Полная цель и остальные network/hardware/audit/final gates открыты.
+
+## 2026-10-20 — atomic JPEG cache journal и cold recovery
+
+Previous goal turn — progress:78e817f21; текущие branch/чистота/план перепроверены.
+Новый portable storage/jpeg_journal.c/.h: два4096byte banks snapshot всех5entries,
+explicit LE/CRC/commit page, layout/codec/source/frame identities. Durable invalid
+до in-place frame/source writes; publish вызывает mandatory flush/physical SHA
+до первого metadata erase. Другой bank сохраняет last confirmed head. При I/O/
+read-back failure handle poisoned; abort/cancel без записи. Повторный begin для
+durably invalid entry не стирает flash ещё раз.
+
+Cold open выбирает newest structural snapshot даже при foreign IDs и не
+возвращает старый matching cache. Equal sequences fail closed; MAX counter не
+wrap. Отдельно закрыт опасный fallback: повреждённый newest invalid record после
+частичной перезаписи frame может вернуть older ready metadata. Поэтому каждый
+lookup требует full physical frame SHA; lookup error не очищает только RAM flag
+и не позволяет следующему begin пропустить durable invalidation.
+
+MSVC /O2 /W4 /WX: actual NOR core и реальная planner mapping, synthetic full
+frames5×115200bytes.4270/2410callbacks на update при128/256pages;5fault modes
+на каждый ordinal =33400cases. Partial error, silent partial/corrupt read и
+hard cuts до/в середине/после операции. СвежаяRAM после каждого cut; ready всегда
+равен целому old/newframe, остальные4frames и protected flash не меняются.
+769metadata corruptions(512body/256footer bytes+explicit dangerous fallback),
+6boot-read failures,14state/argument/foreign/sequence rejects pass.12compiled
+mutants runtime-rejected в quick state/corruption mode; full fault gate отдельный.
+Independent Python struct/zlib/hashlib parser проверил4реальных snapshots и все
+source/pixel hashes.3.17billion internal assertions не являются coverage claim.
+
+При RV32 compile оптимизирован open: удалить expected footer copy256bytes,
+проверить fields/padding непосредственно. Open frame704→448; тот же full33400
+gate и12mutants заново pass. GCC15.2 RV32IMC/ilp32 ET_REL:code2976,const24,
+writable0,handle1032(включаетbody512),maxsingleframe448. Caller/callback/NOR/
+IRQ/task stack и physical timing не измерены. Precompact source SHA связан с
+старым report; outputs/ABI/source pins сохранены в118raw proof:
+qemu/parity/jpeg-cache-journal-validation-20261020.json.
+
+App3E03/TJpgd archive unchanged,6artifact checks pass;6original oldH10 owners
+readonly-confirmed. Physical flash/QEMU/SDK/snapshot не менялись; новыхVM нет.
+Journal пока не в CMake и не связан с upload. Он не решает atomic source JPEG
+replacement сам по себе. Следом authorized ESP-IDF/SHA transport и budgets,
+shared scratch subfiles, actual source/cache workflow и matching stamped assets
+build, затем real codec/final tests. Полная цель IMPROVEMENT_PLAN остаётся открыта.

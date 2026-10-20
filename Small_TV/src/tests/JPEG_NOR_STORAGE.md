@@ -4,8 +4,9 @@ Checkpoint 2026-10-20: `storage/jpeg_nor.c/.h` реализует настоящ
 sector read/modify/erase/program поверх транспортных callbacks. Он пока не
 включён в production CMake и не выполняет запись в подключённое устройство.
 Readonly [ownership guard](JPEG_OWNERSHIP_GUARD.md) теперь также подготовлен
-отдельно. Atomic metadata, его production authorization/build integration,
-ESP-IDF adapter и libjpeg integration остаются обязательными этапами.
+отдельно, как и [cache journal](JPEG_CACHE_JOURNAL.md) с cold-recovery tests.
+Production authorization/build/upload integration, ESP-IDF adapter и libjpeg
+integration остаются обязательными этапами.
 
 ## Контракт записи
 

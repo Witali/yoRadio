@@ -50,6 +50,12 @@ stamp, partial read/hash failures и10compiled mutants проверены. См.
 [JPEG_OWNERSHIP_GUARD.md](JPEG_OWNERSHIP_GUARD.md). Atomic metadata, authorization/
 SHA transport, matching assets build и codec integration ещё нужны.
 
+Portable [JPEG_CACHE_JOURNAL.md](JPEG_CACHE_JOURNAL.md): two-bank snapshots,
+durable invalidation, mandatory physical frame hash на publish/каждый hit;
+33400NOR/power-cut cases,769corruptions,6boot read failures и12compiled mutants.
+Independent Python wire parser проверяет реальные persisted records. Это ещё
+не actual source-upload/HTTP integration, ESP-IDF/hardware или production decoder.
+
 ## JPEG Huffman selectors
 
 Отдельный `jpeg_selector_oracle.py` проверяет136valid/32invalid входа с

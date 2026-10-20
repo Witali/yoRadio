@@ -51,9 +51,15 @@ RV32 object1848bytes/handle4352/frame304 измерены; это ещё не pr
 3050read/3010hash faults,12generator rejects/12controls и10compiled mutants pass.
 Runtime capabilities/build integration пока не подключены. RV32 core1150 и
 const descriptors1448bytes измерены. [Результаты](tests/JPEG_OWNERSHIP_GUARD.md).
-Далее — atomic metadata/cold recovery, ESP-IDF authorization/SHA adapter,
-сборка matching stamped assets с сохранением photos/settings, operation/time
-budgets и shared scratch subfiles для libjpeg. Production остаётся3E03/TJpgd.
+Следующий checkpoint: portable two-bank cache journal готов отдельно. Durable
+invalidation до data writes, verified publication и каждый physical cache hit;
+33400NOR/power-cut cases,769metadata corruptions,6boot failures,12mutants и
+independent wire gate pass. RV32 code2976/const24/handle1032/maxframe448;
+не production link. [Результаты](tests/JPEG_CACHE_JOURNAL.md).
+Далее — ESP-IDF authorization/SHA adapter, привязка invalidation к actual upload/
+cache writes и source hash, сборка matching stamped assets с сохранением photos/
+settings, operation/time budgets и shared scratch subfiles для libjpeg.
+Production остаётся3E03/TJpgd; полный HTTP/power-loss workflow ещё не закрыт.
 
 1. Зафиксировать матрицу входов/лимитов: baseline/progressive, gray/RGB/CMYK/YCCK,
    8/12-bit lossy и 2–16-bit Huffman lossless. Не обещать весь T.81: библиотека

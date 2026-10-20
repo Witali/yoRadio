@@ -37,6 +37,21 @@ const descriptors1448,maxsingleframe320, не runtime/link/whole stack.85rawproo
 на неизвестной flash marker автоматически не записывать. Детали
 tests/JPEG_OWNERSHIP_GUARD.md. Полная цель IMPROVEMENT_PLAN остаётся активной.
 
+Journal checkpoint20Oct: storage/jpeg_journal.c/.h подготовлен вне production.
+Два metadata banks полного snapshot пяти entries, durable invalidation перед
+source/frame overwrite, commit page после erase/body verification. Publish и
+каждый lookup требуют adapter flush/full physical SHA. Newest foreign IDs не
+откатываются к старому matching bank; ties fail closed/MAX generation не wrap.
+33400fault cases(128/256pages),769corruptions,6boot failures,12compiled mutants
+и independent Python wire gate pass. Все ready recovery frames целые; прочие
+4frames/protected bytes сохранны. RV32 code2976/const24/handle1032/open448
+(оптимизировано704→448), не whole stack/runtime/link.118raw proof,6artifact pass,
+app3E03/TJpgd unchanged;6oldH10 owners readonly-confirmed, VM не трогать.
+Следом ESP-IDF authorization/SHA/budgets и shared scratch subfiles, actual upload
+invalidation/source identity, matching assets build и codec integration.
+Журнал сам не восстанавливает source JPEG после interrupted upload. Детали
+tests/JPEG_CACHE_JOURNAL.md; цель/остальные пункты плана сохраняются целиком.
+
 ## Независимость проверок подсистем — 2026-10-18
 
 ## План улучшений форматов изображений — 2026-10-19

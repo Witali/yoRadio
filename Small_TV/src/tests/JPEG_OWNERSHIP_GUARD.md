@@ -106,6 +106,7 @@ Proof с точными sources/compiler pins и85compressed raw outputs:
 [`jpeg-ownership-guard-validation-20261020.json`](../../qemu/parity/jpeg-ownership-guard-validation-20261020.json).
 6artifact checks подтверждают неизменность app3E03 и archive. Six original
 H10 owner identities подтверждены readonly CIM; его QMP/RSP, SDK и snapshots
-не менялись. Atomic invalidation/publication/cold recovery, hardware faults,
-transport authorization/budgets, build/codec integration и final acceptance
-остаются обязательными следующими этапами.
+не менялись. Portable [atomic cache journal](JPEG_CACHE_JOURNAL.md) теперь также
+подготовлен отдельно; actual upload/source workflow, hardware faults, transport
+authorization/budgets, build/codec integration и final acceptance остаются
+обязательными следующими этапами.
