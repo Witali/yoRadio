@@ -201,10 +201,22 @@ claim or default change.
 4. **Application matrix complete:** [six full GCC exports](../tests/results/cyd-network-settings-20261020/SDK.md)
    cover vendor/custom FLAC with PDM, continuous DAC and legacy DAC from clean
    source `195cd3b0e`. ELF symbols verify the selected decoder; custom changes
-   exactly the two FLAC configuration selectors. A custom-path QEMU harness
-   checking PCM/guards/lifecycle remains pending. Separate host platform seams
-   and vendor prebuilt coverage from target execution evidence.
-5. **Physical qualification open:** CYD A/B with matched
+   exactly the two FLAC configuration selectors.
+5. **SDK/QEMU adapter and core complete for the stated profile:** the
+   [standalone Xtensa harness](../tests/target/cyd_flac_qemu/README.md) runs
+   unchanged production components with real SDK tasks on cores 0/1. Its
+   [frozen qualification](../tests/results/cyd-flac-qemu-20261020/README.md)
+   preserves 520 unique byte-exact PCM16 comparisons and 48 guard/recovery
+   checks, final image/configuration/source hashes and terminal emulator exit 0.
+   Six source depths and four input schedules are covered. This is a synthetic
+   decoder owner with an isolated debug profile, not full-radio resource data.
+6. **Actual CYD task target gate open:** run unchanged `audio_service.c` via
+   public startup/play/stop/maintenance APIs with all three real SDK task owners.
+   First cover ordered EOF/PCM identity, Stop/reopen and maintenance/resume;
+   then backpressure/errors, scoped OOM and deliberate target semantic controls.
+   HTTP transport and output hardware need explicitly bounded seams. No test
+   may assign the private phase or ACK instead of executing its actual owner.
+7. **Physical qualification open:** CYD A/B with matched
    configuration, all three audio output backends, ordinary/demanding FLAC, HTTP/HTTPS,
    UI traffic, EOF/Stop recovery, repeated codec changes, DMA and watchdog metrics.
    No custom default switch or speedup claim before this gate passes.

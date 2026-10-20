@@ -1,0 +1,7393 @@
+{
+  "passed": true,
+  "scope": "Execute frozen shared custom FLAC on ESP32 SDK6.0.2 under local Xtensa QEMU.\n\n130 independently FFmpeg-checked fixtures x4 feed schedules; every PCM byte is\ncompared in the actual core1 SDK callback. This adapter/core gate does not run\nthe actual CYD decoder_task, inject OOM, use RF/DMA or touch a physical device.\n",
+  "physical_hardware": false,
+  "actual_cyd_decoder_task": false,
+  "oom_injection": false,
+  "source_sha256": {
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_flac\\CMakeLists.txt": "3ffc9efa66e36764482b9a544da22df89c604edc32bc0dfb8c00d269695a7a80",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_flac\\custom_flac_adapter.cpp": "ffa4f71d2e0387e369ad5da1f5fa268557d6fc50cd56738cb65affaaafbd7a26",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_flac\\custom_flac_adapter.h": "f500ddeadc2edf3ee256c3e3504e8e7b9ba475325f0f96747f17dd270ee6c519",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_codec_support\\CMakeLists.txt": "70fe8a58f4616f63675fd9923bb98fc1e80195ebcc23369011fc21bb8ca214d9",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\idf\\components\\custom_codec_support\\Arduino.h": "613e2c4aae1d1a604703286460dfe90d80c1dd1baf6ac936785b28db8219cd33",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\CodecMemoryArena.cpp": "ace889590a42c0d918018c6e37a2a1f7bb1e9fffd3bb428d8dd87345f4ab711a",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\CodecMemoryArena.h": "f5bebd05568968cb0e12e84db7f5ed87983393294cafae1741e47bceccb3478c",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.cpp": "31b9b9da732e0de2cd0cb40685ee184059bc328e3c402b218e10c91a85c89d14",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\yoRadio\\src\\audioI2S\\flac_decoder\\flac_decoder.h": "d5c561cd2136a0c8390a67fb6640ec5f01d8c0f515341f4301104487bf636859",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tools\\audio_test_server\\generate_flac_depths.py": "6f15589438a6fd31fb937e95e7f840a3288ff083c5e3771b6e9b486cede9f4c1",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_flac_qemu\\project\\CMakeLists.txt": "ab990768b5ca227acfd5c241ff2a70bc42411334126206daa3d1f707893b5f74",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_flac_qemu\\project\\main\\CMakeLists.txt": "afe855bf5c100c6e94f8c3363aa1c5dc63f02a9867a54879492e87f15a58aa35",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_flac_qemu\\project\\main\\main.cpp": "62c6fffd6fdf79cec7872ded50391d23f8e8b43d26572556b2d85b1aa0cb222c",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_flac_qemu\\project\\partitions.csv": "95c294d2948a20ab3b6bf106137dafcd7797bcbf6e2b48b02bc5c286ff41f399",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_flac_qemu\\project\\sdkconfig.defaults": "d99f4f4ac51612c694444099226db4fbf833a2bfcde572d38c8da3ee7fa28983",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_flac_qemu\\sdk-build.ps1": "1637816d5be6ccedd3e95a0dbe4cd2980379aa6151aad6106755a0cb72f70dbc",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\target\\cyd_flac_qemu\\README.md": "181a882535e3a0aa7cb9ad89c8175da52c1f4a24e1982dc79ab99fb50183e182",
+    "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-qemu.py": "ef79ae79bbc6415f4e2fe68ff49937766f6772f3924eb8fd2237d60b10850689"
+  },
+  "commands": [
+    {
+      "name": "sdk-head",
+      "command": [
+        "git",
+        "-c",
+        "core.longpaths=true",
+        "-C",
+        "C:\\Work\\yoRadio\\.idf\\v6.0.2",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.031000000017229468,
+      "output_sha256": "1d19bc0de0b888051c0efbda64366dcd9719579be4d57a8e376bfd5cfedac38c"
+    },
+    {
+      "name": "sdk-tracked-changes",
+      "command": [
+        "git",
+        "-c",
+        "core.longpaths=true",
+        "-C",
+        "C:\\Work\\yoRadio\\.idf\\v6.0.2",
+        "status",
+        "--porcelain",
+        "--untracked-files=no"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.9379999999655411,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "ffmpeg-version",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-version"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "ccf923e713e82e8b3d7b4534dca9347bfc69618112d3b7fdc02d7d148512476c"
+    },
+    {
+      "name": "ffmpeg-0",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-mono-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3"
+    },
+    {
+      "name": "ffmpeg-1",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-mono-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "ba7a2d943c55306bb2d2968e2d52438512037f0209dc954b6f27a5fada98afb6"
+    },
+    {
+      "name": "ffmpeg-2",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-mono-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25"
+    },
+    {
+      "name": "ffmpeg-3",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-mono-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "6fc0e47f9cfcd8586803d52e3e2aacf95ce915978b585bf04bb0944cdc4d4a25"
+    },
+    {
+      "name": "ffmpeg-4",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-stereo-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.06299999996554106,
+      "output_sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c"
+    },
+    {
+      "name": "ffmpeg-5",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-stereo-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a"
+    },
+    {
+      "name": "ffmpeg-6",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-stereo-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e"
+    },
+    {
+      "name": "ffmpeg-7",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-stereo-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e"
+    },
+    {
+      "name": "ffmpeg-8",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-left-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c"
+    },
+    {
+      "name": "ffmpeg-9",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-left-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a"
+    },
+    {
+      "name": "ffmpeg-10",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-left-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e"
+    },
+    {
+      "name": "ffmpeg-11",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-left-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e"
+    },
+    {
+      "name": "ffmpeg-12",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-right-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c"
+    },
+    {
+      "name": "ffmpeg-13",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-right-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a"
+    },
+    {
+      "name": "ffmpeg-14",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-right-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e"
+    },
+    {
+      "name": "ffmpeg-15",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-right-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e"
+    },
+    {
+      "name": "ffmpeg-16",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-mid-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "1b74113b3e080de11c9fac707fedb0de8020a5d2e7fdfac25b81c9be7433ea4c"
+    },
+    {
+      "name": "ffmpeg-17",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-mid-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "41e7f0567de41af85b85c1804136c34baf7344f68a33ac733ff5ad386b17349a"
+    },
+    {
+      "name": "ffmpeg-18",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-mid-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e"
+    },
+    {
+      "name": "ffmpeg-19",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-4bit-mid-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "dc91be7378bf0810a03c275e236d42aa556dfc6f3088950d4e0eedcfb489944e"
+    },
+    {
+      "name": "ffmpeg-20",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-mono-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3"
+    },
+    {
+      "name": "ffmpeg-21",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-mono-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.031000000017229468,
+      "output_sha256": "65dd4f4b2671be5ddf1b24043d299cde6c8a38d5a858a69d466f15382a048155"
+    },
+    {
+      "name": "ffmpeg-22",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-mono-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.03200000000651926,
+      "output_sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff"
+    },
+    {
+      "name": "ffmpeg-23",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-mono-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "eeb1be15c6705573bc084faca324db1c23a214c618dd54b023f233ace5efdbff"
+    },
+    {
+      "name": "ffmpeg-24",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-stereo-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351"
+    },
+    {
+      "name": "ffmpeg-25",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-stereo-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439"
+    },
+    {
+      "name": "ffmpeg-26",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-stereo-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31"
+    },
+    {
+      "name": "ffmpeg-27",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-stereo-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31"
+    },
+    {
+      "name": "ffmpeg-28",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-left-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351"
+    },
+    {
+      "name": "ffmpeg-29",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-left-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439"
+    },
+    {
+      "name": "ffmpeg-30",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-left-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.062000000034458935,
+      "output_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31"
+    },
+    {
+      "name": "ffmpeg-31",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-left-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31"
+    },
+    {
+      "name": "ffmpeg-32",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-right-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351"
+    },
+    {
+      "name": "ffmpeg-33",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-right-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439"
+    },
+    {
+      "name": "ffmpeg-34",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-right-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31"
+    },
+    {
+      "name": "ffmpeg-35",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-right-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31"
+    },
+    {
+      "name": "ffmpeg-36",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-mid-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.06300000002374873,
+      "output_sha256": "96e2b93a50ace4a677867c62c6564aedb75165934ad4fca503318e8a54580351"
+    },
+    {
+      "name": "ffmpeg-37",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-mid-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.061999999976251274,
+      "output_sha256": "e011ea7885dc1f80e4513e37079e43d8607e7869603c84d98602c19178ad6439"
+    },
+    {
+      "name": "ffmpeg-38",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-mid-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31"
+    },
+    {
+      "name": "ffmpeg-39",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-8bit-mid-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "b4356f8fb92621c7d704916e694e00cabb782f737d1f02aba0d2332360575a31"
+    },
+    {
+      "name": "ffmpeg-40",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-mono-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3"
+    },
+    {
+      "name": "ffmpeg-41",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-mono-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.062000000034458935,
+      "output_sha256": "37cf3de8559b0587689ad7ac0a26f8b351cf66af6c9508be2315308b987eb940"
+    },
+    {
+      "name": "ffmpeg-42",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-mono-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3"
+    },
+    {
+      "name": "ffmpeg-43",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-mono-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e16d39ca8eedbc0b7b71199c6d0d4432da364e7a32a17dc1d3e0d63b217df7d3"
+    },
+    {
+      "name": "ffmpeg-44",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-stereo-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781"
+    },
+    {
+      "name": "ffmpeg-45",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-stereo-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f"
+    },
+    {
+      "name": "ffmpeg-46",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-stereo-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.061999999976251274,
+      "output_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7"
+    },
+    {
+      "name": "ffmpeg-47",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-stereo-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7"
+    },
+    {
+      "name": "ffmpeg-48",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-left-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781"
+    },
+    {
+      "name": "ffmpeg-49",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-left-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f"
+    },
+    {
+      "name": "ffmpeg-50",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-left-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.062000000034458935,
+      "output_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7"
+    },
+    {
+      "name": "ffmpeg-51",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-left-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7"
+    },
+    {
+      "name": "ffmpeg-52",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-right-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781"
+    },
+    {
+      "name": "ffmpeg-53",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-right-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f"
+    },
+    {
+      "name": "ffmpeg-54",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-right-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7"
+    },
+    {
+      "name": "ffmpeg-55",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-right-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7"
+    },
+    {
+      "name": "ffmpeg-56",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-mid-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "167aa1f5007a9d2d1e37fe364b642fbf1dc5908a13e1c4cb0fb595b87c2fc781"
+    },
+    {
+      "name": "ffmpeg-57",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-mid-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "10c47859c46b9b73629662354cf7a4cfec1f252902605c00026e7573c2ea5f6f"
+    },
+    {
+      "name": "ffmpeg-58",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-mid-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7"
+    },
+    {
+      "name": "ffmpeg-59",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-12bit-mid-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "e3f57481a3526fd5359ccc3deff755c34a850468bbc2ed9efcca9fe4c28084c7"
+    },
+    {
+      "name": "ffmpeg-60",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-mono-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3"
+    },
+    {
+      "name": "ffmpeg-61",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-mono-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "2724fa7db96d549228780e81cbc95d7dc84be26f0e34598f8d73542b5e8b5e1a"
+    },
+    {
+      "name": "ffmpeg-62",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-mono-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.031000000017229468,
+      "output_sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4"
+    },
+    {
+      "name": "ffmpeg-63",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-mono-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "b6dcbcb6f5e70da2aeeb63b5fd58c97dbf95d58de7d36b6be37e1df1cc5ed1e4"
+    },
+    {
+      "name": "ffmpeg-64",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-stereo-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.030999999959021807,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-65",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-stereo-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6"
+    },
+    {
+      "name": "ffmpeg-66",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-stereo-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22"
+    },
+    {
+      "name": "ffmpeg-67",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-stereo-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22"
+    },
+    {
+      "name": "ffmpeg-68",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-left-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-69",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-left-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.061999999976251274,
+      "output_sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6"
+    },
+    {
+      "name": "ffmpeg-70",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-left-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22"
+    },
+    {
+      "name": "ffmpeg-71",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-left-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22"
+    },
+    {
+      "name": "ffmpeg-72",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-right-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-73",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-right-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6"
+    },
+    {
+      "name": "ffmpeg-74",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-right-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.061999999976251274,
+      "output_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22"
+    },
+    {
+      "name": "ffmpeg-75",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-right-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22"
+    },
+    {
+      "name": "ffmpeg-76",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-mid-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-77",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-mid-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "c139a8a3d5a9754036793d214453bdecf796d2f294797e851f0a29eab699fcb6"
+    },
+    {
+      "name": "ffmpeg-78",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-mid-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22"
+    },
+    {
+      "name": "ffmpeg-79",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-16bit-mid-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "c2f815f7288c38e54cd6de11abf8b9775b72635026d8608389ec9c76e2ee2f22"
+    },
+    {
+      "name": "ffmpeg-80",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-mono-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3"
+    },
+    {
+      "name": "ffmpeg-81",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-mono-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315"
+    },
+    {
+      "name": "ffmpeg-82",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-mono-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315"
+    },
+    {
+      "name": "ffmpeg-83",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-mono-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "5f7a540a2513e16bd4a0e94fc11d670559c7f536ea7cac28db1310f4e8be2315"
+    },
+    {
+      "name": "ffmpeg-84",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-stereo-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-85",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-stereo-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-86",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-stereo-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-87",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-stereo-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-88",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-left-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-89",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-left-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-90",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-left-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-91",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-left-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-92",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-right-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-93",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-right-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-94",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-right-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-95",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-right-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-96",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-mid-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-97",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-mid-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-98",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-mid-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.061999999976251274,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-99",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-20bit-mid-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "a9b98d39af646827c3e1b5bd15d4d8fb00386a360689d8d47a9f2e19b14d1a29"
+    },
+    {
+      "name": "ffmpeg-100",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-mono-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e595cebf33d435d88cc1e2d0d7382a122ed389f76f97b41ec9e62d736662bdf3"
+    },
+    {
+      "name": "ffmpeg-101",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-mono-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.03200000000651926,
+      "output_sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649"
+    },
+    {
+      "name": "ffmpeg-102",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-mono-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649"
+    },
+    {
+      "name": "ffmpeg-103",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-mono-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "bf71c9d679370b882aaafbda8c75d5c8d99c83ff4304c57517640067af07f649"
+    },
+    {
+      "name": "ffmpeg-104",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-stereo-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-105",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-stereo-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-106",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-stereo-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-107",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-stereo-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-108",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-left-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-109",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-left-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.06300000002374873,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-110",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-left-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.045999999972991645,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-111",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-left-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.06300000002374873,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-112",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-right-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.031000000017229468,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-113",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-right-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-114",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-right-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.062000000034458935,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-115",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-right-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-116",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-mid-constant.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "55a4ac76294f61a118ceb43fefb41255c0de73cc316f782912775d8ef3b77f5b"
+    },
+    {
+      "name": "ffmpeg-117",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-mid-verbatim.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-118",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-mid-fixed4.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.061999999976251274,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-119",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\small\\flac-24bit-mid-lpc32.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.06300000002374873,
+      "output_sha256": "e00cc73a2aef5e081bb5f2718241b7556854c9ffbaa7e5f023fa27dea61b57e9"
+    },
+    {
+      "name": "ffmpeg-120",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\large\\flac-24bit-mono-verbatim-block8192.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "46cbaeda549356ebace006c6f69ec8fc5dec18e40cbad7438a0c92169e9b08f5"
+    },
+    {
+      "name": "ffmpeg-121",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\large\\flac-24bit-mono-lpc32-block8192.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "46cbaeda549356ebace006c6f69ec8fc5dec18e40cbad7438a0c92169e9b08f5"
+    },
+    {
+      "name": "ffmpeg-122",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\large\\flac-24bit-stereo-verbatim-block8192.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.046999999962281436,
+      "output_sha256": "6cd39f65fc3a897ed16fb463bd1fb8509b77bacdb685c44e3c9e205bcdcd2f8f"
+    },
+    {
+      "name": "ffmpeg-123",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\large\\flac-24bit-stereo-lpc32-block8192.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.06300000002374873,
+      "output_sha256": "6cd39f65fc3a897ed16fb463bd1fb8509b77bacdb685c44e3c9e205bcdcd2f8f"
+    },
+    {
+      "name": "ffmpeg-124",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\large\\flac-24bit-left-verbatim-block8192.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.061999999976251274,
+      "output_sha256": "6cd39f65fc3a897ed16fb463bd1fb8509b77bacdb685c44e3c9e205bcdcd2f8f"
+    },
+    {
+      "name": "ffmpeg-125",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\large\\flac-24bit-left-lpc32-block8192.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "6cd39f65fc3a897ed16fb463bd1fb8509b77bacdb685c44e3c9e205bcdcd2f8f"
+    },
+    {
+      "name": "ffmpeg-126",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\large\\flac-24bit-right-verbatim-block8192.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.061999999976251274,
+      "output_sha256": "6cd39f65fc3a897ed16fb463bd1fb8509b77bacdb685c44e3c9e205bcdcd2f8f"
+    },
+    {
+      "name": "ffmpeg-127",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\large\\flac-24bit-right-lpc32-block8192.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "6cd39f65fc3a897ed16fb463bd1fb8509b77bacdb685c44e3c9e205bcdcd2f8f"
+    },
+    {
+      "name": "ffmpeg-128",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\large\\flac-24bit-mid-verbatim-block8192.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.061999999976251274,
+      "output_sha256": "6cd39f65fc3a897ed16fb463bd1fb8509b77bacdb685c44e3c9e205bcdcd2f8f"
+    },
+    {
+      "name": "ffmpeg-129",
+      "command": [
+        "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe",
+        "-v",
+        "error",
+        "-xerror",
+        "-i",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures\\large\\flac-24bit-mid-lpc32-block8192.flac",
+        "-f",
+        "s16le",
+        "-acodec",
+        "pcm_s16le",
+        "-"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.0470000000204891,
+      "output_sha256": "6cd39f65fc3a897ed16fb463bd1fb8509b77bacdb685c44e3c9e205bcdcd2f8f"
+    },
+    {
+      "name": "build",
+      "command": [
+        "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\sources\\harness\\sdk-build.ps1",
+        "-OutputDirectory",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01",
+        "-IdfDirectory",
+        "C:\\Work\\yoRadio\\.idf\\v6.0.2",
+        "-IdfToolsDirectory",
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2",
+        "-IdfPythonExecutable",
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 117.20299999997951,
+      "output_sha256": "101bbd261cc28279d0b86148e7e4d9f6d8120d5e1cb920485e39007239a501b2"
+    },
+    {
+      "name": "compiler-version",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
+        "--version"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.030999999959021807,
+      "output_sha256": "2bc27a9674734ab4e4a07514743a150bc75331b49299574b9218e21a51e62c0e"
+    },
+    {
+      "name": "ninja-version",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe",
+        "--version"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.01600000000325963,
+      "output_sha256": "53c905b7eb0035c96d3b8cd4667a1f1e7a52cc6d4fd01c94badb86d46a254118"
+    },
+    {
+      "name": "cmake-version",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe",
+        "--version"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.062000000034458935,
+      "output_sha256": "f05fe86b5001ce00292a42883a46ecdeee3a88e96401f2d833aa0a1cb4f223ee"
+    },
+    {
+      "name": "merge",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe",
+        "-m",
+        "esptool",
+        "--chip",
+        "esp32",
+        "merge-bin",
+        "--output",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\qemu-flash.bin",
+        "--flash-mode",
+        "dio",
+        "--flash-size",
+        "4MB",
+        "--flash-freq",
+        "40m",
+        "0x1000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\build\\bootloader\\bootloader.bin",
+        "0x8000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\build\\partition_table\\partition-table.bin",
+        "0x10000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\build\\cyd_custom_flac_qemu.bin",
+        "0x100000",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\fixtures.bin",
+        "--pad-to-size",
+        "4MB"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.2809999999590218,
+      "output_sha256": "8a15dca67624d6628e5090d4ce9391d92f2580cd7ac3998c6518a76c7be45082"
+    },
+    {
+      "name": "qemu-version",
+      "command": [
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "--version"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.031000000017229468,
+      "output_sha256": "d061cd7a4f348764cce022b763516b211148bf9fa78554d3efc9b343cf43fe58"
+    },
+    {
+      "name": "qemu",
+      "command": [
+        "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe",
+        "-M",
+        "esp32",
+        "-smp",
+        "2",
+        "-L",
+        "C:\\Work\\QEMU-ESP32\\pc-bios",
+        "-display",
+        "none",
+        "-monitor",
+        "none",
+        "-serial",
+        "stdio",
+        "-no-reboot",
+        "-snapshot",
+        "-nic",
+        "none",
+        "-drive",
+        "file=C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\.build\\cyd-custom-flac-qemu-tracked-01\\qemu-flash.bin,if=mtd,format=raw"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 94.82799999997951,
+      "output_sha256": "f985ba5cb63a21da2b5e8807ceb180f39bda38230408b5f0c83c6f085569f17f"
+    },
+    {
+      "name": "sdk-head-after",
+      "command": [
+        "git",
+        "-c",
+        "core.longpaths=true",
+        "-C",
+        "C:\\Work\\yoRadio\\.idf\\v6.0.2",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.03200000000651926,
+      "output_sha256": "1d19bc0de0b888051c0efbda64366dcd9719579be4d57a8e376bfd5cfedac38c"
+    },
+    {
+      "name": "sdk-tracked-changes-after",
+      "command": [
+        "git",
+        "-c",
+        "core.longpaths=true",
+        "-C",
+        "C:\\Work\\yoRadio\\.idf\\v6.0.2",
+        "status",
+        "--porcelain",
+        "--untracked-files=no"
+      ],
+      "exit_status": 0,
+      "elapsed_seconds": 0.8119999999762513,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "runtime_sha256": {
+    "C:\\Work\\QEMU-ESP32\\bin\\qemu-system-xtensa.exe": "f6a5f29315d1bea5c99b74890a99c86c70886fdc0d50f24f62c24cdda43abc35",
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom.bin": "9115bbcd03da9f54d3baca5ad94d588a43da54ed332347137ba3dc9010df258b",
+    "C:\\Work\\QEMU-ESP32\\pc-bios\\esp32-v3-rom-app.bin": "6d3240e7cdb1ec9c1d683515e0a8578e9fb8ece3e7736cb9a996512c656e8442",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\python_env\\idf6.0_py3.12_env\\Scripts\\python.exe": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14",
+    "C:\\Work\\yoRadio\\.idf\\v6.0.2\\tools\\tools.json": "44f1cf25be0b1ff13f8a94c13420341bc732799ad44d2efcc430eff8544a2237",
+    "C:\\Users\\rudol\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+    "C:\\Users\\rudol\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe": "09948d4cdd0650da6ff5a87577469f2a218dc2615ae379f8f734d24c49de0f73",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\xtensa-esp-elf\\esp-15.2.0_20251204\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe": "20e70278d1fa041c1305e0e70e6f35dde01b7eb21f2c7bbc0013456493a011a5",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\ninja\\1.12.1\\ninja.exe": "68865c3276d449d746cea5065fdec2baf755d7813e161ab04205b0907b2629b8",
+    "C:\\Work\\yoRadio\\.idf\\tools-v6.0.2\\tools\\cmake\\4.0.3\\bin\\cmake.exe": "392ab4d6c3c91543fd297ed6c7e7354bf62edcd26fdf2706ad8613ad620cc45e"
+  },
+  "sdk_commit": "7101770dc6db2667b3c477cc31365dd1acd6db4e",
+  "fixture_count": 130,
+  "fixture_blob_bytes": 1549200,
+  "execution_bundle_sha256": "90b99c77226c3d03720b210fb5acaa0637d6a1fb90ee6607d0eaecaa00a9cca7",
+  "exact_pcm_cases": [
+    {
+      "id": 0,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13408
+    },
+    {
+      "id": 0,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 54,
+      "decoder_peak": 4896,
+      "stack_free": 13408
+    },
+    {
+      "id": 0,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13408
+    },
+    {
+      "id": 0,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13408
+    },
+    {
+      "id": 1,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 5152,
+      "stack_free": 13408
+    },
+    {
+      "id": 1,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 438,
+      "decoder_peak": 5152,
+      "stack_free": 13408
+    },
+    {
+      "id": 1,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 5152,
+      "stack_free": 13408
+    },
+    {
+      "id": 1,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 5152,
+      "stack_free": 13408
+    },
+    {
+      "id": 2,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 5920,
+      "stack_free": 13168
+    },
+    {
+      "id": 2,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1077,
+      "decoder_peak": 5920,
+      "stack_free": 13168
+    },
+    {
+      "id": 2,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 9,
+      "decoder_peak": 5920,
+      "stack_free": 13168
+    },
+    {
+      "id": 2,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 5920,
+      "stack_free": 13168
+    },
+    {
+      "id": 3,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 5408,
+      "stack_free": 13168
+    },
+    {
+      "id": 3,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 753,
+      "decoder_peak": 5408,
+      "stack_free": 13168
+    },
+    {
+      "id": 3,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 6,
+      "decoder_peak": 5408,
+      "stack_free": 13168
+    },
+    {
+      "id": 3,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 5408,
+      "stack_free": 13168
+    },
+    {
+      "id": 4,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 4,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 55,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 4,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 4,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 5,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 5,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 823,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 5,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 7,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 5,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 6,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 6,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2102,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 6,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 17,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 6,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 7,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10272,
+      "stack_free": 13168
+    },
+    {
+      "id": 7,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1453,
+      "decoder_peak": 10272,
+      "stack_free": 13168
+    },
+    {
+      "id": 7,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 12,
+      "decoder_peak": 10272,
+      "stack_free": 13168
+    },
+    {
+      "id": 7,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10272,
+      "stack_free": 13168
+    },
+    {
+      "id": 8,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 8,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 56,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 8,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 8,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 9,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 9,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 951,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 9,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 8,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 9,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 10,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 10,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2230,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 10,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 18,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 10,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 11,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 11,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1581,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 11,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 13,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 11,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 12,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 12,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 56,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 12,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 12,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 13,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 13,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 951,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 13,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 8,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 13,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 9760,
+      "stack_free": 13168
+    },
+    {
+      "id": 14,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 14,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2230,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 14,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 18,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 14,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 15,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 15,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1581,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 15,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 13,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 15,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 16,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 16,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 56,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 16,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 16,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 17,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10016,
+      "stack_free": 13168
+    },
+    {
+      "id": 17,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1079,
+      "decoder_peak": 10016,
+      "stack_free": 13168
+    },
+    {
+      "id": 17,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 9,
+      "decoder_peak": 10016,
+      "stack_free": 13168
+    },
+    {
+      "id": 17,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10016,
+      "stack_free": 13168
+    },
+    {
+      "id": 18,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 18,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2230,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 18,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 18,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 18,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 19,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 19,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1581,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 19,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 13,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 19,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10528,
+      "stack_free": 13168
+    },
+    {
+      "id": 20,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 20,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 54,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 20,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 20,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 21,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 5664,
+      "stack_free": 13168
+    },
+    {
+      "id": 21,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 950,
+      "decoder_peak": 5664,
+      "stack_free": 13168
+    },
+    {
+      "id": 21,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 8,
+      "decoder_peak": 5664,
+      "stack_free": 13168
+    },
+    {
+      "id": 21,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 5664,
+      "stack_free": 13168
+    },
+    {
+      "id": 22,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 6432,
+      "stack_free": 13168
+    },
+    {
+      "id": 22,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1589,
+      "decoder_peak": 6432,
+      "stack_free": 13168
+    },
+    {
+      "id": 22,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 13,
+      "decoder_peak": 6432,
+      "stack_free": 13168
+    },
+    {
+      "id": 22,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 6432,
+      "stack_free": 13168
+    },
+    {
+      "id": 23,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 5920,
+      "stack_free": 13168
+    },
+    {
+      "id": 23,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1265,
+      "decoder_peak": 5920,
+      "stack_free": 13168
+    },
+    {
+      "id": 23,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 10,
+      "decoder_peak": 5920,
+      "stack_free": 13168
+    },
+    {
+      "id": 23,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 5920,
+      "stack_free": 13168
+    },
+    {
+      "id": 24,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 24,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 56,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 24,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 24,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 25,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 25,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1847,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 25,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 15,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 25,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 26,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 26,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3126,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 26,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 25,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 26,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 27,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11296,
+      "stack_free": 13168
+    },
+    {
+      "id": 27,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2477,
+      "decoder_peak": 11296,
+      "stack_free": 13168
+    },
+    {
+      "id": 27,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 20,
+      "decoder_peak": 11296,
+      "stack_free": 13168
+    },
+    {
+      "id": 27,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11296,
+      "stack_free": 13168
+    },
+    {
+      "id": 28,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 28,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 57,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 28,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 28,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 29,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 29,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1975,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 29,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 16,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 29,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 30,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 30,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3254,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 30,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 26,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 30,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 31,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 31,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2605,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 31,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 21,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 31,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 32,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 32,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 57,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 32,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 32,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 33,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 33,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1975,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 33,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 16,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 33,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 10784,
+      "stack_free": 13168
+    },
+    {
+      "id": 34,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 34,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3254,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 34,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 26,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 34,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 35,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 35,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2605,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 35,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 21,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 35,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 36,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 36,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 57,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 36,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 36,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 37,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 37,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2103,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 37,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 17,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 37,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11040,
+      "stack_free": 13168
+    },
+    {
+      "id": 38,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 38,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3254,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 38,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 26,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 38,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 39,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 39,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2605,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 39,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 21,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 39,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11552,
+      "stack_free": 13168
+    },
+    {
+      "id": 40,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 40,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 55,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 40,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 40,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 41,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 6176,
+      "stack_free": 13168
+    },
+    {
+      "id": 41,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1462,
+      "decoder_peak": 6176,
+      "stack_free": 13168
+    },
+    {
+      "id": 41,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 12,
+      "decoder_peak": 6176,
+      "stack_free": 13168
+    },
+    {
+      "id": 41,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 6176,
+      "stack_free": 13168
+    },
+    {
+      "id": 42,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 6944,
+      "stack_free": 13168
+    },
+    {
+      "id": 42,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2101,
+      "decoder_peak": 6944,
+      "stack_free": 13168
+    },
+    {
+      "id": 42,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 17,
+      "decoder_peak": 6944,
+      "stack_free": 13168
+    },
+    {
+      "id": 42,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 6944,
+      "stack_free": 13168
+    },
+    {
+      "id": 43,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 6432,
+      "stack_free": 13168
+    },
+    {
+      "id": 43,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1777,
+      "decoder_peak": 6432,
+      "stack_free": 13168
+    },
+    {
+      "id": 43,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 14,
+      "decoder_peak": 6432,
+      "stack_free": 13168
+    },
+    {
+      "id": 43,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 6432,
+      "stack_free": 13168
+    },
+    {
+      "id": 44,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 44,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 57,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 44,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 44,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 45,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 45,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2871,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 45,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 23,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 45,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 46,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 46,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4150,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 46,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 33,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 46,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 47,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12320,
+      "stack_free": 13168
+    },
+    {
+      "id": 47,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3501,
+      "decoder_peak": 12320,
+      "stack_free": 13168
+    },
+    {
+      "id": 47,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 28,
+      "decoder_peak": 12320,
+      "stack_free": 13168
+    },
+    {
+      "id": 47,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12320,
+      "stack_free": 13168
+    },
+    {
+      "id": 48,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 48,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 58,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 48,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 48,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 49,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 49,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2999,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 49,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 24,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 49,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 50,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 50,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4278,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 50,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 34,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 50,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 51,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 51,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3629,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 51,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 29,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 51,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 52,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 52,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 58,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 52,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 52,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 53,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 53,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2999,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 53,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 24,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 53,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 11808,
+      "stack_free": 13168
+    },
+    {
+      "id": 54,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 54,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4278,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 54,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 34,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 54,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 55,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 55,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3629,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 55,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 29,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 55,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 56,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 56,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 58,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 56,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 56,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 57,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 57,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3127,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 57,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 25,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 57,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12064,
+      "stack_free": 13168
+    },
+    {
+      "id": 58,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 58,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4278,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 58,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 34,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 58,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 59,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 59,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3629,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 59,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 29,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 59,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12576,
+      "stack_free": 13168
+    },
+    {
+      "id": 60,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 60,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 55,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 60,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 60,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 61,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 6688,
+      "stack_free": 13168
+    },
+    {
+      "id": 61,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1974,
+      "decoder_peak": 6688,
+      "stack_free": 13168
+    },
+    {
+      "id": 61,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 16,
+      "decoder_peak": 6688,
+      "stack_free": 13168
+    },
+    {
+      "id": 61,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 6688,
+      "stack_free": 13168
+    },
+    {
+      "id": 62,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 7456,
+      "stack_free": 13168
+    },
+    {
+      "id": 62,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2613,
+      "decoder_peak": 7456,
+      "stack_free": 13168
+    },
+    {
+      "id": 62,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 21,
+      "decoder_peak": 7456,
+      "stack_free": 13168
+    },
+    {
+      "id": 62,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 7456,
+      "stack_free": 13168
+    },
+    {
+      "id": 63,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 6944,
+      "stack_free": 13168
+    },
+    {
+      "id": 63,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2289,
+      "decoder_peak": 6944,
+      "stack_free": 13168
+    },
+    {
+      "id": 63,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 19,
+      "decoder_peak": 6944,
+      "stack_free": 13168
+    },
+    {
+      "id": 63,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 6944,
+      "stack_free": 13168
+    },
+    {
+      "id": 64,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 64,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 58,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 64,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 64,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 65,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 65,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3895,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 65,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 31,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 65,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 66,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 66,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5174,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 66,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 41,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 66,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 67,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13344,
+      "stack_free": 13168
+    },
+    {
+      "id": 67,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4525,
+      "decoder_peak": 13344,
+      "stack_free": 13168
+    },
+    {
+      "id": 67,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 36,
+      "decoder_peak": 13344,
+      "stack_free": 13168
+    },
+    {
+      "id": 67,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13344,
+      "stack_free": 13168
+    },
+    {
+      "id": 68,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 68,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 59,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 68,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 68,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 69,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 69,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4023,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 69,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 32,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 69,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 70,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 70,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5302,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 70,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 42,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 70,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 71,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 71,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4653,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 71,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 37,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 71,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 72,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 72,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 59,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 72,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 72,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 73,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 73,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4023,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 73,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 32,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 73,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 12832,
+      "stack_free": 13168
+    },
+    {
+      "id": 74,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 74,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5302,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 74,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 42,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 74,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 75,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 75,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4653,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 75,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 37,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 75,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 76,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 76,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 59,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 76,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 76,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 77,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 77,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4151,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 77,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 33,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 77,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13088,
+      "stack_free": 13168
+    },
+    {
+      "id": 78,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 78,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5302,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 78,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 42,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 78,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 79,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 79,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4653,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 79,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 37,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 79,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13600,
+      "stack_free": 13168
+    },
+    {
+      "id": 80,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 80,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 56,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 80,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 80,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 81,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 7200,
+      "stack_free": 13168
+    },
+    {
+      "id": 81,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2486,
+      "decoder_peak": 7200,
+      "stack_free": 13168
+    },
+    {
+      "id": 81,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 20,
+      "decoder_peak": 7200,
+      "stack_free": 13168
+    },
+    {
+      "id": 81,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 7200,
+      "stack_free": 13168
+    },
+    {
+      "id": 82,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 7968,
+      "stack_free": 13168
+    },
+    {
+      "id": 82,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 3125,
+      "decoder_peak": 7968,
+      "stack_free": 13168
+    },
+    {
+      "id": 82,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 25,
+      "decoder_peak": 7968,
+      "stack_free": 13168
+    },
+    {
+      "id": 82,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 7968,
+      "stack_free": 13168
+    },
+    {
+      "id": 83,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 7456,
+      "stack_free": 13168
+    },
+    {
+      "id": 83,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2801,
+      "decoder_peak": 7456,
+      "stack_free": 13168
+    },
+    {
+      "id": 83,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 23,
+      "decoder_peak": 7456,
+      "stack_free": 13168
+    },
+    {
+      "id": 83,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 7456,
+      "stack_free": 13168
+    },
+    {
+      "id": 84,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 84,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 59,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 84,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 84,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 85,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 85,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4919,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 85,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 39,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 85,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 86,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 86,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6198,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 86,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 49,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 86,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 87,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14368,
+      "stack_free": 13168
+    },
+    {
+      "id": 87,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5549,
+      "decoder_peak": 14368,
+      "stack_free": 13168
+    },
+    {
+      "id": 87,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 44,
+      "decoder_peak": 14368,
+      "stack_free": 13168
+    },
+    {
+      "id": 87,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14368,
+      "stack_free": 13168
+    },
+    {
+      "id": 88,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 88,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 60,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 88,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 88,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 89,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 89,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5047,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 89,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 40,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 89,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 90,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 90,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6326,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 90,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 50,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 90,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 91,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 91,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5677,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 91,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 45,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 91,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 92,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 92,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 60,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 92,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 92,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 93,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 93,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5047,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 93,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 40,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 93,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 13856,
+      "stack_free": 13168
+    },
+    {
+      "id": 94,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 94,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6326,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 94,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 50,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 94,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 95,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 95,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5677,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 95,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 45,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 95,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 96,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 96,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 60,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 96,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 96,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 97,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 97,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5175,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 97,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 41,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 97,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14112,
+      "stack_free": 13168
+    },
+    {
+      "id": 98,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 98,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6326,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 98,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 50,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 98,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 99,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 99,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5677,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 99,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 45,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 99,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14624,
+      "stack_free": 13168
+    },
+    {
+      "id": 100,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 100,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 56,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 100,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 100,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 4896,
+      "stack_free": 13168
+    },
+    {
+      "id": 101,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 7712,
+      "stack_free": 13168
+    },
+    {
+      "id": 101,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2998,
+      "decoder_peak": 7712,
+      "stack_free": 13168
+    },
+    {
+      "id": 101,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 24,
+      "decoder_peak": 7712,
+      "stack_free": 13168
+    },
+    {
+      "id": 101,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 7712,
+      "stack_free": 13168
+    },
+    {
+      "id": 102,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8480,
+      "stack_free": 13168
+    },
+    {
+      "id": 102,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 3637,
+      "decoder_peak": 8480,
+      "stack_free": 13168
+    },
+    {
+      "id": 102,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 29,
+      "decoder_peak": 8480,
+      "stack_free": 13168
+    },
+    {
+      "id": 102,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 8480,
+      "stack_free": 13168
+    },
+    {
+      "id": 103,
+      "schedule": 0,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 7968,
+      "stack_free": 13168
+    },
+    {
+      "id": 103,
+      "schedule": 1,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 3313,
+      "decoder_peak": 7968,
+      "stack_free": 13168
+    },
+    {
+      "id": 103,
+      "schedule": 127,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 27,
+      "decoder_peak": 7968,
+      "stack_free": 13168
+    },
+    {
+      "id": 103,
+      "schedule": 2048,
+      "pcm_bytes": 2048,
+      "callbacks": 2,
+      "feeds": 2,
+      "decoder_peak": 7968,
+      "stack_free": 13168
+    },
+    {
+      "id": 104,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 104,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 60,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 104,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 104,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 105,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 105,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 5943,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 105,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 47,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 105,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 106,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 106,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 7222,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 106,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 57,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 106,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 107,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 15392,
+      "stack_free": 13168
+    },
+    {
+      "id": 107,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6573,
+      "decoder_peak": 15392,
+      "stack_free": 13168
+    },
+    {
+      "id": 107,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 52,
+      "decoder_peak": 15392,
+      "stack_free": 13168
+    },
+    {
+      "id": 107,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 15392,
+      "stack_free": 13168
+    },
+    {
+      "id": 108,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 108,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 61,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 108,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 108,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 109,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 109,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6071,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 109,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 48,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 109,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 110,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 110,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 7350,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 110,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 58,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 110,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 111,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 111,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6701,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 111,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 53,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 111,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 112,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 112,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 61,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 112,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 112,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 113,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 113,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6071,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 113,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 48,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 113,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 3,
+      "decoder_peak": 14880,
+      "stack_free": 13168
+    },
+    {
+      "id": 114,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 114,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 7350,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 114,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 58,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 114,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 115,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 115,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6701,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 115,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 53,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 115,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 116,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 116,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 61,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 116,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 116,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 8992,
+      "stack_free": 13168
+    },
+    {
+      "id": 117,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 117,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6199,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 117,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 49,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 117,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 15136,
+      "stack_free": 13168
+    },
+    {
+      "id": 118,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 118,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 7350,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 118,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 58,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 118,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 16160,
+      "stack_free": 13168
+    },
+    {
+      "id": 119,
+      "schedule": 0,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 1,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 119,
+      "schedule": 1,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 6701,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 119,
+      "schedule": 127,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 53,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 119,
+      "schedule": 2048,
+      "pcm_bytes": 4096,
+      "callbacks": 2,
+      "feeds": 4,
+      "decoder_peak": 15648,
+      "stack_free": 13168
+    },
+    {
+      "id": 120,
+      "schedule": 0,
+      "pcm_bytes": 16658,
+      "callbacks": 17,
+      "feeds": 1,
+      "decoder_peak": 57120,
+      "stack_free": 13168
+    },
+    {
+      "id": 120,
+      "schedule": 1,
+      "pcm_bytes": 16658,
+      "callbacks": 17,
+      "feeds": 24011,
+      "decoder_peak": 57120,
+      "stack_free": 13168
+    },
+    {
+      "id": 120,
+      "schedule": 127,
+      "pcm_bytes": 16658,
+      "callbacks": 17,
+      "feeds": 190,
+      "decoder_peak": 57120,
+      "stack_free": 13168
+    },
+    {
+      "id": 120,
+      "schedule": 2048,
+      "pcm_bytes": 16658,
+      "callbacks": 17,
+      "feeds": 12,
+      "decoder_peak": 57120,
+      "stack_free": 13168
+    },
+    {
+      "id": 121,
+      "schedule": 0,
+      "pcm_bytes": 16658,
+      "callbacks": 17,
+      "feeds": 1,
+      "decoder_peak": 59168,
+      "stack_free": 13168
+    },
+    {
+      "id": 121,
+      "schedule": 1,
+      "pcm_bytes": 16658,
+      "callbacks": 17,
+      "feeds": 26212,
+      "decoder_peak": 59168,
+      "stack_free": 13168
+    },
+    {
+      "id": 121,
+      "schedule": 127,
+      "pcm_bytes": 16658,
+      "callbacks": 17,
+      "feeds": 207,
+      "decoder_peak": 59168,
+      "stack_free": 13168
+    },
+    {
+      "id": 121,
+      "schedule": 2048,
+      "pcm_bytes": 16658,
+      "callbacks": 17,
+      "feeds": 13,
+      "decoder_peak": 59168,
+      "stack_free": 13168
+    },
+    {
+      "id": 122,
+      "schedule": 0,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 1,
+      "decoder_peak": 113440,
+      "stack_free": 13168
+    },
+    {
+      "id": 122,
+      "schedule": 1,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 47959,
+      "decoder_peak": 113440,
+      "stack_free": 13168
+    },
+    {
+      "id": 122,
+      "schedule": 127,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 378,
+      "decoder_peak": 113440,
+      "stack_free": 13168
+    },
+    {
+      "id": 122,
+      "schedule": 2048,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 24,
+      "decoder_peak": 113440,
+      "stack_free": 13168
+    },
+    {
+      "id": 123,
+      "schedule": 0,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 1,
+      "decoder_peak": 117536,
+      "stack_free": 13168
+    },
+    {
+      "id": 123,
+      "schedule": 1,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 52360,
+      "decoder_peak": 117536,
+      "stack_free": 13168
+    },
+    {
+      "id": 123,
+      "schedule": 127,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 413,
+      "decoder_peak": 117536,
+      "stack_free": 13168
+    },
+    {
+      "id": 123,
+      "schedule": 2048,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 26,
+      "decoder_peak": 117536,
+      "stack_free": 13168
+    },
+    {
+      "id": 124,
+      "schedule": 0,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 1,
+      "decoder_peak": 114464,
+      "stack_free": 13168
+    },
+    {
+      "id": 124,
+      "schedule": 1,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 49001,
+      "decoder_peak": 114464,
+      "stack_free": 13168
+    },
+    {
+      "id": 124,
+      "schedule": 127,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 386,
+      "decoder_peak": 114464,
+      "stack_free": 13168
+    },
+    {
+      "id": 124,
+      "schedule": 2048,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 24,
+      "decoder_peak": 114464,
+      "stack_free": 13168
+    },
+    {
+      "id": 125,
+      "schedule": 0,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 1,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 125,
+      "schedule": 1,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 53401,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 125,
+      "schedule": 127,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 421,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 125,
+      "schedule": 2048,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 27,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 126,
+      "schedule": 0,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 1,
+      "decoder_peak": 114464,
+      "stack_free": 13168
+    },
+    {
+      "id": 126,
+      "schedule": 1,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 49001,
+      "decoder_peak": 114464,
+      "stack_free": 13168
+    },
+    {
+      "id": 126,
+      "schedule": 127,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 386,
+      "decoder_peak": 114464,
+      "stack_free": 13168
+    },
+    {
+      "id": 126,
+      "schedule": 2048,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 24,
+      "decoder_peak": 114464,
+      "stack_free": 13168
+    },
+    {
+      "id": 127,
+      "schedule": 0,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 1,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 127,
+      "schedule": 1,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 53401,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 127,
+      "schedule": 127,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 421,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 127,
+      "schedule": 2048,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 27,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 128,
+      "schedule": 0,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 1,
+      "decoder_peak": 115488,
+      "stack_free": 13168
+    },
+    {
+      "id": 128,
+      "schedule": 1,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 50042,
+      "decoder_peak": 115488,
+      "stack_free": 13168
+    },
+    {
+      "id": 128,
+      "schedule": 127,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 395,
+      "decoder_peak": 115488,
+      "stack_free": 13168
+    },
+    {
+      "id": 128,
+      "schedule": 2048,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 25,
+      "decoder_peak": 115488,
+      "stack_free": 13168
+    },
+    {
+      "id": 129,
+      "schedule": 0,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 1,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 129,
+      "schedule": 1,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 53401,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 129,
+      "schedule": 127,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 421,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    },
+    {
+      "id": 129,
+      "schedule": 2048,
+      "pcm_bytes": 33316,
+      "callbacks": 17,
+      "feeds": 27,
+      "decoder_peak": 118560,
+      "stack_free": 13168
+    }
+  ],
+  "guards": 48,
+  "all_bound_inputs_current": true,
+  "warnings": []
+}

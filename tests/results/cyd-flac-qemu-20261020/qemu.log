@@ -1,0 +1,580 @@
+Adding SPI flash device
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0040,len:6272
+load:0x40078000,len:15820
+load:0x40080400,len:3920
+entry 0x40080644
+I (676) boot: ESP-IDF v6.0.2 2nd stage bootloader
+I (677) boot: compile time Oct 20 2026 12:02:36
+I (677) boot: Multicore bootloader
+I (724) boot: chip revision: v0.0
+I (726) boot.esp32: SPI Speed      : 40MHz
+I (726) boot.esp32: SPI Mode       : DIO
+I (726) boot.esp32: SPI Flash Size : 4MB
+I (734) boot: Enabling RNG early entropy source...
+I (745) boot: Partition Table:
+I (746) boot: ## Label            Usage          Type ST Offset   Length
+I (746) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (746) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (746) boot:  2 factory          factory app      00 00 00010000 000f0000
+I (747) boot:  3 fixtures         Unknown data     01 40 00100000 00300000
+I (752) boot: End of partition table
+I (799) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=096d0h ( 38608) map
+I (898) esp_image: segment 1: paddr=000196f8 vaddr=3ffb0000 size=02998h ( 10648) load
+I (922) esp_image: segment 2: paddr=0001c098 vaddr=40080000 size=03f80h ( 16256) load
+I (948) esp_image: segment 3: paddr=00020020 vaddr=400d0020 size=0f9e0h ( 63968) map
+I (974) esp_image: segment 4: paddr=0002fa08 vaddr=40083f80 size=06324h ( 25380) load
+I (998) esp_image: segment 5: paddr=00035d34 vaddr=50000000 size=00028h (    40) load
+I (1061) boot: Loaded app from partition at offset 0x10000
+I (1062) boot: Disabling RNG early entropy source...
+I (1079) cpu_start: Multicore app
+I (2608) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (2612) cpu_start: Pro cpu start user code
+I (2612) cpu_start: cpu freq: 240000000 Hz
+I (2612) app_init: Application information:
+I (2612) app_init: Project name:     cyd_custom_flac_qemu
+I (2612) app_init: App version:      v0.9.693-1894-ge78b154da-dirty
+I (2612) app_init: Compile time:     Oct 20 2026 12:02:12
+I (2613) app_init: ELF file SHA256:  ddaa44712...
+I (2613) app_init: ESP-IDF:          v6.0.2
+I (2613) efuse_init: Min chip rev:     v0.0
+I (2613) efuse_init: Max chip rev:     v3.99 
+I (2613) efuse_init: Chip rev:         v0.0
+I (2614) heap_init: Initializing. RAM available for dynamic allocation:
+I (2615) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (2615) heap_init: At 3FFB3470 len 0002CB90 (178 KiB): DRAM
+I (2615) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (2615) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (2616) heap_init: At 4008A2A4 len 00015D5C (87 KiB): IRAM
+I (2646) spi_flash: detected chip: gd
+I (2652) spi_flash: flash io: dio
+I (2666) main_task: Started on CPU0
+I (2670) main_task: Calling app_main()
+CYD_FLAC_QEMU_BOOT target=esp32 sdk=v6.0.2 arch=xtensa cores=2 owner_core=1 coordinator_core=0 output_frames=512
+CYD_FLAC_QEMU_CASE {"id":0,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13312}
+CYD_FLAC_QEMU_CASE {"id":0,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":54,"decoder_peak":4896,"stack_free":13312}
+CYD_FLAC_QEMU_CASE {"id":0,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13312}
+CYD_FLAC_QEMU_CASE {"id":0,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13312}
+CYD_FLAC_QEMU_CASE {"id":1,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":5152,"stack_free":13312}
+CYD_FLAC_QEMU_CASE {"id":1,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":438,"decoder_peak":5152,"stack_free":13312}
+CYD_FLAC_QEMU_CASE {"id":1,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":4,"decoder_peak":5152,"stack_free":13312}
+CYD_FLAC_QEMU_CASE {"id":1,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":5152,"stack_free":13312}
+CYD_FLAC_QEMU_CASE {"id":2,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":5920,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":2,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":1077,"decoder_peak":5920,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":2,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":9,"decoder_peak":5920,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":2,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":5920,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":3,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":5408,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":3,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":753,"decoder_peak":5408,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":3,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":6,"decoder_peak":5408,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":3,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":5408,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":4,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":4,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":55,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":4,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":4,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":5,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":5,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":823,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":5,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":7,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":5,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":6,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":6,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2102,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":6,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":17,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":6,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":7,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10272,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":7,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":1453,"decoder_peak":10272,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":7,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":12,"decoder_peak":10272,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":7,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10272,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":8,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":8,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":56,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":8,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":8,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":9,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":9,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":951,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":9,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":8,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":9,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":10,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":10,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2230,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":10,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":18,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":10,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":11,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":11,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":1581,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":11,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":13,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":11,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":12,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":12,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":56,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":12,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":12,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":13,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":13,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":951,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":13,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":8,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":13,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":9760,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":14,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":14,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2230,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":14,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":18,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":14,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":15,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":15,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":1581,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":15,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":13,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":15,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":16,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":16,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":56,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":16,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":16,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":17,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10016,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":17,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":1079,"decoder_peak":10016,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":17,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":9,"decoder_peak":10016,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":17,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10016,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":18,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":18,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2230,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":18,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":18,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":18,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":19,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":19,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":1581,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":19,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":13,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":19,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10528,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":20,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":20,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":54,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":20,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":20,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":21,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":5664,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":21,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":950,"decoder_peak":5664,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":21,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":8,"decoder_peak":5664,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":21,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":5664,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":22,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":6432,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":22,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":1589,"decoder_peak":6432,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":22,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":13,"decoder_peak":6432,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":22,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":6432,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":23,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":5920,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":23,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":1265,"decoder_peak":5920,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":23,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":10,"decoder_peak":5920,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":23,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":5920,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":24,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":24,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":56,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":24,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":24,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":25,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":25,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":1847,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":25,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":15,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":25,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":26,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":26,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":3126,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":26,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":25,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":26,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":27,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11296,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":27,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2477,"decoder_peak":11296,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":27,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":20,"decoder_peak":11296,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":27,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11296,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":28,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":28,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":57,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":28,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":28,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":29,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":29,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":1975,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":29,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":16,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":29,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":30,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":30,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":3254,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":30,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":26,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":30,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":31,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":31,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2605,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":31,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":21,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":31,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":32,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":32,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":57,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":32,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":32,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":33,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":33,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":1975,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":33,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":16,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":33,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":10784,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":34,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":34,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":3254,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":34,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":26,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":34,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":35,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":35,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2605,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":35,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":21,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":35,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":36,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":36,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":57,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":36,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":36,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":37,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":37,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2103,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":37,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":17,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":37,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11040,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":38,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":38,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":3254,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":38,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":26,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":38,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":39,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":39,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2605,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":39,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":21,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":39,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11552,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":40,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":40,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":55,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":40,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":40,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":41,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":6176,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":41,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":1462,"decoder_peak":6176,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":41,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":12,"decoder_peak":6176,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":41,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":6176,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":42,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":6944,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":42,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":2101,"decoder_peak":6944,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":42,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":17,"decoder_peak":6944,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":42,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":2,"decoder_peak":6944,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":43,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":6432,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":43,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":1777,"decoder_peak":6432,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":43,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":14,"decoder_peak":6432,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":43,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":6432,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":44,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":44,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":57,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":44,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":44,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":45,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":45,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2871,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":45,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":23,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":45,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":46,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":46,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4150,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":46,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":33,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":46,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":47,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12320,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":47,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":3501,"decoder_peak":12320,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":47,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":28,"decoder_peak":12320,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":47,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12320,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":48,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":48,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":58,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":48,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":48,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":49,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":49,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2999,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":49,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":24,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":49,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":50,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":50,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4278,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":50,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":34,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":50,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":51,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":51,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":3629,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":51,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":29,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":51,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":52,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":52,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":58,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":52,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":52,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":53,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":53,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":2999,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":53,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":24,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":53,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":11808,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":54,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":54,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4278,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":54,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":34,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":54,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":55,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":55,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":3629,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":55,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":29,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":55,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":56,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":56,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":58,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":56,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":56,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":57,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":57,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":3127,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":57,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":25,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":57,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12064,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":58,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":58,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4278,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":58,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":34,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":58,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":59,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":59,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":3629,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":59,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":29,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":59,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12576,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":60,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":60,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":55,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":60,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":60,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":61,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":6688,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":61,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":1974,"decoder_peak":6688,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":61,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":16,"decoder_peak":6688,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":61,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":6688,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":62,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":7456,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":62,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":2613,"decoder_peak":7456,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":62,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":21,"decoder_peak":7456,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":62,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":2,"decoder_peak":7456,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":63,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":6944,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":63,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":2289,"decoder_peak":6944,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":63,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":19,"decoder_peak":6944,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":63,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":2,"decoder_peak":6944,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":64,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":64,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":58,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":64,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":64,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":65,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":65,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":3895,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":65,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":31,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":65,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":66,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":66,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5174,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":66,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":41,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":66,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":67,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13344,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":67,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4525,"decoder_peak":13344,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":67,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":36,"decoder_peak":13344,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":67,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13344,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":68,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":68,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":59,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":68,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":68,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":69,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":69,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4023,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":69,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":32,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":69,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":70,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":70,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5302,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":70,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":42,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":70,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":71,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":71,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4653,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":71,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":37,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":71,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":72,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":72,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":59,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":72,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":72,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":73,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":73,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4023,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":73,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":32,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":73,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":2,"decoder_peak":12832,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":74,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":74,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5302,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":74,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":42,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":74,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":75,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":75,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4653,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":75,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":37,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":75,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":76,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":76,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":59,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":76,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":76,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":77,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":77,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4151,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":77,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":33,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":77,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13088,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":78,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":78,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5302,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":78,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":42,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":78,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":79,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":79,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4653,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":79,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":37,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":79,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13600,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":80,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":80,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":56,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":80,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":80,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":81,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":7200,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":81,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":2486,"decoder_peak":7200,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":81,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":20,"decoder_peak":7200,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":81,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":2,"decoder_peak":7200,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":82,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":7968,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":82,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":3125,"decoder_peak":7968,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":82,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":25,"decoder_peak":7968,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":82,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":2,"decoder_peak":7968,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":83,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":7456,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":83,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":2801,"decoder_peak":7456,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":83,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":23,"decoder_peak":7456,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":83,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":2,"decoder_peak":7456,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":84,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":84,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":59,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":84,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":84,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":85,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":85,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":4919,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":85,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":39,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":85,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":86,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":86,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6198,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":86,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":49,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":86,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":87,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14368,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":87,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5549,"decoder_peak":14368,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":87,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":44,"decoder_peak":14368,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":87,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14368,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":88,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":88,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":60,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":88,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":88,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":89,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":89,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5047,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":89,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":40,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":89,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":90,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":90,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6326,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":90,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":50,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":90,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":91,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":91,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5677,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":91,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":45,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":91,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":92,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":92,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":60,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":92,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":92,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":93,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":93,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5047,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":93,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":40,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":93,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":13856,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":94,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":94,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6326,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":94,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":50,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":94,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":95,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":95,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5677,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":95,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":45,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":95,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":96,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":96,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":60,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":96,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":96,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":97,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":97,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5175,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":97,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":41,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":97,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14112,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":98,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":98,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6326,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":98,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":50,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":98,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":99,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":99,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5677,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":99,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":45,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":99,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14624,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":100,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":100,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":56,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":100,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":100,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":4896,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":101,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":7712,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":101,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":2998,"decoder_peak":7712,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":101,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":24,"decoder_peak":7712,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":101,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":2,"decoder_peak":7712,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":102,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":8480,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":102,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":3637,"decoder_peak":8480,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":102,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":29,"decoder_peak":8480,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":102,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":2,"decoder_peak":8480,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":103,"schedule":0,"pcm_bytes":2048,"callbacks":2,"feeds":1,"decoder_peak":7968,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":103,"schedule":1,"pcm_bytes":2048,"callbacks":2,"feeds":3313,"decoder_peak":7968,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":103,"schedule":127,"pcm_bytes":2048,"callbacks":2,"feeds":27,"decoder_peak":7968,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":103,"schedule":2048,"pcm_bytes":2048,"callbacks":2,"feeds":2,"decoder_peak":7968,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":104,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":104,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":60,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":104,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":104,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":105,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":105,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":5943,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":105,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":47,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":105,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":106,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":106,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":7222,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":106,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":57,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":106,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":107,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":15392,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":107,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6573,"decoder_peak":15392,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":107,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":52,"decoder_peak":15392,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":107,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":15392,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":108,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":108,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":61,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":108,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":108,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":109,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":109,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6071,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":109,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":48,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":109,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":110,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":110,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":7350,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":110,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":58,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":110,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":111,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":111,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6701,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":111,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":53,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":111,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":112,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":112,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":61,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":112,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":112,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":113,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":113,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6071,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":113,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":48,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":113,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":3,"decoder_peak":14880,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":114,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":114,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":7350,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":114,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":58,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":114,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":115,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":115,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6701,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":115,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":53,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":115,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":116,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":116,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":61,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":116,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":116,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":8992,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":117,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":117,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6199,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":117,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":49,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":117,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":15136,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":118,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":118,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":7350,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":118,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":58,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":118,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":16160,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":119,"schedule":0,"pcm_bytes":4096,"callbacks":2,"feeds":1,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":119,"schedule":1,"pcm_bytes":4096,"callbacks":2,"feeds":6701,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":119,"schedule":127,"pcm_bytes":4096,"callbacks":2,"feeds":53,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":119,"schedule":2048,"pcm_bytes":4096,"callbacks":2,"feeds":4,"decoder_peak":15648,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":120,"schedule":0,"pcm_bytes":16658,"callbacks":17,"feeds":1,"decoder_peak":57120,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":120,"schedule":1,"pcm_bytes":16658,"callbacks":17,"feeds":24011,"decoder_peak":57120,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":120,"schedule":127,"pcm_bytes":16658,"callbacks":17,"feeds":190,"decoder_peak":57120,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":120,"schedule":2048,"pcm_bytes":16658,"callbacks":17,"feeds":12,"decoder_peak":57120,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":121,"schedule":0,"pcm_bytes":16658,"callbacks":17,"feeds":1,"decoder_peak":59168,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":121,"schedule":1,"pcm_bytes":16658,"callbacks":17,"feeds":26212,"decoder_peak":59168,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":121,"schedule":127,"pcm_bytes":16658,"callbacks":17,"feeds":207,"decoder_peak":59168,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":121,"schedule":2048,"pcm_bytes":16658,"callbacks":17,"feeds":13,"decoder_peak":59168,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":122,"schedule":0,"pcm_bytes":33316,"callbacks":17,"feeds":1,"decoder_peak":113440,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":122,"schedule":1,"pcm_bytes":33316,"callbacks":17,"feeds":47959,"decoder_peak":113440,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":122,"schedule":127,"pcm_bytes":33316,"callbacks":17,"feeds":378,"decoder_peak":113440,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":122,"schedule":2048,"pcm_bytes":33316,"callbacks":17,"feeds":24,"decoder_peak":113440,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":123,"schedule":0,"pcm_bytes":33316,"callbacks":17,"feeds":1,"decoder_peak":117536,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":123,"schedule":1,"pcm_bytes":33316,"callbacks":17,"feeds":52360,"decoder_peak":117536,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":123,"schedule":127,"pcm_bytes":33316,"callbacks":17,"feeds":413,"decoder_peak":117536,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":123,"schedule":2048,"pcm_bytes":33316,"callbacks":17,"feeds":26,"decoder_peak":117536,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":124,"schedule":0,"pcm_bytes":33316,"callbacks":17,"feeds":1,"decoder_peak":114464,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":124,"schedule":1,"pcm_bytes":33316,"callbacks":17,"feeds":49001,"decoder_peak":114464,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":124,"schedule":127,"pcm_bytes":33316,"callbacks":17,"feeds":386,"decoder_peak":114464,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":124,"schedule":2048,"pcm_bytes":33316,"callbacks":17,"feeds":24,"decoder_peak":114464,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":125,"schedule":0,"pcm_bytes":33316,"callbacks":17,"feeds":1,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":125,"schedule":1,"pcm_bytes":33316,"callbacks":17,"feeds":53401,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":125,"schedule":127,"pcm_bytes":33316,"callbacks":17,"feeds":421,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":125,"schedule":2048,"pcm_bytes":33316,"callbacks":17,"feeds":27,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":126,"schedule":0,"pcm_bytes":33316,"callbacks":17,"feeds":1,"decoder_peak":114464,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":126,"schedule":1,"pcm_bytes":33316,"callbacks":17,"feeds":49001,"decoder_peak":114464,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":126,"schedule":127,"pcm_bytes":33316,"callbacks":17,"feeds":386,"decoder_peak":114464,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":126,"schedule":2048,"pcm_bytes":33316,"callbacks":17,"feeds":24,"decoder_peak":114464,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":127,"schedule":0,"pcm_bytes":33316,"callbacks":17,"feeds":1,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":127,"schedule":1,"pcm_bytes":33316,"callbacks":17,"feeds":53401,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":127,"schedule":127,"pcm_bytes":33316,"callbacks":17,"feeds":421,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":127,"schedule":2048,"pcm_bytes":33316,"callbacks":17,"feeds":27,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":128,"schedule":0,"pcm_bytes":33316,"callbacks":17,"feeds":1,"decoder_peak":115488,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":128,"schedule":1,"pcm_bytes":33316,"callbacks":17,"feeds":50042,"decoder_peak":115488,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":128,"schedule":127,"pcm_bytes":33316,"callbacks":17,"feeds":395,"decoder_peak":115488,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":128,"schedule":2048,"pcm_bytes":33316,"callbacks":17,"feeds":25,"decoder_peak":115488,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":129,"schedule":0,"pcm_bytes":33316,"callbacks":17,"feeds":1,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":129,"schedule":1,"pcm_bytes":33316,"callbacks":17,"feeds":53401,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":129,"schedule":127,"pcm_bytes":33316,"callbacks":17,"feeds":421,"decoder_peak":118560,"stack_free":13168}
+CYD_FLAC_QEMU_CASE {"id":129,"schedule":2048,"pcm_bytes":33316,"callbacks":17,"feeds":27,"decoder_peak":118560,"stack_free":13168}
+E (96244) custom_flac: FLAC metadata is too large: 65537 bytes
+CYD_FLAC_QEMU_COMPLETE fixtures=130 cases=520 guards=48 byte_compare=1 heap_integrity=1 owner_core=1 coordinator_core=0 actual_cyd_task=0 oom_injection=0 hardware=0

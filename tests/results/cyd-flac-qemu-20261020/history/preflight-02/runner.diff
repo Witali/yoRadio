@@ -1,0 +1,11 @@
+--- 
++++ 
+@@ -52,7 +52,7 @@
+     powershell_value=args.powershell or shutil.which('pwsh.exe') or shutil.which('pwsh')
+     if not ffmpeg_value or not powershell_value:parser.error('FFmpeg and PowerShell7 are required')
+     ffmpeg=Path(ffmpeg_value).resolve();powershell=Path(powershell_value).resolve()
+-    if any(out==path or out.is_relative_to(path) for path in (sdk,idf_tools,qemu.parent,rom_directory,ffmpeg.parent)):
++    if any(out==path or out.is_relative_to(path) for path in (sdk,idf_tools,idf_python.parent,qemu.parent,rom_directory,ffmpeg.parent,powershell.parent)):
+         parser.error('Output must not overlap installed SDK/tool/ROM directories')
+     if not out.is_relative_to(ROOT/'.build'):
+         enclosing=next((path for path in out.parents if (path/'.git').exists()),None)

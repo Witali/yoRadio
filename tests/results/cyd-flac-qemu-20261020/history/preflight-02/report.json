@@ -1,0 +1,39 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "case": "portable-pwsh",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-qemu.py",
+        "--output",
+        ".build/portable-pwsh-preflight/results",
+        "--powershell",
+        ".build/portable-pwsh-preflight/pwsh.exe"
+      ],
+      "status": 2,
+      "diagnostic": "usage: run-cyd-flac-qemu.py [-h] --output OUTPUT [--idf IDF]\r\n                            [--idf-tools IDF_TOOLS] [--idf-python IDF_PYTHON]\r\n                            [--qemu QEMU] [--rom-directory ROM_DIRECTORY]\r\n                            [--ffmpeg FFMPEG] [--powershell POWERSHELL]\r\n                            [--build-timeout BUILD_TIMEOUT]\r\n                            [--qemu-timeout QEMU_TIMEOUT]\r\nrun-cyd-flac-qemu.py: error: Output must not overlap installed SDK/tool/ROM directories\r\n",
+      "created": false
+    },
+    {
+      "case": "portable-python",
+      "command": [
+        "C:\\Work\\yoRadio\\.idf\\python-3.12.10\\tools\\python.exe",
+        "-X",
+        "utf8",
+        "C:\\Work\\yoRadio\\.worktree\\esp32-cyd-c3-review\\tests\\run-cyd-flac-qemu.py",
+        "--output",
+        ".build/portable-python-preflight/results",
+        "--idf-python",
+        ".build/portable-python-preflight/python.exe"
+      ],
+      "status": 2,
+      "diagnostic": "usage: run-cyd-flac-qemu.py [-h] --output OUTPUT [--idf IDF]\r\n                            [--idf-tools IDF_TOOLS] [--idf-python IDF_PYTHON]\r\n                            [--qemu QEMU] [--rom-directory ROM_DIRECTORY]\r\n                            [--ffmpeg FFMPEG] [--powershell POWERSHELL]\r\n                            [--build-timeout BUILD_TIMEOUT]\r\n                            [--qemu-timeout QEMU_TIMEOUT]\r\nrun-cyd-flac-qemu.py: error: Output must not overlap installed SDK/tool/ROM directories\r\n",
+      "created": false
+    }
+  ],
+  "runner_sha256": "3161ce38cbf0f6f34cb5889fc6c0369533f9ce3b6129e6feb0505ae1bd670206",
+  "previous_reports_unchanged": true
+}
